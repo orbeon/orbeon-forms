@@ -50,6 +50,8 @@ trait FormRunnerProcessor {
 @JSExportTopLevel("FormRunnerOffline")
 object FormRunnerOffline extends App with FormRunnerProcessor {
 
+  import Private._
+
   def onOrbeonApiLoaded(): Unit = {
     XFormsApp.onOrbeonApiLoaded(LocalClientServerChannel)
     FormRunnerApp.onOrbeonApiLoaded2()
@@ -85,40 +87,26 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     this
   }
 
-  private val FormRunnerFunctionLibraryList: FunctionLibrary = {
-
-    val formRunnerLibraries =
-      List(
-        FormRunnerFunctionLibrary,
-        FormRunnerInternalFunctionLibrary,
-        FormRunnerDateSupportFunctionLibrary,
-        FormRunnerErrorSummaryFunctionLibrary,
-        FormRunnerSecureUtilsFunctionLibrary,
-        FormRunnerPersistenceFunctionLibrary,
-        FormRunnerGridDataMigrationFunctionLibrary,
-        FormRunnerSimpleDataMigrationFunctionLibrary,
-        FormRunnerNumberSupportFunctionLibrary,
-        FormRunnerWizardFunctionLibrary,
-        FormRunnerFileMetadataFunctionLibrary
-      )
-
-      new FunctionLibraryList |!> (fll =>
-        (OfflineDemo.XFormsFunctionLibraries.iterator ++ formRunnerLibraries).foreach(fll.addFunctionLibrary)
-      )
-  }
-
-  private def compileForm(
+  @JSExport
+  def compileAndCacheFormIfNeeded(
     serializedForm  : SerializedForm,
-    functionLibrary : FunctionLibrary
-  ): CompiledForm =
-    OfflineDemo.compileForm(
-      serializedForm,
-      functionLibrary
-    )
+    appName         : String, // needed for the cache!
+    formName        : String, // needed for the cache!
+    formVersion     : Int     // needed for the cache!
+  ): CompiledForm = {
 
-  private case class CacheKey(appName: String, formName: String, formVersion: Int)
+    val cacheKey = CacheKey(appName, formName, formVersion)
 
-  private var staticStateCache = Map[CacheKey, CompiledForm]()
+    staticStateCache.getOrElse(cacheKey, {
+      val result =
+        OfflineDemo.compileForm(
+          serializedForm,
+          FormRunnerFunctionLibraryList
+        )
+      staticStateCache += cacheKey -> result
+      result
+    })
+  }
 
   @JSExport
   def renderForm(
@@ -126,25 +114,16 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     serializedForm : SerializedForm,
     appName        : String, // needed for the cache!
     formName       : String, // needed for the cache!
+    formVersion    : Int,    // needed for the cache!
     mode           : String,
     documentId     : js.UndefOr[String]
-  ): Unit = { // TODO: js.Promise[Something]
+  ): Unit = {// TODO: js.Promise[Something]
 
-    //XXX TODO: version
-    val formVersion = 1
-
-    val cacheKey = CacheKey(appName, formName, formVersion)
-
-    val compiledForm =
-      staticStateCache.getOrElse(cacheKey, {
-        val result = compileForm(serializedForm, FormRunnerFunctionLibraryList)
-        staticStateCache += cacheKey -> result
-        result
-      })
+    configure(DemoSubmissionProvider)
 
     OfflineDemo.renderCompiledForm(
       container,
-      compiledForm,
+      compileAndCacheFormIfNeeded(serializedForm, appName, formName, formVersion),
       FormRunnerFunctionLibraryList,
       Some(
         new XFormsURIResolver {
@@ -176,18 +155,50 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
 
   @JSExport
   def testFetchForm(
-    appName    : String,
-    formName   : String
+    appName     : String,
+    formName    : String,
+    formVersion : Int
   ): js.Promise[SerializedForm] = {
 
     configure(DemoSubmissionProvider)
 
     val future =
-      OfflineDemo.fetchSerializedFormForTesting(s"${OfflineDemo.findBasePathForTesting}/fr/service/$appName/$formName/compile") map { serializedForm =>
-        println(s"fetched serialized form from server for `$appName`/`$formName`, string length: ${serializedForm.size}")
+      OfflineDemo.fetchSerializedFormForTesting(
+        s"${OfflineDemo.findBasePathForTesting}/fr/service/$appName/$formName/compile?form-version=$formVersion"
+      ) map { serializedForm =>
+        println(s"fetched serialized form from server for `$appName`/`$formName`/`$formVersion`, string length: ${serializedForm.size}")
         serializedForm
       }
 
     future.toJSPromise
+  }
+
+  private object Private {
+
+    val FormRunnerFunctionLibraryList: FunctionLibrary = {
+
+      val formRunnerLibraries =
+        List(
+          FormRunnerFunctionLibrary,
+          FormRunnerInternalFunctionLibrary,
+          FormRunnerDateSupportFunctionLibrary,
+          FormRunnerErrorSummaryFunctionLibrary,
+          FormRunnerSecureUtilsFunctionLibrary,
+          FormRunnerPersistenceFunctionLibrary,
+          FormRunnerGridDataMigrationFunctionLibrary,
+          FormRunnerSimpleDataMigrationFunctionLibrary,
+          FormRunnerNumberSupportFunctionLibrary,
+          FormRunnerWizardFunctionLibrary,
+          FormRunnerFileMetadataFunctionLibrary
+        )
+
+      new FunctionLibraryList |!> (fll =>
+        (OfflineDemo.XFormsFunctionLibraries.iterator ++ formRunnerLibraries).foreach(fll.addFunctionLibrary)
+      )
+    }
+
+    case class CacheKey(appName: String, formName: String, formVersion: Int)
+
+    var staticStateCache = Map[CacheKey, CompiledForm]()
   }
 }

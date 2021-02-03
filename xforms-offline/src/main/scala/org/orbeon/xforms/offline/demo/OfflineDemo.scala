@@ -7,7 +7,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.library.{EXFormsFunctions, XFormsFunctionLibrary, XXFormsFunctionLibrary}
+import org.orbeon.oxf.xforms.library.{EXFormsFunctions, SaxonFunctionLibrary, XFormsFunctionLibrary, XXFormsFunctionLibrary}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLOutput
 import org.orbeon.oxf.xforms.state.XFormsStateManager
@@ -27,7 +27,6 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.|
-
 
 @JSExportTopLevel("OrbeonOffline")
 object OfflineDemo extends App {
@@ -80,7 +79,8 @@ object OfflineDemo extends App {
     List(
       XFormsFunctionLibrary,
       XXFormsFunctionLibrary,
-      EXFormsFunctions
+      EXFormsFunctions,
+      SaxonFunctionLibrary
     )
 
   private val XFormsFunctionLibraryList: FunctionLibrary =

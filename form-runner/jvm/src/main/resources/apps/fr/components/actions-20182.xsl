@@ -707,7 +707,10 @@
 
             <!-- Delegate the rest to common implementation. We should not duplicate much of the code above either, but
                  the problem is the evaluation of `response-items`, 'item-label', and 'item-value', which must take place
-                 in a context where variables are available, so we cannot use `saxon:evaluate()`. -->
+                 in a context where variables are available, so we cannot use `saxon:evaluate()`/`xxf:evaluate()`.
+
+                 2021-02-02: Q: The offline `xxf:evaluate()` scopes variables. Maybe the older implementation doesn't?
+            -->
             <xf:dispatch name="fr-call-itemset-action" targetid="fr-form-instance">
                 <xf:property name="control-name"       value="'{$to-control-name}'"/>
                 <xf:property name="new-itemset-id"     value="$new-itemset-id"/>

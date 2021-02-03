@@ -301,7 +301,7 @@ object XPathCache extends XPathCacheTrait {
     functionContext     : FunctionContext,
     baseURI             : String,
     locationData        : LocationData,
-    reporter: Reporter
+    reporter            : Reporter
   ): String =
     evaluateAsAvt(
       Seq(contextItem).asJava,

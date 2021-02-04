@@ -7,6 +7,7 @@ import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.event.XFormsServer
 import org.orbeon.oxf.xforms.state.RequestParameters
+import org.orbeon.xforms.offline.{DomDocumentFragmentXMLReceiver, OfflineExternalContext}
 import org.orbeon.xforms.rpc.{ClientServerChannel, WireAjaxEvent}
 import org.orbeon.xforms.{Namespaces, StateHandling}
 import org.scalajs.dom
@@ -25,7 +26,7 @@ object LocalClientServerChannel extends ClientServerChannel[dom.Document] {
     showProgress      : Boolean,
     ignoreErrors      : Boolean
   ): Future[dom.Document] =
-    CoreCrossPlatformSupport.withExternalContext(DemoExternalContext.newExternalContext) {
+    CoreCrossPlatformSupport.withExternalContext(OfflineExternalContext.newExternalContext) {
 
       implicit val ec    : ExternalContext = CoreCrossPlatformSupport.externalContext
       implicit val logger: IndentedLogger  = Loggers.getIndentedLogger("offline")

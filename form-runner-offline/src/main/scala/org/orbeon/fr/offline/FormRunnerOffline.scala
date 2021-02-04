@@ -2,26 +2,32 @@ package org.orbeon.fr.offline
 
 import org.log4s.{Debug, Info}
 import org.orbeon.dom.{Document, Element}
+import org.orbeon.facades.{JSZip, TextDecoder}
 import org.orbeon.fr.FormRunnerApp
 import org.orbeon.oxf.fr.library._
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.xforms.embedding.SubmissionProvider
-import org.orbeon.xforms.offline.demo.OfflineDemo.{CompiledForm, SerializedForm}
-import org.orbeon.xforms.offline.demo.{LocalClientServerChannel, OfflineDemo}
+import org.orbeon.xforms.offline.OfflineSupport
+import org.orbeon.xforms.offline.OfflineSupport.{CompiledForm, RuntimeForm, SerializedBundle}
+import org.orbeon.xforms.offline.demo.LocalClientServerChannel
 import org.orbeon.xforms.{App, XFormsApp}
 import org.scalajs.dom.html
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.RegExp
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.typedarray.Uint8Array
 
 
 trait FormRunnerProcessor {
@@ -44,7 +50,7 @@ trait FormRunnerProcessor {
 
   @JSExport
   def destroyForm(container: html.Element): Unit =
-    OfflineDemo.destroyForm(container)
+    OfflineSupport.destroyForm(container)
 }
 
 @JSExportTopLevel("FormRunnerOffline")
@@ -89,85 +95,134 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
 
   @JSExport
   def compileAndCacheFormIfNeeded(
-    serializedForm  : SerializedForm,
-    appName         : String, // needed for the cache!
-    formName        : String, // needed for the cache!
-    formVersion     : Int     // needed for the cache!
-  ): CompiledForm = {
+    serializedBundle : SerializedBundle,
+    appName          : String, // needed for the cache!
+    formName         : String, // needed for the cache!
+    formVersion      : Int     // needed for the cache!
+  ): js.Promise[CompiledForm] =
+    compileAndCacheFormIfNeededF(
+      serializedBundle,
+      appName,
+      formName,
+      formVersion
+    ).toJSPromise
+
+  private def compileAndCacheFormIfNeededF(
+    serializedBundle : SerializedBundle,
+    appName          : String, // needed for the cache!
+    formName         : String, // needed for the cache!
+    formVersion      : Int     // needed for the cache!
+  ): Future[CompiledForm] = {
 
     val cacheKey = CacheKey(appName, formName, formVersion)
 
-    staticStateCache.getOrElse(cacheKey, {
-      val result =
-        OfflineDemo.compileForm(
-          serializedForm,
-          FormRunnerFunctionLibraryList
-        )
-      staticStateCache += cacheKey -> result
-      result
-    })
+    staticStateCache.get(cacheKey) match {
+      case Some(compiledForm) =>
+        Future(compiledForm)
+      case None =>
+
+        val jsonStringF =
+          (serializedBundle: Any) match {
+            case v: Uint8Array =>
+              JSZip.loadAsync(v.buffer).toFuture flatMap { jsZip =>
+                jsZip.file(new RegExp("form\\.json")).headOption match { // first `form.json` in the Zip
+                  case Some(zipObject) => zipObject.async("uint8array").toFuture map (b => new TextDecoder().decode(b))
+                  case None            => Future.failed(new IllegalArgumentException("missing `form.json` in Zip archive"))
+                }
+              }
+            case v: String => Future(v)
+          }
+
+        jsonStringF map { serializedForm =>
+          val result =
+            OfflineSupport.compileForm(
+              serializedForm,
+              FormRunnerFunctionLibraryList
+            )
+          staticStateCache += cacheKey -> result
+          result
+        }
+    }
   }
 
   @JSExport
   def renderForm(
-    container      : html.Element,
-    serializedForm : SerializedForm,
-    appName        : String, // needed for the cache!
-    formName       : String, // needed for the cache!
-    formVersion    : Int,    // needed for the cache!
-    mode           : String,
-    documentId     : js.UndefOr[String]
-  ): Unit = {// TODO: js.Promise[Something]
+    container        : html.Element,
+    serializedBundle : SerializedBundle,
+    appName          : String, // needed for the cache!
+    formName         : String, // needed for the cache!
+    formVersion      : Int,    // needed for the cache!
+    mode             : String,
+    documentId       : js.UndefOr[String]
+  ): js.Promise[RuntimeForm] = {
 
     configure(DemoSubmissionProvider)
 
-    OfflineDemo.renderCompiledForm(
-      container,
-      compileAndCacheFormIfNeeded(serializedForm, appName, formName, formVersion),
-      FormRunnerFunctionLibraryList,
-      Some(
-        new XFormsURIResolver {
-          def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
-            urlString match {
-              case "input:instance" =>
+    val future =
+      compileAndCacheFormIfNeededF(serializedBundle, appName, formName, formVersion) map { compiledFormF =>
+        OfflineSupport.renderCompiledForm(
+          container,
+          compiledFormF,
+          FormRunnerFunctionLibraryList,
+          Some(
+            new XFormsURIResolver {
+              def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
+                urlString match {
+                  case "input:instance" =>
 
-                val root = Element("request")
+                    val root = Element("request")
 
-                root.addElement("app").addText(appName)
-                root.addElement("form").addText(formName)
-                root.addElement("form-version").addText(formVersion.toString)
-                val documentElem = root.addElement("document")
-                documentId foreach documentElem.addText
-                root.addElement("mode").addText(mode)
+                    root.addElement("app").addText(appName)
+                    root.addElement("form").addText(formName)
+                    root.addElement("form-version").addText(formVersion.toString)
+                    val documentElem = root.addElement("document")
+                    documentId foreach documentElem.addText
+                    root.addElement("mode").addText(mode)
 
-                Document(root)
-              case _ =>
-                throw new UnsupportedOperationException(s"resolving `$urlString")
+                    Document(root)
+                  case _ =>
+                    throw new UnsupportedOperationException(s"resolving `$urlString")
+                }
+
+              def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo = {
+                throw new UnsupportedOperationException(s"resolving readonly `$urlString")
+              }
             }
+          )
+        )
+      }
 
-          def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo = {
-            throw new UnsupportedOperationException(s"resolving readonly `$urlString")
-          }
-        }
-      )
-    )
+    future.toJSPromise
   }
 
   @JSExport
   def testFetchForm(
     appName     : String,
     formName    : String,
-    formVersion : Int
-  ): js.Promise[SerializedForm] = {
+    formVersion : Int,
+    zip         : Boolean
+  ): js.Promise[SerializedBundle] = {
 
     configure(DemoSubmissionProvider)
 
+    val query =
+      PathUtils.recombineQuery(
+        s"${OfflineSupport.findBasePathForTesting}/fr/service/$appName/$formName/compile",
+        ("form-version" -> formVersion.toString) :: (zip list ("format" -> "zip"))
+      )
+
     val future =
-      OfflineDemo.fetchSerializedFormForTesting(
-        s"${OfflineDemo.findBasePathForTesting}/fr/service/$appName/$formName/compile?form-version=$formVersion"
-      ) map { serializedForm =>
-        println(s"fetched serialized form from server for `$appName`/`$formName`/`$formVersion`, string length: ${serializedForm.size}")
-        serializedForm
+      OfflineSupport.fetchSerializedFormForTesting(query) map { serializedBundle =>
+
+        val (resType, resLength) =
+          (serializedBundle: Any) match {
+            case v: Uint8Array => ("Uint8Array", v.length)
+            case v: String     => ("String", v.length)
+          }
+
+        println(s"fetched serialized form from server for `$query`, type: $resType, length: $resLength")
+
+        serializedBundle
       }
 
     future.toJSPromise
@@ -193,7 +248,7 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
         )
 
       new FunctionLibraryList |!> (fll =>
-        (OfflineDemo.XFormsFunctionLibraries.iterator ++ formRunnerLibraries).foreach(fll.addFunctionLibrary)
+        (OfflineSupport.XFormsFunctionLibraries.iterator ++ formRunnerLibraries).foreach(fll.addFunctionLibrary)
       )
     }
 

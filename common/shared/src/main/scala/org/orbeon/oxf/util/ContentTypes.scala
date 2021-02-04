@@ -23,6 +23,7 @@ object ContentTypes {
   val XhtmlContentType          = "application/xhtml+xml"
   val JavaScriptContentType     = "application/javascript"
   val CssContentType            = "text/css"
+  val ZipContentType            = "application/zip"
   val SoapContentType           = "application/soap+xml"
   val OctetStreamContentType    = "application/octet-stream"
   val UnknownContentType        = "content/unknown"

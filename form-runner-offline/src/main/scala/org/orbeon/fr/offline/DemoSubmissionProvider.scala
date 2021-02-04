@@ -1,23 +1,14 @@
 package org.orbeon.fr.offline
 
-import org.log4s.Logger
+import org.orbeon.facades.TextDecoder
 import org.orbeon.oxf.http.{Headers, HttpMethod, StatusCode}
-import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.xforms.embedding.{SubmissionProvider, SubmissionRequest, SubmissionResponse}
-import org.orbeon.xforms.offline.demo.OfflineDemo
 import org.scalajs.dom.experimental.{Headers => FetchHeaders}
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.typedarray.Uint8Array
 
-
-@js.native
-@JSGlobal("TextDecoder")
-class TextDecoder extends js.Object {
-  def decode(buffer: Uint8Array): String = js.native
-}
 
 object DemoSubmissionProvider extends SubmissionProvider {
 
@@ -25,8 +16,8 @@ object DemoSubmissionProvider extends SubmissionProvider {
 //  val logger: Logger = LoggerFactory.createLogger("org")
 //  implicit val indentedLogger = new IndentedLogger(logger, true)
 
-  import OfflineDemo._
   import org.orbeon.oxf.util.Logging._
+  import org.orbeon.xforms.offline.OfflineSupport._
 
   private var store = Map[String, (Option[String], Uint8Array)]()
 

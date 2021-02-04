@@ -1,4 +1,4 @@
-package org.orbeon.xforms.offline.demo
+package org.orbeon.xforms.offline
 
 import java.io.{InputStream, OutputStream, PrintWriter}
 import java.net.URL
@@ -16,7 +16,7 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 
-object DemoExternalContext {
+object OfflineExternalContext {
 
   private var session: Option[ExternalContext.Session] = None
 

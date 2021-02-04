@@ -1006,7 +1006,8 @@ lazy val xformsOffline = (project in file("xforms-offline"))
   .enablePlugins(JSDependenciesPlugin)
   .dependsOn(
     xformsRuntimeJS,
-    xformsWeb
+    xformsWeb,
+    webFacades
   )
   .settings(
     Compile / unmanagedJars      := Nil,

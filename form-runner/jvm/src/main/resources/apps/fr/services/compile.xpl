@@ -19,6 +19,7 @@
 
 
     <p:processor name="oxf:xforms-compiler">
+        <p:input  name="instance" href="#instance"/>
         <p:input  name="data" href="#unrolled-form-definition"/>
         <p:output name="data" ref="data"/>
     </p:processor>

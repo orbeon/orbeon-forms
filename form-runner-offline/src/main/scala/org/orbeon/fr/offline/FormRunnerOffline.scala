@@ -156,8 +156,6 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     documentId       : js.UndefOr[String]
   ): js.Promise[RuntimeForm] = {
 
-    configure(DemoSubmissionProvider)
-
     val future =
       compileAndCacheFormIfNeededF(serializedBundle, appName, formName, formVersion) map { compiledFormF =>
         OfflineSupport.renderCompiledForm(

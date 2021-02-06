@@ -432,8 +432,8 @@ trait FormRunnerPersistence {
   ).unzip3
 
   def putWithAttachments(
-    data              : DocumentInfo,
-    migrate           : DocumentInfo => DocumentInfo,
+    liveData          : DocumentInfo,
+    migrate           : Option[DocumentInfo => DocumentInfo],
     toBaseURI         : String,
     fromBasePath      : String,
     toBasePath        : String,
@@ -446,10 +446,10 @@ trait FormRunnerPersistence {
     workflowStage     : Option[String] = None
   ): (Seq[String], Seq[String], Int) = {
 
-    val migratedData = migrate(data)
+    val savedData = migrate.map(_(liveData)).getOrElse(liveData)
 
     // Find all instance nodes containing file URLs we need to upload
-    val attachments     = collectAttachments(migratedData, fromBasePath, toBasePath, forceAttachments)
+    val attachments     = collectAttachments(savedData, fromBasePath, toBasePath, forceAttachments)
     val migratedHolders = attachments._1.toList
     val beforeURLs      = attachments._2.toList
     val afterURLs       = attachments._3.toList
@@ -494,7 +494,7 @@ trait FormRunnerPersistence {
     val versionOpt =
       // Save and try to retrieve returned version
       for {
-        done     <- saveXmlData(migratedData) // https://github.com/orbeon/orbeon-forms/issues/3629
+        done     <- saveXmlData(savedData) // https://github.com/orbeon/orbeon-forms/issues/3629
         headers  <- done.headers
         versions <- headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion => values }
         version  <- versions.headOption
@@ -511,18 +511,22 @@ trait FormRunnerPersistence {
     // - https://github.com/orbeon/orbeon-forms/issues/606
     // - https://github.com/orbeon/orbeon-forms/issues/3084
     // - https://github.com/orbeon/orbeon-forms/issues/3301
-    beforeURLs.zip(afterURLs).foreach {
-      case (beforeURL, afterURL) =>
-        val holder = {
-          scaxon.XPath.evalOne(
-            item       = data,
-            expr       = "//*[not(*)][xxf:trim() = $beforeURL]",
-            namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
-            variables  = Map("beforeURL" -> new StringValue(beforeURL))
-          )(XFormsFunctionLibrary).asInstanceOf[NodeInfo]
-        }
-        updateHolder(holder, afterURL)
-    }
+
+    // If data isn't migrated, then it has already been updated (and doing it again would fail)
+    // FIXME: if no migration happens *and* sending an attachment failed, then the URL will still updated in the data
+    if (migrate.isDefined)
+      beforeURLs.zip(afterURLs).foreach {
+        case (beforeURL, afterURL) =>
+          val holder = {
+            scaxon.XPath.evalOne(
+              item       = liveData,
+              expr       = "//*[not(*)][xxf:trim() = $beforeURL]",
+              namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+              variables  = Map("beforeURL" -> new StringValue(beforeURL))
+            )(XFormsFunctionLibrary).asInstanceOf[NodeInfo]
+          }
+          updateHolder(holder, afterURL)
+      }
 
     (beforeURLs, afterURLs, versionOpt map (_.toInt) getOrElse 1)
   }

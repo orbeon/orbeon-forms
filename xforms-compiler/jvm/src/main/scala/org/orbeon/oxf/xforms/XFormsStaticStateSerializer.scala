@@ -6,15 +6,13 @@ import io.circe.syntax._
 import io.circe.{Encoder, Json}
 import org.orbeon.dom
 import org.orbeon.dom.QName
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.BasicCredentials
-import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.StringUtils.StringOps
-import org.orbeon.oxf.util.{Base64, Connection, ConnectionResult, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, NetUtils, StaticXPath, URLRewriterUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, StaticXPath}
+import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, StaticBind}
-import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.itemset.{Item, ItemNode, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
@@ -24,7 +22,6 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
-import java.net.URI
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -523,47 +520,6 @@ object XFormsStaticStateSerializer {
         "namespaces" -> Json.fromInt(collectedNamespacesWithPositions(a.namespaces))
       )
 
-    def encodeResources = {
-
-//      val appName  = ???
-//      val formName = ???
-
-      implicit val logger: IndentedLogger = new IndentedLogger(Logger)
-      implicit val ec: ExternalContext = NetUtils.getExternalContext
-
-      ResourcesToInclude map { resource =>
-
-        val resolvedAbsoluteUrl =
-          URLRewriterUtils.rewriteServiceURL(
-            ec.getRequest,
-            resource,
-            URLRewriter.REWRITE_MODE_ABSOLUTE
-          )
-
-        val cxr =
-          Connection.connectNow(
-            method          = GET,
-            url             = new URI(resolvedAbsoluteUrl),
-            credentials     = None,
-            content         = None,
-            headers         = Map.empty,
-            loadState       = true,
-            saveState       = true,
-            logBody         = false
-          )
-
-        val dataUrl =
-          ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
-            "data:" + cxr.content.contentType.getOrElse("") + ";base64," + Base64.encode(NetUtils.inputStreamToByteArray(is), useLineBreaks = false)
-          }
-
-        Json.obj(
-          "key"   -> Json.fromString(resource),
-          "value" -> Json.fromString(dataUrl)
-        )
-      }
-    }
-
     implicit val encodeXFormsStaticState: Encoder[XFormsStaticState] = (a: XFormsStaticState) => Json.obj(
       "namespaces"           -> collectedNamespacesInOrder.asJson,
       "qnames"               -> collectedQNamesInOrder.asJson,
@@ -572,8 +528,7 @@ object XFormsStaticStateSerializer {
       "commonBindings"       -> collectedCommonBindingsInOrder.asJson,
       "scopes"               -> collectedScopesInOrder.asJson,
       "topLevelPart"         -> a.topLevelPart.asJson,
-      "template"             -> template.asJson,
-      "resources"            -> Json.arr(encodeResources: _*)
+      "template"             -> template.asJson
     )
 
     staticState.asJson.noSpaces

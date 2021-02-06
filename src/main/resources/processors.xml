@@ -688,6 +688,9 @@
     <processor name="fr:resources-patcher">
         <class name="org.orbeon.oxf.fr.ResourcesPatcher"/>
     </processor>
+    <processor name="fr:compiler">
+        <class name="org.orbeon.oxf.fr.FormRunnerCompiler"/>
+    </processor>
 
     <!-- Include in the end so it's possible to override, see: https://github.com/orbeon/orbeon-forms/issues/447 -->
 

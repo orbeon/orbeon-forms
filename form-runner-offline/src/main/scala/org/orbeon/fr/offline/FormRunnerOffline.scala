@@ -1,14 +1,15 @@
 package org.orbeon.fr.offline
 
+import cats.syntax.option._
 import org.log4s.{Debug, Info}
 import org.orbeon.dom.{Document, Element}
-import org.orbeon.facades.{JSZip, TextDecoder}
+import org.orbeon.facades.{JSZip, TextDecoder, ZipObject}
 import org.orbeon.fr.FormRunnerApp
 import org.orbeon.oxf.fr.library._
-import org.orbeon.oxf.http.BasicCredentials
+import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
 import org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.{Connection, ConnectionResult, DataURLDecoder, DecodedDataURL, PathUtils}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
@@ -20,12 +21,13 @@ import org.orbeon.xforms.offline.demo.LocalClientServerChannel
 import org.orbeon.xforms.{App, XFormsApp}
 import org.scalajs.dom.html
 
+import java.io.InputStream
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.RegExp
+import scala.scalajs.js.{RegExp, |}
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.typedarray.Uint8Array
 
@@ -125,12 +127,97 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
           (serializedBundle: Any) match {
             case v: Uint8Array =>
               JSZip.loadAsync(v.buffer).toFuture flatMap { jsZip =>
-                jsZip.file(new RegExp("form\\.json")).headOption match { // first `form.json` in the Zip
-                  case Some(zipObject) => zipObject.async("uint8array").toFuture map (b => new TextDecoder().decode(b))
-                  case None            => Future.failed(new IllegalArgumentException("missing `form.json` in Zip archive"))
+
+                var futures: List[Future[(String, Either[String, Uint8Array])]] = Nil
+
+                jsZip.forEach((relativePath: String, zipObject: ZipObject) => {
+                  println(s"xxxx found `$relativePath` in zip")
+
+                  futures ::=
+                    zipObject.async("uint8array").toFuture map { data =>
+
+                      val FormRe = "/([^/]+)/([^/]+)/([^/]+)/form/form.json".r
+                      val XmlRe  = "/([^.]+).xml".r
+
+                      relativePath -> (
+                        relativePath match {
+                          case FormRe(appName, formName, formVersion) =>
+                            println(s"xxx got form for `$appName/$formName/$formVersion`")
+                            Left(new TextDecoder().decode(data))
+                          case XmlRe(path) =>
+                            println(s"xxx got XML for `$path`")
+                            Right(data)
+                          case other =>
+                            println(s"xxx got other for `$other`")
+                            Right(data)
+                        }
+                      )
+                    }
+                })
+
+                Future.sequence(futures) map { values =>
+
+                  val resources =
+                    values collect {
+                      case (path, Right(data)) =>
+                        if (path.startsWith("/fr"))
+                          path -> data
+                        else
+                          s"oxf:$path" -> data // TODO xxx oxf:
+                    }
+
+                  val resourcesMap = resources.toMap
+
+                  println(s"xxxx resources ${resourcesMap.keys mkString ", " }")
+
+                  // Store a connection resolver that resolves to resources included in the compiled form
+                  Connection.resourceResolver = (urlString: String) => {
+
+                    // Special case: normalize Form Runner resources so that we don't have to duplicate them for each form.
+                    // This prevents overriding resources for each form individually, but this is usually not necessary.
+                    // And if we wanted to allow that, we should find a more efficient way to do it anyway.
+                    val updatedUrlString =
+                      if (urlString.startsWith("/fr/service/i18n/fr-resources/"))
+                        "/fr/service/i18n/fr-resources/orbeon/offline"
+                      else
+                        urlString
+
+                    resourcesMap.get(updatedUrlString) map { data =>
+
+                      val contentType = "application/xml" // XXX TODO
+
+                      val is = new InputStream {
+
+                        val it = data.iterator
+
+                        def read(): Int =
+                          if (it.hasNext)
+                            it.next()
+                          else
+                            -1
+                      }
+
+                      ConnectionResult(
+                        url                = updatedUrlString,
+                        statusCode         = StatusCode.Ok,
+                        headers            = Map.empty,
+                        content            = StreamedContent(is, contentType.some, data.length.toLong.some, None),
+                        dontHandleResponse = false,
+                      )
+                    }
+                  }
+
+                  values collectFirst
+                    { case (path, Left(json)) => json } getOrElse
+                    (throw new IllegalArgumentException("missing form in Zip"))
                 }
               }
-            case v: String => Future(v)
+            case v: String =>
+              Future(v)
+            case null =>
+              throw new IllegalArgumentException(s"cannot pass `null` form definition Zip file if it is not in cache for key $cacheKey")
+            case _ =>
+              throw new IllegalArgumentException(s"unexpected form definition object passed for key $cacheKey")
           }
 
         jsonStringF map { serializedForm =>

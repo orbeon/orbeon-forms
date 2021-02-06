@@ -39,6 +39,7 @@ class ZipObject extends js.Object {
 class JSZip extends js.Object {
   def file(name: String): ZipObject = js.native
   def file(regex: js.RegExp): js.Array[ZipObject] = js.native
+  def forEach(callback: js.Function2[String, ZipObject, Unit]): Unit = js.native
   val version: String = js.native
 }
 

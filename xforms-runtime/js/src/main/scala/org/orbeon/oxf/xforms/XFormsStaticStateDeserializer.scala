@@ -834,10 +834,6 @@ object XFormsStaticStateDeserializer {
     implicit val decodeShareableScript: Decoder[ShareableScript] = deriveDecoder
     implicit val decodeStaticScript   : Decoder[StaticScript]    = deriveDecoder
 
-    case class Resource(key: String, value: String)
-
-    implicit val decodeResource       : Decoder[Resource]        = deriveDecoder
-
     implicit val decodeTopLevelPartAnalysis: Decoder[TopLevelPartAnalysisImpl] = (c: HCursor) =>
       for {
         startScope          <- c.get[Int]("startScopeRef").map(collectedScopes)
@@ -893,39 +889,10 @@ object XFormsStaticStateDeserializer {
         }
         topLevelPart         <- c.get[TopLevelPartAnalysisImpl]("topLevelPart")
         template             <- c.get[SAXStore]("template")
-        resources            <- c.get[List[Resource]]("resources")
       } yield {
 
         // Do this *after* the top-level template has been deserialized
         topLevelPart.marks = collectedSAXStoreMarks
-
-        val resourcesMap = resources map (r => r.key -> r.value) toMap
-
-        // Store a connection resolver that resolves to resources included in the compiled form
-        Connection.resourceResolver = (urlString: String) => {
-
-          // Special case: normalize Form Runner resources so that we don't have to duplicate them for each form.
-          // This prevents overriding resources for each form individually, but this is usually not necessary.
-          // And if we wanted to allow that, we should find a more efficient way to do it anyway.
-          val updatedUrlString =
-            if (urlString.startsWith("/fr/service/i18n/fr-resources/"))
-              "/fr/service/i18n/fr-resources/orbeon/offline"
-            else
-              urlString
-
-          resourcesMap.get(updatedUrlString) map { value =>
-
-            val DecodedDataURL(bytes, mediatype, charset) = DataURLDecoder.decode(value)
-
-            ConnectionResult(
-              url                = updatedUrlString,
-              statusCode         = StatusCode.Ok,
-              headers            = Map.empty,
-              content            = StreamedContent.fromBytes(bytes, (mediatype + (charset map ("; charset=" + _) getOrElse "")).some, None),
-              dontHandleResponse = false,
-            )
-          }
-        }
 
         CoreCrossPlatformSupport.properties = PropertySet(properties)
 

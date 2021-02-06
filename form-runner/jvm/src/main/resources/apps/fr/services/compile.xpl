@@ -1,6 +1,7 @@
 <p:config
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <!-- Page detail (app, form, document, and mode) -->
     <p:param type="input" name="instance"/>
@@ -18,7 +19,7 @@
     </p:processor>
 
 
-    <p:processor name="oxf:xforms-compiler">
+    <p:processor name="fr:compiler">
         <p:input  name="instance" href="#instance"/>
         <p:input  name="data" href="#unrolled-form-definition"/>
         <p:output name="data" ref="data"/>

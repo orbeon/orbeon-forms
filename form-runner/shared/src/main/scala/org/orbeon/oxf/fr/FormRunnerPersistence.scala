@@ -22,6 +22,7 @@ import org.orbeon.scaxon
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
+
 import org.orbeon.oxf.fr.FormRunner.properties
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}

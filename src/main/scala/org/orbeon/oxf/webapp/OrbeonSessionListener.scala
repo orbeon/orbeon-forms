@@ -13,29 +13,31 @@
  */
 package org.orbeon.oxf.webapp
 
-import javax.servlet.ServletException
-import javax.servlet.http.{HttpSessionEvent, HttpSessionListener}
-
+import org.apache.log4j.Logger
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
 import org.orbeon.oxf.servlet.ServletSessionImpl
 import org.orbeon.oxf.webapp.ServletPortlet._
 
+import javax.servlet.ServletException
+import javax.servlet.http.{HttpSessionEvent, HttpSessionListener}
 import scala.util.control.NonFatal
 
 // For backward compatibility
 class OrbeonSessionListenerDelegate extends OrbeonSessionListener
+
 
 /**
  * This listener listens for HTTP session lifecycle changes.
  */
 class OrbeonSessionListener extends HttpSessionListener {
 
+  import OrbeonSessionListener._
+
   private val InitProcessorPrefix     = "oxf.session-created-processor."
   private val InitInputPrefix         = "oxf.session-created-processor.input."
   private val DestroyProcessorPrefix  = "oxf.session-destroyed-processor."
   private val DestroyInputPrefix      = "oxf.session-destroyed-processor.input."
-
-  private implicit val logger = ProcessorService.Logger
 
   def logPrefix = "Session listener"
   def initParameters = Map()
@@ -45,9 +47,7 @@ class OrbeonSessionListener extends HttpSessionListener {
 
       val httpSession = event.getSession
 
-      // Immediately store SessionListeners into the session to avoid concurrency issues which can occur if we
-      // do this lazily in ServletExternalContext.addListener().
-      httpSession.setAttribute(SessionListeners.SessionListenersKey, new SessionListeners)
+      sessionListenersCreate(new ServletSessionImpl(httpSession))
 
       runWithServletContext(
         servletContext         = httpSession.getServletContext,
@@ -61,6 +61,7 @@ class OrbeonSessionListener extends HttpSessionListener {
 
   override def sessionDestroyed(event: HttpSessionEvent): Unit =
     withRootException("session destruction", new ServletException(_)) {
+
       val httpSession = event.getSession
       if (httpSession ne null) {
 
@@ -74,21 +75,36 @@ class OrbeonSessionListener extends HttpSessionListener {
         )
 
         // Run listeners after the processor because processor might add new listeners
-        val listeners =
-          httpSession.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
-
-        for {
-          listeners <- Option(listeners).iterator
-          listener  <- listeners.iterateRemoveAndClose()
-        } locally {
-          try {
-            listener.sessionDestroyed(new ServletSessionImpl(httpSession))
-          } catch {
-            case NonFatal(t) =>
-              // Catch so we can continue running the remaining listeners
-              logger.error("Throwable caught when calling listener", t)
-          }
-        }
+        sessionListenersDestroy(new ServletSessionImpl(httpSession))
       }
     }
+}
+
+object OrbeonSessionListener {
+
+  implicit val logger: Logger = ProcessorService.Logger
+
+  // Immediately store `SessionListeners` into the session to avoid concurrency issues which can occur if we
+  // do this lazily in `ServletExternalContext.addListener()`.
+  def sessionListenersCreate(session: ExternalContext.Session): Unit =
+    session.setAttribute(SessionListeners.SessionListenersKey, new SessionListeners)
+
+  def sessionListenersDestroy(session: ExternalContext.Session): Unit = {
+
+    val listeners =
+      session.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
+
+    for {
+      listeners <- Option(listeners).iterator
+      listener  <- listeners.iterateRemoveAndClose()
+    } locally {
+      try {
+        listener.sessionDestroyed(session)
+      } catch {
+        case NonFatal(t) =>
+          // Catch so we can continue running the remaining listeners
+          logger.error("Throwable caught when calling listener", t)
+      }
+    }
+  }
 }

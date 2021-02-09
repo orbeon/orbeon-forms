@@ -18,7 +18,8 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext, ServletPortletRequest, SimpleRole}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.webapp.UserRolesFacade
+import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.webapp.{OrbeonSessionListener, UserRolesFacade}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.slf4j.LoggerFactory
@@ -83,31 +84,52 @@ object FormRunnerAuth {
     // Get the username, group and roles from the request, based on the Form Runner configuration.
     // The first time this is called, the result is stored into the required session. The subsequent times,
     // the value stored in the session is retrieved. This ensures that authentication information remains an
-    // invariant for a given session.
+    // invariant for a given session. However, in the case of non-sticky headers, the incoming headers are
+    // checked at each request for changes and can cause the session content to be cleared.
     //
-    // See https://github.com/orbeon/orbeon-forms/issues/2464
-    // See also https://github.com/orbeon/orbeon-forms/issues/2632
+    // See:
+    //
+    // - https://github.com/orbeon/orbeon-forms/issues/2464
+    // - https://github.com/orbeon/orbeon-forms/issues/2632
+    // - https://github.com/orbeon/orbeon-forms/issues/4436
+    //
     def getCredentialsUseSession(
-      userRoles  : UserRolesFacade,
-      session    : ExternalContext.Session,
-      getHeader  : String => List[String]
+      userRoles : UserRolesFacade,
+      session   : ExternalContext.Session,
+      getHeader : String => List[String]
     ): Option[Credentials] = {
 
       val sessionCredentialsOpt = ServletPortletRequest.findCredentialsInSession(session)
-      val newCredentialsOpt     = findCredentialsFromContainerOrHeaders(userRoles, getHeader)
-      val propertySet           = Properties.instance.getPropertySet
-      val sticky                = propertySet.getBoolean(HeaderStickyPropertyName, default = false)
-      val updateSessionIfNew    = authMethod == AuthMethod.Header && ! sticky
 
-      if (updateSessionIfNew || sessionCredentialsOpt.isEmpty) {
-        if (newCredentialsOpt != sessionCredentialsOpt) {
-          // Reset content of the session before we store the new credentials
-          XFormsStateManager.sessionDestroyed(session)
-          session.getAttributeNames().foreach(session.removeAttribute(_))
-          XFormsStateManager.sessionCreated(session)
-          ServletPortletRequest.storeCredentialsInSession(session, newCredentialsOpt)
-        }
+      lazy val stickyHeadersConfigured =
+        Properties.instance.getPropertySet.getBoolean(HeaderStickyPropertyName, default = false)
+
+      lazy val newCredentialsOpt = findCredentialsFromContainerOrHeaders(userRoles, getHeader)
+
+      def storeAndReturnNewCredentials(): Option[Credentials] = {
+        ServletPortletRequest.storeCredentialsInSession(session, newCredentialsOpt)
         newCredentialsOpt
+      }
+
+      def clearAndInitializeSessionContent(): Unit = {
+        XFormsStateManager.sessionDestroyed(session)
+        OrbeonSessionListener.sessionListenersDestroy(session)
+
+        session.getAttributeNames().foreach(session.removeAttribute(_))
+
+        OrbeonSessionListener.sessionListenersCreate(session)
+        XFormsStateManager.sessionCreated(session)
+      }
+
+      if (sessionCredentialsOpt.isEmpty && newCredentialsOpt.nonEmpty) {
+        // Covers the case of going from anonymous to having credentials
+        storeAndReturnNewCredentials()
+      } else if (authMethod == AuthMethod.Header && ! stickyHeadersConfigured && newCredentialsOpt != sessionCredentialsOpt) {
+        // Covers the case of an existing login where the user changes (different "non-sticky" headers) or the
+        // case of a user logging out (via headers, as in the case of container auth a logout is implemented
+        // by destroying the session).
+        clearAndInitializeSessionContent()
+        storeAndReturnNewCredentials()
       } else {
         sessionCredentialsOpt
       }

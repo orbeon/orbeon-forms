@@ -17,10 +17,8 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     containingDocument   : XFormsContainingDocument,
     isInitialState       : Boolean, // TODO: handle `isInitialState = true`
     disableDocumentCache : Boolean  // for testing only
-  ): Unit = {
-    println(s"xxx storing doc for ${containingDocument.uuid}")
+  ): Unit =
     documents += containingDocument.uuid -> containingDocument
-  }
 
   def getClientEncodedStaticState (containingDocument: XFormsContainingDocument): Option[String] = None
   def getClientEncodedDynamicState(containingDocument: XFormsContainingDocument): Option[String] = None

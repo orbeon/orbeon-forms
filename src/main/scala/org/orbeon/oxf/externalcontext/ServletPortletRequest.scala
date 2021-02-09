@@ -13,10 +13,8 @@
   */
 package org.orbeon.oxf.externalcontext
 
-import scala.collection.JavaConverters._
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.URLRewriterUtils
-import org.orbeon.oxf.webapp._
+
 
 object ServletPortletRequest {
 
@@ -34,7 +32,6 @@ object ServletPortletRequest {
       case None              => session.removeAttribute(CredentialsSessionKey)
     }
   }
-
 }
 
 // Implementations shared between ServletExternalContext and Portlet2ExternalContext.

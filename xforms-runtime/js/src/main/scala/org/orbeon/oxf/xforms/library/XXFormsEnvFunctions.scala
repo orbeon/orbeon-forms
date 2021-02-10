@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.library.XFormsEnvFunctions.findIndexForRepeatId
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.function.GetRequestHeaderSupport
+import org.orbeon.saxon.function.{GetRequestHeaderSupport, ProcessTemplateSupport}
 import org.orbeon.saxon.ma.map.MapItem
 import org.orbeon.saxon.model.BuiltInAtomicType
 import org.orbeon.saxon.om
@@ -349,9 +349,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
               key.getStringValue -> javaParamOpt.orNull
           }
 
-          // TODO: 2021-01-20: `MessageFormat` not (yet) supported in Scala.js.
-//          ProcessTemplate.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.toList, currentLocale)
-          resourceOrTemplate
+          ProcessTemplateSupport.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.toList)
 
         case _ =>
           resourceOrTemplate

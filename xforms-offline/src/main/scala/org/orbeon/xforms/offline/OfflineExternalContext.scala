@@ -5,7 +5,7 @@ import java.net.URL
 import java.util
 import java.util.Locale
 
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext, SimpleSession, WebAppContext}
 import org.orbeon.oxf.http.HttpMethod

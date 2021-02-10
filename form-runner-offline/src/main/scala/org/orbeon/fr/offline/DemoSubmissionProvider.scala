@@ -19,7 +19,9 @@ object DemoSubmissionProvider extends SubmissionProvider {
   import org.orbeon.oxf.util.Logging._
   import org.orbeon.xforms.offline.OfflineSupport._
 
-  private var store = Map[String, (Option[String], Uint8Array)]()
+  case class FormData(contentTypeOpt: Option[String], data: Uint8Array, workflowStageOpt: Option[String])
+
+  private var store = Map[String, FormData]()
 
   def submit(req: SubmissionRequest): SubmissionResponse = {
 
@@ -46,10 +48,14 @@ object DemoSubmissionProvider extends SubmissionProvider {
 
         // TODO: check pathname is persistence path
         store.get(req.url.pathname) match {
-          case Some((responseContentTypeOpt, responseBody)) =>
+          case Some(FormData(responseContentTypeOpt, responseBody, workflowStageOpt)) =>
+
+            val headersList = responseContentTypeOpt.map(Headers.ContentType ->).toList :::
+              workflowStageOpt.map("Orbeon-Workflow-Stage" ->).toList
+
             new SubmissionResponse {
               val statusCode = StatusCode.Ok
-              val headers    = new FetchHeaders(responseContentTypeOpt.toArray.toJSArray.map(x => js.Array(Headers.ContentType, x)))
+              val headers    = new FetchHeaders(headersList.toJSArray.map{ case (k, v) => js.Array(k, v) })
               val body       = responseBody
             }
           case None =>
@@ -68,7 +74,12 @@ object DemoSubmissionProvider extends SubmissionProvider {
 
         // TODO: check pathname is persistence path
         val existing = store.contains(req.url.pathname)
-        store += req.url.pathname -> (req.headers.get(Headers.ContentType).toOption -> req.body.getOrElse(throw new IllegalArgumentException))
+        store += req.url.pathname ->
+          FormData(
+            req.headers.get(Headers.ContentType).toOption,
+            req.body.getOrElse(throw new IllegalArgumentException),
+            req.headers.get("Orbeon-Workflow-Stage").toOption
+          )
 
         new SubmissionResponse {
           val statusCode = if (existing) StatusCode.Ok else StatusCode.Created

@@ -21,7 +21,7 @@ object TryUtils {
     def onFailure(f: PartialFunction[Throwable, Any]): Try[U] =
       t recoverWith new OnFailurePF(f)
 
-    def rootFailure: Try[U] = ???
+    def rootFailure: Try[U] = throw new NotImplementedError("rootFailure")
 
     def doEitherWay(f: => Any): Try[U] =
       try t match {

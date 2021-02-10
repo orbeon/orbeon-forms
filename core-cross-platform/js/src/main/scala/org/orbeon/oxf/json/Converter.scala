@@ -11,7 +11,7 @@ object Converter {
 
   type XmlElem = NodeInfo
 
-  def xmlToJsonString(root: XmlElem, strict: Boolean): String = ???
-  def jsonStringToXmlDoc(source: String, rootElementName: String = Symbols.JSON): StaticXPath.DocumentNodeInfoType = ???
-  def jsonStringToXmlStream(source: String, receiver: XMLReceiver, rootElementName: String = Symbols.JSON): Unit = ???
+  def xmlToJsonString(root: XmlElem, strict: Boolean): String = throw new NotImplementedError("xmlToJsonString")
+  def jsonStringToXmlDoc(source: String, rootElementName: String = Symbols.JSON): StaticXPath.DocumentNodeInfoType = throw new NotImplementedError("jsonStringToXmlDoc")
+  def jsonStringToXmlStream(source: String, receiver: XMLReceiver, rootElementName: String = Symbols.JSON): Unit = throw new NotImplementedError("jsonStringToXmlStream")
 }

@@ -27,14 +27,14 @@ object OfflineExternalContext {
 
       // Probably unused by offline
       def getWebAppContext: WebAppContext = new WebAppContext {
-        def getResource(s: String)                    : URL                         = ???
-        def getResourceAsStream(s: String)            : InputStream                 = ???
-        def getRealPath(s: String)                    : String                      = ???
-        def initParameters                            : Map[String, String]         = ???
-        def attributes                                : mutable.Map[String, AnyRef] = ???
-        def log(message: String, throwable: Throwable): Unit                        = ???
-        def log(message: String)                      : Unit                        = ???
-        def getNativeContext                          : AnyRef                      = ???
+        def getResource(s: String)                    : URL                         = throw new NotImplementedError("getResource")
+        def getResourceAsStream(s: String)            : InputStream                 = throw new NotImplementedError("getResourceAsStream")
+        def getRealPath(s: String)                    : String                      = throw new NotImplementedError("getRealPath")
+        def initParameters                            : Map[String, String]         = throw new NotImplementedError("initParameters")
+        def attributes                                : mutable.Map[String, AnyRef] = throw new NotImplementedError("attributes")
+        def log(message: String, throwable: Throwable): Unit                        = throw new NotImplementedError("log")
+        def log(message: String)                      : Unit                        = throw new NotImplementedError("log")
+        def getNativeContext                          : AnyRef                      = throw new NotImplementedError("getNativeContext")
       }
 
       def getSession(create: Boolean): ExternalContext.Session = {
@@ -61,42 +61,42 @@ object OfflineExternalContext {
         def getParameterMap                         : util.Map[String, Array[AnyRef]] = Map.empty.asJava
         def getCharacterEncoding                    : String = CharsetNames.Utf8
         def getContentLength                        : Int = -1
-        def getContentType                          : String = ???
-        def getInputStream                          : InputStream = ???
-        def getProtocol                             : String = ???
+        def getContentType                          : String = throw new NotImplementedError("getContentType")
+        def getInputStream                          : InputStream = throw new NotImplementedError("getInputStream")
+        def getProtocol                             : String = throw new NotImplementedError("getProtocol")
         def getRemoteHost                           : String = dom.window.document.location.hostname
-        def getRemoteAddr                           : String = ???
+        def getRemoteAddr                           : String = throw new NotImplementedError("getRemoteAddr")
         def getScheme                               : String = "http"
         def getMethod                               : HttpMethod = HttpMethod.GET
         def getServerName                           : String = dom.window.document.location.hostname
         def getServerPort                           : Int = dom.window.document.location.port.toInt
         def getSession(create: Boolean)             : ExternalContext.Session = selfExternalContext.getSession(create)
-        def sessionInvalidate()                     : Unit = ???
-        def isRequestedSessionIdValid               : Boolean = ???
-        def getRequestedSessionId                   : String = ???
-        def getAuthType                             : String = ???
+        def sessionInvalidate()                     : Unit = throw new NotImplementedError("sessionInvalidate")
+        def isRequestedSessionIdValid               : Boolean = throw new NotImplementedError("isRequestedSessionIdValid")
+        def getRequestedSessionId                   : String = throw new NotImplementedError("getRequestedSessionId")
+        def getAuthType                             : String = throw new NotImplementedError("getAuthType")
         def isSecure                                : Boolean = dom.window.document.location.protocol == "https:/"
         def credentials                             : Option[Credentials] = None
         def isUserInRole(role: String)              : Boolean = false
-        def getLocale                               : Locale = ???
-        def getLocales                              : util.Enumeration[_] = ???
-        def getPathTranslated                       : String = ???
-        def getQueryString                          : String = ???
-        def getRequestURI                           : String = ???
-        def getRequestURL                           : String = ???
+        def getLocale                               : Locale = throw new NotImplementedError("getLocale")
+        def getLocales                              : util.Enumeration[_] = throw new NotImplementedError("getLocales")
+        def getPathTranslated                       : String = throw new NotImplementedError("getPathTranslated")
+        def getQueryString                          : String = throw new NotImplementedError("getQueryString")
+        def getRequestURI                           : String = throw new NotImplementedError("getRequestURI")
+        def getRequestURL                           : String = throw new NotImplementedError("getRequestURL")
 
         // Not relevant
-        def getPortletMode: String = ???
-        def getWindowState: String = ???
-        def getNativeRequest: Any = ???
+        def getPortletMode: String = throw new NotImplementedError("getPortletMode")
+        def getWindowState: String = throw new NotImplementedError("getWindowState")
+        def getNativeRequest: Any = throw new NotImplementedError("getNativeRequest")
       }
 
       val getResponse: ExternalContext.Response = new ExternalContext.Response {
-        def getWriter: PrintWriter = ???
+        def getWriter: PrintWriter = throw new NotImplementedError("getWriter")
 
-        def getOutputStream: OutputStream = ???
+        def getOutputStream: OutputStream = throw new NotImplementedError("getOutputStream")
 
-        def isCommitted: Boolean = ???
+        def isCommitted: Boolean = throw new NotImplementedError("isCommitted")
 
         def reset(): Unit = ()
         def setContentType(contentType: String): Unit = ()
@@ -106,18 +106,18 @@ object OfflineExternalContext {
         def addHeader(name: String, value: String): Unit = ()
 
         def sendError(code: Int): Unit = ()
-        def getCharacterEncoding: String = ???
+        def getCharacterEncoding: String = throw new NotImplementedError("getCharacterEncoding")
 
-        def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean): Unit = ???
+        def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean): Unit = throw new NotImplementedError("sendRedirect")
 
         def setPageCaching(lastModified: Long): Unit = ()
         def setResourceCaching(lastModified: Long, expires: Long): Unit = ()
 
-        def checkIfModifiedSince(request: ExternalContext.Request, lastModified: Long): Boolean = ???
+        def checkIfModifiedSince(request: ExternalContext.Request, lastModified: Long): Boolean = throw new NotImplementedError("checkIfModifiedSince")
 
         def setTitle(title: String): Unit = ()
 
-        def getNativeResponse: AnyRef = ???
+        def getNativeResponse: AnyRef = throw new NotImplementedError("getNativeResponse")
 
         def rewriteActionURL  (urlString: String): String                                           = urlString // TODO: CHECK
         def rewriteRenderURL  (urlString: String): String                                           = urlString // TODO: CHECK
@@ -125,7 +125,7 @@ object OfflineExternalContext {
         def rewriteRenderURL  (urlString: String, portletMode: String, windowState: String): String = urlString // TODO: CHECK
         def rewriteResourceURL(urlString: String, rewriteMode: Int): String                         = urlString // TODO: CHECK
 
-        def getNamespacePrefix: String = ???
+        def getNamespacePrefix: String = throw new NotImplementedError("getNamespacePrefix")
       }
 
       def getStartLoggerString: String = ""

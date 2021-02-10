@@ -174,7 +174,7 @@ class EmailValidator extends Serializable {
    * @return true if the email address's domain is valid.
    */
   protected def isValidDomain(domain: String): Boolean = {
-    ???
+    throw new NotImplementedError("isValidDomain")
 // ORBEON: Remove support for `DomainValidator`.
 //    // see if domain is an IP address in brackets
 //    val ipDomainMatcher = EmailValidator.IP_DOMAIN_PATTERN.matcher(domain)

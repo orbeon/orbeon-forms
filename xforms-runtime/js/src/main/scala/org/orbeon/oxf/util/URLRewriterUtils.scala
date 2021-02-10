@@ -17,7 +17,7 @@ object URLRewriterUtils {
     rewriteMode  : Int
   ): String = {
     println(s"xxx URLRewriterUtils.rewriteResourceURL called for $urlString")
-    ???
+    throw new NotImplementedError("rewriteResourceURL")
   }
 
   def rewriteServiceURL(
@@ -29,7 +29,7 @@ object URLRewriterUtils {
     if (PathUtils.urlHasProtocol(urlString))
       urlString
     else
-      ???
+      throw new NotImplementedError("rewriteServiceURL")
   }
 
   // Used by `rewriteResourceURL` for `XFormsOutputControl`.

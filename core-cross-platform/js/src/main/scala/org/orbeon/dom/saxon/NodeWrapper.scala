@@ -94,7 +94,7 @@ trait NodeWrapper
 //      }
 //    }
 //    null
-    ???
+    throw new NotImplementedError("getSuccessorNode")
   }
 
   // From `VirtualNode`
@@ -248,7 +248,8 @@ trait NodeWrapper
     Navigator.appendSequentialKey(this, buffer, addDocNr = true)
 
   // ORBEON: This doesn't appear to be used by Saxon XPath
-  override def getDeclaredNamespaces(buffer: Array[om.NamespaceBinding]): Array[om.NamespaceBinding] = ???
+  override def getDeclaredNamespaces(buffer: Array[om.NamespaceBinding]): Array[om.NamespaceBinding] =
+    throw new NotImplementedError("getDeclaredNamespaces")
 
   override def getAllNamespaces: om.NamespaceMap =
     node match {

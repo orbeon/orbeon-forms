@@ -328,7 +328,8 @@ object SaxonUtils {
 
   val NamespaceType: Short = Type.NAMESPACE
 
-  def getInternalPathForDisplayPath(namespaces: Map[String, String], path: String): String = ???
+  def getInternalPathForDisplayPath(namespaces: Map[String, String], path: String): String =
+    throw new NotImplementedError("getInternalPathForDisplayPath")
 
   def attCompare(boundNodeOpt: Option[om.NodeInfo], att: om.NodeInfo): Boolean =
     boundNodeOpt exists (_.getAttributeValue(att.getURI, att.getLocalPart) == att.getStringValue)

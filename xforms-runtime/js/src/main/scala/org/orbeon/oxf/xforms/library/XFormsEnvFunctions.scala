@@ -187,7 +187,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   // TODO: Should be `Iterator`?
   @XPathFunction
-  def valid(items: Iterable[om.Item], relevant: Boolean = true, recurse: Boolean = true): Boolean = ???
+  def valid(items: Iterable[om.Item], relevant: Boolean = true, recurse: Boolean = true): Boolean = throw new NotImplementedError("valid")
 
   // So we can call as `bind()` and `xxf:bind()`
   def bindImpl(bindId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] = // should be `om.NodeInfo`?

@@ -297,7 +297,7 @@ object XFormsStaticStateDeserializer {
       }
 
     // Dummy as the source must not contain the `om.Item` case
-    implicit val decodeOmItem: Decoder[om.Item] = (c: HCursor) => ???
+    implicit val decodeOmItem: Decoder[om.Item] = (c: HCursor) => throw new NotImplementedError("decodeOmItem")
 
     implicit def eitherDecoder[A, B](implicit a: Decoder[A], b: Decoder[B]): Decoder[Either[A, B]] = {
       val left:  Decoder[Either[A, B]] = a.map(Left.apply)
@@ -1067,7 +1067,7 @@ object TopLevelPartAnalysisImpl {
 
         def allXblAssetsMaybeDuplicates: Iterable[XBLAssets] = Nil
 
-        def containingScope(prefixedId: String): Scope = ???
+        def containingScope(prefixedId: String): Scope = throw new NotImplementedError("containingScope")
 
         def scopeForPrefixedId(prefixedId: String): Scope =
           findControlAnalysis(prefixedId) map

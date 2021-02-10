@@ -211,7 +211,7 @@ trait FormRunnerOps extends OrbeonFormsOps {
   object Wizard {
     def nextPage(wait: Boolean = true) = clickElementByCSS(".fr-wizard-next a", wait)
     def lastPage(wait: Boolean = true) = clickElementByCSS(".fr-wizard-prev a", wait)
-    def togglePage(id: String) = ???
+    def togglePage(id: String) = throw new NotImplementedError("togglePage")
     def pageSelected(id: String) = isCaseSelected(removeCaseGroupRepeatPrefix(clientId(id + "-section-case")))
   }
 }

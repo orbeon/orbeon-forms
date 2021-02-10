@@ -252,9 +252,9 @@ object XFormsAPI {
   def topLevelModel(modelId: String): Option[XFormsModel] =
     inScopeContainingDocumentOpt flatMap (_.models find (_.getId == modelId))
 
-  def context[T](xpath: String)(body: => T): T = ???
-  def context[T](item: om.Item)(body: => T): T = ???
-  def event[T](attributeName: String): Seq[om.Item] = ???
+  def context[T](xpath: String)(body: => T): T = throw new NotImplementedError("context")
+  def context[T](item: om.Item)(body: => T): T = throw new NotImplementedError("context")
+  def event[T](attributeName: String): Seq[om.Item] = throw new NotImplementedError("event")
 
   // The xf:dispatch action
   def dispatch(

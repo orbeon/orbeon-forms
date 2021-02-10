@@ -49,9 +49,9 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   ): Option[UploadProgress[Unit]] =
     None
 
-  def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit = ???
+  def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit = throw new NotImplementedError("removeUploadProgress")
 
-  def attachmentFileExists(holderValue: String): Boolean = ???
+  def attachmentFileExists(holderValue: String): Boolean = throw new NotImplementedError("attachmentFileExists")
 
   // Form Runner: called with `input:instance`
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String =
@@ -62,20 +62,20 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
         url
     }
 
-  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = ???
+  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = throw new NotImplementedError("resolveResourceURL")
 
   def resolveRenderURL(
     containingDocument : XFormsContainingDocument,
     currentElement     : dom.Element,
     url                : String,
     skipRewrite        : Boolean
-  ): String = ???
+  ): String = throw new NotImplementedError("resolveRenderURL")
 
-  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String = ???
+  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String = throw new NotImplementedError("rewriteURL")
 
-  def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String = ???
+  def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String = throw new NotImplementedError("resolveActionURL")
 
-  def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document = ???
+  def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document = throw new NotImplementedError("htmlStringToDocumentTagSoup")
 
   def streamHTMLFragment(
     value        : String,
@@ -117,7 +117,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger
   ): String =
-    ???
+    throw new NotImplementedError("proxyURI")
 
   def proxyBase64Binary(
     value            : String,
@@ -127,27 +127,27 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger
   ): String =
-    ???
+    throw new NotImplementedError("proxyBase64Binary")
 
   def renameAndExpireWithSession(
     existingFileURI  : String)(implicit
     logger           : IndentedLogger
   ): URI =
-    ???
+    throw new NotImplementedError("renameAndExpireWithSession")
 
   def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
   ): Option[String] =
-    ???
+    throw new NotImplementedError("inputStreamToRequestUri")
 
   def inputStreamToSessionUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
   ): Option[String] =
-    ???
+    throw new NotImplementedError("inputStreamToSessionUri")
 
-  def getLastModifiedIfFast(absoluteURL: String): Long = ???
+  def getLastModifiedIfFast(absoluteURL: String): Long = throw new NotImplementedError("getLastModifiedIfFast")
 
   // Must not be called, see comment in trait
   def readTinyTreeFromUrl(urlString: String): DocumentNodeInfoType =
@@ -242,19 +242,19 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     result()
   }
 
-  def hmacString(text: String, encoding: String): String = ???
-  def digestBytes(bytes: Array[Byte], encoding: String): String = ???
+  def hmacString(text: String, encoding: String): String = throw new NotImplementedError("hmacString")
+  def digestBytes(bytes: Array[Byte], encoding: String): String = throw new NotImplementedError("digestBytes")
 
-  def openUrlStream(urlString: String): InputStream = ???
+  def openUrlStream(urlString: String): InputStream = throw new NotImplementedError("openUrlStream")
 
-  def writeMultipartFormData(document: dom.Document, os: OutputStream): String = ???
+  def writeMultipartFormData(document: dom.Document, os: OutputStream): String = throw new NotImplementedError("writeMultipartFormData")
 
   def getRootThrowable(t : Throwable) : Throwable = Exceptions.getRootThrowable(t).orNull
   def causesIterator(t : Throwable) : Iterator[Throwable] = Exceptions.causesIterator(t)
 
-  def tempFileSize(filePath: String): Long = ???
+  def tempFileSize(filePath: String): Long = throw new NotImplementedError("tempFileSize")
 
-  def deleteFileIfPossible(urlString: String): Unit = ???
+  def deleteFileIfPossible(urlString: String): Unit = throw new NotImplementedError("deleteFileIfPossible")
 
   protected def getIdentityTransformer: Transformer =
     new SaxonTransformerFactory(GlobalConfiguration).newTransformer

@@ -1,5 +1,6 @@
 package org.orbeon.xforms.offline.demo
 
+import cats.syntax.option._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.xforms.XFormsStaticStateDeserializer
 import org.orbeon.saxon.functions.FunctionLibrary
@@ -57,7 +58,7 @@ object OfflineDemo extends App {
     container    : html.Element,
     serializedForm : SerializedForm,
   ): RuntimeForm =
-    renderCompiledForm(container, serializedForm, XFormsFunctionLibraryList, None)
+    renderCompiledForm(container.some, serializedForm, XFormsFunctionLibraryList, None)
 
   @JSExport
   def compileForm(

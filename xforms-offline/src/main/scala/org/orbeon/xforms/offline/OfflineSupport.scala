@@ -67,14 +67,15 @@ object OfflineSupport {
     }
 
   def renderCompiledForm(
-    container       : html.Element,
+    containerOpt    : Option[html.Element],
     inputForm       : SerializedForm | CompiledForm,
     functionLibrary : FunctionLibrary,
     uriResolver     : Option[XFormsURIResolver]
   ): RuntimeForm = {
 
     withDebug("form initialization and rendering") {
-      destroyForm(container)
+
+      containerOpt foreach destroyForm
 
       val newUuid = CoreCrossPlatformSupport.randomHexId
 
@@ -141,25 +142,34 @@ object OfflineSupport {
             containingDocument.hostLanguage match {
               case "xhtml" =>
 
-                val rcv = new DomDocumentFragmentXMLReceiver
-                withDebug("generate markup") {
-                  XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rcv)
+                containerOpt match {
+                  case Some(container) =>
+
+                    val rcv = new DomDocumentFragmentXMLReceiver
+                    withDebug("generate markup") {
+                      XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rcv)
+                    }
+
+                    // Find CSS/JS to load
+                    // TODO: For now, don't load any extra CSS as it will likely not be found. At the very least we would need to
+                    //   have the list of offline CSS baseline assets and not insert the CSS if already present.
+      //              val stylesheetsToLoad = findAndDetachCssToLoad(rcv.frag)
+                    val stylesheetsToLoad = Nil
+                    val scriptsToLoad     = findAndDetachJsToLoad(rcv.frag)
+
+                    // Asynchronously load styles, insert HTML, then load scripts
+                    for {
+      //                _ <- loadStylesheets(stylesheetsToLoad) // XXX TODO
+                      _ <- Future()
+                      _ =  moveChildren(source = rcv.frag.querySelector("body"), target = container)
+                      _ <- loadScripts(scriptsToLoad)
+                    } yield ()
+
+                  case None =>
+                    withDebug("generate markup for warmup only") {
+                      XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(new XMLReceiverAdapter)
+                    }
                 }
-
-                // Find CSS/JS to load
-                // TODO: For now, don't load any extra CSS as it will likely not be found. At the very least we would need to
-                //   have the list of offline CSS baseline assets and not insert the CSS if already present.
-  //              val stylesheetsToLoad = findAndDetachCssToLoad(rcv.frag)
-                val stylesheetsToLoad = Nil
-                val scriptsToLoad     = findAndDetachJsToLoad (rcv.frag)
-
-                // Asynchronously load styles, insert HTML, then load scripts
-                for {
-  //                _ <- loadStylesheets(stylesheetsToLoad) // XXX TODO
-                  _ <- Future()
-                  _ =  moveChildren(source = rcv.frag.querySelector("body"), target = container)
-                  _ <- loadScripts(scriptsToLoad)
-                } yield ()
 
                 containingDocument.afterInitialResponse()
 

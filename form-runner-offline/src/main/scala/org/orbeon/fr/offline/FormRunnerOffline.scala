@@ -9,7 +9,7 @@ import org.orbeon.oxf.fr.library._
 import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
 import org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, DataURLDecoder, DecodedDataURL, PathUtils}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, PathUtils}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
@@ -27,7 +27,6 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.{RegExp, |}
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.typedarray.Uint8Array
 
@@ -108,6 +107,32 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
       formName,
       formVersion
     ).toJSPromise
+
+  @JSExport
+  def warmupFormIfNeeded(
+    appName          : String,
+    formName         : String,
+    formVersion      : Int
+  ): Unit =
+    OfflineSupport.renderCompiledForm(
+      None,
+      staticStateCache.getOrElse(
+        CacheKey(appName, formName, formVersion),
+        throw new IllegalStateException(s"form not in cache for $appName/$formName/$formVersion")
+      ),
+      FormRunnerFunctionLibraryList,
+      Some(
+        new XFormsURIResolver {
+          def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
+            urlString match {
+              case "input:instance" => createFormParamInstance(appName, formName, formVersion, "test", None)
+              case _                => throw new UnsupportedOperationException(s"resolving `$urlString")
+            }
+          def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo =
+            throw new UnsupportedOperationException(s"resolving readonly `$urlString")
+        }
+      )
+    )
 
   private def compileAndCacheFormIfNeededF(
     serializedBundle : SerializedBundle,
@@ -244,34 +269,20 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
   ): js.Promise[RuntimeForm] = {
 
     val future =
-      compileAndCacheFormIfNeededF(serializedBundle, appName, formName, formVersion) map { compiledFormF =>
+      compileAndCacheFormIfNeededF(serializedBundle, appName, formName, formVersion) map { compiledForm =>
         OfflineSupport.renderCompiledForm(
-          container,
-          compiledFormF,
+          container.some,
+          compiledForm,
           FormRunnerFunctionLibraryList,
           Some(
             new XFormsURIResolver {
               def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
                 urlString match {
-                  case "input:instance" =>
-
-                    val root = Element("request")
-
-                    root.addElement("app").addText(appName)
-                    root.addElement("form").addText(formName)
-                    root.addElement("form-version").addText(formVersion.toString)
-                    val documentElem = root.addElement("document")
-                    documentId foreach documentElem.addText
-                    root.addElement("mode").addText(mode)
-
-                    Document(root)
-                  case _ =>
-                    throw new UnsupportedOperationException(s"resolving `$urlString")
+                  case "input:instance" => createFormParamInstance(appName, formName, formVersion, mode, documentId.toOption)
+                  case _                => throw new UnsupportedOperationException(s"resolving `$urlString")
                 }
-
-              def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo = {
+              def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo =
                 throw new UnsupportedOperationException(s"resolving readonly `$urlString")
-              }
             }
           )
         )
@@ -340,5 +351,25 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     case class CacheKey(appName: String, formName: String, formVersion: Int)
 
     var staticStateCache = Map[CacheKey, CompiledForm]()
+
+    def createFormParamInstance(
+      appName          : String,
+      formName         : String,
+      formVersion      : Int,
+      mode             : String,
+      documentIdOpt    : Option[String]
+    ): Document = {
+
+      val root = Element("request")
+
+      root.addElement("app").addText(appName)
+      root.addElement("form").addText(formName)
+      root.addElement("form-version").addText(formVersion.toString)
+      val documentElem = root.addElement("document")
+      documentIdOpt foreach documentElem.addText
+      root.addElement("mode").addText(mode)
+
+      Document(root)
+    }
   }
 }

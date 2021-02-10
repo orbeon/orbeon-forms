@@ -77,7 +77,7 @@ object FormRunnerMetadata {
     val iterationResource = currentFormRunnerResources / "email" / "iteration" stringValue
 
     def iterationString(it: Int) =
-      ProcessTemplateSupport.processTemplateWithNames(iterationResource, List(("iteration", it)), Configuration.getLocale(currentLang))
+      ProcessTemplateSupport.processTemplateWithNames(iterationResource, List(("iteration", it)))
 
     val controlDetails = gatherRelevantControls(XFormsAPI.inScopeContainingDocument)
 

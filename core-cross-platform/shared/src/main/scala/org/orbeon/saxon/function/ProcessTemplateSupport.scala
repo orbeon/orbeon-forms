@@ -1,6 +1,7 @@
 package org.orbeon.saxon.function
 
-import java.text.MessageFormat
+import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter}
+
 import java.util.Locale
 import java.util.regex.Matcher
 
@@ -21,8 +22,7 @@ object ProcessTemplateSupport {
 
   def processTemplateWithNames(
     templateWithNames : String,
-    javaNamedParams   : List[(String, Any)],
-    currentLocale     : Locale
+    javaNamedParams   : List[(String, Any)]
   ): String = {
 
     // TODO
@@ -45,7 +45,9 @@ object ProcessTemplateSupport {
         Matcher.quoteReplacement("{" + nameToPos(m.group(1)).toString)
       }).replaceAllLiterally("'", "''")
 
-    new MessageFormat(templateWithPositions, currentLocale)
-      .format(javaNamedParams.map(v => formatValue(v._2)).toArray)
+    MessageFormatter.format(
+      MessageFormatCache(templateWithPositions),
+      javaNamedParams.map(v => formatValue(v._2)).toVector
+    )
   }
 }

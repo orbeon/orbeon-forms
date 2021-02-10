@@ -60,7 +60,7 @@ class XXFormsResource extends XFormsFunction {
               key.getStringValue -> javaParamOpt.orNull
           }
 
-          ProcessTemplateSupport.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List), currentLocale)
+          ProcessTemplateSupport.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.to(List))
 
         case None =>
           resourceOrTemplate

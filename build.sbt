@@ -1210,8 +1210,9 @@ lazy val coreCrossPlatform = (crossProject(JVMPlatform, JSPlatform).crossType(Cr
   )
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scala212,
-      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+      "org.parboiled"   %%% "parboiled"     % Parboiled2Version,
+      "org.scala-lang"  %   "scala-reflect" % scala212,
+      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
     )
   )
 
@@ -1221,7 +1222,7 @@ lazy val coreCrossPlatformJVM = coreCrossPlatform.jvm
     domJVM
   )
   .settings(
-    libraryDependencies                ++= CoreLibraryDependencies
+    libraryDependencies ++= CoreLibraryDependencies
   )
 
 lazy val coreCrossPlatformJS = coreCrossPlatform.js

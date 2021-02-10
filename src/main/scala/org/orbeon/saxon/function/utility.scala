@@ -65,7 +65,7 @@ class ProcessTemplate extends DefaultFunctionSupport {
               key.getStringValue -> javaParamOpt.orNull
           }
 
-          ProcessTemplateSupport.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.toList, Configuration.getLocale(langArgument))
+          ProcessTemplateSupport.processTemplateWithNames(resourceOrTemplate, javaNamedParamsIt.toList)
 
         case None =>
           resourceOrTemplate

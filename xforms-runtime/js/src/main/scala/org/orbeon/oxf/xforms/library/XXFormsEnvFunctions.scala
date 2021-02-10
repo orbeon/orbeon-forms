@@ -6,7 +6,7 @@ import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.{MessageFormatter, MessageFormatCache, XPathCache}
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction

@@ -13,8 +13,6 @@
   */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import java.util.Locale
-
 import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -98,7 +96,7 @@ class XXFormsResourceTest extends AnyFunSpec {
     for (((template, params), expected) <- Expected)
       it(s"must replace template to `$expected`") {
         assert(
-          expected === ProcessTemplateSupport.processTemplateWithNames(template, params, Locale.getDefault(Locale.Category.FORMAT))
+          expected === ProcessTemplateSupport.processTemplateWithNames(template, params)
         )
       }
   }

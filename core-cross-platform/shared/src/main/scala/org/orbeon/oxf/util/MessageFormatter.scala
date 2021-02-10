@@ -1,4 +1,4 @@
-package org.orbeon.oxf.xforms.library
+package org.orbeon.oxf.util
 
 import org.parboiled2._
 

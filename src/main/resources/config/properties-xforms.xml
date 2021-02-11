@@ -236,7 +236,8 @@
             { "full": "/apps/fr/style/font-awesome/css/font-awesome.css",                    "min": true  },
             { "full": "/config/theme/xforms.css",                                            "min": false },
             { "full": "/config/theme/error.css",                                             "min": false },
-            { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false }
+            { "full": "/ops/nprogress-0.2.0/nprogress.css",                                  "min": false },
+            { "full": "/ops/css-loader/css-loader.css",                                      "min": false }
           ],
 
           "js": [

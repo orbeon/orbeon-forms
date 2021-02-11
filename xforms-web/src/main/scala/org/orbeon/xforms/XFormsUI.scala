@@ -16,11 +16,10 @@ package org.orbeon.xforms
 import org.orbeon.xforms.facade.{Controls, Utils}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
+import org.scalajs.dom.raw.{Element, Node}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{newInstance, global => g}
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers
 import scala.scalajs.js.timers.SetTimeoutHandle
@@ -30,7 +29,7 @@ import scala.scalajs.js.timers.SetTimeoutHandle
 @JSExportTopLevel("OrbeonXFormsUi")
 object XFormsUI {
 
-  @JSExport // 2020-04-27: 6 JavaScript usages
+  @JSExport // 2020-04-27: 6 JavaScript usages from xforms.js
   var modalProgressPanelShown: Boolean = false
 
   @JSExport // 2020-04-27: 1 JavaScript usage
@@ -52,11 +51,11 @@ object XFormsUI {
           Utils.resetIOSZoom()
             Some(
               timers.setTimeout(200.milliseconds) {
-                Private.panel.show()
+                Private.showModalProgressPanelRaw()
               }
             )
         } else {
-          Private.panel.show()
+          Private.showModalProgressPanelRaw()
           None
         }
 
@@ -81,29 +80,37 @@ object XFormsUI {
       }
     }
 
+  def showModalProgressPanelImmediate(): Unit =
+    Private.showModalProgressPanelRaw()
+
+  def hideModalProgressPanelImmediate(): Unit =
+    Private.hideModalProgressPanelRaw()
+
   private object Private {
 
-    lazy val panel: js.Dynamic = {
+    private def findLoaderElem: Option[Element] =
+      Option(dom.document.querySelector("body > .orbeon-loader"))
 
-      val panel =
-        newInstance(g.YAHOO.widget.Panel)(
-          Page.namespaceIdIfNeeded(Support.formElemOrDefaultForm(js.undefined).id, "orbeon-spinner"),
-          new js.Object {
-            val modal       = true
-            val fixedcenter = true
-            val visible     = true
-            val draggable   = false
-            val width       = "60px"
-            val close       = false
-            val zindex      = 4
-          }
-        )
-
-      panel.setBody("""<div class="xforms-modal-progress"/>""")
-      panel.render(dom.document.body)
-
-      panel
+    private def createLoaderElem: Element = {
+      val newDiv = dom.document.createElement("div")
+      newDiv.classList.add("orbeon-loader")
+      dom.document.body.appendChild(newDiv)
+      newDiv
     }
+
+    def showModalProgressPanelRaw(): Unit = {
+      val elem = findLoaderElem getOrElse createLoaderElem
+      val cl = elem.classList
+      cl.add("loader") // TODO: `add()` can take several arguments
+      cl.add("loader-default")
+      cl.add("is-active")
+    }
+
+    def hideModalProgressPanelRaw(): Unit =
+      findLoaderElem foreach { elem =>
+        val cl = elem.classList
+        cl.remove("is-active")
+      }
 
     def hideModalProgressPanel(
       timerIdOpt        : Option[SetTimeoutHandle],
@@ -116,7 +123,7 @@ object XFormsUI {
         // So that the modal progress panel doesn't show just after we try to hide it
         timerIdOpt foreach timers.clearTimeout
 
-        Private.panel.hide()
+        hideModalProgressPanelRaw()
 
         // Restore focus
         // See https://github.com/orbeon/orbeon-forms/issues/4511

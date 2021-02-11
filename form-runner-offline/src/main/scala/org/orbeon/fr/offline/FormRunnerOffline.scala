@@ -18,7 +18,7 @@ import org.orbeon.xforms.embedding.SubmissionProvider
 import org.orbeon.xforms.offline.OfflineSupport
 import org.orbeon.xforms.offline.OfflineSupport.{CompiledForm, RuntimeForm, SerializedBundle}
 import org.orbeon.xforms.offline.demo.LocalClientServerChannel
-import org.orbeon.xforms.{App, XFormsApp}
+import org.orbeon.xforms.{App, XFormsApp, XFormsUI}
 import org.scalajs.dom.html
 
 import java.io.InputStream
@@ -268,24 +268,31 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     documentId       : js.UndefOr[String]
   ): js.Promise[RuntimeForm] = {
 
+    XFormsUI.showModalProgressPanelImmediate()
+
     val future =
       compileAndCacheFormIfNeededF(serializedBundle, appName, formName, formVersion) map { compiledForm =>
-        OfflineSupport.renderCompiledForm(
-          container.some,
-          compiledForm,
-          FormRunnerFunctionLibraryList,
-          Some(
-            new XFormsURIResolver {
-              def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
-                urlString match {
-                  case "input:instance" => createFormParamInstance(appName, formName, formVersion, mode, documentId.toOption)
-                  case _                => throw new UnsupportedOperationException(s"resolving `$urlString")
-                }
-              def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo =
-                throw new UnsupportedOperationException(s"resolving readonly `$urlString")
-            }
+
+        try {
+          OfflineSupport.renderCompiledForm(
+            container.some,
+            compiledForm,
+            FormRunnerFunctionLibraryList,
+            Some(
+              new XFormsURIResolver {
+                def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
+                  urlString match {
+                    case "input:instance" => createFormParamInstance(appName, formName, formVersion, mode, documentId.toOption)
+                    case _                => throw new UnsupportedOperationException(s"resolving `$urlString")
+                  }
+                def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo =
+                  throw new UnsupportedOperationException(s"resolving readonly `$urlString")
+              }
+            )
           )
-        )
+        } finally {
+          XFormsUI.hideModalProgressPanelImmediate()
+        }
       }
 
     future.toJSPromise

@@ -15,10 +15,12 @@ object EmbeddingSupport {
 
   def destroyForm(container: html.Element): Unit = {
     Option(container.querySelector("form")).foreach { formElem =>
-      val form = Page.getForm(formElem.id)
+      val formId = formElem.id
+      val form = Page.getForm(formId)
       form.xblInstances.foreach(_.destroy())
       form.xblInstances.clear()
       Page.unregisterForm(form)
+      StateHandling.clearClientState(formId)
     }
     container.childNodes.foreach(container.removeChild)
   }

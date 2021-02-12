@@ -491,7 +491,7 @@ trait XFormsModelInstances {
         // Instance 1) has cache hint and 2) is not input:*, so it can be cached
         // NOTE: We don't allow sharing for input:* URLs as the data will likely differ per request
         val caching = InstanceCaching.fromValues(instance.timeToLive, instance.handleXInclude, resolveInstanceURL(instance), None)
-        val documentInfo = XFormsServerSharedInstancesCache.findContentOrLoad(instance, caching, instance.readonly, loadInstance)
+        val documentInfo = XFormsServerSharedInstancesCache.findContentOrLoad(caching, instance.readonly, instance.exposeXPathTypes, loadInstance)
         indexInstance(new XFormsInstance(selfModel, instance, Option(caching), documentInfo, instance.readonly, _modified = false, valid = true))
       } else {
         // Instance cannot be cached

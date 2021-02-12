@@ -11,20 +11,20 @@ trait XFormsServerSharedInstancesCacheTrait {
   type InstanceLoader = (String, Boolean) => DocumentNodeInfoType
 
   // Try to find instance content in the cache but do not attempt to load it if not found
-  def findContentOrNull(
-      instance        : Instance,
-      instanceCaching : InstanceCaching,
-      readonly        : Boolean)(implicit
-      indentedLogger  : IndentedLogger
-  ): DocumentNodeInfoType
+  def findContent(
+    instanceCaching  : InstanceCaching,
+    readonly         : Boolean,
+    exposeXPathTypes : Boolean)(implicit
+    indentedLogger   : IndentedLogger
+  ): Option[DocumentNodeInfoType]
 
   // Try to find instance content in the cache or load it
   def findContentOrLoad(
-      instance        : Instance,
-      instanceCaching : InstanceCaching,
-      readonly        : Boolean,
-      loadInstance    : InstanceLoader)(implicit
-      indentedLogger  : IndentedLogger
+    instanceCaching  : InstanceCaching,
+    readonly         : Boolean,
+    exposeXPathTypes : Boolean,
+    loadInstance     : InstanceLoader)(implicit
+    indentedLogger   : IndentedLogger
   ): DocumentNodeInfoType
 
   // Remove the given entry from the cache if present

@@ -527,9 +527,9 @@ object XFormsInstance extends Logging {
           (
             Some(caching),
             XFormsServerSharedInstancesCache.findContentOrLoad(
-              instance,
               caching,
               instanceState.readonly,
+              instance.exposeXPathTypes,
               loader
             )
           )

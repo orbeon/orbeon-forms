@@ -14,13 +14,13 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
   private var cache = Map[CacheKeyType, DocumentNodeInfoType]()
 
   // Try to find instance content in the cache but do not attempt to load it if not found
-  def findContentOrNull(
+  def findContent(
       instance        : Instance,
       instanceCaching : InstanceCaching,
       readonly        : Boolean)(implicit
       indentedLogger  : IndentedLogger
-  ): DocumentNodeInfoType =
-    cache.get(createCacheKey(instanceCaching)).orNull
+  ): Option[DocumentNodeInfoType] =
+    cache.get(createCacheKey(instanceCaching))
 
   def findContentOrLoad(
       instance        : Instance,

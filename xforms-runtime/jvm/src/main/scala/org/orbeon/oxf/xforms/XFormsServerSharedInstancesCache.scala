@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms
 import cats.syntax.option._
 import org.orbeon.oxf.cache.{InternalCacheKey, ObjectCache}
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xforms.model.XFormsInstance._
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
@@ -29,22 +28,22 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
   import Private._
 
   // Try to find instance content in the cache but do not attempt to load it if not found
-  def findContentOrNull(
-      instance        : Instance,
-      instanceCaching : InstanceCaching,
-      readonly        : Boolean)(implicit
-      indentedLogger  : IndentedLogger
-  ): DocumentNodeInfoType =
+  def findContent(
+      instanceCaching  : InstanceCaching,
+      readonly         : Boolean,
+      exposeXPathTypes : Boolean)(implicit
+      indentedLogger   : IndentedLogger
+  ): Option[DocumentNodeInfoType] =
     find(instanceCaching)(indentedLogger) map
-      (wrapDocumentInfo(_, readonly, instance.exposeXPathTypes)) orNull // TODO: shouldn't need to wrap since we don't expose types on readonly instances?
+      (wrapDocumentInfo(_, readonly, exposeXPathTypes)) // TODO: shouldn't need to wrap since we don't expose types on readonly instances?
 
   // Try to find instance content in the cache or load it
   def findContentOrLoad(
-      instance        : Instance,
-      instanceCaching : InstanceCaching,
-      readonly        : Boolean,
-      loadInstance    : InstanceLoader)(implicit
-      indentedLogger  : IndentedLogger
+    instanceCaching  : InstanceCaching,
+    readonly         : Boolean,
+    exposeXPathTypes : Boolean,
+    loadInstance     : InstanceLoader)(implicit
+    indentedLogger   : IndentedLogger
   ): DocumentNodeInfoType = {
 
     // Add an entry to the cache
@@ -78,7 +77,7 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
     find(instanceCaching) orElse
       loadAndCache map
-      (wrapDocumentInfo(_, readonly, instance.exposeXPathTypes)) get
+      (wrapDocumentInfo(_, readonly, exposeXPathTypes)) get
   }
 
   // Remove the given entry from the cache if present

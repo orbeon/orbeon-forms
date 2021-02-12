@@ -19,9 +19,11 @@ import org.orbeon.apache.xerces.xni.parser.{XMLErrorHandler, XMLInputSource, XML
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.util.StaticXPath._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, Exceptions, IndentedLogger, StaticXPath, UploadProgress}
+import org.orbeon.oxf.util.{Base64, Connection, CoreCrossPlatformSupport, Exceptions, IndentedLogger, StaticXPath, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver
@@ -31,7 +33,7 @@ import org.scalajs.dom.DOMParser
 import org.scalajs.dom.ext._
 import org.scalajs.dom.raw.HTMLDocument
 
-import java.io.{InputStream, OutputStream, Reader, StringReader}
+import java.io.{ByteArrayOutputStream, InputStream, OutputStream, Reader, StringReader}
 import java.net.URI
 import javax.xml.transform.Transformer
 import javax.xml.transform.sax.TransformerHandler
@@ -57,9 +59,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String =
     url match {
       case "input:instance" => url
-      case _ =>
-        println(s"xxx resolveServiceURL: `$url`")
-        url
+      case _                => url
     }
 
   def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = throw new NotImplementedError("resolveResourceURL")
@@ -116,9 +116,29 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     customHeaders    : Map[String, List[String]],
     getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger
-  ): String =
-    throw new NotImplementedError("proxyURI")
+  ): String = {
 
+    implicit val ec = externalContext
+
+    val cxr =
+      Connection.connectNow(
+        method          = GET,
+        url             = new URI(uri),
+        credentials     = None,
+        content         = None,
+        headers         = Map.empty,
+        loadState       = false,
+        saveState       = false,
+        logBody         = false
+      )
+
+    val baos = new ByteArrayOutputStream
+    IOUtils.copyStreamAndClose(cxr.content.inputStream, baos)
+    "data:" + contentType.orElse(cxr.mediatype).getOrElse("") + ";base64," + Base64.encode(baos.toByteArray, useLineBreaks = false)
+  }
+
+  // In the JavaScript environment, we currently don't require a way to handle dynamic URLs, so we
+  // proxy resources as `data:` URLs.
   def proxyBase64Binary(
     value            : String,
     filename         : Option[String],
@@ -127,7 +147,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     getHeader        : String => Option[List[String]])(implicit
     logger           : IndentedLogger
   ): String =
-    throw new NotImplementedError("proxyBase64Binary")
+    "data:" + mediatype.getOrElse("") + ";base64," + value
 
   def renameAndExpireWithSession(
     existingFileURI  : String)(implicit
@@ -147,7 +167,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   ): Option[String] =
     throw new NotImplementedError("inputStreamToSessionUri")
 
-  def getLastModifiedIfFast(absoluteURL: String): Long = throw new NotImplementedError("getLastModifiedIfFast")
+  // TODO: This is used by `XFormsOutputControl` when proxying resources.
+  def getLastModifiedIfFast(absoluteURL: String): Long = 0
 
   // Must not be called, see comment in trait
   def readTinyTreeFromUrl(urlString: String): DocumentNodeInfoType =
@@ -307,6 +328,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
       def fatalError(domain: String, key: String, exception: XMLParseException): Unit =
         println("Fatal: " + exception.getMessage)
     })
+
     println(s"xxxx parsing $systemId")
     val t1 = System.currentTimeMillis()
     parser.parse(source)

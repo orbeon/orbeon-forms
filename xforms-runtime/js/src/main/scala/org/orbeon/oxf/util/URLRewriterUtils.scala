@@ -17,7 +17,7 @@ object URLRewriterUtils {
     rewriteMode  : Int
   ): String = {
     println(s"xxx URLRewriterUtils.rewriteResourceURL called for $urlString")
-    throw new NotImplementedError("rewriteResourceURL")
+    urlString
   }
 
   def rewriteServiceURL(

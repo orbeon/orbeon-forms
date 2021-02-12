@@ -3,7 +3,6 @@ package org.orbeon.fr.offline
 import cats.syntax.option._
 import io.circe.generic.auto._
 import io.circe.parser.decode
-import io.circe.syntax._
 import org.log4s.{Debug, Info}
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.facades.{JSZip, TextDecoder, ZipObject}
@@ -13,7 +12,6 @@ import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
 import org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, PathUtils}
-import org.orbeon.oxf.xforms.XFormsStaticState
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo

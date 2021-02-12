@@ -1,24 +1,30 @@
 package org.orbeon.oxf.fr
 
+import cats.syntax.option._
+import io.circe.generic.auto._
+import io.circe.syntax._
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.Names.FormInstance
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsStaticStateSerializer.ResourcesToInclude
-import org.orbeon.oxf.xforms.analysis.model.Instance
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Submission}
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.oxf.xforms.processor.XFormsCompiler
 import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.scaxon.SimplePath._
 
 import java.net.URI
 import java.util.zip.{ZipEntry, ZipOutputStream}
 
 
 class FormRunnerCompiler extends ProcessorImpl {
+
+  case class ManifestEntry(url: String, zipPath: String, contentType: String)
 
   private val Logger = LoggerFactory.createLogger(classOf[FormRunnerCompiler])
   private implicit val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
@@ -41,30 +47,66 @@ class FormRunnerCompiler extends ProcessorImpl {
 
           val (jsonString, staticState) = XFormsCompiler.compile(formDocument)
 
-          val attachments =
-            staticState.topLevelPart.findControlAnalysis(FormInstance) collect {
-              case instance: Instance =>
+          val cacheableResourcesToInclude = {
 
-                val basePath = FormRunner.createFormDefinitionBasePath(appName, formName)
+            val urlOptIt =
+              staticState.topLevelPart.iterateControls collect {
+                case instance: Instance
+                  if instance.readonly &&
+                     instance.cache    &&
+                     instance.dependencyURL.isDefined =>
+                  instance.dependencyURL
+                case submission: Submission
+                  if submission.avtXxfReadonlyOpt.contains("true") &&
+                     submission.avtXxfCacheOpt.contains("true")    &&
+                     submission.avtMethod.exists(s => HttpMethod.withNameInsensitiveOption(s).contains(HttpMethod.GET)) =>
 
-                val dataDoc =
-                  XFormsInstanceSupport.extractDocument(
-                    instance.inlineRootElemOpt.get, // FIXME: `get`
-                    instance.excludeResultPrefixes,
-                    instance.readonly,
-                    instance.exposeXPathTypes,
-                    removeInstanceData = false
-                  )
+                  if (submission.avtActionOrResource == "/fr/service/i18n/fr-resources/{$app}/{$form}")
+                    "/fr/service/i18n/fr-resources/orbeon/offline".some
+                  else
+                    submission.avtActionOrResource.some
+              }
 
-                FormRunner.collectAttachments(
-                  data             = dataDoc,
-                  fromBasePath     = basePath,
-                  toBasePath       = basePath,
-                  forceAttachments = true
-                ) map (_.holder.getStringValue.trimAllToEmpty)
-            }
+            val entriesIt =
+              urlOptIt.flatten map { uri =>
+                ManifestEntry(uri, new URI(uri).normalize.getPath, ContentTypes.XmlContentType)
+              }
 
-          println(s"xxxx attachments: ${attachments mkString ", "}")
+            entriesIt.toList
+          }
+
+          val formInstanceAttachments = {
+
+            val opt =
+              staticState.topLevelPart.findControlAnalysis(FormInstance) collect {
+                case instance: Instance =>
+
+                  val basePath = FormRunner.createFormDefinitionBasePath(appName, formName)
+
+                  val dataDoc =
+                    XFormsInstanceSupport.extractDocument(
+                      instance.inlineRootElemOpt.get, // FIXME: `get`
+                      instance.excludeResultPrefixes,
+                      instance.readonly,
+                      instance.exposeXPathTypes,
+                      removeInstanceData = false
+                    )
+
+                  FormRunner.collectAttachments(
+                    data             = dataDoc,
+                    fromBasePath     = basePath,
+                    toBasePath       = basePath,
+                    forceAttachments = true
+                  ) map { awh =>
+                    val holder    = awh.holder
+                    val uri       = holder.getStringValue.trimAllToEmpty
+                    val mediatype = awh.holder.attValue("mediatype")
+                    ManifestEntry(uri, new URI(uri).normalize.getPath, mediatype)
+                  }
+              }
+
+            opt.toList.flatten
+          }
 
           val useZipFormat =
             ec.getRequest.getFirstParamAsString("format").contains("zip")
@@ -75,9 +117,26 @@ class FormRunnerCompiler extends ProcessorImpl {
 
             chos.setContentType("application/zip")
 
+            val jsonFormPath = s"/$appName/$formName/$formVersion/form/form.json"
+
+            // Generate and write manifest
+            locally {
+
+              val manifest =
+                (
+                  ManifestEntry(jsonFormPath, jsonFormPath, ContentTypes.XmlContentType) ::
+                  formInstanceAttachments :::
+                  cacheableResourcesToInclude
+                ).asJson.noSpaces
+
+              val entry = new ZipEntry("manifest.json")
+              zos.putNextEntry(entry)
+              zos.write(manifest.getBytes(CharsetNames.Utf8))
+            }
+
             // Write form JSON
             locally {
-              val entry = new ZipEntry(s"/$appName/$formName/$formVersion/form/form.json")
+              val entry = new ZipEntry(jsonFormPath)
               zos.putNextEntry(entry)
               zos.write(jsonString.getBytes(CharsetNames.Utf8))
             }
@@ -104,9 +163,9 @@ class FormRunnerCompiler extends ProcessorImpl {
             }
 
             // Write static attachments and other resources
-            attachments.iterator.flatten ++ ResourcesToInclude foreach { pathOrUrl =>
-              ConnectionResult.withSuccessConnection(connect(pathOrUrl), closeOnSuccess = true) { is =>
-                val entry = new ZipEntry(new URI(pathOrUrl).normalize.getPath)
+            formInstanceAttachments.iterator ++ cacheableResourcesToInclude foreach { manifestEntry =>
+              ConnectionResult.withSuccessConnection(connect(manifestEntry.url), closeOnSuccess = true) { is =>
+                val entry = new ZipEntry(manifestEntry.zipPath)
                 zos.putNextEntry(entry)
                 IOUtils.copyStreamAndClose(is, zos, doCloseOut = false)
               }

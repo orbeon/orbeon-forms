@@ -280,7 +280,7 @@ private object XFormsProcessorBase {
         (_, instance)         <- model.instances
         if instance.dependencyURL.isDefined && ! instance.cache
         resolvedDependencyURL =
-        XFormsCrossPlatformSupport.resolveServiceURL(
+          XFormsCrossPlatformSupport.resolveServiceURL(
             containingDocument,
             instance.element,
             instance.dependencyURL.get,

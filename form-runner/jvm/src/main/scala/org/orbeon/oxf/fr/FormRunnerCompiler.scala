@@ -17,14 +17,13 @@ import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.oxf.xforms.processor.XFormsCompiler
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.ManifestEntry
 
 import java.net.URI
 import java.util.zip.{ZipEntry, ZipOutputStream}
 
 
 class FormRunnerCompiler extends ProcessorImpl {
-
-  case class ManifestEntry(url: String, zipPath: String, contentType: String)
 
   private val Logger = LoggerFactory.createLogger(classOf[FormRunnerCompiler])
   private implicit val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
@@ -69,7 +68,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
             val entriesIt =
               urlOptIt.flatten map { uri =>
-                ManifestEntry(uri, new URI(uri).normalize.getPath, ContentTypes.XmlContentType)
+                ManifestEntry(new URI(uri), ContentTypes.XmlContentType)
               }
 
             entriesIt.toList
@@ -101,7 +100,7 @@ class FormRunnerCompiler extends ProcessorImpl {
                     val holder    = awh.holder
                     val uri       = holder.getStringValue.trimAllToEmpty
                     val mediatype = awh.holder.attValue("mediatype")
-                    ManifestEntry(uri, new URI(uri).normalize.getPath, mediatype)
+                    ManifestEntry(new URI(uri), mediatype)
                   }
               }
 
@@ -117,7 +116,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
             chos.setContentType("application/zip")
 
-            val jsonFormPath = s"/$appName/$formName/$formVersion/form/form.json"
+            val jsonFormPath = s"_forms/$appName/$formName/$formVersion/form/form.json"
 
             // Generate and write manifest
             locally {
@@ -129,7 +128,7 @@ class FormRunnerCompiler extends ProcessorImpl {
                   cacheableResourcesToInclude
                 ).asJson.noSpaces
 
-              val entry = new ZipEntry("manifest.json")
+              val entry = new ZipEntry(ManifestEntry.JsonFilename)
               zos.putNextEntry(entry)
               zos.write(manifest.getBytes(CharsetNames.Utf8))
             }
@@ -164,7 +163,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
             // Write static attachments and other resources
             formInstanceAttachments.iterator ++ cacheableResourcesToInclude foreach { manifestEntry =>
-              ConnectionResult.withSuccessConnection(connect(manifestEntry.url), closeOnSuccess = true) { is =>
+              ConnectionResult.withSuccessConnection(connect(manifestEntry.uri), closeOnSuccess = true) { is =>
                 val entry = new ZipEntry(manifestEntry.zipPath)
                 zos.putNextEntry(entry)
                 IOUtils.copyStreamAndClose(is, zos, doCloseOut = false)

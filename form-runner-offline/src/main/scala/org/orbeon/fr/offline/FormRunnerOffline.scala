@@ -1,6 +1,9 @@
 package org.orbeon.fr.offline
 
 import cats.syntax.option._
+import io.circe.generic.auto._
+import io.circe.parser.decode
+import io.circe.syntax._
 import org.log4s.{Debug, Info}
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.facades.{JSZip, TextDecoder, ZipObject}
@@ -10,6 +13,7 @@ import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
 import org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, PathUtils}
+import org.orbeon.oxf.xforms.XFormsStaticState
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
@@ -18,7 +22,7 @@ import org.orbeon.xforms.embedding.SubmissionProvider
 import org.orbeon.xforms.offline.OfflineSupport
 import org.orbeon.xforms.offline.OfflineSupport.{CompiledForm, RuntimeForm, SerializedBundle}
 import org.orbeon.xforms.offline.demo.LocalClientServerChannel
-import org.orbeon.xforms.{App, XFormsApp, XFormsUI}
+import org.orbeon.xforms.{App, ManifestEntry, XFormsApp, XFormsUI}
 import org.scalajs.dom.html
 
 import java.io.InputStream
@@ -153,47 +157,38 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
             case v: Uint8Array =>
               JSZip.loadAsync(v.buffer).toFuture flatMap { jsZip =>
 
-                var futures: List[Future[(String, Either[String, Uint8Array])]] = Nil
+                // Collect all Zip content
+                var futures: List[Future[(String, Uint8Array)]] = Nil
 
                 jsZip.forEach((relativePath: String, zipObject: ZipObject) => {
                   println(s"xxxx found `$relativePath` in zip")
-
-                  futures ::=
-                    zipObject.async("uint8array").toFuture map { data =>
-
-                      val FormRe = "/([^/]+)/([^/]+)/([^/]+)/form/form.json".r
-                      val XmlRe  = "/([^.]+).xml".r
-
-                      relativePath -> (
-                        relativePath match {
-                          case FormRe(appName, formName, formVersion) =>
-                            println(s"xxx got form for `$appName/$formName/$formVersion`")
-                            Left(new TextDecoder().decode(data))
-                          case XmlRe(path) =>
-                            println(s"xxx got XML for `$path`")
-                            Right(data)
-                          case other =>
-                            println(s"xxx got other for `$other`")
-                            Right(data)
-                        }
-                      )
-                    }
+                  futures ::= zipObject.async("uint8array").toFuture map (relativePath ->)
                 })
 
-                Future.sequence(futures) map { values =>
+                Future.sequence(futures) map { zipValues =>
 
-                  val resources =
-                    values collect {
-                      case (path, Right(data)) =>
-                        if (path.startsWith("/fr"))
-                          path -> data
-                        else
-                          s"oxf:$path" -> data // TODO xxx oxf:
-                    }
+                  // Read and decode the manifest
+                  val manifestEntries: Iterable[ManifestEntry] =
+                    zipValues.collectFirst {
+                      case (ManifestEntry.JsonFilename, data) =>
+                        decode[Iterable[ManifestEntry]](new TextDecoder().decode(data))
+                          .getOrElse(throw new IllegalArgumentException(s"incorrect `${ManifestEntry.JsonFilename}` contents"))
+                    } getOrElse
+                      (throw new IllegalArgumentException(s"missing `${ManifestEntry.JsonFilename}` contents"))
 
-                  val resourcesMap = resources.toMap
+                  // Collect resources described in the manifest
+                  val resourcesByUri = {
 
-                  println(s"xxxx resources ${resourcesMap.keys mkString ", " }")
+                    val resourcesByZipPath = zipValues.toMap
+
+                    manifestEntries flatMap { case ManifestEntry(uri, zipPath, contentType) =>
+                      resourcesByZipPath.get(zipPath) map { data =>
+                        uri -> (data, contentType)
+                      }
+                    } toMap
+                  }
+
+                  println(s"xxxx resources ${resourcesByUri.keys mkString ", " }")
 
                   // Store a connection resolver that resolves to resources included in the compiled form
                   Connection.resourceResolver = (urlString: String) => {
@@ -207,9 +202,7 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
                       else
                         urlString
 
-                    resourcesMap.get(updatedUrlString) map { data =>
-
-                      val contentType = "application/xml" // XXX TODO
+                    resourcesByUri.get(updatedUrlString) map { case (data, contentType) =>
 
                       val is = new InputStream {
 
@@ -232,8 +225,9 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
                     }
                   }
 
-                  values collectFirst
-                    { case (path, Left(json)) => json } getOrElse
+                  // Find form
+                  zipValues collectFirst
+                    { case (path, data) if path.endsWith("form.json") => new TextDecoder().decode(data) } getOrElse
                     (throw new IllegalArgumentException("missing form in Zip"))
                 }
               }

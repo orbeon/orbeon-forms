@@ -2,7 +2,6 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.model.InstanceCaching
 
 
@@ -15,19 +14,19 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
   // Try to find instance content in the cache but do not attempt to load it if not found
   def findContent(
-      instance        : Instance,
-      instanceCaching : InstanceCaching,
-      readonly        : Boolean)(implicit
-      indentedLogger  : IndentedLogger
+    instanceCaching  : InstanceCaching,
+    readonly         : Boolean,
+    exposeXPathTypes : Boolean)(implicit
+    indentedLogger   : IndentedLogger
   ): Option[DocumentNodeInfoType] =
     cache.get(createCacheKey(instanceCaching))
 
   def findContentOrLoad(
-      instance        : Instance,
-      instanceCaching : InstanceCaching,
-      readonly        : Boolean,
-      loadInstance    : InstanceLoader)(implicit
-      indentedLogger  : IndentedLogger
+    instanceCaching  : InstanceCaching,
+    readonly         : Boolean,
+    exposeXPathTypes : Boolean,
+    loadInstance     : InstanceLoader)(implicit
+    indentedLogger   : IndentedLogger
   ): DocumentNodeInfoType = {
 
     val cacheKey = createCacheKey(instanceCaching)
@@ -49,6 +48,12 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
 
   def removeAll(implicit indentedLogger: IndentedLogger): Unit =
     cache = Map.empty
+
+  def sideLoad(
+    instanceCaching : InstanceCaching,
+    doc             : DocumentNodeInfoType
+  ): Unit =
+    cache += createCacheKey(instanceCaching) -> doc
 
   private object Private {
 

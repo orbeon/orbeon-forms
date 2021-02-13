@@ -11,17 +11,21 @@ import org.orbeon.oxf.fr.library._
 import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
 import org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, PathUtils}
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.util.{Connection, ConnectionResult, PathUtils, XPath}
+import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
+import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.utils.Configuration
 import org.orbeon.xforms.embedding.SubmissionProvider
 import org.orbeon.xforms.offline.OfflineSupport
-import org.orbeon.xforms.offline.OfflineSupport.{CompiledForm, RuntimeForm, SerializedBundle}
 import org.orbeon.xforms.offline.demo.LocalClientServerChannel
-import org.orbeon.xforms.{App, ManifestEntry, XFormsApp, XFormsUI}
+import org.orbeon.xforms._
 import org.scalajs.dom.html
+
+import org.orbeon.oxf.util.Logging._
 
 import java.io.InputStream
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,7 +34,8 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.scalajs.js.typedarray.Uint8Array
+import scala.scalajs.js.typedarray.{ArrayBuffer, Uint8Array}
+import scala.util.{Failure, Try}
 
 
 trait FormRunnerProcessor {
@@ -59,6 +64,7 @@ trait FormRunnerProcessor {
 @JSExportTopLevel("FormRunnerOffline")
 object FormRunnerOffline extends App with FormRunnerProcessor {
 
+  import OfflineSupport._
   import Private._
 
   def onOrbeonApiLoaded(): Unit = {
@@ -153,81 +159,98 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
         val jsonStringF =
           (serializedBundle: Any) match {
             case v: Uint8Array =>
-              JSZip.loadAsync(v.buffer).toFuture flatMap { jsZip =>
+              decodeZipContent(v.buffer) map { zipValues =>
 
-                // Collect all Zip content
-                var futures: List[Future[(String, Uint8Array)]] = Nil
+                // Read and decode the manifest
+                val manifestEntries = findManifestEntries(zipValues).get
 
-                jsZip.forEach((relativePath: String, zipObject: ZipObject) => {
-                  println(s"xxxx found `$relativePath` in zip")
-                  futures ::= zipObject.async("uint8array").toFuture map (relativePath ->)
-                })
+                // Collect resources described in the manifest
+                val resourcesByUri = {
 
-                Future.sequence(futures) map { zipValues =>
+                  val resourcesByZipPath = zipValues.toMap
 
-                  // Read and decode the manifest
-                  val manifestEntries: Iterable[ManifestEntry] =
-                    zipValues.collectFirst {
-                      case (ManifestEntry.JsonFilename, data) =>
-                        decode[Iterable[ManifestEntry]](new TextDecoder().decode(data))
-                          .getOrElse(throw new IllegalArgumentException(s"incorrect `${ManifestEntry.JsonFilename}` contents"))
-                    } getOrElse
-                      (throw new IllegalArgumentException(s"missing `${ManifestEntry.JsonFilename}` contents"))
+                  manifestEntries flatMap { case ManifestEntry(uri, zipPath, contentType) =>
+                    resourcesByZipPath.get(zipPath) map { data =>
+                      uri -> (data, contentType)
+                    }
+                  } toMap
+                }
 
-                  // Collect resources described in the manifest
-                  val resourcesByUri = {
+                val NormalizedResourcesPath = "/fr/service/i18n/fr-resources/orbeon/offline"
 
-                    val resourcesByZipPath = zipValues.toMap
+                // Pre-cache resources if needed
+                resourcesByUri collectFirst {
+                  case (k, (data, _)) if k.startsWith("/fr/service/i18n/fr-resources/") =>
 
-                    manifestEntries flatMap { case ManifestEntry(uri, zipPath, contentType) =>
-                      resourcesByZipPath.get(zipPath) map { data =>
-                        uri -> (data, contentType)
-                      }
-                    } toMap
-                  }
-
-                  println(s"xxxx resources ${resourcesByUri.keys mkString ", " }")
-
-                  // Store a connection resolver that resolves to resources included in the compiled form
-                  Connection.resourceResolver = (urlString: String) => {
-
-                    // Special case: normalize Form Runner resources so that we don't have to duplicate them for each form.
-                    // This prevents overriding resources for each form individually, but this is usually not necessary.
-                    // And if we wanted to allow that, we should find a more efficient way to do it anyway.
-                    val updatedUrlString =
-                      if (urlString.startsWith("/fr/service/i18n/fr-resources/"))
-                        "/fr/service/i18n/fr-resources/orbeon/offline"
-                      else
-                        urlString
-
-                    resourcesByUri.get(updatedUrlString) map { case (data, contentType) =>
-
-                      val is = new InputStream {
-
-                        val it = data.iterator
-
-                        def read(): Int =
-                          if (it.hasNext)
-                            it.next()
-                          else
-                            -1
-                      }
-
-                      ConnectionResult(
-                        url                = updatedUrlString,
-                        statusCode         = StatusCode.Ok,
-                        headers            = Map.empty,
-                        content            = StreamedContent(is, contentType.some, data.length.toLong.some, None),
-                        dontHandleResponse = false,
+                    // Lazy so that we do the work zero or one time whether the document is already in
+                    // the cache for the specific app/form names, already in the cache for other app/form
+                    // names, or not in the cache at all.
+                    lazy val formRunnerResourcesXmlDoc = {
+                      XFormsCrossPlatformSupport.readTinyTree(
+                        configuration  = XPath.GlobalConfiguration,
+                        inputStream    = new Uint8ArrayInputStream(data),
+                        systemId       = NormalizedResourcesPath,
+                        handleXInclude = false,
+                        handleLexical  = true
                       )
                     }
-                  }
 
-                  // Find form
-                  zipValues collectFirst
-                    { case (path, data) if path.endsWith("form.json") => new TextDecoder().decode(data) } getOrElse
-                    (throw new IllegalArgumentException("missing form in Zip"))
+                    // We want to store the XML in the cache for both the normalized path AND the regular path, but
+                    // it's the same immutable document in both cases. We store the normalized path so that we can
+                    // easily find it in the cache. We store the regular path so that Form Runner will find that.
+                    // Here we `foldLeft()` so that we ensure parsing the XML at most once.
+                    List(NormalizedResourcesPath, s"/fr/service/i18n/fr-resources/$appName/$formName")
+                      .foldLeft(None: Option[DocumentNodeInfoType]) {
+                        case (prevDocOpt, path) =>
+                          val instanceCaching = InstanceCaching(-1, handleXInclude = false, path, None)
+                          XFormsServerSharedInstancesCache.findContent(
+                            instanceCaching  = instanceCaching,
+                            readonly         = true,
+                            exposeXPathTypes = false
+                          ) match {
+                            case None =>
+                              debug(s"preemptively storing into cache for `$path`")
+                              val newDoc = prevDocOpt.getOrElse(formRunnerResourcesXmlDoc)
+                              XFormsServerSharedInstancesCache.sideLoad(
+                                instanceCaching = instanceCaching,
+                                doc             = newDoc
+                              )
+                              newDoc.some
+                            case Some(existingDoc) =>
+                              existingDoc.some
+                          }
+                      }
                 }
+
+                debug(s"resources found in Zip file: ${resourcesByUri.keys mkString ", " }")
+
+                // Store a connection resolver that resolves to resources included in the compiled form
+                Connection.resourceResolver = (urlString: String) => {
+
+                  // Special case: normalize Form Runner resources so that we don't have to duplicate them for each form.
+                  // This prevents overriding resources for each form individually, but this is usually not necessary.
+                  // And if we wanted to allow that, we should find a more efficient way to do it anyway.
+                  val updatedUrlString =
+                    if (urlString.startsWith("/fr/service/i18n/fr-resources/"))
+                      "/fr/service/i18n/fr-resources/orbeon/offline"
+                    else
+                      urlString
+
+                  resourcesByUri.get(updatedUrlString) map { case (data, contentType) =>
+                    ConnectionResult(
+                      url                = updatedUrlString,
+                      statusCode         = StatusCode.Ok,
+                      headers            = Map.empty,
+                      content            = StreamedContent(new Uint8ArrayInputStream(data), contentType.some, data.length.toLong.some, None),
+                      dontHandleResponse = false,
+                    )
+                  }
+                }
+
+                // Find form
+                zipValues collectFirst
+                  { case (path, data) if path.endsWith("form.json") => new TextDecoder().decode(data) } getOrElse
+                  (throw new IllegalArgumentException("missing form in Zip"))
               }
             case v: String =>
               Future(v)
@@ -315,7 +338,7 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
             case v: String     => ("String", v.length)
           }
 
-        println(s"fetched serialized form from server for `$query`, type: $resType, length: $resLength")
+        info(s"fetched serialized form from server for `$query`, type: $resType, length: $resLength")
 
         serializedBundle
       }
@@ -369,6 +392,36 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
       root.addElement("mode").addText(mode)
 
       Document(root)
+    }
+
+    def decodeZipContent(buffer: ArrayBuffer): Future[List[(String, Uint8Array)]] =
+      JSZip.loadAsync(buffer).toFuture flatMap { jsZip =>
+
+        var futures: List[Future[(String, Uint8Array)]] = Nil
+
+        jsZip.forEach(
+          (relativePath: String, zipObject: ZipObject) =>
+            futures ::= zipObject.async("uint8array").toFuture map (relativePath ->)
+        )
+
+        Future.sequence(futures)
+      }
+
+    def findManifestEntries(zipValues: List[(String, Uint8Array)]): Try[Iterable[ManifestEntry]] =
+      zipValues.collectFirst {
+        case (ManifestEntry.JsonFilename, data) => decode[Iterable[ManifestEntry]](new TextDecoder().decode(data)).toTry
+      } getOrElse
+        Failure(new IllegalArgumentException(s"missing `${ManifestEntry.JsonFilename}` contents"))
+
+    class Uint8ArrayInputStream(data: Uint8Array) extends InputStream {
+
+      private val it = data.iterator
+
+      def read(): Int =
+        if (it.hasNext)
+          it.next()
+        else
+          -1
     }
   }
 }

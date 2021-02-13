@@ -50,8 +50,9 @@ object DemoSubmissionProvider extends SubmissionProvider {
         store.get(req.url.pathname) match {
           case Some(FormData(responseContentTypeOpt, responseBody, workflowStageOpt)) =>
 
-            val headersList = responseContentTypeOpt.map(Headers.ContentType ->).toList :::
-              workflowStageOpt.map("Orbeon-Workflow-Stage" ->).toList
+            val headersList =
+              responseContentTypeOpt.map(Headers.ContentType ->    ).toList :::
+              workflowStageOpt      .map("Orbeon-Workflow-Stage" ->).toList
 
             new SubmissionResponse {
               val statusCode = StatusCode.Ok

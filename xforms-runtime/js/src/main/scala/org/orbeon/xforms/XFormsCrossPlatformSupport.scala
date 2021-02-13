@@ -33,7 +33,7 @@ import org.scalajs.dom.DOMParser
 import org.scalajs.dom.ext._
 import org.scalajs.dom.raw.HTMLDocument
 
-import java.io.{ByteArrayOutputStream, InputStream, OutputStream, Reader, StringReader}
+import java.io._
 import java.net.URI
 import javax.xml.transform.Transformer
 import javax.xml.transform.sax.TransformerHandler
@@ -51,9 +51,11 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   ): Option[UploadProgress[Unit]] =
     None
 
-  def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit = throw new NotImplementedError("removeUploadProgress")
+  def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit =
+    throw new NotImplementedError("removeUploadProgress")
 
-  def attachmentFileExists(holderValue: String): Boolean = throw new NotImplementedError("attachmentFileExists")
+  def attachmentFileExists(holderValue: String): Boolean =
+    throw new NotImplementedError("attachmentFileExists")
 
   // Form Runner: called with `input:instance`
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String =
@@ -62,7 +64,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
       case _                => url
     }
 
-  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = throw new NotImplementedError("resolveResourceURL")
+  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String =
+    throw new NotImplementedError("resolveResourceURL")
 
   def resolveRenderURL(
     containingDocument : XFormsContainingDocument,
@@ -71,11 +74,14 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     skipRewrite        : Boolean
   ): String = throw new NotImplementedError("resolveRenderURL")
 
-  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String = throw new NotImplementedError("rewriteURL")
+  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String =
+    throw new NotImplementedError("rewriteURL")
 
-  def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String = throw new NotImplementedError("resolveActionURL")
+  def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String =
+    throw new NotImplementedError("resolveActionURL")
 
-  def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document = throw new NotImplementedError("htmlStringToDocumentTagSoup")
+  def htmlStringToDocumentTagSoup(value: String, locationData: LocationData): org.w3c.dom.Document =
+    throw new NotImplementedError("htmlStringToDocumentTagSoup")
 
   def streamHTMLFragment(
     value        : String,

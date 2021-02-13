@@ -124,7 +124,7 @@ class FormRunnerCompiler extends ProcessorImpl {
               val manifest =
                 (
                   ManifestEntry(jsonFormPath, jsonFormPath, ContentTypes.XmlContentType) ::
-                  formInstanceAttachments :::
+                  formInstanceAttachments                                                :::
                   cacheableResourcesToInclude
                 ).asJson.noSpaces
 

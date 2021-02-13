@@ -114,6 +114,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     outputFragment(doc.body.childNodes)
   }
 
+  // In the JavaScript environment, we currently don't require a way to handle dynamic URLs, so we
+  // proxy resources as `data:` URLs.
   def proxyURI(
     uri              : String,
     filename         : Option[String],

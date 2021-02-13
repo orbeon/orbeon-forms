@@ -234,8 +234,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def getLastModifiedIfFast(absoluteURL: String): Long =
     NetUtils.getLastModifiedIfFast(absoluteURL)
 
-  // NOTE: Only referred to indirectly by Form Builder Summary page in order to load
-  // external resources. This will not be called when offline!
+  // See comment in trait
   def readTinyTreeFromUrl(urlString: String): DocumentNodeInfoType =
     useAndClose(URLFactory.createURL(urlString).openStream()) { is =>
       readTinyTree(

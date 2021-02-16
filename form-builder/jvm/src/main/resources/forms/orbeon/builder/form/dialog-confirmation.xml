@@ -27,7 +27,7 @@
     <xf:var   model="fr-form-model" name="form-resources" value="$form-resources"/>
 
     <xh:div>
-        <xh:i class="fa fa-fw  fa-exclamation-circle fr-dialog-icon"/>
+        <xh:i class="fa fa-fw fa-exclamation-circle fr-dialog-icon"/>
         <xh:div class="fr-dialog-message">
             <xf:output value="message"/>
         </xh:div>

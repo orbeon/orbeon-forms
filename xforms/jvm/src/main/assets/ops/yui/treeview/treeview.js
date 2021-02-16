@@ -797,7 +797,7 @@ TV.prototype = {
             case KEY.ENTER:
                 if (node.href) {
                     if (node.target) {
-                        window.open(node.href,node.target);
+                        window.open(node.href,node.target, "noopener");
                     } else {
                         window.location(node.href);
                     }

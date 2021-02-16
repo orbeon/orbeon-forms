@@ -31,8 +31,9 @@ object HrefButton {
       private def onClick(): Unit = {
         val a = $(containerElem).find(".fr-href-button-anchor")
         org.scalajs.dom.window.open(
-          url    = a.attr("href"  ).toString,
-          target = a.attr("target").toString
+          url      = a.attr("href"  ).toString,
+          target   = a.attr("target").toString,
+          features = "noopener"
         )
       }
     }

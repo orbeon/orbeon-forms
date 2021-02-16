@@ -1264,7 +1264,7 @@
                                             if (target == "_blank")
                                                 // Use target name that we can reuse, in case opening the window works
                                                 target = Math.random().toString().substring(2);
-                                            var newWindow = window.open("about:blank", target);
+                                            var newWindow = window.open("about:blank", target, "noopener");
                                             if (newWindow && newWindow.close) {
                                                 return false;
                                             } else {
@@ -1329,10 +1329,10 @@
                                                 // on a dialog displayed on unload.
                                             }
                                         } else {
-                                            window.open(resource, target);
+                                            window.open(resource, target, "noopener");
                                         }
                                     } else {
-                                        window.open(resource, "_blank");
+                                        window.open(resource, "_blank", "noopener");
                                     }
                                     break;
                                 }

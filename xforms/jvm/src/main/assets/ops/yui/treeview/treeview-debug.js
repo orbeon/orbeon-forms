@@ -817,7 +817,7 @@ TV.prototype = {
                 this.logger.log('ENTER: ' + newNode.href);
                 if (node.href) {
                     if (node.target) {
-                        window.open(node.href,node.target);
+                        window.open(node.href,node.target, "noopener");
                     } else {
                         window.location(node.href);
                     }

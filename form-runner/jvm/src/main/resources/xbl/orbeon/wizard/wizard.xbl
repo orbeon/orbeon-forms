@@ -1154,6 +1154,7 @@
                                                 value="Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid'))"
                                                 xxbl:scope="inner"/>
 
+                                            <xf:dispatch targetid="{{Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid'))}}" name="fr-expand"/>
                                             <!-- NOTE: 2020-01-23: This is dispatched only for *top-level* pages. -->
                                             <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
                                                 <xf:property name="section-binding" value="xxf:binding(Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid')))" xxbl:scope="outer"/>
@@ -1170,6 +1171,9 @@
                                                 <xsl:attribute name="view-appearance">wizard</xsl:attribute>
                                                 <xsl:attribute name="collapsible">false</xsl:attribute>
                                                 <xsl:apply-templates select="@* except (@collapse | @collapsible | @open)"/>
+                                                <!-- Tell the section whether it needs to be initially open or not (optimization) -->
+                                                <xsl:attribute name="nonrelevant">true</xsl:attribute>
+                                                <xsl:attribute name="open" select="concat('{case(''switch'') = ''', $static-section-id, '-case''}')"/>
 
                                                 <!-- Update the `changed` token -->
                                                 <xf:action event="xforms-value-changed">

@@ -185,10 +185,11 @@ object Wizard {
 
           val sectionName = controlNameFromId(sectionId)
 
-          val sectionBoundNode =
-            XFormsAPI.resolveAs[XFormsComponentControl](sectionId) flatMap (_.boundNodeOpt) getOrElse (throw new IllegalStateException)
+          // 2021-02-16: Allow for "missing" bindings in case of initially non-relevant/lazily loaded sections.
+          val sectionBoundNodeOpt =
+            XFormsAPI.resolveAs[XFormsComponentControl](sectionId) flatMap (_.boundNodeOpt)
 
-          val isVisited = sectionBoundNode hasAtt "*:section-status"
+          val isVisited = sectionBoundNodeOpt exists (_ hasAtt "*:section-status")
 
           def strictIsAccessible =
             prevOpt match {

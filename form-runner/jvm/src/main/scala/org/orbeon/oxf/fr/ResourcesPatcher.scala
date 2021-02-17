@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, XPath}
 import org.orbeon.oxf.xml.dom.Support
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.NodeInfo
@@ -45,8 +45,10 @@ class ResourcesPatcher extends SimpleProcessor  {
       instanceElem / "form" stringValue
     )
 
+    val langs = CoreCrossPlatformSupport.externalContext.getRequest.getFirstParamAsString("langs") map (_.splitTo[Set](","))
+
     // Transform and write out the document
-    ResourcesPatcher.transform(resourcesDocument, appForm)(Properties.instance.getPropertySet)
+    ResourcesPatcher.transform(resourcesDocument, appForm, langs)(Properties.instance.getPropertySet)
     TransformerUtils.writeDom4j(resourcesDocument, xmlReceiver)
   }
 }
@@ -58,9 +60,17 @@ object ResourcesPatcher {
 
   def transform(
     resourcesDocument : dom.Document,
-    appForm           : AppForm)(implicit
+    appForm           : AppForm,
+    langsOpt             : Option[Set[String]] = None
+  )(implicit
     properties        : PropertySet
   ): Unit = {
+
+    // Start by filtering out unwanted languages if specified
+    langsOpt foreach { langs =>
+      resourcesDocument.getRootElement.elements.filterNot(e => langs(e.attributeValue(XMLNames.XMLLangQName))) foreach
+        (_.detach())
+    }
 
     val resourceElems = new DocumentWrapper(resourcesDocument, null, XPath.GlobalConfiguration).rootElement / "resource"
     val propertyNames = properties.propertiesStartsWith((Prefix :: appForm.toList).mkString("."))

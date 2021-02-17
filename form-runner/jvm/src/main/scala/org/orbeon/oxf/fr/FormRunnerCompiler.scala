@@ -5,7 +5,7 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.fr.Names.FormInstance
+import org.orbeon.oxf.fr.Names.{FormInstance, FormResources}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -48,6 +48,15 @@ class FormRunnerCompiler extends ProcessorImpl {
 
           val cacheableResourcesToInclude = {
 
+            // Find all the languages used and return a comma-separated list of them
+            val usedLangsOpt =
+              staticState.topLevelPart.findControlAnalysis(FormResources) collect {
+                case instance: Instance =>
+                  instance.inlineRootElemOpt.get.elementIterator() map
+                    (_.attributeValue(XMLNames.XMLLangQName))      mkString
+                    ","
+              }
+
             val urlOptIt =
               staticState.topLevelPart.iterateControls collect {
                 case instance: Instance
@@ -61,7 +70,7 @@ class FormRunnerCompiler extends ProcessorImpl {
                      submission.avtMethod.exists(s => HttpMethod.withNameInsensitiveOption(s).contains(HttpMethod.GET)) =>
 
                   if (submission.avtActionOrResource == "/fr/service/i18n/fr-resources/{$app}/{$form}")
-                    "/fr/service/i18n/fr-resources/orbeon/offline".some
+                    PathUtils.recombineQuery("/fr/service/i18n/fr-resources/orbeon/offline", usedLangsOpt.map("langs" ->)).some
                   else
                     submission.avtActionOrResource.some
               }

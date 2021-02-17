@@ -78,6 +78,7 @@
 
                     <!-- Section configuration -->
                     <xsl:variable name="editable"       select="exists($root/@edit-ref)"/>
+                    <xsl:variable name="nonrelevant"    select="$root/@nonrelevant = 'true'"/>
                     <xsl:variable name="collapsible"    select="not($root/@collapsible = 'false' or $root/@collapse = 'false')"/>
                     <xsl:variable name="animate"        select="not($root/@animate = 'false')"/>
                     <xsl:variable name="readonly"       select="$root/@readonly = 'true'"/>
@@ -160,7 +161,13 @@
 
                                         https://github.com/orbeon/orbeon-forms/issues/4271
                                 -->
-                                <xf:switch id="switch" xxf:readonly-appearance="dynamic" xxf:element="div" xxf:xforms11-switch="{$editable}" xxf:update="{'full'[not($editable)]}">
+                                <xf:switch
+                                    id="switch"
+                                    xxf:readonly-appearance="dynamic"
+                                    xxf:element="div"
+                                    xxf:xforms11-switch="{$editable or $nonrelevant}"
+                                    xxf:update="{'full'[not($editable)]}">
+
                                     <!-- Closed section -->
                                     <xf:case id="case-closed" selected="{{not($initially-open)}}"/>
                                     <!-- Open section -->

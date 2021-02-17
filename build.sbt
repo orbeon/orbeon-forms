@@ -23,8 +23,8 @@ val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
 val SaxonVersion                  = "10.0.0.49-SNAPSHOT"
-val XercesVersion                 = "2.11.0.8-SNAPSHOT"
-val SaxVersion                    = "2.0.2.6-SNAPSHOT"
+val XercesVersion                 = "2.11.0.9-SNAPSHOT"
+val SaxVersion                    = "2.0.2.8-SNAPSHOT"
 val ScalaJsDomVersion             = "0.9.8"
 val ScalaJsJQueryVersion          = "0.9.6"
 val ScribeVersion                 = "2.7.13"
@@ -161,7 +161,7 @@ val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition fr
 
 
 lazy val scala212 = "2.12.14"
-lazy val scala213 = "2.13.3"
+lazy val scala213 = "2.13.4"
 lazy val supportedScalaVersions = List(scala212, scala213)
 
 // "ThisBuild is a Scope encompassing all projects"

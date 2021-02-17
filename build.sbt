@@ -982,7 +982,7 @@ lazy val xformsRuntimeJVM = xformsRuntime.jvm
 
 lazy val xformsRuntimeJS = xformsRuntime.js
   .dependsOn(
-    xformsCompilerJS, // stubs
+    xformsCompilerJS, // stubs and shared stuff
     xformsAnalysisJS,
     coreCrossPlatformJS
   )

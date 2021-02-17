@@ -110,7 +110,7 @@
 
                                 <xf:var
                                     name="initially-open"
-                                    value="fr:is-readonly-mode() or not('{$root/@open}' = 'false')"/>
+                                    value="fr:is-readonly-mode() or not(fr:component-param-value('open') = 'false')"/>
 
                                 <!-- Section title area: open/close button, title, help -->
                                 <xsl:element name="xh:h{$level}">

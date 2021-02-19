@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.library
 import cats.syntax.option._
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
@@ -190,16 +190,33 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
   def valid(items: Iterable[om.Item], relevant: Boolean = true, recurse: Boolean = true): Boolean = throw new NotImplementedError("valid")
 
   // So we can call as `bind()` and `xxf:bind()`
-  def bindImpl(bindId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] = // should be `om.NodeInfo`?
-    xfc.container.searchContainedModelsInScope(xfc.sourceEffectiveId, bindId, Option(xpc.getContextItem)) match {
+  def bindImpl(bindId: String, searchAncestors: Boolean)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] = { // should be `om.NodeInfo`?
+
+    val contextItemOpt =
+      Option(xpc.getContextItem)
+
+    val startContainer = xfc.container
+
+    val startContainerIt =
+      startContainer.searchContainedModelsInScope(xfc.sourceEffectiveId, bindId, contextItemOpt).iterator
+
+    val searchIt =
+      if (searchAncestors)
+        startContainerIt ++
+          startContainer.ancestorsIterator.drop(1).flatMap(_.searchContainedModels(bindId, contextItemOpt))
+      else
+        startContainerIt
+
+    searchIt.nextOption() match {
       case Some(bind: RuntimeBind) => bind.items.asScala
       case _                       => Nil
     }
+  }
 
   // XForms 2.0
   @XPathFunction
   def bind(bindId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
-    bindImpl(bindId)
+    bindImpl(bindId, searchAncestors = false)
 
   // XForms 2.0
   @XPathFunction

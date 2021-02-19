@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.xforms.function
 
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.oxf.xml.DependsOnContextItem
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
+
 
 class Bind extends XFormsFunction with DependsOnContextItem {
 
@@ -24,9 +26,25 @@ class Bind extends XFormsFunction with DependsOnContextItem {
 
     implicit val ctx = xpathContext
 
-    val bindId = stringArgument(0)
+    val bindId          = stringArgument(0)
+    val searchAncestors = booleanArgument(1, default = false)
 
-    XFormsFunction.context.container.searchContainedModelsInScope(getSourceEffectiveId, bindId, Option(xpathContext.getContextItem)) match {
+    val contextItemOpt =
+      Option(xpathContext.getContextItem)
+
+    val startContainer = XFormsFunction.context.container
+
+    val startContainerIt =
+      startContainer.searchContainedModelsInScope(getSourceEffectiveId, bindId, contextItemOpt).iterator
+
+    val searchIt =
+      if (searchAncestors)
+        startContainerIt ++
+          startContainer.ancestorsIterator.drop(1).flatMap(_.searchContainedModels(bindId, contextItemOpt))
+      else
+        startContainerIt
+
+    searchIt.nextOption() match {
       case Some(bind: RuntimeBind) => new ListIterator(bind.items)
       case _                       => EmptyIterator.getInstance
     }

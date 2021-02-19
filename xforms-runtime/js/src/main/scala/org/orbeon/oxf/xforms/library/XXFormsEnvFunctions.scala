@@ -503,8 +503,8 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   // Now available in XForms 2.0
   @XPathFunction
-  def bind(bindId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
-    XFormsFunctionLibrary.bindImpl(bindId)
+  def bind(bindId: String, searchAncestors: Boolean = false)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[om.Item] =
+    XFormsFunctionLibrary.bindImpl(bindId, searchAncestors)
 
   // Validation functions
 

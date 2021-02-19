@@ -149,6 +149,8 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     formVersion      : Int     // needed for the cache!
   ): Future[CompiledForm] = {
 
+    debug(s"beginning of `compileAndCacheFormIfNeededF`")
+
     val cacheKey = CacheKey(appName, formName, formVersion)
 
     staticStateCache.get(cacheKey) match {
@@ -159,7 +161,12 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
         val jsonStringF =
           (serializedBundle: Any) match {
             case v: Uint8Array =>
+
+              debug(s"before `decodeZipContent`")
+
               decodeZipContent(v.buffer) map { zipValues =>
+
+                debug(s"got `zipValues`")
 
                 // Read and decode the manifest
                 val manifestEntries = findManifestEntries(zipValues).get
@@ -175,6 +182,8 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
                     }
                   } toMap
                 }
+
+                debug(s"computed `resourcesByUri`")
 
                 val NormalizedResourcesPath = "/fr/service/i18n/fr-resources/orbeon/offline"
 

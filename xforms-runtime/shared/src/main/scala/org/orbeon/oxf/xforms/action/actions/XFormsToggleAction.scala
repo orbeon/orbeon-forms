@@ -25,7 +25,6 @@ class XFormsToggleAction extends XFormsAction {
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val interpreter   = actionContext.interpreter
-    val actionElement = actionContext.element
 
     // Find case control
     resolveControlAvt("case")(actionContext) match {

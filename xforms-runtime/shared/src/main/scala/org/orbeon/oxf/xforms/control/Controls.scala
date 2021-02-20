@@ -129,6 +129,8 @@ object Controls {
     // Instantiate the control
     // TODO LATER: controls must take ElementAnalysis, not Element
 
+    val stats = container.containingDocument.getRequestStats
+
     // NOTE: If we are unable to create a control (case of Model at least), this has no effect
     XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement, effectiveId) map { control =>
 
@@ -144,6 +146,8 @@ object Controls {
           restoreState  = state.isDefined,
           state         = state flatMap (_.get(effectiveId))
         )
+      stats.controlsCreated += 1
+
 
         // Build the control's children if any
         control.buildChildren(buildTree(controlIndex, state, _, _, Some(control), _, _), idSuffix)
@@ -352,6 +356,8 @@ object Controls {
     var _partialFocusRepeatOption: Option[XFormsRepeatControl] = None
     def partialFocusRepeat: Option[XFormsRepeatControl] = _partialFocusRepeatOption
 
+    val stats = containingDocument.getRequestStats
+
     def startVisitControl(control: XFormsControl): Boolean = {
 
       // Increment before the early return as `endVisitControl` always decrements.
@@ -379,6 +385,8 @@ object Controls {
 
       // Only update the binding if needed
       if (mustReEvaluateBinding) {
+
+        stats.bindingsUpdated += 1
 
         def evaluateBindingAndValues(): Unit =
           control.evaluateBindingAndValues(
@@ -421,6 +429,7 @@ object Controls {
         }
         _updatedCount += 1
       } else {
+        stats.bindingsRefreshed += 1
         control.refreshBindingAndValues(bindingContext)
         _optimizedCount += 1
       }

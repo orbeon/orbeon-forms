@@ -21,6 +21,19 @@ import scala.collection.mutable
 // Gather request statistics
 // For now, only support XPath statistics
 trait RequestStats {
+
+  var refreshes             : Int
+
+  var controlsCreated       : Int
+  var bindingsUpdated       : Int
+  var bindingsRefreshed     : Int
+
+  var eventsDispatched      : Int
+  var eventsWithoutHandlers : Int
+
+  var xpathCompiled         : Int
+  var xpathEvaluated        : Int
+
   def afterInitialResponse()
   def afterUpdateResponse()
   def addXPathStat(expr: String, time: Long)
@@ -31,6 +44,18 @@ trait RequestStats {
 }
 
 class RequestStatsImpl extends RequestStats {
+
+  var refreshes             = 0
+
+  var controlsCreated       = 0
+  var bindingsUpdated       = 0
+  var bindingsRefreshed     = 0
+
+  var eventsDispatched      = 0
+  var eventsWithoutHandlers = 0
+
+  var xpathCompiled         = 0
+  var xpathEvaluated        = 0
 
   private class XPathStats(val expr: String) {
     private var _count = 0
@@ -46,13 +71,15 @@ class RequestStatsImpl extends RequestStats {
     def meanTime = _totalTime / _count
 
     override def toString =
-      "expr: " + expr + ", count: " + count + ", total time: " + totalTime+ ", mean time: " + meanTime
+      s"expr: $expr, count: $count, total time: $totalTime, mean time: $meanTime"
   }
 
   private val xpathStats = mutable.Map[String, XPathStats]()
 
-  def addXPathStat(expr: String, time: Long) =
+  def addXPathStat(expr: String, time: Long): Unit = {
+    xpathEvaluated += 1
     xpathStats.getOrElseUpdate(expr, new XPathStats(expr)).addStat(time)
+  }
 
   private def topXPath(n: Int, f: XPathStats => Long) =
     xpathStats.values.toSeq sortBy f takeRight n reverse
@@ -63,15 +90,22 @@ class RequestStatsImpl extends RequestStats {
     afterUpdateResponse()
 
   def afterUpdateResponse(): Unit = {
-    println("afterResponse:")
-    println(" distinct XPath: " + distinctXPath)
-    println(" total time in XPath: " + (xpathStats.values map (_.totalTime) sum))
-    println(" top XPath by mean time: ")
+    println("afterUpdateResponse statistics:")
+    println(s"  refreshes:             $refreshes")
+    println(s"  controlsCreated:       $controlsCreated")
+    println(s"  bindingsUpdated:       $bindingsUpdated")
+    println(s"  bindingsRefreshed:     $bindingsRefreshed")
+    println(s"  eventsDispatched:      $eventsDispatched")
+    println(s"  eventsWithoutHandlers: $eventsWithoutHandlers")
+    println(s"  xpathEvaluated:        $xpathEvaluated")
+    println(s"  distinct XPath:        $distinctXPath")
+    println(s"  total time in XPath:   ${xpathStats.values.map(_.totalTime).sum}")
+    println("  top XPath by mean time: ")
     for ((topXPath, i) <- topXPath(10, _.meanTime).zipWithIndex)
-      println("  " + (i + 1) + ": " + topXPath.toString)
-    println(" top XPath by total time: ")
+      println(s"    ${i + 1}: ${topXPath.toString}")
+    println("  top XPath by total time: ")
     for ((topXPath, i) <- topXPath(10, _.totalTime).zipWithIndex)
-      println("  " + (i + 1) + ": " + topXPath.toString)
+      println(s"    ${i + 1}: ${topXPath.toString}")
   }
 
   def withXPath[T](expr: => String)(body: => T): T = {
@@ -88,6 +122,19 @@ class RequestStatsImpl extends RequestStats {
 }
 
 object NOPRequestStats extends RequestStats {
+
+  var refreshes             = 0
+
+  var controlsCreated       = 0
+  var bindingsUpdated       = 0
+  var bindingsRefreshed     = 0
+
+  var eventsDispatched      = 0
+  var eventsWithoutHandlers = 0
+
+  var xpathCompiled         = 0
+  var xpathEvaluated        = 0
+
   def afterInitialResponse() = ()
   def afterUpdateResponse() = ()
   def addXPathStat(expr: String, time: Long) = ()
@@ -97,7 +144,7 @@ object NOPRequestStats extends RequestStats {
 object RequestStatsImpl {
   def apply(): RequestStats =
     if (XFormsGlobalProperties.isRequestStats)
-      new RequestStatsImpl()
+      new RequestStatsImpl
     else
       NOPRequestStats
 }

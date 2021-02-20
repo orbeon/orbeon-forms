@@ -51,6 +51,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
   def refreshStart(): Unit = {
     Private.requireRefresh = false
     inRefresh = true
+    containingDocument.getRequestStats.refreshes += 1
     containingDocument.xpathDependencies.refreshStart()
   }
 

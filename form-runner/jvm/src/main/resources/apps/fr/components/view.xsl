@@ -1004,7 +1004,6 @@
                     </xh:span>
 
                     <xf:var
-                        xmlns:saxon="http://saxon.sf.net/"
                         name="names-and-refs-if-relevant"
                         value="
                             let $buttons-property :=

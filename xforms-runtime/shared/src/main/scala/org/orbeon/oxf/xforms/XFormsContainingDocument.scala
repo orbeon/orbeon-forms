@@ -33,7 +33,6 @@ import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
-
 import scala.collection.{Seq, immutable}
 
 
@@ -128,9 +127,9 @@ class XFormsContainingDocument(
     XFormsAPI.withContainingDocument(this) { // for the XForms API
 
       // These are cleared in `afterInitialResponse()`
-      this._uriResolver  = uriResolver
-      this._responseForReplaceAll     = response
-      this._initializing = true
+      this._uriResolver           = uriResolver
+      this._responseForReplaceAll = response
+      this._initializing          = true
 
       addAllModels()
 

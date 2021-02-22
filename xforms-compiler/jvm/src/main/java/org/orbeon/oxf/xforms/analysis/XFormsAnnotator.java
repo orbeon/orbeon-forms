@@ -136,9 +136,12 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 if (stackElement.isXForms()) {
                     // Must be `xf:output`
                     attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
-                } else if (hostLanguageAVTs && hasAVT(attributes)) {
-                    // Must be an AVT on an host language elemAbstractRewriteent
-                    attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
+                } else {
+                    // Keep and index `id` if present but don't generate one if not present as there is no need, since the entire
+                    // content is generated dynamically and the AVT doesn't require finding an element by `id` like in the non-LHHA
+                    // case.
+                    // https://github.com/orbeon/orbeon-forms/issues/4782
+                    indexIdGatherNamespaces(attributes.getValue(idIndex));
                 }
             } else if (inXBL && level - 1 == preserveLevel && stackElement.isXBL() && "binding".equals(localname)) {
 
@@ -230,7 +233,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     // Start xf:repeat-iteration
                     // NOTE: Use xf:repeat-iteration instead of xxf:iteration so we don't have to deal with a new namespace
                     reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA(), xformsElementId + "~iteration");	    
+                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA(), xformsElementId + "~iteration");
                     final Attributes repeatIterationAttributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, reusableAttributes, reusableStringArray, 0);
                     stackElement.startElement(uri, localname + "-iteration", qName + "-iteration", repeatIterationAttributes);
                 } else {
@@ -447,7 +450,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                             final String inspectorQName = XMLUtils.buildQName(inspectorPrefix, inspectorLocal);
 
                             reusableAttributes.clear();
-             	            reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA(), "orbeon-inspector");
+                            reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA(), "orbeon-inspector");
                             final Attributes newAttributes = getAttributesGatherNamespacesMaybeGenerateIds(frURI, inspectorQName, reusableAttributes, reusableStringArray, 0);
                             final String xformsElementId = reusableStringArray[0];
 

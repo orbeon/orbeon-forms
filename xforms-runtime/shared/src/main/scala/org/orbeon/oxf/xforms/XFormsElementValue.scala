@@ -245,9 +245,10 @@ object XFormsElementValue {
               }
               attributeControl.getExternalValue()
             } else if (currentAttributeName == "id") {
+              // This is an id, prefix if needed, but also add suffix
               // https://github.com/orbeon/orbeon-forms/issues/4782
               val it = ctxStack.getCurrentBindingContext.repeatPositions
-	      
+
               if (it.isEmpty)
                 prefix + currentAttributeValue
               else

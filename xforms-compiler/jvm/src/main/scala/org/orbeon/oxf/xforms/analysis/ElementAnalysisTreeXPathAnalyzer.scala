@@ -419,7 +419,8 @@ object ElementAnalysisTreeXPathAnalyzer {
                 val (expressionOrConstant, _) =
                   XFormsStaticElementValue.getElementExpressionOrConstant(
                     outerElem       = nestedElement,
-                    containerPrefix = "", // won't be used
+                    containerPrefix = "",    // won't be used
+                    isWithinRepeat  = false, // won't be used
                     acceptHTML      = true
                   )
 

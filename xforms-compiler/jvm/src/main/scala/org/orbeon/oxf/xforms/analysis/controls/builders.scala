@@ -114,6 +114,7 @@ object LHHAAnalysisBuilder {
       XFormsStaticElementValue.getElementExpressionOrConstant(
         outerElem       = element,
         containerPrefix = containerScope.fullPrefix,
+        isWithinRepeat  = parent.exists(_.isWithinRepeat),
         acceptHTML      = true
       )
 
@@ -952,6 +953,7 @@ object NestedNameOrValueControlBuilder {
       XFormsStaticElementValue.getElementExpressionOrConstant(
         outerElem       = element,
         containerPrefix = containerScope.fullPrefix,
+        isWithinRepeat  = parent.exists(_.isWithinRepeat),
         acceptHTML      = false
       )
 

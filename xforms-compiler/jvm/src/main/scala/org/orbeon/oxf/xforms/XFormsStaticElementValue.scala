@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.{Constants, XFormsId, XFormsNames}
 
 import java.{lang => jl}
 import scala.collection.mutable.ListBuffer
@@ -43,6 +43,7 @@ object XFormsStaticElementValue {
   def getElementExpressionOrConstant(
     outerElem       : dom.Element,
     containerPrefix : String,
+    isWithinRepeat  : Boolean,
     acceptHTML      : Boolean
   ): (Either[String, XPathExpressionString], Boolean) = {
 
@@ -128,9 +129,20 @@ object XFormsStaticElementValue {
 
                 if (hostLanguageAVTs && XMLUtils.maybeAVT(currentAttributeValue)) {
                   // XXX: Check escaping. Anything else to escape?
-                  addExpr(s""" xxf:evaluate-avt('${currentAttributeValue.replaceAllLiterally("'", "''")}') """ )
+                  addExpr(s"""xxf:evaluate-avt('${currentAttributeValue.replaceAllLiterally("'", "''")}')""" )
                 } else if (currentAttributeName == "id") {
+                  // This is an id, prefix if needed, but also add suffix
+                  // https://github.com/orbeon/orbeon-forms/issues/4782
+
+                  // Always append the prefixed id
                   literalBuilder.append((containerPrefix + currentAttributeValue).escapeXmlForAttribute) // TODO: check was `unescapeXmlMinimal`
+
+                  // Append repeat suffix if needed
+                  // https://github.com/orbeon/orbeon-forms/issues/4782
+                  if (isWithinRepeat) {
+                    literalBuilder.append(Constants.RepeatSeparatorString)
+                    addExpr(s"""string-join(for $$p in xxf:repeat-positions() return string($$p), '${Constants.RepeatIndexSeparatorString}')""")
+                  }
                 } else {
                   literalBuilder.append(currentAttributeValue.escapeXmlForAttribute) // TODO: check was `unescapeXmlMinimal`
                 }

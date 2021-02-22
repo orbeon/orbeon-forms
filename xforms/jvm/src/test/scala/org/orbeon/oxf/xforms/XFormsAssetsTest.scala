@@ -121,7 +121,7 @@ class XFormsAssetsTest extends AnyFunSpec{
     val result =
       XFormsAssetsBuilder.updateAssets(
         assets,
-        "/ops/javascript/scalajs/orbeon-xforms.js /ops/yui/container/assets/skins/sam/container.css",
+        "/ops/javascript/scalajs/orbeon-xforms-web.js /ops/yui/container/assets/skins/sam/container.css",
         """+/apps/fr/resources/scalajs/orbeon-form-runner.js
            -/ops/yui/calendar/assets/skins/sam/calendar.css
            +/apps/fr/assets/foo.css

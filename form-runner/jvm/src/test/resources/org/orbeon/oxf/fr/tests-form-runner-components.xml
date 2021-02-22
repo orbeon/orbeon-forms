@@ -145,7 +145,7 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Placement.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Help.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Hint.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/scalajs/orbeon-xforms.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/scalajs/orbeon-xforms-web.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js"/>
                 <xh:script src="/ops/yui/datasource/datasource.js"/>
                 <xh:script src="/ops/yui/autocomplete/autocomplete.js"/>

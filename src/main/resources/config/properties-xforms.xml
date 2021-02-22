@@ -274,7 +274,7 @@
             { "full": "/ops/javascript/orbeon/xforms/controls/Help.js",                      "min": true  },
             { "full": "/ops/javascript/orbeon/xforms/controls/Hint.js",                      "min": true  },
 
-            { "full": "/ops/javascript/scalajs/orbeon-xforms.js",                            "min": false }
+            { "full": "/ops/javascript/scalajs/orbeon-xforms-web.js",                        "min": false }
           ]
         }
     </property>

@@ -144,7 +144,7 @@
 
     <property as="xs:string"  name="oxf.xforms.assets.baseline.updates.offline">
         <!-- Not sure if all of these are needed but listing them all won't hurt -->
-        -/ops/javascript/scalajs/orbeon-xforms.js
+        -/ops/javascript/scalajs/orbeon-xforms-web.js
         -/ops/javascript/scalajs/orbeon-xforms-offline.js
         -/apps/fr/resources/scalajs/orbeon-form-runner.js
         -/apps/fr/resources/scalajs/orbeon-form-runner-web.js
@@ -206,7 +206,7 @@
         +/apps/fr/style/form-runner-base.css
         +/apps/fr/style/form-runner-orbeon.css
 
-        -/ops/javascript/scalajs/orbeon-xforms.js
+        -/ops/javascript/scalajs/orbeon-xforms-web.js
         +/apps/fr/resources/scalajs/orbeon-form-runner-web.js
     </property>
 

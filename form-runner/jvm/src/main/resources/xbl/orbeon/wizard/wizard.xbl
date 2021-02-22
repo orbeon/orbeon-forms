@@ -1043,6 +1043,7 @@
                                         </xh:li>
                                         <xh:li>current-section-uses-paging: <xf:output value="$current-section-uses-paging"/></xh:li>
                                         <xh:li>prev-repeat-id-and-index-opt: <xf:output value="string-join(for $ v in $prev-repeat-id-and-index-opt return string($v), ', ')"/></xh:li>
+                                        <xh:li>current-repeat-id-and-index-opt: <xf:output value="string-join(for $ v in $current-repeat-id-and-index-opt return string($v), ', ')"/></xh:li>
                                         <xh:li>next-repeat-id-and-index-opt: <xf:output value="string-join(for $ v in $next-repeat-id-and-index-opt return string($v), ', ')"/></xh:li>
                                         <xh:li>next-nested-case-id-opt: <xf:output value="$next-nested-case-id-opt"/></xh:li>
                                         <xh:li>next-top-level-case-id-opt: <xf:output value="$next-top-level-case-id-opt"/></xh:li>

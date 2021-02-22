@@ -231,7 +231,7 @@ class PathMapXPathDependencies(
       )
     }
 
-    def intersectsStructuralChangeModel(controlEffectiveId: String, analysis: XPathAnalysis) = {
+    def intersectsStructuralChangeModel(controlEffectiveId: String, analysis: XPathAnalysis): Boolean = {
 
       val controlIndexes        = XFormsId.getEffectiveIdSuffixParts(controlEffectiveId)
       val controlIsWithinRepeat = controlIndexes.nonEmpty
@@ -257,7 +257,7 @@ class PathMapXPathDependencies(
       controlEffectiveId : String,
       bindingAnalysis    : XPathAnalysis,
       changes            : MapSet[ModelOrInstanceKey, String]
-    ) =
+    ): Boolean =
       searchMatchesForInstances(
         controlEffectiveId,
         bindingAnalysis.valueDependentPaths,
@@ -325,11 +325,11 @@ class PathMapXPathDependencies(
   def markStructuralChange(model: XFormsModel, instanceOpt: Option[XFormsInstance]): Unit =
     getOrCreateModelState(model).markStructuralChange()
 
-  def rebuildDone(model: XFormsModel)     = getOrCreateModelState(model).rebuildDone()
-  def recalculateDone(model: XFormsModel) = getOrCreateModelState(model).recalculateDone()
-  def revalidateDone(model: XFormsModel)  = getOrCreateModelState(model).revalidateDone()
+  def rebuildDone    (model: XFormsModel): Unit = getOrCreateModelState(model).rebuildDone()
+  def recalculateDone(model: XFormsModel): Unit = getOrCreateModelState(model).recalculateDone()
+  def revalidateDone (model: XFormsModel): Unit = getOrCreateModelState(model).revalidateDone()
 
-  def modelDestruct(model: XFormsModel) = {
+  def modelDestruct(model: XFormsModel): Unit = {
 
     // Remove all references to concrete models and instances
     modelStates -= getOrCreateModelState(model).modelKey
@@ -338,9 +338,8 @@ class PathMapXPathDependencies(
       instancesByKey -= ModelOrInstanceKey(instance)
   }
 
-  def refreshStart(): Unit = {
+  def refreshStart(): Unit =
     inRefresh = true
-  }
 
   def refreshDone(): Unit = {
 
@@ -369,17 +368,14 @@ class PathMapXPathDependencies(
   }
 
 
-  def bindingUpdateStart(): Unit = {
+  def bindingUpdateStart(): Unit =
     inBindingUpdate = true
-  }
 
-  def bindingUpdateDone(): Unit = {
+  def bindingUpdateDone(): Unit =
     inBindingUpdate = false
-  }
 
-  def afterInitialResponse(): Unit = {
+  def afterInitialResponse(): Unit =
     outputLHHAItemsetStats()
-  }
 
   def beforeUpdateResponse(): Unit = {
     lhhaEvaluationCount = 0
@@ -395,9 +391,8 @@ class PathMapXPathDependencies(
     itemsetHitCount = 0
   }
 
-  def afterUpdateResponse(): Unit = {
+  def afterUpdateResponse(): Unit =
     outputLHHAItemsetStats()
-  }
 
   def notifyComputeLHHA(): Unit = lhhaEvaluationCount += 1
   def notifyOptimizeLHHA(): Unit = lhhaOptimizedCount += 1

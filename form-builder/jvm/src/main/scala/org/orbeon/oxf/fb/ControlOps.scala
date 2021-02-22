@@ -806,10 +806,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     val containerIds = ancestorContainers map (_.id)
     val repeatDepth  = ancestorContainers count isRepeat
 
-    def suffix = 1 to repeatDepth map (_ => 1) mkString RepeatIndexSeparatorString
-    val prefixedId = containerIds :+ staticId mkString ComponentSeparatorString
-
-    prefixedId + (if (repeatDepth == 0) "" else RepeatSeparatorString + suffix)
+    XFormsId(staticId, containerIds.toList, 1 to repeatDepth map (_ => 1) toList).toEffectiveId
   }
 
   def renameControlReferences(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit = {

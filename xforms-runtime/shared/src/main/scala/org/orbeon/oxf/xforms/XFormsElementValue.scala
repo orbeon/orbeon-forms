@@ -238,9 +238,9 @@ object XFormsElementValue {
                 attributeControl.setBindingContext(
                   bindingContext = bindingContext,
                   parentRelevant = true,
-                  update = false,
-                  restoreState = false,
-                  state = None
+                  update         = false,
+                  restoreState   = false,
+                  state          = None
                 )
               }
               attributeControl.getExternalValue()

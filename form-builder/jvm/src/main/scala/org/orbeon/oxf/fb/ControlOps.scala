@@ -26,10 +26,8 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{Whitespace, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{ComputedMIP, MIP}
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs}

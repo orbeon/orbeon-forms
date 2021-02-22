@@ -178,7 +178,7 @@ abstract class XFormsAnnotatorBase(
     stackElement
   }
 
-  def doesClosestXHTMLRequireSeparatorAppearance =
+  def doesClosestXHTMLRequireSeparatorAppearance: Boolean =
     currentStackElement.ancestors find (_.isXHTML) exists (e => SeparatorAppearanceElements(e.localname))
 
   def setDocumentLocator(locator: Locator): Unit = {

@@ -875,7 +875,7 @@
                                                 <xxf:setvisited
                                                     if="$current-section-uses-paging"
                                                     iterate="1 to $current-repeat-id-and-index-opt[2]"
-                                                    control="{{$prev-repeat-id-and-index-opt[1]}}~iteration"
+                                                    control="{{$current-repeat-id-and-index-opt[1]}}~iteration"
                                                     xxf:repeat-indexes="{{.}}"
                                                     visited="true"
                                                     recurse="true"/>

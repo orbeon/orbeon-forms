@@ -51,6 +51,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   def repeatPosition(repeatId: String = null)(implicit xfc: XFormsFunction.Context): Int =
     xfc.bindingContext.enclosingRepeatIterationBindingContext(Option(repeatId)).position
 
+  @XPathFunction
+  def repeatPositions()(implicit xfc: XFormsFunction.Context): Iterator[Int] =
+    xfc.bindingContext.repeatPositions
+
 //    Fun("context", classOf[XXFormsContext], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
 //      Arg(STRING, EXACTLY_ONE)
 //    )

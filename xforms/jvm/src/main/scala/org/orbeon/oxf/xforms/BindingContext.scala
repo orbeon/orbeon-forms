@@ -228,6 +228,12 @@ case class BindingContext(
     }
   }
 
+  def repeatPositions: Iterator[Int] =
+    new AncestorIterator(includeSelf = true) collect {
+      case binding if binding.isRepeatIterationBindingContext => binding
+    } map
+      (_.position)
+
   def enclosingRepeatIterationBindingContext(repeatId: Option[String]): BindingContext = {
 
     def matches(binding: BindingContext) =

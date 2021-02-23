@@ -557,7 +557,9 @@ object Controls {
   private val instancesControlsToRestore = new DynamicVariable[(InstancesControls, Boolean)]
 
   // Visit all the descendant controls of the given container control
-  // 2018-01-04: 2 uses left.
+  // 2018-01-04: 2 uses left:
+  // - `updateBindings`
+  // - `dispatchDestructionEventsForRemovedRepeatIteration`
   def visitControls(control: XFormsControl, listener: XFormsControlVisitorListener, includeCurrent: Boolean): Unit =
     control match {
       case containerControl: XFormsContainerControl =>

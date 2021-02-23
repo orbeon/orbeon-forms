@@ -188,7 +188,7 @@ object ElementAnalysisTreeXPathAnalyzer {
           val result =
             e.expressionOrConstant match {
               case Left(expr) =>
-                analyzeXPathWithStringExpression(partAnalysisCtx, e, getChildrenContext(partAnalysisCtx, e), e.inScopeVariables, expr).some
+                analyzeXPathWithStringExpression(partAnalysisCtx, e, e.contextAnalysis, e.inScopeVariables, expr).some
               case Right(_) =>
                 // Value of LHHA is 100% static and analysis is constant
                 StringAnalysis.some

@@ -4827,7 +4827,7 @@
                     </value>
                     <label scope="" prefixed-id="xf-5" model-prefixed-id="m1" binding="true" value="false">
                         <value>
-                            <analysis expression="string((.)[1])" analyzed="true">
+                            <analysis expression="string((@label)[1])" analyzed="true">
                                 <value-dependent>
                                     <path>instance('i12')/@label</path>
                                 </value-dependent>
@@ -4842,7 +4842,7 @@
                     </label>
                     <help scope="" prefixed-id="xf-6" model-prefixed-id="m2" binding="true" value="false">
                         <value>
-                            <analysis expression="string((.)[1])" analyzed="true">
+                            <analysis expression="string((@label)[1])" analyzed="true">
                                 <value-dependent>
                                     <path>instance('i22')/@label</path>
                                 </value-dependent>

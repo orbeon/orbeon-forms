@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.apache.log4j.Logger
+import org.log4s
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
 import org.orbeon.oxf.servlet.ServletSessionImpl
@@ -75,10 +75,6 @@ class OrbeonSessionListener extends HttpSessionListener {
         )
 
         // Run listeners after the processor because processor might add new listeners
-
-
-          }
-        }
         sessionListenersDestroy(new ServletSessionImpl(httpSession))
       }
     }
@@ -86,7 +82,7 @@ class OrbeonSessionListener extends HttpSessionListener {
 
 object OrbeonSessionListener {
 
-  implicit val logger: Logger = ProcessorService.Logger
+  implicit val logger: log4s.Logger = ProcessorService.Logger
 
   // Immediately store `SessionListeners` into the session to avoid concurrency issues which can occur if we
   // do this lazily in `ServletExternalContext.addListener()`.
@@ -107,7 +103,7 @@ object OrbeonSessionListener {
       } catch {
         case NonFatal(t) =>
           // Catch so we can continue running the remaining listeners
-          logger.error("Throwable caught when calling listener", t)
+          logger.error(t)("Throwable caught when calling listener")
       }
     }
   }

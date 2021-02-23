@@ -650,6 +650,10 @@ object XFormsStaticStateDeserializer {
 
             case qName: QName if EventHandler.isAction(qName) =>
 
+              implicit val eitherDecoder: Decoder[Either[String, String]] = {
+                Decoder.decodeEither("left", "right")
+              }
+
               if (EventHandler.isEventHandler(element)) {
 
                 val eventHandler =
@@ -667,8 +671,9 @@ object XFormsStaticStateDeserializer {
                     isIfNonRelevant        <- c.get[Boolean]("isIfNonRelevant")
                     isXBLHandler           <- c.get[Boolean]("isXBLHandler")
                     observersPrefixedIds   <- c.get[Set[String]]("observersPrefixedIds")
-                    targetPrefixedIds   <- c.get[Set[String]]("targetPrefixedIds")
+                    targetPrefixedIds      <- c.get[Set[String]]("targetPrefixedIds")
                   } yield {
+                    // NOTE: See comment in `MessageActionBuilder` about the duplication, etc.
                     val eh =
                       if (EventHandler.isContainerAction(element.getQName)) {
                         new EventHandler(
@@ -694,7 +699,33 @@ object XFormsStaticStateDeserializer {
                           isIfNonRelevant,
                           isXBLHandler
                         ) with WithChildrenTrait
-                      } else
+                      } else if (element.getQName == XFORMS_MESSAGE_QNAME)
+                        new EventHandler(
+                          index,
+                          element,
+                          controlStack.headOption,
+                          None,
+                          staticId,
+                          prefixedId,
+                          namespaceMapping,
+                          scope,
+                          containerScope,
+                          keyText,
+                          keyModifiers,
+                          eventNames,
+                          isAllEvents,
+                          isCapturePhaseOnly,
+                          isTargetPhase,
+                          isBubblingPhase,
+                          propagate,
+                          isPerformDefaultAction,
+                          isPhantom,
+                          isIfNonRelevant,
+                          isXBLHandler
+                        ) with WithExpressionOrConstantTrait {
+                          val expressionOrConstant: Either[String, String] = c.get[Either[String, String]]("expressionOrConstant").right.get // XXX TODO
+                        }
+                      else
                         new EventHandler(
                           index,
                           element,
@@ -729,6 +760,10 @@ object XFormsStaticStateDeserializer {
               } else {
                 if (EventHandler.isContainerAction(element.getQName))
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithChildrenTrait
+                else if (element.getQName == XFORMS_MESSAGE_QNAME)
+                  new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithExpressionOrConstantTrait {
+                    val expressionOrConstant: Either[String, String] = c.get[Either[String, String]]("expressionOrConstant").right.get // XXX TODO
+                  }
                 else
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait
               }

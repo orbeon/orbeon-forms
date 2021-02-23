@@ -322,6 +322,7 @@ object XFormsStaticStateSerializer {
 
     implicit val eitherEncoder: Encoder[Either[String, String]] =
       Encoder.encodeEither("left", "right")
+
     def maybeWithSpecificElementAnalysisFields(a: ElementAnalysis): List[(String, Json)] =
       a match {
         case c: Model         =>
@@ -379,7 +380,6 @@ object XFormsStaticStateSerializer {
 //            //allMIPNameToXPathMIP combines both above
 //            constraintsByLevel // ValidationLevel // depends on `allMIPNameToXPathMIP`
           )
-        case c: InputControl  => Nil
         case c: OutputControl =>
           List(
             "isImageMediatype"     -> Json.fromBoolean(c.isImageMediatype),
@@ -403,24 +403,16 @@ object XFormsStaticStateSerializer {
             "mustEncodeValues" -> c.mustEncodeValues.asJson,
             "itemsetAnalysis"  -> c.itemsetAnalysis.asJson
           )
-
-        case c: UploadControl          => Nil
-        case c: SwitchControl          => Nil
         case c: CaseControl            =>
           List(
             "valueExpression" -> c.valueExpression.asJson,
             "valueLiteral"    -> c.valueLiteral.asJson
           )
-        case c: GroupControl           => Nil
-        case c: DialogControl          => Nil
-        case c: AttributeControl       => Nil // ok, all extracted from attributes
         case c: ComponentControl       =>
           List(
             "commonBindingRef" -> Json.fromInt(collectedCommonBindingsWithPositions(c.commonBinding)),
             "binding"          -> c.bindingOrThrow.asJson
           )
-        case c: RepeatControl          => Nil
-        case c: RepeatIterationControl => Nil
         case c: VariableAnalysisTrait  =>
           List(
             "name"                   -> Json.fromString(c.name),
@@ -441,18 +433,28 @@ object XFormsStaticStateSerializer {
             "isIfNonRelevant"        -> Json.fromBoolean(c.isIfNonRelevant),
             "isXBLHandler"           -> Json.fromBoolean(c.isXBLHandler),
             "observersPrefixedIds"   -> c.observersPrefixedIds.asJson,
-            "targetPrefixedIds"      -> c.targetPrefixedIds.asJson
-          )
-          // xf:range (skip!)
-          // actions that are not `EventHandler`
-        case c: TriggerControl         => Nil // ok
-        case c: TextareaControl        => Nil // ok
-        case c: SecretControl          => Nil // ok
-        case c: NestedNameOrValueControl    =>
+            "targetPrefixedIds"      -> c.targetPrefixedIds.asJson,
+          ) :::
+            c.cast[WithExpressionOrConstantTrait].map{v =>
+              "expressionOrConstant" -> v.expressionOrConstant.asJson
+            }.toList
+        case c: WithExpressionOrConstantTrait => // includes `NestedNameOrValueControl` and `xf:message` action
           List(
             "expressionOrConstant" -> c.expressionOrConstant.asJson,
           )
-        case c                         => Nil
+//          // xf:range (skip!)
+//        case _: UploadControl          => Nil
+//        case _: SwitchControl          => Nil
+//        case _: GroupControl           => Nil
+//        case _: DialogControl          => Nil
+//        case _: AttributeControl       => Nil // ok, all extracted from attributes
+//        case _: RepeatControl          => Nil
+//        case _: RepeatIterationControl => Nil
+//        case _: InputControl           => Nil
+//        case _: TriggerControl         => Nil // ok
+//        case _: TextareaControl        => Nil // ok
+//        case _: SecretControl          => Nil // ok
+        case _                         => Nil
       }
 
     implicit lazy val encodeMapSet: Encoder[MapSet[String, String]] = (a: MapSet[String, String]) =>

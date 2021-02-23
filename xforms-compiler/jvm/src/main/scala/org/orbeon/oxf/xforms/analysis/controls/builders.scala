@@ -840,7 +840,7 @@ object EventHandlerBuilder {
     val isIfNonRelevant: Boolean = attOpt(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
     val isXBLHandler   : Boolean = element.getQName == XBL_HANDLER_QNAME
 
-    if (withChildren) {
+    if (withChildren)
       new EventHandler(
         index,
         element,
@@ -864,7 +864,7 @@ object EventHandlerBuilder {
         isIfNonRelevant,
         isXBLHandler
       ) with WithChildrenTrait
-    } else if (withExpressionOrConstant) {
+    else if (withExpressionOrConstant)
       new EventHandler(
         index,
         element,
@@ -896,7 +896,7 @@ object EventHandlerBuilder {
             acceptHTML      = false
           )
       }
-    } else
+    else
       new EventHandler(
         index,
         element,

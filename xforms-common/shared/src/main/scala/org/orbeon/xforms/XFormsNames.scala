@@ -242,6 +242,8 @@ object XFormsNames {
   val XFORMS_ITEM_QNAME                   = xformsQName("item")
   val XFORMS_CHOICES_QNAME                = xformsQName("choices")
 
+  val XFORMS_MESSAGE_QNAME                = xformsQName("message")
+
   val XFORMS_SUBMIT_REPLACE_ALL      = "all"
   val XFORMS_SUBMIT_REPLACE_INSTANCE = "instance"
   val XFORMS_SUBMIT_REPLACE_TEXT     = "text"

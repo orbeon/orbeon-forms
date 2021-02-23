@@ -168,20 +168,24 @@ class XFormsActionInterpreter(
           //     <xf:delete ref="/*/foo[1]" while="/*/foo"/>
           //
           // In this case, in the second iteration, `xf:delete` must find an up-to-date binding!
-          withBinding(
-            ref                            = actionAnalysis.ref,
-            context                        = None,
-            modelId                        = None,
-            bindId                         = actionAnalysis.bind,
-            bindingElement                 = actionAnalysis.element,
-            bindingElementNamespaceMapping = actionAnalysis.namespaceMapping,
-            sourceEffectiveId              = getSourceEffectiveId(actionAnalysis),
-            scope                          = actionAnalysis.scope,
-            handleNonFatal                 = false,
-          ) {
-            XFormsActions.getAction(actionQName)
-              .execute(DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem))
-          }
+
+          val actionImpl = XFormsActions.getAction(actionQName)
+          if (actionImpl.pushBinding)
+            withBinding(
+              ref                            = actionAnalysis.ref,
+              context                        = None,
+              modelId                        = None,
+              bindId                         = actionAnalysis.bind,
+              bindingElement                 = actionAnalysis.element,
+              bindingElementNamespaceMapping = actionAnalysis.namespaceMapping,
+              sourceEffectiveId              = getSourceEffectiveId(actionAnalysis),
+              scope                          = actionAnalysis.scope,
+              handleNonFatal                 = false,
+            ) {
+              actionImpl.execute(DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem))
+            }
+          else
+            actionImpl.execute(DynamicActionContext(this, actionAnalysis, hasOverriddenContext option contextItem))
         }
 
         // Stop if there is no iteration

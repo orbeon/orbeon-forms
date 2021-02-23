@@ -32,6 +32,8 @@ import scala.jdk.CollectionConverters._
 
 abstract class XFormsAction extends Logging {
 
+  val pushBinding: Boolean = true
+
   // Execute the action with the given context
   // By default, run the legacy execute()
   def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit =

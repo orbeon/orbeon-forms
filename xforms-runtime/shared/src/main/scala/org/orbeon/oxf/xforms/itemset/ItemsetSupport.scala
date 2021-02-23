@@ -240,7 +240,7 @@ object ItemsetSupport {
                 findChildElem(elem, XFORMS_VALUE_QNAME) map
                   (_.asInstanceOf[WithExpressionOrConstantTrait]) flatMap { valueElem =>
 
-                    val rawValue = evaluateExpressionOrConstant(valueElem, parentEffectiveId)
+                    val rawValue = evaluateExpressionOrConstant(valueElem, parentEffectiveId, pushContextAndModel = true)
 
                     // For multiple selection:
                     //
@@ -285,7 +285,7 @@ object ItemsetSupport {
               lhhaElemOpt match {
                 case Some(lhhaElem: LHHAAnalysis) =>
 
-                  val lhhaValueOpt = evaluateExpressionOrConstant(lhhaElem, parentEffectiveId)
+                  val lhhaValueOpt = evaluateExpressionOrConstant(lhhaElem, parentEffectiveId, pushContextAndModel = true)
                   val containsHtml = lhhaElem.containsHTML
 
                   // XXX TODO
@@ -581,14 +581,17 @@ object ItemsetSupport {
     result()
   }
 
+  // TODO: Move somewhere else as this is now used by other callers.
   def evaluateExpressionOrConstant(
-    childElem         : WithExpressionOrConstantTrait,
-    parentEffectiveId : String)(implicit
-    contextStack      : XFormsContextStack
+    childElem           : WithExpressionOrConstantTrait,
+    parentEffectiveId   : String,
+    pushContextAndModel : Boolean)(implicit
+    contextStack        : XFormsContextStack
   ): Option[String] =
     childElem.expressionOrConstant match {
       case Left(expr)   =>
-        withContextAndModelOnly(childElem, parentEffectiveId) { currentBindingContext =>
+
+        def evaluate(currentBindingContext: BindingContext) =
           XPathCache.evaluateAsStringOpt(
             contextItems       = currentBindingContext.nodeset,
             contextPosition    = currentBindingContext.position,
@@ -601,7 +604,11 @@ object ItemsetSupport {
             locationData       = childElem.locationData,
             reporter           = contextStack.container.getContainingDocument.getRequestStats.getReporter
           )
-        }
+
+        if (pushContextAndModel)
+          withContextAndModelOnly(childElem, parentEffectiveId)(evaluate)
+        else
+          evaluate(contextStack.getCurrentBindingContext)
       case Right(constant) =>
         constant.some
     }

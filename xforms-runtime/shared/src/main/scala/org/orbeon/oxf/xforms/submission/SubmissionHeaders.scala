@@ -60,7 +60,8 @@ object SubmissionHeaders {
 
                 evaluateExpressionOrConstant(
                   labelOrValueElem,
-                  parentEffectiveId
+                  parentEffectiveId,
+                  pushContextAndModel = true
                 )
               }
 

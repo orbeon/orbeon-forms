@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.analysis.EventHandler._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Constraint, QNameToXPathMIP, buildInternalCustomMIPName}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.{TypeMIP, XPathMIP}
-import org.orbeon.oxf.xforms.analysis.model.{BindTree, Instance, InstanceMetadata, ModelVariable, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, ModelVariable, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
@@ -764,16 +764,17 @@ object InstanceMetadataBuilder {
 object EventHandlerBuilder {
 
   def apply(
-    index             : Int,
-    element           : Element,
-    parent            : Option[ElementAnalysis],
-    preceding         : Option[ElementAnalysis],
-    staticId          : String,
-    prefixedId        : String,
-    namespaceMapping  : NamespaceMapping,
-    scope             : Scope,
-    containerScope    : Scope,
-    withChildren      : Boolean
+    index                    : Int,
+    element                  : Element,
+    parent                   : Option[ElementAnalysis],
+    preceding                : Option[ElementAnalysis],
+    staticId                 : String,
+    prefixedId               : String,
+    namespaceMapping         : NamespaceMapping,
+    scope                    : Scope,
+    containerScope           : Scope,
+    withChildren             : Boolean,
+    withExpressionOrConstant : Boolean // see comment in `MessageActionBuilder.apply`
   ): ElementAnalysis = {
 
     // We check attributes in the `ev:*` or no namespace. We don't need to handle attributes in the `xbl:*` namespace.
@@ -839,7 +840,7 @@ object EventHandlerBuilder {
     val isIfNonRelevant: Boolean = attOpt(XXFORMS_EVENTS_IF_NON_RELEVANT_ATTRIBUTE_QNAME) contains "true"
     val isXBLHandler   : Boolean = element.getQName == XBL_HANDLER_QNAME
 
-    if (withChildren)
+    if (withChildren) {
       new EventHandler(
         index,
         element,
@@ -863,7 +864,39 @@ object EventHandlerBuilder {
         isIfNonRelevant,
         isXBLHandler
       ) with WithChildrenTrait
-    else
+    } else if (withExpressionOrConstant) {
+      new EventHandler(
+        index,
+        element,
+        parent,
+        preceding,
+        staticId,
+        prefixedId,
+        namespaceMapping,
+        scope,
+        containerScope,
+        keyText,
+        keyModifiers,
+        eventNames,
+        isAllEvents,
+        isCapturePhaseOnly,
+        isTargetPhase,
+        isBubblingPhase,
+        propagate,
+        isPerformDefaultAction,
+        isPhantom,
+        isIfNonRelevant,
+        isXBLHandler
+      ) with WithExpressionOrConstantTrait {
+        val (expressionOrConstant, _) =
+          XFormsStaticElementValue.getElementExpressionOrConstant(
+            outerElem       = element,
+            containerPrefix = containerScope.fullPrefix,
+            isWithinRepeat  = parent.exists(_.isWithinRepeat),
+            acceptHTML      = false
+          )
+      }
+    } else
       new EventHandler(
         index,
         element,
@@ -938,15 +971,15 @@ object VariableAnalysisBuilder {
 object NestedNameOrValueControlBuilder {
 
   def apply(
-    index             : Int,
-    element           : Element,
-    parent            : Option[ElementAnalysis],
-    preceding         : Option[ElementAnalysis],
-    staticId          : String,
-    prefixedId        : String,
-    namespaceMapping  : NamespaceMapping,
-    scope             : Scope,
-    containerScope    : Scope
+    index            : Int,
+    element          : Element,
+    parent           : Option[ElementAnalysis],
+    preceding        : Option[ElementAnalysis],
+    staticId         : String,
+    prefixedId       : String,
+    namespaceMapping : NamespaceMapping,
+    scope            : Scope,
+    containerScope   : Scope
   ): NestedNameOrValueControl = {
 
     val (expressionOrConstant, _) =
@@ -969,5 +1002,63 @@ object NestedNameOrValueControlBuilder {
       containerScope,
       expressionOrConstant
     )
+  }
+}
+
+object MessageActionBuilder {
+
+  // NOTE: It's not great how we create actions which are also `EventHandler`. Here we need a mixin
+  // of `EventHandler` and `WithExpressionOrConstantTrait` just to create the special case of
+  // `MessageAction`. Maybe at some point we should separate the concerns of `EventHandler` and
+  // actions, so that `EventHandler` just becomes a container for actions.
+  def apply(
+    index            : Int,
+    element          : Element,
+    parent           : Option[ElementAnalysis],
+    preceding        : Option[ElementAnalysis],
+    staticId         : String,
+    prefixedId       : String,
+    namespaceMapping : NamespaceMapping,
+    scope            : Scope,
+    containerScope   : Scope,
+    isEventHandler   : Boolean
+  ): ElementAnalysis = {
+
+    if (isEventHandler)
+      EventHandlerBuilder(
+        index,
+        element,
+        parent,
+        preceding,
+        staticId,
+        prefixedId,
+        namespaceMapping,
+        scope,
+        containerScope,
+        withChildren             = false,
+        withExpressionOrConstant = true
+      )
+    else
+      new ElementAnalysis(
+        index,
+        element,
+        parent,
+        preceding,
+        staticId,
+        prefixedId,
+        namespaceMapping,
+        scope,
+        containerScope
+      ) with ActionTrait
+        with WithExpressionOrConstantTrait {
+
+        val (expressionOrConstant, _) =
+          XFormsStaticElementValue.getElementExpressionOrConstant(
+            outerElem       = element,
+            containerPrefix = containerScope.fullPrefix,
+            isWithinRepeat  = parent.exists(_.isWithinRepeat),
+            acceptHTML      = false
+          )
+      }
   }
 }

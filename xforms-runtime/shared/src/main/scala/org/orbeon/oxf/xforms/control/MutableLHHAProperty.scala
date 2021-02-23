@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContextStackSupport._
-import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsElementValue}
+import org.orbeon.oxf.xforms.XFormsContextStack
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty

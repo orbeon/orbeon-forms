@@ -16,11 +16,13 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsElementValue
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
+import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.xxformsQName
+
 
 /**
  * 10.12 The message Element
@@ -59,6 +61,9 @@ class XFormsMessageAction extends XFormsAction {
 
   import XFormsMessageAction._
 
+  // We handle the binding ourselves
+  override val pushBinding: Boolean = false
+
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
     val containingDocument = actionContext.containingDocument
@@ -73,17 +78,13 @@ class XFormsMessageAction extends XFormsAction {
       } getOrElse
         ModalQName // "The default is "modal" if the attribute is not specified."
 
-    // Get message value
     val messageValue =
-      XFormsElementValue.getElementValue(
-        actionContext.interpreter.container,
-        actionContext.interpreter.actionXPathContext,
-        actionContext.interpreter.getSourceEffectiveId(actionContext.analysis),
-        actionContext.element,
-        acceptHTML = false,
-        defaultHTML = false,
-        null
-      ) getOrElse ""
+      ItemsetSupport.evaluateExpressionOrConstant(
+        childElem           = actionContext.analysis.asInstanceOf[WithExpressionOrConstantTrait],
+        parentEffectiveId   = actionContext.interpreter.getSourceEffectiveId(actionContext.analysis),
+        pushContextAndModel = false // `XFormsActionInterpreter` already handles that
+      )(actionContext.interpreter.actionXPathContext) getOrElse ""
+
     ExtensionLevels.get(levelQName) match {
       case Some(fn) =>
         fn(containingDocument.indentedLogger, messageValue)

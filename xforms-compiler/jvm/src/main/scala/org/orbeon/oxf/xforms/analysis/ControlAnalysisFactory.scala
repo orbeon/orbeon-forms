@@ -107,13 +107,12 @@ object ControlAnalysisFactory {
     { case e: Element if byQNameFactory.isDefinedAt(e.getQName) => byQNameFactory(e.getQName) }
 
   private val ActionFactoryPf: PartialFunction[Element, ControlFactory] = {
-    case e if isContainerAction(e.getQName) && isEventHandler(e) => EventHandlerBuilder(_, _, _, _, _, _, _, _, _, withChildren = true)
+    case e if isContainerAction(e.getQName) && isEventHandler(e) => EventHandlerBuilder(_, _, _, _, _, _, _, _, _, withChildren = true, withExpressionOrConstant = false)
     case e if isContainerAction(e.getQName)                      => new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ActionTrait with WithChildrenTrait
-    case e if isAction(e.getQName) && isEventHandler(e)          => EventHandlerBuilder(_, _, _, _, _, _, _, _, _, withChildren = false)
+    case e if e.getQName == XFORMS_MESSAGE_QNAME                 => MessageActionBuilder(_, _, _, _, _, _, _, _, _, isEventHandler = isEventHandler(e))
+    case e if isAction(e.getQName) && isEventHandler(e)          => EventHandlerBuilder(_, _, _, _, _, _, _, _, _, withChildren = false, withExpressionOrConstant = false)
     case e if isAction(e.getQName)                               => new ElementAnalysis(_, _, _, _, _, _, _, _, _) with ActionTrait
   }
-
-  val actionFactory: Element => Option[ControlFactory] = ActionFactoryPf.lift
 
   private val ControlOrActionFactory = ControlFactoryPf orElse ActionFactoryPf lift
 

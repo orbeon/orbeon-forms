@@ -26,8 +26,8 @@ import scala.collection.mutable
 import scala.scalajs.js
 
 object Select1Search {
-  XBL.declareCompanion(name = "fr|dropdown-select1-search" , new Select1SearchCompanion())
-  XBL.declareCompanion(name = "fr|databound-select1-search", new Select1SearchCompanion())
+  XBL.declareCompanion(name = "fr|dropdown-select1-search" , new Select1SearchCompanion)
+  XBL.declareCompanion(name = "fr|databound-select1-search", new Select1SearchCompanion)
 }
 
 private class Select1SearchCompanion extends XBLCompanion {

@@ -1172,7 +1172,7 @@
                                                 <xsl:attribute name="collapsible">false</xsl:attribute>
                                                 <xsl:apply-templates select="@* except (@collapse | @collapsible | @open)"/>
                                                 <!-- Tell the section whether it needs to be initially open or not (optimization) -->
-                                                <xsl:attribute name="nonrelevant">true</xsl:attribute>
+                                                <xsl:attribute name="content-nonrelevant-if-collapsed">true</xsl:attribute>
                                                 <xsl:attribute name="open" select="concat('{case(''switch'') = ''', $static-section-id, '-case''}')"/>
 
                                                 <!-- Update the `changed` token -->

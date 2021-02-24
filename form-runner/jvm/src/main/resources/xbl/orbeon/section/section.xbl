@@ -77,16 +77,16 @@
                             )"/>
 
                     <!-- Section configuration -->
-                    <xsl:variable name="editable"       select="exists($root/@edit-ref)"/>
-                    <xsl:variable name="nonrelevant"    select="$root/@nonrelevant = 'true'"/>
-                    <xsl:variable name="collapsible"    select="not($root/@collapsible = 'false' or $root/@collapse = 'false')"/>
-                    <xsl:variable name="animate"        select="not($root/@animate = 'false')"/>
-                    <xsl:variable name="readonly"       select="$root/@readonly = 'true'"/>
-                    <xsl:variable name="is-repeat"      select="frf:isRepeat(.)"/>
-                    <xsl:variable name="appearance"     select="($root/@appearance, 'full')[1]"/>
-                    <xsl:variable name="repeat-menu"    select="$appearance = 'full'    and not($readonly)"/>
-                    <xsl:variable name="right-column"   select="$appearance = 'minimal' and not($readonly)"/>
-                    <xsl:variable name="has-html-label" select="$root/xf:label/@mediatype = 'text/html'"/>
+                    <xsl:variable name="editable"                         select="exists($root/@edit-ref)"/>
+                    <xsl:variable name="content-nonrelevant-if-collapsed" select="$root/@content-nonrelevant-if-collapsed = 'true'"/>
+                    <xsl:variable name="collapsible"                      select="not($root/@collapsible = 'false' or $root/@collapse = 'false')"/>
+                    <xsl:variable name="animate"                          select="not($root/@animate = 'false')"/>
+                    <xsl:variable name="readonly"                         select="$root/@readonly = 'true'"/>
+                    <xsl:variable name="is-repeat"                        select="frf:isRepeat(.)"/>
+                    <xsl:variable name="appearance"                       select="($root/@appearance, 'full')[1]"/>
+                    <xsl:variable name="repeat-menu"                      select="$appearance = 'full'    and not($readonly)"/>
+                    <xsl:variable name="right-column"                     select="$appearance = 'minimal' and not($readonly)"/>
+                    <xsl:variable name="has-html-label"                   select="$root/xf:label/@mediatype = 'text/html'"/>
 
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
@@ -165,7 +165,7 @@
                                     id="switch"
                                     xxf:readonly-appearance="dynamic"
                                     xxf:element="div"
-                                    xxf:xforms11-switch="{$editable or $nonrelevant}"
+                                    xxf:xforms11-switch="{$editable or $content-nonrelevant-if-collapsed}"
                                     xxf:update="{'full'[not($editable)]}">
 
                                     <!-- Closed section -->

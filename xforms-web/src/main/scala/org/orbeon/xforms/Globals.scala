@@ -20,18 +20,38 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportAll
 object Globals {
 
-  var maskFocusEvents             : Boolean                   = false               // avoid catching focus event when we do call setfocus upon server request
-  var maskDialogCloseEvents       : Boolean                   = false               // avoid catching a dialog close event received from the server, so we don't sent it back to the server
-  var currentFocusControlId       : String                    = null                // id of the control that got the focus last
-  var currentFocusControlElement  : js.Object                 = null                // element for the control that got the focus last
-  var yuiCalendar                 : js.Object                 = null                // reusable calendar widget
-  var tooltipLibraryInitialized   : Boolean                   = false
+  var maskFocusEvents             : Boolean                   = _ // avoid catching focus event when we do call setfocus upon server request
+  var maskDialogCloseEvents       : Boolean                   = _ // avoid catching a dialog close event received from the server, so we don't sent it back to the server
+  var currentFocusControlId       : String                    = _ // id of the control that got the focus last
+  var currentFocusControlElement  : js.Object                 = _ // element for the control that got the focus last
+  var yuiCalendar                 : js.Object                 = _ // reusable calendar widget
+  var tooltipLibraryInitialized   : Boolean                   = _
 
-  var activeControl               : js.Object                 = null                // the currently active control, used to disable hint
-  var dialogs                     : js.Dictionary[js.Dynamic] = js.Dictionary.empty // map for dialogs: id -> YUI dialog object
-  var hintTooltipForControl       : js.Dictionary[js.Any]     = js.Dictionary.empty // map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
-  var alertTooltipForControl      : js.Dictionary[js.Any]     = js.Dictionary.empty // map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
-  var helpTooltipForControl       : js.Dictionary[js.Any]     = js.Dictionary.empty // map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
-  var sliderYui                   : js.Dictionary[js.Any]     = js.Dictionary.empty // maps slider id to the YUI object for that slider
-  var lastDialogZIndex            : Int                       = 1050                // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
+  var activeControl               : js.Object                 = _ // the currently active control, used to disable hint
+  var dialogs                     : js.Dictionary[js.Dynamic] = _ // map for dialogs: id -> YUI dialog object
+  var hintTooltipForControl       : js.Dictionary[js.Any]     = _ // map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
+  var alertTooltipForControl      : js.Dictionary[js.Any]     = _ // map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
+  var helpTooltipForControl       : js.Dictionary[js.Any]     = _ // map from element id -> YUI help or true, that tells us if we have already created a Tooltip for an element
+  var sliderYui                   : js.Dictionary[js.Any]     = _ // maps slider id to the YUI object for that slider
+  var lastDialogZIndex            : Int                       = _ // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
+
+  // Reset all values upon initialization
+  reset()
+
+  def reset(): Unit = {
+    maskFocusEvents            = false
+    maskDialogCloseEvents      = false
+    currentFocusControlId      = null
+    currentFocusControlElement = null
+    yuiCalendar                = null
+    tooltipLibraryInitialized  = false
+
+    activeControl              = null
+    dialogs                    = js.Dictionary.empty
+    hintTooltipForControl      = js.Dictionary.empty
+    alertTooltipForControl     = js.Dictionary.empty
+    helpTooltipForControl      = js.Dictionary.empty
+    sliderYui                  = js.Dictionary.empty
+    lastDialogZIndex           = 1050
+  }
 }

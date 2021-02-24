@@ -9,6 +9,7 @@ import org.scalajs.dom.html
 import scala.collection.compat._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
 
 
 object EmbeddingSupport {
@@ -20,6 +21,7 @@ object EmbeddingSupport {
       form.xblInstances.foreach(_.destroy())
       form.xblInstances.clear()
       Page.unregisterForm(form)
+      Globals.reset()
       StateHandling.clearClientState(formId)
     }
     container.childNodes.foreach(container.removeChild)

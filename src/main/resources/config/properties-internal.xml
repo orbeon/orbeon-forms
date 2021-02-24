@@ -165,6 +165,7 @@
         +/xbl/orbeon/wizard/wizard.css
         +/xbl/orbeon/character-counter/character-counter.css
         +/xbl/orbeon/dropdown-date/dropdown-date.css
+        +/xbl/orbeon/alert-dialog/alert-dialog.css
 
         <!-- Temporary until we can create a baseline that includes baseline XBL components -->
         +/xbl/orbeon/date/date.css

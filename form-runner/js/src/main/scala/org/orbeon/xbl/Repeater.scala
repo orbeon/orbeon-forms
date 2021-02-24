@@ -13,6 +13,20 @@
   */
 package org.orbeon.xbl
 
-object Repeater extends GridSectionMenus {
+import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+
+
+object Repeater {
+
+  XBL.declareCompanion(
+    "fr|repeater",
+    new XBLCompanion {
+      override def init()   : Unit = RepeaterMenus // initialize menus once
+      override def destroy(): Unit = ()
+    }
+  )
+}
+
+object RepeaterMenus extends GridSectionMenus {
   override def componentName = "repeater"
 }

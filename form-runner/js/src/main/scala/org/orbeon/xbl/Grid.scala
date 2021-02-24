@@ -13,6 +13,20 @@
   */
 package org.orbeon.xbl
 
-object Grid extends GridSectionMenus {
+import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+
+
+object Grid {
+
+  XBL.declareCompanion(
+    "fr|grid-multiple",
+    new XBLCompanion {
+      override def init()   : Unit = GridMenus // initialize menus once
+      override def destroy(): Unit = ()
+    }
+  )
+}
+
+object GridMenus extends GridSectionMenus {
   override def componentName = "grid"
 }

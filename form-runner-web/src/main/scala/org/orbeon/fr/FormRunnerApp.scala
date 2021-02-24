@@ -48,6 +48,8 @@ object FormRunnerApp extends App {
     frPrivateDyn.API = FormRunnerPrivateAPI
 
     // Register XBL components
+    xbl.Grid
+    xbl.Repeater
     xbl.DndRepeat
     xbl.Tabbable
     xbl.Number
@@ -63,7 +65,6 @@ object FormRunnerApp extends App {
     // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
     //FormRunnerPrivateAPI
   }
-
 
   def onPageContainsFormsMarkup(): Unit =
     XFormsApp.onPageContainsFormsMarkup()

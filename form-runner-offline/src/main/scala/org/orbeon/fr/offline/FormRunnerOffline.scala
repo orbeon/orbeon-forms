@@ -89,10 +89,8 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     setLoggerThreshold("org.orbeon.offline", Debug)
   }
 
-  def onPageContainsFormsMarkup(): Unit = {
+  def onPageContainsFormsMarkup(): Unit =
     XFormsApp.onPageContainsFormsMarkup()
-    FormRunnerApp.onPageContainsFormsMarkup2()
-  }
 
   @JSExport
   def configure(

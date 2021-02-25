@@ -16,6 +16,7 @@ package org.orbeon.xbl
 import org.orbeon.date.JSDateUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xbl.DatePickerFacade._
+import org.orbeon.xforms.Constants.XFormsIosClass
 import org.orbeon.xforms.facade.XBL
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames, Language, Support}
 import org.scalajs.dom
@@ -43,7 +44,7 @@ private class DateCompanion extends XBLCompanionWithState {
   val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
 
   def inputEl    : JQuery     = $(containerElem).find("input").first()
-  def iOS        : Boolean    = dom.document.body.classList.contains("xforms-ios")
+  def iOS        : Boolean    = dom.document.body.classList.contains(XFormsIosClass)
   var datePicker : DatePicker = _
 
   override def init(): Unit = {

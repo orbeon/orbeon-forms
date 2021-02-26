@@ -169,6 +169,8 @@
 
         <!-- Temporary until we can create a baseline that includes baseline XBL components -->
         +/xbl/orbeon/date/date.css
+        +/xbl/orbeon/time/time.css
+        +/xbl/orbeon/datetime/datetime.css
         +/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css
         +/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css
         +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/css/select2.css

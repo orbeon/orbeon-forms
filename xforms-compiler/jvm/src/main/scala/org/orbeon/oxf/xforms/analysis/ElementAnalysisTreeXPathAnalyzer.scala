@@ -572,7 +572,7 @@ object ElementAnalysisTreeXPathAnalyzer {
                 pmxpa
               case other: PathMapXPathAnalysis =>
                 // Both are PathMap analysis so actually combine
-                new PathMapXPathAnalysis(
+                PathMapXPathAnalysis(
                   combineXPathStrings(pmxpa.xpathString, other.xpathString),
                   true,
                   pmxpa.valueDependentPaths combine other.valueDependentPaths,
@@ -595,7 +595,7 @@ object ElementAnalysisTreeXPathAnalyzer {
       xpa match {
         case cxpa: ConstantXPathAnalysis => cxpa
         case pmxpa: PathMapXPathAnalysis =>
-          new PathMapXPathAnalysis(
+          PathMapXPathAnalysis(
             xpathString            = pmxpa.xpathString,
             figuredOutDependencies = true,
             valueDependentPaths    = pmxpa.valueDependentPaths combine pmxpa.returnablePaths,

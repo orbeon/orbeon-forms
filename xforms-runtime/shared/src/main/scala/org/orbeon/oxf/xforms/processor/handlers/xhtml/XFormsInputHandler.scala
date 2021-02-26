@@ -202,8 +202,7 @@ class XFormsInputHandler(
               inputClasses.append(" xforms-type-")
               inputClasses.append(secondType)
             }
-          }
-          else {
+          } else {
             reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, "")
           }
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)

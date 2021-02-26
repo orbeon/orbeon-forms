@@ -35,10 +35,12 @@
 
         <xbl:handlers>
             <xbl:handler event="fr-expand" phase="target">
-                <xf:toggle case="case-open"/>
+                <!-- For attributes, see https://github.com/orbeon/orbeon-forms/issues/4790 -->
+                <xf:toggle case="case-open" xxf:deferred-updates="false" xxf:toggle-ancestors="false"/>
             </xbl:handler>
             <xbl:handler event="fr-collapse" phase="target">
-                <xf:toggle case="case-closed"/>
+                <!-- For attributes, see https://github.com/orbeon/orbeon-forms/issues/4790 -->
+                <xf:toggle case="case-closed" xxf:deferred-updates="false" xxf:toggle-ancestors="false"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">

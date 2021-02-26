@@ -856,16 +856,39 @@
                                             </xf:action>
                                         </xf:group>
                                         <xf:group id="fr-wizard-visit-all" appearance="xxf:internal">
-                                            <xxf:setvisited
-                                                event="fr-wizard-visit-all"
-
-                                                control="switch"
-                                                visited="true"
-                                                recurse="true"/>
+                                            <xf:action event="fr-wizard-visit-all">
+                                                <xf:dispatch
+                                                    iterate="$top-level-section-ids"
+                                                    name="fr-expand"
+                                                    targetid="{{.}}"/>
+                                                <!-- Avoid extra refreshes at this point: xxf:deferred-updates="false" -->
+                                                <xxf:setvisited
+                                                    xxf:deferred-updates="false"
+                                                    control="switch"
+                                                    visited="true"
+                                                    recurse="true"/>
+                                            </xf:action>
                                         </xf:group>
                                         <xf:group id="fr-wizard-visit-all-to-current" appearance="xxf:internal">
                                             <!-- NOTE: We visit the current page upon xforms-deselect too. -->
                                             <xf:action event="fr-wizard-visit-all-to-current">
+                                                <!-- The current section, since it is current, is obviously already
+                                                     expanded. So we make sure we expand anything before it. -->
+                                                <xf:dispatch
+                                                    iterate="
+                                                        distinct-values(
+                                                            for $prev-nav-case-id in $prev-nav-case-ids
+                                                            return
+                                                                $nav-matching-top-level-section-ids[
+                                                                    index-of(
+                                                                        $nav-section-or-grid-ids,
+                                                                        Wizard:sectionIdFromCaseIdOpt($prev-nav-case-id)
+                                                                    )
+                                                                ]
+                                                        )"
+                                                    name="fr-expand"
+                                                    targetid="{{.}}"/>
+
                                                 <xxf:setvisited
                                                     iterate="$prev-nav-case-ids, if ($current-section-uses-paging) then () else $current-nav-case-id"
                                                     control="{{.}}"
@@ -881,18 +904,24 @@
                                             </xf:action>
                                         </xf:group>
                                         <xf:group id="fr-wizard-visit-all-available" appearance="xxf:internal">
-                                            <xxf:setvisited
-                                                event="fr-wizard-visit-all-available"
-
-                                                iterate="
-                                                    for $section-name in xxf:split(xxf:instance('available-top-level-sections'))
-                                                    return
-                                                        (: See https://github.com/orbeon/orbeon-forms/issues/4022 :)
-                                                        for $section-id in $nav-section-or-grid-ids[frf:controlNameFromId(.) = $section-name]
-                                                        return concat($section-id, '-case')"
-                                                control="{{.}}"
-                                                visited="true"
-                                                recurse="true"/>
+                                            <xf:action event="fr-wizard-visit-all-available">
+                                                <xf:dispatch
+                                                    iterate="
+                                                        for $section-name in xxf:split(xxf:instance('available-top-level-sections'))
+                                                        return concat($section-name, '-section')"
+                                                    name="fr-expand"
+                                                    targetid="{{.}}"/>
+                                                <xxf:setvisited
+                                                    iterate="
+                                                        for $section-name in xxf:split(xxf:instance('available-top-level-sections'))
+                                                        return
+                                                            (: See https://github.com/orbeon/orbeon-forms/issues/4022 :)
+                                                            for $section-id in $nav-section-or-grid-ids[frf:controlNameFromId(.) = $section-name]
+                                                            return concat($section-id, '-case')"
+                                                    control="{{.}}"
+                                                    visited="true"
+                                                    recurse="true"/>
+                                            </xf:action>
                                         </xf:group>
                                         <xf:group id="fr-wizard-unvisit-following" appearance="xxf:internal">
                                             <xxf:setvisited
@@ -902,26 +931,30 @@
                                                 control="{{.}}"
                                                 visited="false"
                                                 recurse="true"/>
+                                            <!-- NOTE: We *could* collapse the corresponding top-level sections. -->
                                         </xf:group>
                                         <xf:group id="fr-wizard-section-deselected" appearance="xxf:internal">
                                             <xf:action event="fr-wizard-section-deselected">
-
+                                                <!-- Avoid extra refreshes at this point: xxf:deferred-updates="false" -->
                                                 <xxf:setvisited
                                                     if="not($current-section-uses-paging)"
 
+                                                    xxf:deferred-updates="false"
                                                     control="{{event('control')}}"
                                                     visited="true"
                                                     recurse="true"/>
 
                                                 <xxf:setvisited
                                                     if="$current-section-uses-paging"
-
                                                     iterate="1 to $current-repeat-id-and-index-opt[2]"
+
+                                                    xxf:deferred-updates="false"
                                                     control="{{$current-repeat-id-and-index-opt[1]}}~iteration"
                                                     xxf:repeat-indexes="{{.}}"
                                                     visited="true"
                                                     recurse="true"/>
                                             </xf:action>
+                                            <!-- NOTE: We *could* collapse the corresponding top-level sections. Should we? -->
                                         </xf:group>
                                     </xh:div>
                                 </xh:div>

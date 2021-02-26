@@ -316,6 +316,7 @@ object XFormsNames {
   val XXFORMS_REPEAT_STARTINDEX_QNAME     = QName("startindex")
   val XXFORMS_DND_QNAME                   = xxformsQName("dnd")
   val XXFORMS_DEFERRED_UPDATES_QNAME      = xxformsQName("deferred-updates")
+  val XXFORMS_TOGGLE_ANCESTORS_QNAME      = xxformsQName("toggle-ancestors")
   val XXFORMS_WHITESPACE_QNAME            = xxformsQName("whitespace")
 
   val XXFORMS_FORMAT_QNAME                = xxformsQName("format")

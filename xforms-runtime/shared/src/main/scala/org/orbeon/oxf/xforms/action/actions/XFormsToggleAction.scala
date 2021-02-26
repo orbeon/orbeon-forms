@@ -13,10 +13,13 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAPI, XFormsAction}
 import org.orbeon.oxf.xforms.control.Focus
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
+import org.orbeon.xforms.XFormsNames.XXFORMS_TOGGLE_ANCESTORS_QNAME
+
 
 /**
  * 9.2.3 The toggle Element
@@ -24,13 +27,17 @@ import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 class XFormsToggleAction extends XFormsAction {
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
-    val interpreter   = actionContext.interpreter
+    val interpreter = actionContext.interpreter
 
     // Find case control
     resolveControlAvt("case")(actionContext) match {
       case Some(caseControl: XFormsCaseControl) =>
         // Perform the actual toggle action
-        XFormsToggleAction.toggle(caseControl, interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis))
+        XFormsToggleAction.toggle(
+          caseControl                  = caseControl,
+          mustHonorDeferredUpdateFlags = interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis),
+          mustToggleAncestors          = ! actionContext.analysis.element.attributeValueOpt(XXFORMS_TOGGLE_ANCESTORS_QNAME).contains("false")
+        )
       case _ =>
         // "If there is a null search result for the target object and the source object is an XForms action such as
         // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
@@ -46,7 +53,8 @@ object XFormsToggleAction {
 
   def toggle(
     caseControl                  : XFormsCaseControl,
-    mustHonorDeferredUpdateFlags : Boolean = true
+    mustHonorDeferredUpdateFlags : Boolean = true,
+    mustToggleAncestors          : Boolean = true
   ): Unit = {
 
     val doc = XFormsAPI.inScopeContainingDocument
@@ -58,17 +66,21 @@ object XFormsToggleAction {
     // NOTE: The logic below doesn't handle showing ancestor `xxf:xforms11-switch="true"` cases yet.
     if (caseControl.getSwitch.isRelevant) { // the `xf:switch` and consequently all ancestors are relevant
 
-      val focusedBeforeOpt = doc.controls.getFocusedControl
-
       val ancestorOrSelfHiddenCasesIt = Focus.ancestorOrSelfHiddenCases(caseControl)
-      val requireFocusUpdate          = ancestorOrSelfHiddenCasesIt.nonEmpty
+      val focusedBeforeOpt            = ancestorOrSelfHiddenCasesIt.nonEmpty option doc.controls.getFocusedControl
 
       // Q: Should we instead toggle from root to leaf?
-      ancestorOrSelfHiddenCasesIt foreach (_.toggle())
+      val casesToToggle =
+        if (mustToggleAncestors)
+          ancestorOrSelfHiddenCasesIt
+        else
+          ! caseControl.isCaseVisible iterator caseControl
+
+      casesToToggle foreach (_.toggle())
 
       // Update the focus only if at least one `xf:case` requires toggling
-      if (requireFocusUpdate)
-        Focus.updateFocusWithEvents(focusedBeforeOpt, None)(doc)
+      focusedBeforeOpt foreach
+        (Focus.updateFocusWithEvents(_, None)(doc))
     }
   }
 }

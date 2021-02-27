@@ -478,12 +478,15 @@ class PathMapXPathDependencies(
           result
         case None =>
           val tempResult = control.bindingAnalysis match {
+            case None if control.hasBinding =>
+              // Control has an XPath binding AND binding dependencies are unknown
+              MustUpdateResultNA
+            case Some(analysis) if ! analysis.figuredOutDependencies =>
+              // Binding dependencies are unknown (should be the same as above)
+              MustUpdateResultNA
             case None =>
               // Control does not have an XPath binding
               MustNotUpdateResultZero
-            case Some(analysis) if ! analysis.figuredOutDependencies =>
-              // Binding dependencies are unknown
-              MustUpdateResultOne
             case Some(analysis) =>
               // Binding dependencies are known
               UpdateResult(
@@ -538,7 +541,7 @@ class PathMapXPathDependencies(
           val tempValueAnalysis = control.valueAnalysis
           val tempUpdateResult = tempValueAnalysis match {
             case None =>
-              // Control does not have a value
+              // Control does not have a value OR dependencies could not be figured out
               MustUpdateResultNA//TODO: should be able to return false here; change once markDirty is handled better
             case Some(analysis) if ! analysis.figuredOutDependencies =>
               // Value dependencies are unknown
@@ -581,15 +584,14 @@ class PathMapXPathDependencies(
     // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
     assert(inRefresh || inBindingUpdate)
 
-    val analyses = {
+    val analysesOrEmpty = {
 
       val lhhaControl = {
         collectByErasedType[StaticLHHASupport](control) getOrElse
         (throw new OXFException(s"Control $controlEffectiveId not found or doesn't support LHHA"))
       }
 
-      lhhaControl.lhhaValueAnalyses(lhha) ensuring
-        (_.nonEmpty, s"Control $controlEffectiveId doesn't have LHHA $lhha")
+      lhhaControl.lhhaValueAnalyses(lhha)
     }
 
     // NOTE: No side-effects except for stats
@@ -609,10 +611,16 @@ class PathMapXPathDependencies(
         }
 
       // Not the most optimal, but for now require an update if any has changed
-      analyses exists requireUpdateForAnalysis
+      analysesOrEmpty match {
+        case Nil =>
+          lhhaUnknownDependencies += 1
+          true
+        case analyses =>
+          analyses exists requireUpdateForAnalysis
+      }
     }
 
-    buildRepeatResultCacheKey(control, analyses, controlEffectiveId: String) match {
+    buildRepeatResultCacheKey(control, analysesOrEmpty, controlEffectiveId: String) match {
       case Some(key) => modifiedLHHACacheForRepeats.getOrElseUpdate(key, requireUpdate)
       case None      => requireUpdate
     }
@@ -624,6 +632,9 @@ class PathMapXPathDependencies(
 
     def requireUpdate =
       control.itemsetAnalysis match {
+        case None =>
+          itemsetUnknownDependencies += 1
+          true
         case Some(analysis) if ! analysis.figuredOutDependencies => // dependencies are unknown
           itemsetUnknownDependencies += 1
           true
@@ -633,8 +644,6 @@ class PathMapXPathDependencies(
               intersectsValue(controlEffectiveId, analysis, refreshChangeset)
           if (result) itemsetHitCount += 1 else itemsetMissCount += 1
           result
-        case None =>
-          throw new IllegalStateException("Itemset not analyzed")
       }
 
     buildRepeatResultCacheKey(control, control.itemsetAnalysis.toList, controlEffectiveId: String) match {
@@ -700,8 +709,8 @@ class PathMapXPathDependencies(
               ),
               1
             )
-          case _ =>
-            throw new IllegalStateException(s"No value analysis found for `xf:bind` with name = ${mip.name}")
+          case None =>
+            MustUpdateResultOne
         }
 
         if (updateResult.requireUpdate)

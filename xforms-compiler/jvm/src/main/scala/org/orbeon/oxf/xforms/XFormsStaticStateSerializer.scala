@@ -194,6 +194,7 @@ object XFormsStaticStateSerializer {
         for {
           analysisOpt <- List(e.bindingAnalysis, e.valueAnalysis) ::: (e.narrowTo[SelectionControlTrait].toList map (_.itemsetAnalysis))
           analysis    <- analysisOpt
+          if analysis.figuredOutDependencies // this should not even be preserved in the tree in the first place!
           mapSet      <- List(analysis.valueDependentPaths, analysis.returnablePaths)
           pathSet     <- mapSet.map.values
           path        <- pathSet
@@ -426,7 +427,7 @@ object XFormsStaticStateSerializer {
             "staticItemset"    -> c.staticItemset.asJson,
             "useCopy"          -> Json.fromBoolean(c.useCopy),
             "mustEncodeValues" -> c.mustEncodeValues.asJson,
-            "itemsetAnalysis"  -> c.itemsetAnalysis.asJson
+            "itemsetAnalysis"  -> c.itemsetAnalysis.filter(_.figuredOutDependencies).asJson
           )
         case c: CaseControl            =>
           List(
@@ -488,7 +489,7 @@ object XFormsStaticStateSerializer {
     implicit lazy val encodeXPathAnalysis: Encoder[XPathAnalysis] = (a: XPathAnalysis) =>
       Json.obj(
         "xpathString"            -> Json.fromString(a.xpathString),
-        "figuredOutDependencies" -> Json.fromBoolean(a.figuredOutDependencies),
+        "figuredOutDependencies" -> Json.fromBoolean(a.figuredOutDependencies), // TODO: always true!
         "valueDependentPaths"    -> a.valueDependentPaths.asJson,
         "returnablePaths"        -> a.returnablePaths.asJson,
         "dependentModels"        -> a.dependentModels.asJson,
@@ -507,8 +508,8 @@ object XFormsStaticStateSerializer {
           "containerScopeRef" -> Json.fromInt(collectedScopesWithPositions(a.containerScope)),
           "modelRef"          -> (a.model map (_.prefixedId) map Json.fromString).asJson,
           "langRef"           -> a.lang.asJson,
-          "bindingAnalysis"   -> a.bindingAnalysis.asJson,
-          "valueAnalysis"     -> a.valueAnalysis.asJson,
+          "bindingAnalysis"   -> a.bindingAnalysis.filter(_.figuredOutDependencies).asJson,
+          "valueAnalysis"     -> a.valueAnalysis.filter(_.figuredOutDependencies).asJson,
         ) ++
           maybeWithSpecificElementAnalysisFields(a) ++
           maybeWithChildrenFields(a)

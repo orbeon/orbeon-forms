@@ -872,7 +872,9 @@
                                         <xf:group id="fr-wizard-visit-all-to-current" appearance="xxf:internal">
                                             <!-- NOTE: We visit the current page upon xforms-deselect too. -->
                                             <xf:action event="fr-wizard-visit-all-to-current">
-                                                <!-- The current section, since it is current, is obviously already
+                                                <!-- This is called upon "next".
+
+                                                     The current section, since it is current, is obviously already
                                                      expanded. So we make sure we expand anything before it. -->
                                                 <xf:dispatch
                                                     iterate="
@@ -905,10 +907,10 @@
                                         </xf:group>
                                         <xf:group id="fr-wizard-visit-all-available" appearance="xxf:internal">
                                             <xf:action event="fr-wizard-visit-all-available">
+                                                <!-- Expand all as we want the errors recorded because this is called during `save` and
+                                                     the save must be blocked if there are any errors in the entire form. -->
                                                 <xf:dispatch
-                                                    iterate="
-                                                        for $section-name in xxf:split(xxf:instance('available-top-level-sections'))
-                                                        return concat($section-name, '-section')"
+                                                    iterate="$top-level-section-ids"
                                                     name="fr-expand"
                                                     targetid="{{.}}"/>
                                                 <xxf:setvisited

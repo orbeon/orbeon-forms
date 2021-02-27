@@ -31,6 +31,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
+import java.util.Base64
 import java.{util => ju}
 import scala.collection.mutable
 
@@ -47,6 +48,7 @@ object XFormsStaticStateDeserializer {
 
     val namePool = StaticXPath.GlobalNamePool
 
+    var collectedStrings        = IndexedSeq[String]()
     var collectedNamespaces     = IndexedSeq[Map[String, String]]()
     var collectedQNames         = IndexedSeq[QName]()
     var collectedCommonBindings = IndexedSeq[CommonBinding]()
@@ -126,9 +128,9 @@ object XFormsStaticStateDeserializer {
 
       for {
         eventBufferPosition          <- c.get[Int]("eventBufferPosition")
-        eventBuffer                  <- c.get[Array[Byte]]("eventBuffer")
+        eventBuffer                  <- c.get[String]("eventBuffer").map(Base64.getDecoder.decode)
         charBufferPosition           <- c.get[Int]("charBufferPosition")
-        charBuffer                   <- c.get[Array[Char]]("charBuffer")
+        charBuffer                   <- c.get[String]("charBuffer").map(_.toCharArray)
         intBufferPosition            <- c.get[Int]("intBufferPosition")
         intBuffer                    <- c.get[Array[Int]]("intBuffer")
         lineBufferPosition           <- c.get[Int]("lineBufferPosition")
@@ -138,7 +140,7 @@ object XFormsStaticStateDeserializer {
         attributeCountBufferPosition <- c.get[Int]("attributeCountBufferPosition")
         attributeCountBuffer         <- c.get[Array[Int]]("attributeCountBuffer")
         attributeCount               <- c.get[Int]("attributeCount")
-        stringBuilder                <- c.get[Array[String]]("stringBuilder")
+        stringBuilder                <- c.get[Array[Int]]("stringBuilder").map(_.map(collectedStrings))
         hasDocumentLocator           <- c.get[Boolean]("hasDocumentLocator")
         _                            <- c.get[Iterable[a.Mark]]("marks") // decoding registers marks as side-effect!
       } yield {
@@ -904,6 +906,10 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeXFormsStaticState: Decoder[XFormsStaticState] = (c: HCursor) =>
       for {
+        strings             <- c.get[IndexedSeq[String]]("strings")
+        _ = {
+          collectedStrings = strings
+        }
         namespaces           <- c.get[IndexedSeq[Map[String, String]]]("namespaces")
         _ = {
           collectedNamespaces = namespaces

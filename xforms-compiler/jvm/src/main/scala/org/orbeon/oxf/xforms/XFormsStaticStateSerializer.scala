@@ -22,6 +22,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
+import java.util.Base64
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -46,40 +47,6 @@ object XFormsStaticStateSerializer {
     "prefix"             -> Json.fromString(a.namespace.prefix),
     "uri"                -> Json.fromString(a.namespace.uri),
   )
-
-  implicit val encodeSAXStore: Encoder[SAXStore] = (a: SAXStore) => {
-
-    implicit val encodeSAXStoreMark: Encoder[a.Mark] = (m: a.Mark) => Json.obj(
-      "_id"                          -> Json.fromString(m._id),
-      "eventBufferPosition"          -> Json.fromInt(m.eventBufferPosition),
-      "charBufferPosition"           -> Json.fromInt(m.charBufferPosition),
-      "intBufferPosition"            -> Json.fromInt(m.intBufferPosition),
-      "lineBufferPosition"           -> Json.fromInt(m.lineBufferPosition),
-      "systemIdBufferPosition"       -> Json.fromInt(m.systemIdBufferPosition),
-      "attributeCountBufferPosition" -> Json.fromInt(m.attributeCountBufferPosition),
-      "stringBuilderPosition"        -> Json.fromInt(m.stringBuilderPosition)
-    )
-
-    Json.obj(
-      "eventBufferPosition"          -> Json.fromInt(a.eventBufferPosition),
-      "eventBuffer"                  -> a.eventBuffer.slice(0, a.eventBufferPosition).asJson,
-      "charBufferPosition"           -> Json.fromInt(a.charBufferPosition),
-      "charBuffer"                   -> a.charBuffer.slice(0, a.charBufferPosition).asJson,
-      "intBufferPosition"            -> Json.fromInt(a.intBufferPosition),
-      "intBuffer"                    -> a.intBuffer.slice(0, a.intBufferPosition).asJson,
-      "lineBufferPosition"           -> Json.fromInt(a.lineBufferPosition),
-      "lineBuffer"                   -> a.lineBuffer.slice(0, a.lineBufferPosition).asJson,
-      "systemIdBufferPosition"       -> Json.fromInt(a.systemIdBufferPosition),
-      "systemIdBuffer"               -> a.systemIdBuffer.slice(0, a.systemIdBufferPosition).map(x => if (x eq null) "" else x).asJson,
-      "attributeCountBufferPosition" -> Json.fromInt(a.attributeCountBufferPosition),
-      "attributeCountBuffer"         -> a.attributeCountBuffer.slice(0, a.attributeCountBufferPosition).asJson,
-      "attributeCount"               -> Json.fromInt(a.attributeCount),
-      "stringBuilder"                -> a.stringBuilder.asScala.asJson,
-      "hasDocumentLocator"           -> Json.fromBoolean(a.hasDocumentLocator),
-      //    write(out, if (a.publicId == null) "" else a.publicId)
-      "marks"                        -> a.getMarks.asScala.asJson
-    )
-  }
 
   implicit val encodeAnnotatedTemplate: Encoder[AnnotatedTemplate] = deriveEncoder
 
@@ -106,6 +73,64 @@ object XFormsStaticStateSerializer {
             QName(localName, "", uri)
           }
         }
+
+    val (
+      collectedStringsInOrder      : Iterable[String],
+      collectedStringsWithPositions: Map[String, Int]
+    ) = {
+
+      val distinct = mutable.LinkedHashSet[String]()
+
+      def processSAXStore(s: SAXStore): Unit =
+        s.stringBuilder.iterator.asScala foreach (distinct +=)
+
+      processSAXStore(template)
+
+      staticState.topLevelPart.iterateGlobals foreach { global =>
+        processSAXStore(global.templateTree)
+      }
+
+      staticState.topLevelPart.iterateControls foreach {
+        case e: ComponentControl => e.bindingOpt foreach (b => processSAXStore(b.templateTree))
+        case _ =>
+      }
+
+      (distinct, distinct.zipWithIndex.toMap)
+    }
+
+    implicit val encodeSAXStore: Encoder[SAXStore] = (a: SAXStore) => {
+
+    implicit val encodeSAXStoreMark: Encoder[a.Mark] = (m: a.Mark) => Json.obj(
+      "_id"                          -> Json.fromString(m._id),
+      "eventBufferPosition"          -> Json.fromInt(m.eventBufferPosition),
+      "charBufferPosition"           -> Json.fromInt(m.charBufferPosition),
+      "intBufferPosition"            -> Json.fromInt(m.intBufferPosition),
+      "lineBufferPosition"           -> Json.fromInt(m.lineBufferPosition),
+      "systemIdBufferPosition"       -> Json.fromInt(m.systemIdBufferPosition),
+      "attributeCountBufferPosition" -> Json.fromInt(m.attributeCountBufferPosition),
+      "stringBuilderPosition"        -> Json.fromInt(m.stringBuilderPosition)
+    )
+
+    Json.obj(
+      "eventBufferPosition"          -> Json.fromInt(a.eventBufferPosition),
+      "eventBuffer"                  -> Json.fromString(Base64.getEncoder.encodeToString(a.eventBuffer.slice(0, a.eventBufferPosition))),
+      "charBufferPosition"           -> Json.fromInt(a.charBufferPosition),
+      "charBuffer"                   -> Json.fromString(new String(a.charBuffer, 0, a.charBufferPosition)),
+      "intBufferPosition"            -> Json.fromInt(a.intBufferPosition),
+      "intBuffer"                    -> a.intBuffer.slice(0, a.intBufferPosition).asJson,
+      "lineBufferPosition"           -> Json.fromInt(a.lineBufferPosition),
+      "lineBuffer"                   -> a.lineBuffer.slice(0, a.lineBufferPosition).asJson,
+      "systemIdBufferPosition"       -> Json.fromInt(a.systemIdBufferPosition),
+      "systemIdBuffer"               -> a.systemIdBuffer.slice(0, a.systemIdBufferPosition).map(x => if (x eq null) "" else x).asJson,
+      "attributeCountBufferPosition" -> Json.fromInt(a.attributeCountBufferPosition),
+      "attributeCountBuffer"         -> a.attributeCountBuffer.slice(0, a.attributeCountBufferPosition).asJson,
+      "attributeCount"               -> Json.fromInt(a.attributeCount),
+      "stringBuilder"                -> a.stringBuilder.asScala.map(collectedStringsWithPositions).asJson,
+      "hasDocumentLocator"           -> Json.fromBoolean(a.hasDocumentLocator),
+      //    write(out, if (a.publicId == null) "" else a.publicId)
+      "marks"                        -> a.getMarks.asScala.asJson
+    )
+  }
 
     // We serialize the namespace mappings only once to save space. To give an idea, a basic Form Runner
     // form has 34 distinct namespace mappings. We should be able to reduce that by being more consistent
@@ -517,6 +542,7 @@ object XFormsStaticStateSerializer {
       )
 
     implicit val encodeXFormsStaticState: Encoder[XFormsStaticState] = (a: XFormsStaticState) => Json.obj(
+      "strings"              -> collectedStringsInOrder.asJson,
       "namespaces"           -> collectedNamespacesInOrder.asJson,
       "qnames"               -> collectedQNamesInOrder.asJson,
       "nonDefaultProperties" -> a.nonDefaultProperties.asJson,

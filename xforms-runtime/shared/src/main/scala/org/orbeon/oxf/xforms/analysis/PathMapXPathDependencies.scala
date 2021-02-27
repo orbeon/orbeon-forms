@@ -439,7 +439,7 @@ class PathMapXPathDependencies(
   ): Option[RepeatCacheKey] = {
     if (control.isWithinRepeat) {
       analyses match {
-        case analyses if analyses.nonEmpty && (analyses forall(_.figuredOutDependencies)) =>
+        case analyses if analyses.nonEmpty && (analyses forall (_.figuredOutDependencies)) =>
 
           val allDependentModelsPrefixedIdsIt = analyses.iterator flatMap(_.dependentModels.iterator)
 

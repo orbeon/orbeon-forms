@@ -297,11 +297,11 @@ object XFormsStaticStateDeserializer {
     // Dummy as the source must not contain the `om.Item` case
     implicit val decodeOmItem: Decoder[om.Item] = (c: HCursor) => throw new NotImplementedError("decodeOmItem")
 
-    implicit def eitherDecoder[A, B](implicit a: Decoder[A], b: Decoder[B]): Decoder[Either[A, B]] = {
-      val left:  Decoder[Either[A, B]] = a.map(Left.apply)
-      val right: Decoder[Either[A, B]] = b.map(Right.apply)
-      left or right
-    }
+    implicit def eitherDecoder[A, B](implicit a: Decoder[A], b: Decoder[B]): Decoder[Either[A, B]] = (c: HCursor) =>
+      if (c.value.asObject.exists(_.contains("left")))
+        c.get[A]("left").map(Left.apply)
+      else
+        c.get[B]("right").map(Right.apply)
 
     //decodeValueNode.asInstanceOf[Decoder[Item.ValueNode]]
     implicit val decodeValueNode: Decoder[Item.ValueNode] = (c: HCursor) =>
@@ -626,10 +626,6 @@ object XFormsStaticStateDeserializer {
 
             case qName if LHHA.QNamesSet(qName) =>
 
-              implicit val eitherDecoder: Decoder[Either[String, String]] = {
-                Decoder.decodeEither("left", "right")
-              }
-
               val lhha =
                 for {
                   expressionOrConstant      <- c.get[Either[String, String]]("expressionOrConstant")
@@ -651,10 +647,6 @@ object XFormsStaticStateDeserializer {
               lhha.right.get // XXX TODO
 
             case qName: QName if EventHandler.isAction(qName) =>
-
-              implicit val eitherDecoder: Decoder[Either[String, String]] = {
-                Decoder.decodeEither("left", "right")
-              }
 
               if (EventHandler.isEventHandler(element)) {
 
@@ -772,10 +764,6 @@ object XFormsStaticStateDeserializer {
 
             case qName if VariableAnalysis.VariableQNames(qName) =>
 
-              implicit val eitherDecoder: Decoder[Either[String, String]] = {
-                Decoder.decodeEither("left", "right")
-              }
-
               val variable =
                 for {
                   name                 <- c.get[String]("name")
@@ -819,10 +807,6 @@ object XFormsStaticStateDeserializer {
             case XFORMS_HEADER_QNAME =>
               new HeaderControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_VALUE_QNAME | XFORMS_NAME_QNAME =>
-
-              implicit val eitherStringDecoder: Decoder[Either[String, String]] = {
-                Decoder.decodeEither("left", "right")
-              }
 
               val nestedNameOrValueControl =
                 for {

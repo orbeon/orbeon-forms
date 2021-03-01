@@ -31,14 +31,14 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
     env          : StaticContext,
     reasons      : ju.List[String]
   ): Expression =
-    try {
-      val fn = getFunctionItemOrThrow(symbolicName, new RetainedStaticContext(env))
-      val f = fn.makeFunctionCall(staticArgs.toIndexedSeq: _*)
-      f.setRetainedStaticContext(fn.getRetainedStaticContext)
-      f
-    } catch {
-      case e: XPathException =>
-        reasons.add(e.getMessage)
+    findFunctionItem(symbolicName, new RetainedStaticContext(env)) match {
+      case Some(fn) =>
+        val f = fn.makeFunctionCall(staticArgs.toIndexedSeq: _*)
+        f.setRetainedStaticContext(fn.getRetainedStaticContext)
+        f
+      case None =>
+        // Adding information to the `reasons` list is usually unneeded unless we are the last
+        // function library in a list, and it is costly to do.
         null
     }
 
@@ -102,14 +102,17 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
     def findEntry(name: StructuredQName, arity: Int): Option[Entry] =
       arity >= 0 flatOption entries.get(name.getURI, name.getLocalPart, arity)
 
-    def getFunctionItemOrThrow(symbolicName: SymbolicName.F, rsc: => RetainedStaticContext): SystemFunction =
+    def findFunctionItem(symbolicName: SymbolicName.F, rsc: => RetainedStaticContext): Option[SystemFunction] =
       findEntry(symbolicName.getComponentName, symbolicName.getArity) map { entry =>
         val fn = entry.make()
         fn.setDetails(entry)
         fn.setArity(symbolicName.getArity)
         fn.setRetainedStaticContext(rsc)
         fn
-      } getOrElse {
+      }
+
+    def getFunctionItemOrThrow(symbolicName: SymbolicName.F, rsc: => RetainedStaticContext): SystemFunction =
+      findFunctionItem(symbolicName, rsc) getOrElse {
 
         val localName = symbolicName.getComponentName.getLocalPart
 

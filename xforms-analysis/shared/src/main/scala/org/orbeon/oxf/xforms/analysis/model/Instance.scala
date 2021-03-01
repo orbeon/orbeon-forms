@@ -120,6 +120,8 @@ class Instance(
       }
     }
 
+  // Scala 3 would be nice here:
+  // `export instanceMetadata._`
   def readonly              : Boolean                  = instanceMetadata.readonly
   def cache                 : Boolean                  = instanceMetadata.cache
   def timeToLive            : Long                     = instanceMetadata.timeToLive

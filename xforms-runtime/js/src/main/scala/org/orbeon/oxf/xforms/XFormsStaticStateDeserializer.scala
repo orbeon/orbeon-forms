@@ -7,12 +7,12 @@ import io.circe.{Decoder, DecodingFailure, HCursor}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.dom
 import org.orbeon.dom.QName
-import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
+import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, DataURLDecoder, DecodedDataURL, IndentedLogger, Modifier, StaticXPath, XPath}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Modifier, StaticXPath, XPath}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil.TopLevelItemsetQNames
 import org.orbeon.oxf.xforms.analysis.controls._
@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope
@@ -176,8 +176,8 @@ object XFormsStaticStateDeserializer {
     implicit val decodeQName: Decoder[dom.QName] = (c: HCursor) =>
       for {
         localName <- c.get[String]("localName")
-        prefix    <- c.get[String]("prefix")
-        uri       <- c.get[String]("uri")
+        prefix    <- c.getOrElse[String]("prefix")("")
+        uri       <- c.getOrElse[String]("uri")("")
       } yield
         dom.QName(localName: String, prefix: String, uri: String)
 
@@ -196,26 +196,24 @@ object XFormsStaticStateDeserializer {
         bindingElemNamespaceMapping <- c.get[Int]("bindingElemNamespaceMapping")
         directName                  <- c.get[Option[Int]]("directName")
         cssName                     <- c.get[Option[String]]("cssName")
-        containerElementName        <- c.get[String]("containerElementName")
-        modeBinding                 <- c.get[Boolean]("modeBinding")
-        modeValue                   <- c.get[Boolean]("modeValue")
-        modeExternalValue           <- c.get[Boolean]("modeExternalValue")
-        modeJavaScriptLifecycle     <- c.get[Boolean]("modeJavaScriptLifecycle")
-        modeLHHA                    <- c.get[Boolean]("modeLHHA")
-        modeFocus                   <- c.get[Boolean]("modeFocus")
-        modeItemset                 <- c.get[Boolean]("modeItemset")
-        modeSelection               <- c.get[Boolean]("modeSelection")
-        modeHandlers                <- c.get[Boolean]("modeHandlers")
+        containerElementName        <- c.getOrElse[String]("containerElementName")("div")
+        modeBinding                 <- c.getOrElse[Boolean]("modeBinding")(false)
+        modeValue                   <- c.getOrElse[Boolean]("modeValue")(false)
+        modeExternalValue           <- c.getOrElse[Boolean]("modeExternalValue")(false)
+        modeJavaScriptLifecycle     <- c.getOrElse[Boolean]("modeJavaScriptLifecycle")(false)
+        modeLHHA                    <- c.getOrElse[Boolean]("modeLHHA")(false)
+        modeFocus                   <- c.getOrElse[Boolean]("modeFocus")(false)
+        modeItemset                 <- c.getOrElse[Boolean]("modeItemset")(false)
+        modeSelection               <- c.getOrElse[Boolean]("modeSelection")(false)
+        modeHandlers                <- c.getOrElse[Boolean]("modeHandlers")(false)
         standardLhhaAsSeq           <- c.get[Seq[LHHA]]("standardLhhaAsSeq")
-        standardLhhaAsSet           <- c.get[Set[LHHA]]("standardLhhaAsSet")
-        labelFor                    <- c.get[Option[String]]("labelFor")
-        formatOpt                   <- c.get[Option[String]]("formatOpt")
-        serializeExternalValueOpt   <- c.get[Option[String]]("serializeExternalValueOpt")
-        deserializeExternalValueOpt <- c.get[Option[String]]("deserializeExternalValueOpt")
-        debugBindingName            <- c.get[String]("debugBindingName")
+        labelFor                    <- c.getOrElse[Option[String]]("labelFor")(None)
+        formatOpt                   <- c.getOrElse[Option[String]]("formatOpt")(None)
+        serializeExternalValueOpt   <- c.getOrElse[Option[String]]("serializeExternalValueOpt")(None)
+        deserializeExternalValueOpt <- c.getOrElse[Option[String]]("deserializeExternalValueOpt")(None)
         cssClasses                  <- c.get[String]("cssClasses")
-        allowedExternalEvents       <- c.get[Set[String]]("allowedExternalEvents")
-        constantInstances           <- c.get[Iterable[((Int, Int), StaticXPath.DocumentNodeInfoType)]]("constantInstances")
+        allowedExternalEvents       <- c.getOrElse[Set[String]]("allowedExternalEvents")(Set.empty)
+        constantInstances           <- c.getOrElse[Iterable[((Int, Int), StaticXPath.DocumentNodeInfoType)]]("constantInstances")(Map.empty)
       } yield
         CommonBinding(
           bindingElemId,
@@ -233,12 +231,10 @@ object XFormsStaticStateDeserializer {
           modeSelection,
           modeHandlers,
           standardLhhaAsSeq,
-          standardLhhaAsSet,
           labelFor,
           formatOpt,
           serializeExternalValueOpt,
           deserializeExternalValueOpt,
-          debugBindingName,
           cssClasses,
           allowedExternalEvents,
           constantInstances.toMap,
@@ -280,8 +276,8 @@ object XFormsStaticStateDeserializer {
 
     implicit lazy val decodeElement: Decoder[dom.Element] = (c: HCursor) =>
       for {
-        name     <- c.get[Int]("name")
-        atts     <- c.get[List[(dom.QName, String)]]("atts")
+        nameIndex   <- c.get[Int]("name")
+        attsIndexes <- c.get[List[(Int, String)]]("atts")
         children <- {
           val childIt =
             c.downField("children").values.toIterator.flatten map {
@@ -292,8 +288,8 @@ object XFormsStaticStateDeserializer {
           Right(childIt map (_.right.get)) // TODO: `.get`; ideally should get the first error
         }
       } yield {
-        val r = dom.Element(collectedQNames(name))
-        atts foreach { case (name, value) => r.addAttribute(name, value) }
+        val r = dom.Element(collectedQNames(nameIndex))
+        attsIndexes foreach { case (index, value) => r.addAttribute(collectedQNames(index), value) }
         children foreach r.add
         r
       }
@@ -311,13 +307,11 @@ object XFormsStaticStateDeserializer {
     implicit val decodeValueNode: Decoder[Item.ValueNode] = (c: HCursor) =>
       for {
         label      <- c.get[LHHAValue]("label")
-        attributes <- c.get[List[(QName, String)]]("attributes")
+        attributes <- c.get[List[(QName, String)]]("attributes") // TODO: QName
         position   <- c.get[Int]("position")
-
         help       <- c.get[Option[LHHAValue]]("help")
         hint       <- c.get[Option[LHHAValue]]("hint")
         value      <- c.get[Either[String, List[om.Item]]]("value")
-
       } yield {
         Item.ValueNode(label, help, hint, value, attributes)(position)
       }
@@ -362,38 +356,43 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeXPathAnalysis: Decoder[XPathAnalysis] = (c: HCursor) =>
       for {
-        _xpathString            <- c.get[String]("xpathString")
-        _figuredOutDependencies <- c.get[Boolean]("figuredOutDependencies")
-        _valueDependentPaths    <- c.get[MapSet[String, String]]("valueDependentPaths")
-        _returnablePaths        <- c.get[MapSet[String, String]]("returnablePaths")
-        _dependentModels        <- c.get[Set[String]]("dependentModels")
-        _dependentInstances     <- c.get[Set[String]]("dependentInstances")
+        _valueDependentPaths    <- c.getOrElse[MapSet[String, String]]("valueDependentPaths")(MapSet.empty)
+        _returnablePaths        <- c.getOrElse[MapSet[String, String]]("returnablePaths")(MapSet.empty)
+        _dependentModels        <- c.getOrElse[Set[String]]("dependentModels")(Set.empty)
+        _dependentInstances     <- c.getOrElse[Set[String]]("dependentInstances")(Set.empty)
       } yield
         new XPathAnalysis {
-          val xpathString            = _xpathString
-          val figuredOutDependencies = _figuredOutDependencies
+          val xpathString            = "N/A"
+          val figuredOutDependencies = true
           val valueDependentPaths    = _valueDependentPaths
           val returnablePaths        = _returnablePaths
           val dependentModels        = _dependentModels
           val dependentInstances     = _dependentInstances
         }
 
+    var currentIndex = 0
+
     implicit lazy val decodeElementAnalysis: Decoder[ElementAnalysis] = (c: HCursor) =>
       for {
-        index             <- c.get[Int]("index")
-        element           <- c.get[dom.Element]("element")
-        staticId          <- c.get[String]("staticId")
-        prefixedId        <- c.get[String]("prefixedId")
-        namespaceMapping  <- c.get[Int]("nsRef").map(nsRef => NamespaceMapping(collectedNamespaces(nsRef)))
-        scope             <- c.get[Int]("scopeRef").map(collectedScopes)
-        containerScope    <- c.get[Int]("containerScopeRef").map(collectedScopes)
-        modelOptRef       <- c.get[Option[String]]("modelRef")
-  //      "langRef"           <- a.lang.asJson,
-        bindingAnalysis   <- c.get[Option[XPathAnalysis]]("bindingAnalysis")
-        valueAnalysis     <- c.get[Option[XPathAnalysis]]("valueAnalysis")
+        element             <- c.get[dom.Element]("element")
+        prefixedId          <- c.get[String]("prefixedId")
+        namespaceMapping    <- c.get[Int]("nsRef").map(nsRef => NamespaceMapping(collectedNamespaces(nsRef)))
+        scopeIndex          <- c.get[Int]("scopeRef")
+        containerScopeIndex <- c.getOrElse[Int]("containerScopeRef")(scopeIndex)
+        modelOptRef         <- c.get[Option[String]]("modelRef")
+  //      "langRef"           <- a.lang.asJson, // default is `LangRef.Undefined`
+        bindingAnalysis     <- c.getOrElse[Option[XPathAnalysis]]("bindingAnalysis")(None)
+        valueAnalysis       <- c.getOrElse[Option[XPathAnalysis]]("valueAnalysis")(None)
       } yield {
 
         import org.orbeon.xforms.XFormsNames._
+
+        val index = currentIndex
+        currentIndex += 1
+
+        val staticId       = XFormsId.getStaticIdFromId(prefixedId)
+        val scope          = collectedScopes(scopeIndex)
+        val containerScope = collectedScopes(containerScopeIndex)
 
         // TODO: Review how we do this. Maybe we should use a map to builders, like `ControlAnalysisFactory`.
         val newControl =
@@ -432,12 +431,12 @@ object XFormsStaticStateDeserializer {
 
               val model =
                 for {
-                  bindInstances                    <- c.get[Iterable[String]]("bindInstances")
-                  computedBindExpressionsInstances <- c.get[Iterable[String]]("computedBindExpressionsInstances")
-                  validationBindInstances          <- c.get[Iterable[String]]("validationBindInstances")
-                  figuredAllBindRefAnalysis        <- c.get[Boolean]("figuredAllBindRefAnalysis")
-                  recalculateOrder                 <- c.get[Option[Iterable[String]]]("recalculateOrder")
-                  defaultValueOrder                <- c.get[Option[Iterable[String]]]("defaultValueOrder")
+                  bindInstances                    <- c.getOrElse[Iterable[String]]("bindInstances")(Nil)
+                  computedBindExpressionsInstances <- c.getOrElse[Iterable[String]]("computedBindExpressionsInstances")(Nil)
+                  validationBindInstances          <- c.getOrElse[Iterable[String]]("validationBindInstances")(Nil)
+                  figuredAllBindRefAnalysis        <- c.getOrElse[Boolean]("figuredAllBindRefAnalysis")(true)
+                  recalculateOrder                 <- c.getOrElse[Option[Iterable[String]]]("recalculateOrder")(None)
+                  defaultValueOrder                <- c.getOrElse[Option[Iterable[String]]]("defaultValueOrder")(None)
                 } yield {
                   val model = new Model(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
 
@@ -488,22 +487,22 @@ object XFormsStaticStateDeserializer {
 
               val instance =
                 for {
-                  readonly              <- c.get[Boolean]("readonly")
-                  cache                 <- c.get[Boolean]("cache")
-                  timeToLive            <- c.get[Long]("timeToLive")
-                  exposeXPathTypes      <- c.get[Boolean]("exposeXPathTypes")
-                  indexIds              <- c.get[Boolean]("indexIds")
-                  indexClasses          <- c.get[Boolean]("indexClasses")
-                  isLaxValidation       <- c.get[Boolean]("isLaxValidation")
-                  isStrictValidation    <- c.get[Boolean]("isStrictValidation")
-                  isSchemaValidation    <- c.get[Boolean]("isSchemaValidation")
-                  indexClasses          <- c.get[Boolean]("indexClasses")
-                  credentials           <- c.get[Option[BasicCredentials]]("credentials")
-                  excludeResultPrefixes <- c.get[Set[String]]("excludeResultPrefixes")
-                  useInlineContent      <- c.get[Boolean]("useInlineContent")
-                  useExternalContent    <- c.get[Boolean]("useExternalContent")
-                  instanceSource        <- c.get[Option[String]]("instanceSource")
-                  inlineRootElemOpt     <- c.get[Option[dom.Element]]("inlineRootElem")
+                  readonly                <- c.getOrElse[Boolean]("readonly")(false)
+                  cache                   <- c.getOrElse[Boolean]("cache")(false)
+                  timeToLive              <- c.getOrElse[Long]("timeToLive")(-1L)
+                  exposeXPathTypes        <- c.getOrElse[Boolean]("exposeXPathTypes")(false)
+                  indexIds                <- c.getOrElse[Boolean]("indexIds")(false)
+                  indexClasses            <- c.getOrElse[Boolean]("indexClasses")(false)
+                  isLaxValidation         <- c.getOrElse[Boolean]("isLaxValidation")(false)
+                  isStrictValidation      <- c.getOrElse[Boolean]("isStrictValidation")(false)
+                  isSchemaValidation      <- c.getOrElse[Boolean]("isSchemaValidation")(false)
+                  credentials             <- c.getOrElse[Option[BasicCredentials]]("credentials")(None)
+                  excludeResultPrefixes   <- c.getOrElse[Set[String]]("excludeResultPrefixes")(Set.empty)
+                  useInlineContent        <- c.getOrElse[Boolean]("useInlineContent")(true)
+                  useExternalContent      <- c.getOrElse[Boolean]("useExternalContent")(false)
+                  instanceSource          <- c.getOrElse[Option[String]]("instanceSource")(None)
+                  inlineRootElemOpt       <- c.getOrElse[Option[dom.Element]]("inlineRootElem")(None)
+//                  inlineRootElemStringOpt <- c.get[Option[String]]("inlineRootElem")
                 } yield {
 
                   val r =
@@ -531,6 +530,7 @@ object XFormsStaticStateDeserializer {
                         credentials           = credentials,
                         excludeResultPrefixes = excludeResultPrefixes,
                         inlineRootElemOpt     = inlineRootElemOpt,
+//                        inlineRootElemOpt     = inlineRootElemStringOpt.map(s => XFormsCrossPlatformSupport.readDom4j(s).getRootElement),
                         useInlineContent      = useInlineContent,
                         useExternalContent    = useExternalContent,
                         instanceSource        = instanceSource,
@@ -558,7 +558,7 @@ object XFormsStaticStateDeserializer {
                 for {
                   id         <- c.get[String]("id")
                   name       <- c.get[String]("name")
-                  level      <- c.get[ValidationLevel]("level")
+                  level      <- c.getOrElse[ValidationLevel]("level")(ValidationLevel.ErrorLevel)
                   expression <- c.get[String]("expression")
                 } yield
                   new StaticBind.XPathMIP(id, name, level, expression, namespaceMapping, xpathMipLocationData, functionLibrary)
@@ -593,10 +593,10 @@ object XFormsStaticStateDeserializer {
 
               val output =
                 for {
-                  isImageMediatype     <- c.get[Boolean]("isImageMediatype")
-                  isHtmlMediatype      <- c.get[Boolean]("isHtmlMediatype")
-                  isDownloadAppearance <- c.get[Boolean]("isDownloadAppearance")
-                  staticValue          <- c.get[Option[String]]("staticValue")
+                  isImageMediatype     <- c.getOrElse[Boolean]("isImageMediatype")(false)
+                  isHtmlMediatype      <- c.getOrElse[Boolean]("isHtmlMediatype")(false)
+                  isDownloadAppearance <- c.getOrElse[Boolean]("isDownloadAppearance")(false)
+                  staticValue          <- c.getOrElse[Option[String]]("staticValue")(None)
                 } yield
                   new OutputControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
                     isImageMediatype,
@@ -660,20 +660,20 @@ object XFormsStaticStateDeserializer {
 
                 val eventHandler =
                   for {
-                    keyText                <- c.get[Option[String]]("keyText")
-                    keyModifiers           <- c.get[Set[Modifier]]("keyModifiers")
-                    eventNames             <- c.get[Set[String]]("eventNames")
-                    isAllEvents            <- c.get[Boolean]("isAllEvents")
-                    isCapturePhaseOnly     <- c.get[Boolean]("isCapturePhaseOnly")
-                    isTargetPhase          <- c.get[Boolean]("isTargetPhase")
-                    isBubblingPhase        <- c.get[Boolean]("isBubblingPhase")
-                    propagate              <- c.get[Propagate]("propagate")
-                    isPerformDefaultAction <- c.get[Perform]("isPerformDefaultAction")
-                    isPhantom              <- c.get[Boolean]("isPhantom")
-                    isIfNonRelevant        <- c.get[Boolean]("isIfNonRelevant")
-                    isXBLHandler           <- c.get[Boolean]("isXBLHandler")
-                    observersPrefixedIds   <- c.get[Set[String]]("observersPrefixedIds")
-                    targetPrefixedIds      <- c.get[Set[String]]("targetPrefixedIds")
+                    keyText                <- c.getOrElse[Option[String]]("keyText")(None)
+                    keyModifiers           <- c.getOrElse[Set[Modifier]]("keyModifiers")(Set.empty)
+                    eventNames             <- c.getOrElse[Set[String]]("eventNames")(Set.empty)
+                    isAllEvents            <- c.getOrElse[Boolean]("isAllEvents")(false)
+                    isCapturePhaseOnly     <- c.getOrElse[Boolean]("isCapturePhaseOnly")(false)
+                    isTargetPhase          <- c.getOrElse[Boolean]("isTargetPhase")(true)
+                    isBubblingPhase        <- c.getOrElse[Boolean]("isBubblingPhase")(true)
+                    propagate              <- c.getOrElse[Propagate]("propagate")(Propagate.Continue)
+                    isPerformDefaultAction <- c.getOrElse[Perform]("isPerformDefaultAction")(Perform.Perform)
+                    isPhantom              <- c.getOrElse[Boolean]("isPhantom")(false)
+                    isIfNonRelevant        <- c.getOrElse[Boolean]("isIfNonRelevant")(false)
+                    isXBLHandler           <- c.getOrElse[Boolean]("isXBLHandler")(false)
+                    observersPrefixedIds   <- c.getOrElse[Set[String]]("observersPrefixedIds")(Set.empty)
+                    targetPrefixedIds      <- c.getOrElse[Set[String]]("targetPrefixedIds")(Set.empty)
                   } yield {
                     // NOTE: See comment in `MessageActionBuilder` about the duplication, etc.
                     val eh =

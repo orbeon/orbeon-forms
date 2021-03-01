@@ -128,12 +128,10 @@ object CommonBindingBuilder {
       modeSelection               = xblMode("selection"), // to indicate that the control acts as a selection control
       modeHandlers                = ! xblMode("nohandlers"),
       standardLhhaAsSeq           = standardLhhaAsSeq,
-      standardLhhaAsSet           = standardLhhaAsSeq.to(Set),
       labelFor                    = bindingElem.attributeValueOpt(XXBL_LABEL_FOR_QNAME),
       formatOpt                   = bindingElem.attributeValueOpt(XXBL_FORMAT_QNAME),
       serializeExternalValueOpt   = bindingElem.attributeValueOpt(XXBL_SERIALIZE_EXTERNAL_VALUE_QNAME),
       deserializeExternalValueOpt = bindingElem.attributeValueOpt(XXBL_DESERIALIZE_EXTERNAL_VALUE_QNAME),
-      debugBindingName            = bindingElem.getQualifiedName,
       cssClasses                  = cssClasses,
       allowedExternalEvents       = allowedExternalEvents,
       constantInstances           = constantInstances

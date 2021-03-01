@@ -22,13 +22,13 @@ case class CommonBinding(
   modeSelection               : Boolean,
   modeHandlers                : Boolean,
   standardLhhaAsSeq           : Seq[LHHA],
-  standardLhhaAsSet           : Set[LHHA],
   labelFor                    : Option[String],
   formatOpt                   : Option[String],
   serializeExternalValueOpt   : Option[String],
   deserializeExternalValueOpt : Option[String],
-  debugBindingName            : String,
   cssClasses                  : String,
   allowedExternalEvents       : Set[String],
   constantInstances           : Map[(Int, Int), StaticXPath.DocumentNodeInfoType]
-)
+) {
+  val standardLhhaAsSet: Set[LHHA] = standardLhhaAsSeq.toSet
+}

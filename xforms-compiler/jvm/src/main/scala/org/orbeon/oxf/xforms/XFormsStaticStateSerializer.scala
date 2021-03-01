@@ -18,12 +18,15 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.xforms.analysis.{Perform, Propagate}
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
 import java.util.Base64
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
 
@@ -32,21 +35,25 @@ import scala.jdk.CollectionConverters._
 //
 // We already output namespaces only once. Ideas for the rest:
 //
-// - don't output attribute prefix/namespace when they are blank
 // - optimize `SAXStore`/template
-// - don't output common default values, including `null`, `None`, and `""`
-// - XML: omit `"atts": []`
 //
 object XFormsStaticStateSerializer {
 
   val Logger = LoggerFactory.createLogger(XFormsStaticStateSerializer.getClass)
 
   // NOTE: `deriveEncoder` doesn't work because of `private` case class constructor.
-  implicit val encodeQName: Encoder[dom.QName] = (a: dom.QName) => Json.obj(
-    "localName"          -> Json.fromString(a.localName),
-    "prefix"             -> Json.fromString(a.namespace.prefix),
-    "uri"                -> Json.fromString(a.namespace.uri),
-  )
+  implicit val encodeQName: Encoder[dom.QName] = (a: dom.QName) => {
+
+    val b = ListBuffer[(String, Json)]()
+
+    b += "localName"          -> Json.fromString(a.localName)
+    if (a.namespace.prefix.nonEmpty)
+      b += "prefix"             -> Json.fromString(a.namespace.prefix)
+    if (a.namespace.uri.nonEmpty)
+      b += "uri"                -> Json.fromString(a.namespace.uri)
+
+    Json.fromFields(b)
+  }
 
   implicit val encodeAnnotatedTemplate: Encoder[AnnotatedTemplate] = deriveEncoder
 
@@ -189,6 +196,9 @@ object XFormsStaticStateSerializer {
       def updateDistinctCommon(e: ElementAnalysis) = {
 
         distinct += e.element.getQName
+        e.element.attributeIterator foreach { att =>
+          distinct += att.getQName
+        }
 
         // XPath analysis QNames
         for {
@@ -214,9 +224,12 @@ object XFormsStaticStateSerializer {
         case e: Instance =>
           updateDistinctCommon(e)
           // All inline instance element QNames
-          // TODO: Consider serializing instance as plain XML?
+          // Considered serializing instance as plain XML, but it turns out the parsing on the other side is slow.
           e.inlineRootElemOpt.iterator flatMap (_.descendantElementIterator(includeSelf = true)) foreach { e =>
             distinct += e.getQName
+            e.attributeIterator foreach { att =>
+              distinct += att.getQName
+            }
           }
         case e =>
           updateDistinctCommon(e)
@@ -251,32 +264,51 @@ object XFormsStaticStateSerializer {
       // we decide to remove attributes on elements from the serialization.
     )
 
-    implicit val commonBindingEncoder: Encoder[CommonBinding] = (a: CommonBinding) => Json.obj(
-      "bindingElemId"               -> a.bindingElemId.asJson,
-      "bindingElemNamespaceMapping" -> Json.fromInt(collectedNamespacesWithPositions(a.bindingElemNamespaceMapping.mapping)),
-      "directName"                  -> (a.directName map collectedQNamesWithPositions).asJson,
-      "cssName"                     -> a.cssName.asJson,
-      "containerElementName"        -> Json.fromString(a.containerElementName),
-      "modeBinding"                 -> Json.fromBoolean(a.modeBinding),
-      "modeValue"                   -> Json.fromBoolean(a.modeValue),
-      "modeExternalValue"           -> Json.fromBoolean(a.modeExternalValue),
-      "modeJavaScriptLifecycle"     -> Json.fromBoolean(a.modeJavaScriptLifecycle),
-      "modeLHHA"                    -> Json.fromBoolean(a.modeLHHA),
-      "modeFocus"                   -> Json.fromBoolean(a.modeFocus),
-      "modeItemset"                 -> Json.fromBoolean(a.modeItemset),
-      "modeSelection"               -> Json.fromBoolean(a.modeSelection),
-      "modeHandlers"                -> Json.fromBoolean(a.modeHandlers),
-      "standardLhhaAsSeq"           -> a.standardLhhaAsSeq.asJson,
-      "standardLhhaAsSet"           -> a.standardLhhaAsSet.asJson,
-      "labelFor"                    -> a.labelFor.asJson,
-      "formatOpt"                   -> a.formatOpt.asJson,
-      "serializeExternalValueOpt"   -> a.serializeExternalValueOpt.asJson,
-      "deserializeExternalValueOpt" -> a.deserializeExternalValueOpt.asJson,
-      "debugBindingName"            -> Json.fromString(a.debugBindingName),
-      "cssClasses"                  -> Json.fromString(a.cssClasses),
-      "allowedExternalEvents"       -> a.allowedExternalEvents.asJson,
-      "constantInstances"           -> a.constantInstances.toIterable.asJson // NOTE: Keep `.toIterable` to trigger right encoder.
-    )
+      implicit val commonBindingEncoder: Encoder[CommonBinding] = (a: CommonBinding) => {
+
+        val b = ListBuffer[(String, Json)]()
+
+        b += "bindingElemId"               -> a.bindingElemId.asJson
+        b += "bindingElemNamespaceMapping" -> Json.fromInt(collectedNamespacesWithPositions(a.bindingElemNamespaceMapping.mapping))
+        b += "directName"                  -> (a.directName map collectedQNamesWithPositions).asJson
+        b += "cssName"                     -> a.cssName.asJson
+        if (a.containerElementName != "div")
+          b += "containerElementName"        -> Json.fromString(a.containerElementName)
+        if (a.modeBinding)
+          b += "modeBinding"                 -> Json.fromBoolean(a.modeBinding)
+        if (a.modeValue)
+          b += "modeValue"                   -> Json.fromBoolean(a.modeValue)
+        if (a.modeExternalValue)
+          b += "modeExternalValue"           -> Json.fromBoolean(a.modeExternalValue)
+        if (a.modeJavaScriptLifecycle)
+          b += "modeJavaScriptLifecycle"     -> Json.fromBoolean(a.modeJavaScriptLifecycle)
+        if (a.modeLHHA)
+          b += "modeLHHA"                    -> Json.fromBoolean(a.modeLHHA)
+        if (a.modeFocus)
+          b += "modeFocus"                   -> Json.fromBoolean(a.modeFocus)
+        if (a.modeItemset)
+          b += "modeItemset"                 -> Json.fromBoolean(a.modeItemset)
+        if (a.modeSelection)
+          b += "modeSelection"               -> Json.fromBoolean(a.modeSelection)
+        if (a.modeHandlers)
+          b += "modeHandlers"                -> Json.fromBoolean(a.modeHandlers)
+        b += "standardLhhaAsSeq"           -> a.standardLhhaAsSeq.asJson
+        if (a.labelFor.isDefined)
+          b += "labelFor"                    -> a.labelFor.asJson
+        if (a.formatOpt.isDefined)
+          b += "formatOpt"                   -> a.formatOpt.asJson
+        if (a.serializeExternalValueOpt.isDefined)
+          b += "serializeExternalValueOpt"   -> a.serializeExternalValueOpt.asJson
+        if (a.deserializeExternalValueOpt.isDefined)
+          b += "deserializeExternalValueOpt" -> a.deserializeExternalValueOpt.asJson
+        b += "cssClasses"                  -> Json.fromString(a.cssClasses)
+        if (a.allowedExternalEvents.nonEmpty)
+          b += "allowedExternalEvents"       -> a.allowedExternalEvents.asJson
+        if (a.constantInstances.nonEmpty)
+          b += "constantInstances"           -> a.constantInstances.toIterable.asJson // NOTE: Keep `.toIterable` to trigger right encoder.
+
+      Json.fromFields(b)
+    }
 
     val (
       collectedCommonBindingsInOrder      : Iterable[CommonBinding],
@@ -308,7 +340,7 @@ object XFormsStaticStateSerializer {
 
     implicit lazy val encodeElementTree: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
       "name"     -> Json.fromInt(collectedQNamesWithPositions(a.getQName)),
-      "atts"     -> (a.attributeIterator map (a => (a.getQName, a.getValue)) toList).asJson, // TODO: collectedQNamesWithPositions
+      "atts"     -> (a.attributeIterator map (a => (collectedQNamesWithPositions(a.getQName), a.getValue)) toList).asJson,
       "children" -> Json.arr(a.content collect {
         case n: dom.Element               => n.asJson // recurse
         case n: dom.Text                  => Json.fromString(n.getStringValue)
@@ -317,7 +349,7 @@ object XFormsStaticStateSerializer {
 
     val encodeLocalElementOnly: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
       "name" -> Json.fromInt(collectedQNamesWithPositions(a.getQName)),
-      "atts" -> (a.attributeIterator map (a => (a.getQName, a.getValue)) toList).asJson, // TODO: collectedQNamesWithPositions
+      "atts" -> (a.attributeIterator map (a => (collectedQNamesWithPositions(a.getQName), a.getValue)) toList).asJson,
     )
 
     implicit val encodeLHHAValue: Encoder[LHHAValue] = deriveEncoder
@@ -349,35 +381,55 @@ object XFormsStaticStateSerializer {
     implicit val eitherEncoder: Encoder[Either[String, String]] =
       Encoder.encodeEither("left", "right")
 
-    def maybeWithSpecificElementAnalysisFields(a: ElementAnalysis): List[(String, Json)] =
+    def maybeWithSpecificElementAnalysisFields(a: ElementAnalysis, b: ListBuffer[(String, Json)]): Unit =
       a match {
         case c: Model         =>
-          List(
-            "bindInstances"                    -> c.bindInstances.asJson,
-            "computedBindExpressionsInstances" -> c.computedBindExpressionsInstances.asJson,
-            "validationBindInstances"          -> c.validationBindInstances.asJson,
-            "figuredAllBindRefAnalysis"        -> Json.fromBoolean(c.figuredAllBindRefAnalysis),
-            "recalculateOrder"                 -> (c.recalculateOrder  filter (_.nonEmpty) map (_ map (_.staticId))).asJson,
-            "defaultValueOrder"                -> (c.defaultValueOrder filter (_.nonEmpty) map (_ map (_.staticId))).asJson
-          )
+          if (c.bindInstances.nonEmpty)
+            b += "bindInstances"                    -> c.bindInstances.asJson
+          if (c.computedBindExpressionsInstances.nonEmpty)
+            b += "computedBindExpressionsInstances" -> c.computedBindExpressionsInstances.asJson
+          if (c.validationBindInstances.nonEmpty)
+            b += "validationBindInstances"          -> c.validationBindInstances.asJson
+          if (! c.figuredAllBindRefAnalysis)
+            b += "figuredAllBindRefAnalysis"        -> Json.fromBoolean(c.figuredAllBindRefAnalysis)
+          val recalculateOrder = c.recalculateOrder filter (_.nonEmpty)
+          if (recalculateOrder.isDefined)
+            b += "recalculateOrder"                 -> (recalculateOrder map (_ map (_.staticId))).asJson
+          val defaultValueOrder = c.defaultValueOrder filter (_.nonEmpty)
+          if (defaultValueOrder.isDefined)
+            b += "defaultValueOrder"                -> (defaultValueOrder map (_ map (_.staticId))).asJson
         case c: Instance      =>
-          List(
-            "readonly"              -> Json.fromBoolean(c.readonly),
-            "cache"                 -> Json.fromBoolean(c.cache),
-            "timeToLive"            -> Json.fromLong(c.timeToLive),
-            "exposeXPathTypes"      -> Json.fromBoolean(c.exposeXPathTypes),
-            "indexIds"              -> Json.fromBoolean(c.indexIds),
-            "indexClasses"          -> Json.fromBoolean(c.indexClasses),
-            "isLaxValidation"       -> Json.fromBoolean(c.isLaxValidation),
-            "isStrictValidation"    -> Json.fromBoolean(c.isStrictValidation),
-            "isSchemaValidation"    -> Json.fromBoolean(c.isSchemaValidation),
-            "credentials"           -> c.credentials.asJson,
-            "excludeResultPrefixes" -> c.excludeResultPrefixes.asJson,
-            "useInlineContent"      -> Json.fromBoolean(c.useInlineContent),
-            "useExternalContent"    -> Json.fromBoolean(c.useExternalContent),
-            "instanceSource"        -> c.instanceSource.asJson,
-            "inlineRootElem"        -> c.inlineRootElemOpt.asJson
-          )
+            if (c.readonly)
+              b += "readonly"              -> Json.fromBoolean(c.readonly)
+            if (c.cache)
+              b += "cache"                 -> Json.fromBoolean(c.cache)
+            if (c.timeToLive != -1)
+              b += "timeToLive"            -> Json.fromLong(c.timeToLive)
+            if (c.exposeXPathTypes)
+              b += "exposeXPathTypes"      -> Json.fromBoolean(c.exposeXPathTypes)
+            if (c.indexIds)
+              b += "indexIds"              -> Json.fromBoolean(c.indexIds)
+            if (c.indexClasses)
+              b += "indexClasses"          -> Json.fromBoolean(c.indexClasses)
+            if (c.isLaxValidation)
+              b += "isLaxValidation"       -> Json.fromBoolean(c.isLaxValidation)
+            if (c.isStrictValidation)
+              b += "isStrictValidation"    -> Json.fromBoolean(c.isStrictValidation)
+            if (c.isSchemaValidation)
+              b += "isSchemaValidation"    -> Json.fromBoolean(c.isSchemaValidation)
+            if (c.credentials.isDefined)
+              b += "credentials"           -> c.credentials.asJson
+            if (c.excludeResultPrefixes.nonEmpty)
+              b += "excludeResultPrefixes" -> c.excludeResultPrefixes.asJson
+            if (! c.useInlineContent)
+              b += "useInlineContent"      -> Json.fromBoolean(c.useInlineContent)
+            if (c.useExternalContent)
+              b += "useExternalContent"    -> Json.fromBoolean(c.useExternalContent)
+            if (c.instanceSource.isDefined)
+              b += "instanceSource"        -> c.instanceSource.asJson
+            if (c.inlineRootElemOpt.isDefined)
+              b += "inlineRootElem"        -> c.inlineRootElemOpt.asJson
+//              "inlineRootElem"        -> (c.inlineRootElemOpt map (e => e.serializeToString())).asJson
         case c: StaticBind    =>
 
           implicit val encodeTypeMIP: Encoder[StaticBind.TypeMIP] = (a: StaticBind.TypeMIP) => Json.obj(
@@ -390,84 +442,109 @@ object XFormsStaticStateSerializer {
             "policy"     -> a.policy.asJson
           )
 
-          implicit val encodeXPathMIP: Encoder[StaticBind.XPathMIP] = (a: StaticBind.XPathMIP) => Json.obj(
-            "id"         -> Json.fromString(a.id),
-            "name"       -> Json.fromString(a.name),
-            "level"      -> a.level.asJson,
-            "expression" -> Json.fromString(a.expression)
-          )
+          implicit val encodeXPathMIP: Encoder[StaticBind.XPathMIP] = (a: StaticBind.XPathMIP) => {
 
-          List(
-            "typeMIPOpt"                  -> c.typeMIPOpt.asJson,
-//            "dataType"                    -> c.dataType.asJson,
-//            "nonPreserveWhitespaceMIPOpt" -> c.nonPreserveWhitespaceMIPOpt.asJson,
-            "mipNameToXPathMIP"           -> c.mipNameToXPathMIP.asJson,
-            "customMIPNameToXPathMIP"     -> c.customMIPNameToXPathMIP.asJson
-//            //allMIPNameToXPathMIP combines both above
-//            constraintsByLevel // ValidationLevel // depends on `allMIPNameToXPathMIP`
-          )
+            val b = ListBuffer[(String, Json)]()
+
+            b += "id"         -> Json.fromString(a.id)
+            b += "name"       -> Json.fromString(a.name)
+            if (a.level != ValidationLevel.ErrorLevel)
+              b += "level"      -> a.level.asJson
+            b += "expression" -> Json.fromString(a.expression)
+
+            Json.fromFields(b)
+          }
+
+          b ++=
+            List(
+              "typeMIPOpt"                  -> c.typeMIPOpt.asJson,
+  //            "dataType"                    -> c.dataType.asJson,
+  //            "nonPreserveWhitespaceMIPOpt" -> c.nonPreserveWhitespaceMIPOpt.asJson,
+              "mipNameToXPathMIP"           -> c.mipNameToXPathMIP.asJson,
+              "customMIPNameToXPathMIP"     -> c.customMIPNameToXPathMIP.asJson
+  //            //allMIPNameToXPathMIP combines both above
+  //            constraintsByLevel // ValidationLevel // depends on `allMIPNameToXPathMIP`
+            )
         case c: OutputControl =>
-          List(
-            "isImageMediatype"     -> Json.fromBoolean(c.isImageMediatype),
-            "isHtmlMediatype"      -> Json.fromBoolean(c.isHtmlMediatype),
-            "isDownloadAppearance" -> Json.fromBoolean(c.isDownloadAppearance),
-            "staticValue"          -> c.staticValue.asJson
-          )
+          if (c.isImageMediatype)
+            b += "isImageMediatype"     -> Json.fromBoolean(c.isImageMediatype)
+          if (c.isHtmlMediatype)
+            b += "isHtmlMediatype"      -> Json.fromBoolean(c.isHtmlMediatype)
+          if (c.isDownloadAppearance)
+            b += "isDownloadAppearance" -> Json.fromBoolean(c.isDownloadAppearance)
+          if (c.staticValue.isDefined)
+            b += "staticValue"          -> c.staticValue.asJson
         case c: LHHAAnalysis  =>
-          List(
-            "expressionOrConstant"      -> c.expressionOrConstant.asJson,
-            "isPlaceholder"             -> Json.fromBoolean(c.isPlaceholder),
-            "containsHTML"              -> Json.fromBoolean(c.containsHTML),
-            "hasLocalMinimalAppearance" -> Json.fromBoolean(c.hasLocalMinimalAppearance),
-            "hasLocalFullAppearance"    -> Json.fromBoolean(c.hasLocalFullAppearance),
-            "hasLocalLeftAppearance"    -> Json.fromBoolean(c.hasLocalLeftAppearance)
-          )
+          b ++=
+            List(
+              "expressionOrConstant"      -> c.expressionOrConstant.asJson,
+              "isPlaceholder"             -> Json.fromBoolean(c.isPlaceholder),
+              "containsHTML"              -> Json.fromBoolean(c.containsHTML),
+              "hasLocalMinimalAppearance" -> Json.fromBoolean(c.hasLocalMinimalAppearance),
+              "hasLocalFullAppearance"    -> Json.fromBoolean(c.hasLocalFullAppearance),
+              "hasLocalLeftAppearance"    -> Json.fromBoolean(c.hasLocalLeftAppearance)
+            )
         case c: SelectionControl =>
-          List(
-            "staticItemset"    -> c.staticItemset.asJson,
-            "useCopy"          -> Json.fromBoolean(c.useCopy),
-            "mustEncodeValues" -> c.mustEncodeValues.asJson,
-            "itemsetAnalysis"  -> c.itemsetAnalysis.filter(_.figuredOutDependencies).asJson
-          )
+          b ++=
+            List(
+              "staticItemset"    -> c.staticItemset.asJson,
+              "useCopy"          -> Json.fromBoolean(c.useCopy),
+              "mustEncodeValues" -> c.mustEncodeValues.asJson,
+              "itemsetAnalysis"  -> c.itemsetAnalysis.filter(_.figuredOutDependencies).asJson
+            )
         case c: CaseControl            =>
-          List(
-            "valueExpression" -> c.valueExpression.asJson,
-            "valueLiteral"    -> c.valueLiteral.asJson
-          )
+          b ++=
+            List(
+              "valueExpression" -> c.valueExpression.asJson,
+              "valueLiteral"    -> c.valueLiteral.asJson
+            )
         case c: ComponentControl       =>
-          List(
-            "commonBindingRef" -> Json.fromInt(collectedCommonBindingsWithPositions(c.commonBinding)),
-            "binding"          -> c.bindingOrThrow.asJson
-          )
+          b ++=
+            List(
+              "commonBindingRef" -> Json.fromInt(collectedCommonBindingsWithPositions(c.commonBinding)),
+              "binding"          -> c.bindingOrThrow.asJson
+            )
         case c: VariableAnalysisTrait  =>
-          List(
-            "name"                   -> Json.fromString(c.name),
-            "expressionOrConstant"   -> c.expressionOrConstant.asJson
-          )
+          b ++=
+            List(
+              "name"                   -> Json.fromString(c.name),
+              "expressionOrConstant"   -> c.expressionOrConstant.asJson
+            )
         case c: EventHandler           =>
-          List(
-            "keyText"                -> c.keyText.asJson,
-            "keyModifiers"           -> c.keyModifiers.asJson,
-            "eventNames"             -> c.eventNames.asJson,
-            "isAllEvents"            -> Json.fromBoolean(c.isAllEvents),
-            "isCapturePhaseOnly"     -> Json.fromBoolean(c.isCapturePhaseOnly),
-            "isTargetPhase"          -> Json.fromBoolean(c.isTargetPhase),
-            "isBubblingPhase"        -> Json.fromBoolean(c.isBubblingPhase),
-            "propagate"              -> c.propagate.asJson,
-            "isPerformDefaultAction" -> c.isPerformDefaultAction.asJson,
-            "isPhantom"              -> Json.fromBoolean(c.isPhantom),
-            "isIfNonRelevant"        -> Json.fromBoolean(c.isIfNonRelevant),
-            "isXBLHandler"           -> Json.fromBoolean(c.isXBLHandler),
-            "observersPrefixedIds"   -> c.observersPrefixedIds.asJson,
-            "targetPrefixedIds"      -> c.targetPrefixedIds.asJson,
-          ) :::
-            c.cast[WithExpressionOrConstantTrait].map{v =>
-              "expressionOrConstant" -> v.expressionOrConstant.asJson
-            }.toList
+
+          if (c.keyText.isDefined)
+            b += "keyText"                -> c.keyText.asJson
+          if (c.keyModifiers.nonEmpty)
+            b += "keyModifiers"           -> c.keyModifiers.asJson
+          if (c.eventNames.nonEmpty)
+            b+= "eventNames"             -> c.eventNames.asJson
+          if (c.isAllEvents)
+            b += "isAllEvents"            -> Json.fromBoolean(c.isAllEvents)
+          if (c.isCapturePhaseOnly)
+            b += "isCapturePhaseOnly"     -> Json.fromBoolean(c.isCapturePhaseOnly)
+          if (! c.isTargetPhase)
+            b += "isTargetPhase"          -> Json.fromBoolean(c.isTargetPhase)
+          if (! c.isBubblingPhase)
+            b += "isBubblingPhase"        -> Json.fromBoolean(c.isBubblingPhase)
+          if (c.propagate != Propagate.Continue)
+            b += "propagate"              -> c.propagate.asJson
+          if (c.isPerformDefaultAction != Perform.Perform)
+            b += "isPerformDefaultAction" -> c.isPerformDefaultAction.asJson
+          if (c.isPhantom)
+            b += "isPhantom"              -> Json.fromBoolean(c.isPhantom)
+          if (c.isIfNonRelevant)
+            b += "isIfNonRelevant"        -> Json.fromBoolean(c.isIfNonRelevant)
+          if (c.isXBLHandler)
+            b += "isXBLHandler"           -> Json.fromBoolean(c.isXBLHandler)
+          if (c.observersPrefixedIds.nonEmpty)
+            b += "observersPrefixedIds"   -> c.observersPrefixedIds.asJson
+          if (c.targetPrefixedIds.nonEmpty)
+            b += "targetPrefixedIds"      -> c.targetPrefixedIds.asJson
+          c.cast[WithExpressionOrConstantTrait] foreach { v =>
+            b += "expressionOrConstant" -> v.expressionOrConstant.asJson
+          }
         case c: WithExpressionOrConstantTrait => // includes `NestedNameOrValueControl` and `xf:message` action
-          List(
-            "expressionOrConstant" -> c.expressionOrConstant.asJson,
-          )
+          b += "expressionOrConstant" -> c.expressionOrConstant.asJson
 //          // xf:range (skip!)
 //        case _: UploadControl          => Nil
 //        case _: SwitchControl          => Nil
@@ -486,34 +563,54 @@ object XFormsStaticStateSerializer {
     implicit lazy val encodeMapSet: Encoder[MapSet[String, String]] = (a: MapSet[String, String]) =>
       convertMapSet(a).asJson
 
-    implicit lazy val encodeXPathAnalysis: Encoder[XPathAnalysis] = (a: XPathAnalysis) =>
-      Json.obj(
-        "xpathString"            -> Json.fromString(a.xpathString),
-        "figuredOutDependencies" -> Json.fromBoolean(a.figuredOutDependencies), // TODO: always true!
-        "valueDependentPaths"    -> a.valueDependentPaths.asJson,
-        "returnablePaths"        -> a.returnablePaths.asJson,
-        "dependentModels"        -> a.dependentModels.asJson,
-        "dependentInstances"     -> a.dependentInstances.asJson,
-      )
+    implicit lazy val encodeXPathAnalysis: Encoder[XPathAnalysis] = (a: XPathAnalysis) => {
 
-    implicit lazy val encodeElementAnalysis: Encoder[ElementAnalysis] = (a: ElementAnalysis) =>
-      Json.fromFields(
-        List(
-          "index"             -> Json.fromInt(a.index),
-          "element"           -> encodeLocalElementOnly(a.element),
-          "staticId"          -> Json.fromString(a.staticId),
-          "prefixedId"        -> Json.fromString(a.prefixedId),
-          "nsRef"             -> Json.fromInt(collectedNamespacesWithPositions(a.namespaceMapping.mapping)),
-          "scopeRef"          -> Json.fromInt(collectedScopesWithPositions(a.scope)),
-          "containerScopeRef" -> Json.fromInt(collectedScopesWithPositions(a.containerScope)),
-          "modelRef"          -> (a.model map (_.prefixedId) map Json.fromString).asJson,
-          "langRef"           -> a.lang.asJson,
-          "bindingAnalysis"   -> a.bindingAnalysis.filter(_.figuredOutDependencies).asJson,
-          "valueAnalysis"     -> a.valueAnalysis.filter(_.figuredOutDependencies).asJson,
-        ) ++
-          maybeWithSpecificElementAnalysisFields(a) ++
-          maybeWithChildrenFields(a)
-      )
+      val b = ListBuffer[(String, Json)]()
+
+      // Don't serialize `xpathString` as it's used only for debugging
+      // Don't serialize `figuredOutDependencies` as it's always true
+      if (a.valueDependentPaths.nonEmpty)
+        b += "valueDependentPaths"    -> a.valueDependentPaths.asJson
+      if (a.returnablePaths.nonEmpty)
+        b += "returnablePaths"        -> a.returnablePaths.asJson
+      if (a.dependentModels.nonEmpty)
+        b += "dependentModels"        -> a.dependentModels.asJson
+      if (a.dependentInstances.nonEmpty)
+        b += "dependentInstances"     -> a.dependentInstances.asJson
+
+      Json.fromFields(b)
+    }
+
+    implicit lazy val encodeElementAnalysis: Encoder[ElementAnalysis] = (a: ElementAnalysis) => {
+
+      val b = ListBuffer[(String, Json)]()
+
+      // Don't serialize the index and just recreate in order when deserializing
+      b += "element"           -> encodeLocalElementOnly(a.element)
+      // Reconstitute `staticId` from the `prefixedId` when deserializing
+      b += "prefixedId"        -> Json.fromString(a.prefixedId)
+      b += "nsRef"             -> Json.fromInt(collectedNamespacesWithPositions(a.namespaceMapping.mapping))
+      b += "scopeRef"          -> Json.fromInt(collectedScopesWithPositions(a.scope))
+      // Assume that in many case they are the same
+      if (a.containerScope != a.scope)
+        b += "containerScopeRef" -> Json.fromInt(collectedScopesWithPositions(a.containerScope))
+      b += "modelRef"          -> (a.model map (_.prefixedId) map Json.fromString).asJson
+      if (a.lang != LangRef.Undefined)
+        b += "langRef"           -> a.lang.asJson
+
+      val bindingAnalysis = a.bindingAnalysis.filter(_.figuredOutDependencies)
+      if (bindingAnalysis.isDefined)
+        b += "bindingAnalysis"   -> bindingAnalysis.asJson
+      val valueAnalysis = a.valueAnalysis.filter(_.figuredOutDependencies)
+      if (valueAnalysis.isDefined)
+        b += "valueAnalysis"     -> valueAnalysis.asJson
+
+      // TODO
+      maybeWithSpecificElementAnalysisFields(a, b)
+      b ++= maybeWithChildrenFields(a)
+
+      Json.fromFields(b)
+    }
 
     def maybeWithChildrenFields(a: ElementAnalysis): List[(String, Json)] =
       a match {

@@ -719,6 +719,7 @@ object InstanceMetadataBuilder {
     val resource = getAttributeEncode(RESOURCE_QNAME)
 
     // `@src` always wins, `@resource` always loses
+    // Q: Is one always the opposite of the other after the checks further below?
     val useInlineContent   : Boolean = src.isEmpty && hasInlineContent
     val useExternalContent : Boolean = src.isDefined || ! hasInlineContent && resource.isDefined
 

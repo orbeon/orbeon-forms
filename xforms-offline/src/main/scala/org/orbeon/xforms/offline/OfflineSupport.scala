@@ -160,7 +160,7 @@ object OfflineSupport {
                     // Asynchronously load styles, insert HTML, then load scripts
                     for {
       //                _ <- loadStylesheets(stylesheetsToLoad) // XXX TODO
-                      _ <- Future()
+                      _ <- Future(())
                       _ =  moveChildren(source = rcv.frag.querySelector("body"), target = container)
                       _ <- loadScripts(scriptsToLoad)
                     } yield ()

@@ -60,7 +60,7 @@ val CoreLibraryDependencies = Seq(
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
-  "org.apache.commons"          %  "commons-lang3"                  % "3.11",
+  "org.apache.commons"          %  "commons-lang3"                  % "3.12.0",
   "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
   "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
   "commons-codec"               %  "commons-codec"                  % "1.15",

@@ -133,16 +133,16 @@ object XFormsStaticStateDeserializer {
         charBuffer                   <- c.get[String]("charBuffer").map(_.toCharArray)
         intBufferPosition            <- c.get[Int]("intBufferPosition")
         intBuffer                    <- c.get[Array[Int]]("intBuffer")
-        lineBufferPosition           <- c.get[Int]("lineBufferPosition")
-        lineBuffer                   <- c.get[Array[Int]]("lineBuffer")
-        systemIdBufferPosition       <- c.get[Int]("systemIdBufferPosition")
-        systemIdBuffer               <- c.get[Array[String]]("systemIdBuffer")
+        lineBufferPosition           <- c.getOrElse[Int]("lineBufferPosition")(0)
+        lineBuffer                   <- c.getOrElse[Array[Int]]("lineBuffer")(Array.empty)
+        systemIdBufferPosition       <- c.getOrElse[Int]("systemIdBufferPosition")(0)
+        systemIdBuffer               <- c.getOrElse[Array[String]]("systemIdBuffer")(Array.empty)
         attributeCountBufferPosition <- c.get[Int]("attributeCountBufferPosition")
         attributeCountBuffer         <- c.get[Array[Int]]("attributeCountBuffer")
         attributeCount               <- c.get[Int]("attributeCount")
         stringBuilder                <- c.get[Array[Int]]("stringBuilder").map(_.map(collectedStrings))
-        hasDocumentLocator           <- c.get[Boolean]("hasDocumentLocator")
-        _                            <- c.get[Iterable[a.Mark]]("marks") // decoding registers marks as side-effect!
+        hasDocumentLocator           <- c.getOrElse[Boolean]("hasDocumentLocator")(false)
+        _                            <- c.getOrElse[Iterable[a.Mark]]("marks")(Nil) // decoding registers marks as side-effect!
       } yield {
 
         a.eventBufferPosition          = eventBufferPosition
@@ -206,7 +206,7 @@ object XFormsStaticStateDeserializer {
         modeItemset                 <- c.getOrElse[Boolean]("modeItemset")(false)
         modeSelection               <- c.getOrElse[Boolean]("modeSelection")(false)
         modeHandlers                <- c.getOrElse[Boolean]("modeHandlers")(false)
-        standardLhhaAsSeq           <- c.get[Seq[LHHA]]("standardLhhaAsSeq")
+        standardLhhaAsSeq           <- c.getOrElse[Seq[LHHA]]("standardLhhaAsSeq")(Nil)
         labelFor                    <- c.getOrElse[Option[String]]("labelFor")(None)
         formatOpt                   <- c.getOrElse[Option[String]]("formatOpt")(None)
         serializeExternalValueOpt   <- c.getOrElse[Option[String]]("serializeExternalValueOpt")(None)
@@ -249,15 +249,15 @@ object XFormsStaticStateDeserializer {
         parentRef      <- c.get[Option[String]]("parentRef")
         scopeId        <- c.get[String]("scopeId")
         simplyPrefixed <- c.getOrElse[Iterable[String]]("simplyPrefixed")(Nil)
-        other          <- c.getOrElse[Iterable[(String, String)]]("other")(Nil)
+        other          <- c.getOrElse[Iterable[String]]("other")(Nil)
       } yield {
 
         val r = new Scope(parentRef.map(parentScopesById), scopeId)
 
         val prefix = r.fullPrefix
 
-        simplyPrefixed foreach (k  => r += k -> (prefix + k))
-        other          foreach (kv => r += kv)
+        simplyPrefixed foreach (staticId   => r += staticId -> (prefix + staticId))
+        other          foreach (prefixedId => r += XFormsId.getStaticIdFromId(prefixedId) -> prefixedId)
 
         parentScopesById += r.scopeId -> r
 
@@ -284,7 +284,7 @@ object XFormsStaticStateDeserializer {
     implicit lazy val decodeElement: Decoder[dom.Element] = (c: HCursor) =>
       for {
         nameIndex   <- c.get[Int]("name")
-        attsIndexes <- c.get[List[(Int, String)]]("atts")
+        attsIndexes <- c.getOrElse[List[(Int, String)]]("atts")(Nil)
         children <- {
 
           val childIt =

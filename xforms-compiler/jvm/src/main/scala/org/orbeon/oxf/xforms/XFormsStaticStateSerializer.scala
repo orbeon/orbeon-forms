@@ -31,11 +31,17 @@ import scala.jdk.CollectionConverters._
 
 
 //
-// TODO: Optimize output size.
+// Ideas for more optimizations:
 //
-// We already output namespaces only once. Ideas for the rest:
-//
+// - make more use of string table
+//   - `dependentModels`, `dependentInstances`
+//   - `expressionOrConstant`: are all the values in the string table?
+// - `ElementAnalysis`: only output element attributes that are needed
+//   - for example don't output `id`
+//   - check all usages of attributes in static controls and callers of `.element`
 // - optimize `SAXStore`/template
+//   - are we outputting unneeded content?
+//   - can we find a better representation?
 //
 object XFormsStaticStateSerializer {
 
@@ -107,37 +113,45 @@ object XFormsStaticStateSerializer {
 
     implicit val encodeSAXStore: Encoder[SAXStore] = (a: SAXStore) => {
 
-    implicit val encodeSAXStoreMark: Encoder[a.Mark] = (m: a.Mark) => Json.obj(
-      "_id"                          -> Json.fromString(m._id),
-      "eventBufferPosition"          -> Json.fromInt(m.eventBufferPosition),
-      "charBufferPosition"           -> Json.fromInt(m.charBufferPosition),
-      "intBufferPosition"            -> Json.fromInt(m.intBufferPosition),
-      "lineBufferPosition"           -> Json.fromInt(m.lineBufferPosition),
-      "systemIdBufferPosition"       -> Json.fromInt(m.systemIdBufferPosition),
-      "attributeCountBufferPosition" -> Json.fromInt(m.attributeCountBufferPosition),
-      "stringBuilderPosition"        -> Json.fromInt(m.stringBuilderPosition)
-    )
+      implicit val encodeSAXStoreMark: Encoder[a.Mark] = (m: a.Mark) => Json.obj(
+        "_id"                          -> Json.fromString(m._id),
+        "eventBufferPosition"          -> Json.fromInt(m.eventBufferPosition),
+        "charBufferPosition"           -> Json.fromInt(m.charBufferPosition),
+        "intBufferPosition"            -> Json.fromInt(m.intBufferPosition),
+        "lineBufferPosition"           -> Json.fromInt(m.lineBufferPosition),
+        "systemIdBufferPosition"       -> Json.fromInt(m.systemIdBufferPosition),
+        "attributeCountBufferPosition" -> Json.fromInt(m.attributeCountBufferPosition),
+        "stringBuilderPosition"        -> Json.fromInt(m.stringBuilderPosition)
+      )
 
-    Json.obj(
-      "eventBufferPosition"          -> Json.fromInt(a.eventBufferPosition),
-      "eventBuffer"                  -> Json.fromString(Base64.getEncoder.encodeToString(a.eventBuffer.slice(0, a.eventBufferPosition))),
-      "charBufferPosition"           -> Json.fromInt(a.charBufferPosition),
-      "charBuffer"                   -> Json.fromString(new String(a.charBuffer, 0, a.charBufferPosition)),
-      "intBufferPosition"            -> Json.fromInt(a.intBufferPosition),
-      "intBuffer"                    -> a.intBuffer.slice(0, a.intBufferPosition).asJson,
-      "lineBufferPosition"           -> Json.fromInt(a.lineBufferPosition),
-      "lineBuffer"                   -> a.lineBuffer.slice(0, a.lineBufferPosition).asJson,
-      "systemIdBufferPosition"       -> Json.fromInt(a.systemIdBufferPosition),
-      "systemIdBuffer"               -> a.systemIdBuffer.slice(0, a.systemIdBufferPosition).map(x => if (x eq null) "" else x).asJson,
-      "attributeCountBufferPosition" -> Json.fromInt(a.attributeCountBufferPosition),
-      "attributeCountBuffer"         -> a.attributeCountBuffer.slice(0, a.attributeCountBufferPosition).asJson,
-      "attributeCount"               -> Json.fromInt(a.attributeCount),
-      "stringBuilder"                -> a.stringBuilder.asScala.map(collectedStringsWithPositions).asJson,
-      "hasDocumentLocator"           -> Json.fromBoolean(a.hasDocumentLocator),
+      val b = ListBuffer[(String, Json)]()
+
+      b += "eventBufferPosition"          -> Json.fromInt(a.eventBufferPosition)
+      b += "eventBuffer"                  -> Json.fromString(Base64.getEncoder.encodeToString(a.eventBuffer.slice(0, a.eventBufferPosition)))
+      b += "charBufferPosition"           -> Json.fromInt(a.charBufferPosition)
+      b += "charBuffer"                   -> Json.fromString(new String(a.charBuffer, 0, a.charBufferPosition))
+      b += "intBufferPosition"            -> Json.fromInt(a.intBufferPosition)
+      b += "intBuffer"                    -> a.intBuffer.slice(0, a.intBufferPosition).asJson
+      if (a.lineBufferPosition > 0) {
+        b += "lineBufferPosition"           -> Json.fromInt(a.lineBufferPosition)
+        b += "lineBuffer"                   -> a.lineBuffer.slice(0, a.lineBufferPosition).asJson
+      }
+      if (a.systemIdBufferPosition > 0) {
+        b += "systemIdBufferPosition"       -> Json.fromInt(a.systemIdBufferPosition)
+        b += "systemIdBuffer"               -> a.systemIdBuffer.slice(0, a.systemIdBufferPosition).map(x => if (x eq null) "" else x).asJson
+      }
+      b += "attributeCountBufferPosition" -> Json.fromInt(a.attributeCountBufferPosition)
+      b += "attributeCountBuffer"         -> a.attributeCountBuffer.slice(0, a.attributeCountBufferPosition).asJson
+      b += "attributeCount"               -> Json.fromInt(a.attributeCount)
+      b += "stringBuilder"                -> a.stringBuilder.asScala.map(collectedStringsWithPositions).asJson
+      if (a.hasDocumentLocator)
+        b += "hasDocumentLocator"           -> Json.fromBoolean(a.hasDocumentLocator)
       //    write(out, if (a.publicId == null) "" else a.publicId)
-      "marks"                        -> a.getMarks.asScala.asJson
-    )
-  }
+      if (a.getMarks.asScala.nonEmpty)
+        b += "marks"                        -> a.getMarks.asScala.asJson
+
+      Json.fromFields(b)
+    }
 
     // We serialize the namespace mappings only once to save space. To give an idea, a basic Form Runner
     // form has 34 distinct namespace mappings. We should be able to reduce that by being more consistent
@@ -265,7 +279,7 @@ object XFormsStaticStateSerializer {
       if (simplyPrefixed.nonEmpty)
         b += "simplyPrefixed" -> simplyPrefixed.map(_._1).asJson
       if (other.nonEmpty)
-        b += "other"          -> other.asJson
+        b += "other"          -> other.map(_._2).asJson
 
       Json.fromFields(b)
     }
@@ -306,7 +320,8 @@ object XFormsStaticStateSerializer {
           b += "modeSelection"               -> Json.fromBoolean(a.modeSelection)
         if (a.modeHandlers)
           b += "modeHandlers"                -> Json.fromBoolean(a.modeHandlers)
-        b += "standardLhhaAsSeq"           -> a.standardLhhaAsSeq.asJson
+        if (a.standardLhhaAsSeq.nonEmpty)
+          b += "standardLhhaAsSeq"           -> a.standardLhhaAsSeq.asJson
         if (a.labelFor.isDefined)
           b += "labelFor"                    -> a.labelFor.asJson
         if (a.formatOpt.isDefined)
@@ -352,12 +367,18 @@ object XFormsStaticStateSerializer {
       "mapping" -> a.mapping.asJson
     )
 
+    def appendElemAndAtts(a: dom.Element, b: ListBuffer[(String, Json)]) = {
+      b += "name" -> Json.fromInt(collectedQNamesWithPositions(a.getQName))
+      val atts = (a.attributeIterator map (a => (collectedQNamesWithPositions(a.getQName), a.getValue))).toList
+      if (atts.nonEmpty)
+        b += "atts" -> atts.asJson
+    }
+
     implicit lazy val encodeElementTree: Encoder[dom.Element] = (a: dom.Element) => {
 
       val b = ListBuffer[(String, Json)]()
 
-      b += "name"     -> Json.fromInt(collectedQNamesWithPositions(a.getQName))
-      b += "atts"     -> (a.attributeIterator map (a => (collectedQNamesWithPositions(a.getQName), a.getValue)) toList).asJson
+      appendElemAndAtts(a, b)
 
       val children =
         a.content collect {
@@ -371,10 +392,11 @@ object XFormsStaticStateSerializer {
       Json.fromFields(b)
     }
 
-    val encodeLocalElementOnly: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
-      "name" -> Json.fromInt(collectedQNamesWithPositions(a.getQName)),
-      "atts" -> (a.attributeIterator map (a => (collectedQNamesWithPositions(a.getQName), a.getValue)) toList).asJson,
-    )
+    val encodeLocalElementOnly: Encoder[dom.Element] = (a: dom.Element) => {
+      val b = ListBuffer[(String, Json)]()
+      appendElemAndAtts(a, b)
+      Json.fromFields(b)
+    }
 
     implicit val encodeLHHAValue: Encoder[LHHAValue] = deriveEncoder
     implicit val encodeItemNode: Encoder[ItemNode] = (a: ItemNode) => Json.fromFields(

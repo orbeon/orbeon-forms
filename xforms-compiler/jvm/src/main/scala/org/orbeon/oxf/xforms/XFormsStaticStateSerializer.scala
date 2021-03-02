@@ -18,7 +18,6 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.Constants
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
@@ -353,14 +352,24 @@ object XFormsStaticStateSerializer {
       "mapping" -> a.mapping.asJson
     )
 
-    implicit lazy val encodeElementTree: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
-      "name"     -> Json.fromInt(collectedQNamesWithPositions(a.getQName)),
-      "atts"     -> (a.attributeIterator map (a => (collectedQNamesWithPositions(a.getQName), a.getValue)) toList).asJson,
-      "children" -> Json.arr(a.content collect {
-        case n: dom.Element               => n.asJson // recurse
-        case n: dom.Text                  => Json.fromString(n.getStringValue)
-      }: _*)
-    )
+    implicit lazy val encodeElementTree: Encoder[dom.Element] = (a: dom.Element) => {
+
+      val b = ListBuffer[(String, Json)]()
+
+      b += "name"     -> Json.fromInt(collectedQNamesWithPositions(a.getQName))
+      b += "atts"     -> (a.attributeIterator map (a => (collectedQNamesWithPositions(a.getQName), a.getValue)) toList).asJson
+
+      val children =
+        a.content collect {
+          case n: dom.Element => n.asJson // recurse
+          case n: dom.Text    => Json.fromString(n.getStringValue)
+        }
+
+      if (children.nonEmpty)
+        b += "children" -> Json.arr(children: _*)
+
+      Json.fromFields(b)
+    }
 
     val encodeLocalElementOnly: Encoder[dom.Element] = (a: dom.Element) => Json.obj(
       "name" -> Json.fromInt(collectedQNamesWithPositions(a.getQName)),
@@ -470,16 +479,16 @@ object XFormsStaticStateSerializer {
             Json.fromFields(b)
           }
 
-          b ++=
-            List(
-              "typeMIPOpt"                  -> c.typeMIPOpt.asJson,
+          if (c.typeMIPOpt.isDefined)
+            b += "typeMIPOpt"                  -> c.typeMIPOpt.asJson
   //            "dataType"                    -> c.dataType.asJson,
   //            "nonPreserveWhitespaceMIPOpt" -> c.nonPreserveWhitespaceMIPOpt.asJson,
-              "mipNameToXPathMIP"           -> c.mipNameToXPathMIP.asJson,
-              "customMIPNameToXPathMIP"     -> c.customMIPNameToXPathMIP.asJson
+          if (c.mipNameToXPathMIP.nonEmpty)
+            b += "mipNameToXPathMIP"           -> c.mipNameToXPathMIP.asJson
+          if (c.customMIPNameToXPathMIP.nonEmpty)
+            b += "customMIPNameToXPathMIP"     -> c.customMIPNameToXPathMIP.asJson
   //            //allMIPNameToXPathMIP combines both above
   //            constraintsByLevel // ValidationLevel // depends on `allMIPNameToXPathMIP`
-            )
         case c: OutputControl =>
           if (c.isImageMediatype)
             b += "isImageMediatype"     -> Json.fromBoolean(c.isImageMediatype)
@@ -490,43 +499,39 @@ object XFormsStaticStateSerializer {
           if (c.staticValue.isDefined)
             b += "staticValue"          -> c.staticValue.asJson
         case c: LHHAAnalysis  =>
-          b ++=
-            List(
-              "expressionOrConstant"      -> c.expressionOrConstant.asJson,
-              "isPlaceholder"             -> Json.fromBoolean(c.isPlaceholder),
-              "containsHTML"              -> Json.fromBoolean(c.containsHTML),
-              "hasLocalMinimalAppearance" -> Json.fromBoolean(c.hasLocalMinimalAppearance),
-              "hasLocalFullAppearance"    -> Json.fromBoolean(c.hasLocalFullAppearance),
-              "hasLocalLeftAppearance"    -> Json.fromBoolean(c.hasLocalLeftAppearance)
-            )
+          b += "expressionOrConstant"      -> c.expressionOrConstant.asJson
+          if (c.isPlaceholder)
+            b += "isPlaceholder"             -> Json.fromBoolean(c.isPlaceholder)
+          if (c.containsHTML)
+            b += "containsHTML"              -> Json.fromBoolean(c.containsHTML)
+          if (c.hasLocalMinimalAppearance)
+            b += "hasLocalMinimalAppearance" -> Json.fromBoolean(c.hasLocalMinimalAppearance)
+          if (c.hasLocalFullAppearance)
+            b += "hasLocalFullAppearance"    -> Json.fromBoolean(c.hasLocalFullAppearance)
+          if (c.hasLocalLeftAppearance)
+            b += "hasLocalLeftAppearance"    -> Json.fromBoolean(c.hasLocalLeftAppearance)
         case c: SelectionControl =>
-          b ++=
-            List(
-              "staticItemset"    -> c.staticItemset.asJson,
-              "useCopy"          -> Json.fromBoolean(c.useCopy),
-              "mustEncodeValues" -> c.mustEncodeValues.asJson,
-              "itemsetAnalysis"  -> c.itemsetAnalysis.filter(_.figuredOutDependencies).asJson
-            )
+          if (c.staticItemset.isDefined)
+            b += "staticItemset"    -> c.staticItemset.asJson
+          if (c.useCopy)
+            b += "useCopy"          -> Json.fromBoolean(c.useCopy)
+          if (c.mustEncodeValues.isDefined)
+            b += "mustEncodeValues" -> c.mustEncodeValues.asJson
+          val itemsetAnalysis = c.itemsetAnalysis.filter(_.figuredOutDependencies)
+          if (itemsetAnalysis.isDefined)
+            b += "itemsetAnalysis"  -> itemsetAnalysis.asJson
         case c: CaseControl            =>
-          b ++=
-            List(
-              "valueExpression" -> c.valueExpression.asJson,
-              "valueLiteral"    -> c.valueLiteral.asJson
-            )
+          if (c.valueExpression.isDefined)
+            b += "valueExpression" -> c.valueExpression.asJson
+          if (c.valueLiteral.isDefined)
+            b += "valueLiteral"    -> c.valueLiteral.asJson
         case c: ComponentControl       =>
-          b ++=
-            List(
-              "commonBindingRef" -> Json.fromInt(collectedCommonBindingsWithPositions(c.commonBinding)),
-              "binding"          -> c.bindingOrThrow.asJson
-            )
+          b += "commonBindingRef" -> Json.fromInt(collectedCommonBindingsWithPositions(c.commonBinding))
+          b += "binding"          -> c.bindingOrThrow.asJson
         case c: VariableAnalysisTrait  =>
-          b ++=
-            List(
-              "name"                   -> Json.fromString(c.name),
-              "expressionOrConstant"   -> c.expressionOrConstant.asJson
-            )
+          b += "name"                   -> Json.fromString(c.name)
+          b += "expressionOrConstant"   -> c.expressionOrConstant.asJson
         case c: EventHandler           =>
-
           if (c.keyText.isDefined)
             b += "keyText"                -> c.keyText.asJson
           if (c.keyModifiers.nonEmpty)
@@ -620,17 +625,16 @@ object XFormsStaticStateSerializer {
       if (valueAnalysis.isDefined)
         b += "valueAnalysis"     -> valueAnalysis.asJson
 
-      // TODO
       maybeWithSpecificElementAnalysisFields(a, b)
-      b ++= maybeWithChildrenFields(a)
+      maybeWithChildrenFields(a, b)
 
       Json.fromFields(b)
     }
 
-    def maybeWithChildrenFields(a: ElementAnalysis): List[(String, Json)] =
-      a match {
-        case w: WithChildrenTrait if w.children.nonEmpty => List("children" -> withChildrenEncoder(w))
-        case _                                           => Nil
+    def maybeWithChildrenFields(a: ElementAnalysis, b: ListBuffer[(String, Json)]): Unit =
+      a.narrowTo[WithChildrenTrait] foreach { w =>
+        if (w.children.nonEmpty)
+          b += "children" -> withChildrenEncoder(w)
       }
 
     def withChildrenEncoder(a: WithChildrenTrait): Json = a.children.asJson

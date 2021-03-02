@@ -258,7 +258,7 @@ object XFormsStaticStateDeserializer {
 
         simplyPrefixed foreach (k  => r += k -> (prefix + k))
         other          foreach (kv => r += kv)
-        
+
         parentScopesById += r.scopeId -> r
 
         r
@@ -286,13 +286,18 @@ object XFormsStaticStateDeserializer {
         nameIndex   <- c.get[Int]("name")
         attsIndexes <- c.get[List[(Int, String)]]("atts")
         children <- {
+
           val childIt =
-            c.downField("children").values.toIterator.flatten map {
-              case s if s.isString => s.asString.map(dom.Text.apply).toRight(throw new IllegalArgumentException)
-              case s if s.isObject => decodeElement.decodeJson(s)
-              case _ => throw new IllegalArgumentException
-            }
-          Right(childIt map (_.right.get)) // TODO: `.get`; ideally should get the first error
+            if (c.value.asObject.exists(_.contains("children")))
+              c.downField("children").values.toIterator.flatten map {
+                case s if s.isString => s.asString.map(dom.Text.apply).toRight(throw new IllegalArgumentException)
+                case s if s.isObject => decodeElement.decodeJson(s)
+                case s               => throw new IllegalArgumentException
+              }
+            else
+              Iterator.empty
+
+            Right(childIt map (_.right.get)) // TODO: `.get`; ideally should get the first error
         }
       } yield {
         val r = dom.Element(collectedQNames(nameIndex))
@@ -302,7 +307,8 @@ object XFormsStaticStateDeserializer {
       }
 
     // Dummy as the source must not contain the `om.Item` case
-    implicit val decodeOmItem: Decoder[om.Item] = (c: HCursor) => throw new NotImplementedError("decodeOmItem")
+    implicit val decodeOmItem: Decoder[om.Item] = (c: HCursor) =>
+      throw new NotImplementedError("decodeOmItem")
 
     implicit def eitherDecoder[A, B](implicit a: Decoder[A], b: Decoder[B]): Decoder[Either[A, B]] = (c: HCursor) =>
       if (c.value.asObject.exists(_.contains("left")))
@@ -327,7 +333,7 @@ object XFormsStaticStateDeserializer {
       for {
         multiple <- c.get[Boolean]("multiple")
         hasCopy  <- c.get[Boolean]("hasCopy")
-        children <- c.get[Iterable[Item.ValueNode]]("children") // TODO: ChoiceNode
+        children <- c.getOrElse[Iterable[Item.ValueNode]]("children")(Nil) // TODO: ChoiceNode
       } yield {
         val r = new Itemset(multiple, hasCopy)
         children foreach r.addChildItem
@@ -405,7 +411,7 @@ object XFormsStaticStateDeserializer {
         val newControl =
           element.getQName match {
 
-            case _ if c.downField("commonBindingRef").succeeded =>
+            case _ if c.value.asObject.exists(_.contains("commonBindingRef")) =>
 
               val componentControl =
                 for {
@@ -478,8 +484,8 @@ object XFormsStaticStateDeserializer {
 
               val caseControl =
                 for {
-                  valueExpression <- c.get[Option[String]]("valueExpression")
-                  valueLiteral    <- c.get[Option[String]]("valueLiteral")
+                  valueExpression <- c.getOrElse[Option[String]]("valueExpression")(None)
+                  valueLiteral    <- c.getOrElse[Option[String]]("valueLiteral")(None)
                 } yield
                   new CaseControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
                     valueExpression,
@@ -572,9 +578,9 @@ object XFormsStaticStateDeserializer {
 
               val staticBind =
                 for {
-                  typeMIPOpt                  <- c.get[Option[StaticBind.TypeMIP]]("typeMIPOpt")
-                  mipNameToXPathMIP           <- c.get[Iterable[(String, List[StaticBind.XPathMIP])]]("mipNameToXPathMIP")
-                  customMIPNameToXPathMIP     <- c.get[Map[String, List[StaticBind.XPathMIP]]]("customMIPNameToXPathMIP")
+                  typeMIPOpt                  <- c.getOrElse[Option[StaticBind.TypeMIP]]("typeMIPOpt")(None)
+                  mipNameToXPathMIP           <- c.getOrElse[Iterable[(String, List[StaticBind.XPathMIP])]]("mipNameToXPathMIP")(Nil)
+                  customMIPNameToXPathMIP     <- c.getOrElse[Map[String, List[StaticBind.XPathMIP]]]("customMIPNameToXPathMIP")(Map.empty)
                 } yield
                   new StaticBind(
                     index,
@@ -618,10 +624,10 @@ object XFormsStaticStateDeserializer {
 
               val select =
                 for {
-                  staticItemset    <- c.get[Option[Itemset]]("staticItemset")
-                  useCopy          <- c.get[Boolean]("useCopy")
-                  mustEncodeValues <- c.get[Option[Boolean]]("mustEncodeValues")
-                  itemsetAnalysis  <- c.get[Option[XPathAnalysis]]("itemsetAnalysis")
+                  staticItemset    <- c.getOrElse[Option[Itemset]]("staticItemset")(None)
+                  useCopy          <- c.getOrElse[Boolean]("useCopy")(false)
+                  mustEncodeValues <- c.getOrElse[Option[Boolean]]("mustEncodeValues")(None)
+                  itemsetAnalysis  <- c.getOrElse[Option[XPathAnalysis]]("itemsetAnalysis")(None)
                 } yield
                   new SelectionControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
                     staticItemset,
@@ -636,11 +642,11 @@ object XFormsStaticStateDeserializer {
               val lhha =
                 for {
                   expressionOrConstant      <- c.get[Either[String, String]]("expressionOrConstant")
-                  isPlaceholder             <- c.get[Boolean]("isPlaceholder")
-                  containsHTML              <- c.get[Boolean]("containsHTML")
-                  hasLocalMinimalAppearance <- c.get[Boolean]("hasLocalMinimalAppearance")
-                  hasLocalFullAppearance    <- c.get[Boolean]("hasLocalFullAppearance")
-                  hasLocalLeftAppearance    <- c.get[Boolean]("hasLocalLeftAppearance")
+                  isPlaceholder             <- c.getOrElse[Boolean]("isPlaceholder")(false)
+                  containsHTML              <- c.getOrElse[Boolean]("containsHTML")(false)
+                  hasLocalMinimalAppearance <- c.getOrElse[Boolean]("hasLocalMinimalAppearance")(false)
+                  hasLocalFullAppearance    <- c.getOrElse[Boolean]("hasLocalFullAppearance")(false)
+                  hasLocalLeftAppearance    <- c.getOrElse[Boolean]("hasLocalLeftAppearance")(false)
                 } yield
                   new LHHAAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope,
                     expressionOrConstant,
@@ -850,7 +856,7 @@ object XFormsStaticStateDeserializer {
         newControl match {
           case withChildren: WithChildrenTrait =>
             controlStack ::= withChildren
-            c.get[Iterable[ElementAnalysis]]("children") foreach withChildren.addChildren
+            c.getOrElse[Iterable[ElementAnalysis]]("children")(Nil) foreach withChildren.addChildren
             controlStack = controlStack.tail
           case _ =>
         }
@@ -965,7 +971,6 @@ object XFormsStaticStateDeserializer {
     }
   }
 }
-
 
 object XFormsStaticStateImpl {
 

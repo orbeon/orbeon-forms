@@ -246,14 +246,21 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeScope: Decoder[Scope] = (c: HCursor) =>
       for {
-        parentRef <- c.get[Option[String]]("parentRef")
-        scopeId   <- c.get[String]("scopeId")
-        idMap     <- c.get[Map[String, String]]("idMap")
+        parentRef      <- c.get[Option[String]]("parentRef")
+        scopeId        <- c.get[String]("scopeId")
+        simplyPrefixed <- c.getOrElse[Iterable[String]]("simplyPrefixed")(Nil)
+        other          <- c.getOrElse[Iterable[(String, String)]]("other")(Nil)
       } yield {
 
         val r = new Scope(parentRef.map(parentScopesById), scopeId)
-        idMap foreach (kv => r += kv)
+
+        val prefix = r.fullPrefix
+
+        simplyPrefixed foreach (k  => r += k -> (prefix + k))
+        other          foreach (kv => r += kv)
+        
         parentScopesById += r.scopeId -> r
+
         r
       }
 

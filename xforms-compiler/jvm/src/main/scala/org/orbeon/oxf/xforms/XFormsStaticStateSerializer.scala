@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xforms.xbl.{CommonBinding, ConcreteBinding}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.xforms.Constants
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
@@ -250,11 +251,25 @@ object XFormsStaticStateSerializer {
         }
       }
 
-    implicit val encodeScope: Encoder[Scope] = (a: Scope) => Json.obj(
-      "parentRef" -> a.parent.map(_.scopeId).asJson,
-      "scopeId"   -> Json.fromString(a.scopeId),
-      "idMap"     -> a.idMap.asJson
-    )
+    implicit val encodeScope: Encoder[Scope] = (a: Scope) => {
+
+      val b = ListBuffer[(String, Json)]()
+
+      b += "parentRef" -> a.parent.map(_.scopeId).asJson
+      b += "scopeId"   -> Json.fromString(a.scopeId)
+
+      val prefix = a.fullPrefix
+
+      val (simplyPrefixed, other) =
+        a.idMap.toIterable.partition { case (k, v) => v == prefix + k }
+
+      if (simplyPrefixed.nonEmpty)
+        b += "simplyPrefixed" -> simplyPrefixed.map(_._1).asJson
+      if (other.nonEmpty)
+        b += "other"          -> other.asJson
+
+      Json.fromFields(b)
+    }
 
     implicit val concreteBindingEncoder: Encoder[ConcreteBinding]   = (a: ConcreteBinding) => Json.obj(
       "innerScopeRef" -> Json.fromInt(collectedScopesWithPositions(a.innerScope)),

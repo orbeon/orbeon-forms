@@ -474,7 +474,7 @@ object ToolboxOps {
   def readXcvFromClipboard(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     Option(NetUtils.getExternalContext) flatMap
       (_.getRequest.getSession(true).getAttribute(FormBuilderClipboardSessionAttributeName)) collect {
-        case s: SAXStore => TransformerUtils.saxStoreToTinyTree(XPath.GlobalConfiguration, s).rootElement
+        case s: String => TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, s, false, false).rootElement
       }
 
   // Returns an `<xcv>` root elementBaseOps.scala
@@ -491,11 +491,12 @@ object ToolboxOps {
 
   // `xcv` must be an `<xcv>` root element
   def writeXcvToClipboard(xcv: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
-    ScopeFunctionSupport.storeAttribute(
-      NetUtils.getExternalContext.getRequest.getSession(true).setAttribute(_, _),
-      FormBuilderClipboardSessionAttributeName,
-      xcv
-    )
+    Option(NetUtils.getExternalContext) foreach { ec =>
+      ec.getRequest.getSession(true).setAttribute(
+        FormBuilderClipboardSessionAttributeName,
+        TransformerUtils.tinyTreeToString(xcv)
+      )
+    }
 
   def dndControl(
     sourceCellElem : NodeInfo,

@@ -16,6 +16,9 @@ package org.orbeon.oxf.util
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.properties.PropertySet
+import org.scalajs.dom.crypto.GlobalCrypto
+
+import scala.scalajs.js.typedarray.Uint8Array
 
 
 object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
@@ -27,9 +30,11 @@ object CoreCrossPlatformSupport extends CoreCrossPlatformSupportTrait {
 
   private val hexDigits = Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
 
-  // This is probably not as good as the server side code based on `SecureRandom`
-  def randomHexId: String =
-    0 until 40 map (_ => hexDigits((Math.random() * 16).floor.toInt)) mkString
+  def randomHexId: String = {
+    val values = new Uint8Array(40 / 2)
+    GlobalCrypto.crypto.getRandomValues(values)
+    values.map(v => "" + hexDigits(v >> 4) + hexDigits(v & 0xf)).mkString
+  }
 
   def getApplicationResourceVersion: Option[String] = None // TODO: CHECK
 

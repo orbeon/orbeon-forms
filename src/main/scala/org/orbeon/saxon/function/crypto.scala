@@ -19,6 +19,8 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.{DoubleValue, StringValue}
 import org.orbeon.scaxon.Implicits._
 
+import java.security.SecureRandom
+
 class Digest extends DefaultFunctionSupport {
 
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
@@ -51,4 +53,19 @@ class Hmac extends DefaultFunctionSupport {
 class Random extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(c: XPathContext): DoubleValue =
     RandomSupport.evaluate(isSeed = true)
+}
+
+object RandomSupport {
+
+  private lazy val secureRandom = new SecureRandom
+
+  def evaluate(isSeed: Boolean): Double = secureRandom.nextDouble()
+
+  // TODO: We should also support the "non-seeded" mode, but this seems to imply that, in order to keep a
+  // reproducible sequence, we need to keep the state per containing document, and also to be able to serialize
+  // the state to the dynamic state.
+  //        final Expression seedExpression = (argument == null || argument.length == 0) ? null : argument[0];
+  //        final boolean isSeed = (seedExpression != null) && argument[0].effectiveBooleanValue(c);
+  //        final java.util.Random random = isSeed ? new java.util.Random() : new java.util.Random(0);
+  //        return new StringValue(XMLUtils.removeScientificNotation(random.nextDouble()));
 }

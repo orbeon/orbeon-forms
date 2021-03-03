@@ -143,13 +143,13 @@ abstract class ElementAnalysis(
   val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement, scope)
 
   // XPath analysis
-  final var contextAnalysis: Option[XPathAnalysis] = None
+  final var contextAnalysis: Option[XPathAnalysis] = None // only used during construction of `bindingAnalysis` and `valueAnalysis`
   final var bindingAnalysis: Option[XPathAnalysis] = None
   final var valueAnalysis  : Option[XPathAnalysis] = None // TODO: Shouldn't this go to special nested traits only?
   // LHHAAnalysis, StaticBind, VariableAnalysisTrait, ValueTrait
 
   def freeTransientState(): Unit = {
-    contextAnalysis foreach (_.freeTransientState())
+    contextAnalysis foreach (_.freeTransientState()) // TODO: Could also set to `None`, right?
     bindingAnalysis foreach (_.freeTransientState())
     valueAnalysis   foreach (_.freeTransientState())
   }

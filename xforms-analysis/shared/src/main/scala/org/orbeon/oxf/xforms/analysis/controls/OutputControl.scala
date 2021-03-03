@@ -36,7 +36,7 @@ class OutputControl(
   val isImageMediatype    : Boolean,
   val isHtmlMediatype     : Boolean,
   val isDownloadAppearance: Boolean,
-  val staticValue         : Option[String]
+  val staticValue         : Option[String] // TODO: `expressionOrConstant`
 ) extends ValueControl(index, element, parent, preceding, staticId, prefixedId,  namespaceMapping,  scope,  containerScope)
      with OptionalSingleNode {
 

@@ -136,12 +136,9 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 if (stackElement.isXForms()) {
                     // Must be `xf:output`
                     attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
-                } else {
-                    // Keep and index `id` if present but don't generate one if not present as there is no need, since the entire
-                    // content is generated dynamically and the AVT doesn't require finding an element by `id` like in the non-LHHA
-                    // case.
-                    // https://github.com/orbeon/orbeon-forms/issues/4782
-                    indexIdGatherNamespaces(attributes.getValue(idIndex));
+                } else if (hostLanguageAVTs && hasAVT(attributes)) {
+                    // Must be an AVT on an host language elemAbstractRewriteent
+                    attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
                 }
             } else if (inXBL && level - 1 == preserveLevel && stackElement.isXBL() && "binding".equals(localname)) {
 

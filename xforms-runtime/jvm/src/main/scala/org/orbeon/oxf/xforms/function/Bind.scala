@@ -49,4 +49,6 @@ class Bind extends XFormsFunction with DependsOnContextItem {
       case _                       => EmptyIterator.getInstance
     }
   }
+
+  // TODO: PathMap
 }

@@ -861,6 +861,16 @@
                                                     iterate="$top-level-section-ids"
                                                     name="fr-expand"
                                                     targetid="{{.}}"/>
+
+                                                <!-- Create `fr:section-status` for all top-level sections so that the TOC status updates  -->
+                                                <xf:action iterate="$relevant-top-level-section-ids">
+                                                    <xf:var name="section-binding" value="xxf:binding(.)"/>
+                                                    <xf:insert
+                                                        if="not(exists($section-binding/@fr:section-status))"
+                                                        context="$section-binding"
+                                                        origin="xf:attribute('fr:section-status', '')"/>
+                                                </xf:action>
+
                                                 <!-- Avoid extra refreshes at this point: xxf:deferred-updates="false" -->
                                                 <xxf:setvisited
                                                     xxf:deferred-updates="false"
@@ -913,13 +923,28 @@
                                                     iterate="$top-level-section-ids"
                                                     name="fr-expand"
                                                     targetid="{{.}}"/>
-                                                <xxf:setvisited
-                                                    iterate="
+
+                                                <xf:var
+                                                    name="available-top-level-sections-ids"
+                                                    value="
                                                         for $section-name in xxf:split(xxf:instance('available-top-level-sections'))
                                                         return
                                                             (: See https://github.com/orbeon/orbeon-forms/issues/4022 :)
-                                                            for $section-id in $nav-section-or-grid-ids[frf:controlNameFromId(.) = $section-name]
-                                                            return concat($section-id, '-case')"
+                                                            $nav-section-or-grid-ids[frf:controlNameFromId(.) = $section-name]"/>
+
+                                                <!-- Create `fr:section-status` for all top-level sections so that the TOC status updates -->
+                                                <xf:action iterate="$available-top-level-sections-ids">
+                                                    <xf:var name="section-binding" value="xxf:binding(.)"/>
+                                                    <xf:insert
+                                                        if="not(exists($section-binding/@fr:section-status))"
+                                                        context="$section-binding"
+                                                        origin="xf:attribute('fr:section-status', '')"/>
+                                                </xf:action>
+
+                                                <xxf:setvisited
+                                                    iterate="
+                                                        for $section-id in $available-top-level-sections-ids
+                                                        return concat($section-id, '-case')"
                                                     control="{{.}}"
                                                     visited="true"
                                                     recurse="true"/>
@@ -933,6 +958,7 @@
                                                 control="{{.}}"
                                                 visited="false"
                                                 recurse="true"/>
+                                            <!-- Q: Should we remove `fr:section-status`? -->
                                             <!-- NOTE: We *could* collapse the corresponding top-level sections. -->
                                         </xf:group>
                                         <xf:group id="fr-wizard-section-deselected" appearance="xxf:internal">
@@ -1190,6 +1216,7 @@
                                                 xxbl:scope="inner"/>
 
                                             <xf:dispatch targetid="{{Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid'))}}" name="fr-expand"/>
+
                                             <!-- NOTE: 2020-01-23: This is dispatched only for *top-level* pages. -->
                                             <xf:dispatch name="fr-section-shown" targetid="fr-wizard" xxbl:scope="inner">
                                                 <xf:property name="section-binding" value="xxf:binding(Wizard:sectionIdFromCaseIdOpt(event('xxf:targetid')))" xxbl:scope="outer"/>

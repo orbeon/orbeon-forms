@@ -19,10 +19,11 @@ import org.orbeon.xforms.Constants.ComponentSeparator
 /**
  * Represent an XBL scope, that is a set of ids associated with elements that can see each other.
  *
- * Note:
- *
  * - within a scope, static ids must be unique
  * - static ids might have prefixed ids in different containing scopes
+ *
+ * 2021-03-01: This is not a very good representation. It contains a lot of data while in most cases,
+ * ids are within the scope directly. See also `XFormsStaticStateSerializer`.
  */
 class Scope(val parent: Option[Scope], val scopeId: String) {
 

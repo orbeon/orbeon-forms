@@ -324,9 +324,9 @@ object XFormsStaticStateDeserializer {
         position   <- c.get[Int]("position")
         help       <- c.get[Option[LHHAValue]]("help")
         hint       <- c.get[Option[LHHAValue]]("hint")
-        value      <- c.get[Either[String, List[om.Item]]]("value")
+        value      <- c.get[String]("value")
       } yield {
-        Item.ValueNode(label, help, hint, value, attributes)(position)
+        Item.ValueNode(label, help, hint, Left(value), attributes)(position)
       }
 
     implicit val decodeItemset: Decoder[Itemset] = (c: HCursor) =>

@@ -172,7 +172,8 @@
                 <!-- `app` and `form` must be passed as attributes (see view.xsl) -->
                 <xsl:variable name="static-app"             select="/*/@app/string()"/>
                 <xsl:variable name="static-form"            select="/*/@form/string()"/>
-                <xsl:variable name="static-validation-mode" select="/*/@validation-mode/string()"/>
+                <xsl:variable name="static-validate"        select="/*/@validate/string()"/>        <!-- This is the `free|lax|strict` Form Runner validation mode. -->
+                <xsl:variable name="static-validation-mode" select="/*/@validation-mode/string()"/> <!-- This is the `incremental|explicit` Form Runner validation mode. -->
 
                 <xsl:variable
                     xmlns:p="http://www.orbeon.com/oxf/pipeline"
@@ -882,9 +883,8 @@
                                         <xf:group id="fr-wizard-visit-all-to-current" appearance="xxf:internal">
                                             <!-- NOTE: We visit the current page upon xforms-deselect too. -->
                                             <xf:action event="fr-wizard-visit-all-to-current">
-                                                <!-- This is called upon "next".
-
-                                                     The current section, since it is current, is obviously already
+                                                <!-- This is called upon "next". -->
+                                                <!-- The current section, since it is current, is obviously already
                                                      expanded. So we make sure we expand anything before it. -->
                                                 <xf:dispatch
                                                     iterate="
@@ -1233,8 +1233,10 @@
                                                 <xsl:attribute name="view-appearance">wizard</xsl:attribute>
                                                 <xsl:attribute name="collapsible">false</xsl:attribute>
                                                 <xsl:apply-templates select="@* except (@collapse | @collapsible | @open)"/>
-                                                <!-- Tell the section whether it needs to be initially open or not (optimization) -->
-                                                <xsl:attribute name="content-nonrelevant-if-collapsed">true</xsl:attribute>
+                                                <!-- Tell the section whether it needs to be initially open or not (optimization).
+                                                     We can't enable this yet in `lax|strict` mode, see:
+                                                     https://github.com/orbeon/orbeon-forms/issues/4790#issuecomment-791652516 -->
+                                                <xsl:attribute name="content-nonrelevant-if-collapsed" select="$static-validate = 'free'"/>
                                                 <xsl:attribute name="open" select="concat('{case(''switch'') = ''', $static-section-id, '-case''}')"/>
 
                                                 <!-- Update the `changed` token -->

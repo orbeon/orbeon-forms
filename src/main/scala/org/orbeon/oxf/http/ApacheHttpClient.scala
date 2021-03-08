@@ -266,7 +266,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
     val connectionManager: PoolingClientConnectionManager = {
 
       // Create SSL context, based on a custom key store if specified
-      val trustStore =
+      val keyStore =
         (settings.sslKeystoreURI, settings.sslKeystorePassword) match {
           case (Some(keyStoreURI), Some(keyStorePassword)) =>
 
@@ -295,14 +295,14 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
       val schemeRegistry = new SchemeRegistry
       schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory))
 
-      val sslSocketFactory = trustStore match {
-        case Some(trustStore) =>
+      val sslSocketFactory = keyStore match {
+        case Some(keyStore) =>
           // Calling full constructor
           new SSLSocketFactory(
             SSLSocketFactory.TLS,
-            trustStore._1,
-            trustStore._2,
-            trustStore._1,
+            keyStore._1,
+            keyStore._2,
+            null,
             null,
             null,
             hostnameVerifier

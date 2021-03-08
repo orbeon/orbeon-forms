@@ -43,6 +43,16 @@
                 value="xxf:property(string-join(('oxf.fr.import.restrict-to-latest-version', $app, $form), '.')) = true()"/>
 
             <xf:var
+                name="default-format"
+                value="
+                    (
+                        xxf:property(string-join(('oxf.fr.import.default-format', $app, $form), '.'))[
+                            . = ('excel-headings', 'excel-named-ranges')
+                        ],
+                        'excel-headings'
+                    )[1]"/>
+
+            <xf:var
                 name="show-start-over-button"
                 value="xxf:property(string-join(('oxf.fr.import.show-start-over-button', $app, $form), '.')) = true()"/>
 
@@ -98,6 +108,7 @@
                     </version>
                     <upload>
                         <file mediatype="" filename="" size=""/>
+                        <file-format/>
                     </upload>
                     <validate>
                         <!-- 'not-started' | 'started' | 'succeeded' | 'failed' -->
@@ -140,12 +151,14 @@
                 </xf:bind>
                 <xf:bind ref="upload" id="upload-bind">
                     <xf:bind ref="file" required="true()"/>
+                    <xf:bind ref="file-format" id="file-format-bind" name="file-format" xxf:default="$default-format"/>
                 </xf:bind>
                 <xf:bind ref="validate" id="validate-bind">
                     <xf:bind ref="validating" constraint="$validation-completed"/>
-                    <xf:bind ref="stats/*"    type="xs:integer" readonly="true()"/>
+                    <xf:bind ref="stats/(total | processed | succeeded)" type="xs:integer" readonly="true()"/>
+                    <xf:bind ref="stats/(all-values-count | set-values-count | counts/@*)" type="xs:integer" readonly="true()"/>
                 </xf:bind>
-                <xf:bind ref="import" id="import-bind">
+                <xf:bind ref="import" id="import-bind" relevant="$file-format != 'excel-named-ranges'">
                     <xf:bind id="fr-keep-existing-records-bind" ref="keep-existing-records"/>
                     <xf:bind id="fr-import-invalid-data-bind"   ref="import-invalid-data"/>
 
@@ -172,6 +185,7 @@
                 <xf:action context="validate">
                     <xf:setvalue ref="validating">not-started</xf:setvalue>
                     <xf:setvalue iterate="stats/*" ref="."/>
+                    <xf:delete ref="stats/_"/>
                 </xf:action>
             </xf:action>
 
@@ -193,7 +207,7 @@
             <!-- Validate data to import -->
             <xf:submission
                 id="fr-import-validate-submission"
-                ref="instance('fr-form-instance')/upload/file"
+                ref="instance('fr-form-instance')/upload"
                 method="post"
                 mode="asynchronous"
                 action="/fr/service/{
@@ -202,6 +216,8 @@
                         $form
                     }/validate?form-version={
                         instance('fr-form-instance')/version/selected-version
+                    }&amp;document-id={
+                        xxf:get-request-parameter('document-id')
                     }"
                 replace="instance"
                 instance="fr-form-instance"
@@ -224,7 +240,7 @@
             <!-- Import data -->
             <xf:submission
                 id="fr-import-import-submission"
-                ref="instance('fr-form-instance')/upload/file"
+                ref="instance('fr-form-instance')/upload"
                 method="post"
                 mode="asynchronous"
                 action="/fr/service/{
@@ -267,6 +283,23 @@
                 <!-- Error -->
                 <xf:message event="xforms-submit-error">An error occurred while deleting the data.</xf:message>
             </xf:submission>
+
+            <!-- Submit the form data to the form's `new` page -->
+            <xf:submission
+                id="fr-import-submit-new-form-submission"
+                ref="bind('validate-bind')/stats/form"
+                method="post"
+                serialization="application/xml"
+                action="/fr/{$app}/{$form}/edit{
+                    let $doc := xxf:get-request-parameter('document-id')
+                    return
+                        if (xxf:non-blank($doc)) then
+                            concat('/', xxf:trim($doc))
+                        else
+                            ''
+                }?data-format-version=edge"
+                replace="all"
+                xxf:target="_blank"/>
 
             <!-- Statistics gathered upon polling event -->
             <xf:instance id="fr-import-batch-stats" xxf:expose-xpath-types="true">
@@ -407,6 +440,7 @@
                     <application-name>orbeon</application-name>
                     <form-name>runner</form-name>
                     <title xml:lang="en">Form Runner Excel Import</title>
+                    <title xml:lang="de">Form Runner Excel Importieren</title>
                     <title xml:lang="fr">Form Runner Import Excel</title>
                     <description/>
                     <author>Orbeon, Inc.</author>
@@ -418,6 +452,7 @@
             <xf:instance id="fr-form-resources">
                 <resources xmlns="">
                     <resource xml:lang="en"/>
+                    <resource xml:lang="de"/>
                     <resource xml:lang="fr"/>
                     <!--<resource xml:lang="es"/>-->
                     <!--<resource xml:lang="no"/>-->
@@ -538,6 +573,13 @@
 
             <!-- END: Shared with `dialog-publish.xml` -->
 
+            <!-- Current Form Runner language -->
+            <!-- TODO: Provide XPath function! -->
+            <xf:var
+                name="fr-lang"
+                model="fr-resources-model"
+                value="$fr-lang"/>
+
         </xf:model>
     </xh:head>
     <xh:body>
@@ -547,6 +589,13 @@
                     <xf:label ref="xxf:r('import.form-version.label', '|fr-fr-resources|')"/>
 
                     <fr:grid>
+                        <xh:tr>
+                            <xh:td colspan="3">
+                                <xf:output value="frf:formTitleFromMetadataElem(instance('fb-publish-form-metadata')/form, $fr-lang)">
+                                    <xf:label ref="xxf:r('home.titles.title', '|fr-fr-resources|')"/>
+                                </xf:output>
+                            </xh:td>
+                        </xh:tr>
                         <xh:tr>
                             <xh:td>
                                 <xf:output value="$app">
@@ -632,17 +681,24 @@
 
                     <fr:grid>
                         <xh:tr>
-                            <xh:td colspan="1">
+                            <xh:td colspan="3">
+                                <xf:output value="frf:formTitleFromMetadataElem(instance('fb-publish-form-metadata')/form, $fr-lang)">
+                                    <xf:label ref="xxf:r('home.titles.title', '|fr-fr-resources|')"/>
+                                </xf:output>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
                                 <xf:output value="$app">
                                     <xf:label ref="xxf:r('import.application-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
-                            <xh:td colspan="1">
+                            <xh:td>
                                 <xf:output value="$form">
                                     <xf:label ref="xxf:r('import.form-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
-                            <xh:td colspan="1">
+                            <xh:td>
                                 <xf:output value="instance('fr-form-instance')/version/selected-version">
                                     <xf:label ref="xxf:r('import.form-version.label', '|fr-fr-resources|')"/>
                                 </xf:output>
@@ -680,6 +736,7 @@
                                     <xf:hint  ref="xxf:r('import.file.hint',  '|fr-fr-resources|')"/>
                                     <xf:alert ref="xxf:r('import.file.alert', '|fr-fr-resources|')"/>
 
+                                    <!-- 2021-03-26: This event does not get dispatched! -->
                                     <xf:dispatch
                                         event="xforms-value-changed"
 
@@ -707,17 +764,24 @@
 
                     <fr:grid>
                         <xh:tr>
-                            <xh:td colspan="2">
+                            <xh:td colspan="3">
+                                <xf:output value="frf:formTitleFromMetadataElem(instance('fb-publish-form-metadata')/form, $fr-lang)">
+                                    <xf:label ref="xxf:r('home.titles.title', '|fr-fr-resources|')"/>
+                                </xf:output>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
                                 <xf:output value="$app">
                                     <xf:label ref="xxf:r('import.application-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
-                            <xh:td colspan="2">
+                            <xh:td>
                                 <xf:output value="$form">
                                     <xf:label ref="xxf:r('import.form-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
-                            <xh:td colspan="2">
+                            <xh:td>
                                 <xf:output value="instance('fr-form-instance')/version/selected-version">
                                     <xf:label ref="xxf:r('import.form-version.label', '|fr-fr-resources|')"/>
                                 </xf:output>
@@ -748,26 +812,54 @@
                         </xh:tr>
                     </fr:grid>
                     <xf:group ref="stats[$validating or $validation-done]">
-                        <fr:grid>
-                            <xh:tr>
-                                <xh:td>
-                                    <!-- TODO: i18n: not sure why `{xxf:r('import.rows', '|fr-fr-resources|')}` in suffix doesn't work. -->
-                                    <fr:number ref="total" suffix="rows">
-                                        <xf:label ref="xxf:r('import.total', '|fr-fr-resources|')"/>
-                                    </fr:number>
-                                </xh:td>
-                                <xh:td>
-                                    <fr:number ref="succeeded" suffix="rows">
-                                        <xf:label ref="xxf:r('import.valid', '|fr-fr-resources|')"/>
-                                    </fr:number>
-                                </xh:td>
-                                <xh:td>
-                                    <fr:number ref="bind('fr-import-invalid-count-bind')" suffix="rows">
-                                        <xf:label ref="xxf:r('import.invalid', '|fr-fr-resources|')"/>
-                                    </fr:number>
-                                </xh:td>
-                            </xh:tr>
-                        </fr:grid>
+                        <xf:group ref=".[not(bind('file-format-bind') = 'excel-named-ranges')]">
+                            <fr:grid>
+                                <xh:tr>
+                                    <xh:td>
+                                        <!-- TODO: i18n: not sure why `{xxf:r('import.rows', '|fr-fr-resources|')}` in suffix doesn't work. -->
+                                        <fr:number ref="total" suffix="rows">
+                                            <xf:label ref="xxf:r('import.total', '|fr-fr-resources|')"/>
+                                        </fr:number>
+                                    </xh:td>
+                                    <xh:td>
+                                        <fr:number ref="succeeded" suffix="rows">
+                                            <xf:label ref="xxf:r('import.valid', '|fr-fr-resources|')"/>
+                                        </fr:number>
+                                    </xh:td>
+                                    <xh:td>
+                                        <fr:number ref="bind('fr-import-invalid-count-bind')" suffix="rows">
+                                            <xf:label ref="xxf:r('import.invalid', '|fr-fr-resources|')"/>
+                                        </fr:number>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </xf:group>
+                        <xf:group ref=".[bind('file-format-bind') = 'excel-named-ranges']">
+                            <fr:grid>
+                                <xh:tr>
+                                    <xh:td>
+                                        <fr:number ref="all-values-count">
+                                            <xf:label ref="xxf:r('import.fields-found', '|fr-fr-resources|')"/>
+                                        </fr:number>
+                                    </xh:td>
+                                    <xh:td>
+                                        <fr:number ref="set-values-count">
+                                            <xf:label ref="xxf:r('import.values-found', '|fr-fr-resources|')"/>
+                                        </fr:number>
+                                    </xh:td>
+                                    <xh:td>
+                                        <fr:number ref="counts/@error">
+                                            <xf:label ref="xxf:r('import.errors', '|fr-fr-resources|')"/>
+                                        </fr:number>
+                                    </xh:td>
+                                    <xh:td>
+                                        <fr:number ref="counts/@warning">
+                                            <xf:label ref="xxf:r('import.warnings', '|fr-fr-resources|')"/>
+                                        </fr:number>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </xf:group>
                     </xf:group>
 
                     <xf:group ref=".[$validating]">
@@ -825,17 +917,29 @@
                                         <xh:span class="alert alert-{if ($some-invalid) then 'warning' else 'success'}">
                                             <xf:output
                                                 value="
-                                                    if ($some-invalid) then
-                                                        xxf:format-message(
-                                                            xxf:r('import.invalid-records-message', '|fr-fr-resources|'),
-                                                            for $n in (bind('fr-import-invalid-count-bind'), processed)
-                                                                return xs:integer($n)
-                                                        )
+                                                    if (bind('file-format-bind') = 'excel-named-ranges') then
+                                                        if ($some-invalid) then
+                                                            xxf:format-message(
+                                                                xxf:r('import.invalid-document-message', '|fr-fr-resources|'),
+                                                                ()
+                                                            )
+                                                        else
+                                                            xxf:format-message(
+                                                                xxf:r('import.valid-document-message', '|fr-fr-resources|'),
+                                                                ()
+                                                            )
                                                     else
-                                                        xxf:format-message(
-                                                            xxf:r('import.valid-records-message', '|fr-fr-resources|'),
-                                                            xs:integer(processed)
-                                                        )"
+                                                        if ($some-invalid) then
+                                                            xxf:format-message(
+                                                                xxf:r('import.invalid-records-message', '|fr-fr-resources|'),
+                                                                for $n in (bind('fr-import-invalid-count-bind'), processed)
+                                                                    return xs:integer($n)
+                                                            )
+                                                        else
+                                                            xxf:format-message(
+                                                                xxf:r('import.valid-records-message', '|fr-fr-resources|'),
+                                                                xs:integer(processed)
+                                                            )"
                                             />
                                         </xh:span>
                                     </xh:td>
@@ -847,7 +951,7 @@
                                 <xh:tr>
                                     <xh:td colspan="2">
                                         <xh:span class="alert alert-warning">
-                                            <xf:label value="xxf:r('import.validation-canceled', '|fr-fr-resources|')"/>
+                                            <xf:output value="xxf:r('import.validation-canceled', '|fr-fr-resources|')"/>
                                         </xh:span>
                                     </xh:td>
                                 </xh:tr>
@@ -861,17 +965,24 @@
 
                     <fr:grid>
                         <xh:tr>
-                            <xh:td colspan="2">
+                            <xh:td colspan="3">
+                                <xf:output value="frf:formTitleFromMetadataElem(instance('fb-publish-form-metadata')/form, $fr-lang)">
+                                    <xf:label ref="xxf:r('home.titles.title', '|fr-fr-resources|')"/>
+                                </xf:output>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
                                 <xf:output value="$app">
                                     <xf:label ref="xxf:r('import.application-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
-                            <xh:td colspan="2">
+                            <xh:td>
                                 <xf:output value="$form">
                                     <xf:label ref="xxf:r('import.form-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
-                            <xh:td colspan="2">
+                            <xh:td>
                                 <xf:output value="instance('fr-form-instance')/version/selected-version">
                                     <xf:label ref="xxf:r('import.form-version.label', '|fr-fr-resources|')"/>
                                 </xf:output>
@@ -1076,11 +1187,20 @@
                 <!--<fr:xforms-inspector/>-->
 
             </fr:body>
+            <fr:inner-buttons>
+                <fr:wizard-prev-button/>
+                <fr:wizard-next-button/>
+                <xf:group ref=".[bind('file-format-bind') = 'excel-named-ranges']">
+                    <xf:submit
+                        ref="if ($validation-completed) then . else ''"
+                        submission="fr-import-submit-new-form-submission">
+                        <xf:label ref="xxf:r('import.review-data.label', '|fr-fr-resources|')"/>
+                    </xf:submit>
+                </xf:group>
+            </fr:inner-buttons>
             <fr:buttons>
                 <fr:home-button/>
                 <fr:summary-button/>
-                <fr:wizard-prev-button/>
-                <fr:wizard-next-button/>
                 <fr:close-button/>
             </fr:buttons>
         </fr:view>

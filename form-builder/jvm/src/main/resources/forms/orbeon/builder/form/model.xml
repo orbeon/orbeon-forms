@@ -783,6 +783,18 @@
 
     </xf:action>
 
+    <xf:action event="fb-excel-export">
+
+        <!-- Save -->
+        <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
+        <xf:action type="xpath">
+            fr:run-process-by-name('oxf.fr.detail.process', 'save')
+        </xf:action>
+
+        <!-- Export -->
+        <xf:send submission="fb-export-submission"/>
+    </xf:action>
+
     <xf:submission
         id="fb-publish-submission"
         ref="event('doc')"
@@ -799,6 +811,26 @@
             }"
         replace="instance"
         instance="fb-publish-response-instance"/>
+
+    <xf:submission
+        id="fb-export-submission"
+        ref="
+            xxf:call-xpl(
+                'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                'data',
+                instance('fb-form-instance'),
+                'data'
+            )"
+        serialization="application/xml"
+        method="post"
+        resource="/fr/service/export?document-id={
+                encode-for-uri(fr:document-id())
+            }&amp;language={
+                encode-for-uri($fb-lang)
+            }&amp;repeats-at-least={
+                5 (: TODO: use configuration property :)
+            }"
+        replace="all"/>
 
     <xf:action observer="fb-publish-submission" event="xforms-submit-done">
 

@@ -24,7 +24,22 @@
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
           xmlns:utils="java:org.orbeon.oxf.xml.SaxonUtils">
 
-    <p:param type="input" name="instance"/>
+    <!--
+        Example:
+
+        <upload>
+            <file mediatype="application/zip" filename="report.xlsx" size="15123">file:/...</file>
+            <file-format>excel-named-ranges | excel-headings</file-format>
+        </upload>
+    -->
+    <p:param type="input"  name="instance"/>
+    <!--
+        Form data, example:
+
+        <form>
+            ...
+        </form>
+    -->
     <p:param type="output" name="data"/>
 
     <!-- Apply unzip/XForms model/zip/result -->
@@ -58,19 +73,21 @@
                 <xf:action ev:event="xforms-ready" xxf:xpath-analysis="true">
                     <!-- Remember original empty data -->
 
+                    <xf:var
+                        name="format"
+                        value="if (local-name(instance()) = 'rows') then 'headings' else 'named-ranges'"/>
+
                     <xf:insert
                         ref="instance('fr-empty-data')"
                         origin="xxf:instance('fr-form-instance')"/>
 
-                    <xf:var
-                        name="non-empty-headers"
-                        value="instance()/row[1]/c[normalize-space(.) and @r]"/>
-
-                    <!-- TODO: validate that headers match data -->
-
-                    <xf:setvalue ref="instance('fr-import-stats')/total" value="count(instance()/row) - 1"/>
-
-                    <!--<xf:message level="xxf:log-info" value="concat('xxx ', string-join($headers/string(), ', '))"/>-->
+                    <xf:setvalue
+                        ref="instance('fr-import-stats')/total"
+                        value="
+                            if ($format = 'headings') then
+                                count(instance()/row) - 1
+                            else
+                                1"/>
 
                     <xf:action type="xpath">
                         xxf:set-session-attribute('org.orbeon.fr.import.total', xs:integer(instance('fr-import-stats')/total)),
@@ -78,50 +95,97 @@
                         xxf:set-session-attribute('org.orbeon.fr.import.succeeded', 0)
                     </xf:action>
 
-                    <!-- Iterate over all rows -->
-                    <xf:action iterate="instance()/row[position() gt 1]">
-                        <xf:var name="row" value="."/>
-                        <xf:var name="p"   value="position()"/>
+<!--                    <xf:message level="xxf:log-error" value="$format"/>-->
+<!--                    <xf:message level="xxf:log-error" value="xxf:serialize(instance(), 'xml')"/>-->
 
-                        <!-- Check at each iteration whether to stop -->
-                        <xf:action if="not(xxf:get-session-attribute('org.orbeon.fr.import.cancel'))">
+                    <xf:action if="$format = 'headings'">
 
-                            <!-- Start with empty data -->
-                            <xf:var name="new" value="xxf:create-document()"/>
-                            <xf:insert context="$new" origin="instance('fr-empty-data')"/>
+                        <!-- TODO: validate that headers match data -->
 
-                            <!-- Fill data -->
-                            <xf:action iterate="$non-empty-headers">
-                                <xf:var name="r"          value="@r/string()"/>
-                                <xf:var name="raw-header" value="normalize-space(.)"/>
-                                <xf:var name="v"          value="($row/c[@r = $r]/string(), '')[1]"/>
+                        <xf:var
+                            name="non-empty-headers"
+                            value="instance()/row[1]/c[normalize-space(.) and @r]"/>
 
+                        <xf:action iterate="instance()/row[position() gt 1]">
+                            <xf:var name="row" value="."/>
+                            <xf:var name="p"   value="position()"/>
+
+                            <!-- Check at each iteration whether to stop -->
+                            <xf:action if="not(xxf:get-session-attribute('org.orbeon.fr.import.cancel'))">
+
+                                <!-- Start with empty data -->
+                                <xf:var name="new" value="xxf:create-document()"/>
+                                <xf:insert context="$new" origin="instance('fr-empty-data')"/>
+
+                                <!-- Fill data -->
+                                <xf:action iterate="$non-empty-headers">
+                                    <xf:var name="r"          value="@r/string()"/>
+                                    <xf:var name="raw-header" value="normalize-space(.)"/>
+                                    <xf:var name="v"          value="($row/c[@r = $r]/string(), '')[1]"/>
+
+                                    <xf:setvalue
+                                        ref="$new//*[not(*) and name() = utils:makeNCName($raw-header, false())]"
+                                        value="$v"/>
+                                </xf:action>
+
+                                <!-- Set filled data -->
+                                <xf:insert ref="xxf:instance('fr-form-instance')" origin="$new"/>
+                                <xf:refresh/>
+                                <!-- Remember validity -->
                                 <xf:setvalue
-                                    ref="$new//*[not(*) and name() = utils:makeNCName($raw-header, false())]"
-                                    value="$v"/>
+                                    ref="instance('fr-import-stats')/processed"
+                                    value="xs:integer(.) + 1"/>
+                                <xf:setvalue
+                                    if="xxf:instance('fr-error-summary-instance')/valid = true()"
+                                    ref="instance('fr-import-stats')/succeeded"
+                                    value="xs:integer(.) + 1"/>
+                                <xf:setvalue
+                                    if="xxf:instance('fr-error-summary-instance')/valid != true()"
+                                    ref="instance('fr-import-stats')/invalid-rows"
+                                    value="if (. != '') then concat(., ' ', $p) else $p"/>
+
+                                <xf:action type="xpath">
+                                    xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed),
+                                    xxf:set-session-attribute('org.orbeon.fr.import.succeeded', instance('fr-import-stats')/succeeded)
+                                </xf:action>
                             </xf:action>
 
-                            <!-- Set filled data -->
-                            <xf:insert ref="xxf:instance('fr-form-instance')" origin="$new"/>
-                            <xf:refresh/>
-                            <!-- Remember validity -->
-                            <xf:setvalue
-                                ref="instance('fr-import-stats')/processed"
-                                value="xs:integer(.) + 1"/>
-                            <xf:setvalue
-                                if="xxf:instance('fr-error-summary-instance')/valid = true()"
-                                ref="instance('fr-import-stats')/succeeded"
-                                value="xs:integer(.) + 1"/>
-                            <xf:setvalue
-                                if="xxf:instance('fr-error-summary-instance')/valid != true()"
-                                ref="instance('fr-import-stats')/invalid-rows"
-                                value="if (. != '') then concat(., ' ', $p) else $p"/>
-
-                            <xf:action type="xpath">
-                                xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed),
-                                xxf:set-session-attribute('org.orbeon.fr.import.succeeded', instance('fr-import-stats')/succeeded)
-                            </xf:action>
                         </xf:action>
+                    </xf:action>
+                    <xf:action if="$format = 'named-ranges'">
+
+                        <!-- In this mode, the instance contains the form data already -->
+                        <xf:insert
+                            ref="xxf:instance('fr-form-instance')"
+                            origin="instance()/form"/>
+
+                        <xf:refresh/>
+
+                        <!-- Remember validity -->
+                        <xf:setvalue
+                            ref="instance('fr-import-stats')/processed"
+                            value="xs:integer(.) + 1"/>
+                        <xf:setvalue
+                            if="xxf:instance('fr-error-summary-instance')/valid = true()"
+                            ref="instance('fr-import-stats')/succeeded"
+                            value="xs:integer(.) + 1"/>
+                        <xf:setvalue
+                            if="xxf:instance('fr-error-summary-instance')/valid != true()"
+                            ref="instance('fr-import-stats')/invalid-rows"
+                            value="1"/>
+
+                        <xf:action type="xpath">
+                            xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed),
+                            xxf:set-session-attribute('org.orbeon.fr.import.succeeded', instance('fr-import-stats')/succeeded)
+                        </xf:action>
+
+                        <xf:insert
+                            ref="instance('fr-import-stats')/*"
+                            origin="instance()/*"/>
+
+                        <xf:insert
+                            ref="instance('fr-import-stats')/*"
+                            origin="xxf:instance('fr-error-summary-instance')/counts"/>
 
                     </xf:action>
 

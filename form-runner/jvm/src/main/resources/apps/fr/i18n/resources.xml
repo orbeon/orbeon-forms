@@ -77,6 +77,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
             <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish</save-publish>
 
@@ -355,7 +356,7 @@
                 <app>Application</app>
                 <form>Form</form>
                 <version>Version</version>
-                <title>Title</title>
+                <title>Form Title</title>
                 <view>View</view>
                 <new>New</new>
                 <local>Local</local>
@@ -450,6 +451,9 @@
             <start-over>
                 <label>Start Over</label>
             </start-over>
+            <review-data>
+                <label>Review Data</label>
+            </review-data>
             <existing-records-message>
                 There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
             </existing-records-message>
@@ -462,10 +466,20 @@
             <valid-records-message>
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
             </valid-records-message>
+            <invalid-document-message>
+                The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message>
+                The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+            </valid-document-message>
             <import-complete-message>
                 Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
             </import-complete-message>
             <na>N/A</na>
+            <fields-found>Fields Found</fields-found>
+            <values-found>Values Found</values-found>
+            <errors>Errors</errors>
+            <warnings>Warnings</warnings>
         </import>
         <authentication>
             <menu>
@@ -556,6 +570,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Tester</test>
             <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Tester formules</test-formulas>
             <test-offline>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Tester hors ligne</test-offline>
+            <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Export Excel</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</save-publish>
 
@@ -838,7 +853,7 @@
                 <app>Application</app>
                 <form>Formulaire</form>
                 <version>Version</version>
-                <title>Titre</title>
+                <title>Titre du formulaire</title>
                 <view>Voir</view>
                 <new>Nouveau</new>
                 <local>Local</local>
@@ -877,25 +892,25 @@
                 <alert>Version du formulaire manquante</alert>
             </form-version>
             <application-name>
-                <label>Nom d'application</label>
+                <label>Nom de l'application</label>
             </application-name>
             <form-name>
-                <label>Nom de formulaire</label>
+                <label>Nom du formulaire</label>
             </form-name>
             <version-comment>
-                <label>Commentaire de version</label>
+                <label>Commentaire sur la version</label>
             </version-comment>
             <upload>
-                <label>Téléchargement vers le serveur</label>
+                <label>Télécharger vers le serveur</label>
             </upload>
             <file>
-                <label>Fichier Excel à importer</label>
-                <hint>Le fichier doit être au formatExcel 2007 format (.xlsx)</hint>
+                <label>Importer le fichier Excel</label>
+                <hint>Le fichier doit être au format Excel 2007 (.xlsx)</hint>
                 <alert>Fichier manquant</alert>
             </file>
             <validation>
                 <label>Validation</label>
-                <alert>Veuillez démarrer la validation avant de procéder à l'import</alert>
+                <alert>Veuillez démarrer la validation avant de procéder à l'importation</alert>
             </validation>
             <start-validation>
                 <label>Démarrer la validation</label>
@@ -911,44 +926,57 @@
             </cancel-validation>
             <validation-canceled>La validation a été annulée.</validation-canceled>
             <import>
-                <label>Import</label>
+                <label>Importer</label>
             </import>
             <existing-records>
-                <label>Enregistrements existants dans la base de données</label>
-                <item id="0">Conserver</item>
+                <label>Enregistrements existant dans la base de données</label>
+                <item id="0">Garder</item>
                 <item id="1">Supprimer</item>
             </existing-records>
             <invalid-data>
-                <label>Enregistrements avec données invalides</label>
+                <label>Enregistrements avec des données invalides</label>
                 <item id="0">Ignorer</item>
                 <item id="1">Importer</item>
             </invalid-data>
             <start-import>
-                <label>Démarrer l'import</label>
+                <label>Démarrer l'importation</label>
             </start-import>
             <cancel-import>
-                <label>Annuler l'import</label>
+                <label>Annuler l'importation</label>
             </cancel-import>
-            <import-canceled>L'import a été annulé.</import-canceled>
+            <import-canceled>L'imporation a été annulée.</import-canceled>
             <start-over>
-                <label>Recommencer</label>
+                <label>Recommencer à zéro</label>
             </start-over>
+            <review-data>
+                <label>Revoir les données</label>
+            </review-data>
             <existing-records-message>
-                Il y a {0,number,integer} {0,choice,1#document existant|1&lt;documents existants} dans la base de données pour la version {3} du formulaire {1}/{2}.
+                Il existe {0,choice,1#document|1&lt;documents} dans la base de données pour la version {3} du formulaire {1}/{2}.
             </existing-records-message>
             <eta-message>
                 {0,choice,0#|0&lt;{0, number, integer} heures} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} secondes}
             </eta-message>
             <invalid-records-message>
-                {0,number,integer} {1,choice,1#document|1&lt;documents} sur {1,number,integer} {0,choice,1#est invalide|1&lt;sont invalides}.
+                {0,number,integer} sur {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#est|1&lt;sont} {0,choice,1#invalide|1&lt;invalides}.
             </invalid-records-message>
             <valid-records-message>
-                {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#a été validé et sera importé|1&lt;ont été validés et seront importés}.
+                {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#a été validé|1&lt;ont été validés} et {0,choice,1#sera importé|1&lt;seront importés}.
             </valid-records-message>
+            <invalid-document-message>
+                Le document téléchargé contient des erreurs de validation. Veuillez utiliser le bouton "Revoir les données" pour revoir et corriger les erreurs avant de sauvegarder.
+            </invalid-document-message>
+            <valid-document-message>
+                Les données du document téléchargé sont valides. Veuillez utiliser le bouton "Revoir les données" pour revoir les données du formulaire avant de sauvegarder.
+            </valid-document-message>
             <import-complete-message>
-                L''import {0,choice,1#d''''|1&lt;de }{0,number,integer} {0,choice,1#document|1&lt;documents} est complet. {1,number,integer} {1,choice,1#document invalide a été ignoré|1&lt;documents invalides ont été ignorés}.
+		        L'importation de {0,number,integer} {0,choice,1#document|1&lt;documents} est terminée. {1,number,integer} {1,choice,1#document invalide a été ignoré|1&lt;documents invalides ont été ignorés}
             </import-complete-message>
             <na>n/d</na>
+            <fields-found>Champs trouvés</fields-found>
+            <values-found>Valeurs trouvées</values-found>
+            <errors>Erreurs</errors>
+            <warnings>Avertissements</warnings>
         </import>
         <authentication>
             <menu>
@@ -1039,6 +1067,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testear</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</save-publish>
 
@@ -1402,6 +1431,9 @@
             <start-over>
                 <label todo="true">Start Over</label>
             </start-over>
+            <review-data>
+                <label todo="true">Review Data</label>
+            </review-data>
             <existing-records-message todo="true">
                 There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
             </existing-records-message>
@@ -1414,10 +1446,20 @@
             <valid-records-message todo="true">
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
             </valid-records-message>
+            <invalid-document-message todo="true">
+                The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message todo="true">
+                The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+            </valid-document-message>
             <import-complete-message todo="true">
                 Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
             </import-complete-message>
             <na todo="true">N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors todo="true">Errors</errors>
+            <warnings todo="true">Warnings</warnings>
         </import>
         <authentication>
             <menu>
@@ -1508,6 +1550,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiser…</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiser…</save-publish>
 
@@ -1775,7 +1818,7 @@
                 <app todo="true">[App]</app>
                 <form todo="true">[Form]</form>
                 <version todo="true">[Version]</version>
-                <title todo="true">[Title]</title>
+                <title todo="true">[Form Title]</title>
                 <view todo="true">[View]</view>
                 <new todo="true">[New]</new>
                 <local todo="true">[Local]</local>
@@ -1870,6 +1913,9 @@
             <start-over>
                 <label todo="true">Start Over</label>
             </start-over>
+            <review-data>
+                <label todo="true">Review Data</label>
+            </review-data>
             <existing-records-message todo="true">
                 There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
             </existing-records-message>
@@ -1882,10 +1928,20 @@
             <valid-records-message todo="true">
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
             </valid-records-message>
+            <invalid-document-message todo="true">
+                The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message todo="true">
+                The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+            </valid-document-message>
             <import-complete-message todo="true">
                 Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
             </import-complete-message>
             <na todo="true">N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors todo="true">Errors</errors>
+            <warnings todo="true">Warnings</warnings>
         </import>
         <authentication>
             <menu>
@@ -1976,6 +2032,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Тестировать</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Публиковать</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Публиковать</save-publish>
 
@@ -2241,7 +2298,7 @@
                 <app todo="true">[App]</app>
                 <form todo="true">[Form]</form>
                 <version todo="true">[Version]</version>
-                <title todo="true">[Title]</title>
+                <title todo="true">[Form Title]</title>
                 <view todo="true">[View]</view>
                 <new todo="true">[New]</new>
                 <local todo="true">[Local]</local>
@@ -2336,6 +2393,9 @@
             <start-over>
                 <label todo="true">Start Over</label>
             </start-over>
+            <review-data>
+                <label todo="true">Review Data</label>
+            </review-data>
             <existing-records-message todo="true">
                 There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
             </existing-records-message>
@@ -2348,10 +2408,20 @@
             <valid-records-message todo="true">
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
             </valid-records-message>
+            <invalid-document-message todo="true">
+                The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message todo="true">
+                The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+            </valid-document-message>
             <import-complete-message todo="true">
                 Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
             </import-complete-message>
             <na todo="true">N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors todo="true">Errors</errors>
+            <warnings todo="true">Warnings</warnings>
         </import>
         <authentication>
             <menu>
@@ -2442,6 +2512,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Prova</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Pubblica</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Pubblica</save-publish>
 
@@ -2755,82 +2826,95 @@
         </home>
         <import>
             <form-version>
-                <label todo="true">Form Version</label>
-                <alert todo="true">Missing form version</alert>
+                <label>Versione Formulario</label>
+                <alert>Versione formulario mancante</alert>
             </form-version>
             <application-name>
-                <label todo="true">Application Name</label>
+                <label>Nome Applicazione</label>
             </application-name>
             <form-name>
-                <label todo="true">Form Name</label>
+                <label>Nome Formulario</label>
             </form-name>
             <version-comment>
-                <label todo="true">Version comment</label>
+                <label>Commento Versione</label>
             </version-comment>
             <upload>
-                <label todo="true">Upload</label>
+                <label>Caricamento</label>
             </upload>
             <file>
-                <label todo="true">Excel file to import</label>
-                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
-                <alert todo="true">Missing file</alert>
+                <label>File Excel da importare</label>
+                <hint>Il file dev'essere nel formato Excel 2007 (.xlsx)</hint>
+                <alert>File mancante</alert>
             </file>
             <validation>
-                <label todo="true">Validation</label>
-                <alert todo="true">Please start the validation before proceeding to the import</alert>
+                <label>Validazione</label>
+                <alert>Avviare la validazione prima di procedere con l'importazione</alert>
             </validation>
             <start-validation>
-                <label todo="true">Start Validation</label>
+                <label>Avviare Validazione</label>
             </start-validation>
-            <total todo="true">Total</total>
-            <valid todo="true">Valid</valid>
-            <invalid todo="true">Invalid</invalid>
-            <imported todo="true">[Imported]</imported>
-            <skipped todo="true">[Skipped]</skipped>
-            <eta todo="true">ETA</eta>
+            <total>Totale</total>
+            <valid>Valido/i</valid>
+            <invalid>Invalido/i</invalid>
+            <imported>Importato/i</imported>
+            <skipped>Saltato/i</skipped>
+            <eta>ETA</eta>
             <cancel-validation>
-                <label todo="true">Cancel Validation</label>
+                <label>Annullare Validazione</label>
             </cancel-validation>
-            <validation-canceled todo="true">Validation was canceled.</validation-canceled>
+            <validation-canceled>La validazione è stata annullata.</validation-canceled>
             <import>
-                <label todo="true">Import</label>
+                <label>Import</label>
             </import>
             <existing-records>
-                <label todo="true">Existing database records</label>
-                <item id="0" todo="true">Keep</item>
-                <item id="1" todo="true">Delete</item>
+                <label>Record presenti nel database</label>
+                <item id="0">Mantenere</item>
+                <item id="1">Eliminare</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Records with invalid data</label>
-                <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Import</item>
+                <label>Record con dati invalidi</label>
+                <item id="0">Saltare</item>
+                <item id="1">Importare</item>
             </invalid-data>
             <start-import>
-                <label todo="true">Start Import</label>
+                <label>Avviare Importazione</label>
             </start-import>
             <cancel-import>
-                <label todo="true">Cancel Import</label>
+                <label>Annullare Importazione</label>
             </cancel-import>
-            <import-canceled todo="true">Import was canceled.</import-canceled>
+            <import-canceled>L'importazione è stata annullata.</import-canceled>
             <start-over>
-                <label todo="true">Start Over</label>
+                <label>Ricominciare</label>
             </start-over>
-            <existing-records-message todo="true">
-                There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
+            <review-data>
+                <label>Revisionare Dati</label>
+            </review-data>
+            <existing-records-message>
+                {0,choice,1#C'è|1&lt;Ci sono} {0,number,integer} {0,choice,1#documento|1&lt;documenti} {0,choice,1#presente|1&lt;presenti} nel database per la versione {3} del formulario {1}/{2}.
             </existing-records-message>
-            <eta-message todo="true">
-                {0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}
+            <eta-message>
+                {0,choice,0#|0&lt;{0, number, integer} ore} {1,choice,0#|0&lt;{1, number, integer} minuti} {2,choice,0#|0&lt;{2, number, integer} secondi}
             </eta-message>
-            <invalid-records-message todo="true">
-                {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid.
+            <invalid-records-message>
+                {0,number,integer} {1,choice,1#documento|1&lt;documenti} di {1,number,integer} {0,choice,1#è invalido|1&lt;sono invalidi}.
             </invalid-records-message>
-            <valid-records-message todo="true">
-                {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
+            <valid-records-message>
+                {0,number,integer} {0,choice,1#documento è stato validato e sarà importato|1&lt;documenti sono stati validati e saranno importati}.
             </valid-records-message>
-            <import-complete-message todo="true">
-                Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
+            <invalid-document-message>
+                Il documento caricato contiene errori di validazione. Utilizzare il bottone "Revisionare Dati" per controllare e correggere gli errori prima del salvataggio.
+            </invalid-document-message>
+            <valid-document-message>
+                I dati del documento caricato sono validi. Utilizzare il bottone "Revisionare Dati" per controllare i dati del formulario prima del salvataggio.
+            </valid-document-message>
+            <import-complete-message>
+                L'importazione di {0,number,integer} {0,choice,1#documento|1&lt;documenti} è completata. {1,number,integer} {1,choice,1#documento invalido è stato saltato|1&lt;documenti invalidi sono stati saltati}.
             </import-complete-message>
-            <na todo="true">N/A</na>
+            <na>N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors>Errori</errors>
+            <warnings>Avvertenze</warnings>
         </import>
         <authentication>
             <menu>
@@ -2921,6 +3005,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Veröffentlichen</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Veröffentlichen</save-publish>
 
@@ -3234,82 +3319,95 @@
         </home>
         <import>
             <form-version>
-                <label todo="true">Form Version</label>
-                <alert todo="true">Missing form version</alert>
+                <label>Formularversion</label>
+                <alert>Fehlende Formularversion</alert>
             </form-version>
             <application-name>
-                <label todo="true">Application Name</label>
+                <label>Applikationsname</label>
             </application-name>
             <form-name>
-                <label todo="true">Form Name</label>
+                <label>Formularname</label>
             </form-name>
             <version-comment>
-                <label todo="true">Version comment</label>
+                <label>Versionskommentar</label>
             </version-comment>
             <upload>
-                <label todo="true">Upload</label>
+                <label>Hochladen</label>
             </upload>
             <file>
-                <label todo="true">Excel file to import</label>
-                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
-                <alert todo="true">Missing file</alert>
+                <label>Excel Datei zum Importieren</label>
+                <hint>Datei muss in Excel 2007 Format sein (.xlsx)</hint>
+                <alert>Fehlende Datei</alert>
             </file>
             <validation>
-                <label todo="true">Validation</label>
-                <alert todo="true">Please start the validation before proceeding to the import</alert>
+                <label>Validierung</label>
+                <alert>Bitte Validierung vor dem Import starten</alert>
             </validation>
             <start-validation>
-                <label todo="true">Start Validation</label>
+                <label>Validierung starten</label>
             </start-validation>
-            <total todo="true">Total</total>
-            <valid todo="true">Valid</valid>
-            <invalid todo="true">Invalid</invalid>
-            <imported todo="true">[Imported]</imported>
-            <skipped todo="true">[Skipped]</skipped>
-            <eta todo="true">ETA</eta>
+            <total>Gesamt</total>
+            <valid>Gültig</valid>
+            <invalid>Ungültig</invalid>
+            <imported>Importiert</imported>
+            <skipped>Übersprungen</skipped>
+            <eta>ETA</eta>
             <cancel-validation>
-                <label todo="true">Cancel Validation</label>
+                <label>Validierung abbrechen</label>
             </cancel-validation>
-            <validation-canceled todo="true">Validation was canceled.</validation-canceled>
+            <validation-canceled>Validierung wurde abgebrochen.</validation-canceled>
             <import>
-                <label todo="true">Import</label>
+                <label>Import</label>
             </import>
             <existing-records>
-                <label todo="true">Existing database records</label>
-                <item id="0" todo="true">Keep</item>
-                <item id="1" todo="true">Delete</item>
+                <label>Vorhandene Datenbankeinträge</label>
+                <item id="0">Beibehalten</item>
+                <item id="1">Löschen</item>
             </existing-records>
             <invalid-data>
-                <label todo="true">Records with invalid data</label>
-                <item id="0" todo="true">Skip</item>
-                <item id="1" todo="true">Import</item>
+                <label>Datensätze mit ungültigen Daten</label>
+                <item id="0">Überspringen</item>
+                <item id="1">Import</item>
             </invalid-data>
             <start-import>
-                <label todo="true">Start Import</label>
+                <label>Import starten</label>
             </start-import>
             <cancel-import>
-                <label todo="true">Cancel Import</label>
+                <label>Import abbrechen</label>
             </cancel-import>
-            <import-canceled todo="true">Import was canceled.</import-canceled>
+            <import-canceled>Import wurde abgebrochen.</import-canceled>
             <start-over>
-                <label todo="true">Start Over</label>
+                <label>Neu beginnen</label>
             </start-over>
-            <existing-records-message todo="true">
-                There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
+            <review-data>
+                <label>Daten überprüfen</label>
+            </review-data>
+            <existing-records-message>
+                Es {0,choice,1#existiert|1&lt;existieren} {0,number,integer} {0,choice,1#Dokument|1&lt;Dokumente} in der Datenbank für Version {3} des Formulars {1}/{2}.
             </existing-records-message>
-            <eta-message todo="true">
-                {0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}
+            <eta-message>
+                {0,choice,0#|0&lt;{0, number, integer} Stunden} {1,choice,0#|0&lt;{1, number, integer} Minuten} {2,choice,0#|0&lt;{2, number, integer} Sekunden}
             </eta-message>
-            <invalid-records-message todo="true">
-                {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid.
+            <invalid-records-message>
+                {0,number,integer} von {1,number,integer} {1,choice,1#Dokument|1&lt;Dokumente} {0,choice,1#ist|1&lt;sind} ungültig.
             </invalid-records-message>
-            <valid-records-message todo="true">
-                {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
+            <valid-records-message>
+                {0,number,integer} {0,choice,1#Dokument|1&lt;Dokumente} {0,choice,1#wurde|1&lt;wurden} validiert und {0,choice,1#wird|1&lt;werden} hochgeladen.
             </valid-records-message>
-            <import-complete-message todo="true">
-                Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
+            <invalid-document-message>
+                Das hochgeladene Dokument enthält Validierungsfehler. Verwenden Sie die Schaltfläche "Daten überprüfen", um die Fehler vor dem Speichern zu überprüfen und zu beheben.
+            </invalid-document-message>
+            <valid-document-message>
+                Die Daten des hochgeladenen Dokuments sind gültig. Verwenden Sie die Schaltfläche "Daten überprüfen", um die Formulardaten vor dem Speichern zu überprüfen.
+            </valid-document-message>
+            <import-complete-message>
+                Der Import von {0,number,integer} {0,choice,1#Dokument|1&lt;Dokumenten} ist abgeschlossen. {1,number,integer} {1,choice,1#ungültiges Dokument wurde|1&lt;ungültige Dokumente wurden} übersprungen.
             </import-complete-message>
-            <na todo="true">N/A</na>
+            <na>N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors>Fehler</errors>
+            <warnings>Warnungen</warnings>
         </import>
         <authentication>
             <menu>
@@ -3400,6 +3498,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testaa</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</save-publish>
 
@@ -3773,6 +3872,9 @@
             <start-over>
                 <label todo="true">Start Over</label>
             </start-over>
+            <review-data>
+                <label todo="true">Review Data</label>
+            </review-data>
             <existing-records-message todo="true">
                 There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
             </existing-records-message>
@@ -3785,10 +3887,20 @@
             <valid-records-message todo="true">
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
             </valid-records-message>
+            <invalid-document-message todo="true">
+                The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message todo="true">
+                The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+            </valid-document-message>
             <import-complete-message todo="true">
                 Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
             </import-complete-message>
             <na todo="true">N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors todo="true">Errors</errors>
+            <warnings todo="true">Warnings</warnings>
         </import>
         <authentication>
             <menu>
@@ -3879,6 +3991,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testa</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</save-publish>
 
@@ -4252,6 +4365,9 @@
             <start-over>
                 <label todo="true">Start Over</label>
             </start-over>
+            <review-data>
+                <label todo="true">Review Data</label>
+            </review-data>
             <existing-records-message todo="true">
                 There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
             </existing-records-message>
@@ -4264,10 +4380,20 @@
             <valid-records-message todo="true">
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
             </valid-records-message>
+            <invalid-document-message todo="true">
+                The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message todo="true">
+                The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+            </valid-document-message>
             <import-complete-message todo="true">
                 Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
             </import-complete-message>
             <na todo="true">N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors todo="true">Errors</errors>
+            <warnings todo="true">Warnings</warnings>
         </import>
         <authentication>
             <menu>
@@ -4358,6 +4484,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testen</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</save-publish>
 
@@ -4730,6 +4857,9 @@
             <start-over>
                 <label todo="true">Start Over</label>
             </start-over>
+            <review-data>
+                <label todo="true">Review Data</label>
+            </review-data>
             <existing-records-message todo="true">
                 There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
             </existing-records-message>
@@ -4742,10 +4872,20 @@
             <valid-records-message todo="true">
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
             </valid-records-message>
+            <invalid-document-message todo="true">
+                The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message todo="true">
+                The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+            </valid-document-message>
             <import-complete-message todo="true">
                 Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
             </import-complete-message>
             <na todo="true">N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors todo="true">Errors</errors>
+            <warnings todo="true">Warnings</warnings>
         </import>
         <authentication>
             <menu>
@@ -4836,6 +4976,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testar</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</save-publish>
 
@@ -5208,6 +5349,9 @@
             <start-over>
                 <label todo="true">Start Over</label>
             </start-over>
+            <review-data>
+                <label todo="true">Review Data</label>
+            </review-data>
             <existing-records-message todo="true">
                 There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
             </existing-records-message>
@@ -5220,10 +5364,20 @@
             <valid-records-message todo="true">
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
             </valid-records-message>
+            <invalid-document-message todo="true">
+                The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message todo="true">
+                The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+            </valid-document-message>
             <import-complete-message todo="true">
                 Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
             </import-complete-message>
             <na todo="true">N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors todo="true">Errors</errors>
+            <warnings todo="true">Warnings</warnings>
         </import>
         <authentication>
             <menu>
@@ -5314,6 +5468,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Offentliggør...</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Offentliggør</save-publish>
 
@@ -5674,6 +5829,9 @@
             <start-over>
                 <label todo="true">Start Over</label>
             </start-over>
+            <review-data>
+                <label todo="true">Review Data</label>
+            </review-data>
             <existing-records-message todo="true">
                 There {0,choice,1#is|1&lt;are} {0,number,integer} existing {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
             </existing-records-message>
@@ -5686,10 +5844,20 @@
             <valid-records-message todo="true">
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been validated and will be imported.
             </valid-records-message>
+            <invalid-document-message todo="true">
+                The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message todo="true">
+                The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+            </valid-document-message>
             <import-complete-message todo="true">
                 Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete. {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
             </import-complete-message>
             <na todo="true">N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors todo="true">Errors</errors>
+            <warnings todo="true">Warnings</warnings>
         </import>
         <authentication>
             <menu>
@@ -5780,6 +5948,7 @@
             <test>&lt;i class="fa fa-fw fa-cog"/&lt; Testuj</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Test Formulas</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"/&lt; Publikuj</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&lt; Zapisz i publikuj</save-publish>
 
@@ -6152,6 +6321,9 @@
             <start-over>
                 <label>Zacznij od nowa</label>
             </start-over>
+            <review-data>
+                <label todo="true">Review Data</label>
+            </review-data>
             <existing-records-message>
                 {0,choice,1#Istnieje|1&lt;Istnieją} {0,number,integer} {0,choice,1#dokument|1&lt;dokumenty} w bazie danych dla wersji {3} dla fołrmularza {1}/{2}.
             </existing-records-message>
@@ -6164,10 +6336,20 @@
             <valid-records-message>
                 {0,number,integer} {0,choice,1#dokument|1&lt;dokumenty} {0,choice,1#został zatwierdzony i zostanie zaimportowany|1&lt;zostały zatwierdzone i zostaną zaimportowane}.
             </valid-records-message>
+            <invalid-document-message todo="true">
+                The document uploaded contains validation errors. Use the "Review Data" button to review and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message todo="true">
+                The document uploaded contains valid data. Use the "Review Data" button to review the form data before saving.
+            </valid-document-message>
             <import-complete-message>
                 Import {0,number,integer} {0,choice,1#dokumentu|1&lt;dokumentów} jest gotowy. {1,number,integer} {1,choice,1#nieprawidłowy dokument był pominięty|1&lt;nieprawidłowe dokumenty były pominiete}.
             </import-complete-message>
             <na>Nie dotyczy</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors todo="true">Errors</errors>
+            <warnings todo="true">Warnings</warnings>
         </import>
         <authentication>
             <menu>

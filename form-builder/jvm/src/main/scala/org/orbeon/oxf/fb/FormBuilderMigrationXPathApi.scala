@@ -60,7 +60,7 @@ object FormBuilderMigrationXPathApi {
 
     // 2. Migrate inline instance data
     MigrationSupport.migrateDataInPlace(
-      dataRootElem     = (ctx.dataInstanceElem child *).head.asInstanceOf[NodeWrapper],
+      dataRootElem     = ctx.dataRootElem.asInstanceOf[NodeWrapper],
       srcVersion       = DataFormatVersion.V400, // ok because we only process legacy grids
       dstVersion       = DataFormatVersion.Edge,
       findMigrationSet = migrationsFromForm

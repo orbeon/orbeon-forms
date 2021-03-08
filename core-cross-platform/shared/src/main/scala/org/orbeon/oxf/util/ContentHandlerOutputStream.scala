@@ -33,17 +33,21 @@ class ContentHandlerOutputStream(
   val doStartEndDocument : Boolean
 ) extends OutputStream {
 
-  private val byteBuffer            = new Array[Byte](76 * 3 / 4) // maximum bytes that, once decoded, can fit in a line of 76 characters
-  private var currentBufferSize     = 0
-  private val resultingLine         = new Array[Char](76 + 1)
-  private val singleByte            = new Array[Byte](1)
-  private var contentType : String  = null
-  private var statusCode  : String  = null
-  private var documentStarted       = false
-  private var closed                = false
+  private val byteBuffer                  = new Array[Byte](76 * 3 / 4) // maximum bytes that, once decoded, can fit in a line of 76 characters
+  private var currentBufferSize           = 0
+  private val resultingLine               = new Array[Char](76 + 1)
+  private val singleByte                  = new Array[Byte](1)
+  private var contentType        : String = null
+  private var contentDisposition : String = null
+  private var statusCode         : String = null
+  private var documentStarted             = false
+  private var closed                      = false
 
   def setContentType(contentType: String): Unit =
     this.contentType = contentType
+
+  def setContentDisposition(contentDisposition: String): Unit =
+    this.contentDisposition = contentDisposition
 
   def setStatusCode(statusCode: String): Unit =
     this.statusCode = statusCode
@@ -55,6 +59,8 @@ class ContentHandlerOutputStream(
       attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.qualifiedName)
       if (contentType != null)
         attributes.addAttribute("", Headers.ContentTypeLower, Headers.ContentTypeLower, "CDATA", contentType)
+      if (contentDisposition != null)
+        attributes.addAttribute("", Headers.ContentDispositionLower, Headers.ContentDispositionLower, "CDATA", contentDisposition);
       if (statusCode != null)
         attributes.addAttribute("", "status-code", "status-code", "CDATA", statusCode)
 

@@ -45,10 +45,11 @@ trait FormRunnerLang {
   //@XPathFunction
   def currentFormResources = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-form-resources")
 
-  def formResourcesInLang(lang: String): NodeInfo = {
-    val formResources = topLevelModel(FormModel).get.getInstance(FormResources).documentInfo.rootElement
-    (formResources / *).find(_.attValue("*:lang") == lang).getOrElse(currentFormResources)
-  }
+  def formResourcesInLang(lang: String): NodeInfo =
+    formResourcesInLang(topLevelModel(FormModel).get.getInstance(FormResources).documentInfo.rootElement, lang)
+
+  def formResourcesInLang(formResourcesRootElem: NodeInfo, lang: String): NodeInfo =
+    (formResourcesRootElem / *).find(_.attValue("*:lang") == lang).getOrElse(currentFormResources)
 
   // List of available languages for the given form
   // Empty if the form doesn't have resources

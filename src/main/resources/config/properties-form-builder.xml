@@ -122,6 +122,10 @@
         navigate(uri = "/fr/orbeon/builder/new")
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.process.excel-export.orbeon.builder">
+        xf:dispatch(name = "fb-excel-export")
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.process.test.orbeon.builder">
         xf:dispatch(name = "fb-test-form")
     </property>

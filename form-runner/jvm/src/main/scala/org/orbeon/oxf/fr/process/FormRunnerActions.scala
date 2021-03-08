@@ -166,12 +166,12 @@ trait FormRunnerActions {
 
         val databaseData =
           MigrationSupport.migrateDataWithFormMetadataMigrations(
-            appForm       = AppForm(app, form),
-            data          = originalData,
-            metadataOpt   = metadataInstance map (_.root),
-            srcVersion    = DataFormatVersion.Edge,
-            dstVersion    = providerDataFormatVersion,
-            pruneMetadata = pruneMetadata
+            appForm             = AppForm(app, form),
+            data                = originalData,
+            metadataRootElemOpt = metadataInstance.map(_.rootElement),
+            srcVersion          = DataFormatVersion.Edge,
+            dstVersion          = providerDataFormatVersion,
+            pruneMetadata       = pruneMetadata
           ) getOrElse {
             // Make a copy as we only want to set the `fr:data-format-version` attribute on the migrated data
             val originalDataClone = new DocumentWrapper(dom.Document(), null, XPath.GlobalConfiguration)

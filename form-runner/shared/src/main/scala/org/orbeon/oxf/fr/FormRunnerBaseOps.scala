@@ -50,15 +50,17 @@ case class FormRunnerParams(
 )
 
 object FormRunnerParams {
-  def apply(): FormRunnerParams = {
-    val params = parametersInstance.get.rootElement
 
+  def apply(): FormRunnerParams =
+    apply(parametersInstance.get.rootElement)
+
+  def apply(paramsRootElem: NodeInfo): FormRunnerParams = {
     FormRunnerParams(
-      app         = params elemValue "app",
-      form        = params elemValue "form",
-      formVersion = Try(params elemValue "form-version" toInt) getOrElse 1, // in `test` mode, for example, `form-version` is blank
-      document    = params elemValue "document" trimAllToOpt,
-      mode        = params elemValue "mode"
+      app         = paramsRootElem elemValue "app",
+      form        = paramsRootElem elemValue "form",
+      formVersion = Try(paramsRootElem elemValue "form-version" toInt) getOrElse 1, // in `test` mode, for example, `form-version` is blank
+      document    = paramsRootElem elemValue "document" trimAllToOpt,
+      mode        = paramsRootElem elemValue "mode"
     )
   }
 }
@@ -286,14 +288,16 @@ trait FormRunnerBaseOps {
     metadataInstanceRootElem.elemValueOpt(featureName) orElse
     formRunnerProperty(s"oxf.fr.detail.$featureName")
 
-  def formTitleFromMetadata: Option[String] = {
+  def formTitleFromMetadata: Option[String] =
+    metadataInstance  map
+      (_.rootElement) flatMap
+      (formTitleFromMetadataElem(_, currentLang))
 
-    val metadataElem = metadataInstance map (_.rootElement) toList
-
-    metadataElem.elemWithLangOpt("title", currentLang) orElse
-      metadataElem.firstChildOpt("title")              map
+  //@XPathFunction
+  def formTitleFromMetadataElem(metadataElem: NodeInfo, requestedLang: String): Option[String] =
+    metadataElem.elemWithLangOpt("title", requestedLang) orElse
+      metadataElem.firstChildOpt("title")                map
       (_.stringValue)
-  }
 
   // Captcha support
   //@XPathFunction

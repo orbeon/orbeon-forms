@@ -17,42 +17,44 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.datamigration._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+
 
 object GridDataMigration {
 
   //@XPathFunction
   def dataMaybeMigratedFromDatabaseFormat(
-    app       : String,
-    form      : String,
-    data      : DocumentNodeInfoType,
-    metadata  : Option[DocumentNodeInfoType]
+    app         : String,
+    form        : String,
+    data        : DocumentNodeInfoType,
+    metadataOpt : Option[DocumentNodeInfoType]
   ): DocumentNodeInfoType =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
-      appForm       = AppForm(app, form),
-      data          = data,
-      metadataOpt   = metadata,
-      srcVersion    = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
-      dstVersion    = DataFormatVersion.Edge,
-      pruneMetadata = false
+      appForm             = AppForm(app, form),
+      data                = data,
+      metadataRootElemOpt = metadataOpt.map(_.rootElement),
+      srcVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
+      dstVersion          = DataFormatVersion.Edge,
+      pruneMetadata       = false
     ) getOrElse
       data
 
   // NOTE: Exposed to some users.
   //@XPathFunction
   def dataMaybeMigratedToDatabaseFormat(
-    app       : String,
-    form      : String,
-    data      : DocumentNodeInfoType,
-    metadata  : Option[DocumentNodeInfoType]
+    app         : String,
+    form        : String,
+    data        : DocumentNodeInfoType,
+    metadataOpt : Option[DocumentNodeInfoType]
   ): DocumentNodeInfoType =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
-      appForm       = AppForm(app, form),
-      data          = data,
-      metadataOpt   = metadata,
-      srcVersion    = DataFormatVersion.Edge,
-      dstVersion    = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
-      pruneMetadata = false
+      appForm             = AppForm(app, form),
+      data                = data,
+      metadataRootElemOpt = metadataOpt.map(_.rootElement),
+      srcVersion          = DataFormatVersion.Edge,
+      dstVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
+      pruneMetadata       = false
     ) getOrElse
       data
 
@@ -83,12 +85,12 @@ object GridDataMigration {
     pruneMetadata           : Boolean
   ): DocumentNodeInfoType =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
-      appForm       = AppForm(app, form),
-      data          = data,
-      metadataOpt   = metadataOpt,
-      srcVersion    = DataFormatVersion.Edge,
-      dstVersion    = DataFormatVersion.withNameIncludeEdge(dataFormatVersionString),
-      pruneMetadata = pruneMetadata
+      appForm             = AppForm(app, form),
+      data                = data,
+      metadataRootElemOpt = metadataOpt.map(_.rootElement),
+      srcVersion          = DataFormatVersion.Edge,
+      dstVersion          = DataFormatVersion.withNameIncludeEdge(dataFormatVersionString),
+      pruneMetadata       = pruneMetadata
     ) getOrElse
       data
 
@@ -101,13 +103,13 @@ object GridDataMigration {
     dataFormatVersionString : String
   ): Option[DocumentWrapper] =
     MigrationSupport.migrateDataWithFormMetadataMigrations(
-      appForm       = AppForm(app, form),
-      data          = data,
-      metadataOpt   = metadataOpt,
-      srcVersion    = dataFormatVersionString.trimAllToOpt    map
-                        DataFormatVersion.withNameIncludeEdge getOrElse
-                        DataFormatVersion.V400,
-      dstVersion    = DataFormatVersion.Edge,
-      pruneMetadata = false
+      appForm             = AppForm(app, form),
+      data                = data,
+      metadataRootElemOpt = metadataOpt.map(_.rootElement),
+      srcVersion          = dataFormatVersionString.trimAllToOpt    map
+                              DataFormatVersion.withNameIncludeEdge getOrElse
+                              DataFormatVersion.V400,
+      dstVersion          = DataFormatVersion.Edge,
+      pruneMetadata       = false
     )
 }

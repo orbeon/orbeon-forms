@@ -153,5 +153,8 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
       getBindNameOrEmpty(iterationBind)
 
   def findNestedControls(containerElem: NodeInfo): Seq[NodeInfo] =
-    containerElem descendant (NodeInfoCell.CellTest || NodeInfoCell.TdTest) child * filter IsControl
+    containerElem descendant (NodeInfoCell.CellTest || NodeInfoCell.TdTest) flatMap findCellNestedControl
+
+  def findCellNestedControl(containerElem: NodeInfo): Option[NodeInfo] =
+    containerElem child * find IsControl
 }

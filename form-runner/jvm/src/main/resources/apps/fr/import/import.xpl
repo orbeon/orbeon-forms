@@ -24,13 +24,15 @@
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
           xmlns:utils="java:org.orbeon.oxf.xml.SaxonUtils">
 
-    <p:param type="input" name="instance"/>
+    <!-- See `validate.xpl` -->
+    <p:param type="input"  name="instance"/>
+    <!-- See `validate.xpl` -->
     <p:param type="output" name="data"/>
 
     <!-- Apply unzip/XForms model/zip/result -->
     <p:processor name="oxf:pipeline">
         <p:input name="instance" href="#instance"/>
-        <p:input name="config" href="apply.xpl"/>
+        <p:input name="config"   href="apply.xpl"/>
         <p:input name="xforms-model">
             <!-- XForms model that gets inserted into Form Runner to perform import upon initialization -->
             <xf:model

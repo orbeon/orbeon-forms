@@ -51,8 +51,8 @@ class BinaryTextXMLReceiver(
   require(! forceContentType || isNotBlank(requestedContentType.get))
   require(! forceEncoding    || isNotBlank(requestedEncoding.get))
 
-  val response     = output.left.toOption
-  val outputStream = response map (_.getOutputStream) getOrElse output.right.get
+  val responseOpt  = output.left.toOption
+  val outputStream = responseOpt map (_.getOutputStream) getOrElse output.right.get
 
   private val prefixMappings = new mutable.HashMap[String, String]
 
@@ -117,7 +117,7 @@ class BinaryTextXMLReceiver(
       }
 
       // Set Last-Modified, Content-Disposition and status code when available
-      response foreach { response =>
+      responseOpt foreach { response =>
 
         // This will override caching settings which may have taken place before
         attributes.getValue(Headers.LastModifiedLower).trimAllToOpt foreach
@@ -141,15 +141,16 @@ class BinaryTextXMLReceiver(
       }
 
       // Set ContentHandler and headers depending on input type
-      val contentTypeAttribute = Option(attributes.getValue(Headers.ContentTypeLower))
+      val contentTypeAttribute        = Option(attributes.getValue(Headers.ContentTypeLower))
+      val contentDispositionAttribute = Option(attributes.getValue(Headers.ContentDispositionLower)) flatMap (_.trimAllToOpt)
       if (isBinaryInput) {
-        response foreach { response =>
+        responseOpt foreach { response =>
           // Get content-type and encoding
 
           if (! forceContentType          &&
-            ! ignoreDocumentContentType &&
-            ! forceEncoding             &&
-            ! ignoreDocumentEncoding    &&
+              ! ignoreDocumentContentType &&
+              ! forceEncoding             &&
+              ! ignoreDocumentEncoding    &&
             contentTypeAttribute.isDefined) {
             // Simple case where we just forward what's coming in
             response.setContentType(contentTypeAttribute.get)
@@ -166,15 +167,21 @@ class BinaryTextXMLReceiver(
             else
               response.setContentType(contentType)
           }
+
+          contentDispositionAttribute map Headers.buildContentDispositionHeader foreach (response.setHeader _).tupled
         }
+
         outputReceiver = new Base64XMLReceiver(outputStream)
       } else {
         // Get content-type and encoding
         val contentType = getContentType(contentTypeAttribute, DefaultTextContentType)
         val encoding    = getEncoding(contentTypeAttribute, CachedSerializer.DEFAULT_ENCODING)
 
-        // Always set the content type with a charset attribute, defaulting to utf-8
-        response foreach (_.setContentType(contentType + "; charset=" + encoding))
+        responseOpt foreach { response =>
+          // Always set the content type with a charset attribute (with a default)
+          response.setContentType(contentType + "; charset=" + encoding)
+          contentDispositionAttribute map Headers.buildContentDispositionHeader foreach (response.setHeader _).tupled
+        }
 
         writer = new OutputStreamWriter(outputStream, encoding)
         outputReceiver = new TextXMLReceiver(writer)
@@ -199,7 +206,7 @@ class BinaryTextXMLReceiver(
   override def processingInstruction(target: String, data: String): Unit =
     parseSerializerPI(target, data) match {
       case Some(("status-code", Some(code))) =>
-        response foreach (_.setStatus(code.toInt))
+        responseOpt foreach (_.setStatus(code.toInt))
       case Some(("flush", _)) =>
         if (writer ne null)
           writer.flush()

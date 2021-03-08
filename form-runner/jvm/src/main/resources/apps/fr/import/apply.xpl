@@ -16,10 +16,14 @@
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
           xmlns:xh="http://www.w3.org/1999/xhtml">
 
-    <p:param type="input" name="xforms-model"/>
-    <p:param type="input" name="instance"/>
+    <!-- Model to apply -->
+    <p:param type="input"  name="xforms-model"/>
+    <!-- See `validate.xpl` -->
+    <p:param type="input"  name="instance"/>
+
     <p:param type="output" name="data"/>
 
     <!-- Extract request parameters (app, form, document, and mode) from URL -->
@@ -40,13 +44,6 @@
         <p:output name="data" id="zip"/>
     </p:processor>
 
-    <!-- Extract rows -->
-    <p:processor name="oxf:pipeline">
-        <p:input  name="config" href="extract.xpl"/>
-        <p:input  name="file"   href="#zip"/>
-        <p:output name="rows"   id="rows"/>
-    </p:processor>
-
     <!-- Obtain the form definition -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../detail/read-form.xpl"/>
@@ -54,6 +51,66 @@
         <p:output name="data" id="xhtml-fr-xforms"/>
         <p:output name="instance" id="parameters-with-version"/>
     </p:processor>
+
+    <!-- Extract rows -->
+    <p:choose href="#instance">
+        <p:when test="/*/file-format = 'excel-named-ranges'">
+
+            <p:choose href="#parameters">
+                <p:when test="p:non-blank(p:get-request-parameter('document-id'))">
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config" href="#parameters" transform="oxf:unsafe-xslt">
+                            <config xsl:version="2.0">
+
+                                <xsl:variable name="params" select="/*"/>
+
+                                <xsl:variable
+                                    name="resource"
+                                    select="
+                                        concat(
+                                            '/fr/service/persistence/crud/',
+                                            $params/app,
+                                            '/',
+                                            $params/form,
+                                            '/data/',
+                                            p:get-request-parameter('document-id'),
+                                            '/data.xml'
+                                        )"/>
+
+                                <url><xsl:value-of select="p:rewrite-service-uri($resource, true())"/></url>
+                                <mode>xml</mode>
+                                <handle-xinclude>false</handle-xinclude>
+                                <cache-control><use-local-cache>false</use-local-cache><conditional-get>false</conditional-get></cache-control>
+
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="form-data"/>
+                    </p:processor>
+                </p:when>
+                <p:otherwise>
+                    <p:processor name="oxf:identity">
+                        <p:input name="data"><null xsi:nil="true"/></p:input>
+                        <p:output name="data" id="form-data"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
+
+            <p:processor name="fr:extract-rows-from-excel-with-named-ranges">
+                <p:input  name="params" href="#parameters"/>
+                <p:input  name="data"   href="#form-data"/>
+                <p:input  name="form"   href="#xhtml-fr-xforms"/>
+                <p:input  name="file"   href="#zip"/>
+                <p:output name="rows"   id="rows"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <p:processor name="oxf:pipeline">
+                <p:input  name="config" href="extract-rows-from-excel-with-headings.xpl"/>
+                <p:input  name="file"   href="#zip"/>
+                <p:output name="rows"   id="rows"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
 
     <!-- Unroll the form (theme, components, inclusions) -->
     <p:processor name="oxf:pipeline">
@@ -85,10 +142,10 @@
 
     <!-- Process -->
     <p:processor name="oxf:xforms-to-xhtml">
-        <p:input name="annotated-document" href="#full-form"/>
-        <p:input name="instance" href="#parameters-with-version"/>
-        <p:input name="data" href="#rows"/>
-        <p:output name="document" id="binary-document" ref="data"/>
+        <p:input  name="annotated-document" href="#full-form"/>
+        <p:input  name="instance"           href="#parameters-with-version"/>
+        <p:input  name="data"               href="#rows"/>
+        <p:output name="document"           ref="data" id="binary-document"/>
     </p:processor>
 
 </p:config>

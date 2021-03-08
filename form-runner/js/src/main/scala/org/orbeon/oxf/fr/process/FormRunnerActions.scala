@@ -145,12 +145,12 @@ trait FormRunnerActions {
 
         val databaseData =
           MigrationSupport.migrateDataWithFormMetadataMigrations(
-            appForm       = AppForm(app, form),
-            data          = originalData,
-            metadataOpt   = metadataInstance map (_.root),
-            srcVersion    = DataFormatVersion.Edge,
-            dstVersion    = providerDataFormatVersion,
-            pruneMetadata = pruneMetadata
+            appForm             = AppForm(app, form),
+            data                = originalData,
+            metadataRootElemOpt = metadataInstance map (_.rootElement),
+            srcVersion          = DataFormatVersion.Edge,
+            dstVersion          = providerDataFormatVersion,
+            pruneMetadata       = pruneMetadata
           ) getOrElse
             originalData
 

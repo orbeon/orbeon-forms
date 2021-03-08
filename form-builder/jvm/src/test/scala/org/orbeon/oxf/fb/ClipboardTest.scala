@@ -156,7 +156,7 @@ class ClipboardTest
         val doc = ctx.formDefinitionRootElem
 
         def findValues(controlName: String) =
-          ctx.dataInstanceElem descendant controlName map (_.stringValue)
+          ctx.dataRootElem descendant controlName map (_.stringValue)
 
         def assertCutPasteRepeatToRepeat(sourceControlName: String, newControlName: String, expected: List[String]): Unit = {
 
@@ -218,7 +218,7 @@ class ClipboardTest
         val doc = ctx.formDefinitionRootElem
 
         def findValues(controlName: String) =
-          ctx.dataInstanceElem descendant controlName map (_.stringValue)
+          ctx.dataRootElem descendant controlName map (_.stringValue)
 
         def assertContainerCutPaste(gridId: String, controlNames: List[String], expected: List[String]): Unit = {
 

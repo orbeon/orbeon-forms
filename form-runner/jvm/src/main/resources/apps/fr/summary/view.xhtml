@@ -1253,12 +1253,12 @@
                                 </xf:trigger>
                             </xf:group>
                             <!-- PDF and TIFF button
-                                 - don't show the PDF or TIFF button in CE if PDF template in use (also on detail page)
+                                 - don't show the button in CE if PDF template in use (also on detail page)
                                  - button not enabled when a draft is selected (not sure it makes sense to create a PDF
                                    for a draft and the PDF functionality right now doesn't support creating a PDF for a draft) -->
                             <xf:group
                                 ref="
-                                    if ($button-name = ('pdf', 'tiff') and
+                                    if ($button-name = ('pdf', 'tiff', 'excel-export') and
                                         not(($button-name = 'pdf' and $has-pdf-template or $button-name = 'tiff') and not(fr:is-pe()))) then
                                         (
                                             if ($view-enabled and $selection-data-or-draft = 'data') then

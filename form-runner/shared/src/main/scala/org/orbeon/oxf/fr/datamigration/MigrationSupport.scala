@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, instanceRoot}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
+import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.{immutable => i}
 
@@ -48,10 +48,10 @@ object MigrationSupport {
 
   // `val migrationsFromMetadata: (ops: MigrationOps) => ops.M ` = ops => ...`
   class MigrationsFromMetadata(
-    metadataOpt : Option[DocumentNodeInfoType]
+    metadataRootElemOpt : Option[NodeInfo]
   ) extends MigrationGetter {
     def find(ops: MigrationOps): Option[ops.M] =
-      metadataOpt flatMap (metadata => findMigrationForVersion(metadata.rootElement, ops.version)) match {
+      metadataRootElemOpt flatMap (metadata => findMigrationForVersion(metadata, ops.version)) match {
         // Using `map` fails because Scala 2.12 cannot represent the dependent function type!
         case Some(jsonString) => Some(ops.decodeMigrationSetFromJson(jsonString))
         case None             => None
@@ -210,12 +210,12 @@ object MigrationSupport {
     }
 
   def migrateDataWithFormMetadataMigrations(
-    appForm       : AppForm,
-    data          : DocumentNodeInfoType,
-    metadataOpt   : Option[DocumentNodeInfoType],
-    srcVersion    : DataFormatVersion,
-    dstVersion    : DataFormatVersion,
-    pruneMetadata : Boolean
+    appForm             : AppForm,
+    data                : DocumentNodeInfoType,
+    metadataRootElemOpt : Option[NodeInfo],
+    srcVersion          : DataFormatVersion,
+    dstVersion          : DataFormatVersion,
+    pruneMetadata       : Boolean
   ): Option[DocumentWrapper] =
     appForm match {
       case AppForm.FormBuilder => None
@@ -227,7 +227,7 @@ object MigrationSupport {
             dataRootElem     = mutableData.rootElement.asInstanceOf[NodeWrapper],
             srcVersion       = srcVersion,
             dstVersion       = dstVersion,
-            findMigrationSet = new MigrationsFromMetadata(metadataOpt)
+            findMigrationSet = new MigrationsFromMetadata(metadataRootElemOpt)
           )
 
         if (pruneMetadata)

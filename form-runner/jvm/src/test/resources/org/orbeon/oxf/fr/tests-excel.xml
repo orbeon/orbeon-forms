@@ -34,7 +34,7 @@
                 </p:processor>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input  name="config" href="oxf:/apps/fr/import/extract.xpl"/>
+                    <p:input  name="config" href="oxf:/apps/fr/import/extract-rows-from-excel-with-headings.xpl"/>
                     <p:input  name="file"   href="#zip"/>
                     <p:output name="rows"   ref="rows"/>
                 </p:processor>
@@ -112,7 +112,7 @@
                 </p:processor>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input  name="config" href="oxf:/apps/fr/import/extract.xpl"/>
+                    <p:input  name="config" href="oxf:/apps/fr/import/extract-rows-from-excel-with-headings.xpl"/>
                     <p:input  name="file"   href="#zip"/>
                     <p:output name="rows"   ref="rows"/>
                 </p:processor>
@@ -190,7 +190,7 @@
                 </p:processor>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input  name="config" href="oxf:/apps/fr/import/extract.xpl"/>
+                    <p:input  name="config" href="oxf:/apps/fr/import/extract-rows-from-excel-with-headings.xpl"/>
                     <p:input  name="file"   href="#zip"/>
                     <p:output name="rows"   ref="rows"/>
                 </p:processor>

@@ -492,6 +492,12 @@
                         <fr:repeater ref="()"/>
                     </xf:group>
                 </xsl:if>
+                <!-- This part of the hack is to cause the initialization of the grid menus in Form Builder, as
+                     some dialogs still use the older grid, which doesn't make a distinction between repeated and
+                     non-repeated. We could use `javascript-lifecycle` and initialize the menus for the legacy
+                     grids as well but decided not to. We should update the repeated grids in Form Builder to
+                     use the non-legacy grids and then remove this. -->
+                <fr:grid repeat="content" ref="''" template="()"/>
             </xsl:if>
         </xh:span>
     </xsl:template>

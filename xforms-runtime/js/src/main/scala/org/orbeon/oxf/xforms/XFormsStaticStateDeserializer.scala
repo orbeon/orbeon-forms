@@ -38,6 +38,14 @@ import scala.collection.mutable
 
 object XFormsStaticStateDeserializer {
 
+  // Our own `Int` decoder which assumes that all `Int` values fit within 56 bits and
+  // are returned as `Double`. This is because otherwise we get many instantiations of
+  // `BigDecimal` which are costly. One issue is that `toDouble` truncates. Can we
+  // detect that efficiently? Or guaranteed that we never store a value which will be
+  // truncated?
+  implicit final val decodeInt: Decoder[Int] = (c: HCursor) =>
+    c.value.asNumber.map(_.toDouble.toInt).toRight(DecodingFailure("Custom Int", c.history))
+
   def deserialize(
     jsonString      : String,
     functionLibrary : FunctionLibrary)(implicit

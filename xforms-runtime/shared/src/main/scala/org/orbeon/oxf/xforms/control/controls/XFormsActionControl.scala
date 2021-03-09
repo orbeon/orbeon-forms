@@ -38,4 +38,7 @@ class XFormsActionControl(container: XBLContainer, parent: XFormsControl, elemen
   // Don't build any children, as in the view we don't support event handlers nested within event handlers, and nested
   // actions are evaluated dynamically.
   override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl], idSuffix: Seq[Int]) = ()
+
+  override def supportAjaxUpdates = false
+  override def getBackCopy: AnyRef = this
 }

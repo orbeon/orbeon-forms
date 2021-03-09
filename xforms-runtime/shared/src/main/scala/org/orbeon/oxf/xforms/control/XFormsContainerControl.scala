@@ -61,7 +61,9 @@ trait XFormsContainerControl extends VisitableTrait {
       cloned._children = new mutable.ArrayBuffer[XFormsControl](_children.size)
       for (currentChildControl <- _children) {
         val currentChildClone = currentChildControl.getBackCopy.asInstanceOf[XFormsControl]
-        currentChildClone.parent = null // cloned control doesn't need a parent
+
+        if (currentChildClone ne currentChildControl)
+          currentChildClone.parent = null // cloned control doesn't need a parent
         cloned._children += currentChildClone
       }
     }

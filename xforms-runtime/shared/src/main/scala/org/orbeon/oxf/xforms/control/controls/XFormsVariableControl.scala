@@ -60,8 +60,6 @@ class XFormsVariableControl(
   override def bindingContextForChildOpt  : Option[BindingContext] = Option(_bindingContextForChild)
   override def bindingContextForFollowing : BindingContext         = _bindingContextForFollowing
 
-  override def supportAjaxUpdates = false
-
   override def onCreate(restoreState: Boolean, state: Option[ControlState], update: Boolean): Unit = {
     super.onCreate(restoreState, state, update)
     // FIXME: Case should be caught by the requireValueUpdate() below, but it's more fail-safe to mark things dirty here too
@@ -122,4 +120,7 @@ class XFormsVariableControl(
     previousControl       : Option[XFormsControl]
   ) =
     throw new IllegalStateException
+
+  override def supportAjaxUpdates = false
+  override def getBackCopy: AnyRef = this
 }

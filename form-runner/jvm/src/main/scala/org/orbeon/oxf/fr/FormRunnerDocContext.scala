@@ -14,17 +14,21 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.SimplePath._
 
 
 trait FormRunnerDocContext {
-  def formDefinitionRootElem : NodeInfo
-  def modelElem              : NodeInfo
-  def dataInstanceElem       : NodeInfo
-  def metadataInstanceElem   : NodeInfo
-  def resourcesInstanceElem  : NodeInfo
-  def topLevelBindElem       : Option[NodeInfo]
-  def bodyElem               : NodeInfo
-  def dataRootElem           : NodeInfo
-  def metadataRootElem       : NodeInfo
-  def resourcesRootElem      : NodeInfo
+
+  def formDefinitionRootElem: NodeInfo
+
+  lazy val modelElem             = FormRunner.getModelElem(formDefinitionRootElem)
+  lazy val dataInstanceElem      = FormRunner.instanceElemFromModelElem(modelElem, Names.FormInstance).get
+  lazy val metadataInstanceElem  = FormRunner.instanceElemFromModelElem(modelElem, Names.MetadataInstance).get
+  lazy val resourcesInstanceElem = FormRunner.instanceElemFromModelElem(modelElem, Names.FormResources).get
+  lazy val topLevelBindElem      = FormRunner.findTopLevelBindFromModelElem(modelElem)
+  lazy val bodyElem              = FormRunner.getFormRunnerBodyElem(formDefinitionRootElem)
+
+  lazy val dataRootElem          = dataInstanceElem      / * head
+  lazy val metadataRootElem      = metadataInstanceElem  / * head
+  lazy val resourcesRootElem     = resourcesInstanceElem / * head
 }

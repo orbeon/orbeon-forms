@@ -39,10 +39,6 @@ object ProcessorSupport {
       (d => Option(d.file))                      getOrElse
       DOMGenerator.DefaultContext
 
-  // 1 Java caller
-  def normalizeTextNodesJava(nodeToNormalize: Node): Node =
-    nodeToNormalize.normalizeTextNodes
-
   def qNameToExplodedQName(qName: QName): String =
     if (qName eq null) null else qName.clarkName
 

@@ -15,24 +15,37 @@ package org.orbeon.oxf.fr
 
 import cats.syntax.option._
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.{findMigrationForVersion, findMigrationOps}
 import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.Whitespace
+import org.orbeon.oxf.xforms.NodeInfoFactory.namespaceInfo
+import org.orbeon.oxf.xforms.action.XFormsAPI.insert
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.xml.NamespaceMapping
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs
+import org.orbeon.oxf.xml.SaxonUtils.parseQName
+import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.compat._
+
 
 trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   import Private._
+
+  val TrueExpr : String = "true()"
+  val FalseExpr: String = "false()"
 
   // Extensible records would be cool here. see:
   //
@@ -240,7 +253,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     predicate : NodeInfo => Boolean
   ): Seq[ControlBindPathHoldersResources] =
     for {
-      section         <- findSectionsWithTemplates(body)
+      section         <- FormRunner.findSectionsWithTemplates(body)
       sectionName     <- getControlNameOpt(section).toList
 
       BindPathHolders(
@@ -289,9 +302,99 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       ControlBindPathHoldersResources(control, bind, path, holders, resourceHoldersWithLang)
 
   def xblBindingForSection(head: NodeInfo, section: NodeInfo): Option[DocumentWrapper] = {
-    val mapping = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
-    sectionTemplateBindingName(section) flatMap mapping.get
+    val mapping = FormRunner.sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
+    FormRunner.sectionTemplateBindingName(section) flatMap mapping.get
   }
+
+  // Return None if no namespace mapping is required OR none can be created
+  def valueNamespaceMappingScopeIfNeeded(
+    bind       : NodeInfo,
+    qNameValue : String)(implicit
+    ctx        : FormRunnerDocContext
+  ): Option[(String, String)] = {
+
+    val (prefix, _) = parseQName(qNameValue)
+
+    def existingNSMapping =
+      bind.namespaceMappings.toMap.get(prefix) map (prefix ->)
+
+    def newNSMapping = {
+      // If there is no mapping and the schema prefix matches the prefix and a uri is found for the
+      // schema, then insert a new mapping. We place it on the top-level bind so we don't have to insert
+      // it repeatedly.
+      val newURI =
+        if (SchemaOps.findSchemaPrefix(bind).contains(prefix))
+          SchemaOps.findSchemaNamespace(bind)
+        else
+          None
+
+      newURI map { uri =>
+        insert(into = ctx.topLevelBindElem.toList, origin = namespaceInfo(prefix, uri))
+        prefix -> uri
+      }
+    }
+
+    if (prefix == "")
+      None
+    else
+      existingNSMapping orElse newNSMapping
+  }
+
+  def readDenormalizedCalculatedMip(
+    bindElem    : NodeInfo,
+    mip         : ModelDefs.ComputedMIP,
+    mipAttQName : QName)(implicit // pass `mipAttQName` separately for Form Builder
+    ctx         : FormRunnerDocContext
+  ): String =
+    denormalizeMipValue(
+      mip          = mip,
+      mipValue     = bindElem attValueOpt mipAttQName,
+      hasCalculate = hasCalculate(bindElem),
+      isTypeString = isTypeStringUpdateNsIfNeeded(bindElem, _)
+    )
+
+  // When *writing* a value to the form definition, return the attribute value if the value doesn't
+  // match its default value, otherwise return `None`.
+  //
+  // This depends on context, as the default for `readonly` depends on whether there is a `calculate`.
+  //
+  def normalizeMipValue(
+    mip          : ModelDefs.MIP,
+    mipValue     : String,
+    hasCalculate : => Boolean,
+    isTypeString : String => Boolean
+  ): Option[String] =
+    mipValue.trimAllToOpt flatMap { trimmed =>
+
+     // See also https://github.com/orbeon/orbeon-forms/issues/3950
+
+      val isDefault =
+        mip match {
+          case ModelDefs.Relevant   => trimmed == TrueExpr
+          case ModelDefs.Readonly   => trimmed == TrueExpr && hasCalculate || trimmed == FalseExpr && ! hasCalculate
+          case ModelDefs.Required   => trimmed == FalseExpr
+          case ModelDefs.Constraint => trimmed.isEmpty
+          case ModelDefs.Calculate  => trimmed.isEmpty
+          case ModelDefs.Default    => trimmed.isEmpty
+          case ModelDefs.Type       => isTypeString(trimmed)
+          case ModelDefs.Whitespace => trimmed == Whitespace.Policy.Preserve.entryName
+        }
+
+      ! isDefault option trimmed
+    }
+
+  def hasCalculate(bindElem: NodeInfo): Boolean =
+    bindElem.attValueOpt(ModelDefs.Calculate.name).isDefined
+
+  // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
+  // expressions and types could use it. So for now the mapping is never garbage collected.
+  def isTypeStringUpdateNsIfNeeded(
+    bindElem : NodeInfo,
+    value    : String)(implicit
+    ctx      : FormRunnerDocContext
+  ): Boolean =
+    valueNamespaceMappingScopeIfNeeded(bindElem, value).isDefined &&
+      Set(XMLConstants.XS_STRING_QNAME, XFormsNames.XFORMS_STRING_QNAME)(bindElem.resolveQName(value))
 
   private object Private {
 
@@ -323,5 +426,40 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
           // https://github.com/orbeon/orbeon-forms/issues/4972
           None
       }
+
+  // When *reading* a value from the form definition, return the denormalized or explicit value since the
+  // user interface is not and should not be aware of defaults.
+  def denormalizeMipValue(
+    mip          : ModelDefs.ComputedMIP,
+    mipValue     : Option[String],
+    hasCalculate : => Boolean,
+    isTypeString : String => Boolean
+  ): String = {
+
+    // Start by normalizing
+    val normalizedValueOpt =
+      mipValue flatMap (_.trimAllToOpt) flatMap { rawMipValue =>
+        normalizeMipValue(
+          mip,
+          rawMipValue,
+          hasCalculate,
+          isTypeString
+        )
+      }
+
+      normalizedValueOpt match {
+        case Some(value) =>
+          value
+        case None =>
+          mip match {
+            case ModelDefs.Relevant   => TrueExpr
+            case ModelDefs.Readonly   => if (hasCalculate) TrueExpr else FalseExpr
+            case ModelDefs.Required   => FalseExpr
+            case ModelDefs.Calculate  => ""
+            case ModelDefs.Default    => ""
+            case ModelDefs.Whitespace => Whitespace.Policy.Preserve.entryName
+          }
+      }
+    }
   }
 }

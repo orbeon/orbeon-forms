@@ -23,34 +23,33 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Whitespace, XPath}
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{ComputedMIP, MIP}
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.oxf.xml.SaxonUtils.parseQName
-import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.Constants.{ComponentSeparator, ComponentSeparatorString, RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
+import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 import scala.collection.compat._
+import scala.collection.mutable
+
 
 /*
  * Form Builder: operations on controls.
  */
-trait ControlOps extends SchemaOps with ResourcesOps {
+trait ControlOps extends ResourcesOps {
 
   self: GridOps => // funky dependency, to resolve at some point
 
@@ -416,87 +415,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     }
   }
 
-  private val TrueExpr  = "true()"
-  private val FalseExpr = "false()"
-
-  // When *writing* a value to the form definition, return the attribute value if the value doesn't
-  // match its default value, otherwise return `None`.
-  //
-  // This depends on context, as the default for `readonly` depends on whether there is a `calculate`.
-  //
-  private def normalizeMipValue(
-    mip          : MIP,
-    mipValue     : String,
-    hasCalculate : => Boolean,
-    isTypeString : String => Boolean
-  ): Option[String] =
-    mipValue.trimAllToOpt flatMap { trimmed =>
-
-     // See also https://github.com/orbeon/orbeon-forms/issues/3950
-
-      val isDefault =
-        mip match {
-          case ModelDefs.Relevant   => trimmed == TrueExpr
-          case ModelDefs.Readonly   => trimmed == TrueExpr && hasCalculate || trimmed == FalseExpr && ! hasCalculate
-          case ModelDefs.Required   => trimmed == FalseExpr
-          case ModelDefs.Constraint => trimmed.isEmpty
-          case ModelDefs.Calculate  => trimmed.isEmpty
-          case ModelDefs.Default    => trimmed.isEmpty
-          case ModelDefs.Type       => isTypeString(trimmed)
-          case ModelDefs.Whitespace => trimmed == Whitespace.Policy.Preserve.entryName
-        }
-
-      ! isDefault option trimmed
-    }
-
-  // When *reading* a value from the form definition, return the denormalized or explicit value since the
-  // user interface is not and should not be aware of defaults.
-  private def denormalizeMipValue(
-    mip          : ComputedMIP,
-    mipValue     : Option[String],
-    hasCalculate : => Boolean,
-    isTypeString : String => Boolean
-  ): String = {
-
-    // Start by normalizing
-    val normalizedValueOpt =
-      mipValue flatMap (_.trimAllToOpt) flatMap { rawMipValue =>
-        normalizeMipValue(
-          mip,
-          rawMipValue,
-          hasCalculate,
-          isTypeString
-        )
-      }
-
-      normalizedValueOpt match {
-        case Some(value) =>
-          value
-        case None =>
-          mip match {
-            case ModelDefs.Relevant   => TrueExpr
-            case ModelDefs.Readonly   => if (hasCalculate) TrueExpr else FalseExpr
-            case ModelDefs.Required   => FalseExpr
-            case ModelDefs.Calculate  => ""
-            case ModelDefs.Default    => ""
-            case ModelDefs.Whitespace => Whitespace.Policy.Preserve.entryName
-          }
-      }
-    }
-
-  private def hasCalculate(bindElem: NodeInfo): Boolean =
-    bindElem.attValueOpt(ModelDefs.Calculate.name).isDefined
-
-  // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
-  // expressions and types could use it. So for now the mapping is never garbage collected.
-  private def isTypeStringUpdateNsIfNeeded(
-    bindElem : NodeInfo,
-    value    : String)(implicit
-    ctx      : FormBuilderDocContext
-  ): Boolean =
-    valueNamespaceMappingScopeIfNeeded(bindElem, value).isDefined &&
-      Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(bindElem.resolveQName(value))
-
   // Update a mip for the given control, grid or section id
   // The bind is created if needed
   def writeAndNormalizeMip(
@@ -528,52 +446,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
       toggleAttribute(bindElem, mipToFBMIPQNames(mip)._1, valueOpt)
     }
   }
-
-  // Return None if no namespace mapping is required OR none can be created
-  def valueNamespaceMappingScopeIfNeeded(
-    bind       : NodeInfo,
-    qNameValue : String)(implicit
-    ctx        : FormBuilderDocContext
-  ): Option[(String, String)] = {
-
-    val (prefix, _) = parseQName(qNameValue)
-
-    def existingNSMapping =
-      bind.namespaceMappings.toMap.get(prefix) map (prefix ->)
-
-    def newNSMapping = {
-      // If there is no mapping and the schema prefix matches the prefix and a uri is found for the
-      // schema, then insert a new mapping. We place it on the top-level bind so we don't have to insert
-      // it repeatedly.
-      val newURI =
-        if (findSchemaPrefix(bind).contains(prefix))
-          findSchemaNamespace(bind)
-        else
-          None
-
-      newURI map { uri =>
-        insert(into = ctx.topLevelBindElem.toList, origin = namespaceInfo(prefix, uri))
-        prefix -> uri
-      }
-    }
-
-    if (prefix == "")
-      None
-    else
-      existingNSMapping orElse newNSMapping
-  }
-
-  def readDenormalizedCalculatedMip(
-    bindElem : NodeInfo,
-    mip      : ComputedMIP)(implicit
-    ctx      : FormBuilderDocContext
-  ): String =
-    denormalizeMipValue(
-      mip          = mip,
-      mipValue     = bindElem attValueOpt mipToFBMIPQNames(mip)._1,
-      hasCalculate = hasCalculate(bindElem),
-      isTypeString = isTypeStringUpdateNsIfNeeded(bindElem, _)
-    )
 
   // Return `(attQName, elemQName)`
   def mipToFBMIPQNames(mip: ModelDefs.MIP): (QName, QName) =

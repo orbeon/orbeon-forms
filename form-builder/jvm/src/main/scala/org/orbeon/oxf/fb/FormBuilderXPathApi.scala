@@ -103,7 +103,7 @@ object FormBuilderXPathApi {
           else
             FormRunner.findInBindsTryIndex(ctx.formDefinitionRootElem, FormBinds)
       } yield
-        FormBuilder.readDenormalizedCalculatedMip(bindElem, mip)
+        FormRunner.readDenormalizedCalculatedMip(bindElem, mip, mipToFBMIPQNames(mip)._1)
 
     resultOpt getOrElse (throw new IllegalArgumentException)
   }

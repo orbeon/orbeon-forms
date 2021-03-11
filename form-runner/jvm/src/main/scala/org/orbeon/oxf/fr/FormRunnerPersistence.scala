@@ -13,14 +13,11 @@
  */
 package org.orbeon.oxf.fr
 
-import java.io.File
-import java.net.URI
-import java.{util => ju}
-
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.scaxon
 import org.orbeon.dom.QName
+import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner.properties
@@ -28,27 +25,31 @@ import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVers
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.FunctionLibrary
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsNames.{XXFORMS_NAMESPACE_URI, XXFORMS_SHORT_PREFIX}
-import org.orbeon.xml.NamespaceMapping
 
+import java.io.File
+import java.net.URI
+import java.{util => ju}
 import scala.collection.JavaConverters._
-import scala.util.control.NonFatal
+
 
 sealed trait FormOrData extends EnumEntry with Lowercase
 
@@ -97,6 +98,7 @@ object DataFormatVersion extends Enum[DataFormatVersion] {
 object FormRunnerPersistence {
 
   val DataFormatVersionName               = "data-format-version"
+  val FormDefinitionFormatVersionName     = "form-definition-format-version"
   val PruneMetadataName                   = "prune-metadata"
   val ShowProgressName                    = "show-progress"
   val FormTargetName                      = "formtarget"
@@ -188,6 +190,34 @@ object FormRunnerPersistence {
           s"`${fullProviderPropertyName(provider, DataFormatVersionName)}` property is set to `$dataFormatVersionString` but must be one of ${DataFormatVersion.values map (_.entryName) mkString ("`", "`, `", "`")}"
         )
     }
+  }
+
+  def findFormDefinitionFormatFromStringVersions(versions: collection.Seq[String]): Option[DataFormatVersion] = {
+
+    val allDistinctVersionsPassed = (
+        versions         flatMap
+        (_.trimAllToOpt) flatMap
+        common.Version.majorMinor
+      ).distinct
+
+    val maxVersionPassedOpt =
+      allDistinctVersionsPassed.nonEmpty option allDistinctVersionsPassed.max
+
+    import scala.math.Ordering.Implicits._
+
+    val allPossibleDataFormatsPairs =
+      for {
+        value <- DataFormatVersion.values
+        mm    <- common.Version.majorMinor(value.entryName)
+      } yield
+        value -> mm
+
+    val closestPair =
+      maxVersionPassedOpt flatMap { maxVersionInMetadata =>
+        allPossibleDataFormatsPairs.filter(_._2 <= maxVersionInMetadata).lastOption
+      }
+
+    closestPair map (_._1)
   }
 
   private def fullProviderPropertyName(provider: String, property: String) =

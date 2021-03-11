@@ -68,7 +68,7 @@ object FormBuilderMigrationXPathApi {
 
     // 3. Migrate other aspects such as binds and controls
     MigrationSupport.AllMigrationOps foreach { ops =>
-      migrationsFromForm.find(ops) foreach (m => ops.migrateOthersTo(doc, m))
+      migrationsFromForm.find(ops) foreach (m => ops.migrateOthersUp(doc, m))
     }
 
     // Q: Should we migrate repeat templates here?

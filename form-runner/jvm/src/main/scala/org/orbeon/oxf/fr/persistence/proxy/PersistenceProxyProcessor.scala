@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.fr.persistence.proxy
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
-import java.net.URI
-
-import javax.xml.transform.stream.StreamResult
 import org.apache.http.HttpStatus
 import org.orbeon.dom.QName
 import org.orbeon.io.IOUtils
+import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.datamigration.MigrationSupport
+import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
@@ -45,8 +45,13 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.RelevanceHandling._
 
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
+import java.net.URI
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.stream.StreamResult
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
+
 
 /**
  * The persistence proxy processor:
@@ -113,6 +118,9 @@ private object PersistenceProxyProcessor {
     // Throws if there is an incompatibility
     checkDataFormatVersions(request, app, form, formOrData)
 
+    val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains("data.xml")
+    val isFormBuilder    = app == "orbeon" && form == "builder"
+
     val requestContent = HttpMethodsWithRequestBody(request.getMethod) option {
 
       val requestInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
@@ -143,7 +151,10 @@ private object PersistenceProxyProcessor {
     val requestForData = formOrData == FormOrData.Data && request.getMethod == HttpMethod.GET
     val transforms     = requestForData.flatList {
 
+      if (isDataXmlRequest && ! isFormBuilder) {
+
         // Prune non-relevant nodes, if we're asked to do it
+        // https://doc.orbeon.com/form-runner/apis/persistence-api/crud#url-parameters
         val removeNonRelevantTransform = {
           val nonrelevantParamValue      = request.getFirstParamAsString(NonRelevantName)
           val requestedRelevanceHandling = nonrelevantParamValue.flatMap(RelevanceHandling.withNameLowercaseOnlyOption)
@@ -154,7 +165,82 @@ private object PersistenceProxyProcessor {
           }
         }
 
-      removeNonRelevantTransform.toList
+        List(removeNonRelevantTransform).flatten
+
+      } else if (isDataXmlRequest && isFormBuilder | formOrData == FormOrData.Form) {
+
+        // Special case of form definitions
+        request.getFirstParamAsString(FormDefinitionFormatVersionName).map(DataFormatVersion.withName) match {
+          case Some(dstVersion) =>
+            // We are explicitly asked to downgrade a form definition format
+            // The database may contain a form definition in any format
+
+            def migrate(is: InputStream, os: OutputStream): Unit = {
+
+              val formDoc =
+                new DocumentWrapper(TransformerUtils.readDom4j(is, null, false, false), null, XPath.GlobalConfiguration)
+
+              val migrationsFromForm =
+                new MigrationsFromForm(
+                  outerDocument        = formDoc,
+                  availableXBLBindings = None, // XXX ok?
+                  legacyGridsOnly      = false
+                )
+
+              // 1. All grids must have ids for what follows
+//                FormBuilder.addMissingGridIds(ctx.bodyElem)
+
+              // 2. Migrate inline instance data
+              val frDocCtx: FormRunnerDocContext = new FormRunnerDocContext {
+                val formDefinitionRootElem: NodeInfo = formDoc.rootElement
+              }
+
+              // If we don't find a version in the form definition, it means it was last updated with a version older than 2018.2
+              // TODO: We should discriminate between 4.8.0 and 4.0.0 ideally. Currently we don't have a user use case but it would
+              //   be good for correctness.
+              val srcVersionFromMetadataOrGuess =
+                findFormDefinitionFormatFromStringVersions(
+                  (frDocCtx.metadataRootElem / "updated-with-version" ++ frDocCtx.metadataRootElem / "created-with-version") map
+                    (_.stringValue)
+                ) getOrElse DataFormatVersion.V480
+
+              MigrationSupport.migrateDataInPlace(
+                dataRootElem     = (frDocCtx.dataInstanceElem child *).head.asInstanceOf[NodeWrapper],
+                srcVersion       = srcVersionFromMetadataOrGuess,
+                dstVersion       = dstVersion,
+                findMigrationSet = migrationsFromForm
+              )
+
+              // 3. Migrate other aspects such as binds and controls
+              MigrationSupport.migrateOtherInPlace(
+                formRootElem     = formDoc,
+                srcVersion       = srcVersionFromMetadataOrGuess,
+                dstVersion       = dstVersion,
+                findMigrationSet = migrationsFromForm
+              )
+
+              // Serialize out the result
+              val receiver =
+                TransformerUtils.getIdentityTransformerHandler |!>
+                  (_.setResult(new StreamResult(os)))
+
+              receiver.getTransformer |!>
+                (_.setOutputProperty(OutputKeys.ENCODING,                     CharsetNames.Utf8)) |!>
+                (_.setOutputProperty(OutputKeys.METHOD,                       "xml"))             |!>
+                (_.setOutputProperty(OutputKeys.VERSION,                      "1.0"))             |!>
+                (_.setOutputProperty(OutputKeys.INDENT,                       "no"))              |!>
+                (_.setOutputProperty(TransformerUtils.INDENT_AMOUNT_PROPERTY, "0"))
+
+              TransformerUtils.writeTinyTree(formDoc, receiver)
+            }
+
+            List(migrate _)
+
+          case None => Nil
+        }
+      } else {
+        Nil
+      }
     }
 
     proxyRequest(request, requestContent, serviceURI, headers, response, transforms)
@@ -209,12 +295,12 @@ private object PersistenceProxyProcessor {
   }
 
   def proxyRequest(
-    request        : Request,
-    requestContent : Option[StreamedContent],
-    serviceURI     : String,
-    headers        : Map[String, String],
-    response       : Response,
-    transforms     : List[(InputStream, OutputStream) => Unit]
+    request            : Request,
+    requestContent     : Option[StreamedContent],
+    serviceURI         : String,
+    headers            : Map[String, String],
+    response           : Response,
+    responseTransforms : List[(InputStream, OutputStream) => Unit]
   ): Unit =
     IOUtils.useAndClose(proxyEstablishConnection(request, requestContent, serviceURI, headers)) { cxr =>
 
@@ -246,7 +332,7 @@ private object PersistenceProxyProcessor {
       applyTransforms(
         cxr.content.inputStream,
         response.getOutputStream,
-        if (doTransforms) transforms else Nil
+        if (doTransforms) responseTransforms else Nil
       )
     }
 

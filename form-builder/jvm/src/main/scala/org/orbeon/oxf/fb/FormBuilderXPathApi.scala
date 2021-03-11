@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{FormRunner, Names}
+import org.orbeon.oxf.fr.{FormRunner, Names, SchemaOps}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -470,11 +470,11 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def findSchemaOrEmpty(inDoc: NodeInfo) =
-    findSchema(inDoc).orNull
+    SchemaOps.findSchema(inDoc).orNull
 
   //@XPathFunction
   def findSchemaPrefixOrEmpty(inDoc: NodeInfo) =
-    findSchemaPrefix(inDoc).orNull
+    SchemaOps.findSchemaPrefix(inDoc).orNull
 
   // Various counts
   //@XPathFunction

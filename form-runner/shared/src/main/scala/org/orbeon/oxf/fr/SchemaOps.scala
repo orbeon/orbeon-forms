@@ -11,26 +11,26 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fb
+package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
-trait SchemaOps {
+object SchemaOps {
 
-  def findSchema(inDoc: NodeInfo) =
+  def findSchema(inDoc: NodeInfo): Option[NodeInfo] =
     getModelElem(inDoc) / XSSchemaTest headOption
 
-  def findSchemaNamespace(inDoc: NodeInfo) =
+  def findSchemaNamespace(inDoc: NodeInfo): Option[String] =
     for {
       schema          <- findSchema(inDoc)
       targetNamespace <- schema attValueOpt "targetNamespace"
     } yield
       targetNamespace
 
-  def findSchemaPrefix(inDoc: NodeInfo) =
+  def findSchemaPrefix(inDoc: NodeInfo): Option[String] =
     for {
       schema          <- findSchema(inDoc)
       targetNamespace <- findSchemaNamespace(inDoc)

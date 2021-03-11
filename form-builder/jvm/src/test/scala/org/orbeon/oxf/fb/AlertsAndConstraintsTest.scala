@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.dom.Document
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.SchemaOps._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}

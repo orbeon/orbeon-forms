@@ -222,18 +222,18 @@ object FormRunnerPersistence {
     }
   }
 
+  // Parse a list of product versions as found in a form definition and find the closest data format associated
+  // with the form definition.
+  // See `SimpleDataMigrationTest` for example for versions. They must start with two integers separated by `.`.
   def findFormDefinitionFormatFromStringVersions(versions: collection.Seq[String]): Option[DataFormatVersion] = {
 
-    val allDistinctVersionsPassed = (
-        versions         flatMap
-        (_.trimAllToOpt) flatMap
-        common.VersionSupport.majorMinor
-      ).distinct
-
-    val maxVersionPassedOpt =
-      allDistinctVersionsPassed.nonEmpty option allDistinctVersionsPassed.max
-
-    import scala.math.Ordering.Implicits._
+    def parseVersions: Seq[(Int, Int)] =
+      for {
+        version <- versions
+        trimmed <- version.trimAllToOpt // DEBATE: We shouldn't have to trim or ignore blank lines.
+        mm      <- common.VersionSupport.majorMinor(trimmed)
+      } yield
+        mm
 
     val allPossibleDataFormatsPairs =
       for {
@@ -242,12 +242,18 @@ object FormRunnerPersistence {
       } yield
         value -> mm
 
-    val closestPair =
-      maxVersionPassedOpt flatMap { maxVersionInMetadata =>
-        allPossibleDataFormatsPairs.filter(_._2 <= maxVersionInMetadata).lastOption
-      }
+    val allDistinctVersionsPassed = parseVersions.distinct
 
-    closestPair map (_._1)
+    val maxVersionPassedOpt =
+      allDistinctVersionsPassed.nonEmpty option allDistinctVersionsPassed.max
+
+    import scala.math.Ordering.Implicits._
+
+    for {
+      maxVersionPassed <- maxVersionPassedOpt
+      (closest, _)     <- allPossibleDataFormatsPairs.filter(_._2 <= maxVersionPassed).lastOption
+    } yield
+      closest
   }
 
   private def fullProviderPropertyName(provider: String, property: String) =

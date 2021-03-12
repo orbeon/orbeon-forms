@@ -89,7 +89,7 @@ object EmailValidator {
    * @param allowLocal Should local addresses be considered valid?
    * @return singleton instance of this validator
    */
-  def getInstance(allowLocal: Boolean): EmailValidator = getInstance(allowLocal, false)
+  def getInstance(allowLocal: Boolean): EmailValidator = getInstance(allowLocal, allowTld = false)
 }
 
 class EmailValidator extends Serializable {

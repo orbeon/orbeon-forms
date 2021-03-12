@@ -216,7 +216,7 @@ private object PersistenceProxyProcessor {
                   ) getOrElse DataFormatVersion.V480
 
                 MigrationSupport.migrateDataInPlace(
-                  dataRootElem     = (frDocCtx.dataInstanceElem child *).head.asInstanceOf[NodeWrapper],
+                  dataRootElem     = frDocCtx.dataRootElem.asInstanceOf[NodeWrapper],
                   srcVersion       = srcVersionFromMetadataOrGuess,
                   dstVersion       = dstVersion,
                   findMigrationSet = migrationsFromForm

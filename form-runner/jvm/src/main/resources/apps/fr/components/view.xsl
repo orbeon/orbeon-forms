@@ -921,7 +921,7 @@
 
         <!-- Nothing below must statically depend on the mode -->
         <xsl:choose>
-            <xsl:when test="exists($custom-buttons)">
+            <xsl:when test="exists($custom-buttons) and empty($buttons-property)">
                 <xh:span class="fr-buttons">
                     <xsl:apply-templates select="$custom-buttons/node()"/>
                 </xh:span>

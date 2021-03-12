@@ -64,10 +64,10 @@ object MigrationOps20191 extends MigrationOps {
 
     def migrationsForBinding(doc: DocumentNodeInfoType, topLevel: Boolean): Seq[Migration20191] =
       for {
-        gridElem           <- if (legacyGridsOnly) findLegacyUnrepeatedGrids(doc) else findAllGrids(doc, repeat = false)
-        gridName           = getControlName(gridElem)
-        afterElem          = precedingSiblingOrSelfContainers(gridElem, includeSelf = false).headOption
-        containerNames     = findContainerNamesForModel(gridElem, includeSelf = false, includeIterationElements = true)
+        gridElem       <- if (legacyGridsOnly) findLegacyUnrepeatedGrids(doc) else findAllGrids(doc, repeat = false)
+        gridName       = getControlName(gridElem)
+        afterElem      = precedingSiblingOrSelfContainers(gridElem, includeSelf = false).headOption
+        containerNames = findContainerNamesForModel(gridElem, includeSelf = false, includeIterationElements = true)
       } yield
         Migration20191(
           containerPath = containerNames map PathElem.apply,
@@ -225,8 +225,8 @@ object MigrationOps20191 extends MigrationOps {
           afterElem flatMap (p => findBindByName(outerDocument, p.value)) filter (_.parentOption contains containerBindElem)
 
         insert(
-          into  = containerBindElem,
-          after = afterBindElem.toList,
+          into   = containerBindElem,
+          after  = afterBindElem.toList,
           origin =
             elementInfo(
               XFormsBindQName,

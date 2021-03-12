@@ -112,15 +112,16 @@ private object PEVersion {
   )
 
   case class LicenseInfo(
-      versionNumber   : String,
-      licensor        : String,
-      licensee        : String,
-      organization    : String,
-      email           : String,
-      issued          : String,
-      version         : Option[String],
-      expiration      : Option[Long],
-      subscriptionEnd : Option[Long]) {
+    versionNumber   : String,
+    licensor        : String,
+    licensee        : String,
+    organization    : String,
+    email           : String,
+    issued          : String,
+    version         : Option[String],
+    expiration      : Option[Long],
+    subscriptionEnd : Option[Long]
+  ) {
 
     def isBadVersion                = version         exists (isVersionExpired(versionNumber, _))
     def isExpired                   = expiration      exists (System.currentTimeMillis() > _)

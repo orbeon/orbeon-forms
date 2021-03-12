@@ -100,7 +100,6 @@ private object FlatView {
     val body = root.child(XHBodyTest).head
     val xblMappings = sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
 
-
     // `outerSectionNames` lists the name of the ancestor sections of the current node,
     // e.g. List("top-section", "sub-section")
     def collectFromNode(outerSectionNames: List[String],  node: NodeInfo): List[List[String]] = {

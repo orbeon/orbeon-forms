@@ -5,7 +5,7 @@ import io.circe.generic.auto._
 import io.circe.parser.decode
 import org.log4s.{Debug, Info}
 import org.orbeon.dom.{Document, Element}
-import org.orbeon.facades.{JSZip, TextDecoder, ZipObject}
+import org.orbeon.facades.{Fflate, JSZip, TextDecoder, ZipObject}
 import org.orbeon.fr.FormRunnerApp
 import org.orbeon.oxf.fr.library._
 import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
@@ -24,7 +24,6 @@ import org.orbeon.xforms.offline.OfflineSupport
 import org.orbeon.xforms.offline.demo.LocalClientServerChannel
 import org.orbeon.xforms._
 import org.scalajs.dom.html
-
 import org.orbeon.oxf.util.Logging._
 
 import java.io.InputStream
@@ -140,6 +139,108 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
       )
     )
 
+  private def findFormInZipDataAndHookupResolvers(
+    zipValues : List[(String, Uint8Array)],
+    appName   : String,
+    formName  : String
+  ): String = {
+
+    debug(s"got `zipValues`")
+
+    // Read and decode the manifest
+    val manifestEntries = findManifestEntries(zipValues).get
+
+    // Collect resources described in the manifest
+    val resourcesByUri = {
+
+      val resourcesByZipPath = zipValues.toMap
+
+      manifestEntries flatMap { case ManifestEntry(uri, zipPath, contentType) =>
+        resourcesByZipPath.get(zipPath) map { data =>
+          uri -> (data, contentType)
+        }
+      } toMap
+    }
+
+    debug(s"computed `resourcesByUri`")
+
+    val NormalizedResourcesPath = "/fr/service/i18n/fr-resources/orbeon/offline"
+
+    // Pre-cache resources if needed
+    resourcesByUri collectFirst {
+      case (k, (data, _)) if k.startsWith("/fr/service/i18n/fr-resources/") =>
+
+        // Lazy so that we do the work zero or one time whether the document is already in
+        // the cache for the specific app/form names, already in the cache for other app/form
+        // names, or not in the cache at all.
+        lazy val formRunnerResourcesXmlDoc = {
+          XFormsCrossPlatformSupport.readTinyTree(
+            configuration  = XPath.GlobalConfiguration,
+            inputStream    = new Uint8ArrayInputStream(data),
+            systemId       = NormalizedResourcesPath,
+            handleXInclude = false,
+            handleLexical  = true
+          )
+        }
+
+        // We want to store the XML in the cache for both the normalized path AND the regular path, but
+        // it's the same immutable document in both cases. We store the normalized path so that we can
+        // easily find it in the cache. We store the regular path so that Form Runner will find that.
+        // Here we `foldLeft()` so that we ensure parsing the XML at most once.
+        List(NormalizedResourcesPath, s"/fr/service/i18n/fr-resources/$appName/$formName")
+          .foldLeft(None: Option[DocumentNodeInfoType]) {
+            case (prevDocOpt, path) =>
+              val instanceCaching = InstanceCaching(-1, handleXInclude = false, path, None)
+              XFormsServerSharedInstancesCache.findContent(
+                instanceCaching  = instanceCaching,
+                readonly         = true,
+                exposeXPathTypes = false
+              ) match {
+                case None =>
+                  debug(s"preemptively storing into cache for `$path`")
+                  val newDoc = prevDocOpt.getOrElse(formRunnerResourcesXmlDoc)
+                  XFormsServerSharedInstancesCache.sideLoad(
+                    instanceCaching = instanceCaching,
+                    doc             = newDoc
+                  )
+                  newDoc.some
+                case Some(existingDoc) =>
+                  existingDoc.some
+              }
+          }
+    }
+
+    debug(s"resources found in Zip file: ${resourcesByUri.keys mkString ", " }")
+
+    // Store a connection resolver that resolves to resources included in the compiled form
+    Connection.resourceResolver = (urlString: String) => {
+
+      // Special case: normalize Form Runner resources so that we don't have to duplicate them for each form.
+      // This prevents overriding resources for each form individually, but this is usually not necessary.
+      // And if we wanted to allow that, we should find a more efficient way to do it anyway.
+      val updatedUrlString =
+        if (urlString.startsWith("/fr/service/i18n/fr-resources/"))
+          "/fr/service/i18n/fr-resources/orbeon/offline"
+        else
+          urlString
+
+      resourcesByUri.get(updatedUrlString) map { case (data, contentType) =>
+        ConnectionResult(
+          url                = updatedUrlString,
+          statusCode         = StatusCode.Ok,
+          headers            = Map.empty,
+          content            = StreamedContent(new Uint8ArrayInputStream(data), contentType.some, data.length.toLong.some, None),
+          dontHandleResponse = false,
+        )
+      }
+    }
+
+    // Find form
+    zipValues collectFirst
+      { case (path, data) if path.endsWith("form.json") => new TextDecoder().decode(data) } getOrElse
+      (throw new IllegalArgumentException("missing form in Zip"))
+  }
+
   private def compileAndCacheFormIfNeededF(
     serializedBundle : SerializedBundle,
     appName          : String, // needed for the cache!
@@ -159,105 +260,9 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
         val jsonStringF =
           (serializedBundle: Any) match {
             case v: Uint8Array =>
-
               debug(s"before `decodeZipContent`")
-
-              decodeZipContent(v.buffer) map { zipValues =>
-
-                debug(s"got `zipValues`")
-
-                // Read and decode the manifest
-                val manifestEntries = findManifestEntries(zipValues).get
-
-                // Collect resources described in the manifest
-                val resourcesByUri = {
-
-                  val resourcesByZipPath = zipValues.toMap
-
-                  manifestEntries flatMap { case ManifestEntry(uri, zipPath, contentType) =>
-                    resourcesByZipPath.get(zipPath) map { data =>
-                      uri -> (data, contentType)
-                    }
-                  } toMap
-                }
-
-                debug(s"computed `resourcesByUri`")
-
-                val NormalizedResourcesPath = "/fr/service/i18n/fr-resources/orbeon/offline"
-
-                // Pre-cache resources if needed
-                resourcesByUri collectFirst {
-                  case (k, (data, _)) if k.startsWith("/fr/service/i18n/fr-resources/") =>
-
-                    // Lazy so that we do the work zero or one time whether the document is already in
-                    // the cache for the specific app/form names, already in the cache for other app/form
-                    // names, or not in the cache at all.
-                    lazy val formRunnerResourcesXmlDoc = {
-                      XFormsCrossPlatformSupport.readTinyTree(
-                        configuration  = XPath.GlobalConfiguration,
-                        inputStream    = new Uint8ArrayInputStream(data),
-                        systemId       = NormalizedResourcesPath,
-                        handleXInclude = false,
-                        handleLexical  = true
-                      )
-                    }
-
-                    // We want to store the XML in the cache for both the normalized path AND the regular path, but
-                    // it's the same immutable document in both cases. We store the normalized path so that we can
-                    // easily find it in the cache. We store the regular path so that Form Runner will find that.
-                    // Here we `foldLeft()` so that we ensure parsing the XML at most once.
-                    List(NormalizedResourcesPath, s"/fr/service/i18n/fr-resources/$appName/$formName")
-                      .foldLeft(None: Option[DocumentNodeInfoType]) {
-                        case (prevDocOpt, path) =>
-                          val instanceCaching = InstanceCaching(-1, handleXInclude = false, path, None)
-                          XFormsServerSharedInstancesCache.findContent(
-                            instanceCaching  = instanceCaching,
-                            readonly         = true,
-                            exposeXPathTypes = false
-                          ) match {
-                            case None =>
-                              debug(s"preemptively storing into cache for `$path`")
-                              val newDoc = prevDocOpt.getOrElse(formRunnerResourcesXmlDoc)
-                              XFormsServerSharedInstancesCache.sideLoad(
-                                instanceCaching = instanceCaching,
-                                doc             = newDoc
-                              )
-                              newDoc.some
-                            case Some(existingDoc) =>
-                              existingDoc.some
-                          }
-                      }
-                }
-
-                debug(s"resources found in Zip file: ${resourcesByUri.keys mkString ", " }")
-
-                // Store a connection resolver that resolves to resources included in the compiled form
-                Connection.resourceResolver = (urlString: String) => {
-
-                  // Special case: normalize Form Runner resources so that we don't have to duplicate them for each form.
-                  // This prevents overriding resources for each form individually, but this is usually not necessary.
-                  // And if we wanted to allow that, we should find a more efficient way to do it anyway.
-                  val updatedUrlString =
-                    if (urlString.startsWith("/fr/service/i18n/fr-resources/"))
-                      "/fr/service/i18n/fr-resources/orbeon/offline"
-                    else
-                      urlString
-
-                  resourcesByUri.get(updatedUrlString) map { case (data, contentType) =>
-                    ConnectionResult(
-                      url                = updatedUrlString,
-                      statusCode         = StatusCode.Ok,
-                      headers            = Map.empty,
-                      content            = StreamedContent(new Uint8ArrayInputStream(data), contentType.some, data.length.toLong.some, None),
-                      dontHandleResponse = false,
-                    )
-                  }
-                }
-
-                // Find form
-                zipValues collectFirst
-                  { case (path, data) if path.endsWith("form.json") => new TextDecoder().decode(data) } getOrElse
-                  (throw new IllegalArgumentException("missing form in Zip"))
+              decodeZipContent(v.buffer) map { files =>
+                findFormInZipDataAndHookupResolvers(files, appName, formName)
               }
             case v: String =>
               Future(v)
@@ -402,6 +407,9 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     }
 
     def decodeZipContent(buffer: ArrayBuffer): Future[List[(String, Uint8Array)]] =
+      Future(Fflate.unzipSync(new Uint8Array(buffer)).toList)
+
+    def decodeZipContentJsZip(buffer: ArrayBuffer): Future[List[(String, Uint8Array)]] =
       JSZip.loadAsync(buffer).toFuture flatMap { jsZip =>
 
         var futures: List[Future[(String, Uint8Array)]] = Nil

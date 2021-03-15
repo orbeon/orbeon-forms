@@ -5,7 +5,7 @@ import io.circe.generic.auto._
 import io.circe.parser.decode
 import org.log4s.{Debug, Info}
 import org.orbeon.dom.{Document, Element}
-import org.orbeon.facades.{Fflate, JSZip, TextDecoder, ZipObject}
+import org.orbeon.facades.{Fflate, TextDecoder}
 import org.orbeon.fr.FormRunnerApp
 import org.orbeon.oxf.fr.library._
 import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
@@ -408,19 +408,6 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
 
     def decodeZipContent(buffer: ArrayBuffer): Future[List[(String, Uint8Array)]] =
       Future(Fflate.unzipSync(new Uint8Array(buffer)).toList)
-
-    def decodeZipContentJsZip(buffer: ArrayBuffer): Future[List[(String, Uint8Array)]] =
-      JSZip.loadAsync(buffer).toFuture flatMap { jsZip =>
-
-        var futures: List[Future[(String, Uint8Array)]] = Nil
-
-        jsZip.forEach(
-          (relativePath: String, zipObject: ZipObject) =>
-            futures ::= zipObject.async("uint8array").toFuture map (relativePath ->)
-        )
-
-        Future.sequence(futures)
-      }
 
     def findManifestEntries(zipValues: List[(String, Uint8Array)]): Try[Iterable[ManifestEntry]] =
       zipValues.collectFirst {

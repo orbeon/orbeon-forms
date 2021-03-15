@@ -1,7 +1,7 @@
 package org.orbeon.xforms.offline
 
 import org.log4s.Logger
-import org.orbeon.facades.{JSZip, TextDecoder}
+import org.orbeon.facades.TextDecoder
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.CoreUtils._

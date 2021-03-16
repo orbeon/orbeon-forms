@@ -411,9 +411,9 @@
     <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]">
 
         <xsl:variable
-                name="copy-custom-model"
-                select="$is-detail and normalize-space($custom-model)"
-                as="xs:boolean"/>
+            name="copy-custom-model"
+            select="$is-detail and normalize-space($custom-model)"
+            as="xs:boolean"/>
 
         <!-- Model receiving input parameters -->
         <xf:model

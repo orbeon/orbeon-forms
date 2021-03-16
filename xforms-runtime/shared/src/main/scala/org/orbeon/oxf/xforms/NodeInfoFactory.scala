@@ -38,13 +38,14 @@ object NodeInfoFactory {
     removeInstanceDataFromClonedNodes : Boolean   = true
   ): om.NodeInfo = {
     val newElement = Wrapper.wrap(dom.Element(qName))
-    XFormsAPI.insert(
-      into                              = Seq(newElement),
-      origin                            = content,
-      doDispatch                        = false,
-      searchForInstance                 = false,
-      removeInstanceDataFromClonedNodes = removeInstanceDataFromClonedNodes
-    )
+    if (content.nonEmpty)
+      XFormsAPI.insert(
+        into                              = List(newElement),
+        origin                            = content,
+        doDispatch                        = false,
+        searchForInstance                 = false,
+        removeInstanceDataFromClonedNodes = removeInstanceDataFromClonedNodes
+      )
     newElement
   }
 

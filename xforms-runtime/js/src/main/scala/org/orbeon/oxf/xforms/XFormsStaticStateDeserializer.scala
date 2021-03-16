@@ -1086,6 +1086,9 @@ object TopLevelPartAnalysisImpl {
         def findControlAnalysis(prefixedId: String): Option[ElementAnalysis] =
           controlAnalysisMap.get(prefixedId)
 
+        def wrapElement(elem: dom.Element): om.NodeInfo =
+          NodeInfoFactory.elementInfo(elem)
+
         def parent: Option[PartAnalysis] = None
         def isTopLevelPart: Boolean = true
 

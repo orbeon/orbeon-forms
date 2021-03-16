@@ -14,7 +14,8 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
@@ -22,6 +23,7 @@ import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLSupport}
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.om
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
@@ -57,9 +59,11 @@ trait PartAnalysisContextMutable extends TransientState {
   def allGlobals: mutable.ArrayBuffer[Global]
   def iterateGlobals: Iterator[Global]
 
-  // Shortcut for `attachToControl`
   def findControlAnalysis(prefixedId: String): Option[ElementAnalysis] =
     controlAnalysisMap.get(prefixedId)
+
+  def wrapElement(elem: dom.Element): om.NodeInfo =
+    new DocumentWrapper(elem.getDocument, null, StaticXPath.GlobalConfiguration).wrap(elem)
 
   def freeTransientState(): Unit
 }

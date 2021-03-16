@@ -29,6 +29,9 @@ object NodeInfoFactory {
   // enough as NodeWrapper does need a Configuration to operate properly. So for now we keep this wrapper.
   private val Wrapper = new DocumentWrapper(dom.Document(), null, XPath.GlobalConfiguration)
 
+  def elementInfo(elem: dom.Element): om.NodeInfo =
+    Wrapper.wrap(elem)
+
   def elementInfo(
     qName                             : dom.QName,
     content                           : Seq[om.Item] = Nil,

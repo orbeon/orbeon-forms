@@ -221,10 +221,9 @@
     <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"                  value=""/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
 
-    <property as="xs:string"  name="oxf.xforms.resources.baseline">
-        fr:number
-        fr:date
-    </property>
+    <!-- Deprecated. Use `oxf.xforms.assets.baseline` instead.
+         See https://github.com/orbeon/orbeon-forms/issues/4810 -->
+    <property as="xs:string"  name="oxf.xforms.resources.baseline"/>
 
     <property as="xs:string"  name="oxf.xforms.assets.baseline">
         {
@@ -275,6 +274,11 @@
             { "full": "/ops/javascript/orbeon/xforms/controls/Hint.js",                      "min": true  },
 
             { "full": "/ops/javascript/scalajs/orbeon-xforms-web.js",                        "min": false }
+          ],
+
+          "xbl": [
+            "fr:number",
+            "fr:date"
           ]
         }
     </property>

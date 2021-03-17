@@ -1009,8 +1009,8 @@ object XFormsStaticStateImpl {
       def isHTMLDocument: Boolean = true // TODO
 
       // TODO: serialize/deserialize
-      def assets: XFormsAssets = XFormsAssets(Nil, Nil) // XXX TODO
-      def sanitizeInput: String => String = identity // XXX TODO
+      val assets: XFormsAssets = XFormsAssets(Nil, Nil, Set.empty) // XXX TODO
+      val sanitizeInput: String => String = identity // XXX TODO
 
       def nonDefaultProperties: Map[String, (String, Boolean)] = _nonDefaultProperties
 

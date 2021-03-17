@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, Logging}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.XFormsAssetsBuilder
 import org.orbeon.oxf.xforms.xbl.XBLAssetsBuilder.HeadElementBuilder
 import org.orbeon.oxf.xml.ParserConfiguration
 import org.orbeon.oxf.xml.dom.Extensions
@@ -39,6 +40,20 @@ trait BindingLoader extends Logging {
   def existsByPath(path: String): Boolean
   def contentAsDOM4J(path: String): Document
 
+  def findXblAssets(xbl: Set[QName]): (List[String], List[String]) = {
+
+    val (foundBaselinePaths, _) =
+      pathsForQNames(xbl, readURLMappingsCacheAgainstProperty)
+
+    val (_, abstractBindings) =
+      extractAndIndexFromPaths(
+        GlobalBindingIndex.Empty,
+        foundBaselinePaths
+      )
+
+    collectResourceBaselines(abstractBindings)
+  }
+
   def getUpToDateLibraryAndBaseline(
     indexOpt      : Option[BindingIndex[IndexableBinding]],
     checkUpToDate : Boolean // 2016-10-06: always set to `true`
@@ -46,7 +61,7 @@ trait BindingLoader extends Logging {
 
     var originalOrUpdatedIndexOpt = indexOpt
 
-    val (scripts, styles, checkedPaths) = {
+    val ((scripts, styles), checkedPaths) = {
 
       val propertySet = getPropertySet
 
@@ -57,62 +72,57 @@ trait BindingLoader extends Logging {
 
         debug("reloading library and baseline")
 
-        val urlMappings = readURLMappingsCacheAgainstProperty
+        // These are not namespace mappings! They map a namespace URI to a prefix, such as
+        // `http://orbeon.org/oxf/xml/form-runner -> orbeon`.
+        val nsUriToPrefix = readURLMappingsCacheAgainstProperty
 
         def propertyQNames(property: Property) =
           property.value.toString.tokenizeToSet flatMap
             (Extensions.resolveQName(property.namespaces, _, unprefixedIsNoNamespace = true))
 
-        def pathsForQNames(qNames: Set[QName]) =
-          qNames flatMap { qName =>
-            findBindingPathByNameUseMappings(urlMappings, qName.namespace.uri, qName.localName)
-          } partition (_._2) match {
-            case (found, notFound) => (found map (_._1), notFound map (_._1))
-          }
+        // 1. Legacy `oxf.xforms.resources.baseline` property
+        val (foundBaselinePathsStep1, notFoundBaselinePathsStep1) =
+          pathsForQNames(propertyQNames(baselineProperty), nsUriToPrefix)
 
-        val (foundBaselinePaths, notFoundBaselinePaths) =
-          pathsForQNames(propertyQNames(baselineProperty))
-
-        val (baselineIndex, baselineBindings) =
+        val (baselineIndexStep1, baselineBindingsStep1) =
           extractAndIndexFromPaths(
             GlobalBindingIndex.Empty, // note the empty index
-            foundBaselinePaths
+            foundBaselinePathsStep1
           )
 
-        val (foundLibraryPaths, notFoundLibraryPaths) =
-          pathsForQNames(propertyQNames(libraryProperty))
+        // 2. `oxf.xforms.assets.baseline` property
+        // https://github.com/orbeon/orbeon-forms/issues/4810
+        val (foundBaselinePathsStep2, notFoundBaselinePathsStep2) =
+          pathsForQNames(XFormsAssetsBuilder.fromJsonProperty.xbl, nsUriToPrefix)
 
-        val foundLibraryPathsNotInBaseline = foundLibraryPaths  -- foundBaselinePaths
+        val (baselineIndexStep2, baselineBindingsStep2) =
+          extractAndIndexFromPaths(
+            baselineIndexStep1,
+            foundBaselinePathsStep2 -- foundBaselinePathsStep1
+          )
+
+        // 3. `oxf.xforms.xbl.library` property
+        val (foundLibraryPaths, notFoundLibraryPaths) =
+          pathsForQNames(propertyQNames(libraryProperty), nsUriToPrefix)
 
         val (newIndex, _) =
           extractAndIndexFromPaths(
-            baselineIndex,
-            foundLibraryPathsNotInBaseline
+            baselineIndexStep2,
+            foundLibraryPaths -- foundBaselinePathsStep2 -- foundBaselinePathsStep1
           )
 
         val allCheckedPaths =
-          foundBaselinePaths    ++
-          notFoundBaselinePaths ++
-          foundLibraryPaths     ++
+          foundBaselinePathsStep1    ++
+          notFoundBaselinePathsStep1 ++
+          foundBaselinePathsStep2    ++
+          notFoundBaselinePathsStep2 ++
+          foundLibraryPaths          ++
           notFoundLibraryPaths
 
         // Side-effect!
         originalOrUpdatedIndexOpt = Some(newIndex)
 
-        (baselineBindings, allCheckedPaths)
-      }
-
-      def collectResourceBaselines(baselineBindings: Iterable[AbstractBinding], allCheckedPaths: Set[String]) = {
-
-        debug("collecting resource baselines")
-
-        def collectUniqueReferenceElements(getHeadElements : XBLAssets => Seq[HeadElement]) =
-          XBLAssets.orderedHeadElements(
-            baselineBindings map (binding => XBLAssets(binding.commonBinding.cssName, binding.scripts, binding.styles)), // same in `allXblAssetsMaybeDuplicates`
-            getHeadElements
-          ).iterator.collect{ case e: HeadElement.Reference => e.src }.to(mutable.LinkedHashSet).to(List)
-
-        (collectUniqueReferenceElements(_.scripts), collectUniqueReferenceElements(_.styles), allCheckedPaths)
+        (baselineBindingsStep1 ::: baselineBindingsStep2 /* TODO: Check duplicates? */, allCheckedPaths)
       }
 
       lazy val lazyIndexAndBindings: (List[AbstractBinding], Set[String]) = readAndIndexBindings
@@ -122,13 +132,15 @@ trait BindingLoader extends Logging {
       if (indexOpt.isEmpty)
         lazyIndexAndBindings
 
-      def reloadLibraryAndBaseline: (List[String], List[String], Set[String]) =
-        (collectResourceBaselines _).tupled(lazyIndexAndBindings)
+      def reloadLibraryAndBaseline: ((List[String], List[String]), Set[String]) =
+        (collectResourceBaselines(lazyIndexAndBindings._1), lazyIndexAndBindings._2)
 
       // We read and associate the value with 2 properties, but evaluation occurs at most once
       lazy val lazyEvaluatedValue = reloadLibraryAndBaseline
       def evaluate(property: Property) = lazyEvaluatedValue
 
+      // NOTE: For `oxf.xforms.assets.baseline` we already associated the JSON so we can't also
+      // associate this.
       libraryProperty.associatedValue(evaluate)
       baselineProperty.associatedValue(evaluate)
 
@@ -251,6 +263,29 @@ trait BindingLoader extends Logging {
     (currentIndex, newBindings)
   }
 
+  def bindingPathByName(prefix: String, localname: String) =
+    s"/xbl/$prefix/$localname/$localname.xbl"
+
+  private def pathsForQNames(qNames: Set[QName], nsUriToPrefix: Map[String, String]): (Set[String], Set[String]) =
+    qNames flatMap { qName =>
+      findBindingPathByNameUseMappings(nsUriToPrefix, qName.namespace.uri, qName.localName)
+    } partition (_._2) match {
+      case (found, notFound) => (found map (_._1), notFound map (_._1))
+    }
+
+  private def collectResourceBaselines(baselineBindings: Iterable[AbstractBinding]): (List[String], List[String]) = {
+
+    debug("collecting resource baselines")
+
+    def collectUniqueReferenceElements(getHeadElements : XBLAssets => Seq[HeadElement]) =
+      XBLAssets.orderedHeadElements(
+        baselineBindings map (binding => XBLAssets(binding.commonBinding.cssName, binding.scripts, binding.styles)), // same in `allXblAssetsMaybeDuplicates`
+        getHeadElements
+      ).iterator.collect{ case e: HeadElement.Reference => e.src }.to(mutable.LinkedHashSet).to(List)
+
+    (collectUniqueReferenceElements(_.scripts), collectUniqueReferenceElements(_.styles))
+  }
+
   private def extractAndIndexFromPaths(
     index : BindingIndex[IndexableBinding],
     paths : IterableOnce[String]
@@ -316,7 +351,7 @@ trait BindingLoader extends Logging {
     currentIndex
   }
 
-  // E.g. http://orbeon.org/oxf/xml/form-runner -> orbeon
+  // E.g. `http://orbeon.org/oxf/xml/form-runner -> orbeon`
   // NOTE: The caching is not optimal, as we need, to cache, to iterate all properties with propertiesStartsWith!
   // Would need a way to cache against PropertySet.
   private def readURLMappingsCacheAgainstProperty: Map[String, String] = {
@@ -343,12 +378,9 @@ trait BindingLoader extends Logging {
     }
   }
 
-  def bindingPathByName(prefix: String, localname: String) =
-    s"/xbl/$prefix/$localname/$localname.xbl"
-
-  // E.g. fr:tabview -> oxf:/xbl/orbeon/tabview/tabview.xbl
-  private def findBindingPathByNameUseMappings(mappings: Map[String, String], uri: String, localname: String) =
-    mappings.get(uri) map { prefix =>
+  // E.g. `fr:tabview -> oxf:/xbl/orbeon/tabview/tabview.xbl`
+  private def findBindingPathByNameUseMappings(nsUriToPrefix: Map[String, String], uri: String, localname: String) =
+    nsUriToPrefix.get(uri) map { prefix =>
       val path = bindingPathByName(prefix, localname)
       (path, existsByPath(path))
     }

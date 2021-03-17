@@ -13,9 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import java.io._
-import java.net.{URI, URLEncoder}
-
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
@@ -27,13 +24,15 @@ import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.XFormsAssetPaths._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquireLock
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
+import org.orbeon.oxf.xforms.xbl.BindingLoader
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
-import XFormsAssetPaths._
-
+import java.io._
+import java.net.{URI, URLEncoder}
 import scala.collection.compat._
 import scala.collection.immutable.ListSet
 import scala.util.{Failure, Success, Try}
@@ -69,15 +68,26 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           response.sendRedirect(pathWithContext, isServerSide = false, isExitPortal = false)
         }
 
-        val updatesParameterValue = externalContext.getRequest.getFirstParamAsString(UpdatesParameter)
-        val updatesPropertyName   = updatesParameterValue.map(List(XFormsAssetsBuilder.AssetsBaselineProperty, UpdatesParameter, _).mkString("."))
-        val updatesPropertyValue  = updatesPropertyName.map(CoreCrossPlatformSupport.properties.getString)
-        val updates               = updatesPropertyValue.getOrElse("")
-        val assets                = XFormsAssetsBuilder.updateAssets(XFormsAssetsBuilder.fromJSONProperty, excludesProp = "", updates)
-        val isMinimal             = XFormsGlobalProperties.isMinimalResources
-        val resources             = (if (isCSS) assets.css else assets.js).map(_.assetPath(tryMin = isMinimal)).to(ListSet)
+        val updatesPropOpt =
+          for {
+            paramValue <- externalContext.getRequest.getFirstParamAsString(UpdatesParameter)
+            propName   = List(XFormsAssetsBuilder.AssetsBaselineProperty, UpdatesParameter, paramValue).mkString(".")
+            prop       <- CoreCrossPlatformSupport.properties.getPropertyOpt(propName)
+          } yield
+            prop
 
-        AssetsAggregator.aggregate(resources, redirect, None, isCSS)
+        val assets    = XFormsAssetsBuilder.updateAssets(XFormsAssetsBuilder.fromJsonProperty, excludesProp = None, updatesPropOpt)
+        val isMinimal = XFormsGlobalProperties.isMinimalResources
+        val resources = (if (isCSS) assets.css else assets.js).map(_.assetPath(tryMin = isMinimal)).to(ListSet)
+
+        val xblResources =
+          if (assets.xbl.nonEmpty) {
+            val (scripts, styles) = BindingLoader.findXblAssets(assets.xbl)
+            if (isCSS) styles else scripts
+          } else
+            Nil
+
+        AssetsAggregator.aggregate(resources ++ xblResources, redirect, None, isCSS)
 
       case FormDynamicResourcesRegex(uuid) =>
 

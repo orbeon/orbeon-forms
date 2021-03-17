@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.oxf.properties.Property
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.scalatest.funspec.AnyFunSpec
 
 
@@ -115,21 +117,29 @@ class XFormsAssetsTest extends AnyFunSpec{
         ]
       }"""
 
+  // TODO: Test updating with XBL QNames.
   describe(s"Updating assets") {
-    val assets = XFormsAssetsBuilder.fromJsonString(BaselineAssets)
+
+    val assets = XFormsAssetsBuilder.fromJsonString(BaselineAssets, Map.empty)
 
     val result =
       XFormsAssetsBuilder.updateAssets(
         assets,
-        "/ops/javascript/scalajs/orbeon-xforms-web.js /ops/yui/container/assets/skins/sam/container.css",
-        """+/apps/fr/resources/scalajs/orbeon-form-runner.js
-           -/ops/yui/calendar/assets/skins/sam/calendar.css
-           +/apps/fr/assets/foo.css
-        """.stripMargin
+        Some("/ops/javascript/scalajs/orbeon-xforms.js /ops/yui/container/assets/skins/sam/container.css"),
+        Some(
+          Property(
+            XS_STRING_QNAME,
+            """+/apps/fr/resources/scalajs/orbeon-form-runner.js
+               -/ops/yui/calendar/assets/skins/sam/calendar.css
+               +/apps/fr/assets/foo.css
+            """,
+            Map.empty
+          )
+        )
       )
 
     it("must add and remove assets") {
-      assert(XFormsAssetsBuilder.fromJsonString(ExpectedAssets) == result)
+      assert(XFormsAssetsBuilder.fromJsonString(ExpectedAssets, Map.empty) == result)
     }
   }
 }

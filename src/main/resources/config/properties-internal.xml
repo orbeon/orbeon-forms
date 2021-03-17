@@ -156,46 +156,60 @@
         +/apps/fr/style/form-runner-orbeon.css
         +/apps/fr/style/form-runner-responsive.css
 
-        <!-- Temporary until we can create a baseline that includes baseline XBL components -->
-        +/xbl/orbeon/section/section.css
-        +/xbl/orbeon/grid/grid.css
-        /xbl/orbeon/repeater/repeater.css
-        +/xbl/orbeon/error-summary/error-summary.css
-        +/xbl/orbeon/number/number.css
-        +/xbl/orbeon/wizard/wizard.css
-        +/xbl/orbeon/character-counter/character-counter.css
-        +/xbl/orbeon/dropdown-date/dropdown-date.css
-        +/xbl/orbeon/alert-dialog/alert-dialog.css
+        <!-- Core Form Runner XBL components -->
+        +fr:section
+        +fr:grid
+        +fr:grid-single
+        +fr:grid-multiple
+        +fr:repeater
+        +fr:error-summary
+        +fr:wizard
+        +fr:alert-dialog
+        +fr:dnd-repeat
+        +fr:tabbable
+        +fr:captcha
+        +fr:process-button
+        +fr:href-button         <!-- not sure if used outside of Summary page now -->
+        +fr:ladda-button
+        +fr:xforms-inspector
 
-        <!-- Temporary until we can create a baseline that includes baseline XBL components -->
-        +/xbl/orbeon/date/date.css
-        +/xbl/orbeon/time/time.css
-        +/xbl/orbeon/datetime/datetime.css
-        +/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css
-        +/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css
-        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/css/select2.css
-        +/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda-themeless.min.css
-        +/xbl/orbeon/ladda-button/ladda-button.css
+        <!-- Common controls XBL components -->
+        <!-- NOTE: `fr:number` and `fr:date` are already in the baseline -->
+        +fr:time
+        +fr:datetime
+        +fr:hidden
+        +fr:character-counter
+        +fr:dropdown-date
+        +fr:fields-date
+        +fr:date-picker
+        +fr:attachment
+        +fr:attachment-multiple
+        +fr:image-attachment
+        +fr:image
+        +fr:dropdown-select1-search
+        +fr:databound-select1-search
+        +fr:autosize-textarea
+        +fr:tinymce
+        +fr:box-select
+        +fr:checkbox-input
+        +fr:databound-select1
+        +fr:expandable-output
+        +fr:explanation
+        +fr:open-select1
+        +fr:handwritten-signature
+        +fr:us-phone
+        +fr:us-state
+        +fr:yesno-input
 
-        +/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js
-        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/select2.full.js
-        +/xbl/orbeon/autosize-textarea/autosize.min.js
-        +/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/spin.min.js
-        +/xbl/orbeon/ladda-button/ladda-1.0.0-orbeon/ladda.min.js
-        +/ops/dragula/dragula.min.js
+        <!-- Less common controls XBL components -->
+        +fr:wpaint
+
+        <!-- Examples controls XBL components -->
+<!--        +fr:us-currency-thousands-->
+<!--        +fr:california-plate-->
+
+        <!-- Extra support needed when offline -->
         +/ops/fflate/index.js
-
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/fr.js-->
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/de.js-->
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/sv.js-->
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/pt.js-->
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/it.js-->
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/es.js-->
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/fi.js-->
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/nl.js-->
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/ru.js-->
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/pl.js-->
-<!--        +/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/da.js-->
 
         <!-- Main offline JavaScript -->
         +/apps/fr/resources/scalajs/orbeon-form-runner-offline.js

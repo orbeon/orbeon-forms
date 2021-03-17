@@ -13,10 +13,13 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.properties.Property
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
@@ -108,14 +111,27 @@ class XFormsStaticStateImpl(
   def uploadMaxSizeAggregateExpression        : Option[CompiledExpression]      = dynamicProperties.uploadMaxSizeAggregateExpression
   def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
 
-  // TODO: uses spray JSON
+  // TODO: don't use spray JSON and switch to Circe
   lazy val sanitizeInput: String => String = StringReplacer(staticProperties.staticStringProperty(P.SanitizeProperty))
 
-  // TODO: uses spray JSON
+  // TODO: don't use spray JSON and switch to Circe
   lazy val assets: XFormsAssets =
     XFormsAssetsBuilder.updateAssets(
-      XFormsAssetsBuilder.fromJSONProperty,
-      staticProperties.staticStringProperty(P.AssetsBaselineExcludesProperty),
-      staticProperties.staticStringProperty(P.AssetsBaselineUpdatesProperty)
+      XFormsAssetsBuilder.fromJsonProperty,
+      staticProperties.staticStringProperty(P.AssetsBaselineExcludesProperty).trimAllToOpt,
+      staticProperties.staticStringProperty(P.AssetsBaselineUpdatesProperty).trimAllToOpt.map(propValue =>
+        Property(
+          XS_STRING_QNAME,
+          propValue,
+          topLevelPart
+            .defaultModel
+            .map(_.namespaceMapping.mapping)
+            // FIXME: It's unclear what namespace mapping to use! With Form Runner/Form Builder, the
+            //   property value is read and copied over to an attribute on the first model, but the
+            //   namespace context from the properties file is lost in this process. Maybe we should
+            //   instead convert QNames to EQNames.
+            .getOrElse(throw new IllegalArgumentException("can't find namespace mapping"))
+        )
+      )
     )
 }

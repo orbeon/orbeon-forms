@@ -83,7 +83,7 @@ class FormRunnerCompiler extends ProcessorImpl {
             entriesIt.toList
           }
 
-          val formInstanceAttachments = {
+          val formInstanceDataAttachments = {
 
             val opt =
               staticState.topLevelPart.findControlAnalysis(FormInstance) collect {
@@ -116,6 +116,8 @@ class FormRunnerCompiler extends ProcessorImpl {
             opt.toList.flatten
           }
 
+          val distinctResources = (formInstanceDataAttachments ::: cacheableResourcesToInclude).distinct
+
           val useZipFormat =
             ec.getRequest.getFirstParamAsString("format").contains("zip")
 
@@ -132,9 +134,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
               val manifest =
                 (
-                  ManifestEntry(jsonFormPath, jsonFormPath, ContentTypes.XmlContentType) ::
-                  formInstanceAttachments                                                :::
-                  cacheableResourcesToInclude
+                  ManifestEntry(jsonFormPath, jsonFormPath, ContentTypes.XmlContentType) :: distinctResources
                 ).asJson.noSpaces
 
               val entry = new ZipEntry(ManifestEntry.JsonFilename)
@@ -171,7 +171,7 @@ class FormRunnerCompiler extends ProcessorImpl {
             }
 
             // Write static attachments and other resources
-            formInstanceAttachments.iterator ++ cacheableResourcesToInclude foreach { manifestEntry =>
+            distinctResources.iterator foreach { manifestEntry =>
               ConnectionResult.withSuccessConnection(connect(manifestEntry.uri), closeOnSuccess = true) { is =>
                 val entry = new ZipEntry(manifestEntry.zipPath)
                 zos.putNextEntry(entry)

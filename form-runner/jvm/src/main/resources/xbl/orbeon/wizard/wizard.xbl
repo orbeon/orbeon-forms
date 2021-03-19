@@ -499,7 +499,6 @@
                                             ]
                                     "/>
 
-                                <!-- Wizard.scala uses this via the variable `id` -->
                                 <xf:var
                                     id="fr-wizard-allow-prev"
                                     name="allow-prev"
@@ -508,7 +507,6 @@
                                         exists($prev-nav-case-ids)
                                     "/>
 
-                                <!-- Wizard.scala uses this via the variable `id` -->
                                 <xf:var
                                     id="fr-wizard-allow-next"
                                     name="allow-next"
@@ -521,11 +519,13 @@
                                         exists($next-nested-case-id-opt)
                                     "/>
 
+                                <!-- Wizard.scala uses this via the variable `id` -->
                                 <xf:var
                                     id="fr-wizard-is-first-nav"
                                     name="is-first-nav"
                                     value="empty($prev-nav-case-ids)"/>
 
+                                <!-- Wizard.scala uses this via the variable `id` -->
                                 <xf:var
                                     id="fr-wizard-is-last-nav"
                                     name="is-last-nav"

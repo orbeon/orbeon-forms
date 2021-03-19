@@ -42,8 +42,10 @@ object OfflineSupport {
   type RuntimeForm      = String
 
   def destroyForm(container: html.Element): Unit =
-    EmbeddingSupport.destroyForm(container)
-    // TODO: Remove from `XFormsStateManager`.
+    EmbeddingSupport.destroyForm(container) foreach { uuid =>
+      debug(s"removing form from cache with UUID `$uuid`")
+      XFormsStateManager.onRemovedFromCache(uuid)
+    }
 
   val XFormsFunctionLibraries =
     List(

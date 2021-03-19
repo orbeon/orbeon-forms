@@ -39,6 +39,6 @@ object XFormsStateManager extends XFormsStateManagerTrait {
   def createInitialDocumentFromStore(parameters: RequestParameters): XFormsContainingDocument = throw new NotImplementedError("createInitialDocumentFromStore")
 
   def onAddedToCache(uuid: String): Unit = ()
-  def onRemovedFromCache(uuid: String): Unit = ()
-  def onEvictedFromCache(containingDocument: XFormsContainingDocument): Unit = ()
+  def onRemovedFromCache(uuid: String): Unit = documents -= uuid
+  def onEvictedFromCache(containingDocument: XFormsContainingDocument): Unit = onRemovedFromCache(containingDocument.uuid)
 }

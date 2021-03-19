@@ -14,17 +14,22 @@ import scala.scalajs.js
 
 object EmbeddingSupport {
 
-  def destroyForm(container: html.Element): Unit = {
-    Option(container.querySelector("form")).foreach { formElem =>
-      val formId = formElem.id
-      val form = Page.getForm(formId)
-      form.xblInstances.foreach(_.destroy())
-      form.xblInstances.clear()
-      Page.unregisterForm(form)
-      Globals.reset()
-      StateHandling.clearClientState(formId)
-    }
+  // Destroy the form's UI data structures and return its UUID if found
+  def destroyForm(container: html.Element): Option[String] = {
+    val uuidOpt =
+      Option(container.querySelector("form")) map { formElem =>
+        val formId = formElem.id
+        val form = Page.getForm(formId)
+        val uuid = form.uuid
+        form.xblInstances.foreach(_.destroy())
+        form.xblInstances.clear()
+        Page.unregisterForm(form)
+        Globals.reset()
+        StateHandling.clearClientState(formId)
+        uuid
+      }
     container.childNodes.foreach(container.removeChild)
+    uuidOpt
   }
 
   def findAndDetachCssToLoad(container: dom.NodeSelector): List[String] = {

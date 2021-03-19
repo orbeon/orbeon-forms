@@ -11,6 +11,7 @@ import org.orbeon.oxf.fr.library._
 import org.orbeon.oxf.http.{BasicCredentials, StatusCode, StreamedContent}
 import org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.{Connection, ConnectionResult, PathUtils, XPath}
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
@@ -19,20 +20,20 @@ import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.utils.Configuration
+import org.orbeon.xforms._
 import org.orbeon.xforms.embedding.SubmissionProvider
 import org.orbeon.xforms.offline.OfflineSupport
 import org.orbeon.xforms.offline.demo.LocalClientServerChannel
-import org.orbeon.xforms._
-import org.scalajs.dom.html
-import org.orbeon.oxf.util.Logging._
+import org.scalajs.dom.{html, window}
 
 import java.io.InputStream
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.timers
 import scala.scalajs.js.typedarray.{ArrayBuffer, Uint8Array}
 import scala.util.{Failure, Try}
 
@@ -295,34 +296,43 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     documentId       : js.UndefOr[String]
   ): js.Promise[RuntimeForm] = {
 
-    XFormsUI.showModalProgressPanelImmediate()
+    val promise = Promise[RuntimeForm]()
 
-    val future =
-      compileAndCacheFormIfNeededF(serializedBundle, appName, formName, formVersion) map { compiledForm =>
+    // This is to ensure that the modal progress panel shows before we start the calculation
+    window.requestAnimationFrame(_ => {
 
-        try {
-          OfflineSupport.renderCompiledForm(
-            container.some,
-            compiledForm,
-            FormRunnerFunctionLibraryList,
-            Some(
-              new XFormsURIResolver {
-                def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
-                  urlString match {
-                    case "input:instance" => createFormParamInstance(appName, formName, formVersion, mode, documentId.toOption)
-                    case _                => throw new UnsupportedOperationException(s"resolving `$urlString")
-                  }
-                def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo =
-                  throw new UnsupportedOperationException(s"resolving readonly `$urlString")
-              }
+      XFormsUI.showModalProgressPanelImmediate()
+
+      timers.setTimeout(0) {
+        compileAndCacheFormIfNeededF(serializedBundle, appName, formName, formVersion) map { compiledForm =>
+          try {
+            OfflineSupport.renderCompiledForm(
+              container.some,
+              compiledForm,
+              FormRunnerFunctionLibraryList,
+              Some(
+                new XFormsURIResolver {
+                  def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
+                    urlString match {
+                      case "input:instance" => createFormParamInstance(appName, formName, formVersion, mode, documentId.toOption)
+                      case _                => throw new UnsupportedOperationException(s"resolving `$urlString")
+                    }
+                  def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo =
+                    throw new UnsupportedOperationException(s"resolving readonly `$urlString")
+                }
+              )
             )
-          )
-        } finally {
-          XFormsUI.hideModalProgressPanelImmediate()
+          } finally {
+            XFormsUI.hideModalProgressPanelImmediate()
+          }
+        } foreach { runtimeForm =>
+          // Complete the outer promise/future
+          promise.success(runtimeForm)
         }
       }
+    })
 
-    future.toJSPromise
+    promise.future.toJSPromise
   }
 
   @JSExport

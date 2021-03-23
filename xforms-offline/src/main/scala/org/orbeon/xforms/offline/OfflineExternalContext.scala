@@ -9,8 +9,7 @@ import org.scalajs.dom
 
 import java.io.{InputStream, OutputStream, PrintWriter}
 import java.net.URL
-import java.util.Locale
-import java.{util, util => ju}
+import java.{util => ju}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -55,9 +54,9 @@ object OfflineExternalContext {
         def getContextPath                          : String = ""
         def getServletPath                          : String = ""
         def getClientContextPath(urlString: String) : String = ""
-        val getAttributesMap                        : util.Map[String, AnyRef]        = mutable.Map.empty.asJava
-        def getHeaderValuesMap                      : util.Map[String, Array[String]] = Map.empty.asJava
-        def getParameterMap                         : util.Map[String, Array[AnyRef]] = Map.empty.asJava
+        val getAttributesMap                        : ju.Map[String, AnyRef]        = mutable.Map.empty.asJava
+        def getHeaderValuesMap                      : ju.Map[String, Array[String]] = Map.empty.asJava
+        def getParameterMap                         : ju.Map[String, Array[AnyRef]] = Map.empty.asJava
         def getCharacterEncoding                    : String = CharsetNames.Utf8
         def getContentLength                        : Int = -1
         def getContentType                          : String = throw new NotImplementedError("getContentType")
@@ -77,8 +76,8 @@ object OfflineExternalContext {
         def isSecure                                : Boolean = dom.window.document.location.protocol == "https:/"
         def credentials                             : Option[Credentials] = None
         def isUserInRole(role: String)              : Boolean = false
-        def getLocale                               : Locale = throw new NotImplementedError("getLocale")
-        def getLocales                              : util.Enumeration[_] = throw new NotImplementedError("getLocales")
+        def getLocale                               : ju.Locale = throw new NotImplementedError("getLocale")
+        def getLocales                              : ju.Enumeration[_] = throw new NotImplementedError("getLocales")
         def getPathTranslated                       : String = throw new NotImplementedError("getPathTranslated")
         def getQueryString                          : String = throw new NotImplementedError("getQueryString")
         def getRequestURI                           : String = throw new NotImplementedError("getRequestURI")

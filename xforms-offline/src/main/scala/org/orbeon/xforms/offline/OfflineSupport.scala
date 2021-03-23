@@ -4,6 +4,7 @@ import org.log4s.Logger
 import org.orbeon.facades.TextDecoder
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.rewrite.Rewrite
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory}
@@ -13,6 +14,7 @@ import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLOutput
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.{RequestInformation, XFormsContainingDocument, XFormsStaticState, XFormsStaticStateDeserializer}
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverAdapter
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.xforms.EmbeddingSupport._
@@ -147,9 +149,17 @@ object OfflineSupport {
                 containerOpt match {
                   case Some(container) =>
 
-                    val rcv = new DomDocumentFragmentXMLReceiver
+                    val fragRcv = new DomDocumentFragmentXMLReceiver
+
+                    val rewriteRcv = Rewrite.getRewriteXMLReceiver(
+                      rewriter    = CoreCrossPlatformSupport.externalContext.getResponse,
+                      xmlReceiver = fragRcv,
+                      fragment    = false,
+                      rewriteURI  = XHTML_NAMESPACE_URI
+                    )
+
                     withDebug("generate markup") {
-                      XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rcv)
+                      XHTMLOutput.send(containingDocument, staticState.template.get, CoreCrossPlatformSupport.externalContext)(rewriteRcv)
                     }
 
                     // Find CSS/JS to load
@@ -157,13 +167,13 @@ object OfflineSupport {
                     //   have the list of offline CSS baseline assets and not insert the CSS if already present.
       //              val stylesheetsToLoad = findAndDetachCssToLoad(rcv.frag)
                     val stylesheetsToLoad = Nil
-                    val scriptsToLoad     = findAndDetachJsToLoad(rcv.frag)
+                    val scriptsToLoad     = findAndDetachJsToLoad(fragRcv.frag)
 
                     // Asynchronously load styles, insert HTML, then load scripts
                     for {
       //                _ <- loadStylesheets(stylesheetsToLoad) // XXX TODO
                       _ <- Future(())
-                      _ =  moveChildren(source = rcv.frag.querySelector("body"), target = container)
+                      _ =  moveChildren(source = fragRcv.frag.querySelector("body"), target = container)
                       _ <- loadScripts(scriptsToLoad)
                     } yield ()
 

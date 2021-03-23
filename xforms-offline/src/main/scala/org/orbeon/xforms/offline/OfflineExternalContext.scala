@@ -1,17 +1,16 @@
 package org.orbeon.xforms.offline
 
-import java.io.{InputStream, OutputStream, PrintWriter}
-import java.net.URL
-import java.util
-import java.util.Locale
-
 import cats.syntax.option._
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext, SimpleSession, WebAppContext}
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, URLRewriterUtils}
 import org.scalajs.dom
 
+import java.io.{InputStream, OutputStream, PrintWriter}
+import java.net.URL
+import java.util.Locale
+import java.{util, util => ju}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -123,7 +122,9 @@ object OfflineExternalContext {
         def rewriteRenderURL  (urlString: String): String                                           = urlString // TODO: CHECK
         def rewriteActionURL  (urlString: String, portletMode: String, windowState: String): String = urlString // TODO: CHECK
         def rewriteRenderURL  (urlString: String, portletMode: String, windowState: String): String = urlString // TODO: CHECK
-        def rewriteResourceURL(urlString: String, rewriteMode: Int): String                         = urlString // TODO: CHECK
+
+        def rewriteResourceURL(urlString: String, rewriteMode: Int): String                         =
+          URLRewriterUtils.rewriteResourceURL(getRequest, urlString, ju.Collections.emptyList(), rewriteMode)
 
         def getNamespacePrefix: String = throw new NotImplementedError("getNamespacePrefix")
       }

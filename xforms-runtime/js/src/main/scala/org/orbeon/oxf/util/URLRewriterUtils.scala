@@ -1,8 +1,11 @@
 package org.orbeon.oxf.util
 
-import java.{util => ju}
-
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.scalajs.dom
+import PathUtils._
+
+import java.net.URI
+import java.{util => ju}
 
 
 object URLRewriterUtils {
@@ -16,8 +19,20 @@ object URLRewriterUtils {
     pathMatchers : ju.List[PathMatcher],
     rewriteMode  : Int
   ): String = {
-    println(s"xxx URLRewriterUtils.rewriteResourceURL called for $urlString")
-    urlString
+
+    // We want to rewrite for example `/xbl/etc.`
+    val stringNoSlash = if (! urlString.startsWith("//")) urlString.dropStartingSlash else urlString
+    val uriNoSlash    = URI.create(stringNoSlash)
+
+    if (uriNoSlash.getScheme ne null) {
+      urlString
+    } else {
+      val base = URI.create(dom.window.location.href)
+      if (base.getScheme == "http" || base.getScheme == "https")
+        base.resolve("_/" + stringNoSlash).toString // mostly for when we load the offline template from Orbeon Forms for testing
+      else
+        base.resolve(uriNoSlash).toString           // regular offline case where resources are loaded from `file:`
+    }
   }
 
   def rewriteServiceURL(

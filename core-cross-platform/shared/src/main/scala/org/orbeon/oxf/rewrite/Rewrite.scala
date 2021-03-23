@@ -2,7 +2,7 @@ package org.orbeon.oxf.rewrite
 
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.xml.XMLReceiver
-import org.orbeon.oxf.xml.saxrewrite.{DocumentRootState, FragmentRootState, State, StatefulHandler}
+import org.orbeon.oxf.xml.saxrewrite.{DocumentRootState, FragmentRootState, StatefulHandler}
 
 
 /**
@@ -56,21 +56,20 @@ object Rewrite {
     xmlReceiver : XMLReceiver,
     fragment    : Boolean,
     rewriteURI  : String
-  ): StatefulHandler = {
-    var rootState: State = null
-    if (fragment) {
-      // Start directly with rewrite state
-      val fragmentRootState = new FragmentRootState(null, xmlReceiver)
-      val afterRootState = new RewriteState(fragmentRootState, xmlReceiver, rewriter, 0, rewriteURI)
-      fragmentRootState.setNextState(afterRootState)
-      rootState = fragmentRootState
-    } else {
-      // Start with root filter
-      val documentRootState = new DocumentRootState(null, xmlReceiver)
-      val afterRootState = new RewriteState(documentRootState, xmlReceiver, rewriter, 0, rewriteURI)
-      documentRootState.setNextState(afterRootState)
-      rootState = documentRootState
-    }
-    new StatefulHandler(rootState)
-  }
+  ): XMLReceiver =
+    new StatefulHandler(
+      if (fragment) {
+        // Start directly with rewrite state
+        val fragmentRootState = new FragmentRootState(null, xmlReceiver)
+        val afterRootState    = new RewriteState(fragmentRootState, xmlReceiver, rewriter, 0, rewriteURI)
+        fragmentRootState.setNextState(afterRootState)
+        fragmentRootState
+      } else {
+        // Start with root filter
+        val documentRootState = new DocumentRootState(null, xmlReceiver)
+        val afterRootState    = new RewriteState(documentRootState, xmlReceiver, rewriter, 0, rewriteURI)
+        documentRootState.setNextState(afterRootState)
+        documentRootState
+      }
+    )
 }

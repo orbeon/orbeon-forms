@@ -28,7 +28,7 @@ trait App {
 
     Logging.initialize()
 
-    scribe.info("Starting Orbeon app")
+    scribe.info("Starting Orbeon client-side web app")
 
     scribe.debug("running initializations after Orbeon API is available")
     onOrbeonApiLoaded()
@@ -77,7 +77,7 @@ trait App {
     def initialize(): Unit = {
 
       // By default, set to `Error` instead of `Debug`, not to pollute the console when it isn't necessary
-      val rootLevel = Level.Error
+      val rootLevel = Level.Info
 
       scribe.Logger.root.clearHandlers().clearModifiers().withHandler(
         minimumLevel = Some(rootLevel),

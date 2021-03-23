@@ -45,10 +45,14 @@ object InitSupport {
   def pageContainsFormsMarkup(): Unit =
     pageContainsFormsMarkupPromise.success(())
 
+  private var initTimestampBeforeMs: Long = -1
+
   // TODO: `xformsPageLoadedServer`
   // Called by form-specific dynamic initialization
   @JSExport
   def initializeFormWithInitData(initializationsString: String): Unit = {
+
+    initTimestampBeforeMs = System.currentTimeMillis()
 
     // Only now are properties available
     // TODO: pass `opsXFormsProperties` directly
@@ -70,7 +74,7 @@ object InitSupport {
       initializeHeartBeatIfNeeded()
 
       if (Page.countInitializedForms == allFormElems.size) {
-        scribe.debug(s"all forms are loaded")
+        scribe.info(s"all forms are loaded; total time for client-side web app initialization: ${System.currentTimeMillis() - initTimestampBeforeMs} ms")
         scheduleOrbeonLoadedEventIfNeeded()
       }
     }

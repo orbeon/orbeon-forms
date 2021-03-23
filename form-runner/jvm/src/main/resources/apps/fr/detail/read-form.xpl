@@ -66,9 +66,9 @@
                     select="
                         concat(
                             '/fr/service/persistence/crud/',
-                            /*/app,
+                            $params/app,
                             '/',
-                            /*/form,
+                            $params/form,
                             '/form/form.xhtml',
                             (: document is available e.g. when editing or viewing a document :)
                             if ($use-document-id) then concat('?document=', $params/document) else ''

@@ -28,7 +28,7 @@ val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and b
 val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.1"
 val RosHttpVersion                = "2.1.0"
-val ScalaLoggingVersion           = "3.9.2"
+val ScalaLoggingVersion           = "3.9.3"
 val Log4sVersion                  = "1.8.2"
 val ScalaCollectionCompatVersion  = "2.2.0"
 

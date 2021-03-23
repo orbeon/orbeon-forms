@@ -197,7 +197,7 @@ object InitSupport {
             return
         }
 
-      val uuidInput        = getTwoPassSubmissionField(formElem, UuidFieldName)
+      val uuidInput = getTwoPassSubmissionField(formElem, UuidFieldName)
 
       val (repeatTreeChildToParent, repeatTreeParentToAllChildren) =
         processRepeatHierarchy(initializations.repeatTree)

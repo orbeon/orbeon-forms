@@ -27,6 +27,7 @@ import org.orbeon.xforms.offline.demo.LocalClientServerChannel
 import org.scalajs.dom.{html, window}
 
 import java.io.InputStream
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
@@ -94,9 +95,12 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
 
   @JSExport
   def configure(
-    submissionProvider : js.UndefOr[SubmissionProvider]
+    submissionProvider    : js.UndefOr[SubmissionProvider],
+    compiledFormCacheSize : js.UndefOr[Int]
   ): FormRunnerProcessor = {
     util.Connection.submissionProvider = submissionProvider.toOption
+    compiledFormCacheSize foreach
+      (max => staticStateCacheMaxSize = Some(max ensuring (_ > 0, "maximum compiled form cache size must be greater than 0")))
     this
   }
 
@@ -115,10 +119,18 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     ).toJSPromise
 
   @JSExport
+  def isFormInCache(
+    appName     : String,
+    formName    : String,
+    formVersion : Int
+  ): Boolean =
+    staticStateCache.contains(CacheKey(appName, formName, formVersion))
+
+  @JSExport
   def warmupFormIfNeeded(
-    appName          : String,
-    formName         : String,
-    formVersion      : Int
+    appName     : String,
+    formName    : String,
+    formVersion : Int
   ): Unit =
     OfflineSupport.renderCompiledForm(
       None,
@@ -279,6 +291,10 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
               serializedForm,
               FormRunnerFunctionLibraryList
             )
+          if (staticStateCacheMaxSize contains staticStateCache.size) {
+            info(s"expiring compiled form cache entry for `${staticStateCache.keys.head}`")
+            staticStateCache -= staticStateCache.keys.head
+          }
           staticStateCache += cacheKey -> result
           result
         }
@@ -343,7 +359,7 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
     zip         : Boolean
   ): js.Promise[SerializedBundle] = {
 
-    configure(DemoSubmissionProvider)
+    configure(DemoSubmissionProvider, js.undefined)
 
     val query =
       PathUtils.recombineQuery(
@@ -394,7 +410,8 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
 
     case class CacheKey(appName: String, formName: String, formVersion: Int)
 
-    var staticStateCache = Map[CacheKey, CompiledForm]()
+    var staticStateCacheMaxSize: Option[Int] = None
+    val staticStateCache: mutable.Map[CacheKey, CompiledForm] = mutable.LinkedHashMap[CacheKey, CompiledForm]()
 
     def createFormParamInstance(
       appName          : String,

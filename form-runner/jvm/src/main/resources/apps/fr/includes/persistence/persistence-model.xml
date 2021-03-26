@@ -126,8 +126,7 @@
                 <xf:var
                     name="form-data"
                     value="
-                        if ($is-xml-submit)
-                        then
+                        if ($is-xml-submit) then
                             xxf:get-request-attribute('fr-form-data')
                         else
                             xf:parse(

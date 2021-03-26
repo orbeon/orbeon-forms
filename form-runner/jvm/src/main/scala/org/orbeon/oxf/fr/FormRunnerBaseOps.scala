@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.fr
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum._
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names._
@@ -31,6 +33,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 
+import scala.collection.immutable
 import scala.util.Try
 
 // The standard Form Runner parameters
@@ -334,7 +337,16 @@ trait FormRunnerBaseOps {
 
   def isEmbeddable: Boolean = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
 
+  sealed trait MessageAppearance extends EnumEntry with Lowercase
+  object MessageAppearance extends Enum[MessageAppearance] {
+    val values: immutable.IndexedSeq[MessageAppearance] = findValues
+
+    case object Dialog    extends MessageAppearance
+    case object Ephemeral extends MessageAppearance
+  }
+
   // Display a success message
+  // TODO: support
   //@XPathFunction
   def successMessage(message: String): Unit = {
     setvalue(persistenceInstance.rootElement / "message", message)
@@ -343,12 +355,19 @@ trait FormRunnerBaseOps {
 
   // Display an error message
   //@XPathFunction
-  def errorMessage(message: String): Unit =
-    dispatch(
-      name       = "fr-show",
-      targetId   = "fr-error-dialog",
-      properties = Map("message" -> Some(message))
-    )
+  def errorMessage(message: String): Unit = errorMessage(message, MessageAppearance.Dialog)
+  def errorMessage(message: String, appearance: MessageAppearance): Unit =
+    appearance match {
+      case MessageAppearance.Dialog =>
+        dispatch(
+          name       = "fr-show",
+          targetId   = "fr-error-dialog",
+          properties = Map("message" -> Some(message))
+        )
+      case MessageAppearance.Ephemeral =>
+        setvalue(persistenceInstance.rootElement / "message", message)
+        toggle("fr-message-error")
+    }
 
   def formRunnerStandaloneBaseUrl(propertySet: PropertySet, req: ExternalContext.Request): String = {
 

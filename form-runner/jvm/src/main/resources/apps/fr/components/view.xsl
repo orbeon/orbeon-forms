@@ -903,13 +903,22 @@
 
     <!-- Success messages -->
     <xsl:template match="fr:messages" name="fr-messages">
-        <xf:switch class="fr-messages" model="fr-persistence-model" ref=".[instance('fr-persistence-instance')/message != '']">
+        <xf:switch
+            class="fr-messages"
+            model="fr-persistence-model"
+            ref=".[instance('fr-persistence-instance')/message != '']"
+            xh:aria-live="polite">
+
             <xf:case id="fr-message-none">
                 <xh:span/>
             </xf:case>
             <xf:case id="fr-message-success">
                 <xf:output value="instance('fr-persistence-instance')/message" class="fr-message-success alert alert-success"/>
             </xf:case>
+            <xf:case id="fr-message-error">
+                <xf:output value="instance('fr-persistence-instance')/message" class="fr-message-error alert alert-error"/>
+            </xf:case>
+
         </xf:switch>
     </xsl:template>
 

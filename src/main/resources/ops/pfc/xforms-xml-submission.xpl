@@ -41,6 +41,7 @@
         <!-- NOTE: In portlet mode, the method and content-type are not available (not sure why), so just assume checking for the content type is enough -->
         <p:when
             test="
+                exists(/*/parameters/parameter[name = '$uuid']) and
                 (
                     (
                         lower-case(/*/method) = 'post' and (

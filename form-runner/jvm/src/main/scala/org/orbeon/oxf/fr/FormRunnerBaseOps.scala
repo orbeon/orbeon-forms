@@ -346,7 +346,7 @@ trait FormRunnerBaseOps {
   }
 
   // Display a success message
-  // TODO: support
+  // TODO: support `dialog` appearance, for symmetry with `error-message`
   //@XPathFunction
   def successMessage(message: String): Unit = {
     setvalue(persistenceInstance.rootElement / "message", message)

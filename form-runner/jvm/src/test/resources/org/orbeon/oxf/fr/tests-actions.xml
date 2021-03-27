@@ -485,14 +485,9 @@
                      <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
                          process:runProcessByName('oxf.fr.detail.process', 'summary')
                      </xf:action>
+                     <xf:load resource="https://www.bbc.com/news"/>
+                     <xf:load resource="https://www.bbc.com/news" xxf:target="_blank"/>
 
-                     <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                         process:runProcess('navigate(uri = ''https://www.bbc.com/news'')')
-                     </xf:action>
-
-                     <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                         process:runProcess('navigate(uri = ''https://www.bbc.com/news'', target = ''_blank'')')
-                     </xf:action>
                 </xf:action>
                 <xf:action
                     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"

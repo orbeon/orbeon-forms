@@ -32,10 +32,11 @@
     <xsl:variable name="metadata"       select="if ($is-detail) then frf:metadataInstanceRootOpt($fr-form-model) else ()"/>
     <xsl:variable name="page-layout"    select="if ($is-detail) then frf:optionFromMetadataOrPropertiesXPath($metadata, 'html-page-layout', $app, $form, $mode) else ()"/>
 
-    <xsl:variable name="view"           select="(/xh:html/xh:body/fr:view)[1]"                   as="element(fr:view)?"/>
-    <xsl:variable name="fluid"          select="$view/@fluid = 'true' or $page-layout = 'fluid'" as="xs:boolean"/>
-    <xsl:variable name="body"           select="($view/fr:body, $view)[1]"                       as="element()?"/>
-    <xsl:variable name="custom-buttons" select="$view/fr:buttons"                                as="element()*"/>
+    <xsl:variable name="view"                 select="(/xh:html/xh:body/fr:view)[1]"                   as="element(fr:view)?"/>
+    <xsl:variable name="fluid"                select="$view/@fluid = 'true' or $page-layout = 'fluid'" as="xs:boolean"/>
+    <xsl:variable name="body"                 select="($view/fr:body, $view)[1]"                       as="element()?"/>
+    <xsl:variable name="custom-buttons"       select="$view/fr:buttons"                                as="element()*"/>
+    <xsl:variable name="custom-inner-buttons" select="$view/fr:inner-buttons"                          as="element()*"/>
 
     <!-- Template for the default layout of a form -->
     <xsl:variable name="default-page-template" as="element(*)*">
@@ -360,13 +361,20 @@
 
                         <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
                         <!-- Optional inner buttons -->
-                        <xsl:if test="exists($inner-buttons)">
-                            <xsl:call-template name="fr-buttons-bar">
-                                <xsl:with-param name="buttons-property"  select="'oxf.fr.detail.buttons.inner'" tunnel="yes"/>
-                                <xsl:with-param name="highlight-primary" select="true()"                        tunnel="yes"/>
-                                <xsl:with-param name="inverse"           select="false()"                       tunnel="yes"/>
-                            </xsl:call-template>
-                        </xsl:if>
+                        <xsl:choose>
+                            <xsl:when test="exists($custom-inner-buttons)">
+                                <xh:span class="fr-buttons">
+                                    <xsl:apply-templates select="$custom-inner-buttons/node()"/>
+                                </xh:span>
+                            </xsl:when>
+                            <xsl:when test="exists($inner-buttons)">
+                                <xsl:call-template name="fr-buttons-bar">
+                                    <xsl:with-param name="buttons-property"  select="'oxf.fr.detail.buttons.inner'" tunnel="yes"/>
+                                    <xsl:with-param name="highlight-primary" select="true()"                        tunnel="yes"/>
+                                    <xsl:with-param name="inverse"           select="false()"                       tunnel="yes"/>
+                                </xsl:call-template>
+                            </xsl:when>
+                        </xsl:choose>
                     </xsl:element>
                 </xsl:otherwise>
             </xsl:choose>

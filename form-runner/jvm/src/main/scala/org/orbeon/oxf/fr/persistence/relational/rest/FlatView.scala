@@ -59,7 +59,8 @@ private object FlatView {
           s"""|SELECT *
               |  FROM information_schema.views
               | WHERE table_name = ?
-              |""".stripMargin
+              |       AND table_schema = current_schema()
+              |              |""".stripMargin
 
         useAndClose(connection.prepareStatement(sqlQuery)) { ps =>
           // On PostgreSQL, the name is stored in lower case in `information_schema.views`

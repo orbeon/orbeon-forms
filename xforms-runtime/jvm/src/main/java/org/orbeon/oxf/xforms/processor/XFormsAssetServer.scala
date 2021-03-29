@@ -13,12 +13,15 @@
  */
 package org.orbeon.oxf.xforms.processor
 
+import org.orbeon.io.IOUtils
+import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.{CharsetNames, IOUtils}
+import org.orbeon.io.IOUtils._
+import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.http.{SessionExpiredException, StatusCode}
+import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.io.IOUtils._
@@ -32,12 +35,13 @@ import org.orbeon.oxf.xforms.xbl.BindingLoader
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.io._
-import java.net.{URI, URLEncoder}
+import java.net.URI
 import scala.collection.compat._
 import scala.collection.immutable.ListSet
 import scala.util.{Failure, Success, Try}
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 /**
   * Serve XForms engine JavaScript and CSS resources by combining them.
@@ -206,16 +210,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
         val contentFilename = addExtensionIfNeeded(rawFilename)
 
         // Handle as attachment
-
-        // To support spaces and non-US-ASCII characters, we encode the filename using RFC 5987 percentage encoding.
-        // This is what the XPath `encode-for-uri()` does. Here we use the URLEncoder, which does
-        // application/x-www-form-urlencoded encoding, which seems to differ from RFC 5987 in that the space is
-        // encoded as a "+". Also see https://stackoverflow.com/a/2678602/5295.
-        val filenameEncodedForHeader = URLEncoder.encode(contentFilename, CharsetNames.Utf8).replaceAllLiterally("+", "%20")
-
-        // All browsers since IE7, Safari 5 support the `filename*=UTF-8''` syntax to indicate that the filename is
-        // UTF-8 percent encoded. Also see https://stackoverflow.com/a/6745788/5295.
-        response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + filenameEncodedForHeader)
+        (response.setHeader _).tupled(Headers.buildContentDispositionHeader(contentFilename))
 
         // Copy stream out
         try {

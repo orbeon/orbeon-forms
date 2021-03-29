@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.http
 
-import org.orbeon.oxf.util.NumericUtils
+import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.util.{DateUtils, NumericUtils}
+
+import java.net.URLEncoder
 
 
 object Headers {
@@ -27,6 +30,7 @@ object Headers {
   val OrbeonRemoteAddress     = "Orbeon-Remote-Address"
 
   val ContentType             = "Content-Type"
+  val ContentDisposition      = "Content-Disposition"
   val ContentLength           = "Content-Length"
   val LastModified            = "Last-Modified"
   val Authorization           = "Authorization"
@@ -46,6 +50,7 @@ object Headers {
   val OrbeonCredentialsLower  = OrbeonCredentials.toLowerCase
 
   val ContentTypeLower        = ContentType.toLowerCase
+  val ContentDispositionLower = ContentDisposition.toLowerCase
   val ContentLengthLower      = ContentLength.toLowerCase
   val LastModifiedLower       = LastModified.toLowerCase
   val AuthorizationLower      = Authorization.toLowerCase
@@ -133,9 +138,21 @@ object Headers {
   def firstNonNegativeLongHeaderIgnoreCase[T](headers: Iterable[(String, T)], name: String)(implicit ev: T => Iterable[String]): Option[Long] =
     firstItemIgnoreCase(headers, name) flatMap NumericUtils.parseLong filter (_ >= 0L)
 
+  def buildContentDispositionHeader(contentFilename: String): (String, String) = {
+    // To support spaces and non-US-ASCII characters, we encode the filename using RFC 5987 percentage encoding.
+    // This is what the XPath `encode-for-uri()` does. Here we use the URLEncoder, which does
+    // application/x-www-form-urlencoded encoding, which seems to differ from RFC 5987 in that the space is
+    // encoded as a "+". Also see https://stackoverflow.com/a/2678602/5295.
+    val filenameEncodedForHeader = URLEncoder.encode(contentFilename, CharsetNames.Utf8).replaceAllLiterally("+", "%20")
+
+    // All browsers since IE7, Safari 5 support the `filename*=UTF-8''` syntax to indicate that the filename is
+    // UTF-8 percent encoded. Also see https://stackoverflow.com/a/6745788/5295.
+    "Content-Disposition" -> ("attachment; filename*=UTF-8''" + filenameEncodedForHeader)
+  }
+
   // List of common HTTP headers
   val CommonHeaders = Seq(
-    "﻿Accept",
+    "Accept",
     "Accept-Charset",
     "Accept-Datetime",
     "Accept-Encoding",

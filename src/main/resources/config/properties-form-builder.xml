@@ -126,6 +126,10 @@
         xf:dispatch(name = "fb-test-form")
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.process.test-formulas.orbeon.builder">
+        xf:dispatch(name = "fb-test-formulas")
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.process.publish.orbeon.builder">
         xf:show(
             dialog = "fb-publish-dialog",

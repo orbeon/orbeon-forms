@@ -1018,7 +1018,7 @@ div.orbeon.orbeon-portlet-div {
 
     // Test dialog
     .fb-test-dialog {
-        width: 1000px;                              // Space to fit the 940px layout (couldn't find a reasonable variable to use here)
+        width: 90vw;                                // Try to be very wide
         max-width: none;
         .xxforms-dialog-body {
             .fb-dialog-remaining-height {
@@ -1026,7 +1026,7 @@ div.orbeon.orbeon-portlet-div {
             }
             .fb-test-iframe {
                 height: 100%; width: 100%;          // Use all the space available in container (.fb-dialog-remaining-height)
-                box-sizing: border-box;            // So the size of this box doesn't get larger than its container, which would add scrollbars to the container
+                box-sizing: border-box;             // So the size of this box doesn't get larger than its container, which would add scrollbars to the container
                 border: none;                       // By default, iframes have a particularly ugly border
             }
         }

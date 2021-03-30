@@ -13,7 +13,11 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xforms.MapSet
+import org.orbeon.oxf.xml.XMLReceiver
+import org.orbeon.oxf.xml.XMLReceiverSupport._
+
 
 /**
  * Abstract representation of an XPath analysis as usable by the XForms engine.
@@ -51,3 +55,67 @@ class NegativeAnalysis(xpathString: String)
 
 object StringAnalysis
   extends ConstantXPathAnalysis("'CONSTANT'", figuredOutDependencies = true)
+
+object XPathAnalysis {
+
+  def buildInstanceString(instanceId: String): String =
+    s"instance('${instanceId.replace("'", "''")}')"
+
+  def mapSetToIterable(mapSet: MapSet[String, String]): Iterable[String] =
+    mapSet map (entry => buildInstanceString(entry._1) + "/" + entry._2)
+
+  def writeXPathAnalysis(xpa: XPathAnalysis)(implicit receiver: XMLReceiver): Unit =
+    xpa match {
+      case a: ConstantXPathAnalysis =>
+        element("analysis", atts = List("expression" -> a.xpathString, "analyzed" -> a.figuredOutDependencies.toString))
+      case a =>
+        withElement("analysis", atts = List("expression" -> a.xpathString, "analyzed" -> a.figuredOutDependencies.toString)) {
+
+          def write(iterable: Iterable[String], enclosingElemName: String, elemName: String): Unit =
+            if (iterable.nonEmpty)
+              withElement(enclosingElemName) {
+                for (value <- iterable)
+                  element(elemName, text = getDisplayPath(value))
+              }
+
+          write(mapSetToIterable(a.valueDependentPaths), "value-dependent",      "path")
+          write(mapSetToIterable(a.returnablePaths),     "returnable",           "path")
+
+          write(a.dependentModels,                  "dependent-models",     "model")
+          write(a.dependentInstances,               "dependent-instances",  "instance")
+          write(a.returnablePaths.map.keys,         "returnable-instances", "instance")
+        }
+    }
+
+  /**
+   * Given an internal path, get a display path (for debugging/logging).
+   */
+  def getDisplayPath(path: String): String = {
+
+    // Special case of empty path
+    if (path.isEmpty) return path
+
+    val pool = StaticXPath.GlobalConfiguration.getNamePool
+
+    {
+      for (token <- path split '/') yield {
+        if (token.startsWith("instance(")) {
+          // instance(...)
+          token
+        } else {
+          val (optionalAt, number) = if (token.startsWith("@")) ("@", token.substring(1)) else ("", token)
+
+          optionalAt + {
+            try {
+              // Obtain QName
+              pool.getDisplayName(number.toInt)
+            } catch {
+              // Shouldn't happen, right? But since this is for debugging we output the token.
+              case e: NumberFormatException => token
+            }
+          }
+        }
+      }
+    } mkString "/"
+  }
+}

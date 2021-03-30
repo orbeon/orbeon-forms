@@ -1,0 +1,257 @@
+<!--
+  Copyright (C) 2012 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+    xmlns:p="http://www.orbeon.com/oxf/pipeline">
+
+    <xbl:binding
+        id="fr-formula-debugger"
+        element="fr|formula-debugger">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/formula-debugger/formula-debugger.css"/>
+        </xbl:resources>
+        <xbl:handlers>
+
+        </xbl:handlers>
+        <xbl:implementation>
+            <xf:model id="local-model">
+
+                <xf:instance id="local" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
+                    <_ filter="false" mip="calculate"/>
+                </xf:instance>
+
+                <xf:bind ref="@filter" type="xs:boolean"/>
+
+                <xf:action event="xforms-ready fr-refresh-data">
+                    <xf:delete ref="*"/>
+                    <xf:setvalue ref="@filter">false</xf:setvalue>
+                    <xf:insert
+                        xmlns:FormRunnerFormulaDebugger="java:org.orbeon.oxf.fr.xbl.FormRunnerFormulaDebugger"
+                        context="instance()"
+                        origin="
+                            let $rows := FormRunnerFormulaDebugger:explainModel(instance()/@mip)
+                            return
+                                for $i in 1 to array:size($rows)
+                                return
+                                    let $row := array:get($rows, $i)
+                                    return
+                                        xf:element(
+                                            'row',
+                                            (
+                                                xf:attribute(
+                                                    'projectionDeps',
+                                                    map:get($row, 'projectionDeps')
+                                                ),
+                                                xf:element(
+                                                    'name',
+                                                    frf:controlNameFromId(map:get($row, 'name'))
+                                                ),
+                                                xf:element(
+                                                    'expr',
+                                                    map:get($row, 'expr')
+                                                ),
+                                                xf:element(
+                                                    'refs',
+                                                    for $r in map:get($row, 'refs')
+                                                    return
+                                                        xf:element(
+                                                            'ref',
+                                                            frf:controlNameFromId(string($r))
+                                                        )
+                                                ),
+                                                xf:element(
+                                                    'transitive-refs',
+                                                    for $r in map:get($row, 'transitive-refs')
+                                                    return
+                                                        xf:element(
+                                                            'ref',
+                                                            frf:controlNameFromId(string($r))
+                                                        )
+                                                ),
+                                                map:get($row, 'xpath-analysis')
+                                            )
+                                        )"/>
+                </xf:action>
+
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
+
+                <xsl:template match="/*">
+                    <xf:group appearance="xxf:internal" xxbl:scope="outer">
+
+                        <xf:var name="fr-formulas-local">
+                            <xxf:value value="instance('local')" xxbl:scope="inner"/>
+                        </xf:var>
+
+                        <xf:var name="fr-filter" value="$fr-formulas-local/@filter = true()"/>
+
+                        <xf:action event="xforms-value-changed" target="fr-mip-filter">
+                            <xf:dispatch
+                                name="fr-refresh-data"
+                                targetid="local-model"
+                                xxbl:scope="inner"/>
+                            <xf:setindex
+                                repeat="formula-grid-repeat"
+                                index="1"/>
+                        </xf:action>
+
+                        <fr:section>
+                            <xf:label>Form Builder Formula Viewer</xf:label>
+
+                            <xf:select1 appearance="minimal" id="fr-mip-filter" ref="$fr-formulas-local/@mip" class="fr-mip-filter">
+                                <xf:label ref="'Formula Type'"/>
+                                <xf:item>
+                                    <xf:label>Calculate</xf:label>
+                                    <xf:value>calculate</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Default</xf:label>
+                                    <xf:value>default</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Relevant</xf:label>
+                                    <xf:value>relevant</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Required</xf:label>
+                                    <xf:value>required</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Readonly</xf:label>
+                                    <xf:value>readonly</xf:value>
+                                </xf:item>
+                            </xf:select1>
+
+                            <fr:checkbox-input id="fr-check" ref="$fr-formulas-local/@filter" appearance="minimal" class="fr-formula-filter">
+                                <xf:label ref="'Show related rows only'"/>
+                            </fr:checkbox-input>
+
+                            <xh:div class="table table-bordered fr-formula-legend">
+                                <xh:div class="fr-direct-dependency">Direct dependency</xh:div>
+                                <xh:div class="fr-direct-influence">Direct influence</xh:div>
+                                <xh:div class="fr-transitive-dependency">Transitive dependency</xh:div>
+                                <xh:div class="fr-transitive-influence">Transitive influence</xh:div>
+                                <xh:div class="xforms-repeat-selected-item-1">Current selection</xh:div>
+                            </xh:div>
+
+                            <!-- TODO: show sections/grids/repeats information, and whether `$foo` resolves to *all* or a subset of values -->
+                            <!-- TODO: help for selection controls; how to show options? like in Form Runner Summary page? -->
+                            <!-- TODO: show MIP values -->
+
+                            <fr:grid repeat="content" template="()" readonly="true" ref="$fr-formulas-local" id="formula-grid" number-rows="true">
+                                <xf:var name="fr-bind-name">
+                                    <xxf:value value="concat(name, '-bind')"/>
+                                </xf:var>
+                                <xh:tr
+                                    class="{{
+                                        let $r  := .,
+                                            $i  := index('formula-grid-repeat'),
+                                            $ri := $fr-formulas-local/*[$i],
+                                            $is-direct-dependency     := $ri/refs/ref            = $r/name,
+                                            $is-direct-influence      := $ri/name                = $r/refs/ref,
+                                            $is-transitive-dependency := $ri/transitive-refs/ref = $r/name,
+                                            $is-transitive-influence  := $ri/name                = $r/transitive-refs/ref
+                                        return (
+                                            'fr-direct-dependency'    [$is-direct-dependency],
+                                            'fr-direct-influence'     [$is-direct-influence],
+                                            'fr-transitive-dependency'[$is-transitive-dependency],
+                                            'fr-transitive-influence' [$is-transitive-influence],
+                                            'xforms-hidden'           [
+                                                $fr-filter and not(
+                                                    $r/name = $ri/name        or
+                                                    $is-direct-dependency     or
+                                                    $is-direct-influence      or
+                                                    $is-transitive-dependency or
+                                                    $is-transitive-influence
+                                                )
+                                            ]
+                                        )
+                                    }}">
+                                    <xh:td colspan="1">
+                                        <xf:output id="fr-control-name-output" ref="name" appearance="minimal">
+                                            <xf:label ref="'Control Name'"/>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td colspan="4">
+                                        <xf:output id="fr-control-expr-output" class="fr-xpath-expr" ref="expr" appearance="minimal">
+                                            <xf:label ref="'Expression'"/>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td colspan="2">
+                                        <xf:output id="fr-control-deps-output" class="fr-xpath-deps" ref=".[exists(refs/ref)]" value="string-join(refs/ref, '&#x0a;')" appearance="minimal">
+                                            <xf:label ref="'Control Dependencies'"/>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output id="fr-control-type" ref="xxf:type(bind($fr-bind-name))" appearance="minimal">
+                                            <xf:label ref="'Type'"/>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:input id="fr-control-value-input" ref="bind($fr-bind-name)">
+                                            <xf:label ref="'Control'"/>
+                                        </xf:input>
+                                    </xh:td>
+                                    <xh:td colspan="3">
+                                        <xf:group>
+                                            <xf:label ref="'Proj. Deps'"/>
+                                            <xh:div>
+                                                <xf:output value="if (xxf:is-blank(expr)) then () else if (@projectionDeps = true()) then '🟢' else '🔴'"/>
+                                            </xh:div>
+                                            <xf:output
+                                                id="fr-xpath-analysis"
+                                                class="fr-xpath-analysis"
+                                                mediatype="text/html"
+                                                ref=".[exists(analysis/value-dependent/path)]"
+                                                value="
+                                                    concat(
+                                                        '&lt;ul>&lt;li>',
+                                                        string-join(
+                                                            (
+                                                                analysis/value-dependent/path/string()
+                                                            ),
+                                                            '&lt;/li>&lt;li>'
+                                                        ),
+                                                        '&lt;/li>&lt;/ul>'
+                                                    )"/>
+
+                                        </xf:group>
+
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </fr:section>
+                    </xf:group>
+                </xsl:template>
+
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

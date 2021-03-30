@@ -16,9 +16,12 @@ package org.orbeon.oxf.xforms.analysis.model
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.xforms.analysis.XPathAnalysis
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.expr.{Expression, LocalVariableReference, VariableReference}
+import org.orbeon.saxon.expr.Expression
+import shapeless.syntax.typeable._
 
+import java.io.PrintStream
 import scala.annotation.tailrec
 import scala.collection.compat._
 
@@ -39,6 +42,10 @@ object DependencyAnalyzer {
     refs       : Set[String]
   )
 
+  case class Vertex(name: String, refs: Set[Vertex], expr: Option[String], xpa: Option[XPathAnalysis]) {
+    def transitiveRefs: Set[Vertex] = refs ++ refs.flatMap(_.transitiveRefs)
+  }
+
   private object BindDetails {
 
     def fromStaticBindMIP(
@@ -51,23 +58,17 @@ object DependencyAnalyzer {
       val compiledExpr = mip.compiledExpression
       val expr         = compiledExpr.expression.getInternalExpression
 
-      val referencedVariableNamesIt = iterateExternalVariableReferences(expr) filter validBindNames
+      val referencedVariableNamesIt = SaxonUtils.iterateExternalVariableReferences(expr) filter validBindNames
 
       BindDetails(staticBind, staticBind.nameOpt, referencedVariableNamesIt.to(Set))
     }
   }
 
-  private def iterateExternalVariableReferences(expr: Expression): Iterator[String] =
-    SaxonUtils.iterateExpressionTree(expr) collect {
-      case vr: VariableReference if ! vr.isInstanceOf[LocalVariableReference] =>
-        vr.getBinding.getVariableQName.getLocalName
-    }
-
   def findMissingVariableReferences(expr: Expression, validBindNames: scala.collection.Set[String]): Set[String] =
-    (iterateExternalVariableReferences(expr) filterNot validBindNames).to(Set)
+    (SaxonUtils.iterateExternalVariableReferences(expr) filterNot validBindNames).to(Set)
 
   def containsVariableReference(expr: Expression, name: String): Boolean =
-    iterateExternalVariableReferences(expr) contains name
+    SaxonUtils.iterateExternalVariableReferences(expr) contains name
 
   //
   // Return an evaluation order or a `ValidationException` if there is a cycle.
@@ -75,41 +76,41 @@ object DependencyAnalyzer {
   // NOTE: If a variable reference is not found, this behaves as if the variable reference was missing.
   //
   def determineEvaluationOrder(
-    model : Model,
-    mip  : ModelDefs.StringMIP // `Model.Calculate` or `Model.Default`.
-  ): List[StaticBind] = {
+    model   : Model,
+    mip     : ModelDefs.XPathMIP // `Model.Calculate` or `Model.Default`.
+  ): (List[StaticBind], () => List[Vertex]) = {
 
     if (Logger.isDebugEnabled)
       Logger.debug(s"analyzing ${mip.name} dependencies for model ${model.staticId}")
 
     val allBindsByName = model.bindsByName
 
-    val bindsWithMIPDetails = {
+    val bindsDetailsForGivenMip = {
 
       def iterateBinds(bindsIt: Iterator[StaticBind]): Iterator[StaticBind] =
         bindsIt flatMap (b => Iterator(b) ++ iterateBinds(b.childrenBindsIt))
 
       val validBindNames = allBindsByName.keySet
 
-      val bindsIt   = iterateBinds(model.topLevelBinds.iterator)
-      val detailsIt = bindsIt flatMap (b => BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
+      val allBindsIt = iterateBinds(model.topLevelBinds.iterator)
+      val detailsIt  = allBindsIt flatMap (b => BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
 
       detailsIt.toList
     }
 
     // The algorithm requires all vertices so create all the ones which are referenced by name by expressions, but
     // are not present in bindsWithMIPDetails.
-    val otherBindDetailsIt = {
+    val otherBindDetails = {
 
-      val existingBindNames = bindsWithMIPDetails flatMap (_.name) toSet
-      val referredBindNames = bindsWithMIPDetails flatMap (_.refs) toSet
+      val existingBindNames = bindsDetailsForGivenMip flatMap (_.name) toSet
+      val referredBindNames = bindsDetailsForGivenMip flatMap (_.refs) toSet
       val namesToAdd        = referredBindNames -- existingBindNames
 
       for {
-        name       <- namesToAdd
+        name       <- namesToAdd.toList
         staticBind <- allBindsByName.get(name)
       } yield
-        BindDetails.apply(staticBind, staticBind.nameOpt, Set.empty)
+        BindDetails(staticBind, staticBind.nameOpt, Set.empty)
     }
 
     // NOTE: We would like to follow the original bind order as closely as possible, but currently we don't: the
@@ -136,31 +137,67 @@ object DependencyAnalyzer {
       visit(bindsForSort, Nil).reverse
     }
 
-    def logResult(result: List[StaticBind]): Unit =
-      if (result.nonEmpty && Logger.isDebugEnabled) {
+    def logResult(explanation: List[Vertex]): Unit = {
 
-        val idsToRefs = bindsWithMIPDetails map (b => b.staticBind.staticId -> b.refs) toMap
+      val maxNameWidth = explanation map (_.name.size) max
 
-        val maxStaticId = result map (_.staticId.size) max
+      val allExplanations =
+        explanation map { case Vertex(name, refs, _, projectionDeps) =>
 
-        def explanation(staticBind: StaticBind) = {
+          val dependsOnMsg = if (refs.isEmpty) "" else refs map (_.name) mkString (" (references: ", ", ", ")")
 
-          val staticId = staticBind.staticId
-          val refs     = idsToRefs(staticId)
+          s"  ${name.padTo(maxNameWidth, ' ')} ($projectionDeps)$dependsOnMsg"
+        } mkString "\n"
 
-          val dependsOnMsg = if (refs.isEmpty) "" else refs mkString (" (references: ", ", ", ")")
+      Logger.debug(s"topological sort (${explanation.size} nodes):\n$allExplanations")
+    }
 
-          s"  ${staticId.padTo(maxStaticId, ' ')}$dependsOnMsg"
-        }
+    def buildExplanationGraph(result: List[StaticBind]): List[Vertex] = {
 
-        val allExplanations = result map explanation mkString "\n"
+      val idsToRefs = bindsDetailsForGivenMip map (b => b.staticBind.staticId -> b.refs) toMap
 
-        Logger.debug(s"topological sort (${result.size} nodes):\n$allExplanations")
+      var verticesByIds: Map[String, Vertex] =
+        otherBindDetails.map(d =>
+          d.staticBind.staticId ->
+            Vertex(
+              d.name.get,
+              Set.empty,
+              None,
+              d.staticBind.firstXPathMIP(mip) collect {
+                case m if m.analysis.figuredOutDependencies => m.analysis
+              }
+            )
+        ).toMap
+
+      def explanation(staticBind: StaticBind) = {
+
+        val staticId = staticBind.staticId
+        val refs     = idsToRefs.getOrElse(staticBind.staticId, Set.empty)
+
+        val vertex = Vertex(
+          staticId,
+          refs map allBindsByName map (b => verticesByIds(b.staticId)),
+          staticBind.firstXPathMIP(mip).map(_.expression),
+          staticBind.firstXPathMIP(mip).map(_.analysis)
+        )
+        verticesByIds += staticId -> vertex
+        vertex
       }
 
-    // We are only interested in the binds containing the MIP
-    val idsToKeep = bindsWithMIPDetails map (_.staticBind.staticId) toSet
+      result map explanation
+    }
 
-    (sortTopologically(bindsWithMIPDetails ++ otherBindDetailsIt) filter (b => idsToKeep(b.staticId))) |!> logResult
+    // We are only interested in the binds containing the MIP
+    val idsToKeep = bindsDetailsForGivenMip map (_.staticBind.staticId) toSet
+
+    val resultWithOther = sortTopologically(bindsDetailsForGivenMip ++ otherBindDetails)
+    val resultFiltered  = resultWithOther filter (b => idsToKeep(b.staticId))
+
+    lazy val explanation = buildExplanationGraph(resultWithOther)
+
+    if (resultFiltered.nonEmpty && Logger.isDebugEnabled)
+      explanation |!> logResult
+
+    (resultFiltered, () => explanation)
   }
 }

@@ -24,7 +24,7 @@
     xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
     xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
-    xxf:external-events="fb-show-test-dialog xxforms-rpc-request"
+    xxf:external-events="fb-show-test-dialog fb-show-test-formulas-dialog xxforms-rpc-request"
     xxf:xpath-analysis="false"
     xxf:expose-xpath-types="true"
 
@@ -605,6 +605,38 @@
         xxf:show-progress="false"
     />
 
+    <xf:submission
+        id="fb-test-formulas-form-submission"
+        ref="
+            xxf:call-xpl(
+                'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                (
+                    'data',
+                    'bindings'
+                ),
+                (
+                    xxf:call-xpl(
+                        'oxf:/forms/orbeon/builder/form/add-test-formulas-configuration.xpl',
+                        'data',
+                        xxf:call-xpl(
+                            'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                            'data',
+                            instance('fb-form-instance'),
+                            'data'
+                        ),
+                        'data'
+                    )                ,
+                    xxf:instance('fb-components-instance')
+                ),
+                'data'
+            )"
+        method="post"
+        replace="all"
+        resource="/fr/{bind('application-name-bind')}/{bind('form-name-bind')}/test"
+        xxf:target="fb-test-iframe"
+        xxf:show-progress="false"
+    />
+
     <!-- Global variables -->
     <xf:instance id="fb-variables">
         <variables>
@@ -679,10 +711,24 @@
         ORBEON.xforms.Document.dispatchEvent("fr-form-model", "fb-show-test-dialog");
     </xf:action>
 
+    <xf:action type="javascript" ev:event="fb-test-formulas">
+        var oldIFrame = ORBEON.jQuery('.fb-test-iframe');
+        var newIFrame = ORBEON.jQuery(oldIFrame[0].outerHTML);
+        var iframeContainer = oldIFrame.parent();
+        oldIFrame.remove();
+        iframeContainer.append(newIFrame);
+        ORBEON.xforms.Document.dispatchEvent("fr-form-model", "fb-show-test-formulas-dialog");
+    </xf:action>
+
     <!-- Dispatched from the client, see above action -->
     <xf:action ev:event="fb-show-test-dialog">
         <xxf:show dialog="fb-test-dialog"/>
         <xf:send submission="fb-test-form-submission"/>
+    </xf:action>
+
+    <xf:action ev:event="fb-show-test-formulas-dialog">
+        <xxf:show dialog="fb-test-dialog"/>
+        <xf:send submission="fb-test-formulas-form-submission"/>
     </xf:action>
 
     <!-- Publish form operation -->

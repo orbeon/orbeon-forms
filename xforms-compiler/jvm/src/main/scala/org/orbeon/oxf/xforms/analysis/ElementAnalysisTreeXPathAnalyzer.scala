@@ -18,8 +18,8 @@ import org.orbeon.dom.{Element, QName, Text}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.StaticXPath.CompiledExpression
 import org.orbeon.oxf.util.{IndentedLogger, StaticXPath}
+import org.orbeon.oxf.xforms.analysis.XPathAnalysis.buildInstanceString
 import org.orbeon.oxf.xforms.{MapSet, XFormsStaticElementValue}
-import org.orbeon.oxf.xforms.analysis.PathMapXPathAnalysisBuilder.buildInstanceString
 import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.valueOrSelectAttribute
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
@@ -266,8 +266,8 @@ object ElementAnalysisTreeXPathAnalyzer {
       }
 
       if (partAnalysisCtx.staticProperties.isCalculateDependencies) {
-        model.recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(model, ModelDefs.Calculate))
-        model.defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(model, ModelDefs.Default))
+        model.recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(model, ModelDefs.Calculate)._1)
+        model.defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(model, ModelDefs.Default)._1)
       }
     }
 

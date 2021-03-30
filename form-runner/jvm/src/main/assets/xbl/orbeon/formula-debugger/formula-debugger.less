@@ -1,0 +1,62 @@
+@import (reference) "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+    .xbl-fr-formula-debugger {
+
+        .fr-formula-filter {
+            margin-bottom: 10px;
+        }
+
+        .fr-formula-legend {
+            margin-bottom: 10px;
+            display: inline-flex;
+            div {
+                width: 12em;
+                font-weight: bold;
+                text-align: center;
+                flex-grow: 1;
+                flex-basis: 0;
+                padding: 4px;
+            }
+        }
+
+        .fr-direct-dependency {
+            background-color: green;
+        }
+
+        .fr-direct-influence {
+            background-color: yellow;
+        }
+
+        .fr-transitive-dependency {
+            background-color: lightgreen;
+        }
+
+        .fr-transitive-influence {
+            background-color: lightyellow;
+        }
+
+        .xforms-repeat-selected-item-1 {
+            background-color: orange;
+        }
+
+        .fr-xpath-expr, .fr-xpath-deps, .fr-xpath-analysis {
+            &.xforms-output.xforms-output-appearance-minimal output {
+                white-space: pre-wrap;
+
+            }
+        }
+
+        .fr-xpath-expr {
+            &.xforms-output.xforms-output-appearance-minimal output {
+                font-family: monospace;
+                font-size: 90%;
+            }
+        }
+
+        .fr-xpath-analysis ul {
+            list-style-type: decimal;
+        }
+
+    }
+}

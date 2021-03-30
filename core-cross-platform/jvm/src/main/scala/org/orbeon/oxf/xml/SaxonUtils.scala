@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml
 
-import java.net.URI
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
@@ -21,7 +20,7 @@ import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.{SaxonConfiguration, ValueRepresentationType}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, BuiltInType, Type}
-import org.orbeon.saxon.expr.{Expression, ExpressionTool, XPathContextMajor}
+import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.DeepEqual
 import org.orbeon.saxon.instruct.NumberInstruction
 import org.orbeon.saxon.om._
@@ -33,6 +32,7 @@ import org.orbeon.saxon.{ArrayFunctions, Configuration, MapFunctions, om}
 import org.orbeon.scaxon.Implicits
 import org.w3c.dom.Node._
 
+import java.net.URI
 import scala.jdk.CollectionConverters._
 import scala.util.Try
 import scala.util.control.Breaks.{break, breakable}
@@ -67,6 +67,12 @@ object SaxonUtils {
   def iterateExpressionTree(e: Expression): Iterator[Expression] =
     Iterator(e) ++
       (e.iterateSubExpressions.asScala.asInstanceOf[Iterator[Expression]] flatMap iterateExpressionTree)
+
+  def iterateExternalVariableReferences(expr: Expression): Iterator[String] =
+    SaxonUtils.iterateExpressionTree(expr) collect {
+      case vr: VariableReference if ! vr.isInstanceOf[LocalVariableReference] =>
+        vr.getBinding.getVariableQName.getLocalName
+    }
 
   // Parse the given qualified name and return the separated prefix and local name
   def parseQName(lexicalQName: String): (String, String) = {

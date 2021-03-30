@@ -1,13 +1,17 @@
 package org.orbeon.oxf.fr.library
 
 import org.orbeon.macros.XPathFunction
+import org.orbeon.oxf.fr.Names.FormModel
 import org.orbeon.oxf.fr.{FormOrData, FormRunner, FormRunnerPersistence, GridDataMigration}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
+import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer.Vertex
+import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs}
 import org.orbeon.oxf.xforms.control.controls.FileMetadata
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.om
-import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent, StringValue}
 import org.orbeon.xbl.{DateSupportJava, NumberSupportJava, Wizard}
 
 import scala.jdk.CollectionConverters._
@@ -366,4 +370,40 @@ object FormRunnerFileMetadataFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction(name = "humanReadableBytes")
   def humanReadableBytes(size: String): String =
     FileMetadata.humanReadableBytes(size)
+}
+
+object FormRunnerFormulaDebuggerLibrary extends OrbeonFunctionLibrary {
+
+  lazy val namespaces = List("java:org.orbeon.oxf.fr.xbl.FormRunnerFormulaDebugger" -> "FormRunnerFormulaDebugger")
+
+  @XPathFunction(name = "explainModel")
+  def explainModel(mipName: String): om.Item = {
+
+    import org.orbeon.scaxon.Implicits._
+
+    val mip =
+      ModelDefs.AllXPathMipsByName(mipName)
+
+    val explanation =
+      DependencyAnalyzer.determineEvaluationOrder(
+        model   = XFormsAPI.topLevelModel(FormModel).map(_.staticModel).getOrElse(throw new IllegalArgumentException("model not found")),
+        mip     = mip
+      )._2()
+
+    val rows =
+      explanation map { case vertex @ Vertex(name, refs, expr, projectionDeps) =>
+
+        SaxonUtils.newMapItem(
+          Map[AtomicValue, ValueRepresentationType](
+            (SaxonUtils.fixStringValue("name"), Option(name: StringValue).getOrElse(EmptySequence)),
+            (SaxonUtils.fixStringValue("expr"), expr.map(StringValue.makeStringValue).getOrElse(EmptySequence)),
+            (SaxonUtils.fixStringValue("projectionDeps"), projectionDeps.exists(_.figuredOutDependencies)),
+            (SaxonUtils.fixStringValue("refs"), new SequenceExtent(refs.map(_.name).toList)),
+            (SaxonUtils.fixStringValue("transitive-refs"), new SequenceExtent((vertex.transitiveRefs -- refs).map(_.name).toList))
+          )
+        )
+      }
+
+    SaxonUtils.newArrayItem(rows.toVector)
+  }
 }

@@ -54,6 +54,7 @@ object ModelDefs {
   val MIPNameToAttributeQName  = AllMIPs map (m => m.name -> m.aName) toMap
 
   val AllComputedMipsByName    = AllMIPs collect { case m: ComputedMIP => m.name -> m } toMap
+  val AllXPathMipsByName       = AllMIPs collect { case m: XPathMIP    => m.name -> m } toMap
 
   val QNameToXPathComputedMIP  = AllMIPs collect { case m: XPathMIP with ComputedMIP => m.aName -> m } toMap
   val QNameToXPathValidateMIP  = AllMIPs collect { case m: XPathMIP with ValidateMIP => m.aName -> m } toMap

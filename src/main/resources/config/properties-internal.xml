@@ -172,6 +172,7 @@
         +fr:href-button         <!-- not sure if used outside of Summary page now -->
         +fr:ladda-button
         +fr:xforms-inspector
+        +fr:formula-debugger
 
         <!-- Common controls XBL components -->
         <!-- NOTE: `fr:number` and `fr:date` are already in the baseline -->

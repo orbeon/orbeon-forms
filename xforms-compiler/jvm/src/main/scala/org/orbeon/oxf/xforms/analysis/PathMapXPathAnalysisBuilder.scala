@@ -490,41 +490,6 @@ object PathMapXPathAnalysisBuilder {
     true
   }
 
-  /**
-   * Given an internal path, get a display path (for debugging/logging).
-   */
-  def getDisplayPath(path: String): String = {
-
-    // Special case of empty path
-    if (path.isEmpty) return path
-
-    val pool = XPath.GlobalConfiguration.getNamePool
-
-    {
-      for (token <- path split '/') yield {
-        if (token.startsWith("instance(")) {
-          // instance(...)
-          token
-        } else {
-          val (optionalAt, number) = if (token.startsWith("@")) ("@", token.substring(1)) else ("", token)
-
-          optionalAt + {
-            try {
-              // Obtain QName
-              pool.getDisplayName(number.toInt)
-            } catch {
-              // Shouldn't happen, right? But since this is for debugging we output the token.
-              case e: NumberFormatException => token
-            }
-          }
-        }
-      }
-    } mkString "/"
-  }
-
-  def buildInstanceString(instanceId: String): String = "instance('" + instanceId.replaceAll("'", "''") + "')"
-
-
 //  import java.io.ByteArrayOutputStream
 //  import org.orbeon.io.CharsetNames
 //  import org.orbeon.oxf.xml.dom.IOSupport

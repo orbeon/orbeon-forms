@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml
 
-import java.net.URI
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
@@ -37,6 +36,8 @@ import org.orbeon.saxon.value._
 import org.orbeon.scaxon.Implicits
 import org.w3c.dom.Node._
 
+import java.io.PrintStream
+import java.net.URI
 import scala.jdk.CollectionConverters._
 import scala.util.Try
 import scala.util.control.Breaks.{break, breakable}
@@ -71,6 +72,13 @@ object SaxonUtils {
   def iterateExpressionTree(e: Expression): Iterator[Expression] =
     Iterator(e) ++
       (e.operands.iterator.asScala flatMap (o => iterateExpressionTree(o.getChildExpression)))
+
+  def iterateExternalVariableReferences(expr: Expression): Iterator[String] = {
+    SaxonUtils.iterateExpressionTree(expr) collect {
+      case vr: OrbeonVariableReference =>
+        vr.name.getLocalPart
+    }
+  }
 
   // Parse the given qualified name and return the separated prefix and local name
   def parseQName(lexicalQName: String): (String, String) = {

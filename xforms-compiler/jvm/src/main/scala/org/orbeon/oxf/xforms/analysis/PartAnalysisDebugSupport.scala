@@ -15,13 +15,14 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
-import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.XPathAnalysis.writeXPathAnalysis
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.xforms.Constants
+
 
 object PartAnalysisDebugSupport {
 
@@ -163,32 +164,6 @@ object PartAnalysisDebugSupport {
       writeElementAnalysis(a)
       a.children filterNot (_.isInstanceOf[VariableValueTrait]) foreach recurse
     }
-
-    def writeXPathAnalysis(xpa: XPathAnalysis)(implicit receiver: XMLReceiver): Unit =
-      xpa match {
-        case a: ConstantXPathAnalysis =>
-          element("analysis", atts = List("expression" -> a.xpathString, "analyzed" -> a.figuredOutDependencies.toString))
-        case a =>
-          withElement("analysis", atts = List("expression" -> a.xpathString, "analyzed" -> a.figuredOutDependencies.toString)) {
-
-            def write(iterable: Iterable[String], enclosingElemName: String, elemName: String): Unit =
-              if (iterable.nonEmpty)
-                withElement(enclosingElemName) {
-                  for (value <- iterable)
-                    element(elemName, text = PathMapXPathAnalysisBuilder.getDisplayPath(value))
-                }
-
-            def mapSetToSet(mapSet: MapSet[String, String]) =
-              mapSet map (entry => PathMapXPathAnalysisBuilder.buildInstanceString(entry._1) + "/" + entry._2)
-
-            write(mapSetToSet(a.valueDependentPaths), "value-dependent",      "path")
-            write(mapSetToSet(a.returnablePaths),     "returnable",           "path")
-
-            write(a.dependentModels,                  "dependent-models",     "model")
-            write(a.dependentInstances,               "dependent-instances",  "instance")
-            write(a.returnablePaths.map.keys,         "returnable-instances", "instance")
-          }
-      }
 
     def recurse(ea: ElementAnalysis)(implicit receiver: XMLReceiver): Unit = {
 

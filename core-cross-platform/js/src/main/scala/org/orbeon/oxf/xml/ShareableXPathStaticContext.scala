@@ -59,48 +59,6 @@ class ShareableXPathStaticContext(
   private def declareVariableIfNeeded(qName: StructuredQName): Expression =
     variables.getOrElseUpdate(qName, new OrbeonVariableReference(qName))
 
-  class OrbeonVariableReference(val name: StructuredQName) extends Expression with Callable {
-
-    def getImplementationMethod            : Int      = ITERATE_METHOD
-    def getItemType                        : ItemType = AnyItemType
-    def computeCardinality()               : Int      = StaticProperty.ALLOWS_ZERO_OR_MORE
-    override def computeSpecialProperties(): Int      = StaticProperty.NO_NODES_NEWLY_CREATED // since we are returning an already-evaluated expression
-
-    def call(context  : XPathContext, arguments: Array[Sequence]): Sequence = {
-//      println(s"xxxx evaluating $name")
-
-      val variableResolver =
-        context.getController.getUserData(
-          classOf[ShareableXPathStaticContext].getName,
-          "variableResolver"
-        ).asInstanceOf[VariableResolver]
-
-      variableResolver(name, context)
-    }
-
-    override def iterate(context: XPathContext): SequenceIterator =
-      call(context, null).iterate()
-
-    override def equals(other: Any): Boolean =
-      other match {
-        case o: OrbeonVariableReference => name == o.name // && resolver eq other.resolver
-        case _ => false
-      }
-
-    override def computeHashCode: Int = name.hashCode
-
-    override def getExpressionName: String = "$" + name.getDisplayName
-
-    def copy(rebindings: RebindingMap) =
-      new OrbeonVariableReference(name)
-
-    def `export`(destination: ExpressionPresenter): Unit = {
-      destination.startElement("orbeonVar", this)
-      destination.emitAttribute("name", name)
-      destination.endElement()
-    }
-  }
-
   def bindVariable(qName: StructuredQName): Expression =
     declareVariableIfNeeded(qName)
 
@@ -135,4 +93,45 @@ class ShareableXPathStaticContext(
   def declareVariable(namespaceURI: String, localName   : String): XPathVariable = ???
   val getStackFrameMap: SlotManager = config.makeSlotManager
   def isContextItemParentless: Boolean = false
+}
+
+class OrbeonVariableReference(val name: StructuredQName) extends Expression with Callable {
+
+  def getImplementationMethod            : Int      = ITERATE_METHOD
+  def getItemType                        : ItemType = AnyItemType
+  def computeCardinality()               : Int      = StaticProperty.ALLOWS_ZERO_OR_MORE
+  override def computeSpecialProperties(): Int      = StaticProperty.NO_NODES_NEWLY_CREATED // since we are returning an already-evaluated expression
+
+  def call(context  : XPathContext, arguments: Array[Sequence]): Sequence = {
+
+    val variableResolver =
+      context.getController.getUserData(
+        classOf[ShareableXPathStaticContext].getName,
+        "variableResolver"
+      ).asInstanceOf[VariableResolver]
+
+    variableResolver(name, context)
+  }
+
+  override def iterate(context: XPathContext): SequenceIterator =
+    call(context, null).iterate()
+
+  override def equals(other: Any): Boolean =
+    other match {
+      case o: OrbeonVariableReference => name == o.name // && resolver eq other.resolver
+      case _ => false
+    }
+
+  override def computeHashCode: Int = name.hashCode
+
+  override def getExpressionName: String = "$" + name.getDisplayName
+
+  def copy(rebindings: RebindingMap) =
+    new OrbeonVariableReference(name)
+
+  def `export`(destination: ExpressionPresenter): Unit = {
+    destination.startElement("orbeonVar", this)
+    destination.emitAttribute("name", name)
+    destination.endElement()
+  }
 }

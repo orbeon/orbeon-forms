@@ -91,9 +91,10 @@ class MapGet extends MapFunction {
     val key = SaxonUtils.fixStringValue(itemArgument(1).asInstanceOf[AtomicValue]) // enforced by signature
 
     map.getOrElse(key, EmptySequence.getInstance) match {
+      case null        => EmptyIterator.getInstance
       case v: Value    => v.iterate()
       case v: NodeInfo => SingletonIterator.makeIterator(v)
-      case _           => throw new IllegalStateException
+      case v           => throw new IllegalStateException(v.getClass.getName)
     }
   }
 }

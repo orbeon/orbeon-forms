@@ -240,11 +240,6 @@ class XFormsOutputControl(
   // XForms doesn't specify this as of XForms 2.0, but we already read the other MIPs so it makes sense.
   override def valueType: QName = super.valueType
 
-  // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data"
-  // We make an exception for https://github.com/orbeon/orbeon-forms/issues/3583
-  override def isDirectlyFocusableMaybeWithToggle: Boolean =
-    staticControl.hasLHHA(LHHA.Label) && super.isDirectlyFocusableMaybeWithToggle
-
   override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
     var added: Boolean = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)
     added |= addFileMetadataAttributes(attributesImpl, previousControlOpt.asInstanceOf[Option[FileMetadata]])

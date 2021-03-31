@@ -108,8 +108,17 @@ private class DateCompanion extends XBLCompanionWithState {
         inputEl.prop("value", newValue)
       } else {
         newValue.trimAllToOpt match {
-          case Some(newValue) => JSDateUtils.isoDateToStringUsingLocalTimezone(newValue) foreach datePicker.setDate
-          case None           => datePicker.clearDates()
+          case Some(newValue) =>
+            JSDateUtils.isoDateToStringUsingLocalTimezone(newValue) match {
+              case Some(date) =>
+                datePicker.setDate(date)
+              case None       =>
+                // https://github.com/orbeon/orbeon-forms/issues/4828
+                datePicker.clearDates()
+                inputEl.prop("value", newValue)
+            }
+          case None           =>
+            datePicker.clearDates()
         }
       }
     }
@@ -118,6 +127,7 @@ private class DateCompanion extends XBLCompanionWithState {
       // On iOS, ignore the format as the native widget uses its own format
       if (! iOS) {
         val jsDate = datePicker.getDate
+
         // Orbeon Forms format:         https://doc.orbeon.com/configuration/properties/xforms#for-xf-input
         // bootstrap-datepicker format: https://bootstrap-datepicker.readthedocs.io/en/latest/options.html#format
         datePicker.options.format = newFormat
@@ -126,7 +136,12 @@ private class DateCompanion extends XBLCompanionWithState {
           .replaceAllLiterally("[M]"  , "m"   )
           .replaceAllLiterally("[M01]", "mm"  )
           .replaceAllLiterally("[Y]"  , "yyyy")
-        datePicker.setDate(jsDate)
+
+        // Don't set if `null` as that means we have a value which is not a date, and if we set it to `null`
+        // we will cause the value to be emptied.
+        // https://github.com/orbeon/orbeon-forms/issues/4828
+        if (jsDate ne null)
+          datePicker.setDate(jsDate)
       }
     }
 

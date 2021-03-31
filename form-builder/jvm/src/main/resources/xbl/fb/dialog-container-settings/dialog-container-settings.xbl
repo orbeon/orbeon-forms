@@ -18,7 +18,8 @@
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:cell="java:org.orbeon.oxf.fr.NodeInfoCell"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
@@ -46,6 +47,7 @@
                 <xf:action if="not($i/container-type = 'section')">
                     <xf:setvalue ref="$i/initially-open"             value="false()"/>
                     <xf:setvalue ref="$i/grid-columns"               value="if ($control/@columns = 24) then 24 else 12"/>
+                    <xf:setvalue ref="$i/grid-height"                value="array:size(cell:analyze12ColumnGridAndFillHoles($control, false()))"/>
                     <xf:setvalue ref="$i/can-migrate-grid-columns"   value="if ($control/@columns = 24) then fbf:canMigrateGridColumns($control, 24, 12) else fbf:canMigrateGridColumns($control, 12, 24)"/>
                 </xf:action>
 
@@ -313,6 +315,7 @@
 
                         <!-- Grids only -->
                         <grid-columns/>
+                        <grid-height/>
                         <can-migrate-grid-columns/>
 
                         <standard-classes/>
@@ -407,6 +410,11 @@
                     ref="grid-columns"
                     relevant="true()"
                     readonly="$i/container-type = 'section' or ../can-migrate-grid-columns = 'false'"/>
+
+                <xf:bind
+                    ref="grid-height"
+                    relevant="true()"
+                    readonly="$i/container-type = 'section'"/>
 
                 <xf:bind
                     ref="collapsible"
@@ -520,7 +528,7 @@
 
                             <fr:grid>
                                 <xh:tr>
-                                    <xh:td colspan="1">
+                                    <xh:td colspan="2">
                                         <xf:input ref="control-name" incremental="true" id="fb-control-name-input">
                                             <xf:label ref="$resources/dialog-container-settings/control-name/label"/>
                                             <xf:alert ref="$resources/dialog-container-settings/control-name/alert"/>
@@ -541,9 +549,14 @@
                                             </xf:item>
                                         </xf:select1>
                                     </xh:td>
+                                    <xh:td colspan="1">
+                                        <xf:output appearance="full xxf:horizontal" ref="grid-height">
+                                            <xf:label ref="$resources/dialog-container-settings/grid-rows/label"/>
+                                        </xf:output>
+                                    </xh:td>
                                 </xh:tr>
                                 <xh:tr>
-                                    <xh:td>
+                                    <xh:td colspan="2">
                                         <fr:checkbox-input ref="initially-open">
                                             <xf:label ref="$resources/dialog-container-settings/options/item[value = 'fr-initially-open']/label"/>
                                         </fr:checkbox-input>
@@ -555,7 +568,7 @@
                                             </xf:itemset>
                                         </xf:select>
                                     </xh:td>
-                                    <xh:td>
+                                    <xh:td colspan="2">
                                         <xf:select1 ref="collapsible" appearance="full xxf:horizontal">
                                             <xf:label ref="$resources/dialog-container-settings/collapsible/label"/>
                                             <xf:itemset ref="$resources/default-always-never/item">
@@ -566,20 +579,20 @@
                                     </xh:td>
                                 </xh:tr>
                                 <xh:tr>
-                                    <xh:td colspan="2">
+                                    <xh:td colspan="4">
                                         <xf:input ref="$i/custom-classes">
                                             <xf:label ref="$resources/classes/label"/>
                                         </xf:input>
                                     </xh:td>
                                 </xh:tr>
                                 <xh:tr>
-                                    <xh:td>
+                                    <xh:td colspan="2">
                                         <fb:boolean-or-formula ref="relevant" resources-ref="$resources">
                                             <xf:label ref="$resources/dialog-container-settings/visibility/label"/>
                                             <xf:hint  ref="$resources/dialog-container-settings/visibility/hint"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
-                                    <xh:td>
+                                    <xh:td colspan="2">
                                         <fb:boolean-or-formula ref="readonly" resources-ref="$resources">
                                             <xf:label ref="$resources/dialog-container-settings/readonly/label"/>
                                             <xf:hint  ref="$resources/dialog-container-settings/readonly/hint"/>

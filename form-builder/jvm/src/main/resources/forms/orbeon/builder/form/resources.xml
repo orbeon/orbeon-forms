@@ -694,6 +694,9 @@
             <grid-columns>
                 <label>Number of grid columns</label>
             </grid-columns>
+            <grid-rows>
+                <label>Number of grid rows</label>
+            </grid-rows>
             <options>
                 <label>Options</label>
                 <item>
@@ -1993,6 +1996,9 @@
             <grid-columns>
                 <label>Nombre de colonnes dans la grille</label>
             </grid-columns>
+            <grid-rows>
+                <label>Nombre de rangées dans la grille</label>
+            </grid-rows>
             <options>
                 <label>Options</label>
                 <item>
@@ -3276,6 +3282,9 @@
             <grid-columns>
                 <label todo="true">[Number of grid columns]</label>
             </grid-columns>
+            <grid-rows>
+                <label todo="true">Number of grid rows</label>
+            </grid-rows>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -4585,6 +4594,9 @@
             <grid-columns>
                 <label todo="true">[Number of grid columns]</label>
             </grid-columns>
+            <grid-rows>
+                <label todo="true">Number of grid rows</label>
+            </grid-rows>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -5895,6 +5907,9 @@
             <grid-columns>
                 <label todo="true">[Number of grid columns]</label>
             </grid-columns>
+            <grid-rows>
+                <label todo="true">Number of grid rows</label>
+            </grid-rows>
             <options>
                 <label>Opzioni</label>
                 <item>
@@ -7197,6 +7212,9 @@
             <grid-columns>
                 <label todo="true">[Number of grid columns]</label>
             </grid-columns>
+            <grid-rows>
+                <label todo="true">Number of grid rows</label>
+            </grid-rows>
             <options>
                 <label>Optionen</label>
                 <item>
@@ -8502,6 +8520,9 @@
             <grid-columns>
                 <label todo="true">[Number of grid columns]</label>
             </grid-columns>
+            <grid-rows>
+                <label todo="true">Number of grid rows</label>
+            </grid-rows>
             <options>
                 <label>Asetukset</label>
                 <item>
@@ -9804,6 +9825,9 @@
             <grid-columns>
                 <label todo="true">[Number of grid columns]</label>
             </grid-columns>
+            <grid-rows>
+                <label todo="true">Number of grid rows</label>
+            </grid-rows>
             <options>
                 <label>Opciones</label>
                 <item>
@@ -11107,6 +11131,9 @@
             <grid-columns>
                 <label todo="true">[Number of grid columns]</label>
             </grid-columns>
+            <grid-rows>
+                <label todo="true">Number of grid rows</label>
+            </grid-rows>
             <options>
                 <label>Opties</label>
                 <item>
@@ -12389,6 +12416,9 @@
             <grid-columns>
                 <label todo="true">[Number of grid columns]</label>
             </grid-columns>
+            <grid-rows>
+                <label todo="true">Number of grid rows</label>
+            </grid-rows>
             <options>
                 <label>Opções</label>
                 <item>
@@ -13698,6 +13728,9 @@
             <grid-columns>
                 <label todo="true">[Number of grid columns]</label>
             </grid-columns>
+            <grid-rows>
+                <label todo="true">Number of grid rows</label>
+            </grid-rows>
             <options>
                 <label>Val</label>
                 <item>

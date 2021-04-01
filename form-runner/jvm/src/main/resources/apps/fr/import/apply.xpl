@@ -56,44 +56,35 @@
     <p:choose href="#instance">
         <p:when test="/*/file-format = 'excel-named-ranges'">
 
-            <p:choose href="#parameters">
-                <p:when test="p:non-blank(p:get-request-parameter('document-id'))">
-                    <p:processor name="oxf:url-generator">
-                        <p:input name="config" href="#parameters" transform="oxf:unsafe-xslt">
-                            <config xsl:version="2.0">
+            <!-- This is read lazily by the Excel processor if data is needed -->
+            <p:processor name="oxf:url-generator">
+                <p:input name="config" href="#parameters" transform="oxf:unsafe-xslt">
+                    <config xsl:version="2.0">
 
-                                <xsl:variable name="params" select="/*"/>
+                        <xsl:variable name="params" select="/*"/>
 
-                                <xsl:variable
-                                    name="resource"
-                                    select="
-                                        concat(
-                                            '/fr/service/persistence/crud/',
-                                            $params/app,
-                                            '/',
-                                            $params/form,
-                                            '/data/',
-                                            p:get-request-parameter('document-id'),
-                                            '/data.xml'
-                                        )"/>
+                        <xsl:variable
+                            name="resource"
+                            select="
+                                concat(
+                                    '/fr/service/persistence/crud/',
+                                    $params/app,
+                                    '/',
+                                    $params/form,
+                                    '/data/',
+                                    p:get-request-parameter('document-id'),
+                                    '/data.xml'
+                                )"/>
 
-                                <url><xsl:value-of select="p:rewrite-service-uri($resource, true())"/></url>
-                                <mode>xml</mode>
-                                <handle-xinclude>false</handle-xinclude>
-                                <cache-control><use-local-cache>false</use-local-cache><conditional-get>false</conditional-get></cache-control>
+                        <url><xsl:value-of select="p:rewrite-service-uri($resource, true())"/></url>
+                        <mode>xml</mode>
+                        <handle-xinclude>false</handle-xinclude>
+                        <cache-control><use-local-cache>false</use-local-cache><conditional-get>false</conditional-get></cache-control>
 
-                            </config>
-                        </p:input>
-                        <p:output name="data" id="form-data"/>
-                    </p:processor>
-                </p:when>
-                <p:otherwise>
-                    <p:processor name="oxf:identity">
-                        <p:input name="data"><null xsi:nil="true"/></p:input>
-                        <p:output name="data" id="form-data"/>
-                    </p:processor>
-                </p:otherwise>
-            </p:choose>
+                    </config>
+                </p:input>
+                <p:output name="data" id="form-data"/>
+            </p:processor>
 
             <p:processor name="fr:extract-rows-from-excel-with-named-ranges">
                 <p:input  name="params" href="#parameters"/>

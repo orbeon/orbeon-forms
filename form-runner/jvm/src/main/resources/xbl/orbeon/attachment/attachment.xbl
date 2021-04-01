@@ -222,8 +222,8 @@
                         </resource>
                         <resource xml:lang="fr">
                             <download>Télécharger</download>
-                            <select-file>Sélectionner fichier</select-file>
-                            <select-files>Sélectionner fichiers</select-files>
+                            <select-file>Sélectionner un fichier</select-file>
+                            <select-files>Sélectionner des fichiers</select-files>
                             <drag>Déposer les fichiers ici ou utiliser le bouton ci-dessous.</drag>
                             <empty>Pas de fichier joint.</empty>
                             <remove>Supprimer le fichier joint</remove>
@@ -238,7 +238,7 @@
                         </resource>
                         <resource xml:lang="it">
                             <download>Scaricare</download>
-                            <select-file>[Select File]</select-file>
+                            <select-file>Selezionare File</select-file>
                             <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>
@@ -246,7 +246,7 @@
                         </resource>
                         <resource xml:lang="de">
                             <download>Herunterladen</download>
-                            <select-file>[Select File]</select-file>
+                            <select-file>Datei auswählen</select-file>
                             <select-files todo="true">[Select Files]</select-files>
                             <drag todo="true">[Drag files here or use the button below.]</drag>
                             <empty todo="true">[No attachment.]</empty>

@@ -38,7 +38,7 @@ object columnFilterPart {
                 val valueWhere =
                   column.filterType match {
                     case FilterType.None              => List.empty
-                    case FilterType.Exact    (_)      => List(s"AND tf$i.val = ?")
+                    case FilterType.Exact    (_)      => List("AND " + Provider.textEquals  (request.provider, s"tf$i.val"))
                     case FilterType.Substring(_)      => List("AND " + Provider.textContains(request.provider, s"tf$i.val"))
                     case FilterType.Token    (tokens) =>
                       tokens.map { _ =>

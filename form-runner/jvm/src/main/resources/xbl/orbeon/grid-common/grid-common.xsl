@@ -115,19 +115,19 @@
         </xsl:if>
     </xsl:function>
 
-    <xsl:function name="fr:th-td-classes-attr">
-        <xsl:param name="th-td" as="xs:string"/> <!-- Either 'th' or 'td' -->
-        <xsl:param name="class" as="xs:string?"/>
-        <xsl:param name="id"    as="xs:string?"/>
+    <xsl:function name="fr:th-td-tr-classes-attr">
+        <xsl:param name="th-td-tr" as="xs:string"/> <!-- 'th' | 'td' | 'tr' -->
+        <xsl:param name="class"    as="xs:string?"/>
+        <xsl:param name="id"       as="xs:string?"/>
         <xsl:attribute
             name="class"
             select="
-                concat('fr-grid-', $th-td),
+                concat('fr-grid-', $th-td-tr),
                 '{$class-value}'[exists($class)],
                 (
                     concat('{''fb-selected''[xxf:get-variable(''fr-form-model'', ''selected-cell'') = ''', $id, ''']}'),
                     'xforms-activable'
-                )[$is-editable and $th-td = 'td'] (: for cell selection :)
+                )[$is-editable and $th-td-tr = 'td'] (: for cell selection :)
             "/>
     </xsl:function>
 
@@ -227,7 +227,7 @@
 
                         <!-- Attributes -->
                         <xsl:attribute name="xxf:control">true</xsl:attribute><!-- for cell selection -->
-                        <xsl:copy-of select="fr:th-td-classes-attr('td', $c/@class, $c/@id)"/>
+                        <xsl:copy-of select="fr:th-td-tr-classes-attr('td', $c/@class, $c/@id)"/>
 
                         <xsl:if test="$h > 1"><xsl:attribute name="{fr:rowspan-attribute()}" select="$h"/></xsl:if>
                         <xsl:if test="$w > 1"><xsl:attribute name="{fr:colspan-attribute()}" select="$w"/></xsl:if>
@@ -277,11 +277,19 @@
 
             <xsl:choose>
                 <xsl:when test="not($use-css-grids-output)">
+
+                    <xsl:variable name="tr" select="map:get($cells[1], 'c')/parent::xh:tr"/>
+
+                    <xsl:if test="exists($tr/@class)">
+                        <xsl:copy-of select="fr:scope-outer-avt-class($tr/@class)"/>
+                    </xsl:if>
+
                     <xsl:element name="{$tr-elem}">
-                        <!--  Maybe: restore `@class` coming from `*:tr` if there is one. But since anyway
-                              the new grid format doesn't have explicit rows, this would be only for
-                              backward compatibility. -->
-                        <xsl:attribute name="class" select="'fr-grid-tr'"/>
+
+                        <xsl:if test="exists($tr)">
+                            <xsl:copy-of select="fr:th-td-tr-classes-attr('tr', $tr/@class, ())"/>
+                        </xsl:if>
+
                         <xsl:if test="$left-column and $static-row-pos = 1">
                             <xsl:copy-of select="$side-block"/>
                         </xsl:if>

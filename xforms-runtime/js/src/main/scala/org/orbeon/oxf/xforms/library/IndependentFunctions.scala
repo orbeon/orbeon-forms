@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms.library
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ContentTypes.XmlContentType
-import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.FunctionSupport._
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
@@ -135,10 +135,10 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING, EXACTLY_ONE)
 //    )
 
+  // TODO: Handle `params`.
   @XPathFunction
-  def serialize(node: Option[om.NodeInfo], params: om.Item): String = {
-    """[TODO]: serialize xml"""
-  }
+  def serialize(node: Option[om.NodeInfo], params: om.Item): String =
+    node map StaticXPath.tinyTreeToString getOrElse ""
 
   //
 //    Fun("property", classOf[Property], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,

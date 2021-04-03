@@ -419,7 +419,7 @@ object ItemsetSupport {
                       )
                     } catch {
                       case NonFatal(t) =>
-                        XFormsError.handleNonFatalXPathError(container, t)
+                        XFormsError.handleNonFatalXPathError(container, t, Some(attributeValue))
                         ""
                     }
                   Some(attributeName -> tempResult)

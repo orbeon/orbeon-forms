@@ -96,10 +96,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     }
 
   @XPathFunction
-  def runProcessByName(scope: String, name: String): Boolean = {
-    println(s"TODO: `runProcessByName($scope, $name)` called")
+  def runProcessByName(scope: String, name: String): Boolean =
     SimpleProcess.runProcessByName(scope, name).isSuccess
-  }
 
   @XPathFunction
   def runProcess(scope: String, process: String): Boolean =

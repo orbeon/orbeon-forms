@@ -581,8 +581,10 @@ object XFormsStaticStateDeserializer {
                   name       <- c.get[String]("name")
                   level      <- c.getOrElse[ValidationLevel]("level")(ValidationLevel.ErrorLevel)
                   expression <- c.get[String]("expression")
+                  analysis   <- c.getOrElse[Option[XPathAnalysis]]("analysis")(None)
                 } yield
-                  new StaticBind.XPathMIP(id, name, level, expression, namespaceMapping, xpathMipLocationData, functionLibrary)
+                  new StaticBind.XPathMIP(id, name, level, expression, namespaceMapping, xpathMipLocationData, functionLibrary) |!>
+                    (_.analysis = analysis.getOrElse(new NegativeAnalysis(expression)))
 
               val staticBind =
                 for {

@@ -1,5 +1,6 @@
 package org.orbeon.oxf.xforms
 
+import cats.syntax.option._
 import io.circe.generic.auto._
 import io.circe.generic.semiauto._
 import io.circe.syntax._
@@ -207,6 +208,18 @@ object XFormsStaticStateSerializer {
 
       val distinct = mutable.LinkedHashSet[QName]()
 
+      def collectForXPathAnalysis(analysis: XPathAnalysis): Unit =
+        if (analysis.figuredOutDependencies) // this should not even be preserved in the tree in the first place!
+          for {
+            mapSet      <- List(analysis.valueDependentPaths, analysis.returnablePaths)
+            pathSet     <- mapSet.map.values
+            path        <- pathSet
+          } locally {
+            splitAnalysisPath(path) foreach { qName =>
+              distinct += qName
+            }
+          }
+
       def updateDistinctCommon(e: ElementAnalysis) = {
 
         distinct += e.element.getQName
@@ -218,14 +231,8 @@ object XFormsStaticStateSerializer {
         for {
           analysisOpt <- List(e.bindingAnalysis, e.valueAnalysis) ::: (e.narrowTo[SelectionControlTrait].toList map (_.itemsetAnalysis))
           analysis    <- analysisOpt
-          if analysis.figuredOutDependencies // this should not even be preserved in the tree in the first place!
-          mapSet      <- List(analysis.valueDependentPaths, analysis.returnablePaths)
-          pathSet     <- mapSet.map.values
-          path        <- pathSet
         } locally {
-          splitAnalysisPath(path) foreach { qName =>
-            distinct += qName
-          }
+          collectForXPathAnalysis(analysis)
         }
 
         distinct += e.element.getQName
@@ -244,6 +251,11 @@ object XFormsStaticStateSerializer {
             e.attributeIterator foreach { att =>
               distinct += att.getQName
             }
+          }
+        case e: StaticBind =>
+          updateDistinctCommon(e)
+          e.allMIPNameToXPathMIP.valuesIterator.flatten foreach { xpathMip =>
+            collectForXPathAnalysis(xpathMip.analysis)
           }
         case e =>
           updateDistinctCommon(e)
@@ -497,6 +509,8 @@ object XFormsStaticStateSerializer {
             if (a.level != ValidationLevel.ErrorLevel)
               b += "level"      -> a.level.asJson
             b += "expression" -> Json.fromString(a.expression)
+            if (a.analysis.figuredOutDependencies)
+              b += "analysis" -> a.analysis.some.asJson
 
             Json.fromFields(b)
           }

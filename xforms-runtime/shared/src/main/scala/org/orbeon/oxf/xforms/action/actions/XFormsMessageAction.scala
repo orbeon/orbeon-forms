@@ -71,7 +71,7 @@ class XFormsMessageAction extends XFormsAction {
     val levelQName =
       actionContext.element.attributeValueOpt(XFormsNames.LEVEL_QNAME) flatMap { levelQName =>
         Extensions.resolveQName(
-          actionContext.analysis.namespaceMapping.mapping,
+          actionContext.analysis.namespaceMapping.mapping.get,
           levelQName,
           unprefixedIsNoNamespace = true
         )

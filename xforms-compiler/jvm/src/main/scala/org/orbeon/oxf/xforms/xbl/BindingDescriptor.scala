@@ -286,7 +286,7 @@ object BindingDescriptor {
 
         BindingDescriptor(
           Some(QName(localname, prefix, ns.mapping(prefix))),
-          datatype.trimAllToOpt flatMap (Extensions.resolveQName(ns.mapping, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
+          datatype.trimAllToOpt flatMap (Extensions.resolveQName(ns.mapping.get, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
           None
         )(binding)
     }
@@ -308,7 +308,7 @@ object BindingDescriptor {
 
         BindingDescriptor(
           qNameFromElementSelector(typeSelectorOpt, ns),
-          datatype.trimAllToOpt flatMap (Extensions.resolveQName(ns.mapping, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
+          datatype.trimAllToOpt flatMap (Extensions.resolveQName(ns.mapping.get, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
           Some(BindingAttributeDescriptor(QName(attName), attPredicate))// TODO: QName for attName
         )(binding)
     }

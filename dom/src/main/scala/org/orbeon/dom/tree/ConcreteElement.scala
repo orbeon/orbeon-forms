@@ -721,6 +721,20 @@ class ConcreteElement(var qname: QName)
   def allInScopeNamespacesAsStrings: Map[String, String] =
     allInScopeNamespacesAs(_.uri)
 
+  def namespaceForPrefix(prefix: String): Option[String] =
+    new Element.ancestorOrSelfElementIt(this) flatMap (_.declaredNamespacesIterator) find (_.prefix == prefix) match {
+      case Some(ns) => Some(ns.uri)
+      case None     =>
+        // It seems that by default this may not be declared. However, it should be: "The prefix xml is by definition
+        // bound to the namespace name http://www.w3.org/XML/1998/namespace. It MAY, but need not, be declared, and MUST
+        // NOT be bound to any other namespace name. Other prefixes MUST NOT be bound to this namespace name, and it
+        // MUST NOT be declared as the default namespace."
+        if (prefix == XmlNamespace.prefix)
+          Some(XmlNamespace.uri)
+        else
+          None
+    }
+
   def add(element: Element)    : Unit    = addNode(element)
   def remove(element: Element) : Boolean = removeNode(element)
 

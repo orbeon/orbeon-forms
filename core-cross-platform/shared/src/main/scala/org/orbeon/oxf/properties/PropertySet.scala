@@ -128,7 +128,7 @@ object PropertySet {
 //    def convertDate   (value: String, namespaces: Map[String, String]) = new ju.Date(DateUtilsUsingSaxon.parseISODateOrDateTime(value))
 
     def convertQName(value: String, namespaces: Map[String, String]): QName =
-      Extensions.resolveQName(namespaces, value, unprefixedIsNoNamespace = true) getOrElse
+      Extensions.resolveQName(namespaces.get, value, unprefixedIsNoNamespace = true) getOrElse
         (throw new ValidationException("QName value not found ", null))
 
     def convertURI(value: String, namespaces: Map[String, String]): URI =

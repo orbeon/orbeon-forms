@@ -43,10 +43,10 @@ object Extensions {
     def idOrThrow: String     = idOpt getOrElse (throw new IllegalArgumentException)
 
     def resolveStringQName(qNameString: String, unprefixedIsNoNamespace: Boolean): Option[QName] =
-      Extensions.resolveQName(e.allInScopeNamespacesAsStrings, qNameString, unprefixedIsNoNamespace)
+      Extensions.resolveQName(e.namespaceForPrefix, qNameString, unprefixedIsNoNamespace)
 
     def resolveStringQNameOrThrow(qNameString: String, unprefixedIsNoNamespace: Boolean): QName =
-      Extensions.resolveQName(e.allInScopeNamespacesAsStrings, qNameString, unprefixedIsNoNamespace) getOrElse
+      Extensions.resolveQName(e.namespaceForPrefix, qNameString, unprefixedIsNoNamespace) getOrElse
         (throw new IllegalArgumentException)
 
     def resolveAttValueQName(attName: QName, unprefixedIsNoNamespace: Boolean): Option[QName] =
@@ -196,7 +196,7 @@ object Extensions {
     * @param unprefixedIsNoNamespace if true, an unprefixed value is in no namespace; if false, it is in the default namespace
     */
   def resolveQName(
-    namespaces              : Map[String, String],
+    namespaces              : String => Option[String],
     qNameStringOrig         : String,
     unprefixedIsNoNamespace : Boolean
   ): Option[QName] =
@@ -211,14 +211,14 @@ object Extensions {
             (
               qNameString,
               prefix,
-              if (unprefixedIsNoNamespace) "" else namespaces.getOrElse(prefix, "")
+              if (unprefixedIsNoNamespace) "" else namespaces(prefix).getOrElse("")
             )
           case colonIndex =>
             val prefix = qNameString.substring(0, colonIndex)
             (
               qNameString.substring(colonIndex + 1),
               prefix,
-              namespaces.getOrElse(prefix, throw new OXFException(s"No namespace declaration found for prefix: `$prefix`"))
+              namespaces(prefix).getOrElse(throw new OXFException(s"No namespace declaration found for prefix: `$prefix`"))
             )
         }
 
@@ -232,7 +232,7 @@ object Extensions {
     elem.resolveStringQName(elem.attributeValue(attributeName), unprefixedIsNoNamespace = true).orNull
 
   def resolveTextValueQNameJava(elem: Element, unprefixedIsNoNamespace: Boolean): QName =
-    resolveQName(elem.allInScopeNamespacesAsStrings, elem.getStringValue, unprefixedIsNoNamespace).orNull
+    resolveQName(elem.namespaceForPrefix, elem.getStringValue, unprefixedIsNoNamespace).orNull
 
   def createDocumentCopyParentNamespacesJava(elem: Element, detach: Boolean): Document =
     elem.createDocumentCopyParentNamespaces(detach)

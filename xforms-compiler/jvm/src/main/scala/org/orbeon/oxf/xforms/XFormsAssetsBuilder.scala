@@ -36,7 +36,7 @@ object XFormsAssetsBuilder {
 
     def qNameFromString(s: String): QName =
       updatesProp
-        .map(_.namespaces)
+        .map(_.namespaces.get _)
         .flatMap(Extensions.resolveQName(_, s, unprefixedIsNoNamespace = true))
         .getOrElse(throw new IllegalArgumentException(s"can't resolve QName `$s`"))
 
@@ -111,7 +111,7 @@ object XFormsAssetsBuilder {
       fields.get(key) match {
         case Some(JsArray(values)) =>
           values collect { case JsString(value) =>
-            Extensions.resolveQName(namespaces, value, unprefixedIsNoNamespace = true)
+            Extensions.resolveQName(namespaces.get, value, unprefixedIsNoNamespace = true)
               .getOrElse(throw new IllegalArgumentException)
           }
         case _ => Vector.empty

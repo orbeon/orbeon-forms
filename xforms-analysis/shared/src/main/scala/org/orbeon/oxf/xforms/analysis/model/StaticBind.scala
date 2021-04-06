@@ -58,7 +58,7 @@ class StaticBind(
 
   val dataType: Option[QName] =
     typeMIPOpt map (_.datatype) flatMap
-      (Extensions.resolveQName(namespaceMapping.mapping, _, unprefixedIsNoNamespace = true))
+      (Extensions.resolveQName(namespaceMapping.mapping.get, _, unprefixedIsNoNamespace = true))
 
   // All XPath MIPs
   val allMIPNameToXPathMIP = customMIPNameToXPathMIP ++ mipNameToXPathMIP

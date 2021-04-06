@@ -49,7 +49,7 @@ class ContainerControl(
   // TODO: serialize/builder
   val elementQName: Option[QName] =
     Extensions.resolveQName(
-      namespaceMapping.mapping,
+      namespaceMapping.mapping.get,
       element.attributeValue(XFormsNames.XXFORMS_ELEMENT_QNAME),
       unprefixedIsNoNamespace = true
     )

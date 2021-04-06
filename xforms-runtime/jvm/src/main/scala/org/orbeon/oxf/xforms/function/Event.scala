@@ -47,7 +47,7 @@ class Event extends XFormsFunction with RuntimeDependentFunction {
     // state.
 //        final Element element = getContextStack(xpathContext).getCurrentBindingContext().getControlElement();
 //        final Map namespaceMappings = containingDocument(xpathContext).getStaticState().getNamespaceMappings(element);
-    Extensions.resolveQName(namespaceMappings, attributeName, unprefixedIsNoNamespace = true) map
+    Extensions.resolveQName(namespaceMappings.get, attributeName, unprefixedIsNoNamespace = true) map
       (q => event.getAttribute(q.clarkName))
   }
 

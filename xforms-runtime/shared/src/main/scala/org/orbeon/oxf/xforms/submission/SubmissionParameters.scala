@@ -119,7 +119,7 @@ object SubmissionParameters {
 
       val methodQName =
         Extensions.resolveQName(
-          staticSubmission.namespaceMapping.mapping,
+          staticSubmission.namespaceMapping.mapping.get,
           resolvedMethodQName,
           unprefixedIsNoNamespace = true
         ) getOrElse
@@ -174,7 +174,7 @@ object SubmissionParameters {
         staticSubmission.avtXxfRelevantAttOpt flatMap
           stringAvtTrimmedOpt                 flatMap (
             Extensions.resolveQName(
-              staticSubmission.namespaceMapping.mapping,
+              staticSubmission.namespaceMapping.mapping.get,
               _,
               unprefixedIsNoNamespace = true
             )

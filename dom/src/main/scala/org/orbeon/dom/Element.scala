@@ -27,6 +27,8 @@ trait Element extends Branch {
   def allInScopeNamespacesAsNodes: Map[String, Namespace]
   def allInScopeNamespacesAsStrings: Map[String, String]
 
+  def namespaceForPrefix(prefix: String): Option[String]
+
   /**
    * Adds the attribute value of the given local name. If an attribute already
    * exists for the given name it will be replaced.
@@ -211,4 +213,14 @@ trait Element extends Branch {
 object Element {
   def apply(qName: QName): Element = new ConcreteElement(qName)
   def apply(name: String): Element = Element(QName(name))
+
+  final class ancestorOrSelfElementIt(start: Element) extends Iterator[Element] {
+    private var current = start
+    def hasNext: Boolean = current ne null
+    def next(): Element = {
+      val r = current
+      current = current.getParent
+      r
+    }
+  }
 }

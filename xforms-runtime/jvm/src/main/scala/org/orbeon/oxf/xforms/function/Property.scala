@@ -56,7 +56,7 @@ class Property extends XFormsFunction with RuntimeDependentFunction {
         case Right(namespaces) =>
           val propertyNameString = stringArgument(0)
           val qName =
-            Extensions.resolveQName(namespaces, propertyNameString, unprefixedIsNoNamespace = false) getOrElse
+            Extensions.resolveQName(namespaces.get, propertyNameString, unprefixedIsNoNamespace = false) getOrElse
               (throw new XPathException(s"Missing property name"))
           (qName.namespace.uri, qName.localName)
       }

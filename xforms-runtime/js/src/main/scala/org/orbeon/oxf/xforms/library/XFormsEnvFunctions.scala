@@ -179,7 +179,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     for {
       currentEvent <- xfc.containingDocument.currentEventOpt.iterator
-      qName        <- Extensions.resolveQName(namespaceMappings, name, unprefixedIsNoNamespace = true).iterator
+      qName        <- Extensions.resolveQName(namespaceMappings.get, name, unprefixedIsNoNamespace = true).iterator
       item         <- Implicits.asScalaIterator(currentEvent.getAttribute(qName.clarkName))
     } yield
       item

@@ -78,7 +78,7 @@ trait BindingLoader extends Logging {
 
         def propertyQNames(property: Property) =
           property.value.toString.tokenizeToSet flatMap
-            (Extensions.resolveQName(property.namespaces, _, unprefixedIsNoNamespace = true))
+            (Extensions.resolveQName(property.namespaces.get, _, unprefixedIsNoNamespace = true))
 
         // 1. Legacy `oxf.xforms.resources.baseline` property
         val (foundBaselinePathsStep1, notFoundBaselinePathsStep1) =

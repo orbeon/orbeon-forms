@@ -169,7 +169,7 @@ object XFormsModelSubmissionBase {
               case Some((name, value)) =>
                 name -> {
                   value.trimAllToOpt flatMap
-                    (Extensions.resolveQName(namespaceContext, _, unprefixedIsNoNamespace = true)) getOrElse
+                    (Extensions.resolveQName(namespaceContext.get, _, unprefixedIsNoNamespace = true)) getOrElse
                     QName(name, XXFORMS_NAMESPACE_SHORT)
                 }
               case None =>

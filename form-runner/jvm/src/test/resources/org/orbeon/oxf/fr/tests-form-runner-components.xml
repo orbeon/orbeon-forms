@@ -805,7 +805,7 @@
                     <xxf:control-values>
                         <xxf:control class="input-prepend fr-field-width-natural" id="my-currency≡xf-11"/>
                         <xxf:control id="my-currency≡xf-13" class="add-on"/>
-                        <xxf:control id="my-currency≡xf-14">
+                        <xxf:control id="my-currency≡prefix">
                             <xxf:value>$</xxf:value>
                         </xxf:control>
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>

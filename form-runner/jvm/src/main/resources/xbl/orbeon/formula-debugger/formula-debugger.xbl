@@ -219,30 +219,25 @@
                                         </xf:input>
                                     </xh:td>
                                     <xh:td colspan="3">
-                                        <xf:group>
-                                            <xf:label ref="'Proj. Deps'"/>
-                                            <xh:div>
-                                                <xf:output value="if (xxf:is-blank(expr)) then () else if (@projectionDeps = true()) then '🟢' else '🔴'"/>
-                                            </xh:div>
-                                            <xf:output
-                                                id="fr-xpath-analysis"
-                                                class="fr-xpath-analysis"
-                                                mediatype="text/html"
-                                                ref=".[exists(analysis/value-dependent/path)]"
-                                                value="
-                                                    concat(
-                                                        '&lt;ul>&lt;li>',
-                                                        string-join(
-                                                            (
-                                                                analysis/value-dependent/path/string()
-                                                            ),
-                                                            '&lt;/li>&lt;li>'
+                                        <xf:output id="fr-path-deps-output" value="if (xxf:is-blank(expr)) then () else if (@projectionDeps = true()) then '🟢' else '🔴'" appearance="minimal">
+                                            <xf:label ref="'Path Dependencies'"/>
+                                        </xf:output>
+                                        <xf:output
+                                            id="fr-xpath-analysis"
+                                            class="fr-xpath-analysis"
+                                            mediatype="text/html"
+                                            ref=".[exists(analysis/value-dependent/path)]"
+                                            value="
+                                                concat(
+                                                    '&lt;ul>&lt;li>',
+                                                    string-join(
+                                                        (
+                                                            analysis/value-dependent/path/string()
                                                         ),
-                                                        '&lt;/li>&lt;/ul>'
-                                                    )"/>
-
-                                        </xf:group>
-
+                                                        '&lt;/li>&lt;li>'
+                                                    ),
+                                                    '&lt;/li>&lt;/ul>'
+                                                )"/>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

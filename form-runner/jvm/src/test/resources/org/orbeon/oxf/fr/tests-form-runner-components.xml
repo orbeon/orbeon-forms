@@ -808,6 +808,7 @@
                         <xxf:control id="my-currency≡prefix">
                             <xxf:value>$</xxf:value>
                         </xxf:control>
+                        <xxf:attribute for="my-currency≡html-input" name="aria-describedby">my-currency≡prefix</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>

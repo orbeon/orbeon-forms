@@ -1090,10 +1090,11 @@
                                             <!--
                                                 - only keep "reasonable" types
                                                 - add supported type only if already present in the data
+                                                - 2021-04-07: Re-added `double`, as some forms doing math calculations require this!
                                             -->
                                             <xf:var
                                                 name="supported"
-                                                value="'string', 'decimal', 'integer', 'dateTime', 'date', 'time', 'boolean', 'email', $builtin-type"/>
+                                                value="'string', 'decimal', 'integer', 'double', 'dateTime', 'date', 'time', 'boolean', 'email', $builtin-type"/>
 
                                             <xf:var name="current-builtin-type" value="builtin-type/string()"/>
                                             <xf:select1 ref="builtin-type">

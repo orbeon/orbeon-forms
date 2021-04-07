@@ -830,6 +830,9 @@
                 <label>Remove language</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>XML Schema Upload</label>
             <schema-type>
@@ -2126,6 +2129,9 @@
                 <label>Supprimer la langue</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Chercher les contrôles</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Insertion de schéma XML</label>
             <schema-type>
@@ -3405,6 +3411,9 @@
                 <label>Fjern språk</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label todo="true">Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>XML-skjemaopplasting</label>
             <schema-type>
@@ -4711,6 +4720,9 @@
                 <label>Удалить язык</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Загрузка схемы XML</label>
             <schema-type>
@@ -6010,6 +6022,9 @@
                 <label>Rimuovi lungua</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Carica schema XML</label>
             <schema-type>
@@ -7310,6 +7325,9 @@
                 <label>Sprache löschen</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>XML-Schema hochladen</label>
             <schema-type>
@@ -8612,6 +8630,9 @@
                 <label>Poista kieli</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>XML-skeeman lähettäminen</label>
             <schema-type>
@@ -9911,6 +9932,9 @@
                 <label>Eliminar Idioma</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Subir Esquema XML</label>
             <schema-type>
@@ -11218,6 +11242,9 @@
                 <label>Taal verwijderen</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>XML Schema uploaden</label>
             <schema-type>
@@ -12496,6 +12523,9 @@
                 <label>Remover língua</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Carregar o XML Schema</label>
             <schema-type>
@@ -13803,6 +13833,9 @@
                 <label>Ta bort språk</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Ladda upp XML-schema</label>
             <schema-type>

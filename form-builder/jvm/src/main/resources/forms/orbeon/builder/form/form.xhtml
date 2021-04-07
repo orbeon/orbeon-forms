@@ -231,6 +231,10 @@
                             <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command"       xxf:text="z" name="DOMActivate" targetid="undo-trigger"/>
                             <xf:dispatch if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command shift" xxf:text="z" name="DOMActivate" targetid="redo-trigger"/>
 
+                            <xf:action   if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command"       xxf:text="j">
+                                <xf:dispatch name="fb-show-dialog" targetid="dialog-search"/>
+                            </xf:action>
+
                             <!-- Buttons -->
                             <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="ctrl" xxf:text="s">
                                 fr:run-process-by-name('oxf.fr.detail.process', 'save')
@@ -703,6 +707,29 @@
                                 <fb:dialog-edit-source        id="dialog-edit-source"        ref="$form"      resources-ref="$form-resources"/>
                                 <fb:dialog-http-services      id="dialog-http-services"      ref="$form"      resources-ref="$form-resources"/>
                                 <fb:dialog-ids                id="dialog-ids"                ref="$form"      resources-ref="$form-resources"/>
+
+                                <fb:dialog-search             id="dialog-search"             ref="$form"      resources-ref="$form-resources">
+                                    <xf:action
+                                        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                        event="fb-apply"
+                                        if="xxf:non-blank(event('control-name'))">
+
+                                        <xf:dispatch
+                                            iterate="
+                                                for $elem in reverse(
+                                                    frf:findAncestorSectionsLeafToRoot(
+                                                        fbf:findControlByNameOrEmpty(event('control-name')),
+                                                        false()
+                                                    )
+                                                )
+                                                return $elem/@id"
+                                            name="fr-expand"
+                                            targetid="{concat('|fb≡', ., '|')}"/>
+
+                                        <xf:action type="xpath">fbf:selectCellForControlId(concat(event('control-name'), '-control'))</xf:action>
+                                    </xf:action>
+                                </fb:dialog-search>
+
                                 <fb:dialog-pdf                id="dialog-pdf"                ref="$form"      resources-ref="$form-resources">
                                     <xf:action ev:event="fb-apply">
                                         <xf:delete bind="pdf-attachments-bind"/>

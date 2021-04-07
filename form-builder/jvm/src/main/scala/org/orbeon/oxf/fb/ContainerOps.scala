@@ -221,6 +221,7 @@ trait ContainerOps extends ControlOps {
     controlName          : String,
     repeat               : Boolean,
     userCanAddRemove     : Boolean,
+    numberRows           : Boolean,
     usePaging            : Boolean,
     min                  : String,
     max                  : String,
@@ -251,6 +252,7 @@ trait ContainerOps extends ControlOps {
       toggleAttribute(control, "repeat",            RepeatContentToken,                              repeat)
       toggleAttribute(control, FBReadonly,          "true",                                          repeat && ! userCanAddRemove)
       toggleAttribute(control, FBPageSize,          "1",                                             repeat && ! userCanAddRemove && usePaging)
+      toggleAttribute(control, "number-rows",       "true",                                          repeat && numberRows)
       toggleAttribute(control, "min",               minOpt.get,                                      repeat && minOpt.isDefined)
       toggleAttribute(control, "max",               maxOpt.get,                                      repeat && maxOpt.isDefined)
       toggleAttribute(control, "freeze",            freezeOpt.get,                                   repeat && freezeOpt.isDefined)

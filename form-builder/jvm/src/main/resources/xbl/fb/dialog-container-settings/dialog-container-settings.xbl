@@ -53,6 +53,7 @@
                 <xf:setvalue ref="$i/is-repeat"                      value="$i/was-repeat"/>
 
                 <xf:setvalue ref="$i/user-can-add-remove"            value="not($control/@fb:readonly = 'true')"/>
+                <xf:setvalue ref="$i/number-rows"                    value="$control/@number-rows = 'true'"/>
                 <xf:setvalue ref="$i/use-paging"                     value="$control/@fb:page-size = '1'"/>
 
                 <xf:setvalue ref="$i/was-custom-iteration-name"      value="$i/was-repeat = true() and fbf:hasCustomIterationName($i/control-name)"/>
@@ -194,6 +195,7 @@
                             $new-name,
                             $i/is-repeat = true(),
                             $i/user-can-add-remove = true(),
+                            $i/number-rows = true(),
                             $i/use-paging = true(),
                             $i/min-repeat,
                             $i/max-repeat,
@@ -323,6 +325,7 @@
                         <is-repeat/>
 
                         <user-can-add-remove/>
+                        <number-rows/>
                         <use-paging/>
 
                         <was-custom-iteration-name/>
@@ -411,7 +414,7 @@
 
                 <xf:bind
                     ref="
-                        was-repeat | is-repeat | user-can-add-remove | use-paging |
+                        was-repeat | is-repeat | user-can-add-remove | number-rows | use-paging |
                         was-custom-iteration-name | is-custom-iteration-name | apply-defaults | initial-iterations"
                     type="xs:boolean"
                     xxf:default="false()"/>
@@ -620,6 +623,11 @@
                                                 <xf:label value="$resources/dialog-container-settings/user-can-add-remove/label"/>
                                             </fr:checkbox-input>
                                         </xh:td>
+                                        <xh:td>
+                                            <fr:checkbox-input ref="$i/number-rows" appearance="full" id="number-rows">
+                                                <xf:label value="$resources/dialog-container-settings/number-rows/label"/>
+                                            </fr:checkbox-input>
+                                        </xh:td>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
@@ -793,7 +801,7 @@
 
                     </fr:tabbable>
 
-                    <!--<fr:xforms-inspector/>-->
+<!--                    <fr:xforms-inspector/>-->
 
                     <xh:div class="fr-dialog-buttons">
                         <xh:div class="pull-left">

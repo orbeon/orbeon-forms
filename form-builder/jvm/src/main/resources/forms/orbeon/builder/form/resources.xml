@@ -725,6 +725,10 @@
                 <label>Allow the user to add, remove, or move repetitions</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label>Show repetition number</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label>Show one repetition at a time in the wizard</label>
                 <hint/>
@@ -2020,6 +2024,10 @@
                 <label>Permettre à l'utilisateur d'ajouter, supprimer ou déplacer des répétitions</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label>Numéroter les répétitions</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label>Montrer une répétition à la fois dans le wizard</label>
                 <hint/>
@@ -3299,6 +3307,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label todo="true">Show repetition number</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
@@ -4604,6 +4616,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label todo="true">Show repetition number</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
@@ -5910,6 +5926,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label todo="true">Show repetition number</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
@@ -7208,6 +7228,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label todo="true">Show repetition number</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
@@ -8509,6 +8533,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label todo="true">Show repetition number</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
@@ -9807,6 +9835,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label todo="true">Show repetition number</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
@@ -11106,6 +11138,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label todo="true">Show repetition number</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
@@ -12384,6 +12420,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label todo="true">Show repetition number</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>
@@ -13689,6 +13729,10 @@
                 <label todo="true">[Allow the user to add, remove, or move repetitions]</label>
                 <hint/>
             </user-can-add-remove>
+            <number-rows>
+                <label todo="true">Show repetition number</label>
+                <hint/>
+            </number-rows>
             <use-paging>
                 <label todo="true">[Show one repetition at a time in the wizard]</label>
                 <hint/>

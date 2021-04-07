@@ -152,6 +152,7 @@
                 .fr-grid-th,
                 .fr-grid-td,
                 .fr-repeat-column-left,
+                .fr-repeat-column-number,
                 .fr-repeat-column-right,
                 &.fr-repeat-multiple-rows .fr-grid-head {
                     border-left: 1px solid #ddd;
@@ -167,15 +168,21 @@
                     width: 100%;
                 }
 
-                &.fr-grid-readonly {
+                &.fr-grid-readonly:not(.fr-grid-number-rows) {
                     .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
                         grid-template-columns: auto;
                     }
                 }
 
-                &:not(.fr-grid-readonly) {
+                &:not(.fr-grid-readonly):not(.fr-grid-number-rows) {
                     .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
                         grid-template-columns: 35px auto;
+                    }
+                }
+
+                &:not(.fr-grid-readonly).fr-grid-number-rows {
+                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                        grid-template-columns: 35px 35px auto;
                     }
                 }
             }
@@ -359,10 +366,9 @@
                 word-wrap: break-word;
             }
 
-            .fr-repeat-column-left, .fr-repeat-column-right {
+            .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
                 //width: @frGridPlusMinusIconWidth + 5px*2 + 1px;                   // 5px padding from tables.less (no variable), 1px for the border
                 width: 35px;
-                text-align: left;
                 box-sizing: border-box;
 
                 // Icons
@@ -380,11 +386,18 @@
                     display: block;
                     margin: auto;
                 }
+            }
 
+            .fr-repeat-column-left, .fr-repeat-column-right {
+                text-align: left;
+            }
+
+            .fr-repeat-column-number {
+                text-align: right;
             }
 
             .fr-grid-head {
-                .fr-repeat-column-left, .fr-repeat-column-right {
+                .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {
                     vertical-align: middle;
                 }
 
@@ -398,8 +411,10 @@
             }
 
             // Highlight the current grid row
-            .xforms-repeat-selected-item-1 .fr-repeat-column-left {
-                background-color: @grayLighter;
+            .xforms-repeat-selected-item-1 {
+                .fr-repeat-column-left, .fr-repeat-column-number {
+                    background-color: @grayLighter;
+                }
             }
 
             // Hide menu button...

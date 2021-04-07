@@ -185,7 +185,8 @@
         <xsl:param name="is-repeat"    as="xs:boolean"/>
         <xsl:param name="left-column"  as="xs:boolean"/>
         <xsl:param name="right-column" as="xs:boolean"/>
-        <xsl:param name="side-block"   as="element(*)?"/>
+        <xsl:param name="number-rows"  as="xs:boolean"/>
+        <xsl:param name="side-block"   as="element(*)*"/>
 
         <xsl:variable
             name="lhh-in-header"
@@ -290,7 +291,7 @@
                             <xsl:copy-of select="fr:th-td-tr-classes-attr('tr', $tr/@class, ())"/>
                         </xsl:if>
 
-                        <xsl:if test="$left-column and $static-row-pos = 1">
+                        <xsl:if test="($left-column or $number-rows) and $static-row-pos = 1">
                             <xsl:copy-of select="$side-block"/>
                         </xsl:if>
                         <xsl:copy-of select="$cells-content"/>

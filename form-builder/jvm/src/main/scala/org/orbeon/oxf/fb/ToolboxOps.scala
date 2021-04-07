@@ -303,6 +303,7 @@ object ToolboxOps {
           controlName          = newGridName,
           repeat               = true,
           userCanAddRemove     = true,
+          numberRows           = false,
           usePaging            = false,
           min                  = "1",
           max                  = "",

@@ -98,6 +98,7 @@
                 <xsl:variable name="appearance"               select="($root/@appearance, 'full')[1]"/>
                 <xsl:variable name="insert"                   select="($root/@insert, if ($appearance = 'full') then 'index' else 'bottom')[1]"/>
 
+                <xsl:variable name="number-rows"              select="$appearance = 'full' and $root/@number-rows = 'true'"/>
                 <xsl:variable name="left-column"              select="$appearance = 'full' and not($readonly)"/>
                 <xsl:variable name="right-column"             select="$appearance = 'minimal' and not($readonly)"/>
                 <xsl:variable name="remove-at-bottom"         select="false()"/>
@@ -224,6 +225,7 @@
                                         (),
                                     'fr-grid-readonly'[$readonly],
                                     'fr-repeat',
+                                    'fr-grid-number-rows'[$number-rows],
                                     if ($static-row-count le 1) then
                                         'fr-repeat-single-row'
                                     else
@@ -250,6 +252,9 @@
                             <xsl:if test="$is-table">
                                 <!-- Add `colgroup` to make column sizing with CSS easier -->
                                 <xh:colgroup>
+                                    <xsl:if test="$number-rows">
+                                        <xh:col class="fr-repeat-column-number" xxf:control="true" ref=".[not($view-mode)]"/>
+                                    </xsl:if>
                                     <xsl:if test="$left-column">
                                         <xh:col class="fr-repeat-column-left" xxf:control="true" ref=".[not($view-mode)]"/>
                                     </xsl:if>
@@ -266,7 +271,12 @@
                                 </xh:colgroup>
                             </xsl:if>
 
-                            <xsl:variable name="header-side-block" as="element(*)?">
+                            <xsl:variable name="header-side-block" as="element(*)*">
+                                <xsl:if test="$number-rows">
+                                    <xsl:element name="{$th-elem}">
+                                        <xsl:attribute name="class" select="'fr-repeat-column-number'"/>
+                                    </xsl:element>
+                                </xsl:if>
                                 <xsl:if test="$left-column or $right-column">
                                     <xsl:element name="{$th-elem}">
                                         <xsl:attribute name="class" select="concat('fr-repeat-column-', if ($left-column) then 'left' else 'right')"/>
@@ -397,7 +407,7 @@
                                             <xsl:attribute name="class">fr-grid-head</xsl:attribute>
                                             <xsl:element name="{$tr-elem}">
                                                 <xsl:attribute name="class">fr-grid-master-row</xsl:attribute>
-                                                <xsl:if test="$left-column">
+                                                <xsl:if test="$left-column or $number-rows">
                                                     <xsl:copy-of select="$header-side-block"/>
                                                 </xsl:if>
                                                 <xsl:copy-of select="$head-content"/>
@@ -411,7 +421,7 @@
                                 <xsl:otherwise>
                                     <xsl:element name="xh:div">
                                         <xsl:attribute name="class">fr-grid-repeat-top-row</xsl:attribute>
-                                        <xsl:if test="$left-column">
+                                        <xsl:if test="$left-column or $number-rows">
                                             <xsl:copy-of select="$header-side-block"/>
                                         </xsl:if>
                                         <xsl:element name="xh:div">
@@ -425,7 +435,16 @@
                                 </xsl:otherwise>
                             </xsl:choose>
 
-                            <xsl:variable name="side-block" as="element(*)?">
+                            <xsl:variable name="side-block" as="element(*)*">
+                                <xsl:if test="$number-rows">
+                                    <xsl:element name="{$td-elem}">
+                                        <xsl:attribute name="class" select="'fr-repeat-column-number'"/>
+                                        <xsl:if test="$static-row-count gt 1 and not($use-css-grids-output)">
+                                            <xsl:attribute name="{fr:rowspan-attribute()}" select="$static-row-count"/>
+                                        </xsl:if>
+                                        <xf:output value="xxf:repeat-position()"/>
+                                    </xsl:element>
+                                </xsl:if>
                                 <xsl:if test="$left-column or $right-column">
                                     <xsl:element name="{$td-elem}">
                                         <xsl:attribute
@@ -434,8 +453,10 @@
                                         <xsl:if test="$static-row-count gt 1 and not($use-css-grids-output)">
                                             <xsl:attribute name="{fr:rowspan-attribute()}" select="$static-row-count"/>
                                         </xsl:if>
-                                        <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                        <xsl:attribute name="ref">.[not($view-mode)]</xsl:attribute>
+                                        <xsl:if test="$left-column or $right-column">
+                                            <xsl:attribute name="xxf:control">true</xsl:attribute>
+                                            <xsl:attribute name="ref">.[not($view-mode)]</xsl:attribute>
+                                        </xsl:if>
 
                                         <!-- TODO LATER: Whether we are left/right or menu/add should be orthogonal. -->
                                         <xsl:choose>
@@ -449,7 +470,7 @@
                                                     </xh:button>
                                                 </xh:div>
                                             </xsl:when>
-                                            <xsl:otherwise>
+                                            <xsl:when test="$right-column">
                                                 <xf:trigger
                                                     appearance="minimal"
                                                     ref="$repeat-context[$can-remove]"
@@ -467,7 +488,7 @@
                                                 <xf:group ref="$repeat-context[not($can-remove)]">
                                                     <xh:i class="fa fa-fw fa-minus-circle disabled"/>
                                                 </xf:group>
-                                            </xsl:otherwise>
+                                            </xsl:when>
                                         </xsl:choose>
                                    </xsl:element>
                                 </xsl:if>
@@ -475,7 +496,7 @@
 
                             <xsl:variable
                                 name="rows-content"
-                                select="fr:rows-content(true(), $left-column, $right-column, $side-block)"/>
+                                select="fr:rows-content(true(), $left-column, $right-column, $number-rows, $side-block)"/>
 
                             <xsl:variable name="maybe-repeated-content">
 
@@ -500,7 +521,7 @@
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <!-- CSS grids output -->
-                                        <xsl:if test="$left-column">
+                                        <xsl:if test="$left-column or $number-rows">
                                             <xsl:copy-of select="$side-block"/>
                                         </xsl:if>
                                         <xsl:element name="xh:div">

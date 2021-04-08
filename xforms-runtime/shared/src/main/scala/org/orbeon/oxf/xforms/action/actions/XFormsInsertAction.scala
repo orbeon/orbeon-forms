@@ -53,7 +53,8 @@ object XFormsInsertAction {
     doDispatch                        : Boolean,
     requireDefaultValues              : Boolean,
     searchForInstance                 : Boolean,
-    removeInstanceDataFromClonedNodes : Boolean)(implicit
+    removeInstanceDataFromClonedNodes : Boolean,
+    structuralDependencies            : Boolean)(implicit
     indentedLogger                    : IndentedLogger
   ): util.List[om.NodeInfo] = {
 
@@ -305,10 +306,23 @@ object XFormsInsertAction {
           case Some(modifiedInstance) =>
 
             modifiedInstance.markModified()
-            modifiedInstance.model.markStructuralChange(Option(modifiedInstance), FlaggedDefaultsStrategy)
 
             val documentWrapper = modifiedInstance.documentInfo.asInstanceOf[DocumentWrapper]
-            insertedNodes map documentWrapper.wrap
+            val insertedNodeInfos = insertedNodes map documentWrapper.wrap
+
+            // https://github.com/orbeon/orbeon-forms/issues/4849
+            if (structuralDependencies)
+              modifiedInstance.model.markStructuralChange(Option(modifiedInstance), FlaggedDefaultsStrategy)
+
+            // TODO: This needs work, see https://github.com/orbeon/orbeon-forms/issues/4849
+//            if (insertedNodes forall (_.isInstanceOf[Attribute])) {
+//              // Consider inserting an attribute the same as setting the value of an existing attribute
+//              insertedNodeInfos foreach { insertedNodeInfo =>
+//                modifiedInstance.model.markValueChange(insertedNodeInfo, isCalculate = false)
+//              }
+//            }
+
+            insertedNodeInfos
           case None =>
             Nil
         }
@@ -454,18 +468,21 @@ class XFormsInsertAction extends XFormsAction {
 
   override def execute(actionContext: DynamicActionContext)(implicit logger: IndentedLogger): Unit = {
 
-    val containingDocument  = actionContext.containingDocument
-    val contextStack        = actionContext.interpreter.actionXPathContext
+    val containingDocument     = actionContext.containingDocument
+    val contextStack           = actionContext.interpreter.actionXPathContext
 
-    val atAttributeOpt      = actionContext.element.attributeValueOpt("at")
-    val originAttributeOpt  = actionContext.element.attributeValueOpt("origin")
-    val contextAttributeOpt = actionContext.element.attributeValueOpt(XFormsNames.CONTEXT_QNAME)
+    val atAttributeOpt         = actionContext.element.attributeValueOpt("at")
+    val originAttributeOpt     = actionContext.element.attributeValueOpt("origin")
+    val contextAttributeOpt    = actionContext.element.attributeValueOpt(XFormsNames.CONTEXT_QNAME)
 
-    // Extension: allow position to be an AVT
+    // Extension: allow `position` to be an AVT
     val resolvedPositionAttributeOpt = Option(actionContext.interpreter.resolveAVT(actionContext.analysis, "position"))
 
-    // Extension: xxf:default="true" AVT requires that recalculate apply default values on the inserted nodes.
+    // Extension: `xxf:default="true"` AVT requires that recalculate apply default values on the inserted nodes.
     val setRequireDefaultValues = actionContext.interpreter.resolveAVT(actionContext.analysis, XFormsNames.XXFORMS_DEFAULTS_QNAME) == "true"
+
+    // Extension: `xxf:structural-dependencies="false"` disables marking a structural dependency
+    val structuralDependencies = ! actionContext.element.attributeValueOpt(XFormsNames.XXFORMS_STRUCTURAL_DEPENDENCIES).contains("false")
 
     // "2. The Node Set Binding node-set is determined."
     val currentBindingContext = contextStack.getCurrentBindingContext
@@ -596,7 +613,8 @@ class XFormsInsertAction extends XFormsAction {
       doDispatch                        = true,
       requireDefaultValues              = setRequireDefaultValues,
       searchForInstance                 = true,
-      removeInstanceDataFromClonedNodes = true
+      removeInstanceDataFromClonedNodes = true,
+      structuralDependencies            = structuralDependencies
     )
   }
 }

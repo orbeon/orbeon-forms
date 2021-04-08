@@ -129,6 +129,7 @@
 
                 <xf:insert
                     if="not(exists($section-binding/@fr:section-status))"
+                    xxf:structural-dependencies="false"
                     context="$section-binding"
                     origin="xf:attribute('fr:section-status', '')"/>
 

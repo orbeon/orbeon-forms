@@ -201,7 +201,8 @@ class XFormsRepeatControl(
           doDispatch                        = true,
           requireDefaultValues              = false,
           searchForInstance                 = true,
-          removeInstanceDataFromClonedNodes = true
+          removeInstanceDataFromClonedNodes = true,
+          structuralDependencies            = true
         )
 
         // TODO: should dispatch xxforms-move instead of xforms-insert?

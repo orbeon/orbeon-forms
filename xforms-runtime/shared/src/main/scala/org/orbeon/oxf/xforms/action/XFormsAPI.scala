@@ -141,7 +141,8 @@ object XFormsAPI {
         doDispatch                        = doDispatch,
         requireDefaultValues              = requireDefaultValues,
         searchForInstance                 = searchForInstance,
-        removeInstanceDataFromClonedNodes = removeInstanceDataFromClonedNodes)(
+        removeInstanceDataFromClonedNodes = removeInstanceDataFromClonedNodes,
+        structuralDependencies            = true)(
         indentedLogger                    = action map (_.indentedLogger) orNull,
       ).asInstanceOf[JList[T]].asScala
     } else

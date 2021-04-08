@@ -318,6 +318,7 @@ object XFormsNames {
   val XXFORMS_DEFERRED_UPDATES_QNAME      = xxformsQName("deferred-updates")
   val XXFORMS_TOGGLE_ANCESTORS_QNAME      = xxformsQName("toggle-ancestors")
   val XXFORMS_WHITESPACE_QNAME            = xxformsQName("whitespace")
+  val XXFORMS_STRUCTURAL_DEPENDENCIES     = xxformsQName("structural-dependencies")
 
   val XXFORMS_FORMAT_QNAME                = xxformsQName("format")
   val XXFORMS_UNFORMAT_QNAME              = xxformsQName("unformat")

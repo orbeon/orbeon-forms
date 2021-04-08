@@ -294,7 +294,8 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             doDispatch                        = true,
             requireDefaultValues              = applyDefaults,
             searchForInstance                 = true,
-            removeInstanceDataFromClonedNodes = true
+            removeInstanceDataFromClonedNodes = true,
+            structuralDependencies            = true
           )
 
           // Perform the deletion of the selected node

@@ -18,7 +18,6 @@
         <p:output name="data" id="unrolled-form-definition"/>
     </p:processor>
 
-
     <p:processor name="fr:compiler">
         <p:input  name="instance" href="#instance"/>
         <p:input  name="data" href="#unrolled-form-definition"/>

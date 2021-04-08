@@ -75,6 +75,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
             <test-formulas>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish</save-publish>
 
@@ -551,6 +552,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Tester</test>
             <test-formulas>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Tester formules</test-formulas>
+            <test-offline>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Tester hors ligne</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publier</save-publish>
 
@@ -1031,6 +1033,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testear</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</save-publish>
 
@@ -1497,6 +1500,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiser…</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiser…</save-publish>
 
@@ -1962,6 +1966,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Тестировать</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Публиковать</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Публиковать</save-publish>
 
@@ -2425,6 +2430,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Prova</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Pubblica</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Pubblica</save-publish>
 
@@ -2901,6 +2907,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Veröffentlichen</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Veröffentlichen</save-publish>
 
@@ -3377,6 +3384,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testaa</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Julkaise</save-publish>
 
@@ -3853,6 +3861,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testa</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicera</save-publish>
 
@@ -4329,6 +4338,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testen</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publiceren</save-publish>
 
@@ -4804,6 +4814,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testar</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</save-publish>
 
@@ -5279,6 +5290,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Offentliggør...</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Offentliggør</save-publish>
 
@@ -5742,6 +5754,7 @@
 
             <test>&lt;i class="fa fa-fw fa-cog"/&lt; Testuj</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Formulas</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Test Offline</test-offline>
             <publish>&lt;i class="fa fa-fw fa-globe"/&lt; Publikuj</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"/&lt; Zapisz i publikuj</save-publish>
 

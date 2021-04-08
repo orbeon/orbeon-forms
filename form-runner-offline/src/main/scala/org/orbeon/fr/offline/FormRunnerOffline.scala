@@ -13,7 +13,7 @@ import org.orbeon.oxf.util
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
-import org.orbeon.oxf.util.{Connection, ConnectionResult, PathUtils, XPath}
+import org.orbeon.oxf.util.{Base64, Connection, ConnectionResult, PathUtils, XPath}
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
@@ -300,6 +300,26 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
         }
     }
   }
+
+  @JSExport
+  def renderFormFromBase64(
+    container   : html.Element,
+    base64      : String,
+    appName     : String, // needed for the cache!
+    formName    : String, // needed for the cache!
+    formVersion : Int,    // needed for the cache!
+    mode        : String,
+    documentId  : js.UndefOr[String]
+  ): js.Promise[RuntimeForm] =
+    renderForm(
+      container,
+      Uint8Array.from(Base64.decode(base64).toJSArray.asInstanceOf[js.Array[Short]]),
+      appName,
+      formName,
+      formVersion,
+      mode,
+      documentId
+    )
 
   @JSExport
   def renderForm(

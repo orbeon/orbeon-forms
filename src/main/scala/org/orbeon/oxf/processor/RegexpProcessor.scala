@@ -76,7 +76,7 @@ object RegexpMatcher {
   def compilePattern(path: String, glob: Boolean = false) =
     Pattern.compile(if (glob) globToRegexp(path.toCharArray) else path)
 
-  case class MatchResult(matches: Boolean, groupsWithNulls: Seq[String] = Seq()) {
+  case class MatchResult(matches: Boolean, groupsWithNulls: Seq[String] = Nil) {
     def group(i: Int) = groupsWithNulls(i)
   }
 
@@ -84,7 +84,7 @@ object RegexpMatcher {
     def apply(pattern: Pattern, s: String): MatchResult = {
       val matcher = pattern.matcher(s)
       val matches = matcher.matches
-      MatchResult(matches, if (matches) 1 to matcher.groupCount map matcher.group else Seq())
+      MatchResult(matches, if (matches) 1 to matcher.groupCount map matcher.group else Nil)
     }
   }
 

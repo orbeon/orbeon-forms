@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.controller
 
-import java.util.regex.Pattern
-import java.{util => ju}
-
+import cats.syntax.option._
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element, QName}
@@ -39,8 +37,11 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xml.dom.Extensions._
 
+import java.util.regex.Pattern
+import java.{util => ju}
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 // Orbeon Forms application controller
 class PageFlowControllerProcessor extends ProcessorImpl with Logging {
@@ -165,22 +166,26 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       }
     }
 
-    // Run the first matching entry if any
-    val routOpt = (
-      pageFlow.routes.iterator
-      map  (route => route -> MatchResult(route.routeElement.pattern, path))
-      find (_._2.matches)
-    )
+    def findRoute(path: String, method: Option[HttpMethod]): Option[(Route, MatchResult)] =
+      pageFlow.routes.iterator map { route =>
+        route -> MatchResult(route.routeElement.pattern, path)
+      } collectFirst {
+        case rm @ (_: FileRoute,              MatchResult(true, _))               => rm
+        case rm @ (route: PageOrServiceRoute, MatchResult(true, _))
+          if method.isEmpty || method.exists(route.routeElement.supportedMethods) => rm
+      }
 
-    routOpt match {
+    // Run the first matching entry if any
+    findRoute(path, request.getMethod.some) match {
       case Some((route: FileRoute, matchResult)) =>
         // Run the given route and let the caller handle errors
         debug("processing file", logParams)
         route.process(pc, ec, matchResult)
-      case Some((route: PageOrServiceRoute, matchResult)) if route.routeElement.supportedMethods(request.getMethod) =>
+      case Some((route: PageOrServiceRoute, matchResult)) =>
         debug("processing page/service", logParams)
         // Run the given route and handle "not found" and error conditions
-        try route.process(pc, ec, matchResult)
+        try
+          route.process(pc, ec, matchResult)
         catch { case NonFatal(t) =>
           getRootThrowable(t) match {
             case e: HttpRedirectException =>
@@ -196,17 +201,15 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 case _ =>
                   sendHttpStatusCode(e)
               }
-            case e: ResourceNotFoundException =>
+            case _: ResourceNotFoundException =>
               if (route.isPage)     runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
-            case e =>
+            case _ =>
               if (route.isPage)     runErrorRoute(t)          else sendError(t)
           }
         }
-      case Some((route: PageOrServiceRoute, _)) if route.isService && ! route.routeElement.supportedMethods(request.getMethod) =>
-        // Method not allowed on service
+      case None if findRoute(path, None).isDefined =>
         sendMethodNotAllowed()
       case _ =>
-        // Handle "not found"
         runNotFoundRoute(None)
     }
   }

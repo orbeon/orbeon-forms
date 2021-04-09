@@ -28,7 +28,6 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   private val EditorIdPrefix   = "fb-lhh-editor-for-"
   private val EditorIdPrefixes = List(LHHA.Label.entryName, LHHA.Hint.entryName) map (EditorIdPrefix + _ + '-')
 
-
   def unsupportedBrowser(browserName: String, browserVersion: Double): Unit = {
     implicit val ctx = FormBuilderDocContext()
 

@@ -15,10 +15,14 @@ package org.orbeon.oxf.xforms
 
 import cats.syntax.option._
 import org.orbeon.oxf.cache.{InternalCacheKey, ObjectCache}
-import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xforms.model.XFormsInstance._
-import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
+
+import scala.jdk.CollectionConverters._
+
 
 /**
  * Cache for shared and immutable XForms instances.
@@ -84,14 +88,31 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
   def remove(
     instanceSourceURI : String,
     requestBodyHash   : String,
-    handleXInclude    : Boolean)(implicit
+    handleXInclude    : Boolean,
+    ignoreQueryString : Boolean)(implicit
     indentedLogger    : IndentedLogger
   ): Unit = {
     debug("removing instance", List("URI" -> instanceSourceURI, "request hash" -> requestBodyHash))
 
     val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
-    val cacheKey = createCacheKey(instanceSourceURI, handleXInclude, Option(requestBodyHash))
-    cache.remove(cacheKey)
+
+    if (ignoreQueryString) {
+
+      // Here we remove all the entries that have a URI that matches but *with the query string removed*
+
+      def extractUriOpt(key: InternalCacheKey) =
+        key.getKey.splitTo[List]("|").headOption
+
+      val uriNoQueryString = PathUtils.removeQueryString(instanceSourceURI)
+
+      cache.iterateCacheKeys().asScala collect { case key: InternalCacheKey
+        if extractUriOpt(key).map(PathUtils.removeQueryString).contains(uriNoQueryString) => key
+      } foreach
+        cache.remove
+    } else {
+      val cacheKey = createCacheKey(instanceSourceURI, handleXInclude, Option(requestBodyHash))
+      cache.remove(cacheKey)
+    }
   }
 
   // Empty the cache

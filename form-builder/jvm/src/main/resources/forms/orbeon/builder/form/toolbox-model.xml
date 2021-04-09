@@ -235,7 +235,8 @@
         <xf:bind ref="libraries"         id="fb-toolbox-libraries-bind"/>
     </xf:bind>
 
-    <!-- This contains the components available for the currently edited form -->
+    <!-- This contains the components available for the currently edited form
+         The submission sets `xxf:readonly="true"` and `xxf:cache="true"`. -->
     <xf:instance id="fb-components-instance">
         <components/>
     </xf:instance>

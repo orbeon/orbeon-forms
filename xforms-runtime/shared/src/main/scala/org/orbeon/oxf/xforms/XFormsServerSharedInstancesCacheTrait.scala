@@ -31,7 +31,8 @@ trait XFormsServerSharedInstancesCacheTrait {
   def remove(
     instanceSourceURI : String,
     requestBodyHash   : String,
-    handleXInclude    : Boolean)(implicit
+    handleXInclude    : Boolean,
+    ignoreQueryString : Boolean)(implicit
     indentedLogger    : IndentedLogger
   ): Unit
 

@@ -196,7 +196,8 @@ class XFormsInstance(
             XFormsServerSharedInstancesCache.remove(
               instanceCaching.pathOrAbsoluteURI,
               null,
-              instanceCaching.handleXInclude
+              instanceCaching.handleXInclude,
+              false
             )
           case None =>
             warn(

@@ -770,6 +770,13 @@
             <xf:property name="version-comment"          value="event('version-comment')"/>
             <xf:property name="available"                value="event('available')"/>
         </xf:send>
+
+        <xf:action if="bind('form-name-bind') = 'library'">
+            <xxf:invalidate-instance
+                resource="/fr/service/custom/orbeon/builder/toolbox"
+                ignore-query-string="true"/>
+        </xf:action>
+
     </xf:action>
 
     <xf:submission

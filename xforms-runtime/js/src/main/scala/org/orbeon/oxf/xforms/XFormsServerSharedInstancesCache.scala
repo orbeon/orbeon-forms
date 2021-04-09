@@ -1,7 +1,8 @@
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.model.InstanceCaching
 
 
@@ -41,10 +42,26 @@ object XFormsServerSharedInstancesCache extends XFormsServerSharedInstancesCache
   def remove(
     instanceSourceURI : String,
     requestBodyHash   : String,
-    handleXInclude    : Boolean)(implicit
+    handleXInclude    : Boolean,
+    ignoreQueryString : Boolean)(implicit
     indentedLogger    : IndentedLogger
   ): Unit =
-    cache -= createCacheKey(instanceSourceURI, handleXInclude, Option(requestBodyHash))
+    if (ignoreQueryString) {
+
+      def extractUriOpt(key: CacheKeyType) =
+        key.splitTo[List]("|").headOption
+
+      val uriNoQueryString = PathUtils.removeQueryString(instanceSourceURI)
+
+      cache.keysIterator collect { case key
+        if extractUriOpt(key).map(PathUtils.removeQueryString).contains(uriNoQueryString) => key
+      } foreach { key =>
+        cache -= key
+      }
+
+    } else {
+      cache -= createCacheKey(instanceSourceURI, handleXInclude, Option(requestBodyHash))
+    }
 
   def removeAll(implicit indentedLogger: IndentedLogger): Unit =
     cache = Map.empty

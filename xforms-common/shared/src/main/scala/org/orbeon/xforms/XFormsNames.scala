@@ -320,6 +320,8 @@ object XFormsNames {
   val XXFORMS_WHITESPACE_QNAME            = xxformsQName("whitespace")
   val XXFORMS_STRUCTURAL_DEPENDENCIES     = xxformsQName("structural-dependencies")
 
+  val IGNORE_QUERY_STRING                 = QName("ignore-query-string")
+
   val XXFORMS_FORMAT_QNAME                = xxformsQName("format")
   val XXFORMS_UNFORMAT_QNAME              = xxformsQName("unformat")
 

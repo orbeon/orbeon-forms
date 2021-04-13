@@ -451,6 +451,7 @@
     <property as="xs:boolean" name="oxf.fr.import.allow-invalid-documents.*.*"                  value="false"/>
     <property as="xs:boolean" name="oxf.fr.import.restrict-to-latest-version.*.*"               value="false"/>
     <property as="xs:string"  name="oxf.fr.import.default-format.*.*"                           value="excel-headings"/>
+    <property as="xs:boolean" name="oxf.fr.import.show-app-form-names.*.*"                      value="true"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                      value="free"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.separate-toc.*.*"                  value="false"/>

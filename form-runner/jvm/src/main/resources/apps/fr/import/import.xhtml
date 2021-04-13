@@ -56,6 +56,10 @@
                 name="show-start-over-button"
                 value="xxf:property(string-join(('oxf.fr.import.show-start-over-button', $app, $form), '.')) = true()"/>
 
+            <xf:var
+                name="show-app-form-names"
+                value="xxf:property(string-join(('oxf.fr.import.show-app-form-names', $app, $form), '.')) = true()"/>
+
             <xf:action event="xforms-model-construct-done">
 
                 <xf:action if="not(fr:is-pe())" type="xpath">
@@ -689,17 +693,17 @@
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
-                                <xf:output value="$app">
+                                <xf:output ref=".[$show-app-form-names]" value="$app">
                                     <xf:label ref="xxf:r('import.application-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
                             <xh:td>
-                                <xf:output value="$form">
+                                <xf:output ref=".[$show-app-form-names]" value="$form">
                                     <xf:label ref="xxf:r('import.form-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
                             <xh:td>
-                                <xf:output value="instance('fr-form-instance')/version/selected-version">
+                                <xf:output ref=".[$show-app-form-names]" value="instance('fr-form-instance')/version/selected-version">
                                     <xf:label ref="xxf:r('import.form-version.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
@@ -772,17 +776,17 @@
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
-                                <xf:output value="$app">
+                                <xf:output ref=".[$show-app-form-names]" value="$app">
                                     <xf:label ref="xxf:r('import.application-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
                             <xh:td>
-                                <xf:output value="$form">
+                                <xf:output ref=".[$show-app-form-names]" value="$form">
                                     <xf:label ref="xxf:r('import.form-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
                             <xh:td>
-                                <xf:output value="instance('fr-form-instance')/version/selected-version">
+                                <xf:output ref=".[$show-app-form-names]" value="instance('fr-form-instance')/version/selected-version">
                                     <xf:label ref="xxf:r('import.form-version.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
@@ -973,17 +977,17 @@
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
-                                <xf:output value="$app">
+                                <xf:output ref=".[$show-app-form-names]" value="$app">
                                     <xf:label ref="xxf:r('import.application-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
                             <xh:td>
-                                <xf:output value="$form">
+                                <xf:output ref=".[$show-app-form-names]" value="$form">
                                     <xf:label ref="xxf:r('import.form-name.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>
                             <xh:td>
-                                <xf:output value="instance('fr-form-instance')/version/selected-version">
+                                <xf:output ref=".[$show-app-form-names]" value="instance('fr-form-instance')/version/selected-version">
                                     <xf:label ref="xxf:r('import.form-version.label', '|fr-fr-resources|')"/>
                                 </xf:output>
                             </xh:td>

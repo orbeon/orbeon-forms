@@ -2988,8 +2988,8 @@
             <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
             <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Aktualisieren"&gt;&lt;/i&gt;</refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Nächstes</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Vorheriges</wizard-prev>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Weiter</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Zurück</wizard-prev>
             <wizard-toc todo="true">&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; [Content]</wizard-toc>
 
             <!-- Submit dialog -->

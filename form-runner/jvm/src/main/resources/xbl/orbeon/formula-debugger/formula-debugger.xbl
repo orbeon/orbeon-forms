@@ -228,15 +228,24 @@
                                             mediatype="text/html"
                                             ref=".[exists(analysis/value-dependent/path)]"
                                             value="
-                                                concat(
-                                                    '&lt;ul>&lt;li>',
-                                                    string-join(
-                                                        (
-                                                            analysis/value-dependent/path/string()
-                                                        ),
-                                                        '&lt;/li>&lt;li>'
+                                                string-join(
+                                                    (
+                                                        '&lt;ul>',
+                                                        for $path in analysis/value-dependent/path
+                                                        return
+                                                            let $flag  := $path/@flag = 'true'
+                                                            return
+                                                                (
+                                                                    if ($flag) then
+                                                                        '&lt;li style=&quot;color: red&quot;>'
+                                                                    else
+                                                                        '&lt;li>',
+                                                                    $path,
+                                                                    '&lt;/li>'
+                                                                ),
+                                                        '&lt;/ul>'
                                                     ),
-                                                    '&lt;/li>&lt;/ul>'
+                                                    ''
                                                 )"/>
                                     </xh:td>
                                 </xh:tr>

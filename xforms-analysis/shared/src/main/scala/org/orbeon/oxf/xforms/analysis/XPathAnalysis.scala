@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xforms.MapSet
 import org.orbeon.oxf.xml.XMLReceiver
@@ -64,7 +65,11 @@ object XPathAnalysis {
   def mapSetToIterable(mapSet: MapSet[String, String]): Iterable[String] =
     mapSet map (entry => buildInstanceString(entry._1) + "/" + entry._2)
 
-  def writeXPathAnalysis(xpa: XPathAnalysis)(implicit receiver: XMLReceiver): Unit =
+  def writeXPathAnalysis(
+    xpa      : XPathAnalysis,
+    flagPath : String => Boolean = _ => false)(implicit
+    receiver : XMLReceiver
+  ): Unit =
     xpa match {
       case a: ConstantXPathAnalysis =>
         element("analysis", atts = List("expression" -> a.xpathString, "analyzed" -> a.figuredOutDependencies.toString))
@@ -74,8 +79,10 @@ object XPathAnalysis {
           def write(iterable: Iterable[String], enclosingElemName: String, elemName: String): Unit =
             if (iterable.nonEmpty)
               withElement(enclosingElemName) {
-                for (value <- iterable)
-                  element(elemName, text = getDisplayPath(value))
+                for (value <- iterable) {
+                  val displayPath = getDisplayPath(value)
+                  element(elemName, atts = flagPath(displayPath) list ("flag" -> "true"), text = displayPath)
+                }
               }
 
           write(mapSetToIterable(a.valueDependentPaths), "value-dependent",      "path")

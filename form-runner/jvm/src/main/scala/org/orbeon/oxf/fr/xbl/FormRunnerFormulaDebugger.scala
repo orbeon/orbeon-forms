@@ -1,16 +1,15 @@
 package org.orbeon.oxf.fr.xbl
 
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.fr.Names.FormModel
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis
-import org.orbeon.oxf.xforms.analysis.XPathAnalysis.mapSetToIterable
 import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer.Vertex
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs}
-import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver}
 import org.orbeon.oxf.xml.XMLReceiverSupport.withDocument
+import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
 import org.orbeon.scaxon.Implicits._
@@ -33,17 +32,30 @@ object FormRunnerFormulaDebugger {
     val mip =
       ModelDefs.AllXPathMipsByName(mipName)
 
+    val model =
+      XFormsAPI.topLevelModel(FormModel).map(_.staticModel).getOrElse(throw new IllegalArgumentException("model not found"))
+
     val explanation =
       DependencyAnalyzer.determineEvaluationOrder(
-        model   = XFormsAPI.topLevelModel(FormModel).map(_.staticModel).getOrElse(throw new IllegalArgumentException("model not found")),
+        model   = model,
         mip     = mip
       )._2()
+
+    val instanceString = XPathAnalysis.buildInstanceString(Names.FormInstance)
+
+    val allBindPaths = model.iterateAllBinds map { bind =>
+      instanceString :: bind.ancestorOrSelfBinds.reverse.flatMap(b => FormRunner.controlNameFromIdOpt(b.staticId)) mkString "/"
+    }
+
+    val allBindPathsSet = allBindPaths.toSet
 
     def xpathAnalysisDoc(xpa: XPathAnalysis) = {
       val (receiver, result) = StaticXPath.newTinyTreeReceiver
       implicit val rcv: XMLReceiver = receiver
       withDocument {
-        XPathAnalysis.writeXPathAnalysis(xpa)
+        XPathAnalysis.writeXPathAnalysis(xpa, path =>
+          path.startsWith(instanceString) && ! allBindPathsSet(path)
+        )
       }
       result()
     }

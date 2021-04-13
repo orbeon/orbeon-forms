@@ -350,7 +350,7 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeMapSet: Decoder[MapSet[String, String]] = (c: HCursor) => {
 
-      def splitAnalysisPath(path: String): List[Int] =
+      def splitAnalysisPath(path: String): List[String] =
         path match {
           case "" => Nil
           case s  =>
@@ -359,7 +359,9 @@ object XFormsStaticStateDeserializer {
               val code = (if (isAtt) e.substring(1) else e).toInt
 
               val qName = collectedQNames(code)
-              namePool.allocateFingerprint(qName.namespace.uri, qName.localName)
+              val fp = namePool.allocateFingerprint(qName.namespace.uri, qName.localName)
+
+              if (isAtt) "@" + fp.toString else fp.toString
             }
           }
 
@@ -377,10 +379,10 @@ object XFormsStaticStateDeserializer {
 
     implicit val decodeXPathAnalysis: Decoder[XPathAnalysis] = (c: HCursor) =>
       for {
-        _valueDependentPaths    <- c.getOrElse[MapSet[String, String]]("valueDependentPaths")(MapSet.empty)
-        _returnablePaths        <- c.getOrElse[MapSet[String, String]]("returnablePaths")(MapSet.empty)
-        _dependentModels        <- c.getOrElse[Set[String]]("dependentModels")(Set.empty)
-        _dependentInstances     <- c.getOrElse[Set[String]]("dependentInstances")(Set.empty)
+        _valueDependentPaths <- c.getOrElse[MapSet[String, String]]("valueDependentPaths")(MapSet.empty)
+        _returnablePaths     <- c.getOrElse[MapSet[String, String]]("returnablePaths")(MapSet.empty)
+        _dependentModels     <- c.getOrElse[Set[String]]("dependentModels")(Set.empty)
+        _dependentInstances  <- c.getOrElse[Set[String]]("dependentInstances")(Set.empty)
       } yield
         new XPathAnalysis {
           val xpathString            = "N/A"

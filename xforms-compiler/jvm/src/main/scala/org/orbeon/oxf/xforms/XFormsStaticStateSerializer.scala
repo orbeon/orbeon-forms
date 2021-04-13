@@ -72,7 +72,7 @@ object XFormsStaticStateSerializer {
 
     val namePool = StaticXPath.GlobalNamePool
 
-    def splitAnalysisPath(path: String): List[QName] =
+    def splitAnalysisPath(path: String): List[(Boolean, QName)] =
       path match {
         case "" => Nil
         case s =>
@@ -84,7 +84,9 @@ object XFormsStaticStateSerializer {
             val uri       = namePool.getURI(code)
 
             //namePool.getUnprefixedQName() // Saxon 10
-            QName(localName, "", uri)
+            val qName = QName(localName, "", uri)
+
+            (isAtt, qName)
           }
         }
 
@@ -215,7 +217,7 @@ object XFormsStaticStateSerializer {
             pathSet     <- mapSet.map.values
             path        <- pathSet
           } locally {
-            splitAnalysisPath(path) foreach { qName =>
+            splitAnalysisPath(path) foreach { case (_, qName) =>
               distinct += qName
             }
           }
@@ -272,7 +274,10 @@ object XFormsStaticStateSerializer {
       m.map.mapValues { set =>
         set map {
           case "" => ""
-          case s  => splitAnalysisPath(s) map collectedQNamesWithPositions mkString "/"
+          case s  => splitAnalysisPath(s) map { case (isAtt, qName) =>
+            val p = collectedQNamesWithPositions(qName)
+            if (isAtt) "@" + p.toString else p.toString
+          } mkString "/"
         }
       }
 

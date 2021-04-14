@@ -17,6 +17,11 @@ env:
   - TARGET=orbeon-dist
 addons:
   postgresql: "9.5"
+  apt:
+    packages:
+    - mysql-server-5.6
+    - mysql-client-core-5.6
+    - mysql-client-5.6
   artifacts:
     paths:
     - $(ls build/distrib/* | egrep -v '(embedding|proxy-portlet|xforms-filter|orbeon-auth)' | egrep -v '\-[CP]E\.(tgz|war)' | tr "\n" ":")
@@ -34,7 +39,7 @@ before_cache:
 before_install:
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - sudo apt-get update
+  #- sudo apt-get update
   - sudo apt-get -y install docker-ce
 install:
 # From https://docs.travis-ci.com/user/languages/java/: "Because there is no single standard way of installing project dependencies with Ant, you need to

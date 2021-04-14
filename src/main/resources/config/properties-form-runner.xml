@@ -464,6 +464,6 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.calculated-value.appearance.*.*"          value=""/>
 
     <!-- Process for the publish API -->
-    <property as="xs:string"  name="oxf.fr.detail.process.before-publish"/>
+    <property as="xs:string"  name="oxf.fr.detail.process.before-publish.*.*"/>
 
 </properties>

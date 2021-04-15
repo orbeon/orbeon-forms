@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.{Constants, XFormsId, XFormsNames}
+import org.orbeon.xforms.{Constants, XFormsNames}
 
 import java.{lang => jl}
 import scala.collection.mutable.ListBuffer
@@ -30,6 +30,20 @@ import scala.collection.mutable.ListBuffer
 object XFormsStaticElementValue {
 
   type XPathExpressionString = String
+
+  def findElemBindingOrValueExpression(elem: dom.Element): Option[String] = {
+
+    def fromValue =
+      elem.attributeValueOpt(XFormsNames.VALUE_QNAME) map StaticXPath.makeStringExpression
+
+    def fromRef =
+      ElementAnalysis.getBindingExpression(elem) map StaticXPath.makeStringExpression
+
+    def fromBind =
+      elem.attributeValueOpt(XFormsNames.BIND_QNAME) map (v => StaticXPath.makeStringExpression(s"""bind('$v')"""))
+
+   fromValue orElse fromRef orElse fromBind
+  }
 
   // Only for the case where there is no `bind`, `ref`, or `value` on the element.
   // We construct either:
@@ -45,7 +59,7 @@ object XFormsStaticElementValue {
     containerPrefix : String,
     isWithinRepeat  : Boolean,
     acceptHTML      : Boolean
-  ): (Either[String, XPathExpressionString], Boolean) = {
+  ): (Either[XPathExpressionString, String], Boolean) = {
 
     val outerIsHTML = LHHAAnalysis.isHTML(outerElem)
 
@@ -112,17 +126,7 @@ object XFormsStaticElementValue {
               // Instead, we take `value`, then `ref`, then `bind`.
               // For the outer element, `value` will evaluated relative to `ref` or `bind` if present.
               // TODO: Throw an error for invalid conditions.
-
-              def fromValue =
-                elem.attributeValueOpt(XFormsNames.VALUE_QNAME) map StaticXPath.makeStringExpression
-
-              def fromRef =
-                ElementAnalysis.getBindingExpression(elem) map StaticXPath.makeStringExpression
-
-              def fromBind =
-                elem.attributeValueOpt(XFormsNames.BIND_QNAME) map (v => StaticXPath.makeStringExpression(s"""bind('$v')"""))
-
-              fromValue orElse fromRef orElse fromBind foreach { v =>
+              findElemBindingOrValueExpression(elem) foreach { v =>
                 addExpr(v, isHTMLMediatype)
               }
             } else {

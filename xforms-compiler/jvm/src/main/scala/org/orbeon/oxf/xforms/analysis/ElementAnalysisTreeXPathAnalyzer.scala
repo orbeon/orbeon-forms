@@ -426,6 +426,8 @@ object ElementAnalysisTreeXPathAnalyzer {
                 val prefixedId = XFormsId.getRelatedEffectiveId(e.prefixedId, staticId)
 
                 val (expressionOrConstant, _) =
+                  XFormsStaticElementValue.findElemBindingOrValueExpression(nestedElement) map
+                  (Left(_) -> LHHAAnalysis.isHTML(nestedElement))                          getOrElse
                   XFormsStaticElementValue.getElementExpressionOrConstant(
                     outerElem       = nestedElement,
                     containerPrefix = "",    // won't be used

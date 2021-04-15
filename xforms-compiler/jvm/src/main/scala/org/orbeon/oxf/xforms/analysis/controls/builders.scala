@@ -111,12 +111,14 @@ object LHHAAnalysisBuilder {
     // TODO: figure out whether to allow HTML or not (could default to true?)
 
     val (expressionOrConstant, containsHTML) =
-      XFormsStaticElementValue.getElementExpressionOrConstant(
-        outerElem       = element,
-        containerPrefix = containerScope.fullPrefix,
-        isWithinRepeat  = parent.exists(_.isWithinRepeat),
-        acceptHTML      = true
-      )
+      XFormsStaticElementValue.findElemBindingOrValueExpression(element) map
+        (Left(_) -> LHHAAnalysis.isHTML(element))                        getOrElse
+        XFormsStaticElementValue.getElementExpressionOrConstant(
+          outerElem       = element,
+          containerPrefix = containerScope.fullPrefix,
+          isWithinRepeat  = parent.exists(_.isWithinRepeat),
+          acceptHTML      = true
+        )
 
     val lhhaType: LHHA =
       LHHA.withNameOption(element.getName) getOrElse

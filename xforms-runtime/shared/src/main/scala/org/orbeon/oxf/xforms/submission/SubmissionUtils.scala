@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.submission
 
 import java.io.{ByteArrayOutputStream, InputStream}
 import java.net.URI
-
 import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.common.OXFException
@@ -26,13 +25,14 @@ import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
+import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.{SaxonUtils, XMLParsing}
 import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.collection.mutable
+
 
 object SubmissionUtils {
 
@@ -105,8 +105,13 @@ object SubmissionUtils {
   def dataNodeHash(node: om.NodeInfo): String =
     XFormsCrossPlatformSupport.hmacString(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""), "hex")
 
-  def readByteArray(model: XFormsModel, resolvedAbsoluteUrl: URI): Array[Byte] =
-    processGETConnection(model, resolvedAbsoluteUrl) { is =>
+  def readByteArray(
+    headersGetter       : String => Option[List[String]],
+    resolvedAbsoluteUrl : URI)(implicit
+    logger              : IndentedLogger,
+    externalContext     : ExternalContext
+  ): Array[Byte] =
+    processGETConnection(headersGetter, resolvedAbsoluteUrl) { is =>
       inputStreamToByteArray(is)
     }
 
@@ -117,8 +122,14 @@ object SubmissionUtils {
     os.toByteArray
   }
 
-  def readTinyTree(model: XFormsModel, resolvedAbsoluteUrl: URI, handleXInclude: Boolean): DocumentNodeInfoType =
-    processGETConnection(model, resolvedAbsoluteUrl) { is =>
+  def readTinyTree(
+    headersGetter       : String => Option[List[String]],
+    resolvedAbsoluteUrl : URI,
+    handleXInclude      : Boolean)(implicit
+    logger              : IndentedLogger,
+    externalContext     : ExternalContext
+  ): DocumentNodeInfoType =
+    processGETConnection(headersGetter, resolvedAbsoluteUrl) { is =>
       XFormsCrossPlatformSupport.readTinyTree(
         XPath.GlobalConfiguration,
         is,
@@ -128,13 +139,22 @@ object SubmissionUtils {
       )
     }
 
-  private def processGETConnection[T](model: XFormsModel, resolvedAbsoluteUrl: URI)(body: InputStream => T): T =
-    ConnectionResult.withSuccessConnection(openGETConnection(model, resolvedAbsoluteUrl), closeOnSuccess = true)(body)
+  private def processGETConnection[T](
+    headersGetter       : String => Option[List[String]],
+    resolvedAbsoluteUrl : URI)(
+    body                : InputStream => T)(implicit
+    logger              : IndentedLogger,
+    externalContext     : ExternalContext
+  ): T =
+    ConnectionResult.withSuccessConnection(openGETConnection(headersGetter, resolvedAbsoluteUrl), closeOnSuccess = true)(body)
 
-  private def openGETConnection(model: XFormsModel, resolvedAbsoluteUrl: URI): ConnectionResult = {
+  private def openGETConnection(
+    headersGetter       : String => Option[List[String]],
+    resolvedAbsoluteUrl : URI)(implicit
+    logger              : IndentedLogger,
+    externalContext     : ExternalContext
+  ): ConnectionResult = {
 
-    implicit val _logger                   = model.indentedLogger
-    implicit val _externalContext          = XFormsCrossPlatformSupport.externalContext
     implicit val _coreCrossPlatformSupport = CoreCrossPlatformSupport
 
     Connection.connectNow(
@@ -148,7 +168,7 @@ object SubmissionUtils {
         customHeaders    = Map.empty,
         headersToForward = Connection.headersToForwardFromProperty,
         cookiesToForward = Connection.cookiesToForwardFromProperty,
-        getHeader        = model.containingDocument.headersGetter
+        getHeader        = headersGetter
       ) mapValues (_.toList),
       loadState       = true,
       saveState       = true,

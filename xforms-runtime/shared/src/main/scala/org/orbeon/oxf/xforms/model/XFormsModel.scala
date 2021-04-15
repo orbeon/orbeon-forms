@@ -399,18 +399,22 @@ trait XFormsModelInstances {
     }
   }
 
-  private def loadInstance(pathOrAbsoluteURI: String, handleXInclude: Boolean): DocumentNodeInfoType =
+  private def loadInstance(pathOrAbsoluteURI: String, handleXInclude: Boolean): DocumentNodeInfoType = {
+
+    implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
+
     SubmissionUtils.readTinyTree(
-      model               = selfModel,
+      headersGetter       = containingDocument.headersGetter,
       resolvedAbsoluteUrl = new URI(
         URLRewriterUtils.rewriteServiceURL(
-          XFormsCrossPlatformSupport.externalContext.getRequest,
+          externalContext.getRequest,
           pathOrAbsoluteURI,
           URLRewriter.REWRITE_MODE_ABSOLUTE
         )
       ),
       handleXInclude = handleXInclude
     )
+  }
 
   // Set instance and associated information if everything went well
   // NOTE: No XInclude supported to read instances with `@src` for now

@@ -13,21 +13,22 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import java.io.ByteArrayOutputStream
-import java.net.URI
-
 import cats.syntax.option._
 import org.orbeon.dom.Document
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
-import org.orbeon.oxf.json.Converter
-import org.orbeon.oxf.util.{ContentTypes, XPath}
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.json.Converter
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.xforms.XFormsCrossPlatformSupport
+
+import java.io.ByteArrayOutputStream
+import java.net.URI
+
 
 import scala.util.control.NonFatal
 
@@ -169,8 +170,11 @@ object SerializationParameters {
               )
 
             try {
+              implicit val logger         : IndentedLogger = submission.model.indentedLogger
+              implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
+
               SerializationParameters(
-                messageBody            = SubmissionUtils.readByteArray(submission.model, resolvedAbsoluteUrl).some,
+                messageBody            = SubmissionUtils.readByteArray(submission.containingDocument.headersGetter, resolvedAbsoluteUrl).some,
                 queryString            = null,
                 actualRequestMediatype = actualRequestMediatype(serialization)
               )

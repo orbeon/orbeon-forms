@@ -20,7 +20,6 @@
                     context="instance('controls-label-value-itemset')"
                     origin="fbf:getControlsLabelValueItemset()"/>
                 <xxf:show dialog="dialog"/>
-<!--                <xf:setfocus control="control-selector"/>-->
             </xbl:handler>
             <xbl:handler event="DOMActivate" observer="cancel-trigger" >
                 <xxf:hide dialog="dialog"/>
@@ -33,7 +32,6 @@
                 </xf:dispatch>
             </xbl:handler>
             <xbl:handler observer="control-selector" event="xforms-value-changed" if="xxf:non-blank(event('xxf:value'))">
-<!--                <xf:message>selected!</xf:message>-->
                 <xf:action/>
                 <xxf:hide dialog="dialog"/>
                 <xf:dispatch name="fb-apply" target="fb-dialog-search">

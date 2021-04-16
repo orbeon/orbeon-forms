@@ -7187,4 +7187,112 @@
         </output>
     </test>
 
+    <test description="xxf:binding() function" name="oxf:xforms-xpath-analysis">
+        <input name="form">
+            <xh:html xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="main">
+                            <form>
+                                <number>42</number>
+                            </form>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo" xxbl:mode="binding">
+                            <xbl:template>
+                                <xf:var id="v1" name="v1" value="xxf:binding('fr-foo')"/>
+                                <xf:output id="o1" value="xxf:binding('fr-foo')"/>
+                                <xf:var id="v1-outer" name="v1-outer" xxbl:scope="outer">
+                                    <xxf:value value="$v1" xxbl:scope="inner"/>
+                                </xf:var>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:foo id="my-foo" ref="number"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="model" binding="false" value="false">
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="main" analyzed-binds="true">
+                    <instance scope="" prefixed-id="main" model-prefixed-id="model" binding="false" value="false"/>
+                </model>
+                <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="true" value="false">
+                    <binding>
+                        <analysis expression="number" analyzed="true">
+                            <returnable>
+                                <path>instance('main')/number</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>main</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>main</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                    <template scope="my-foo" prefixed-id="my-foo≡xf-2" binding="false" value="false">
+                        <var scope="my-foo" prefixed-id="my-foo≡v1" binding="false" value="false" name="v1">
+                            <value>
+                                <analysis expression="xxf:binding('fr-foo')" analyzed="true">
+                                    <returnable>
+                                        <path>instance('main')/number</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>main</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>main</instance>
+                                    </returnable-instances>
+                                </analysis>
+                            </value>
+                        </var>
+                        <output scope="my-foo" prefixed-id="my-foo≡o1" binding="false" value="true">
+                            <value>
+                                <analysis expression="string((xxf:binding('fr-foo'))[1])" analyzed="true">
+                                    <value-dependent>
+                                        <path>instance('main')/number</path>
+                                    </value-dependent>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>main</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </value>
+                        </output>
+                        <var scope="" prefixed-id="my-foo≡v1-outer" model-prefixed-id="model" binding="false" value="false" name="v1-outer">
+                            <value>
+                                <analysis expression="$v1" analyzed="true">
+                                    <returnable>
+                                        <path>instance('main')/number</path>
+                                    </returnable>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>main</instance>
+                                    </dependent-instances>
+                                    <returnable-instances>
+                                        <instance>main</instance>
+                                    </returnable-instances>
+                                </analysis>
+                            </value>
+                        </var>
+                    </template>
+                </foo>
+            </root>
+        </output>
+    </test>
+
 </group>

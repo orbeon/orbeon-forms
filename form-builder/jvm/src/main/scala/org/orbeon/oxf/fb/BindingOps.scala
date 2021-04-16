@@ -228,16 +228,4 @@ trait BindingOps {
 
     editorAttributeValueOpt contains "true"
   }
-
-  // Create a new data holder given the new control name, using the instance template if found
-  def newDataHolder(controlName: String, binding: NodeInfo): NodeInfo = {
-
-    val instanceTemplate = bindingMetadata(binding) / FBTemplatesTest / FBInstanceTest
-    if (instanceTemplate.nonEmpty) {
-      // Because `elementInfo` doesn't support being passed text `NodeInfo`!
-      val mutable = TransformerUtils.extractAsMutableDocument(instanceTemplate.head).rootElement
-      elementInfo(controlName, (mutable.head /@ @*) ++ (mutable / (Text || *)))
-    } else
-      elementInfo(controlName)
-  }
 }

@@ -14,23 +14,22 @@
 package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.Direction
-import org.orbeon.oxf.fb.XMLNames._
+import org.orbeon.oxf.fb.XMLNames.{FBInitialIterations, _}
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerTemplatesOps
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory.elementInfo
-import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.oxf.util.CoreUtils._
+
 import scala.collection.compat._
+
 
 trait ContainerOps extends ControlOps {
 
@@ -54,9 +53,6 @@ trait ContainerOps extends ControlOps {
     element parent * child * filter
       (_.name == siblingName) filterNot
       (_ == element)
-
-  def getInitialIterationsAttribute(controlElem: NodeInfo): Option[String] =
-    controlElem attValueOpt FBInitialIterations flatMap trimAllToOpt
 
   // Return all the container controls in the view
   def getAllContainerControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] = getAllControlsWithIds(inDoc) filter IsContainer
@@ -187,7 +183,7 @@ trait ContainerOps extends ControlOps {
         }
 
         // Moving sections can impact templates
-        updateTemplates(None)
+        FormRunnerTemplatesOps.updateTemplates(None, ctx.componentBindings)
 
       case _ =>
     }
@@ -238,7 +234,7 @@ trait ContainerOps extends ControlOps {
     findControlByName(inDoc, controlName) foreach { control =>
 
       val wasRepeat = isRepeat(control)
-      val oldInitialIterationsAttribute = getInitialIterationsAttribute(control)
+      val oldInitialIterationsAttribute = FormRunnerTemplatesOps.getInitialIterationsAttribute(control)
 
       val minOpt    = minMaxFreezeForAttribute(min)
       val maxOpt    = minMaxFreezeForAttribute(max)
@@ -291,9 +287,9 @@ trait ContainerOps extends ControlOps {
         updateTemplatesCheckContainers(findAncestorRepeatNames(control).to(Set))
 
         // Ensure new template rooted at iteration
-        ensureTemplateReplaceContent(
+        FormRunnerTemplatesOps.ensureTemplateReplaceContent(
           controlName,
-          createTemplateContentFromBind(iterationBind.head, ctx.componentBindings)
+          FormRunnerTemplatesOps.createTemplateContentFromBind(iterationBind.head, ctx.componentBindings)
         )
 
       } else if (wasRepeat && ! repeat) {
@@ -322,7 +318,7 @@ trait ContainerOps extends ControlOps {
         // Template should already exists an should have already been renamed if needed
         // MAYBE: Ensure template just in case.
 
-        val newInitialIterationsAttribute = getInitialIterationsAttribute(control)
+        val newInitialIterationsAttribute = FormRunnerTemplatesOps.getInitialIterationsAttribute(control)
 
         if (oldInitialIterationsAttribute != newInitialIterationsAttribute)
           updateTemplatesCheckContainers(findAncestorRepeatNames(control, includeSelf = true).to(Set))
@@ -345,149 +341,7 @@ trait ContainerOps extends ControlOps {
   def findTemplateInstance(doc: NodeInfo, controlName: String): Option[NodeInfo] =
     instanceElem(doc, templateId(controlName))
 
-  def ensureTemplateReplaceContent(
-    controlName : String,
-    content     : NodeInfo)(implicit
-    ctx         : FormBuilderDocContext
-  ): Unit = {
-
-    val templateInstanceId = templateId(controlName)
-    val modelElement = getModelElem(ctx.formDefinitionRootElem)
-    modelElement / XFInstanceTest find (_.hasIdValue(templateInstanceId)) match {
-      case Some(templateInstance) =>
-        // clear existing template instance content
-        delete(templateInstance / *)
-        insert(into = templateInstance , origin = content)
-
-      case None =>
-        // Insert template instance if not present
-        val template: NodeInfo =
-          <xf:instance
-            xmlns:xf="http://www.w3.org/2002/xforms"
-            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-            id={templateInstanceId}
-            fb:readonly="true"
-            xxf:exclude-result-prefixes="#all">{nodeInfoToElem(content)}</xf:instance>
-
-        insert(into = modelElement, after = modelElement / XFInstanceTest takeRight 1, origin = template)
-    }
-  }
-
-  def createTemplateContentFromBindName(
-    bindName : String,
-    bindings : Seq[NodeInfo])(implicit
-    ctx      : FormBuilderDocContext
-  ): Option[NodeInfo] =
-    findBindByName(ctx.formDefinitionRootElem, bindName) map (createTemplateContentFromBind(_, bindings))
-
-  private val AttributeRe = "@(.+)".r
-
-  // Create an instance template based on a hierarchy of binds rooted at the given bind
-  // This checks each control binding in case the control specifies a custom data holder.
-  def createTemplateContentFromBind(
-    startBindElem : NodeInfo,
-    bindings      : Seq[NodeInfo])(implicit
-    ctx           : FormBuilderDocContext
-  ): NodeInfo = {
-
-    val inDoc       = startBindElem.getDocumentRoot
-    val descriptors = getAllRelevantDescriptors(bindings)
-
-    val allControlsByName = getAllControlsWithIds(inDoc) map (c => controlNameFromId(c.id) -> c) toMap
-
-    def holderForBind(bind: NodeInfo, topLevel: Boolean): Option[NodeInfo] = {
-
-      val controlName    = getBindNameOrEmpty(bind)
-      val controlElemOpt = allControlsByName.get(controlName)
-
-      // Handle non-standard cases, see https://github.com/orbeon/orbeon-forms/issues/2470
-      def fromNonStandardRef =
-        bind attValueOpt "ref" match {
-          case Some(AttributeRe(att)) => Some(Some(NodeInfoFactory.attributeInfo(att)))
-          case Some(".")              => Some(None)
-          case _                      => None
-        }
-
-      def fromBinding =
-        for {
-          controlElem <- controlElemOpt
-          appearances = controlElem attTokens APPEARANCE_QNAME
-          descriptor  <- findMostSpecificWithoutDatatype(controlElem.uriQualifiedName, appearances, descriptors)
-          binding     <- descriptor.binding
-        } yield {
-          Some(FormBuilder.newDataHolder(controlName, binding))
-        }
-
-      def fromPlainControlName =
-        Some(Some(elementInfo(controlName)))
-
-      val elementTemplateOpt = fromNonStandardRef orElse fromBinding orElse fromPlainControlName flatten
-
-      elementTemplateOpt foreach { elementTemplate =>
-
-        val iterationCount = {
-
-          // If the current control is a repeated fr:grid or fr:section with the attribute set, find the first occurrence
-          // in the data of this  repeat, and use its concrete initial number of iterations to update the template. We
-          // can imagine other values for the attribute in the future, maybe an integer value (`0`, `1`, ...) setting
-          // the initial number of iterations.
-          // See https://github.com/orbeon/orbeon-forms/issues/2379
-          def useInitialIterations(controlElem: NodeInfo) =
-            ! topLevel && isRepeat(controlElem) && getInitialIterationsAttribute(controlElem).contains("first")
-
-          controlElemOpt match {
-            case Some(controlElem) if useInitialIterations(controlElem) =>
-
-              val firstDataHolder   = findDataHolders(controlName) take 1
-              val iterationsHolders = firstDataHolder / *
-
-              iterationsHolders.size
-
-            case _ =>
-              1
-          }
-        }
-
-        // Recursively insert elements in the template
-        if (iterationCount > 0) {
-
-          // If iterationCount > 1, we just duplicate the children `iterationCount` times. In practice, this means
-          // multiple iteration elements:
-          //
-          // <repeated-section-2-iteration>
-          //   ...
-          // </repeated-section-2-iteration>
-          // <repeated-section-2-iteration>
-          //   ...
-          // </repeated-section-2-iteration>
-          val nested         = bind / "*:bind" flatMap (holderForBind(_, topLevel = false))
-          val repeatedNested = (1 to iterationCount) flatMap (_ => nested)
-
-          insert(into = elementTemplate, origin = repeatedNested)
-        }
-      }
-
-      elementTemplateOpt
-    }
-
-    holderForBind(startBindElem, topLevel = true) getOrElse (throw new IllegalStateException)
-  }
-
-  // Make sure all template instances reflect the current bind structure
-
-  def updateTemplates(ancestorContainerNames: Option[Set[String]])(implicit ctx: FormBuilderDocContext): Unit =
-    for {
-      templateInstance <- templateInstanceElements(ctx.formDefinitionRootElem)
-      repeatName       = controlNameFromId(templateInstance.id)
-      if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(repeatName))
-      iterationName    <- findRepeatIterationName(ctx.formDefinitionRootElem, repeatName)
-      template         <- createTemplateContentFromBindName(iterationName, ctx.componentBindings)
-    } locally {
-      ensureTemplateReplaceContent(repeatName, template)
-    }
-
   // Update templates but only those which might contain one of specified names
   def updateTemplatesCheckContainers(ancestorContainerNames: Set[String])(implicit ctx: FormBuilderDocContext): Unit =
-    updateTemplates(Some(ancestorContainerNames))
+    FormRunnerTemplatesOps.updateTemplates(Some(ancestorContainerNames), ctx.componentBindings)
 }

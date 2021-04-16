@@ -53,7 +53,7 @@ class ClipboardTest
           assert(Control1 === FormRunner.getControlName(selectedCell / * head))
           assert(FormRunner.findControlByName(doc, Control1).nonEmpty)
           assert(FormRunner.findBindByName(doc, Control1).nonEmpty)
-          assert(FormBuilder.findDataHolders(Control1).nonEmpty)
+          assert(FormRunner.findDataHolders(Control1).nonEmpty)
           assert(FormBuilder.findCurrentResourceHolder(Control1).nonEmpty)
         }
 
@@ -66,7 +66,7 @@ class ClipboardTest
 
         assert(FormRunner.findControlByName(doc, Control1).isEmpty)
         assert(FormRunner.findBindByName(doc, Control1).isEmpty)
-        assert(FormBuilder.findDataHolders(Control1).isEmpty)
+        assert(FormRunner.findDataHolders(Control1).isEmpty)
         assert(FormBuilder.findCurrentResourceHolder(Control1).isEmpty)
 
         ToolboxOps.pasteFromClipboard()

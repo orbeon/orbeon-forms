@@ -20,7 +20,7 @@ import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{FormRunner, Names}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerDocContext, FormRunnerTemplatesOps, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
@@ -73,10 +73,6 @@ trait ControlOps extends ResourcesOps {
       id={Names.FormBinds}
       ref="instance('fr-form-instance')"
       xmlns:xf="http://www.w3.org/2002/xforms"/>
-
-  // Find data holders (there can be more than one with repeats)
-  def findDataHolders(controlName: String)(implicit ctx: FormBuilderDocContext): List[NodeInfo] =
-    findBindPathHoldersInDocument(ctx.formDefinitionRootElem, controlName, Some(ctx.dataRootElem)) flatMap (_.holders) getOrElse Nil
 
   def precedingBoundControlNameInSectionForControl(controlElem: NodeInfo): Option[String] = {
 
@@ -258,7 +254,7 @@ trait ControlOps extends ResourcesOps {
       if (oldName != newName) {
         findDataHolders(oldName) foreach (rename(_, newName))
         renameBinds(oldName, newName)
-        updateTemplates(None)
+        FormRunnerTemplatesOps.updateTemplates(None, ctx.componentBindings)
       }
     }
   }
@@ -456,11 +452,6 @@ trait ControlOps extends ResourcesOps {
 
   def getAllNamesInUse(implicit ctx: FormBuilderDocContext): Set[String] =
     iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get)).to(Set)
-
-  // Return all the controls in the view
-  def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =
-    getFormRunnerBodyElem(inDoc) descendant * filter
-      (e => isIdForControl(e.id))
 
   // Finds if a control uses a particular type of editor (say "static-itemset")
   def hasEditor(controlElement: NodeInfo, editor: String)(implicit ctx: FormBuilderDocContext): Boolean =

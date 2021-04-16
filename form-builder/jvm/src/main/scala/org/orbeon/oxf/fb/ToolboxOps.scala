@@ -90,7 +90,7 @@ object ToolboxOps {
           setvalue(newControlElem / "*:alert" /@ "ref", OldStandardAlertRef)
 
           // Data holder may contain file attributes
-          val dataHolder = newDataHolder(newControlName, binding)
+          val dataHolder = FormRunnerTemplatesOps.newDataHolder(newControlName, binding)
 
           // Create resource holder for all form languages
           val resourceHolders = {
@@ -969,9 +969,9 @@ object ToolboxOps {
       val newControlName = getControlName(containerElem)
       val bindElem       = findBindByName(ctx.formDefinitionRootElem, newControlName).get
 
-      ensureTemplateReplaceContent(
+      FormRunnerTemplatesOps.ensureTemplateReplaceContent(
         controlName = newControlName,
-        content     = createTemplateContentFromBind(bindElem firstChildOpt * head, ctx.componentBindings))
+        content     = FormRunnerTemplatesOps.createTemplateContentFromBind(bindElem firstChildOpt * head, ctx.componentBindings))
     }
 
     // Update ancestor templates if any

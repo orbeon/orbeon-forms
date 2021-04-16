@@ -141,6 +141,10 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       buildBindPath(bindNode) map (BindPath(bindNode, _))
     }
 
+  // Find data holders (there can be more than one with repeats)
+  def findDataHolders(controlName: String)(implicit ctx: FormRunnerDocContext): List[NodeInfo] =
+    findBindPathHoldersInDocument(ctx.formDefinitionRootElem, controlName, Some(ctx.dataRootElem)) flatMap (_.holders) getOrElse Nil
+
   // If `contextItemOpt` is `None`, don't search for holders.
   def findBindPathHoldersInDocument(
     inDoc          : NodeInfo,

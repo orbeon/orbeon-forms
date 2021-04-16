@@ -16,15 +16,12 @@ package org.orbeon.oxf.fr.persistence.proxy
 import org.apache.http.HttpStatus
 import org.orbeon.dom.QName
 import org.orbeon.io.IOUtils
-import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
-import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr._
-import org.orbeon.oxf.fr.datamigration.MigrationSupport
-import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
@@ -47,7 +44,6 @@ import org.orbeon.xforms.RelevanceHandling._
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
 import java.net.URI
-import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
@@ -66,7 +62,7 @@ class PersistenceProxyProcessor extends ProcessorImpl {
 
   // Start the processor
   override def start(pipelineContext: PipelineContext): Unit = {
-    val ec = NetUtils.getExternalContext
+    implicit val ec = NetUtils.getExternalContext
     proxyRequest(ec.getRequest, ec.getResponse)
   }
 }
@@ -86,7 +82,7 @@ private object PersistenceProxyProcessor {
   implicit val Logger                = new IndentedLogger(LoggerFactory.createLogger(PersistenceProxyProcessor.getClass))
 
   // Proxy the request to the appropriate persistence implementation
-  def proxyRequest(request: Request, response: Response): Unit = {
+  def proxyRequest(request: Request, response: Response)(implicit externalContext: ExternalContext): Unit = {
     val incomingPath = request.getRequestPath
     incomingPath match {
       case FormPath(path, app, form, _)                => proxyRequest               (request, response, app, form, FormOrData.Form, None          , path)
@@ -103,13 +99,14 @@ private object PersistenceProxyProcessor {
 
   // Proxy the request depending on app/form name and whether we are accessing form or data
   def proxyRequest(
-    request        : Request,
-    response       : Response,
-    app            : String,
-    form           : String,
-    formOrData     : FormOrData,
-    filename       : Option[String],
-    path           : String
+    request         : Request,
+    response        : Response,
+    app             : String,
+    form            : String,
+    formOrData      : FormOrData,
+    filename        : Option[String],
+    path            : String)(implicit
+    externalContext : ExternalContext
   ): Unit = {
 
     // Throws if there is an incompatibility
@@ -156,9 +153,17 @@ private object PersistenceProxyProcessor {
       NetUtils.encodeQueryString(request.getParameterMap)
     )
 
-    val requestForData = formOrData == FormOrData.Data && request.getMethod == HttpMethod.GET
-    val transforms     = requestForData.flatList {
+    def maybeMigrateFormDefinition =
+      request.getFirstParamAsString(FormDefinitionFormatVersionName).map(DataFormatVersion.withName) map { dstVersion =>
+        Transforms.migrateFormDefinition(
+          dstVersion,
+          app,
+          form
+        )
+      }
 
+    val transforms =
+      if (formOrData == FormOrData.Data && request.getMethod == HttpMethod.GET) {
         if (isDataXmlRequest && ! isFormBuilder) {
 
           // Prune non-relevant nodes, if we're asked to do it
@@ -179,78 +184,8 @@ private object PersistenceProxyProcessor {
           List(removeNonRelevantTransform, decryptTransform).flatten
 
         } else if (isDataXmlRequest && isFormBuilder || formOrData == FormOrData.Form) {
-
-          // Special case of form definitions
-          request.getFirstParamAsString(FormDefinitionFormatVersionName).map(DataFormatVersion.withName) match {
-            case Some(dstVersion) =>
-              // We are explicitly asked to downgrade a form definition format
-              // The database may contain a form definition in any format
-
-              def migrate(is: InputStream, os: OutputStream): Unit = {
-
-                val formDoc =
-                  new DocumentWrapper(TransformerUtils.readDom4j(is, null, false, false), null, XPath.GlobalConfiguration)
-
-                val migrationsFromForm =
-                  new MigrationsFromForm(
-                    outerDocument        = formDoc,
-                    availableXBLBindings = None, // XXX ok?
-                    legacyGridsOnly      = false
-                  )
-
-                // 1. All grids must have ids for what follows
-//                FormBuilder.addMissingGridIds(ctx.bodyElem)
-
-                // 2. Migrate inline instance data
-                val frDocCtx: FormRunnerDocContext = new FormRunnerDocContext {
-                  val formDefinitionRootElem: NodeInfo = formDoc.rootElement
-                }
-
-                // If we don't find a version in the form definition, it means it was last updated with a version older than 2018.2
-                // TODO: We should discriminate between 4.8.0 and 4.0.0 ideally. Currently we don't have a user use case but it would
-                //   be good for correctness.
-                val srcVersionFromMetadataOrGuess =
-                  findFormDefinitionFormatFromStringVersions(
-                    (frDocCtx.metadataRootElem / "updated-with-version" ++ frDocCtx.metadataRootElem / "created-with-version") map
-                      (_.stringValue)
-                  ) getOrElse DataFormatVersion.V480
-
-                MigrationSupport.migrateDataInPlace(
-                  dataRootElem     = frDocCtx.dataRootElem.asInstanceOf[NodeWrapper],
-                  srcVersion       = srcVersionFromMetadataOrGuess,
-                  dstVersion       = dstVersion,
-                  findMigrationSet = migrationsFromForm
-                )
-
-                // 3. Migrate other aspects such as binds and controls
-                MigrationSupport.migrateOtherInPlace(
-                  formRootElem     = formDoc,
-                  srcVersion       = srcVersionFromMetadataOrGuess,
-                  dstVersion       = dstVersion,
-                  findMigrationSet = migrationsFromForm
-                )
-
-                // Serialize out the result
-                val receiver =
-                  TransformerUtils.getIdentityTransformerHandler |!>
-                    (_.setResult(new StreamResult(os)))
-
-                receiver.getTransformer |!>
-                  (_.setOutputProperty(OutputKeys.ENCODING,                     CharsetNames.Utf8)) |!>
-                  (_.setOutputProperty(OutputKeys.METHOD,                       "xml"))             |!>
-                  (_.setOutputProperty(OutputKeys.VERSION,                      "1.0"))             |!>
-                  (_.setOutputProperty(OutputKeys.INDENT,                       "no"))              |!>
-                  (_.setOutputProperty(TransformerUtils.INDENT_AMOUNT_PROPERTY, "0"))
-
-                TransformerUtils.writeTinyTree(formDoc, receiver)
-              }
-
-              List(migrate _)
-
-            case None => Nil
-          }
+          maybeMigrateFormDefinition.toList
         } else {
-
           // Decrypt attachment if we're told to do so
           filename.isDefined.flatList {
             val decryptHeader     = request.getFirstHeader(FormRunnerPersistence.OrbeonDecryptHeaderLower)
@@ -258,6 +193,10 @@ private object PersistenceProxyProcessor {
             isEncryptedAtRest.list(FieldEncryption.decryptAttachmentTransform _)
           }
         }
+      } else if (formOrData == FormOrData.Form) {
+        maybeMigrateFormDefinition.toList
+      } else {
+        Nil
       }
 
     proxyRequest(request, requestContent, serviceURI, headers, response, transforms)

@@ -13,13 +13,17 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.scaxon.Implicits._
 
 import scala.collection.compat._
+
 
 trait FormRunnerContainerOps extends FormRunnerControlOps {
 
@@ -157,4 +161,9 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
   def findCellNestedControl(containerElem: NodeInfo): Option[NodeInfo] =
     containerElem child * find IsControl
+
+  // Return all the controls in the view
+  def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =
+    getFormRunnerBodyElem(inDoc) descendant * filter
+      (e => isIdForControl(e.id))
 }

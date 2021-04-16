@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{FormRunner, Names, SchemaOps}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerTemplatesOps, Names, SchemaOps}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -264,7 +264,7 @@ object FormBuilderXPathApi {
   // FIXME: Saxon can pass null as `bindings`.
   //@XPathFunction
   def createTemplateContentFromBindName(inDoc: NodeInfo, name: String, bindings: List[NodeInfo]): Option[NodeInfo] =
-    FormBuilder.createTemplateContentFromBindName(name, Option(bindings) getOrElse Nil)(FormBuilderDocContext(inDoc))
+    FormRunnerTemplatesOps.createTemplateContentFromBindName(name, Option(bindings) getOrElse Nil)(FormBuilderDocContext(inDoc))
 
   // See: https://github.com/orbeon/orbeon-forms/issues/633
   // See: https://github.com/orbeon/orbeon-forms/issues/3073
@@ -280,7 +280,7 @@ object FormBuilderXPathApi {
       for {
         sectionNode   <- FormRunner.findSectionsWithTemplates(ctx.bodyElem)
         controlName   <- FormRunner.getControlNameOpt(sectionNode).toList
-        holder        <- FormBuilder.findDataHolders(controlName) // TODO: What about within repeated sections? Templates ok?
+        holder        <- FormRunner.findDataHolders(controlName) // TODO: What about within repeated sections? Templates ok?
         componentNode <- FormRunner.findComponentNodeForSection(sectionNode)
         xblNode       <- FormRunner.findXblXblForSectionTemplateNamespace(ctx.bodyElem, componentNode.namespaceURI)
         bindingNode   <- FormRunner.findXblBindingForLocalname(xblNode, componentNode.localname)
@@ -439,7 +439,7 @@ object FormBuilderXPathApi {
   // Find data holders (there can be more than one with repeats)
   //@XPathFunction
   def findDataHolders(controlName: String): List[NodeInfo] =
-    FormBuilder.findDataHolders(controlName)(FormBuilderDocContext())
+    FormRunner.findDataHolders(controlName)(FormBuilderDocContext())
 
   //@XPathFunction
   def possibleAppearancesByControlNameAsXML(
@@ -478,13 +478,13 @@ object FormBuilderXPathApi {
 
   // Various counts
   //@XPathFunction
-  def countSections        (inDoc: NodeInfo): Int = FormBuilder.getAllControlsWithIds(inDoc)             count FormRunner.IsSection
+  def countSections        (inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(inDoc)              count FormRunner.IsSection
   def countAllGrids        (inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant * count FormRunner.IsGrid
-  def countRepeats         (inDoc: NodeInfo): Int = FormBuilder.getAllControlsWithIds(inDoc)             count FormRunner.isRepeat
+  def countRepeats         (inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(inDoc)              count FormRunner.isRepeat
   def countSectionTemplates(inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant * count FormRunner.isSectionTemplateContent
 
   def countGrids           (inDoc: NodeInfo): Int = countAllGrids(inDoc) - countRepeats(inDoc)
-  def countAllNonContainers(inDoc: NodeInfo): Int = FormBuilder.getAllControlsWithIds(inDoc)             count (! FormRunner.IsContainer(_))
+  def countAllNonContainers(inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(inDoc)              count (! FormRunner.IsContainer(_))
   def countAllContainers   (inDoc: NodeInfo): Int = getAllContainerControls(inDoc).size
   def countAllControls     (inDoc: NodeInfo): Int = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
@@ -506,7 +506,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getAllControlsWithIds: Seq[NodeInfo] =
-    FormBuilder.getAllControlsWithIds(FormBuilderDocContext().formDefinitionRootElem) filterNot { elem =>
+    FormRunner.getAllControlsWithIds(FormBuilderDocContext().formDefinitionRootElem) filterNot { elem =>
       // https://github.com/orbeon/orbeon-forms/issues/4786
       FormRunner.IsContainer(elem) || FormRunner.isSectionTemplateContent(elem)
     }

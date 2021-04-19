@@ -14,15 +14,16 @@
 package org.orbeon.oxf.xforms.state
 
 import java.util.concurrent.locks.Lock
-
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+
+import scala.util.Try
 
 // Encoded combination of static an dynamic state that fully represents an XForms document's current state
 case class XFormsState(
   staticStateDigest : Option[String],
   staticState       : Option[String],
   dynamicState      : Option[DynamicState]
-) {
+){
   override def toString = s"XFormsState($staticState, $dynamicState)"
 }
 
@@ -54,14 +55,14 @@ trait XFormsStateLifecycle {
     disableDocumentCache : Boolean
   ): XFormsContainingDocument
 
-  def acquireDocumentLock (uuid: String, timeout: Long): Option[Lock]
+  def acquireDocumentLock (uuid: String, timeout: Long): Try[Option[Lock]]
+  def releaseDocumentLock (lock: Lock): Unit
+
   def beforeUpdate        (parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument
 
   def beforeUpdateResponse(containingDocument: XFormsContainingDocument, ignoreSequence: Boolean): Unit
   def afterUpdateResponse (containingDocument: XFormsContainingDocument): Unit
   def afterUpdate         (containingDocument: XFormsContainingDocument, keepDocument: Boolean, disableDocumentCache: Boolean): Unit
-
-  def releaseDocumentLock (lock: Lock): Unit
 
   def onAddedToCache      (uuid: String): Unit
   def onRemovedFromCache  (uuid: String): Unit

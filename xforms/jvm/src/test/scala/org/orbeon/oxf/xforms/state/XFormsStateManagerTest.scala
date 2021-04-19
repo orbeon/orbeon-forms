@@ -230,7 +230,7 @@ class XFormsStateManagerTest
       // New state
       val lock = XFormsStateManager.acquireDocumentLock(parameters.uuid, 0L)
 
-      if (lock.isEmpty)
+      if (lock.toOption.exists(_.isEmpty))
         fail("Ajax update lock timeout exceeded")
 
       try {
@@ -258,7 +258,7 @@ class XFormsStateManagerTest
 
         result
       } finally
-        XFormsStateManager.releaseDocumentLock(lock.get)
+        XFormsStateManager.releaseDocumentLock(lock.get.get)
     }
 
     def getInitialState(state1: TestState, isCache: Boolean) = {

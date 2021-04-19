@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms
 
 import java.util.concurrent.locks.Lock
 import java.{util => ju}
-
 import cats.Eval
 import cats.syntax.option._
 import org.apache.commons.lang3.StringUtils
@@ -57,12 +56,11 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection.{immutable => i, mutable => m}
 import scala.reflect.ClassTag
+import scala.util.{Success, Try}
 
 object XFormsContainingDocumentSupport {
 
-  val StandaloneDeploymentTypeJava: DeploymentType = DeploymentType.Standalone
-
-  def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument => T): T = {
+  def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument => T): Try[T] = {
     withLock(RequestParameters(uuid, None, None, None), timeout) {
       case Some(containingDocument) =>
         withUpdateResponse(containingDocument, ignoreSequence = true)(block(containingDocument))
@@ -72,11 +70,11 @@ object XFormsContainingDocumentSupport {
     }
   }
 
-  def withLock[T](params: RequestParameters, timeout: Long)(block: Option[XFormsContainingDocument] => T): T = {
+  def withLock[T](params: RequestParameters, timeout: Long)(block: Option[XFormsContainingDocument] => T): Try[T] = {
 
     LifecycleLogger.eventAssumingRequest("xforms", "before document lock", List("uuid" -> params.uuid))
 
-    XFormsStateManager.acquireDocumentLock(params.uuid, timeout) match {
+    (XFormsStateManager.acquireDocumentLock(params.uuid, timeout): Try[Option[Lock]]) map {
       case Some(lock) =>
         try {
 
@@ -300,7 +298,7 @@ trait ContainingDocumentUpload {
     def uploadMaxSizeAggregateProperty = staticState.uploadMaxSizeAggregate
   }
 
-  def getUploadConstraintsForControl(controlEffectiveId: String): (MaximumSize, AllowedMediatypes) = {
+  def getUploadConstraintsForControl(controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] = {
 
     val allowedMediatypesMaybeRange = {
 
@@ -317,7 +315,7 @@ trait ContainingDocumentUpload {
         AllowedMediatypes.AllowedAnyMediatype
     }
 
-    UploadChecker.uploadMaxSizeForControl(controlEffectiveId) -> allowedMediatypesMaybeRange
+    Success(UploadChecker.uploadMaxSizeForControl(controlEffectiveId) -> allowedMediatypesMaybeRange)
   }
 }
 

@@ -74,7 +74,7 @@ trait GridSectionMenus {
     val jButton = jTarget.closest(s".fr-$componentName-remove-button")
     val button  = jButton(0)
 
-    componentId(e).zip(findIterationForElemWithId(button.asInstanceOf[html.Element])) foreach {
+    componentId(e).zip(findIterationForElemWithId(button)) foreach {
       case (currentComponentId, currentIteration) =>
         dispatchActionEvent(Operation.Remove, currentComponentId, currentIteration)
     }

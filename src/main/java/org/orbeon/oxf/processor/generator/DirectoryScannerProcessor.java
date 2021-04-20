@@ -16,6 +16,8 @@ package org.orbeon.oxf.processor.generator;
 import com.drew.imaging.jpeg.JpegSegmentData;
 import com.drew.imaging.jpeg.JpegSegmentReader;
 import com.drew.imaging.jpeg.JpegSegmentType;
+import com.drew.lang.ByteArrayReader;
+import com.drew.lang.SequentialByteArrayReader;
 import com.drew.lang.StreamReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
@@ -462,7 +464,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                         byte[] exifSegment = segmentData.getSegment(JpegSegmentType.APP1);
                         if (exifSegment != null) {
                             Metadata metadata = new Metadata();
-                            new ExifReader().extract(exifSegment, metadata, JpegSegmentType.APP1);
+                            new ExifReader().extract(new ByteArrayReader(exifSegment), metadata);
                             outputMetadata(helper, metadata, EXIF_ELEMENT);
                         }
                     }
@@ -471,7 +473,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                         byte[] iptcSegment = segmentData.getSegment(JpegSegmentType.APPD);
                         if (iptcSegment != null) {
                             Metadata metadata = new Metadata();
-                            new IptcReader().extract(iptcSegment, metadata, JpegSegmentType.APPD);
+                                new IptcReader().extract(new SequentialByteArrayReader(iptcSegment), metadata, iptcSegment.length);
                             outputMetadata(helper, metadata, IPTC_ELEMENT);
                         }
                     }

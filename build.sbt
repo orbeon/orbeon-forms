@@ -67,7 +67,9 @@ val CoreLibraryDependencies = Seq(
   "org.mockito"                 % "mockito-all"                     % "1.8.5"           % Test, // 1.10.19
   "mysql"                       % "mysql-connector-java"            % "5.1.26"          % Test, // 6.0.5,
   "org.postgresql"              % "postgresql"                      % "9.3-1102-jdbc4"  % Test,
-  "org.seleniumhq.selenium"     % "selenium-java"                   % "2.45.0"          % Test  // 3.0.1
+  "org.seleniumhq.selenium"     % "selenium-java"                   % "2.45.0"          % Test,  // 3.0.1
+  "com.github.librepdf"         % "openpdf"                         % "1.3.25",
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.68" // for `itext`/`openpdf`, also pulls `bcprov` and `bcpkix`
 //  "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
 //  "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
 ) map

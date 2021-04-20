@@ -62,6 +62,9 @@ object Provider extends Enum[Provider] {
         s"$colName ILIKE ?"
     }
 
+  def textEquals(provider: Provider, colName: String): String =
+    s"$colName = ?"
+
   def readXmlColumn(provider: Provider, resultSet: ResultSet): DocumentInfo = {
     provider match {
       case PostgreSQL =>

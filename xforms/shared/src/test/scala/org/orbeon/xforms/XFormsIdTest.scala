@@ -32,7 +32,7 @@ class XFormsIdTest extends AnyFunSpec {
     for ((s, xformsId) <- expected)
       it(s"must pass for `$s`") {
         assert(xformsId === XFormsId.fromEffectiveId(s))
+        assert(s === xformsId.toEffectiveId)
       }
-
   }
 }

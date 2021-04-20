@@ -180,6 +180,36 @@ object MigrationSupport {
       }
     }
 
+  // 2021-03-11: When migrating "down", this only supports "4.8.0" and "2019.1.0" as destination.
+  def migrateOtherInPlace(
+    formRootElem     : DocumentWrapper,
+    srcVersion       : DataFormatVersion,
+    dstVersion       : DataFormatVersion,
+    findMigrationSet : MigrationGetter // `(ops: MigrationOps) => ops.M `
+  ): MigrationResult =
+    if (srcVersion == dstVersion) {
+      MigrationResult.None
+    } else {
+
+      val (migrateUp, migrationOpsToApply) = findMigrationOps(srcVersion, dstVersion)
+
+      migrationOpsToApply.foldLeft(MigrationResult.None: MigrationResult) {
+        case (migrationResultSoFar, ops) =>
+
+          val migrate =
+            if (migrateUp)
+              ops.migrateOthersUp(formRootElem, _)
+            else
+              ops.migrateOthersDown(formRootElem, _)
+
+          val newResultOpt = findMigrationSet.find(ops) map migrate
+
+          MigrationResult(
+            migrationResultSoFar == MigrationResult.Some || newResultOpt.contains(MigrationResult.Some)
+          )
+      }
+    }
+
   def migrateDataWithFormMetadataMigrations(
     appForm       : AppForm,
     data          : DocumentInfo,

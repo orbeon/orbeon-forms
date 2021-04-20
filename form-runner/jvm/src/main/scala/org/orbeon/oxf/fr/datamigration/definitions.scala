@@ -91,7 +91,12 @@ trait MigrationOps {
     migrationSet : M
   ): MigrationResult
 
-  def migrateOthersTo(
+  def migrateOthersDown(
+    outerDocument : DocumentWrapper,
+    migrationSet  : M
+  ): MigrationResult
+
+  def migrateOthersUp(
     outerDocument : DocumentWrapper,
     migrationSet  : M
   ): MigrationResult

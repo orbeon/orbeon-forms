@@ -20,7 +20,7 @@ val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.0"
 val EnumeratumCirceVersion        = "1.6.0"
-val ShapelessVersion              = "2.3.3"
+val ShapelessVersion              = "2.3.4"
 val ScalaXmlVersion               = "2.0.0-M1"
 val ScalaAsyncVersion             = "0.10.0"
 val Parboiled1Version             = "1.3.1"
@@ -28,7 +28,7 @@ val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and b
 val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.1"
 val RosHttpVersion                = "2.1.0"
-val ScalaLoggingVersion           = "3.9.2"
+val ScalaLoggingVersion           = "3.9.3"
 val Log4sVersion                  = "1.8.2"
 val ScalaCollectionCompatVersion  = "2.2.0"
 
@@ -97,13 +97,13 @@ val CoreLibraryDependencies = Seq(
   "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test,
   "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
-  "mysql"                       % "mysql-connector-java"            % "8.0.22"          % Test,
-  "org.postgresql"              % "postgresql"                      % "42.2.19"         % Test,
+  "mysql"                       % "mysql-connector-java"            % "8.0.24"          % Test,
+  "org.postgresql"              % "postgresql"                      % "42.2.18"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
   "com.lowagie"                 % "itext"                           % "2.1.7" /* last MPL version */ excludeAll ExclusionRule(organization = "bouncycastle"),
-  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.66", // for `itext`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.68", // for `itext`, also pulls `bcprov` and `bcpkix`
 
   "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
   "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided

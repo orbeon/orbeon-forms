@@ -16,7 +16,6 @@ package org.orbeon.oxf.http
 import java.io.IOException
 import java.net.{CookieStore => _, _}
 import java.security.KeyStore
-
 import javax.net.ssl.SSLContext
 import jcifs.ntlmssp.{Type1Message, Type2Message, Type3Message}
 import jcifs.util.Base64
@@ -40,6 +39,7 @@ import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.resources.URLFactory
 import org.slf4j.LoggerFactory
 
 
@@ -266,7 +266,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
     val connectionManager: PoolingClientConnectionManager = {
 
       // Create SSL context, based on a custom key store if specified
-      val trustStore =
+      val keyStore =
         (settings.sslKeystoreURI, settings.sslKeystorePassword) match {
           case (Some(keyStoreURI), Some(keyStorePassword)) =>
 
@@ -274,7 +274,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
               settings.sslKeystoreType getOrElse KeyStore.getDefaultType
 
             val keyStore =
-              useAndClose(new URL(keyStoreURI).openStream) { is => // URL is typically local (file:, etc.)
+              useAndClose(URLFactory.createURL(keyStoreURI).openStream) { is => // URL is typically local (file:, etc.)
                 KeyStore.getInstance(keyStoreType) |!>
                   (_.load(is, keyStorePassword.toCharArray))
               }
@@ -295,14 +295,14 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
       val schemeRegistry = new SchemeRegistry
       schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory))
 
-      val sslSocketFactory = trustStore match {
-        case Some(trustStore) =>
+      val sslSocketFactory = keyStore match {
+        case Some(keyStore) =>
           // Calling full constructor
           new SSLSocketFactory(
             SSLSocketFactory.TLS,
-            trustStore._1,
-            trustStore._2,
-            trustStore._1,
+            keyStore._1,
+            keyStore._2,
+            null,
             null,
             null,
             hostnameVerifier

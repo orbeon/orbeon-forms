@@ -61,9 +61,6 @@
                         name="local-has-request-body"
                         value="not($submission/@method = ('get', 'delete'))"/>
 
-                    <!--<xf:message value="saxon:serialize($submission, 'xml')"/>-->
-                    <!--<xf:message value="exists(xxf:instance('fb-form-instance'))"/>-->
-
                     <xf:setvalue ref="$request/method"        value="$submission/@method"/>
                     <xf:setvalue ref="$request/serialization" value="$submission/@serialization"/>
                     <xf:setvalue ref="$request/resource"      value="$submission/@resource"/>
@@ -882,8 +879,6 @@
                                 <xf:label value="$resources/cancel/label"/>
                             </xf:trigger>
                         </xf:group>
-
-                        <!--<fr:xforms-inspector/>-->
                     </xh:div>
                 </xxf:dialog>
 

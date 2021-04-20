@@ -1933,8 +1933,14 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         instance.setFocus();
                 }
             } else {
-                // Generic code to find focusable descendant-or-self HTML element and focus on it
-                var htmlControl = $(control).find('input:visible, textarea:visible, select:visible, button:visible, a:visible');
+
+                // Generic code, trying to find:
+                // P1. A HTML form field
+                var htmlControl = $(control).find("input:visible, textarea:visible, select:visible, button:visible, a:visible");
+                // P2. A focusable element
+                if (! htmlControl.is('*'))
+                    htmlControl = $(control).find("[tabindex]:not([tabindex = '-1']):visible");
+
                 if (htmlControl.is('*'))
                     ORBEON.util.Dom.focus(htmlControl.get(0));
                 else

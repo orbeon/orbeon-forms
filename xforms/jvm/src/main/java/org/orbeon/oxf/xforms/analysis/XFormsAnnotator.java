@@ -134,16 +134,16 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
             if (inLHHA) {
                 // Gather id and namespace information about content of LHHA
                 if (stackElement.isXForms()) {
-                    // Must be xf:output
-                    attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                    // Must be `xf:output`
+                    attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
                 } else if (hostLanguageAVTs && hasAVT(attributes)) {
-                    // Must be an AVT on an host language element
-                    attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                    // Must be an AVT on an host language elemAbstractRewriteent
+                    attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
                 }
             } else if (inXBL && level - 1 == preserveLevel && stackElement.isXBL() && "binding".equals(localname)) {
 
                 // Gather id and namespace information
-                attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
 
                 // Gather binding information from xbl:xbl/xbl:binding/@element
                 final String elementAtt = attributes.getValue("element");
@@ -161,7 +161,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
             // This must be xbl:xbl (otherwise we will have isPreserve == true) or xbl:template
             assert localname.equals("xbl") || localname.equals("template") || localname.equals("handler");
             // NOTE: Still process attributes, because the annotator is used to process top-level <xbl:handler> as well.
-            attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+            attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
             stackElement.startElement(uri, localname, qName, attributes);
         } else {
 
@@ -175,7 +175,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // Element with a binding
 
                 // Create a new id and update the attributes if needed
-                attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
                 final String xformsElementId = reusableStringArray[0];
 
                 // Index binding by prefixed id
@@ -196,7 +196,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                 // TODO: can we restrain gathering ids / namespaces to only certain elements (all controls + elements with XPath expressions + models + instances)?
 
                 // Create a new id and update the attributes if needed
-                attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
                 final String xformsElementId = reusableStringArray[0];
 
                 attributes = handleFullUpdateIfNeeded(stackElement, attributes, xformsElementId);
@@ -230,8 +230,8 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                     // Start xf:repeat-iteration
                     // NOTE: Use xf:repeat-iteration instead of xxf:iteration so we don't have to deal with a new namespace
                     reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, xformsElementId + "~iteration");
-                    final Attributes repeatIterationAttributes = getAttributesGatherNamespaces(uri, qName, reusableAttributes, reusableStringArray, 0);
+                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, xformsElementId + "~iteration");	    
+                    final Attributes repeatIterationAttributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, reusableAttributes, reusableStringArray, 0);
                     stackElement.startElement(uri, localname + "-iteration", qName + "-iteration", repeatIterationAttributes);
                 } else {
                     // Leave element untouched (except for the id attribute)
@@ -257,7 +257,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                             // Entering title
                             inTitle = true;
                             // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xf:output)
-                            attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                            attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
                             htmlElementId = reusableStringArray[0];
                             htmlTitleElementId = htmlElementId;
                         }
@@ -271,7 +271,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
                     // Create a new xf:group control which specifies the element name to use. Namespace mappings for the
                     // given QName must be in scope as that QName is the original element name.
-                    final AttributesImpl newAttributes = new AttributesImpl(getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex));
+                    final AttributesImpl newAttributes = new AttributesImpl(getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex));
                     newAttributes.addAttribute(XFormsNames.XXFORMS_NAMESPACE_URI(), "element", "xxf:element", XMLReceiverHelper.CDATA, qName);
 
                     startPrefixMapping2("xxf", XFormsNames.XXFORMS_NAMESPACE_URI());
@@ -292,7 +292,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
                                     // Create a new id and update the attributes if needed
                                     if (htmlElementId == null) {
-                                        attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
+                                        attributes = getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, attributes, reusableStringArray, idIndex);
                                         htmlElementId = reusableStringArray[0];
 
                                         // TODO: Clear all attributes having AVTs or XPath expressions will end up in repeat templates.
@@ -308,7 +308,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
                                     // Create a new xxf:attribute control
                                     reusableAttributes.clear();
 
-                                    final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(uri, qName, reusableAttributes, reusableStringArray, -1);
+                                    final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespacesMaybeGenerateIds(uri, qName, reusableAttributes, reusableStringArray, -1);
 
                                     newAttributes.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, htmlElementId);
                                     newAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, attributeName);
@@ -441,7 +441,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, "orbeon-inspector");
-                            final Attributes newAttributes = getAttributesGatherNamespaces(frURI, inspectorQName, reusableAttributes, reusableStringArray, 0);
+                            final Attributes newAttributes = getAttributesGatherNamespacesMaybeGenerateIds(frURI, inspectorQName, reusableAttributes, reusableStringArray, 0);
                             final String xformsElementId = reusableStringArray[0];
 
                             metadata.mapBindingToElement(rewriteId(xformsElementId), inspectorBindingOpt.get());
@@ -497,7 +497,7 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         startPrefixMapping2(prefix, uri);
     }
 
-    private Attributes getAttributesGatherNamespaces(String uriForDebug, String qNameForDebug, Attributes attributes, String[] newIdAttribute, final int idIndex) {
+    private Attributes getAttributesGatherNamespacesMaybeGenerateIds(String uriForDebug, String qNameForDebug, Attributes attributes, String[] newIdAttribute, final int idIndex) {
         final String rawId;
         if (isGenerateIds) {
             // Process ids
@@ -526,18 +526,18 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         }
 
         // Remember that this id was used
-        if (rawId != null) {
-            metadata.idGenerator().add(rawId);
-
-            // Gather namespace information if there is an id
-            if (isGenerateIds || idIndex != -1) {
-                metadata.addNamespaceMapping(rewriteId(rawId), namespaceContext.currentMapping());
-            }
-        }
+        indexIdGatherNamespaces(rawId);
 
         newIdAttribute[0] = rawId;
 
         return attributes;
+    }
+
+    private void indexIdGatherNamespaces(final String rawId) {
+        if (rawId != null) {
+            metadata.idGenerator().add(rawId);
+            metadata.addNamespaceMapping(rewriteId(rawId), namespaceContext.currentMapping());
+        }
     }
 
     private static final scala.Option<IndexableBinding> NONE_INDEXABLE_BINDING = scala.Option.apply(null);

@@ -165,7 +165,43 @@ object MigrationOps20191 extends MigrationOps {
     result
   }
 
-  def migrateOthersTo(
+  def migrateOthersDown(
+    outerDocument : DocumentWrapper,
+    migrationSet  : M
+  ): MigrationResult = {
+
+    val topLevelMigrations = migrationSet.migrations filter (_.topLevel)
+
+    topLevelMigrations foreach {
+      case Migration20191(_, newGridElem, _, _, _) =>
+
+        val gridName = newGridElem.value
+
+        // 1. Binds
+        findBindByName(outerDocument, gridName) foreach { gridBindElem =>
+
+          insert(
+            after      = gridBindElem.toList,
+            origin     = gridBindElem / *,
+            doDispatch = false
+          )
+
+          delete(
+            ref        = gridBindElem,
+            doDispatch = false
+          )
+        }
+
+        // 2. Controls
+        FormRunner.findControlByName(outerDocument, gridName) foreach { gridElem =>
+          delete(gridElem /@ BIND_QNAME)
+        }
+    }
+
+    MigrationResult(topLevelMigrations.nonEmpty)
+  }
+
+  def migrateOthersUp(
     outerDocument : DocumentWrapper,
     migrationSet  : M
   ): MigrationResult = {

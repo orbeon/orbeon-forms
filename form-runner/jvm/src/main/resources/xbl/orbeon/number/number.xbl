@@ -414,12 +414,15 @@
                             concat('fr-field-width-', $field-width)
                         )
                     }">
-                    <xf:group fr:keep-if-param-non-blank="prefix" class="add-on" ref=".[xxf:non-blank($prefix)]"><xf:output value="$prefix"/></xf:group>
+                    <xf:group fr:keep-if-param-non-blank="prefix" class="add-on" ref=".[xxf:non-blank($prefix)]">
+                        <xf:output id="prefix" value="$prefix"/>
+                    </xf:group>
                     <xh:input
                         id="html-input"
                         class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
                         type="text"
                         step="any"
+                        aria-describedby="{string-join((xxf:client-id('prefix'), xxf:client-id('suffix')), ' ')}"
                         pattern="{
                             if (NumberSupport:isZeroValidationFractionDigitsJava($binding) and
                                 xxf:custom-mip($binding, 'non-negative') = 'true'
@@ -436,7 +439,9 @@
                         }"
                         maxlength="{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}"
                         xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern"/>
-                    <xf:group fr:keep-if-param-non-blank="suffix" class="add-on" ref=".[xxf:non-blank($suffix)]"><xf:output value="$suffix"/></xf:group>
+                    <xf:group fr:keep-if-param-non-blank="suffix" class="add-on" ref=".[xxf:non-blank($suffix)]">
+                        <xf:output id="suffix" value="$suffix"/>
+                    </xf:group>
                 </xh:span>
             </xf:group>
             <!-- Static readonly mode -->

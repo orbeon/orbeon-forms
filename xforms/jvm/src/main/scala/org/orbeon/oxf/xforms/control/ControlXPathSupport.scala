@@ -72,7 +72,7 @@ trait ControlXPathSupport {
           )
         catch {
           case NonFatal(t) =>
-            XFormsError.handleNonFatalXPathError(container, t)
+            XFormsError.handleNonFatalXPathError(container, t, Some(attributeValue))
             null
         }
       }
@@ -113,7 +113,7 @@ trait ControlXPathSupport {
         )
       catch {
         case NonFatal(t) =>
-          XFormsError.handleNonFatalXPathError(container, t)
+          XFormsError.handleNonFatalXPathError(container, t, Some(xpathString))
           None
       }
     }

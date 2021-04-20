@@ -18,12 +18,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.value.Int64Value
 
-/**
- * Return the current node of one of the enclosing xf:repeat iteration, either the closest
- * iteration if no argument is passed, or the iteration for the repeat id passed.
- *
- * This function must be called from within an xf:repeat.
- */
+
 class XXFormsRepeatPosition extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext): Int64Value = {

@@ -502,7 +502,10 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getAllControlsWithIds: Seq[NodeInfo] =
-    FormBuilder.getAllControlsWithIds(FormBuilderDocContext().formDefinitionRootElem) filterNot FormRunner.IsContainer
+    FormBuilder.getAllControlsWithIds(FormBuilderDocContext().formDefinitionRootElem) filterNot { elem =>
+      // https://github.com/orbeon/orbeon-forms/issues/4786
+      FormRunner.IsContainer(elem) || FormRunner.isSectionTemplateContent(elem)
+    }
 
   //@XPathFunction
   def getControlsLabelValueItemset: Seq[NodeInfo] = {

@@ -69,11 +69,12 @@ abstract class ProcessorTestBase(
           runOneTest(descriptor) match {
             case SuccessTestResult =>
             case FailedTestResult(expected, actual) =>
-              assert(
-                expected.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
-                  actual.getRootElement.serializeToString(XMLWriter.PrettyFormat)
-              )
-              assert(false)
+              fail(s"""|Expected:
+                       |${expected.getRootElement.serializeToString(XMLWriter.PrettyFormat)}
+                       |
+                       |Actual:
+                       |${actual.getRootElement.serializeToString(XMLWriter.PrettyFormat)}
+                       |""".stripMargin)
             case ErrorTestResult(t) =>
               throw Exceptions.getRootThrowable(t)
           }

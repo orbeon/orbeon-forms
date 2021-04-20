@@ -492,6 +492,12 @@
                         <fr:repeater ref="()"/>
                     </xf:group>
                 </xsl:if>
+                <!-- This part of the hack is to cause the initialization of the grid menus in Form Builder, as
+                     some dialogs still use the older grid, which doesn't make a distinction between repeated and
+                     non-repeated. We could use `javascript-lifecycle` and initialize the menus for the legacy
+                     grids as well but decided not to. We should update the repeated grids in Form Builder to
+                     use the non-legacy grids and then remove this. -->
+                <fr:grid repeat="content" ref="''" template="()"/>
             </xsl:if>
         </xh:span>
     </xsl:template>
@@ -903,13 +909,22 @@
 
     <!-- Success messages -->
     <xsl:template match="fr:messages" name="fr-messages">
-        <xf:switch class="fr-messages" model="fr-persistence-model" ref=".[instance('fr-persistence-instance')/message != '']">
+        <xf:switch
+            class="fr-messages"
+            model="fr-persistence-model"
+            ref=".[instance('fr-persistence-instance')/message != '']"
+            xh:aria-live="polite">
+
             <xf:case id="fr-message-none">
                 <xh:span/>
             </xf:case>
             <xf:case id="fr-message-success">
                 <xf:output value="instance('fr-persistence-instance')/message" class="fr-message-success alert alert-success"/>
             </xf:case>
+            <xf:case id="fr-message-error">
+                <xf:output value="instance('fr-persistence-instance')/message" class="fr-message-error alert alert-error"/>
+            </xf:case>
+
         </xf:switch>
     </xsl:template>
 
@@ -921,7 +936,7 @@
 
         <!-- Nothing below must statically depend on the mode -->
         <xsl:choose>
-            <xsl:when test="exists($custom-buttons)">
+            <xsl:when test="exists($custom-buttons) and empty($buttons-property)">
                 <xh:span class="fr-buttons">
                     <xsl:apply-templates select="$custom-buttons/node()"/>
                 </xh:span>

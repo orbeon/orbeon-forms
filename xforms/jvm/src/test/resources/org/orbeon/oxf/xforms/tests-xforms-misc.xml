@@ -1276,6 +1276,7 @@
                             <xxf:value>My message</xxf:value>
                         </xxf:control>
                     </xxf:control-values>
+                    <xxf:focus control-id="my-output"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

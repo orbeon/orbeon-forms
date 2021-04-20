@@ -160,8 +160,16 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
         val contentFilename = addExtensionIfNeeded(rawFilename)
 
         // Handle as attachment
-        // TODO: filename should be encoded somehow, as 1) spaces don't work and 2) non-ISO-8859-1 won't work
-        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(contentFilename, CharsetNames.Utf8))
+
+        // To support spaces and non-US-ASCII characters, we encode the filename using RFC 5987 percentage encoding.
+        // This is what the XPath `encode-for-uri()` does. Here we use the URLEncoder, which does
+        // application/x-www-form-urlencoded encoding, which seems to differ from RFC 5987 in that the space is
+        // encoded as a "+". Also see https://stackoverflow.com/a/2678602/5295.
+        val filenameEncodedForHeader = URLEncoder.encode(contentFilename, CharsetNames.Utf8).replaceAllLiterally("+", "%20")
+
+        // All browsers since IE7, Safari 5 support the `filename*=UTF-8''` syntax to indicate that the filename is
+        // UTF-8 percent encoded. Also see https://stackoverflow.com/a/6745788/5295.
+        response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + filenameEncodedForHeader)
 
         // Copy stream out
         try {

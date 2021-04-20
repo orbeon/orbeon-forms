@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
-
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA.Label
 import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA, StaticLHHASupport}
@@ -125,7 +125,7 @@ class XXFormsComponentHandler(
             Some(targetPrefixedId + currentControlSuffix)
         }
 
-    result.flatten.orNull
+    result.flatten.map(XFormsUtils.namespaceId(containingDocument, _)).orNull
   }
 }
 

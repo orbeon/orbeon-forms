@@ -49,6 +49,8 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE)
     )
 
+    Fun("repeat-positions", classOf[XXFormsRepeatPositions], op = 0, min = 0, INTEGER, ALLOWS_ZERO_OR_MORE)
+
     Fun("context", classOf[XXFormsContext], op = 0, min = 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE)
     )

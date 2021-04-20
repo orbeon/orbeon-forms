@@ -14,10 +14,17 @@
 package org.orbeon.xforms
 
 import org.orbeon.oxf.util.StringUtils._
+
 import scala.collection.compat._
 
+
 // Structured representation of an id
-case class XFormsId(staticId: String, containers: List[String], iterations: List[Int])
+case class XFormsId(staticId: String, containers: List[String], iterations: List[Int]) {
+  def toEffectiveId: String = {
+    (containers :+ staticId).mkString(Constants.ComponentSeparatorString) +
+      (if (iterations.isEmpty) "" else Constants.RepeatSeparatorString + iterations.mkString(Constants.RepeatIndexSeparatorString))
+  }
+}
 
 // Utilities for handling XForms ids. For historical reasons, we manipulate id parts as strings in most cases. This
 // is probably not efficient in many cases. Also, we use `Array` as this was converted from Java. We should consider

@@ -153,25 +153,23 @@ class EmailProcessor extends ProcessorImpl {
     // Create message
     val message = new MimeMessage(session)
 
-    def createAddresses(addressElement: Element): Array[Address] = {
+    def createAddresses(addressElement: Element): List[Address] = {
       val email = addressElement.element("email").getTextTrim // required
 
-      val result = addressElement.elementOpt("name") match {
+      addressElement.elementOpt("name") match {
         case Some(nameElement) => List(new InternetAddress(email, nameElement.getTextTrim))
-        case None              => InternetAddress.parse(email).toList
+        case None => InternetAddress.parse(email).toList
       }
-
-      result.toArray
     }
 
-    def addRecipients(elementName: String, recipientType: RecipientType) =
-      for (element <- messageElement.jElements(elementName).asScala) {
-        val addresses = createAddresses(element)
-        message.addRecipients(recipientType, addresses)
-      }
+    def addRecipients(elementName: String, recipientType: RecipientType): Unit = {
+      val elements  = messageElement.elements(elementName)
+      val addresses = elements.flatMap(createAddresses).toArray
+      message.addRecipients(recipientType, addresses)
+    }
 
     // Set From
-    message.addFrom(createAddresses(messageElement.element("from")))
+    message.addFrom(createAddresses(messageElement.element("from")).toArray)
 
     // Set Reply-To
     locally {
@@ -182,7 +180,7 @@ class EmailProcessor extends ProcessorImpl {
         // We might be able to just call `setReplyTo` with the above, but it's unclear
         // what's the behavior in there is nothing set. Also, can there be a default?
         if (replyTo.nonEmpty)
-          message.setReplyTo(replyTo)
+          message.setReplyTo(replyTo.toArray)
       }
     }
 

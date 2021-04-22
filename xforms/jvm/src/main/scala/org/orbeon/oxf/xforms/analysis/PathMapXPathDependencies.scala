@@ -18,12 +18,13 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.Model.MIP
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, ValidationLevel}
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
+import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs, StaticBind}
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.w3c.dom.Node._
 
 import scala.collection.{mutable => m}
@@ -470,7 +471,7 @@ class PathMapXPathDependencies(
 
     assert(inRefresh || inBindingUpdate)
 
-    val resultCacheKey = buildRepeatResultCacheKey(control, control.getBindingAnalysis.toList, controlEffectiveId: String)
+    val resultCacheKey = buildRepeatResultCacheKey(control, control.bindingAnalysis.toList, controlEffectiveId: String)
 
     val cached = resultCacheKey flatMap modifiedBindingCacheForRepeats.get
     val updateResult: UpdateResult =
@@ -478,7 +479,7 @@ class PathMapXPathDependencies(
         case Some(result) =>
           result
         case None =>
-          val tempResult = control.getBindingAnalysis match {
+          val tempResult = control.bindingAnalysis match {
             case None =>
               // Control does not have an XPath binding
               MustNotUpdateResultZero
@@ -499,7 +500,7 @@ class PathMapXPathDependencies(
               "binding requires update",
               List(
                 "effective id" -> controlEffectiveId,
-                "XPath"        -> control.getBindingAnalysis.get.xpathString
+                "XPath"        -> control.bindingAnalysis.get.xpathString
               )
             )
 
@@ -522,7 +523,7 @@ class PathMapXPathDependencies(
 
     assert(inRefresh || inBindingUpdate)
 
-    val resultCacheKey = buildRepeatResultCacheKey(control, control.getBindingAnalysis.toList, controlEffectiveId: String)
+    val resultCacheKey = buildRepeatResultCacheKey(control, control.bindingAnalysis.toList, controlEffectiveId: String)
 
     val cached = resultCacheKey flatMap modifiedValueCacheForRepeats.get
     val (updateResult, valueAnalysis) =
@@ -531,12 +532,12 @@ class PathMapXPathDependencies(
           (
             result,
             if (result.requireUpdate)
-              control.getValueAnalysis
+              control.valueAnalysis
             else
               null
           )
         case None =>
-          val tempValueAnalysis = control.getValueAnalysis
+          val tempValueAnalysis = control.valueAnalysis
           val tempUpdateResult = tempValueAnalysis match {
             case None =>
               // Control does not have a value
@@ -624,7 +625,7 @@ class PathMapXPathDependencies(
     assert(inRefresh || inBindingUpdate)
 
     def requireUpdate =
-      control.getItemsetAnalysis match {
+      control.itemsetAnalysis match {
         case Some(analysis) if ! analysis.figuredOutDependencies => // dependencies are unknown
           itemsetUnknownDependencies += 1
           true
@@ -638,7 +639,7 @@ class PathMapXPathDependencies(
           throw new IllegalStateException("Itemset not analyzed")
       }
 
-    buildRepeatResultCacheKey(control, control.getItemsetAnalysis.toList, controlEffectiveId: String) match {
+    buildRepeatResultCacheKey(control, control.itemsetAnalysis.toList, controlEffectiveId: String) match {
       case Some(key) => modifiedItemsetCacheForRepeats.getOrElseUpdate(key, requireUpdate)
       case None      => requireUpdate
     }
@@ -656,9 +657,9 @@ class PathMapXPathDependencies(
 
     // Get constraints by the level specified
     val mips = mip match {
-      case Model.Constraint => bind.constraintsByLevel.getOrElse(level, Nil)
-      case Model.Type       => bind.typeMIPOpt.toList
-      case Model.Whitespace => bind.nonPreserveWhitespaceMIPOpt.toList
+      case ModelDefs.Constraint => bind.constraintsByLevel.getOrElse(level, Nil)
+      case ModelDefs.Type       => bind.typeMIPOpt.toList
+      case ModelDefs.Whitespace => bind.nonPreserveWhitespaceMIPOpt.toList
       case _                => bind.getXPathMIPs(mip.name)
     }
 
@@ -676,8 +677,8 @@ class PathMapXPathDependencies(
         // the value to type check has changed.
         val valueAnalysis = mip match {
           case xpathMIP: StaticBind#XPathMIP => Some(xpathMIP.analysis)
-          case _: StaticBind#TypeMIP         => bind.getValueAnalysis
-          case _: StaticBind#WhitespaceMIP   => bind.getValueAnalysis
+          case _: StaticBind#TypeMIP         => bind.valueAnalysis
+          case _: StaticBind#WhitespaceMIP   => bind.valueAnalysis
           case _                             => throw new IllegalStateException(s"unexpected MIP `${mip.name}`")
         }
 

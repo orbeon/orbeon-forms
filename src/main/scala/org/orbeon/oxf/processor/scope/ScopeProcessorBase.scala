@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.processor.scope
 
-import enumeratum._
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -21,29 +20,19 @@ import org.orbeon.oxf.processor.{CacheableInputReader, ProcessorImpl, ProcessorI
 
 object ScopeProcessorBase {
 
-  sealed trait Scope extends EnumEntry
-  object Scope extends Enum[Scope] {
-
-    val values = findValues
-
-    case object Request     extends Scope
-    case object Session     extends Scope
-    case object Application extends Scope
-  }
-
   val TextPlain               = "text/plain"
   val ScopeConfigNamespaceUri = "http://orbeon.org/oxf/schemas/scope-config"
 
   case class ContextConfig(
-    contextType                 : Scope,
+    contextType                 : ExternalContext.Scope,
     sessionScope                : ExternalContext.SessionScope,
     key                         : String,
     isTextPlain                 : Boolean,
     testIgnoreStoredKeyValidity : Boolean
   ) {
-    def javaIsRequestScope     = contextType == Scope.Request
-    def javaIsSessionScope     = contextType == Scope.Session
-    def javaIsApplicationScope = contextType == Scope.Application
+    def javaIsRequestScope     = contextType == ExternalContext.Scope.Request
+    def javaIsSessionScope     = contextType == ExternalContext.Scope.Session
+    def javaIsApplicationScope = contextType == ExternalContext.Scope.Application
   }
 }
 
@@ -71,7 +60,7 @@ abstract class ScopeProcessorBase extends ProcessorImpl {
               sessionScopeElement.getStringValue
 
           ContextConfig(
-            Scope.withNameLowercaseOnly(contextName),
+            ExternalContext.Scope.withNameLowercaseOnly(contextName),
             if ("application" == sessionScopeValue)
               ExternalContext.SessionScope.Application
             else

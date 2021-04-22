@@ -44,7 +44,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     forwardProperties  : Map[String, String], // lowercase name -> original name
     keepParams         : Set[String],
     resourcesRegex     : String,
-    httpClient         : HttpClient
+    httpClient         : HttpClient[org.apache.http.client.CookieStore]
    ) {
     val FormRunnerResourcePathRegex: Regex = resourcesRegex.r
   }
@@ -56,7 +56,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     context            : PortletContext,
     request            : PortletRequest,
     response           : MimeResponse,
-    httpClient         : HttpClient
+    httpClient         : HttpClient[org.apache.http.client.CookieStore]
   ) extends PortletEmbeddingContextWithResponse(
     context,
     request,
@@ -73,7 +73,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
   }
 
   // For BufferedPortlet
-  def findTitle(request: RenderRequest) = Option(getTitle(request))
+  def findTitle(request: RenderRequest): Option[String] = Option(getTitle(request))
 
   private var settingsOpt: Option[PortletSettings] = None
 
@@ -222,7 +222,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
   private def preferenceFromPublicRenderParameter(request: PortletRequest, pref: Pref): Option[String] =
     if (getBooleanPreference(request, EnablePublicRenderParameters))
-      publicRenderParametersIt(request) collectFirst { case (pref.nameLabel.publicName, value) => value }
+      nonBlankFirstPublicRenderParametersIt(request) collectFirst { case (pref.nameLabel.publicName, value) => value }
     else
       None
 
@@ -244,7 +244,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     val path = {
 
       def pathParameterOpt =
-        Option(request.getParameter(WSRPURLRewriter.PathParameterName))
+        Option(request.getRenderParameters.getValue(WSRPURLRewriter.PathParameterName))
 
       def defaultPath =
         if (getPreference(request, Page) == "home")
@@ -309,13 +309,16 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     } yield
       pair
 
-  private def publicRenderParametersIt(request: PortletRequest): Iterator[(String, String)] =
+  private def nonBlankFirstPublicRenderParametersIt(request: PortletRequest): Iterator[(String, String)] = {
+    val params = request.getRenderParameters
     for {
-      (key, values) <- request.getPublicParameterMap.asScala.iterator
-      firstValue    <- values.headOption
+      name          <- params.getNames.asScala.iterator
+      if params.isPublic(name)
+      firstValue    <- params.getValues(name).headOption
       nonBlankValue <- firstValue.trimAllToOpt
     } yield
-      key -> nonBlankValue
+      name -> nonBlankValue
+  }
 
   private def sessionParameters(request: PortletRequest): Iterator[(String, String)] = {
 

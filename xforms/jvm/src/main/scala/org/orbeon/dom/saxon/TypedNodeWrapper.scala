@@ -14,7 +14,7 @@
 package org.orbeon.dom.saxon
 
 import org.orbeon.dom.{Document, Node}
-import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.`type`.{SchemaType, Type}
@@ -64,7 +64,7 @@ class TypedNodeWrapper private (node: Node, parent: NodeWrapper)
 
       // For type annotation purposes, `xf:integer` is translated into `xs:integer`. This is because XPath has no
       // knowledge of the XForms union types.
-      if (uri == XFormsNames.XFORMS_NAMESPACE_URI && Model.XFormsVariationTypeNames(localname))
+      if (uri == XFormsNames.XFORMS_NAMESPACE_URI && ModelDefs.XFormsVariationTypeNames(localname))
         uri = XMLConstants.XSD_URI
 
       val requestedTypeFingerprint = StandardNames.getFingerprint(uri, localname)

@@ -15,36 +15,36 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
 
+import cats.syntax.option._
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.appendWithSpace
-import org.orbeon.oxf.xforms.processor.handlers.{OutputInterceptor, XFormsBaseHandler}
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor, XFormsBaseHandler}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.xml.sax.Attributes
 
 import scala.util.control.NonFatal
 
-/**
- * Handle xf:repeat.
- */
+
 class XFormsRepeatHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
+  uri             : String,
+  localname       : String,
+  qName           : String,
+  localAtts       : Attributes,
+  elementAnalysis : ElementAnalysis,
+  handlerContext  : HandlerContext
 ) extends
   XFormsControlLifecyleHandler(
     uri,
     localname,
     qName,
     localAtts,
-    matched,
+    elementAnalysis,
     handlerContext,
     repeating  = true,
     forwarding = true
@@ -57,11 +57,11 @@ class XFormsRepeatHandler(
     sb.toString
   }
 
-  override def isMustOutputContainerElement: Boolean = xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+  override def isMustOutputContainerElement: Boolean = handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
   override protected def handleControlStart(): Unit = {
 
-    val isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+    val isMustGenerateBeginEndDelimiters = ! handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
     val namespacedId = XFormsUtils.namespaceId(containingDocument, getEffectiveId)
 
     val repeatControl = containingDocument.getObjectByEffectiveId(getEffectiveId).asInstanceOf[XFormsRepeatControl]
@@ -70,14 +70,14 @@ class XFormsRepeatHandler(
 
       // Unroll repeat
 
-      val isTopLevelRepeat = xformsHandlerContext.countParentRepeats == 0
-      val isRepeatSelected = xformsHandlerContext.isRepeatSelected || isTopLevelRepeat
+      val isTopLevelRepeat = handlerContext.countParentRepeats == 0
+      val isRepeatSelected = handlerContext.isRepeatSelected || isTopLevelRepeat
 
-      val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
+      val xhtmlPrefix = handlerContext.findXHTMLPrefix
       val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
 
       // Place interceptor on output
-      val savedOutput = xformsHandlerContext.getController.getOutput
+      val savedOutput = handlerContext.controller.output
 
       var outputDelimiter: (String, String) => Unit = null // initialized further below
 
@@ -111,56 +111,62 @@ class XFormsRepeatHandler(
 
         // User and DnD classes
         appendClasses(userClasses)
-        staticControlOpt flatMap (_.asInstanceOf[RepeatControl].dndClasses) foreach appendClasses
+        elementAnalysis.asInstanceOf[RepeatControl].dndClasses foreach appendClasses
 
         outputInterceptor.setAddedClasses(sb.toString)
 
-        xformsHandlerContext.pushRepeatContext(iteration, repeatSelected)
+        handlerContext.pushRepeatContext(iteration, repeatSelected)
         try {
-          xformsHandlerContext.getController.repeatBody()
+          handlerContext.controller.repeatBody()
           outputInterceptor.flushCharacters(finalFlush = true, topLevelCharacters = true)
         } catch {
           case NonFatal(t) =>
             throw OrbeonLocationException.wrapException(
               t,
-              new ExtendedLocationData(repeatControl.getLocationData, "unrolling xf:repeat control", repeatControl.element)
+              XmlExtendedLocationData(
+                repeatControl.getLocationData,
+                "unrolling xf:repeat control".some,
+                element = repeatControl.element.some
+              )
             )
         }
-        xformsHandlerContext.popRepeatContext()
+        handlerContext.popRepeatContext()
       }
 
-      xformsHandlerContext.getController.setOutput(new DeferredXMLReceiverImpl(outputInterceptor))
+      handlerContext.controller.output = new DeferredXMLReceiverImpl(outputInterceptor)
 
       val repeatIndex = repeatControl.getIndex
-      val selectedClass = "xforms-repeat-selected-item-" + ((xformsHandlerContext.countParentRepeats % 4) + 1)
+      val selectedClass = "xforms-repeat-selected-item-" + ((handlerContext.countParentRepeats % 4) + 1)
       val staticReadonly = XFormsBaseHandler.isStaticReadonly(repeatControl)
 
-      implicit val addedClasses = new jl.StringBuilder(200)
-      for (i <- 1 to repeatControl.getSize) {
-        // Delimiter: before repeat entries, except the first one which is output by `generateFirstDelimiter()`
-        if (i > 1)
-          outputDelimiter("xforms-repeat-delimiter", null)
+      locally {
+        implicit val addedClasses: jl.StringBuilder = new jl.StringBuilder(200)
+        for (i <- 1 to repeatControl.getSize) {
+          // Delimiter: before repeat entries, except the first one which is output by `generateFirstDelimiter()`
+          if (i > 1)
+            outputDelimiter("xforms-repeat-delimiter", null)
 
-        // Determine classes to add on root elements and around root characters
-        addedClasses.setLength(0)
+          // Determine classes to add on root elements and around root characters
+          addedClasses.setLength(0)
 
-        // Selected iteration
-        val selected = isRepeatSelected && i == repeatIndex && ! staticReadonly
-        if (selected)
-          addedClasses append selectedClass
+          // Selected iteration
+          val selected = isRepeatSelected && i == repeatIndex && ! staticReadonly
+          if (selected)
+            addedClasses append selectedClass
 
-        // MIP classes
-        // Q: Could use handleMIPClasses()?
-        val relevant = repeatControl.children(i - 1).isRelevant
-        if (! relevant)
-          appendClasses("xforms-disabled")
+          // MIP classes
+          // Q: Could use handleMIPClasses()?
+          val relevant = repeatControl.children(i - 1).isRelevant
+          if (! relevant)
+            appendClasses("xforms-disabled")
 
-        // Apply the content of the body for this iteration
-        repeatBody(i, repeatSelected = selected)
+          // Apply the content of the body for this iteration
+          repeatBody(i, repeatSelected = selected)
+        }
       }
 
       // Restore output
-      xformsHandlerContext.getController.setOutput(savedOutput)
+      handlerContext.controller.output = savedOutput
 
       // Delimiter: end repeat
       if (isMustGenerateBeginEndDelimiters)
@@ -177,16 +183,16 @@ class XFormsRepeatHandler(
             prefix    = prefix,
             uri       = uri,
             atts      = List("id" -> s"repeat-$infix-$namespacedId", "class" -> "xforms-repeat-begin-end"))(
-            receiver  = xformsHandlerContext.getController.getOutput
+            receiver  = handlerContext.controller.output
           )
 
-      xformsHandlerContext.getController.findFirstHandlerOrElem match {
+      handlerContext.controller.findFirstHandlerOrElem match {
 
         case Some(Left(handler: XFormsControlLifecyleHandler)) =>
 
           outputBeginEndDelimiters(
             localName = handler.getContainingElementName,
-            prefix    = xformsHandlerContext.findXHTMLPrefix,
+            prefix    = handlerContext.findXHTMLPrefix,
             uri       = XMLConstants.XHTML_NAMESPACE_URI
           )
 
@@ -194,7 +200,7 @@ class XFormsRepeatHandler(
 
           outputBeginEndDelimiters(
             localName = handler.localname,
-            prefix    = xformsHandlerContext.findXHTMLPrefix,
+            prefix    = handlerContext.findXHTMLPrefix,
             uri       = XMLConstants.XHTML_NAMESPACE_URI
           )
 
@@ -210,7 +216,7 @@ class XFormsRepeatHandler(
 
           outputBeginEndDelimiters(
             localName = "span",
-            prefix    = xformsHandlerContext.findXHTMLPrefix,
+            prefix    = handlerContext.findXHTMLPrefix,
             uri       = XMLConstants.XHTML_NAMESPACE_URI
           )
       }

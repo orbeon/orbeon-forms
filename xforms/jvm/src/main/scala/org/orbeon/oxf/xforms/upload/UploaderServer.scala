@@ -38,8 +38,9 @@ import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
-import org.slf4j.{Logger, LoggerFactory}
+import org.slf4j.LoggerFactory
 
+import java.net.URI
 import scala.collection.JavaConverters._
 import scala.collection.{mutable => m}
 import scala.util.{Failure, Success, Try}
@@ -357,7 +358,7 @@ object UploaderServer {
     // case is that of a zero-length file, which will probably not be created by `DiskFileItem` as nothing
     // is written.
     def fileFromFileItemCreateIfNeeded(fileItem: DiskFileItem): java.io.File =
-      new java.io.File(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE))
+      new java.io.File(new URI(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE)))
 
     def withFileScanCall(block: => FileScanStatus): FileScanStatus =
       Try(block) match {

@@ -15,14 +15,19 @@ package org.orbeon.oxf.xforms.event
 
 
 import org.orbeon.oxf.common.OrbeonLocationException
-import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsObject
-import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.util.{IndentedLogger, Logging}
+import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
+import org.orbeon.oxf.xforms.analysis.EventHandler
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
+import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContextStack}
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparator, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.analysis.Phase
+import org.orbeon.xforms.runtime.XFormsObject
 
 import scala.util.control.NonFatal
 
@@ -94,7 +99,7 @@ object Dispatch extends Logging {
                 event.currentPhase = phase
 
                 withDebug("handler", Seq("name" -> event.name, "phase" -> phase.name, "observer" -> observer.getEffectiveId)) {
-                  handler.handleEvent(observer, event)
+                  handleEvent(handler, observer, event)
                   statHandleEvent += 1
                 }
               }
@@ -105,7 +110,7 @@ object Dispatch extends Logging {
               Iterator.iterate(target.parentEventObserver)(_.parentEventObserver) takeWhile (_ ne null) toList
 
             // Capture phase
-            handlers.get(Capture) foreach (doPhase(ancestorObservers.reverse, _, Capture))
+            handlers.get(Phase.Capture) foreach (doPhase(ancestorObservers.reverse, _, Phase.Capture))
 
             // Target phase
             locally {
@@ -115,14 +120,14 @@ object Dispatch extends Logging {
               // processing, and in XFormsUploadControl for upload processing.
               target.performTargetAction(event)
 
-              handlers.get(Target) foreach (doPhase(List(target), _, Target))
+              handlers.get(Phase.Target) foreach (doPhase(List(target), _, Phase.Target))
 
               callNativeListeners(target)
             }
 
             // Bubbling phase, which the event may not support
             if (event.bubbles)
-              handlers.get(Bubbling) foreach (doPhase(ancestorObservers, _, Bubbling))
+              handlers.get(Phase.Bubbling) foreach (doPhase(ancestorObservers, _, Phase.Bubbling))
 
             // Perform default action
             if (! event.cancelable || performDefaultAction)
@@ -135,7 +140,7 @@ object Dispatch extends Logging {
           }
         } else {
           // No handlers, try to do as little as possible
-          event.currentPhase = Target
+          event.currentPhase = Phase.Target
           target.performTargetAction(event)
           callNativeListeners(target)
           if (! event.cancelable || performDefaultAction)
@@ -150,7 +155,7 @@ object Dispatch extends Logging {
         // Add location information if possible
         val locationData = Option(target.getLocationData).orNull
         throw OrbeonLocationException.wrapException(t,
-          new ExtendedLocationData(
+          XmlExtendedLocationData(
             locationData,
             Some("dispatching XForms event"),
             List(
@@ -191,5 +196,156 @@ object Dispatch extends Logging {
     val newSuffix = appendSuffixes(containerParts, repeatIndexes)
 
     replaceIdSuffix(result.getEffectiveId, newSuffix)
+  }
+
+  def handleEvent(
+    eventHandler   : EventHandler,
+    eventObserver  : XFormsEventTarget,
+    event          : XFormsEvent)(implicit
+    indentedLogger : IndentedLogger
+  ): Unit = {
+
+    assert(eventHandler.observersPrefixedIds ne null)
+    assert(eventHandler.targetPrefixedIds ne null)
+
+    val containingDocument = event.containingDocument
+
+    // Find dynamic context within which the event handler runs
+    val (container, handlerEffectiveId, xpathContext) =
+      eventObserver match {
+
+        // Observer is the XBL component itself but from the "inside"
+        case componentControl: XFormsComponentControl if eventHandler.isXBLHandler =>
+
+          if (componentControl.canRunEventHandlers(event)) {
+
+            val xblContainer = componentControl.nestedContainerOpt.get // TODO: What if None?
+            xblContainer.getContextStack.resetBindingContext()
+            val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
+
+            val handlerEffectiveId =
+              xblContainer.getFullPrefix + eventHandler.staticId + XFormsId.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
+
+            (xblContainer, handlerEffectiveId, stack)
+          } else {
+            debug("ignoring event dispatched to non-relevant component control", List(
+              "name"       -> event.name,
+              "control id" -> componentControl.effectiveId)
+            )
+            return
+          }
+
+        // Regular observer
+        case _ =>
+
+          // Resolve the concrete handler
+          resolveHandler(containingDocument, eventHandler, eventObserver, event.targetObject) match {
+            case Some(concreteHandler) =>
+
+              val handlerContainer   = concreteHandler.container
+              val handlerEffectiveId = concreteHandler.getEffectiveId
+              val stack              = new XFormsContextStack(handlerContainer, concreteHandler.bindingContext)
+
+              (handlerContainer, handlerEffectiveId, stack)
+            case None =>
+              return
+          }
+      }
+
+    val handlerIsRelevant =
+      containingDocument.findControlByEffectiveId(handlerEffectiveId) map (_.isRelevant) getOrElse {
+        // Actions in models do not have a dynamic representation and so are not indexed at this time. In such
+        // cases, we look at the relevance of the container.
+        container.isRelevant
+      }
+
+    if (handlerIsRelevant || eventHandler.isIfNonRelevant) {
+      try {
+        XFormsAPI.withScalaAction(
+          new XFormsActionInterpreter(
+            container           = container,
+            outerActionElement  = eventHandler.element,
+            handlerEffectiveId  = handlerEffectiveId,
+            event               = event,
+            eventObserver       = eventObserver)(
+            actionXPathContext  = xpathContext,
+            indentedLogger      = containingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
+          )
+        ) {
+          _.runAction(eventHandler)
+        }
+      } catch {
+        case NonFatal(t) =>
+          // Something bad happened while running the action: dispatch error event to the root of the current scope
+          // NOTE: We used to dispatch the event to XFormsContainingDocument, but that is no longer a event
+          // target. We thought about dispatching to the root control of the current scope, BUT in case the action
+          // is running within a model before controls are created, that won't be available. SO the answer is to
+          // dispatch to what we know exists, and that is the current observer or the target. The observer is
+          // "closer" from the action, so we dispatch to that.
+          Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, t))
+      }
+    } else {
+      debug("skipping non-relevant handler", List(
+        "event"        -> event.name,
+        "observer"     -> event.targetObject.getEffectiveId,
+        "handler name" -> eventHandler.localName,
+        "handler id"   -> handlerEffectiveId
+      ))
+    }
+  }
+
+  // Given a static handler, and concrete observer and target, try to find the concrete handler
+  private def resolveHandler(
+    containingDocument : XFormsContainingDocument,
+    handler            : EventHandler,
+    eventObserver      : XFormsEventTarget,
+    targetObject       : XFormsEventTarget
+  ): Option[XFormsEventHandler] = {
+
+    val resolvedObject =
+      if (targetObject.scope == handler.scope) {
+        // The scopes match so we can resolve the id relative to the target
+        targetObject.container.resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId)
+      } else if (handler.isPhantom && ! handler.isWithinRepeat) {
+        // Optimize for non-repeated phantom handler
+        containingDocument.findObjectByEffectiveId(handler.prefixedId)
+      } else if (handler.isPhantom) {
+        // Repeated phantom handler
+
+        val zeroOrOneControl =
+          for {
+            controls           <- Option(containingDocument.controls).toList
+            effectiveControlId <-
+              Controls.resolveControlsEffectiveIds(
+                containingDocument.staticOps,
+                controls.getCurrentControlTree,
+                targetObject.getEffectiveId,
+                handler.staticId,
+                followIndexes = true // so this will return 0 or 1 element
+              )
+            control            <- controls.findObjectByEffectiveId(effectiveControlId)
+          } yield
+            control
+
+        zeroOrOneControl.headOption
+
+      } else {
+        // See https://github.com/orbeon/orbeon-forms/issues/243
+        warn(
+          "skipping event in different scope (see issue #243)",
+          List(
+            "target id"             -> targetObject.getEffectiveId,
+            "handler id"            -> handler.prefixedId,
+            "observer id"           -> eventObserver.getEffectiveId,
+            "target scope"          -> targetObject.scope.scopeId,
+            "handler scope"         -> handler.scope.scopeId,
+            "observer scope"        -> eventObserver.scope.scopeId
+          ))(
+          containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+        )
+        None
+      }
+
+    resolvedObject map (_.asInstanceOf[XFormsEventHandler])
   }
 }

@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.itemset
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport.isSelected
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.oxf.xml.{TransformerUtils, XMLReceiver}
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.tinytree.TinyBuilder

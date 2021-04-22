@@ -13,16 +13,14 @@
   */
 package org.orbeon.oxf.xforms.submission
 
+import cats.Eval
+import cats.syntax.option._
 import org.orbeon.oxf.util.ConnectionResult
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 /**
   * Handle replace="none".
   */
-class NoneReplacer(
-  submission         : XFormsModelSubmission,
-  containingDocument : XFormsContainingDocument
-) extends Replacer {
+class NoneReplacer(submission: XFormsModelSubmission) extends Replacer {
 
   // NOP
   def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
@@ -32,6 +30,6 @@ class NoneReplacer(
     connectionResult: ConnectionResult,
     p: SubmissionParameters,
     p2: SecondPassParameters
-  ): Runnable =
-    submission.sendSubmitDone(connectionResult)
+  ): Option[Eval[Unit]] =
+    submission.sendSubmitDone(connectionResult).some
 }

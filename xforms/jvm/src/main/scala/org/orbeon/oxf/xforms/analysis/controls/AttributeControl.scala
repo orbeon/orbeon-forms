@@ -14,27 +14,32 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.CoreControl
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
 
-class AttributeControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-    extends CoreControl(staticStateContext, element, parent, preceding, scope)
-    with ValueTrait
-    with OptionalSingleNode {
 
-  // Attribute control uses an AVT
-  override def computeValueAnalysis = Some(analyzeXPath(getChildrenContext, attributeValue, avt = true))
+class AttributeControl(
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends CoreControl(part, index, element, parent, preceding, scope)
+     with ValueTrait
+     with OptionalSingleNode {
 
-  val forStaticId = element.attributeValue(FOR_QNAME)
-  val forPrefixedId = XFormsId.getRelatedEffectiveId(prefixedId, forStaticId)
+  val forStaticId   : String = element.attributeValue(FOR_QNAME)
+  val forPrefixedId : String = XFormsId.getRelatedEffectiveId(prefixedId, forStaticId)
 
-  val attributeName = element.attributeValue(NAME_QNAME)
-  val attributeValue = element.attributeValue(VALUE_QNAME)
+  val attributeName : String = element.attributeValue(NAME_QNAME)
+  val attributeValue: String = element.attributeValue(VALUE_QNAME)
 
-  val forName = element.attributeValue("for-name")
-  val urlType = element.attributeValue("url-type")
-  val portletMode = element.attributeValue("portlet-mode")
-  val windowState = element.attributeValue("window-state")
+  val forName       : String = element.attributeValue("for-name")
+  val urlType       : String = element.attributeValue("url-type")
+  val portletMode   : String = element.attributeValue("portlet-mode")
+  val windowState   : String = element.attributeValue("window-state")
 }

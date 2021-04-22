@@ -18,8 +18,7 @@ import java.{util => ju}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlUtil._
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.analysis.model.{Model, ModelDefs}
 import org.orbeon.saxon.om.NodeInfo
 
 import scala.collection.JavaConverters._
@@ -32,13 +31,17 @@ trait PartControlsAnalysis extends TransientState {
   val controlAnalysisMap = LinkedHashMap[String, ElementAnalysis]()
   protected val controlTypes       = HashMap[String, LinkedHashMap[String, ElementAnalysis]]() // type -> Map of prefixedId -> ElementAnalysis
 
+  def iterateControlsNoModels: Iterator[ElementAnalysis] =
+    for (control <- controlAnalysisMap.valuesIterator if ! control.isInstanceOf[Model] && ! control.isInstanceOf[RootControl])
+      yield control
+
   // Special handling of attributes
-  private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map()
+  private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map.empty
 
   protected def indexNewControl(
     elementAnalysis : ElementAnalysis,
     lhhas           : Buffer[LHHAAnalysis],
-    eventHandlers   : Buffer[EventHandlerImpl],
+    eventHandlers   : Buffer[EventHandler],
     models          : Buffer[Model],
     attributes      : Buffer[AttributeControl]
   ): Unit = {
@@ -54,7 +57,7 @@ trait PartControlsAnalysis extends TransientState {
     // Register special controls
     elementAnalysis match {
       case lhha: LHHAAnalysis if ! TopLevelItemsetQNames(lhha.getParent.element.getQName) => lhhas += lhha
-      case eventHandler: EventHandlerImpl                                                 => eventHandlers += eventHandler
+      case eventHandler: EventHandler                                                 => eventHandlers += eventHandler
       case model: Model                                                                   => models        += model
       case attribute: AttributeControl                                                    => attributes    += attribute
       case _                                                                              =>
@@ -84,13 +87,6 @@ trait PartControlsAnalysis extends TransientState {
           existingMap + (forId -> (existingAttributes ++ newAttributes))
       }
     }
-
-  protected def analyzeControlsXPath() =
-    for (control <- controlAnalysisMap.values if ! control.isInstanceOf[Model] && ! control.isInstanceOf[RootControl])
-      control.analyzeXPath()
-
-  def iterateControls =
-    controlAnalysisMap.valuesIterator
 
   def findControlAnalysis(prefixedId: String) =
     controlAnalysisMap.get(prefixedId)
@@ -141,7 +137,7 @@ trait PartControlsAnalysis extends TransientState {
 
   def hasControls = getTopLevelControlElements.size > 0
 
-  override def freeTransientState() = {
+  override def freeTransientState(): Unit = {
     super.freeTransientState()
 
     for (controlAnalysis <- controlAnalysisMap.values)
@@ -162,7 +158,7 @@ trait PartControlsAnalysis extends TransientState {
 
     control match {
       case model: Model              => deindexModel(model)
-      case handler: EventHandlerImpl => deregisterEventHandler(handler)
+      case handler: EventHandler => deregisterEventHandler(handler)
       case att: AttributeControl     => _attributeControls -= att.forPrefixedId
       case _                         =>
     }
@@ -178,7 +174,7 @@ trait PartControlsAnalysis extends TransientState {
     }
 
     tree match {
-      case childrenBuilder: ChildrenBuilderTrait =>
+      case childrenBuilder: WithChildrenTrait =>
         childrenBuilder.indexedElements foreach deindexControl
 
         if (! self)

@@ -84,8 +84,9 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
      outputStream    : OutputStream
   ): Unit = {
 
-    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
-    implicit val indentedLogger : IndentedLogger  = new IndentedLogger(XHTMLToPDFProcessor.logger)
+    implicit val externalContext         : ExternalContext               = NetUtils.getExternalContext
+    implicit val indentedLogger          : IndentedLogger                = new IndentedLogger(XHTMLToPDFProcessor.logger)
+    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
     val requestOpt  = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
     val renderer    = new ITextRenderer(DefaultDotsPerPoint, DefaultDotsPerPixel)

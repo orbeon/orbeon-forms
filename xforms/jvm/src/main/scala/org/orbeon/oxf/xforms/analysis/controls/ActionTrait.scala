@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.{Namespace, QName}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 
-trait ActionTrait extends SimpleElementAnalysis {
+trait ActionTrait extends ElementAnalysis {
 
   import ActionTrait._
 
@@ -33,7 +33,7 @@ private object ActionTrait {
 
   val Namespaces: Seq[Namespace] = Seq(Namespace.EmptyNamespace, XXFORMS_NAMESPACE, EXFORMS_NAMESPACE)
 
-  def makeQName(s: String) = QName(s, _: Namespace)
+  def makeQName(s: String): Namespace => QName = QName(s, _)
 
   val IfQNames      : Seq[QName] = Namespaces map makeQName("if")
   val WhileQNames   : Seq[QName] = Namespaces map makeQName("while")

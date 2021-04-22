@@ -15,10 +15,8 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel.ErrorLevel
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, ValidationLevel}
+import org.orbeon.oxf.xforms.analysis.model.{ModelDefs, StaticBind}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_ITERATION_MOVED
 import org.orbeon.oxf.xforms.event.events._
@@ -30,6 +28,9 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.model.ValidationLevel
+import org.orbeon.xforms.analysis.model.ValidationLevel.ErrorLevel
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.{immutable => i}
@@ -56,17 +57,17 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
       Nil
 
   // Standard MIPs
-  private var _readonly = Model.DEFAULT_READONLY
+  private var _readonly = ModelDefs.DEFAULT_READONLY
   final def isReadonly = _readonly
 
-  private var _required = Model.DEFAULT_REQUIRED
+  private var _required = ModelDefs.DEFAULT_REQUIRED
   final def isRequired = _required
 
   // TODO: maybe represent as case class
   //case class ValidationStatus(valid: Boolean, alertLevel: Option[ValidationLevel], failedValidations: List[StaticBind#MIP])
   //private var _validationStatus: Option[ValidationStatus] = None
 
-  private var _valid = Model.DEFAULT_VALID
+  private var _valid = ModelDefs.DEFAULT_VALID
   def isValid = _valid
 
   // NOTE: At this time, the control only stores the constraints for a single level (the "highest" level). There is no
@@ -92,7 +93,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   // Custom MIPs
   private var _customMIPs = Map.empty[String, String]
   def customMIPs: Map[String, String] = _customMIPs
-  def customMIPsClasses: i.Iterable[String] = customMIPs map { case (k, v) => Model.buildExternalCustomMIPName(k) + '-' + v }
+  def customMIPsClasses: i.Iterable[String] = customMIPs map { case (k, v) => ModelDefs.buildExternalCustomMIPName(k) + '-' + v }
 
   override def onDestroy(update: Boolean): Unit = {
     super.onDestroy(update)
@@ -188,9 +189,9 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
   }
 
   private def setDefaultMIPs(): Unit = {
-    this._readonly          = Model.DEFAULT_READONLY
-    this._required          = Model.DEFAULT_REQUIRED
-    this._valid             = Model.DEFAULT_VALID
+    this._readonly          = ModelDefs.DEFAULT_READONLY
+    this._required          = ModelDefs.DEFAULT_REQUIRED
+    this._valid             = ModelDefs.DEFAULT_VALID
     this._valueType         = null
     this._customMIPs        = Map.empty[String, String]
 
@@ -303,7 +304,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
   def hasStaticReadonlyAppearance =
     containingDocument.staticReadonly ||
-      XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
+      XFormsProperties.ReadonlyAppearanceStaticValue == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
 
   override def outputAjaxDiff(
     previousControlOpt    : Option[XFormsControl],
@@ -377,7 +378,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     // Output custom MIPs classes
     for ((name, value) <- customMIPs)
-      write(Model.buildExternalCustomMIPName(name), value)
+      write(ModelDefs.buildExternalCustomMIPName(name), value)
 
     // Output type class
     (getBuiltinTypeNameOpt map ("xforms-type" ->))        orElse
@@ -489,7 +490,7 @@ object XFormsSingleNodeControl {
             value2         = mips2.get(name)
             if Option(value1) != value2
           } yield
-            plusOrMinusPrefix + Model.buildExternalCustomMIPName(name) + '-' + value1 // TODO: encode so that there are no spaces
+            plusOrMinusPrefix + ModelDefs.buildExternalCustomMIPName(name) + '-' + value1 // TODO: encode so that there are no spaces
 
         val classesToRemove = diff(customMIPs1, customMIPs2, '-')
         val classesToAdd    = diff(customMIPs2, customMIPs1, '+')

@@ -15,9 +15,10 @@ package org.orbeon.oxf.xforms.event.events
 
 import org.apache.commons.lang3.StringUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.event.EventHandlerImpl.parseKeyModifiers
+import org.orbeon.oxf.xforms.analysis.EventHandler
+import org.orbeon.oxf.xforms.analysis.EventHandler.parseKeyModifiers
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.event.{EventHandler, XFormsEvent, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 import org.orbeon.xforms.EventNames._
 
 abstract class KeyboardEvent(name: String, target: XFormsEventTarget, properties: PropertyGetter)

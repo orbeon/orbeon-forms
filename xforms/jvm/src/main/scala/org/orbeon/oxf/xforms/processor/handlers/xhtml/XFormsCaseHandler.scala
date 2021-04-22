@@ -18,8 +18,9 @@ import java.{lang => jl}
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SwitchControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
-import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor}
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsNames
@@ -31,19 +32,19 @@ import org.xml.sax.Attributes
  * TODO: This currently is based on delimiters. This is wrong: should be the case, like group, only around <tr>, etc.
  */
 class XFormsCaseHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
+  uri             : String,
+  localname       : String,
+  qName           : String,
+  localAtts       : Attributes,
+  elementAnalysis : ElementAnalysis,
+  handlerContext  : HandlerContext
 ) extends
   XFormsControlLifecyleHandler(
     uri,
     localname,
     qName,
     localAtts,
-    matched,
+    elementAnalysis,
     handlerContext,
     repeating  = false,
     forwarding = true
@@ -56,18 +57,18 @@ class XFormsCaseHandler(
 
   // If we are the top-level of a full update, output a delimiter anyway
   protected override def isMustOutputContainerElement: Boolean =
-    xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+    handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
   override protected def handleControlStart(): Unit = {
 
-    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
+    val xhtmlPrefix = handlerContext.findXHTMLPrefix
     val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
 
     // Determine whether this case is visible
-    val caseControl = containingDocument.getControlByEffectiveId(getEffectiveId).asInstanceOf[XFormsCaseControl]
+    val caseControl = currentControl.asInstanceOf[XFormsCaseControl]
 
     val switchHasFullUpdate =
-      staticControlOpt exists (_.parent.get.asInstanceOf[SwitchControl].hasFullUpdate)
+      elementAnalysis.parent.get.asInstanceOf[SwitchControl].hasFullUpdate
 
     // This case is visible if it is selected or if the switch is read-only and we display read-only as static
     isVisible =
@@ -78,13 +79,13 @@ class XFormsCaseHandler(
 
     val selectedClasses = if (isVisible) "xforms-case-selected" else "xforms-case-deselected"
 
-    val controller = xformsHandlerContext.getController
-    currentSavedOutput = controller.getOutput
+    val controller = handlerContext.controller
+    currentSavedOutput = controller.output
 
     // Classes on top-level elements and characters and on the first delimiter
     val elementClasses = {
-      implicit val classes = new jl.StringBuilder
-      appendControlUserClasses(attributes, currentControl)
+      implicit val classes: jl.StringBuilder = new jl.StringBuilder
+      appendControlUserClasses(localAtts, currentControl)
       // Don't add MIP classes as they can conflict with classes of nested content if used outside <tr>, etc.
       classes.toString
     }
@@ -110,13 +111,13 @@ class XFormsCaseHandler(
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, controlClasses)
 
           // `ControlsComparator` skips the root element, so we create a dummy one to be skipped
-          if (xformsHandlerContext.hasFullUpdateTopLevelControl)
+          if (handlerContext.hasFullUpdateTopLevelControl)
             currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, SAXUtils.EMPTY_ATTRIBUTES)
 
           currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes)
 
         } else {
-          controller.setOutput(new DeferredXMLReceiverAdapter)
+          controller.output = new DeferredXMLReceiverAdapter
         }
 
         None
@@ -124,7 +125,7 @@ class XFormsCaseHandler(
       } else {
         // Place interceptor if needed
         isMustGenerateBeginEndDelimiters =
-          ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+          ! handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
         val newOutputInterceptor =
           new OutputInterceptor(
@@ -154,26 +155,26 @@ class XFormsCaseHandler(
           )
 
         newOutputInterceptor.setAddedClasses(controlClasses)
-        controller.setOutput(new DeferredXMLReceiverImpl(newOutputInterceptor))
+        controller.output = new DeferredXMLReceiverImpl(newOutputInterceptor)
 
         Some(newOutputInterceptor)
       }
 
-    xformsHandlerContext.pushCaseContext(isVisible)
+    handlerContext.pushCaseContext(isVisible)
   }
 
   protected override def handleControlEnd(): Unit = {
 
-    xformsHandlerContext.popCaseContext()
+    handlerContext.popCaseContext()
 
     currentOutputInterceptorOpt match {
       case None =>
         if (isVisible) {
-          val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
+          val xhtmlPrefix = handlerContext.findXHTMLPrefix
           val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
           currentSavedOutput.endElement(XHTML_NAMESPACE_URI, "span", spanQName)
 
-          if (xformsHandlerContext.hasFullUpdateTopLevelControl)
+          if (handlerContext.hasFullUpdateTopLevelControl)
             currentSavedOutput.endElement(XHTML_NAMESPACE_URI, "span", spanQName)
         }
       case Some(currentOutputInterceptor) =>
@@ -187,7 +188,7 @@ class XFormsCaseHandler(
         }
     }
 
-    xformsHandlerContext.getController.setOutput(currentSavedOutput)
+    handlerContext.controller.output = currentSavedOutput
   }
 
   // Don't output any LHHA

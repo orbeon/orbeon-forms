@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms
 
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.oxf.common.{OrbeonLocationException, Version}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, SecureUtils}
-import org.orbeon.oxf.xforms.XFormsProperties.NO_UPDATES
+import org.orbeon.oxf.xforms.XFormsProperties.NoUpdates
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PathMapXPathDependencies, XPathDependencies}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
@@ -28,10 +28,11 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.state.{DynamicState, XFormsState, XFormsStaticStateCache}
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
-import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.xforms.runtime.XFormsObject
+import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.Seq
 import scala.util.control.NonFatal
@@ -261,11 +262,10 @@ class XFormsContainingDocument(
   private def processCompletedAsynchronousSubmissions(skipDeferredEventHandling: Boolean, addPollEvent: Boolean): Unit = {
     val manager = getAsynchronousSubmissionManager(false)
     if (manager != null && manager.hasPendingAsynchronousSubmissions) {
-      if (! skipDeferredEventHandling)
-        startOutermostActionHandler()
-      manager.processCompletedAsynchronousSubmissions()
-      if (! skipDeferredEventHandling)
-        endOutermostActionHandler()
+
+      maybeWithOutermostActionHandler(! skipDeferredEventHandling) {
+        manager.processCompletedAsynchronousSubmissions()
+      }
 
       // Remember to send a poll event if needed
       if (addPollEvent)
@@ -342,7 +342,7 @@ object XFormsContainingDocument {
       val uuid = SecureUtils.randomHexId
 
       // attempt to ignore `oxf:xforms-submission`
-      if (staticState.propertyMaybeAsExpression(NO_UPDATES).fold(_.toString != "true" , _ => true))
+      if (staticState.propertyMaybeAsExpression(NoUpdates).fold(_.toString != "true" , _ => true))
         LifecycleLogger.eventAssumingRequest("xforms", "new form session", List("uuid" -> uuid))
 
       val doc = new XFormsContainingDocument(staticState, uuid, disableUpdates = false)
@@ -358,7 +358,7 @@ object XFormsContainingDocument {
       doc
     } catch {
       case NonFatal(t) =>
-        throw OrbeonLocationException.wrapException(t, new ExtendedLocationData(null, "initializing XForms containing document"))
+        throw OrbeonLocationException.wrapException(t, XmlExtendedLocationData(null, "initializing XForms containing document".some))
     }
 
   /**
@@ -390,7 +390,7 @@ object XFormsContainingDocument {
       doc
     } catch {
       case NonFatal(t) =>
-        throw OrbeonLocationException.wrapException(t, new ExtendedLocationData(null, "re-initializing XForms containing document"))
+        throw OrbeonLocationException.wrapException(t, XmlExtendedLocationData(null, "re-initializing XForms containing document".some))
     }
 
   private def findOrRestoreStaticState(

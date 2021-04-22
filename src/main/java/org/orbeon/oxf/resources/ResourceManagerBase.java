@@ -19,8 +19,8 @@ import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Locator;
 
 import java.io.IOException;
@@ -86,7 +86,7 @@ public abstract class ResourceManagerBase implements ResourceManager {
             throw rnfe;
         } catch (Exception e) {
             if(locator[0] != null)
-                throw new ValidationException("Can't retrieve or parse document for key " + key, e, new LocationData(locator[0]));
+                throw new ValidationException("Can't retrieve or parse document for key " + key, e, XmlLocationData.apply(locator[0]));
             else
                 throw new OXFException("Can't retrieve or parse document for key " + key, e);
         } finally {

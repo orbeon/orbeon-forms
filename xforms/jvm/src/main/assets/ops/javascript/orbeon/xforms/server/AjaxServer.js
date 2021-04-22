@@ -246,8 +246,7 @@
                                 template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
 
                                 // Get the span that contains the one span per checkbox/radio
-                                // This is the first span that has no class on it (we don't want to get a span for label, hint, help, alert)
-                                var spanContainer = _.detect(documentElement.getElementsByTagName("span"), function(span) { return span.className == "xforms-items"; });
+                                var spanContainer = documentElement.querySelector("span.xforms-items");
 
                                 // Remove spans and store current checked value
                                 var valueToChecked = {};
@@ -909,7 +908,7 @@
                         }
 
                         function handleInnerHtml(elem) {
-initElem
+
                             var innerHTML    = ORBEON.util.Dom.getStringValue(childrenWithLocalName(elem, 'value')[0]);
                             var initElem     = childrenWithLocalName(elem, 'init')[0];
                             var initValue    = _.isUndefined(initElem) ? null : ORBEON.util.Dom.getStringValue(initElem);

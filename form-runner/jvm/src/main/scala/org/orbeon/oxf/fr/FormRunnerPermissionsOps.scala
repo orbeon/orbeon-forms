@@ -205,13 +205,13 @@ trait FormRunnerPermissionsOps {
   def redirectToHomePageIfLoggedIn(): Unit = {
     val request  = NetUtils.getExternalContext.getRequest
     val response = NetUtils.getExternalContext.getResponse
-    val username = request.getUsername
-    if (username != null)
+    if (request.credentials.isDefined) {
       response.sendRedirect(
         response.rewriteRenderURL("/fr/"),
         isServerSide = false,
         isExitPortal = false
       )
+    }
   }
 
   private def allOperationsIfNoPermissionsDefined

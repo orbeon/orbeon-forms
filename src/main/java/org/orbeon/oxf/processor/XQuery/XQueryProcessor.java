@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.processor.XQuery;
 
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLParsing;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
+import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.saxon.xqj.SaxonXQDataSource;
 import org.xml.sax.SAXException;
 
@@ -31,7 +31,10 @@ import javax.xml.namespace.QName;
 import javax.xml.xquery.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -46,8 +49,7 @@ public class XQueryProcessor extends ProcessorImpl {
 
     public static final String XQUERY_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/xquery";
 
-    private static Logger logger = Logger.getLogger(XQueryProcessor.class);
-
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(XQueryProcessor.class);
 
     private static HashMap<String, String> knownImplementations = initKnownImplementations();
 

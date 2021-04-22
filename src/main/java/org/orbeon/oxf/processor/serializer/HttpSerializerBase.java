@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.serializer;
 
-import org.apache.log4j.Logger;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
@@ -27,7 +26,6 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 
@@ -48,7 +46,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
     private static final boolean DEFAULT_FORCE_ENCODING = false;
     private static final boolean DEFAULT_IGNORE_DOCUMENT_ENCODING = false;
 
-    private static Logger logger = LoggerFactory.createLogger(HttpSerializerBase.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(HttpSerializerBase.class);
 
     protected HttpSerializerBase() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, getConfigSchemaNamespaceURI()));
@@ -131,7 +129,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
                 // If local caching of the data is enabled and if the configuration status code is a success code, use
                 // the caching API. It doesn't make sense in HTTP to allow caching of non-successful responses.
-                if (config.cacheUseLocalCache && NetUtils.isSuccessCode(config.statusCode)) {
+                if (config.cacheUseLocalCache && StatusCode.isSuccessCode(config.statusCode)) {
 
                     // We return a ResultStore
                     final boolean[] read = new boolean[1];
@@ -183,7 +181,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                         @Override
                         public boolean allowCaching() {
                             // It doesn't make sense in HTTP to allow caching of non-successful responses
-                            return NetUtils.isSuccessCode(statusCode);
+                            return StatusCode.isSuccessCode(statusCode);
                         }
                     });
 

@@ -16,6 +16,8 @@ package org.orbeon.oxf.processor.generator;
 import com.drew.imaging.jpeg.JpegSegmentData;
 import com.drew.imaging.jpeg.JpegSegmentReader;
 import com.drew.imaging.jpeg.JpegSegmentType;
+import com.drew.lang.ByteArrayReader;
+import com.drew.lang.SequentialByteArrayReader;
 import com.drew.lang.StreamReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
@@ -23,6 +25,7 @@ import com.drew.metadata.MetadataException;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifReader;
 import com.drew.metadata.iptc.IptcReader;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Node;
 import org.orbeon.oxf.common.Defaults;
@@ -37,7 +40,6 @@ import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom.LocationData;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -213,7 +215,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                             String filePath = path + name;
                             File file = new File(config.getBaseDirectory(), filePath);
                             long lastModified = file.lastModified();
-                            String lastModifiedDate = DateUtils.DateTime().print(lastModified);
+                            String lastModifiedDate = DateUtils.formatIsoDateTimeUtc(lastModified);
                             long fileSize = file.length();
 
                             helper.startElement(FILE_ELEMENT, new String[]{"last-modified-ms", Long.toString(lastModified),
@@ -462,7 +464,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                         byte[] exifSegment = segmentData.getSegment(JpegSegmentType.APP1);
                         if (exifSegment != null) {
                             Metadata metadata = new Metadata();
-                            new ExifReader().extract(exifSegment, metadata, JpegSegmentType.APP1);
+                            new ExifReader().extract(new ByteArrayReader(exifSegment), metadata);
                             outputMetadata(helper, metadata, EXIF_ELEMENT);
                         }
                     }
@@ -471,7 +473,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                         byte[] iptcSegment = segmentData.getSegment(JpegSegmentType.APPD);
                         if (iptcSegment != null) {
                             Metadata metadata = new Metadata();
-                            new IptcReader().extract(iptcSegment, metadata, JpegSegmentType.APPD);
+                                new IptcReader().extract(new SequentialByteArrayReader(iptcSegment), metadata, iptcSegment.length);
                             outputMetadata(helper, metadata, IPTC_ELEMENT);
                         }
                     }

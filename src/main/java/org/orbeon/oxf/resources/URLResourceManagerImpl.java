@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.resources;
 
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -33,7 +32,7 @@ import java.util.Map;
  */
 public class URLResourceManagerImpl extends ResourceManagerBase {
 
-    private static Logger logger = LoggerFactory.createLogger(URLResourceManagerImpl.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(URLResourceManagerImpl.class);
 
     protected URL baseURL;
 

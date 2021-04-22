@@ -17,7 +17,7 @@ import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.toJQuerySelect2
 import org.orbeon.jquery._
 import org.orbeon.xforms.facade.{Controls, Properties, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, ServerValueStore}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, ServerValueStore, Support}
 import org.scalajs.dom
 import org.scalajs.dom.{FocusEvent, MutationObserver, MutationObserverInit, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
@@ -54,15 +54,7 @@ private class Select1SearchCompanion extends XBLCompanion {
       // as at that point the `<span class="select2-selection--single">` looses the focus, and since Select2 places that element inside
       // the element that represents the `<xf:select1>`, if that event is left to propagate, the XForms code takes that event as the
       // `<xf:select1>` having lost the focus
-      xformsSelect.addEventListener(
-        "focusout",
-        (event: FocusEvent) => {
-          val target = event.target.asInstanceOf[dom.html.Element]
-          if (target.classList.contains("select2-selection--single"))
-            event.stopPropagation()
-        },
-        useCapture = true
-      )
+      Support.stopFocusOutPropagation(xformsSelect, _.target, "select2-selection--single")
 
       def initOrUpdatePlaceholder(): Unit = {
 
@@ -78,6 +70,9 @@ private class Select1SearchCompanion extends XBLCompanion {
             initialOption.value    = initialValue
             initialOption.selected = true
             htmlSelect.appendChild(initialOption)
+          } else {
+            while (htmlSelect.hasChildNodes())
+              htmlSelect.removeChild(htmlSelect.firstChild)
           }
         }
 
@@ -93,7 +88,8 @@ private class Select1SearchCompanion extends XBLCompanion {
         }
 
         jSelect.select2(options)
-        if (servicePerformsSearch)
+        val isDatabound = containerElem.classList.contains("xbl-fr-databound-select1-search")
+        if (isDatabound)
           jSelect.on("change", onChange _)
       }
 

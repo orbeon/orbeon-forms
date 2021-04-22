@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
@@ -94,7 +94,7 @@ object FormBuilderXPathApi {
 
     val resultOpt =
       for {
-        mip      <- Model.AllComputedMipsByName.get(mipName)
+        mip      <- ModelDefs.AllComputedMipsByName.get(mipName)
         bindElem <-
           if (controlName ne null)
             FormRunner.findBindByName(ctx.formDefinitionRootElem, controlName)
@@ -113,7 +113,7 @@ object FormBuilderXPathApi {
 
     val resultOpt =
       for {
-        mip <- Model.AllComputedMipsByName.get(mipName)
+        mip <- ModelDefs.AllComputedMipsByName.get(mipName)
       } yield
         FormBuilder.writeAndNormalizeMip(Option(controlName), mip, mipValue)
 
@@ -502,7 +502,10 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getAllControlsWithIds: Seq[NodeInfo] =
-    FormBuilder.getAllControlsWithIds(FormBuilderDocContext().formDefinitionRootElem) filterNot FormRunner.IsContainer
+    FormBuilder.getAllControlsWithIds(FormBuilderDocContext().formDefinitionRootElem) filterNot { elem =>
+      // https://github.com/orbeon/orbeon-forms/issues/4786
+      FormRunner.IsContainer(elem) || FormRunner.isSectionTemplateContent(elem)
+    }
 
   //@XPathFunction
   def getControlsLabelValueItemset: Seq[NodeInfo] = {

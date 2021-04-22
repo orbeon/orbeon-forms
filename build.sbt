@@ -5,7 +5,7 @@ import org.orbeon.sbt.OrbeonWebappPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport.jsEnv
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-val DefaultOrbeonFormsVersion     = "2019.1-SNAPSHOT"
+val DefaultOrbeonFormsVersion     = "2021.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
@@ -15,12 +15,12 @@ val ScribeVersion                 = "2.7.10"
 val PerfolationVersion            = "1.1.5"
 
 // Shared Scala libraries
-val ScalatTestVersion             = "3.1.2"
+val ScalatTestVersion             = "3.1.4"
 val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.0"
 val EnumeratumCirceVersion        = "1.6.0"
-val ShapelessVersion              = "2.3.3"
+val ShapelessVersion              = "2.3.4"
 val ScalaXmlVersion               = "2.0.0-M1"
 val ScalaAsyncVersion             = "0.10.0"
 val Parboiled1Version             = "1.3.1"
@@ -28,26 +28,27 @@ val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and b
 val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.1"
 val RosHttpVersion                = "2.1.0"
-val ScalaLoggingVersion           = "3.9.2"
-val ScalaCollectionCompatVersion  = "2.1.6"
+val ScalaLoggingVersion           = "3.9.3"
+val Log4sVersion                  = "1.8.2"
+val ScalaCollectionCompatVersion  = "2.2.0"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
-val JodaConvertVersion            = "2.2.1"
 val Slf4jVersion                  = "1.7.30"
-val HttpComponentsVersion         = "4.5.12"
+val HttpComponentsVersion         = "4.5.13"
 val Log4jVersion                  = "1.2.17"
-val CommonsIoVersion              = "2.8.0"
-val FlyingSaucerVersion           = "9.1.20"
-val TinkVersion                   = "1.4.0"
+val CommonsIoVersion              = "2.7"
+val FlyingSaucerVersion           = "9.1.21"
+val TinkVersion                   = "1.5.0"
 val JavaMailVersion               = "1.6.2"
-val JavaActivationVersion         = "1.2.2"
+val JavaActivationVersion         = "1.2.0"
 
 // "Provided" Java libraries
 val ServletApiVersion             = "4.0.1"
 val PortletApiVersion             = "3.0.1"
 val LiferayPortalServiceVersion   = "6.2.5"
 val LiferayPortalKernelVersion    = "5.3.0"
+
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
@@ -58,12 +59,11 @@ val CoreLibraryDependencies = Seq(
   "io.spray"                    %% "spray-json"                     % SprayJsonVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
-  "joda-time"                   %  "joda-time"                      % "2.10.6",
-  "org.joda"                    %  "joda-convert"                   % JodaConvertVersion % Provided,
-  "org.apache.commons"          %  "commons-lang3"                  % "3.11",
+  "org.log4s"                   %% "log4s"                          % Log4sVersion,
+  "org.apache.commons"          %  "commons-lang3"                  % "3.12.0",
   "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
   "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
-  "commons-codec"               %  "commons-codec"                  % "1.14",
+  "commons-codec"               %  "commons-codec"                  % "1.15",
   "commons-collections"         %  "commons-collections"            % "3.2.2",
   "commons-digester"            %  "commons-digester"               % "2.1",
   "commons-cli"                 %  "commons-cli"                    % "1.4",
@@ -73,8 +73,8 @@ val CoreLibraryDependencies = Seq(
   "commons-pool"                %  "commons-pool"                   % "1.6",
   "commons-validator"           %  "commons-validator"              % "1.7",  // 1.5.1
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
-  "com.sun.mail"                % "javax.mail"                      % JavaMailVersion,
-  "jakarta.activation"          % "jakarta.activation-api"          % JavaActivationVersion,
+  "com.sun.mail"                % "javax.mail"                      % JavaMailVersion exclude("javax.activation", "activation"),
+  "com.sun.activation" 		% "javax.activation"                % JavaActivationVersion,
   "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
   "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.1",
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
@@ -93,17 +93,19 @@ val CoreLibraryDependencies = Seq(
   ),
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
-  "org.apache.commons"          % "commons-dbcp2"                   % "2.7.0"           % Test,
+  "org.apache.commons"          % "commons-dbcp2"                   % "2.8.0"           % Test,
   "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test,
-  "com.google.guava"            % "guava"                           % "29.0-jre"          % Test,
+  "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
-  "mysql"                       % "mysql-connector-java"            % "8.0.21"          % Test,
-  "org.postgresql"              % "postgresql"                      % "42.2.16"         % Test,
+  "mysql"                       % "mysql-connector-java"            % "8.0.24"          % Test,
+  "org.postgresql"              % "postgresql"                      % "42.2.20"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
-  "com.lowagie"                 % "itext"                           % "2.1.7" /* last MPL version */ excludeAll ExclusionRule(organization = "bouncycastle"),
-  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.66",  // for `itext`, also pulls `bcprov` and `bcpkix`
+  "com.github.librepdf"         % "openpdf"                         % "1.3.25",
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.68", // for `itext`/`openpdf`, also pulls `bcprov` and `bcpkix`
+  "com.drewnoakes"              % "metadata-extractor"              % "2.15.0",
+  "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
 
   "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
   "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
@@ -412,12 +414,16 @@ lazy val assetsSettings = Seq(
   }
 )
 
+// This project contains utilities with no dependencies. It is mostly cross-JS/JVM platforms, with
+// a few exceptions that are JS- or JVM-only. `common` is not a good name. On the other hand,
+// `utils` is also very general. Can we find something more telling?
 lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("common"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-common",
     libraryDependencies += "com.beachape"           %%% "enumeratum"        % EnumeratumVersion,
     libraryDependencies += "com.beachape"           %%% "enumeratum-circe"  % EnumeratumCirceVersion,
+    libraryDependencies += "org.log4s"              %%% "log4s"             % Log4sVersion,
     crossScalaVersions := supportedScalaVersions
   )
   .jvmSettings(commonScalaJvmSettings)
@@ -428,7 +434,9 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
       (includeFilter in unmanagedJars).value,
       (excludeFilter in unmanagedJars).value
     ),
-    libraryDependencies += "org.scala-js"           %% "scalajs-stubs" % scalaJSVersion % Provided
+    libraryDependencies += "org.scala-js"           %% "scalajs-stubs" % scalaJSVersion % Provided,
+    libraryDependencies += "org.slf4j"              %  "slf4j-api"     % Slf4jVersion,
+    libraryDependencies += "org.slf4j"              %  "slf4j-log4j12" % Slf4jVersion
   )
   .jsSettings(commonScalaJsSettings)
   .jsSettings(
@@ -437,7 +445,14 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
 
 lazy val commonJVM = common.jvm
 lazy val commonJS  = common.js
+//  .enablePlugins(TzdbPlugin)
+  .settings(
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
+//    zonesFilter := {(z: String) => z == "America/Los_Angeles"} // Q: See if/how we do this filtering
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time-tzdb" % "2.0.0" % Test // for now, get the whole database
+  )
 
+// Custom DOM implementation. This must be cross-platform and have no dependencies.
 lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("dom"))
   .settings(commonSettings: _*)
   .settings(
@@ -461,12 +476,10 @@ lazy val fullPortlet = (project in file("full-portlet"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-full-portlet",
-    libraryDependencies += "org.joda"           % "joda-convert"              % JodaConvertVersion          % Provided,
-    libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.portlet"      % "portlet-api"               % PortletApiVersion           % Provided,
     libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
     libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
     libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
-
   )
 
 lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
@@ -474,8 +487,8 @@ lazy val formRunnerProxyPortlet = (project in file("proxy-portlet"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-proxy-portlet",
-    libraryDependencies += "javax.portlet" %  "portlet-api"                   % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet" % "javax.servlet-api"              % ServletApiVersion           % Provided,
+    libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
     libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
     libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )
@@ -485,8 +498,8 @@ lazy val portletSupport = (project in file("portlet-support"))
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-portlet-support",
-    libraryDependencies += "javax.portlet" %  "portlet-api"                   % PortletApiVersion           % Provided,
-    libraryDependencies += "javax.servlet" % "javax.servlet-api"              % ServletApiVersion           % Provided,
+    libraryDependencies += "javax.portlet"      %  "portlet-api"              % PortletApiVersion           % Provided,
+    libraryDependencies += "javax.servlet"      % "javax.servlet-api"         % ServletApiVersion           % Provided,
     libraryDependencies += "com.liferay.portal" % "portal-service"            % LiferayPortalServiceVersion % Provided,
     libraryDependencies += "com.liferay.portal" % "com.liferay.portal.kernel" % LiferayPortalKernelVersion  % Provided
   )
@@ -520,7 +533,6 @@ lazy val formRunnerJVM = formRunner.jvm
     sourceDirectory   in DebugDatabaseTest := (sourceDirectory in DatabaseTest).value,
     javaOptions       in DebugDatabaseTest += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
   ).settings(
-    libraryDependencies += "org.joda"      %  "joda-convert"     % JodaConvertVersion % Provided,
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion  % Provided,
     libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion  % Provided,
 
@@ -549,7 +561,8 @@ lazy val formRunnerJS = formRunner.js
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
-      "org.scala-lang.modules" %%% "scala-xml"      % ScalaXmlVersion
+      "org.scala-lang.modules" %%% "scala-xml"      % ScalaXmlVersion,
+      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
@@ -648,9 +661,9 @@ lazy val xforms = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
 lazy val xformsJVM = xforms.jvm
   .dependsOn(
     commonJVM,
+    xformsCommonJVM,
     core % "test->test;compile->compile"
   )
-  .dependsOn(xformsCommon.jvm)
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
   .settings(commonScalaJvmSettings)
@@ -669,7 +682,7 @@ lazy val xformsJVM = xforms.jvm
 
 lazy val xformsJS = xforms.js
   .dependsOn(commonJS % "test->test;compile->compile")
-  .dependsOn(xformsCommon.js)
+  .dependsOn(xformsCommonJS)
   .settings(commonScalaJsSettings)
   .settings(
 
@@ -677,7 +690,8 @@ lazy val xformsJS = xforms.js
       "org.scala-js" %%% "scalajs-dom"      % ScalaJsDomVersion,
       "be.doeraene"  %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
       "com.beachape" %%% "enumeratum"       % EnumeratumVersion,
-      "com.beachape" %%% "enumeratum-circe" % EnumeratumCirceVersion
+      "com.beachape" %%% "enumeratum-circe" % EnumeratumCirceVersion,
+      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
     jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
@@ -710,11 +724,13 @@ lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossTy
 
 lazy val xformsCommonJVM = xformsCommon.jvm
   .dependsOn(commonJVM)
-  .dependsOn(dom.jvm)
+  .dependsOn(domJVM)
+  .dependsOn(coreCrossPlatformJVM)
 
 lazy val xformsCommonJS = xformsCommon.js
   .dependsOn(commonJS)
-  .dependsOn(dom.js)
+  .dependsOn(domJS)
+  .dependsOn(coreCrossPlatformJS)
   .settings(commonScalaJsSettings)
 
 lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-runtime"))
@@ -768,9 +784,31 @@ lazy val webFacades = (project in file("web-facades"))
     )
   )
 
+lazy val coreCrossPlatform = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("core-cross-platform"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-core-cross-platform"
+  )
+
+lazy val coreCrossPlatformJVM = coreCrossPlatform.jvm
+  .dependsOn(commonJVM)
+  .dependsOn(domJVM)
+  .settings(
+    libraryDependencies                ++= CoreLibraryDependencies
+  )
+
+lazy val coreCrossPlatformJS = coreCrossPlatform.js
+  .dependsOn(commonJS)
+  .dependsOn(domJS)
+  .settings(commonScalaJsSettings)
+
 lazy val core = (project in file("src"))
   .enablePlugins(BuildInfoPlugin, SbtWeb)
-  .dependsOn(commonJVM, dom.jvm)
+  .dependsOn(
+    coreCrossPlatformJVM,
+    commonJVM,
+    domJVM
+  )
   .configs(DebugTest)
   .settings(commonSettings: _*)
   .settings(commonScalaJvmSettings)
@@ -804,7 +842,7 @@ lazy val orbeonWar = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.
 lazy val orbeonWarJVM = orbeonWar.jvm
   .dependsOn(
     commonJVM,
-    dom.jvm,
+    domJVM,
     core,
     xformsJVM,
     formRunnerJVM,
@@ -859,7 +897,7 @@ lazy val root = (project in file("."))
   .aggregate(
     commonJVM,
     commonJS,
-    dom.jvm,
+    domJVM,
     core,
     xformsJVM,
     xformsJS,

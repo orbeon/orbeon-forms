@@ -191,7 +191,13 @@ object MigrationOps48 extends MigrationOps {
     MigrationResult.Some
   }
 
-  def migrateOthersTo(
+  def migrateOthersDown(
+    outerDocument : DocumentWrapper,
+    migrationSet  : M
+  ): MigrationResult =
+    ???
+
+  def migrateOthersUp(
     outerDocument : DocumentWrapper,
     migrationSet  : M
   ): MigrationResult = {

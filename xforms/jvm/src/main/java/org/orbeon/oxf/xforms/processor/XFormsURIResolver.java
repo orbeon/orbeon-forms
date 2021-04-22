@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
+import org.orbeon.datatypes.BasicLocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.http.Credentials;
+import org.orbeon.oxf.http.BasicCredentials;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.XMLReaderToReceiver;
-import org.orbeon.oxf.xml.dom.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.xml.sax.InputSource;
@@ -62,7 +62,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
         return resolve(href, base, null);
     }
 
-    public SAXSource resolve(String href, String base, final Credentials credentials) throws TransformerException {
+    public SAXSource resolve(String href, String base, final BasicCredentials credentials) throws TransformerException {
 
         final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
         if (inputName != null) {
@@ -92,7 +92,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
                         }
                     };
 
-                    if (indentedLogger.isDebugEnabled())
+                    if (indentedLogger.debugEnabled())
                         indentedLogger.logDebug("", "resolving resource through initialization resolver", "uri", urlString);
 
                     return new SAXSource(xmlReader, new InputSource(urlString));
@@ -106,23 +106,23 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public Document readAsDom4j(String urlString, Credentials credentials) {
+    public Document readAsDom4j(String urlString, BasicCredentials credentials) {
         try {
             final SAXSource source = (SAXSource) resolve(urlString, null, credentials);
             // XInclude handled by source if needed
             return TransformerUtils.readDom4j(source, false);
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(urlString, -1, -1));
+            throw OrbeonLocationException.wrapException(e, BasicLocationData.apply(urlString, -1, -1));
         }
     }
 
-    public DocumentInfo readAsTinyTree(Configuration configuration, String urlString, Credentials credentials) {
+    public DocumentInfo readAsTinyTree(Configuration configuration, String urlString, BasicCredentials credentials) {
         try {
             final SAXSource source = (SAXSource) resolve(urlString, null, credentials);
             // XInclude handled by source if needed
             return TransformerUtils.readTinyTree(configuration, source, false);
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new LocationData(urlString, -1, -1));
+            throw OrbeonLocationException.wrapException(e, BasicLocationData.apply(urlString, -1, -1));
         }
     }
 }

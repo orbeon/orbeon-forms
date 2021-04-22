@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
@@ -59,7 +58,7 @@ import java.util.*;
  */
 public class ImageServer extends ProcessorImpl {
 
-    private static Logger logger = LoggerFactory.createLogger(ImageServer.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(ImageServer.class);
 
     public static final String IMAGE_SERVER_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/image-server-config";
     public static final String IMAGE_SERVER_IMAGE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/image-server-image";

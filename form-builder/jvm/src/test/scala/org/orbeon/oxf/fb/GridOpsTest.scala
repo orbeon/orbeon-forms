@@ -298,7 +298,7 @@ class GridOpsTest
     }
 
     it("must report failure to convert from 24 to 12 columns if cells are oddly aligned") {
-      assert(FormBuilder.findGridColumnMigrationType(grid24Odd, from = 24 ,to = 12).isEmpty)
+      assert(FormBuilder.findGridColumnMigrationType(grid24Odd, from = 24, to = 12).isEmpty)
     }
   }
 }

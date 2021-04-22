@@ -18,7 +18,7 @@ import java.{lang => jl}
 import cats.syntax.option._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
-import org.orbeon.oxf.http.Credentials
+import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.URIProcessorOutputImpl.{URIReferences, URIReferencesState}
 import org.orbeon.oxf.processor._
@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xml._
+import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.util.control.NonFatal
 
@@ -105,7 +106,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
     outputName      : String
   ): Unit = {
 
-    val externalContext = NetUtils.getExternalContext
+    val externalContext = CrossPlatformSupport.externalContext
     val htmlLogger      = Loggers.getIndentedLogger("html")
     val cachingLogger   = Loggers.getIndentedLogger("cache")
 
@@ -266,7 +267,7 @@ private object XFormsProcessorBase {
   def collectDependencies(
     containingDocument : XFormsContainingDocument,
     logger             : IndentedLogger
-  ): Iterator[(String, Option[Credentials])] = {
+  ): Iterator[(String, Option[BasicCredentials])] = {
 
     val instanceDependencies = {
       // Add static instance source dependencies for top-level models
@@ -284,7 +285,7 @@ private object XFormsProcessorBase {
             URLRewriter.REWRITE_MODE_ABSOLUTE
           )
       } yield {
-        if (logger.isDebugEnabled)
+        if (logger.debugEnabled)
             logger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", resolvedDependencyURL)
 
         (resolvedDependencyURL, instance.credentials)
@@ -300,7 +301,7 @@ private object XFormsProcessorBase {
         schemaURIs       <- currentModel.getSchemaURIs.toList
         currentSchemaURI <- schemaURIs
       } yield {
-        if (logger.isDebugEnabled)
+        if (logger.debugEnabled)
           logger.logDebug("", "adding document cache dependency for schema", "schema URI", currentSchemaURI)
         (currentSchemaURI, None)
       }

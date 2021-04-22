@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import java.util.concurrent.Callable
-
+import cats.Eval
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
-import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.xforms.UrlType
 
@@ -52,50 +51,48 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
 
     resolve(
       containingDocument,
-      submission.getSubmissionElement,
+      submission.staticSubmission.element,
       PathUtils.appendQueryString(resolvedActionOrResource, queryString),
       if (isNorewrite) URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT else URLRewriter.REWRITE_MODE_ABSOLUTE
     )
   }
 
   /**
-   * Submit the Callable for synchronous or asynchronous execution.
-   *
-   * @return ConnectionResult or null if asynchronous
+   * Submit the `Eval` for synchronous or asynchronous execution.
    */
-  protected def submitCallable(
-    p        : SubmissionParameters,
-    p2       : SecondPassParameters,
-    callable : Callable[SubmissionResult]
-  ): SubmissionResult =
+  protected def submitEval(
+    p    : SubmissionParameters,
+    p2   : SecondPassParameters,
+    eval : Eval[SubmissionResult]
+  ): Option[SubmissionResult] =
     if (p2.isAsynchronous) {
       // Tell XFCD that we have one more async submission
-      containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(callable)
+      containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(eval)
       // Tell caller he doesn't need to do anything
-      null
+      None
     }  else if (p.isDeferredSubmissionSecondPass) {
       // Tell XFCD that we have a submission replace="all" ready for a second pass
       // Tell caller he doesn't need to do anything
-      containingDocument.setReplaceAllCallable(callable)
-      null
+      containingDocument.setReplaceAllEval(eval)
+      None
     }  else {
       // Just run it now
-      callable.call
+      Option(eval.value)
     }
 
   protected def getDetailsLogger(
     p  : SubmissionParameters,
     p2 : SecondPassParameters
-  ) = submission.getDetailsLogger(p, p2)
+  ): IndentedLogger = submission.getDetailsLogger(p, p2)
 
   protected def getTimingLogger(
     p  : SubmissionParameters,
     p2 : SecondPassParameters
-  ) = submission.getTimingLogger(p, p2)
+  ): IndentedLogger = submission.getTimingLogger(p, p2)
 }
 
 object BaseSubmission {
 
-  def isLogBody =
+  def isLogBody: Boolean =
     XFormsProperties.getDebugLogging.contains("submission-body")
 }

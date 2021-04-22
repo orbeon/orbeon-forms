@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.DateUtilsUsingSaxon
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringReplacer._
 import org.orbeon.oxf.util.StringUtils._
@@ -74,8 +74,8 @@ trait FormRunnerHome {
         form elemValue Names.AppName,
         form elemValue Names.FormName,
         form elemValue Names.FormVersion,
-        localTime  map (v => AvailableAndTime((form elemValue "available")        != "false", DateUtils.parseISODateOrDateTime(v))),
-        remoteTime map (v => AvailableAndTime((form elemValue "remote-available") != "false", DateUtils.parseISODateOrDateTime(v))),
+        localTime  map (v => AvailableAndTime((form elemValue "available")        != "false", DateUtilsUsingSaxon.parseISODateOrDateTime(v))),
+        remoteTime map (v => AvailableAndTime((form elemValue "remote-available") != "false", DateUtilsUsingSaxon.parseISODateOrDateTime(v))),
         form attTokens "operations"
       )
     }

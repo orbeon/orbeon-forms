@@ -15,46 +15,55 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
+
 
 class XXFormsDynamicHandler(
   uri            : String,
   localname      : String,
   qName          : String,
   localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
-) extends XFormsBaseHandler(uri, localname, qName, localAtts, matched, handlerContext, false, false) {
+  handlerContext : HandlerContext
+) extends
+  XFormsBaseHandler(
+    uri,
+    localname,
+    qName,
+    localAtts,
+    handlerContext,
+    repeating  = false,
+    forwarding = false
+  ) {
 
   private var elementName: String = _
   private var elementQName: String = _
 
   override def start(): Unit = {
 
-    val controller = xformsHandlerContext.getController
-    val contentHandler = controller.getOutput
+    val controller = handlerContext.controller
+    val contentHandler = controller.output
 
     // TODO: Duplicated with `XFormsBaseHandlerXHTML`. Use mixin?
-    val prefixedId = xformsHandlerContext.getPrefixedId(attributes)
-    val effectiveId = xformsHandlerContext.getEffectiveId(attributes)
+    val prefixedId = handlerContext.getPrefixedId(attributes)
+    val effectiveId = handlerContext.getEffectiveId(attributes)
 
-    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
+    val xhtmlPrefix = handlerContext.findXHTMLPrefix
 
     this.elementName = "div"
     this.elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName)
 
     val classes = "xxforms-dynamic-control"
     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getIdClassXHTMLAttributes(attributes, classes, effectiveId))
-    xformsHandlerContext.pushComponentContext(prefixedId)
+    handlerContext.pushComponentContext(prefixedId)
 
     containingDocument.getControlByEffectiveId(effectiveId) match {
       case control: XXFormsDynamicControl =>
         // Output new scripts upon update if any
         // NOTE: Not implemented as of 2016-01-18.
         if (! containingDocument.initializing && control.newScripts.nonEmpty && containingDocument.isServeInlineResources) {
-          implicit val helper = new XMLReceiverHelper(contentHandler)
+          implicit val helper: XMLReceiverHelper = new XMLReceiverHelper(contentHandler)
           helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
           // NOTE: As of 2018-05-03, this is still not functional, so there is no impact
           // for https://github.com/orbeon/orbeon-forms/issues/3565
@@ -64,23 +73,23 @@ class XXFormsDynamicHandler(
         }
         // Output new markup
         control.nested foreach { nested =>
-          xformsHandlerContext.pushPartAnalysis(nested.partAnalysis)
+          handlerContext.pushPartAnalysis(nested.partAnalysis)
           processShadowTree(controller, nested.template)
 
           // Add part globals for top-level part only (see comments in PartAnalysisImpl)
           if (nested.partAnalysis.isTopLevel)
             nested.partAnalysis.getGlobals foreach { global =>
-              XXFormsComponentHandler.processShadowTree(xformsHandlerContext.getController, global.templateTree)
+              XXFormsComponentHandler.processShadowTree(handlerContext.controller, global.templateTree)
             }
 
-          xformsHandlerContext.popPartAnalysis()
+          handlerContext.popPartAnalysis()
         }
 
       case _ =>
     }
   }
 
-  def processShadowTree(controller: ElementHandlerController, shadowTree: SAXStore): Unit = {
+  def processShadowTree[Ctx](controller: ElementHandlerController[Ctx], shadowTree: SAXStore): Unit = {
     controller.startBody()
 
     // Replay content of body
@@ -91,8 +100,8 @@ class XXFormsDynamicHandler(
       var level = 0
 
       // Filter out start/end doc
-      override def startDocument() = ()
-      override def endDocument() = ()
+      override def startDocument(): Unit = ()
+      override def endDocument  (): Unit = ()
 
       override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
         super.startElement(uri, localname, qName, attributes)
@@ -115,19 +124,19 @@ class XXFormsDynamicHandler(
       }
 
       // Let prefix mappings go through no matter what so that mappings on html/body work
-      override def startPrefixMapping(prefix: String, uri: String) =
+      override def startPrefixMapping(prefix: String, uri: String): Unit =
         getXMLReceiver.startPrefixMapping(prefix, uri)
 
-      override def endPrefixMapping(prefix: String) =
+      override def endPrefixMapping(prefix: String): Unit =
         getXMLReceiver.endPrefixMapping(prefix)
     })
     controller.endBody()
   }
 
   override def end(): Unit = {
-    xformsHandlerContext.popComponentContext()
-    val controller = xformsHandlerContext.getController
-    val contentHandler = controller.getOutput
+    handlerContext.popComponentContext()
+    val controller = handlerContext.controller
+    val contentHandler = controller.output
     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName)
   }
 }

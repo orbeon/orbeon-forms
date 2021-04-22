@@ -14,8 +14,8 @@
 package org.orbeon.oxf.webapp
 
 import java.io.{BufferedWriter, OutputStreamWriter, PrintWriter}
-import javax.naming.InitialContext
 
+import javax.naming.InitialContext
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.StatusCode

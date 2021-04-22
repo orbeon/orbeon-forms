@@ -25,7 +25,7 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.common.OXFException
 
-object SecureUtils {
+object SecureUtils extends SecureUtilsTrait {
 
   // Properties
   private val XFormsPasswordProperty    = "oxf.xforms.password" // for backward compatibility
@@ -42,7 +42,7 @@ object SecureUtils {
   }
 
   private def getKeyLength: Int =
-    Properties.instance.getPropertySet.getInteger(KeyLengthProperty, 128).intValue
+    Properties.instance.getPropertySet.getInteger(KeyLengthProperty, 128)
 
   private def getHashAlgorithm: String =
     Properties.instance.getPropertySet.getString(HashAlgorithmProperty, "SHA1")

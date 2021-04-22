@@ -17,6 +17,7 @@ import java.net.URI
 import java.{util => ju}
 
 import cats.syntax.option._
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
@@ -25,7 +26,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, Submission}
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, ModelDefs, Submission}
 import org.orbeon.oxf.xforms.control.Controls
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
@@ -33,14 +34,14 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.submission.{BaseSubmission, SubmissionUtils, XFormsModelSubmission}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{SequenceExtent, Value}
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.xforms.{CrossPlatformSupport, XFormsId, XFormsNames}
 
 import scala.util.control.NonFatal
 
@@ -86,8 +87,8 @@ class XFormsModel(
           staticEventHandler <- staticModel.eventHandlers
           parent             =
             staticEventHandler.parent match {
-              case Some(sp: Submission) => _submissions(sp.staticId)
-              case _                    => selfModel
+              case Some(staticSubmission: Submission) => _submissions(staticSubmission.staticId)
+              case _                                  => selfModel
             }
         } yield
           (staticEventHandler.staticId, new XFormsModelAction(parent, staticEventHandler))
@@ -403,7 +404,7 @@ trait XFormsModelInstances {
       model               = selfModel,
       resolvedAbsoluteUrl = new URI(
         URLRewriterUtils.rewriteServiceURL(
-          NetUtils.getExternalContext.getRequest,
+          CrossPlatformSupport.externalContext.getRequest,
           pathOrAbsoluteURI,
           URLRewriter.REWRITE_MODE_ABSOLUTE
         )
@@ -423,7 +424,8 @@ trait XFormsModelInstances {
         loadInitialExternalInstanceFromCacheIfNeeded(instance)
       } else if (instance.useInlineContent) {
         // Load from inline content
-        try setInlineInstance(instance)
+        try
+          setInlineInstance(instance)
         catch {
           case NonFatal(_) =>
             Dispatch.dispatchEvent(
@@ -432,10 +434,10 @@ trait XFormsModelInstances {
                 null,
                 new ValidationException(
                   "Error extracting or setting inline instance",
-                  new ExtendedLocationData(
+                  XmlExtendedLocationData(
                     instance.locationData,
-                    "processing XForms instance",
-                    instance.element
+                    "processing XForms instance".some,
+                    element = instance.element.some
                   )
                 )
               )
@@ -449,10 +451,10 @@ trait XFormsModelInstances {
             "",
             new ValidationException(
               s"Required @src attribute, @resource attribute, or inline content for instance: `${instance.staticId}`",
-              new ExtendedLocationData(
+              XmlExtendedLocationData(
                 instance.locationData,
-                "processing XForms instance",
-                instance.element
+                "processing XForms instance".some,
+                element = instance.element.some
               )
             )
           )
@@ -474,7 +476,7 @@ trait XFormsModelInstances {
       if (instance.cache && ! ProcessorImpl.isProcessorInputScheme(instanceResource)) {
         // Instance 1) has cache hint and 2) is not input:*, so it can be cached
         // NOTE: We don't allow sharing for input:* URLs as the data will likely differ per request
-        val caching = InstanceCaching.fromValues(instance.timeToLive, instance.handleXInclude, resolveInstanceURL(instance), null)
+        val caching = InstanceCaching.fromValues(instance.timeToLive, instance.handleXInclude, resolveInstanceURL(instance), None)
         val documentInfo = XFormsServerSharedInstancesCache.findContentOrLoad(instance, caching, instance.readonly, loadInstance)
         indexInstance(new XFormsInstance(selfModel, instance, Option(caching), documentInfo, instance.readonly, false, true))
       } else {
@@ -498,10 +500,10 @@ trait XFormsModelInstances {
             instanceResource,
             OrbeonLocationException.wrapException(
               e,
-              new ExtendedLocationData(
+              XmlExtendedLocationData(
                 instance.locationData,
-                "reading external instance",
-                instance.element
+                "reading external instance".some,
+                element = instance.element.some
               )
             )
           )
@@ -521,12 +523,13 @@ trait XFormsModelInstances {
           // NOTE: If there is no resolver, URLs of the form input:* are not allowed
           assert(! ProcessorImpl.isProcessorInputScheme(absoluteURLString))
 
-          if (indentedLogger.isDebugEnabled)
+          if (indentedLogger.debugEnabled)
             indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteURLString)
 
           val absoluteResolvedUrl = new URI(absoluteURLString)
 
-          implicit val ec: ExternalContext = NetUtils.getExternalContext
+          implicit val ec                      : ExternalContext               = CrossPlatformSupport.externalContext
+          implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
           val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
             url              = absoluteResolvedUrl,
@@ -538,16 +541,15 @@ trait XFormsModelInstances {
           )
 
           val connectionResult =
-            Connection(
+            Connection.connectNow(
               method      = HttpMethod.GET,
               url         = absoluteResolvedUrl,
               credentials = instance.credentials,
               content     = None,
               headers     = headers,
               loadState   = true,
+              saveState   = true,
               logBody     = BaseSubmission.isLogBody
-            ).connect(
-              saveState = true
             )
 
           ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is =>
@@ -561,7 +563,7 @@ trait XFormsModelInstances {
           }
         case Some(uriResolver) =>
           // Optimized case that uses the provided resolver
-          if (indentedLogger.isDebugEnabled)
+          if (indentedLogger.debugEnabled)
             indentedLogger.logDebug("load", "getting document from resolver", "URI", absoluteURLString)
 
           // TODO: Handle validating and handleXInclude!

@@ -60,7 +60,7 @@ object ScriptBuilder {
     Controls.ControlsIterator(startControl, includeSelf = false, followVisible = true) foreach {
       case c: XFormsValueComponentControl =>
         if (c.isRelevant) {
-          val abstractBinding = c.staticControl.abstractBinding
+          val abstractBinding = c.staticControl.commonBinding
           if (abstractBinding.modeJavaScriptLifecycle)
             controlsToInitialize +=
               c.getEffectiveId -> (
@@ -71,7 +71,7 @@ object ScriptBuilder {
               )
         }
       case c: XFormsComponentControl =>
-        if (c.isRelevant && c.staticControl.abstractBinding.modeJavaScriptLifecycle)
+        if (c.isRelevant && c.staticControl.commonBinding.modeJavaScriptLifecycle)
           controlsToInitialize += c.getEffectiveId -> None
       case c =>
         // Legacy JavaScript initialization
@@ -99,13 +99,13 @@ object ScriptBuilder {
 
       // Heartbeat delay is dynamic because it depends on session duration
       def heartbeatOpt =
-        Some(SESSION_HEARTBEAT_DELAY_PROPERTY -> heartbeatDelay)
+        Some(SessionHeartbeatDelayProperty -> heartbeatDelay)
 
       // Help events are dynamic because they depend on whether the xforms-help event is used
       // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
       def helpOpt = dynamicProperty(
         containingDocument.staticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
-        HELP_HANDLER_PROPERTY,
+        HelpHandlerProperty,
         true
       )
 
@@ -128,9 +128,9 @@ object ScriptBuilder {
     }
 
     val globalProperties = List(
-      DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY -> getAjaxTimeout,
-      RETRY_DELAY_INCREMENT              -> getRetryDelayIncrement,
-      RETRY_MAX_DELAY                    -> getRetryMaxDelay
+      DelayBeforeAjaxTimeoutProperty -> getAjaxTimeout,
+      RetryDelayIncrement            -> getRetryDelayIncrement,
+      RetryMaxDelay                  -> getRetryMaxDelay
     )
 
     // combine all static and dynamic properties

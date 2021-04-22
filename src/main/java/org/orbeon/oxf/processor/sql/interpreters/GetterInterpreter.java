@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
-import org.joda.time.format.ISODateTimeFormat;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.ProcessorSupport;
@@ -26,7 +25,7 @@ import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLParsing;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -39,6 +38,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -256,7 +257,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 }
             }
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(getDocumentLocator()));
+            throw new ValidationException(e, XmlLocationData.apply(getDocumentLocator()));
         }
     }
 
@@ -300,7 +301,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 // Get URI once for all columns
                 String outputElementURI = (getColumnsPrefix == null) ? "" : namespaceSupport.getURI(getColumnsPrefix);
                 if (outputElementURI == null)
-                    throw new ValidationException("Invalid namespace prefix: " + getColumnsPrefix, new LocationData(getDocumentLocator()));
+                    throw new ValidationException("Invalid namespace prefix: " + getColumnsPrefix, XmlLocationData.apply(getDocumentLocator()));
 
                 // Iterate through all columns
                 for (int i = 1; i <= metadata.getColumnCount(); i++) {
@@ -330,7 +331,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                             elementName = elementName.toLowerCase();
                             elementName = elementName.replace('_', '-');
                         } else if (getColumnsFormat != null)
-                            throw new ValidationException("Invalid get-columns format: " + getColumnsFormat, new LocationData(getDocumentLocator()));
+                            throw new ValidationException("Invalid get-columns format: " + getColumnsFormat, XmlLocationData.apply(getDocumentLocator()));
                         String elementQName = (outputElementURI.equals("")) ? elementName : getColumnsPrefix + ":" + elementName;
                         ContentHandler output = interpreterContext.getOutput();
                         output.startElement(outputElementURI, elementName, elementQName, SAXUtils.EMPTY_ATTRIBUTES);
@@ -363,7 +364,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 }
             }
         } catch (Exception e) {
-            throw new ValidationException(e, new LocationData(getDocumentLocator()));
+            throw new ValidationException(e, XmlLocationData.apply(getDocumentLocator()));
         }
         interpreterContext.getNamespaceSupport().popContext();
     }
@@ -428,7 +429,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
             final int columnType = resultSet.getMetaData().getColumnType(columnIndex);
             final String defaultXMLType = (String) sqlTypesToDefaultXMLTypes.get(new Integer(columnType));
             if (xmlTypeName != null && !xmlTypeName.equals(defaultXMLType))
-                throw new ValidationException("Illegal XML type for SQL type: " + xmlTypeName + ", " + resultSet.getMetaData().getColumnTypeName(columnIndex), new LocationData(locator));
+                throw new ValidationException("Illegal XML type for SQL type: " + xmlTypeName + ", " + resultSet.getMetaData().getColumnTypeName(columnIndex), XmlLocationData.apply(locator));
 
             if (columnType == Types.CLOB) {
                 // The actual column is a CLOB
@@ -444,7 +445,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 return getColumnStringValue(resultSet, columnIndex, columnType);
             }
         } catch (SQLException e) {
-            throw new ValidationException("Exception while getting column: " + (resultSet.getMetaData().getColumnLabel(columnIndex)), e, new LocationData(locator));
+            throw new ValidationException("Exception while getting column: " + (resultSet.getMetaData().getColumnLabel(columnIndex)), e, XmlLocationData.apply(locator));
         }
     }
 
@@ -459,11 +460,11 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
         if (columnType == Types.DATE) {
             final Date value = resultSet.getDate(columnIndex);
             if (value != null)
-                stringValue = ISODateTimeFormat.date().print(value.getTime());
+                stringValue = DateTimeFormatter.ISO_LOCAL_DATE.format(Instant.ofEpochMilli(value.getTime()));
         } else if (columnType == Types.TIMESTAMP) {
             final Timestamp value = resultSet.getTimestamp(columnIndex);
             if (value != null)
-                stringValue = DateUtils.DateTime().print(value.getTime());
+                stringValue = DateUtils.formatIsoDateTimeUtc(value.getTime());
         } else if (columnType == Types.DECIMAL
                 || columnType == Types.NUMERIC) {
             final BigDecimal value = resultSet.getBigDecimal(columnIndex);
@@ -518,14 +519,14 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
 
         final int colonIndex = typeAttribute.indexOf(':');
         if (colonIndex < 1)
-            throw new ValidationException("Invalid column type:" + typeAttribute, new LocationData(locator));
+            throw new ValidationException("Invalid column type:" + typeAttribute, XmlLocationData.apply(locator));
 
         final String typePrefix = typeAttribute.substring(0, colonIndex);
         final String typeLocalname = typeAttribute.substring(colonIndex + 1);
 
         final String typeURI;
         if (prefixesMap.get(typePrefix) == null && !(Boolean.TRUE.equals(propertySet.getBoolean("legacy-implicit-prefixes")))) {
-            throw new ValidationException("Undeclared type prefix for type:" + typeAttribute, new LocationData(locator));
+            throw new ValidationException("Undeclared type prefix for type:" + typeAttribute, XmlLocationData.apply(locator));
         } else if (prefixesMap.get(typePrefix) == null) {
             // LEGACY BEHAVIOR: use implicit prefixes
             if (typePrefix.equals("xs"))
@@ -533,7 +534,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
             else if (typePrefix.equals("oxf"))
                 typeURI = XPLConstants.OPS_TYPES_URI();
             else
-                throw new ValidationException("Invalid type prefix for type:" + typeAttribute, new LocationData(locator));
+                throw new ValidationException("Invalid type prefix for type:" + typeAttribute, XmlLocationData.apply(locator));
         } else {
             // NEW BEHAVIOR: use actual mappings
             typeURI = (String) prefixesMap.get(typePrefix);

@@ -17,16 +17,22 @@ import org.orbeon.dom.{Element, QName}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsElementValue
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StaticStateContext, XPathAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.saxon.om.Item
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 
-class OutputControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-    extends ValueControl(staticStateContext, element, parent, preceding, scope)
-    with OptionalSingleNode {
+class OutputControl(
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ValueControl(part, index, element, parent, preceding, scope)
+     with OptionalSingleNode {
 
   // Unlike other value controls, don't restrict to simple content (even though the spec says it should!)
   override def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedBoundItem(item)
@@ -42,11 +48,6 @@ class OutputControl(staticStateContext: StaticStateContext, element: Element, pa
   override val externalEvents: Set[String] = externalEventsDef
 
   val staticValue: Option[String] =
-    (! isImageMediatype && ! isDownloadAppearance && LHHAAnalysis.hasStaticValue(staticStateContext, element)) option
-      XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, true, null)
-
-  // Q: Do we need to handle the context anyway?
-  override protected def computeContextAnalysis: Option[XPathAnalysis] = staticValue.isEmpty flatOption super.computeContextAnalysis
-  override protected def computeBindingAnalysis: Option[XPathAnalysis] = staticValue.isEmpty flatOption super.computeBindingAnalysis
-  override protected def computeValueAnalysis  : Option[XPathAnalysis] = staticValue.isEmpty flatOption super.computeValueAnalysis
+    (! isImageMediatype && ! isDownloadAppearance && LHHAAnalysis.hasStaticValue(element)) option
+      XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
 }

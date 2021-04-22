@@ -16,15 +16,16 @@ package org.orbeon.oxf.xforms.submission
 import java.io.{Externalizable, ObjectInput, ObjectOutput}
 import java.util.concurrent._
 
+import cats.Eval
 import javax.enterprise.concurrent.ManagedExecutorService
 import javax.naming.{InitialContext, NamingException}
 import org.orbeon.oxf.externalcontext.{AsyncRequest, LocalExternalContext}
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.{IndentedLogger, NetUtils}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.{CrossPlatformSupport, EventNames}
 
 /**
   * Handle asynchronous submissions.
@@ -58,7 +59,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
         allowDuplicates   = false  // no need for duplicates
       )
 
-  def addAsynchronousSubmission(callable: Callable[SubmissionResult]): Unit = {
+  def addAsynchronousSubmission(eval: Eval[SubmissionResult]): Unit = {
     val asynchronousSubmissionsOpt =
       findAsynchronousSubmissions(
         create = true,
@@ -68,25 +69,26 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
     // NOTE: If we want to re-enable foreground async submissions, we must:
     // - do a better detection: !(xf-submit-done/xf-submit-error listener) && replace="none"
     // - OR provide an explicit hint on xf:submission
-    asynchronousSubmissionsOpt foreach {
-      _.submit(
-        {
-          // Make sure this is created at the time `submit` is called
-          // Should we use `AsyncExternalContext` here?
-          val newExternalContext = {
+    asynchronousSubmissionsOpt foreach { asynchronousSubmissions =>
 
-              val currentExternalContext = NetUtils.getExternalContext
+      // Make sure this is created at the time `submit` is called
+      // Should we use `AsyncExternalContext` here?
+      val newExternalContext = {
 
-              new LocalExternalContext(
-                currentExternalContext.getWebAppContext,
-                new AsyncRequest(currentExternalContext.getRequest),
-                currentExternalContext.getResponse
-              )
-            }
+        val currentExternalContext = CrossPlatformSupport.externalContext
 
-          () => withPipelineContext { pipelineContext =>
+        new LocalExternalContext(
+          currentExternalContext.getWebAppContext,
+          new AsyncRequest(currentExternalContext.getRequest),
+          currentExternalContext.getResponse
+        )
+      }
+
+      asynchronousSubmissions.submit(
+        Eval.later {
+          withPipelineContext { pipelineContext =>
             pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, newExternalContext)
-            callable.call()
+            eval.value
           }
         }
       )
@@ -111,7 +113,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
     * Submissions are processed in the order in which they are made available upon termination by the completion
     * service.
     */
-  def processAllAsynchronousSubmissions(): Unit = {
+  def processAllAsynchronousSubmissionsForJoin(): Unit = {
 
     val asynchronousSubmissionOpt =
       findAsynchronousSubmissions(
@@ -210,7 +212,7 @@ private object AsynchronousSubmissionManager {
 
   def findAsynchronousSubmissions(create: Boolean, sessionKey: String): Option[AsynchronousSubmissions] = {
 
-    val session = NetUtils.getExternalContext.getRequest.getSession(true)
+    val session = CrossPlatformSupport.externalContext.getRequest.getSession(true)
 
     session.getAttribute(sessionKey) map (_.asInstanceOf[AsynchronousSubmissions]) orElse {
       if (create) {
@@ -229,14 +231,8 @@ private object AsynchronousSubmissionManager {
     private var _pendingCount = 0
     def pendingCount = _pendingCount
 
-    def submit(task: () => SubmissionResult): Future[SubmissionResult] = {
-
-      val future = completionService.submit(
-        new Callable[SubmissionResult]() {
-          def call() = task()
-        }
-      )
-
+    def submit(task: Eval[SubmissionResult]): Future[SubmissionResult] = {
+      val future = completionService.submit(() => task.value)
       _pendingCount += 1
       future
     }

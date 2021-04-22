@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.event
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.dom.LocationData
-import org.orbeon.oxf.xforms.XFormsObject
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
+import org.orbeon.xforms.runtime.XFormsObject
 
 import scala.collection.immutable
 

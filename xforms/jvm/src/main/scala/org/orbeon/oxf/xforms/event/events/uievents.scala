@@ -15,12 +15,11 @@ package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.xforms.analysis.model.ValidationLevel
 
 class DOMActivateEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsUIEvent(DOM_ACTIVATE, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = true) {
@@ -164,14 +163,14 @@ private object XXFormsConstraintsChangedEvent {
   def properties(level: Option[ValidationLevel], previous: List[StaticBind#MIP], current: List[StaticBind#MIP]): PropertyGetter = {
     case "level"            => level map (_.entryName)
     case "constraints"      => Option(current map (_.id))
-    case "errors"           => Some(validationsForLevel(current, ErrorLevel))
-    case "warnings"         => Some(validationsForLevel(current, WarningLevel))
-    case "infos"            => Some(validationsForLevel(current, InfoLevel))
-    case "added-errors"     => Some(diffValidations(previous, current, ErrorLevel))
-    case "removed-errors"   => Some(diffValidations(current, previous, ErrorLevel))
-    case "added-warnings"   => Some(diffValidations(previous, current, WarningLevel))
-    case "removed-warnings" => Some(diffValidations(current, previous, WarningLevel))
-    case "added-infos"      => Some(diffValidations(previous, current, InfoLevel))
-    case "removed-infos"    => Some(diffValidations(current, previous, InfoLevel))
+    case "errors"           => Some(validationsForLevel(current, ValidationLevel.ErrorLevel))
+    case "warnings"         => Some(validationsForLevel(current, ValidationLevel.WarningLevel))
+    case "infos"            => Some(validationsForLevel(current, ValidationLevel.InfoLevel))
+    case "added-errors"     => Some(diffValidations(previous, current, ValidationLevel.ErrorLevel))
+    case "removed-errors"   => Some(diffValidations(current, previous, ValidationLevel.ErrorLevel))
+    case "added-warnings"   => Some(diffValidations(previous, current, ValidationLevel.WarningLevel))
+    case "removed-warnings" => Some(diffValidations(current, previous, ValidationLevel.WarningLevel))
+    case "added-infos"      => Some(diffValidations(previous, current, ValidationLevel.InfoLevel))
+    case "removed-infos"    => Some(diffValidations(current, previous, ValidationLevel.InfoLevel))
   }
 }

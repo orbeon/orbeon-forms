@@ -17,16 +17,17 @@ import java.util
 import java.util.Collections
 
 import cats.syntax.option._
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.util.{XPath, XPathCache}
-import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait
+import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysisTrait
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.tinytree.TinyBuilder
 import org.orbeon.xforms.XFormsNames
@@ -211,7 +212,7 @@ class XFormsContextStack {
         } toMap
 
       val indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
-      if (indentedLogger.isDebugEnabled)
+      if (indentedLogger.debugEnabled)
         indentedLogger.logDebug("", "evaluated model variables", "count", variableInfos.size.toString)
 
       for (_ <- 0 until variableInfos.size)
@@ -318,7 +319,11 @@ class XFormsContextStack {
 
     val locationData =
       if (keepLocationData && bindingElement != null)
-        new ExtendedLocationData(bindingElement.getData.asInstanceOf[LocationData], "pushing XForms control binding", bindingElement)
+        XmlExtendedLocationData(
+          bindingElement.getData.asInstanceOf[LocationData],
+          "pushing XForms control binding".some,
+          element = bindingElement.some
+        )
       else
         null
 
@@ -506,15 +511,13 @@ class XFormsContextStack {
               updateBindingWithContextItem(this.head, evaluationContextBinding, evaluationContextBinding.getSingleItemOrNull)
             )
 
+          val expression = if (ref != null) ref else nodeset
           val result =
             try
               XPathCache.evaluateKeepItemsJava(
                 evaluationContextBinding.nodeset,
                 evaluationContextBinding.position,
-                if (ref != null)
-                  ref
-                else
-                  nodeset,
+                expression,
                 bindingElementNamespaceMapping,
                 evaluationContextBinding.getInScopeVariables,
                 containingDocument.functionLibrary,
@@ -526,7 +529,7 @@ class XFormsContextStack {
             catch {
               case e: Exception =>
                 if (handleNonFatal) {
-                  XFormsError.handleNonFatalXPathError(container, e)
+                  XFormsError.handleNonFatalXPathError(container, e, Some(expression))
                   java.util.Collections.emptyList[Item]
                 } else
                   throw e
@@ -622,16 +625,16 @@ class XFormsContextStack {
         if (bindingElement != null)
           throw OrbeonLocationException.wrapException(
             t,
-            new ExtendedLocationData(
+            XmlExtendedLocationData(
               locationData,
-              "evaluating binding expression",
-              bindingElement
+              "evaluating binding expression".some,
+              element = bindingElement.some
             )
           )
         else
           throw OrbeonLocationException.wrapException(
             t,
-            new ExtendedLocationData(
+            XmlExtendedLocationData(
               locationData, "" + "evaluating binding expression",
               bindingElement,
               Array("ref", ref, "context", context, "nodeset", nodeset, "modelId", modelId, "bindId", bindId)

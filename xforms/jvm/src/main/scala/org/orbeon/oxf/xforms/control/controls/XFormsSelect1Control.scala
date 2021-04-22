@@ -17,7 +17,6 @@ import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
@@ -31,9 +30,10 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsNames._
 
 import scala.util.control.NonFatal
 
@@ -102,7 +102,7 @@ class XFormsSelect1Control(
       case NonFatal(t) =>
         throw OrbeonLocationException.wrapException(
           t,
-          new ExtendedLocationData(getLocationData, "evaluating itemset", element)
+          XmlExtendedLocationData(getLocationData, "evaluating itemset".some, element = Some(element))
         )
     }
 

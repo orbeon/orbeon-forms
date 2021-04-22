@@ -18,7 +18,7 @@ import java.{util => ju}
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.http.{Headers, HttpMethod, StatusCode}
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.Properties
@@ -247,7 +247,7 @@ class ServletExternalContext(
       // - error, not found, or unauthorized pipeline runs
       // - oxf:http-serializer runs and sees pipeline IS cacheable so sends a 403
       // - client sees wrong result!
-      if (! NetUtils.isSuccessCode(status))
+      if (!StatusCode.isSuccessCode(status))
         responseCachingDisabled = true
 
       nativeResponse.setStatus(status)

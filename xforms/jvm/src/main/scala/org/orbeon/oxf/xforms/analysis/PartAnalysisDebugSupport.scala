@@ -51,23 +51,21 @@ object PartAnalysisDebugSupport {
 
     def writeElementAnalysis(a: ElementAnalysis)(implicit receiver: XMLReceiver): Unit = {
 
-      if (a.bindingAnalyzed)
-        a.getBindingAnalysis match {
-          case Some(bindingAnalysis) if a.hasBinding =>
-            // For now there can be a binding analysis even if there is no binding on the control
-            // (hack to simplify determining which controls to update)
-            withElement("binding") {
-              writeXPathAnalysis(bindingAnalysis)
-            }
-          case _ => // NOP
-        }
-
-      if (a.valueAnalyzed)
-        a.getValueAnalysis foreach { valueAnalysis =>
-          withElement("value") {
-            writeXPathAnalysis(valueAnalysis)
+      a.bindingAnalysis match {
+        case Some(bindingAnalysis) if a.hasBinding =>
+          // For now there can be a binding analysis even if there is no binding on the control
+          // (hack to simplify determining which controls to update)
+          withElement("binding") {
+            writeXPathAnalysis(bindingAnalysis)
           }
+        case _ => // NOP
+      }
+
+      a.valueAnalysis foreach { valueAnalysis =>
+        withElement("value") {
+          writeXPathAnalysis(valueAnalysis)
         }
+      }
     }
 
     def writeModel(a: Model)(implicit receiver: XMLReceiver): Unit = {
@@ -118,19 +116,18 @@ object PartAnalysisDebugSupport {
       a.children foreach recurse
     }
 
-    def writeChildrenBuilder(a: ChildrenBuilderTrait)(implicit receiver: XMLReceiver): Unit = {
+    def writeChildrenBuilder(a: WithChildrenTrait)(implicit receiver: XMLReceiver): Unit = {
       writeElementAnalysis(a)
       a.children foreach recurse
     }
 
     def writeSelectionControl(a: SelectionControlTrait)(implicit receiver: XMLReceiver): Unit = {
       writeElementAnalysis(a)
-      if (a.itemsetAnalyzed)
-        a.getItemsetAnalysis foreach { analysis =>
-          withElement("itemset") {
-            writeXPathAnalysis(analysis)
-          }
+      a.itemsetAnalysis foreach { analysis =>
+        withElement("itemset") {
+          writeXPathAnalysis(analysis)
         }
+      }
     }
 
     def writeXPathAnalysis(xpa: XPathAnalysis)(implicit receiver: XMLReceiver): Unit =
@@ -192,7 +189,7 @@ object PartAnalysisDebugSupport {
           case a: Model                 => writeModel(a)
           case a: StaticBind            => writeStaticBind(a)
           case a: SelectionControlTrait => writeSelectionControl(a)
-          case a: ChildrenBuilderTrait  => writeChildrenBuilder(a)
+          case a: WithChildrenTrait     => writeChildrenBuilder(a)
           case a                        => writeElementAnalysis(a)
         }
       }

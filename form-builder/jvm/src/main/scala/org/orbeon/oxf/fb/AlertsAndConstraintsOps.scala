@@ -21,13 +21,11 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
-import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
-import org.orbeon.oxf.xforms.analysis.model.{Model, ValidationLevel}
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xforms.function.xxforms.{ExcludedDatesValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
@@ -36,9 +34,11 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.model.ValidationLevel
 
-import scala.{xml => sx}
 import scala.collection.compat._
+import scala.{xml => sx}
 
 trait AlertsAndConstraintsOps extends ControlOps {
 
@@ -142,7 +142,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     validations match {
       case Nil =>
         delete(existingAttributeValidations ++ existingElementValidations)
-      case List(Validation(_, ErrorLevel, value, None)) =>
+      case List(Validation(_, ValidationLevel.ErrorLevel, value, None)) =>
 
         // Single validation without custom alert: set @fb:mipAttName and remove all nested elements
         // See also: https://github.com/orbeon/orbeon-forms/issues/1829
@@ -164,7 +164,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 val dummyMIPElem =
                   <xf:dummy
                     id={idOpt.orNull}
-                    level={if (level != ErrorLevel) level.entryName else null}
+                    level={if (level != ValidationLevel.ErrorLevel) level.entryName else null}
                     value={if (mip != Type) nonEmptyValue else null}
                     xmlns:xf={XF}
                     xmlns:fb={XMLNames.FB}>{if (mip == Type) nonEmptyValue else null}</xf:dummy>
@@ -263,7 +263,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       Some((v.idOpt, v.level, v.stringValue, v.alert))
 
     def levelFromXML(validationElem: NodeInfo) =
-      LevelByName(validationElem attValue "level")
+      ValidationLevel.LevelByName(validationElem attValue "level")
   }
 
   // Required is either a simple boolean or a custom XPath expression
@@ -275,7 +275,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     import RequiredValidation._
 
-    def level       = ErrorLevel
+    def level       = ValidationLevel.ErrorLevel
     def stringValue = eitherToXPath(required)
 
     def toXML(forLang: String)(implicit ctx: FormBuilderDocContext): sx.Elem =
@@ -332,7 +332,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     val datatypeQName = datatype.fold(_._1, identity)
 
-    def level       = ErrorLevel
+    def level       = ValidationLevel.ErrorLevel
     def stringValue = XMLUtils.buildQName(datatypeQName.namespace.prefix, datatypeQName.localName)
 
     // Rename control element if needed when the datatype changes
@@ -436,7 +436,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
           val builtinTypeString = builtinTypeStringOpt.get
 
           // If a builtin type, we just have a local name
-          val nsURI = Model.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
+          val nsURI = ModelDefs.uriForBuiltinTypeName(builtinTypeString, builtinTypeRequired)
 
           // Namespace mapping must be in scope
           val prefix = bind.nonEmptyPrefixesForURI(nsURI).min
@@ -669,7 +669,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       val bindId = (a parent * head).id
       (
         None, // no id because we don't want that attribute to roundtrip
-        ErrorLevel,
+        ValidationLevel.ErrorLevel,
         a.stringValue,
         findAlertForId(bindId)
       )
@@ -679,7 +679,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       val id = e.id
       (
         id.trimAllToOpt,
-        (e attValue LEVEL_QNAME).trimAllToOpt map LevelByName getOrElse ErrorLevel,
+        (e attValue LEVEL_QNAME).trimAllToOpt map ValidationLevel.LevelByName getOrElse ValidationLevel.ErrorLevel,
         if (mip == Type) e.stringValue else e attValue VALUE_QNAME,
         findAlertForId(id)
       )

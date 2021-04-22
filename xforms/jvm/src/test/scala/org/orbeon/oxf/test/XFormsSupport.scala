@@ -32,8 +32,9 @@ import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsObject}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.{Constants, EventNames}
 import org.scalatestplus.mockito.MockitoSugar
 

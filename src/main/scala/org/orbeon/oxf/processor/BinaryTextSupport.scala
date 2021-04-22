@@ -110,7 +110,7 @@ object BinaryTextSupport {
     if (fileName ne null)
       attributes.addAttribute("", "filename", "filename", "CDATA", fileName)
     if (lastModified ne null)
-      attributes.addAttribute("", Headers.LastModifiedLower, Headers.LastModifiedLower, "CDATA", DateUtils.RFC1123Date.print(lastModified))
+      attributes.addAttribute("", Headers.LastModifiedLower, Headers.LastModifiedLower, "CDATA", DateUtils.formatRfc1123DateTimeGmt(lastModified))
     if (statusCode > 0)
       attributes.addAttribute("", "status-code", "status-code", "CDATA", Integer.toString(statusCode))
 

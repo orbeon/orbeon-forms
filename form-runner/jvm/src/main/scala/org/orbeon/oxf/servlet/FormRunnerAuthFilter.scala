@@ -18,6 +18,7 @@ import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
 import org.orbeon.oxf.fr.FormRunnerAuth
 import org.orbeon.oxf.util.StringUtils._
+
 import scala.collection.compat._
 
 class FormRunnerAuthFilter extends Filter {
@@ -61,7 +62,7 @@ object FormRunnerAuthFilter {
 
     val authHeaders = FormRunnerAuth.getCredentialsAsHeadersUseSession(
       userRoles = servletRequest,
-      session   = servletRequest.getSession(true),
+      session   = new ServletSessionImpl(servletRequest.getSession(true)),
       getHeader = servletRequest.getHeaders(_).asScala.to(List)
     ).toMap
 

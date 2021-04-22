@@ -751,9 +751,13 @@
         <xsl:variable name="location" select="@location/string()" as="xs:string"/>
         <xsl:variable name="target"   select="@target/string()"   as="xs:string?"/>
 
-        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-            process:runProcess('navigate(uri = ''<xsl:value-of select="$location"/>''<xsl:if test="exists($target)">, target = ''<xsl:value-of select="$target"/>''</xsl:if>)')
-        </xf:action>
+        <!-- Prefer `<xf:load>` to `fr:run-process(…, 'navigate(…))`, as the latter builds a process (string) with
+             XPath, which requires escaping, and is thus more error prone -->
+        <xf:load resource="{$location}">
+            <xsl:if test="exists($target)">
+                <xsl:attribute name="xxf:target" select="$target"/>
+            </xsl:if>
+        </xf:load>
 
     </xsl:template>
 

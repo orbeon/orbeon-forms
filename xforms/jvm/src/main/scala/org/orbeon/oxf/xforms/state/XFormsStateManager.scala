@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.events.XXFormsStateRestoredEvent
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsProperties}
+import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.collection.JavaConverters._
 
@@ -45,11 +46,13 @@ object XFormsStateManager extends XFormsStateLifecycle {
     }
 
   // This must be called once exactly when the session is destroyed
-  def sessionDestroyed(session: ExternalContext.Session): Unit =
-    getOrCreateUuidListInSession(session).iterator.asScala foreach { uuid =>
-      XFormsDocumentCache.remove(uuid)
-      EhcacheStateStore.removeDynamicState(uuid)
-    }
+  def sessionDestroyed(session: ExternalContext.Session): Unit = {
+    if (session.getAttributeNames(ExternalContext.SessionScope.Application).contains(XFormsStateManagerUUIDListKey))
+      getUuidListInSession(session).iterator.asScala foreach { uuid =>
+        XFormsDocumentCache.remove(uuid)
+        EhcacheStateStore.removeDynamicState(uuid)
+      }
+  }
 
   val LogType = "state manager"
   val Logger  = Loggers.getIndentedLogger("state")
@@ -256,7 +259,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     containingDocument.afterUpdateResponse()
 
   // The UUID list is added once upon session creation so it is expected to be found here
-  def getOrCreateUuidListInSession(session: ExternalContext.Session): ConcurrentLinkedQueue[String] =
+  def getUuidListInSession(session: ExternalContext.Session): ConcurrentLinkedQueue[String] =
     session.getAttribute(XFormsStateManagerUUIDListKey, ExternalContext.SessionScope.Application) map
       (_.asInstanceOf[ConcurrentLinkedQueue[String]]) getOrElse
       (throw new IllegalStateException(s"`$XFormsStateManagerUUIDListKey` was not set in the session. Check your listeners."))
@@ -269,7 +272,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
 
     val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext = CrossPlatformSupport.externalContext
 
     val xformsState = getStateFromParamsOrStore(parameters, isInitialState)
 
@@ -307,7 +310,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
         assert(isServerState)
 
         // State must be found by UUID in the store
-        if (Logger.isDebugEnabled)
+        if (Logger.debugEnabled)
           Logger.logDebug(
             LogType,
             "Getting document state from store.",
@@ -360,7 +363,7 @@ object XFormsStateManager extends XFormsStateLifecycle {
     // because the session goes away -> all of its attributes go away so we don't have to remove them below.
     def removeUuidFromSession(uuid: String): Unit =
       Option(NetUtils.getSession(ForceSessionCreation)) map // support missing session for tests
-        getOrCreateUuidListInSession                    foreach
+        getUuidListInSession                    foreach
         (_.remove(uuid))
 
     def cacheOrStore(
@@ -395,13 +398,13 @@ object XFormsStateManager extends XFormsStateLifecycle {
     }
 
     def addUuidToSession(uuid: String): Boolean =
-      getOrCreateUuidListInSession(NetUtils.getSession(ForceSessionCreation)).add(uuid)
+      getUuidListInSession(NetUtils.getSession(ForceSessionCreation)).add(uuid)
 
     def storeDocumentState(containingDocument: XFormsContainingDocument, isInitialState: Boolean): Unit = {
       require(containingDocument.staticState.isServerStateHandling)
       EhcacheStateStore.storeDocumentState(
         containingDocument,
-        NetUtils.getExternalContext.getRequest.getSession(ForceSessionCreation),
+        CrossPlatformSupport.externalContext.getRequest.getSession(ForceSessionCreation),
         isInitialState
       )
     }

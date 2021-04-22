@@ -278,6 +278,14 @@
             clear: left;
         }
 
+        // Prevent the checkbox or radio button (from being separated from its label)
+        .xforms-selected,
+        .xforms-deselected {
+            @media print {
+                page-break-inside: avoid;
+            }
+        }
+
         label.radio,
         label.checkbox {
             display: inline-block;

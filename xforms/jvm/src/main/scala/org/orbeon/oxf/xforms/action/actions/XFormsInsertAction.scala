@@ -106,7 +106,7 @@ object XFormsInsertAction {
 
               Iterator(singleSourceNode.createCopy)
             case Right(_) =>
-              if (indentedLogger != null && indentedLogger.isDebugEnabled)
+              if (indentedLogger != null && indentedLogger.debugEnabled)
                 indentedLogger.logDebug("xf:insert", "origin node-set from node-set binding is empty, terminating")
               return Collections.emptyList[NodeInfo]
           }
@@ -115,7 +115,7 @@ object XFormsInsertAction {
           // There are explicitly specified origin objects
           // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
           if (originItems.isEmpty) {
-            if (indentedLogger != null && indentedLogger.isDebugEnabled)
+            if (indentedLogger != null && indentedLogger.debugEnabled)
               indentedLogger.logDebug("xf:insert", "origin node-set is empty, terminating")
             return Collections.emptyList[NodeInfo]
           }
@@ -238,7 +238,7 @@ object XFormsInsertAction {
 
                   otherNodes foreach { node =>
                     // We never insert attributes or namespace nodes as siblings
-                    if (indentedLogger != null && indentedLogger.isDebugEnabled)
+                    if (indentedLogger != null && indentedLogger.debugEnabled)
                       indentedLogger.logDebug(
                         "xf:insert",
                         "skipping insertion of node as sibling in element content",
@@ -286,7 +286,7 @@ object XFormsInsertAction {
     val didInsertNodes = insertedNodes.nonEmpty
 
     // Log stuff
-    if (indentedLogger != null && indentedLogger.isDebugEnabled)
+    if (indentedLogger != null && indentedLogger.debugEnabled)
       if (didInsertNodes)
         indentedLogger.logDebug(
           "xf:insert",

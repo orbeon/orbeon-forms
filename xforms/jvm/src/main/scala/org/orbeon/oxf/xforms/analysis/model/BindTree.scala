@@ -15,9 +15,6 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.xbl.XBLBindingBuilder
-import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.xforms.XXBLScope
 
 import scala.collection.compat._
 import scala.collection.{mutable => m}
@@ -63,36 +60,37 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
     staticBinds.to(List)
   }
 
-  def hasBinds = topLevelBinds.nonEmpty
+  def hasBinds: Boolean = topLevelBinds.nonEmpty
 
   // Destroy the tree of binds
   def destroy(): Unit =
     bindsById.values foreach model.part.unmapScopeIds
 
   // Add a new bind
-  def addBind(rawBindElement: Element, parentId: String, precedingId: Option[String]): Unit = {
-
-    assert(! model.part.isTopLevel)
-
-    // First annotate tree
-    val annotatedTree =
-      XBLBindingBuilder.annotateSubtree(
-        model.part,
-        None,
-        rawBindElement.createDocumentCopyParentNamespaces(detach = false),
-        model.scope,
-        model.scope,
-        XXBLScope.Inner,
-        model.containerScope,
-        hasFullUpdate = false,
-        ignoreRoot = false
-      )
-
-    // Add new bind to parent
-    bindsById(parentId).addBind(annotatedTree.getRootElement, precedingId)
-
-    // NOTE: We are not in a top-level part, so for now XPath analysis doesn't need to be updated
-  }
+  // 2020-10-01: No usages!
+//  def addBind(rawBindElement: Element, parentId: String, precedingId: Option[String]): Unit = {
+//
+//    assert(! model.part.isTopLevel)
+//
+//    // First annotate tree
+//    val annotatedTree =
+//      XBLBindingBuilder.annotateSubtree(
+//        model.part,
+//        None,
+//        rawBindElement.createDocumentCopyParentNamespaces(detach = false),
+//        model.scope,
+//        model.scope,
+//        XXBLScope.Inner,
+//        model.containerScope,
+//        hasFullUpdate = false,
+//        ignoreRoot = false
+//      )
+//
+//    // Add new bind to parent
+//    bindsById(parentId).addBind(annotatedTree.getRootElement, precedingId)
+//
+//    // NOTE: We are not in a top-level part, so for now XPath analysis doesn't need to be updated
+//  }
 
   // Remove an existing bind
   def removeBind(bind: StaticBind): Unit = {
@@ -110,41 +108,17 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
 
   // In-scope variable on binds include variables implicitly declared with bind/@name
   // Used by XPath analysis
-  lazy val allBindVariables = model.variablesMap ++ (bindsByName map { case (k, v) => k -> new BindAsVariable(k, v) })
+  lazy val allBindVariables: Map[String, VariableTrait] = model.variablesMap ++ (bindsByName map { case (k, v) => k -> new BindAsVariable(k, v) })
 
   class BindAsVariable(val name: String, bind: StaticBind) extends VariableTrait {
-    def variableAnalysis = bind.getBindingAnalysis
+    def variableAnalysis: Option[XPathAnalysis] = bind.bindingAnalysis
   }
 
   // Whether we figured out all XPath ref analysis
-  var figuredAllBindRefAnalysis = ! hasBinds // default value sets to true if no binds
+  var figuredAllBindRefAnalysis: Boolean = ! hasBinds // default value sets to true if no binds
 
-  private var _recalculateOrder: Option[List[StaticBind]] = None
-  def recalculateOrder = _recalculateOrder
-
-  private var _defaultValueOrder: Option[List[StaticBind]] = None
-  def defaultValueOrder = _defaultValueOrder
-
-  def analyzeBindsXPath(): Unit = {
-    // Analyze all binds and return whether all of them were successfully analyzed
-    figuredAllBindRefAnalysis = (topLevelBinds map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
-
-    // Analyze all MIPs
-    // NOTE: Do this here, because MIPs can depend on bind/@name, which requires all bind/@ref to be analyzed first
-    topLevelBinds foreach (_.analyzeMIPs())
-
-    if (! figuredAllBindRefAnalysis) {
-      bindInstances.clear()
-      computedBindExpressionsInstances.clear()
-      validationBindInstances.clear()
-      // keep bindAnalysis as those can be used independently from each other
-    }
-
-    if (model.part.staticState.isCalculateDependencies) {
-      _recalculateOrder  = Some(DependencyAnalyzer.determineEvaluationOrder(this, Model.Calculate))
-      _defaultValueOrder = Some(DependencyAnalyzer.determineEvaluationOrder(this, Model.Default))
-    }
-  }
+  var recalculateOrder : Option[List[StaticBind]] = None
+  var defaultValueOrder: Option[List[StaticBind]] = None
 
   def freeBindsTransientState(): Unit =
     for (bind <- topLevelBinds)

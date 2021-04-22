@@ -21,8 +21,6 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
@@ -34,9 +32,9 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
 import scala.collection.Searching._
 import scala.collection.SeqLike
 import scala.collection.generic.IsSeqLike
@@ -56,7 +54,7 @@ object ErrorSummary {
           def allErrorsIt =
             (errorsInstance.rootElement / ErrorElemName).iterator
 
-          (if (onlyVisible) visibleErrorsIt else allErrorsIt) filter (_.attValue(LevelAttName) == ErrorLevel.entryName)
+          (if (onlyVisible) visibleErrorsIt else allErrorsIt) filter (_.attValue(LevelAttName) == ValidationLevel.ErrorLevel.entryName)
         }
 
         val sectionNameErrors = (
@@ -177,7 +175,7 @@ object ErrorSummary {
 
     def updateValidStatusByScanning() =
       updateValidStatus(
-        ! (errorsInstanceDoc.rootElement / * exists (_.attValue(LevelAttName) == ErrorLevel.entryName))
+        ! (errorsInstanceDoc.rootElement / * exists (_.attValue(LevelAttName) == ValidationLevel.ErrorLevel.entryName))
       )
 
     (currentErrorOpt, eventLevelOpt, alertOpt) match {
@@ -202,7 +200,7 @@ object ErrorSummary {
 
         XFormsAPI.delete(currentError)
 
-        if ((currentError attValue LevelAttName) == ErrorLevel.entryName)
+        if ((currentError attValue LevelAttName) == ValidationLevel.ErrorLevel.entryName)
           updateValidStatusByScanning()
 
       case (None, Some(actualEventLevel), Some(alert)) =>

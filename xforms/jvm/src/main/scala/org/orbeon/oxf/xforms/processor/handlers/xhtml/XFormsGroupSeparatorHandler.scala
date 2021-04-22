@@ -16,18 +16,20 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.{lang => jl}
 
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor}
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 
-// Group within xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr.
+
+// Group within `xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr`.
 class XFormsGroupSeparatorHandler(
   uri            : String,
   localname      : String,
   qName          : String,
   localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
+  matched        : ElementAnalysis,
+  handlerContext : HandlerContext
 ) extends
   XFormsGroupHandler(
     uri,
@@ -43,28 +45,28 @@ class XFormsGroupSeparatorHandler(
 
   // If we are the top-level of a full update, output a delimiter anyway
   override def isMustOutputContainerElement: Boolean =
-    xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+    handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
   override def handleControlStart(): Unit = {
 
-    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
+    val xhtmlPrefix = handlerContext.findXHTMLPrefix
 
     val groupElementName = getContainingElementName
     val groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName)
 
-    val controller = xformsHandlerContext.getController
+    val controller = handlerContext.controller
 
     // Place interceptor on output
     // NOTE: Strictly, we should be able to do without the interceptor. We use it here because it
     // automatically handles ids and element names
-    currentSavedOutput = controller.getOutput
+    currentSavedOutput = controller.output
 
-    val isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+    val isMustGenerateBeginEndDelimiters = ! handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
     // Classes on top-level elements and characters and on the first delimiter
     val elementClasses = {
 
-      implicit val classes = new jl.StringBuilder
+      implicit val classes: jl.StringBuilder = new jl.StringBuilder
 
       appendControlUserClasses(attributes, currentControl)
 
@@ -98,7 +100,7 @@ class XFormsGroupSeparatorHandler(
         },
         isAroundTableOrListElement = true
     )
-    controller.setOutput(new DeferredXMLReceiverImpl(outputInterceptor))
+    controller.output = new DeferredXMLReceiverImpl(outputInterceptor)
 
     // Set control classes
     outputInterceptor.setAddedClasses(elementClasses)
@@ -108,14 +110,14 @@ class XFormsGroupSeparatorHandler(
 
   override def handleControlEnd(): Unit = {
 
-    val controller = xformsHandlerContext.getController
+    val controller = handlerContext.controller
 
     // Restore output
-    controller.setOutput(currentSavedOutput)
+    controller.output = currentSavedOutput
 
     // Delimiter: end repeat
     outputInterceptor.flushCharacters(finalFlush = true, topLevelCharacters = true)
-    val isMustGenerateBeginEndDelimiters = ! xformsHandlerContext.isFullUpdateTopLevelControl(getEffectiveId)
+    val isMustGenerateBeginEndDelimiters = ! handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
     if (isMustGenerateBeginEndDelimiters)
       outputInterceptor.outputDelimiter(currentSavedOutput, "xforms-group-begin-end", "group-end-" + XFormsUtils.namespaceId(containingDocument, getEffectiveId))
   }

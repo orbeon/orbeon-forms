@@ -33,12 +33,12 @@ class Event extends XFormsFunction with RuntimeDependentFunction {
     implicit val ctx = xpathContext
 
     Option(getContainingDocument) flatMap (_.currentEventOpt) match {
-      case Some(event) => getEventAttribute(event, stringArgument(0))
+      case Some(event) => findEventAttribute(event, stringArgument(0)).orNull
       case None        => EmptyIterator.getInstance
     }
   }
 
-  private def getEventAttribute(event: XFormsEvent, attributeName: String): SequenceIterator = {
+  private def findEventAttribute(event: XFormsEvent, attributeName: String): Option[SequenceIterator] = {
 
     // As an extension, we allow a QName
 
@@ -47,8 +47,8 @@ class Event extends XFormsFunction with RuntimeDependentFunction {
     // state.
 //        final Element element = getContextStack(xpathContext).getCurrentBindingContext().getControlElement();
 //        final Map namespaceMappings = containingDocument(xpathContext).getStaticState().getNamespaceMappings(element);
-    val attributeQName = Extensions.resolveQName(namespaceMappings, attributeName, unprefixedIsNoNamespace = true)
-    event.getAttribute(attributeQName.clarkName)
+    Extensions.resolveQName(namespaceMappings, attributeName, unprefixedIsNoNamespace = true) map
+      (q => event.getAttribute(q.clarkName))
   }
 
   // The following copies StaticContext namespace information

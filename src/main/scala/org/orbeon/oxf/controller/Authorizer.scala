@@ -20,6 +20,7 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.URLRewriter._
 import org.orbeon.oxf.http.Headers._
+import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException, StreamedContent}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.CoreUtils._
@@ -137,7 +138,7 @@ object Authorizer extends Logging {
           proxiedHeaders + (OrbeonRemoteAddress -> Option(request.getRemoteAddr).toList)
         }
 
-        val content = Connection.requiresRequestBody(method) option
+        val content = HttpMethodsWithRequestBody(method) option
           StreamedContent(
             EmptyInputStream,
             Some("application/octet-stream"),
@@ -147,21 +148,22 @@ object Authorizer extends Logging {
 
         debug("Delegating to authorizer", Seq("url" -> newURL.toString))
 
-        val connection =
-          Connection(
+        val cxr =
+          Connection.connectNow(
             method          = method,
             url             = newURL,
             credentials     = None,
             content         = content,
             headers         = allHeaders,
             loadState       = true,
+            saveState       = true,
             logBody         = false)(
             logger          = logger,
             externalContext = ec
           )
 
         // TODO: state must be saved in session, not anywhere else; why is this configurable globally?
-        try ConnectionResult.withSuccessConnection(connection.connect(saveState = true), closeOnSuccess = true)(_ => true)
+        try ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true)(_ => true)
         catch {
           case HttpStatusCodeException(code, _, _) =>
             debug("Unauthorized", Seq("code" -> code.toString))

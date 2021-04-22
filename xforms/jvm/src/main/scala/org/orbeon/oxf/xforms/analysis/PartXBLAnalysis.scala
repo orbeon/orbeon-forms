@@ -13,16 +13,15 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.dom.{Document, Element}
+import org.orbeon.dom.Document
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ComponentControl}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding}
+import org.orbeon.oxf.xforms.xbl.AbstractBinding
 import org.orbeon.oxf.xml.SAXStore
-import org.orbeon.xforms.{Constants, XFormsId}
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xforms.{Constants, XFormsId}
 
-import scala.collection.compat._
 import scala.collection.mutable
 
 case class Global(templateTree: SAXStore, compactShadowTree: Document)
@@ -36,7 +35,6 @@ trait PartXBLAnalysis extends TransientState {
   // all XBL components. They would then have to be properly scoped.
   metadata.extractInlineXBL(staticStateDocument.xblElements, startScope)
 
-  private val concreteBindings    = mutable.HashMap[String, ConcreteBinding]()
   val abstractBindingsWithGlobals = mutable.ArrayBuffer[AbstractBinding]()
   val allGlobals                  = mutable.ArrayBuffer[Global]()
 
@@ -47,9 +45,6 @@ trait PartXBLAnalysis extends TransientState {
   // - deindex scope id => Scope
   //def removeScope(scope: Scope) = ???
 
-  def addBinding(controlPrefixedId: String, binding: ConcreteBinding) : Unit                    = concreteBindings += controlPrefixedId -> binding
-  def getBinding(controlPrefixedId: String)                           : Option[ConcreteBinding] = concreteBindings.get(controlPrefixedId)
-  def removeBinding(controlPrefixedId: String)                        : Unit                    = concreteBindings -= controlPrefixedId
   // NOTE: Can't update abstractBindings, allScripts, allStyles, allGlobals without checking all again, so for now
   // leave that untouched.
 
@@ -73,7 +68,7 @@ trait PartXBLAnalysis extends TransientState {
   def dumpScopes(): Unit = {
     println("scopes:")
     println(
-      prefixedIdToXBLScopeMap.to(List).map{
+      prefixedIdToXBLScopeMap.toList.map{
         case (id, scope) => s"$id -> ${scope.scopeId}"
       }.sorted.mkString("\n")
     )
@@ -106,7 +101,6 @@ trait PartXBLAnalysis extends TransientState {
     control match {
       case component: ComponentControl =>
         component.bindingOpt foreach { binding =>
-          removeBinding(component.prefixedId)
           deregisterScope(binding.innerScope)
         }
       case attribute: AttributeControl =>
@@ -147,21 +141,7 @@ trait PartXBLAnalysis extends TransientState {
     existingComponent.removeConcreteBinding()
   }
 
-  // For the given bound node prefixed id, remove the current shadow tree and create a new one
-  // NOTE: Can be used only in a sub-part, as this mutates the tree.
-  // Can return `None` if the binding does not have a template.
-  def createOrUpdateShadowTree(existingComponent: ComponentControl, elemInSource: Element): Unit = {
-
-    assert(! isTopLevel)
-
-    if (existingComponent.bindingOpt.isDefined)
-      existingComponent.removeConcreteBinding()
-
-    existingComponent.setConcreteBinding(elemInSource)
-    analyzeSubtree(existingComponent)
-  }
-
-  override def freeTransientState() = {
+  override def freeTransientState(): Unit = {
     super.freeTransientState()
     metadata.commitBindingIndex()
   }

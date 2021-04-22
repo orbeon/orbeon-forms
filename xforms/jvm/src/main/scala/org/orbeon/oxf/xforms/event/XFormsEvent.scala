@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.datatypes.LocationData
+import org.orbeon.oxf.xforms.analysis.EventHandler
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om._
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.Phase
 
 import scala.collection.JavaConverters._
 
@@ -137,12 +139,6 @@ abstract class XFormsEvent(
 }
 
 object XFormsEvent {
-
-  // Event phases
-  sealed abstract class Phase(val name: String)
-  object Capture  extends Phase("capture")
-  object Target   extends Phase("target")
-  object Bubbling extends Phase("bubbling")
 
   // PropertyGetter is more general than `Map`, but a `Map` is automatically a `PropertyGetter`
   type PropertyGetter = PartialFunction[String, Option[Any]]

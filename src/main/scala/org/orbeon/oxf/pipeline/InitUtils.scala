@@ -15,13 +15,13 @@ package org.orbeon.oxf.pipeline
 
 import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpSession}
-import org.apache.log4j.Logger
+import org.log4s.Logger
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
-import org.orbeon.oxf.externalcontext.{ExternalContext, WebAppContext, WebAppExternalContext}
+import org.orbeon.oxf.externalcontext.{ExternalContext, ServletWebAppContext, WebAppExternalContext}
 import org.orbeon.oxf.http.HttpStatusCodeException
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor._
@@ -66,7 +66,7 @@ object InitUtils {
     val tsBegin = if (logger.isInfoEnabled) System.currentTimeMillis else 0L
 
     if (logger.isInfoEnabled)
-      externalContext.getStartLoggerString.trimAllToOpt foreach logger.info
+      externalContext.getStartLoggerString.trimAllToOpt foreach (logger.info(_))
 
     // Set ExternalContext into PipelineContext
     pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
@@ -162,7 +162,7 @@ object InitUtils {
     require(servletContext ne null)
 
     // Make sure the Web app context is initialized
-    val webAppContext = WebAppContext(servletContext)
+    val webAppContext = ServletWebAppContext(servletContext)
 
     if (message != null)
       logger.info(logMessagePrefix + " - " + message)

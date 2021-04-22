@@ -18,30 +18,35 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.expr.{Expression, ExpressionTool, XPathContext}
-import org.orbeon.saxon.om.{Item, NodeInfo, VirtualNode}
+import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
 
 /**
  * xxf:extract-document() takes an element as parameter and extracts a document.
  */
 class XXFormsExtractDocument extends XFormsFunction {
-  override def evaluateItem(xpathContext: XPathContext): Item = {
 
-    def effectiveBooleanValue(e: Expression) = ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))
+  override def evaluateItem(xpathContext: XPathContext): DocumentInfo = {
+
+    implicit val ctx = xpathContext
 
     val item                  = argument(0).evaluateItem(xpathContext)
-    val excludeResultPrefixes = argument.lift(1) map (_.evaluateAsString(xpathContext).toString)
-    val readonly              = argument.lift(2) exists effectiveBooleanValue
+    val excludeResultPrefixes = stringArgumentOpt(1)
+    val readonly              = booleanArgument(2, default = false)
 
     val rootElement =
       item match {
-        case virtualNode: VirtualNode =>
-          virtualNode.getUnderlyingNode.asInstanceOf[Element]
-        case nodeInfo: NodeInfo =>
-          TransformerUtils.tinyTreeToDom4j(nodeInfo).getRootElement
-        case _ => return null
+        case virtualNode: VirtualNode => virtualNode.getUnderlyingNode.asInstanceOf[Element]
+        case nodeInfo: NodeInfo       => TransformerUtils.tinyTreeToDom4j(nodeInfo).getRootElement
+        case _                        => return null
       }
 
-    Instance.extractDocument(rootElement, stringOptionToSet(excludeResultPrefixes), readonly, exposeXPathTypes = false, removeInstanceData = true)
+    Instance.extractDocument(
+      rootElement,
+      stringOptionToSet(excludeResultPrefixes),
+      readonly,
+      exposeXPathTypes   = false,
+      removeInstanceData = true
+    )
   }
 }

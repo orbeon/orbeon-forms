@@ -29,4 +29,6 @@ object UriScheme extends Enum[UriScheme] {
   case object Mailto extends UriScheme
   case object Oxf    extends UriScheme
   case object Echo   extends UriScheme
+
+  val SchemesWithHeaders: Set[UriScheme] = Set(Http, Https, Echo)
 }

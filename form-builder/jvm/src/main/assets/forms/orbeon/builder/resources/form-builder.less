@@ -531,7 +531,7 @@ div.orbeon.orbeon-portlet-div {
 
         .xforms-tabbable-appearance-left > .tabs-left {
             display: grid; // tried with `flex` but didn't manage to make things work nicely (kind of with `min-width` though)
-            grid-template-columns: 15   0px auto; // arbitrary for now, to fit all existing tab labels in English
+            grid-template-columns: max-content 1fr;
 
             &> .nav-tabs {
                 grid-row: 1;
@@ -753,6 +753,10 @@ div.orbeon.orbeon-portlet-div {
                     @optionsWidth : 700px;
                     @2colWidth    : @optionsWidth/2;
                     @3colWidth    : @optionsWidth/3;
+
+                    // So all the options are on the same line
+                    min-width: @optionsWidth;
+
                     .fb-action-option-2-col-span-1 { width: @2colWidth }
                     .fb-action-option-3-col-span-1 { width: @3colWidth }
                     .fb-action-option-3-col-span-2 { width: @3colWidth * 2 }
@@ -773,26 +777,9 @@ div.orbeon.orbeon-portlet-div {
                     vertical-align: top;
                 }
 
-                // Hide buttons while dragging as they get moved to the left (which maybe could be fixed?)
-                &.gu-mirror {
-                    .fb-action-buttons {
-                        display: none;
-                    }
-                }
-
                 .fb-action-options, .fb-action-buttons {
                     display: table-cell;
                     padding-bottom: 5px;
-                }
-
-                .fb-action-grab {
-                    display: inline-block;
-                    opacity: 0.1;
-                }
-
-                &.xforms-dnd-moves .fb-action-grab {
-                    cursor: move;
-                    opacity: 0.5;
                 }
             }
         }
@@ -813,6 +800,26 @@ div.orbeon.orbeon-portlet-div {
             .select2-container {
                 display: block;
             }
+        }
+    }
+
+    .xbl-fr-dnd-repeat {
+
+        // Hide buttons while dragging as they get moved to the left (which maybe could be fixed?)
+        .gu-mirror {
+            .fb-action-buttons {
+                display: none;
+            }
+        }
+
+        .fb-action-grab {
+            display: inline-block;
+            opacity: 0.1;
+        }
+
+        .xforms-dnd-moves .fb-action-grab {
+            cursor: move;
+            opacity: 0.5;
         }
     }
 
@@ -854,6 +861,11 @@ div.orbeon.orbeon-portlet-div {
 
     .fb-pdf-dialog {
         width: 700px;
+        max-width: none;
+    }
+
+    .fb-search-dialog {
+        width: 500px;
         max-width: none;
     }
 
@@ -1290,6 +1302,25 @@ div.orbeon.orbeon-portlet-div {
 
     .navbar .fr-language-choice .nav {
         margin-right: 0;
+    }
+
+    .xforms-dialog {
+
+        // Make the language choice selector smaller and floating to the top right
+        .xbl-fb-language-choice {
+            float: right;
+
+            .navbar {
+                margin-bottom: 0;
+                .navbar-inner {
+                    min-height: 10px;
+                }
+
+                .nav > li >a {
+                    padding: 5px;
+                }
+            }
+        }
     }
 
     // Hide XForms Inspector in Form Builder, since it doesn't show properly in Form Builder

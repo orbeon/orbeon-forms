@@ -17,15 +17,15 @@ import orbeon.apache.xerces.impl.Constants;
 import orbeon.apache.xerces.impl.XMLEntityManager;
 import orbeon.apache.xerces.impl.XMLErrorReporter;
 import orbeon.apache.xerces.xni.parser.XMLInputSource;
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.URIProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.StringUtils;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.SequenceReader;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.util.StringUtils;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
 import org.w3c.dom.Document;
 import org.xml.sax.*;
@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class XMLParsing {
 
-    private static Logger logger = Logger.getLogger(XMLParsing.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(XMLParsing.class);
 
     public static final EntityResolver ENTITY_RESOLVER = new EntityResolver();
     public static final ErrorHandler ERROR_HANDLER = new ErrorHandler();
@@ -218,7 +218,7 @@ public class XMLParsing {
         }
 
         public void fatalError(SAXParseException exception) throws SAXException {
-            throw new ValidationException("Fatal error: " + exception.getMessage(), new LocationData(exception));
+            throw new ValidationException("Fatal error: " + exception.getMessage(), XmlLocationData.apply(exception));
         }
 
         public void warning(SAXParseException exception) throws SAXException {
@@ -320,7 +320,7 @@ public class XMLParsing {
             xmlReader.setErrorHandler(ERROR_HANDLER);
             xmlReader.parse(inputSource);
         } catch (SAXParseException e) {
-            throw new ValidationException(e.getMessage(), new LocationData(e));
+            throw new ValidationException(e.getMessage(), XmlLocationData.apply(e));
         } catch (Exception e) {
             throw new OXFException(e);
         } finally {

@@ -44,12 +44,12 @@
             </icon>
             <templates>
                 <view>
-                    <fr:tinymce id="" xmlns="">
+                    <xf:textarea mediatype="text/html" id="" xmlns="">
                         <xf:label ref=""/>
                         <xf:hint ref=""/>
                         <xf:help ref=""/>
                         <xf:alert ref=""/>
-                    </fr:tinymce>
+                    </xf:textarea>
                 </view>
             </templates>
         </metadata>

@@ -47,6 +47,10 @@ class SimpleSession(sessionId: String) extends Session {
     sessionAtts -= name
   }
 
+  def getAttributeNames(scope: SessionScope): List[String] = {
+    checkExpired()
+    sessionAtts.keys.toList
+  }
 
   def getCreationTime: Long = {
     checkExpired()

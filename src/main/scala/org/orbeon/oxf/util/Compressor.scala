@@ -18,6 +18,7 @@ import java.util.zip.{Deflater, GZIPInputStream, GZIPOutputStream}
 
 import org.apache.commons.pool.BasePoolableObjectFactory
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.io.IOUtils
 
 import scala.util.control.NonFatal
 
@@ -87,10 +88,10 @@ object Compressor extends Logging {
     compressBytes(bytesToEncode, Deflater.BEST_SPEED)
   }
 
-  def uncompressBytes(bytesToDecode: Array[Byte]) = {
+  def uncompressBytes(bytesToDecode: Array[Byte]): Array[Byte] = {
     val is = new GZIPInputStream(new ByteArrayInputStream(bytesToDecode))
     val os = new ByteArrayOutputStream(BUFFER_SIZE)
-    NetUtils.copyStream(is, os)
+    IOUtils.copyStreamAndClose(is, os)
     os.toByteArray
   }
 

@@ -195,4 +195,27 @@ class SimpleDataMigrationTest
       }
     }
   }
+
+  describe("Find form definition format") {
+
+    val Expected = List(
+      (Nil,                              None),
+      (List("2018.2.2.201903012338 PE"), Some(DataFormatVersion.V480)),
+      (List("2019.1.0.201910220207 PE"), Some(DataFormatVersion.V20191)),
+      (List("2020.1.202012300129 PE"),   Some(DataFormatVersion.V20191)),
+      (
+        List(
+          "2018.2.2.201903012338 PE",
+          "2019.1.0.201910220207 PE",
+          "2020.1.202012300129 PE"
+        ),
+        Some(DataFormatVersion.V20191)
+      ),
+    )
+
+    for ((versions, expected) <- Expected)
+      it(s"must pass for $versions") {
+        assert(FormRunnerPersistence.findFormDefinitionFormatFromStringVersions(versions) == expected)
+      }
+  }
 }

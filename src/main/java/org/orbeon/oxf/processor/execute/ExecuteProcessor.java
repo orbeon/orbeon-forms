@@ -36,8 +36,6 @@ import java.io.File;
  */
 public class ExecuteProcessor extends ProcessorImpl {
 
-//    private static Logger logger = LoggerFactory.createLogger(ExecuteProcessor.class);
-
     public static final String EXECUTE_PROCESSOR_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/execute-processor-config";
 
     private static final String OUTPUT_PROPERTY = "org.orbeon.oxf.processor.execute.output";

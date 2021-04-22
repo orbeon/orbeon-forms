@@ -13,7 +13,10 @@
   */
 package org.orbeon.io
 
-import java.io.{InputStream, OutputStream, Reader, Writer}
+import java.io._
+import java.{lang => jl}
+
+import org.orbeon.oxf.common.Defaults
 
 import scala.util.control.NonFatal
 
@@ -22,13 +25,13 @@ object IOUtils {
 
   private val CopyBufferSize = 8192
 
-  def copyStream(in: InputStream, out: OutputStream, progress: Long => Unit = _ => ()): Unit = {
+  def copyStreamAndClose(in: InputStream, out: OutputStream, progress: Long => Unit = _ => (), doCloseOut: Boolean = true): Unit = {
 
     require(in ne null)
     require(out ne null)
 
     useAndClose(in) { in =>
-      useAndClose(out) { out =>
+      useAndClose(out, doCloseOut) { out =>
         val buffer = new Array[Byte](CopyBufferSize)
         Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
           progress(read)
@@ -39,13 +42,13 @@ object IOUtils {
     }
   }
 
-  def copyReader(in: Reader, out: Writer, progress: Long => Unit = _ => ()): Unit = {
+  def copyReaderAndClose(in: Reader, out: Writer, progress: Long => Unit = _ => (), doCloseOut: Boolean = true): Unit = {
 
     require(in ne null)
     require(out ne null)
 
     useAndClose(in) { in =>
-      useAndClose(out) { out =>
+      useAndClose(out, doCloseOut) { out =>
         val buffer = new Array[Char](CopyBufferSize)
         Iterator continually (in read buffer) takeWhile (_ != -1) filter (_ > 0) foreach { read =>
           progress(read)
@@ -57,10 +60,10 @@ object IOUtils {
 
   // Scala 2.13 has `scala.util.Using`. Switch to that when possible.
   // Use a closable item and make sure an attempt to close it is done after use
-  def useAndClose[T <: {def close(): Unit}, U](closable: T)(block: T => U): U =
+  def useAndClose[T <: {def close(): Unit}, U](closable: T, doClose: Boolean = true)(block: T => U): U =
     try block(closable)
     finally {
-      if (closable ne null)
+      if (doClose && (closable ne null))
         runQuietly(closable.close())
     }
 
@@ -69,5 +72,19 @@ object IOUtils {
     try block
     catch {
       case NonFatal(_) => // NOP
+    }
+
+  def readStreamAsStringAndClose(reader: Reader): String = {
+    val writer = new StringBuilderWriter(new jl.StringBuilder)
+    copyReaderAndClose(reader, writer)
+    writer.result
+  }
+
+  // - JSON: "JSON text SHALL be encoded in Unicode.  The default encoding is UTF-8."
+  //   http://www.ietf.org/rfc/rfc4627.txt
+  // - other: we pick UTF-8 anyway (2014-09-18)
+  def readStreamAsStringAndClose(is: InputStream, charset: Option[String]): String =
+    useAndClose(new InputStreamReader(is, charset getOrElse Defaults.DefaultEncodingForModernUse)) { reader =>
+      readStreamAsStringAndClose(reader)
     }
 }

@@ -28,6 +28,7 @@
     <xbl:binding
         id="fr-repeater-binding"
         element="fr|repeater"
+        xxbl:mode="javascript-lifecycle"
         xxf:external-events="fr-move-up fr-move-down fr-insert-above fr-insert-below fr-clear fr-remove">
 
         <xbl:resources>

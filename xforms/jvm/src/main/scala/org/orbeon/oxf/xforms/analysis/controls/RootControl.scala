@@ -14,22 +14,21 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, LangRef}
+import org.orbeon.oxf.xforms.analysis.{LangRef, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
-import org.orbeon.xforms.xbl.Scope
-import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LastIdQName
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xforms.analysis.StaticStateContext
-import org.orbeon.oxf.xml.dom.Comparator
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{Constants, EventNames}
 
 /**
  * Single root container for a part, whether top-level or a nested part.
  */
-class RootControl(staticStateContext: StaticStateContext, element: Element, scope: Scope)
-  extends ContainerControl(staticStateContext, element, None, None, scope)
-  with ChildrenBuilderTrait {
+class RootControl(
+  part    : PartAnalysisImpl,
+  index   : Int,
+  element : Element,
+  scope   : Scope
+) extends ContainerControl(part, index, element, None, None, scope) {
 
   override val staticId       = Constants.DocumentId
   override val prefixedId     = part.startScope.fullPrefix + staticId
@@ -55,13 +54,6 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
 
     fromChildElements orElse fromParentPart
   }
-
-  // Ignore <xbl:xbl> elements that can be at the top-level, as the static state document produced by the extractor.
-  // Also ignore <properties> and <last-id> elements
-  // might place them there.
-  override def findRelevantChildrenElements =
-    findAllChildrenElements filterNot
-      { case (e, _) => Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LastIdQName)(e.getQName) }
 
   override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, EventNames.XXFormsPoll)
   override val externalEvents              = externalEventsDef

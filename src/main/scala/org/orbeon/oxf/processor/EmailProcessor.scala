@@ -22,6 +22,7 @@ import javax.mail._
 import javax.mail.internet._
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.io.IOUtils._
@@ -34,7 +35,7 @@ import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.{LocationData, LocationSAXWriter}
+import org.orbeon.oxf.xml.dom.LocationSAXWriter
 
 import scala.collection.JavaConverters._
 
@@ -152,25 +153,23 @@ class EmailProcessor extends ProcessorImpl {
     // Create message
     val message = new MimeMessage(session)
 
-    def createAddresses(addressElement: Element): Array[Address] = {
+    def createAddresses(addressElement: Element): List[Address] = {
       val email = addressElement.element("email").getTextTrim // required
 
-      val result = addressElement.elementOpt("name") match {
+      addressElement.elementOpt("name") match {
         case Some(nameElement) => List(new InternetAddress(email, nameElement.getTextTrim))
-        case None              => InternetAddress.parse(email).toList
+        case None => InternetAddress.parse(email).toList
       }
-
-      result.toArray
     }
 
-    def addRecipients(elementName: String, recipientType: RecipientType) =
-      for (element <- messageElement.jElements(elementName).asScala) {
-        val addresses = createAddresses(element)
-        message.addRecipients(recipientType, addresses)
-      }
+    def addRecipients(elementName: String, recipientType: RecipientType): Unit = {
+      val elements  = messageElement.elements(elementName)
+      val addresses = elements.flatMap(createAddresses).toArray
+      message.addRecipients(recipientType, addresses)
+    }
 
     // Set From
-    message.addFrom(createAddresses(messageElement.element("from")))
+    message.addFrom(createAddresses(messageElement.element("from")).toArray)
 
     // Set Reply-To
     locally {
@@ -181,7 +180,7 @@ class EmailProcessor extends ProcessorImpl {
         // We might be able to just call `setReplyTo` with the above, but it's unclear
         // what's the behavior in there is nothing set. Also, can there be a default?
         if (replyTo.nonEmpty)
-          message.setReplyTo(replyTo)
+          message.setReplyTo(replyTo.toArray)
       }
     }
 
@@ -284,7 +283,7 @@ class EmailProcessor extends ProcessorImpl {
 
             // Generate a FileItem from the source
             val source = PartUtils.getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, mediatype)
-            Left(PartUtils.handleStreamedPartContent(pipelineContext, source))
+            Left(PartUtils.handleStreamedPartContent(source)(EmailProcessor.Logger))
           case None =>
             // Content of the part is inline
 

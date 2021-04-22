@@ -13,11 +13,12 @@
   */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.xforms.CrossPlatformSupport
 import spray.json._
+
 import scala.collection.compat._
 
 case class XFormsAssets(css: List[AssetPath], js: List[AssetPath])
@@ -79,7 +80,7 @@ object XFormsAssets {
     fromJson(json.parseJson)
 
   def fromJSONProperty: XFormsAssets =
-    Properties.instance.getPropertySet
+    CrossPlatformSupport.properties
       .getPropertyOrThrow(AssetsBaselineProperty)
       .associatedValue(v => fromJsonString(v.value.toString))
 

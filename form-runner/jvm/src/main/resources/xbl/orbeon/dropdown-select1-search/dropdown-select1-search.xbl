@@ -27,6 +27,7 @@
             fr|dropdown-select1-search,
             xf|select1[appearance ~= search]"
         xxbl:container="span"
+        xxbl:label-for="select1"
         xxbl:mode="lhha binding value focus selection javascript-lifecycle">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

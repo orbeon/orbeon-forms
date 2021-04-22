@@ -13,16 +13,16 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl}
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
+import shapeless.syntax.typeable._
 
-import scala.xml.SAXException
 
 /**
   * This class is a helper base class which handles the lifecycle of producing markup for a control. The following
@@ -37,25 +37,24 @@ import scala.xml.SAXException
   * `handleControlStart()` is used, but container controls will use `handleControlEnd()`.
   */
 abstract class XFormsControlLifecyleHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef,
-  repeating      : Boolean,
-  forwarding     : Boolean
+  uri                 : String,
+  localname           : String,
+  qName               : String,
+  localAtts           : Attributes,
+  val elementAnalysis : ElementAnalysis,
+  handlerContext      : HandlerContext,
+  repeating           : Boolean,
+  forwarding          : Boolean
 ) extends
   XFormsBaseHandlerXHTML(
     uri,
     localname,
     qName,
     localAtts,
-    matched,
     handlerContext,
     repeating,
     forwarding
-  ) with WithControl {
+  ) {
 
   import Private._
 
@@ -63,14 +62,14 @@ abstract class XFormsControlLifecyleHandler(
   def getContainingElementName = "span"
 
   protected def getContainingElementQName: String =
-    XMLUtils.buildQName(xformsHandlerContext.findXHTMLPrefix, getContainingElementName)
+    XMLUtils.buildQName(handlerContext.findXHTMLPrefix, getContainingElementName)
 
   override final def start(): Unit =
     if (isMustOutputControl(currentControl)) {
 
       // Open control element, usually `<span>`
       if (isMustOutputContainerElement)
-        xformsHandlerContext.getController.getOutput.startElement(
+        handlerContext.controller.output.startElement(
           XMLConstants.XHTML_NAMESPACE_URI,
           getContainingElementName,
           getContainingElementQName,
@@ -80,6 +79,7 @@ abstract class XFormsControlLifecyleHandler(
             attributes,
             getPrefixedId,
             getEffectiveId,
+            elementAnalysis,
             currentControl,
             Option(getStaticLHHA(getPrefixedId, LHHA.Label))
           )
@@ -115,7 +115,7 @@ abstract class XFormsControlLifecyleHandler(
 
       // Close control element, usually `<span>`
       if (isMustOutputContainerElement)
-        xformsHandlerContext.getController.getOutput.endElement(
+        handlerContext.controller.output.endElement(
           XMLConstants.XHTML_NAMESPACE_URI,
           getContainingElementName,
           getContainingElementQName
@@ -127,7 +127,6 @@ abstract class XFormsControlLifecyleHandler(
   protected def isMustOutputContainerElement                = true
 
   // TODO: Those should take the static LHHA
-  @throws[SAXException]
   protected def handleLabel(): Unit =
     handleLabelHintHelpAlert(
       getStaticLHHA(getPrefixedId, LHHA.Label),
@@ -139,7 +138,6 @@ abstract class XFormsControlLifecyleHandler(
       isExternal = false
     )
 
-  @throws[SAXException]
   protected def handleAlert(): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyAlert)
       handleLabelHintHelpAlert(
@@ -152,7 +150,6 @@ abstract class XFormsControlLifecyleHandler(
         isExternal = false
       )
 
-  @throws[SAXException]
   protected def handleHint(): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyHint)
       handleLabelHintHelpAlert(
@@ -165,7 +162,6 @@ abstract class XFormsControlLifecyleHandler(
         isExternal = false
       )
 
-  @throws[SAXException]
   protected def handleHelp(): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControl))
       handleLabelHintHelpAlert(
@@ -179,11 +175,8 @@ abstract class XFormsControlLifecyleHandler(
       )
 
   // Must be overridden by subclasses
-  @throws[SAXException]
   protected def handleControlStart(): Unit
-
-  @throws[SAXException]
-  protected def handleControlEnd() = ()
+  protected def handleControlEnd  (): Unit = ()
 
   protected def getEmptyNestedControlAttributesMaybeWithId(
     effectiveId : String,
@@ -208,23 +201,51 @@ abstract class XFormsControlLifecyleHandler(
   def getForEffectiveId(effectiveId: String): String =
     XFormsBaseHandler.getLHHACId(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.ControlCode)
 
+  // See https://github.com/orbeon/orbeon-forms/issues/4046
+  final lazy val currentControl: XFormsControl =
+    containingDocument.getControlByEffectiveId(getEffectiveId) ensuring (_ ne null)
+
+  final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =
+    for {
+      attValue      <- ControlAjaxSupport.findAriaBy(elementAnalysis, currentControl, LHHA.Label, condition = _ => true)(containingDocument)
+      attName       = ControlAjaxSupport.AriaLabelledby
+    } locally {
+      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
+    }
+
+  final protected def handleAriaByAtts(atts: AttributesImpl): Unit =
+    for {
+      (lhha, attName) <- ControlAjaxSupport.LhhaWithAriaAttName
+      attValue        <- ControlAjaxSupport.findAriaBy(elementAnalysis, currentControl, lhha, condition = _.isForRepeat)(containingDocument)
+    } locally {
+      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
+    }
+
+  final protected def getStaticLHHA(controlPrefixedId: String, lhha: LHHA): LHHAAnalysis = {
+    val globalOps = handlerContext.getPartAnalysis
+    if (lhha == LHHA.Alert)
+      globalOps.getAlerts(controlPrefixedId).head
+    else // for alerts, take the first one, but does this make sense?
+      globalOps.getLHH(controlPrefixedId, lhha)
+  }
+
   private object Private {
 
     val beforeAfterTokens: (List[String], List[String]) =
-      staticControlOpt                       flatMap
-      collectByErasedType[StaticLHHASupport] flatMap
-      (_.beforeAfterTokensOpt)               getOrElse
-      xformsHandlerContext.getDocumentOrder
+      elementAnalysis.narrowTo[StaticLHHASupport] flatMap
+      (_.beforeAfterTokensOpt)                    getOrElse
+      handlerContext.documentOrder
 
-    def hasLocalLabel = hasLocalLHHA(LHHA.Label)
-    def hasLocalHint  = hasLocalLHHA(LHHA.Hint)
-    def hasLocalHelp  = hasLocalLHHA(LHHA.Help)
-    def hasLocalAlert = hasLocalLHHA(LHHA.Alert)
+    def hasLocalLabel: Boolean = hasLocalLHHA(LHHA.Label)
+    def hasLocalHint : Boolean = hasLocalLHHA(LHHA.Hint)
+    def hasLocalHelp : Boolean = hasLocalLHHA(LHHA.Help)
+    def hasLocalAlert: Boolean = hasLocalLHHA(LHHA.Alert)
 
     def hasLocalLHHA(lhhaType: LHHA): Boolean =
-      xformsHandlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId) match {
+      handlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId) match {
         case support: StaticLHHASupport => support.hasLocal(lhhaType)
         case _                          => false
       }
   }
+
 }

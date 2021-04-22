@@ -44,11 +44,22 @@
             for $d in xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))
             return xs:integer($d[. castable as xs:integer])"/>
 
+    <xf:var
+        name="is-background"
+        value="
+            starts-with(xxf:get-request-path(), '/fr/service/') and
+            (: For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
+               probably, as they also need to send an XML response back. :)
+            $mode = ('new', 'edit') and
+            (: PE only :)
+            (fr:is-pe() or frf:sendError(404))"/>
+
     <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
     <xf:var
         name="autosave-enabled"
         value="
             frf:isAutosaveSupported($app, $form)                and
+            not($is-background)                                 and
             $autosave-delay gt 0                                and
             xxf:non-blank(xxf:username())                       and
             frf:xpathAllAuthorizedOperations(
@@ -65,16 +76,6 @@
         name="is-submit"
         value="exists(xxf:get-request-attribute('fr-form-data')) or
                exists(xxf:get-request-parameter('fr-form-data'))"/>
-
-    <xf:var
-        name="is-background"
-        value="
-            starts-with(xxf:get-request-path(), '/fr/service/') and
-            (: For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
-               probably, as they also need to send an XML response back. :)
-            $mode = ('new', 'edit') and
-            (: PE only :)
-            (fr:is-pe() or frf:sendError(404))"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->
     <xf:action
@@ -491,6 +492,54 @@
             <xf:setvalue
                 ref="instance('fr-background-response-instance')/document-id"
                 value="fr:document-id()"/>
+
+            <xf:delete
+                ref="instance('fr-background-response-instance')/data"/>
+
+            <xf:action
+                if="instance('fr-background-response-instance')/process-success/data(.) and (: process must be successful :)
+                    xxf:get-request-parameter('return-data') = 'true'                   and (: caller must request data   :)
+                    xxf:property(                                                           (: property must allow it     :)
+                        string-join(
+                            (
+                                'oxf.fr.detail.service',
+                                 if ($is-background) then 'background' else 'foreground',
+                                 'enable-return-data',
+                                 $app,
+                                 $form
+                             ),
+                            '.'
+                        )
+                    )">
+
+                <xf:insert
+                    ref="instance('fr-background-response-instance')/document-id"
+                    origin="
+                        let $data-format-version  := (xxf:get-request-parameter('data-format-version'), '4.0.0')[1],
+                            $prune-metadata-param := xxf:get-request-parameter('prune-metadata'),
+                            $prune-metadata       :=
+                                if (exists($prune-metadata-param)) then
+                                    $prune-metadata-param = 'true'
+                                else if ($data-format-version = 'edge') then
+                                    false()
+                                else
+                                    true()
+                        return
+                            xf:element(
+                                'data',
+                                grid-migration:dataMaybeMigratedFromEdge(
+                                   fr:app-name(),
+                                   fr:form-name(),
+                                   xxf:instance('fr-form-instance')/root(),
+                                   xxf:instance('fr-form-metadata')/root(),
+                                   $data-format-version,
+                                   $prune-metadata
+                               )
+                            )
+                    "
+                />
+
+            </xf:action>
 
             <xf:send submission="fr-send-background-response"/>
 

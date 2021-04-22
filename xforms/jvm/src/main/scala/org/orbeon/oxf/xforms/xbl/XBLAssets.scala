@@ -61,7 +61,7 @@ object XBLAssets {
     bindings        : Iterable[AbstractBinding],
     getHeadElements : AbstractBinding => Seq[HeadElement]
   ): List[HeadElement] =
-    (bindings.to(List) sortBy (_.cssName)).iterator.flatMap(getHeadElements).to(mutable.LinkedHashSet).to(List)
+    (bindings.to(List) sortBy (_.commonBinding.cssName)).iterator.flatMap(getHeadElements).to(mutable.LinkedHashSet).to(List)
 
   // Output baseline, remaining, and inline resources
   def outputResources(

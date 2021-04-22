@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.Eval
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.{Document, Node}
@@ -36,7 +37,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
 
   // Unwrapped document set by `deserialize()`
   private var _resultingDocumentOpt: Option[Document Either DocumentInfo] = None
-  def resultingDocumentOrDocumentInfo = _resultingDocumentOpt map (_.merge) orNull
+  def resultingDocumentOpt: Option[Either[Document, DocumentInfo]] = _resultingDocumentOpt
 
   // For CacheableSubmission
   private var wrappedDocumentInfo: Option[DocumentInfo] = None
@@ -75,7 +76,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         submitErrorEvent = new XFormsSubmitErrorEvent(
           submission,
           ErrorType.ResourceError,
-          connectionResult
+          connectionResult.some
         )
       )
     }
@@ -95,31 +96,30 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
       ConnectionResult.withSuccessConnection(connectionResult, closeOnSuccess = true) { is =>
 
         if (! isReadonly) {
-          if (logger.isDebugEnabled)
+          if (logger.debugEnabled)
             logger.logDebug("", "deserializing to mutable instance")
           // Q: What about configuring validation? And what default to choose?
 
           Left(
             if (isJSON) {
               val receiver = new LocationSAXContentHandler
-              Converter.jsonStringToXmlStream(connectionResult.readTextResponseBody.get, receiver)
+              Converter.jsonStringToXmlStream(SubmissionUtils.readTextContent(connectionResult.content).get, receiver)
               receiver.getDocument
             } else {
               TransformerUtils.readDom4j(is, connectionResult.url, isHandleXInclude, true)
             }
           )
         } else {
-          if (logger.isDebugEnabled)
+          if (logger.debugEnabled)
             logger.logDebug("", "deserializing to read-only instance")
           // Q: What about configuring validation? And what default to choose?
           // NOTE: isApplicationSharedHint is always false when get get here. `isApplicationSharedHint="true"` is handled above.
 
           Right(
-            if (isJSON) {
-              Converter.jsonStringToXmlDoc(connectionResult.readTextResponseBody.get)
-            } else {
+            if (isJSON)
+              Converter.jsonStringToXmlDoc(SubmissionUtils.readTextContent(connectionResult.content).get)
+            else
               TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, isHandleXInclude, true)
-            }
           )
         }
       }
@@ -133,7 +133,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           submitErrorEvent = new XFormsSubmitErrorEvent(
             submission,
             ErrorType.ParseError,
-            connectionResult
+            connectionResult.some
           )
         )
     }
@@ -143,7 +143,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
     p2               : SecondPassParameters
-  ): Runnable = {
+  ): Option[Eval[Unit]] = {
 
     // Set new instance document to replace the one submitted
 
@@ -166,7 +166,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           submitErrorEvent = new XFormsSubmitErrorEvent(
             target           = submission,
             errorType        = ErrorType.TargetError,
-            connectionResult = connectionResult
+            connectionResult = connectionResult.some
           )
         )
       case Some(replaceInstanceNoTargetref) =>
@@ -192,7 +192,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             submitErrorEvent = new XFormsSubmitErrorEvent(
               submission,
               ErrorType.TargetError,
-              connectionResult
+              connectionResult.some
             )
           )
         }
@@ -206,7 +206,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             submitErrorEvent = new XFormsSubmitErrorEvent(
               submission,
               ErrorType.TargetError,
-              connectionResult
+              connectionResult.some
             )
           )
         }
@@ -222,7 +222,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             submitErrorEvent = new XFormsSubmitErrorEvent(
               submission,
               ErrorType.TargetError,
-              connectionResult
+              connectionResult.some
             )
           )
         }
@@ -230,7 +230,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         implicit val detailsLogger  = submission.getDetailsLogger(p, p2)
 
         // Obtain root element to insert
-        if (detailsLogger.isDebugEnabled)
+        if (detailsLogger.debugEnabled)
           detailsLogger.logDebug(
             "",
             if (p2.isReadonly)
@@ -309,7 +309,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           // - doDelete() does as well
           // Does this mean that we should check that the node is still where it should be?
         }
-        submission.sendSubmitDone(connectionResult)
+        submission.sendSubmitDone(connectionResult).some
     }
   }
 }

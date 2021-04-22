@@ -1,0 +1,113 @@
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+
+    <xbl:binding id="fb-dialog-search" element="fb|dialog-search">
+        <xbl:handlers>
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+                <!-- Clear selection -->
+                <xf:setvalue iterate="instance()//*[not(*)]" ref="."/>
+                <!-- Update items -->
+                <xf:insert
+                    context="instance('controls-label-value-itemset')"
+                    origin="fbf:getControlsLabelValueItemset()"/>
+                <xxf:show dialog="dialog"/>
+<!--                <xf:setfocus control="control-selector"/>-->
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="cancel-trigger" >
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="save-trigger">
+                <xxf:hide dialog="dialog"/>
+                <xf:dispatch name="fb-apply" target="fb-dialog-search">
+                    <xf:property name="control-name"  value="instance()/control-name[xxf:non-blank()]"/>
+                    <xf:property name="open-settings" value="instance()/open-settings = 'true'"/>
+                </xf:dispatch>
+            </xbl:handler>
+            <xbl:handler observer="control-selector" event="xforms-value-changed" if="xxf:non-blank(event('xxf:value'))">
+<!--                <xf:message>selected!</xf:message>-->
+                <xf:action/>
+                <xxf:hide dialog="dialog"/>
+                <xf:dispatch name="fb-apply" target="fb-dialog-search">
+                    <xf:property name="control-name" value="xxf:non-blank(event('xxf:value'))"/>
+                </xf:dispatch>
+            </xbl:handler>
+            <xbl:handler event="xxforms-dialog-close" observer="dialog">
+                <!-- Clean-up internal instance upon dialog close -->
+                <xf:delete ref="instance('controls-label-value-itemset')/*"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <xf:model id="model">
+
+                <xf:instance id="i" xxf:exclude-result-prefixes="#all">
+                    <_>
+                        <control-name/>
+                        <open-settings/>
+                    </_>
+                </xf:instance>
+
+                <xf:instance id="controls-label-value-itemset">
+                    <_/>
+                </xf:instance>
+
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+
+            <!-- Bindings specified on control -->
+            <xf:var name="form"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
+            <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+
+            <xxf:dialog id="dialog" appearance="minimal" level="modal" class="fb-search-dialog">
+                <xf:label ref="$resources/dialog-search/label"/>
+
+                <xh:div>
+
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td colspan="11">
+                                <xf:select1 appearance="search" ref="instance()/control-name" id="control-selector">
+                                    <xf:label appearance="minimal" ref="$resources/components/parameters-editor/control/label"/>
+                                    <xf:alert ref="$resources/components/parameters-editor/control/alert"/>
+                                    <xf:itemset ref="instance('controls-label-value-itemset')/item">
+                                        <xf:label value="@label"/>
+                                        <xf:value value="@value"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </xh:td>
+                            <xh:td>
+                                <fr:checkbox-input ref="instance()/open-settings">
+
+                                </fr:checkbox-input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+
+                    <!--<fr:xforms-inspector/>-->
+
+                        <xh:div class="fr-dialog-buttons">
+                            <xf:group id="triggers">
+                                <xf:trigger id="save-trigger" appearance="xxf:primary">
+                                    <xf:label ref="$resources/apply/label"/>
+                                </xf:trigger>
+<!--                                <xf:output value="$resources/or/label"/>-->
+<!--                                <xf:trigger appearance="minimal" id="cancel-trigger">-->
+<!--                                    <xf:label ref="$resources/cancel/label"/>-->
+<!--                                </xf:trigger>-->
+                            </xf:group>
+                        </xh:div>
+
+                </xh:div>
+            </xxf:dialog>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

@@ -15,26 +15,28 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
 
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.{LHHASupport, XFormsSingleNodeControl}
-import org.orbeon.oxf.xforms.processor.handlers.HandlerSupport
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport}
 import org.xml.sax.Attributes
 
+
 abstract class XFormsGroupHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
+  uri             : String,
+  localname       : String,
+  qName           : String,
+  localAtts       : Attributes,
+  elementAnalysis : ElementAnalysis,
+  handlerContext  : HandlerContext
 ) extends
   XFormsControlLifecyleHandler(
     uri,
     localname,
     qName,
     localAtts,
-    matched,
+    elementAnalysis,
     handlerContext,
     repeating  = false,
     forwarding = true
@@ -52,7 +54,7 @@ abstract class XFormsGroupHandler(
 
     // Copy over existing label classes if any
     val labelClassAttribute =
-      xformsHandlerContext.getPartAnalysis.getLHH(getPrefixedId, LHHA.Label).element.attributeValue(XFormsNames.CLASS_QNAME)
+      handlerContext.getPartAnalysis.getLHH(getPrefixedId, LHHA.Label).element.attributeValue(XFormsNames.CLASS_QNAME)
 
     if (labelClassAttribute ne null) {
       labelClasses.append(' ')
@@ -63,8 +65,10 @@ abstract class XFormsGroupHandler(
   }
 
   protected def getLabelValue(xformsControl: XFormsSingleNodeControl): String =
-    if (xformsControl eq null) // TODO: can happen?
+    if (xformsControl eq null) {
+      // Q: Can this happen?
+      // 2020-11-13: Not 100% sure but haven't seen it yet. Probably safe to remove.
       null
-    else
+    } else
       xformsControl.getLabel
 }

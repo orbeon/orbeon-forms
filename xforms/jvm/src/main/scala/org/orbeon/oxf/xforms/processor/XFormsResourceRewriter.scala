@@ -18,7 +18,7 @@ import java.io._
 import java.util.regex.Matcher
 
 import org.orbeon.io.IOUtils._
-import org.orbeon.io.{CharsetNames, StringBuilderWriter}
+import org.orbeon.io.{CharsetNames, IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
@@ -27,6 +27,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.AssetPath
+import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -65,7 +66,7 @@ object XFormsResourceRewriter extends Logging {
     logger       : IndentedLogger
   ): Unit = {
 
-    val response = NetUtils.getExternalContext.getResponse
+    val response = CrossPlatformSupport.externalContext.getResponse
 
     val pipelineContext = PipelineContext.get
 
@@ -95,7 +96,7 @@ object XFormsResourceRewriter extends Logging {
     def tryReadCSS(path: String, is: InputStream) =
       Try {
         val sbw = new StringBuilderWriter
-        copyReader(new InputStreamReader(is, CharsetNames.Utf8), sbw)
+        copyReaderAndClose(new InputStreamReader(is, CharsetNames.Utf8), sbw)
         sbw.result
       } onFailure
         logFailure(path)
@@ -212,7 +213,7 @@ object XFormsResourceRewriter extends Logging {
     outputWriter.flush()
 
     inputStreamIterator foreach { is =>
-      useAndClose(is)(NetUtils.copyStream(_, os))
+      IOUtils.copyStreamAndClose(is, os, doCloseOut = false)
       os.write('\n')
     }
 

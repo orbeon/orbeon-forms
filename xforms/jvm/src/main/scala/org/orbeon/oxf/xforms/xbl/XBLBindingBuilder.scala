@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import java.net.URI
-
+import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.util.CoreUtils._
@@ -22,6 +21,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{IndentedLogger, WhitespaceMatching}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
@@ -29,9 +29,6 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
 import org.xml.sax.Attributes
-import dom.Extensions._
-
-import scala.collection.JavaConverters._
 
 
 /**
@@ -75,7 +72,7 @@ object XBLBindingBuilder {
   // - `mapScopeIds`
   // - updates to `Metadata`
   //
-  //  Indexing of of the result, OTOH, is done by the caller.
+  //  Indexing of the result, OTOH, is done by the caller.
   //
   def createConcreteBindingFromElem(
     partAnalysis      : PartAnalysisImpl,
@@ -84,7 +81,7 @@ object XBLBindingBuilder {
     controlPrefixedId : String,
     containerScope    : Scope)(implicit
     indentedLogger    : IndentedLogger
-  ): Option[(ConcreteBinding, Option[Global])] =
+  ): Option[(ConcreteBinding, Option[Global], Document)] =
     for (rawShadowTree <- generateRawShadowTree(partAnalysis, controlElement, abstractBinding)(indentedLogger))
       yield
         createScopeAndConcreteBinding(
@@ -98,7 +95,7 @@ object XBLBindingBuilder {
 
   // From a raw non-control tree (handlers, models) rooted at an element, produce a full annotated tree.
   def annotateSubtreeByElement(
-    partAnalysis   : PartAnalysisImpl,
+    partAnalysis   : PartAnalysisImpl, // for `Metadata` and `mapScopeIds`
     boundElement   : Element,
     element        : Element,
     innerScope     : Scope,
@@ -120,8 +117,8 @@ object XBLBindingBuilder {
 
   // Annotate a tree
   def annotateSubtree(
-    partAnalysis   : PartAnalysisImpl,
-    boundElement   : Option[Element], // for `xml:base` resolution
+    partAnalysis   : PartAnalysisImpl, // for `Metadata` and `mapScopeIds`
+    boundElement   : Option[Element],  // for `xml:base` resolution
     rawTree        : Document,
     innerScope     : Scope,
     outerScope     : Scope,
@@ -164,6 +161,30 @@ object XBLBindingBuilder {
     documentResult.getDocument
   }
 
+  def rebuildBinds(model: Model, rawModelElement: Element): Unit = {
+
+    assert(! model.part.isTopLevel)
+
+    def annotateSubTree(rawElement: Element) = {
+      val annotatedTree =
+        XBLBindingBuilder.annotateSubtree(
+          model.part,
+          None,
+          rawElement.createDocumentCopyParentNamespaces(detach = false),
+          model.scope,
+          model.scope,
+          XXBLScope.Inner,
+          model.containerScope,
+          hasFullUpdate = false,
+          ignoreRoot = false
+        )
+
+      annotatedTree
+    }
+
+    model.replaceBinds(rawModelElement.elements(XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement))
+  }
+
   private object Private {
 
     val logShadowTrees = XFormsProperties.getDebugLogging.contains("analysis-xbl-tree")
@@ -172,12 +193,12 @@ object XBLBindingBuilder {
     def generateRawShadowTree(
       partAnalysis    : PartAnalysisImpl,
       boundElement    : Element,
-      abstractBinding : AbstractBinding)(
+      abstractBinding : AbstractBinding)(implicit
       indentedLogger  : IndentedLogger
     ): Option[Document] =
       abstractBinding.templateElementOpt map {
         templateElement =>
-          withDebug("generating raw XBL shadow content", Seq("binding id" -> abstractBinding.bindingId.orNull)) {
+          withDebug("generating raw XBL shadow content", Seq("binding id" -> abstractBinding.commonBinding.bindingElemId.orNull)) {
 
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
 
@@ -195,9 +216,9 @@ object XBLBindingBuilder {
               xblSupport            = partAnalysis.staticState.xblSupport,
               shadowTreeDocument    = shadowTreeDocument,
               boundElement          = boundElement,
-              abstractBindingOpt    = Some(abstractBinding),
-              excludeNestedHandlers = abstractBinding.modeHandlers,
-              excludeNestedLHHA     = abstractBinding.modeLHHA,
+              abstractBindingOpt    = abstractBinding.some,
+              excludeNestedHandlers = abstractBinding.commonBinding.modeHandlers,
+              excludeNestedLHHA     = abstractBinding.commonBinding.modeLHHA,
               supportAVTs           = abstractBinding.supportAVTs
             )
           }(indentedLogger)
@@ -210,7 +231,7 @@ object XBLBindingBuilder {
       containerScope         : Scope,
       abstractBinding        : AbstractBinding,
       rawShadowTree          : Document
-    ) = {
+    ): (ConcreteBinding, Option[Global], Document) = {
 
       // New prefix corresponds to bound element prefixed id
       //val newPrefix = boundControlPrefixedId + COMPONENT_SEPARATOR
@@ -233,32 +254,18 @@ object XBLBindingBuilder {
           ignoreRoot = true
         )
 
-      // Annotate event handlers and implementation models
-      def annotateByElement(element: Element) =
-        annotateSubtreeByElement(
-          partAnalysis,
-          boundElement,
-          element,
-          newInnerScope,
-          outerScope,
-          XXBLScope.Inner,
-          newInnerScope
-        )
-
-      val annotatedHandlers = abstractBinding.handlers      map annotateByElement
-      val annotatedModels   = abstractBinding.modelElements map annotateByElement
-
       // Remember concrete binding information
+
+      require(
+        abstractBinding.commonBinding.bindingElemId.isDefined,
+        s"missing id on XBL binding for ${abstractBinding.bindingElement.toDebugString}"
+      )
+
       val newConcreteBinding =
         ConcreteBinding(
-          abstractBinding,
           newInnerScope,
-          outerScope,
-          annotatedHandlers,
-          annotatedModels,
           templateTree,
-          compactShadowTree,
-          boundElement.jAttributes.asScala map { att => att.getQName -> att.getValue } toMap
+          boundElement.attributes map { att => att.getQName -> att.getValue } toMap
         )
 
       // See also "Issues with `xxbl:global`" in PartAnalysisImpl
@@ -270,7 +277,7 @@ object XBLBindingBuilder {
       // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
       // TODO: should do this here, in order to include only the scripts and resources actually used
 
-      (newConcreteBinding, globalOpt)
+      (newConcreteBinding, globalOpt, compactShadowTree)
     }
 
     // Annotate a subtree and return a template and compact tree
@@ -347,7 +354,7 @@ object XBLBindingBuilder {
       abstractBinding.global map { globalDocument =>
 
         val (globalTemplateTree, globalCompactShadowTree) =
-          withDebug("generating global XBL shadow content", Seq("binding id" -> abstractBinding.bindingId.orNull)) {
+          withDebug("generating global XBL shadow content", Seq("binding id" -> abstractBinding.commonBinding.bindingElemId.orNull)) {
 
             val topLevelScopeForGlobals = partAnalysis.startScope
 

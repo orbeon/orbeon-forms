@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms
 
 import java.{util => ju}
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.CoreUtils._
@@ -22,7 +23,6 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControlFactory
 import org.orbeon.oxf.xforms.model.{RuntimeBind, XFormsInstance, XFormsModel}
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 
 import scala.collection.JavaConverters._
@@ -227,6 +227,12 @@ case class BindingContext(
       throw new ValidationException(s"No enclosing container XForms control found for id $contextId", locationData)
     }
   }
+
+  def repeatPositions: Iterator[Int] =
+    new AncestorIterator(includeSelf = true) collect {
+      case binding if binding.isRepeatIterationBindingContext => binding
+    } map
+      (_.position)
 
   def enclosingRepeatIterationBindingContext(repeatId: Option[String]): BindingContext = {
 

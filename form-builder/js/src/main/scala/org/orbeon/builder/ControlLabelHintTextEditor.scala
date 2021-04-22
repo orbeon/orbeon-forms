@@ -124,7 +124,7 @@ object ControlLabelHintTextEditor {
       Private.container.offset(labelHintOffset)
       Private.setValue(Private.labelHintValue)
       Private.checkbox.prop("checked", Private.isLabelHintHtml)
-      // Set tooltip for checkbox and HTML5 placeholders (don"t do this once for all, as the language can change)
+      // Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
       Private.checkbox.tooltip(new JQueryTooltipConfig() {
         val title = $(".fb-message-lhha-checkbox").text()
       })
@@ -271,7 +271,7 @@ object ControlLabelHintTextEditor {
         tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, tinyMceConfig, GlobalTinyMce.EditorManager)
         tinyMceObject.render()
         afterTinyMCEInitialized(() => {
-          // We don"t need the anchor anymore; just used to tell TinyMCE where to go in the DOM
+          // We don't need the anchor anymore; just used to tell TinyMCE where to go in the DOM
           tinymceAnchor.detach()
           $(tinyMceObject.getWin()).on("resize", makeSpaceForMCE _)
         })

@@ -29,7 +29,7 @@ abstract class XPathAnalysis {
   val dependentModels: collection.Set[String]
   val dependentInstances: collection.Set[String]
 
-  def returnableInstances = returnablePaths.map.keys
+  def returnableInstances: Iterable[String] = returnablePaths.map.keys
 
   // Combine this analysis with another one and return a new analysis
   def combine(other: XPathAnalysis): XPathAnalysis

@@ -43,6 +43,7 @@ object LightClientServerChannel extends ClientServerChannel[dom.Document] {
 
     requestTryCount = 0
 
+  Page.loadingIndicator().requestStarted(showProgress)
     asyncAjaxRequestWithRetry(
       requestFormId,
       AjaxRequest.buildXmlRequest(requestFormId, eventsToSend, sequenceNumberOpt),
@@ -71,8 +72,6 @@ object LightClientServerChannel extends ClientServerChannel[dom.Document] {
           controller.abort()
         }
 
-        Page.loadingIndicator().requestStarted(showProgress)
-
         val promise = Promise[dom.Document]()
 
         Support.fetchText(
@@ -88,28 +87,30 @@ object LightClientServerChannel extends ClientServerChannel[dom.Document] {
             response match {
               case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
                 // We ignore HTTP status and just check that we have a well-formed response document
+                Page.loadingIndicator().requestEnded(showProgress)
                 promise.success(responseXml)
               case Success((503, _, _)) =>
                 // The server returns an explicit 503 when the Ajax server is still busy
                 retryRequestAfterDelay(() =>
-                  asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors) onComplete
+                  asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
                     promise.complete
                 )
               case Success((_, responseText, responseXmlOpt)) =>
                 // Retry if we DON'T have an explicit error doc or a login
                 if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, ignoreErrors))
                   retryRequestAfterDelay(() =>
-                    asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors) onComplete
+                    asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
                       promise.complete
                   )
                 else {
+                  Page.loadingIndicator().requestEnded(showProgress)
                   // This was handled by showing a dialog or login
                   promise.failure(new Throwable) // TODO: It would be good to return another error type.
                 }
               case Failure(_) =>
                 logAndShowError(_, requestFormId, ignoreErrors)
                 retryRequestAfterDelay(() =>
-                  asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress = false, ignoreErrors = ignoreErrors) onComplete
+                  asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
                     promise.complete
                 )
             }

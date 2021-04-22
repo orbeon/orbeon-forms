@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.XMLParsing
 import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.xforms.CrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.Attributes
 
@@ -58,7 +59,7 @@ trait BindingLoader extends Logging {
         val urlMappings = readURLMappingsCacheAgainstProperty
 
         def propertyQNames(property: Property) =
-          property.value.toString.tokenizeToSet map
+          property.value.toString.tokenizeToSet flatMap
             (Extensions.resolveQName(property.namespaces, _, unprefixedIsNoNamespace = true))
 
         def pathsForQNames(qNames: Set[QName]) =
@@ -381,8 +382,8 @@ trait BindingLoader extends Logging {
 
     // Create binding for all xbl:binding[@element]
     for {
-      bindingElement <- xblElement.elements(XBL_BINDING_QNAME).to(List)
-      _              <- Option(bindingElement.attributeValue(ELEMENT_QNAME))
+      bindingElement <- xblElement.elements(XBL_BINDING_QNAME).toList
+      _              <- bindingElement.attributeValueOpt(ELEMENT_QNAME)
     } yield
       AbstractBinding.fromBindingElement(bindingElement, path, lastModified, scriptElements)
   }
@@ -394,12 +395,11 @@ trait BindingLoader extends Logging {
 
 object BindingLoader extends BindingLoader {
 
-  import org.orbeon.oxf.properties.Properties
   import org.orbeon.oxf.resources.ResourceManagerWrapper
 
   private val rm = ResourceManagerWrapper.instance
 
-  def getPropertySet = Properties.instance.getPropertySet
+  def getPropertySet = CrossPlatformSupport.properties
 
   def lastModifiedByPath(path: String): Long = {
     debug("checking last modified", List("path" -> path))

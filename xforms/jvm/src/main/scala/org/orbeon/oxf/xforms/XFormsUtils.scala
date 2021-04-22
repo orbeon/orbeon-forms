@@ -19,6 +19,7 @@ import java.net.{URI, URISyntaxException}
 import javax.xml.transform.dom.{DOMResult, DOMSource}
 import javax.xml.transform.{Result, TransformerException}
 import org.ccil.cowan.tagsoup.HTMLSchema
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.processor.DebugProcessor
@@ -27,9 +28,10 @@ import org.orbeon.oxf.util.{NetUtils, URLRewriterUtils, XPathCache}
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.{IOSupport, LocationData}
+import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, VirtualNode}
+import org.orbeon.xforms.CrossPlatformSupport
 import org.w3c.dom
 import org.xml.sax.InputSource
 
@@ -120,13 +122,13 @@ object XFormsUtils {
     if (skipRewrite)
       resolvedURIStringNoPortletFragment
     else
-      NetUtils.getExternalContext.getResponse.rewriteRenderURL(resolvedURIStringNoPortletFragment, null, null)
+      CrossPlatformSupport.externalContext.getResponse.rewriteRenderURL(resolvedURIStringNoPortletFragment, null, null)
   }
 
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: Element, url: String): String = {
     val resolvedURI = resolveXMLBase(containingDocument, currentElement, url)
     val resolvedURIStringNoPortletFragment = uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument, resolvedURI)
-    NetUtils.getExternalContext.getResponse.rewriteActionURL(resolvedURIStringNoPortletFragment, null, null)
+    CrossPlatformSupport.externalContext.getResponse.rewriteActionURL(resolvedURIStringNoPortletFragment, null, null)
   }
 
   private def uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument: XFormsContainingDocument, resolvedURI: URI): String =
@@ -151,7 +153,7 @@ object XFormsUtils {
    */
   def resolveResourceURL(containingDocument: XFormsContainingDocument, element: Element, url: String, rewriteMode: Int): String = {
     val resolvedURI = resolveXMLBase(containingDocument, element, url)
-    NetUtils.getExternalContext.getResponse.rewriteResourceURL(resolvedURI.toString, rewriteMode)
+    CrossPlatformSupport.externalContext.getResponse.rewriteResourceURL(resolvedURI.toString, rewriteMode)
   }
 
   /**
@@ -165,7 +167,7 @@ object XFormsUtils {
    */
   def resolveServiceURL(containingDocument: XFormsContainingDocument, element: Element, url: String, rewriteMode: Int): String = {
     val resolvedURI = resolveXMLBase(containingDocument, element, url)
-    URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, resolvedURI.toString, rewriteMode)
+    URLRewriterUtils.rewriteServiceURL(CrossPlatformSupport.externalContext.getRequest, resolvedURI.toString, rewriteMode)
   }
 
   /**

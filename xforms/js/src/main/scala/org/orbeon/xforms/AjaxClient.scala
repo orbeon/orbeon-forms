@@ -361,7 +361,6 @@ object AjaxClient {
         // `require(EventQueue.ajaxRequestInProgress == false)`
 
         EventQueue.ajaxRequestInProgress = false
-        Page.loadingIndicator().requestEnded(showProgress)
 
         // Notify listeners that we are done processing this request
         ajaxResponseProcessed.fire(details)
@@ -477,7 +476,7 @@ object AjaxClient {
           events collect { case e if e.eventName == XXFormsValue => e } groupByKeepOrder (_.targetIdOpt)
 
         valueEventsGroupedByTargetId foreach {
-          case (Some(targetId), events) => ServerValueStore.set(targetId, events.head.properties.get("value").get.asInstanceOf[String])
+          case (Some(targetId), events) => ServerValueStore.set(targetId, events.last.properties.get("value").get.asInstanceOf[String])
           case _ =>
         }
       }

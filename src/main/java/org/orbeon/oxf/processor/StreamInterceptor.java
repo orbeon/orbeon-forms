@@ -13,16 +13,14 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
 import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.XMLParsing;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
@@ -40,7 +38,7 @@ import java.io.*;
  */
 public class StreamInterceptor {
 
-    private static Logger logger = LoggerFactory.createLogger(StreamInterceptor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(StreamInterceptor.class);
 
     private StringWriter writer;
     private ByteArrayOutputStream byteStream;
@@ -158,7 +156,7 @@ public class StreamInterceptor {
                 }
             }
         } catch (SAXParseException e) {
-            throw new ValidationException(e.getMessage(), new LocationData(e));
+            throw new ValidationException(e.getMessage(), XmlLocationData.apply(e));
         } catch (Exception e) {
             throw new OXFException(e);
         }

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.event.events
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import XFormsEvent._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
+import org.orbeon.xforms.analysis.model.ValidationLevel
 
 /**
  * Base class for UI events, that is events only dispatched to controls.

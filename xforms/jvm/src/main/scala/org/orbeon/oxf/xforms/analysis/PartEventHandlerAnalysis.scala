@@ -14,14 +14,12 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.event.{EventHandler, EventHandlerImpl}
-import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.xforms.EventNames
+import org.orbeon.xforms.XFormsNames._
 
-import scala.collection.mutable
 import scala.collection.compat._
+import scala.collection.mutable
 
 
 // Part analysis: event handlers information
@@ -31,18 +29,18 @@ trait PartEventHandlerAnalysis {
 
   import PartEventHandlerAnalysis._
 
-  private[PartEventHandlerAnalysis] var _handlersForObserver: Map[String, List[EventHandler]] = Map()
-  private[PartEventHandlerAnalysis] var _eventNames: Set[String] = Set()
-  private[PartEventHandlerAnalysis] var _keyboardHandlers: List[EventHandler] = List()
+  private[PartEventHandlerAnalysis] var _handlersForObserver: Map[String, List[EventHandler]] = Map.empty
+  private[PartEventHandlerAnalysis] var _eventNames: Set[String] = Set.empty
+  private[PartEventHandlerAnalysis] var _keyboardHandlers: List[EventHandler] = Nil
 
   // Scripts
-  private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, StaticScript] = Map()
+  private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, StaticScript] = Map.empty
   def scriptsByPrefixedId: Map[String, StaticScript] = _scriptsByPrefixedId
   private[PartEventHandlerAnalysis] var _uniqueJsScripts: List[ShareableScript] = Nil
   def uniqueJsScripts: List[ShareableScript] = _uniqueJsScripts
 
   // Register new event handlers
-  def registerEventHandlers(eventHandlers: Seq[EventHandlerImpl]): Unit = {
+  def registerEventHandlers(eventHandlers: Seq[EventHandler]): Unit = {
 
     val tuples =
       for {
@@ -118,7 +116,7 @@ trait PartEventHandlerAnalysis {
       findForActionIt(ScriptActionName,  scriptType, Some(JavaScriptScriptType)) map
       (extractStaticScript(_, scriptType))
 
-    val jsScripts      = findForScriptTypeIt(JavaScriptScriptType).to(List)
+    val jsScripts      = findForScriptTypeIt(JavaScriptScriptType).toList
     val xpathScriptsIt = findForScriptTypeIt(XPathScriptType)
 
     _scriptsByPrefixedId ++=
@@ -131,7 +129,7 @@ trait PartEventHandlerAnalysis {
   }
 
   // Deregister the given handler
-  def deregisterEventHandler(eventHandler: EventHandlerImpl): Unit = {
+  def deregisterEventHandler(eventHandler: EventHandler): Unit = {
     eventHandler.observersPrefixedIds foreach (_handlersForObserver -= _)
 
     if (eventHandler.eventNames intersect EventNames.KeyboardEvents nonEmpty)

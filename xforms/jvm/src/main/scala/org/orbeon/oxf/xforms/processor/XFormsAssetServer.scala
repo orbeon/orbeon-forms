@@ -17,7 +17,7 @@ import java.io._
 import java.net.{URI, URLEncoder}
 
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.{CharsetNames, UriScheme}
+import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.HttpMethod.GET
@@ -30,10 +30,12 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquireLock
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
+import org.orbeon.xforms.CrossPlatformSupport
 
+import scala.collection.compat._
+import scala.collection.immutable.ListSet
 import scala.util.Try
 import scala.util.control.NonFatal
-import scala.collection.compat._
 
 /**
   * Serve XForms engine JavaScript and CSS resources by combining them.
@@ -44,7 +46,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
   override def start(pipelineContext: PipelineContext): Unit = {
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext = CrossPlatformSupport.externalContext
 
     val requestPath = externalContext.getRequest.getRequestPath
     val response    = externalContext.getResponse
@@ -80,7 +82,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           expires      = requestTime + externalContext.getRequest.getSession(true).getMaxInactiveInterval * 1000
         )
 
-        useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
+        IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
           fromCurrentStateOpt orElse fromInitialStateOpt foreach { content =>
             writer.write(content)
           }
@@ -100,7 +102,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
           response.setResourceCaching(validity, requestTime + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
 
-          useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
+          IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
             ScriptBuilder.writeScripts(
               state.topLevelPart.uniqueJsScripts,
               writer.write
@@ -158,31 +160,34 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
         val contentFilename = addExtensionIfNeeded(rawFilename)
 
         // Handle as attachment
-        // TODO: filename should be encoded somehow, as 1) spaces don't work and 2) non-ISO-8859-1 won't work
-        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(contentFilename, CharsetNames.Utf8))
+
+        // To support spaces and non-US-ASCII characters, we encode the filename using RFC 5987 percentage encoding.
+        // This is what the XPath `encode-for-uri()` does. Here we use the URLEncoder, which does
+        // application/x-www-form-urlencoded encoding, which seems to differ from RFC 5987 in that the space is
+        // encoded as a "+". Also see https://stackoverflow.com/a/2678602/5295.
+        val filenameEncodedForHeader = URLEncoder.encode(contentFilename, CharsetNames.Utf8).replaceAllLiterally("+", "%20")
+
+        // All browsers since IE7, Safari 5 support the `filename*=UTF-8''` syntax to indicate that the filename is
+        // UTF-8 percent encoded. Also see https://stackoverflow.com/a/6745788/5295.
+        response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + filenameEncodedForHeader)
 
         // Copy stream out
         try {
           val cxr =
-            Connection(
+            Connection.connectNow(
               method      = GET,
               url         = resource.uri,
               credentials = None,
               content     = None,
               headers     = resource.headers,
               loadState   = true,
+              saveState   = true,
               logBody     = false
-            ).connect(
-              saveState = true
             )
 
           // TODO: handle 404, etc. and set response parameters *after* we know that we have a successful response code.
 
-          useAndClose(cxr.content.inputStream) { is =>
-            useAndClose(response.getOutputStream) { os =>
-              copyStream(is, os)
-            }
-          }
+          IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
         } catch {
           case NonFatal(t) => warn("exception copying stream", Seq("throwable" -> OrbeonFormatter.format(t)))
         }
@@ -278,7 +283,7 @@ object XFormsAssetServer {
   ): String = {
 
     // Get session
-    val externalContext = NetUtils.getExternalContext
+    val externalContext = CrossPlatformSupport.externalContext
     val session = externalContext.getRequest.getSession(true)
 
     require(session ne null, "proxyURI requires a session")
@@ -287,7 +292,7 @@ object XFormsAssetServer {
     // an absolute URI.
     val serviceAbsoluteUrl = new URI(
       URLRewriterUtils.rewriteServiceURL(
-        NetUtils.getExternalContext.getRequest,
+        CrossPlatformSupport.externalContext.getRequest,
         uri,
         URLRewriter.REWRITE_MODE_ABSOLUTE
       )
@@ -295,14 +300,15 @@ object XFormsAssetServer {
 
     val outgoingHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        url              = serviceAbsoluteUrl,
-        hasCredentials   = false,
-        customHeaders    = customHeaders,
-        headersToForward = headersToForward,
-        cookiesToForward = Connection.cookiesToForwardFromProperty,
-        getHeader        = getHeader)(
-        logger           = logger,
-        externalContext  = externalContext
+        url                      = serviceAbsoluteUrl,
+        hasCredentials           = false,
+        customHeaders            = customHeaders,
+        headersToForward         = headersToForward,
+        cookiesToForward         = Connection.cookiesToForwardFromProperty,
+        getHeader                = getHeader)(
+        logger                   = logger,
+        externalContext          = externalContext,
+        coreCrossPlatformSupport = CoreCrossPlatformSupport
       )
 
     val resource =
@@ -329,7 +335,7 @@ object XFormsAssetServer {
     removeFile      : Boolean
   ): Unit = {
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext = CrossPlatformSupport.externalContext
 
     findDynamicResource(requestPath) foreach { resource =>
       externalContext.getRequest.sessionOpt foreach { session =>

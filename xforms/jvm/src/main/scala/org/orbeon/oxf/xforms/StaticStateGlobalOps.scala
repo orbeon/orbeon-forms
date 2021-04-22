@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.analysis.model.Instance
-import org.orbeon.oxf.xforms.xbl.{AbstractBinding, XBLAssets}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, ConcreteBinding, XBLAssets}
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._
@@ -74,7 +74,6 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
   def hasControlByName(controlName: String) = existsInParts(_.hasControlByName(controlName))
   def controlsByName(controlName: String) = collectInParts(_.controlsByName(controlName))
-  def getBinding(prefixedId: String) = findInPartsOpt(_.getBinding(prefixedId))
 
   def repeats = collectInPartsReverse(_.repeats)
   def getRepeatHierarchyString(ns: String) = parts map (_.getRepeatHierarchyString(ns)) mkString "," // just concat the repeat strings from all parts

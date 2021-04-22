@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.file;
 
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.optional.ssh.Scp;
 import org.orbeon.dom.Document;
@@ -48,7 +47,7 @@ public class FileProcessor extends ProcessorImpl {
 
     private static final boolean DEFAULT_MAKE_DIRECTORIES = false;
 
-    private static Logger logger = LoggerFactory.createLogger(FileProcessor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(FileProcessor.class);
 
     public static final String FILE_PROCESSOR_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/file-processor-config";
 

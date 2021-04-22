@@ -384,7 +384,8 @@
                         . = $i/original-control-name or
                         not(
                             ends-with(., '-iteration') or
-                            . = xxf:split($i/control-names)
+                            xxf:split($i/control-names) = . or
+                            xxf:split($i/control-names) = concat(., '-content')
                         )"/>
 
                 <xf:bind

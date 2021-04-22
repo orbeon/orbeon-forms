@@ -13,16 +13,18 @@
  */
 package org.orbeon.oxf.processor.pipeline;
 
-import org.apache.log4j.Logger;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.xml.sax.SAXException;
 
 /**
@@ -30,7 +32,7 @@ import org.xml.sax.SAXException;
  */
 public class TeeProcessor extends ProcessorImpl {
 
-    private static final Logger logger = LoggerFactory.createLogger(TeeProcessor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(TeeProcessor.class);
     private Exception creationException;
     private Exception resetException;
     private ProcessorKey resetProcessorKey;

@@ -10,23 +10,12 @@
   * See the GNU Lesser General Public License for more details.
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  *//**
-  * Copyright (C) 2010 Orbeon, Inc.
-  *
-  * This program is free software; you can redistribute it and/or modify it under the terms of the
-  * GNU Lesser General Public License as published by the Free Software Foundation; either version
-  * 2.1 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  * See the GNU Lesser General Public License for more details.
-  *
-  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsTextareaControl}
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
@@ -35,25 +24,35 @@ import org.xml.sax.Attributes
   * Handle xf:textarea.
   */
 class XFormsTextareaHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
-) extends XFormsControlLifecyleHandler(uri, localname, qName, localAtts, matched, handlerContext, repeating = false, forwarding = false) {
+  uri             : String,
+  localname       : String,
+  qName           : String,
+  localAtts       : Attributes,
+  elementAnalysis : ElementAnalysis,
+  handlerContext  : HandlerContext
+) extends
+  XFormsControlLifecyleHandler(
+    uri,
+    localname,
+    qName,
+    localAtts,
+    elementAnalysis,
+    handlerContext,
+    repeating  = false,
+    forwarding = false
+  ) {
 
   private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
-    staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControl))
+    PlaceHolderInfo.placeHolderValueOpt(elementAnalysis, currentControl)
 
   override protected def handleControlStart(): Unit = {
 
     val textareaControl        = currentControl.asInstanceOf[XFormsTextareaControl]
-    val xmlReceiver            = xformsHandlerContext.getController.getOutput
+    val xmlReceiver            = handlerContext.controller.output
     val htmlTextareaAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, textareaControl, addId = true)
 
     // Create xhtml:textarea
-    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
+    val xhtmlPrefix = handlerContext.findXHTMLPrefix
 
     if (! XFormsBaseHandler.isStaticReadonly(textareaControl)) {
 

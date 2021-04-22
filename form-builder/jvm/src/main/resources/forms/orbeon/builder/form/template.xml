@@ -22,6 +22,7 @@
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:map="http://www.w3.org/2005/xpath-functions/map"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+    xmlns:math="http://www.w3.org/2005/xpath-functions/math"
     xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:saxon="http://saxon.sf.net/"

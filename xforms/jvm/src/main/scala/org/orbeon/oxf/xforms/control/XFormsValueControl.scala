@@ -62,7 +62,6 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
 
   final override def preEvaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
 
-    // Evaluate other aspects of the control if necessary
     super.preEvaluateImpl(relevant, parentRelevant) // 2019-09-13: `super` is a NOP
 
     // Evaluate control values

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.http.HttpStatusCode
@@ -21,14 +22,15 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.DataModel.Reason
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.xforms.XFormsNames
 
-import scala.xml.Elem
 import scala.collection.compat._
+import scala.xml.Elem
+
 
 // Represent a non-fatal server XForms error
 case class ServerError(
@@ -126,8 +128,11 @@ object XFormsError {
     containingDocument.addServerError(ServerError(reason.message, Option(locationData)))
   }
 
-  def handleNonFatalXPathError(container: XBLContainer, t: Throwable): Unit =
-    handleNonFatalXFormsError(container, "exception while evaluating XPath expression", t)
+  def handleNonFatalXPathError(container: XBLContainer, t: Throwable, expressionOpt: Option[String] = None): Unit = {
+    val expressionForMessage = expressionOpt.map(e => s" `$e`").getOrElse("")
+    val message = "exception while evaluating XPath expression" + expressionForMessage
+    handleNonFatalXFormsError(container, message, t)
+  }
 
   def handleNonFatalActionError(target: XFormsEventTarget, t: Throwable): Unit =
     handleNonFatalXFormsError(target.container, "exception while running action", t)
@@ -156,15 +161,8 @@ object XFormsError {
   }
 
   // Output the Ajax error panel with a placeholder for errors
-  def outputAjaxErrorPanel(
-    containingDocument : XFormsContainingDocument,
-    helper             : XMLReceiverHelper,
-    htmlPrefix         : String
-  ): Unit =
-    helper.element("", XMLNames.XIncludeURI, "include", Array(
-      "href", XHTMLBodyHandler.getIncludedResourceURL(containingDocument.getRequestPath, "error-dialog.xml"),
-      "fixup-xml-base", "false"
-    ))
+  def outputAjaxErrorPanel(containingDocument: XFormsContainingDocument)(implicit xmlReceiver: XMLReceiver): Unit =
+    outputXInclude(XHTMLBodyHandler.getIncludedResourceURL(containingDocument.getRequestPath, "error-dialog.xml"))
 
   import XMLReceiverSupport._
 

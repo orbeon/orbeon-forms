@@ -13,38 +13,40 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
+import org.orbeon.datatypes.ExtendedLocationData
 import org.orbeon.dom.saxon.{DocumentWrapper, TypedDocumentWrapper}
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.oxf.common.{ValidationException, Version}
-import org.orbeon.oxf.http.Credentials
+import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Logging, NetUtils, XPath}
+import org.orbeon.oxf.util.{Logging, XPath}
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.model.InstanceDataOps
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.ExtendedLocationData
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import shapeless.syntax.typeable._
 
-import scala.collection.JavaConverters._
-
 /**
  * Static analysis of an XForms instance.
  */
 class Instance(
-  staticStateContext : StaticStateContext,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends SimpleElementAnalysis(
-  staticStateContext,
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ElementAnalysis(
+  part,
+  index,
   element,
   parent,
   preceding,
@@ -54,7 +56,7 @@ class Instance(
   def partExposeXPathTypes: Boolean = part.isExposeXPathTypes
 
   override def extendedLocationData =
-    new ExtendedLocationData(
+    XmlExtendedLocationData(
       locationData,
       Some("processing XForms instance"),
       List("id" -> staticId),
@@ -83,13 +85,13 @@ class Instance(
               "model id"       -> parent.get.staticId,
               "instance id"    -> staticId,
               "scope id"       -> (component.bindingOpt map (_.innerScope.scopeId) orNull),
-              "binding name"   -> component.abstractBinding.debugBindingName,
+              "binding name"   -> component.commonBinding.debugBindingName,
               "model index"    -> modelIndex.toString,
               "instance index" -> instanceIndex.toString
             )
           )
 
-          component.abstractBinding.constantInstances((modelIndex, instanceIndex))
+          component.commonBinding.constantInstances((modelIndex, instanceIndex))
         case None =>
 
           debug(
@@ -152,14 +154,14 @@ trait InstanceMetadata {
   def isStrictValidation = validation == "strict"
   def isSchemaValidation = isLaxValidation || isStrictValidation
 
-  val credentials: Option[Credentials] = {
+  val credentials: Option[BasicCredentials] = {
     // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
     def username       = element.attributeValue(XXFORMS_USERNAME_QNAME)
     def password       = element.attributeValue(XXFORMS_PASSWORD_QNAME)
     def preemptiveAuth = element.attributeValue(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
     def domain         = element.attributeValue(XXFORMS_DOMAIN_QNAME)
 
-    Option(username) map (Credentials(_, password, preemptiveAuth, domain))
+    Option(username) map (BasicCredentials(_, password, preemptiveAuth, domain))
   }
 
   val excludeResultPrefixes: Set[String] = element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES).tokenizeToSet
@@ -180,7 +182,7 @@ trait InstanceMetadata {
     throw new ValidationException("xf:instance must contain at most one child element", extendedLocationData)
 
   private def getAttributeEncode(qName: QName): Option[String] =
-    Option(element.attributeValue(qName)) map (att => NetUtils.encodeHRRI(att.trimAllToEmpty, true))
+    element.attributeValueOpt(qName) map (att => att.trimAllToEmpty.encodeHRRI(processSpace = true))
 
   private def src: Option[String]      = getAttributeEncode(SRC_QNAME)
   private def resource: Option[String] = getAttributeEncode(RESOURCE_QNAME)

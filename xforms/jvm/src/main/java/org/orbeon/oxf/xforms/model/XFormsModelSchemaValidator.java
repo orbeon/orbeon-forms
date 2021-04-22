@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.model;
 
-import org.apache.log4j.Logger;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Attribute;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
@@ -41,14 +41,10 @@ import org.orbeon.msv.verifier.regexp.xmlschema.XSREDocDecl;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.URLRewriter$;
 import org.orbeon.oxf.processor.validation.SchemaValidationException;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.oxf.xforms.ErrorInfo;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xforms.schema.MSVGrammarReaderController;
@@ -59,9 +55,9 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLParsing;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;
 import org.orbeon.xforms.XFormsNames;
+import org.orbeon.xforms.runtime.ErrorInfo;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.AttributesImpl;
 import scala.Option;
@@ -83,7 +79,7 @@ import java.util.List;
 public class XFormsModelSchemaValidator {
 
     private static final ValidationContext validationContext = new ValidationContext();
-    public static Logger logger = LoggerFactory.createLogger(XFormsModelSchemaValidator.class);
+    public static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(XFormsModelSchemaValidator.class);
 
     private Element modelElement;
     private IndentedLogger indentedLogger;
@@ -102,7 +98,7 @@ public class XFormsModelSchemaValidator {
         // Check for external schemas
         final String schemaAttribute = modelElement.attributeValue(XFormsNames.SCHEMA_QNAME());
         if (schemaAttribute != null)
-            this.schemaURIs = org.apache.commons.lang3.StringUtils.split(NetUtils.encodeHRRI(schemaAttribute, false));
+            this.schemaURIs = org.apache.commons.lang3.StringUtils.split(MarkupUtils.encodeHRRI(schemaAttribute, false));
 
         // Check for inline schemas
         // "3.3.1 The model Element [...] xs:schema elements located inside the current model need not be listed."
@@ -160,13 +156,13 @@ public class XFormsModelSchemaValidator {
         } else {
             newErrorMessage = errMsg;
         }
-        if (indentedLogger.isDebugEnabled())
+        if (indentedLogger.debugEnabled())
             indentedLogger.logDebug("schema", "validation error", "error", newErrorMessage);
         InstanceData.addSchemaError(element);
     }
 
     private void addSchemaError(final Attribute attribute, final String schemaError) {
-        if (indentedLogger.isDebugEnabled())
+        if (indentedLogger.debugEnabled())
             indentedLogger.logDebug("schema", "validation error", "error", schemaError);
         InstanceData.addSchemaError(attribute);
     }
@@ -174,7 +170,7 @@ public class XFormsModelSchemaValidator {
     private boolean handleIDErrors(final IDConstraintChecker icc) {
         boolean isValid = true;
         for (ErrorInfo errorInfo = icc.clearErrorInfo(); errorInfo != null; errorInfo = icc.clearErrorInfo()) {
-            if (indentedLogger.isDebugEnabled())
+            if (indentedLogger.debugEnabled())
                 indentedLogger.logDebug("schema", "validation error", "error", errorInfo.message());
             addSchemaError(errorInfo.element(), errorInfo.message());
             isValid = false;
@@ -556,7 +552,7 @@ public class XFormsModelSchemaValidator {
             // Resolve URL
             // NOTE: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
             final String resolvedURLString = org.orbeon.oxf.xforms.XFormsUtils.resolveServiceURL(containingDocument, modelElement, schemaURIs[0],
-                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+                    URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE());
 
             // Load associated grammar
             schemaGrammar = loadCacheGrammar(containingDocument, resolvedURLString);
@@ -602,7 +598,7 @@ public class XFormsModelSchemaValidator {
             }
             return grammar;
         } catch (Exception e) {
-            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(absoluteSchemaURL, -1, -1, "loading schema from URI"));
+            throw OrbeonLocationException.wrapException(e, XmlExtendedLocationData.apply(absoluteSchemaURL, -1, -1, "loading schema from URI"));
         }
     }
 

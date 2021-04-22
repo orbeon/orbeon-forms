@@ -16,8 +16,12 @@ package org.orbeon.oxf.xforms.submission
 import java.io.ByteArrayInputStream
 import java.net.URI
 
+import cats.syntax.option._
 import org.orbeon.oxf.http.{Headers, StreamedContent}
-import org.orbeon.oxf.util.{Connection, ConnectionResult, NetUtils}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport}
+import org.orbeon.xforms.CrossPlatformSupport
+
+import scala.util.Success
 
 /**
  * Test submission which just echoes the incoming document.
@@ -37,20 +41,21 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     p : SubmissionParameters,
     p2: SecondPassParameters,
     sp: SerializationParameters
-  ): SubmissionResult = {
+  ): Option[SubmissionResult] = {
 
-    if (sp.messageBody == null) {
-      // Not sure when this can happen, but it can't be good
-      throw new XFormsSubmissionException(
-        submission  = submission,
-        message     = "Action 'test:': no message body.",
-        description = "processing submission response"
-      )
-    }  else {
-      // Log message body for debugging purposes
-      val indentedLogger = getDetailsLogger(p, p2)
-      if (indentedLogger.isDebugEnabled && BaseSubmission.isLogBody)
-        Connection.logRequestBody(sp.actualRequestMediatype, sp.messageBody)(indentedLogger)
+    sp.messageBody match {
+      case None =>
+        // Not sure when this can happen, but it can't be good
+        throw new XFormsSubmissionException(
+          submission  = submission,
+          message     = "Action 'test:': no message body.",
+          description = "processing submission response"
+        )
+      case Some(messageBody) =>
+        // Log message body for debugging purposes
+        val indentedLogger = getDetailsLogger(p, p2)
+        if (indentedLogger.debugEnabled && BaseSubmission.isLogBody)
+          SubmissionUtils.logRequestBody(sp.actualRequestMediatype, messageBody)(indentedLogger)
     }
 
     val customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.replaceType == ReplaceType.All)
@@ -65,16 +70,17 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
       )
 
     val headers = Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-      url              = url,
-      method           = p.httpMethod,
-      hasCredentials   = p2.credentialsOpt.isDefined,
-      mediatype        = sp.actualRequestMediatype,
-      encodingForSOAP  = p2.encoding,
-      customHeaders    = customHeaderNameValues,
-      headersToForward = Connection.headersToForwardFromProperty,
-      getHeader        = containingDocument.headersGetter)(
-      logger           = getDetailsLogger(p, p2),
-      externalContext  = NetUtils.getExternalContext
+      url                      = url,
+      method                   = p.httpMethod,
+      hasCredentials           = p2.credentialsOpt.isDefined,
+      mediatypeOpt             = sp.actualRequestMediatype.some,
+      encodingForSOAP          = p2.encoding,
+      customHeaders            = customHeaderNameValues,
+      headersToForward         = Connection.headersToForwardFromProperty,
+      getHeader                = containingDocument.headersGetter)(
+      logger                   = getDetailsLogger(p, p2),
+      externalContext          = CrossPlatformSupport.externalContext,
+      coreCrossPlatformSupport = CoreCrossPlatformSupport
     )
 
     // Do as if we are receiving a regular XML response
@@ -83,9 +89,9 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
       statusCode          = 200,
       headers             = headers,
       content             = StreamedContent(
-        inputStream     = new ByteArrayInputStream(sp.messageBody),
+        inputStream     = new ByteArrayInputStream(sp.messageBody getOrElse Array.emptyByteArray),
         contentType     = Headers.firstItemIgnoreCase(headers, Headers.ContentType),
-        contentLength   = Some(sp.messageBody.length),
+        contentLength   = Some(sp.messageBody map (_.length.toLong) getOrElse 0L),
         title           = None
       )
     )
@@ -94,6 +100,6 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     // Deserialize here so it can run in parallel
     replacer.deserialize(connectionResult, p, p2)
 
-    new SubmissionResult(submission.getEffectiveId, replacer, connectionResult)
+    SubmissionResult(submission.getEffectiveId, Success((replacer, connectionResult))).some
   }
 }

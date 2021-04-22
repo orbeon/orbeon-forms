@@ -28,6 +28,7 @@ import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{NetUtils, XPath}
+import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
@@ -39,6 +40,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.XFormsNames.{ID_QNAME, VALIDATION_QNAME}
 
 import scala.collection.compat._
 import scala.collection.mutable
@@ -335,8 +337,13 @@ object ToolboxOps {
         insert(after = ctx.modelElem +: xbl, origin = binding parent * )
 
       // Insert template into section
-      findViewTemplate(binding) foreach
-        (template => insert(into = section, after = section / *, origin = template))
+      findViewTemplate(binding) foreach { template =>
+        val control     = insert(into = section, after = section / *, origin = template)
+        val sectionName = ControlOps.controlNameFromIdOpt(section.id).get
+        val contentName = sectionName + TemplateContentSuffix
+        val idAttribute = NodeInfoFactory.attributeInfo(ID_QNAME, controlId(contentName))
+        insert(into = control, origin = idAttribute)
+      }
 
       UndoAction.InsertSectionTemplate(section.id)
     }

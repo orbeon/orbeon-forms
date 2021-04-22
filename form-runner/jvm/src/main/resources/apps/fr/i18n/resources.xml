@@ -224,6 +224,8 @@
                 <database-error>There was an error communicating with the database. Please contact the application administrator.</database-error>
                 <service-error>There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error>There was an error running the process. Please contact the application administrator.</process-error>
+                <wizard-prev-error>Please fix errors before moving backward</wizard-prev-error>
+                <wizard-next-error>Please fix errors before moving forward</wizard-next-error>
                 <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
                 <error-dialog-title>Unable to complete action</error-dialog-title>
                 <confirmation-dialog-title>Confirmation</confirmation-dialog-title>
@@ -700,6 +702,8 @@
                 <database-error>Une erreur s'est produite en communiquant avec la base de données. Veuillez contacter votre l'administrateur système.</database-error>
                 <service-error>Une erreur s'est produite en communiquant avec un service. Veuillez contacter votre l'administrateur système.</service-error>
                 <process-error>Une erreur s'est produite en exécutant le processus. Veuillez contacter votre l'administrateur système.</process-error>
+                <wizard-prev-error>Veuillez corriger les erreurs avant de revenir en arrière</wizard-prev-error>
+                <wizard-next-error>Veuillez corriger les erreurs avant d'avancer</wizard-next-error>
                 <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas enregistrées.</clear-confirm-message>
                 <error-dialog-title>L'opération n'a pas pu être effectuée</error-dialog-title>
                 <confirmation-dialog-title>Confirmation</confirmation-dialog-title>
@@ -719,7 +723,7 @@
                 <upload-done>Téléchargement vers le serveur terminé</upload-done>
                 <upload-error>Une erreur s'est produite durant le téléchargement vers le serveur. Veuillez ressayer.</upload-error>
                 <upload-error-size>Le fichier téléchargé est trop grand. La taille maximale est {0,number,integer} bytes et la taille reçue est {1,number,integer} bytes.</upload-error-size>
-                <upload-error-mediatype>Le fichier téléchargé est d'un type incorrect.</upload-error-mediatype>
+                <upload-error-mediatype>Le fichier téléchargé est d''un type incorrect.</upload-error-mediatype>
                 <upload-error-file-scan>Le fichier téléchargé a été rejeté par le scanner de fichiers. Veuillez vérifier qu'il ne s'agit pas d'un fichier infecté. Voici le message du scanner de fichiers: "{0}".</upload-error-file-scan>
                 <lost-attachments>Des fichiers joints ont été perdus suite à un problème sur le serveur. Veuillez vérifier tous vos fichiers joints et les annexer à nouveau si nécessaire.</lost-attachments>
             </messages>
@@ -1168,6 +1172,8 @@
                 <database-error>Error de comunicación con la base de datos. Contacte al adminstrador de la aplicación.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error>Error corriendo el proceso. Contacte al adminstrador de la aplicación.</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Esta seguro de limpiar todos los campos de la página? Los datos se perderán sino los guarda.</clear-confirm-message>
                 <error-dialog-title>Imposible completar la acción</error-dialog-title>
                 <confirmation-dialog-title>Confirmación</confirmation-dialog-title>
@@ -1632,6 +1638,8 @@
                 <database-error>Feil i kommunikasjon med tjener. Vennligst kontakt din systemadministrator.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error todo="true">[There was an error running the process. Please contact the application administrator.]</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Er du sikker på at du vil slette innholdet i alle felter på siden? Innholdet vil bli tapt.</clear-confirm-message>
                 <error-dialog-title todo="true">[Unable to Complete Action]</error-dialog-title>
                 <confirmation-dialog-title todo="true">[Confirmation]</confirmation-dialog-title>
@@ -2093,6 +2101,8 @@
                 <database-error>Нет соединения с базой данных. Свяжитесь с системным администратором.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error todo="true">[There was an error running the process. Please contact the application administrator.]</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Вы уверены, что хотите очистить все поля? Несохраненные данные будут потеряны.</clear-confirm-message>
                 <error-dialog-title todo="true">[Unable to Complete Action]</error-dialog-title>
                 <confirmation-dialog-title todo="true">[Confirmation]</confirmation-dialog-title>
@@ -2559,6 +2569,8 @@
                 <database-error>Nella communicazione con la database è apparso un errore. Si prega di contattare l'amministratore.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error>È apparso un errore durante l'esecuzione del processo. Si prega di contattare l'amministratore.</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Sei sicuro di voler cancellare tutti i campi di questa pagina? Tutti i dati che non sono stati salvati saranno perduti.</clear-confirm-message>
                 <error-dialog-title>Non è stato possibile completare questa azione</error-dialog-title>
                 <confirmation-dialog-title>Confermazione</confirmation-dialog-title>
@@ -3032,6 +3044,8 @@
                 <database-error>Bei der Kommunikation mit der Datenbank ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error>Beim Ausführen dieses Prozesses ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Sind Sie sich sicher, dass Sie alle Felder auf dieser Seite zurücksetzen wollen? Ungespeicherte Änderungen gehen verloren.</clear-confirm-message>
                 <error-dialog-title>Aktion konnte nicht beendet werden</error-dialog-title>
                 <confirmation-dialog-title>Bestätigung</confirmation-dialog-title>
@@ -3505,6 +3519,8 @@
                 <database-error>Virhe tietokannan kanssa kommunikoinnissa. Ole hyvä ja ota yhteyttä järjestelmänvalvojaan.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error>Virhetilanne ajettaessa prosessia. Ota yhteyttä ohjelmiston ylläpitäjään.</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Oletko varma, että haluat tyhjentää kaikki kentät tällä sivulla? Tiedot häviävät jos et ole tallentanut niitä</clear-confirm-message>
                 <error-dialog-title>Kykenemätön suorittamaan toimintaa loppuun</error-dialog-title>
                 <confirmation-dialog-title>Varmistus</confirmation-dialog-title>
@@ -3978,6 +3994,8 @@
                 <database-error>Databasfel. Vänligen kontakta administratör.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error>Processen kunde inte köras. Vänligen kontakta administratör.</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Bekräfta att du vill rensa alla fält på denna sida. Värdena går förlorade om du inte har sparat dem.</clear-confirm-message>
                 <error-dialog-title>Operationen kunde inte fullföljas</error-dialog-title>
                 <confirmation-dialog-title>Var god bekräfta</confirmation-dialog-title>
@@ -4451,6 +4469,8 @@
                 <database-error>Er was een probleem in de databasecommunicatie. Neem contact op met de databasebeheerder.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error>Er was een probleem bij het starten van het proces. Neem contact op met de databasebeheerder.</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Weet u zeker dat alle velden op deze pagina wilt wissen? Uw gegevens zijn weg als u deze niet hebt opgeslagen.</clear-confirm-message>
                 <error-dialog-title>Kon actie niet voltooien</error-dialog-title>
                 <confirmation-dialog-title>Bevestiging</confirmation-dialog-title>
@@ -4923,6 +4943,8 @@
                 <database-error>Houve um erro na comunicação com a base de dados. Entre em contacto com o administrador do aplicação.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error>Houve um erro na execução do processo. Entre em contacto com administrador da aplicação.</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Tem certeza de que deseja apagar todos os campos nesta página? Os seus dados serão perdidos caso não os tenha guardado.</clear-confirm-message>
                 <error-dialog-title>Não é possível concluir a acção</error-dialog-title>
                 <confirmation-dialog-title>Confirmação</confirmation-dialog-title>
@@ -5389,6 +5411,8 @@
                 <database-error>Fejl i forbindelse til server. Kontakt systemadministrator.</database-error>
                 <service-error todo="true">There was an error communicating with a backend service. Please contact the application administrator.</service-error>
                 <process-error>Der var en fejl i afvikling af programmer. Kontakt systemadministrator.</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Er du sikker på at du vil slette indholdet i alle felter på siden? Indholdet vil forsvinde helt.</clear-confirm-message>
                 <error-dialog-title>Kunne ikke afslutte behandling</error-dialog-title>
                 <confirmation-dialog-title>Bekræftelse</confirmation-dialog-title>
@@ -5855,6 +5879,8 @@
                 <database-error>Wystąpił błąd komunikacji z bazą danych. Skontaktuj się się z administratorem aplikacji.</database-error>
                 <service-error>Wystąpił błąd komunikacji z serwisem. Skontaktuj się się z administratorem aplikacji.</service-error>
                 <process-error>W trakcie wykonywania procesu wystąpił błąd. Skontaktuj się się z administratorem aplikacji.</process-error>
+                <wizard-prev-error todo="true">[Please fix errors before moving backward]</wizard-prev-error>
+                <wizard-next-error todo="true">[Please fix errors before moving forward]</wizard-next-error>
                 <clear-confirm-message>Czy jesteś pewien, że chcesz wyczyścić wszystkie pola na tej stronie? Twoje dane zostaną utraceone, jeśli nie zostały wcześniej zapisane.</clear-confirm-message>
                 <error-dialog-title>Nie można ukończyć akcji.</error-dialog-title>
                 <confirmation-dialog-title>Potwierdzenie</confirmation-dialog-title>

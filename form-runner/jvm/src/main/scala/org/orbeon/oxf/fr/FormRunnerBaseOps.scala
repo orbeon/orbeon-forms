@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.fr
 
+import enumeratum.EnumEntry.Lowercase
+import enumeratum._
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.Names._
@@ -31,6 +33,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 
+import scala.collection.immutable
 import scala.util.Try
 
 // The standard Form Runner parameters
@@ -69,7 +72,7 @@ trait FormRunnerBaseOps {
   val LiferayLanguageHeader  = "orbeon-liferay-language"
 
   val DefaultIterationSuffix = "-iteration"
-
+  val TemplateContentSuffix  = "-content"
   val TemplateSuffix         = "-template"
 
   // Get an id based on a name
@@ -266,6 +269,8 @@ trait FormRunnerBaseOps {
 
   private val NewOrEditModes = Set("new", "edit")
   def isNewOrEditMode(mode: String): Boolean = NewOrEditModes(mode)
+  //@XPathFunction
+  def isNewOrEditMode: Boolean = isNewOrEditMode(FormRunnerParams().mode)
 
   def optionFromMetadataOrProperties(
     metadataInstanceRootElem : NodeInfo,
@@ -285,15 +290,20 @@ trait FormRunnerBaseOps {
   }
 
   // Captcha support
+  //@XPathFunction
   def captchaPassed: Boolean = persistenceInstance.rootElement / "captcha" === "true"
   //@XPathFunction
   def showCaptcha: Boolean = isNewOrEditMode(FormRunnerParams().mode) && ! captchaPassed
 
   //@XPathFunction
   def captchaComponent(app: String, form: String): Array[String] = {
-    val logger              = ProcessorImpl.logger
-    val captchaPropertyName = "oxf.fr.detail.captcha":: app :: form :: Nil mkString "."
-    val captchaPropertyOpt  = properties.getPropertyOpt(captchaPropertyName)
+    val logger                   = ProcessorImpl.logger
+    val captchaPropertyPrefix    = "oxf.fr.detail.captcha"
+    val captchaPropertyShortName = captchaPropertyPrefix                :: app :: form :: Nil mkString "."
+    val captchaPropertyLongName  = captchaPropertyPrefix :: "component" :: app :: form :: Nil mkString "."
+    def property(name: String)   = properties.getPropertyOpt(name)
+    val captchaPropertyOpt       = property(captchaPropertyLongName) orElse
+                                   property(captchaPropertyShortName)
     captchaPropertyOpt match {
       case None => Array.empty
       case Some(captchaProperty) =>
@@ -327,7 +337,16 @@ trait FormRunnerBaseOps {
 
   def isEmbeddable: Boolean = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
 
+  sealed trait MessageAppearance extends EnumEntry with Lowercase
+  object MessageAppearance extends Enum[MessageAppearance] {
+    val values: immutable.IndexedSeq[MessageAppearance] = findValues
+
+    case object Dialog    extends MessageAppearance
+    case object Ephemeral extends MessageAppearance
+  }
+
   // Display a success message
+  // TODO: support `dialog` appearance, for symmetry with `error-message`
   //@XPathFunction
   def successMessage(message: String): Unit = {
     setvalue(persistenceInstance.rootElement / "message", message)
@@ -336,12 +355,19 @@ trait FormRunnerBaseOps {
 
   // Display an error message
   //@XPathFunction
-  def errorMessage(message: String): Unit =
-    dispatch(
-      name       = "fr-show",
-      targetId   = "fr-error-dialog",
-      properties = Map("message" -> Some(message))
-    )
+  def errorMessage(message: String): Unit = errorMessage(message, MessageAppearance.Dialog)
+  def errorMessage(message: String, appearance: MessageAppearance): Unit =
+    appearance match {
+      case MessageAppearance.Dialog =>
+        dispatch(
+          name       = "fr-show",
+          targetId   = "fr-error-dialog",
+          properties = Map("message" -> Some(message))
+        )
+      case MessageAppearance.Ephemeral =>
+        setvalue(persistenceInstance.rootElement / "message", message)
+        toggle("fr-message-error")
+    }
 
   def formRunnerStandaloneBaseUrl(propertySet: PropertySet, req: ExternalContext.Request): String = {
 

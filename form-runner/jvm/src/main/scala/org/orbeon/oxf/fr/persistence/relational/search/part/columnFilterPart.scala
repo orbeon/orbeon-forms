@@ -15,11 +15,11 @@ package org.orbeon.oxf.fr.persistence.relational.search.part
 
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Statement._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Column, FilterType, Request}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{Column, FilterType, SearchRequest}
 
 object columnFilterPart {
 
-  def apply(request: Request): StatementPart =
+  def apply(request: SearchRequest): StatementPart =
     if (! request.columns.exists(_.filterType != FilterType.None))
         NilPart
     else
@@ -38,7 +38,7 @@ object columnFilterPart {
                 val valueWhere =
                   column.filterType match {
                     case FilterType.None              => List.empty
-                    case FilterType.Exact    (_)      => List(s"AND tf$i.val = ?")
+                    case FilterType.Exact    (_)      => List("AND " + Provider.textEquals  (request.provider, s"tf$i.val"))
                     case FilterType.Substring(_)      => List("AND " + Provider.textContains(request.provider, s"tf$i.val"))
                     case FilterType.Token    (tokens) =>
                       tokens.map { _ =>

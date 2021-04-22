@@ -17,23 +17,20 @@ import java.net.{URI, URISyntaxException}
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsProperties._
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom.LocationData
-import org.orbeon.xforms.{Constants, XXBLScope}
+import org.orbeon.oxf.xml.dom.XmlLocationData
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{Constants, CrossPlatformSupport, Namespaces, XXBLScope}
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
-import scala.collection.JavaConverters._
 import scala.collection.{mutable => m}
 
 object XFormsExtractor {
@@ -250,7 +247,7 @@ class XFormsExtractor(
     val isXForms            = uri == XFORMS_NAMESPACE_URI
     val isXXForms           = uri == XXFORMS_NAMESPACE_URI
     val isEXForms           = uri == EXFORMS_NAMESPACE_URI
-    val isXBL               = uri == XBL_NAMESPACE_URI
+    val isXBL               = uri == Namespaces.XBL
     val isXXBL              = uri == XXBL_NAMESPACE_URI // for xxbl:global
 
     val staticId            = attributes.getValue("", "id")
@@ -274,7 +271,7 @@ class XFormsExtractor(
                 throw new ValidationException(
                   s"Error creating URI from: `$parentElementDetails` and `$xmlBaseAttribute`.",
                   e,
-                  LocationData.createIfPresent(locator)
+                  XmlLocationData.createIfPresent(locator)
                 )
             }
           case None =>
@@ -366,14 +363,14 @@ class XFormsExtractor(
 
       // TODO: Just warn?
       if (isXXForms) {
-        if (! AllowedXXFormsElements(localname) && ! XFormsActions.isAction(QName(localname, XXFORMS_NAMESPACE)))
-          throw new ValidationException(s"Invalid extension element in XForms document: `$qName`", LocationData.createIfPresent(locator))
+        if (! AllowedXXFormsElements(localname) && ! EventHandler.isAction(QName(localname, XXFORMS_NAMESPACE)))
+          throw new ValidationException(s"Invalid extension element in XForms document: `$qName`", XmlLocationData.createIfPresent(locator))
       } else if (isEXForms) {
         if (! AllowedEXFormElements(localname))
-          throw new ValidationException(s"Invalid eXForms element in XForms document: `$qName`", LocationData.createIfPresent(locator))
+          throw new ValidationException(s"Invalid eXForms element in XForms document: `$qName`", XmlLocationData.createIfPresent(locator))
       } else if (isXBL) {
         if (! AllowedXBLElements(localname))
-          throw new ValidationException(s"Invalid XBL element in XForms document: `$qName`", LocationData.createIfPresent(locator))
+          throw new ValidationException(s"Invalid XBL element in XForms document: `$qName`", XmlLocationData.createIfPresent(locator))
       }
 
       // Preserve as is the content of labels, etc., instances, and schemas
@@ -529,13 +526,13 @@ trait ExtractorProperties {
   protected def outputNonDefaultProperties(): Unit =
     xmlReceiverOpt foreach { implicit xmlReceiver =>
 
-      val propertySet = Properties.instance.getPropertySet
+      val propertySet = CrossPlatformSupport.properties
 
       val propertiesToKeep = {
         for {
-          (name, prop) <- SUPPORTED_DOCUMENT_PROPERTIES.asScala
+          (name, prop) <- SupportedDocumentProperties
           defaultValue = prop.defaultValue
-          globalValue  = propertySet.getObject(XFORMS_PROPERTY_PREFIX + name, defaultValue)
+          globalValue  = propertySet.getObject(XFormsProperties.PropertyPrefix + name, defaultValue)
         } yield
           unparsedInlineProperties.get(name) match {
             case Some(localValue) => localValue  != defaultValue.toString option (name, localValue          , true)

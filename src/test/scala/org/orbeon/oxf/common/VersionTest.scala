@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.PEVersion._
 import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.DateUtilsUsingSaxon
 import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatest.funspec.AnyFunSpecLike
 
@@ -86,7 +86,7 @@ class VersionTest
 
     assert(PEVersion.dateFromVersionNumber(Version.VersionNumber).isDefined || currentBuildIsSnapshot)
 
-    val TimeStamp = Some(DateUtils.parseISODateOrDateTime("2013-01-28"))
+    val TimeStamp = Some(DateUtilsUsingSaxon.parseISODateOrDateTime("2013-01-28"))
 
     val BuildTimeStamp = "201301281947"
 
@@ -121,7 +121,7 @@ class VersionTest
         subscriptionEnd = subscriptionEnd
       )
 
-    def parse(s: String) = Some(DateUtils.parseISODateOrDateTime(s))
+    def parse(s: String) = Some(DateUtilsUsingSaxon.parseISODateOrDateTime(s))
 
     case class Booleans(badVersion: Boolean, expired: Boolean, buildAfterSubscriptionEnd: Boolean)
 

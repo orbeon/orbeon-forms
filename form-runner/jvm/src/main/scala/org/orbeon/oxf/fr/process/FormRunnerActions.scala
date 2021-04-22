@@ -31,17 +31,17 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
+import org.orbeon.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xbl.ErrorSummary
+import org.orbeon.xbl.{ErrorSummary, Wizard}
 
 import scala.language.postfixOps
-import scala.util.Try
+import scala.util.{Failure, Try}
 import scala.collection.compat._
 
 trait FormRunnerActions {
@@ -77,6 +77,8 @@ trait FormRunnerActions {
     "set-data-status"        -> trySetDataStatus,
     "set-workflow-stage"     -> trySetWorkflowStage,
     "wizard-update-validity" -> tryUpdateCurrentWizardPageValidity,
+    "wizard-prev"            -> tryWizardPrev,
+    "wizard-next"            -> tryWizardNext,
     "new-to-edit"            -> tryNewToEdit
   )
 
@@ -114,6 +116,26 @@ trait FormRunnerActions {
     Try {
       dispatch(name = "fr-update-validity", targetId = Names.ViewComponent)
     }
+
+  def tryWizardPrev(params: ActionParams): Try[Any] = {
+    Try {
+      // Still run `fr-prev` even if not allowed, as `fr-prev` does perform actions even if not moving to the previous page
+      val isPrevAllowed = Wizard.isPrevAllowed
+      dispatch(name = "fr-prev", targetId = Names.ViewComponent)
+      if (! isPrevAllowed)
+        throw new UnsupportedOperationException()
+    }
+  }
+
+  def tryWizardNext(params: ActionParams): Try[Any] = {
+    Try {
+      // Still run `fr-next` even if not allowed, as `fr-next` does perform actions even if not moving to the next page
+      val isNextAllowed = Wizard.isNextAllowed
+      dispatch(name = "fr-next", targetId = Names.ViewComponent)
+      if (! isNextAllowed)
+        throw new UnsupportedOperationException()
+    }
+  }
 
   // It makes sense to update all calculations as needed before saving data
   // https://github.com/orbeon/orbeon-forms/issues/3591
@@ -247,8 +269,11 @@ trait FormRunnerActions {
   def trySuccessMessage(params: ActionParams): Try[Any] =
     Try(FormRunner.successMessage(messageFromResourceOrParam(params).map(evaluateValueTemplate).get))
 
-  def tryErrorMessage(params: ActionParams): Try[Any] =
-    Try(FormRunner.errorMessage(messageFromResourceOrParam(params).map(evaluateValueTemplate).get))
+  def tryErrorMessage(params: ActionParams): Try[Any] = {
+    val message    = messageFromResourceOrParam(params).map(evaluateValueTemplate).get
+    val appearance = paramByName(params, "appearance").map(MessageAppearance.withName).getOrElse(MessageAppearance.Dialog)
+    Try(FormRunner.errorMessage(message, appearance))
+  }
 
   def tryConfirm(params: ActionParams): Try[Any] =
     Try {
@@ -267,8 +292,10 @@ trait FormRunnerActions {
 
   def tryCaptcha(params: ActionParams): Try[Any] =
     Try {
-      if (showCaptcha)
-        dispatch(name = "fr-verify", targetId = "captcha")
+      if (showCaptcha) {
+        dispatch(name = "fr-verify", targetId = "fr-captcha")
+        dispatch(name = "fr-verify", targetId = "fr-view-component")
+      }
     }
 
   def trySendEmail(params: ActionParams): Try[Any] =

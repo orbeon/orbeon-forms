@@ -20,9 +20,14 @@ import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.util.DateUtils;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.util.DateUtilsUsingSaxon;
+import org.orbeon.oxf.xml.DigestContentHandler;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiverAdapter;
+import org.orbeon.datatypes.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.orbeon.saxon.value.DurationValue;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -64,7 +69,7 @@ public class CacheProcessor extends ProcessorImpl {
                         // Don't cache
                         readInputAsSAX(pipelineContext, INPUT_DATA, receiver);
                     }
-                    
+
 
                 } catch (SAXException e) {
                     throw new OXFException(e);
@@ -109,7 +114,7 @@ public class CacheProcessor extends ProcessorImpl {
                         public void characters(char[] chars, int start, int length) throws SAXException {
                             // Save location in case we need to use to signal an error
                             if (cachedValidity.locationData == null)
-                                cachedValidity.locationData = new LocationData(locator);
+                                cachedValidity.locationData = XmlLocationData.apply(locator);
                             validityBuffer.append(chars, start, length);
                         }
                         public void setDocumentLocator(Locator locator) {
@@ -140,7 +145,7 @@ public class CacheProcessor extends ProcessorImpl {
                 }
             } else {
                 // Validity is a date
-                state.validity = new Long(DateUtils.parseISODateOrDateTime(validity.validity));
+                state.validity = new Long(DateUtilsUsingSaxon.parseISODateOrDateTime(validity.validity));
             }
         }
         return state;

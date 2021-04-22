@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.controller;
 
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Attribute;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
@@ -28,8 +29,7 @@ import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;
 import org.orbeon.xml.NamespaceMapping;
 
 import java.util.HashMap;
@@ -89,8 +89,8 @@ public class PageFlowControllerBuilder {
                 addInput(new ASTInput("model-data", new ASTHrefId(epilogueModelData)));
                 addInput(new ASTInput("instance", new ASTHrefId(epilogueInstance)));
                 final String[] locationParams = new String[] { "pipeline",  epilogueURL };
-                setLocationData(new ExtendedLocationData((LocationData) epilogueElement.getData(),
-                    "executing epilogue", epilogueElement, locationParams));
+                setLocationData(XmlExtendedLocationData.apply((LocationData) epilogueElement.getData(),
+                        "executing epilogue", epilogueElement, locationParams));
             }});
         }
     }
@@ -260,9 +260,9 @@ public class PageFlowControllerBuilder {
                             final ASTOutput dataOutput = new ASTOutput("data", internalActionData);
                             final String[] locationParams =
                                     new String[]{"pipeline", actionAttribute, "page id", pageElement.attributeValue("id"), "when", whenAttribute};
-                            dataOutput.setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "reading action data output", pageElement, locationParams));
+                            dataOutput.setLocationData(XmlExtendedLocationData.apply((LocationData) actionElement.getData(), "reading action data output", pageElement, locationParams));
                             addOutput(dataOutput);
-                            setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "executing action", pageElement, locationParams));
+                            setLocationData(XmlExtendedLocationData.apply((LocationData) actionElement.getData(), "executing action", pageElement, locationParams));
                         }});
 
                         // Force execution of action if no <result> is reading it
@@ -307,7 +307,7 @@ public class PageFlowControllerBuilder {
                                         setNamespaces(NamespaceMapping.apply(Extensions.getNamespaceContextNoDefaultJava(resultElement)));
                                         final String[] locationParams =
                                                 new String[]{"page id", pageElement.attributeValue("id"), "when", resultWhenAttribute};
-                                        setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing result", resultElement, locationParams));
+                                        setLocationData(XmlExtendedLocationData.apply((LocationData) resultElement.getData(), "executing result", resultElement, locationParams));
                                     }
                                     executeResult(this, pageIdToPathInfo, pageIdToSetvaluesDocument,
                                         xformedInstance, resultElement, internalActionData,
@@ -379,15 +379,15 @@ public class PageFlowControllerBuilder {
                                 new String[] { "page id", pageElement.attributeValue("id"), "model", modelAttribute };
                         {
                             final ASTOutput dataOutput = new ASTOutput("data", modelData);
-                            dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model data output", pageElement, locationParams));
+                            dataOutput.setLocationData(XmlExtendedLocationData.apply((LocationData) pageElement.getData(), "reading page model data output", pageElement, locationParams));
                             addOutput(dataOutput);
                         }
                         {
                             final ASTOutput instanceOutput = new ASTOutput("instance", modelInstance);
                             addOutput(instanceOutput);
-                            instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model instance output", pageElement, locationParams));
+                            instanceOutput.setLocationData(XmlExtendedLocationData.apply((LocationData) pageElement.getData(), "reading page model instance output", pageElement, locationParams));
                         }
-                        setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page model", pageElement, locationParams));
+                        setLocationData(XmlExtendedLocationData.apply((LocationData) pageElement.getData(), "executing page model", pageElement, locationParams));
                     }});
                 } else if (viewAttribute != null) {
                     // There is no model but there is a view
@@ -413,15 +413,15 @@ public class PageFlowControllerBuilder {
                                 new String[] { "page id", pageElement.attributeValue("id"), "view", viewAttribute };
                         {
                             final ASTOutput dataOutput = new ASTOutput("data", viewData);
-                            dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view data output", pageElement, locationParams));
+                            dataOutput.setLocationData(XmlExtendedLocationData.apply((LocationData) pageElement.getData(), "reading page view data output", pageElement, locationParams));
                             addOutput(dataOutput);
                         }
                         {
                             final ASTOutput instanceOutput = new ASTOutput("instance", viewInstance);
-                            instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view instance output", pageElement, locationParams));
+                            instanceOutput.setLocationData(XmlExtendedLocationData.apply((LocationData) pageElement.getData(), "reading page view instance output", pageElement, locationParams));
                             addOutput(instanceOutput);
                         }
-                        setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page view", pageElement, locationParams));
+                        setLocationData(XmlExtendedLocationData.apply((LocationData) pageElement.getData(), "executing page view", pageElement, locationParams));
                     }});
                 } else {
                     // There is no view, send nothing to epilogue
@@ -599,7 +599,7 @@ public class PageFlowControllerBuilder {
                     addInput(new ASTInput("data", redirectURLData));// {{setDebug("redirect 2");}}
                     final String[] locationParams =
                             new String[] { "result page id", resultPageId  };
-                    setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(),
+                    setLocationData(XmlExtendedLocationData.apply((LocationData) resultElement.getData(),
                             "page redirection", resultElement, locationParams));
                 }});
             }

@@ -13,82 +13,12 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import java.io.InputStream
-import java.net.URL
 import javax.portlet.PortletContext
 import javax.servlet.ServletContext
-
 import org.orbeon.oxf.webapp.Orbeon
 
 import scala.collection.JavaConverters._
-import scala.util.control.NonFatal
 
-// Abstraction for ServletContext and PortletContext
-trait WebAppContext {
-  // Resource handling
-  def getResource(s: String): URL
-  def getResourceAsStream(s: String): InputStream
-  def getRealPath(s: String): String
-
-  // Immutable context initialization parameters
-  def initParameters: Map[String, String]
-
-  def jInitParameters = initParameters.asJava
-  def getInitParametersMap = jInitParameters
-
-  // Mutable context attributes backed by the actual context
-  def attributes: collection.mutable.Map[String, AnyRef]
-
-  def jAttributes = attributes.asJava
-  def getAttributesMap = jAttributes
-
-  // Logging
-  def log(message: String, throwable: Throwable)
-  def log(message: String)
-
-  // Add webAppDestroyed listener
-  def addListener(listener: WebAppListener): Unit =
-    attributes.getOrElseUpdate(WebAppContext.WebAppListeners, new WebAppListeners)
-      .asInstanceOf[WebAppListeners].addListener(listener)
-
-  // Remove webAppDestroyed listener
-  def removeListener(listener: WebAppListener): Unit =
-   webAppListenersOption foreach (_.removeListener(listener))
-
-  // Call all webAppDestroyed listeners
-  def webAppDestroyed(): Unit =
-    webAppListenersOption.toIterator flatMap (_.iterator) foreach { listener =>
-      try {
-        listener.webAppDestroyed()
-      } catch {
-        case NonFatal(t) => log("Throwable caught when calling listener", t)
-      }
-    }
-
-  private def webAppListenersOption: Option[WebAppListeners] =
-    attributes.get(WebAppContext.WebAppListeners) map (_.asInstanceOf[WebAppListeners])
-
-  // Access to native context
-  def getNativeContext: AnyRef
-}
-
-trait WebAppListener {
-  def webAppDestroyed()
-}
-
-class WebAppListeners extends Serializable {
-
-  @transient private var _listeners: List[WebAppListener] = Nil
-
-  def addListener(listener: WebAppListener) =
-    _listeners ::= listener
-
-  def removeListener(listener: WebAppListener) =
-    _listeners = _listeners filter (_ ne listener)
-
-  def iterator =
-    _listeners.reverse.toIterator
-}
 
 // Expose parameters and attributes as maps
 trait ParametersAndAttributes {
@@ -169,10 +99,10 @@ class PortletWebAppContext(val portletContext: PortletContext) extends WebAppCon
 /**
  * Return the singleton WebAppContext for the current web app. When WebAppContext is created, also initialize Orbeon.
  */
-object WebAppContext {
-
-  private val WebAppListeners = "oxf.webapp.listeners"
-
+object ServletWebAppContext {
   def apply(servletContext: ServletContext): WebAppContext = new ServletWebAppContext(servletContext)
+}
+
+object PortletWebAppContext {
   def apply(portletContext: PortletContext): WebAppContext = new PortletWebAppContext(portletContext)
 }

@@ -382,7 +382,7 @@
                 <item id="3">Don't show subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label>Maximum Attachment Size per Control</label>
+                <label>Maximum Attachment Size per File</label>
                 <hint>Can also be set on a per-control basis in Control Settings</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -830,6 +830,9 @@
                 <label>Remove language</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>XML Schema Upload</label>
             <schema-type>
@@ -1201,9 +1204,6 @@
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow and Permissions</label>
-
-            <operations>Operations</operations>
-
             <custom-operations>Define custom operations for this form</custom-operations>
             <operation-label>Label</operation-label>
             <predefined-label>Predefined</predefined-label>
@@ -1232,6 +1232,35 @@
 
             <stage-name>Stage Name</stage-name>
             <default-stage>Default</default-stage>
+
+            <operations>
+                <label>Operations</label>
+                <item>
+                    <label>Fill new form</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>List and search data</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Access data for editing</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Access data for viewing</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Access PDF/TIFF</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -2100,6 +2129,9 @@
                 <label>Supprimer la langue</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Chercher les contrôles</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Insertion de schéma XML</label>
             <schema-type>
@@ -2470,10 +2502,8 @@
             <delete>Supprimer</delete>
         </dialog-permissions>
         <dialog-workflow>
-            <label>Workflow et Permissions</label>
-
-            <operations>Opérations</operations>
-
+          <label>Workflow et Permissions</label>
+	  
             <custom-operations>Personaliser les opérations pour le formulaire courant</custom-operations>
             <operation-label>Libellé</operation-label>
             <predefined-label>Prédéfini</predefined-label>
@@ -2502,6 +2532,35 @@
 
             <stage-name>Nom de l'étape</stage-name>
             <default-stage>Défaut</default-stage>
+
+            <operations>
+                <label>Opérations</label>
+                <item>
+                    <label>Remplir un nouveau formulaire</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Lister et rechercher les données</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Accéder pour l'édition</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Accéder pour la lecture</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label>Accéder le PDF/TIFF</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -2903,7 +2962,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -3352,6 +3411,9 @@
                 <label>Fjern språk</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label todo="true">Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>XML-skjemaopplasting</label>
             <schema-type>
@@ -3752,8 +3814,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -3782,6 +3842,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -4183,7 +4272,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -4631,6 +4720,9 @@
                 <label>Удалить язык</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Загрузка схемы XML</label>
             <schema-type>
@@ -5031,8 +5123,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -5061,6 +5151,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -5463,7 +5582,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -5903,6 +6022,9 @@
                 <label>Rimuovi lungua</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Carica schema XML</label>
             <schema-type>
@@ -6303,8 +6425,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -6333,6 +6453,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -7176,6 +7325,9 @@
                 <label>Sprache löschen</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>XML-Schema hochladen</label>
             <schema-type>
@@ -7576,8 +7728,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -7606,6 +7756,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -8010,7 +8189,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -8451,6 +8630,9 @@
                 <label>Poista kieli</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>XML-skeeman lähettäminen</label>
             <schema-type>
@@ -8851,8 +9033,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -8881,6 +9061,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -9282,7 +9491,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -9723,6 +9932,9 @@
                 <label>Eliminar Idioma</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Subir Esquema XML</label>
             <schema-type>
@@ -10123,8 +10335,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -10153,6 +10363,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+            
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -11003,6 +11242,9 @@
                 <label>Taal verwijderen</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>XML Schema uploaden</label>
             <schema-type>
@@ -11375,8 +11617,6 @@
         <dialog-workflow>
             <label>Workflow en bevoegdheden</label>
 
-            <operations>Bewerkingen</operations>
-
             <custom-operations>Definieer aangepaste bewerkingen voor dit form</custom-operations>
             <operation-label>Label</operation-label>
             <predefined-label>Voorgedefinieerd</predefined-label>
@@ -11405,6 +11645,35 @@
 
             <stage-name>Stadium naam</stage-name>
             <default-stage>Standaard</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -11807,7 +12076,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -12254,6 +12523,9 @@
                 <label>Remover língua</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Carregar o XML Schema</label>
             <schema-type>
@@ -12654,8 +12926,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -12684,6 +12954,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>
@@ -13086,7 +13385,7 @@
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
             <attachment-max-size>
-                <label todo="true">[Maximum Attachment Size per Control]</label>
+                <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
             </attachment-max-size>
             <attachment-max-size-aggregate>
@@ -13534,6 +13833,9 @@
                 <label>Ta bort språk</label>
             </remove-language>
         </dialog-add-language>
+        <dialog-search>
+            <label>Search Controls</label>
+        </dialog-search>
         <dialog-upload-schema>
             <label>Ladda upp XML-schema</label>
             <schema-type>
@@ -13934,8 +14236,6 @@
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
 
-            <operations todo="true">[Operations]</operations>
-
             <custom-operations todo="true">[Define custom operations for this form]</custom-operations>
             <operation-label todo="true">[Label]</operation-label>
             <predefined-label todo="true">[Predefined]</predefined-label>
@@ -13964,6 +14264,35 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
+
+            <operations>
+                <label todo="true">[Operations]</label>
+                <item>
+                    <label todo="true">[Fill new form]</label>
+                    <value>1</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[List and search data]</label>
+                    <value>2</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for editing]</label>
+                    <value>3</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access data for viewing]</label>
+                    <value>4</value>
+                    <hint/>
+                </item>
+                <item>
+                    <label todo="true">[Access PDF/TIFF]</label>
+                    <value>5</value>
+                    <hint/>
+                </item>
+            </operations>
 
         </dialog-workflow>
         <xbl-control-settings>

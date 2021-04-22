@@ -61,12 +61,19 @@
                         name="local-has-request-body"
                         value="not($submission/@method = ('get', 'delete'))"/>
 
-                    <!--<xf:message value="saxon:serialize($submission, 'xml')"/>-->
-                    <!--<xf:message value="exists(xxf:instance('fb-form-instance'))"/>-->
-
                     <xf:setvalue ref="$request/method"        value="$submission/@method"/>
                     <xf:setvalue ref="$request/serialization" value="$submission/@serialization"/>
                     <xf:setvalue ref="$request/resource"      value="$submission/@resource"/>
+
+                    <!--
+                        Copy namespaces in scope, so we can validate the AVT
+                        FIXME: `$request/resource/namespace::*` should return all the namespaces in scope on
+                               `<resource>` but instead it only seems to return the namespaces specifically on that
+                               element, so we get the namespaces on the form, as this is generally where they
+                               are declared.
+                    -->
+                    <xf:delete ref="$request/resource/namespace::*"/>
+                    <xf:insert context="$request/resource"    origin="$form/namespace::*"/>
 
                     <xf:action if="not($local-has-request-body)">
                         <xf:var
@@ -872,8 +879,6 @@
                                 <xf:label value="$resources/cancel/label"/>
                             </xf:trigger>
                         </xf:group>
-
-                        <!--<fr:xforms-inspector/>-->
                     </xh:div>
                 </xxf:dialog>
 

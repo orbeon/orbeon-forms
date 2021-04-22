@@ -18,7 +18,7 @@ import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.saxon.om.NodeInfo
@@ -130,7 +130,7 @@ object BindingDescriptor {
   ): Seq[(Option[String], Option[NodeInfo], Boolean)] = {
 
     val Datatype1 = datatype
-    val Datatype2 = Model.getVariationTypeOrKeep(datatype)
+    val Datatype2 = ModelDefs.getVariationTypeOrKeep(datatype)
 
     val appearancesToBinding =
       getAllRelevantDescriptors(bindings) collect {
@@ -286,7 +286,7 @@ object BindingDescriptor {
 
         BindingDescriptor(
           Some(QName(localname, prefix, ns.mapping(prefix))),
-          datatype.trimAllToOpt map (Extensions.resolveQName(ns.mapping, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
+          datatype.trimAllToOpt flatMap (Extensions.resolveQName(ns.mapping, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
           None
         )(binding)
     }
@@ -308,7 +308,7 @@ object BindingDescriptor {
 
         BindingDescriptor(
           qNameFromElementSelector(typeSelectorOpt, ns),
-          datatype.trimAllToOpt map (Extensions.resolveQName(ns.mapping, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
+          datatype.trimAllToOpt flatMap (Extensions.resolveQName(ns.mapping, _, unprefixedIsNoNamespace = true)) filterNot StringQNames,
           Some(BindingAttributeDescriptor(QName(attName), attPredicate))// TODO: QName for attName
         )(binding)
     }
@@ -386,7 +386,7 @@ object BindingDescriptor {
     ): Option[BindingDescriptor] = {
 
       val Datatype1 = searchDatatype
-      val Datatype2 = Model.getVariationTypeOrKeep(searchDatatype)
+      val Datatype2 = ModelDefs.getVariationTypeOrKeep(searchDatatype)
 
       def findWithDatatypeAndAppearance =
         descriptors collectFirst {
@@ -420,7 +420,7 @@ object BindingDescriptor {
     ): Option[BindingDescriptor] = {
 
       val Datatype1 = searchDatatype
-      val Datatype2 = Model.getVariationTypeOrKeep(searchDatatype)
+      val Datatype2 = ModelDefs.getVariationTypeOrKeep(searchDatatype)
 
       def findWithNameDatatypeAndAppearance =
         relatedDescriptors collectFirst {

@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.sql.interpreters;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -55,7 +55,7 @@ public class ColumnIteratorInterpreter extends SQLProcessor.InterpreterContentHa
             }
 
         } catch (SQLException e) {
-            throw new ValidationException(e, new LocationData(getDocumentLocator()));
+            throw new ValidationException(e, XmlLocationData.apply(getDocumentLocator()));
         }
     }
 

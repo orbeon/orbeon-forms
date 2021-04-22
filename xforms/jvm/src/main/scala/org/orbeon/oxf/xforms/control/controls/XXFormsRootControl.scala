@@ -14,13 +14,14 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import java.io.IOException
+
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsNoSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsLoadEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.xforms.CrossPlatformSupport
 
 // Control at the root of the control tree
 // NOTE: This is also the root of a dynamic sub-tree, in which case the control is a child of xxf:dynamic
@@ -40,7 +41,7 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
     case load: XXFormsLoadEvent =>
       // Internal load event for "two-pass load" handling Ajax load in portlet environments (see `XFormsLoadAction`)
       try {
-        NetUtils.getExternalContext.getResponse.sendRedirect(load.resource, false, false)
+        CrossPlatformSupport.externalContext.getResponse.sendRedirect(load.resource, false, false)
       } catch {
         case e: IOException => throw new ValidationException(e, getLocationData)
       }

@@ -698,7 +698,7 @@
                             <xxf:case id="my-summary≡xf-84⊙1" visibility="visible"/>
                             <xxf:case id="my-summary≡xf-91⊙1" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-85⊙1" label="&lt;span class=&quot;fr-error-label&quot;&gt;Note&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-88&quot;&gt;Invalid note&lt;/span&gt;"/>
+                        <xxf:control id="my-summary≡xf-85⊙1" label="&lt;span class=&quot;fr-error-label&quot;&gt;Note&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-88⊙1&quot;&gt;Invalid note&lt;/span&gt;"/>
                         <xxf:control id="my-summary≡xf-92⊙1" relevant="false"/>
                         <xxf:control id="my-summary≡xf-93⊙1" relevant="false"/>
                         <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-78⊙2"/>
@@ -709,7 +709,7 @@
                             <xxf:case id="my-summary≡xf-84⊙2" visibility="visible"/>
                             <xxf:case id="my-summary≡xf-91⊙2" visibility="hidden"/>
                         </xxf:control>
-                        <xxf:control id="my-summary≡xf-85⊙2" label="&lt;span class=&quot;fr-error-label&quot;&gt;Last name&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-88&quot;&gt;Invalid last name&lt;/span&gt;"/>
+                        <xxf:control id="my-summary≡xf-85⊙2" label="&lt;span class=&quot;fr-error-label&quot;&gt;Last name&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot; id=&quot;my-summary≡xf-88⊙2&quot;&gt;Invalid last name&lt;/span&gt;"/>
                         <xxf:control id="my-summary≡xf-92⊙2" relevant="false"/>
                         <xxf:control id="my-summary≡xf-93⊙2" relevant="false"/>
                         <xxf:control id="my-summary≡xf-94" class="fr-show-more-errors" relevant="false"/>
@@ -805,9 +805,10 @@
                     <xxf:control-values>
                         <xxf:control class="input-prepend fr-field-width-natural" id="my-currency≡xf-11"/>
                         <xxf:control id="my-currency≡xf-13" class="add-on"/>
-                        <xxf:control id="my-currency≡xf-14">
+                        <xxf:control id="my-currency≡prefix">
                             <xxf:value>$</xxf:value>
                         </xxf:control>
+                        <xxf:attribute for="my-currency≡html-input" name="aria-describedby">my-currency≡prefix</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>

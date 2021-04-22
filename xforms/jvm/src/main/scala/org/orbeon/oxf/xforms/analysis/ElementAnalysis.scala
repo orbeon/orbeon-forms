@@ -13,18 +13,20 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import cats.syntax.option._
+import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.{Element, QName}
+import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.XFormsUtils.maybeAVT
-import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl}
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, RepeatControl, VariableAnalysisTrait}
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Capture, Phase, Target}
-import org.orbeon.oxf.xforms.event.{EventHandler, Perform, Propagate}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.{ExtendedLocationData, Extensions, LocationData}
+import org.orbeon.oxf.xml.dom.{Extensions, XmlExtendedLocationData}
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.{Perform, Phase, Propagate}
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
@@ -35,7 +37,7 @@ import scala.util.control.Breaks
 
 // xml:lang reference
 sealed trait LangRef
-case class LiteralLangRef(lang: String) extends LangRef
+case class LiteralLangRef(lang: String)      extends LangRef
 case class AVTLangRef(att: AttributeControl) extends LangRef
 
 /**
@@ -43,10 +45,13 @@ case class AVTLangRef(att: AttributeControl) extends LangRef
  */
 abstract class ElementAnalysis(
   val part      : PartAnalysisImpl,
+  val index     : Int, // index of the element in the view
   val element   : Element,
   val parent    : Option[ElementAnalysis],
-  val preceding : Option[ElementAnalysis]
-) extends ElementEventHandlers with ElementRepeats {
+  val preceding : Option[ElementAnalysis],
+  val scope     : Scope
+) extends ElementEventHandlers
+     with ElementRepeats {
 
   selfElement =>
 
@@ -56,14 +61,34 @@ abstract class ElementAnalysis(
 
   implicit def logger: IndentedLogger = part.getIndentedLogger
 
+  // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
+  // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
+  // Find the model associated with the given element, whether explicitly set with `@model`, or inherited.
+  lazy val model: Option[Model] =
+    // Check for local @model attribute
+    element.attributeValue(XFormsNames.MODEL_QNAME) match {
+      case localModelStaticId: String =>
+        // Get model prefixed id and verify it belongs to this scope
+        val localModelPrefixedId = scope.prefixedIdForStaticId(localModelStaticId)
+        val localModel = part.getModel(localModelPrefixedId)
+        if (localModel eq null)
+          throw new ValidationException("Reference to non-existing model id: " + localModelStaticId, ElementAnalysis.createLocationData(element))
+
+        Some(localModel)
+      case _ =>
+        // Use inherited model
+        closestAncestorInScope match {
+          case Some(ancestor) => ancestor.model // there is an ancestor control in the same scope, use its model id
+          case None           => part.getDefaultModelForScope(scope) // top-level control in a new scope, use default model id for scope
+        }
+    }
+
   // xml:lang, inherited from parent unless overridden locally
-  lazy val lang: Option[LangRef] = {
-    val v = element.attributeValue(XML_LANG_QNAME)
-    if (v ne null)
-      extractXMLLang(v)
-    else
-      parent flatMap (_.lang)
-  }
+  lazy val lang: Option[LangRef] =
+    element.attributeValueOpt(XML_LANG_QNAME) match {
+      case Some(v) => extractXMLLang(v)
+      case None    => parent flatMap (_.lang)
+    }
 
   protected def extractXMLLang(lang: String): Some[LangRef] =
     if (! lang.startsWith("#"))
@@ -74,21 +99,21 @@ abstract class ElementAnalysis(
       Some(AVTLangRef(part.getAttributeControl(prefixedId, "xml:lang")))
     }
 
-  val namespaceMapping: NamespaceMapping
-
   // Element local name
   def localName: String = element.getName
 
-  // Scope and model
-  val scope: Scope
-  val model: Option[Model]
-
   // In-scope variables (for XPath analysis)
-  val inScopeVariables: Map[String, VariableTrait]
+  // Only overridden anonymously in `VariableAnalysisTrait` where it says "This is bad architecture"
+  // FIXME
+  lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
+
+  protected def getRootVariables: Map[String, VariableTrait] = Map.empty
 
   def removeFromParent(): Unit =
-    parent foreach
-      { case parent: ChildrenBuilderTrait => parent.removeChild(selfElement); case _ => }
+    parent foreach {
+      case parent: WithChildrenTrait => parent.removeChild(selfElement)
+      case _ =>
+    }
 
   lazy val treeInScopeVariables: Map[String, VariableTrait] = {
 
@@ -123,11 +148,20 @@ abstract class ElementAnalysis(
   // - Outer scope: this is the scope given this control if this control has `xxbl:scope='outer'`. It is usually the
   //   actual scope of the closest ancestor XBL bound element, except for directly nested handlers.
 
-  def containerScope: Scope
+  // Only overridden by `RootControl`
+  // TODO: pass during construction?
+  def containerScope: Scope = part.containingScope(prefixedId)
+
+  final def getChildElementScope(childElement: Element): Scope = {
+    val childPrefixedId =  XFormsId.getRelatedEffectiveId(prefixedId, childElement.idOrNull)
+    part.scopeForPrefixedId(childPrefixedId)
+  }
 
   // Ids
   val staticId  : String = element.idOrNull
   val prefixedId: String = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
+
+  final val namespaceMapping: NamespaceMapping = part.metadata.getNamespaceMapping(prefixedId).orNull
 
   // Location
   val locationData: ExtendedLocationData = ElementAnalysis.createLocationData(element)
@@ -149,8 +183,8 @@ abstract class ElementAnalysis(
   // Extension attributes
   protected def allowedExtensionAttributes = Set.empty[QName]
 
-  final lazy val extensionAttributes =
-    Map() ++ (
+  final lazy val extensionAttributes: Map[QName, String] =
+    Map.empty ++ (
       CommonExtensionAttributes ++
       (element.attributeIterator collect { case att if att.getName.startsWith("data-") => att.getQName }) ++
       allowedExtensionAttributes map (qName => (qName, element.attributeValue(qName))) filter (_._2 ne null)
@@ -160,48 +194,23 @@ abstract class ElementAnalysis(
     extensionAttributes map { case (k, v) => k -> (if (maybeAVT(v)) "" else v) } // all blank values for AVTs
 
   // XPath analysis
-  private var contextAnalysis: Option[XPathAnalysis] = None
-  private var _contextAnalyzed = false
-  private var bindingAnalysis: Option[XPathAnalysis] = None
-  private var _bindingAnalyzed = false
-  def bindingAnalyzed = _bindingAnalyzed
-  private var valueAnalysis: Option[XPathAnalysis] = None
-  private var _valueAnalyzed = false
-  def valueAnalyzed: Boolean = _valueAnalyzed
-
-  final def getContextAnalysis: Option[XPathAnalysis] = { assert(_contextAnalyzed); contextAnalysis }
-  final def getBindingAnalysis: Option[XPathAnalysis] = { assert(_bindingAnalyzed); bindingAnalysis }
-  final def getValueAnalysis  : Option[XPathAnalysis] = { assert(_valueAnalyzed)  ; valueAnalysis   }
-
-  def analyzeXPath(): Unit = {
-    contextAnalysis = computeContextAnalysis
-    _contextAnalyzed = true
-    bindingAnalysis = computeBindingAnalysis
-    _bindingAnalyzed = true
-    valueAnalysis = computeValueAnalysis
-    _valueAnalyzed = true
-  }
-
-  // To implement in subclasses
-  protected def computeContextAnalysis: Option[XPathAnalysis]
-  protected def computeBindingAnalysis: Option[XPathAnalysis]
-  protected def computeValueAnalysis: Option[XPathAnalysis]
+  final var contextAnalysis: Option[XPathAnalysis] = None
+  final var bindingAnalysis: Option[XPathAnalysis] = None
+  final var valueAnalysis  : Option[XPathAnalysis] = None // TODO: Shouldn't this go to special nested traits only?
+  // LHHAAnalysis, StaticBind, VariableAnalysisTrait, ValueTrait
 
   /**
    * Return the context within which children elements or values evaluate. This is the element binding if any, or the
    * element context if there is no binding.
    */
-  def getChildrenContext: Option[XPathAnalysis] = if (hasBinding) getBindingAnalysis else getContextAnalysis
+  def getChildrenContext: Option[XPathAnalysis] = if (hasBinding) bindingAnalysis else contextAnalysis
 
   val closestAncestorInScope: Option[ElementAnalysis] = ElementAnalysis.getClosestAncestorInScope(selfElement, scope)
 
   def freeTransientState(): Unit = {
-    if (_contextAnalyzed && getContextAnalysis.isDefined)
-      getContextAnalysis.get.freeTransientState()
-    if (_bindingAnalyzed && getBindingAnalysis.isDefined)
-      getBindingAnalysis.get.freeTransientState()
-    if (_valueAnalyzed && getValueAnalysis.isDefined)
-      getValueAnalysis.get.freeTransientState()
+    contextAnalysis foreach (_.freeTransientState())
+    bindingAnalysis foreach (_.freeTransientState())
+    valueAnalysis   foreach (_.freeTransientState())
   }
 }
 
@@ -215,7 +224,7 @@ trait ElementEventHandlers {
   // Event handler information as a tuple:
   // - whether the default action needs to run
   // - all event handlers grouped by phase and observer prefixed id
-  private type HandlerAnalysis = (Boolean, Map[Phase, Map[String, List[EventHandler]]])
+  type HandlerAnalysis = (Boolean, Map[Phase, Map[String, List[EventHandler]]])
 
   // Cache for event handlers
   // Use an immutable map and @volatile so that update are published to other threads accessing this static state.
@@ -258,7 +267,7 @@ trait ElementEventHandlers {
     def relevant(observer: ElementAnalysis) =
       observer.scope == selfElement.scope || hasPhantomHandler(observer)
 
-    (ancestorOrSelfIterator(selfElement) filter relevant) ++: observersInAncestorParts
+    (ancestorsIterator(selfElement, includeSelf = true) filter relevant) ++: observersInAncestorParts
   }
 
   // Find all the handlers for the given event name if an event with that name is dispatched to this element.
@@ -279,9 +288,9 @@ trait ElementEventHandlers {
 
       def matchesPhaseNameTarget(eventHandler: EventHandler) =
         (
-          eventHandler.isCapturePhaseOnly && phase == Capture ||
-          eventHandler.isTargetPhase      && phase == Target  ||
-          eventHandler.isBubblingPhase    && phase == Bubbling
+          eventHandler.isCapturePhaseOnly && phase == Phase.Capture ||
+          eventHandler.isTargetPhase      && phase == Phase.Target  ||
+          eventHandler.isBubblingPhase    && phase == Phase.Bubbling
         ) &&
           eventHandler.isMatchByNameAndTarget(eventName, selfElement.prefixedId)
 
@@ -349,21 +358,21 @@ trait ElementEventHandlers {
     val observersFromLeafToRoot = relevantObserversFromLeafToRoot
 
     val captureHandlers =
-      handlersForPhase(observersFromLeafToRoot.reverse.init, Capture)
+      handlersForPhase(observersFromLeafToRoot.reverse.init, Phase.Capture)
 
     val targetHandlers =
       if (propagate)
-        handlersForPhase(List(observersFromLeafToRoot.head), Target)
+        handlersForPhase(List(observersFromLeafToRoot.head), Phase.Target)
       else
         None
 
     val bubblingHandlers =
       if (propagate)
-        handlersForPhase(observersFromLeafToRoot.tail, Bubbling)
+        handlersForPhase(observersFromLeafToRoot.tail, Phase.Bubbling)
       else
         None
 
-    (performDefaultAction, Map() ++ captureHandlers ++ targetHandlers ++ bubblingHandlers)
+    (performDefaultAction, Map.empty ++ captureHandlers ++ targetHandlers ++ bubblingHandlers)
   }
 }
 
@@ -434,14 +443,12 @@ object ElementAnalysis {
   /**
    * Return an iterator over all the element's ancestors.
    */
-  def ancestorIterator(start: ElementAnalysis): Iterator[ElementAnalysis] =
-    new IteratorBase(start.parent, _.parent) {}
+  def ancestorsIterator(start: ElementAnalysis, includeSelf: Boolean): Iterator[ElementAnalysis] =
+    new IteratorBase(if (includeSelf) start.some else start.parent, _.parent) {}
 
-  /**
-   * Iterator over the element and all its ancestors.
-   */
-  def ancestorOrSelfIterator(start: ElementAnalysis): Iterator[ElementAnalysis] =
-    new IteratorBase(Option(start), _.parent) {}
+  def ancestorsAcrossPartsIterator(start: ElementAnalysis, includeSelf: Boolean): Iterator[ElementAnalysis] =
+    (new IteratorBase(if (includeSelf) start.some else start.parent, _.parent) {}) ++
+      (start.part.elementInParent.iterator flatMap (ancestorsAcrossPartsIterator(_, includeSelf = true)))
 
   /**
    * Iterator over the element's preceding siblings.
@@ -452,26 +459,20 @@ object ElementAnalysis {
   /**
    * Return a list of ancestors in the same scope from leaf to root.
    */
-  def getAllAncestorsInScope(start: ElementAnalysis, scope: Scope): List[ElementAnalysis] =
-    ancestorIterator(start) filter (_.scope == scope) toList
-
-  /**
-   * Return a list of ancestor-or-self in the same scope from leaf to root.
-   */
-  def getAllAncestorsOrSelfInScope(start: ElementAnalysis): List[ElementAnalysis] =
-    start :: getAllAncestorsInScope(start, start.scope)
+  def getAllAncestorsInScope(start: ElementAnalysis, scope: Scope, includeSelf: Boolean): List[ElementAnalysis] =
+    ancestorsIterator(start, includeSelf = includeSelf) filter (_.scope == scope) toList
 
   /**
    * Get the closest ancestor in the same scope.
    */
   def getClosestAncestorInScope(start: ElementAnalysis, scope: Scope): Option[ElementAnalysis] =
-    ancestorIterator(start) find (_.scope == scope)
+    ancestorsIterator(start, includeSelf = false) find (_.scope == scope)
 
   /**
    * Return the first ancestor with a binding analysis that is in the same scope/model.
    */
-  def getClosestAncestorInScopeModel(start: ElementAnalysis, scopeModel: ScopeModel): Option[ElementAnalysis] =
-    ancestorIterator(start) find (e => ScopeModel(e.scope, e.model) == scopeModel)
+  def getClosestAncestorInScopeModel(start: ElementAnalysis, scopeModel: (Scope, Option[Model])): Option[ElementAnalysis] =
+    ancestorsIterator(start, includeSelf = false) find (e => (e.scope, e.model) == scopeModel)
 
   /**
    * Get the binding XPath expression from the @ref or (deprecated) @nodeset attribute.
@@ -481,11 +482,11 @@ object ElementAnalysis {
       element.attributeValueOpt(XFormsNames.NODESET_QNAME)
 
   def createLocationData(element: Element): ExtendedLocationData =
-      element.getData match {
-        case data: LocationData if (element ne null) && (data.file ne null) && data.line != -1 =>
-          new ExtendedLocationData(data, "gathering static information", element)
-        case _ => null
-      }
+    element.getData match {
+      case data: LocationData if (element ne null) && (data.file ne null) && data.line != -1 =>
+        XmlExtendedLocationData(data, "gathering static information".some, element = element.some)
+      case _ => null
+    }
 
   /**
    * Get the value of an attribute containing a space-separated list of tokens as a set.
@@ -500,5 +501,5 @@ object ElementAnalysis {
    * Get the value of an attribute containing a space-separated list of QNames as a set.
    */
   def attQNameSet(element: Element, qName: QName, namespaces: NamespaceMapping): Set[QName] =
-    attSet(element, qName) map (Extensions.resolveQName(namespaces.mapping, _, unprefixedIsNoNamespace = true))
+    attSet(element, qName) flatMap (Extensions.resolveQName(namespaces.mapping, _, unprefixedIsNoNamespace = true))
 }

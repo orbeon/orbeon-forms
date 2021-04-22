@@ -22,23 +22,21 @@ import org.orbeon.oxf.util.{XPath, XPathCache}
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
-import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
 
 import scala.annotation.tailrec
 
 class LHHAAnalysis(
-  staticStateContext : StaticStateContext,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-   with SingleNodeTrait
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ElementAnalysis(part, index, element, parent, preceding, scope)
    with OptionalSingleNode
    with AppearanceTrait {
 
@@ -101,8 +99,8 @@ class LHHAAnalysis(
       case LHHA.Label | LHHA.Hint =>
         hasLocalMinimalAppearance || (
           ! hasLocalFullAppearance &&
-            staticStateContext.partAnalysis.staticState.staticStringProperty(
-              if (lhhaType == LHHA.Hint) HINT_APPEARANCE_PROPERTY else LABEL_APPEARANCE_PROPERTY
+            part.staticState.staticStringProperty(
+              if (lhhaType == LHHA.Hint) HintAppearanceProperty else LabelAppearanceProperty
             )
           .tokenizeToSet.contains(XFORMS_MINIMAL_APPEARANCE_QNAME.localName)
         )
@@ -121,7 +119,7 @@ class LHHAAnalysis(
       def searchXblLabelFor(e: StaticLHHASupport): Option[StaticLHHASupport Either String] =
         e match {
           case xbl: ComponentControl =>
-            xbl.abstractBinding.labelFor match {
+            xbl.commonBinding.labelFor match {
               case Some(nestedLabelForStaticId) =>
                 searchLHHAControlInScope(xbl.bindingOrThrow.innerScope, nestedLabelForStaticId) match {
                   case Some(nestedLabelForTarget) => searchXblLabelFor(nestedLabelForTarget) // recurse
@@ -182,83 +180,12 @@ class LHHAAnalysis(
   // TODO: figure out whether to allow HTML or not (could default to true?)
   //
   val staticValue: Option[String] =
-    LHHAAnalysis.hasStaticValue(staticStateContext, element) option
+    LHHAAnalysis.hasStaticValue(element) option
       XFormsElementValue.getStaticChildElementValue(containerScope.fullPrefix, element, acceptHTML = true, null)
 
   def debugOut(): Unit =
     if (staticValue.isDefined)
       println("static value for control " + prefixedId + " => " + staticValue.get)
-
-  // Consider that LHHA don't have context/binding as we delegate implementation in computeValueAnalysis
-  override protected def computeContextAnalysis: Option[XPathAnalysis] = None
-  override protected def computeBindingAnalysis: Option[XPathAnalysis] = None
-
-  override protected def computeValueAnalysis: Option[XPathAnalysis] = {
-    if (staticValue.isEmpty) {
-      // Value is likely not static
-
-      // Delegate to concrete implementation
-      val delegateAnalysis =
-        new SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-          with ValueTrait with OptionalSingleNode with ViewTrait
-
-      delegateAnalysis.analyzeXPath()
-
-      if (ref.isDefined || value.isDefined) {
-        // 1. E.g. <xf:label model="…" context="…" value|ref="…"/>
-
-        // Don't assert because we want to support nested `fr:param` elements in Form Builder.
-        //assert(element.elements.isEmpty) // no children elements allowed in this case
-
-        // Use value provided by the delegate
-        delegateAnalysis.getValueAnalysis
-      } else {
-        // 2. E.g. <xf:label>…<xf:output value|ref=""…/>…<span class="{…}">…</span></xf:label>
-
-        // NOTE: We do allow @context and/or @model on LHHA element, which can change the context
-
-        // The subtree can only contain HTML elements interspersed with xf:output. HTML elements may have AVTs.
-        var combinedAnalysis: XPathAnalysis = StringAnalysis()
-
-        element.visitDescendants(
-          new VisitorListener {
-            val hostLanguageAVTs: Boolean = XFormsProperties.isHostLanguageAVTs
-            def startElement(element: Element): Unit = {
-              if (element.getQName == XFORMS_OUTPUT_QNAME) {
-                // Add dependencies
-                val outputAnalysis =
-                  new SimpleElementAnalysis(
-                    staticStateContext = staticStateContext,
-                    element            = element,
-                    parent             = Some(delegateAnalysis),
-                    preceding          = None,
-                    scope              = delegateAnalysis.getChildElementScope(element)
-                  ) with ValueTrait with OptionalSingleNode with ViewTrait
-                outputAnalysis.analyzeXPath()
-                if (outputAnalysis.getValueAnalysis.isDefined)
-                  combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get
-              } else if (hostLanguageAVTs) {
-                for {
-                  attribute <- element.attributes
-                  attributeValue = attribute.getValue
-                  if XFormsUtils.maybeAVT(attributeValue)
-                } combinedAnalysis = NegativeAnalysis(attributeValue) // not supported just yet
-              }
-            }
-
-            def endElement(element: Element): Unit = ()
-            def text(text: Text): Unit = ()
-          },
-          mutable = false
-        )
-
-        // Result of all combined analyses
-        Some(combinedAnalysis)
-      }
-    } else
-      // Value of LHHA is 100% static and analysis is constant
-      Some(StringAnalysis())
-  }
 }
 
 object LHHAAnalysis {
@@ -286,7 +213,7 @@ object LHHAAnalysis {
   }
 
   // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
-  def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
+  def hasStaticValue(lhhaElement: Element): Boolean = {
 
     val SearchExpression =
       """
@@ -319,5 +246,5 @@ object LHHAAnalysis {
     stringOptionToSet(validationAtt)
 
   def gatherAlertLevels(levelAtt: Option[String]): Set[ValidationLevel] =
-    stringOptionToSet(levelAtt) collect LevelByName
+    stringOptionToSet(levelAtt) collect ValidationLevel.LevelByName
 }

@@ -31,7 +31,7 @@ class Scope(val parent: Option[Scope], val scopeId: String) {
   private val idMap = mutable.HashMap[String, String]()
   val fullPrefix: String = if (isTopLevelScope) "" else scopeId + ComponentSeparator
 
-  def isTopLevelScope                           : Boolean        = scopeId.length == 0
+  def isTopLevelScope                           : Boolean        = scopeId.isEmpty
   def prefixedIdForStaticId(staticId: String)   : String         = idMap.get(staticId).orNull
   def prefixedIdForStaticIdOpt(staticId: String): Option[String] = idMap.get(staticId)
   def contains(staticId: String)                : Boolean        = idMap.contains(staticId)

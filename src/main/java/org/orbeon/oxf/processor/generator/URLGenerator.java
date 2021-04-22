@@ -13,18 +13,21 @@
  */
 package org.orbeon.oxf.processor.generator;
 
-import org.apache.log4j.Logger;
+import org.orbeon.datatypes.BasicLocationData;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.io.CharsetNames;
+import org.orbeon.io.IOUtils;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.http.Credentials;
+import org.orbeon.oxf.http.BasicCredentials;
 import org.orbeon.oxf.http.HttpMethod;
 import org.orbeon.oxf.http.HttpStatusCodeException;
+import org.orbeon.oxf.http.StatusCode;
 import org.orbeon.oxf.json.Converter;
 import org.orbeon.oxf.json.Symbols;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -36,7 +39,7 @@ import org.orbeon.oxf.resources.handler.SystemHandler;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
 import scala.Option;
@@ -63,7 +66,7 @@ import java.util.*;
  */
 public class URLGenerator extends ProcessorImpl {
 
-    private static Logger logger = Logger.getLogger(URLGenerator.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(URLGenerator.class);
     public static IndentedLogger indentedLogger = new IndentedLogger(logger);
 
     public static final boolean DEFAULT_VALIDATING = false;
@@ -589,18 +592,18 @@ public class URLGenerator extends ProcessorImpl {
                         }
                     }
                 } catch (SAXParseException spe) {
-                    throw new ValidationException(spe.getMessage(), new LocationData(spe));
+                    throw new ValidationException(spe.getMessage(), XmlLocationData.apply(spe));
                 } catch (ValidationException e) {
                     final LocationData locationData = e.firstLocationData();
                     // The system id may not be set
                     if (locationData == null || locationData.file() == null)
-                        throw OrbeonLocationException.wrapException(e, new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
+                        throw OrbeonLocationException.wrapException(e, BasicLocationData.apply(configURIReferences.config.getURL().toExternalForm(), -1, -1));
                     else
                         throw e;
                 } catch (OXFException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new ValidationException(e, new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
+                    throw new ValidationException(e, BasicLocationData.apply(configURIReferences.config.getURL().toExternalForm(), -1, -1));
                 }
             }
 
@@ -824,7 +827,7 @@ public class URLGenerator extends ProcessorImpl {
         public void readJSON(InputStream is, XMLReceiver output) throws IOException {
 
             final Reader reader     = new InputStreamReader(is, CharsetNames.Utf8());
-            final String jsonString = NetUtils.readStreamAsString(reader);
+            final String jsonString = IOUtils.readStreamAsStringAndClose(reader);
 
             Converter.jsonStringToXmlStream(jsonString, output, Symbols.JSON());
         }
@@ -976,9 +979,9 @@ public class URLGenerator extends ProcessorImpl {
                 final Map<String, String[]> newHeaders =
                     URLGeneratorBase.setIfModifiedIfNeeded(config.getHeaderNameValues(), lastModified);
 
-                final Credentials credentials = config.getUsername() == null ?
+                final BasicCredentials credentials = config.getUsername() == null ?
                     null :
-                    Credentials.apply(
+                    BasicCredentials.apply(
                         config.getUsername(),
                         config.getPassword(),
                         config.isPreemptiveAuth() ? "true" : "false",
@@ -1002,11 +1005,23 @@ public class URLGenerator extends ProcessorImpl {
                         config.getForwardHeaders(),
                         Connection.getHeaderFromRequest(externalContext.getRequest()),
                         indentedLogger,
-                        externalContext
+                        externalContext,
+                        CoreCrossPlatformSupport$.MODULE$
                     );
 
                 connectionResult =
-                    Connection.jApply(HttpMethod.GET$.MODULE$, url, credentials, null, headers, true, false, indentedLogger, externalContext).connect(true);
+                    Connection.jConnectNow(
+                        HttpMethod.GET$.MODULE$,
+                        url,
+                        credentials,
+                        null,
+                        headers,
+                        true,
+                        true,
+                        false,
+                        indentedLogger,
+                        externalContext
+                    );
 
                 inputStream = connectionResult.content().inputStream();
 
@@ -1066,7 +1081,7 @@ public class URLGenerator extends ProcessorImpl {
         public boolean isFailureStatusCode() throws IOException {
             // NOTE: We accept -1 internally to indicate we don't have an actual status code
             final int statusCode = getConnectionStatusCode();
-            return statusCode > 0 && ! NetUtils.isSuccessCode(statusCode);
+            return statusCode > 0 && ! StatusCode.isSuccessCode(statusCode);
         }
 
         private void checkStatusCode() throws IOException {

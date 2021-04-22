@@ -20,7 +20,8 @@ import java.util.{List => JList}
 
 import com.lowagie.text.pdf._
 import com.lowagie.text.{Image, Rectangle}
-import org.apache.log4j.Logger
+import org.log4s
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.Element
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.exception.OrbeonFormatter
@@ -37,7 +38,6 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{FloatValue, Int64Value}
 import org.orbeon.xml.NamespaceMapping
@@ -328,31 +328,31 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
           val externalContext = NetUtils.getExternalContext
 
           val cxr =
-            Connection(
+            Connection.connectNow(
               method          = GET,
               url             = url,
               credentials     = None,
               content         = None,
               headers         = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-                url              = url,
-                hasCredentials   = false,
-                customHeaders    = URLGeneratorBase.extractHeaders(context.element),
-                headersToForward = Connection.headersToForwardFromProperty,
-                cookiesToForward = Connection.cookiesToForwardFromProperty,
-                getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest))(
-                logger           = context.logger,
-                externalContext  = externalContext
+                url                      = url,
+                hasCredentials           = false,
+                customHeaders            = URLGeneratorBase.extractHeaders(context.element),
+                headersToForward         = Connection.headersToForwardFromProperty,
+                cookiesToForward         = Connection.cookiesToForwardFromProperty,
+                getHeader                = Connection.getHeaderFromRequest(externalContext.getRequest))(
+                logger                   = context.logger,
+                externalContext          = externalContext,
+                coreCrossPlatformSupport = CoreCrossPlatformSupport
               ),
               loadState       = true,
+              saveState       = true,
               logBody         = false)(
               logger          = context.logger,
               externalContext = externalContext
-            ).connect(
-              saveState = true
             )
 
           ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
-            val tempURLString = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, PDFTemplateProcessor.Logger)
+            val tempURLString = NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, PDFTemplateProcessor.Logger.logger)
             // NOTE: iText's Image.getInstance() closes the local URL's InputStream
             Image.getInstance(URLFactory.createURL(tempURLString))
           }
@@ -401,7 +401,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
 object PDFTemplateProcessor {
 
-  val Logger: Logger = LoggerFactory.createLogger(classOf[PDFTemplateProcessor])
+  val Logger: log4s.Logger = LoggerFactory.createLogger(classOf[PDFTemplateProcessor])
   val PDFTemplateModelNamespaceURI = "http://www.orbeon.com/oxf/pdf-template/model"
 
   def createBarCode(barcodeType: String): Barcode = barcodeType match {

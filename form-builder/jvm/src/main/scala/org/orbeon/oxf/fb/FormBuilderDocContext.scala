@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.{FormRunnerDocContext, Names}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+
 
 case class FormBuilderDocContext(
   explicitFormDefinitionInstance : Option[NodeInfo],   // for annotating the form definition outside of an instance
@@ -36,18 +36,7 @@ case class FormBuilderDocContext(
   lazy val componentBindings: Seq[NodeInfo] =
     asScalaSeq(formBuilderModel.get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 
-  lazy val undoRootElem         = undoInstance.get.rootElement
-
-  lazy val modelElem             = getModelElem(formDefinitionRootElem)
-  lazy val dataInstanceElem      = instanceElemFromModelElem(modelElem, Names.FormInstance).get
-  lazy val metadataInstanceElem  = instanceElemFromModelElem(modelElem, Names.MetadataInstance).get
-  lazy val resourcesInstanceElem = instanceElemFromModelElem(modelElem, Names.FormResources).get
-  lazy val topLevelBindElem      = findTopLevelBindFromModelElem(modelElem)
-  lazy val bodyElem              = getFormRunnerBodyElem(formDefinitionRootElem)
-
-  lazy val dataRootElem          = dataInstanceElem      / * head
-  lazy val metadataRootElem      = metadataInstanceElem  / * head
-  lazy val resourcesRootElem     = resourcesInstanceElem / * head
+  lazy val undoRootElem = undoInstance.get.rootElement
 }
 
 object FormBuilderDocContext {

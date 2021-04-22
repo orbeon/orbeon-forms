@@ -17,6 +17,7 @@ import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.scaxon.SimplePath.Test
+import org.orbeon.xforms.Namespaces
 
 object XMLNames {
 
@@ -27,7 +28,7 @@ object XMLNames {
   val XF  = XFORMS_NAMESPACE_URI
   val XXF = XXFORMS_NAMESPACE_URI
   val XS  = XSD_URI
-  val XBL = XBL_NAMESPACE_URI
+  val XBL = Namespaces.XBL
 
   val XHHeadTest               : Test      = XH -> "head"
   val XHBodyTest               : Test      = XH -> "body"

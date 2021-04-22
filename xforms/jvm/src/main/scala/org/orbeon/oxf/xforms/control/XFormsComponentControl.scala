@@ -55,16 +55,15 @@ class XFormsValueComponentControl(
   override type Control <: ComponentControl with ValueComponentTrait with ViewTrait with StaticLHHASupport
 
   // Don't expose an external value unless explicitly allowed
-  override def handleExternalValue: Boolean = staticControl.abstractBinding.modeExternalValue
+  override def handleExternalValue: Boolean = staticControl.commonBinding.modeExternalValue
 
   private def evaluateWithContext(eval: (NamespaceMapping, FunctionContext) => Option[String]): Option[String] =
     for {
-      binding              <- staticControl.bindingOpt
-      abstractBinding      = binding.abstractBinding
+      _                    <- staticControl.bindingOpt
       nestedContainer      <- nestedContainerOpt
       nestedBindingContext <- bindingContextForChildOpt
       result               <- eval(
-                               abstractBinding.namespaceMapping,
+                               staticControl.commonBinding.bindingElemNamespaceMapping,
                                XFormsFunction.Context(
                                  container         = nestedContainer,
                                  bindingContext    = nestedBindingContext,
@@ -101,7 +100,7 @@ class XFormsValueComponentControl(
   override def evaluateExternalValue(): Unit = {
 
     def fromBinding =
-      staticControl.abstractBinding.serializeExternalValueOpt flatMap { serializeExpr =>
+      staticControl.commonBinding.serializeExternalValueOpt flatMap { serializeExpr =>
         evaluateWithContext(
           (namespaceMapping, functionContext) =>
             evaluateAsString(
@@ -121,7 +120,7 @@ class XFormsValueComponentControl(
   override def translateExternalValue(boundItem: Item, externalValue: String): Option[String] = {
 
     def fromBinding =
-      staticControl.abstractBinding.deserializeExternalValueOpt flatMap { deserializeExpr =>
+      staticControl.commonBinding.deserializeExternalValueOpt flatMap { deserializeExpr =>
         evaluateWithContext(
           (namespaceMapping, functionContext) =>
             evaluateAsString(
@@ -216,7 +215,7 @@ class XFormsComponentControl(
         initializeModels()
     }
 
-  private def modeBinding = staticControl.abstractBinding.modeBinding
+  private def modeBinding = staticControl.commonBinding.modeBinding
 
   // Only handle binding if we support modeBinding
   override protected def computeBinding(parentContext: BindingContext): BindingContext =
@@ -240,11 +239,11 @@ class XFormsComponentControl(
 
     super.onCreate(restoreState, state, update)
 
-    if (staticControl.hasLazyBinding && staticControl.bindingOpt.isEmpty) {
+    if (staticControl.hasLazyBinding && ! staticControl.hasConcreteBinding) {
 
       // Only update the static tree. The dynamic tree is created later.
       XXFormsDynamicControl.createOrUpdateStaticShadowTree(this, None)
-      assert(staticControl.bindingOpt.isDefined)
+      assert(staticControl.hasConcreteBinding)
 
       // See https://github.com/orbeon/orbeon-forms/issues/4018
       //
@@ -320,7 +319,7 @@ class XFormsComponentControl(
 
     super.onDestroy(update)
 
-    if (staticControl.hasLazyBinding && staticControl.bindingOpt.isDefined) {
+    if (staticControl.hasLazyBinding && staticControl.hasConcreteBinding) {
 
       if (update) {
         containingDocument.controls.getCurrentControlTree.deindexSubtree(this, includeCurrent = false)
@@ -480,7 +479,7 @@ class XFormsComponentControl(
     buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) => Option[XFormsControl],
     idSuffix: Seq[Int]
   ): Unit =
-    if (staticControl.bindingOpt.isDefined)
+    if (staticControl.hasConcreteBinding)
       Controls.buildChildren(
         control   = this,
         children  = staticControl.children,
@@ -491,6 +490,6 @@ class XFormsComponentControl(
   // Get the control at the root of the inner scope of the component
   def innerRootControl: XXFormsComponentRootControl = children collectFirst { case root: XXFormsComponentRootControl => root } get
 
-  override def ajaxLhhaSupport: Seq[LHHA] = staticControl.abstractBinding.standardLhhaAsSeq
-  override def htmlLhhaSupport: Set[LHHA] = staticControl.abstractBinding.standardLhhaAsSet
+  override def ajaxLhhaSupport: Seq[LHHA] = staticControl.commonBinding.standardLhhaAsSeq
+  override def htmlLhhaSupport: Set[LHHA] = staticControl.commonBinding.standardLhhaAsSet
 }

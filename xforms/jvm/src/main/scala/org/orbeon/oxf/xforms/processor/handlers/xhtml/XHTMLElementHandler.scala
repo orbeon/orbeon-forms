@@ -13,31 +13,58 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
-import org.xml.sax.{Attributes, SAXException}
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
+import org.orbeon.oxf.xml.XMLReceiverSupport.{element, _}
+import org.orbeon.oxf.xml.{XMLConstants, XMLNames, XMLReceiver}
+import org.xml.sax.Attributes
 
-/**
-  * Handle xhtml:* for handling AVTs as well as rewriting @id and @for.
-  */
+
 object XHTMLElementHandler {
-  val REF_ID_ATTRIBUTE_NAMES = Array("for")
+
+  val RefIdAttributeNames: Array[String] = Array("for")
+
+  def outputXInclude(href: String)(implicit xmlReceiver: XMLReceiver): Unit =
+    element(
+      localName = "include",
+      uri       = XMLNames.XIncludeURI,
+      atts      = List("href" -> href, "fixup-xml-base" -> "false")
+    )
+
+  def outputHiddenField(htmlPrefix: String, name: String, value: String)(implicit xmlReceiver: XMLReceiver): Unit =
+    element(
+      localName = "input",
+      prefix    = htmlPrefix,
+      uri       = XMLConstants.XHTML_NAMESPACE_URI,
+      atts      = List("type" -> "hidden", "name" -> name, "value" -> value)
+    )
 }
 
-class XHTMLElementHandler(uri: String, localname: String, qName: String, localAtts: Attributes, matched: Any, handlerContext: Any)
-  extends XFormsBaseHandlerXHTML(uri, localname, qName, localAtts, matched, handlerContext, false, true) {
+// Handle `xh:*` for handling AVTs as well as rewriting `@id` and `@for`.
+class XHTMLElementHandler(
+  uri            : String,
+  localname      : String,
+  qName          : String,
+  localAtts      : Attributes,
+  handlerContext : HandlerContext
+) extends
+  XFormsBaseHandlerXHTML(
+    uri,
+    localname,
+    qName,
+    localAtts,
+    handlerContext,
+    repeating  = false,
+    forwarding = true
+  ) {
 
-  @throws[SAXException]
-  override def start(): Unit = {
-    xformsHandlerContext.getController.getOutput.startElement(
+  override def start(): Unit =
+    handlerContext.controller.output.startElement(
       uri,
       localname,
       qName,
-      XFormsBaseHandler.handleAVTsAndIDs(attributes, XHTMLElementHandler.REF_ID_ATTRIBUTE_NAMES, xformsHandlerContext)
+      XFormsBaseHandler.handleAVTsAndIDs(attributes, XHTMLElementHandler.RefIdAttributeNames, handlerContext)
     )
-  }
 
-  @throws[SAXException]
-  override def end(): Unit = {
-    xformsHandlerContext.getController.getOutput.endElement(uri, localname, qName)
-  }
+  override def end(): Unit =
+    handlerContext.controller.output.endElement(uri, localname, qName)
 }

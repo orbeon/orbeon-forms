@@ -15,7 +15,9 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.dom.Document;
 import org.orbeon.dom.io.DocumentSource;
+import org.orbeon.dom.io.XMLWriter;
 import org.orbeon.dom.saxon.DocumentWrapper;
+import org.orbeon.dom.Node.NodeOps;
 import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
@@ -52,6 +54,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+
+import static net.sf.ehcache.terracotta.SerializationHelper.serializeToString;
 
 /**
  * Utility class for XSLT and other transformations.

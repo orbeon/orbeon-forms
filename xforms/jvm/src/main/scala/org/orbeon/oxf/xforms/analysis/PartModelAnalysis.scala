@@ -13,14 +13,10 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import java.{util => ju}
-
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.analysis.model.{Instance, Model, ModelDefs}
 import org.orbeon.xforms.xbl.Scope
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 // Part analysis: models and instances information
@@ -31,6 +27,13 @@ trait PartModelAnalysis extends TransientState {
   private[PartModelAnalysis] val modelsByScope             = mutable.LinkedHashMap[Scope, mutable.Buffer[Model]]()
   private[PartModelAnalysis] val modelsByPrefixedId        = mutable.LinkedHashMap[String, Model]()
   private[PartModelAnalysis] val modelByInstancePrefixedId = mutable.LinkedHashMap[String, Model]()
+
+  def iterateModels: Iterator[Model] =
+    for {
+      models <- modelsByScope.valuesIterator
+      model  <- models.iterator
+    } yield
+      model
 
   def getModel(prefixedId: String): Model =
     modelsByPrefixedId.get(prefixedId).orNull
@@ -89,14 +92,6 @@ trait PartModelAnalysis extends TransientState {
     for (instance <- model.instances.values)
       modelByInstancePrefixedId -= instance.prefixedId
   }
-
-  protected def analyzeModelsXPath(): Unit =
-    for {
-      models <- modelsByScope.valuesIterator
-      model  <- models.iterator
-    } locally {
-      model.analyzeXPath()
-    }
 
   override def freeTransientState(): Unit = {
     super.freeTransientState()

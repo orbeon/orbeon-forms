@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.URLRewriter$;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.RegexpMatcher;
 import org.orbeon.oxf.properties.Properties;
@@ -174,7 +175,7 @@ public class URLRewriterUtils {
      */
     private static String rewriteURL(String scheme, String host, int port, String contextPath, String requestPath, String urlString, int rewriteMode) {
         // Accept human-readable URI
-        urlString = NetUtils.encodeHRRI(urlString, true);
+        urlString = MarkupUtils.encodeHRRI(urlString, true);
 
         // Case where a protocol is specified: the URL is left untouched (except for human-readable processing)
         if (NetUtils.urlHasProtocol(urlString))
@@ -185,13 +186,13 @@ public class URLRewriterUtils {
             {
                 String _baseURLString;
                 // Prepend absolute base if needed
-                if ((rewriteMode & ExternalContext.Response.REWRITE_MODE_ABSOLUTE) != 0) {
+                if ((rewriteMode & URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()) != 0) {
                     _baseURLString = scheme + "://" + host + ((port == 80 || port == -1) ? "" : ":" + port);
                 } else {
                     _baseURLString = "";
                 }
                 // Append context path if needed
-                if ((rewriteMode & ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT) == 0)
+                if ((rewriteMode & URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT()) == 0)
                     _baseURLString = _baseURLString + contextPath;
 
                 baseURLString = _baseURLString;
@@ -202,7 +203,7 @@ public class URLRewriterUtils {
                 // This is a special case that appears to be implemented
                 // in Web browsers as a convenience. Users may use it.
                 return baseURLString + requestPath + urlString;
-            } else if ((rewriteMode & ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE) != 0 && !urlString.startsWith("/") && !"".equals(urlString)) {
+            } else if ((rewriteMode & URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE()) != 0 && !urlString.startsWith("/") && !"".equals(urlString)) {
                 // Don't change the URL if it is a relative path and we don't force absolute
                 return urlString;
             } else {
@@ -241,7 +242,7 @@ public class URLRewriterUtils {
             // We need to match the URL against the matcher
 
             // 1. Rewrite to absolute path URI without context
-            final String absoluteURINoContext = rewriteURL(request, urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+            final String absoluteURINoContext = rewriteURL(request, urlString, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT());
             if (NetUtils.urlHasProtocol(absoluteURINoContext))
                 return absoluteURINoContext; // will be an absolute path
 

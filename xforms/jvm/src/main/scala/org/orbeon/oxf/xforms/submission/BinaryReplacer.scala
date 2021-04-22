@@ -16,10 +16,13 @@ package org.orbeon.oxf.xforms.submission
 import java.io.File
 import java.net.URI
 
+import cats.Eval
+import cats.syntax.option._
 import org.orbeon.io.FileUtils
-import org.orbeon.oxf.util.{ConnectionResult, NetUtils}
+import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.hmacURL
+import org.orbeon.xforms.CrossPlatformSupport
 
 // Handle replace="xxf:binary"
 class BinaryReplacer(
@@ -33,22 +36,17 @@ class BinaryReplacer(
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
     p2               : SecondPassParameters
-  ): Unit = {
-
-    contentUrlOpt = Some(
-      NetUtils.inputStreamToAnyURI(
-        connectionResult.content.inputStream,
-        NetUtils.SESSION_SCOPE,
-        submission.getDetailsLogger(p, p2).getLogger
-      )
+  ): Unit =
+    contentUrlOpt = CrossPlatformSupport.inputStreamToSessionUri(
+      connectionResult.content.inputStream)(
+      submission.getDetailsLogger(p, p2)
     )
-  }
 
   def replace(
     connectionResult : ConnectionResult,
     p                : SubmissionParameters,
     p2               : SecondPassParameters
-  ): Runnable = {
+  ): Option[Eval[Unit]] = {
 
     def filenameFromValue  : Option[String] = None // MAYBE: `xxf:filenamevalue`
     def filenameFromHeader : Option[String] = None // MAYBE: `Content-Disposition`'s `filename`.
@@ -78,6 +76,6 @@ class BinaryReplacer(
     // MAYBE `xxf:mediatyperef` (also with other replacers!)
     // MAYBE `xxf:sizeref`      (also with other replacers!)
 
-    submission.sendSubmitDone(connectionResult)
+    submission.sendSubmitDone(connectionResult).some
   }
 }

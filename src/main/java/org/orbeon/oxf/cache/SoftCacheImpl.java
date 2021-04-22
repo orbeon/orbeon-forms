@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.util.LoggerFactory;
 
 import java.lang.ref.ReferenceQueue;
@@ -33,7 +32,7 @@ import java.util.*;
  */
 public class SoftCacheImpl {
 
-    static private Logger logger = LoggerFactory.createLogger(SoftCacheImpl.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(SoftCacheImpl.class);
 
     private int maximumSize;
     private String[] keyNames;

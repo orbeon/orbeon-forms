@@ -1,7 +1,8 @@
 package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.http.{Credentials, HttpMethod}
+import org.orbeon.oxf.http.{BasicCredentials, HttpMethod}
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
 
@@ -9,7 +10,7 @@ case class SecondPassParameters(
 
   actionOrResource   : String,
   isAsynchronous     : Boolean,
-  credentialsOpt     : Option[Credentials],
+  credentialsOpt     : Option[BasicCredentials],
 
   // Serialization
   separator          : String,
@@ -37,9 +38,6 @@ object SecondPassParameters {
   private val Application      = "application"
   private val CacheableMethods = Set(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT): Set[HttpMethod]
 
-  def amendForJava(p: SecondPassParameters, isAsynchronous: Boolean, isReadonly: Boolean): SecondPassParameters =
-    p.copy(isAsynchronous = isAsynchronous, isReadonly = isReadonly)
-
   def apply(dynamicSubmission: XFormsModelSubmission, p: SubmissionParameters): SecondPassParameters = {
 
     val staticSubmission = dynamicSubmission.staticSubmission
@@ -52,7 +50,7 @@ object SecondPassParameters {
     val actionOrResource =
       stringAvtTrimmedOpt(staticSubmission.avtActionOrResource) match {
         case Some(resolved) =>
-          NetUtils.encodeHRRI(resolved, true)
+          resolved.encodeHRRI(processSpace = true)
         case None =>
           throw new XFormsSubmissionException(
             submission  = dynamicSubmission,
@@ -65,7 +63,7 @@ object SecondPassParameters {
       staticSubmission.avtXxfUsernameOpt flatMap
         stringAvtTrimmedOpt              map { username =>
 
-        Credentials(
+        BasicCredentials(
           username       = username,
           password       =    staticSubmission.avtXxfPasswordOpt       flatMap stringAvtTrimmedOpt,
           preemptiveAuth = ! (staticSubmission.avtXxfPreemptiveAuthOpt flatMap stringAvtTrimmedOpt contains false.toString),

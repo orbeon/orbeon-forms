@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms
 
 import java.{lang => jl}
-
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
@@ -27,9 +27,8 @@ import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XXFormsAttri
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om.Item
-import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.{Constants, XFormsId, XFormsNames}
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
@@ -136,7 +135,7 @@ object XFormsElementValue {
               )
             catch {
               case NonFatal(t) =>
-                XFormsError.handleNonFatalXPathError(container, t)
+                XFormsError.handleNonFatalXPathError(container, t, Some(valueAttribute))
                 "".some
             }
 
@@ -307,8 +306,14 @@ object XFormsElementValue {
                 }
                 attributeControl.getExternalValue()
               } else if (currentAttributeName == "id") {
-                // This is an id, prefix if needed
-                prefix + currentAttributeValue
+                // This is an id, prefix if needed, but also add suffix
+                // https://github.com/orbeon/orbeon-forms/issues/4782
+                val it = ctxStack.getCurrentBindingContext.repeatPositions
+
+                if (it.isEmpty)
+                  prefix + currentAttributeValue
+                else
+                  XFormsId.fromEffectiveId(prefix + currentAttributeValue).copy(iterations = it.toList.reverse).toEffectiveId
               } else {
                 // Simply use control value
                 currentAttributeValue

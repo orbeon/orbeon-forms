@@ -13,10 +13,11 @@
   */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, VariableAnalysis, VariableAnalysisTrait}
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{VariableAnalysis, VariableAnalysisTrait}
 import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.saxon.value.{EmptySequence, StringValue}
 import org.orbeon.xforms.XFormsId
@@ -66,7 +67,7 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
         if (pushContext)
           contextStack.pushBinding(staticVariable.valueElement, sourceEffectiveId, staticVariable.valueScope)
 
-        val result= {
+        val result = {
           val bindingContext = contextStack.getCurrentBindingContext
           val currentNodeset = bindingContext.nodeset
           if (! currentNodeset.isEmpty) {
@@ -90,7 +91,7 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
               case NonFatal(t) if handleNonFatal =>
                   // Don't consider this as fatal
                   // Default value is the empty sequence
-                  XFormsError.handleNonFatalXPathError(contextStack.container, t)
+                  XFormsError.handleNonFatalXPathError(contextStack.container, t, Some(expression))
                   EmptySequence.getInstance
               case NonFatal(t) =>
                 throw new OXFException(t)

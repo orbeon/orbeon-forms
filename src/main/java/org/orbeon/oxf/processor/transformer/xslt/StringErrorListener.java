@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.processor.transformer.xslt;
 
+import org.orbeon.datatypes.ExtendedLocationData;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.errorified.Exceptions;
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.ErrorListener;
@@ -121,7 +122,7 @@ public class StringErrorListener implements ErrorListener {
         if (locator == null && defaultSystemId == null) {
             return null;
         } else if (locator == null) {
-            return new ExtendedLocationData(defaultSystemId, -1, -1, null);
+            return XmlExtendedLocationData.apply(defaultSystemId, -1, -1, null);
         } else {
             String description;
             if (locator instanceof DOMLocator) {
@@ -137,7 +138,7 @@ public class StringErrorListener implements ErrorListener {
             } else {
                 description = null;
             }
-            return new ExtendedLocationData((locator.getSystemId() != null) ? locator.getSystemId() : defaultSystemId, locator.getLineNumber(), locator.getColumnNumber(), description);
+            return XmlExtendedLocationData.apply((locator.getSystemId() != null) ? locator.getSystemId() : defaultSystemId, locator.getLineNumber(), locator.getColumnNumber(), description);
         }
     }
 

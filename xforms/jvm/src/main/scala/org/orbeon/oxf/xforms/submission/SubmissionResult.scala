@@ -15,30 +15,9 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.oxf.util.ConnectionResult
 
+import scala.util.Try
+
 case class SubmissionResult(
   submissionEffectiveId : String,
-  replacerOrThrowable   : Replacer Either Throwable,
-  connectionResult      : ConnectionResult
-) {
-
-  def close(): Unit =
-    Option(connectionResult) foreach (_.close())
-
-  // For Java callers
-  def this(submissionEffectiveId: String, replacer: Replacer, connectionResult: ConnectionResult) =
-    this(
-      submissionEffectiveId,
-      Left(replacer),
-      connectionResult
-    )
-
-  def this(submissionEffectiveId: String, throwable: Throwable, connectionResult: ConnectionResult) =
-    this(
-      submissionEffectiveId,
-      Right(throwable),
-      connectionResult
-    )
-
-  def getReplacer: Replacer = replacerOrThrowable.left.getOrElse(null)
-  def getThrowable: Throwable = replacerOrThrowable.right.getOrElse(null)
-}
+  result                : Try[(Replacer, ConnectionResult)]
+)

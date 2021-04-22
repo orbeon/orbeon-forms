@@ -14,20 +14,20 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import java.{lang => jl}
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
-import org.orbeon.dom.QName
 
-// Trait for all elements that have an appearance
-trait AppearanceTrait extends SimpleElementAnalysis {
+import org.orbeon.dom.QName
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.xforms.XFormsNames._
+
+
+trait AppearanceTrait extends ElementAnalysis {
 
   import AppearanceTrait._
 
-  val appearances = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
-  val mediatype   = Option(element.attributeValue(MEDIATYPE_QNAME))
+  val appearances: Set[QName]     = ElementAnalysis.attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
+  val mediatype  : Option[String] = element.attributeValueOpt(MEDIATYPE_QNAME)
 
-  def encodeAndAppendAppearances(sb: jl.StringBuilder) =
+  def encodeAndAppendAppearances(sb: jl.StringBuilder): Unit =
     appearances foreach (encodeAndAppendAppearance(sb, localName, _))
 }
 
@@ -47,12 +47,12 @@ object AppearanceTrait {
     encodeAppearanceValue(sb, appearance)
   }
 
-  def encodeAppearanceValue(sb: jl.StringBuilder, appearance: QName) = {
+  def encodeAppearanceValue(sb: jl.StringBuilder, appearance: QName): jl.StringBuilder = {
     // Names in a namespace may get a prefix
     val uri = appearance.namespace.uri
     if (uri.nonEmpty) {
       // Try standard prefixes or else use the QName prefix
-      val prefix = AppearanceTrait.StandardPrefixes.getOrElse(uri, appearance.namespace.prefix)
+      val prefix = StandardPrefixes.getOrElse(uri, appearance.namespace.prefix)
       if (prefix.nonEmpty) {
         sb.append(prefix)
         sb.append("-")

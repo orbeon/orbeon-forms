@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.util.Whitespace.applyPolicy
-import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, Model, StaticBind}
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
+import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs, StaticBind}
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.model.XFormsModelBinds._
 import org.orbeon.saxon.om.NodeInfo
@@ -42,7 +42,7 @@ trait CalculateBindOps {
           (if (isFirstCalculate) AllDefaultsStrategy else defaultsStrategy) match {
             case strategy: SomeDefaultsStrategy =>
               applyCalculatedBindsUseOrderIfNeeded(
-                Model.Default,
+                ModelDefs.Default,
                 staticModel.defaultValueOrder,
                 strategy,
                 collector
@@ -52,7 +52,7 @@ trait CalculateBindOps {
 
         if (staticModel.hasCalculateBind)
           applyCalculatedBindsUseOrderIfNeeded(
-            Model.Calculate,
+            ModelDefs.Calculate,
             staticModel.recalculateOrder,
             AllDefaultsStrategy,
             collector
@@ -167,7 +167,7 @@ trait CalculateBindOps {
       iterateBinds(topLevelBinds, bindNode =>
         if (! bindNode.hasChildrenElements) { // quick test to rule out containing elements
           bindNode.staticBind.nonPreserveWhitespaceMIPOpt foreach { mip =>
-            if (dependencies.requireModelMIPUpdate(model, bindNode.staticBind, Model.Whitespace, null)) {
+            if (dependencies.requireModelMIPUpdate(model, bindNode.staticBind, ModelDefs.Whitespace, null)) {
               DataModel.setValueIfChangedHandleErrors(
                 eventTarget  = model,
                 locationData = bindNode.locationData,

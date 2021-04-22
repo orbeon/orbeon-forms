@@ -40,7 +40,8 @@
             padding: 0 @frGridCellPadding;
             position: relative;
 
-            &> .xforms-control, &> .xbl-component, &> .xforms-group {
+            // Exclude buttons, as we don't want them to take the whole width of the cell
+            &> .xforms-control:not(.xforms-trigger-appearance-full), &> .xbl-component, &> .xforms-group {
                 margin: @frGridCellPadding 0;
                 display: block;
             }

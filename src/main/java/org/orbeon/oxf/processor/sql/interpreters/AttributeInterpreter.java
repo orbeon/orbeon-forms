@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
 import org.orbeon.oxf.xml.DeferredXMLReceiverImpl;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -90,13 +90,13 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
         if (colonIndex == -1)
             return QName.apply(qNameString);
         if (colonIndex == 0)
-            throw new ValidationException("Invalid QName:" + qNameString, new LocationData(locator));
+            throw new ValidationException("Invalid QName:" + qNameString, XmlLocationData.apply(locator));
 
         final String prefix = qNameString.substring(0, colonIndex);
         final String localName = qNameString.substring(colonIndex + 1);
 
         if (prefixesMap.get(prefix) == null) {
-            throw new ValidationException("Undeclared prefix for QName:" + qNameString, new LocationData(locator));
+            throw new ValidationException("Undeclared prefix for QName:" + qNameString, XmlLocationData.apply(locator));
         } else {
             return QName.apply(localName, Namespace$.MODULE$.apply(prefix, (String) prefixesMap.get(prefix)));
         }

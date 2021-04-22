@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.externalcontext
 
-import org.apache.log4j.Logger
+import org.log4s.Logger
 
 import scala.collection.mutable
 
@@ -22,7 +22,7 @@ class TestWebAppContext(logger: Logger, val attributes: mutable.Map[String, AnyR
   def getResourceAsStream(s: String)             = throw new UnsupportedOperationException
   def getRealPath(s: String)                     = null
   val initParameters                             = Map.empty[String, String]
-  def log(message: String, throwable: Throwable) = logger.error(message, throwable)
+  def log(message: String, throwable: Throwable) = logger.error(throwable)(message)
   def log(message: String)                       = logger.info(message)
   def getNativeContext                           = null
 }

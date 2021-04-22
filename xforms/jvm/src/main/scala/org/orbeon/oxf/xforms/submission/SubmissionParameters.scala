@@ -2,9 +2,9 @@ package org.orbeon.oxf.xforms.submission
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache.XPathContext
-import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils._
@@ -13,7 +13,7 @@ import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{RelevanceHandling, UrlType}
+import org.orbeon.xforms.{CrossPlatformSupport, RelevanceHandling, UrlType}
 
 
 // Subset of `SubmissionParameters`
@@ -87,7 +87,7 @@ object SubmissionParameters {
         submitErrorEvent = new XFormsSubmitErrorEvent(
           dynamicSubmission,
           ErrorType.NoData,
-          null
+          None
         )
       )
 
@@ -99,31 +99,37 @@ object SubmissionParameters {
         submitErrorEvent = new XFormsSubmitErrorEvent(
           dynamicSubmission,
           ErrorType.NoData,
-          null
+          None
         )
       )
 
     def filterQualifiedName(s: String) =
-      staticSubmission.element.resolveStringQName(s, unprefixedIsNoNamespace = true).localName
+      staticSubmission.element.resolveStringQName(s, unprefixedIsNoNamespace = true) map (_.localName)
 
     val resolvedReplace =
       staticSubmission.avtReplaceOpt    flatMap
-        stringAvtTrimmedOpt             map
+        stringAvtTrimmedOpt             flatMap
         filterQualifiedName             map // so that `xxf:binary` becomes `binary`
         ReplaceType.withNameInsensitive getOrElse
         ReplaceType.All
 
-    val resolvedMethod = {
+    val resolvedMethodClarkName = {
       val resolvedMethodQName =
         staticSubmission.avtMethod flatMap stringAvtTrimmedOpt getOrElse "get"
 
-      Extensions.resolveQName(
-        staticSubmission.namespaceMapping.mapping,
-        resolvedMethodQName,
-        unprefixedIsNoNamespace = true
-      ).clarkName
+      val methodQName =
+        Extensions.resolveQName(
+          staticSubmission.namespaceMapping.mapping,
+          resolvedMethodQName,
+          unprefixedIsNoNamespace = true
+        ) getOrElse
+          QName("get")
+
+      methodQName.clarkName
     }
-    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethod)
+
+    // TODO: We pass a Clark name, but we don't process this correctly!
+    val actualHttpMethod     = actualHttpMethodFromXFormsMethodName(resolvedMethodClarkName)
     val resolvedMediatypeOpt = staticSubmission.avtMediatypeOpt flatMap stringAvtTrimmedOpt
 
     val serializationOpt = staticSubmission.avtSerializationOpt flatMap stringAvtTrimmedOpt
@@ -166,7 +172,7 @@ object SubmissionParameters {
     val resolvedXxfRelevantAtt: Option[QName] =
       if (serialize)
         staticSubmission.avtXxfRelevantAttOpt flatMap
-          stringAvtTrimmedOpt                 map (
+          stringAvtTrimmedOpt                 flatMap (
             Extensions.resolveQName(
               staticSubmission.namespaceMapping.mapping,
               _,
@@ -226,7 +232,7 @@ object SubmissionParameters {
     // Also don't allow deferred submissions when the incoming method is a GET. This is an indirect way of
     // allowing things like using the XForms engine to generate a PDF with an HTTP GET.
     // NOTE: Method can be `null` e.g. in a portlet render request.
-    val incomingMethod = NetUtils.getExternalContext.getRequest.getMethod
+    val incomingMethod = CrossPlatformSupport.externalContext.getRequest.getMethod
 
     val isAllowDeferredSubmission      = incomingMethod != HttpMethod.GET
     val isPossibleDeferredSubmission   = resolvedReplace == ReplaceType.All && ! isHandlingClientGetAll && ! containingDocument.initializing
@@ -237,7 +243,7 @@ object SubmissionParameters {
     SubmissionParameters(
       refContext                     = refContext,
       replaceType                    = resolvedReplace,
-      xformsMethod                   = resolvedMethod,
+      xformsMethod                   = resolvedMethodClarkName,
       httpMethod                     = actualHttpMethod,
       mediatypeOpt                   = resolvedMediatypeOpt,
       serializationOpt               = serializationOpt,
@@ -275,7 +281,7 @@ object SubmissionParameters {
           submitErrorEvent = new XFormsSubmitErrorEvent(
             dynamicSubmission,
             ErrorType.XXFormsMethodError,
-            null
+            None
           )
         )
     }
@@ -285,7 +291,7 @@ object SubmissionParameters {
     val staticSubmission   = dynamicSubmission.staticSubmission
     val containingDocument = dynamicSubmission.containingDocument
 
-    val model = dynamicSubmission.getModel
+    val model = dynamicSubmission.model
     model.resetAndEvaluateVariables()
 
     val contextStack = model.getContextStack

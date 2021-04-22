@@ -14,9 +14,11 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl
+import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsTriggerFullHandler._
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
@@ -25,27 +27,36 @@ import org.orbeon.oxf.xml.{SAXUtils, XMLReceiver, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
+
 /**
  * Default full appearance (button).
  */
 class XFormsTriggerFullHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
-) extends XFormsTriggerHandler(uri, localname, qName, localAtts, matched, handlerContext) {
+  uri             : String,
+  localname       : String,
+  qName           : String,
+  localAtts       : Attributes,
+  elementAnalysis : ElementAnalysis,
+  handlerContext  : HandlerContext
+) extends
+  XFormsTriggerHandler(
+    uri,
+    localname,
+    qName,
+    localAtts,
+    elementAnalysis,
+    handlerContext
+  ) {
 
   override protected def handleControlStart(): Unit = {
 
     val triggerControl = currentControl.asInstanceOf[XFormsTriggerControl]
-    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.getController.getOutput
+    implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
-    val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, triggerControl, true)
+    val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, triggerControl, addId = true)
 
     val isHTMLLabel = (triggerControl ne null) && triggerControl.isHTMLLabel
-    val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
+    val xhtmlPrefix = handlerContext.findXHTMLPrefix
 
     addAttribute(containerAttributes, "type", "button")
 

@@ -75,7 +75,7 @@ object XXFormsItemset {
     control match {
       case c: XFormsSelect1Control =>
         Some(c)
-      case c: XFormsComponentControl if c.staticControl.bindingOrThrow.abstractBinding.modeSelection =>
+      case c: XFormsComponentControl if c.staticControl.commonBinding.modeSelection =>
         // Not the ideal solution, see https://github.com/orbeon/orbeon-forms/issues/1856
         ControlsIterator(c, includeSelf = false) collectFirst { case c: XFormsSelect1Control => c }
       case _ =>

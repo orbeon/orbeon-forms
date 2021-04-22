@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{Item, NodeInfo}
@@ -40,7 +40,7 @@ object XXFormsCustomMIP {
 
   def findCustomMip(binding: Item, qName: QName): Option[String] =
     binding match {
-      case nodeInfo: NodeInfo => InstanceData.findCustomMip(nodeInfo, Model.buildInternalCustomMIPName(qName))
+      case nodeInfo: NodeInfo => InstanceData.findCustomMip(nodeInfo, ModelDefs.buildInternalCustomMIPName(qName))
       case _                  => None
     }
 }

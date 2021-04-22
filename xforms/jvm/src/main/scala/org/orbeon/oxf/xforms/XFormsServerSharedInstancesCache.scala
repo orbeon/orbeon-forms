@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+import cats.syntax.option._
 import org.orbeon.oxf.cache.{InternalCacheKey, ObjectCache}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.model.Instance
@@ -74,7 +75,7 @@ object XFormsServerSharedInstancesCache {
       assert(! instanceContent.isInstanceOf[VirtualNode], "load() must return a TinyTree")
 
       add(InstanceContent(instanceContent), instanceCaching.timeToLive)
-      Some(instanceContent)
+      instanceContent.some
     }
 
     find(instanceCaching) orElse
@@ -132,7 +133,7 @@ object XFormsServerSharedInstancesCache {
         case Some(cacheEntry) =>
           // Instance was found
           debug("found cached instance", instanceCaching.debugPairs)
-          Some(cacheEntry.instanceContent.documentInfo)
+          cacheEntry.instanceContent.documentInfo.some
         case _ =>
           // Not found
           debug("cached instance not found", instanceCaching.debugPairs)

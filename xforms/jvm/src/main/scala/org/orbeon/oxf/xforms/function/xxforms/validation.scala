@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.DateUtilsUsingSaxon
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.DependsOnContextItem
 import org.orbeon.saxon.`type`.ValidationFailure
@@ -258,7 +258,7 @@ class ExcludedDatesValidation extends DateSeqValidationFunction {
   val propertyName = ExcludedDatesValidation.PropertyName
 
   def evaluate(value: String, constraintOpt: Option[Seq[DateValue]]): Boolean =
-    DateUtils.tryParseISODate(value, DateUtils.TimeZone.UTC) exists { dateInstant =>
+    DateUtilsUsingSaxon.tryParseISODate(value, DateUtilsUsingSaxon.TimeZone.UTC) exists { dateInstant =>
        // NOTE: `getCalendar` assumes UTC if the date doesn't have a timezone!
       ! (constraintOpt.iterator.flatten exists (_.getCalendar.getTimeInMillis == dateInstant))
     }

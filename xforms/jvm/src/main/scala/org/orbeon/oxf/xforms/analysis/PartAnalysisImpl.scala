@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
-import org.orbeon.oxf.xforms.XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY
+import org.orbeon.oxf.xforms.XFormsProperties.ExposeXpathTypesProperty
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls._
-import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
@@ -73,13 +73,13 @@ class PartAnalysisImpl(
     }
 
   def ancestorIterator      : Iterator[PartAnalysis] = partAnalysisIterator(partAnalysis.parent)
-  def ancestorOrSelfIterator: Iterator[PartAnalysis] = partAnalysisIterator(Some(partAnalysis))
+  def ancestorOrSelfIterator: Iterator[PartAnalysis] = partAnalysisIterator(partAnalysis.some)
 
   def isTopLevel: Boolean = startScope.isTopLevelScope
 
   def getMark(prefixedId: String): Option[SAXStore#Mark] = metadata.getMark(prefixedId)
 
-  def isExposeXPathTypes: Boolean = staticState.staticBooleanProperty(EXPOSE_XPATH_TYPES_PROPERTY)
+  def isExposeXPathTypes: Boolean = staticState.staticBooleanProperty(ExposeXpathTypesProperty)
 
   /**
    * Return the namespace mappings for a given element. If the element does not have an id, or if the mapping is not
@@ -95,10 +95,9 @@ class PartAnalysisImpl(
       (throw new IllegalStateException(s"namespace mappings not cached for prefix `$prefix` on element `${element.toDebugString}`"))
   }
 
-  def getNamespaceMapping(scope: Scope, id: String): NamespaceMapping = {
+  def getNamespaceMapping(scope: Scope, id: String): NamespaceMapping =
     metadata.getNamespaceMapping(scope.prefixedIdForStaticId(id)) getOrElse
       (throw new IllegalStateException(s"namespace mappings not cached for scope `$scope` on element with id `$id`"))
-  }
 
   // Builder that produces an `ElementAnalysis` for a known incoming Element
   private def build(
@@ -123,16 +122,22 @@ class PartAnalysisImpl(
     // Create new control if possible
     val elementAnalysisOpt =
       ControlAnalysisFactory.create(
-        context        = StaticStateContext(partAnalysis, controlAnalysisMap.size + 1), // Q: Benefit vs. just passing the 2 args?
+        part           = partAnalysis,
+        index          = controlAnalysisMap.size + 1,
         controlElement = controlElement,
-        parent         = Some(parent),
+        parent         = parent.some,
         preceding      = preceding,
         scope          = scopeForPrefixedId(controlPrefixedId)
       )
 
-    elementAnalysisOpt  match {
-      case Some(componentControl: ComponentControl) if ! componentControl.hasLazyBinding =>
-        componentControl.setConcreteBinding(controlElement)
+    elementAnalysisOpt match {
+      case Some(componentControl: ComponentControl) =>
+
+        val abstractBinding =
+          metadata.findAbstractBindingByPrefixedId(componentControl.prefixedId) getOrElse
+            (throw new IllegalStateException)
+
+        componentControl.commonBinding = abstractBinding.commonBinding
         index(componentControl)
         componentControl
       case Some(elementAnalysis) =>
@@ -143,20 +148,23 @@ class PartAnalysisImpl(
     }
   }
 
-  // Analyze a subtree of controls (for `xxf:dynamic`)
-  def analyzeSubtree(container: ChildrenBuilderTrait): Unit = {
+  // Analyze a subtree of controls (for `xxf:dynamic` and components with lazy bindings)
+  def analyzeSubtree(container: ComponentControl): Unit = {
 
     implicit val logger = getIndentedLogger
     withDebug("performing static analysis of subtree", Seq("prefixed id" -> container.prefixedId)) {
 
       // Global lists of external LHHA and handlers
       val lhhas         = m.Buffer[LHHAAnalysis]()
-      val eventHandlers = m.Buffer[EventHandlerImpl]()
+      val eventHandlers = m.Buffer[EventHandler]()
       val models        = m.Buffer[Model]()
       val attributes    = m.Buffer[AttributeControl]()
 
-      // Rebuild children
-      container.build(build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes)))
+      ElementAnalysisTreeBuilder.buildAllElemDescendants(
+        container,
+        build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes)),
+        ElementAnalysisTreeBuilder.componentChildrenForBindingUpdate(container).some // explicit children
+      )
 
       // Attach LHHA
       for (lhha <- lhhas)
@@ -186,19 +194,19 @@ class PartAnalysisImpl(
 
       // Global lists LHHA and handlers
       val lhhas         = m.Buffer[LHHAAnalysis]()
-      val eventHandlers = m.Buffer[EventHandlerImpl]()
+      val eventHandlers = m.Buffer[EventHandler]()
       val models        = m.Buffer[Model]()
       val attributes    = m.Buffer[AttributeControl]()
 
       // Create and index root control
-      val rootControlAnalysis = new RootControl(StaticStateContext(this, 0), staticStateDocument.rootControl, startScope)
+      val rootControlAnalysis = new RootControl(this, 0, staticStateDocument.rootControl, startScope)
       indexNewControl(rootControlAnalysis, lhhas, eventHandlers, models, attributes)
 
       // Gather controls
-      val buildGatherLHHAAndHandlers: ChildrenBuilderTrait#Builder =
+      val buildGatherLHHAAndHandlers: ElementAnalysisTreeBuilder.Builder =
         build(_, _, _, _, indexNewControl(_, lhhas, eventHandlers, models, attributes))
 
-      rootControlAnalysis.build(buildGatherLHHAAndHandlers)
+      ElementAnalysisTreeBuilder.buildAllElemDescendants(rootControlAnalysis, buildGatherLHHAAndHandlers)
 
       // Issues with `xxbl:global`
       //
@@ -217,10 +225,11 @@ class PartAnalysisImpl(
             globalElement <- global.compactShadowTree.getRootElement.jElements.asScala // children of xxbl:global
           } yield
             buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) match {
-              case childrenBuilder: ChildrenBuilderTrait =>
-                childrenBuilder.build(buildGatherLHHAAndHandlers)
-                childrenBuilder
-              case other => other
+              case newParent: WithChildrenTrait =>
+                ElementAnalysisTreeBuilder.buildAllElemDescendants(newParent, buildGatherLHHAAndHandlers)
+                newParent
+              case other =>
+                other
             }
 
         // Add globals to the root analysis
@@ -244,12 +253,9 @@ class PartAnalysisImpl(
 
       // NOTE: For now, we don't analyze the XPath of nested (dynamic) parts
       if (isTopLevel && staticState.isXPathAnalysis) {
-        // Analyze root control XPath first as nested models might ask for its context
-        rootControlAnalysis.analyzeXPath()
-        // Analyze all models XPath
-        analyzeModelsXPath()
-        // Analyze controls XPath
-        analyzeControlsXPath()
+        ElementAnalysisTreeXPathAnalyzer.analyzeXPath(rootControlAnalysis) // first as nested models might ask for its context
+        iterateModels ++ iterateControlsNoModels foreach
+          ElementAnalysisTreeXPathAnalyzer.analyzeXPath
       }
 
       debugResults(Seq("controls" -> controlAnalysisMap.size.toString))
@@ -263,4 +269,3 @@ class PartAnalysisImpl(
     freeTransientState()
   }
 }
-

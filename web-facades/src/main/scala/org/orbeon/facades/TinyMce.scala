@@ -87,6 +87,7 @@ object TinyMce {
     var autoresize_min_height    : js.UndefOr[Double]  = js.undefined
     var autoresize_bottom_margin : js.UndefOr[Double]  = js.undefined
     var suffix                   : js.UndefOr[String]  = js.undefined
+    var convert_urls             : js.UndefOr[Boolean] = js.undefined
   }
 
   object TinyMceDefaultConfig extends TinyMceConfig {
@@ -105,5 +106,6 @@ object TinyMce {
     visual_table_class = "fr-tinymce-table" // Override default TinyMCE class on tables, which adds borders
                                             // We can't leave this just empty, otherwise TinyMCE puts its own CSS class
     skin               = false              // Disable skin (see https://github.com/orbeon/orbeon-forms/issues/3473)
+    convert_urls       = false              // Don't convert an absolute URL to a relative path, which might not work after publish
   }
 }

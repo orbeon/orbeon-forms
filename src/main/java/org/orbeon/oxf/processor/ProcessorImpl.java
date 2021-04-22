@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.QName;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.xml.XMLParsing;
-import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.impl.DelegatingProcessorInput;
 import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
@@ -31,7 +29,8 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.XMLParsing;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -47,7 +46,7 @@ import java.util.*;
  */
 public abstract class ProcessorImpl implements Processor {
 
-    public static Logger logger = LoggerFactory.createLogger(ProcessorImpl.class);
+    public static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(ProcessorImpl.class);
 
     public static final String INPUT_DATA = "data";
     public static final String INPUT_CONFIG = "config";

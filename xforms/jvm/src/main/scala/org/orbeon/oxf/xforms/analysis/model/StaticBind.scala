@@ -1,22 +1,17 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom._
-import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace.Policy.Preserve
 import org.orbeon.oxf.util.Whitespace._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.model.Model._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
-import org.orbeon.oxf.xml.ShareableXPathStaticContext
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs._
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.{util => u}
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.model.ValidationLevel
 
-import scala.collection.compat._
-import scala.collection.immutable.List
 import scala.util.Try
 
 // Represent a static <xf:bind> element
@@ -25,8 +20,9 @@ class StaticBind(
   element   : Element,
   parent    : ElementAnalysis,
   preceding : Option[ElementAnalysis]
-) extends SimpleElementAnalysis(
-  bindTree.model.staticStateContext,
+) extends ElementAnalysis(
+  bindTree.model.part,
+  bindTree.model.index,
   element,
   Some(parent),
   preceding,
@@ -71,44 +67,21 @@ class StaticBind(
 
       val booleanOrStringExpression =
         if (BooleanXPathMIPNames(name))
-          u.XPath.makeBooleanExpression(expression)
+          XPath.makeBooleanExpression(expression)
         else
-          u.XPath.makeStringExpression(expression)
+          XPath.makeStringExpression(expression)
 
-      u.XPath.compileExpression(
+      XPath.compileExpression(
         xpathString      = booleanOrStringExpression,
         namespaceMapping = staticBind.namespaceMapping,
         locationData     = staticBind.locationData,
-        functionLibrary  = staticStateContext.partAnalysis.staticState.functionLibrary,
+        functionLibrary  = part.staticState.functionLibrary,
         avt              = false
       )
     }
 
     // Default to negative, analyzeXPath() can change that
     var analysis: XPathAnalysis = NegativeAnalysis(expression)
-
-    def analyzeXPath(): Unit = {
-
-      val allBindVariablesInScope = bindTree.allBindVariables
-
-      // Saxon: "In the case of free-standing XPath expressions it will be the StaticContext object"
-      val staticContext  = compiledExpression.expression.getInternalExpression.getContainer.asInstanceOf[ShareableXPathStaticContext]
-      if (staticContext ne null) {
-        // NOTE: The StaticContext can be null if the expression is a constant such as BooleanValue
-        val usedVariables = staticContext.referencedVariables
-
-        // Check whether all variables used by the expression are actually in scope, throw otherwise
-        usedVariables find (name => ! allBindVariablesInScope.contains(name.getLocalName)) foreach { name =>
-          throw new ValidationException("Undeclared variable in XPath expression: $" + name.getClarkName, staticBind.locationData)
-        }
-      }
-
-      // Analyze and remember if figured out
-      staticBind.analyzeXPath(getChildrenContext, allBindVariablesInScope, compiledExpression) match {
-        case valueAnalysis if valueAnalysis.figuredOutDependencies => this.analysis = valueAnalysis
-        case _ => // NOP
-      }
-    }
   }
 
   object XPathMIP {
@@ -132,12 +105,12 @@ class StaticBind(
   // The type MIP is not an XPath expression
   class TypeMIP(val id: String, val datatype: String) extends {
     val name  = Type.name
-    val level = ErrorLevel
+    val level = ValidationLevel.ErrorLevel
   } with MIP
 
   class WhitespaceMIP(val id: String, val policy: Policy) extends {
-    val name  = Model.Whitespace.name
-    val level = ErrorLevel
+    val name  = ModelDefs.Whitespace.name
+    val level = ValidationLevel.ErrorLevel
   } with MIP
 
   // Globally remember binds ids
@@ -177,7 +150,7 @@ class StaticBind(
   }
 
   val dataType: Option[QName] =
-    typeMIPOpt map (_.datatype) map
+    typeMIPOpt map (_.datatype) flatMap
       (Extensions.resolveQName(namespaceMapping.mapping, _, unprefixedIsNoNamespace = true))
 
   val nonPreserveWhitespaceMIPOpt: Option[WhitespaceMIP] = {
@@ -192,7 +165,7 @@ class StaticBind(
 
     def fromAttribute(name: QName) =
       for (value <- Option(element.attributeValue(name)).toList)
-      yield (staticId, value, ErrorLevel)
+      yield (staticId, value, ValidationLevel.ErrorLevel)
 
     // For a while we supported `<xf:validation>`
     def fromNestedElementLegacy(name: QName) =
@@ -200,14 +173,14 @@ class StaticBind(
         e     <- element.elements(XFORMS_VALIDATION_QNAME).toList
         value <- e.attributeValueOpt(name)
       } yield
-        (e.idOrNull, value, e.attributeValueOpt(LEVEL_QNAME) map LevelByName getOrElse ErrorLevel)
+        (e.idOrNull, value, e.attributeValueOpt(LEVEL_QNAME) map ValidationLevel.LevelByName getOrElse ValidationLevel.ErrorLevel)
 
     def fromNestedElement(name: QName) =
       for {
         e     <- element.elements(name).toList
         value <- Option(e.attributeValue(VALUE_QNAME))
       } yield
-        (e.idOrNull, value, e.attributeValueOpt(LEVEL_QNAME) map LevelByName getOrElse ErrorLevel)
+        (e.idOrNull, value, e.attributeValueOpt(LEVEL_QNAME) map ValidationLevel.LevelByName getOrElse ValidationLevel.ErrorLevel)
 
     for {
       mip              <- QNameToXPathMIP.values
@@ -216,7 +189,7 @@ class StaticBind(
       mips             = idValuesAndLevel flatMap {
         case (id, value, level) =>
           // Ignore level for non-constraint MIPs as it's not supported yet
-          val overriddenLevel = if (mip.name == Constraint.name) level else ErrorLevel
+          val overriddenLevel = if (mip.name == Constraint.name) level else ValidationLevel.ErrorLevel
           XPathMIP.createOrNone(id, mip.name, overriddenLevel, value)
       }
     } yield
@@ -247,10 +220,10 @@ class StaticBind(
     //         (getElementId(elem), customMIPName, value)
 
     for {
-      (name, idNameValue) <- attributeCustomMIP.to(List) groupBy (_._2)
+      (name, idNameValue) <- attributeCustomMIP.toList groupBy (_._2)
       mips                = idNameValue flatMap {
         case (id, _, value) =>
-          XPathMIP.createOrNone(id, name, ErrorLevel, value)
+          XPathMIP.createOrNone(id, name, ValidationLevel.ErrorLevel, value)
       }
     } yield
       name -> mips
@@ -321,70 +294,8 @@ class StaticBind(
   def getXPathMIPs(mipName: String): List[XPathMIP] = allMIPNameToXPathMIP.getOrElse(mipName, Nil)
 
   // TODO: Support multiple relevant, readonly, and required MIPs.
-  def firstXPathMIP(mip: Model.XPathMIP): Option[XPathMIP] = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
-  def hasXPathMIP  (mip: Model.XPathMIP): Boolean          = firstXPathMIP(mip).isDefined
-
-  // Compute value analysis if we have a `type` or `xxf:whitespace`, otherwise don't bother
-  override protected def computeValueAnalysis: Option[XPathAnalysis] = typeMIPOpt orElse nonPreserveWhitespaceMIPOpt match {
-    case Some(_) if hasBinding => Some(analyzeXPath(getChildrenContext, "string(.)"))
-    case _                     => None
-  }
-
-  // Return true if analysis succeeded
-  def analyzeXPathGather: Boolean = {
-
-    // Analyze context/binding
-    analyzeXPath()
-
-    // If successful, gather derived information
-    val refSucceeded =
-      ref match {
-        case Some(_) =>
-          getBindingAnalysis match {
-            case Some(bindingAnalysis) if bindingAnalysis.figuredOutDependencies =>
-              // There is a binding and analysis succeeded
-
-              // Remember dependent instances
-              val returnableInstances = bindingAnalysis.returnableInstances
-              bindTree.bindInstances ++= returnableInstances
-
-              if (hasCalculateComputedMIPs || hasCustomMIPs)
-                bindTree.computedBindExpressionsInstances ++= returnableInstances
-
-              if (hasValidateMIPs)
-                bindTree.validationBindInstances ++= returnableInstances
-
-              true
-
-            case _ =>
-              // Analysis failed
-              false
-          }
-
-        case None =>
-          // No binding, consider a success
-          true
-      }
-
-    // Analyze children
-    val childrenSucceeded = (_children map (_.analyzeXPathGather)).forall(identity)
-
-    // Result
-    refSucceeded && childrenSucceeded
-  }
-
-  def analyzeMIPs(): Unit = {
-    // Analyze local MIPs if there is a @ref
-    ref match {
-      case Some(_) =>
-        for (mips <- allMIPNameToXPathMIP.values; mip <- mips)
-          mip.analyzeXPath()
-      case None =>
-    }
-
-    // Analyze children
-    _children foreach (_.analyzeMIPs())
-  }
+  def firstXPathMIP(mip: ModelDefs.XPathMIP): Option[XPathMIP] = allMIPNameToXPathMIP.getOrElse(mip.name, Nil).headOption
+  def hasXPathMIP  (mip: ModelDefs.XPathMIP): Boolean          = firstXPathMIP(mip).isDefined
 
   override def freeTransientState(): Unit = {
 

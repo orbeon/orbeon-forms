@@ -25,7 +25,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.pdf.ImageSupport._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, IndentedLogger, NetUtils, URLRewriterUtils}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, IndentedLogger, NetUtils, URLRewriterUtils}
 import org.xhtmlrenderer.layout.SharedContext
 import org.xhtmlrenderer.pdf.ITextFSImage
 import org.xhtmlrenderer.resource.ImageResource
@@ -38,11 +38,12 @@ import scala.util.control.NonFatal
 
 
 class CustomUserAgent(
-  jpegCompressionLevel : Float,
-  pipelineContext      : PipelineContext,
-  sharedContext        : SharedContext)(implicit
-  externalContext      : ExternalContext,
-  indentedLogger       : IndentedLogger
+  jpegCompressionLevel     : Float,
+  pipelineContext          : PipelineContext,
+  sharedContext            : SharedContext)(implicit
+  externalContext          : ExternalContext,
+  indentedLogger           : IndentedLogger,
+  coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
 ) extends NaiveUserAgent {
 
   import Private._
@@ -98,7 +99,7 @@ class CustomUserAgent(
         NetUtils.inputStreamToAnyURI(
           resolveAndOpenStream(resolvedUriString),
           NetUtils.REQUEST_SCOPE,
-          XHTMLToPDFProcessor.logger
+          XHTMLToPDFProcessor.logger.logger
         )
 
       indentedLogger.logDebug("pdf", "getting image resource", "url", originalUriString, "local", localUri)
@@ -142,18 +143,17 @@ class CustomUserAgent(
       )
 
     val cxr =
-      Connection(
+      Connection.connectNow(
         method          = HttpMethod.GET,
         url             = url,
         credentials     = None,
         content         = None,
         headers         = headers,
         loadState       = true,
+        saveState   = true,
         logBody         = false)(
         logger          = indentedLogger,
         externalContext = externalContext
-      ).connect(
-        saveState = true
       )
 
     ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = false)(identity) doEitherWay {

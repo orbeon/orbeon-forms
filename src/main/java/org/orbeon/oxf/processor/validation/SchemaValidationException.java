@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.validation;
 
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 
 // So we can differentiate with other ValidationException, see:
 // https://github.com/orbeon/orbeon-forms/issues/910

@@ -66,7 +66,7 @@ trait RequestResponse extends Common {
 
     val requestPath = httpRequest.getRequestPath
 
-    if (Logger.isDebugEnabled)
+    if (Logger.debugEnabled)
       Logger.logDebug("CRUD", s"receiving request: method = ${httpRequest.getMethod}, path = $requestPath, version = $version")
 
     requestPath match {

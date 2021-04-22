@@ -18,8 +18,7 @@ import java.util.{List => JList}
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.analysis.model.Instance
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Metadata}
-import org.orbeon.oxf.xforms.event.EventHandler
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, Metadata}
 import org.orbeon.xforms.xbl.Scope
 
 trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {

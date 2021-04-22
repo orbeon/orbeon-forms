@@ -68,8 +68,6 @@
     <xsl:variable name="hide-buttons-bar"     select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))"                   as="xs:boolean?"/>
 
     <xsl:variable name="inner-buttons"        select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))"             as="xs:string*"/>
-    <xsl:variable name="captcha-uri-name"     select="frf:captchaComponent($app, $form)"                                                               as="xs:string*"/>
-    <xsl:variable name="has-captcha"          select="exists($captcha-uri-name)"                                                                       as="xs:boolean"/>
 
     <xsl:variable name="error-summary-top"    select="normalize-space($error-summary) = ('top', 'both')"                                               as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')"                                        as="xs:boolean"/>
@@ -411,6 +409,11 @@
     <!-- Add Form Runner models and scripts before the main model -->
     <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]">
 
+        <xsl:variable
+                name="copy-custom-model"
+                select="$is-detail and normalize-space($custom-model)"
+                as="xs:boolean"/>
+
         <!-- Model receiving input parameters -->
         <xf:model
             id="fr-parameters-model"
@@ -468,7 +471,15 @@
                 :)
                 starts-with(xxf:get-request-path(), '/fr/service/')
             }}"
-            xxf:external-events="{@xxf:external-events}"
+            xxf:external-events="{
+                string-join(
+                    (
+                        @xxf:external-events,
+                        if ($copy-custom-model) then doc($custom-model)/*/@xxf:external-events else ()
+                    ),
+                    ' '
+                )
+            }"
             xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary"
             xxf:xbl-support="org.orbeon.oxf.fr.xbl.FormRunnerXblSupport"
             xxf:xforms11-switch="false"
@@ -605,7 +616,7 @@
                 <!-- When the wizard is in use, we don't want to visit *all* controls. -->
                 <!-- See https://github.com/orbeon/orbeon-forms/issues/3178 -->
                 <xxf:setvisited
-                    control="fr-captcha-group"
+                    control="fr-captcha"
                     visited="true"
                     recurse="true"/>
 
@@ -702,7 +713,7 @@
             <xf:bind ref="instance('fr-form-instance')" readonly="fr:is-readonly-mode()"/>
 
             <!-- Custom XForms model content to include -->
-            <xsl:if test="$is-detail and normalize-space($custom-model)">
+            <xsl:if test="$copy-custom-model">
                 <xsl:copy-of select="doc($custom-model)/*/node()"/>
             </xsl:if>
 

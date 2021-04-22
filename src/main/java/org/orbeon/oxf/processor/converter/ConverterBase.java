@@ -34,8 +34,6 @@ public abstract class ConverterBase extends ProcessorImpl {
     public static final boolean DEFAULT_INDENT = true;
     public static final int DEFAULT_INDENT_AMOUNT = 0;
 
-    //private static Logger logger = LoggerFactory.createLogger(ConverterBase.class);
-
     protected ConverterBase() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, getConfigSchemaNamespaceURI()));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));

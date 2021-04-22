@@ -13,11 +13,14 @@
  */
 package org.orbeon.oxf.common
 
-import collection.JavaConverters._
+import java.{util => ju}
+
 import javax.xml.transform.TransformerException
+import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.errorified.Exceptions
-import org.orbeon.oxf.xml.dom.LocationData
 import org.xml.sax.SAXParseException
+
+import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 object OrbeonLocationException {
@@ -27,13 +30,13 @@ object OrbeonLocationException {
   def getAllLocationData(throwable: Throwable): List[LocationData] =
     Exceptions.causesIterator(throwable).toList.reverse flatMap getLocationData
 
-  def jGetAllLocationData(throwable: Throwable) =
+  def jGetAllLocationData(throwable: Throwable): ju.List[LocationData] =
     getAllLocationData(throwable).asJava
 
   // NOTE: We used to attempt to get a "better" LocationData instead of the first one. It's unclear that this made
   // much sense. See:
   // https://github.com/orbeon/orbeon-forms/blob/75f6fc832a76eb66b125d01a36df52489af8c79f/src/main/java/org/orbeon/oxf/common/ValidationException.java#L63
-  def getRootLocationData(throwable: Throwable) =
+  def getRootLocationData(throwable: Throwable): Option[LocationData] =
     getAllLocationData(throwable).headOption
 
   private def getLocationData(throwable: Throwable): List[LocationData] =
@@ -44,12 +47,12 @@ object OrbeonLocationException {
         te.getException match {
           case null | NonFatal(_) => // unclear logic
             Option(te.getLocator) map
-            { l => new LocationData(l.getSystemId, l.getLineNumber, l.getColumnNumber) } toList
+            { l => BasicLocationData(l.getSystemId, l.getLineNumber, l.getColumnNumber) } toList
           case _ =>
             Nil
         }
       case t: SAXParseException =>
-        List(new LocationData(t.getSystemId, t.getLineNumber, t.getColumnNumber))
+        List(BasicLocationData(t.getSystemId, t.getLineNumber, t.getColumnNumber))
       case _ =>
         Nil
     }

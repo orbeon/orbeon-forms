@@ -32,9 +32,9 @@ import org.orbeon.oxf.util.SQLUtils._
 
 import scala.collection.mutable
 
-trait SearchLogic extends SearchRequest {
+trait SearchLogic extends SearchRequestParser {
 
-  private def computePermissions(request: Request, user: Option[Credentials]): SearchPermissions = {
+  private def computePermissions(request: SearchRequest, user: Option[Credentials]): SearchPermissions = {
 
     val searchOperations     = request.anyOfOperations.getOrElse(List(Read, Update, Delete))
     val formPermissionsElOpt = RelationalUtils.readFormPermissions(request.app, request.form)
@@ -63,7 +63,7 @@ trait SearchLogic extends SearchRequest {
     )
   }
 
-  def doSearch(request: Request): (List[Document], Int) =  {
+  def doSearch(request: SearchRequest): (List[Document], Int) =  {
 
     val user             = PermissionsAuthorization.currentUserFromSession
     val permissions      = computePermissions(request, user)
@@ -79,10 +79,9 @@ trait SearchLogic extends SearchRequest {
     else
       RelationalUtils.withConnection { connection =>
 
-        val version = requestedFormVersion(connection, request)
-
+        val versionOpt  = requestedFormVersion(connection, request)
         val commonParts = List(
-          commonPart         (request, connection, version),
+          commonPart         (request, connection, versionOpt),
           draftsPart         (request),
           permissionsPart    (permissions),
           columnFilterPart   (request),

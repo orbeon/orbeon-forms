@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.converter;
 
 import org.orbeon.oxf.externalcontext.URLRewriter;
-import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.URLRewriter$;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -211,7 +211,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
                 ret = this;
                 final AttributesImpl newAtts = SAXUtils.getAttributesFromDefaultNamespace(atts);
-                final String newRes = response.rewriteResourceURL(res, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                final String newRes = response.rewriteResourceURL(res, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
                 final int idx = newAtts.getIndex("", resAtt);
                 newAtts.setValue(idx, newRes);
                 xmlReceiver.startElement(ns, lnam, qnam, newAtts);
@@ -241,23 +241,23 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 ret = this;
                 final AttributesImpl newAtts = SAXUtils.getAttributesFromDefaultNamespace(atts);
                 if (codebaseAttribute != null) {
-                    final String newAttribute = response.rewriteResourceURL(codebaseAttribute, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                    final String newAttribute = response.rewriteResourceURL(codebaseAttribute, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
                     final int idx = newAtts.getIndex("", "codebase");
                     newAtts.setValue(idx, newAttribute);
                 } else {
                     // We don't rewrite these attributes if there is a codebase
                     if (classidAttribute != null) {
-                        final String newAttribute = response.rewriteResourceURL(classidAttribute, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                        final String newAttribute = response.rewriteResourceURL(classidAttribute, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
                         final int idx = newAtts.getIndex("", "classid");
                         newAtts.setValue(idx, newAttribute);
                     }
                     if (dataAttribute != null) {
-                        final String newAttribute = response.rewriteResourceURL(dataAttribute, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                        final String newAttribute = response.rewriteResourceURL(dataAttribute, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
                         final int idx = newAtts.getIndex("", "data");
                         newAtts.setValue(idx, newAttribute);
                     }
                     if (usemapAttribute != null) {
-                        final String newAttribute = response.rewriteResourceURL(usemapAttribute, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                        final String newAttribute = response.rewriteResourceURL(usemapAttribute, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
                         final int idx = newAtts.getIndex("", "usemap");
                         newAtts.setValue(idx, newAttribute);
                     }
@@ -267,7 +267,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         boolean first = true;
                         while (st.hasMoreTokens()) {
                             final String currentArchive = StringUtils.trimAllToEmpty(st.nextToken());
-                            final String newArchive = response.rewriteResourceURL(currentArchive, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                            final String newArchive = response.rewriteResourceURL(currentArchive, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
                             if (!first) {
                                 sb.append(' ');
                             }
@@ -304,7 +304,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 ret = this;
                 final AttributesImpl newAtts = SAXUtils.getAttributesFromDefaultNamespace(atts);
                 if (codebaseAttribute != null) {
-                    final String newAttribute = response.rewriteResourceURL(codebaseAttribute, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                    final String newAttribute = response.rewriteResourceURL(codebaseAttribute, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
                     final int idx = newAtts.getIndex("", "codebase");
                     newAtts.setValue(idx, newAttribute);
                 } else {
@@ -314,7 +314,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     boolean first = true;
                     while (st.hasMoreTokens()) {
                         final String currentArchive = StringUtils.trimAllToEmpty(st.nextToken());
-                        final String newArchive = response.rewriteResourceURL(currentArchive, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                        final String newArchive = response.rewriteResourceURL(currentArchive, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
                         if (!first) {
                             sb.append(' ');
                         }
@@ -357,7 +357,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
     				boolean first = true;
     				while (st.hasMoreTokens()) {
     					final String currentArchive = StringUtils.trimAllToEmpty(st.nextToken());
-    					final String newArchive = response.rewriteResourceURL(currentArchive, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+    					final String newArchive = response.rewriteResourceURL(currentArchive, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
     					if (!first) {
     						sb.append(' ');
     					}
@@ -425,7 +425,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 } else if ("action".equals(urlType)) {
                     newHref = response.rewriteActionURL(href, portletMode, windowState);
                 } else if ("resource".equals(urlType)) {
-                    newHref = response.rewriteResourceURL(href, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                    newHref = response.rewriteResourceURL(href, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
                 } else {
                     newHref = null;
                 }
@@ -684,7 +684,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     } else if ("render".equals(typ)) {
                         newURL = response.rewriteRenderURL(url);
                     } else {
-                        newURL = response.rewriteResourceURL(url, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                        newURL = response.rewriteResourceURL(url, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE());
                     }
                     final char[] chs = newURL.toCharArray();
                     xmlReceiver.characters(chs, 0, chs.length);

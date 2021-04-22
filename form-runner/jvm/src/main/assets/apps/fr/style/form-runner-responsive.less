@@ -45,7 +45,8 @@
 
         .xbl-fr-grid .fr-grid:not(.fr-repeat-single-row) {
 
-            & > .fr-grid-body .fr-grid-td {
+            // https://github.com/orbeon/orbeon-forms/issues/4805
+            & > .fr-grid-body .fr-grid-tr .fr-grid-td {
                 // The main thing this CSS does: change table cells into blocks
                 display: block;
             }

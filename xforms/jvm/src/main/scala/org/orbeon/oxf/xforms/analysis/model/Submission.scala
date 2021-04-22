@@ -15,24 +15,26 @@ package org.orbeon.oxf.xforms.analysis.model
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.oxf.xforms.analysis.{ChildrenActionsTrait, ElementAnalysis, SimpleElementAnalysis, StaticStateContext}
-import org.orbeon.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysisImpl, WithChildrenTrait}
 import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.xbl.Scope
 
 class Submission(
-  staticStateContext : StaticStateContext,
-  element            : Element,
-  parent             : Option[ElementAnalysis],
-  preceding          : Option[ElementAnalysis],
-  scope              : Scope
-) extends SimpleElementAnalysis(
-  staticStateContext,
+  part      : PartAnalysisImpl,
+  index     : Int,
+  element   : Element,
+  parent    : Option[ElementAnalysis],
+  preceding : Option[ElementAnalysis],
+  scope     : Scope
+) extends ElementAnalysis(
+  part,
+  index,
   element,
   parent,
   preceding,
   scope
-) with ChildrenActionsTrait {
+) with WithChildrenTrait {
 
   // `resource` has precedence over `action`
   val avtActionOrResource =

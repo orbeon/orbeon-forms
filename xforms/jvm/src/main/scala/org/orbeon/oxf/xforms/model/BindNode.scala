@@ -17,11 +17,11 @@ import java.{util => ju}
 
 import org.orbeon.dom.Node
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.model.Model.{Required, Type}
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
-import org.orbeon.oxf.xforms.analysis.model.{Model, StaticBind, ValidationLevel}
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Required, Type}
+import org.orbeon.oxf.xforms.analysis.model.{ModelDefs, StaticBind}
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.w3c.dom.Node.ELEMENT_NODE
 
 import scala.collection.JavaConverters._
@@ -48,9 +48,9 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
     }
 
   // Current MIP state
-  private var _relevant = Model.DEFAULT_RELEVANT // move to public var once all callers are Scala
-  private var _readonly = Model.DEFAULT_READONLY // move to public var once all callers are Scala
-  private var _required = Model.DEFAULT_REQUIRED // move to public var once all callers are Scala
+  private var _relevant = ModelDefs.DEFAULT_RELEVANT // move to public var once all callers are Scala
+  private var _readonly = ModelDefs.DEFAULT_READONLY // move to public var once all callers are Scala
+  private var _required = ModelDefs.DEFAULT_REQUIRED // move to public var once all callers are Scala
 
   private var _invalidTypeValidation: StaticBind#MIP = null
   private var _requiredValidation: StaticBind#MIP    = null
@@ -63,7 +63,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
 
   // Failed validations for the given level, including type/required
   def failedValidations(level: ValidationLevel): List[StaticBind#MIP] = level match {
-    case level @ ErrorLevel if ! typeValid || ! requiredValid =>
+    case level @ ValidationLevel.ErrorLevel if ! typeValid || ! requiredValid =>
       // Add type/required if needed
       (! typeValid     list invalidTypeValidation)     :::
       (! requiredValid list invalidRequiredValidation) :::
@@ -75,8 +75,8 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
 
   // Highest failed validation level, including type/required
   def highestValidationLevel = {
-    def typeOrRequiredLevel = (! typeValid || ! requiredValid) option ErrorLevel
-    def constraintLevel     = LevelsByPriority find failedConstraints.contains
+    def typeOrRequiredLevel = (! typeValid || ! requiredValid) option ValidationLevel.ErrorLevel
+    def constraintLevel     = ValidationLevel.LevelsByPriority find failedConstraints.contains
 
     typeOrRequiredLevel orElse constraintLevel
   }
@@ -86,7 +86,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
     if (typeValid && requiredValid)
       failedConstraints
     else
-      failedConstraints + (ErrorLevel -> failedValidations(ErrorLevel))
+      failedConstraints + (ValidationLevel.ErrorLevel -> failedValidations(ValidationLevel.ErrorLevel))
 
   def staticBind = parentBind.staticBind
   def locationData = staticBind.locationData
@@ -111,7 +111,7 @@ class BindNode(val parentBind: RuntimeBind, val position: Int, val item: Item) {
   def requiredValid             = _requiredValidation eq null
 
   def constraintsSatisfiedForLevel(level: ValidationLevel) = ! failedConstraints.contains(level)
-  def valid = typeValid && requiredValid && constraintsSatisfiedForLevel(ErrorLevel)
+  def valid = typeValid && requiredValid && constraintsSatisfiedForLevel(ValidationLevel.ErrorLevel)
 
   def ancestorOrSelfBindNodes =
     Iterator.iterate(this)(_.parentBind.parentIteration) takeWhile (_ ne null)
@@ -152,10 +152,10 @@ object BindNode {
   // - also prioritize failed datatype validation, as part of https://github.com/orbeon/orbeon-forms/issues/2242
   private def prioritizeValidations(mipsForLevel: (ValidationLevel, List[StaticBind#MIP])) =
     mipsForLevel match {
-      case (ErrorLevel, mips) if mips exists (_.name == Required.name) =>
-        ErrorLevel -> (mips filter (_.name == Required.name))
-      case (ErrorLevel, mips) if mips exists (_.name == Type.name) =>
-        ErrorLevel -> (mips filter (_.name == Type.name))
+      case (ValidationLevel.ErrorLevel, mips) if mips exists (_.name == Required.name) =>
+        ValidationLevel.ErrorLevel -> (mips filter (_.name == Required.name))
+      case (ValidationLevel.ErrorLevel, mips) if mips exists (_.name == Type.name) =>
+        ValidationLevel.ErrorLevel -> (mips filter (_.name == Type.name))
       case validations =>
         validations
     }
@@ -183,7 +183,7 @@ object BindNode {
         mutable.Map[ValidationLevel, collection.mutable.Builder[StaticBind#MIP, List[StaticBind#MIP]]]()
 
       for {
-        level       <- LevelsByPriority
+        level       <- ValidationLevel.LevelsByPriority
         bindNode    <- bindNodes
         failed      = bindNode.failedValidationsForAllLevels.getOrElse(level, Nil)
         if failed.nonEmpty

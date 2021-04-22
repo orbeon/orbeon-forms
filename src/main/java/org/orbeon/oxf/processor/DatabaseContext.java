@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -31,7 +30,7 @@ import java.util.Map;
  */
 public class DatabaseContext {
 
-    private static Logger logger = LoggerFactory.createLogger(DatabaseContext.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(DatabaseContext.class);
     public static final String DATASOURCE_CONTEXT = "datasource-context"; // used by DatabaseContext
 
     /**

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.resources;
 
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.WebAppContext;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -33,7 +32,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
     public static final String WEB_APP_CONTEXT_KEY = WebAppResourceManagerImpl.class.getName() + "WebAppContext";
     public static final String ROOT_DIR = "oxf.resources.webapp.rootdir";
 
-    private static Logger logger = LoggerFactory.createLogger(WebAppResourceManagerImpl.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(WebAppResourceManagerImpl.class);
 
     private WebAppContext webAppContext;
     private String rootDirectory;

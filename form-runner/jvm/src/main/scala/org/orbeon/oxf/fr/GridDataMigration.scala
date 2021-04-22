@@ -38,6 +38,41 @@ object GridDataMigration {
     ) getOrElse
       data
 
+  // NOTE: Exposed to some users.
+  //@XPathFunction
+  def dataMaybeMigratedToDatabaseFormat(
+    app       : String,
+    form      : String,
+    data      : DocumentInfo,
+    metadata  : Option[DocumentInfo]
+  ): DocumentInfo =
+    MigrationSupport.migrateDataWithFormMetadataMigrations(
+      appForm       = AppForm(app, form),
+      data          = data,
+      metadataOpt   = metadata,
+      srcVersion    = DataFormatVersion.Edge,
+      dstVersion    = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
+      pruneMetadata = false
+    ) getOrElse
+      data
+
+  // NOTE: Exposed to some users.
+  //@XPathFunction
+  def dataMaybeMigratedFromFormDefinition(
+    data     : DocumentInfo,
+    form     : DocumentInfo,
+    format   : String
+  ): DocumentInfo = {
+    MigrationSupport.migrateDataWithFormDefinition(
+      data          = data,
+      form          = form,
+      srcVersion    = DataFormatVersion.Edge,
+      dstVersion    = DataFormatVersion.withNameInsensitive(format),
+      pruneMetadata = false
+    ) getOrElse
+      data
+  }
+
   //@XPathFunction
   def dataMaybeMigratedFromEdge(
     app                     : String,

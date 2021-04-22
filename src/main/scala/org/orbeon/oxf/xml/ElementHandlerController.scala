@@ -13,20 +13,17 @@
   */
 package org.orbeon.oxf.xml
 
-import java.lang.reflect.Constructor
-import java.{lang => jl, util => ju}
-
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.dom.Converter._
-import org.orbeon.oxf.xml.dom.LocationData
+import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.saxon.om.StructuredQName
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
-import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
+
 
 /**
   * This is the controller for the handlers system.
@@ -37,21 +34,24 @@ import scala.util.control.NonFatal
   * - reacts to a stream of SAX events
   * - calls handlers when needed
   * - handles repeated content
-  *
-  * Q: Should use pools of handlers to reduce memory consumption?
   */
-class ElementHandlerController
-  extends ElementHandlerControllerXMLReceiver
-     with ElementHandlerControllerHandlers
+class ElementHandlerController[Ctx](
+  pf        : PartialFunction[(String, String, String, Attributes, Ctx), ElementHandler[Ctx]],
+  defaultPf : PartialFunction[(String, String, String, Attributes, Ctx), ElementHandler[Ctx]]
+) extends ElementHandlerControllerXMLReceiver[Ctx]
+     with ElementHandlerControllerHandlers[Ctx] {
+
+  protected var findHandlerFn: (String, String, String, Attributes, Ctx) => Option[ElementHandler[Ctx]] = Function.untupled(pf.orElse(defaultPf).lift)
+
+  def combinePf(newPf: PartialFunction[(String, String, String, Attributes, Ctx), ElementHandler[Ctx]]): Unit =
+    findHandlerFn = Function.untupled(pf.orElse(newPf).orElse(defaultPf).lift)
+}
 
 object ElementHandlerController {
 
-  type Matcher[T <: AnyRef] = (Attributes, AnyRef) => T
+  type Matcher[Ctx, T] = (Attributes, Ctx) => Option[T]
 
-  // For Java callers
-  abstract class Function2Base[V1, V2, R] extends ((V1, V2) => R)
-
-  private[xml] case class HandlerInfo(level: Int, elementHandler: ElementHandler, locator: Locator) {
+  private[xml] case class HandlerInfo[Ctx](level: Int, elementHandler: ElementHandler[Ctx], locator: Locator) {
 
     val saxStore: Option[SAXStore] = elementHandler.isRepeating option new SAXStore
 
@@ -60,108 +60,33 @@ object ElementHandlerController {
       saxStore foreach (_.setDocumentLocator(locator))
   }
 
-  private[xml] val AllMatcher: Matcher[jl.Boolean] = (_: Attributes, _: AnyRef) => jl.Boolean.TRUE
-
-  private[xml] type HandlerAndMatcher = (String, Matcher[_ <: AnyRef])
-
-  // `Class.forName` is expensive, so we cache mappings
-  private val classNameToHandlerClass = new ju.concurrent.ConcurrentHashMap[String, Constructor[ElementHandler]]
-
-  private[xml] def getHandlerByClassName(
-    handlerClassName : String,
-    uri              : String,
-    localname        : String,
-    qName            : String,
-    attributes       : Attributes,
-    matched          : AnyRef,
-    handlerContext   : AnyRef)(implicit
-    locator          : OutputLocator
-  ): ElementHandler = {
-
-    // Atomically get or create the constructor
-    val constructor =
-      classNameToHandlerClass.computeIfAbsent(
-        handlerClassName,
-        _ => withWrapThrowable {
-          Class.forName(handlerClassName).asInstanceOf[Class[ElementHandler]]
-            .getConstructor(classOf[String], classOf[String], classOf[String], classOf[Attributes], classOf[AnyRef], classOf[AnyRef])
-        }
-      )
-
-    withWrapThrowable {
-      // Copy the attributes if needed as they will be stored in the handler and they can mutate afterwards, causing problems!
-      // See also comments in `ElementHandler`.
-      constructor.newInstance(
-        uri,
-        localname,
-        qName,
-        if (attributes.getLength == 0) SAXUtils.EMPTY_ATTRIBUTES else new AttributesImpl(attributes),
-        matched,
-        handlerContext
-      )
-    }
-  }
-
   private[xml] def withWrapThrowable[T](thunk: => T)(implicit locator: OutputLocator): T =
     try {
       thunk
     } catch {
       case NonFatal(e) =>
-        throw OrbeonLocationException.wrapException(e, LocationData.createIfPresent(locator))
+        throw OrbeonLocationException.wrapException(e, XmlLocationData.createIfPresent(locator))
     }
 }
 
-trait ElementHandlerControllerHandlers extends XMLReceiver {
+trait ElementHandlerControllerHandlers[Ctx] extends XMLReceiver {
 
   import ElementHandlerController._
 
-  private val _handlerMatchers = new ju.HashMap[String, ju.List[HandlerAndMatcher]]
-  private val _uriHandlers     = new ju.HashMap[String, String]
-  private val _customMatchers  = new ju.ArrayList[HandlerAndMatcher]
+  private var _handlerInfos: List[HandlerInfo[Ctx]] = Nil
 
-  private val _handlerInfos = new ju.Stack[HandlerInfo]
-  def currentHandlerInfoOpt                : Option[HandlerInfo] = ! _handlerInfos.isEmpty option _handlerInfos.peek
-  def pushHandler(handlerInfo: HandlerInfo): Unit = _handlerInfos.push(handlerInfo)
-  def popHandler ()                        : Unit = _handlerInfos.pop()
+  def currentHandlerInfoOpt                     : Option[HandlerInfo[Ctx]] = _handlerInfos.headOption.flatMap(Option.apply)
+  def pushHandler(handlerInfo: HandlerInfo[Ctx]): Unit = _handlerInfos ::= handlerInfo
+  def popHandler ()                             : Unit = _handlerInfos = _handlerInfos.tail
 
-  private var _elementHandlerContext: AnyRef = null
-  def setElementHandlerContext(elementHandlerContext: AnyRef): Unit = _elementHandlerContext = elementHandlerContext
+  var output: DeferredXMLReceiver = _
+  var handlerContext: Ctx = _
 
-  private var _output: DeferredXMLReceiver = null
-  def getOutput: DeferredXMLReceiver = _output
-  def setOutput(output: DeferredXMLReceiver): Unit = _output = output
+  protected def findHandlerFn: (String, String, String, Attributes, Ctx) => Option[ElementHandler[Ctx]]
 
   // Implemented by `ElementHandlerControllerXMLReceiver`
   implicit def locator: OutputLocator
   def level: Int
-
-  // Register a handler. The handler can match, in order:
-  //
-  // - URI + localname + custom matcher
-  // - URI + localname
-  // - URI only
-  //
-  def registerHandler(handlerClassName: String, uri: String, localnameOrNull: String, matcherOrNull: Matcher[_ <: AnyRef]): Unit = {
-    if (localnameOrNull ne null) {
-      // Match on URI + localname and optionally custom matcher
-      val key = XMLUtils.buildExplodedQName(uri, localnameOrNull)
-      var handlerMatchers = _handlerMatchers.get(key)
-      if (handlerMatchers eq null) {
-        handlerMatchers = new ju.ArrayList[HandlerAndMatcher]
-        _handlerMatchers.put(key, handlerMatchers)
-      }
-      handlerMatchers.add(
-        (handlerClassName, if (matcherOrNull ne null) matcherOrNull else AllMatcher)
-      )
-    } else {
-      // Match on URI only
-      _uriHandlers.put(uri, handlerClassName)
-    }
-  }
-
-  // TODO: Just pass in a `List`?
-  def registerHandler(handlerClassName: String, matcher: Matcher[_ <: AnyRef]): Unit =
-    _customMatchers.add((handlerClassName, matcher))
 
   // A repeated handler may call this 1 or more times to start handling the captured body.
   def repeatBody(): Unit = {
@@ -181,21 +106,20 @@ trait ElementHandlerControllerHandlers extends XMLReceiver {
     }
   }
 
-  // This should mirror what `OutputInterceptor` produces when there is content.
-  // See also the test for #151 which outputs various types of repeats.
-  def findFirstHandlerOrElem: Option[ElementHandler Either StructuredQName] = {
+  // Used by `XFormsRepeatHandler`
+  def findFirstHandlerOrElem: Option[ElementHandler[Ctx] Either StructuredQName] = {
 
     val breaks = new scala.util.control.Breaks
     import breaks._
 
-    var result: Option[ElementHandler Either StructuredQName] = None
+    var result: Option[ElementHandler[Ctx] Either StructuredQName] = None
 
     breakable {
       currentHandlerInfoOpt flatMap (_.saxStore) foreach (_.replay(new XMLReceiverAdapter {
 
         override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
-          findHandler(uri, localname, qName, attributes)  map (_.elementHandler) match {
-            case Some(_: NullHandler | _: TransparentHandler) =>
+          findHandler(uri, localname, qName, attributes) map (_.elementHandler) match {
+            case Some(_: NullHandler[_] | _: TransparentHandler[_]) =>
             case Some(elementHandler) =>
               result = Some(Left(elementHandler))
               break()
@@ -219,7 +143,8 @@ trait ElementHandlerControllerHandlers extends XMLReceiver {
   def endBody(): Unit =
     popHandler()
 
-  def findHandlerFromElem(element: Element, handlerContext: AnyRef): Option[ElementHandler] =
+  // Used by `XFormsLHHAHandler.findTargetControlForEffectiveId`
+  def findHandlerFromElem(element: Element): Option[ElementHandler[Ctx]] =
     findHandler(
       element.getNamespaceURI,
       element.getName,
@@ -233,50 +158,18 @@ trait ElementHandlerControllerHandlers extends XMLReceiver {
     localname      : String,
     qName          : String,
     attributes     : Attributes
-  ): Option[HandlerInfo] = {
-
-    def fromCustomMatchers =
-      findWithMatchers(_customMatchers, uri, localname, qName, attributes, _elementHandlerContext)
-
-    def fromFullMatchers =
-      Option(_handlerMatchers.get(XMLUtils.buildExplodedQName(uri, localname))) flatMap { handlerMatchers =>
-        findWithMatchers(handlerMatchers, uri, localname, qName, attributes, _elementHandlerContext)
-      }
-
-    def fromUriBasedHandler =
-      Option(_uriHandlers.get(uri)) map { uriHandlerClassName =>
-        HandlerInfo(
-          level,
-          getHandlerByClassName(uriHandlerClassName, uri, localname, qName, attributes, null, _elementHandlerContext),
-          locator
-        )
-      }
-
-    fromCustomMatchers orElse fromFullMatchers orElse fromUriBasedHandler
-  }
-
-  private def findWithMatchers(
-    matchers       : ju.List[HandlerAndMatcher],
-    uri            : String,
-    localname      : String,
-    qName          : String,
-    attributes     : Attributes,
-    handlerContext : AnyRef
-  ): Option[HandlerInfo] =
-    matchers.asScala.iterator map {
-      case (handlerClassName, matcher) =>
-        handlerClassName -> matcher(attributes, _elementHandlerContext)
-    } collectFirst {
-      case (handlerClassName, matched) if matched ne null =>
-        HandlerInfo(
-          level,
-          getHandlerByClassName(handlerClassName, uri, localname, qName, attributes, matched, handlerContext),
-          locator
-        )
-    }
+  ): Option[HandlerInfo[Ctx]] =
+    findHandlerFn(
+      uri,
+      localname,
+      qName,
+      if (attributes.getLength == 0) SAXUtils.EMPTY_ATTRIBUTES else new AttributesImpl(attributes), // Q: Why copy `Attributes`?
+      handlerContext
+    ) map
+      (HandlerInfo(level, _, locator))
 }
 
-trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
+trait ElementHandlerControllerXMLReceiver[Ctx] extends XMLReceiver {
 
   import ElementHandlerController._
 
@@ -291,9 +184,9 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
   def level: Int = _level
 
   // Implemented by `ElementHandlerControllerHandlers`
-  def getOutput: XMLReceiver
-  def currentHandlerInfoOpt: Option[HandlerInfo]
-  def pushHandler(handlerInfo: HandlerInfo): Unit
+  def output: XMLReceiver
+  def currentHandlerInfoOpt: Option[HandlerInfo[Ctx]]
+  def pushHandler(handlerInfo: HandlerInfo[Ctx]): Unit
   def popHandler(): Unit
 
   def findHandler(
@@ -301,11 +194,11 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
     localname      : String,
     qName          : String,
     attributes     : Attributes
-  ): Option[HandlerInfo]
+  ): Option[HandlerInfo[Ctx]]
 
   // NOTE: This is called by the outer caller. Then it can be called by repeat or component body replay, which
-  // recursively hit this controller. The outer caller may or may not call setDocumentLocator() once. If there is
-  // one, repeat body replay recursively calls setDocumentLocator(), which is pushed on the stack, and then popped
+  // recursively hit this controller. The outer caller may or may not call `setDocumentLocator()` once. If there is
+  // one, repeat body replay recursively calls `setDocumentLocator()`, which is pushed on the stack, and then popped
   // after the repeat body has been entirely replayed.
   def setDocumentLocator(locator: Locator): Unit =
     if (locator ne null) {
@@ -317,7 +210,7 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
         // We don't forward this (anyway nobody is listening initially)
       } else {
         // This is a repeat or component body replay (otherwise it's a bug)
-        // Push the SAXStore's locator
+        // Push the `SAXStore`'s locator
         _locator.push(locator)
         // But don't forward this! SAX prevents calls to `setDocumentLocator()` mid-course. Our own locator will do the job.
       }
@@ -325,12 +218,12 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
 
   def startDocument(): Unit =
     withWrapThrowable {
-      getOutput.startDocument()
+      output.startDocument()
     }
 
   def endDocument(): Unit =
     withWrapThrowable {
-      getOutput.endDocument()
+      output.endDocument()
     }
 
   def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit =
@@ -359,7 +252,7 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
               }
             case None =>
               // New handler not found, send to output
-              getOutput.startElement(uri, localname, qName, attributes)
+              output.startElement(uri, localname, qName, attributes)
           }
       }
     }
@@ -386,7 +279,7 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
           // NOP
         case _ =>
           // Just forward
-          getOutput.endElement(uri, localname, qName)
+          output.endElement(uri, localname, qName)
       }
 
       _namespaceContext.endElement()
@@ -420,7 +313,6 @@ trait ElementHandlerControllerXMLReceiver extends XMLReceiver {
       if (_isFillingUpSAXStore)
         currentHandlerInfoOpt flatMap (_.saxStore) foreach thunk
       else if (currentHandlerInfoOpt forall (_.elementHandler.isForwarding))
-        thunk(getOutput)
+        thunk(output)
     }
-
 }

@@ -16,6 +16,7 @@ package org.orbeon.saxon
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
+import org.orbeon.saxon.function.EnvironmentVariable
 import org.orbeon.saxon.functions.{FormatDate, FormatNumber}
 import org.orbeon.saxon.om.StandardNames
 
@@ -57,6 +58,10 @@ trait XSLTFunctions extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
+    )
+
+    Fun("environment-variable", classOf[EnvironmentVariable], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE)
     )
   }
 }

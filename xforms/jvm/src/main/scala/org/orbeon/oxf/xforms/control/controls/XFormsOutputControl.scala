@@ -16,16 +16,16 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{ServletURLRewriter, URLRewriter}
+import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Connection, NetUtils}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, OutputControl}
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.model.DataModel
-import org.orbeon.oxf.xforms.processor.XFormsAssetServer.proxyURI
 import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsError, XFormsUtils}
+import org.orbeon.xforms.CrossPlatformSupport
+import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConverters._
@@ -138,17 +138,6 @@ class XFormsOutputControl(
         else
           value
 
-      def doProxyURI(uri: String, lastModified: Long) =
-        proxyURI(
-          uri              = uri,
-          filename         = filename,
-          contentType      = mediatype,
-          lastModified     = lastModified,
-          customHeaders    = evaluatedHeaders,
-          headersToForward = Connection.headersToForwardFromProperty,
-          getHeader        = containingDocument.headersGetter
-      )
-
       internalValue.trimAllToOpt match {
         case Some(trimmedInternalValue) =>
           getBuiltinTypeName match {
@@ -164,14 +153,27 @@ class XFormsOutputControl(
                   // values. So for now we keep the proxying for data: URLs.
 
                   val rebasedURI      = XFormsUtils.resolveXMLBase(containingDocument, element, trimmedInternalValue)
-                  val servletRewriter = new ServletURLRewriter(NetUtils.getExternalContext.getRequest)
+                  val servletRewriter = new ServletURLRewriter(CrossPlatformSupport.externalContext.getRequest)
                   val resolvedURI     = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
                   val lastModified    = NetUtils.getLastModifiedIfFast(resolvedURI)
 
-                  (resolvedURI, doProxyURI(resolvedURI, lastModified))
+                  (
+                    resolvedURI,
+                    CrossPlatformSupport.proxyURI(
+                      uri              = resolvedURI,
+                      filename         = filename,
+                      contentType      = mediatype,
+                      lastModified     = lastModified,
+                      customHeaders    = evaluatedHeaders,
+                      getHeader        = containingDocument.headersGetter
+                    )
+                  )
                 } else {
                   // Otherwise we leave the value as is
-                  (trimmedInternalValue, trimmedInternalValue)
+                  (
+                    trimmedInternalValue,
+                    trimmedInternalValue
+                  )
                 }
 
               verifiedValueOrDefault(
@@ -181,7 +183,13 @@ class XFormsOutputControl(
               )
             case "base64Binary" =>
               // NOTE: "-1" for `lastModified` will cause `XFormsAssetServer` to set `Last-Modified` and `Expires` properly to "now"
-              doProxyURI(NetUtils.base64BinaryToAnyURI(trimmedInternalValue, NetUtils.SESSION_SCOPE, logger.getLogger), -1)
+              CrossPlatformSupport.proxyBase64Binary(
+                trimmedInternalValue,
+                filename,
+                mediatype,
+                evaluatedHeaders,
+                containingDocument.headersGetter
+              )
             case _ =>
               defaultValue
           }
@@ -231,11 +239,6 @@ class XFormsOutputControl(
   // If we have both @ref and @value, read the type
   // XForms doesn't specify this as of XForms 2.0, but we already read the other MIPs so it makes sense.
   override def valueType: QName = super.valueType
-
-  // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data"
-  // We make an exception for https://github.com/orbeon/orbeon-forms/issues/3583
-  override def isDirectlyFocusableMaybeWithToggle: Boolean =
-    staticControl.hasLHHA(LHHA.Label) && super.isDirectlyFocusableMaybeWithToggle
 
   override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, previousControlOpt: Option[XFormsControl]): Boolean = {
     var added: Boolean = super.addAjaxExtensionAttributes(attributesImpl, previousControlOpt)

@@ -15,6 +15,8 @@ package org.orbeon.oxf.util
 
 import java.{lang => jl}
 
+import org.orbeon.oxf.util.StringUtils.StringOps
+
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel("ORBEON.common.MarkupUtils") // AjaxServer.js/xforms.js, remove when possible
@@ -28,6 +30,9 @@ object MarkupUtils {
 
   @JSExport // AjaxServer.js, remove when possible
   def normalizeSerializedHtml(s: String): String = s.normalizeSerializedHtml
+
+  // Java callers
+  def encodeHRRI(s: String, processSpace: Boolean): String = s.encodeHRRI(processSpace)
 
   implicit class MarkupStringOps(private val s: String) extends AnyVal {
 
@@ -92,6 +97,56 @@ object MarkupUtils {
         "\t",
         "\\t"
       )
+
+    /**
+     * Encode a Human Readable Resource Identifier to a URI. Leading and trailing spaces are removed first.
+     *
+     * W3C note: https://www.w3.org/TR/leiri/
+     *
+     * @param uriString    URI to encode
+     * @param processSpace whether to process the space character or leave it unchanged
+     * @return encoded URI, or null if uriString was null
+     */
+    def encodeHRRI(processSpace: Boolean): String = {
+
+      if (s eq null)
+        return null
+
+      // Note that the XML Schema spec says "Spaces are, in principle, allowed in the ·lexical space· of anyURI,
+      // however, their use is highly discouraged (unless they are encoded by %20).".
+
+      // We assume that we never want leading or trailing spaces. You can use %20 if you really want this.
+      val trimmed = s.trimAllToEmpty
+
+      // We try below to follow the "Human Readable Resource Identifiers" RFC, in draft as of 2007-06-06.
+      // - the control characters #x0 to #x1F and #x7F to #x9F
+      // - space #x20
+      // - the delimiters "<" #x3C, ">" #x3E, and """ #x22
+      // - the unwise characters "{" #x7B, "}" #x7D, "|" #x7C, "\" #x5C, "^" #x5E, and "`" #x60
+      val sb = new jl.StringBuilder(trimmed.length * 2)
+
+      for (c <- trimmed)
+        if (
+          c >= 0 && (
+            c <= 0x1f                   ||
+            (processSpace && c == 0x20) ||
+            c == 0x22                   ||
+            c == 0x3c                   ||
+            c == 0x3e                   ||
+            c == 0x5c                   ||
+            c == 0x5e                   ||
+            c == 0x60                   ||
+            (c >= 0x7b && c <= 0x7d)    ||
+            (c >= 0x7f && c <= 0x9f)
+          )
+        ) {
+          sb.append('%')
+          sb.append(NumberUtils.toHexString(c.toByte).toUpperCase)
+        } else
+          sb.append(c)
+
+      sb.toString
+    }
   }
 
   private val CrRegex = """\r""".r

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.resources;
 
-import org.apache.log4j.Logger;
 import org.orbeon.io.CharsetNames;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -36,7 +35,7 @@ import java.util.jar.JarEntry;
  */
 public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
 
-    private static Logger logger = LoggerFactory.createLogger(ClassLoaderResourceManagerImpl.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(ClassLoaderResourceManagerImpl.class);
 
     private final Class clazz;
     private final boolean prependSlash;

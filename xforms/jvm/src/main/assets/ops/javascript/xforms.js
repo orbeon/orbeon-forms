@@ -1617,7 +1617,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         getHelpMessage: function (control) {
             var helpElement = ORBEON.xforms.Controls.getControlLHHA(control, "help");
-            return helpElement == null ? "" : ORBEON.util.Dom.getStringValue(helpElement);
+            var helpMessage =
+                helpElement == null ? "" :
+                // When the help is a control (`xf:help` outside of its control), the content is markup, not escaped HTML
+                helpElement.classList.contains("xforms-control") ? helpElement.innerHTML :
+                ORBEON.util.Dom.getStringValue(helpElement);
+            return helpMessage;
         },
 
         setHelpMessage: function (control, message) {
@@ -1928,8 +1933,14 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         instance.setFocus();
                 }
             } else {
-                // Generic code to find focusable descendant-or-self HTML element and focus on it
-                var htmlControl = $(control).find('input:visible, textarea:visible, select:visible, button:visible, a:visible');
+
+                // Generic code, trying to find:
+                // P1. A HTML form field
+                var htmlControl = $(control).find("input:visible, textarea:visible, select:visible, button:visible, a:visible");
+                // P2. A focusable element
+                if (! htmlControl.is('*'))
+                    htmlControl = $(control).find("[tabindex]:not([tabindex = '-1']):visible");
+
                 if (htmlControl.is('*'))
                     ORBEON.util.Dom.focus(htmlControl.get(0));
                 else
@@ -2321,13 +2332,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
          */
         _findParentXFormsControl: function (element) {
             while (true) {
-                if (! element) return null; // No more parent, stop search
-                if (element.xformsElement) {
-                    // FCKeditor HTML area on Firefox: event target is the document, return the textarea
-                    return element.xformsElement;
-                } else if (element.ownerDocument && element.ownerDocument.xformsElement) {
-                    // FCKeditor HTML area on IE: event target is the body of the document, return the textarea
-                    return element.ownerDocument.xformsElement;
+                if (! element) {
+                    // No more parent, stop search
+                    return null;
                 } else if (element.tagName != null
                         && element.tagName.toLowerCase() == "iframe") {
                     // This might be the iframe that corresponds to a dialog on IE6

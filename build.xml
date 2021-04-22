@@ -14,7 +14,7 @@
 <project name="orbeon" default="orbeon-dev-war" xmlns:xdb="http://exist-db.org/ant">
 
     <!-- Properties to update when version number changes -->
-    <property name="version.number" value="2020.1-SNAPSHOT"/>
+    <property name="version.number" value="2021.1-SNAPSHOT"/>
     <property name="edition"        value="CE"/>
 
     <property file="build-local.properties"/>
@@ -52,7 +52,7 @@
     <!--
         These JARs are checked in. They can be rebuilt with the jarjar target
 
-        - xerces-2.11-orbeon.jar
+        - xerces-2.12-orbeon.jar
         - msv-20081113-orbeon.jar
 
         For directory scanner and SSH support:
@@ -122,14 +122,17 @@
 
     <target name="jarjar" depends="prepare">
         <!-- Xerces fat JAR -->
-        <jarjar jarfile="lib/xerces-2.11-orbeon.jar">
-            <zipfileset src="lib/src/xerces-xercesImpl-2.11.jar">
+        <jarjar jarfile="lib/xerces-2.12-orbeon.jar">
+            <zipfileset src="lib/src/xerces-xercesImpl-2.12.jar">
                 <!-- Don't expose any services -->
-                <exclude name="META-INF/services/**"/>
+                <exclude name="META-INF/**"/>
+                <exclude name="org/apache/wml/**"/>
+                <exclude name="org/apache/html/**"/>
+                <exclude name="org/w3c/**"/>
             </zipfileset>
-            <zipfileset src="lib/src/xerces-serializer-2.11.jar">
+            <zipfileset src="lib/src/xerces-serializer-2.12.jar">
                 <!-- Don't expose any services -->
-                <exclude name="META-INF/services/**"/>
+                <exclude name="META-INF/**"/>
             </zipfileset>
             <rule pattern="org.apache.**" result="orbeon.apache.@1"/>
         </jarjar>
@@ -159,7 +162,7 @@
             -forceprocessing
             -optimizations !method/inlining/unique,!method/inlining/short
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,!bcmail-*.jar,!bcprov-*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar(java/**.class)
@@ -227,7 +230,7 @@
             -forceprocessing
             -optimizations !method/inlining/unique,!method/inlining/short
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,!bcmail-*.jar,!bcprov-*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar(java/**.class)
@@ -297,7 +300,7 @@
             -forceprocessing
             -optimizations !method/inlining/unique,!method/inlining/short
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,!bcmail-*.jar,!bcprov-*.jar,**.jar;)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar(java/**.class)

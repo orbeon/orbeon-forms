@@ -55,9 +55,11 @@
         <fr:row>
             <fr:body/>
         </fr:row>
-        <fr:row>
-            <fr:captcha/>
-        </fr:row>
+        <xsl:if test="p:property(string-join(('oxf.fr.detail.captcha.location', $app, $form), '.')) = 'form-bottom'">
+            <fr:row>
+                <fr:captcha id="fr-captcha" namespace-name="{frf:captchaComponent($app, $form)}"/>
+            </fr:row>
+        </xsl:if>
 
         <!-- Error summary (if at bottom) -->
         <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
@@ -490,39 +492,14 @@
                         <fr:repeater ref="()"/>
                     </xf:group>
                 </xsl:if>
+                <!-- This part of the hack is to cause the initialization of the grid menus in Form Builder, as
+                     some dialogs still use the older grid, which doesn't make a distinction between repeated and
+                     non-repeated. We could use `javascript-lifecycle` and initialize the menus for the legacy
+                     grids as well but decided not to. We should update the repeated grids in Form Builder to
+                     use the non-legacy grids and then remove this. -->
+                <fr:grid repeat="content" ref="''" template="()"/>
             </xsl:if>
         </xh:span>
-    </xsl:template>
-
-    <xsl:template match="fr:captcha" name="fr-captcha">
-        <xsl:if test="$has-captcha">
-            <xf:group id="fr-captcha-group" model="fr-persistence-model" ref=".[frf:showCaptcha()]" class="fr-captcha">
-                <xf:var name="captcha" value="instance('fr-persistence-instance')/captcha"/>
-                <!-- Success: remember the captcha passed, which also influences validity -->
-                <xf:action ev:event="fr-verify-done">
-                    <xf:setvalue ref="$captcha">true</xf:setvalue>
-                    <xf:recalculate model="fr-persistence-model"/>
-                    <xf:refresh/>
-                </xf:action>
-                <!-- Failure: load another challenge -->
-                <xf:action event="fr-verify-error">
-                    <xf:dispatch
-                        if="event('fr-error-code') != 'empty'"
-                        targetid="captcha"
-                        name="fr-reload"/>
-                </xf:action>
-                <!-- Captcha component -->
-                <xsl:element
-                    namespace="{$captcha-uri-name[1]}"
-                    name     ="{$captcha-uri-name[2]}"
-                >
-                    <xsl:attribute name="id">captcha</xsl:attribute>
-                    <xsl:attribute name="ref">$captcha</xsl:attribute>
-                    <xf:label model="fr-form-model" ref="$fr-resources/detail/labels/captcha-label"/>
-                    <xf:alert model="fr-form-model" ref="$fr-resources/detail/labels/captcha-alert"/>
-                </xsl:element>
-            </xf:group>
-        </xsl:if>
     </xsl:template>
 
     <!-- Remove id elements on Form Builder templates -->
@@ -545,15 +522,16 @@
                     name="description"
                     value="
                         (
-                            { if (@paths) then concat(@paths, ', ') else '' }
                             xxf:instance('fr-form-metadata')/description[@xml:lang = xxf:instance('fr-language-instance')],
                             xxf:instance('fr-form-metadata')/description
-                        )[normalize-space()][1]"/>
+                        )[1]"/>
 
                 <xf:group xxf:element="div" ref=".[xxf:non-blank($description)]" class="alert fr-form-description">
                     <!-- Don't allow closing as that removes the markup and the XForms engine might attempt to update the nested
                          xf:output, which will cause an error. -->
-                    <xf:output value="$description"/>
+                    <xf:var name="is-html" value="$description/@mediatype = 'text/html'"/>
+                    <xf:output ref=".[$is-html]"      value="$description" mediatype="text/html"/>
+                    <xf:output ref=".[not($is-html)]" value="$description"/>
                 </xf:group>
             </xh:div>
         </xh:div>
@@ -752,7 +730,7 @@
         </fr:alert-dialog>
 
         <!-- Generic confirmation dialog (message must be passed dynamically) -->
-        <fr:alert-dialog id="fr-confirmation-dialog" close="true">
+        <fr:alert-dialog id="fr-confirmation-dialog">
             <fr:label ref="$fr-resources/detail/messages/confirmation-dialog-title"/>
             <fr:negative-choice>
                 <xf:action event="DOMActivate" type="xpath">
@@ -844,7 +822,7 @@
             <fr:row>
                 <fr:error-summary
                     id="error-summary-control-{$position}"
-                    observer="fr-view-component fr-captcha-group"
+                    observer="fr-view-component fr-captcha"
                     model="fr-error-summary-model"
                     alerts-count-ref="counts/@alert"
                     errors-count-ref="counts/@error"
@@ -931,13 +909,22 @@
 
     <!-- Success messages -->
     <xsl:template match="fr:messages" name="fr-messages">
-        <xf:switch class="fr-messages" model="fr-persistence-model" ref=".[instance('fr-persistence-instance')/message != '']">
+        <xf:switch
+            class="fr-messages"
+            model="fr-persistence-model"
+            ref=".[instance('fr-persistence-instance')/message != '']"
+            xh:aria-live="polite">
+
             <xf:case id="fr-message-none">
                 <xh:span/>
             </xf:case>
             <xf:case id="fr-message-success">
                 <xf:output value="instance('fr-persistence-instance')/message" class="fr-message-success alert alert-success"/>
             </xf:case>
+            <xf:case id="fr-message-error">
+                <xf:output value="instance('fr-persistence-instance')/message" class="fr-message-error alert alert-error"/>
+            </xf:case>
+
         </xf:switch>
     </xsl:template>
 
@@ -949,7 +936,7 @@
 
         <!-- Nothing below must statically depend on the mode -->
         <xsl:choose>
-            <xsl:when test="exists($custom-buttons)">
+            <xsl:when test="exists($custom-buttons) and empty($buttons-property)">
                 <xh:span class="fr-buttons">
                     <xsl:apply-templates select="$custom-buttons/node()"/>
                 </xh:span>

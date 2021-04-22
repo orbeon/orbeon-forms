@@ -103,7 +103,7 @@ trait ScalaToXml {
       XFormsAPI.delete(ref = elem, doDispatch = false)
     }
 
-    // Mutable → immutable
+    // Mutable -> immutable
     TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, TransformerUtils.tinyTreeToString(simplifiedXmlDoc), false, false)
   }
 

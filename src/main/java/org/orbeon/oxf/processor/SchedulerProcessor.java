@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.QName;
@@ -23,7 +22,7 @@ import org.orbeon.oxf.externalcontext.WebAppExternalContext;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.util.DateUtils;
+import org.orbeon.oxf.util.DateUtilsUsingSaxon;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.Task;
 import org.orbeon.oxf.util.task.TaskScheduler;
@@ -37,7 +36,7 @@ import java.util.List;
 
 public class SchedulerProcessor extends ProcessorImpl {
 
-    private static final Logger logger = LoggerFactory.createLogger(SchedulerProcessor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(SchedulerProcessor.class);
 
     public static final String SCHEDULER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/scheduler";
 
@@ -90,7 +89,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                         if ("now".equalsIgnoreCase(startTimeString)) {
                             startTime = System.currentTimeMillis();
                         } else {
-                            startTime = DateUtils.parseISODateOrDateTime(startTimeString);
+                            startTime = DateUtilsUsingSaxon.parseISODateOrDateTime(startTimeString);
                         }
                         config.setStartTime(startTime);
 

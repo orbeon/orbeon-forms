@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
 import org.orbeon.dom.QName;
@@ -30,7 +29,7 @@ import java.util.Iterator;
 
 public class XMLProcessorRegistry extends ProcessorImpl {
 
-    static private Logger logger = LoggerFactory.createLogger(XMLProcessorRegistry.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(XMLProcessorRegistry.class);
 
     public static final String PROCESSOR_REGISTRY_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/processor/processor-registry-config";
 

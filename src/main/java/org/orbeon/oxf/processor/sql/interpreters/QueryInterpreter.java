@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.dom.Element;
 import org.orbeon.dom.Node;
@@ -24,14 +25,14 @@ import org.orbeon.oxf.processor.sql.SQLFunctionLibrary;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.util.Base64XMLReceiver;
-import org.orbeon.oxf.util.DateUtils;
+import org.orbeon.oxf.util.DateUtilsUsingSaxon;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XPathXMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -98,7 +99,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                 // Remember parameter
                 if (queryParameters == null)
                     queryParameters = new ArrayList();
-                queryParameters.add(new QueryParameter(direction, type, sqlType, select, separator, replace, nullIf, query.length(), new LocationData(getDocumentLocator())));
+                queryParameters.add(new QueryParameter(direction, type, sqlType, select, separator, replace, nullIf, query.length(), XmlLocationData.apply(getDocumentLocator())));
             } else {
                 // This must be either a get-column or a (deprecated) simple getter
                 final boolean isGetColumn = "get-column".equals(localname) || "get-column-value".equals(localname);
@@ -109,7 +110,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                 // Level defaults to 1 in query
                 int level = (levelString == null) ? 1 : Integer.parseInt(levelString);
                 if (level < 1)
-                    throw new ValidationException("Attribute level must be 1 or greater in query", new LocationData(getDocumentLocator()));
+                    throw new ValidationException("Attribute level must be 1 or greater in query", XmlLocationData.apply(getDocumentLocator()));
                 // Set value
                 try {
                     final ResultSet rs = getInterpreterContext().getResultSet(level);
@@ -125,7 +126,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                             if (columnType == Types.CLOB) {
                                 value = rs.getClob(columnName);
                             } else if (columnType == Types.BLOB) {
-                                throw new ValidationException("Cannot read a Blob as an xmlFragment type", new LocationData(getDocumentLocator()));
+                                throw new ValidationException("Cannot read a Blob as an xmlFragment type", XmlLocationData.apply(getDocumentLocator()));
                             } else {
                                 value = rs.getString(columnName);
                             }
@@ -138,7 +139,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                     }
                     ((QueryParameter) queryParameters.get(queryParameters.size() - 1)).setValue(value);
                 } catch (Exception e) {
-                    throw new ValidationException(e, new LocationData(getDocumentLocator()));
+                    throw new ValidationException(e, XmlLocationData.apply(getDocumentLocator()));
                 }
             }
         }
@@ -149,7 +150,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
         String selectString = attributes.getValue("select");
         if (selectString != null) {
             if (type != UPDATE)
-                throw new ValidationException("select attribute is valid only on update element", new LocationData(getDocumentLocator()));
+                throw new ValidationException("select attribute is valid only on update element", XmlLocationData.apply(getDocumentLocator()));
             nodeIterator =
                 XPathUtils.selectNodeIterator(
                     getInterpreterContext().getCurrentNode(),
@@ -166,7 +167,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
     public void end(String uri, String localname, String qName) throws SAXException {
         // Validate query
         if (query == null)
-            throw new ValidationException("Missing query", new LocationData(getDocumentLocator()));
+            throw new ValidationException("Missing query", XmlLocationData.apply(getDocumentLocator()));
         // Execute query
         try {
             // Create a single PreparedStatement if the query is not modified at each iteration
@@ -518,14 +519,14 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 if (stringValue == null) {
                                                     stmt.setNull(index, Types.DATE);
                                                 } else {
-                                                    java.sql.Date date = new java.sql.Date(DateUtils.parseISODateOrDateTime(stringValue));
+                                                    java.sql.Date date = new java.sql.Date(DateUtilsUsingSaxon.parseISODateOrDateTime(stringValue));
                                                     stmt.setDate(index, date);
                                                 }
                                             } else if (ProcessorSupport.qNameToExplodedQName(XMLConstants.XS_DATETIME_QNAME()).equals(xmlType)) {
                                                 if (stringValue == null) {
                                                     stmt.setNull(index, Types.TIMESTAMP);
                                                 } else {
-                                                    java.sql.Timestamp timestamp = new java.sql.Timestamp(DateUtils.parseISODateOrDateTime(stringValue));
+                                                    java.sql.Timestamp timestamp = new java.sql.Timestamp(DateUtilsUsingSaxon.parseISODateOrDateTime(stringValue));
                                                     stmt.setTimestamp(index, timestamp);
                                                 }
                                             } else if (ProcessorSupport.qNameToExplodedQName(XMLConstants.XS_BOOLEAN_QNAME()).equals(xmlType)) {
@@ -577,7 +578,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                 }
                 if (type == QUERY || type == CALL) {
                     if (nodeCount > 1)
-                        throw new ValidationException("More than one iteration on sql:query or sql:call element", new LocationData(getDocumentLocator()));
+                        throw new ValidationException("More than one iteration on sql:query or sql:call element", XmlLocationData.apply(getDocumentLocator()));
                     // Execute
                     if (SQLProcessor.logger.isDebugEnabled())
                         SQLProcessor.logger.debug("Executing query/call, " +
@@ -600,7 +601,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
             String statementString = getInterpreterContext().getStatementString();
             SQLProcessor.logger.error("PreparedStatement:\n" + statementString);
             // And throw
-            throw new ValidationException(e, new LocationData(getDocumentLocator()));
+            throw new ValidationException(e, XmlLocationData.apply(getDocumentLocator()));
         }
     }
 

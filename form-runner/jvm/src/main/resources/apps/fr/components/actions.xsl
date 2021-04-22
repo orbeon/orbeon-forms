@@ -180,7 +180,11 @@
                             value="string-join(xxf:split($bind)[. = $possible-values], ' ')"/>
                     </xf:action>
                 </xf:action>
-                <xf:action if="frf:isSingleSelectionControl($element-name) or $element-name = 'autocomplete'">
+                <xf:action
+                    if="not($element-name = 'open-select1') and (
+                            frf:isSingleSelectionControl($element-name) or
+                            $element-name = 'autocomplete'
+                        )">
                     <xf:action iterate="$resolved-data-holders">
                         <xf:var name="bind" value="."/>
                         <xf:setvalue

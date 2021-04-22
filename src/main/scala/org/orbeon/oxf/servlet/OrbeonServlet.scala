@@ -16,7 +16,7 @@ package org.orbeon.oxf.servlet
 import javax.servlet.ServletException
 import javax.servlet.http._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{WebAppContext, WebAppListener}
+import org.orbeon.oxf.externalcontext.{ServletWebAppContext, WebAppListener}
 import org.orbeon.oxf.http.PropertiesApacheHttpClient
 import org.orbeon.oxf.pipeline.api._
 import org.orbeon.oxf.webapp.ServletPortlet._
@@ -56,7 +56,7 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
   // Servlet init
   override def init(): Unit =
     withRootException("initialization", new ServletException(_)) {
-      init(WebAppContext(getServletContext), Some("oxf.servlet-initialized-processor." -> "oxf.servlet-initialized-processor.input."))
+      init(ServletWebAppContext(getServletContext), Some("oxf.servlet-initialized-processor." -> "oxf.servlet-initialized-processor.input."))
 
       // Unclear whether there is a better place to do this
       webAppContext.addListener(new WebAppListener {

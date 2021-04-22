@@ -303,10 +303,21 @@
         then review-messages
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.wizard-prev.*.*">
-        xf:dispatch(name = "fr-prev", targetid = "fr-view-component")
+        wizard-prev
+        recover error-message(
+            resource   = "wizard-prev-error",
+            appearance = "ephemeral"
+        )
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.wizard-next.*.*">
-        xf:dispatch(name = "fr-next", targetid = "fr-view-component")
+        wizard-next
+        recover error-message(
+            resource   = "wizard-next-error",
+            appearance = "ephemeral"
+        )
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.wizard-prev.*.*">
+        xf:dispatch(name = "fr-prev", targetid = "fr-view-component")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.wizard-toc.*.*">
         xf:dispatch(name = "fr-show-toc",  targetid = "fr-view-component")

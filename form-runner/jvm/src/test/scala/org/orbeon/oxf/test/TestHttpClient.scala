@@ -19,7 +19,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.externalcontext.{Credentials, LocalExternalContext, _}
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.{Headers, HttpMethod, HttpResponse, StreamedContent}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor.XPLConstants.OXF_PROCESSORS_NAMESPACE
@@ -185,7 +185,7 @@ object TestHttpClient {
       new HttpResponse {
         lazy val statusCode   = response.statusCode
         lazy val headers      = response.capitalizedHeaders
-        lazy val lastModified = Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
+        lazy val lastModified = DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
         lazy val content      = response.streamedContent
         def disconnect()      = content.close()
       }

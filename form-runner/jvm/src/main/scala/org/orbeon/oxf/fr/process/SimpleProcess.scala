@@ -18,13 +18,15 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.ProcessParser.{RecoverCombinator, ThenCombinator}
 import org.orbeon.oxf.fr.{DataStatus, FormRunnerParams, Names}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{Logging, XPath}
+import org.orbeon.oxf.util.{IndentedLogger, Logging, XPath}
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
+import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.om.Item
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
@@ -40,20 +42,20 @@ import scala.util.Try
 //
 object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFormsActions with Logging {
 
-  implicit val logger = inScopeContainingDocument.getIndentedLogger("process")
+  implicit val logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("process")
 
-  override def extensionActions = AllowedFormRunnerActions ++ AllowedXFormsActions
+  override def extensionActions: Iterable[(String, SimpleProcess.Action)] = AllowedFormRunnerActions ++ AllowedXFormsActions
 
-  def currentXFormsDocumentId = XFormsAPI.inScopeContainingDocument.uuid
+  def currentXFormsDocumentId: String = XFormsAPI.inScopeContainingDocument.uuid
 
   // All XPath runs in the context of the main form instance's root element
-  def xpathContext = formInstance.rootElement
-  def xpathFunctionLibrary = inScopeContainingDocumentOpt map (_.functionLibrary) getOrElse XFormsFunctionLibrary // don't depend on in-scope document for tests
-  def xpathFunctionContext = XPath.functionContext.orNull
+  def xpathContext: Item = formInstance.rootElement
+  def xpathFunctionLibrary: FunctionLibrary = inScopeContainingDocumentOpt map (_.functionLibrary) getOrElse XFormsFunctionLibrary // don't depend on in-scope document for tests
+  def xpathFunctionContext: XPath.FunctionContext = XPath.functionContext.orNull
 
   // NOTE: Clear the PDF/TIFF URLs *before* the process, because if we clear it after, it will be already cleared
   // during the second pass of a two-pass submission.
-  override def beforeProcess() = Try {
+  override def beforeProcess(): Try[Any] = Try {
 
     val childElems = findUrlsInstanceRootElem.toList child *
 
@@ -66,13 +68,13 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
     delete(childElems)
   }
 
-  override def processError(t: Throwable) =
+  override def processError(t: Throwable): Unit =
     tryErrorMessage(Map(Some("resource") -> "process-error"))
 
-  def writeSuspendedProcess(process: String) =
+  def writeSuspendedProcess(process: String): Unit =
     setvalue(topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement, process)
 
-  def readSuspendedProcess =
+  def readSuspendedProcess: String =
     topLevelInstance(Names.PersistenceModel, "fr-processes-instance").get.rootElement.stringValue
 
   case class RollbackContent(data: Document, saveStatus: Option[DataStatus], autoSaveStatus: Option[DataStatus])
@@ -112,8 +114,8 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
 
   // Search first in properties, then try legacy workflow-send
   // The scope is interpreted as a property prefix.
-  def findProcessByName(scope: String, name: String) = {
-    implicit val formRunnerParams = FormRunnerParams()
+  def findProcessByName(scope: String, name: String): Option[String] = {
+    implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
     formRunnerProperty(scope + '.' + name) orElse buildProcessFromLegacyProperties(name)
   }
 

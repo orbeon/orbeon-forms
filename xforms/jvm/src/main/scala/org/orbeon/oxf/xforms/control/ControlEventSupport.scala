@@ -45,7 +45,7 @@ trait ControlEventSupport extends ListenersTrait {
           val newRepeatIndex = repeatIterationControl.iterationIndex
 
           val indentedLogger = controls.indentedLogger
-          if (indentedLogger.isDebugEnabled)
+          if (indentedLogger.debugEnabled)
             indentedLogger.logDebug("xf:repeat", "setting index upon focus change", "new index", newRepeatIndex.toString)
 
           repeatIterationControl.repeat.setIndex(newRepeatIndex)

@@ -13,8 +13,12 @@
   */
 package org.orbeon.oxf.xforms.submission
 
+import cats.Eval
+import cats.syntax.option._
+import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
-import org.orbeon.oxf.util.{ConnectionResult, NetUtils}
+import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 
@@ -36,16 +40,7 @@ object AllReplacer {
 
     SubmissionUtils.forwardResponseHeaders(cxr, response)
 
-    // Forward content to response
-    val outputStream = response.getOutputStream
-    try
-      NetUtils.copyStream(cxr.content.inputStream, outputStream)
-    finally
-      cxr.close()
-
-    // End document and close
-    outputStream.flush()
-    outputStream.close()
+    IOUtils.copyStreamAndClose(cxr.content.inputStream, response.getOutputStream)
   }
 
   class ReplaceAllResponse(val response: ExternalContext.Response)
@@ -69,7 +64,7 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
   // NOP
   def deserialize(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
 
-  def replace(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Runnable = {
+  def replace(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Option[Eval[Unit]] = {
 
     // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
     // Remember that we got a submission producing output
@@ -86,20 +81,20 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
     // processing concludes after dispatching xforms-submit-error with appropriate context information, including an
     // error-type of resource-error"
     if (!p.isDeferredSubmissionSecondPass) {
-      if (NetUtils.isSuccessCode(cxr.statusCode))
-        submission.sendSubmitDone(cxr)
+      if (StatusCode.isSuccessCode(cxr.statusCode))
+        submission.sendSubmitDone(cxr).some
       else {
         // Here we dispatch xforms-submit-error upon getting a non-success error code, even though the response has
         // already been written out. This gives the form author a chance to do something in cases the response is
         // buffered, for example do a sendError().
         throw new XFormsSubmissionException(
           submission       = submission,
-          message          = "xf:submission for submission id: " + submission.getId + ", error code received when submitting instance: " + cxr.statusCode,
+          message          = s"xf:submission for submission id `${submission.getId}`, error code received when submitting instance: `${cxr.statusCode}`",
           description      = "processing submission response",
           submitErrorEvent = new XFormsSubmitErrorEvent(
-            target = submission,
-            errorType = ErrorType.ResourceError,
-            connectionResult = cxr
+            target           = submission,
+            errorType        = ErrorType.ResourceError,
+            connectionResult = cxr.some
           )
         )
       }
@@ -108,7 +103,7 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
       //
       // 1. We don't want to modify the document state
       // 2. This can be called outside of the document lock, see XFormsServer.
-      null
+      None
     }
   }
 }

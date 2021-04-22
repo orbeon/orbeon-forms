@@ -17,9 +17,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.log4j.Logger;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.io.CharsetNames;
-import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.WebAppListener;
@@ -30,12 +29,13 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -216,6 +216,7 @@ public class NetUtils {
                 && ((url1.getPath() == null && url2.getPath() == null) || url2.getPath().startsWith(url1.getPath()));
     }
 
+    // 10 Java callers
     public static void copyStream(InputStream is, OutputStream os) throws IOException {
         int count;
         final byte[] buffer = new byte[COPY_BUFFER_SIZE];
@@ -223,17 +224,12 @@ public class NetUtils {
             os.write(buffer, 0, count);
     }
 
+    // 1 Java caller
     public static void copyStream(Reader reader, Writer writer) throws IOException {
         int count;
         final char[] buffer = new char[COPY_BUFFER_SIZE / 2];
         while ((count = reader.read(buffer)) > 0)
             writer.write(buffer, 0, count);
-    }
-
-    public static String readStreamAsString(Reader reader) throws IOException {
-        final StringBuilderWriter writer = new StringBuilderWriter(new StringBuilder());
-        copyStream(reader, writer);
-        return writer.result();
     }
 
     /**
@@ -244,7 +240,7 @@ public class NetUtils {
     // TODO: Move to PathUtils.
     public static Map<String, String[]> decodeQueryString(final CharSequence queryString) {
 
-        final Map<String, String[]> result = new LinkedHashMap<String, String[]>();
+        final Map<String, String[]> result = new LinkedHashMap<>();
         if (queryString != null) {
             final Matcher matcher = PATTERN_NO_AMP.matcher(queryString);
             int matcherEnd = 0;
@@ -279,7 +275,7 @@ public class NetUtils {
     // TODO: Move to PathUtils.
     public static Map<String, String[]> decodeQueryStringPortlet(final CharSequence queryString) {
 
-        final Map<String, String[]> result = new LinkedHashMap<String, String[]>();
+        final Map<String, String[]> result = new LinkedHashMap<>();
         if (queryString != null) {
             final Matcher matcher = PATTERN_AMP.matcher(queryString);
             int matcherEnd = 0;
@@ -428,13 +424,13 @@ public class NetUtils {
         if (base != null) {
             final URI baseURI;
             try {
-                baseURI = new URI(encodeHRRI(base, true));
+                baseURI = new URI(MarkupUtils.encodeHRRI(base, true));
             } catch (URISyntaxException e) {
                 throw new OXFException(e);
             }
-            resolvedURIString = baseURI.resolve(encodeHRRI(href, true)).normalize().toString();// normalize to remove "..", etc.
+            resolvedURIString = baseURI.resolve(MarkupUtils.encodeHRRI(href, true)).normalize().toString();// normalize to remove "..", etc.
         } else {
-            resolvedURIString = encodeHRRI(href, true);
+            resolvedURIString = MarkupUtils.encodeHRRI(href, true);
         }
         return resolvedURIString;
     }
@@ -661,85 +657,6 @@ public class NetUtils {
     }
 
     /**
-     * Remove the first path element of a path. Return null if there is only one path element
-     *
-     * E.g. /foo/bar => /bar?a=b
-     *
-     * @param path  path to modify
-     * @return      modified path or null
-     */
-    // TODO: Move to PathUtils.
-    public static String removeFirstPathElement(String path) {
-        final int secondSlashIndex = path.indexOf('/', 1);
-        if (secondSlashIndex == -1)
-            return null;
-
-        return path.substring(secondSlashIndex);
-    }
-
-    /**
-     * Return the first path element of a path. If there is only one path element, return the entire path.
-     *
-     * E.g. /foo/bar => /foo
-     *
-     * @param path  path to analyze
-     * @return      first path element
-     */
-    // TODO: Move to PathUtils.
-    public static String getFirstPathElement(String path) {
-        final int secondSlashIndex = path.indexOf('/', 1);
-        if (secondSlashIndex == -1)
-            return path;
-
-        return path.substring(0, secondSlashIndex);
-    }
-
-    /**
-     * Encode a Human Readable Resource Identifier to a URI. Leading and trailing spaces are removed first.
-     *
-     * W3C note: https://www.w3.org/TR/leiri/
-     *
-     * @param uriString    URI to encode
-     * @param processSpace whether to process the space character or leave it unchanged
-     * @return             encoded URI, or null if uriString was null
-     */
-    public static String encodeHRRI(String uriString, boolean processSpace) {
-
-        if (uriString == null)
-            return null;
-
-        // Note that the XML Schema spec says "Spaces are, in principle, allowed in the ·lexical space· of anyURI,
-        // however, their use is highly discouraged (unless they are encoded by %20).".
-
-        // We assume that we never want leading or trailing spaces. You can use %20 if you really want this.
-        uriString = StringUtils.trimAllToEmpty(uriString);
-
-        // We try below to follow the "Human Readable Resource Identifiers" RFC, in draft as of 2007-06-06.
-        // * the control characters #x0 to #x1F and #x7F to #x9F
-        // * space #x20
-        // * the delimiters "<" #x3C, ">" #x3E, and """ #x22
-        // * the unwise characters "{" #x7B, "}" #x7D, "|" #x7C, "\" #x5C, "^" #x5E, and "`" #x60
-        final StringBuilder sb = new StringBuilder(uriString.length() * 2);
-        for (int i = 0; i < uriString.length(); i++) {
-            final char currentChar = uriString.charAt(i);
-
-            if (currentChar >= 0
-                    && (currentChar <= 0x1f || (processSpace && currentChar == 0x20) || currentChar == 0x22
-                     || currentChar == 0x3c || currentChar == 0x3e
-                     || currentChar == 0x5c || currentChar == 0x5e || currentChar == 0x60
-                     || (currentChar >= 0x7b && currentChar <= 0x7d)
-                     || (currentChar >= 0x7f && currentChar <= 0x9f))) {
-                sb.append('%');
-                sb.append(NumberUtils.toHexString((byte) currentChar).toUpperCase());
-            } else {
-                sb.append(currentChar);
-            }
-        }
-
-        return sb.toString();
-    }
-
-    /**
      * Get the current external context.
      *
      * @return  external context if found, null otherwise
@@ -841,15 +758,6 @@ public class NetUtils {
 
     public static void debugLogRequestAsXML(final ExternalContext.Request request) {
         System.out.println(IOSupport.domToPrettyStringJava(RequestGenerator.readWholeRequestAsDOM4J(request, null)));
-    }
-
-    public static boolean isSuccessCode(int code) {
-        // Accept any success code (in particular "201 Resource Created")
-        return code >= 200 && code < 300;
-    }
-
-    public static boolean isRedirectCode(int code) {
-        return (code >= 301 && code <= 303) || code == 307;
     }
 
     /**

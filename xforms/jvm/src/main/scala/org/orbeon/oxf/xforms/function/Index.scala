@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.function
 
+import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.Int64Value
 
@@ -33,7 +33,7 @@ class Index extends XFormsFunction {
     if (index == -1)
       throw new ValidationException(
         s"Function index uses repeat id `$repeatStaticId` which is not in scope",
-        new LocationData(getSystemId, getLineNumber, getColumnNumber)
+        BasicLocationData(getSystemId, getLineNumber, getColumnNumber)
       )
     else
       new Int64Value(index)

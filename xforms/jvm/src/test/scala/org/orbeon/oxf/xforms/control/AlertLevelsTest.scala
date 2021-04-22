@@ -15,11 +15,10 @@ package org.orbeon.oxf.xforms.control
 
 import org.junit.Test
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase
 import org.orbeon.oxf.xml.dom.Converter._
-import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.xforms.RelevanceHandling
+import org.orbeon.xforms.analysis.model.ValidationLevel
 
 class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
 
@@ -36,19 +35,19 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
     withActionAndDoc(setupDocument(WarningsInfosTemplate)) {
 
       // number-control
-      assert(Some(ErrorLevel) === numberControl.alertLevel)
+      assert(Some(ValidationLevel.ErrorLevel) === numberControl.alertLevel)
       assert(DefaultAlertMessage === numberControl.getAlert)
 
       setControlValue(NumberControlId, "a")
-      assert(Some(ErrorLevel) === numberControl.alertLevel)
+      assert(Some(ValidationLevel.ErrorLevel) === numberControl.alertLevel)
       assert(DefaultAlertMessage === numberControl.getAlert)
 
       setControlValue(NumberControlId, "10")
-      assert(Some(ErrorLevel) === numberControl.alertLevel)
+      assert(Some(ValidationLevel.ErrorLevel) === numberControl.alertLevel)
       assert("Must be 50 or more" === numberControl.getAlert)
 
       setControlValue(NumberControlId, "50")
-      assert(Some(WarningLevel) === numberControl.alertLevel)
+      assert(Some(ValidationLevel.WarningLevel) === numberControl.alertLevel)
       assert("Should be 100 or more" === numberControl.getAlert)
 
       setControlValue(NumberControlId, "1000")
@@ -56,7 +55,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
       assert(null eq numberControl.getAlert)
 
       setControlValue(NumberControlId, "1001")
-      assert(Some(InfoLevel) === numberControl.alertLevel)
+      assert(Some(ValidationLevel.InfoLevel) === numberControl.alertLevel)
       assert("Nice, greater than 1000!" == numberControl.getAlert)
 
       // text-control
@@ -68,15 +67,15 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
       assert(null eq textControl.getAlert)
 
       setControlValue(TextControlId, "This is a little bit too long!")
-      assert(Some(WarningLevel) === textControl.alertLevel)
+      assert(Some(ValidationLevel.WarningLevel) === textControl.alertLevel)
       assert("Should be shorter than 10 characters" === textControl.getAlert)
 
       setControlValue(TextControlId, "this!")
-      assert(Some(WarningLevel) === textControl.alertLevel)
+      assert(Some(ValidationLevel.WarningLevel) === textControl.alertLevel)
       assert("Should not start with a lowercase letter" === textControl.getAlert)
 
       setControlValue(TextControlId, "this is a little bit too long and starts with a lowercase letter!")
-      assert(Some(WarningLevel) === textControl.alertLevel)
+      assert(Some(ValidationLevel.WarningLevel) === textControl.alertLevel)
       assert("<ul><li>Should be shorter than 10 characters</li><li>Should not start with a lowercase letter</li></ul>" === textControl.getAlert)
     }
 

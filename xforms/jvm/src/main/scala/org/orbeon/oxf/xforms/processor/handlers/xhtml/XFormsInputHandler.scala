@@ -17,10 +17,11 @@ import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.XFormsUtils.namespaceId
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
-import org.orbeon.oxf.xforms.processor.handlers.HandlerSupport
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsUtils}
@@ -36,26 +37,26 @@ import org.xml.sax.Attributes
  * TODO: Subclasses per appearance.
  */
 class XFormsInputHandler(
-  uri            : String,
-  localname      : String,
-  qName          : String,
-  localAtts      : Attributes,
-  matched        : AnyRef,
-  handlerContext : AnyRef
+  uri             : String,
+  localname       : String,
+  qName           : String,
+  localAtts       : Attributes,
+  elementAnalysis : ElementAnalysis,
+  handlerContext  : HandlerContext
 ) extends
   XFormsControlLifecyleHandler(
     uri,
     localname,
     qName,
     localAtts,
-    matched,
+    elementAnalysis,
     handlerContext,
     repeating  = false,
     forwarding = false
   ) with HandlerSupport {
 
   private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
-    staticControlOpt flatMap (PlaceHolderInfo.placeHolderValueOpt(_, currentControl))
+    PlaceHolderInfo.placeHolderValueOpt(elementAnalysis, currentControl)
 
   private def controlHas(predicate: XFormsInputControl => Boolean) =
     predicate(currentControl.asInstanceOf[XFormsInputControl])
@@ -66,9 +67,10 @@ class XFormsInputHandler(
 
   override protected def handleControlStart(): Unit = {
 
-    implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.getController.getOutput
+    implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
     val inputControl = currentControl.asInstanceOf[XFormsInputControl]
+
     val isRelevantControl = ! isNonRelevant(inputControl)
 
     if (isBoolean) {
@@ -94,7 +96,7 @@ class XFormsInputHandler(
       )
 
       // TODO: Do not delegate but just share `outputContent` implementation.
-      new XFormsSelect1Handler(uri, localname, qName, attributes, matched, handlerContext)
+      new XFormsSelect1Handler(uri, localname, qName, attributes, elementAnalysis, handlerContext)
         .outputContent(
           attributes           = attributes,
           effectiveId          = getEffectiveId,
@@ -103,11 +105,11 @@ class XFormsInputHandler(
           isMultiple           = isMultiple,
           isFull               = true,
           isBooleanInput       = true,
-          xformsHandlerContext = xformsHandlerContext
+          xformsHandlerContext = handlerContext
         )
     } else {
 
-      val xhtmlPrefix = xformsHandlerContext.findXHTMLPrefix
+      val xhtmlPrefix = handlerContext.findXHTMLPrefix
 
       // Create xh:input
       if (! isStaticReadonly(inputControl)) {

@@ -70,8 +70,10 @@
     <property as="xs:boolean" name="oxf.fr.persistence.*.active"                                value="true"/>
 
     <!-- Default data format version -->
-    <property as="xs:string" name="oxf.fr.persistence.*.data-format-version"                    value="4.0.0"/>
+    <property as="xs:string"  name="oxf.fr.persistence.*.data-format-version"                   value="4.0.0"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.*.escape-non-ascii-characters"           value="false"/>
 
+    <property as="xs:string"  name="oxf.fr.default-timezone"                                    value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*">
         /apps/fr/style/orbeon-navbar-logo.png
@@ -87,12 +89,13 @@
     <property as="xs:string"  name="oxf.fr.authentication.header.roles.split"                   value="(\s*[,\|]\s*)+"/>
     <property as="xs:string"  name="oxf.fr.authentication.header.roles.property-name"           value=""/>
     <property as="xs:string"  name="oxf.fr.authentication.header.credentials"                   value="My-Credentials-Header"/>
+    <property as="xs:boolean" name="oxf.fr.authentication.header.sticky"                        value="false"/>
     <!-- E.g. "orbeon admin user" -->
     <property as="xs:string"  name="oxf.fr.authentication.container.roles"                      value=""/>
     <property as="xs:string"  name="oxf.fr.authentication.container.roles.split"                value=",|\s+"/>
     <property as="xs:boolean" name="oxf.fr.authentication.user-menu.enable"                     value="false"/>
-    <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.login"                  value="/fr/auth?source={xxf:get-request-path()}"/>
-    <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.logout"                 value="/fr/logout"/>
+    <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.login"                  value="/fr/auth?source={(xxf:get-request-parameter('source'), xxf:get-request-path())[1]}"/>
+    <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.logout"                 value="/fr/logout?source={xxf:get-request-path()}"/>
     <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.register"               value=""/>
 
     <property as="xs:integer" name="oxf.fr.summary.page-size.*.*"                               value="10"/>
@@ -100,6 +103,7 @@
     <property as="xs:boolean" name="oxf.fr.summary.show-created.*.*"                            value="true"/>
     <property as="xs:boolean" name="oxf.fr.summary.show-last-modified.*.*"                      value="true"/>
     <property as="xs:boolean" name="oxf.fr.summary.show-workflow-stage.*.*"                     value="false"/>
+    <property as="xs:boolean" name="oxf.fr.summary.show-version-selector.*.*"                   value="true"/>
     <property as="xs:string"  name="oxf.fr.summary.buttons.*.*">
         home review pdf delete duplicate new
     </property>
@@ -117,11 +121,15 @@
     <!-- TOC disabled by default -->
     <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-1"/>
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
+
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                       value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.new.service.uri.*.*">
         /fr/service/custom/my-app/new
     </property>
     <property as="xs:string"  name="oxf.fr.detail.new.service.passing-request-parameters.*.*"   value=""/>
+
+    <property as="xs:boolean" name="oxf.fr.detail.service.background.enable-return-data.*.*"    value="false"/>
+
     <property as="xs:string"  name="oxf.fr.detail.buttons.*.*">
         summary clear pdf save-final review
     </property>
@@ -151,7 +159,8 @@
     </property>
 
     <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->
-    <property as="xs:string"  name="oxf.fr.detail.captcha.*.*"                                  value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.captcha.visible.*.*"                          value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.captcha.location.*.*"                         value="form-bottom"/>
 
     <property as="xs:string"  name="oxf.fr.detail.pdf.filename.*.*"                             value=""/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.barcode.*.*"                              value="false"/>
@@ -260,7 +269,7 @@
     <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.controls"                          value="-1"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.dmv-14">
-        summary clear pdf tiff save-final review
+        summary clear save-final review
     </property>
     <property as="xs:string"  name="oxf.fr.resource.orbeon.dmv-14.*.print.formats.date"         value="[Y0001]-[M01]-[D01]"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state.*"                 value="select-value"/>
@@ -275,7 +284,7 @@
         wizard-prev wizard-next review
     </property>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.w9">
-        edit pdf save
+        edit save
     </property>
 
     <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.contact">
@@ -453,5 +462,8 @@
     <!-- Blank string means `if (fr:created-with-or-newer('2018.2')) then 'full' else 'minimal'`. But we cannot
          actually use that expression, since the logic runs in XSLT. So that behavior is implicit. -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.calculated-value.appearance.*.*"          value=""/>
+
+    <!-- Process for the publish API -->
+    <property as="xs:string"  name="oxf.fr.detail.process.before-publish"/>
 
 </properties>

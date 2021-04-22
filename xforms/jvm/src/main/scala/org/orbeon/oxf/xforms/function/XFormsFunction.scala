@@ -20,7 +20,7 @@ import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{PooledXPathExpression, XPath, XPathCache}
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, ElementAnalysisTreeXPathAnalyzer}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
 import org.orbeon.oxf.xforms.model.{BindNode, XFormsModel}
@@ -33,6 +33,7 @@ import org.orbeon.saxon.expr._
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 
 import scala.collection.JavaConverters._
@@ -294,9 +295,9 @@ object XFormsFunction {
     }
   }
 
-  def sourceElementAnalysis(pathMap: PathMap): SimpleElementAnalysis =
+  def sourceElementAnalysis(pathMap: PathMap): ElementAnalysis =
     pathMap.getPathMapContext match {
-      case context: SimpleElementAnalysis#SimplePathMapContext => context.element
+      case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext => context.element
       case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
     }
 

@@ -18,6 +18,7 @@ import java.sql.Connection
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{SearchRequest, SearchVersion}
 
 object RelationalCommon {
 
@@ -77,7 +78,8 @@ object RelationalCommon {
     */
   def requestedFormVersion(connection: Connection, req: RequestCommon): Int = {
 
-    def latest = formVersion(connection, req.app, req.form, None)
+    def latest: Option[Int] =
+      formVersion(connection, req.app, req.form, None)
 
     req.version match {
       case Unspecified        => latest.getOrElse(1)
@@ -88,4 +90,15 @@ object RelationalCommon {
     }
   }
 
+  def requestedFormVersion(connection: Connection, req: SearchRequest): Option[Int] = {
+
+    def latest: Option[Int] =
+      formVersion(connection, req.app, req.form, None)
+
+    req.version match {
+      case SearchVersion.Unspecified  => Some(latest.getOrElse(1))
+      case SearchVersion.All          => None
+      case SearchVersion.Specific(v)  => Some(v)
+    }
+  }
 }

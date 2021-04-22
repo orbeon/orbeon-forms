@@ -15,19 +15,18 @@ package org.orbeon.oxf.xforms.xbl
 
 import java.{util => ju}
 
-import cats.implicits.catsSyntaxOptionId
+import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.analysis.{EventHandler, PartAnalysisImpl}
 import org.orbeon.oxf.xforms.{PartAnalysis, XFormsUtils}
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 
@@ -72,10 +71,10 @@ object XBLTransformer {
 
     val documentWrapper  = new DocumentWrapper(boundElement.getDocument, null, org.orbeon.oxf.util.XPath.GlobalConfiguration)
     val boundElementInfo = documentWrapper.wrap(boundElement)
-    val directNameOpt    = abstractBindingOpt flatMap (_.directName)
+    val directNameOpt    = abstractBindingOpt flatMap (_.commonBinding.directName)
 
     def isNestedHandler(e: Element): Boolean =
-      (e.getParent eq boundElement) && EventHandlerImpl.isEventHandler(e)
+      (e.getParent eq boundElement) && EventHandler.isEventHandler(e)
 
     def isNestedLHHA(e: Element): Boolean =
       (e.getParent eq boundElement) && LHHA.isLHHA(e)
@@ -227,8 +226,8 @@ object XBLTransformer {
           val equalIndex = currentValue.indexOf('=')
           if (equalIndex == -1) {
             // No a=b pair, just a single QName
-            val valueQName = currentElem.resolveStringQName(currentValue, unprefixedIsNoNamespace = true)
-            if (valueQName.namespace.uri != XBL_NAMESPACE_URI) {
+            val valueQName = currentElem.resolveStringQNameOrThrow(currentValue, unprefixedIsNoNamespace = true)
+            if (valueQName.namespace.uri != Namespaces.XBL) {
               // This is not xbl:text, copy the attribute
               val attributeValue = boundElement.attributeValue(valueQName)
               if (attributeValue ne null)
@@ -241,15 +240,15 @@ object XBLTransformer {
             // a=b pair
             val leftSideQName = {
               val leftSide = currentValue.substring(0, equalIndex)
-              currentElem.resolveStringQName(leftSide, unprefixedIsNoNamespace = true)
+              currentElem.resolveStringQNameOrThrow(leftSide, unprefixedIsNoNamespace = true)
             }
             val rightSideQName = {
               val rightSide = currentValue.substring(equalIndex + 1)
-              currentElem.resolveStringQName(rightSide, unprefixedIsNoNamespace = true)
+              currentElem.resolveStringQNameOrThrow(rightSide, unprefixedIsNoNamespace = true)
             }
 
-            val isLeftSideXBLText  = leftSideQName.namespace.uri  == XBL_NAMESPACE_URI
-            val isRightSideXBLText = rightSideQName.namespace.uri == XBL_NAMESPACE_URI
+            val isLeftSideXBLText  = leftSideQName.namespace.uri  == Namespaces.XBL
+            val isRightSideXBLText = rightSideQName.namespace.uri == Namespaces.XBL
 
             val (rightSideValue, namespaceElement) =
               if (! isRightSideXBLText) {

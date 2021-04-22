@@ -16,6 +16,7 @@ package org.orbeon.oxf.controller
 import java.util.regex.Pattern
 import java.util.{List => JList, Map => JMap}
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element, QName}
 import org.orbeon.errorified.Exceptions._
@@ -37,7 +38,6 @@ import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.ProcessorService
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
@@ -75,7 +75,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     // by oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
     // actually know what a "resource" is.
     if (pageFlow.pathMatchers.nonEmpty) {
-      Option(pc.getAttribute(PathMatchers).asInstanceOf[JList[PathMatcher]]) match {
+      Option(pc.getAttribute(PathMatchers).asInstanceOf[JList[URLRewriterUtils.PathMatcher]]) match {
         case Some(existingPathMatchers) =>
           // Add if we come after others (in case of nested page flows)
           val allMatchers = existingPathMatchers.asScala ++ pageFlow.pathMatchers
@@ -230,7 +230,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       att(configRoot, name) orElse Option(properties.getStringOrURIAsString(name, default.orNull, allowEmpty))
 
     def controllerPropertyQName(name: String, default: Option[QName]) =
-      Option(configRoot.resolveAttValueQName(name, unprefixedIsNoNamespace = true)) orElse
+      configRoot.resolveAttValueQName(name, unprefixedIsNoNamespace = true) orElse
         Option(properties.getQName(name, default.orNull))
 
     val defaultMatcher         = controllerPropertyQName(MatcherProperty, Some(DefaultMatcher)).get
@@ -316,7 +316,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     val pathMatchers = (
       routeElements
       collect { case files: FileElement if files.versioned => files }
-      map     (f => new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
+      map     (f => new URLRewriterUtils.PathMatcher(f.path, f.mimeType.orNull, f.versioned))
     )
 
     // Compile the pipeline for the given page element
@@ -334,7 +334,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       )
 
       // For debugging
-      if (logger.isDebugEnabled) {
+      if (logger.debugEnabled) {
         val astDocumentHandler = new ASTDocumentHandler
         ast.walk(astDocumentHandler)
         debug(
@@ -620,7 +620,7 @@ object PageFlowControllerProcessor {
     notFoundRoute     : Option[PageOrServiceRoute],
     unauthorizedRoute : Option[PageOrServiceRoute],
     errorRoute        : Option[PageOrServiceRoute],
-    pathMatchers      : Seq[PathMatcher],
+    pathMatchers      : Seq[URLRewriterUtils.PathMatcher],
     file              : Option[String]
   )
 
@@ -637,7 +637,7 @@ object PageFlowControllerProcessor {
   def compilePattern(e: Element, path: String, default: QName) =
     RegexpMatcher.compilePattern(
       path,
-      glob = ! RegexpQNames(Option(e.resolveAttValueQName(MatcherProperty, unprefixedIsNoNamespace = true)) getOrElse default)
+      glob = ! RegexpQNames(e.resolveAttValueQName(MatcherProperty, unprefixedIsNoNamespace = true) getOrElse default)
     )
 
   def createElementWithText(name: String, text: String): Element =

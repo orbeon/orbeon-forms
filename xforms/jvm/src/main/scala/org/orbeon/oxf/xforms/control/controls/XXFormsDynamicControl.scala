@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
+import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.PartAnalysisImpl
-import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysisTreeBuilder, PartAnalysisImpl}
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA}
 import org.orbeon.oxf.xforms.control.Controls._
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl._
@@ -28,7 +29,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
-import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLContainer}
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.`type`.{Type => SaxonType}
@@ -38,6 +39,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
 import org.w3c.dom.Node.ELEMENT_NODE
+import shapeless.syntax.typeable._
 
 import scala.collection.JavaConverters._
 import scala.collection.generic.Growable
@@ -304,7 +306,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
           // withDynamicStateToRestore(DynamicState(componentControl).decodeInstancesControls) {
           withDynamicStateToRestore(InstancesControls(Nil, gatherRelevantSwitchState(componentControl))) {
             removeDynamicShadowTree(componentControl)
-            createOrUpdateStaticShadowTree(componentControl, Some(elemInSource))
+            createOrUpdateStaticShadowTree(componentControl, elemInSource.some)
             componentControl.recreateNestedContainer()
             updateDynamicShadowTree(componentControl)
           }
@@ -324,7 +326,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       val modelPrefixedId = partAnalysis.startScope.prefixedIdForStaticId(modelId)
       val staticModel = partAnalysis.getModel(modelPrefixedId)
 
-      staticModel.rebuildBinds(modelElement)
+      XBLBindingBuilder.rebuildBinds(staticModel, modelElement)
 
       // Q: When should we best notify the concrete model that its binds need build? Since at this point, we
       // are within a bindings update, it would be nice if the binds are rebuilt before nested controls are
@@ -412,12 +414,13 @@ object XXFormsDynamicControl {
       // Find first element whose prefixed id has a binding and return the mapping prefixedId -> element
       val all =
         for {
-          ancestor   <- ancestorsFromRoot
-          id         = ancestor.id
+          ancestor         <- ancestorsFromRoot
+          id               = ancestor.id
           if id.nonEmpty
-          prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
-          _          <- partAnalysis.getBinding(prefixedId)
-          if ! (isNodeLHHA && ancestor == node.getParent)
+          prefixedId       = partAnalysis.startScope.prefixedIdForStaticId(id)
+          control          <- partAnalysis.findControlAnalysis(prefixedId)
+          componentControl <- control.narrowTo[ComponentControl]
+          if componentControl.hasConcreteBinding && ! (isNodeLHHA && ancestor == node.getParent)
         } yield
           prefixedId -> unsafeUnwrapElement(ancestor)
 
@@ -464,11 +467,10 @@ object XXFormsDynamicControl {
 
     val doc             = componentControl.containingDocument
     val staticComponent = componentControl.staticControl
-    val part            = staticComponent.part
 
     // Update the shadow tree
     // Can return `None` if the binding does not have a template.
-    part.createOrUpdateShadowTree(staticComponent, elemInSource getOrElse staticComponent.element)
+    ElementAnalysisTreeBuilder.createOrUpdateStaticShadowTree(staticComponent, elemInSource)
 
     doc.addControlStructuralChange(componentControl.prefixedId)
   }

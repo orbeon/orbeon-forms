@@ -13,7 +13,7 @@
  */
 package org.orbeon.saxon.function;
 
-import org.orbeon.oxf.externalcontext.ExternalContext;
+import org.orbeon.oxf.externalcontext.URLRewriter$;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.saxon.expr.Expression;
@@ -56,7 +56,7 @@ public class RewriteServiceURI extends SystemFunction {
         return URLRewriterUtils.rewriteServiceURL(
             NetUtils.getExternalContext().getRequest(),
             uri,
-            absolute ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH
+            absolute ? URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE() : URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH()
         );
     }
 }

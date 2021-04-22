@@ -278,142 +278,144 @@
                             </xf:var>
                         </xsl:if>
 
-                        <!-- Only show this group if `show` is true and there are any visible errors -->
-                        <xf:group
-                            xxbl:scope="inner"
-                            id="ig"
-                            ref=".[
-                                data($state/show) and (
-                                    exists($visible-errors-for-section){
-                                        ' or exists($global-errors)'[exists($fr-errors)]
-                                    }
-                                )
-                            ]">
+                        <xh:span aria-live="polite">
+                            <!-- Only show this group if `show` is true and there are any visible errors -->
+                            <xf:group
+                                xxbl:scope="inner"
+                                id="ig"
+                                ref=".[
+                                    data($state/show) and (
+                                        exists($visible-errors-for-section){
+                                            ' or exists($global-errors)'[exists($fr-errors)]
+                                        }
+                                    )
+                                ]">
 
-                            <!-- Include optional header -->
-                            <xbl:content includes=":root > fr|header > *"/>
+                                <!-- Include optional header -->
+                                <xbl:content includes=":root > fr|header > *"/>
 
-                            <!-- Body of the error summary -->
-                            <xf:group class="fr-error-summary-body {{for $d in distinct-values(error/@level[. = ('error', 'warning', 'info')]/string()) return concat('fr-level-', $d)}}" id="body">
-                                <!-- Include optional fr:label into xf:label -->
-                                <xsl:for-each select="/*/fr:label[1]">
-                                    <xf:label xxbl:scope="outer" class="fr-error-title">
-                                        <xsl:copy-of select="@*|node()"/>
-                                    </xf:label>
-                                </xsl:for-each>
+                                <!-- Body of the error summary -->
+                                <xf:group class="fr-error-summary-body {{for $d in distinct-values(error/@level[. = ('error', 'warning', 'info')]/string()) return concat('fr-level-', $d)}}" id="body">
+                                    <!-- Include optional fr:label into xf:label -->
+                                    <xsl:for-each select="/*/fr:label[1]">
+                                        <xf:label xxbl:scope="outer" class="fr-error-title">
+                                            <xsl:copy-of select="@*|node()"/>
+                                        </xf:label>
+                                    </xsl:for-each>
 
-                                <!-- Global errors -->
-                                <xsl:for-each select="$fr-errors">
-                                    <xf:group ref=".[exists({@ref, @nodeset})]" xxbl:scope="outer">
+                                    <!-- Global errors -->
+                                    <xsl:for-each select="$fr-errors">
+                                        <xf:group ref=".[exists({@ref, @nodeset})]" xxbl:scope="outer">
+                                            <xh:ol class="fr-error-group">
+                                                <xf:repeat ref="{@ref, @nodeset}">
+                                                    <xsl:copy-of select="ancestor-or-self::*/namespace::*"/>
+                                                    <xh:li>
+                                                        <!-- Clickable / linkable label -->
+                                                        <xh:td class="fr-error-number"><xf:output value="position()"/></xh:td>
+                                                        <xh:td>
+                                                            <xsl:if test="exists(fr:label)">
+                                                                <xf:output class="fr-error-label">
+                                                                    <xsl:copy-of select="fr:label/(@*|node())"/>
+                                                                </xf:output>
+                                                            </xsl:if>
+                                                        </xh:td>
+                                                        <xh:td>
+                                                            <!-- Alert message -->
+                                                            <xsl:if test="exists(fr:alert)">
+                                                                <xf:output class="fr-error-alert fr-error-alert-error">
+                                                                    <xsl:copy-of select="fr:alert/(@*|node())"/>
+                                                                </xf:output>
+                                                            </xsl:if>
+                                                        </xh:td>
+                                                    </xh:li>
+                                                </xf:repeat>
+                                            </xh:ol>
+                                        </xf:group>
+                                    </xsl:for-each>
+
+                                    <!-- Controls errors -->
+                                    <xf:group ref=".[exists($visible-errors-for-section)]">
                                         <xh:ol class="fr-error-group">
-                                            <xf:repeat ref="{@ref, @nodeset}">
-                                                <xsl:copy-of select="ancestor-or-self::*/namespace::*"/>
-                                                <xh:li>
+                                            <xf:repeat ref="$visible-errors-for-section[position() le data($state/current-page-size)]" id="er">
+                                                <xh:li class="fr-level-{{@level}} fr-error-{{if (starts-with(@alert, '&lt;ul>')) then 'multiple' else 'single'}}">
                                                     <!-- Clickable / linkable label -->
-                                                    <xh:td class="fr-error-number"><xf:output value="position()"/></xh:td>
-                                                    <xh:td>
-                                                        <xsl:if test="exists(fr:label)">
-                                                            <xf:output class="fr-error-label">
-                                                                <xsl:copy-of select="fr:label/(@*|node())"/>
-                                                            </xf:output>
-                                                        </xsl:if>
-                                                    </xh:td>
-                                                    <xh:td>
-                                                        <!-- Alert message -->
-                                                        <xsl:if test="exists(fr:alert)">
-                                                            <xf:output class="fr-error-alert fr-error-alert-error">
-                                                                <xsl:copy-of select="fr:alert/(@*|node())"/>
-                                                            </xf:output>
-                                                        </xsl:if>
-                                                    </xh:td>
+                                                    <xf:var
+                                                        name="label-or-placeholder"
+                                                        value="
+                                                            if (xxf:non-blank(@label)) then
+                                                                concat(
+                                                                    '&lt;span class=&quot;fr-error-label&quot;>',
+                                                                    @label,
+                                                                    '&lt;/span>'
+                                                                )
+
+                                                            else
+                                                                '&lt;span/>'"/>
+                                                    <xf:var
+                                                        name="focusable"
+                                                        value="xxf:focusable(@id, true())"/>
+
+                                                    <xh:span class="fr-error-number"><xf:output value="position()"/></xh:span>
+                                                    <xf:switch caseref="$focusable" xxf:xforms11-switch="true">
+                                                        <xf:case value="true()">
+                                                            <xf:trigger appearance="minimal">
+                                                                <xf:label>
+                                                                    <xf:output
+                                                                        mediatype="text/html"
+                                                                        value="$label-or-placeholder"/>
+                                                                    <span class="fr-error-alert fr-error-alert-{{@level}}">
+                                                                        <xf:output
+                                                                            mediatype="text/html"
+                                                                            value="@alert"/>
+                                                                    </span>
+                                                                </xf:label>
+                                                                <xf:setfocus ev:event="DOMActivate" control="{{@id}}"/>
+                                                            </xf:trigger>
+                                                        </xf:case>
+                                                        <xf:case value="false()">
+                                                            <xf:output
+                                                                mediatype="text/html"
+                                                                value="$label-or-placeholder"/>
+                                                            <xf:output
+                                                                class="fr-error-alert fr-error-alert-{{@level}}"
+                                                                mediatype="text/html"
+                                                                value="@alert"/>
+                                                        </xf:case>
+                                                    </xf:switch>
                                                 </xh:li>
                                             </xf:repeat>
                                         </xh:ol>
+
+                                        <xf:trigger
+                                            ref=".[count($visible-errors-for-section) gt data($state/current-page-size)]"
+                                            appearance="minimal"
+                                            class="fr-show-more-errors">
+                                            <xf:label value="xxf:r('components.error-summary.show-more', '|fr-fr-resources|')"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                ref="$state/current-page-size"
+                                                value="data(.) + data($state/default-page-size)"/>
+                                        </xf:trigger>
+
+                                        <xf:trigger
+                                            ref=".[$state/current-page-size/data(.) gt $state/default-page-size/data(.)]"
+                                            appearance="minimal"
+                                            class="fr-show-less-errors">
+                                            <xf:label value="xxf:r('components.error-summary.show-less', '|fr-fr-resources|')"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                ref="$state/current-page-size"
+                                                value="max((data(.) - data($state/default-page-size), data($state/default-page-size)))"/>
+                                        </xf:trigger>
+
                                     </xf:group>
-                                </xsl:for-each>
-
-                                <!-- Controls errors -->
-                                <xf:group ref=".[exists($visible-errors-for-section)]">
-                                    <xh:ol class="fr-error-group">
-                                        <xf:repeat ref="$visible-errors-for-section[position() le data($state/current-page-size)]" id="er">
-                                            <xh:li class="fr-level-{{@level}} fr-error-{{if (starts-with(@alert, '&lt;ul>')) then 'multiple' else 'single'}}">
-                                                <!-- Clickable / linkable label -->
-                                                <xf:var
-                                                    name="label-or-placeholder"
-                                                    value="
-                                                        if (xxf:non-blank(@label)) then
-                                                            concat(
-                                                                '&lt;span class=&quot;fr-error-label&quot;>',
-                                                                @label,
-                                                                '&lt;/span>'
-                                                            )
-
-                                                        else
-                                                            '&lt;span/>'"/>
-                                                <xf:var
-                                                    name="focusable"
-                                                    value="xxf:focusable(@id, true())"/>
-
-                                                <xh:span class="fr-error-number"><xf:output value="position()"/></xh:span>
-                                                <xf:switch caseref="$focusable" xxf:xforms11-switch="true">
-                                                    <xf:case value="true()">
-                                                        <xf:trigger appearance="minimal">
-                                                            <xf:label>
-                                                                <xf:output
-                                                                    mediatype="text/html"
-                                                                    value="$label-or-placeholder"/>
-                                                                <span class="fr-error-alert fr-error-alert-{{@level}}">
-                                                                    <xf:output
-                                                                        mediatype="text/html"
-                                                                        value="@alert"/>
-                                                                </span>
-                                                            </xf:label>
-                                                            <xf:setfocus ev:event="DOMActivate" control="{{@id}}"/>
-                                                        </xf:trigger>
-                                                    </xf:case>
-                                                    <xf:case value="false()">
-                                                        <xf:output
-                                                            mediatype="text/html"
-                                                            value="$label-or-placeholder"/>
-                                                        <xf:output
-                                                            class="fr-error-alert fr-error-alert-{{@level}}"
-                                                            mediatype="text/html"
-                                                            value="@alert"/>
-                                                    </xf:case>
-                                                </xf:switch>
-                                            </xh:li>
-                                        </xf:repeat>
-                                    </xh:ol>
-
-                                    <xf:trigger
-                                        ref=".[count($visible-errors-for-section) gt data($state/current-page-size)]"
-                                        appearance="minimal"
-                                        class="fr-show-more-errors">
-                                        <xf:label value="xxf:r('components.error-summary.show-more', '|fr-fr-resources|')"/>
-                                        <xf:setvalue
-                                            event="DOMActivate"
-                                            ref="$state/current-page-size"
-                                            value="data(.) + data($state/default-page-size)"/>
-                                    </xf:trigger>
-
-                                    <xf:trigger
-                                        ref=".[$state/current-page-size/data(.) gt $state/default-page-size/data(.)]"
-                                        appearance="minimal"
-                                        class="fr-show-less-errors">
-                                        <xf:label value="xxf:r('components.error-summary.show-less', '|fr-fr-resources|')"/>
-                                        <xf:setvalue
-                                            event="DOMActivate"
-                                            ref="$state/current-page-size"
-                                            value="max((data(.) - data($state/default-page-size), data($state/default-page-size)))"/>
-                                    </xf:trigger>
-
                                 </xf:group>
+
+                                <!-- Include optional footer -->
+                                <xbl:content includes=":root > fr|footer > *"/>
+
                             </xf:group>
-
-                            <!-- Include optional footer -->
-                            <xbl:content includes=":root > fr|footer > *"/>
-
-                        </xf:group>
+                        </xh:span>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

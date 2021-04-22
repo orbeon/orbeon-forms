@@ -14,7 +14,7 @@
 package org.orbeon.oxf.http
 
 import java.io.OutputStream
-import java.net._
+import java.net.{HttpURLConnection, URL, URLDecoder}
 
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.io.CharsetNames
@@ -25,7 +25,7 @@ import scala.collection.mutable
 
 // Expose `ApacheHttpClient` as `HttpURLConnection`
 // 2019-12-13: No longer supports methods which set a body.
-class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends HttpURLConnection(url) {
+class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.http.client.CookieStore]) extends HttpURLConnection(url) {
 
   private val _requestHeaders = new mutable.LinkedHashMap[String, mutable.ListBuffer[String]]
 
@@ -35,7 +35,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
     if (_httpResponse.isEmpty)
       _httpResponse = {
 
-        def credentialsFromURL(url: URL): Option[Credentials] = {
+        def credentialsFromURL(url: URL): Option[BasicCredentials] = {
           url.getUserInfo.trimAllToOpt flatMap { userInfo =>
             // Set username and optional password specified on URL
             val separatorPosition = userInfo.indexOf(":")
@@ -53,7 +53,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient) extends Htt
             val passwordOpt = password.trimAllToOpt map (URLDecoder.decode(_, CharsetNames.Utf8))
 
             usernameOpt map { username =>
-              Credentials(username, passwordOpt, preemptiveAuth = true, None)
+              BasicCredentials(username, passwordOpt, preemptiveAuth = true, None)
             }
           }
         }

@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xml.dom
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.dom.{Document, Element}
 import org.xml.sax.Locator

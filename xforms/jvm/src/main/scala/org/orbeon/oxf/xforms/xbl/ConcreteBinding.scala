@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.orbeon.dom.{Document, Element, QName}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.xforms.xbl.Scope
 
@@ -21,19 +21,7 @@ import org.orbeon.xforms.xbl.Scope
 // NOTE: 2018-02-23: This is only created if the `AbstractBinding` has a template. Wondering if we should support components with
 // no templates (or creating an empty template in that case) so that we don't have to special-case bindings without templates.
 case class ConcreteBinding(
-  abstractBinding   : AbstractBinding,
-  innerScope        : Scope,             // each binding defines a new scope
-  outerScope        : Scope,             // this binding's outer scope
-  handlers          : Seq[Element],      // annotated event handler elements
-  models            : Seq[Element],      // annotated implementation model elements
-  templateTree      : SAXStore,          // template with relevant markup for output, including XHTML when needed
-  compactShadowTree : Document,          // without full content, only the XForms controls
-  boundElementAtts  : Map[QName, String] // attributes on the bound element
-) {
-  require(
-    abstractBinding.bindingId.isDefined,
-    s"missing id on XBL binding for ${abstractBinding.bindingElement.toDebugString}"
-  )
-
-  def bindingId = abstractBinding.bindingId.get
-}
+  innerScope       : Scope,             // each binding defines a new scope
+  templateTree     : SAXStore,          // template with relevant markup for output, including XHTML when needed
+  boundElementAtts : Map[QName, String] // attributes on the bound element
+)

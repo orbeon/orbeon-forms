@@ -16,7 +16,6 @@ package org.orbeon.oxf.http
 import java.io.IOException
 import java.net.{CookieStore => _, _}
 import java.security.KeyStore
-
 import javax.net.ssl.SSLContext
 import jcifs.ntlmssp.{Type1Message, Type2Message, Type3Message}
 import jcifs.util.Base64
@@ -40,16 +39,17 @@ import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.resources.URLFactory
 import org.slf4j.LoggerFactory
 
 
-class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
+class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieStore] {
 
   import Private._
 
   def connect(
     url         : String,
-    credentials : Option[Credentials],
+    credentials : Option[BasicCredentials],
     cookieStore : CookieStore,
     method      : HttpMethod,
     headers     : Map[String, List[String]],
@@ -88,9 +88,9 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
       credentialsProvider.setCredentials(
         new AuthScope(uri.getHost, uri.getPort),
         actualCredentials match {
-          case Credentials(username, passwordOpt, _, None) =>
+          case BasicCredentials(username, passwordOpt, _, None) =>
             new UsernamePasswordCredentials(username, passwordOpt getOrElse "")
-          case Credentials(username, passwordOpt, _, Some(domain)) =>
+          case BasicCredentials(username, passwordOpt, _, Some(domain)) =>
             new NTCredentials(username, passwordOpt getOrElse "", uri.getHost, domain)
         }
       )
@@ -175,7 +175,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
         ) toMap
 
       lazy val lastModified =
-        Headers.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
+        DateHeaders.firstDateHeaderIgnoreCase(headers, Headers.LastModified)
 
       lazy val content = StreamedContent.fromStreamAndHeaders(
         Option(response.getEntity) map (_.getContent) getOrElse EmptyInputStream,
@@ -266,7 +266,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
     val connectionManager: PoolingClientConnectionManager = {
 
       // Create SSL context, based on a custom key store if specified
-      val trustStore =
+      val keyStore =
         (settings.sslKeystoreURI, settings.sslKeystorePassword) match {
           case (Some(keyStoreURI), Some(keyStorePassword)) =>
 
@@ -274,7 +274,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
               settings.sslKeystoreType getOrElse KeyStore.getDefaultType
 
             val keyStore =
-              useAndClose(new URL(keyStoreURI).openStream) { is => // URL is typically local (file:, etc.)
+              useAndClose(URLFactory.createURL(keyStoreURI).openStream) { is => // URL is typically local (file:, etc.)
                 KeyStore.getInstance(keyStoreType) |!>
                   (_.load(is, keyStorePassword.toCharArray))
               }
@@ -295,14 +295,14 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient {
       val schemeRegistry = new SchemeRegistry
       schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory))
 
-      val sslSocketFactory = trustStore match {
-        case Some(trustStore) =>
+      val sslSocketFactory = keyStore match {
+        case Some(keyStore) =>
           // Calling full constructor
           new SSLSocketFactory(
             SSLSocketFactory.TLS,
-            trustStore._1,
-            trustStore._2,
-            trustStore._1,
+            keyStore._1,
+            keyStore._2,
+            null,
             null,
             null,
             hostnameVerifier

@@ -14,19 +14,18 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, Request}
-import org.orbeon.oxf.util.DateUtils._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{Document, SearchRequest}
+import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.scaxon.NodeConversions
 
-
-trait SearchResult extends SearchRequest {
+trait SearchResult extends SearchRequestParser {
 
   def outputResult(
-    request   : Request,
-    documents : List[Document],
-    count     : Int,
-    receiver  : XMLReceiver)
+                    request   : SearchRequest,
+                    documents : List[Document],
+                    count     : Int,
+                    receiver  : XMLReceiver)
   : Unit = {
 
     // Produce XML result
@@ -34,8 +33,8 @@ trait SearchResult extends SearchRequest {
       <documents search-total={count.toString}>{
         documents.map(doc =>
           <document
-            created        ={DateTime.print(doc.metadata.created.getTime)}
-            last-modified  ={DateTime.print(doc.metadata.lastModifiedTime.getTime)}
+            created        ={DateUtils.formatIsoDateTimeUtc(doc.metadata.created.getTime)}
+            last-modified  ={DateUtils.formatIsoDateTimeUtc(doc.metadata.lastModifiedTime.getTime)}
             workflow-stage ={doc.metadata.workflowStage.map(xml.Text(_))}
             name           ={doc.metadata.documentId}
             draft          ={doc.metadata.draft.toString}
@@ -60,7 +59,7 @@ trait SearchResult extends SearchRequest {
         )
       }</documents>
 
-    if (Logger.isDebugEnabled)
+    if (Logger.debugEnabled)
       Logger.logDebug("search result", documentsElem.toString)
 
     NodeConversions.elemToSAX(documentsElem, receiver)

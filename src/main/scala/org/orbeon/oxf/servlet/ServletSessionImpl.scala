@@ -14,6 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import javax.servlet.http.HttpSession
+import scala.collection.JavaConverters._
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
@@ -56,7 +57,13 @@ trait SessionListenerSupport {
 class ServletSessionImpl(protected val httpSession: HttpSession)
   extends SessionDelegate with SessionListenerSupport with ExternalContext.Session {
 
-  def getAttribute   (name: String,                scope: SessionScope) : Option[AnyRef] = Option(httpSession.getAttribute(name))
-  def setAttribute   (name: String, value: AnyRef, scope: SessionScope) : Unit           = httpSession.setAttribute(name, value)
-  def removeAttribute(name: String,                scope: SessionScope) : Unit           = httpSession.removeAttribute(name)
+  def getAttribute     (name: String,                scope: SessionScope) : Option[AnyRef] = Option(httpSession.getAttribute(name))
+  def setAttribute     (name: String, value: AnyRef, scope: SessionScope) : Unit           = httpSession.setAttribute(name, value)
+  def removeAttribute  (name: String,                scope: SessionScope) : Unit           = httpSession.removeAttribute(name)
+  def getAttributeNames(                             scope: SessionScope) : List[String]   = {
+    Option(httpSession.getAttributeNames) match {
+      case None        => List.empty // `getAttributeNames()` can return `null`
+      case Some(names) => names.asScala.toList
+    }
+  }
 }

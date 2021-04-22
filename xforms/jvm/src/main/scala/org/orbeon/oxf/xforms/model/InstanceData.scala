@@ -15,13 +15,13 @@ package org.orbeon.oxf.xforms.model
 
 import java.util
 
+import org.orbeon.datatypes.LocationData
 import org.orbeon.dom._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom.LocationData
 import org.orbeon.saxon.om._
 
 import scala.collection.JavaConverters._
@@ -55,8 +55,8 @@ object InstanceData {
   }
 
   private val ReadonlyLocalInstanceData: InstanceData = new InstanceData {
-    override def getRequired: Boolean = Model.DEFAULT_REQUIRED
-    override def getValid: Boolean = Model.DEFAULT_VALID
+    override def getRequired: Boolean = ModelDefs.DEFAULT_REQUIRED
+    override def getValid: Boolean = ModelDefs.DEFAULT_VALID
     override def getSchemaOrBindType: QName = null
     override def getInvalidBindIds: String = null
     override def getLocationData: LocationData = null
@@ -89,7 +89,7 @@ object InstanceData {
     if (nodeInfo.isInstanceOf[VirtualNode])
       getInheritedRelevant(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""))
     else if (nodeInfo ne null)
-      Model.DEFAULT_RELEVANT
+      ModelDefs.DEFAULT_RELEVANT
     else
       throw new OXFException("Cannot get relevant Model Item Property on null object.")
 
@@ -99,7 +99,7 @@ object InstanceData {
       val currentInstanceData = getLocalInstanceData(currentNode)
       val currentRelevant =
         if (currentInstanceData eq null)
-          Model.DEFAULT_RELEVANT
+          ModelDefs.DEFAULT_RELEVANT
         else
           currentInstanceData.getLocalRelevant
       if (! currentRelevant)
@@ -112,7 +112,7 @@ object InstanceData {
   def getLocalRelevant(node: Node): Boolean = {
     val currentInstanceData = getLocalInstanceData(node)
     if (currentInstanceData eq null)
-      Model.DEFAULT_RELEVANT
+      ModelDefs.DEFAULT_RELEVANT
     else
       currentInstanceData.getLocalRelevant
   }
@@ -120,7 +120,7 @@ object InstanceData {
   def getRequired(nodeInfo: NodeInfo): Boolean = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     if (existingInstanceData eq null)
-      Model.DEFAULT_REQUIRED
+      ModelDefs.DEFAULT_REQUIRED
     else
       existingInstanceData.getRequired
   }
@@ -128,7 +128,7 @@ object InstanceData {
   def getRequired(node: Node): Boolean = {
     val existingInstanceData = getLocalInstanceData(node)
     if (existingInstanceData eq null)
-      Model.DEFAULT_REQUIRED
+      ModelDefs.DEFAULT_REQUIRED
     else
       existingInstanceData.getRequired
   }
@@ -147,7 +147,7 @@ object InstanceData {
       val currentInstanceData = getLocalInstanceData(currentNode)
       val currentReadonly =
         if (currentInstanceData eq null)
-          Model.DEFAULT_READONLY
+          ModelDefs.DEFAULT_READONLY
         else
           currentInstanceData.getLocalReadonly
       if (currentReadonly)
@@ -160,7 +160,7 @@ object InstanceData {
   def getValid(nodeInfo: NodeInfo): Boolean = {
     val existingInstanceData = getLocalInstanceData(nodeInfo, forUpdate = false)
     if (existingInstanceData eq null)
-      Model.DEFAULT_VALID
+      ModelDefs.DEFAULT_VALID
     else
       existingInstanceData.getValid
   }
@@ -168,7 +168,7 @@ object InstanceData {
   def getValid(node: Node): Boolean = {
     val existingInstanceData = getLocalInstanceData(node)
     if (existingInstanceData eq null)
-      Model.DEFAULT_VALID
+      ModelDefs.DEFAULT_VALID
     else
       existingInstanceData.getValid
   }
@@ -232,7 +232,7 @@ object InstanceData {
     }
     node match {
       case elem: Element =>
-        elem.resolveAttValueQName(XMLConstants.XSI_TYPE_QNAME, unprefixedIsNoNamespace = false) // TODO: should pass true?
+        elem.resolveAttValueQName(XMLConstants.XSI_TYPE_QNAME, unprefixedIsNoNamespace = false).orNull // TODO: should pass true?
       case _ =>
         null
     }
@@ -396,31 +396,31 @@ class InstanceData private () {
   private def getLocalRelevant: Boolean = {
     if ((bindNodes ne null) && bindNodes.size > 0) {
       for (bindNode <- bindNodes.asScala) {
-        if (bindNode.relevant != Model.DEFAULT_RELEVANT)
-          return ! Model.DEFAULT_RELEVANT
+        if (bindNode.relevant != ModelDefs.DEFAULT_RELEVANT)
+          return ! ModelDefs.DEFAULT_RELEVANT
       }
     }
-    Model.DEFAULT_RELEVANT
+    ModelDefs.DEFAULT_RELEVANT
   }
 
   private def getLocalReadonly: Boolean = {
     if ((bindNodes ne null) && bindNodes.size > 0) {
       for (bindNode <- bindNodes.asScala) {
-        if (bindNode.readonly != Model.DEFAULT_READONLY)
-          return ! Model.DEFAULT_READONLY
+        if (bindNode.readonly != ModelDefs.DEFAULT_READONLY)
+          return ! ModelDefs.DEFAULT_READONLY
       }
     }
-    Model.DEFAULT_READONLY
+    ModelDefs.DEFAULT_READONLY
   }
 
   def getRequired: Boolean = {
     if ((bindNodes ne null) && bindNodes.size > 0) {
       for (bindNode <- bindNodes.asScala) {
-        if (bindNode.required != Model.DEFAULT_REQUIRED)
-          return ! Model.DEFAULT_REQUIRED
+        if (bindNode.required != ModelDefs.DEFAULT_REQUIRED)
+          return ! ModelDefs.DEFAULT_REQUIRED
       }
     }
-    Model.DEFAULT_REQUIRED
+    ModelDefs.DEFAULT_REQUIRED
   }
 
   def getValid: Boolean = {
@@ -428,11 +428,11 @@ class InstanceData private () {
       return false
     if ((bindNodes ne null) && bindNodes.size > 0) {
       for (bindNode <- bindNodes.asScala) {
-        if (bindNode.valid != Model.DEFAULT_VALID)
-          return ! Model.DEFAULT_VALID
+        if (bindNode.valid != ModelDefs.DEFAULT_VALID)
+          return ! ModelDefs.DEFAULT_VALID
       }
     }
-    Model.DEFAULT_VALID
+    ModelDefs.DEFAULT_VALID
   }
 
   private def collectAllClientCustomMIPs: Map[String, String] =
@@ -451,7 +451,7 @@ class InstanceData private () {
     var sb: java.lang.StringBuilder = null
     if ((bindNodes ne null) && ! bindNodes.isEmpty) {
       for (bindNode <- bindNodes.asScala) {
-        if (bindNode.valid != Model.DEFAULT_VALID) {
+        if (bindNode.valid != ModelDefs.DEFAULT_VALID) {
           if (sb eq null)
             sb = new java.lang.StringBuilder
           else if (sb.length > 0)

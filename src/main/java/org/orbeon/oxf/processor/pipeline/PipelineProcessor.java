@@ -32,8 +32,9 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.ExtendedLocationData;
+import org.orbeon.datatypes.LocationData;
+import org.orbeon.oxf.xml.dom.XmlExtendedLocationData;
 
 import java.util.*;
 
@@ -209,7 +210,7 @@ public class PipelineProcessor extends ProcessorImpl {
 
                 // Set info on processor
                 processor.setId(processorCall.getId());
-                processor.setLocationData(new ExtendedLocationData(processorLocationData,
+                processor.setLocationData(XmlExtendedLocationData.apply(processorLocationData,
                         "executing processor", (Element) processorCall.getNode(),
                         new String[] { "name", processorNameOrURI }));
 
@@ -507,7 +508,7 @@ public class PipelineProcessor extends ProcessorImpl {
                     params = null;
                 }
 
-                processorInputOutput.setLocationData(new ExtendedLocationData(locationData,
+                processorInputOutput.setLocationData(XmlExtendedLocationData.apply(locationData,
                         description, (Element) astNodeContainer.getNode(), params));
             }
         }

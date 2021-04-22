@@ -20,9 +20,9 @@ import org.orbeon.oxf.xforms.analysis.XPathAnalysis.ConstantXPathAnalysis
 
 trait MatchSimpleAnalysis {
   def matchSimpleAnalysis(pathMap: PathMap, analysisOption: Option[ElementAnalysis]): PathMapNodeSet = analysisOption match {
-    case Some(element) if element.getBindingAnalysis.isDefined && element.getBindingAnalysis.get.figuredOutDependencies =>
+    case Some(element) if element.bindingAnalysis.isDefined && element.bindingAnalysis.get.figuredOutDependencies =>
       // Clone the PathMap first because the nodes returned must belong to this PathMap
-      element.getBindingAnalysis.get match {
+      element.bindingAnalysis.get match {
         case bindingAnalysis: PathMapXPathAnalysis =>
           val clonedContextPathMap = bindingAnalysis.pathmap.get.clone
           pathMap.addRoots(clonedContextPathMap.getPathMapRoots)

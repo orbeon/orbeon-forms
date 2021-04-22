@@ -54,7 +54,7 @@ trait XFormsStaticState {
   def staticIntProperty    (name: String)     : Int
 
   def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression]
-  def clientNonDefaultProperties              : Map[String, AnyRef]
+  def clientNonDefaultProperties              : Map[String, Any]
 
   def writeAnalysis(implicit receiver: XMLReceiver): Unit
 }

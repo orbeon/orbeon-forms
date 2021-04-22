@@ -26,7 +26,7 @@ import org.orbeon.oxf.util.ContentTypes;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.datatypes.LocationData;
 
 import java.net.URL;
 import java.util.Iterator;

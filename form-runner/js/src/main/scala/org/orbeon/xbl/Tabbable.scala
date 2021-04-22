@@ -29,7 +29,7 @@ object Tabbable {
 
   val ActiveClass                  = "active"
 
-  val ExcludeRepeatClassesSelector = ":not(.xforms-repeat-delimiter):not(.xforms-repeat-begin-end)"
+  val ExcludeRepeatClassesSelector = ":not(.xforms-repeat-delimiter):not(.xforms-repeat-begin-end):not(.fr-tabbable-add)"
   val NavTabsSelector              = ".nav-tabs"
   val TabPaneSelector              = ".tab-pane"
   val TabContentSelector           = ".tab-content"
@@ -144,7 +144,7 @@ object Tabbable {
         $(containerElem).on("click.tabbable.data-api", "[data-toggle = 'tabbable']", {
           (bound: html.Element, e: JQueryEventObject) => {
 
-            e.preventDefault()  // don"t allow anchor navigation
+            e.preventDefault()  // don't allow anchor navigation
             e.stopPropagation() // prevent ancestor tab handlers from running
 
             val newLi = $(bound).parent(ExcludeRepeatClassesSelector)

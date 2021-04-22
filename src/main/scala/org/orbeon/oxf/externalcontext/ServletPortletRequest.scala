@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.externalcontext
 
+import scala.collection.JavaConverters._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.webapp._
@@ -21,11 +22,19 @@ object ServletPortletRequest {
 
   private val CredentialsSessionKey = "org.orbeon.auth.credentials"
 
-  def findCredentialsInSession(session: SessionFacade): Option[Credentials] = // portlet/servlet session
-     collectByErasedType[Credentials](session.getAttribute(CredentialsSessionKey))
+  def findCredentialsInSession(session: ExternalContext.Session): Option[Credentials] =
+    session.getAttribute(CredentialsSessionKey).map(_.asInstanceOf[Credentials])
 
-   def storeCredentialsInSession(session: SessionFacade, credentials: Credentials): Unit =
-    session.setAttribute(CredentialsSessionKey, credentials)
+  def storeCredentialsInSession(
+    session        : ExternalContext.Session,
+    credentialsOpt : Option[Credentials]
+  ): Unit = {
+    credentialsOpt match {
+      case Some(credentials) => session.setAttribute(CredentialsSessionKey, credentials)
+      case None              => session.removeAttribute(CredentialsSessionKey)
+    }
+  }
+
 }
 
 // Implementations shared between ServletExternalContext and Portlet2ExternalContext.

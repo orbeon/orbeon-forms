@@ -13,34 +13,43 @@
  */
 package org.orbeon.oxf.fr
 
-import java.io.File
-import java.net.URI
-import java.{util => ju}
-
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.io.UriScheme
+import org.orbeon.scaxon
+import org.orbeon.dom.QName
+import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner.properties
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.pipeline.api.FunctionLibrary
+import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
+import java.io.File
+import java.net.URI
+import java.{util => ju}
 import scala.collection.JavaConverters._
-import scala.util.control.NonFatal
+
 
 sealed trait FormOrData extends EnumEntry with Lowercase
 
@@ -89,6 +98,7 @@ object DataFormatVersion extends Enum[DataFormatVersion] {
 object FormRunnerPersistence {
 
   val DataFormatVersionName               = "data-format-version"
+  val FormDefinitionFormatVersionName     = "form-definition-format-version"
   val PruneMetadataName                   = "prune-metadata"
   val ShowProgressName                    = "show-progress"
   val FormTargetName                      = "formtarget"
@@ -180,6 +190,34 @@ object FormRunnerPersistence {
           s"`${fullProviderPropertyName(provider, DataFormatVersionName)}` property is set to `$dataFormatVersionString` but must be one of ${DataFormatVersion.values map (_.entryName) mkString ("`", "`, `", "`")}"
         )
     }
+  }
+
+  def findFormDefinitionFormatFromStringVersions(versions: collection.Seq[String]): Option[DataFormatVersion] = {
+
+    val allDistinctVersionsPassed = (
+        versions         flatMap
+        (_.trimAllToOpt) flatMap
+        common.Version.majorMinor
+      ).distinct
+
+    val maxVersionPassedOpt =
+      allDistinctVersionsPassed.nonEmpty option allDistinctVersionsPassed.max
+
+    import scala.math.Ordering.Implicits._
+
+    val allPossibleDataFormatsPairs =
+      for {
+        value <- DataFormatVersion.values
+        mm    <- common.Version.majorMinor(value.entryName)
+      } yield
+        value -> mm
+
+    val closestPair =
+      maxVersionPassedOpt flatMap { maxVersionInMetadata =>
+        allPossibleDataFormatsPairs.filter(_._2 <= maxVersionInMetadata).lastOption
+      }
+
+    closestPair map (_._1)
   }
 
   private def fullProviderPropertyName(provider: String, property: String) =
@@ -284,7 +322,9 @@ trait FormRunnerPersistence {
   // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
   def readDocument(urlString: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext          = NetUtils.getExternalContext
+    implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+
     val request = externalContext.getRequest
 
     val rewrittenURLString =
@@ -305,16 +345,15 @@ trait FormRunnerPersistence {
       Connection.getHeaderFromRequest(request)
     )
 
-    val cxr = Connection(
+    val cxr = Connection.connectNow(
       method      = GET,
       url         = url,
       credentials = None,
       content     = None,
       headers     = headers,
       loadState   = true,
+      saveState   = true,
       logBody     = false
-    ).connect(
-      saveState = true
     )
 
     // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the test
@@ -359,7 +398,7 @@ trait FormRunnerPersistence {
   // Return all nodes which refer to data attachments
   //@XPathFunction
   def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String): ju.List[NodeInfo] =
-    collectAttachments(data.getDocumentRoot, fromBasePath, fromBasePath, forceAttachments = true)._1.asJava
+    collectAttachments(data.getDocumentRoot, fromBasePath, fromBasePath, forceAttachments = true).map(_.holder).asJava
 
   //@XPathFunction
   def clearMissingUnsavedDataAttachmentReturnFilenamesJava(data: NodeInfo): ju.List[String] = {
@@ -372,7 +411,7 @@ trait FormRunnerPersistence {
           // NOTE: `basePath` is not relevant in our use of `collectAttachments` here, but
           // we don't just want to pass a magic string in. So we still compute `basePath`.
           val basePath = createFormDataBasePath(app, form, isDraft = false, documentId)
-          collectAttachments(data.getDocumentRoot, basePath, basePath, forceAttachments = false)._1
+          collectAttachments(data.getDocumentRoot, basePath, basePath, forceAttachments = false).map(_.holder)
         case _ =>
           Nil
       }
@@ -396,14 +435,20 @@ trait FormRunnerPersistence {
     filenames flatMap (_.trimAllToOpt) asJava
   }
 
+  case class AttachmentWithHolder(
+    fromPath          : String,
+    toPath            : String,
+    holder            : NodeInfo
+  )
+
   def collectAttachments(
     data             : DocumentInfo,
     fromBasePath     : String,
     toBasePath       : String,
     forceAttachments : Boolean
-  ): (Seq[NodeInfo], Seq[String], Seq[String]) = (
+  ): List[AttachmentWithHolder] = {
     for {
-      holder        <- data descendant Node
+      holder        <- data.descendant(Node).toList
       if holder.isAttribute || holder.isElement && ! holder.hasChildElement
       beforeURL     = holder.stringValue.trimAllToEmpty
       isUploaded    = isUploadedFileURL(beforeURL)
@@ -424,9 +469,9 @@ trait FormRunnerPersistence {
       val afterURL =
         toBasePath + filename
 
-      (holder, beforeURL, afterURL)
+      AttachmentWithHolder(beforeURL, afterURL, holder)
     }
-  ).unzip3
+  }
 
   def putWithAttachments(
     data              : DocumentInfo,
@@ -446,34 +491,29 @@ trait FormRunnerPersistence {
     val migratedData = migrate(data)
 
     // Find all instance nodes containing file URLs we need to upload
-    val (uploadHolders, beforeURLs, afterURLs) =
-      collectAttachments(migratedData, fromBasePath, toBasePath, forceAttachments)
+    val attachmentsWithHolder  = collectAttachments(migratedData, fromBasePath, toBasePath, forceAttachments)
+
+    def updateHolder(holder: NodeInfo, afterURL: String): Unit =
+      setvalue(holder, afterURL)
 
     def saveAllAttachments(): Unit = {
-      val holdersAfterURLs = uploadHolders.zip(afterURLs)
-      holdersAfterURLs foreach { case (holder, resource) =>
-        // Copy holder, so we're not blocked in case there are other background uploads
-        val holderCopy = TransformerUtils.extractAsMutableDocument(holder).rootElement
+
+      attachmentsWithHolder.foreach { case AttachmentWithHolder(beforeURL, afterURL, migratedHolder) =>
+        // Copy holder, so we're not blocked in case there are other background uploads; TODO: check if still needed
+        val holderCopy   = TransformerUtils.extractAsMutableDocument(migratedHolder).rootElement
+        val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
         sendThrowOnError("fr-create-update-attachment-submission", Map(
-          "holder" -> Some(holderCopy),
-          "resource" -> Some(PathUtils.appendQueryString(toBaseURI + resource, commonQueryString)),
-          "username" -> username,
-          "password" -> password,
-          "form-version" -> formVersion
-        )
-        )
+          "holder"         -> Some(holderCopy),
+          "path-to-holder" -> Some(pathToHolder),
+          "resource"       -> Some(PathUtils.appendQueryString(toBaseURI + afterURL, commonQueryString)),
+          "username"       -> username,
+          "password"       -> password,
+          "form-version"   -> formVersion)
+        ).foreach { _ =>
+          updateHolder(migratedHolder, afterURL)
+        }
       }
     }
-
-    def updateAttachmentPaths() =
-      uploadHolders zip afterURLs foreach { case (holder, resource) =>
-        setvalue(holder, resource)
-      }
-
-    def rollbackAttachmentPaths() =
-      uploadHolders zip beforeURLs foreach { case (holder, resource) =>
-        setvalue(holder, resource)
-      }
 
     def saveXmlData(migratedData: DocumentInfo) =
       sendThrowOnError("fr-create-update-submission", Map(
@@ -485,40 +525,48 @@ trait FormRunnerPersistence {
         "workflow-stage" -> workflowStage
       ))
 
-    // First process attachments
+    // First upload the attachments
     saveAllAttachments()
 
     val versionOpt =
-      try {
+      // Save and try to retrieve returned version
+      for {
+        done     <- saveXmlData(migratedData) // https://github.com/orbeon/orbeon-forms/issues/3629
+        headers  <- done.headers
+        versions <- headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion => values }
+        version  <- versions.headOption
+      } yield
+        version
 
-        // Before saving data, update attachment paths
-        updateAttachmentPaths()
+    // In our persistence implementation, we do not remove attachments if saving the data fails.
+    // However, some custom persistence implementations do. So we don't think we can assume that
+    // attachments have been saved. So we only update the attachment paths in the data after all
+    // the attachments have been successfully uploaded. This will cause attachments to be saved again
+    // even if they actually have already been saved. It is not ideal, but will not lead to data loss.
+    //
+    // See also:
+    // - https://github.com/orbeon/orbeon-forms/issues/606
+    // - https://github.com/orbeon/orbeon-forms/issues/3084
+    // - https://github.com/orbeon/orbeon-forms/issues/3301
 
-        // Save and try to retrieve returned version
-        for {
-          done     <- saveXmlData(migratedData) // https://github.com/orbeon/orbeon-forms/issues/3629
-          headers  <- done.headers
-          versions <- headers collectFirst { case (name, values) if name equalsIgnoreCase OrbeonFormDefinitionVersion => values }
-          version  <- versions.headOption
-        } yield
-          version
+    attachmentsWithHolder.foreach {
+      case AttachmentWithHolder(beforeURL, afterURL, _) =>
+        val holder = {
+          scaxon.XPath.evalOne(
+            item       = data,
+            expr       = "//*[not(*)][xxf:trim() = $beforeURL]",
+            namespaces = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+            variables  = Map("beforeURL" -> new StringValue(beforeURL))
+          )(XFormsFunctionLibrary).asInstanceOf[NodeInfo]
+        }
+        updateHolder(holder, afterURL)
+    }
 
-      } catch {
-        case NonFatal(e) =>
-          // In our persistence implementation, we do not remove attachments if saving the data fails.
-          // However, some custom persistence implementations do. So we don't think we can assume that
-          // attachments have been saved. So we rollback attachment paths in the data in this case.
-          // This will cause attachments to be saved again even if they actually have already been saved.
-          // It is not ideal, but will not lead to data loss. See also:
-          //
-          // - https://github.com/orbeon/orbeon-forms/issues/606
-          // - https://github.com/orbeon/orbeon-forms/issues/3084
-          // - https://github.com/orbeon/orbeon-forms/issues/3301
-          rollbackAttachmentPaths()
-          throw e
-      }
-
-    (beforeURLs, afterURLs, versionOpt map (_.toInt) getOrElse 1)
+    (
+      attachmentsWithHolder.map(_.fromPath),
+      attachmentsWithHolder.map(_.toPath),
+      versionOpt map (_.toInt) getOrElse 1
+    )
   }
 
   def userOwnsLeaseOrNoneRequired: Boolean =

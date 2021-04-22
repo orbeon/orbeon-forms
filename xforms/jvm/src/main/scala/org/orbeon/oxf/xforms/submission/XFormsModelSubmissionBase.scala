@@ -16,27 +16,25 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.analysis.model.Model.Relevant
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel
-import org.orbeon.oxf.xforms.analysis.model.ValidationLevel._
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs.Relevant
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
 import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventTarget}
 import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.{Extensions, IOSupport}
+import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode}
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import shapeless.syntax.typeable._
 
-import scala.collection.JavaConverters._
-import scala.collection.compat._
 import scala.collection.mutable
 
 abstract class XFormsModelSubmissionBase
@@ -47,12 +45,12 @@ abstract class XFormsModelSubmissionBase
 
   import XFormsModelSubmissionBase._
 
-  def getModel: XFormsModel
+  def model: XFormsModel
 
   protected def sendSubmitError(throwable: Throwable, submissionResult: SubmissionResult): Unit =
     sendSubmitErrorWithDefault(
       throwable,
-      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, submissionResult.connectionResult)
+      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, submissionResult.result.toOption map (_._2))
     )
 
   protected def sendSubmitError(throwable: Throwable, resolvedActionOrResource: String): Unit =
@@ -64,7 +62,7 @@ abstract class XFormsModelSubmissionBase
   private def sendSubmitErrorWithDefault(throwable: Throwable, default: => XFormsSubmitErrorEvent): Unit = {
 
     // After a submission, the context might have changed
-    getModel.resetAndEvaluateVariables()
+    model.resetAndEvaluateVariables()
 
     // Try to get error event from exception and if not possible create default event
     val submitErrorEvent =
@@ -102,7 +100,7 @@ abstract class XFormsModelSubmissionBase
         xfcd              = containingDocument,
         ref               = currentNodeInfo,
         relevanceHandling = relevanceHandling,
-        namespaceContext  = getSubmissionElement.allInScopeNamespacesAsStrings,
+        namespaceContext  = staticSubmission.element.allInScopeNamespacesAsStrings,
         annotateWith      = annotateWith,
         relevantAttOpt    = relevantAttOpt
       )
@@ -116,15 +114,15 @@ abstract class XFormsModelSubmissionBase
       isSatisfiesValidity(documentToSubmit, relevanceHandling)
 
     if (! instanceSatisfiesValidRequired) {
-      if (indentedLogger.isDebugEnabled) {
-        val documentString = TransformerUtils.tinyTreeToString(currentNodeInfo)
-        indentedLogger.logDebug("", "instance document or subset thereof cannot be submitted", "document", documentString)
-      }
+      debug(
+        "instance document or subset thereof cannot be submitted",
+        List("document" -> TransformerUtils.tinyTreeToString(currentNodeInfo))
+      )
       throw new XFormsSubmissionException(
         submission       = thisSubmission,
         message          = "xf:submission: instance to submit does not satisfy valid and/or required model item properties.",
         description      = "checking instance validity",
-        submitErrorEvent = new XFormsSubmitErrorEvent(thisSubmission, ErrorType.ValidationError, null)
+        submitErrorEvent = new XFormsSubmitErrorEvent(thisSubmission, ErrorType.ValidationError, None)
       )
     }
 
@@ -170,7 +168,7 @@ object XFormsModelSubmissionBase {
             decodeSimpleQuery(token).headOption match {
               case Some((name, value)) =>
                 name -> {
-                  value.trimAllToOpt map
+                  value.trimAllToOpt flatMap
                     (Extensions.resolveQName(namespaceContext, _, unprefixedIsNoNamespace = true)) getOrElse
                     QName(name, XXFORMS_NAMESPACE_SHORT)
                 }
@@ -195,7 +193,7 @@ object XFormsModelSubmissionBase {
           doc              = copy,
           levelsToAnnotate =
             attributeNamesForTokens.keySet collect
-              LevelByName                  map { level =>
+              ValidationLevel.LevelByName  map { level =>
                 level -> attributeNamesForTokens(level.entryName)
             } toMap
         )
@@ -371,23 +369,20 @@ object XFormsModelSubmissionBase {
     }
 
   def logInvalidNode(node: Node)(implicit indentedLogger: IndentedLogger): Unit =
-    if (indentedLogger.isDebugEnabled)
+    if (indentedLogger.debugEnabled)
       node match {
         case e: Element =>
-            indentedLogger.logDebug(
-              "",
+            debug(
               "found invalid node",
-              "element name",
-              e.toDebugString
+              List("element name" -> e.toDebugString)
             )
         case a: Attribute =>
-          indentedLogger.logDebug(
-            "",
+          debug(
             "found invalid attribute",
-            "attribute name",
-            a.toDebugString,
-            "parent element",
-            a.getParent.toDebugString
+            List(
+              "attribute name" -> a.toDebugString,
+              "parent element" -> a.getParent.toDebugString
+            )
           )
         case _ =>
           throw new IllegalArgumentException
@@ -400,12 +395,12 @@ object XFormsModelSubmissionBase {
   ): Option[String] =
       xformsSerialization flatMap  (_.trimAllToOpt) orElse defaultSerialization(xformsMethod, httpMethod)
 
-  def getRequestedSerializationOrNull(
+  def getRequestedSerialization(
     xformsSerialization : Option[String],
     xformsMethod        : String,
     httpMethod          : HttpMethod
-  ): String =
-    requestedSerialization(xformsSerialization, xformsMethod, httpMethod).orNull
+  ): Option[String] =
+    requestedSerialization(xformsSerialization, xformsMethod, httpMethod)
 
   private object Private {
 
@@ -436,8 +431,8 @@ object XFormsModelSubmissionBase {
         if (isLocallyNonRelevant(e)) {
           List(e)
         } else {
-          e.jAttributes.asScala.filter(isLocallyNonRelevant) ++:
-            e.jElements.asScala.to(List).flatMap(processElement)
+          e.attributes.filter(isLocallyNonRelevant) ++:
+            e.elements.toList.flatMap(processElement)
         }
 
       processElement(doc.getRootElement) foreach (_.detach())
@@ -459,7 +454,7 @@ object XFormsModelSubmissionBase {
           (_.setValue(""))
 
         if (e.containsElement)
-          e.jElements.asScala foreach (processElement(_, elemNonRelevant))
+          e.elements foreach (processElement(_, elemNonRelevant))
         else if (elemNonRelevant)
           e.setText("")
       }
@@ -479,7 +474,7 @@ object XFormsModelSubmissionBase {
           removeNestedAnnotations(e, relevantAnnotationAttQName, includeSelf = false)
         } else {
           e.removeAttribute(relevantAnnotationAttQName)
-          e.jElements.asScala foreach processElem
+          e.elements foreach processElem
         }
 
       processElem(doc.getRootElement)
@@ -489,13 +484,13 @@ object XFormsModelSubmissionBase {
 
       def processElem(e: Element): Unit = {
         e.removeAttribute(attQname)
-        e.jElements.asScala foreach processElem
+        e.elements foreach processElem
       }
 
       if (includeSelf)
         processElem(startElem)
       else
-        startElem.jElements.asScala foreach processElem
+        startElem.elements foreach processElem
     }
 
     def findFirstElementOrAttributeWith(startNode: Node, check: Node => Boolean): Option[Node] = {
@@ -509,10 +504,10 @@ object XFormsModelSubmissionBase {
         startNode.accept(
           new VisitorSupport {
 
-            override def visit(element: Element)     = checkNodeAndBreakIfFail(element)
-            override def visit(attribute: Attribute) = checkNodeAndBreakIfFail(attribute)
+            override def visit(element: Element)    : Unit = checkNodeAndBreakIfFail(element)
+            override def visit(attribute: Attribute): Unit = checkNodeAndBreakIfFail(attribute)
 
-            def checkNodeAndBreakIfFail(node: Node) =
+            def checkNodeAndBreakIfFail(node: Node): Unit =
               if (check(node)) {
                 foundNode = node
                 break()

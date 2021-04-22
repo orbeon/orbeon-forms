@@ -206,7 +206,7 @@ object APISupport {
     val cx = connectURL(requestDetails)
 
     val redirectOrContent =
-      if (isRedirectCode(cx.statusCode)) {
+      if (StatusCode.isRedirectCode(cx.statusCode)) {
         // https://github.com/orbeon/orbeon-forms/issues/2967
         val location = cx.headers("Location").head
         Redirect(location, exitPortal = urlHasProtocol(location))

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import org.orbeon.oxf.xforms.analysis.ElementAnalysisTreeXPathAnalyzer
 import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr._
@@ -38,7 +38,7 @@ class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
       case Some(repeatIdExpression: StringLiteral) =>
         // Argument is literal and we have a context to ask
         pathMap.getPathMapContext match {
-          case context: SimpleElementAnalysis#SimplePathMapContext =>
+          case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext =>
             // Get PathMap for context id
             matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(repeatIdExpression.getStringValue))
           case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
@@ -46,7 +46,7 @@ class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
       case None =>
         // Argument is not specified, ask PathMap for the result
         pathMap.getPathMapContext match {
-          case context: SimpleElementAnalysis#SimplePathMapContext =>
+          case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext =>
             // Get PathMap for context id
             matchSimpleAnalysis(pathMap, context.getInScopeRepeat)
           case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")

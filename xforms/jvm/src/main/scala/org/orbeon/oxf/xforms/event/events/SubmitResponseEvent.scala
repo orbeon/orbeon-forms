@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.apache.log4j.Level
+import org.log4s
+import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.resources.URLFactory
@@ -26,6 +27,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om._
+import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.collection.immutable
 import scala.util.Try
@@ -35,7 +37,7 @@ import scala.util.control.NonFatal
 trait SubmitResponseEvent extends XFormsEvent {
 
   def connectionResult: Option[ConnectionResult]
-  final def headers = connectionResult map (_.headers)
+  final def headers: Option[Map[String, List[String]]] = connectionResult map (_.headers)
 
   // For a given event, temporarily keep a reference to the body so that it's possible to call
   // `event('response-body')` multiple times.
@@ -97,7 +99,7 @@ private object SubmitResponseEvent {
 
   private def tryToReadBody(cxr: ConnectionResult)(implicit logger: IndentedLogger): Option[String Either DocumentInfo] = {
     // Log response details if not done already
-    cxr.logResponseDetailsOnce(Level.ERROR)
+    cxr.logResponseDetailsOnce(log4s.Error)
 
     if (cxr.hasContent) {
 
@@ -120,11 +122,9 @@ private object SubmitResponseEvent {
       // as XML then as text.
       val tempURIOpt =
         try {
-          useAndClose(cxr.content.inputStream) { is =>
-            Option(NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.getLogger))
-          }
+          CrossPlatformSupport.inputStreamToRequestUri(cxr.content.inputStream)
         } catch {
-          warn("error while reading response body.")
+          warn("error while reading response body")
         }
 
       tempURIOpt flatMap { tempURI =>
@@ -142,7 +142,7 @@ private object SubmitResponseEvent {
 
         def tryText: Try[String Either DocumentInfo]  =
           Try {
-            Left(ConnectionResult.readStreamAsText(URLFactory.createURL(tempURI).openStream(), cxr.charset))
+            Left(IOUtils.readStreamAsStringAndClose(URLFactory.createURL(tempURI).openStream(), cxr.charset))
           }
 
         def asString(value: String Either DocumentInfo) = value match {

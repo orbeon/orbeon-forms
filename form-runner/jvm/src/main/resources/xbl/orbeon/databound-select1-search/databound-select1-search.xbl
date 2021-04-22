@@ -57,6 +57,7 @@
             <display-name lang="sv" todo="true">[With Search]</display-name>
             <display-name lang="pt" todo="true">[With Search]</display-name>
             <toolbox show="false"/>
+            <form-settings show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-search</icon-class>
             </icon>
@@ -349,9 +350,10 @@
                                 <xsl:otherwise>
                                     <fr:databound-select1
                                             id="select1"
+                                            resource="{{xxf:component-param-value('resource')}}"
                                             appearance="minimal"
                                             ref="$binding"
-                                            xbl:attr="xxf:encrypt-item-values resource">
+                                            xbl:attr="xxf:encrypt-item-values">
                                         <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
                                     </fr:databound-select1>
                                 </xsl:otherwise>

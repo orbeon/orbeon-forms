@@ -33,7 +33,7 @@ import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.xforms.Constants.ComponentSeparator
-import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.{CrossPlatformSupport, XFormsId}
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.util.control.NonFatal
@@ -82,18 +82,18 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       case _: XXFormsUploadCancelEvent =>
         // Upload canceled by the user
         containingDocument.endUpload(getUploadUniqueId)
-        UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+        UploaderServer.removeUploadProgress(CrossPlatformSupport.externalContext.getRequest, this)
       case doneEvent: XXFormsUploadDoneEvent =>
         // Upload done: process upload to this control
         // Notify that the upload has ended
         containingDocument.endUpload(getUploadUniqueId)
-        UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+        UploaderServer.removeUploadProgress(CrossPlatformSupport.externalContext.getRequest, this)
         handleUploadedFile(doneEvent.file, doneEvent.filename, doneEvent.contentType, doneEvent.contentLength)
         visitWithAncestors()
       case _: XXFormsUploadErrorEvent =>
         // Upload error: sent by the client in case of error
         containingDocument.endUpload(getUploadUniqueId)
-        UploaderServer.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+        UploaderServer.removeUploadProgress(CrossPlatformSupport.externalContext.getRequest, this)
       case _ =>
     }
   }
@@ -172,9 +172,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
               deleteFileIfPossible(newValueUriString)
               converted
             } else {
-              val newFile    = NetUtils.renameAndExpireWithSession(newValueUriString, logger.getLogger)
-              val newFileURL = newFile.toURI.toString
-
+              val newFileURL = CrossPlatformSupport.renameAndExpireWithSession(newValueUriString).toString
               hmacURL(newFileURL, Option(filename), Option(mediatype), Option(size))
             }
 

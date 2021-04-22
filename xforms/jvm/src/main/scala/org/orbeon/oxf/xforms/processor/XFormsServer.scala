@@ -13,14 +13,14 @@
   */
 package org.orbeon.oxf.xforms.processor
 
-import java.util.concurrent.Callable
 import java.{util => ju}
-
+import cats.Eval
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document, Element}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.{HttpMethod, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
@@ -242,7 +242,7 @@ object XFormsServer {
               outputSubmissionInfo(
                 twoPassSubmitEvent,
                 containingDocument.isPortletContainer || containingDocument.isEmbedded,
-                NetUtils.getExternalContext.getResponse // would be better to pass this to `outputAjaxResponse`
+                CrossPlatformSupport.externalContext.getResponse // would be better to pass this to `outputAjaxResponse`
               )
             }
 
@@ -417,8 +417,16 @@ object XFormsServer {
          twoPassSubmitEvent.browserTarget.toList map ("target" -> _)
 
       val actionAtt =
-        isPortletContainer list
-          "action" -> response.rewriteActionURL(XFORMS_SERVER_SUBMIT)
+        isPortletContainer list {
+
+          val actionUrl =
+            if (twoPassSubmitEvent.isResponseResourceType)
+              response.rewriteResourceURL(XFORMS_SERVER_SUBMIT, URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT) // NOTE: mode ignored in portlet mode
+            else
+              response.rewriteActionURL(XFORMS_SERVER_SUBMIT)
+
+          "action" -> actionUrl
+        }
 
       // Signal that we want a POST to the XForms server
       element(
@@ -562,7 +570,7 @@ class XFormsServer extends ProcessorImpl {
 
     // Use request input provided by client
     val requestDocument = readInputAsOrbeonDom(pipelineContext, XFormsServer.InputRequest)
-    val externalContext = NetUtils.getExternalContext
+    val externalContext = CrossPlatformSupport.externalContext
     val request = externalContext.getRequest
 
     // It's not possible to handle a form update without an existing session. We depend on this to check the UUID,
@@ -619,7 +627,7 @@ class XFormsServer extends ProcessorImpl {
     // - https://github.com/orbeon/orbeon-forms/issues/2071
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
-    val lockResult: Try[Option[Callable[SubmissionResult]]] =
+    val lockResult: Try[Option[Eval[SubmissionResult]]] =
       withLock(parameters, if (isAjaxRequest) 0L else XFormsProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 
@@ -710,7 +718,7 @@ class XFormsServer extends ProcessorImpl {
 
               Success(
                 withUpdateResponse(containingDocument, ignoreSequenceNumber) {
-                  containingDocument.getReplaceAllCallable match {
+                  containingDocument.getReplaceAllEval match {
                     case None =>
                       xmlReceiverOpt match {
                         case Some(xmlReceiver) =>
@@ -780,9 +788,9 @@ class XFormsServer extends ProcessorImpl {
                           debug("handling NOP response for submission with `replace=\"all\"`")
                       }
                       None
-                    case someCallable =>
-                      // Check if there is a submission with replace="all" that needs processing
-                      someCallable
+                    case evalOpt =>
+                      // Check if there is a submission with `replace="all"` that needs processing
+                      evalOpt
                   }
                 }
               )
@@ -833,12 +841,12 @@ class XFormsServer extends ProcessorImpl {
 
     // Throw the exception if there was any
     lockResult match {
-      case Success(Some(replaceAllCallable)) =>
+      case Success(Some(replaceAllEval)) =>
         // Check and run submission with `replace="all"`
         // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         //   hit the document.
         // - No need to output a null document here, `xmlReceiver` is absent anyway.
-        XFormsModelSubmission.runDeferredSubmission(replaceAllCallable, response)
+        XFormsModelSubmission.runDeferredSubmission(replaceAllEval, response)
       case Success(None) =>
       case Failure(t)    => throw t
     }

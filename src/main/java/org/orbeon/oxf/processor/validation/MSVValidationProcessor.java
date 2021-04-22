@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.validation;
 
-import org.apache.log4j.Logger;
+import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.Document;
 import org.orbeon.msv.iso_relax.verifier.*;
 import org.orbeon.msv.verifier.jarv.Const;
@@ -27,7 +27,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.IOSupport;
-import org.orbeon.oxf.xml.dom.LocationData;
+import org.orbeon.oxf.xml.dom.XmlLocationData;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -43,7 +43,7 @@ import java.util.List;
 
 public class MSVValidationProcessor extends ProcessorImpl {
 
-    private Logger logger = LoggerFactory.createLogger(MSVValidationProcessor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.createLoggerJava(MSVValidationProcessor.class);
 
     public static final String ORBEON_ERROR_NS = "http://orbeon.org/oxf/xml/validation";
     public static final String ORBEON_ERROR_PREFIX = "v";
@@ -191,15 +191,15 @@ public class MSVValidationProcessor extends ProcessorImpl {
                         }
 
                         public void error(SAXParseException exception) throws SAXException {
-                            generateErrorElement(new SchemaValidationException("Error " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
+                            generateErrorElement(new SchemaValidationException("Error " + exception.getMessage() + "(schema: " + schemaId + ")", XmlLocationData.apply(exception)));
                         }
 
                         public void fatalError(SAXParseException exception) throws SAXException {
-                            generateErrorElement(new SchemaValidationException("Fatal Error " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
+                            generateErrorElement(new SchemaValidationException("Fatal Error " + exception.getMessage() + "(schema: " + schemaId + ")", XmlLocationData.apply(exception)));
                         }
 
                         public void warning(SAXParseException exception) throws SAXException {
-                            generateErrorElement(new SchemaValidationException("Warning " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
+                            generateErrorElement(new SchemaValidationException("Warning " + exception.getMessage() + "(schema: " + schemaId + ")", XmlLocationData.apply(exception)));
                         }
                     });
 

@@ -26,10 +26,10 @@ object StatusStore {
   def setStatus(status: Status): Unit = {
 
     // Log status
-    if (RelationalUtils.Logger.isDebugEnabled) {
-      def liftLog(log: (String, String) => Unit): (String => Unit) = log("Reindex status", _: String)
-      def logInfo  = liftLog(RelationalUtils.Logger.logInfo)
-      def logDebug = liftLog(RelationalUtils.Logger.logDebug)
+    if (RelationalUtils.Logger.debugEnabled) {
+      def liftLog(log: (String, String) => Unit): String => Unit = log("Reindex status", _: String)
+      def logInfo  = liftLog(RelationalUtils.Logger.logInfo(_, _, Nil: _*))
+      def logDebug = liftLog(RelationalUtils.Logger.logDebug(_, _, Nil: _*))
       status match {
         case Status.Stopped                         => logInfo("Stopped" )
         case Status.Starting(providers)             => logInfo("Starting, will index " + providers.mkString("[", ", ", "]"))

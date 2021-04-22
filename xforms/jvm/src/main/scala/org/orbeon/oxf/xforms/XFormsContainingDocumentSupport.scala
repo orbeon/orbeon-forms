@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.util.concurrent.Callable
 import java.util.concurrent.locks.Lock
 import java.{util => ju}
 
+import cats.Eval
 import cats.syntax.option._
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.datatypes.MaximumSize
@@ -50,6 +50,7 @@ import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionPara
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms._
+import org.orbeon.xforms.runtime.XFormsObject
 import shapeless.syntax.typeable._
 
 import scala.annotation.tailrec
@@ -161,7 +162,7 @@ trait ContainingDocumentTransientState {
     var nonJavaScriptLoadsToRun  : Vector[Load] = Vector.empty
     var scriptsToRun             : Vector[Load Either ScriptInvocation] = Vector.empty
 
-    var replaceAllCallable       : Option[Callable[SubmissionResult]] = None
+    var replaceAllEval           : Option[Eval[SubmissionResult]] = None
     var gotSubmissionReplaceAll  : Boolean = false
     var gotSubmissionRedirect    : Boolean = false
 
@@ -203,12 +204,10 @@ trait ContainingDocumentTransientState {
 
   def getNonJavaScriptLoadsToRun: i.Seq[Load] = transientState.nonJavaScriptLoadsToRun
 
-  def getReplaceAllCallable: Option[Callable[SubmissionResult]] = transientState.replaceAllCallable
+  def getReplaceAllEval: Option[Eval[SubmissionResult]] = transientState.replaceAllEval
 
-  def setReplaceAllCallable(callable: Callable[SubmissionResult]): Unit =
-    transientState.replaceAllCallable = Option(callable)
-
-  def setGotSubmission(): Unit = ()
+  def setReplaceAllEval(eval: Eval[SubmissionResult]): Unit =
+    transientState.replaceAllEval = Option(eval)
 
   def setGotSubmissionReplaceAll(): Unit = {
     if (transientState.gotSubmissionReplaceAll)
@@ -310,7 +309,7 @@ trait ContainingDocumentUpload {
           AllowedMediatypes.unapply
 
       def fromFormSetting =
-        staticState.staticStringProperty(UPLOAD_MEDIATYPES_PROPERTY).trimAllToOpt flatMap
+        staticState.staticStringProperty(UploadMediatypesProperty).trimAllToOpt flatMap
           AllowedMediatypes.unapply
 
       fromCommonConstraint orElse
@@ -361,8 +360,17 @@ trait ContainingDocumentEvent {
     r
   }
 
+  def maybeWithOutermostActionHandler[T](cond: Boolean)(block: => T): T = {
+    if (cond)
+      startOutermostActionHandler()
+    val r = block
+    if (cond)
+      endOutermostActionHandler()
+    r
+  }
+
   def startOutermostActionHandler(): Unit = // Q: What about relevance?
-    allModels foreach (_.startOutermostActionHandler)
+    allModels foreach (_.startOutermostActionHandler())
 
   def endOutermostActionHandler(): Unit =
     if (isRelevant)
@@ -384,11 +392,11 @@ trait ContainingDocumentProperties {
 
   // Used by the property() function
   def getProperty(propertyName: String): Any = propertyName match {
-    case READONLY_APPEARANCE_PROPERTY => if (staticReadonly) READONLY_APPEARANCE_STATIC_VALUE else READONLY_APPEARANCE_DYNAMIC_VALUE
-    case NOSCRIPT_PROPERTY            => false
-    case ENCRYPT_ITEM_VALUES_PROPERTY => encodeItemValues
-    case ORDER_PROPERTY               => lhhacOrder
-    case _                            => staticState.propertyMaybeAsExpression(propertyName).left.get
+    case ReadonlyAppearanceProperty => if (staticReadonly) ReadonlyAppearanceStaticValue else ReadonlyAppearanceDynamicValue
+    case NoscriptProperty           => false
+    case EncryptItemValuesProperty  => encodeItemValues
+    case OrderProperty              => lhhacOrder
+    case _                          => staticState.propertyMaybeAsExpression(propertyName).left.get
   }
 
   private object Memo {
@@ -436,83 +444,81 @@ trait ContainingDocumentProperties {
   // Dynamic properties
   def staticReadonly =
     dynamicProperty(
-      READONLY_APPEARANCE_PROPERTY,
-      _ == READONLY_APPEARANCE_STATIC_VALUE
+      ReadonlyAppearanceProperty,
+      _ == ReadonlyAppearanceStaticValue
     )
 
   def encodeItemValues =
     dynamicProperty(
-      ENCRYPT_ITEM_VALUES_PROPERTY,
+      EncryptItemValuesProperty,
       _.toBoolean
     )
 
   def lhhacOrder =
     dynamicProperty(
-      ORDER_PROPERTY,
+      OrderProperty,
       LHHA.getBeforeAfterOrderTokens
     )
 
   def staticReadonlyHint: Boolean =
     dynamicProperty(
-      STATIC_READONLY_HINT_PROPERTY,
+      StaticReadonlyHintProperty,
       _.toBoolean
     )
 
   def staticReadonlyAlert: Boolean =
     dynamicProperty(
-      STATIC_READONLY_ALERT_PROPERTY,
+      StaticReadonlyAlertProperty,
       _.toBoolean
     )
 
   def hostLanguage =
     dynamicProperty(
-      HOST_LANGUAGE,
+      HostLanguage,
       identity
     )
 
   def isNoUpdates =
     dynamicProperty(
-      NO_UPDATES,
+      NoUpdates,
       _.toBoolean
     )
 
   // Static properties
-  def isOptimizeGetAllSubmission            = staticBooleanProperty(OPTIMIZE_GET_ALL_PROPERTY)
-  def isLocalSubmissionInclude              = staticBooleanProperty(LOCAL_SUBMISSION_INCLUDE_PROPERTY)
-  def isLocalInstanceInclude                = staticBooleanProperty(LOCAL_INSTANCE_INCLUDE_PROPERTY)
-  def isExposeXPathTypes                    = staticBooleanProperty(EXPOSE_XPATH_TYPES_PROPERTY)
-  def isSessionHeartbeat                    = staticBooleanProperty(SESSION_HEARTBEAT_PROPERTY)
-  def isXForms11Switch                      = staticBooleanProperty(XFORMS11_SWITCH_PROPERTY)
-  def isClientStateHandling                 = staticBooleanProperty[String](STATE_HANDLING_PROPERTY, _ == STATE_HANDLING_CLIENT_VALUE)
-  def isReadonlyAppearanceStaticSelectFull  = staticBooleanProperty[String](READONLY_APPEARANCE_STATIC_SELECT_PROPERTY, _ == "full")
-  def isReadonlyAppearanceStaticSelect1Full = staticBooleanProperty[String](READONLY_APPEARANCE_STATIC_SELECT1_PROPERTY, _ ==  "full")
+  def isOptimizeGetAllSubmission            = staticBooleanProperty(OptimizeGetAllProperty)
+  def isExposeXPathTypes                    = staticBooleanProperty(ExposeXpathTypesProperty)
+  def isSessionHeartbeat                    = staticBooleanProperty(SessionHeartbeatProperty)
+  def isXForms11Switch                      = staticBooleanProperty(Xforms11SwitchProperty)
+  def isClientStateHandling                 = staticBooleanProperty[String](StateHandlingProperty, _ == StateHandlingClientValue)
+  def isReadonlyAppearanceStaticSelectFull  = staticBooleanProperty[String](ReadonlyAppearanceStaticSelectProperty, _ == "full")
+  def isReadonlyAppearanceStaticSelect1Full = staticBooleanProperty[String](ReadonlyAppearanceStaticSelect1Property, _ ==  "full")
 
-  def getLabelElementName                   = staticStringProperty(LABEL_ELEMENT_NAME_PROPERTY)
-  def getHintElementName                    = staticStringProperty(HINT_ELEMENT_NAME_PROPERTY)
-  def getHelpElementName                    = staticStringProperty(HELP_ELEMENT_NAME_PROPERTY)
-  def getAlertElementName                   = staticStringProperty(ALERT_ELEMENT_NAME_PROPERTY)
-  def getLabelAppearances                   = staticStringProperty(LABEL_APPEARANCE_PROPERTY).tokenizeToSet
-  def getHintAppearances                    = staticStringProperty(HINT_APPEARANCE_PROPERTY).tokenizeToSet
-  def getHelpAppearance                     = staticStringProperty(HELP_APPEARANCE_PROPERTY)
-  def getDateFormatInput                    = staticStringProperty(DATE_FORMAT_INPUT_PROPERTY)
+  def getLabelElementName                   = staticStringProperty(LabelElementNameProperty)
+  def getHintElementName                    = staticStringProperty(HintElementNameProperty)
+  def getHelpElementName                    = staticStringProperty(HelpElementNameProperty)
+  def getAlertElementName                   = staticStringProperty(AlertElementNameProperty)
+  def getLabelAppearances                   = staticStringProperty(LabelAppearanceProperty).tokenizeToSet
+  def getHintAppearances                    = staticStringProperty(HintAppearanceProperty).tokenizeToSet
+  def getHelpAppearance                     = staticStringProperty(HelpAppearanceProperty)
+  def getDateFormatInput                    = staticStringProperty(DateFormatInputProperty)
 
-  def getShowMaxRecoverableErrors           = staticIntProperty(SHOW_RECOVERABLE_ERRORS_PROPERTY)
-  def getSubmissionPollDelay                = staticIntProperty(ASYNC_SUBMISSION_POLL_DELAY)
-  def getAjaxFullUpdateThreshold            = staticIntProperty(AJAX_UPDATE_FULL_THRESHOLD)
+  def getShowMaxRecoverableErrors           = staticIntProperty(ShowRecoverableErrorsProperty)
+  def getSubmissionPollDelay                = staticIntProperty(AsyncSubmissionPollDelay)
+  def getAjaxFullUpdateThreshold            = staticIntProperty(AjaxUpdateFullThreshold)
 
   def isLocalSubmissionForward =
-    staticBooleanProperty(LOCAL_SUBMISSION_FORWARD_PROPERTY) &&
-    staticBooleanProperty(OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY)
+    staticBooleanProperty(LocalSubmissionForwardProperty) &&
+    staticBooleanProperty(OptimizeLocalSubmissionReplaceAllProperty)
 
   import ContainingDocumentProperties._
 
   def getTypeOutputFormat(typeName: String) =
     SupportedTypesForOutputFormat(typeName) option
-      staticStringProperty(TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX + typeName)
+      staticStringProperty(TypeOutputFormatPropertyPrefix + typeName)
 
   def getTypeInputFormat(typeName: String) = {
     require(SupportedTypesForInputFormat(typeName))
-    staticStringProperty(TYPE_INPUT_FORMAT_PROPERTY_PREFIX + typeName)
+    staticStringProperty(TypeInputFormatPropertyPrefix + typeName)
   }
 }
 
@@ -586,7 +592,7 @@ trait ContainingDocumentRequest {
     isPortletContainer || (Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletClient)
 
   protected def initializeRequestInformation(): Unit =
-    Option(NetUtils.getExternalContext.getRequest) match {
+    Option(CrossPlatformSupport.externalContext.getRequest) match {
       case Some(request) =>
         // Remember if filter provided separate deployment information
 
@@ -675,13 +681,14 @@ trait ContainingDocumentDelayedEvents {
 
   def addTwoPassSubmitEvent(p: TwoPassSubmissionParameters): Unit =
     _delayedEvents += DelayedEvent(
-      eventName         = XFormsEvents.XXFORMS_SUBMIT,
-      targetEffectiveId = p.submissionEffectiveId,
-      bubbles           = true,
-      cancelable        = false,
-      time              = None,
-      showProgress      = p.showProgress,
-      browserTarget     = p.target
+      eventName              = XFormsEvents.XXFORMS_SUBMIT,
+      targetEffectiveId      = p.submissionEffectiveId,
+      bubbles                = true,
+      cancelable             = false,
+      time                   = None,
+      showProgress           = p.showProgress,
+      browserTarget          = p.target,
+      isResponseResourceType = p.isResponseResourceType
     )
 
   def findTwoPassSubmitEvent: Option[DelayedEvent] =
@@ -710,13 +717,14 @@ trait ContainingDocumentDelayedEvents {
 
     if (allowDuplicates || ! (_delayedEvents exists isDuplicate))
       _delayedEvents += DelayedEvent(
-        eventName         = eventName,
-        targetEffectiveId = targetEffectiveId,
-        bubbles           = bubbles,
-        cancelable        = cancelable,
-        time              = time.some,
-        showProgress      = showProgress,
-        browserTarget     = None
+        eventName              = eventName,
+        targetEffectiveId      = targetEffectiveId,
+        bubbles                = bubbles,
+        cancelable             = cancelable,
+        time                   = time.some,
+        showProgress           = showProgress,
+        browserTarget          = None,
+        isResponseResourceType = false
       )
   }
 
@@ -793,7 +801,7 @@ trait ContainingDocumentClientState {
 
   def setInitialClientScript(): Unit = {
 
-    implicit val externalContext = NetUtils.getExternalContext
+    implicit val externalContext = CrossPlatformSupport.externalContext
 
     val response = externalContext.getResponse
 
@@ -802,7 +810,7 @@ trait ContainingDocumentClientState {
       ScriptBuilder.findConfigurationProperties(
         this,
         URLRewriterUtils.isResourcesVersioned,
-        XFormsStateManager.getHeartbeatDelay(this, NetUtils.getExternalContext)
+        XFormsStateManager.getHeartbeatDelay(this, CrossPlatformSupport.externalContext)
       ).toList :::
       List(
         ScriptBuilder.buildJavaScriptInitialData(

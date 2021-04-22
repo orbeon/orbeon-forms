@@ -78,9 +78,19 @@
             <!-- Insert condition on action if missing -->
             <xf:var name="action1" value="$instance/fb:action/xf:action[1]"/>
             <xf:insert
-                if="not(exists($action1/@if))"
+                if="empty($action1/@if)"
                 context="$action1"
                 origin="xf:attribute('if', 'true()')"/>
+            <!-- Insert hint on itemset action if missing -->
+            <xf:action iterate="$instance//xf:action[@class = 'fr-itemset-action']">
+                <xf:insert
+                    if="empty(xf:var[@name = 'item-hint'])"
+                    context="."
+                    origin="xf:element('xf:var', (
+                        xf:attribute('name', 'item-hint'),
+                        xf:attribute('value', '')
+                    ))"/>
+            </xf:action>
         </xf:action>
     </xf:action>
 
@@ -555,6 +565,10 @@
                                             <xf:label ref="$form-resources/dialog-actions/item-value/label" appearance="minimal"/>
                                             <xf:hint ref="$form-resources/dialog-actions/item-value/hint"/>
                                         </xf:input>
+                                        <xf:input ref=".//(*:variable | *:var)[@name = 'item-hint']/(@value | @select)[1]" id="fb-actions-hint" incremental="true" class="fb-action-xpath">
+                                            <xf:label ref="$form-resources/dialog-actions/item-hint/label" appearance="minimal"/>
+                                            <xf:hint ref="$form-resources/dialog-actions/item-hint/hint"/>
+                                        </xf:input>
                                     </xh:div>
                                 </xf:case>
                                 <xf:case value="'fr-save-to-dataset-action'">
@@ -681,8 +695,6 @@
             </xf:trigger>
         </xf:group>
 
-        <!--<fr:xforms-inspector/>-->
-
     </xh:div>
 
     <!-- Model for the bindings editor -->
@@ -769,17 +781,18 @@
                             />
                         </xf:bind>
                     </xf:bind>
-                    <!-- Itemset actions -->
                     <xf:bind ref="xf:action[@class = 'fr-itemset-action']">
                         <xf:bind
                             ref="@class"
                             constraint="not($event = ('fr-run-form-load-action-before-data', 'fr-run-form-load-action-after-data'))"/>
-                        <xf:bind ref=".//(*:variable | *:var)/(@value | @select)[1]" required="true()">
+                        <xf:bind ref=".//(*:variable | *:var)/(@value | @select)[1]">
+                            <xf:bind
+                                ref=".[../@name != 'item-hint']"
+                                required="true()"/>
                             <xf:bind
                                 ref=".[../@name = ('response-items', 'item-label', 'item-value')]"
                                 xxf:whitespace="trim"
-                                type="xxf:XPath2"
-                            />
+                                type="xxf:XPath2"/>
                         </xf:bind>
                     </xf:bind>
                     <!-- Save to dataset -->
@@ -836,6 +849,7 @@
                     <xf:var name="response-items" value=""/>
                     <xf:var name="item-label" value=""/>
                     <xf:var name="item-value" value=""/>
+                    <xf:var name="item-hint" value=""/>
                 </xf:action>
                 <!-- Save to dataset -->
                 <xf:action class="fr-save-to-dataset-action">

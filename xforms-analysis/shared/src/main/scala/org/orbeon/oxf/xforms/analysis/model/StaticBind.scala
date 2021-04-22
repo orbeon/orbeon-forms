@@ -61,7 +61,7 @@ class StaticBind(
       (Extensions.resolveQName(namespaceMapping.mapping.get, _, unprefixedIsNoNamespace = true))
 
   // All XPath MIPs
-  val allMIPNameToXPathMIP = customMIPNameToXPathMIP ++ mipNameToXPathMIP
+  val allMIPNameToXPathMIP: Map[String, List[XPathMIP]] = customMIPNameToXPathMIP ++ mipNameToXPathMIP
 
   // All constraint XPath MIPs grouped by level
   val constraintsByLevel: Map[ValidationLevel, List[XPathMIP]] = {
@@ -221,7 +221,7 @@ object StaticBind {
       )(null) // TODO: pass a logger? Is passed down to `ShareableXPathStaticContext` for warnings only.
     }
 
-    // Default to negative, analyzeXPath() can change that
+    // Default to `NegativeAnalysis`, `analyzeXPath()` can change that
     var analysis: XPathAnalysis = new NegativeAnalysis(expression)
   }
 

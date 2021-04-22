@@ -225,7 +225,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
   }
 
   // Do a refresh of a subtree of controls starting at the given container control.
-  // This is used by `xf:switch` and `xxf:dialog` as of 2019-09-16.
+  // This is used by `xf:switch` and `xxf:dialog` as of 2021-04-14.
   def doPartialRefresh(containerControl: XFormsContainerControl): Unit = {
 
     val focusedBeforeOpt = getFocusedControl
@@ -303,6 +303,7 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
     }
 
     // Update the bindings of a container control and its descendants.
+    // This is used by `xf:switch` and `xxf:dialog` as of 2021-04-14.
     def updateSubtreeBindings(containerControl: XFormsContainerControl): BindingUpdater = {
 
       cloneInitialStateIfNeeded()
@@ -322,8 +323,8 @@ class XFormsControls(val containingDocument: XFormsContainingDocument) {
 
     def gatherControlsForRefresh: List[String] =
       ControlsIterator(containingDocument.controls.getCurrentControlTree) filter
-        XFormsControl.controlSupportsRefreshEvents                           map
-        (_.effectiveId)                                                      toList
+        XFormsControl.controlSupportsRefreshEvents                        map
+        (_.effectiveId)                                                   toList
 
     def gatherControlsForRefresh(containerControl: XFormsContainerControl): List[String] =
       ControlsIterator(containerControl, includeSelf = true) filter

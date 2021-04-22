@@ -308,6 +308,7 @@ object Controls {
   }
 
   // Update the container's and all its descendants' bindings
+  // This is used by `xf:switch` and `xxf:dialog` as of 2021-04-14.
   def updateBindings(control: XFormsContainerControl): BindingUpdater = {
     val xpathDependencies = control.containingDocument.xpathDependencies
     xpathDependencies.bindingUpdateStart()

@@ -21,6 +21,7 @@ val Log4j2Version                 = "2.16.0"
 val CommonsIoVersion              = "2.0.1"  // 2.5
 val EnumeratumVersion             = "1.5.6"
 val AutowireVersion               = "0.2.6"
+val AntVersion                    = "1.10.10"
 
 val CoreLibraryDependencies = Seq(
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
@@ -43,6 +44,8 @@ val CoreLibraryDependencies = Seq(
   "commons-pool"                %  "commons-pool"                   % "1.6",
   "commons-validator"           %  "commons-validator"              % "1.4.0",  // 1.5.1
   "javax.activation"            % "activation"                      % "1.1.1",
+  "org.apache.ant"              %  "ant"                            % AntVersion,
+  "org.apache.ant"              %  "ant-jsch"                       % AntVersion,
   "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.0",
   "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,

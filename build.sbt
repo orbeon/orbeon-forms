@@ -42,6 +42,7 @@ val FlyingSaucerVersion           = "9.1.21"
 val TinkVersion                   = "1.5.0"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.0"
+val AntVersion                    = "1.10.10"
 
 // "Provided" Java libraries
 val ServletApiVersion             = "4.0.1"
@@ -72,6 +73,8 @@ val CoreLibraryDependencies = Seq(
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
   "commons-validator"           %  "commons-validator"              % "1.7",  // 1.5.1
+  "org.apache.ant"              %  "ant"                            % AntVersion,
+  "org.apache.ant"              %  "ant-jsch"                       % AntVersion,
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion exclude("javax.activation", "activation"),
   "com.sun.activation" 		% "javax.activation"                % JavaActivationVersion,

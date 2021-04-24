@@ -19,8 +19,13 @@
 
     <!-- NOTE: Support 2 modes: 1. $app and $form are provided 2. They are not provided and are set to '*' -->
     <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
-    <xf:var name="app"  value="$parameters/app"/>
-    <xf:var name="form" value="$parameters/form"/>
+
+    <xf:var name="mode" value="$parameters/mode/string()"/>
+    <xf:var name="app"  value="if ($mode = 'import') then '*' else $parameters/app/string()"/>
+    <xf:var name="form" value="if ($mode = 'import') then '*' else $parameters/form/string()"/>
+
+    <xf:var name="use-form-resources" value="$app != '*'"/>
+
 
     <!-- Instance containing the current language -->
     <!-- NOTE: The default language is set during initialization below -->
@@ -41,8 +46,8 @@
     <xf:var name="fr-fr-resources"       value="instance('fr-fr-resources')/resource[@xml:lang = $fr-lang][1]"    as="element(resource)?"/>
 
     <!-- Language selector variables -->
-    <xf:var name="fr-selector-lang"      value="if ($app != '*') then $lang else $fr-lang"/>
-    <xf:var name="fr-selector-resources" value="if ($app != '*') then xxf:instance('fr-form-resources') else instance('fr-fr-resources')"/>
+    <xf:var name="fr-selector-lang"      value="if ($use-form-resources) then $lang else $fr-lang"/>
+    <xf:var name="fr-selector-resources" value="if ($use-form-resources) then xxf:instance('fr-form-resources') else instance('fr-fr-resources')"/>
 
     <!-- Instance containing the Form Runner resources -->
     <xf:instance id="fr-fr-resources"><dummy/></xf:instance>
@@ -63,7 +68,7 @@
 
         <!-- Find form language -->
         <xf:setvalue
-            if="$app != '*'"
+            if="$use-form-resources"
             ref="$lang"
             value="
                 frf:selectFormLang(
@@ -81,14 +86,14 @@
                 frf:selectFormRunnerLang(
                     $app,
                     $form,
-                    if ($app != '*') then $lang else $fr-lang,
+                    if ($use-form-resources) then $lang else $fr-lang,
                     instance('fr-fr-resources')/resource/@xml:lang/string()
                 )"
         />
 
         <!-- Save current form language into the session unless fr-remember-language=false -->
         <xf:action type="xpath" if="not(xxf:get-request-parameter('fr-remember-language') = 'false')">
-            xxf:set-session-attribute('fr-language', string(if ($app != '*') then $lang else $fr-lang))
+            xxf:set-session-attribute('fr-language', string(if ($use-form-resources) then $lang else $fr-lang))
         </xf:action>
 
         <!-- So that model variables are updated in case another model uses them -->

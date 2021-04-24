@@ -2911,8 +2911,8 @@
                 L'importazione di {0,number,integer} {0,choice,1#documento|1&lt;documenti} è completata. {1,number,integer} {1,choice,1#documento invalido è stato saltato|1&lt;documenti invalidi sono stati saltati}.
             </import-complete-message>
             <na>N/A</na>
-            <fields-found todo="true">Fields Found</fields-found>
-            <values-found todo="true">Values Found</values-found>
+            <fields-found>Campi trovati</fields-found>
+            <values-found>Valori trovati</values-found>
             <errors>Errori</errors>
             <warnings>Avvertenze</warnings>
         </import>
@@ -3404,8 +3404,8 @@
                 Der Import von {0,number,integer} {0,choice,1#Dokument|1&lt;Dokumenten} ist abgeschlossen. {1,number,integer} {1,choice,1#ungültiges Dokument wurde|1&lt;ungültige Dokumente wurden} übersprungen.
             </import-complete-message>
             <na>N/A</na>
-            <fields-found todo="true">Fields Found</fields-found>
-            <values-found todo="true">Values Found</values-found>
+            <fields-found>Gefundene Felder</fields-found>
+            <values-found>Gefundene Werte</values-found>
             <errors>Fehler</errors>
             <warnings>Warnungen</warnings>
         </import>

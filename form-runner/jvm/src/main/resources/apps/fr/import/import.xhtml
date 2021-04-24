@@ -301,7 +301,26 @@
                             concat('/', xxf:trim($doc))
                         else
                             ''
-                }?data-format-version=edge"
+                }?data-format-version=edge{
+                    let $prop   := xxf:property(string-join(('oxf.fr.import.forward-parameters', $app, $form), '.')),
+                        $params := xxf:split($prop),
+                        $tuples :=
+                            for $name  in $params,
+                                $value in xxf:get-request-parameter($name)
+                            return
+                                concat($name, '=', encode-for-uri($value))
+                    return
+                        if (empty($tuples)) then
+                            ''
+                        else
+                            concat(
+                                '&amp;',
+                                string-join(
+                                    $tuples,
+                                    '&amp;'
+                                )
+                            )
+                }"
                 replace="all"
                 xxf:target="_blank"/>
 

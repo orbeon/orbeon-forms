@@ -453,6 +453,7 @@
     <property as="xs:string"  name="oxf.fr.import.default-format.*.*"                           value="excel-headings"/>
     <property as="xs:boolean" name="oxf.fr.import.show-app-form-names.*.*"                      value="true"/>
     <property as="xs:string"  name="oxf.fr.import.forward-parameters.*.*"                       value=""/>
+    <property as="xs:string"  name="oxf.fr.import.buttons.*.*"                                  value="home summary close"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.wizard.validate.*.*"                      value="free"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.wizard.separate-toc.*.*"                  value="false"/>

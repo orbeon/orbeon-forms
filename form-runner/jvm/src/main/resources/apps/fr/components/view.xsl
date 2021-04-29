@@ -1018,6 +1018,8 @@
                                         $buttons-property-override
                                     else if ($fr-mode = 'view') then
                                         'oxf.fr.detail.buttons.view'
+                                    else if ($fr-mode = 'import') then
+                                        'oxf.fr.import.buttons'
                                     else
                                         'oxf.fr.detail.buttons',
                                 $buttons-names :=

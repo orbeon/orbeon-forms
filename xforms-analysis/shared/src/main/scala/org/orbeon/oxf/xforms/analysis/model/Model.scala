@@ -127,5 +127,13 @@ trait ModelBinds extends BindTree {
     }
   }
 
+  def iterateAllBinds: Iterator[StaticBind] = {
+
+    def iterateBinds(bindsIt: Iterator[StaticBind]): Iterator[StaticBind] =
+      bindsIt flatMap (b => Iterator(b) ++ iterateBinds(b.childrenBindsIt))
+
+    iterateBinds(topLevelBinds.iterator)
+  }
+
   // TODO: use and produce variables introduced with `xf:bind/@name`
 }

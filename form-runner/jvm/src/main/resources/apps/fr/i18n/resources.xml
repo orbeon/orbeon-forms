@@ -2890,7 +2890,7 @@
                 <label>Revisionare Dati</label>
             </review-data>
             <existing-records-message>
-                {0,choice,1#C'è|1&lt;Ci sono} {0,number,integer} {0,choice,1#documento|1&lt;documenti} {0,choice,1#presente|1&lt;presenti} nel database per la versione {3} del formulario {1}/{2}.
+                {0,choice,1#C''è|1&lt;Ci sono} {0,number,integer} {0,choice,1#documento|1&lt;documenti} {0,choice,1#presente|1&lt;presenti} nel database per la versione {3} del formulario {1}/{2}.
             </existing-records-message>
             <eta-message>
                 {0,choice,0#|0&lt;{0, number, integer} ore} {1,choice,0#|0&lt;{1, number, integer} minuti} {2,choice,0#|0&lt;{2, number, integer} secondi}

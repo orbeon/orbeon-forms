@@ -45,17 +45,17 @@ trait FormRunnerSupport extends DocumentTestBase {
     }
 
   def performSectionAction(sectionControl: XFormsControl, action: String): Unit = {
-      // NOTE: We can't yet just dispatch `fr-insert-below` to the section, so find the nested repeater.
-      val repeater =
-        ControlsIterator(sectionControl, includeSelf = false) collectFirst {
-          case c: XFormsComponentControl if c.localName == "repeater" =>  c
-        } get
+    // NOTE: We can't yet just dispatch `fr-insert-below` to the section, so find the nested repeater.
+    val repeater =
+      ControlsIterator(sectionControl, includeSelf = false) collectFirst {
+        case c: XFormsComponentControl if c.localName == "repeater" =>  c
+      } get
 
-      dispatch(name = action, effectiveId = repeater.effectiveId)
+    dispatch(name = action, effectiveId = repeater.effectiveId)
   }
 
   def performGridAction(gridControl: XFormsControl, action: String): Unit =
-      dispatch(name = action, effectiveId = gridControl.effectiveId)
+    dispatch(name = action, effectiveId = gridControl.effectiveId)
 
   def setFormRunnerLanguage(lang: String): Unit =
     setControlValueWithEventSearchNested("fr-language-selector-select", lang)

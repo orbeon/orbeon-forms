@@ -145,7 +145,7 @@ object CollectionUtils {
   }
 
   implicit class IntIteratorOps(private val i: Iterator[Int]) extends AnyVal {
-    def codePointsToString = {
+    def codePointsToString: String = {
       val a = i.to(Array)
       new String(a, 0, a.length)
     }

@@ -309,7 +309,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   private def parseToReceiver(
     stream         : InputStream Either Reader,
     systemId       : String,
-    handleXInclude : Boolean,
+    handleXInclude : Boolean, // unused
     handleLexical  : Boolean,
     receiver       : XMLReceiver
   ): Unit = {

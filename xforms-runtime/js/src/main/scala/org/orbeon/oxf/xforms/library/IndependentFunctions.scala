@@ -3,8 +3,8 @@ package org.orbeon.oxf.xforms.library
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ContentTypes.XmlContentType
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath}
 import org.orbeon.oxf.xml.FunctionSupport._
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.oxf.xml.SaxonUtils.StringValueWithEquals

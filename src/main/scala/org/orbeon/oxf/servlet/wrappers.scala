@@ -116,7 +116,7 @@ trait RequestEmptyBody extends HttpServletRequestWrapper {
 
 private object ServletRequestWrapper {
 
-  var HeadersToFilter= Set(Headers.ContentLengthLower, Headers.ContentTypeLower) // TODO: filtering as in Headers?
+  var HeadersToFilter = Set(Headers.ContentLengthLower, Headers.ContentTypeLower) // TODO: filtering as in Headers?
 
   def appendExtraQueryParameters(pathQuery: String, extraQueryParameters: ju.Map[String, Array[String]]) = {
 

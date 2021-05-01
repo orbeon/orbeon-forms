@@ -41,9 +41,10 @@
         <p:output name="data" id="parameters"/>
     </p:processor>
 
-    <p:processor name="oxf:identity">
-        <p:input name="data">
-            <request>
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#request"/>
+        <p:input name="config">
+            <request xsl:version="2.0">
                 <app>orbeon</app>
                 <form>library</form>
                 <form-version><xsl:value-of select="/request/parameters/parameter[name = 'orbeon-library-version']/value"/></form-version>

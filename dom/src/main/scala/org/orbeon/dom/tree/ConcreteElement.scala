@@ -34,6 +34,7 @@ class ConcreteElement(var qname: QName)
   def this(name: String) =
     this(QName(name))
 
+  def getType: Int = 1
   def getQName: QName = qname
 
   protected var _attributes     = new ju.ArrayList[Attribute](DefaultContentListSize)

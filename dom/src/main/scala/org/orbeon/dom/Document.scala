@@ -23,6 +23,7 @@ class Document extends AbstractBranch {
 
   private var _systemId: Option[String] = None
 
+  def getType: Int = 9
   def systemIdOpt: Option[String] = _systemId
   def systemId: String = _systemId.orNull
   def systemId_=(name: String): Unit = _systemId = Option(name)

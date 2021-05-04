@@ -85,6 +85,8 @@ object Node {
 
 trait Node extends Cloneable {
 
+  def getType: Int
+
   def getParent: Element
   def parentElemOpt: Option[Element] = Option(getParent)
   def setParent(parent: Element): Unit
@@ -116,6 +118,7 @@ object Text {
 
 class Text(var text: String) extends AbstractNode with WithParent {
 
+  def getType: Int = 3
   override def getText: String = text
   override def setText(text: String): Unit = this.text = text
 
@@ -130,6 +133,7 @@ object Comment {
 
 class Comment(var text: String) extends AbstractNode with WithParent {
 
+  def getType: Int = 8
   override def getText: String = text
   override def setText(text: String): Unit = this.text = text
 
@@ -146,6 +150,7 @@ object ProcessingInstruction {
 class ProcessingInstruction(var target: String, var text: String)
   extends AbstractNode with WithParent {
 
+  def getType: Int = 7
   override def getName: String = getTarget
 
   def getTarget: String = target

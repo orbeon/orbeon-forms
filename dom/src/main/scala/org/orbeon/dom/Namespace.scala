@@ -70,6 +70,7 @@ abstract case class Namespace private[Namespace] (prefix: String, uri: String) e
   private def readResolve()            : Object    = Namespace.apply(prefix, uri)
   def copy(prefix: String, uri: String): Namespace = Namespace.apply(prefix, uri)
 
+  def getType: Int = 13
   override def getText: String = uri
   override def getStringValue: String = uri
 

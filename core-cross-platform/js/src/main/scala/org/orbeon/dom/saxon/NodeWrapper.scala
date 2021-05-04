@@ -102,20 +102,8 @@ trait NodeWrapper
 
   // New implementation
 
-  // ORBEON: Should profile to see whether this is called often compared with the previous
-  // implementation where the node type was directly stored into each underlying node.
-  // Try to go from most frequently used to least
-  def getNodeKind: Int =
-    node match {
-      case _: dom.Element               => Type.ELEMENT
-      case _: dom.Attribute             => Type.ATTRIBUTE
-      case _: dom.Text                  => Type.TEXT
-      case _: dom.Document              => Type.DOCUMENT
-      case _: dom.Comment               => Type.COMMENT
-      case _: dom.ProcessingInstruction => Type.PROCESSING_INSTRUCTION
-      case _: dom.Namespace             => Type.NAMESPACE
-      case _                            => throw new IllegalStateException
-    }
+  // 2021-05-03: We noticed that doing a pattern match with JavaScript is costly.
+  def getNodeKind: Int = node.getType
 
   override def equals(other: Any): Boolean =
     other match {

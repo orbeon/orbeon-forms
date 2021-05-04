@@ -69,7 +69,9 @@ val CoreLibraryDependencies = Seq(
   "org.postgresql"              % "postgresql"                      % "9.3-1102-jdbc4"  % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "2.45.0"          % Test,  // 3.0.1
   "com.github.librepdf"         % "openpdf"                         % "1.3.25",
-  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.68" // for `itext`/`openpdf`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.68", // for `itext`/`openpdf`, also pulls `bcprov` and `bcpkix`
+  "com.drewnoakes"              % "metadata-extractor"              % "2.15.0",
+  "com.adobe.xmp"               % "xmpcore"                         % "6.1.11"
 //  "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
 //  "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
 ) map

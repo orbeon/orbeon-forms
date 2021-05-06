@@ -287,9 +287,14 @@
 
                     <xsl:element name="{$tr-elem}">
 
-                        <xsl:if test="exists($tr)">
-                            <xsl:copy-of select="fr:th-td-tr-classes-attr('tr', $tr/@class, ())"/>
-                        </xsl:if>
+                        <xsl:choose>
+                            <xsl:when test="exists($tr)">
+                                <xsl:copy-of select="fr:th-td-tr-classes-attr('tr', $tr/@class, ())"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:attribute name="class">fr-grid-tr</xsl:attribute>
+                            </xsl:otherwise>
+                        </xsl:choose>
 
                         <xsl:if test="($left-column or $number-rows) and $static-row-pos = 1">
                             <xsl:copy-of select="$side-block"/>

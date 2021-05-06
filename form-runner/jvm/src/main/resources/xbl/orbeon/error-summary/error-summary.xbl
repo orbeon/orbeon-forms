@@ -369,7 +369,17 @@
                                                                             value="@alert"/>
                                                                     </span>
                                                                 </xf:label>
-                                                                <xf:setfocus ev:event="DOMActivate" control="{{@id}}"/>
+								<xf:action ev:event="DOMActivate">
+                                                                    <xf:action type="javascript">
+                                                                        <xf:param name="elemId" value="xxf:client-id(@id)"/>
+                                                                        <xf:body>
+                                                                            var elem = window.document.getElementById(elemId);
+                                                                            if (elem)
+                                                                                elem.scrollIntoView();
+                                                                        </xf:body>
+                                                                    </xf:action>
+                                                                    <xf:setfocus control="{{@id}}"/>
+                                                                </xf:action>
                                                             </xf:trigger>
                                                         </xf:case>
                                                         <xf:case value="false()">

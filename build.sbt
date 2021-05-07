@@ -37,11 +37,12 @@ val JUnitInterfaceVersion         = "0.11"
 val Slf4jVersion                  = "1.7.30"
 val HttpComponentsVersion         = "4.5.13"
 val Log4jVersion                  = "1.2.17"
-val CommonsIoVersion              = "2.8.0"
-val FlyingSaucerVersion           = "9.1.21"
+val CommonsIoVersion              = "2.7"
+val FlyingSaucerVersion           = "9.1.22"
 val TinkVersion                   = "1.5.0"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.0"
+val AntVersion                    = "1.10.10"
 
 // "Provided" Java libraries
 val ServletApiVersion             = "4.0.1"
@@ -71,7 +72,9 @@ val CoreLibraryDependencies = Seq(
   "commons-fileupload"          %  "commons-fileupload"             % "1.4",
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
-  "commons-validator"           %  "commons-validator"              % "1.7",  // 1.5.1
+  "commons-validator"           %  "commons-validator"              % "1.7",
+  "org.apache.ant"              %  "ant"                            % AntVersion,
+  "org.apache.ant"              %  "ant-jsch"                       % AntVersion,
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion exclude("javax.activation", "activation"),
   "com.sun.activation" 		% "javax.activation"                % JavaActivationVersion,
@@ -102,9 +105,9 @@ val CoreLibraryDependencies = Seq(
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
-  "com.github.librepdf"         % "openpdf"                         % "1.3.25",
+  "com.github.librepdf"         % "openpdf"                         % "1.3.26",
   "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.68", // for `itext`/`openpdf`, also pulls `bcprov` and `bcpkix`
-  "com.drewnoakes"              % "metadata-extractor"              % "2.15.0",
+  "com.drewnoakes"              % "metadata-extractor"              % "2.16.0",
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
 
   "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,

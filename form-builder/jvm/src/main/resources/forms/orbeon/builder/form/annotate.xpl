@@ -53,7 +53,8 @@
                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                 xmlns:xh="http://www.w3.org/1999/xhtml"
                 xmlns:xf="http://www.w3.org/2002/xforms"
-                xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                xmlns:xbl="http://www.w3.org/ns/xbl">
 
                 <xsl:import href="/oxf/xslt/utils/copy-modes.xsl"/>
                 <xsl:include href="annotate-migrate.xsl"/>
@@ -104,6 +105,11 @@
 
                     </xsl:copy>
                 </xsl:template>
+
+                <!-- Remove migration information, which might be present if we load a published form -->
+                <xsl:template
+                        match="xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/migration"
+                        mode="within-model"/>
 
                 <!--
                     fr:view:
@@ -190,7 +196,7 @@
 
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" ref="data"/>
+        <p:output name="data" ref="data" debug="annotated-form"/>
     </p:processor>
 
 </p:config>

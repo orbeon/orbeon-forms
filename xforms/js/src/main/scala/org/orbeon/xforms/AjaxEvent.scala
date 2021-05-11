@@ -137,8 +137,10 @@ class AjaxEvent(args: js.Any*) extends js.Object {
   }
 
   var properties: js.Dictionary[js.Any] = {
-    // Use `js.Object` as `ClassTag` doesn't support `js.Dictionary`
-    val dict = checkArg[js.Object]("properties", new js.Object).asInstanceOf[js.Dictionary[js.Any]]
+    // Don't use `checkArgOpt` to get the value of the "properties" argument, as `checkArgOpt` ends up doing an
+    // `instanceof` which fails if the properties are passed from another window; instead just trust that if properties
+    // are passed, they are an object
+    val dict = argsDict.getOrElse("properties", new js.Object).asInstanceOf[js.Dictionary[js.Any]]
     dict ++= checkArgOpt[String]("value") map (v => "value" -> (v: js.Any)) // `value` is now a property
     dict
   }

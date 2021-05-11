@@ -46,13 +46,11 @@ object URLRewriterUtils {
     request     : Request,
     urlString   : String,
     rewriteMode : Int
-  ): String = {
-    println(s"xxx URLRewriterUtils.rewriteServiceURL called for $urlString")
+  ): String =
     if (PathUtils.urlHasProtocol(urlString))
       urlString
     else
       throw new NotImplementedError("rewriteServiceURL")
-  }
 
   // Used by `rewriteResourceURL` for `XFormsOutputControl`.
   // Q: Does anything make sense there?

@@ -3,6 +3,7 @@ package org.orbeon.oxf.util
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.scalajs.dom
 import PathUtils._
+import org.orbeon.oxf.externalcontext.URLRewriter
 
 import java.net.URI
 import java.{util => ju}
@@ -13,6 +14,7 @@ object URLRewriterUtils {
   // TODO: placeholder, does it matter for Scala.js?
   def isResourcesVersioned = false
 
+  // TODO: Analyze usage and handle rewriting modes as needed
   def rewriteResourceURL(
     request      : Request,
     urlString    : String,
@@ -27,11 +29,16 @@ object URLRewriterUtils {
     if (uriNoSlash.getScheme ne null) {
       urlString
     } else {
-      val base = URI.create(dom.window.location.href)
-      if (base.getScheme == "http" || base.getScheme == "https")
-        base.resolve("_/" + stringNoSlash).toString // mostly for when we load the offline template from Orbeon Forms for testing
-      else
-        base.resolve(uriNoSlash).toString           // regular offline case where resources are loaded from `file:`
+      if (rewriteMode == URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT) {
+        // Only used directly by `XFormsOutputControl`
+        urlString
+      } else {
+        val base = URI.create(dom.window.location.href)
+        if (base.getScheme == "http" || base.getScheme == "https")
+          base.resolve("_/" + stringNoSlash).toString // mostly for when we load the offline template from Orbeon Forms for testing
+        else
+          base.resolve(uriNoSlash).toString           // regular offline case where resources are loaded from `file:`
+      }
     }
   }
 

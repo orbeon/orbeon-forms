@@ -107,11 +107,14 @@ private class Select1SearchCompanion extends XBLCompanion {
   }
 
   override def destroy(): Unit = {
+
     // Unsubscribe to listener on value change
-    onXFormsSelect1ValueChangeJs.foreach { listener =>
-      Controls.afterValueChange.unsubscribe(listener)
-      onXFormsSelect1ValueChangeJs = None
-    }
+    onXFormsSelect1ValueChangeJs.foreach(Controls.afterValueChange.unsubscribe)
+    onXFormsSelect1ValueChangeJs = None
+
+    // Disconnect mutation observers
+    mutationObservers.foreach(_.disconnect())
+    mutationObservers = Nil
   }
 
   override def xformsFocus(): Unit =
@@ -133,10 +136,13 @@ private class Select1SearchCompanion extends XBLCompanion {
 
     val select2SuccessCallbacks                           = new mutable.Queue[Select2.Success]
     var onXFormsSelect1ValueChangeJs: Option[js.Function] = None
+    var mutationObservers: List[MutationObserver] = Nil
 
     // TODO: not specific to the autocomplete, should be moved to a utility class
     def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit) {
       val observer = new MutationObserver((_, _) => listener())
+      mutationObservers = observer :: mutationObservers
+
       observer.observe(element.get(0), MutationObserverInit(
         attributes = true,
         attributeFilter = js.Array(attributeName)

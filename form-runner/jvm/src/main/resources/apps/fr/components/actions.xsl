@@ -904,6 +904,8 @@
                             </xsl:copy>
                         </xsl:for-each>
                     </xsl:if>
+                    <!-- Cleanup response, which is no longer needed -->
+                    <xf:insert nodeset="." origin="xf:element('response')"/>
                 </xsl:copy>
             </xsl:for-each>
         </xsl:copy>

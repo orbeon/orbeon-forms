@@ -196,7 +196,7 @@
 
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" ref="data" debug="annotated-form"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

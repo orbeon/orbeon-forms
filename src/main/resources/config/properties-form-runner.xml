@@ -133,7 +133,8 @@
     <property as="xs:string"  name="oxf.fr.detail.buttons.*.*">
         summary clear pdf save-final review
     </property>
-    <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-draft.*.*"             value="inline"/>
+    <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-draft.*.*"             value="inline"/><!-- deprecated, use `save-progress` -->
+    <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-progress.*.*"          value="inline"/>
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-final.*.*"             value="inline"/>
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.submit.*.*"                 value="modal"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="edit pdf"/>
@@ -356,10 +357,13 @@
         then success-message("save-success")
         recover error-message("database-error")
     </property>
-    <property as="xs:string"  name="oxf.fr.detail.process.save-draft.*.*">
+    <property as="xs:string"  name="oxf.fr.detail.process.save-draft.*.*"><!-- deprecated, use `save-progress` -->
+        process("save-progress")
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.save-progress.*.*">
         save
         then new-to-edit
-        then success-message("save-draft-success")
+        then success-message("save-progress-success")
         recover error-message("database-error")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.review.*.*">

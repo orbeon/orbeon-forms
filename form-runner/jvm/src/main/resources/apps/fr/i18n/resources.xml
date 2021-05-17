@@ -38,7 +38,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Save</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Save</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Save</save-draft>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Save Progress</save-draft>
+            <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Save Progress</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Edit</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
@@ -220,7 +221,8 @@
         <detail>
             <messages>
                 <save-success>Document saved successfully!</save-success>
-                <save-draft-success>Draft saved successfully!</save-draft-success>
+                <save-draft-success>Progress saved successfully!</save-draft-success>
+                <save-progress-success>Progress saved successfully!</save-progress-success>
                 <email-success>Email sent successfully!</email-success>
                 <form-validation-error>There are validation errors. Please retry once all fields have been properly filled-out.</form-validation-error>
                 <database-error>There was an error communicating with the database. Please contact the application administrator.</database-error>
@@ -515,7 +517,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Enregistrer</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Enregistrer</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Enregistrer</save-draft>
+            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Enregistrer travail en cours</save-draft>
+            <save-progress>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Enregistrer travail en cours</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editer</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Envoyer</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
@@ -700,7 +703,8 @@
         <detail>
             <messages>
                 <save-success>Document enregistré avec succès!</save-success>
-                <save-draft-success>Document en cours enregistré avec succès!</save-draft-success>
+                <save-draft-success>Travail en cours enregistré avec succès!</save-draft-success>
+                <save-progress-success>Travail en cours enregistré avec succès!</save-progress-success>
                 <email-success>Email envoyé avec succès!</email-success>
                 <form-validation-error>Le document contient des erreurs de validation. Veuillez ressayer après les avoir corrigées.</form-validation-error>
                 <database-error>Une erreur s'est produite en communiquant avec la base de données. Veuillez contacter votre l'administrateur système.</database-error>
@@ -996,7 +1000,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Guardar</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Guardar</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-draft>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editar</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
@@ -1172,7 +1177,8 @@
         <detail>
             <messages>
                 <save-success>Documento guardado correctamente!</save-success>
-                <save-draft-success>Borrador guardado correctamente!</save-draft-success>
+                <save-draft-success todo="true">Borrador guardado correctamente!</save-draft-success>
+                <save-progress-success todo="true">Borrador guardado correctamente!</save-progress-success>
                 <email-success>Email enviado correctamente!</email-success>
                 <form-validation-error>Hay errores de validación. Corrija los errores e intente nuevamente</form-validation-error>
                 <database-error>Error de comunicación con la base de datos. Contacte al adminstrador de la aplicación.</database-error>
@@ -1463,7 +1469,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Lagre</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Lagre</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Lagre</save-draft>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Lagre</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Lagre</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Rediger</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Epost</email>
@@ -1640,7 +1647,8 @@
         <detail>
             <messages>
                 <save-success>Skjemaet er lagret!</save-success>
-                <save-draft-success todo="true">[Draft saved successfully!]</save-draft-success>
+                <save-draft-success todo="true">[Progress saved successfully!]</save-draft-success>
+                <save-progress-success todo="true">[Progress saved successfully!]</save-progress-success>
                 <email-success todo="true">[Email sent successfully!]</email-success>
                 <form-validation-error>Skjemaet er ikke innsendt. Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
                 <database-error>Feil i kommunikasjon med tjener. Vennligst kontakt din systemadministrator.</database-error>
@@ -1929,7 +1937,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Сохранить</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Сохранить</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Сохранить</save-draft>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Сохранить</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Сохранить</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Править</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Отправить</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
@@ -2105,7 +2114,8 @@
         <detail>
             <messages>
                 <save-success>Документ сохранен успешно!</save-success>
-                <save-draft-success todo="true">[Draft saved successfully!]</save-draft-success>
+                <save-draft-success todo="true">[Progress saved successfully!]</save-draft-success>
+                <save-progress-success todo="true">[Progress saved successfully!]</save-progress-success>
                 <email-success todo="true">[Email sent successfully!]</email-success>
                 <form-validation-error>Документ не сохранен! Пожалуйста, исправьте ошибки в форме и сохраните еще раз.</form-validation-error>
                 <database-error>Нет соединения с базой данных. Свяжитесь с системным администратором.</database-error>
@@ -2393,7 +2403,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Salva</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Salva</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Salva</save-draft>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Salva</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Salva</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Modifica</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Invia modulo</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
@@ -2575,7 +2586,8 @@
         <detail>
             <messages>
                 <save-success>Il documento è stato salvato!</save-success>
-                <save-draft-success>Bozza salvata correttamente!</save-draft-success>
+                <save-draft-success todo="true">Bozza salvata correttamente!</save-draft-success>
+                <save-progress-success todo="true">Bozza salvata correttamente!</save-progress-success>
                 <email-success>Email inviata correttamente!</email-success>
                 <form-validation-error>Ci sono errori di validazione. Prego controllare che tutti i spazi sono compilati in modo corretto.</form-validation-error>
                 <database-error>Nella communicazione con la database è apparso un errore. Si prega di contattare l'amministratore.</database-error>
@@ -2870,7 +2882,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Speichern</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Speichern</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Speichern</save-draft>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Speichern</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Speichern</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Ändern</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Senden</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
@@ -3052,7 +3065,8 @@
         <detail>
             <messages>
                 <save-success>Dokument erfolgreich gespeichert!</save-success>
-                <save-draft-success>Entwurf erfolgreich gespeichert!</save-draft-success>
+                <save-draft-success todo="true">Entwurf erfolgreich gespeichert!</save-draft-success>
+                <save-progress-success todo="true">Entwurf erfolgreich gespeichert!</save-progress-success>
                 <email-success>Email erfolgreich gesendet!</email-success>
                 <form-validation-error>Validierungsfehler! Bitte füllen Sie alle Felder richtig aus und versuchen Sie es erneut.</form-validation-error>
                 <database-error>Bei der Kommunikation mit der Datenbank ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</database-error>
@@ -3347,7 +3361,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Tallenna</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Tallenna</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Tallenna</save-draft>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Tallenna</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Tallenna</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Muokkaa</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Lähetä</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Sähköposti</email>
@@ -3529,7 +3544,8 @@
         <detail>
             <messages>
                 <save-success>Asiakirja tallennettu onnistuneesti!</save-success>
-                <save-draft-success>Luonnos tallennettu onnistuneesti!</save-draft-success>
+                <save-draft-success todo="true">Luonnos tallennettu onnistuneesti!</save-draft-success>
+                <save-progress-success todo="true">Luonnos tallennettu onnistuneesti!</save-progress-success>
                 <email-success>Sähköposti lähetetty onnistuneesti!</email-success>
                 <form-validation-error>Löytyi virheitä. Yritä uudelleen kun kaikki kentät on täytetty asianmukaisesti.</form-validation-error>
                 <database-error>Virhe tietokannan kanssa kommunikoinnissa. Ole hyvä ja ota yhteyttä järjestelmänvalvojaan.</database-error>
@@ -3824,7 +3840,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Spara</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Spara</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Spara</save-draft>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Spara</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Spara</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Redigera</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Skicka</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Mejla</email>
@@ -4006,7 +4023,8 @@
         <detail>
             <messages>
                 <save-success>Formuläret sparat</save-success>
-                <save-draft-success>Utkast sparat</save-draft-success>
+                <save-draft-success todo="true">Utkast sparat</save-draft-success>
+                <save-progress-success todo="true">Utkast sparat</save-progress-success>
                 <email-success>Mejl skickat</email-success>
                 <form-validation-error>Alla värden är inte giltiga. Gå igenom ifyllda värden och försök igen.</form-validation-error>
                 <database-error>Databasfel. Vänligen kontakta administratör.</database-error>
@@ -4301,7 +4319,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Opslaan</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Opslaan</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Opslaan</save-draft>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Opslaan</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Opslaan</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Bewerken</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Sturen</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; E-mail</email>
@@ -4483,7 +4502,8 @@
         <detail>
             <messages>
                 <save-success>Document succesvol bewaard!</save-success>
-                <save-draft-success>Concept succesvol bewaard!</save-draft-success>
+                <save-draft-success todo="true">Concept succesvol bewaard!</save-draft-success>
+                <save-progress-success todo="true">Concept succesvol bewaard!</save-progress-success>
                 <email-success>E-mail succesvol verstuurd!</email-success>
                 <form-validation-error>Er waren validatieproblemen. Probeer het opnieuw als alle velden correct zijn gevuld.</form-validation-error>
                 <database-error>Er was een probleem in de databasecommunicatie. Neem contact op met de databasebeheerder.</database-error>
@@ -4777,7 +4797,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Guardar</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Guardar</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-draft>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Guardar</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editar</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
@@ -4959,7 +4980,8 @@
         <detail>
             <messages>
                 <save-success>Documento guardado com sucesso!</save-success>
-                <save-draft-success>Rascunho guardado com sucesso!</save-draft-success>
+                <save-draft-success todo="true">Rascunho guardado com sucesso!</save-draft-success>
+                <save-progress-success todo="true">Rascunho guardado com sucesso!</save-progress-success>
                 <email-success>Email enviado com sucesso!</email-success>
                 <form-validation-error>Existem erros de validação. Por favor, tente novamente quando todos os campos forem devidamente preenchidos.</form-validation-error>
                 <database-error>Houve um erro na comunicação com a base de dados. Entre em contacto com o administrador do aplicação.</database-error>
@@ -5253,7 +5275,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Gem</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Gem</save-final>
-            <save-draft>&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Gem</save-draft>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Gem</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Gem</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Rediger</edit>
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
@@ -5429,7 +5452,8 @@
         <detail>
             <messages>
                 <save-success>Blanket er gemt!</save-success>
-                <save-draft-success>Kladde er gemt!</save-draft-success>
+                <save-draft-success todo="true">Kladde er gemt!</save-draft-success>
+                <save-progress-success todo="true">Kladde er gemt!</save-progress-success>
                 <email-success>Email er sendt!</email-success>
                 <form-validation-error>Blanketten er ikke sendt. Ret venligst fejlene før du prøver at sende igen.</form-validation-error>
                 <database-error>Fejl i forbindelse til server. Kontakt systemadministrator.</database-error>
@@ -5717,7 +5741,8 @@
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"/&lt; Zapisz</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&lt; Złóż</save-final>
-            <save-draft>&lt;i class="icon-inbox"/&lt; Zapisz szkic</save-draft>
+            <save-draft todo="true">&lt;i class="icon-inbox"/&lt; Zapisz szkic</save-draft>
+            <save-progress todo="true">&lt;i class="icon-inbox"/&lt; Zapisz szkic</save-progress>
             <edit>&lt;i class="fa fa-fw fa-arrow-left"/&lt; Edytuj</edit>
             <send>&lt;i class="icon-arrow-right"/&lt; Wyślij</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&lt; Email</email>
@@ -5899,7 +5924,8 @@
         <detail>
             <messages>
                 <save-success>Formularz został zapisany pomyślnie!</save-success>
-                <save-draft-success>Szkic został pomyślnie zapisany.</save-draft-success>
+                <save-draft-success todo="true">Szkic został pomyślnie zapisany.</save-draft-success>
+                <save-progress-success todo="true">Szkic został pomyślnie zapisany.</save-progress-success>
                 <email-success>Email został pomyślnie wysłany.</email-success>
                 <form-validation-error>Występują błędy walidacji. Proszę sprawdzić, czy wszystkie pola zostały wypełnione poprawnie.</form-validation-error>
                 <database-error>Wystąpił błąd komunikacji z bazą danych. Skontaktuj się się z administratorem aplikacji.</database-error>

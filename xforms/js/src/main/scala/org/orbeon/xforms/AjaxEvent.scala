@@ -22,6 +22,7 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
+import scala.scalajs.js.Dictionary
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSExportTopLevel
 
@@ -92,7 +93,7 @@ class AjaxEvent(args: js.Any*) extends js.Object {
   // - The "older" version has "n" parameters.
   // - The "newer" version has a single parameter which is an object.
   //
-  private val argsDict =
+  private val argsDict: Dictionary[js.Any] =
     if (args.length > 1)
       js.Dictionary(AjaxEvent.ParamNames.zip(args): _*)
     else
@@ -140,7 +141,12 @@ class AjaxEvent(args: js.Any*) extends js.Object {
     // Don't use `checkArgOpt` to get the value of the "properties" argument, as `checkArgOpt` ends up doing an
     // `instanceof` which fails if the properties are passed from another window; instead just trust that if properties
     // are passed, they are an object
-    val dict = argsDict.getOrElse("properties", new js.Object).asInstanceOf[js.Dictionary[js.Any]]
+    val dict = argsDict
+        .get("properties")
+        // Handle both the case where no `properties` where passed, and where `undefined` was passed
+        .flatMap(p => if (js.isUndefined(p)) None else Some(p))
+        .getOrElse(new js.Object)
+        .asInstanceOf[js.Dictionary[js.Any]]
     dict ++= checkArgOpt[String]("value") map (v => "value" -> (v: js.Any)) // `value` is now a property
     dict
   }

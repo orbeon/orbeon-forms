@@ -130,12 +130,12 @@
                         then
                             xxf:get-request-attribute('fr-form-data')
                         else
-                            saxon:parse(
+                            xf:parse(
                                 saxon:base64Binary-to-string(
                                     xs:base64Binary(xxf:get-request-parameter('fr-form-data')),
                                     'UTF-8'
                                 )
-                            )
+                            )/root()
                     "/>
 
                 <xf:message level="xxf:log-debug">Loading data submitted to the page</xf:message>

@@ -719,7 +719,7 @@
                         value="{((*:variable | *:var)[@name = 'request-instance-name']/(@value | @select))[1]}"/>
                     <xf:insert
                         ref="xxf:instance('fr-service-request-instance')"
-                        origin="saxon:parse(xxf:instance($request-instance-name))"/>
+                        origin="xf:parse(xxf:instance($request-instance-name))"/>
 
                     <xsl:variable
                         name="request-actions"

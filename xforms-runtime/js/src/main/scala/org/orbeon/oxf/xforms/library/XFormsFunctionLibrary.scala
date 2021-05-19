@@ -10,6 +10,7 @@ object XFormsFunctionLibrary
   extends OrbeonFunctionLibrary
     with IndependentRequestFunctions
     with XFormsEnvFunctions
+    with XFormsIndependentFunctions
     with XFormsXXFormsEnvFunctions
     with CryptoFunctions {
 

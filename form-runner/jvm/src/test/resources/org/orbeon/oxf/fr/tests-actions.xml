@@ -18,7 +18,6 @@
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:saxon="http://saxon.sf.net/"
 
     description="Form Runner Actions"
 >
@@ -171,7 +170,7 @@
                     </xf:action>
                     <xf:insert
                         ref="xxf:instance('fr-service-request-instance')"
-                        origin="saxon:parse(xxf:instance('my-service-gaga-instance'))"/>
+                        origin="xf:parse(xxf:instance('my-service-gaga-instance'))"/>
                     <xf:action context="xxf:instance('fr-service-request-instance')">
                         <xf:action>
                             <xf:var
@@ -225,7 +224,7 @@
                     </xf:action>
                     <xf:insert
                         ref="xxf:instance('fr-service-request-instance')"
-                        origin="saxon:parse(xxf:instance('my-service-toto-instance'))"/>
+                        origin="xf:parse(xxf:instance('my-service-toto-instance'))"/>
                     <xf:var
                         name="original-context"
                         value="."/>
@@ -443,7 +442,7 @@
 
                             <xf:insert
                                 ref="xxf:instance('fr-service-request-instance')"
-                                origin="saxon:parse(xxf:instance('my-service-get-attachment-instance'))"/>
+                                origin="xf:parse(xxf:instance('my-service-get-attachment-instance'))"/>
 
                             <xf:var name="original-context" value="."/>
                             <xf:action context="xxf:instance('fr-service-request-instance')">
@@ -618,7 +617,7 @@
                     </xf:action>
                     <xf:message>1</xf:message>
                     <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                               origin="saxon:parse(xxf:instance('my-service-1-instance'))"/>
+                               origin="xf:parse(xxf:instance('my-service-1-instance'))"/>
                     <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-2-id')</xf:action>
                     <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
                     <xf:send submission="my-service-1-submission"/>
@@ -638,7 +637,7 @@
                             <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context-1', .)</xf:action>
                             <xf:message>3</xf:message>
                             <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                                       origin="saxon:parse(xxf:instance('my-service-2-instance'))"/>
+                                       origin="xf:parse(xxf:instance('my-service-2-instance'))"/>
                             <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-3-id')</xf:action>
                             <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
                             <xf:send submission="my-service-2-submission"/>
@@ -653,7 +652,7 @@
                     <xf:action if="$cond1">
                         <xf:message>5</xf:message>
                         <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                                   origin="saxon:parse(xxf:instance('my-service-3-instance'))"/>
+                                   origin="xf:parse(xxf:instance('my-service-3-instance'))"/>
                         <xf:var name="original-context" value="."/>
                         <xf:action context="xxf:instance('fr-service-request-instance')">
                             <xf:action>
@@ -683,7 +682,7 @@
                 <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-6-id" context="xxf:instance('fr-service-response-instance')">
                     <xf:message>8</xf:message>
                     <xf:insert ref="xxf:instance('fr-service-request-instance')"
-                               origin="saxon:parse(xxf:instance('my-service-4-instance'))"/>
+                               origin="xf:parse(xxf:instance('my-service-4-instance'))"/>
                     <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-7-id')</xf:action>
                     <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
                     <xf:send submission="my-service-4-submission"/>
@@ -771,7 +770,7 @@
                         for $i in 1 to 10 return xxf:set-request-attribute(concat('fr-action-continuation-is-last-iteration-', $i), ()),
                         for $i in 1 to 10 return xxf:set-request-attribute(concat('fr-iteration-context-', $i), ())
                     </xf:action>
-                    <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="saxon:parse(xxf:instance('echo-instance'))"/>
+                    <xf:insert ref="xxf:instance('fr-service-request-instance')" origin="xf:parse(xxf:instance('echo-instance'))"/>
                     <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-2-id')</xf:action>
                     <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
                     <xf:send submission="echo-submission"/>

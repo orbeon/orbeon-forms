@@ -26,7 +26,7 @@
                 <!-- Revalidate so the 'type' constraint is reapplied -->
                 <xf:revalidate/>
                 <!-- If we got XML back, parse it and store it in 'countries' -->
-                <xf:insert if="valid(instance('unparsed-xml'))" ref="instance('countries')" origin="saxon:parse(instance('unparsed-xml'))"/>
+                <xf:insert if="valid(instance('unparsed-xml'))" ref="instance('countries')" origin="xf:parse(instance('unparsed-xml'))"/>
             </xf:action>
 
             <xf:send ev:event="xforms-model-construct-done" submission="get-countries"/>

@@ -388,7 +388,7 @@
 
         <xf:insert
             ref="xxf:instance('fr-service-request-instance')"
-            origin="saxon:parse(xxf:instance('{$service-name}-instance'))"/>
+            origin="xf:parse(xxf:instance('{$service-name}-instance'))"/>
 
         <xsl:variable name="request-actions" select="fr:value | fr:url-param | fr:sql-param"/>
 

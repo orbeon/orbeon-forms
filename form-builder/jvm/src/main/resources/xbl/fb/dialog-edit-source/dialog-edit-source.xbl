@@ -17,7 +17,6 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:saxon="http://saxon.sf.net/"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
@@ -48,7 +47,7 @@
 
             <xbl:handler event="DOMActivate" observer="apply-trigger" if="valid(source)">
                 <xf:dispatch targetid="fb-dialog-edit-source" name="fr-save">
-                    <xf:property name="value" value="saxon:parse(instance()/source)"/>
+                    <xf:property name="value" value="xf:parse(instance()/source)/root()"/>
                 </xf:dispatch>
             </xbl:handler>
 

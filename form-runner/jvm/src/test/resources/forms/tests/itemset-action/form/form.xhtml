@@ -1,7 +1,6 @@
 <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -234,7 +233,7 @@
                     <xf:var name="request-instance-name" value="'load-cities-instance'" as="xs:string"/>
                     <!-- Copy over to read-write request instance -->
                     <xf:insert ref="instance('fr-service-request-instance')"
-                               origin="saxon:parse(instance($request-instance-name))"/>
+                               origin="xf:parse(instance($request-instance-name))"/>
                     <!--<xf:insert ref="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>-->
                     <!-- Set values if needed -->
                     <xf:action context="instance('fr-service-request-instance')">
@@ -269,7 +268,7 @@
                     <xf:var name="request-instance-name" value="'load-zips-instance'" as="xs:string"/>
                     <!-- Copy over to read-write request instance -->
                     <xf:insert ref="instance('fr-service-request-instance')"
-                               origin="saxon:parse(instance($request-instance-name))"/>
+                               origin="xf:parse(instance($request-instance-name))"/>
                     <!--<xf:insert ref="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>-->
                     <!-- Set values if needed -->
                     <xf:action context="instance('fr-service-request-instance')">
@@ -308,7 +307,7 @@
                     <xf:var name="request-instance-name" value="'load-states-instance'" as="xs:string"/>
                     <!-- Copy over to read-write request instance -->
                     <xf:insert ref="instance('fr-service-request-instance')"
-                               origin="saxon:parse(instance($request-instance-name))"/>
+                               origin="xf:parse(instance($request-instance-name))"/>
                     <!--<xf:insert ref="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>-->
                     <!-- Set values if needed -->
                     <xf:action context="instance('fr-service-request-instance')">

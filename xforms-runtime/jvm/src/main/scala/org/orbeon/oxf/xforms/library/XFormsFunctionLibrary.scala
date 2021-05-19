@@ -42,6 +42,7 @@ object XFormsFunctionLibrary extends {
   val XSLTFunctionsNS               = Seq(NamespaceConstant.FN)
 }
   with OrbeonFunctionLibrary
+  with XFormsIndependentFunctions
   with XFormsEnvFunctions
   with XFormsXXFormsEnvFunctions
   with XFormsFunnyFunctions

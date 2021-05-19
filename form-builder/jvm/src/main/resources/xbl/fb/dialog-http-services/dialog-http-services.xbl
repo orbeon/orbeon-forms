@@ -17,7 +17,6 @@
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
@@ -78,11 +77,11 @@
                     <xf:action if="not($local-has-request-body)">
                         <xf:var
                             name="body"
-                            value="saxon:parse($instance-body-string)"/>
+                            value="xf:parse($instance-body-string)"/>
                         <xf:insert
                             context="$request/params"
                             origin="
-                                for $e in $body/*//*[not(*)]
+                                for $e in $body//*[not(*)]
                                     return xf:element(
                                         'param',
                                         (
@@ -544,7 +543,7 @@
                 <xf:instance
                     id="fb-submission-template"
                     xxf:readonly="true"
-                    xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+                    xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb xbl exforms">
                     <fb:submission
                         id=""
                         class="fr-service"
@@ -558,7 +557,7 @@
                 <xf:instance
                     id="fb-instance-template"
                     xxf:readonly="true"
-                    xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+                    xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb xbl exforms">
                     <fb:instance
                         id=""
                         class="fr-service"
@@ -579,7 +578,7 @@
                 <xf:submission id="fb-test-service-submission"
                     ref="
                         if ($has-request-body) then
-                            saxon:parse($request/body)/*
+                            xf:parse($request/body)
                         else
                             xf:element(
                                 'params',

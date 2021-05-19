@@ -218,7 +218,7 @@
                     <xf:var name="request-instance-name" value="'echo-instance'" as="xs:string"/>
                     <!-- Copy over to read-write request instance -->
                     <xf:insert ref="instance('fr-service-request-instance')"
-                               origin="saxon:parse(instance($request-instance-name))"/>
+                               origin="xf:parse(instance($request-instance-name))"/>
                     <!-- Set values if needed -->
                     <xf:action context="instance('fr-service-request-instance')">
                         <!-- Setvalue actions will be here -->

@@ -21,7 +21,6 @@
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-    xmlns:saxon="http://saxon.sf.net/"
 
     id="fb-database-service-dialog"
     level="modal"
@@ -161,7 +160,7 @@
                         <xf:setvalue ref="$sql-query/sql:datasource" value="$instance/datasource"/>
                         <!-- Set query -->
                         <xf:delete ref="$sql-query/sql:query"/>
-                        <xf:insert context="$sql-query" ref="*" origin="saxon:parse($instance/query-xml)/*"/>
+                        <xf:insert context="$sql-query" ref="*" origin="xf:parse($instance/query-xml)"/>
                         <!-- Set request instance -->
                         <xf:setvalue ref="." value="xxf:serialize($sql-query, xxf:instance('fr-xsl-output-instance'))"/>
                     </xf:action>
@@ -199,7 +198,7 @@
             <xf:var name="query-instance" value="$model/fb:instance[@id = concat($submission-name, '-instance')]"/>
             <xf:action if="xxf:non-blank($query-instance/*)">
                 <!-- Assume there is a serialized query -->
-                <xf:var name="sql-query" value="saxon:parse($query-instance/*)/*" as="element()"/>
+                <xf:var name="sql-query" value="xf:parse($query-instance/*)" as="element()"/>
                 <!-- Restore datasource -->
                 <xf:setvalue ref="$instance/datasource" value="$sql-query/sql:datasource"/>
                 <!-- Serialize sql:query and remove containing element -->
@@ -259,7 +258,7 @@
         <xf:instance
             id="fb-database-submission-template"
             xxf:readonly="true"
-            xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+            xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb xbl exforms">
             <fb:submission
                 id=""
                 class="fr-database-service"
@@ -272,7 +271,7 @@
         <xf:instance
             id="fb-database-instance-template"
             xxf:readonly="true"
-            xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
+            xxf:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb xbl exforms">
             <fb:instance
                 id=""
                 class="fr-database-service"
@@ -293,7 +292,7 @@ WHERE first_name = &lt;sql:param type="xs:string" select=""/></sql:query>
         <!-- Submission to test a service -->
         <xf:submission
             id="fb-test-database-service-submission"
-            ref="saxon:parse(instance('fb-database-service-instance')/sql)/*"
+            ref="xf:parse(instance('fb-database-service-instance')/sql)"
             method="post"
             resource="/fr/service/custom/orbeon/database"
             replace="text"

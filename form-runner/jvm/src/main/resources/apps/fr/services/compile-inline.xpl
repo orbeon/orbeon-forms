@@ -5,7 +5,7 @@
     xmlns:xh="http://www.w3.org/1999/xhtml">
 
     <!-- Page detail (app, form, document, and mode) -->
-    <p:param type="input" name="instance" debug="xxxxx"/>
+    <p:param type="input" name="instance"/>
     <!-- Compiled form -->
     <p:param type="output" name="data"/>
 
@@ -65,7 +65,7 @@
 
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" ref="data" debug="xxxxx html"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

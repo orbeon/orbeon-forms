@@ -113,6 +113,9 @@
                 <xh:link href="/config/theme/xforms.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/error.css" class="xforms-baseline"/>
                 <xh:link href="/ops/nprogress-0.2.0/nprogress.css" class="xforms-baseline"/>
+                <xh:link href="/ops/css-loader/css-loader.css" class="xforms-baseline"/>
+                <xh:link href="/xbl/orbeon/date/date.css" class="xforms-baseline"/>
+                <xh:link href="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/number/number.css" class="xforms-baseline"/>
                 <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css"/>
                 <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css"/>
@@ -146,6 +149,18 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Help.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/controls/Hint.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/scalajs/orbeon-xforms-web.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fr.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.sv.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pt.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.it.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.de.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.es.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fi.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.nl.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.no.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ru.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pl.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js"/>
                 <xh:script src="/ops/yui/datasource/datasource.js"/>
                 <xh:script src="/ops/yui/autocomplete/autocomplete.js"/>

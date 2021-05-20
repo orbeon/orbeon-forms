@@ -7,6 +7,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 import javax.servlet.{Filter, FilterChain, ReadListener, ServletInputStream, ServletRequest, ServletResponse}
+import scala.collection.JavaConverters._
 
 // To enable, add the following to your `web.xml`, before all the other filters.
 //
@@ -38,7 +39,14 @@ class HttpLoggingFilter extends Filter {
     val servletInputStream  = new Private.ByteArrayServletInputStream(inputStream)
     val wrappedRequest      = new Private.LoggerRequestWrapper(httpRequest, servletInputStream)
 
-    Logger.info(s"request path `$requestPath`, body `$requestBody`")
+    // Log path, headers, and body
+    Logger.info(s"request path `$requestPath`")
+    httpRequest.getHeaderNames.asScala.foreach { headerName =>
+      val headerValue = httpRequest.getHeader(headerName)
+      Logger.info(s"request header `$headerName: $headerValue`")
+    }
+    Logger.info(s"request body `$requestBody`")
+
     chain.doFilter(wrappedRequest, servletResponse)
   }
 }

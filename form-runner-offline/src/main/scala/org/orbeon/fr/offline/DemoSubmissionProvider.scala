@@ -43,51 +43,62 @@ object DemoSubmissionProvider extends SubmissionProvider {
       )
     )
 
-    HttpMethod.withNameInsensitive(req.method) match {
-      case HttpMethod.GET =>
+    req.url.pathname match {
+      case "/fr/service/custom/orbeon/echo" =>
 
-        // TODO: check pathname is persistence path
-        store.get(req.url.pathname) match {
-          case Some(FormData(responseContentTypeOpt, responseBody, workflowStageOpt)) =>
+        new SubmissionResponse {
+          val statusCode = StatusCode.Ok
+          val headers    = new FetchHeaders
+          val body       = req.body
+        }
 
-            val headersList =
-              responseContentTypeOpt.map(Headers.ContentType ->    ).toList :::
-              workflowStageOpt      .map("Orbeon-Workflow-Stage" ->).toList
+      case _ =>
+        HttpMethod.withNameInsensitive(req.method) match {
+          case HttpMethod.GET =>
 
-            new SubmissionResponse {
-              val statusCode = StatusCode.Ok
-              val headers    = new FetchHeaders(headersList.toJSArray.map{ case (k, v) => js.Array(k, v) })
-              val body       = responseBody
+            // TODO: check pathname is persistence path
+            store.get(req.url.pathname) match {
+              case Some(FormData(responseContentTypeOpt, responseBody, workflowStageOpt)) =>
+
+                val headersList =
+                  responseContentTypeOpt.map(Headers.ContentType ->    ).toList :::
+                  workflowStageOpt      .map("Orbeon-Workflow-Stage" ->).toList
+
+                new SubmissionResponse {
+                  val statusCode = StatusCode.Ok
+                  val headers    = new FetchHeaders(headersList.toJSArray.map{ case (k, v) => js.Array(k, v) })
+                  val body       = responseBody
+                }
+              case None =>
+                new SubmissionResponse {
+                  val statusCode = StatusCode.NotFound
+                  val headers    = new FetchHeaders
+                  val body       = new Uint8Array(0)
+                }
             }
-          case None =>
+          case HttpMethod.PUT =>
+
+            if (logger.isDebugEnabled && req.headers.get(Headers.ContentType).exists(_.contains("xml"))) {
+              val body = new TextDecoder().decode(req.body.get)
+              debug(s"PUT body", List("body" -> body))
+            }
+
+            // TODO: check pathname is persistence path
+            val existing = store.contains(req.url.pathname)
+            store += req.url.pathname ->
+              FormData(
+                req.headers.get(Headers.ContentType).toOption,
+                req.body.getOrElse(throw new IllegalArgumentException),
+                req.headers.get("Orbeon-Workflow-Stage").toOption
+              )
+
             new SubmissionResponse {
-              val statusCode = StatusCode.NotFound
+              val statusCode = if (existing) StatusCode.Ok else StatusCode.Created
               val headers    = new FetchHeaders
               val body       = new Uint8Array(0)
             }
+          case _ => ???
         }
-      case HttpMethod.PUT =>
-
-        if (logger.isDebugEnabled && req.headers.get(Headers.ContentType).exists(_.contains("xml"))) {
-          val body = new TextDecoder().decode(req.body.get)
-          debug(s"PUT body", List("body" -> body))
-        }
-
-        // TODO: check pathname is persistence path
-        val existing = store.contains(req.url.pathname)
-        store += req.url.pathname ->
-          FormData(
-            req.headers.get(Headers.ContentType).toOption,
-            req.body.getOrElse(throw new IllegalArgumentException),
-            req.headers.get("Orbeon-Workflow-Stage").toOption
-          )
-
-        new SubmissionResponse {
-          val statusCode = if (existing) StatusCode.Ok else StatusCode.Created
-          val headers    = new FetchHeaders
-          val body       = new Uint8Array(0)
-        }
-      case _ => ???
     }
   }
 

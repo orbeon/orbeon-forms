@@ -436,8 +436,8 @@
                             <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-is-last-iteration-1', position() = last())</xf:action>
                             <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context-1', .)</xf:action>
 
-                            <xf:action xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess" type="xpath">
-                                process:runProcessByName('oxf.fr.detail.process', 'acme-process')
+                            <xf:action type="xpath">
+                                fr:run-process-by-name('oxf.fr.detail.process', 'acme-process')
                             </xf:action>
 
                             <xf:insert
@@ -481,8 +481,8 @@
                     event="fr-action-continuation-my-action-7-id"
                     context="xxf:instance('fr-service-response-instance')">
 
-                     <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-                         process:runProcessByName('oxf.fr.detail.process', 'summary')
+                     <xf:action type="xpath">
+                         fr:run-process-by-name('oxf.fr.detail.process', 'summary')
                      </xf:action>
                      <xf:load resource="https://www.bbc.com/news"/>
                      <xf:load resource="https://www.bbc.com/news" xxf:target="_blank"/>
@@ -490,13 +490,12 @@
                 </xf:action>
                 <xf:action
                     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-                    xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess"
                     event="xforms-submit-error"
                     observer="my-service-gaga-submission my-service-toto-submission my-service-get-attachment-submission"
                     type="xpath">
 
                     xxf:set-request-attribute('fr-action-error', true()),
-                    process:runProcessByName('oxf.fr.detail.process', 'action-service-error')
+                    fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
                 </xf:action>
             </xf:model>
         </output>
@@ -693,10 +692,10 @@
                     <xf:message>9</xf:message>
                 </xf:action>
                 <xf:action xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-                           xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess" event="xforms-submit-error"
+                           event="xforms-submit-error"
                            observer="my-service-1-submission my-service-2-submission my-service-3-submission my-service-4-submission"
                            type="xpath">xxf:set-request-attribute('fr-action-error', true()),
-                    process:runProcessByName('oxf.fr.detail.process', 'action-service-error')
+                    fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
                 </xf:action>
             </xf:model>
 
@@ -831,13 +830,12 @@
                 </xf:action>
                 <xf:action
                      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-                     xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess"
                      event="xforms-submit-error"
                      observer="echo-submission"
                      type="xpath">
 
                      xxf:set-request-attribute('fr-action-error', true()),
-                     process:runProcessByName('oxf.fr.detail.process', 'action-service-error')
+                     fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
                 </xf:action>
             </xf:model>
         </output>

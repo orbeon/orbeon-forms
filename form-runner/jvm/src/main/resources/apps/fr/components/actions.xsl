@@ -278,11 +278,10 @@
             <xf:action
                 event="xforms-submit-error"
                 observer="{string-join(for $n in $all-service-names return concat($n, '-submission'), ' ')}"
-                type="xpath"
-                xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
+                type="xpath">
 
                 xxf:set-request-attribute('fr-action-error', true()),
-                process:runProcessByName('oxf.fr.detail.process', 'action-service-error')
+                fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
             </xf:action>
         </xsl:if>
 

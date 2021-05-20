@@ -213,7 +213,6 @@ trait ProcessInterpreter extends Logging {
     (throw new IllegalArgumentException(s"Non-existing process: $name in scope $scope"))
 
   // Main entry point for starting a process associated with a named button
-  //@XPathFunction
   def runProcessByName(scope: String, name: String): Try[Any] = {
     implicit val ec: ExternalContext = CoreCrossPlatformSupport.externalContext
     LifecycleLogger.withEventAssumingRequest("fr", "process", List("uuid" -> currentXFormsDocumentId, "scope" -> scope, "name" -> name)) {
@@ -222,7 +221,6 @@ trait ProcessInterpreter extends Logging {
   }
 
   // Main entry point for starting a literal process
-  //@XPathFunction
   def runProcess(scope: String, process: String): Try[Any] =
     withDebug("process: running", Seq("process" -> process)) {
       transactionStart()

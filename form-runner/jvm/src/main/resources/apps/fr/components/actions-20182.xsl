@@ -743,8 +743,8 @@
         <xsl:variable name="process-scope" select="@scope/string()" as="xs:string"/>
         <xsl:variable name="process-name"  select="@name/string()"  as="xs:string"/>
 
-        <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.process.SimpleProcess">
-            process:runProcessByName('<xsl:value-of select="$process-scope"/>', '<xsl:value-of select="$process-name"/>')
+        <xf:action type="xpath">
+            fr:run-process-by-name('<xsl:value-of select="$process-scope"/>', '<xsl:value-of select="$process-name"/>')
         </xf:action>
 
     </xsl:template>

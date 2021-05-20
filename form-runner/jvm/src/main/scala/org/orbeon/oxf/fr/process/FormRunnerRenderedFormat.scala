@@ -53,7 +53,7 @@ object FormRunnerRenderedFormat {
 
   private val PdfElemName  = "pdf"
 
-  //@XPathFunctions
+  //@XPathFunction
   def findTemplatePath(
     frFormAttachmentsRootElemOpt : Option[NodeInfo],
     format                       : String,

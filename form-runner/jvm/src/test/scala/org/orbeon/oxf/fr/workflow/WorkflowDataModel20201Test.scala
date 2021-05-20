@@ -121,7 +121,7 @@ class WorkflowDataModel20201Test extends AnyFunSpec with XMLSupport {
   implicit val decoder = implicitly[Decoder[WorkflowConfig]]
   implicit val encoder = implicitly[Encoder[WorkflowConfig]]
 
-  describe("test 2020.1 workflow data model") {
+  describe("2020.1 workflow data model") {
 
     import io.circe.generic.auto._
     import io.circe.parser

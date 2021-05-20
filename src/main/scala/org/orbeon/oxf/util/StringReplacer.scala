@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.util
 
+import io.circe.parser
 import org.orbeon.oxf.util.StringUtils._
-import spray.json._
 
-import scala.util.control.NonFatal
 
 // Factory for a string replacement function configured by a JSON map.
 //
@@ -26,27 +25,19 @@ import scala.util.control.NonFatal
 object StringReplacer extends Logging {
   // Read a filter configuration and return a filter function
   // If there was an error processing the configuration, log and return
-  def apply(json: String)(implicit logger: IndentedLogger): String => String = {
-    val mapping = json.trimAllToOpt match {
-      case Some(nonEmptyJSON) =>
-        try
-          nonEmptyJSON.parseJson match {
-            case JsObject(fields) =>
-              fields collect {
-                case (k, v: JsString) => k -> v.value
-                case _ => throw new IllegalArgumentException
-              }
-            case _ => throw new IllegalArgumentException
-          }
-        catch {
-          case NonFatal(t) =>
-            warn("configuration must be a JSON map of String -> String", Seq("JSON" -> json))
-            Map()
+  def apply(jsonString: String)(implicit logger: IndentedLogger): String => String = {
+    val mapping = jsonString.trimAllToOpt match {
+      case Some(nonEmptyJsonString) =>
+        parser.parse(nonEmptyJsonString) flatMap (_.as[Map[String, String]]) match {
+          case Right(result) => result
+          case Left(_)       =>
+            warn("configuration must be a JSON map of String -> String", List("JSON" -> jsonString))
+            Map.empty
         }
-      case None => Map()
+      case None => Map.empty
     }
 
     // Do the replacement of all mappings one after the other
-    s => mapping.foldLeft(s){ case (prev, (k, v)) => prev.replaceAllLiterally(k, v) }
+    s => mapping.foldLeft(s){ case (prev, (k, v)) => prev.replace(k, v) }
   }
 }

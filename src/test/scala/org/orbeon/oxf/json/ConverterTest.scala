@@ -22,6 +22,7 @@
  */
 package org.orbeon.oxf.json
 
+import io.circe.{Json, parser}
 import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.oxf.util.NumberUtils._
 import org.orbeon.oxf.xml.TransformerUtils._
@@ -31,11 +32,10 @@ import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.saxon.value.Whitespace
 import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.funspec.AnyFunSpecLike
-import spray.json._
 
 import scala.language.postfixOps
 import scala.xml.Elem
-import scala.collection.compat._
+
 
 object ConverterTest {
 
@@ -174,10 +174,10 @@ object ConverterTest {
 
   val ExpectedJsonToXml = XFormsJsonToXml ++ AdditionalJsonToXml
 
-  /*@XPathFunctions*/ def expectedJsonStrings: List[String] = ExpectedJsonToXml map (_._1)
-  /*@XPathFunctions*/ def expectedXmlStrings: List[DocumentInfo] = ExpectedJsonToXml map (_._2) map (elemToDocumentInfo(_, readonly = true))
+  /*@XPathFunction*/ def expectedJsonStrings: List[String] = ExpectedJsonToXml map (_._1)
+  /*@XPathFunction*/ def expectedXmlStrings: List[DocumentInfo] = ExpectedJsonToXml map (_._2) map (elemToDocumentInfo(_, readonly = true))
 
-  /*@XPathFunctions*/ def compareXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Boolean =
+  /*@XPathFunction*/ def compareXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Boolean =
     Comparator.compareDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
 }
 
@@ -204,17 +204,17 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
         strict      <- List(true, false)
         (json, xml) <- ExpectedJsonToXml
       } locally {
-        val expectedJson = json.parseJson
+        val expectedJson = parser.parse(json)
         val actualJson   = Converter.xmlToJson(xml, strict = strict)
 
-        assert(expectedJson === actualJson)
+        assert(expectedJson.contains(actualJson))
       }
     }
   }
 
   describe("Escaping of special characters") {
 
-    val codePointsToEscape           = ((0 to 0x1F).to(Set) + 0x7F -- List(0x09, 0x0a, 0x0d)).toArray.sorted
+    val codePointsToEscape           = ((0 to 0x1F).toSet + 0x7F -- List(0x09, 0x0a, 0x0d)).toArray.sorted
     val stringWithCodePointsToEscape = new String(codePointsToEscape, 0, codePointsToEscape.length)
     val codePointsTranslated         = codePointsToEscape map (_ + 0xE000)
     val unicodeEscapedString         = codePointsToEscape map (c => s"\\u00${toHexString(Array(c.toByte))}") mkString
@@ -222,31 +222,30 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
 
     // String containing both a property name and a string value with characters to escape
     val jsonString = """ { "foo""" + unicodeEscapedString + """": "bar""" + unicodeEscapedString + """" } """
-    val json       = jsonString.parseJson
+    val json       = parser.parse(jsonString)
 
-    val xml           = Converter.jsonToXmlDoc(json)
+    val xml           = Converter.jsonToXmlDoc(json.toTry.get)
     val firstElem     = xml.rootElement / * head
     val firstElemName = firstElem attValueOpt "name" getOrElse firstElem.localname
     val firstValue    = firstElem.stringValue
 
     it ("must escape specified character ranges when going from JSON to XML") {
-      assert("foo" + translatedString === firstElemName)
-      assert("bar" + translatedString === firstValue)
+      assert("foo" + translatedString == firstElemName)
+      assert("bar" + translatedString == firstValue)
     }
 
     val backToJson = Converter.xmlToJson(xml, strict = true)
 
     it ("must roundtrip") {
-      assert(json === backToJson)
+      assert(json.contains(backToJson))
     }
 
     // We'll get `MatchError` during deconstruction if types don't match and the test will fail
-    val JsObject(fields) = backToJson
-    val (name, JsString(value)) = fields.head
+    val Some((name, value)) = backToJson.asObject.flatMap(_.toIterable.headOption)
 
     it ("must contain correct code points when parsing JSON") {
-      assert("bar" + stringWithCodePointsToEscape === value)
-      assert("foo" + stringWithCodePointsToEscape === name)
+      assert(value.asString.contains("bar" + stringWithCodePointsToEscape))
+      assert("foo" + stringWithCodePointsToEscape == name)
     }
   }
 
@@ -319,10 +318,10 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
         (json, xml) <- xmlInputs
       } locally {
 
-        val expectedJson = json.parseJson
+        val expectedJson = parser.parse(json)
         val actualJson   = Converter.xmlToJson(xml, strict = strict)
 
-        assert(expectedJson === actualJson)
+        assert(expectedJson.contains(actualJson))
       }
     }
   }
@@ -348,15 +347,13 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
         (json, xml) <- xmlInputs
       } locally {
 
-        def normalize(v: JsValue) = v match {
-          case JsString(s) => Whitespace.collapseWhitespace(s).toString
-          case other       => other
-        }
+        def normalize(v: Json): Json =
+          v.asString.map(s => Json.fromString(Whitespace.collapseWhitespace(s).toString)).getOrElse(v)
 
-        val expectedJson = normalize(json.parseJson)
+        val expectedJson = parser.parse(json).map(normalize)
         val actualJson   = normalize(Converter.xmlToJson(xml, strict = strict))
 
-        assert(expectedJson === actualJson)
+        assert(expectedJson.contains(actualJson))
       }
     }
   }

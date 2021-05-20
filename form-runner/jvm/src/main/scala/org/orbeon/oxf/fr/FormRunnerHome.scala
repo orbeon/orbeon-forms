@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.fr
 
+import io.circe.{Json, parser}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.findProvider
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.DateUtilsUsingSaxon
 import org.orbeon.oxf.util.PathUtils._
@@ -29,6 +29,7 @@ import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.{immutable => i}
 import scala.util.Try
+
 
 trait FormRunnerHome {
 
@@ -283,34 +284,32 @@ trait FormRunnerHome {
 
 object FormRunnerHome {
 
-  import spray.json._
+  def tryRemoteServersFromString(json: String): Try[Vector[(String, String)]] =
+    parser.parse(json).toTry flatMap tryRemoteServersFromJSON
 
-  def tryRemoteServersFromString(json: String) =
-    Try(json.parseJson) flatMap tryRemoteServersFromJSON
+  def tryRemoteServersFromJSON(json: Json): Try[Vector[(String, String)]] = Try {
+    json.asArray match {
+      case Some(elements) =>
+        elements flatMap (_.asObject) collect {
+          case fields =>
 
-  def tryRemoteServersFromJSON(json: JsValue) = Try {
-    json match {
-      case JsArray(elements) =>
-        elements collect {
-          case JsObject(fields) =>
+            def getFieldOrThrow(key: String) =
+              fields(key) flatMap (_.asString) flatMap trimAllToOpt getOrElse (throw new IllegalArgumentException)
 
-            def stringValueOrThrow(v: JsValue) = (
-              collectByErasedType[JsString](v)
-              map       (_.value)
-              flatMap   trimAllToOpt
-              getOrElse (throw new IllegalArgumentException)
-            )
-
-            stringValueOrThrow(fields("label")) -> stringValueOrThrow(fields("url")).dropTrailingSlash
+            getFieldOrThrow("label") -> getFieldOrThrow("url").dropTrailingSlash
         }
-      case other =>
+      case _ =>
         throw new IllegalArgumentException
     }
   }
 
   private def remoteServersFromJSONProperty: Option[i.Seq[(String, String)]] =
     properties.getPropertyOpt("oxf.fr.home.remote-servers") map { property =>
-      Try(property.associatedValue(_.value.toString.parseJson)) flatMap tryRemoteServersFromJSON getOrElse {
+      Try(
+        property.associatedValue(p =>
+          parser.parse(p.value.toString).toTry.getOrElse(throw new IllegalArgumentException(p.value.toString))
+        )
+      ) flatMap tryRemoteServersFromJSON getOrElse {
         implicit val logger = inScopeContainingDocument.getIndentedLogger("form-runner")
         warn(
           s"incorrect JSON configuration for property `oxf.fr.home.remote-servers`",

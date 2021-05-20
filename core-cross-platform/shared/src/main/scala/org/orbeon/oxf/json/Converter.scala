@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.xml.sax.helpers.AttributesImpl
-import spray.json._
+import io.circe.{Json, parser}
 
 import scala.language.postfixOps
 import org.orbeon.oxf.xml.SaxonUtils
@@ -71,18 +71,20 @@ object Converter extends XmlToJsonAlgorithm with JsonToXmlAlgorithm {
   }
 
   // Convert a JSON String to a readonly DocumentInfo
-  def jsonToXmlDoc(ast: JsValue): StaticXPath.DocumentNodeInfoType = {
+  // For tests only
+  def jsonToXmlDoc(ast: Json): StaticXPath.DocumentNodeInfoType = {
     val (receiver, result) = StaticXPath.newTinyTreeReceiver
     jsonToXmlStream(ast, receiver)
     result()
   }
 
   // Convert a JSON String to a stream of XML events
+  // Throws if parsing fails
   def jsonStringToXmlStream(source: String, receiver: XMLReceiver, rootElementName: String = Symbols.JSON): Unit =
-    jsonToXmlStream(source.parseJson, receiver, rootElementName)
+    jsonToXmlStream(parser.parse(source).toTry.get, receiver, rootElementName)
 
   // Convert a JSON AST to a stream of XML events
-  def jsonToXmlStream(ast: JsValue, receiver: XMLReceiver, rootElementName: String = Symbols.JSON): Unit = {
+  def jsonToXmlStream(ast: Json, receiver: XMLReceiver, rootElementName: String = Symbols.JSON): Unit = {
     receiver.startDocument()
     jsonToXmlImpl(ast, new DeferredXMLReceiverImpl(receiver), rootElementName)
     receiver.endDocument()
@@ -90,10 +92,10 @@ object Converter extends XmlToJsonAlgorithm with JsonToXmlAlgorithm {
 
   // Convert an XML tree to a JSON String
   def xmlToJsonString(root: XmlElem, strict: Boolean): String =
-    xmlToJson(root, strict).toString
+    xmlToJson(root, strict).noSpaces
 
   // Convert an XML tree to a JSON AST
-  def xmlToJson(root: XmlElem, strict: Boolean): JsValue =
+  def xmlToJson(root: XmlElem, strict: Boolean): Json =
     xmlToJsonImpl(
       if (root.isDocument)
         root.rootElement

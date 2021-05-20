@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fb
 
+import io.circe.parser
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
 import org.orbeon.oxf.fb.FormBuilder._
@@ -37,9 +38,10 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.{XFormsNames, XFormsId}
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 
 import scala.collection.compat._
+
 
 object FormBuilderXPathApi {
 
@@ -574,14 +576,13 @@ object FormBuilderXPathApi {
     FormBuilder.hasEditor(controlElement, editor)(FormBuilderDocContext())
 
   //@XPathExpression
-  def alwaysShowRoles: List[String] = {
-
-    import spray.json.DefaultJsonProtocol._
-    import spray.json._
-
-    val rolesJsonOpt = Property.propertyAsString("oxf.fb.permissions.role.always-show")
-    rolesJsonOpt.to(List).flatMap(_.parseJson.convertTo[List[String]])
-  }
+  def alwaysShowRoles: List[String] =
+    Property.propertyAsString("oxf.fb.permissions.role.always-show") match {
+      case Some(rolesJson) =>
+        parser.parse(rolesJson).flatMap(_.as[List[String]]).getOrElse(throw new IllegalArgumentException(rolesJson))
+      case None =>
+        Nil
+    }
 
   //@XPathFunction
   def buildFormBuilderControlNamespacedIdOrEmpty(staticId: String): String =

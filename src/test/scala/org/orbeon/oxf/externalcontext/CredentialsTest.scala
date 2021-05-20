@@ -17,7 +17,7 @@ import org.orbeon.oxf.test.XMLSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.funspec.AnyFunSpec
-import spray.json.DeserializationException
+
 
 class CredentialsTest extends AnyFunSpec with XMLSupport {
 
@@ -232,7 +232,7 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
 
     for ((description, json) <- expectedFailing)
       it (s"must reject $description") {
-        intercept[DeserializationException] {
+        intercept[Throwable] {
           CredentialsSupport.parseCredentials(json, decodeForHeader = false)
         }
       }

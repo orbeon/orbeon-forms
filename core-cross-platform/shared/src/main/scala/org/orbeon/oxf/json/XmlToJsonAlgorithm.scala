@@ -24,7 +24,7 @@ package org.orbeon.oxf.json
 
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import spray.json._
+import io.circe.{Json, JsonNumber, parser}
 
 import scala.language.postfixOps
 import scala.util.Try
@@ -48,7 +48,7 @@ protected trait XmlToJsonAlgorithm {
   def childrenElem(elem: XmlElem): Iterator[XmlElem]
 
   // Convert an XML tree to a JSON AST
-  def xmlToJsonImpl(root: XmlElem, strict: Boolean): JsValue = {
+  def xmlToJsonImpl(root: XmlElem, strict: Boolean): Json = {
 
     def unescapeString(s: String) =
       s.iterateCodePoints map {
@@ -59,32 +59,32 @@ protected trait XmlToJsonAlgorithm {
     def typeOpt (elem: XmlElem) = attValueOpt(elem, Symbols.Type)
     def elemName(elem: XmlElem) = attValueOpt(elem, Symbols.Name) map unescapeString getOrElse localname(elem)
 
-    def jsNullIfBlank(s: String, typ: String, convert: String => JsValue) =
+    def jsNullIfBlank(s: String, typ: String, convert: String => Json): Json =
       s.trimAllToOpt map { trimmed =>
         Try(convert(trimmed)) getOrElse {
           if (strict)
             throwError(s"""unable to parse $typ "$trimmed"""")
           else
-            JsNull
+            Json.Null
         }
       } getOrElse
-        JsNull
+        Json.Null
 
     def throwError(s: String) =
       throw new IllegalArgumentException(s)
 
-    def processElement(elem: XmlElem): JsValue =
+    def processElement(elem: XmlElem): Json =
       typeOpt(elem) match {
-        case Some(Symbols.String) | None => JsString(unescapeString(stringValue(elem)))
-        case Some(Symbols.Number)        => jsNullIfBlank(stringValue(elem), "number",  v => JsNumber(v))
-        case Some(Symbols.Boolean)       => jsNullIfBlank(stringValue(elem), "boolean", v => JsBoolean(v.toBoolean))
-        case Some(Symbols.Null)          => JsNull
-        case Some(Symbols.Object)        => JsObject(childrenElem(elem) map (elem => elemName(elem) -> processElement(elem)) toMap)
-        case Some(Symbols.Array)         => JsArray(childrenElem(elem)  map processElement toVector)
+        case Some(Symbols.String) | None => Json.fromString(unescapeString(stringValue(elem)))
+        case Some(Symbols.Number)        => jsNullIfBlank(stringValue(elem), "number",  v => Json.fromJsonNumber(JsonNumber.fromString(v).getOrElse(throw new IllegalArgumentException(v))))
+        case Some(Symbols.Boolean)       => jsNullIfBlank(stringValue(elem), "boolean", v => Json.fromBoolean(v.toBoolean))
+        case Some(Symbols.Null)          => Json.Null
+        case Some(Symbols.Object)        => Json.obj(childrenElem(elem).map(elem => elemName(elem) -> processElement(elem)).toVector: _*)
+        case Some(Symbols.Array)         => Json.arr(childrenElem(elem).map(processElement).toVector: _*)
         case Some(other)                 =>
           if (strict)
             throwError(s"""unknown datatype `${Symbols.Type}="$other"`""")
-          JsNull
+          Json.Null
       }
 
     processElement(root)

@@ -22,10 +22,10 @@
  */
 package org.orbeon.oxf.json
 
+import io.circe.Json
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import spray.json._
 
 import scala.language.postfixOps
 
@@ -45,7 +45,7 @@ protected trait JsonToXmlAlgorithm {
   def makeNCName(name: String): String
 
   // Convert a JSON AST to a stream of XML events
-  def jsonToXmlImpl(ast: JsValue, rcv: XmlStream, rootElementName: String = Symbols.JSON): Unit = {
+  def jsonToXmlImpl(ast: Json, rcv: XmlStream, rootElementName: String = Symbols.JSON): Unit = {
 
     def escapeString(s: String) =
       s.iterateCodePoints map {
@@ -62,38 +62,42 @@ protected trait JsonToXmlAlgorithm {
       result
     }
 
-    def processValue(jsValue: JsValue): Unit =
-      jsValue match {
-        case JsString(v) =>
-          // Don't add `type="string"` since it's the default
-          text(rcv, escapeString(v))
-        case JsNumber(v) =>
-          addAttribute(rcv, Symbols.Type, Symbols.Number)
-          text(rcv, v.toString)
-        case JsBoolean(v) =>
+    def processValue(jsValue: Json): Unit =
+      jsValue.fold(
+        jsonNull    = addAttribute(rcv, Symbols.Type, Symbols.Null),
+        jsonBoolean = v => {
           addAttribute(rcv, Symbols.Type, Symbols.Boolean)
           text(rcv, v.toString)
-        case JsNull =>
-          addAttribute(rcv, Symbols.Type, Symbols.Null)
-        case JsObject(fields) =>
-          addAttribute(rcv, Symbols.Type, Symbols.Object)
-          fields foreach { case (name, value) =>
-
-            val ncName  = makeNCName(name)
-            val nameAtt = ncName != name list (Symbols.Name -> escapeString(name))
-
-            withElement(ncName, nameAtt) {
-              processValue(value)
-            }
-          }
-        case JsArray(arrayValues) =>
+        },
+        jsonNumber  = v => {
+          addAttribute(rcv, Symbols.Type, Symbols.Number)
+          text(rcv, v.toString)
+        },
+        jsonString  = v => {
+          // Don't add `type="string"` since it's the default
+          text(rcv, escapeString(v))
+        },
+        jsonArray   = v => {
           addAttribute(rcv, Symbols.Type, Symbols.Array)
-          arrayValues foreach { arrayValue =>
+          v foreach { arrayValue =>
             withElement(Symbols.Anonymous) {
               processValue(arrayValue)
             }
           }
-      }
+        },
+        jsonObject  = v => {
+          addAttribute(rcv, Symbols.Type, Symbols.Object)
+            v.toIterable foreach { case (name, value) =>
+
+              val ncName  = makeNCName(name)
+              val nameAtt = ncName != name list (Symbols.Name -> escapeString(name))
+
+              withElement(ncName, nameAtt) {
+                processValue(value)
+              }
+            }
+        },
+      )
 
     withElement(rootElementName) {
       processValue(ast)

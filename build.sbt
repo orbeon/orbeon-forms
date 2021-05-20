@@ -35,7 +35,6 @@ val ScalaJsLocalesVersion         = "1.1.0"
 
 // Scala libraries for Scala JVM only
 val Parboiled1Version             = "1.3.1"
-val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
 val ScalaLoggingVersion           = "3.9.4"
 
 // Shared Scala libraries
@@ -78,7 +77,6 @@ val CoreLibraryDependencies = Seq(
   "org.parboiled"               %% "parboiled-scala"                % Parboiled1Version,
   "org.parboiled"               %% "parboiled"                      % Parboiled2Version,
   "org.scala-sbt"               %% "sbinary"                        % SbinaryVersion,
-  "io.spray"                    %% "spray-json"                     % SprayJsonVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
@@ -575,9 +573,9 @@ lazy val formRunnerJVM = formRunner.jvm
     libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion  % Provided,
 
     libraryDependencies                ++= Seq(
-      "io.circe" %% "circe-core",
-      "io.circe" %% "circe-generic",
-      "io.circe" %% "circe-parser"
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
     ).map(_ % CirceVersion)
   )
   .settings(
@@ -1213,7 +1211,13 @@ lazy val coreCrossPlatform = (crossProject(JVMPlatform, JSPlatform).crossType(Cr
       "org.parboiled"   %%% "parboiled"     % Parboiled2Version,
       "org.scala-lang"  %   "scala-reflect" % scala212,
       compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
-    )
+    ),
+
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
+    ).map(_ % CirceVersion)
   )
 
 lazy val coreCrossPlatformJVM = coreCrossPlatform.jvm

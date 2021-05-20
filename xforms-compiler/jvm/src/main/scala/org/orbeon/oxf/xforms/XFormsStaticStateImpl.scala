@@ -111,10 +111,8 @@ class XFormsStaticStateImpl(
   def uploadMaxSizeAggregateExpression        : Option[CompiledExpression]      = dynamicProperties.uploadMaxSizeAggregateExpression
   def propertyMaybeAsExpression(name: String) : Either[Any, CompiledExpression] = dynamicProperties.propertyMaybeAsExpression(name)
 
-  // TODO: don't use spray JSON and switch to Circe
   lazy val sanitizeInput: String => String = StringReplacer(staticProperties.staticStringProperty(P.SanitizeProperty))
 
-  // TODO: don't use spray JSON and switch to Circe
   lazy val assets: XFormsAssets =
     XFormsAssetsBuilder.updateAssets(
       XFormsAssetsBuilder.fromJsonProperty,

@@ -13,13 +13,13 @@
   */
 package org.orbeon.oxf.xforms
 
+import io.circe.{Json, JsonObject, parser}
 import org.orbeon.dom.QName
 import org.orbeon.oxf.properties.Property
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom.Extensions
-import spray.json._
 
 import scala.collection.compat._
 
@@ -91,38 +91,46 @@ object XFormsAssetsBuilder {
 
   // Public for tests
   def fromJsonString(json: String, namespaces: Map[String, String]): XFormsAssets =
-    fromJson(json.parseJson, namespaces)
+    (parser.parse(json) map (fromJson(_, namespaces))).toTry.getOrElse(throw new IllegalArgumentException(json))
 
-  private def fromJson(json: JsValue, namespaces: Map[String, String]): XFormsAssets = {
+  private def fromJson(json: Json, namespaces: Map[String, String]): XFormsAssets = {
 
-    def collectFullMin(key: String, fields: Map[String, JsValue]): Vector[AssetPath] =
-      fields.get(key) match {
-        case Some(JsArray(values)) =>
-          values collect { case JsObject(fields) =>
-            val full   = fields.get("full") collect { case JsString(v)  => v } getOrElse (throw new IllegalArgumentException)
-            val hasMin = fields.get("min")  collect { case JsBoolean(v) => v } getOrElse false
+    def collectFullMin(key: String, jsonObject: JsonObject): Vector[AssetPath] =
+      jsonObject(key) match {
+        case Some(jsonArray) =>
 
-            AssetPath(full, hasMin)
+          import io.circe.generic.auto._
+
+          case class FullMin(full: String, min: Boolean)
+
+          jsonArray.as[Vector[FullMin]] match {
+            case Right(list)   => list map { case FullMin(full, min) => AssetPath(full, min) }
+            case Left(failure) => throw failure
           }
+
         case _ => throw new IllegalArgumentException
       }
 
-    def collectXbl(key: String, fields: Map[String, JsValue]): Vector[QName] =
-      fields.get(key) match {
-        case Some(JsArray(values)) =>
-          values collect { case JsString(value) =>
-            Extensions.resolveQName(namespaces.get, value, unprefixedIsNoNamespace = true)
-              .getOrElse(throw new IllegalArgumentException)
+    def collectXbl(key: String, jsonObject: JsonObject): Vector[QName] =
+      jsonObject(key) match {
+        case Some(jsonArray) =>
+          jsonArray.as[Vector[String]] match {
+            case Right(list)   =>
+              list map { lexicalQName =>
+                Extensions.resolveQName(namespaces.get, lexicalQName, unprefixedIsNoNamespace = true) getOrElse
+                  (throw new IllegalArgumentException)
+              }
+            case Left(failure) => throw failure
           }
         case _ => Vector.empty
       }
 
-    json match {
-      case JsObject(fields) =>
+    json.asObject match {
+      case Some(jsonObject) =>
 
-        val css = collectFullMin("css", fields)
-        val js  = collectFullMin("js",  fields)
-        val xbl = collectXbl("xbl",  fields)
+        val css = collectFullMin("css", jsonObject)
+        val js  = collectFullMin("js",  jsonObject)
+        val xbl = collectXbl    ("xbl", jsonObject)
 
         XFormsAssets(css.to(List), js.to(List), xbl.toSet)
 

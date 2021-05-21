@@ -6,7 +6,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
-import javax.servlet.{Filter, FilterChain, ReadListener, ServletInputStream, ServletRequest, ServletResponse}
+import javax.servlet.{Filter, FilterChain, FilterConfig, ReadListener, ServletInputStream, ServletRequest, ServletResponse}
 import scala.collection.JavaConverters._
 
 // To enable, add the following to your `web.xml`, before all the other filters.
@@ -49,6 +49,10 @@ class HttpLoggingFilter extends Filter {
 
     chain.doFilter(wrappedRequest, servletResponse)
   }
+
+  // We need to provide those implementation of `init` and `destroy` as long as we support Servlet 3.1 / Tomcat 8.5
+  override def init(config: FilterConfig): Unit = {}
+  override def destroy(): Unit = {}
 }
 
 private object Private {

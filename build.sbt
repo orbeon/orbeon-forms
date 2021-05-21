@@ -609,12 +609,9 @@ lazy val formRunnerJS = formRunner.js
       "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
-
-//    Test / jsDependencies          += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
-
-    // HACK: Not sure why `xformsWeb % "test->test;compile->compile"` doesn't expose this.
-    Test / unmanagedResourceDirectories += sharedAssetsDir((xformsWeb / baseDirectory).value),
+    jsDependencies                         += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                         += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+    Compile / unmanagedResourceDirectories += (xformsJVM / baseDirectory).value / "src" / "main" / "assets",
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,

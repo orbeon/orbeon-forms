@@ -75,12 +75,15 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
     ProcessorService.withProcessorService(processorService) {
       withRootException("request", new ServletException(_)) {
         val httpMethod = request.getMethod
-        if (! acceptedMethods(httpMethod.toLowerCase))
-          throw new OXFException("HTTP method not accepted: " + httpMethod + ". You can configure methods in your web.xml using the parameter: " + HttpAcceptMethodsParam)
 
-        val pipelineContext = new PipelineContext
-        val externalContext = new ServletExternalContext(pipelineContext, webAppContext, request, response)
-        processorService.service(pipelineContext, externalContext)
+        if (! acceptedMethods(httpMethod.toLowerCase)) {
+          logger.info("HTTP method not accepted: " + httpMethod + ". You can configure methods in your web.xml using the parameter: " + HttpAcceptMethodsParam)
+          response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
+        } else {
+          val pipelineContext = new PipelineContext
+          val externalContext = new ServletExternalContext(pipelineContext, webAppContext, request, response)
+          processorService.service(pipelineContext, externalContext)
+        }
       }
     }
 }

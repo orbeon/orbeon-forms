@@ -216,7 +216,7 @@ object FormRunnerPersistence {
     val allDistinctVersionsPassed = (
         versions         flatMap
         (_.trimAllToOpt) flatMap
-        common.Version.majorMinor
+        common.VersionSupport.majorMinor
       ).distinct
 
     val maxVersionPassedOpt =
@@ -227,7 +227,7 @@ object FormRunnerPersistence {
     val allPossibleDataFormatsPairs =
       for {
         value <- DataFormatVersion.values
-        mm    <- common.Version.majorMinor(value.entryName)
+        mm    <- common.VersionSupport.majorMinor(value.entryName)
       } yield
         value -> mm
 

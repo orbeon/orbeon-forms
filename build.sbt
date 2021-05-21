@@ -100,7 +100,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.ant"              %  "ant-jsch"                       % AntVersion,
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion exclude("javax.activation", "activation"),
-  "com.sun.activation" 		      % "javax.activation"                % JavaActivationVersion,
+  "com.sun.activation"          % "javax.activation"                % JavaActivationVersion,
   "org.apache.httpcomponents"   % "httpclient"                      % HttpComponentsVersion,
   "javax.enterprise.concurrent" % "javax.enterprise.concurrent-api" % "1.1",
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,

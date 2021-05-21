@@ -330,6 +330,10 @@ object ElementAnalysisTreeBuilder {
           allChildren collect {
             case (e, s) if isLHHA(e) && ! e.hasAttribute(FOR_QNAME) || TopLevelItemsetQNames(e.getQName) || isAction(e.getQName) => (e, s)
           }
+        case _: OutputControl =>
+          allChildren collect {
+            case (e, s) if isLHHA(e) && ! e.hasAttribute(FOR_QNAME) || isAction(e.getQName) || e.getQName == XFORMS_HEADER_QNAME  => (e, s)
+          }
         case _: ValueControl | _: TriggerControl =>
           allChildren collect {
             case (e, s) if isLHHA(e) && ! e.hasAttribute(FOR_QNAME) || isAction(e.getQName) => (e, s)

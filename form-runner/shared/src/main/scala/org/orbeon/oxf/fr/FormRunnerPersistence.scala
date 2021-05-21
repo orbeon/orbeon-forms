@@ -23,7 +23,6 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
 
-import org.orbeon.oxf.fr.FormRunner.properties
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
@@ -344,7 +343,7 @@ trait FormRunnerPersistence {
     urlString       : String,
     customHeaders   : Map[String, List[String]])(
     implicit logger : IndentedLogger
-  ): Option[DocumentNodeInfoType] = {
+  ): ConnectionResult = {
 
     implicit val externalContext         : ExternalContext = CoreCrossPlatformSupport.externalContext
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
@@ -386,7 +385,7 @@ trait FormRunnerPersistence {
     urlString       : String,
     customHeaders   : Map[String, List[String]])(
     implicit logger : IndentedLogger
-  ): Option[DocumentInfo] = {
+  ): Option[DocumentNodeInfoType] = {
 
     val cxr = readConnectionResult(HttpMethod.GET, urlString, customHeaders)
 

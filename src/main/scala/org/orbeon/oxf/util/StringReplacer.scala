@@ -28,13 +28,11 @@ object StringReplacer extends Logging {
   def apply(jsonString: String)(implicit logger: IndentedLogger): String => String = {
     val mapping = jsonString.trimAllToOpt match {
       case Some(nonEmptyJsonString) =>
-        parser.parse(nonEmptyJsonString) flatMap (_.as[Map[String, String]]) match {
-          case Right(result) => result
-          case Left(_)       =>
-            warn("configuration must be a JSON map of String -> String", List("JSON" -> jsonString))
-            Map.empty
+        parser.decode[Map[String, String]](nonEmptyJsonString) getOrElse {
+          warn("configuration must be a JSON map of String -> String", List("JSON" -> jsonString))
+          Map.empty[String, String]
         }
-      case None => Map.empty
+      case None => Map.empty[String, String]
     }
 
     // Do the replacement of all mappings one after the other

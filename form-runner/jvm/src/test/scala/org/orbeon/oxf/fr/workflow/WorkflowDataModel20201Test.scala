@@ -82,7 +82,6 @@ class WorkflowDataModel20201Test extends AnyFunSpec with XMLSupport {
         <perspectives type="array">
             <_ type="object">
                 <name>creator</name>
-                <summaryButtons type="array"/>
                 <documentation/>
                 <accessTo type="array">
                    <_ type="NewPage">
@@ -93,6 +92,7 @@ class WorkflowDataModel20201Test extends AnyFunSpec with XMLSupport {
                     </_>
                 </accessTo>
                 <availability type="ToAnyoneAvailability"/>
+                <summaryButtons type="array"/>
                 <editButtons type="array">
                     <_ type="object">
                         <name>summary</name>

@@ -36,8 +36,8 @@ class HttpLoggingFilter extends Filter {
     val requestPath         = NetUtils.getRequestPathInfo(httpRequest)
     val requestBody         = new String(byteArray, CharsetNames.Utf8)
     val inputStream         = new ByteArrayInputStream(byteArray)
-    val servletInputStream  = new Private.ByteArrayServletInputStream(inputStream)
-    val wrappedRequest      = new Private.LoggerRequestWrapper(httpRequest, servletInputStream)
+    val servletInputStream  = new HttpLoggingFilter.ByteArrayServletInputStream(inputStream)
+    val wrappedRequest      = new HttpLoggingFilter.LoggerRequestWrapper(httpRequest, servletInputStream)
 
     // Log path, headers, and body
     Logger.info(s"request path `$requestPath`")
@@ -55,7 +55,7 @@ class HttpLoggingFilter extends Filter {
   override def destroy(): Unit = {}
 }
 
-private object Private {
+private object HttpLoggingFilter {
 
   class LoggerRequestWrapper(httpServletRequest: HttpServletRequest, servletInputStream: ServletInputStream)
       extends HttpServletRequestWrapper(httpServletRequest) {

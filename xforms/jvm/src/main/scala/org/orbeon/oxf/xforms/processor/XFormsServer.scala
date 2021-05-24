@@ -843,13 +843,13 @@ class XFormsServer extends ProcessorImpl {
     lockResult match {
       case Failure(e: SessionExpiredException) => // from downstream `acquireDocumentLock`
         // See also `XFormsAssetServer`
-        info(s"${e.getMessage} while retrieving form dynamic resources")
+        info(s"session not found while processing client events")
         // TODO: Unclear is this can happen for replace="all" where `xmlReceiverOpt == None`.
         val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
         ClientEvents.errorResponse(e.code)(xmlReceiver)
       case Failure(e) => // from downstream `acquireDocumentLock`
         // See also `XFormsAssetServer`
-        info(s"${e.getMessage} while retrieving form dynamic resources")
+        info(s"error while processing client events: ${e.getMessage}")
         // TODO: Unclear is this can happen for replace="all" where `xmlReceiverOpt == None`.
         val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
         ClientEvents.errorResponse(StatusCode.InternalServerError)(xmlReceiver)

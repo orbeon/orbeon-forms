@@ -70,10 +70,10 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           case Failure(e: SessionExpiredException) => // from downstream `acquireDocumentLock`
             // For `serveDynamicResource` we return "not found" and here we return "forbidden" as that's the
             // code associated with `SessionExpiredException`. Can we justify the difference?
-            info(s"${e.getMessage} while retrieving form dynamic resources")
+            info(s"session not found while retrieving form dynamic resources")
             response.setStatus(e.code)
           case Failure(e) => // from downstream `acquireDocumentLock`
-            info(s"${e.getMessage} while retrieving form dynamic resources")
+            info(s"error while retrieving form dynamic resources: ${e.getMessage}")
             response.setStatus(StatusCode.InternalServerError)
           case Success(fromCurrentStateOpt) =>
 

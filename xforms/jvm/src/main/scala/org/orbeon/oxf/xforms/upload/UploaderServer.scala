@@ -147,9 +147,11 @@ object UploaderServer {
       lifecycleOpt   = Some(
         new UploadProgressMultipartLifecycle(request.contentLengthOpt, trustedUploadContext.getInputStream, session) {
           def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] =
-            withDocumentAcquireLock(uuid, XFormsProperties.uploadXFormsAccessTimeout) {
-              _.getUploadConstraintsForControl(controlEffectiveId)
-            } .flatten
+            withDocumentAcquireLock(
+              uuid    = uuid,
+              timeout = XFormsProperties.uploadXFormsAccessTimeout)(
+              block   = _.getUploadConstraintsForControl(controlEffectiveId)
+            ).flatten
         }
       ),
       maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter

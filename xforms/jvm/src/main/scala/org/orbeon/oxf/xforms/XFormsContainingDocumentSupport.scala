@@ -44,7 +44,7 @@ import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.{ScriptBuilder, XFormsServer}
-import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsStateManager}
+import org.orbeon.oxf.xforms.state.{DynamicState, LockResponse, RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -56,7 +56,7 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection.{immutable => i, mutable => m}
 import scala.reflect.ClassTag
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 object XFormsContainingDocumentSupport {
 
@@ -74,8 +74,8 @@ object XFormsContainingDocumentSupport {
 
     LifecycleLogger.eventAssumingRequest("xforms", "before document lock", List("uuid" -> params.uuid))
 
-    (XFormsStateManager.acquireDocumentLock(params.uuid, timeout): Try[Option[Lock]]) map {
-      case Some(lock) =>
+    XFormsStateManager.acquireDocumentLock(params.uuid, timeout) match {
+      case LockResponse.Success(lock) =>
         try {
 
           LifecycleLogger.eventAssumingRequest(
@@ -96,7 +96,7 @@ object XFormsContainingDocumentSupport {
           try {
             val result = block(Some(containingDocument))
             keepDocument = true
-            result
+            Success(result)
           } finally {
             XFormsStateManager.afterUpdate(containingDocument, keepDocument, disableDocumentCache = false)
           }
@@ -104,9 +104,11 @@ object XFormsContainingDocumentSupport {
         } finally {
           XFormsStateManager.releaseDocumentLock(lock)
         }
-      case None =>
+      case LockResponse.Timeout =>
         LifecycleLogger.eventAssumingRequest("xforms", "document lock timeout", List("uuid" -> params.uuid))
-        block(None)
+        Success(block(None))
+      case LockResponse.Failure(t) =>
+        Failure(t)
     }
   }
 

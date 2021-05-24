@@ -16,7 +16,13 @@ package org.orbeon.oxf.xforms.state
 import java.util.concurrent.locks.Lock
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
-import scala.util.Try
+
+sealed trait LockResponse
+object LockResponse {
+  case class  Success(lock: Lock)           extends LockResponse
+  case object Timeout                       extends LockResponse
+  case class  Failure(exception: Throwable) extends LockResponse // `InterruptedException | SessionExpiredException`
+}
 
 // Encoded combination of static an dynamic state that fully represents an XForms document's current state
 case class XFormsState(
@@ -55,7 +61,7 @@ trait XFormsStateLifecycle {
     disableDocumentCache : Boolean
   ): XFormsContainingDocument
 
-  def acquireDocumentLock (uuid: String, timeout: Long): Try[Option[Lock]]
+  def acquireDocumentLock (uuid: String, timeout: Long): LockResponse
   def releaseDocumentLock (lock: Lock): Unit
 
   def beforeUpdate        (parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument

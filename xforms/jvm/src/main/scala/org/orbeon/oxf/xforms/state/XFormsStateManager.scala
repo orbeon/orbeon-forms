@@ -130,32 +130,27 @@ object XFormsStateManager extends XFormsStateLifecycle {
       storeDocumentState(containingDocument, isInitialState = false)
   }
 
-  /**
-    * Return the locked document lock. Must be called before beforeUpdate().
-    *
-    * @param uuid incoming UUID
-    * @return `Failure` in case of `InterruptedException` or `SessionExpiredException`, `Success(Some())`
-    *          if the lock was obtained, `Success(None)` if the lock was not obtained after the timeout.
-    */
-  def acquireDocumentLock(uuid: String, timeout: Long): Try[Option[Lock]] = {
-    assert(uuid ne null)
+  // Return the locked document lock. Must be called before `beforeUpdate()`.
+  def acquireDocumentLock(uuid: String, timeout: Long): LockResponse =
     // Check that the session is associated with the requested UUID. This enforces the rule that an incoming request
     // for a given UUID must belong to the same session that created the document. If the session expires, the
     // key goes away as well, and the key won't be present. If we don't do this check, the XForms server might
     // handle requests for a given UUID within a separate session, therefore providing access to other sessions,
     // which is not desirable. Further, we now have a lock stored in the session.
-    getDocumentLock(uuid) match {
+    getDocumentLock(uuid ensuring (_ ne null)) match {
       case Some(lock) =>
         try {
-          Success(lock.tryLock(timeout, TimeUnit.MILLISECONDS) option lock)
+          if (lock.tryLock(timeout, TimeUnit.MILLISECONDS))
+            LockResponse.Success(lock)
+          else
+            LockResponse.Timeout
         } catch {
           case e: InterruptedException =>
-            Failure(e)
+            LockResponse.Failure(e)
         }
       case None =>
-        Failure(SessionExpiredException("Unknown form document requested."))
+        LockResponse.Failure(SessionExpiredException("Unknown form document requested."))
     }
-  }
 
   // Release the given document lock. Must be called after afterUpdate() in a finally block.
   def releaseDocumentLock(lock: Lock): Unit =

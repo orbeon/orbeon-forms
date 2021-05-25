@@ -609,7 +609,7 @@ lazy val formRunnerJS = formRunner.js
       "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
     ),
 
-    jsDependencies                         += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                         += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
     jsDependencies                         += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     Compile / unmanagedResourceDirectories += (xformsJVM / baseDirectory).value / "src" / "main" / "assets",
 
@@ -658,7 +658,7 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
       "io.github.cquiroz"      %%% "scala-java-time" % "2.0.0"
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     Test / jsDependencies          += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
@@ -759,7 +759,7 @@ lazy val formBuilderJS = formBuilder.js
       "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
+    jsDependencies       += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     Test / jsDependencies += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
@@ -1030,7 +1030,7 @@ lazy val xformsOffline = (project in file("xforms-offline"))
       "io.circe" %%% "circe-parser"
     ).map(_ % CirceVersion),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
     Test / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
@@ -1089,7 +1089,7 @@ lazy val formRunnerOffline = (project in file("form-runner-offline"))
       "io.circe" %%% "circe-parser"
     ).map(_ % CirceVersion),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
     Test / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
@@ -1143,7 +1143,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "io.circe" %%% "circe-parser"
     ).map(_ % CirceVersion),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
     Test / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),

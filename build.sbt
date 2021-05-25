@@ -5,7 +5,7 @@ import org.orbeon.sbt.OrbeonWebappPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport.jsEnv
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-val DefaultOrbeonFormsVersion     = "2019.1-SNAPSHOT"
+val DefaultOrbeonFormsVersion     = "2021.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
@@ -20,7 +20,7 @@ val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.0"
 val EnumeratumCirceVersion        = "1.6.0"
-val ShapelessVersion              = "2.3.3"
+val ShapelessVersion              = "2.3.7"
 val ScalaXmlVersion               = "2.0.0-M1"
 val ScalaAsyncVersion             = "0.10.0"
 val Parboiled1Version             = "1.3.1"
@@ -28,7 +28,7 @@ val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and b
 val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.1"
 val RosHttpVersion                = "2.1.0"
-val ScalaLoggingVersion           = "3.9.2"
+val ScalaLoggingVersion           = "3.9.3"
 val Log4sVersion                  = "1.8.2"
 val ScalaCollectionCompatVersion  = "2.2.0"
 
@@ -38,10 +38,11 @@ val Slf4jVersion                  = "1.7.30"
 val HttpComponentsVersion         = "4.5.13"
 val Log4jVersion                  = "1.2.17"
 val CommonsIoVersion              = "2.7"
-val FlyingSaucerVersion           = "9.1.20"
+val FlyingSaucerVersion           = "9.1.22"
 val TinkVersion                   = "1.5.0"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.0"
+val AntVersion                    = "1.10.10"
 
 // "Provided" Java libraries
 val ServletApiVersion             = "4.0.1"
@@ -60,7 +61,7 @@ val CoreLibraryDependencies = Seq(
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
-  "org.apache.commons"          %  "commons-lang3"                  % "3.11",
+  "org.apache.commons"          %  "commons-lang3"                  % "3.12.0",
   "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
   "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
   "commons-codec"               %  "commons-codec"                  % "1.15",
@@ -71,7 +72,9 @@ val CoreLibraryDependencies = Seq(
   "commons-fileupload"          %  "commons-fileupload"             % "1.4",
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
-  "commons-validator"           %  "commons-validator"              % "1.7",  // 1.5.1
+  "commons-validator"           %  "commons-validator"              % "1.7",
+  "org.apache.ant"              %  "ant"                            % AntVersion,
+  "org.apache.ant"              %  "ant-jsch"                       % AntVersion,
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
   "com.sun.mail"                % "javax.mail"                      % JavaMailVersion exclude("javax.activation", "activation"),
   "com.sun.activation" 		% "javax.activation"                % JavaActivationVersion,
@@ -80,7 +83,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.httpcomponents"   % "httpclient-cache"                % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "httpmime"                        % HttpComponentsVersion,
   "org.apache.httpcomponents"   % "fluent-hc"                       % HttpComponentsVersion,
-  "org.apache.httpcomponents"   % "httpcore"                        % "4.4.13",
+  "org.apache.httpcomponents"   % "httpcore"                        % "4.4.14",
   "org.slf4j"                   % "jcl-over-slf4j"                  % Slf4jVersion,
   "org.slf4j"                   % "slf4j-api"                       % Slf4jVersion,
   "org.slf4j"                   % "slf4j-log4j12"                   % Slf4jVersion,
@@ -94,16 +97,18 @@ val CoreLibraryDependencies = Seq(
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.8.0"           % Test,
-  "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test,
-  "com.google.guava"            % "guava"                           % "30.1.1-jre"        % Test,
+  "com.google.code.gson"        % "gson"                            % "2.8.7"           % Test,
+  "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
-  "mysql"                       % "mysql-connector-java"            % "8.0.22"          % Test,
-  "org.postgresql"              % "postgresql"                      % "42.2.18"         % Test,
+  "mysql"                       % "mysql-connector-java"            % "8.0.25"          % Test,
+  "org.postgresql"              % "postgresql"                      % "42.2.20"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
-  "com.lowagie"                 % "itext"                           % "2.1.7" /* last MPL version */ excludeAll ExclusionRule(organization = "bouncycastle"),
-  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.66", // for `itext`, also pulls `bcprov` and `bcpkix`
+  "com.github.librepdf"         % "openpdf"                         % "1.3.26",
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.68", // for `itext`/`openpdf`, also pulls `bcprov` and `bcpkix`
+  "com.drewnoakes"              % "metadata-extractor"              % "2.16.0",
+  "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
 
   "javax.servlet"             %  "javax.servlet-api"              % ServletApiVersion % Provided,
   "javax.portlet"             %  "portlet-api"                    % PortletApiVersion % Provided
@@ -563,7 +568,7 @@ lazy val formRunnerJS = formRunner.js
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.0/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
@@ -621,7 +626,7 @@ lazy val formBuilderJS = formBuilder.js
       "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.0/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
@@ -692,7 +697,7 @@ lazy val xformsJS = xforms.js
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.0/jquery.js",
 
     // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
     unmanagedResourceDirectories in Test += sharedAssetsDir(baseDirectory.value),

@@ -91,11 +91,11 @@ object OrbeonSessionListener {
 
   def sessionListenersDestroy(session: ExternalContext.Session): Unit = {
 
-    val listeners =
-      session.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[SessionListeners]
+    val listenersOpt =
+      session.getAttribute(SessionListeners.SessionListenersKey).asInstanceOf[Option[SessionListeners]]
 
     for {
-      listeners <- Option(listeners).iterator
+      listeners <- listenersOpt.iterator
       listener  <- listeners.iterateRemoveAndClose()
     } locally {
       try {

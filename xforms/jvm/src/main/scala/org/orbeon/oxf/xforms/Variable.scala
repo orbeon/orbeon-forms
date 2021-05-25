@@ -91,7 +91,7 @@ class Variable(val staticVariable: VariableAnalysisTrait, val containingDocument
               case NonFatal(t) if handleNonFatal =>
                   // Don't consider this as fatal
                   // Default value is the empty sequence
-                  XFormsError.handleNonFatalXPathError(contextStack.container, t)
+                  XFormsError.handleNonFatalXPathError(contextStack.container, t, Some(expression))
                   EmptySequence.getInstance
               case NonFatal(t) =>
                 throw new OXFException(t)

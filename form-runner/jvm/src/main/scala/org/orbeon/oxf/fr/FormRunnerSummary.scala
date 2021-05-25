@@ -39,11 +39,12 @@ trait FormRunnerSummary {
   }
 
   //@XPathFunction
-  def defaultTimezoneToOffsetString: Option[String] =
+  def defaultTimezoneToOffsetString: String =
     properties.getPropertyOpt("oxf.fr.default-timezone")
       .flatMap(_.value.toString.trimAllToOpt)
       .map(zoneIdToOffsetAsOfNow)
       .map(offsetToDuration)
+      .orNull
 
   //@XPathFunction
   def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String): Seq[NodeInfo] =

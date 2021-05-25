@@ -49,6 +49,10 @@
                     name="bindings-to-insert"
                     select="$available-section-bindings[resolve-QName(translate(@element, '|', ':'), .) = $possible-section-element-qnames]"/>
 
+
+                <!-- Remove XBL for section templates, which might be present if we load a published form -->
+                <xsl:template match="/*/xh:head/xbl:xbl[xbl:binding[@class = 'fr-section-component']]"/>
+
                 <xsl:template match="/*/xh:head/xf:model[last()]">
                     <xsl:next-match/>
                     <xsl:apply-templates select="$bindings-to-insert/parent::xbl:xbl"/>

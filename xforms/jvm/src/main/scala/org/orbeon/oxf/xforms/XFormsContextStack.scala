@@ -511,15 +511,13 @@ class XFormsContextStack {
               updateBindingWithContextItem(this.head, evaluationContextBinding, evaluationContextBinding.getSingleItemOrNull)
             )
 
+          val expression = if (ref != null) ref else nodeset
           val result =
             try
               XPathCache.evaluateKeepItemsJava(
                 evaluationContextBinding.nodeset,
                 evaluationContextBinding.position,
-                if (ref != null)
-                  ref
-                else
-                  nodeset,
+                expression,
                 bindingElementNamespaceMapping,
                 evaluationContextBinding.getInScopeVariables,
                 containingDocument.functionLibrary,
@@ -531,7 +529,7 @@ class XFormsContextStack {
             catch {
               case e: Exception =>
                 if (handleNonFatal) {
-                  XFormsError.handleNonFatalXPathError(container, e)
+                  XFormsError.handleNonFatalXPathError(container, e, Some(expression))
                   java.util.Collections.emptyList[Item]
                 } else
                   throw e

@@ -116,7 +116,7 @@ private object PersistenceProxyProcessor {
   ): Unit = {
 
     // Throws if there is an incompatibility
-    checkDataFormatVersions(request, app, form, formOrData)
+    checkDataFormatVersionIfNeeded(request, app, form, formOrData)
 
     val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains("data.xml")
     val isFormBuilder    = app == "orbeon" && form == "builder"
@@ -246,31 +246,29 @@ private object PersistenceProxyProcessor {
     proxyRequest(request, requestContent, serviceURI, headers, response, transforms)
   }
 
-  def checkDataFormatVersions(
+  def checkDataFormatVersionIfNeeded(
     request    : Request,
     app        : String,
     form       : String,
     formOrData : FormOrData
   ): Unit =
-    if (formOrData == FormOrData.Data && GetOrPutMethods(request.getMethod)) {
+    if (formOrData == FormOrData.Data && GetOrPutMethods(request.getMethod))
+      // https://github.com/orbeon/orbeon-forms/issues/4861
+      request.getFirstParamAsString(DataFormatVersionName) foreach { incomingVersion =>
 
-      val incomingVersion =
-        request.getFirstParamAsString(DataFormatVersionName) getOrElse
-          PersistenceDefaultDataFormatVersion.entryName
+        val providerVersion =
+          providerDataFormatVersionOrThrow(app, form)
 
-      val providerVersion =
-        providerDataFormatVersionOrThrow(app, form)
+        require(
+          AllowedDataFormatVersionParams(incomingVersion),
+          s"`$FormRunnerPersistence.DataFormatVersionName` parameter must be one of ${AllowedDataFormatVersionParams mkString ", "}"
+        )
 
-      require(
-        AllowedDataFormatVersionParams(incomingVersion),
-        s"`$FormRunnerPersistence.DataFormatVersionName` parameter must be one of ${AllowedDataFormatVersionParams mkString ", "}"
-      )
-
-      // We can remove this once we are able to perform conversions here, see:
-      // https://github.com/orbeon/orbeon-forms/issues/3110
-      if (! Set(RawDataFormatVersion, providerVersion.entryName)(incomingVersion))
-        throw HttpStatusCodeException(StatusCode.BadRequest)
-    }
+        // We can remove this once we are able to perform conversions here, see:
+        // https://github.com/orbeon/orbeon-forms/issues/3110
+        if (! Set(RawDataFormatVersion, providerVersion.entryName)(incomingVersion))
+          throw HttpStatusCodeException(StatusCode.BadRequest)
+      }
 
   def parsePruneAndSerializeXmlData(is: InputStream, os: OutputStream): Unit = {
 

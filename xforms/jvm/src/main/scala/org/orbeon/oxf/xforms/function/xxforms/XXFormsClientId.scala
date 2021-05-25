@@ -13,12 +13,16 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 
 class XXFormsClientId extends XFormsFunction {
-  override def evaluateItem(xpathContext: XPathContext): StringValue =
-    resolveStaticOrAbsoluteId(argument.headOption)(xpathContext)
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+    val containingDocument = getContainingDocument(xpathContext)
+    val effectiveId        = resolveStaticOrAbsoluteId(argument.headOption)(xpathContext)
+    effectiveId.map(XFormsUtils.namespaceId(containingDocument, _))
+  }
 }

@@ -85,6 +85,10 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def findAncestorContainersLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): Seq[NodeInfo] =
     (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
 
+  //@XPathFunction
+  def findAncestorSectionsLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): Seq[NodeInfo] =
+    findAncestorContainersLeafToRoot(descendant, includeSelf) filter IsSection
+
   // Find ancestor section and grid names from root to leaf
   // See also:
   // - https://github.com/orbeon/orbeon-forms/issues/2173

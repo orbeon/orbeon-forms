@@ -908,7 +908,7 @@
                         }
 
                         function handleInnerHtml(elem) {
-initElem
+
                             var innerHTML    = ORBEON.util.Dom.getStringValue(childrenWithLocalName(elem, 'value')[0]);
                             var initElem     = childrenWithLocalName(elem, 'init')[0];
                             var initValue    = _.isUndefined(initElem) ? null : ORBEON.util.Dom.getStringValue(initElem);

@@ -23,6 +23,9 @@ object FormRunnerApp extends App {
 
     XFormsApp.onOrbeonApiLoaded()
 
+    // Register XBL components
+    xbl.Grid
+    xbl.Repeater
     xbl.DndRepeat
     xbl.Tabbable
     xbl.Number
@@ -39,11 +42,6 @@ object FormRunnerApp extends App {
     //FormRunnerPrivateAPI
   }
 
-  def onPageContainsFormsMarkup(): Unit = {
-
+  def onPageContainsFormsMarkup(): Unit =
     XFormsApp.onPageContainsFormsMarkup()
-
-    xbl.Grid
-    xbl.Repeater
-  }
 }

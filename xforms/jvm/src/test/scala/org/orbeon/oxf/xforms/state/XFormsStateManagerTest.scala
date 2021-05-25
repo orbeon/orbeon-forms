@@ -228,37 +228,37 @@ class XFormsStateManagerTest
         )
 
       // New state
-      val lock = XFormsStateManager.acquireDocumentLock(parameters.uuid, 0L)
+      XFormsStateManager.acquireDocumentLock(parameters.uuid, 0L) match {
+        case LockResponse.Success(lock) =>
+          try {
+            val newDoc = XFormsStateManager.beforeUpdate(parameters, ! isCache)
 
-      if (lock.isEmpty)
-        fail("Ajax update lock timeout exceeded")
+            if (isCache)
+              assert(state1.document eq newDoc) // must be the same because cache is enabled and cache has room
+            else
+              assert(state1.document ne newDoc) // can't be the same because cache is disabled
 
-      try {
-        val newDoc = XFormsStateManager.beforeUpdate(parameters, ! isCache)
+            // Run events if any
+            newDoc.beforeExternalEvents(null, isAjaxRequest = true)
 
-        if (isCache)
-          assert(state1.document eq newDoc) // must be the same because cache is enabled and cache has room
-        else
-          assert(state1.document ne newDoc) // can't be the same because cache is disabled
+            for (event <- callback(newDoc))
+              ClientEvents.processEvent(newDoc, event)
 
-        // Run events if any
-        newDoc.beforeExternalEvents(null, true)
+            newDoc.afterExternalEvents(true)
 
-        for (event <- callback(newDoc))
-          ClientEvents.processEvent(newDoc, event)
+            XFormsStateManager.beforeUpdateResponse(newDoc, ignoreSequence = false)
 
-        newDoc.afterExternalEvents(true)
+            val result = TestState(newDoc)
 
-        XFormsStateManager.beforeUpdateResponse(newDoc, ignoreSequence = false)
+            XFormsStateManager.afterUpdateResponse(newDoc)
+            XFormsStateManager.afterUpdate(newDoc, keepDocument = true, disableDocumentCache = ! isCache)
 
-        val result = TestState(newDoc)
-
-        XFormsStateManager.afterUpdateResponse(newDoc)
-        XFormsStateManager.afterUpdate(newDoc, keepDocument = true, disableDocumentCache = ! isCache)
-
-        result
-      } finally
-        XFormsStateManager.releaseDocumentLock(lock.get)
+            result
+          } finally
+            XFormsStateManager.releaseDocumentLock(lock)
+        case LockResponse.Timeout    => fail("Ajax update lock timeout exceeded")
+        case LockResponse.Failure(t) => throw t
+      }
     }
 
     def getInitialState(state1: TestState, isCache: Boolean) = {

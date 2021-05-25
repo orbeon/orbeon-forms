@@ -135,7 +135,7 @@ object XFormsElementValue {
               )
             catch {
               case NonFatal(t) =>
-                XFormsError.handleNonFatalXPathError(container, t)
+                XFormsError.handleNonFatalXPathError(container, t, Some(valueAttribute))
                 "".some
             }
 

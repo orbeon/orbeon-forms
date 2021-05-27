@@ -5188,8 +5188,13 @@
                     </xbl:xbl>
                 </xh:head>
                 <xh:body>
+                    <!-- 2021-05-26: Nested namespace declarations are no longer supported as we build a single expression for the whole
+                         LHHA. It would be nice to restore this functionality at some point. -->
+<!--                    <fr:gaga id="gaga-1">-->
+<!--                        <xf:label><xf:output value="instance()"/>/<xf:output value="instance('i2')"/>/<xf:output xmlns:foo="foo" value="instance('i3')/foo:bar"/></xf:label>-->
+<!--                    </fr:gaga>-->
                     <fr:gaga id="gaga-1">
-                        <xf:label><xf:output value="instance()"/>/<xf:output value="instance('i2')"/>/<xf:output xmlns:foo="foo" value="instance('i3')/foo:bar"/></xf:label>
+                        <xf:label xmlns:foo="foo"><xf:output value="instance()"/>/<xf:output value="instance('i2')"/>/<xf:output value="instance('i3')/foo:bar"/></xf:label>
                     </fr:gaga>
                     <fr:gaga id="gaga-2">
                         <xf:label xmlns:foo="foo" value="string-join((instance(), instance('i2'), instance('i3')/foo:bar), '/')"/>

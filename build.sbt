@@ -484,7 +484,6 @@ lazy val commonJS  = common.js
     libraryDependencies += "io.github.cquiroz" %%% "scala-java-locales"    % ScalaJsLocalesVersion,
     libraryDependencies += "io.github.cquiroz" %%% "locales-minimal-en-db" % ScalaJsLocalesVersion
   )
-  .enablePlugins(JSDependenciesPlugin)
 
 // Custom DOM implementation. This must be cross-platform and have no dependencies.
 lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("dom"))
@@ -609,9 +608,9 @@ lazy val formRunnerJS = formRunner.js
       "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
     ),
 
-    jsDependencies                         += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
-    jsDependencies                         += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
-    Compile / unmanagedResourceDirectories += (xformsJVM / baseDirectory).value / "src" / "main" / "assets",
+    jsDependencies                      += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    Test / jsDependencies               += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
+    Test / unmanagedResourceDirectories += (xformsWeb / baseDirectory).value / "src" / "main" / "assets",
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,
@@ -644,7 +643,6 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
     xformsCommonJS
   )
   .settings(commonScalaJsSettings)
-  .enablePlugins(JSDependenciesPlugin)
   .settings(
     Compile / unmanagedJars      := Nil,
     Compile / unmanagedClasspath := Nil
@@ -657,13 +655,6 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
       "io.github.cquiroz"      %%% "scala-java-time" % "2.0.0"
     ),
-
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
-
-    Test / jsDependencies          += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
-
-    // HACK: Not sure why `xformsWeb % "test->test;compile->compile"` doesn't expose this.
-    Test / unmanagedResourceDirectories += sharedAssetsDir((xformsWeb / baseDirectory).value),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,
@@ -699,13 +690,6 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
       "io.github.cquiroz"      %%% "scala-java-time" % "2.0.0"
     ),
-
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
-
-    Test / jsDependencies          += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
-
-    // HACK: Not sure why `xformsWeb % "test->test;compile->compile"` doesn't expose this.
-    Test / unmanagedResourceDirectories += sharedAssetsDir((xformsWeb / baseDirectory).value),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,
@@ -751,17 +735,12 @@ lazy val formBuilderJS = formBuilder.js
     formRunnerWeb
   )
   .settings(commonScalaJsSettings)
-  .enablePlugins(JSDependenciesPlugin)
   .settings(
 
     libraryDependencies            ++= Seq(
       "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
     ),
-
-    jsDependencies       += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
-
-    Test / jsDependencies += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
     Test / test := {},
 
@@ -824,7 +803,6 @@ lazy val xformsJS = xforms.js
     xformsCommonJS
   )
   .settings(commonScalaJsSettings)
-  .enablePlugins(JSDependenciesPlugin)
   .settings(
 
     libraryDependencies            ++= Seq(
@@ -834,15 +812,6 @@ lazy val xformsJS = xforms.js
       "com.beachape" %%% "enumeratum-circe" % EnumeratumCirceVersion,
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
-
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
-
-    // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
-    Test / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
-
-    Test / jsDependencies           += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
-
-//    jsEnv                         := NodeJSEnv().value,
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,
@@ -886,7 +855,6 @@ lazy val xformsCommonJS = xformsCommon.js
     coreCrossPlatformJS
   )
   .settings(commonScalaJsSettings)
-  .enablePlugins(JSDependenciesPlugin)
   .settings(
     Compile / unmanagedJars      := Nil,
     Compile / unmanagedClasspath := Nil
@@ -914,7 +882,6 @@ lazy val xformsAnalysisJS = xformsAnalysis.js
     xformsCommonJS
   )
   .settings(commonScalaJsSettings)
-  .enablePlugins(JSDependenciesPlugin)
   .settings(
     Compile / unmanagedJars      := Nil,
     Compile / unmanagedClasspath := Nil
@@ -949,7 +916,6 @@ lazy val xformsCompilerJS = xformsCompiler.js
     coreCrossPlatformJS
   )
   .settings(commonScalaJsSettings)
-  .enablePlugins(JSDependenciesPlugin)
 
 lazy val xformsRuntime = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-runtime"))
   .settings(commonSettings: _*)
@@ -982,7 +948,6 @@ lazy val xformsRuntimeJS = xformsRuntime.js
     coreCrossPlatformJS
   )
   .settings(commonScalaJsSettings)
-  .enablePlugins(JSDependenciesPlugin)
   .settings(
     Compile / unmanagedJars      := Nil,
     Compile / unmanagedClasspath := Nil
@@ -998,7 +963,6 @@ lazy val xformsOffline = (project in file("xforms-offline"))
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings)
   .enablePlugins(ScalaJSPlugin)
-  .enablePlugins(JSDependenciesPlugin)
   .dependsOn(
     xformsRuntimeJS,
     xformsWeb,
@@ -1030,13 +994,6 @@ lazy val xformsOffline = (project in file("xforms-offline"))
       "io.circe" %%% "circe-parser"
     ).map(_ % CirceVersion),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
-
-    // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
-    Test / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
-
-    Test / jsDependencies           += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
-
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,
       (ThisBuild / baseDirectory).value,
@@ -1054,7 +1011,6 @@ lazy val formRunnerOffline = (project in file("form-runner-offline"))
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings)
   .enablePlugins(ScalaJSPlugin)
-  .enablePlugins(JSDependenciesPlugin)
   .dependsOn(
     xformsOffline,
     formRunnerWeb,
@@ -1089,13 +1045,6 @@ lazy val formRunnerOffline = (project in file("form-runner-offline"))
       "io.circe" %%% "circe-parser"
     ).map(_ % CirceVersion),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
-
-    // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
-    Test / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
-
-    Test / jsDependencies           += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
-
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,
       (ThisBuild / baseDirectory).value,
@@ -1113,7 +1062,6 @@ lazy val xformsWeb = (project in file("xforms-web"))
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings)
   .enablePlugins(ScalaJSPlugin)
-  .enablePlugins(JSDependenciesPlugin)
   .dependsOn(
     commonJS % "test->test;compile->compile",
     xformsCommonJS
@@ -1142,13 +1090,6 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "io.circe" %%% "circe-generic",
       "io.circe" %%% "circe-parser"
     ).map(_ % CirceVersion),
-
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
-
-    // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
-    Test / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
-
-    Test / jsDependencies           += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,
@@ -1188,7 +1129,6 @@ lazy val webFacades = (project in file("web-facades"))
   .dependsOn(commonJS)
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings: _*)
-  .enablePlugins(JSDependenciesPlugin)
   .settings(
     name := "orbeon-web-facades",
 
@@ -1230,7 +1170,6 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .dependsOn(commonJS)
   .dependsOn(domJS)
   .settings(commonScalaJsSettings)
-  .enablePlugins(JSDependenciesPlugin)
   .settings(
     libraryDependencies ++= Seq(
       "org.xml"    %%% "sax"       % SaxVersion,

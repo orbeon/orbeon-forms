@@ -174,10 +174,6 @@ ThisBuild / traceLevel                  := 0
 // Restrict the number of concurrent linker processes so we don't run out of memory
 Global / concurrentRestrictions += Tags.limit(ScalaJSTags.Link, 2)
 
-// Give a .js or .jvm project's base directory, return the shared assets directory
-def sharedAssetsDir(baseDirectory: File) =
-  baseDirectory.getParentFile / "shared" / "src" / "main" / "assets"
-
 def copyFilesToExplodedWarLib(files: Seq[Attributed[File]]): Unit =
   files map (_.data) foreach { file =>
     copyJarFile(file, ExplodedWarLibPath, _ contains "scalajs-", matchRawJarName = false)
@@ -426,7 +422,7 @@ lazy val assetsSettings = Seq(
 
   // By default sbt-web places resources under META-INF/resources/webjars. We don't support this yet so we fix it back.
   // Also filter out a few things.
-  Assets / WebKeys.exportedMappings        := {
+  Assets / WebKeys.exportedMappings := {
 
     val FullWebJarPrefix = s"${org.webjars.WebJarAssetLocator.WEBJARS_PATH_PREFIX}/${moduleName.value}/${version.value}/"
 
@@ -788,8 +784,8 @@ lazy val xformsJVM = xforms.jvm
 
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion % Provided,
 
-    // Because `Assets` doesn't check the `shared` directory
-    Assets / unmanagedResourceDirectories += sharedAssetsDir(baseDirectory.value),
+    // Add the path to the assets from the `xformsWeb` project so that they get processed in this project instead
+    Assets / unmanagedSourceDirectories += (xformsWeb / baseDirectory).value / "src" / "main" / "assets",
 
     // Package Scala.js output into `orbeon-xforms.jar`
     // This stores the optimized version. For development we need something else.

@@ -15,11 +15,10 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.XFormsContextStack
-import org.orbeon.oxf.xforms.XFormsContextStackSupport.withBinding
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, ValueControl}
 import org.orbeon.oxf.xforms.control._
+import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 
@@ -50,30 +49,25 @@ class XFormsLHHAControl(
   // the value.
   override def computeValue: String = {
 
-    val resultOpt =
-      staticControl.expressionOrConstant match {
-        case Right(constant) =>
-          Some(constant)
-        case Left(expr) =>
+    val resultOpt = {
 
-          implicit val contextStack: XFormsContextStack = selfControl.getContextStack
-          contextStack.setBinding(selfControl.bindingContext)
+      implicit val contextStack: XFormsContextStack = selfControl.getContextStack
 
-          withBinding(staticControl.element, selfControl.effectiveId, staticControl.scope) { currentBindingContext =>
-            XPathCache.evaluateAsStringOpt(
-              contextItems       = currentBindingContext.nodeset,
-              contextPosition    = currentBindingContext.position,
-              xpathString        = expr,
-              namespaceMapping   = staticControl.namespaceMapping,
-              variableToValueMap = currentBindingContext.getInScopeVariables,
-              functionLibrary    = selfControl.lhhaContainer.getContainingDocument.functionLibrary,
-              functionContext    = contextStack.getFunctionContext(selfControl.effectiveId),
-              baseURI            = null,
-              locationData       = staticControl.locationData,
-              reporter           = selfControl.lhhaContainer.getContainingDocument.getRequestStats.getReporter
-            )
-          }
-      }
+      // NOTE: The `expr` is computed using the `ref`, `bind`, or `value` attributes on the element
+      // itself if present. So we must evaluate the value in the context that excludes the binding.
+      // TODO: This is not efficient, since the control's binding is first evaluated during refresh,
+      //   and then it is re-evaluated if there is a `ref` or `bind`.
+      if (staticControl.hasBinding)
+        contextStack.setBinding(selfControl.bindingContext.parent)
+      else
+        contextStack.setBinding(selfControl.bindingContext)
+
+      ItemsetSupport.evaluateExpressionOrConstant(
+        childElem           = staticControl,
+        parentEffectiveId   = selfControl.effectiveId,
+        pushContextAndModel = staticControl.hasBinding
+      )
+    }
 
     resultOpt getOrElse ""
   }

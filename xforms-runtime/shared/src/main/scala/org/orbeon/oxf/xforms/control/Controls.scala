@@ -381,7 +381,7 @@ object Controls {
       def mustReEvaluateBinding =
         (relevanceChangeLevel != -1 && level > relevanceChangeLevel)                       ||
         xpathDependencies.requireBindingUpdate(control.staticControl, control.effectiveId) ||
-        (control.staticControl.element.attribute(XFormsNames.MODEL_QNAME) ne null)
+        control.staticControl.model.isDefined
 
       // Only update the binding if needed
       if (mustReEvaluateBinding) {

@@ -73,9 +73,9 @@ object XFormsContextStackSupport {
 
     contextStack.pushBinding(
       ref                            = null,
-      context                        = bindingElem.element.attributeValue(XFormsNames.CONTEXT_QNAME),
+      context                        = bindingElem.context.orNull,
       nodeset                        = null,
-      modelId                        = bindingElem.element.attributeValue(XFormsNames.MODEL_QNAME),
+      modelId                        = bindingElem.model.map(_.staticId).orNull,
       bindId                         = null,
       bindingElement                 = bindingElem.element,
       bindingElementNamespaceMapping = bindingElem.namespaceMapping,

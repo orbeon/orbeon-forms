@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.analysis.controls.VariableAnalysis.valueOrSelectAtt
 import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.model._
 import org.orbeon.oxf.xml.ShareableXPathStaticContext
-import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
+import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.xbl.Scope
@@ -188,7 +188,16 @@ object ElementAnalysisTreeXPathAnalyzer {
           val result =
             e.expressionOrConstant match {
               case Left(expr) =>
-                analyzeXPathWithStringExpression(partAnalysisCtx, e, e.contextAnalysis, e.inScopeVariables, expr).some
+                analyzeXPathWithStringExpression(
+                  partAnalysisCtx,
+                  e,
+                  if (e.hasBinding && e.element.hasAttribute(VALUE_QNAME))
+                    e.bindingAnalysis
+                  else
+                    e.contextAnalysis,
+                  e.inScopeVariables,
+                  expr
+                ).some
               case Right(_) =>
                 // Value of LHHA is 100% static and analysis is constant
                 StringAnalysis.some

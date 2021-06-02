@@ -4736,7 +4736,7 @@
                     </value>
                     <label scope="" prefixed-id="xf-1" model-prefixed-id="m1" binding="true" value="false">
                         <value>
-                            <analysis expression="string((.)[1])" analyzed="true">
+                            <analysis expression="string((@label)[1])" analyzed="true">
                                 <value-dependent>
                                     <path>instance('i11')/@label</path>
                                 </value-dependent>
@@ -4751,7 +4751,7 @@
                     </label>
                     <help scope="" prefixed-id="xf-2" model-prefixed-id="m1" binding="true" value="false">
                         <value>
-                            <analysis expression="string((.)[1])" analyzed="true">
+                            <analysis expression="string((@help)[1])" analyzed="true">
                                 <value-dependent>
                                     <path>instance('i11')/@help</path>
                                 </value-dependent>
@@ -4766,7 +4766,7 @@
                     </help>
                     <hint scope="" prefixed-id="xf-3" model-prefixed-id="m1" binding="true" value="false">
                         <value>
-                            <analysis expression="string((.)[1])" analyzed="true">
+                            <analysis expression="string((@hint)[1])" analyzed="true">
                                 <value-dependent>
                                     <path>instance('i11')/@hint</path>
                                 </value-dependent>
@@ -4781,7 +4781,7 @@
                     </hint>
                     <alert scope="" prefixed-id="xf-4" model-prefixed-id="m1" binding="true" value="false">
                         <value>
-                            <analysis expression="string((.)[1])" analyzed="true">
+                            <analysis expression="string((@alert)[1])" analyzed="true">
                                 <value-dependent>
                                     <path>instance('i11')/@alert</path>
                                 </value-dependent>

@@ -48,7 +48,7 @@ val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes is
 val Parboiled2Version             = "2.2.1"
 val AutowireVersion               = "0.3.2"
 val SbinaryVersion                = "0.5.1"
-val Log4sVersion                  = "1.8.3-SNAPSHOT"
+val Log4sVersion                  = "1.10.0"
 val ScalaCollectionCompatVersion  = "2.2.0"
 
 // Java libraries

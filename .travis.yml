@@ -18,9 +18,9 @@ addons:
   postgresql: "9.5"
   apt:
     packages:
-    - mysql-server-5.6
-    - mysql-client-core-5.6
-    - mysql-client-5.6
+    - mysql-server-5.7
+    - mysql-client-core-5.7
+    - mysql-client-5.7
   artifacts:
     paths:
     - $(ls build/distrib/* | egrep -v '(embedding|proxy-portlet|xforms-filter|orbeon-auth)' | egrep -v '\-[CP]E\.(tgz|war)' | tr "\n" ":")

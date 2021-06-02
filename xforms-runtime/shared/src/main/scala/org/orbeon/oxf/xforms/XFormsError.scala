@@ -138,9 +138,6 @@ object XFormsError {
 
   private def handleNonFatalXFormsError(container: XBLContainer, message: String, t: Throwable): Unit = {
 
-    // XXX TMP
-    XPath.Logger.warn(s"xxx ${message} / ${t.getMessage}")
-
     // NOTE: We want to catch a status code exception which happen during an XPathException. And in that case, the XPathException
     // is dynamic, so we cannot simply exclude dynamic XPath exceptions. So we have to be inclusive and consider which types of
     // errors are fatal. See https://github.com/orbeon/orbeon-forms/issues/2194

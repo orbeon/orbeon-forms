@@ -865,7 +865,7 @@
                         <xf:output
                             value="
                                 xxf:format-message(
-                                    $fr-resources/errors/summary-title,
+                                    xxf:r('errors.summary-title', '|fr-fr-resources|'),
                                     (
                                         xxf:instance('fr-error-summary-instance')/visible-counts/(
                                             if (count((@error, @warning, @info)[. gt 0]) gt 1) then

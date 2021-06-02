@@ -14,19 +14,18 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.XFormsContextStackSupport._
 import org.orbeon.oxf.xforms.XFormsContextStack
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
+import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.xforms.XFormsId
 
 class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: Boolean)
   extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
 
-  protected def evaluateValueImpl =
+  protected def evaluateValueImpl: Option[(String, Boolean)] =
     for {
       lhh   <- control.staticControl.asInstanceOf[StaticLHHASupport].lhh(lhhaType)
       value <- evaluateOne(lhh)
@@ -37,7 +36,7 @@ class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: B
 class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: LHHA, supportsHTML: Boolean)
   extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
 
-  protected def evaluateValueImpl = {
+  protected def evaluateValueImpl: Option[(String, Boolean)] = {
 
     val activeAlertsOpt = LHHASupport.gatherActiveAlerts(control)
 
@@ -121,29 +120,15 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
   // Can return null
   protected def evaluateOne(lhhaAnalysis: LHHAAnalysis): Option[String] =
     if (lhhaAnalysis.isLocal) {
-      lhhaAnalysis.expressionOrConstant match {
-        case Right(constant) =>
-          Some(constant)
-        case Left(expr) =>
 
-          implicit val contextStack: XFormsContextStack = control.getContextStack
-          contextStack.setBinding(control.bindingContext)
+      implicit val contextStack: XFormsContextStack = control.getContextStack
+      contextStack.setBinding(control.bindingContext)
 
-          withBinding(lhhaAnalysis.element, control.effectiveId, lhhaAnalysis.scope) { currentBindingContext =>
-            XPathCache.evaluateAsStringOpt(
-              contextItems       = currentBindingContext.nodeset,
-              contextPosition    = currentBindingContext.position,
-              xpathString        = expr,
-              namespaceMapping   = lhhaAnalysis.namespaceMapping,
-              variableToValueMap = currentBindingContext.getInScopeVariables,
-              functionLibrary    = control.lhhaContainer.getContainingDocument.functionLibrary,
-              functionContext    = contextStack.getFunctionContext(control.effectiveId),
-              baseURI            = null,
-              locationData       = lhhaAnalysis.locationData,
-              reporter           = control.lhhaContainer.getContainingDocument.getRequestStats.getReporter
-            )
-          }
-      }
+      ItemsetSupport.evaluateExpressionOrConstant(
+        childElem           = lhhaAnalysis,
+        parentEffectiveId   = control.effectiveId,
+        pushContextAndModel = true
+      )
     } else {
       // LHHA is somewhere else. We resolve the control and ask for its value.
       Controls.resolveControlsById(

@@ -2354,6 +2354,12 @@
                     <xf:input id="my-input-3" ref=".">
                         <xf:label mediatype="text/html">"<xf:output value="@label"/>" then "<xf:output mediatype="text/plain" value="@label"/>"</xf:label>
                     </xf:input>
+                    <xf:input id="my-input-4" ref=".">
+                        <xf:label>"<xf:output value="@label" mediatype="text/html"/>" then "<xf:output value="@label"/>"</xf:label>
+                    </xf:input>
+                    <xf:input id="my-input-5" ref=".">
+                        <xf:label><xh:span class="{concat('a', 'b')}"/></xf:label>
+                    </xf:input>
                 </xh:body>
             </xh:html>
         </input>
@@ -2370,6 +2376,14 @@
                 <xh:span id="my-input-3" class="xforms-control xforms-input">
                     <xh:label class="xforms-mediatype-text-html xforms-label" for="my-input-3≡xforms-input-1">"This is a <xh:b>bold</xh:b> value" then "This is a &lt;b&gt;bold&lt;/b&gt; value"</xh:label>
                     <xh:input id="my-input-3≡xforms-input-1" type="text" name="my-input-3≡xforms-input-1" value="" class="xforms-input-input"/>
+                </xh:span>
+                <xh:span id="my-input-4" class="xforms-control xforms-input">
+                    <xh:label class="xforms-mediatype-text-html xforms-label" for="my-input-4≡xforms-input-1">"This is a <xh:b>bold</xh:b> value" then "This is a &lt;b&gt;bold&lt;/b&gt; value"</xh:label>
+                    <xh:input id="my-input-4≡xforms-input-1" type="text" name="my-input-4≡xforms-input-1" value="" class="xforms-input-input"/>
+                </xh:span>
+                <xh:span id="my-input-5" class="xforms-control xforms-input">
+                    <xh:label class="xforms-mediatype-text-html xforms-label" for="my-input-5≡xforms-input-1"><xh:span class="ab"/></xh:label>
+                    <xh:input id="my-input-5≡xforms-input-1" type="text" name="my-input-5≡xforms-input-1" value="" class="xforms-input-input"/>
                 </xh:span>
             </controls>
         </output>

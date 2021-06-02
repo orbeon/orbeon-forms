@@ -47,9 +47,39 @@ object XFormsStaticElementValue {
     acceptHTML      : Boolean
   ): (Either[String, XPathExpressionString], Boolean) = {
 
-    val hostLanguageAVTs = true
+    val outerIsHTML = LHHAAnalysis.isHTML(outerElem)
 
-    var containsHTML = false
+    // Compute `containsHTML` in a separate pass
+    val containsHtml = {
+
+      var localContainsHtml = false
+
+      outerElem.visitDescendants(
+        new VisitorListener {
+          def startElement(elem: dom.Element): Unit = {
+
+            val isHTMLMediatype =
+              if ((elem eq outerElem) || elem.getQName == XFormsNames.XFORMS_OUTPUT_QNAME)
+                ! outerIsHTML && LHHAAnalysis.isHTML(elem) || outerIsHTML && ! LHHAAnalysis.isPlainText(elem)
+              else // nested XHTML element
+                true
+
+            if (isHTMLMediatype && ! acceptHTML)
+              throw new OXFException(s"HTML element or mediatype not allowed for element: `${outerElem.getName}`")
+
+            localContainsHtml ||= isHTMLMediatype
+          }
+
+          def endElement(elem: dom.Element): Unit = ()
+          def text(text: dom.Text): Unit = ()
+        },
+        mutable     = false,
+        includeSelf = true
+      )
+
+      localContainsHtml
+    }
+
     var containsExpr = false
 
     val builder        = new ListBuffer[String]()
@@ -61,113 +91,99 @@ object XFormsStaticElementValue {
         literalBuilder.setLength(0)
       }
 
-    def addExpr(expr: String): Unit = {
+    def addExpr(expr: String, isHtml: Boolean): Unit = {
       commitLiteralBuilderIfNeeded()
-      builder += expr
+      builder += (if (containsHtml && ! isHtml) s"""xxf:escape-xml-minimal($expr)""" else expr)
       containsExpr = true
     }
 
-    val outerIsHTML = LHHAAnalysis.isHTML(outerElem)
+    if (false && outerElem.hasAttribute(XFormsNames.VALUE_QNAME)) {
+      // LATER: Optimize case where we don't need to check the content.
+    } else {
+      outerElem.visitDescendants(
+        new VisitorListener {
+          def startElement(elem: dom.Element): Unit =
+            if ((elem eq outerElem) || elem.getQName == XFormsNames.XFORMS_OUTPUT_QNAME) {
+              // This is either the outer element or a nested `<xf:output>`
 
-    outerElem.visitDescendants(
-      new VisitorListener {
-        def startElement(elem: dom.Element): Unit =
-          if ((elem eq outerElem) || elem.getQName == XFormsNames.XFORMS_OUTPUT_QNAME) {
-            // This is either the outer element or a nested `<xf:output>`
+              val isHTMLMediatype = ! outerIsHTML && LHHAAnalysis.isHTML(elem) || outerIsHTML && ! LHHAAnalysis.isPlainText(elem)
 
-            // XXX: This is possibly wrong, check what logic should be!
-            val isHTMLMediatype = ! outerIsHTML && LHHAAnalysis.isHTML(elem) || outerIsHTML && ! LHHAAnalysis.isPlainText(elem)
+              // For nested `<xf:output>`, we don't support a combination of `value`/`ref` or `value`/`bind`.
+              // Instead, we take `value`, then `ref`, then `bind`.
+              // For the outer element, `value` will evaluated relative to `ref` or `bind` if present.
+              // TODO: Throw an error for invalid conditions.
 
-            // For nested `<xf:output>`, we don't support a combination of `value`/`ref` or `value`/`bind`.
-            // Instead, we take `value`, then `ref`, then `bind`.
-            // For the outer element, `value` will evaluated relative to `ref` or `bind` if present.
-            // TODO: Throw an error for invalid conditions.
+              def fromValue =
+                elem.attributeValueOpt(XFormsNames.VALUE_QNAME) map StaticXPath.makeStringExpression
 
-            def fromValue =
-              elem.attributeValueOpt(XFormsNames.VALUE_QNAME) map StaticXPath.makeStringExpression
+              def fromRef =
+                ElementAnalysis.getBindingExpression(elem) map StaticXPath.makeStringExpression
 
-            def fromRef =
-              ElementAnalysis.getBindingExpression(elem) map StaticXPath.makeStringExpression
+              def fromBind =
+                elem.attributeValueOpt(XFormsNames.BIND_QNAME) map (v => StaticXPath.makeStringExpression(s"""bind('$v')"""))
 
-            def fromBind =
-              elem.attributeValueOpt(XFormsNames.BIND_QNAME) map (v => StaticXPath.makeStringExpression(s"""bind('$v')"""))
-
-            if (acceptHTML) {
-              if (isHTMLMediatype)
-                containsHTML = true // this indicates for sure that there is some nested HTML
-            } else if (isHTMLMediatype) {
-              // HTML is not allowed here, better tell the user
-              throw new OXFException(s"HTML not allowed within element: `${outerElem.getName}`")
-            }
-
-            fromValue orElse fromRef orElse fromBind foreach { v =>
-              if (isHTMLMediatype)
-                addExpr(v)
-              else
-                addExpr(v) // XXX: wrap with function to escape?
-            }
-          } else {
-            // This is a regular element, just serialize the start tag to no namespace
-            // If HTML is not allowed here, better tell the user
-            if (! acceptHTML)
-              throw new OXFException(s"Nested XHTML or XForms not allowed within element: `$outerElem.getName`")
-            containsHTML = true
-
-            literalBuilder.append('<')
-            literalBuilder.append(elem.getName)
-            for (attribute <- elem.attributeIterator) {
-
-              val currentAttributeName  = attribute.getName
-              val currentAttributeValue = attribute.getValue
-
-              // Only consider attributes in no namespace
-              if (attribute.getNamespaceURI.isEmpty) {
-
-                literalBuilder.append(' ')
-                literalBuilder.append(currentAttributeName)
-                literalBuilder.append("=\"")
-
-                if (hostLanguageAVTs && XMLUtils.maybeAVT(currentAttributeValue)) {
-                  // XXX: Check escaping. Anything else to escape?
-                  addExpr(s"""xxf:evaluate-avt('${currentAttributeValue.replaceAllLiterally("'", "''")}')""" )
-                } else if (currentAttributeName == "id") {
-                  // This is an id, prefix if needed, but also add suffix
-                  // https://github.com/orbeon/orbeon-forms/issues/4782
-
-                  // Always append the prefixed id
-                  literalBuilder.append((containerPrefix + currentAttributeValue).escapeXmlForAttribute) // TODO: check was `unescapeXmlMinimal`
-
-                  // Append repeat suffix if needed
-                  // https://github.com/orbeon/orbeon-forms/issues/4782
-                  if (isWithinRepeat) {
-                    literalBuilder.append(Constants.RepeatSeparatorString)
-                    addExpr(s"""string-join(for $$p in xxf:repeat-positions() return string($$p), '${Constants.RepeatIndexSeparatorString}')""")
-                  }
-                } else {
-                  literalBuilder.append(currentAttributeValue.escapeXmlForAttribute) // TODO: check was `unescapeXmlMinimal`
-                }
-
-                literalBuilder.append('"')
+              fromValue orElse fromRef orElse fromBind foreach { v =>
+                addExpr(v, isHTMLMediatype)
               }
+            } else {
+              // This is a regular element, just serialize the start tag to no namespace
+              // If HTML is not allowed here, better tell the user
+
+              literalBuilder.append('<')
+              literalBuilder.append(elem.getName)
+              for (attribute <- elem.attributeIterator) {
+
+                val currentAttributeName  = attribute.getName
+                val currentAttributeValue = attribute.getValue
+
+                // Only consider attributes in no namespace
+                if (attribute.getNamespaceURI.isEmpty) {
+
+                  literalBuilder.append(' ')
+                  literalBuilder.append(currentAttributeName)
+                  literalBuilder.append("=\"")
+
+                  if (XMLUtils.maybeAVT(currentAttributeValue)) {
+                    addExpr(s"""xxf:evaluate-avt('${currentAttributeValue.replace("'", "''")}')""", isHtml = true)
+                  } else if (currentAttributeName == "id") {
+                    // This is an id, prefix if needed, but also add suffix
+                    // https://github.com/orbeon/orbeon-forms/issues/4782
+
+                    // Always append the prefixed id
+                    literalBuilder.append((containerPrefix + currentAttributeValue).escapeXmlForAttribute)
+
+                    // Append repeat suffix if needed
+                    // https://github.com/orbeon/orbeon-forms/issues/4782
+                    if (isWithinRepeat) {
+                      literalBuilder.append(Constants.RepeatSeparatorString)
+                      addExpr(s"""string-join(for $$p in xxf:repeat-positions() return string($$p), '${Constants.RepeatIndexSeparatorString}')""", isHtml = true)
+                    }
+                  } else {
+                    literalBuilder.append(currentAttributeValue.escapeXmlForAttribute)
+                  }
+
+                  literalBuilder.append('"')
+                }
+              }
+              literalBuilder.append('>')
             }
-            literalBuilder.append('>')
-          }
 
-        def endElement(elem: dom.Element): Unit =
-          if ((elem ne outerElem) && (! VoidElements(elem.getName)) && elem.getQName != XFormsNames.XFORMS_OUTPUT_QNAME) {
-            // This is a regular element, just serialize the end tag to no namespace
-            // UNLESS the element was just opened. This means we output `<br>`, not `<br></br>`, etc.
-            literalBuilder.append("</")
-            literalBuilder.append(elem.getName)
-            literalBuilder.append('>')
-          }
+          def endElement(elem: dom.Element): Unit =
+            if ((elem ne outerElem) && (! VoidElements(elem.getName)) && elem.getQName != XFormsNames.XFORMS_OUTPUT_QNAME) {
+              // This is a regular element, just serialize the end tag to no namespace
+              // UNLESS the element was just opened. This means we output `<br>`, not `<br></br>`, etc.
+              literalBuilder.append("</")
+              literalBuilder.append(elem.getName)
+              literalBuilder.append('>')
+            }
 
-        def text(text: dom.Text): Unit =
-          literalBuilder.append(Whitespace.applyPolicy(text.getText, Whitespace.Policy.Collapse))
-      },
-      mutable     = false,
-      includeSelf = true
-    )
+          def text(text: dom.Text): Unit =
+            literalBuilder.append(Whitespace.applyPolicy(text.getText, Whitespace.Policy.Collapse))
+        },
+        mutable     = false,
+        includeSelf = true
+      )
+    }
 
     val expressionOrConstant =
       if (containsExpr) {
@@ -180,7 +196,7 @@ object XFormsStaticElementValue {
         Right(literalBuilder.toString)
       }
 
-    (expressionOrConstant, containsHTML)
+    (expressionOrConstant, containsHtml)
   }
 
   /**
@@ -286,4 +302,6 @@ object XFormsStaticElementValue {
       lastIsStart = false
     }
   }
+
+
 }

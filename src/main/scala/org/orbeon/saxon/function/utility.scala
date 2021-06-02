@@ -14,6 +14,7 @@
 package org.orbeon.saxon.function
 
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, DependsOnContextItemIfSingleArgumentMissing}
 import org.orbeon.saxon.expr.XPathContext
@@ -43,6 +44,11 @@ class Split extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgu
 class Trim extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
   override def evaluateItem(context: XPathContext): StringValue =
     stringArgumentOrContextOpt(0)(context) map (_.trimAllToEmpty)
+}
+
+class EscapeXmlMinimal extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {
+  override def evaluateItem(context: XPathContext): StringValue =
+    stringArgumentOrContextOpt(0)(context) map (_.escapeXmlMinimal)
 }
 
 class ProcessTemplate extends DefaultFunctionSupport {

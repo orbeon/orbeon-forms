@@ -3,6 +3,7 @@ package org.orbeon.oxf.xforms.library
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ContentTypes.XmlContentType
+import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, StaticXPath}
 import org.orbeon.oxf.xml.FunctionSupport._
@@ -198,6 +199,10 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def nonBlank(s: Option[String] = null)(implicit xpc: XPathContext): Boolean =
     stringArgumentOrContextOpt(s) exists (_.trimAllToEmpty.nonEmpty)
+
+  @XPathFunction
+  def escapeXmlMinimal(s: Option[String] = null)(implicit xpc: XPathContext): Option[String] =
+    stringArgumentOrContextOpt(s) map (_.escapeXmlMinimal)
 
   private def classesFromAttribute(i: Option[om.Item])(implicit xpc: XPathContext): Set[String] =
     itemArgumentOrContextOpt(i) match {

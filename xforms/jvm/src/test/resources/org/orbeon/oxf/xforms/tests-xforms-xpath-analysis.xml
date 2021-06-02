@@ -4691,6 +4691,15 @@
                         <!-- Use of xxf:context() -->
                         <xf:alert value="xxf:context('i2')/@label2"/>
                     </xf:input>
+                    <!-- Nested elements -->
+                    <!-- 2021-06-01: We should handle this case, which requires knowing whether there is a `value` OR a nested
+                         `value` or AVT. We should compute this in `getElementExpressionOrConstant` and store it into
+                          `LHHAAnalysis` temporarily for this purpose. -->
+<!--                    <xf:input id="i3" ref="instance()">-->
+<!--                        <xf:label context="instance('i12')" ref="resource">-->
+<!--                            <xf:output value="@label"/>-->
+<!--                        </xf:label>-->
+<!--                    </xf:input>-->
                 </xh:body>
             </xh:html>
         </input>

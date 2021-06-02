@@ -16,11 +16,11 @@ env:
   - TARGET=orbeon-dist
 addons:
   postgresql: "9.5"
-  apt:
-    packages:
-    - mysql-server-5.7
-    - mysql-client-core-5.7
-    - mysql-client-5.7
+#  apt:
+#    packages:
+#    - mysql-server-8.0
+#    - mysql-client-core-5.7
+#    - mysql-client-5.7
   artifacts:
     paths:
     - $(ls build/distrib/* | egrep -v '(embedding|proxy-portlet|xforms-filter|orbeon-auth)' | egrep -v '\-[CP]E\.(tgz|war)' | tr "\n" ":")
@@ -45,7 +45,13 @@ install:
 # specify the exact command to run using install". Here we install npm dependencies for Node.js as we need them for integration tests.
 - npm install
 before_script:
-- sudo /etc/init.d/mysql stop
+- wget https://repo.mysql.com//mysql-apt-config_0.8.10-1_all.deb
+- sudo dpkg -i mysql-apt-config_0.8.10-1_all.deb
+- sudo apt-get update -q
+- sudo apt-get install -q -y --allow-unauthenticated -o Dpkg::Options::=--force-confnew mysql-server
+- sudo systemctl restart mysql
+- sudo mysql_upgrade
+- mysql --version
 - mkdir /home/travis/.orbeon
 # Run MySQL
 - if [ "$TARGET" == "test-unit" ]; then docker run -d --name mysql -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes mysql:5.7 --sql-mode=ALLOW_INVALID_DATES --character-set-server=utf8mb4 --collation-server=utf8mb4_bin; fi

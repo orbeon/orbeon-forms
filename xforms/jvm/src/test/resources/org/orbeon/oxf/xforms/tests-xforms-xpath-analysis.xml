@@ -4928,6 +4928,7 @@
                         </xf:label>
                         <!-- 2 simple xf:output -->
                         <xf:help>
+                            <!-- 2021-06-01: nested `model="m2"` no longer supported. -->
                             <xf:output ref="@help1"/> - <xf:output model="m2" ref="@help2"/>
                         </xf:help>
                         <!-- Output we can't analyze -->
@@ -4980,7 +4981,7 @@
                     </value>
                     <label scope="" prefixed-id="xf-1" model-prefixed-id="m1" binding="false" value="false">
                         <value>
-                            <analysis expression="string((.)[1])" analyzed="true">
+                            <analysis expression="concat(' ', string((@label)[1]), ' ')" analyzed="true">
                                 <value-dependent>
                                     <path>instance('i11')/@label</path>
                                 </value-dependent>
@@ -4995,25 +4996,23 @@
                     </label>
                     <help scope="" prefixed-id="xf-3" model-prefixed-id="m1" binding="false" value="false">
                         <value>
-                            <analysis expression="(string((.)[1])) | (string((.)[1]))" analyzed="true">
+                            <analysis expression="concat(' ', string((@help1)[1]), ' - ', string((@help2)[1]), ' ')" analyzed="true">
                                 <value-dependent>
                                     <path>instance('i11')/@help1</path>
-                                    <path>instance('i21')/@help2</path>
+                                    <path>instance('i11')/@help2</path>
                                 </value-dependent>
                                 <dependent-models>
                                     <model>m1</model>
-                                    <model>m2</model>
                                 </dependent-models>
                                 <dependent-instances>
                                     <instance>i11</instance>
-                                    <instance>i21</instance>
                                 </dependent-instances>
                             </analysis>
                         </value>
                     </help>
                     <hint scope="" prefixed-id="xf-6" model-prefixed-id="m1" binding="false" value="false">
                         <value>
-                            <analysis expression="(string((.)[1])) | (string((index('my-repeat'))[1]))" analyzed="false"/>
+                            <analysis expression="concat(' ', string((@help1)[1]), ' - ', string((index('my-repeat'))[1]), ' ')" analyzed="false"/>
                         </value>
                     </hint>
                 </input>
@@ -5125,7 +5124,7 @@
                 <group scope="" prefixed-id="g1" model-prefixed-id="m1" binding="false" value="false">
                     <label scope="" prefixed-id="l1" model-prefixed-id="m1" binding="true" value="false">
                         <value>
-                            <analysis expression="string((.)[1])" analyzed="true">
+                            <analysis expression="string(($label)[1])" analyzed="true">
                                 <value-dependent>
                                     <path>instance('i11')/@label</path>
                                 </value-dependent>
@@ -5561,7 +5560,7 @@
                         </analysis>
                     </value>
                     <itemset>
-                        <analysis expression="((../item) | (string((.)[1]))) | (string((.)[1]))" analyzed="true">
+                        <analysis expression="((../item) | (string((label)[1]))) | (string((value)[1]))" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/item</path>
                                 <path>instance('instance')/item/label</path>
@@ -5669,7 +5668,7 @@
                         </analysis>
                     </value>
                     <itemset>
-                        <analysis expression="((((((((((((((((((((../item) | (string((.)[1]))) | (string((value)[1]))) | (item)) | (string((.)[1]))) | (string((.)[1]))) | (../choices)) | (string((.)[1]))) | (item)) | (string((.)[1]))) | (string((value)[1]))) | (itemset)) | (string((.)[1]))) | (string((.)[1]))) | (items)) | (items)) | (string((.)[1]))) | (string((item1/value)[1]))) | (item2)) | (string((.)[1]))) | (string((value)[1]))" analyzed="true">
+                        <analysis expression="((((((((((((((((((((../item) | (string((label)[1]))) | (string((value)[1]))) | (item)) | (string((label)[1]))) | (string((value)[1]))) | (../choices)) | (string((label)[1]))) | (item)) | (string((label)[1]))) | (string((value)[1]))) | (itemset)) | (string((label)[1]))) | (string((value)[1]))) | (items)) | (items)) | (string((item1/label)[1]))) | (string((item1/value)[1]))) | (item2)) | (string((label)[1]))) | (string((value)[1]))" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance1')/item</path>
                                 <path>instance('instance1')/item/label</path>
@@ -5888,7 +5887,8 @@
                         <xbl:binding id="fr-foo" element="fr|foo">
                             <xbl:template>
                                 <xf:group id="foo-group">
-                                    <xf:label id="foo-label"><xf:output id="foo-output" xxbl:scope="outer" xbl:attr="ref=label-ref"/></xf:label>
+                                    <!-- 2021-06-01: nested `xxbl:scope="outer"` no longer supported. -->
+                                    <xf:label id="foo-label" xxbl:scope="outer"><xf:output id="foo-output" xbl:attr="ref=label-ref"/></xf:label>
                                 </xf:group>
                             </xbl:template>
                         </xbl:binding>
@@ -5926,9 +5926,9 @@
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false">
                     <template scope="my-foo" prefixed-id="my-foo≡xf-3" binding="false" value="false">
                         <group scope="my-foo" prefixed-id="my-foo≡foo-group" binding="false" value="false">
-                            <label scope="my-foo" prefixed-id="my-foo≡foo-label" binding="false" value="false">
+                            <label scope="" prefixed-id="my-foo≡foo-label" model-prefixed-id="model" binding="false" value="false">
                                 <value>
-                                    <analysis expression="string((.)[1])" analyzed="true">
+                                    <analysis expression="string(($bar)[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('instance')/bar</path>
                                         </value-dependent>

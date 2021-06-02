@@ -37,6 +37,13 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
         <property as="xs:string"  name="oxf.xforms.resources.baseline">
           fr:bar fr:baz
         </property>
+        <property as="xs:string"  name="oxf.xforms.assets.baseline">
+          {{
+            "css": [],
+            "js": [],
+            "xbl": []
+          }}
+        </property>
       </properties>.toDocument
 
     PropertyStore.parse(properties).getGlobalPropertySet

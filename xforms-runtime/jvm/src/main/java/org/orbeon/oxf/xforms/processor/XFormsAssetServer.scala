@@ -76,7 +76,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           } yield
             prop
 
-        val assets    = XFormsAssetsBuilder.updateAssets(XFormsAssetsBuilder.fromJsonProperty, excludesProp = None, updatesPropOpt)
+        val assets    = XFormsAssetsBuilder.updateAssets(XFormsAssetsBuilder.fromJsonProperty(CoreCrossPlatformSupport.properties), excludesProp = None, updatesPropOpt)
         val isMinimal = XFormsGlobalProperties.isMinimalResources
         val resources = (if (isCSS) assets.css else assets.js).map(_.assetPath(tryMin = isMinimal)).to(ListSet)
 

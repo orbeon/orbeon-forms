@@ -93,7 +93,7 @@ trait BindingLoader extends Logging {
         // 2. `oxf.xforms.assets.baseline` property
         // https://github.com/orbeon/orbeon-forms/issues/4810
         val (foundBaselinePathsStep2, notFoundBaselinePathsStep2) =
-          pathsForQNames(XFormsAssetsBuilder.fromJsonProperty.xbl, nsUriToPrefix)
+          pathsForQNames(XFormsAssetsBuilder.fromJsonProperty(getPropertySet).xbl, nsUriToPrefix)
 
         val (baselineIndexStep2, baselineBindingsStep2) =
           extractAndIndexFromPaths(

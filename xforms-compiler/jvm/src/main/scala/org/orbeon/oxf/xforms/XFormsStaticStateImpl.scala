@@ -115,7 +115,7 @@ class XFormsStaticStateImpl(
 
   lazy val assets: XFormsAssets =
     XFormsAssetsBuilder.updateAssets(
-      XFormsAssetsBuilder.fromJsonProperty,
+      XFormsAssetsBuilder.fromJsonProperty(CoreCrossPlatformSupport.properties),
       staticProperties.staticStringProperty(P.AssetsBaselineExcludesProperty).trimAllToOpt,
       staticProperties.staticStringProperty(P.AssetsBaselineUpdatesProperty).trimAllToOpt.map(propValue =>
         Property(

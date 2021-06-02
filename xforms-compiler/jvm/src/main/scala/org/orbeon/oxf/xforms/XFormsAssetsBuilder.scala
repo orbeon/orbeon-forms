@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import io.circe.{Json, JsonObject, parser}
 import org.orbeon.dom.QName
-import org.orbeon.oxf.properties.Property
+import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -81,11 +81,8 @@ object XFormsAssetsBuilder {
     allUpdates.foldLeft(assets)(maybeAddOrRemoveOne)
   }
 
-  def fromJsonProperty: XFormsAssets = {
-
-    val prop =
-      CoreCrossPlatformSupport.properties.getPropertyOrThrow(AssetsBaselineProperty)
-
+  def fromJsonProperty(propertySet: PropertySet): XFormsAssets = {
+    val prop = propertySet.getPropertyOrThrow(AssetsBaselineProperty)
     prop.associatedValue(v => fromJsonString(v.value.toString, prop.namespaces))
   }
 

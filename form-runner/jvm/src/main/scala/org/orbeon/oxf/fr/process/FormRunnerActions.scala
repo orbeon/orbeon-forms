@@ -175,7 +175,11 @@ trait FormRunnerActions {
           ) getOrElse {
             // Make a copy as we only want to set the `fr:data-format-version` attribute on the migrated data
             val originalDataClone = new DocumentWrapper(dom.Document(), null, XPath.GlobalConfiguration)
-            insert(into =  originalDataClone, origin = originalData)
+            insert(
+              into                              = originalDataClone,
+              origin                            = originalData child *,
+              removeInstanceDataFromClonedNodes = false // https://github.com/orbeon/orbeon-forms/issues/4911
+            )
             originalDataClone
           }
 

@@ -146,8 +146,6 @@ object MessageFormatter {
             case v       => throw new IllegalArgumentException(v.toString)
           }
 
-//          dom.console.log("xxx ", choiceValueRaw)
-
           def fromExact =
             choices collectFirst {
               case (ExactChoice(`choiceValue`), message) => format(message, values)

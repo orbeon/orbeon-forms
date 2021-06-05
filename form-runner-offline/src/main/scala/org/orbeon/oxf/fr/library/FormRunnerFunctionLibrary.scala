@@ -20,6 +20,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.{AtomicValue, EmptySequence, StringValue}
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xbl.Wizard
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
@@ -39,20 +40,20 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction def workflowStageValue       : Option[String] = FormRunner.documentWorkflowStage
   @XPathFunction def username                 : Option[String] = CoreCrossPlatformSupport.externalContext.getRequest.credentials map     (_.username)
   @XPathFunction def userGroup                : Option[String] = CoreCrossPlatformSupport.externalContext.getRequest.credentials flatMap (_.group)
-//  @XPathFunction def relevantFormValuesString : String         = FormRunnerMetadata.findAllControlsWithValues(html = false)
-//  @XPathFunction def wizardCurrentPageName    : Option[String] = Wizard.wizardCurrentPageNameOpt
+//  @XPathFunction def relevantFormValuesString : String         = FormRunnerMetadata.findAllControlsWithValues(html = false) // 2021-06-04: unused
+  @XPathFunction def wizardCurrentPageName    : Option[String] = Wizard.wizardCurrentPageNameOpt
 
   @XPathFunction def isBrowserEnvironment     : Boolean        = CoreCrossPlatformSupport.isJsEnv
   @XPathFunction def isPe                     : Boolean        = CoreCrossPlatformSupport.isPE
   @XPathFunction def isDesignTime             : Boolean        = FormRunner.isDesignTime(FormRunnerParams())
   @XPathFunction def isReadonlyMode           : Boolean        = FormRunner.isReadonlyMode(FormRunnerParams())
   @XPathFunction def isNoscript               : Boolean        = false
-//  @XPathFunction def isFormDataValid          : Boolean        = countValidationsByLevel(ErrorLevel) == 0
+//  @XPathFunction def isFormDataValid          : Boolean        = countValidationsByLevel(ErrorLevel) == 0 // 2021-06-04: unused
   @XPathFunction def isFormDataSaved          : Boolean        = FormRunner.isFormDataSaved
-  @XPathFunction def isWizardTocShown         : Boolean        = false // Wizard.isWizardTocShown  // XXX TODO: migrate Wizard
-  @XPathFunction def isWizardBodyShown        : Boolean        = false // Wizard.isWizardBodyShown // XXX TODO: migrate Wizard
-  @XPathFunction def isWizardFirstPage        : Boolean        = false // Wizard.isWizardFirstPage // XXX TODO: migrate Wizard
-  @XPathFunction def isWizardLastPage         : Boolean        = false // Wizard.isWizardLastPage  // XXX TODO: migrate Wizard
+  @XPathFunction def isWizardTocShown         : Boolean        = Wizard.isWizardTocShown
+  @XPathFunction def isWizardBodyShown        : Boolean        = Wizard.isWizardBodyShown
+  @XPathFunction def isWizardFirstPage        : Boolean        = Wizard.isWizardFirstPage
+  @XPathFunction def isWizardLastPage         : Boolean        = Wizard.isWizardLastPage
   @XPathFunction def canCreate                : Boolean        = FormRunner.canCreate
   @XPathFunction def canRead                  : Boolean        = FormRunner.canRead
   @XPathFunction def canUpdate                : Boolean        = FormRunner.canUpdate

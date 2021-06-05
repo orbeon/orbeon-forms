@@ -14,14 +14,9 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.expr.parser.ExpressionTool
-import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om._
-import org.orbeon.saxon.tree.iter.SingletonIterator
-import org.orbeon.saxon.value._
 
-//
+
 //trait DefaultFunctionSupport
 //  extends FunctionSupport
 //    with NoPathMapDependencies
@@ -75,16 +70,4 @@ object FunctionSupport {
 
   def itemArgumentOrContextOpt(i: Option[om.Item])(implicit xpc: XPathContext): Option[om.Item] =
     i orElse Option(xpc.getContextItem)
-
-  // XXX CHECK IF NEEDED
-  def effectiveBooleanValue(e: Expression)(implicit xpathContext: XPathContext): Boolean =
-    ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))
-
-  // XXX CHECK IF NEEDED
-  def evaluateAsLong(e: Expression)(implicit xpathContext: XPathContext): Option[Long] =
-    Option(e.evaluateItem(xpathContext)) flatMap {
-      case v: Int64Value   => Some(v.longValue)
-      case _: IntegerValue => throw new IllegalArgumentException("integer value out of range for Long")
-      case _               => None
-    }
 }

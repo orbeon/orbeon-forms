@@ -19,16 +19,15 @@ import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.{XFormsOutputControl, XFormsSelect1Control, XFormsSelectControl}
-import org.orbeon.oxf.xforms.itemset.{ItemNode, ItemsetSupport, LHHAValue}
+import org.orbeon.oxf.xforms.itemset.{ItemNode, ItemsetSupport}
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, itemset}
-import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -38,6 +37,7 @@ import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
 import scala.xml.Elem
+
 
 object FormRunnerMetadata {
 
@@ -70,7 +70,6 @@ object FormRunnerMetadata {
   //@XPathFunction
   def findAllControlsWithValues(html: Boolean): String = {
 
-    val currentLang = FormRunnerLang.currentFRLang
     val currentFormRunnerResources = FormRunnerLang.currentFRResources
 
     val naString = currentFormRunnerResources / "email" / "na" stringValue
@@ -79,7 +78,11 @@ object FormRunnerMetadata {
     def iterationString(it: Int) =
       ProcessTemplateSupport.processTemplateWithNames(iterationResource, List(("iteration", it)))
 
-    val controlDetails = gatherRelevantControls(XFormsAPI.inScopeContainingDocument)
+    val controlDetails =
+      gatherRelevantControls(
+        XFormsAPI.inScopeContainingDocument,
+        Lang(FormRunnerLang.currentFRLang)
+      )
 
     def createLine(
       name     : String,
@@ -293,7 +296,10 @@ object FormRunnerMetadata {
     <metadata>{groupedMetadata}</metadata>
   }
 
-  def gatherRelevantControls(doc: XFormsContainingDocument): List[ControlDetails] = {
+  def gatherRelevantControls(
+    doc         : XFormsContainingDocument,
+    currentLang : Lang
+  ): List[ControlDetails] = {
 
     val controls = doc.controls.getCurrentControlTree.effectiveIdsToControls
 
@@ -326,44 +332,6 @@ object FormRunnerMetadata {
         case _                                                                 => false
       }
 
-    def iterateResources(resourcesInstance: XFormsInstance): Iterator[(Lang, NodeInfo)] =
-      for (resource <- resourcesInstance.rootElement / Resource iterator)
-      yield
-        Lang(resource.attValue("*:lang")) -> resource
-
-    def resourcesForControl(
-      staticControl : StaticLHHASupport,
-      lang          : Lang,
-      resourcesRoot : NodeInfo,
-      controlName   : String
-    ): (List[(LHHA, String)], List[ItemNode]) = {
-
-      val enclosingHolder = resourcesRoot descendant controlName take 1
-
-      val lhhas =
-        for {
-          lhha   <- LHHA.values.toList
-          if staticControl.hasLHHA(lhha)
-          holder <- enclosingHolder child lhha.entryName
-        } yield
-          lhha -> holder.stringValue
-
-      val items =
-        for ((item, position) <- enclosingHolder child Names.Item zipWithIndex)
-        yield
-          itemset.Item.ValueNode(
-            label      = LHHAValue(item elemValue LHHA.Label.entryName, isHTML = false), // TODO isHTML
-            help       = item elemValueOpt LHHA.Help.entryName flatMap (_.trimAllToOpt) map (LHHAValue(_, isHTML = false)), // TODO isHTML
-            hint       = item elemValueOpt LHHA.Hint.entryName flatMap (_.trimAllToOpt) map (LHHAValue(_, isHTML = false)), // TODO isHTML
-            value      = Left(item elemValueOpt Names.Value getOrElse ""),
-            attributes = Nil
-          )(position)
-
-      // TODO: multiple alerts: level of alert
-
-      (lhhas, items.toList)
-    }
-
     val selectedControls =
       controls.values  filter
         (_.isRelevant) filterNot
@@ -383,21 +351,30 @@ object FormRunnerMetadata {
 
         val singleNodeControlOpt = control.narrowTo[XFormsSingleNodeControl]
 
-        val resourcesInstanceOpt = singleNodeControlOpt flatMap resourcesInstance
         val boundNodeOpt         = singleNodeControlOpt flatMap (_.boundNodeOpt)
         val dataHashOpt          = boundNodeOpt map SubmissionUtils.dataNodeHash
 
         dataHashOpt -> {
 
-          val lhhaAndItemsIt =
-            for {
-              resourcesInstance     <- resourcesInstanceOpt.iterator
-              lhhaStaticControl     <- staticControl.cast[StaticLHHASupport].iterator
-              (lang, resourcesRoot) <- iterateResources(resourcesInstance)
-            } yield
-              lang -> resourcesForControl(lhhaStaticControl, lang, resourcesRoot, controlName)
-
-          val lhhaAndItemsList = lhhaAndItemsIt.toList
+          val lhhaAndItemsList: List[(Lang, (List[(LHHA, String)], List[ItemNode]))] =
+            List(
+              (
+                currentLang,
+                (
+                  List(
+                    LHHA.Label -> control.getLabel,
+                    LHHA.Help  -> control.getHelp,
+                    LHHA.Hint  -> control.getHint,
+                    LHHA.Alert -> control.getAlert
+                  ),
+                  for {
+                    sc             <- control.narrowTo[XFormsSelect1Control].toList
+                    (valueNode, _) <- sc.getItemset.allItemsWithValueIterator(reverse = false)
+                  } yield
+                    valueNode
+                )
+              )
+            )
 
           val valueOpt =
             Option(control) collect {

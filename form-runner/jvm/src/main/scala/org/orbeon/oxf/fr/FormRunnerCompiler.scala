@@ -42,7 +42,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
           val appName     = params.getRootElement.element("app").getText
           val formName    = params.getRootElement.element("form").getText
-          val formVersion = params.getRootElement.element("form-version").getText
+          val formVersion = params.getRootElement.element("form-version").getText.trimAllToOpt.getOrElse("1")
 
           val (jsonString, staticState) = XFormsCompiler.compile(formDocument)
 
@@ -89,7 +89,10 @@ class FormRunnerCompiler extends ProcessorImpl {
               staticState.topLevelPart.findControlAnalysis(FormInstance) collect {
                 case instance: Instance =>
 
-                  val basePath = FormRunner.createFormDefinitionBasePath(appName, formName)
+                  val fbBasePath             = "/fr/service/persistence/crud/orbeon/builder/data/"
+                  val topLevelBasePath       = FormRunner.createFormDefinitionBasePath(appName, formName)
+                  val appLibraryBasePath     = FormRunner.createFormDefinitionBasePath(appName, "library")
+                  val orbeonLibraryBasePath  = FormRunner.createFormDefinitionBasePath("orbeon", "library")
 
                   val dataDoc =
                     XFormsInstanceSupport.extractDocument(
@@ -100,11 +103,19 @@ class FormRunnerCompiler extends ProcessorImpl {
                       removeInstanceData = false
                     )
 
-                  FormRunner.collectAttachments(
-                    data             = dataDoc,
-                    fromBasePath     = basePath,
-                    toBasePath       = basePath,
-                    forceAttachments = true
+                  def collectAttachmentsFor(basePath: String) =
+                    FormRunner.collectAttachments(
+                      data             = dataDoc,
+                      fromBasePath     = basePath,
+                      toBasePath       = basePath,
+                      forceAttachments = true
+                    )
+
+                  (
+                    collectAttachmentsFor(fbBasePath)         :::
+                    collectAttachmentsFor(topLevelBasePath)   :::
+                    collectAttachmentsFor(appLibraryBasePath) :::
+                    collectAttachmentsFor(orbeonLibraryBasePath)
                   ) map { awh =>
                     val holder    = awh.holder
                     val uri       = holder.getStringValue.trimAllToEmpty

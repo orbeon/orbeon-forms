@@ -41,6 +41,17 @@
     <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
+    <!-- Same logic as in `persistence-model.xml` -->
+    <xsl:variable
+        name="is-background"
+        select="starts-with(doc('input:request')/*/request-path, '/fr/service/') and $mode = ('new', 'edit')"
+        as="xs:boolean"/>
+
+    <xsl:variable
+        name="disable-calculations"
+        select="$is-background and doc('input:request')/*/parameters/parameter[name = 'disable-calculations']/value = 'true'"
+        as="xs:boolean"/>
+
     <!-- Either the model with id fr-form-model, or the first model -->
     <xsl:variable name="fr-form-model"    select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
     <xsl:variable name="fr-form-model-id" select="generate-id($fr-form-model)"/>
@@ -752,5 +763,11 @@
     <!-- Remove built-in XBL components which older versions of Orbeon Forms might inline by mistake (pre-4.0?). When
          that happened, only simple bindings were supported. See https://github.com/orbeon/orbeon-forms/issues/2395 -->
     <xsl:template match="/xh:html/xh:head/xbl:xbl/xbl:binding[starts-with(@element, 'fr|')]"/>
+
+    <!-- Disable all calculations if requested (background mode only) -->
+    <xsl:template
+        match="
+            /xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:bind//@calculate[$disable-calculations] |
+            /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/xf:bind//@calculate[$disable-calculations]"/>
 
 </xsl:stylesheet>

@@ -258,7 +258,7 @@ object ControlAjaxSupport {
         XFormsBaseHandler.getLHHACId(containingDocument, control.effectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
       } else {
         val suffix    = XFormsId.getEffectiveIdSuffixParts(control.effectiveId)
-        val newSuffix = suffix.take(suffix.size - staticLhha.forRepeatNesting) map (_.toString: AnyRef)
+        val newSuffix = suffix.take(suffix.size - staticLhha.forRepeatNesting)
 
         XFormsId.buildEffectiveId(staticLhha.prefixedId, newSuffix)
       }

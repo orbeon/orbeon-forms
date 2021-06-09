@@ -89,5 +89,5 @@ object XFormsContextStackSupport {
   }
 
   def getElementEffectiveId(parentEffectiveId: String, elem: ElementAnalysis): String =
-    XFormsId.getRelatedEffectiveId(parentEffectiveId, elem.element.idOrNull)
+    XFormsId.buildEffectiveId(elem.prefixedId, XFormsId.getEffectiveIdSuffixParts(parentEffectiveId))
 }

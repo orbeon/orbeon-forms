@@ -215,8 +215,8 @@ object XFormsId {
       EmptyIntArray
   }
 
-  def buildEffectiveId(prefixedId: String, iterations: Array[AnyRef]): String =
-    if (iterations.length == 0)
+  def buildEffectiveId(prefixedId: String, iterations: Iterable[Int]): String =
+    if (iterations.isEmpty)
       prefixedId
     else
       prefixedId + Constants.RepeatSeparator + (iterations mkString Constants.RepeatIndexSeparatorString)

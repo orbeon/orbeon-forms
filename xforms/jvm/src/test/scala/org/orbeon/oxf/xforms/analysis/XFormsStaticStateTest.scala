@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsId.buildEffectiveId
 import org.scalatestplus.junit.AssertionsForJUnit
 
 
@@ -370,13 +371,6 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
       assertTrue(requireValueUpdate("output4c"))
       assertTrue(requireValueUpdate("output5b"))
     }
-  }
-
-  def buildEffectiveId(prefixedId: String, iterations: Iterable[Int]): String = {
-    if (iterations.isEmpty)
-      prefixedId
-    else
-      prefixedId + RepeatSeparatorString + (iterations mkString RepeatIndexSeparatorString)
   }
 
   @Test def repeatedModels(): Unit = {

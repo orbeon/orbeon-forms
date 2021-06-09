@@ -257,8 +257,8 @@ object ErrorSummary {
         val iterationsMap    = fromIterations zip toIterations toMap
 
         val newIterations = idIterationPairs map {
-          case (fromIt, `repeatPrefixedId`) if iterationsMap.contains(fromIt) => iterationsMap(fromIt).toString.asInstanceOf[AnyRef]
-          case (iteration, _)                                                 => iteration.toString.asInstanceOf[AnyRef]
+          case (fromIt, `repeatPrefixedId`) if iterationsMap.contains(fromIt) => iterationsMap(fromIt)
+          case (iteration, _)                                                 => iteration
         }
 
         val newEffectiveId = XFormsId.buildEffectiveId(prefixedId, newIterations)

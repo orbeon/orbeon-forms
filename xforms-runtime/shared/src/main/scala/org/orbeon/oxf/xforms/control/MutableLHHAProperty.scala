@@ -14,13 +14,13 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.xforms.XFormsContextStack
+import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContextStackSupport}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
 import org.orbeon.oxf.xforms.control.controls.XFormsLHHAControl
-import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.xforms.XFormsId
+
 
 class MutableLHHProperty(control: XFormsControl, lhhaType: LHHA, supportsHTML: Boolean)
   extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
@@ -124,7 +124,7 @@ abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: LHHA, suppo
       implicit val contextStack: XFormsContextStack = control.getContextStack
       contextStack.setBinding(control.bindingContext)
 
-      ItemsetSupport.evaluateExpressionOrConstant(
+      XFormsContextStackSupport.evaluateExpressionOrConstant(
         childElem           = lhhaAnalysis,
         parentEffectiveId   = control.effectiveId,
         pushContextAndModel = true

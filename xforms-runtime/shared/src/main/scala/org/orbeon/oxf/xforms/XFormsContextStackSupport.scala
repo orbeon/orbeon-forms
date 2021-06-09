@@ -13,14 +13,18 @@
  */
 package org.orbeon.oxf.xforms
 
+import cats.syntax.option._
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import org.orbeon.saxon.om
-import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.xforms.XFormsId
+
 
 object XFormsContextStackSupport {
 
@@ -90,4 +94,35 @@ object XFormsContextStackSupport {
 
   def getElementEffectiveId(parentEffectiveId: String, elem: ElementAnalysis): String =
     XFormsId.buildEffectiveId(elem.prefixedId, XFormsId.getEffectiveIdSuffixParts(parentEffectiveId))
+
+  def evaluateExpressionOrConstant(
+    childElem           : WithExpressionOrConstantTrait,
+    parentEffectiveId   : String,
+    pushContextAndModel : Boolean)(implicit
+    contextStack        : XFormsContextStack
+  ): Option[String] =
+    childElem.expressionOrConstant match {
+      case Left(expr)   =>
+
+        def evaluate(currentBindingContext: BindingContext) =
+          XPathCache.evaluateAsStringOpt(
+            contextItems       = currentBindingContext.nodeset,
+            contextPosition    = currentBindingContext.position,
+            xpathString        = expr,
+            namespaceMapping   = childElem.namespaceMapping,
+            variableToValueMap = currentBindingContext.getInScopeVariables,
+            functionLibrary    = contextStack.container.getContainingDocument.functionLibrary,
+            functionContext    = contextStack.getFunctionContext(getElementEffectiveId(parentEffectiveId, childElem)),
+            baseURI            = null,
+            locationData       = childElem.locationData,
+            reporter           = contextStack.container.getContainingDocument.getRequestStats.getReporter
+          )
+
+        if (pushContextAndModel)
+          withContextAndModelOnly(childElem, parentEffectiveId)(evaluate)
+        else
+          evaluate(contextStack.getCurrentBindingContext)
+      case Right(constant) =>
+        constant.some
+    }
 }

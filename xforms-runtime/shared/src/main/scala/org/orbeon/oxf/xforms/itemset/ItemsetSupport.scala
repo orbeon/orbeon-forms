@@ -583,36 +583,4 @@ object ItemsetSupport {
 
     result()
   }
-
-  // TODO: Move somewhere else as this is now used by other callers.
-  def evaluateExpressionOrConstant(
-    childElem           : WithExpressionOrConstantTrait,
-    parentEffectiveId   : String,
-    pushContextAndModel : Boolean)(implicit
-    contextStack        : XFormsContextStack
-  ): Option[String] =
-    childElem.expressionOrConstant match {
-      case Left(expr)   =>
-
-        def evaluate(currentBindingContext: BindingContext) =
-          XPathCache.evaluateAsStringOpt(
-            contextItems       = currentBindingContext.nodeset,
-            contextPosition    = currentBindingContext.position,
-            xpathString        = expr,
-            namespaceMapping   = childElem.namespaceMapping,
-            variableToValueMap = currentBindingContext.getInScopeVariables,
-            functionLibrary    = contextStack.container.getContainingDocument.functionLibrary,
-            functionContext    = contextStack.getFunctionContext(getElementEffectiveId(parentEffectiveId, childElem)),
-            baseURI            = null,
-            locationData       = childElem.locationData,
-            reporter           = contextStack.container.getContainingDocument.getRequestStats.getReporter
-          )
-
-        if (pushContextAndModel)
-          withContextAndModelOnly(childElem, parentEffectiveId)(evaluate)
-        else
-          evaluate(contextStack.getCurrentBindingContext)
-      case Right(constant) =>
-        constant.some
-    }
 }

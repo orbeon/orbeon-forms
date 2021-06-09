@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.findChildElem
 import org.orbeon.oxf.xforms.analysis.WithChildrenTrait
 import org.orbeon.oxf.xforms.analysis.controls.{HeaderControl, WithExpressionOrConstantTrait}
-import org.orbeon.oxf.xforms.itemset.ItemsetSupport.evaluateExpressionOrConstant
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 
 import scala.collection.mutable

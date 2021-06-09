@@ -15,10 +15,9 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.XFormsContextStack
+import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContextStackSupport}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, ValueControl}
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 
@@ -62,7 +61,7 @@ class XFormsLHHAControl(
       else
         contextStack.setBinding(selfControl.bindingContext)
 
-      ItemsetSupport.evaluateExpressionOrConstant(
+      XFormsContextStackSupport.evaluateExpressionOrConstant(
         childElem           = staticControl,
         parentEffectiveId   = selfControl.effectiveId,
         pushContextAndModel = staticControl.hasBinding

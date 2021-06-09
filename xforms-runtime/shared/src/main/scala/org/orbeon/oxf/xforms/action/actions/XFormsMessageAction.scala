@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.xforms.XFormsContextStackSupport
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.analysis.controls.WithExpressionOrConstantTrait
-import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.xxformsQName
@@ -79,7 +79,7 @@ class XFormsMessageAction extends XFormsAction {
         ModalQName // "The default is "modal" if the attribute is not specified."
 
     val messageValue =
-      ItemsetSupport.evaluateExpressionOrConstant(
+      XFormsContextStackSupport.evaluateExpressionOrConstant(
         childElem           = actionContext.analysis.asInstanceOf[WithExpressionOrConstantTrait],
         parentEffectiveId   = actionContext.interpreter.getSourceEffectiveId(actionContext.analysis),
         pushContextAndModel = false // `XFormsActionInterpreter` already handles that

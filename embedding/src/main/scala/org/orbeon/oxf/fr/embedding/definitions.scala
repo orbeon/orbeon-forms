@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.{OutputStream, Writer}
-
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.oxf.http.{Headers, HttpClient, StreamedContent}
@@ -22,6 +21,7 @@ import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.PathUtils._
 
 import scala.collection.immutable
+import scala.util.Try
 import scala.util.matching.Regex
 
 sealed trait FormRunnerMode extends EnumEntry with Lowercase
@@ -63,7 +63,7 @@ trait EmbeddingContext {
 
 trait EmbeddingContextWithResponse extends EmbeddingContext{
   def writer                                 : Writer
-  def outputStream                           : OutputStream
+  def outputStream                           : Try[OutputStream]
   def setHeader(name: String, value: String) : Unit
   def setStatusCode(code: Int)               : Unit
   def decodeURL(encoded: String)             : String

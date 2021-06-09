@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr.embedding.servlet
 
 import java.io.Writer
 import java.{util => ju}
-
 import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
@@ -26,6 +25,7 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 
 import scala.jdk.CollectionConverters._
+import scala.util.Try
 
 class ServletEmbeddingContext(
   val namespace  : String,
@@ -55,7 +55,7 @@ class ServletEmbeddingContextWithResponse(
 ) with EmbeddingContextWithResponse {
 
   def writer                                 = out.fold(identity, _.getWriter)
-  def outputStream                           = out.fold(_ => throw new IllegalStateException, _.getOutputStream)
+  def outputStream                           = Try(out.fold(_ => throw new IllegalStateException, _.getOutputStream))
   def setHeader(name: String, value: String) = out.right.foreach(_.setHeader(name, value))
   override def setStatusCode(code: Int)      = out.right.foreach(_.setStatus(code))
 

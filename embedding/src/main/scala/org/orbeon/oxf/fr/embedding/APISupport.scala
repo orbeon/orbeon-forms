@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr.embedding
 
 import java.io.Writer
-
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
@@ -34,6 +33,7 @@ import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
 import scala.collection.immutable
+import scala.util.{Failure, Success}
 import scala.util.matching.Regex
 
 object APISupport {
@@ -251,7 +251,13 @@ object APISupport {
       case other =>
         // All other types: just copy
         Logger.debug(s"using ctx.outputStream for mediatype = `$other`")
-        useAndClose(content.inputStream)(IOUtils.copy(_, ctx.outputStream))
+        ctx.outputStream match {
+          case Success(os) =>
+            useAndClose(content.inputStream)(IOUtils.copy(_, os))
+          case Failure(t)  =>
+            Logger.warn(s"unable to obtain `OutputStream` possibly because of a missing mediatype downstream", t)
+            ctx.writer.write("unable to provide content")
+        }
     }
 
   def scopeSettings[T](req: HttpServletRequest, settings: EmbeddingSettings)(body: => T): T = {

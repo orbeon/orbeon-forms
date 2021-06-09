@@ -15,7 +15,6 @@ package org.orbeon.oxf.portlet
 
 import java.io.{OutputStream, PrintWriter}
 import java.{util => ju}
-
 import javax.portlet._
 import org.apache.commons.io.IOUtils
 import org.orbeon.io.IOUtils._
@@ -28,6 +27,7 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 
 import scala.jdk.CollectionConverters._
+import scala.util.Try
 
 class PortletEmbeddingContext(
   context            : PortletContext,
@@ -59,10 +59,10 @@ class PortletEmbeddingContextWithResponse(
   httpClient
 ) with EmbeddingContextWithResponse {
 
-  def writer                    : PrintWriter  = response.getWriter
-  def outputStream              : OutputStream = response.getPortletOutputStream
-  def decodeURL(encoded: String): String       = LiferayURL.wsrpToPortletURL(encoded, response)
-  def setStatusCode(code: Int)  : Unit         = () // Q: Can we do anything meaningful for resource caching?
+  def writer                    : PrintWriter       = response.getWriter
+  def outputStream              : Try[OutputStream] = Try(response.getPortletOutputStream)
+  def decodeURL(encoded: String): String            = LiferayURL.wsrpToPortletURL(encoded, response)
+  def setStatusCode(code: Int)  : Unit              = () // Q: Can we do anything meaningful for resource caching?
 
   def setHeader(name: String, value: String): Unit =
     if (name equalsIgnoreCase Headers.ContentType)

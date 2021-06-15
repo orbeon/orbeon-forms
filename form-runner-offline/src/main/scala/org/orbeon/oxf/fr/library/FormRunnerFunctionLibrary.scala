@@ -277,8 +277,8 @@ object FRComponentParam {
   // This also allows support of the edited form in Form Builder.
   def appFormFromMetadata(constantMetadataRootElem: om.NodeInfo): Option[AppForm] =
     for {
-      appName                  <- constantMetadataRootElem elemValueOpt Names.AppName
-      formName                 <- constantMetadataRootElem elemValueOpt Names.FormName
+      appName  <- constantMetadataRootElem elemValueOpt Names.AppName
+      formName <- constantMetadataRootElem elemValueOpt Names.FormName
     } yield
       AppForm(appName, formName)
 

@@ -180,7 +180,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     val destinationNodeInfo =
       submission.evaluateTargetRef(
         p.refContext.xpathContext,
-        submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt),
+        submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt).orNull,
         p.refContext.submissionElementContextItem
       )
 

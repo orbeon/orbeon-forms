@@ -487,15 +487,15 @@ class XFormsModelSubmission(
     }
   }
 
-  def findReplaceInstanceNoTargetref(refInstance: Option[XFormsInstance]): XFormsInstance =
+  def findReplaceInstanceNoTargetref(refInstance: Option[XFormsInstance]): Option[XFormsInstance] =
     if (staticSubmission.xxfReplaceInstanceIdOrNull != null)
-      container.findInstanceOrNull(staticSubmission.xxfReplaceInstanceIdOrNull)
+      container.findInstance(staticSubmission.xxfReplaceInstanceIdOrNull)
     else if (staticSubmission.replaceInstanceIdOrNull != null)
-      model.getInstance(staticSubmission.replaceInstanceIdOrNull)
+      model.findInstance(staticSubmission.replaceInstanceIdOrNull)
     else if (refInstance.isEmpty)
-      model.getDefaultInstance
+      model.defaultInstanceOpt
     else
-      refInstance.get
+      refInstance
 
   def evaluateTargetRef(
     xpathContext                 : XPathCache.XPathContext,

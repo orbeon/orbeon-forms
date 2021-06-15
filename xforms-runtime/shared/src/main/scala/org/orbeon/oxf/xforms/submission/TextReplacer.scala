@@ -115,11 +115,11 @@ object TextReplacer {
             reporter     = containingDocument.getRequestStats.addXPathStat
           ) match {
             case n: om.NodeInfo => n
-            case _           => throwSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`.""")
+            case _              => throwSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`.""")
           }
         case None =>
           // Use default destination
-          submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt).rootElement
+          submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt).getOrElse(throw new IllegalArgumentException).rootElement
       }
 
     def handleSetValueSuccess(oldValue: String): Unit =

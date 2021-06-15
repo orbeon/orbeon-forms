@@ -148,7 +148,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
 
     // Set new instance document to replace the one submitted
 
-    Option(submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt)) match {
+    submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt) match {
       case None =>
 
         // Replacement instance or node was specified but not found

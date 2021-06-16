@@ -995,7 +995,7 @@ object XFormsStaticStateImpl {
   ): XFormsStaticState = {
 
     val staticProperties = new XFormsStaticStateStaticPropertiesImpl(_nonDefaultProperties, globalMaxSizeProperty) {
-      protected def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = featureRequested
+      def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = featureRequested
     }
 
     val dynamicProperties = new XFormsStaticStateDynamicPropertiesImpl(_nonDefaultProperties, staticProperties, _topLevelPart)
@@ -1021,6 +1021,9 @@ object XFormsStaticStateImpl {
       // Delegate (Scala 3's `export` would be nice!)
       // export staticProperties._
       // export dynamicProperties._
+      def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean =
+        staticProperties.isPEFeatureEnabled(featureRequested, featureName)
+
       def isClientStateHandling               : Boolean          = staticProperties.isClientStateHandling
       def isServerStateHandling               : Boolean          = staticProperties.isServerStateHandling
       def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis

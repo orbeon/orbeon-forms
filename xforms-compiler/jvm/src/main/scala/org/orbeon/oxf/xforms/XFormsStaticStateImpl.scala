@@ -48,7 +48,7 @@ object XFormsStaticStateImpl {
         staticStateDocument.nonDefaultProperties,
         RequestGenerator.getMaxSizeProperty
       ) {
-        protected def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean =
+        def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean =
           Version.instance.isPEFeatureEnabled(featureRequested, featureName)
       }
 
@@ -94,6 +94,9 @@ class XFormsStaticStateImpl(
   // Delegate (Scala 3's `export` would be nice!)
   // export staticProperties._
   // export dynamicProperties._
+  def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean =
+    staticProperties.isPEFeatureEnabled(featureRequested, featureName)
+    
   def isClientStateHandling               : Boolean          = staticProperties.isClientStateHandling
   def isServerStateHandling               : Boolean          = staticProperties.isServerStateHandling
   def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis

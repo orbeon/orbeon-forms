@@ -44,6 +44,8 @@ trait XFormsStaticState
 
 trait XFormsStaticStateStaticProperties {
 
+  def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean
+
   def nonDefaultProperties                : Map[String, (String, Boolean)]
 
   def isClientStateHandling               : Boolean

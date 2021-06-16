@@ -11,8 +11,6 @@ abstract class XFormsStaticStateStaticPropertiesImpl(
   globalMaxSizeProperty       : Int
 ) extends XFormsStaticStateStaticProperties {
 
-  protected def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean
-
   val isClientStateHandling   : Boolean     = staticStringProperty(P.StateHandlingProperty) == P.StateHandlingClientValue
   val isServerStateHandling   : Boolean     = staticStringProperty(P.StateHandlingProperty) == P.StateHandlingServerValue
   val isXPathAnalysis         : Boolean     = isPEFeatureEnabled(staticBooleanProperty(P.XpathAnalysisProperty),     P.XpathAnalysisProperty)

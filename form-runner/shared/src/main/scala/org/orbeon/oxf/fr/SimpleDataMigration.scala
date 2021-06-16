@@ -13,17 +13,17 @@
   */
 package org.orbeon.oxf.fr
 
-import com.typesafe.scalalogging.Logger
 import enumeratum.EnumEntry.Lowercase
+import org.log4s.Logger
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.http.StatusCode
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticState}
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, inScopeContainingDocument, insert}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.model.XFormsModel
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
@@ -47,9 +47,9 @@ object SimpleDataMigration {
   //@XPathFunction
   def dataMaybeWithSimpleMigration(
     enclosingModelAbsoluteId : String,
-    templateInstanceRootElem : NodeInfo,
-    dataToMigrateRootElem    : NodeInfo
-  ): Option[NodeInfo] =
+    templateInstanceRootElem : om.NodeInfo,
+    dataToMigrateRootElem    : om.NodeInfo
+  ): Option[om.NodeInfo] =
     try {
 
       require(XFormsId.isAbsoluteId(enclosingModelAbsoluteId))
@@ -58,7 +58,7 @@ object SimpleDataMigration {
 
       implicit val doc = inScopeContainingDocument
 
-      getConfiguredDataMigrationBehavior match {
+      getConfiguredDataMigrationBehavior(doc.staticState) match {
         case DataMigrationBehavior.Disabled =>
           None
         case DataMigrationBehavior.Enabled =>
@@ -95,18 +95,18 @@ object SimpleDataMigration {
   //@XPathFunction
   def iterateBinds(
     enclosingModelAbsoluteId : String,
-    dataRootElem             : NodeInfo
-  ): SequenceIterator = {
+    dataRootElem             : om.NodeInfo
+  ): om.SequenceIterator = {
 
     implicit val doc = inScopeContainingDocument
 
     def processLevel(
-      parents          : List[NodeInfo],
+      parents          : List[om.NodeInfo],
       binds            : Seq[StaticBind],
       path             : List[String]
-    ): List[NodeInfo] = {
+    ): List[om.NodeInfo] = {
 
-      def findOps(prevBindOpt: Option[StaticBind], bind: StaticBind, bindName: String): List[NodeInfo] =
+      def findOps(prevBindOpt: Option[StaticBind], bind: StaticBind, bindName: String): List[om.NodeInfo] =
         parents flatMap { parent =>
 
           val nestedElems =
@@ -134,7 +134,7 @@ object SimpleDataMigration {
 
   private object Private {
 
-    val logger = Logger("org.orbeon.fr.data-migration")
+    val logger: Logger = LoggerFactory.createLogger("org.orbeon.fr.data-migration")
 
     val DataMigrationFeatureName  = "data-migration"
     val DataMigrationPropertyName = s"oxf.fr.detail.$DataMigrationFeatureName"
@@ -155,11 +155,11 @@ object SimpleDataMigration {
     sealed trait DataMigrationOp
 
     object DataMigrationOp {
-      case class Insert(parentElem: NodeInfo, after: Option[String], template: Option[NodeInfo]) extends DataMigrationOp
-      case class Delete(elem: NodeInfo)                                                          extends DataMigrationOp
+      case class Insert(parentElem: om.NodeInfo, after: Option[String], template: Option[om.NodeInfo]) extends DataMigrationOp
+      case class Delete(elem: om.NodeInfo)                                                             extends DataMigrationOp
     }
 
-    def getConfiguredDataMigrationBehavior: DataMigrationBehavior = {
+    def getConfiguredDataMigrationBehavior(staticState: XFormsStaticState): DataMigrationBehavior = {
 
       implicit val formRunnerParams = FormRunnerParams()
 
@@ -173,7 +173,7 @@ object SimpleDataMigration {
           DataMigrationBehavior.Disabled
 
       def isFeatureEnabled =
-        Version.instance.isPEFeatureEnabled(
+        staticState.isPEFeatureEnabled(
           featureRequested = true,
           "Form Runner simple data migration"
         )
@@ -211,8 +211,8 @@ object SimpleDataMigration {
 
     def gatherMigrationOps(
       enclosingModelAbsoluteId : String,
-      templateInstanceRootElem : NodeInfo,
-      dataToMigrateRootElem    : NodeInfo)(implicit
+      templateInstanceRootElem : om.NodeInfo,
+      dataToMigrateRootElem    : om.NodeInfo)(implicit
       doc                      : XFormsContainingDocument
     ): List[DataMigrationOp] = {
 
@@ -245,7 +245,7 @@ object SimpleDataMigration {
       // - NOTE: We never need to identify a template for a repeat iteration, because repeat
       //   iterations are optional!
 
-      def findElementTemplate(templateRootElem: NodeInfo, path: List[String]): Option[NodeInfo] =
+      def findElementTemplate(templateRootElem: om.NodeInfo, path: List[String]): Option[om.NodeInfo] =
         path.foldRight(Option(templateRootElem)) {
           case (_, None)          => None
           case (name, Some(node)) => node firstChildOpt name
@@ -254,9 +254,9 @@ object SimpleDataMigration {
       // NOTE: We work with `List`, which is probably the most optimal thing. Tried with `Iterator` but
       // it is messy and harder to get right.
       def processLevel(
-        parents          : List[NodeInfo],
+        parents          : List[om.NodeInfo],
         binds            : List[StaticBind], // use `List` to ensure eager evaluation
-        templateRootElem : NodeInfo,
+        templateRootElem : om.NodeInfo,
         path             : List[String]
       ): List[DataMigrationOp] = {
 

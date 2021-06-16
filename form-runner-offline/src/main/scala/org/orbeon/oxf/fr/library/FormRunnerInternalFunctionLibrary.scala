@@ -2,7 +2,7 @@ package org.orbeon.oxf.fr.library
 
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.fr.Names.FormModel
-import org.orbeon.oxf.fr.{FormOrData, FormRunner, FormRunnerPersistence, GridDataMigration}
+import org.orbeon.oxf.fr.{FormOrData, FormRunner, FormRunnerPersistence, GridDataMigration, SimpleDataMigration}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -12,6 +12,7 @@ import org.orbeon.oxf.xforms.control.controls.FileMetadata
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent, StringValue}
+import org.orbeon.scaxon.Implicits
 import org.orbeon.xbl.{DateSupportJava, NumberSupportJava, Wizard}
 
 import scala.jdk.CollectionConverters._
@@ -237,19 +238,24 @@ object FormRunnerSimpleDataMigrationFunctionLibrary extends OrbeonFunctionLibrar
     enclosingModelAbsoluteId : String,
     templateInstanceRootElem : om.NodeInfo,
     dataToMigrateRootElem    : om.NodeInfo
-  ): Option[om.NodeInfo] = {
-    // XXX TODO
-    None
-  }
+  ): Option[om.NodeInfo] =
+    SimpleDataMigration.dataMaybeWithSimpleMigration(
+      enclosingModelAbsoluteId,
+      templateInstanceRootElem,
+      dataToMigrateRootElem
+    )
 
   @XPathFunction(name = "iterateBinds")
   def iterateBinds(
     enclosingModelAbsoluteId : String,
     dataRootElem             : om.NodeInfo
-  ): Iterator[om.Item] = {
-    // XXX TODO
-    Iterator.empty
-  }
+  ): Iterator[om.Item] =
+    Implicits.asScalaIterator(
+      SimpleDataMigration.iterateBinds(
+        enclosingModelAbsoluteId,
+        dataRootElem
+      )
+    )
 }
 
 object FormRunnerNumberSupportFunctionLibrary extends OrbeonFunctionLibrary {

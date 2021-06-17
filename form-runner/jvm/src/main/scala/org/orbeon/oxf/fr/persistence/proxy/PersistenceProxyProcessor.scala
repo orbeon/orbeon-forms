@@ -187,7 +187,7 @@ private object PersistenceProxyProcessor {
 
           List(removeNonRelevantTransform, decryptTransform).flatten
 
-        } else if (isDataXmlRequest && isFormBuilder | formOrData == FormOrData.Form) {
+        } else if (isDataXmlRequest && isFormBuilder || formOrData == FormOrData.Form) {
 
           // Special case of form definitions
           request.getFirstParamAsString(FormDefinitionFormatVersionName).map(DataFormatVersion.withName) match {

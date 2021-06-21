@@ -23,7 +23,9 @@
     <xsl:variable name="starting-section-level" select="2"/>
 
     <!-- TODO: Move to separate file. -->
-    <xsl:template match="xh:body//xf:output[exists(xf:label) and empty(@appearance)] | xbl:binding/xbl:template//fr:section[exists(xf:label) and empty(@appearance)]">
+    <xsl:template match="
+            xh:body//xf:output[exists(xf:label) and empty(@appearance)] |
+            xbl:binding/xbl:template//xf:output[exists(xf:label) and empty(@appearance)]">
         <xsl:copy>
             <xsl:for-each select="$calculated-value-appearance[. != 'full']"><!-- `full` is the default so don't bother adding the attribute in this case -->
                 <xsl:attribute name="appearance" select="."/>

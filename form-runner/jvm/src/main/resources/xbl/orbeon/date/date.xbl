@@ -141,6 +141,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
                         <resource xml:lang="fr"><format>MJA</format></resource>
                         <resource xml:lang="de"><format>MTJ</format></resource>
                         <resource xml:lang="pl"><format>YMD</format></resource>
+                        <resource xml:lang="hu"><format>HNÉ</format></resource>
                     </_>
                 </xf:instance>
             </xf:model>

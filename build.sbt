@@ -20,8 +20,8 @@ val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.0"
 val EnumeratumCirceVersion        = "1.6.0"
-val ShapelessVersion              = "2.3.7"
-val ScalaXmlVersion               = "1.3.0" // When upgrading: make sure we don't regress on https://github.com/orbeon/orbeon-forms/issues/4927
+val ShapelessVersion              = "2.3.4"
+val ScalaXmlVersion               = "1.2.0" // When upgrading: make sure we don't regress on https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaAsyncVersion             = "0.10.0"
 val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
@@ -139,7 +139,7 @@ val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version fr
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
 
-lazy val scala212 = "2.12.14"
+lazy val scala212 = "2.12.10"
 lazy val scala213 = "2.13.1"
 lazy val supportedScalaVersions = List(scala212, scala213)
 
@@ -572,7 +572,7 @@ lazy val formRunnerJS = formRunner.js
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
@@ -630,7 +630,7 @@ lazy val formBuilderJS = formBuilder.js
       "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
@@ -701,7 +701,7 @@ lazy val xformsJS = xforms.js
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
     unmanagedResourceDirectories in Test += sharedAssetsDir(baseDirectory.value),

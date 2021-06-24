@@ -2502,10 +2502,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                                     ORBEON.util.DateTime.magicTimeToJSDate, ORBEON.util.DateTime.jsDateToFormatDisplayTime);
                     }
 
-                    // Fire change event
+                    // Fire change event if the control has a value
                     var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(target);
-                    var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, controlCurrentValue, "xxforms-value");
-                    ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                    if (! _.isUndefined(controlCurrentValue)) {
+                        var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, controlCurrentValue, "xxforms-value");
+                        ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                    }
                 }
             }
         },

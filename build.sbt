@@ -20,26 +20,26 @@ val ScalaTestPlusVersion          = "1.0.0-M2"
 val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.0"
 val EnumeratumCirceVersion        = "1.6.0"
-val ShapelessVersion              = "2.3.7"
-val ScalaXmlVersion               = "2.0.0-M1"
+val ShapelessVersion              = "2.3.4"
+val ScalaXmlVersion               = "1.2.0" // When upgrading: make sure we don't regress on https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaAsyncVersion             = "0.10.0"
 val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
 val AutowireVersion               = "0.2.6"
 val SbinaryVersion                = "0.5.1"
 val RosHttpVersion                = "2.1.0"
-val ScalaLoggingVersion           = "3.9.3"
+val ScalaLoggingVersion           = "3.9.4"
 val Log4sVersion                  = "1.8.2"
 val ScalaCollectionCompatVersion  = "2.2.0"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
-val Slf4jVersion                  = "1.7.30"
+val Slf4jVersion                  = "1.7.31"
 val HttpComponentsVersion         = "4.5.13"
 val Log4jVersion                  = "1.2.17"
-val CommonsIoVersion              = "2.7"
+val CommonsIoVersion              = "2.10.0"
 val FlyingSaucerVersion           = "9.1.22"
-val TinkVersion                   = "1.5.0"
+val TinkVersion                   = "1.6.0"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.0"
 val AntVersion                    = "1.10.10"
@@ -73,6 +73,10 @@ val CoreLibraryDependencies = Seq(
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
   "commons-validator"           %  "commons-validator"              % "1.7",
+  "org.apache.axis"             %  "axis"                           % "1.4",
+  "org.apache.axis"             %  "axis-jaxrpc"                    % "1.4",
+  "org.apache.axis"             %  "axis-saaj"                      % "1.4",
+  "axis"                        %  "axis-wsdl4j"                    % "1.5.1",
   "org.apache.ant"              %  "ant"                            % AntVersion,
   "org.apache.ant"              %  "ant-jsch"                       % AntVersion,
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
@@ -97,16 +101,16 @@ val CoreLibraryDependencies = Seq(
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.8.0"           % Test,
-  "com.google.code.gson"        % "gson"                            % "2.8.6"           % Test,
+  "com.google.code.gson"        % "gson"                            % "2.8.7"           % Test,
   "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
   "mysql"                       % "mysql-connector-java"            % "8.0.25"          % Test,
-  "org.postgresql"              % "postgresql"                      % "42.2.20"         % Test,
+  "org.postgresql"              % "postgresql"                      % "42.2.22"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
-  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.68", // for `itext`/`openpdf`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.69", // for `itext`/`openpdf`, also pulls `bcprov` and `bcpkix`
   "com.drewnoakes"              % "metadata-extractor"              % "2.16.0",
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
 
@@ -568,7 +572,7 @@ lazy val formRunnerJS = formRunner.js
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "3.6.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
@@ -626,7 +630,7 @@ lazy val formBuilderJS = formBuilder.js
       "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "3.6.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     jsDependencies      in Test    += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
@@ -697,7 +701,7 @@ lazy val xformsJS = xforms.js
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0"
     ),
 
-    jsDependencies                 += "org.webjars" % "jquery" % "3.6.0" / "1.12.0/jquery.js",
+    jsDependencies                 += "org.webjars" % "jquery" % "1.12.4" / "1.12.4/jquery.js",
 
     // Because `jsDependencies` searches in `resources` instead of `assets`, expose the shared `assets` directory
     unmanagedResourceDirectories in Test += sharedAssetsDir(baseDirectory.value),

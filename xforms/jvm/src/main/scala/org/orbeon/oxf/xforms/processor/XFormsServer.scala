@@ -627,7 +627,7 @@ class XFormsServer extends ProcessorImpl {
     // - https://github.com/orbeon/orbeon-forms/issues/2071
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
-    val lockResult: Try[Option[Eval[SubmissionResult]]] =
+    val lockResult: Try[Try[Option[Eval[SubmissionResult]]]] =
       withLock(parameters, if (isAjaxRequest) 0L else XFormsProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 
@@ -841,14 +841,26 @@ class XFormsServer extends ProcessorImpl {
 
     // Throw the exception if there was any
     lockResult match {
-      case Success(Some(replaceAllEval)) =>
+      case Failure(e: SessionExpiredException) => // from downstream `acquireDocumentLock`
+        // See also `XFormsAssetServer`
+        info(s"session not found while processing client events")
+        // TODO: Unclear is this can happen for replace="all" where `xmlReceiverOpt == None`.
+        val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
+        ClientEvents.errorResponse(e.code)(xmlReceiver)
+      case Failure(e) => // from downstream `acquireDocumentLock`
+        // See also `XFormsAssetServer`
+        info(s"error while processing client events: ${e.getMessage}")
+        // TODO: Unclear is this can happen for replace="all" where `xmlReceiverOpt == None`.
+        val xmlReceiver = xmlReceiverOpt getOrElse (throw new IllegalStateException)
+        ClientEvents.errorResponse(StatusCode.InternalServerError)(xmlReceiver)
+      case Success(Success(Some(replaceAllEval))) =>
         // Check and run submission with `replace="all"`
         // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         //   hit the document.
         // - No need to output a null document here, `xmlReceiver` is absent anyway.
         XFormsModelSubmission.runDeferredSubmission(replaceAllEval, response)
-      case Success(None) =>
-      case Failure(t)    => throw t
+      case Success(Success(None)) =>
+      case Success(Failure(t))    => throw t
     }
   }
 }

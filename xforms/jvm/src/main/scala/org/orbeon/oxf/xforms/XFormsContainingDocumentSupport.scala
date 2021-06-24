@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms
 
 import java.util.concurrent.locks.Lock
 import java.{util => ju}
-
 import cats.Eval
 import cats.syntax.option._
 import org.apache.commons.lang3.StringUtils
@@ -45,7 +44,7 @@ import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.function.xxforms.{UploadMaxSizeValidation, UploadMediatypesValidation}
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsModel}
 import org.orbeon.oxf.xforms.processor.{ScriptBuilder, XFormsServer}
-import org.orbeon.oxf.xforms.state.{DynamicState, RequestParameters, XFormsStateManager}
+import org.orbeon.oxf.xforms.state.{DynamicState, LockResponse, RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{SubmissionResult, TwoPassSubmissionParameters}
 import org.orbeon.oxf.xforms.upload.{AllowedMediatypes, UploadCheckerLogic}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -57,12 +56,11 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection.{immutable => i, mutable => m}
 import scala.reflect.ClassTag
+import scala.util.{Failure, Success, Try}
 
 object XFormsContainingDocumentSupport {
 
-  val StandaloneDeploymentTypeJava: DeploymentType = DeploymentType.Standalone
-
-  def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument => T): T = {
+  def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument => T): Try[T] = {
     withLock(RequestParameters(uuid, None, None, None), timeout) {
       case Some(containingDocument) =>
         withUpdateResponse(containingDocument, ignoreSequence = true)(block(containingDocument))
@@ -72,12 +70,12 @@ object XFormsContainingDocumentSupport {
     }
   }
 
-  def withLock[T](params: RequestParameters, timeout: Long)(block: Option[XFormsContainingDocument] => T): T = {
+  def withLock[T](params: RequestParameters, timeout: Long)(block: Option[XFormsContainingDocument] => T): Try[T] = {
 
     LifecycleLogger.eventAssumingRequest("xforms", "before document lock", List("uuid" -> params.uuid))
 
     XFormsStateManager.acquireDocumentLock(params.uuid, timeout) match {
-      case Some(lock) =>
+      case LockResponse.Success(lock) =>
         try {
 
           LifecycleLogger.eventAssumingRequest(
@@ -98,7 +96,7 @@ object XFormsContainingDocumentSupport {
           try {
             val result = block(Some(containingDocument))
             keepDocument = true
-            result
+            Success(result)
           } finally {
             XFormsStateManager.afterUpdate(containingDocument, keepDocument, disableDocumentCache = false)
           }
@@ -106,9 +104,11 @@ object XFormsContainingDocumentSupport {
         } finally {
           XFormsStateManager.releaseDocumentLock(lock)
         }
-      case None =>
+      case LockResponse.Timeout =>
         LifecycleLogger.eventAssumingRequest("xforms", "document lock timeout", List("uuid" -> params.uuid))
-        block(None)
+        Success(block(None))
+      case LockResponse.Failure(t) =>
+        Failure(t)
     }
   }
 
@@ -300,7 +300,7 @@ trait ContainingDocumentUpload {
     def uploadMaxSizeAggregateProperty = staticState.uploadMaxSizeAggregate
   }
 
-  def getUploadConstraintsForControl(controlEffectiveId: String): (MaximumSize, AllowedMediatypes) = {
+  def getUploadConstraintsForControl(controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] = {
 
     val allowedMediatypesMaybeRange = {
 
@@ -317,7 +317,7 @@ trait ContainingDocumentUpload {
         AllowedMediatypes.AllowedAnyMediatype
     }
 
-    UploadChecker.uploadMaxSizeForControl(controlEffectiveId) -> allowedMediatypesMaybeRange
+    Success(UploadChecker.uploadMaxSizeForControl(controlEffectiveId) -> allowedMediatypesMaybeRange)
   }
 }
 

@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.state
 
 import java.util.concurrent.locks.{Lock, ReentrantLock}
 import java.util.concurrent.{ConcurrentLinkedQueue, TimeUnit}
-
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.SessionExpiredException
@@ -29,6 +28,7 @@ import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument, XFormsPropertie
 import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.collection.JavaConverters._
+import scala.util.{Failure, Success, Try}
 
 object XFormsStateManager extends XFormsStateLifecycle {
 
@@ -130,31 +130,27 @@ object XFormsStateManager extends XFormsStateLifecycle {
       storeDocumentState(containingDocument, isInitialState = false)
   }
 
-  /**
-    * Return the locked document lock. Must be called bef~ore beforeUpdate().
-    *
-    * @param uuid incoming UUID
-    * @return the document lock, already locked
-    */
-  def acquireDocumentLock(uuid: String, timeout: Long): Option[Lock] = {
-    assert(uuid ne null)
+  // Return the locked document lock. Must be called before `beforeUpdate()`.
+  def acquireDocumentLock(uuid: String, timeout: Long): LockResponse =
     // Check that the session is associated with the requested UUID. This enforces the rule that an incoming request
     // for a given UUID must belong to the same session that created the document. If the session expires, the
     // key goes away as well, and the key won't be present. If we don't do this check, the XForms server might
     // handle requests for a given UUID within a separate session, therefore providing access to other sessions,
     // which is not desirable. Further, we now have a lock stored in the session.
-    val lock =
-      getDocumentLock(uuid) getOrElse
-        (throw SessionExpiredException("Unknown form document requested."))
-
-    // Lock document for at most the max retry delay plus an increment
-    try {
-      lock.tryLock(timeout, TimeUnit.MILLISECONDS) option lock
-    } catch {
-      case e: InterruptedException =>
-        throw new OXFException(e)
+    getDocumentLock(uuid ensuring (_ ne null)) match {
+      case Some(lock) =>
+        try {
+          if (lock.tryLock(timeout, TimeUnit.MILLISECONDS))
+            LockResponse.Success(lock)
+          else
+            LockResponse.Timeout
+        } catch {
+          case e: InterruptedException =>
+            LockResponse.Failure(e)
+        }
+      case None =>
+        LockResponse.Failure(SessionExpiredException("Unknown form document requested."))
     }
-  }
 
   // Release the given document lock. Must be called after afterUpdate() in a finally block.
   def releaseDocumentLock(lock: Lock): Unit =

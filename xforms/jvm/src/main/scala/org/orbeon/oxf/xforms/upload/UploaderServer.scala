@@ -146,10 +146,12 @@ object UploaderServer {
       uploadContext  = trustedUploadContext,
       lifecycleOpt   = Some(
         new UploadProgressMultipartLifecycle(request.contentLengthOpt, trustedUploadContext.getInputStream, session) {
-          def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): (MaximumSize, AllowedMediatypes) =
-            withDocumentAcquireLock(uuid, XFormsProperties.uploadXFormsAccessTimeout) {
-              _.getUploadConstraintsForControl(controlEffectiveId)
-            }
+          def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] =
+            withDocumentAcquireLock(
+              uuid    = uuid,
+              timeout = XFormsProperties.uploadXFormsAccessTimeout)(
+              block   = _.getUploadConstraintsForControl(controlEffectiveId)
+            ).flatten
         }
       ),
       maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter
@@ -194,7 +196,7 @@ object UploaderServer {
     // Session keys created, for cleanup
     val sessionKeys = m.ListBuffer[String]()
 
-    def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): (MaximumSize, AllowedMediatypes)
+    def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)]
 
     // Can throw
     def fileItemStarting(fieldName: String, fileItem: FileItem): Option[MaximumSize] = {
@@ -206,7 +208,7 @@ object UploaderServer {
         throw new IllegalStateException("more than one file provided")
 
       val (maxUploadSizeForControl, allowedMediatypeRangesForControl) =
-        getUploadConstraintsForControl(uuid, fieldName)
+        getUploadConstraintsForControl(uuid, fieldName).get // TODO: will throw if this is a `Failure`
 
       val headersOpt =
         for {

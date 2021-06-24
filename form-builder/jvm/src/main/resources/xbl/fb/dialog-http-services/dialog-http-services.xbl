@@ -43,6 +43,16 @@
                 <xf:setvalue ref="$request/is-binary-response" value="false()"/>
                 <xf:delete   ref="$response/headers/header"/>
 
+                <!--
+                    Copy namespaces in scope, so we can validate the AVT
+                    FIXME: `$request/resource/namespace::*` should return all the namespaces in scope on
+                           `<resource>` but instead it only seems to return the namespaces specifically on that
+                           element, so we get the namespaces on the form, as this is generally where they
+                           are declared.
+                -->
+                <xf:delete ref="$request/resource/namespace::*"/>
+                <xf:insert context="$request/resource"    origin="$form/namespace::*"/>
+
                 <!-- Copy parameters if any -->
                 <xf:action if="exists($submission-name-opt)">
 
@@ -64,16 +74,6 @@
                     <xf:setvalue ref="$request/method"        value="$submission/@method"/>
                     <xf:setvalue ref="$request/serialization" value="$submission/@serialization"/>
                     <xf:setvalue ref="$request/resource"      value="$submission/@resource"/>
-
-                    <!--
-                        Copy namespaces in scope, so we can validate the AVT
-                        FIXME: `$request/resource/namespace::*` should return all the namespaces in scope on
-                               `<resource>` but instead it only seems to return the namespaces specifically on that
-                               element, so we get the namespaces on the form, as this is generally where they
-                               are declared.
-                    -->
-                    <xf:delete ref="$request/resource/namespace::*"/>
-                    <xf:insert context="$request/resource"    origin="$form/namespace::*"/>
 
                     <xf:action if="not($local-has-request-body)">
                         <xf:var

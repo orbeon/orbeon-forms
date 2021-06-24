@@ -21,7 +21,7 @@ import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.http.{SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.io.IOUtils._
@@ -34,7 +34,7 @@ import org.orbeon.xforms.CrossPlatformSupport
 
 import scala.collection.compat._
 import scala.collection.immutable.ListSet
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
 /**
@@ -60,32 +60,45 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
         // This is the typical expected scenario: loading the dynamic data occurs just after loading the page and before there have been
         // any changes to the document, so the document should be in cache and have a sequence number of "1".
-        val fromCurrentStateOpt =
-          // NOTE: Use the same timeout as upload for now. If the timeout expires, this throws an exception.
-          withDocumentAcquireLock(uuid, XFormsProperties.uploadXFormsAccessTimeout) { document =>
-            document.initialClientScript
-          }
+        val fromCurrentStateOptTry =
+          withDocumentAcquireLock(
+            uuid,
+            XFormsProperties.uploadXFormsAccessTimeout // same timeout as upload for now (throws if the timeout expires)
+          )(_.initialClientScript)
 
-        // This is the case where the above doesn't hold, for example upon browser back. It should be a much rarer case, and we bear the
-        // cost of getting the state from cache.
-        def fromInitialStateOpt =
-            XFormsStateManager.getStateFromParamsOrStore(
-              RequestParameters(uuid, None, None, None),
-              isInitialState = true
-            ).dynamicState flatMap (_.initialClientScript)
+        fromCurrentStateOptTry match {
+          case Failure(e: SessionExpiredException) => // from downstream `acquireDocumentLock`
+            // For `serveDynamicResource` we return "not found" and here we return "forbidden" as that's the
+            // code associated with `SessionExpiredException`. Can we justify the difference?
+            info(s"session not found while retrieving form dynamic resources")
+            response.setStatus(e.code)
+          case Failure(e) => // from downstream `acquireDocumentLock`
+            info(s"error while retrieving form dynamic resources: ${e.getMessage}")
+            response.setStatus(StatusCode.InternalServerError)
+          case Success(fromCurrentStateOpt) =>
 
-        response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
-        // The document cannot be cached "forever", but upon browser back it can be required again. So some small duration of caching
-        // can make sense for the client.
-        response.setResourceCaching(
-          lastModified = requestTime,
-          expires      = requestTime + externalContext.getRequest.getSession(true).getMaxInactiveInterval * 1000
-        )
+            // This is the case where the above doesn't hold, for example upon browser back. It should be a much rarer case, and we bear
+            // the cost of getting the state from cache.
+            def fromInitialStateOpt =
+                XFormsStateManager.getStateFromParamsOrStore(
+                  RequestParameters(uuid, None, None, None),
+                  isInitialState = true
+                ).dynamicState flatMap (_.initialClientScript)
 
-        IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
-          fromCurrentStateOpt orElse fromInitialStateOpt foreach { content =>
-            writer.write(content)
-          }
+            response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
+
+            // The document cannot be cached "forever", but upon browser back it can be required again. So some small duration of caching
+            // can make sense for the client.
+            response.setResourceCaching(
+              lastModified = requestTime,
+              expires      = requestTime + externalContext.getRequest.getSession(true).getMaxInactiveInterval * 1000
+            )
+
+            IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
+              fromCurrentStateOpt orElse fromInitialStateOpt foreach { content =>
+                writer.write(content)
+              }
+            }
         }
 
       case FormStaticResourcesRegex(staticStateDigest) =>

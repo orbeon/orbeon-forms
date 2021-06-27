@@ -332,10 +332,6 @@ object ToolboxOps {
       val xbl              = ctx.modelElem followingSibling XBLXBLTest
       val existingBindings = xbl child XBLBindingTest
 
-      // Insert binding into form if needed
-      if (! (existingBindings /@ "element" === selector))
-        insert(after = ctx.modelElem +: xbl, origin = binding parent * )
-
       // Insert template into section
       findViewTemplate(binding) foreach { template =>
         val control     = insert(into = section, after = section / *, origin = template)

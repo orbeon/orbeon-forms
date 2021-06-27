@@ -149,7 +149,8 @@
                                 'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
                                 (
                                     'data',
-                                    'bindings'
+                                    'bindings',
+                                    'for-form-builder'
                                 ),
                                 (
                                     xxf:call-xpl(
@@ -180,7 +181,8 @@
                                         ),
                                         'data'
                                     ),
-                                    instance('fr-components-instance')
+                                    instance('fr-components-instance'),
+                                    xf:element('for-form-builder', 'false')
                                 ),
                                 'data'
                             )

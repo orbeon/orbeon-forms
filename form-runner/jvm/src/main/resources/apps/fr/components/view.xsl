@@ -457,7 +457,7 @@
                 observer = "fr-data-safe fr-warn-when-data-unsafe">
                 <xf:action type="javascript">
                     <xf:param name="uuid" value="xxf:document-id()"/>
-                    <xf:param name="safe" value="$fr-data-safe = 'safe' or not($fr-warn-when-data-unsafe)"/>
+                    <xf:param name="safe" value="$fr-data-safe = 'true' or not($fr-warn-when-data-unsafe)"/>
                     <xf:body>ORBEON.fr.private.API.setDataStatus(uuid, safe == "true")</xf:body>
                 </xf:action>
             </xf:action>

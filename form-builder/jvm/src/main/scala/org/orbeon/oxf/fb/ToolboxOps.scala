@@ -97,14 +97,20 @@ object ToolboxOps {
             val formLanguages = FormRunnerResourcesOps.allLangs(ctx.resourcesRootElem)
             formLanguages map { formLang =>
 
+              // Resource holders from XBL metadata
+              val xblResourceEls     = binding / FBMetadataTest / FBTemplatesTest / FBResourcesTest / *
+              val xblResourceElNames = xblResourceEls map (_.localname) toSet
+
               // Elements for LHHA resources, only keeping those referenced from the view (e.g. a button has no hint)
               val lhhaResourceEls = {
-                val lhhaNames = newControlElem / * map (_.localname) filter LHHAResourceNamesToInsert
+                newControlElem.child(*)
+                val lhhaNames = newControlElem.child(*)
+                  .map(_.localname)
+                  .filter(LHHAResourceNamesToInsert)
+                  // Give priority to resources provided by XBL author
+                  .filterNot(xblResourceElNames)
                 lhhaNames map (elementInfo(_))
               }
-
-              // Resource holders from XBL metadata
-              val xblResourceEls = binding / FBMetadataTest / FBTemplatesTest / FBResourcesTest / *
 
               // Template items, if needed
               val itemsResourceEls =

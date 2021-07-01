@@ -515,7 +515,7 @@
                      non-repeated. We could use `javascript-lifecycle` and initialize the menus for the legacy
                      grids as well but decided not to. We should update the repeated grids in Form Builder to
                      use the non-legacy grids and then remove this. -->
-                <fr:grid repeat="content" ref="''" template="()"/>
+                <fr:grid repeat="content" ref="xf:element('_')" template="()"/>
             </xsl:if>
         </xh:span>
     </xsl:template>

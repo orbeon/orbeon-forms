@@ -234,16 +234,19 @@ object Number {
         }
 
         def readValue(input: html.Input, decimalSeparator: Char): String = {
-          val convert = conversionNeeded(input, decimalSeparator)
-          input.value.pipeIf(convert, _.replace('.', decimalSeparator))
+          val convertFromMobile = mobileConversionNeeded(input, decimalSeparator)
+          input.value.pipeIf(convertFromMobile, _.replace('.', decimalSeparator))
+            .kestrel(v => org.scalajs.dom.console.log("readValue", input.value, v))
         }
 
         def writeValue(input: html.Input, decimalSeparator: Char, value: String): Unit = {
-          val convert = conversionNeeded(input, decimalSeparator)
-          input.value = value.pipeIf(convert, _.replace(decimalSeparator, '.'))
+          val convertForMobile = mobileConversionNeeded(input, decimalSeparator)
+          input.value = value.pipeIf(convertForMobile, _.replace(decimalSeparator, '.'))
         }
 
-        def conversionNeeded(input: html.Input, decimalSeparator: Char): Boolean =
+        // On mobile, we set the field to `type="number"`, so the format of `value` always uses a `.`
+        // as decimal separator
+        def mobileConversionNeeded(input: html.Input, decimalSeparator: Char): Boolean =
           input.`type` == "number" && decimalSeparator != '.'
       }
     }

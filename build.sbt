@@ -42,7 +42,7 @@ val FlyingSaucerVersion           = "9.1.22"
 val TinkVersion                   = "1.6.0"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.0"
-val AntVersion                    = "1.10.10"
+val AntVersion                    = "1.10.11"
 
 // "Provided" Java libraries
 val ServletApiVersion             = "4.0.1"

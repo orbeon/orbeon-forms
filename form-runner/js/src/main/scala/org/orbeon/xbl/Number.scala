@@ -236,7 +236,6 @@ object Number {
         def readValue(input: html.Input, decimalSeparator: Char): String = {
           val convertFromMobile = mobileConversionNeeded(input, decimalSeparator)
           input.value.pipeIf(convertFromMobile, _.replace('.', decimalSeparator))
-            .kestrel(v => org.scalajs.dom.console.log("readValue", input.value, v))
         }
 
         def writeValue(input: html.Input, decimalSeparator: Char, value: String): Unit = {

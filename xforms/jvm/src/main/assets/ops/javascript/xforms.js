@@ -1387,11 +1387,13 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayTime(jsDate);
                 }
             } else if (
+                // Legacy non-mobile date: populate with formatted value
                 jControl.is('.xforms-type-date') &&
                 ! ORBEON.xforms.XBL.isComponent(jControl)
             ) {
                 // Date control
                 if (! ORBEON.util.Utils.isIOS()) {
+                    // Only handle the non-iOS case, as the iOS case is handled in `Calendar.js`
                     var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
                     var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayDate(jsDate);
                     if (jControl.is('.xforms-input-appearance-minimal')) {

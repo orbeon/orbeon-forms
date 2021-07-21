@@ -111,14 +111,27 @@ trait NumberSupport[Binding] {
 
   def storageValue(value: String, binding: Binding)(implicit params: NumberConfig): String = {
 
-    val withPeriodEncoded =
-      if (params.groupingSeparator.contains('.') || params.decimalSeparator == '.')
+    // If the `.` is used for something we know to be an invalid character, replace it right away by `≣`.
+    // We keep this behavior for now, but it isn't strictly needed, e.g. in the `1.2.3` → `1≣2≣3` example
+    // below, we could keep `1.2.3` in the data, as it isn't a valid number. If we decide not to do this
+    // encoding anymore, we need to make sure we're still doing the `≣` → `.` when reading the data, for
+    // backward compatibility with data saved with earlier versions of Orbeon Forms.
+    //
+    // - With Polish formatting (1 234,56)
+    //     - `1.2.3`        → `1≣2≣3` (invalid `.`)
+    //     - `1.2` or `1,2` → `1.2`   (still access `.`, as done by number field on iOS & Android)
+    // - With French formatting (1.234,56)
+    //     - `1.2`          → `12`
+
+    val withInvalidPeriodEncoded =
+      if (params.groupingSeparator.contains('.') || params.decimalSeparator == '.' ||
+        (! value.contains(params.decimalSeparator) && value.count(_ == '.') == 1))
         value
       else
         value.translate(".", PeriodEncodedString)
 
     val withSeparatorsReplaced =
-      withPeriodEncoded.translate(params.decimalSeparatorString + params.groupingSeparatorString.getOrElse(""), ".")
+      withInvalidPeriodEncoded.translate(params.decimalSeparatorString + params.groupingSeparatorString.getOrElse(""), ".")
 
     val precisionForRoundingOpt =
       if (params.roundWhenStoring) fractionDigitsFromValidationOrProp(binding) else None
@@ -127,7 +140,7 @@ trait NumberSupport[Binding] {
       case (Some(Left(l)),  _      ) => l.toString // no decimal fraction to round
       case (Some(Right(d)), Some(p)) => formatNumber(Right(roundBigDecimal(d, p)), pictureString(p,        group = false, zeroes = false))
       case (Some(Right(d)), None   ) => formatNumber(Right(d),                     pictureString(d.scale , group = false, zeroes = false))
-      case (None,           _      ) => withPeriodEncoded // Q: Unclear. Should just store `value`?
+      case (None,           _      ) => withInvalidPeriodEncoded
     }
   }
 

@@ -316,10 +316,10 @@ object XFormsFunction {
     }
 
   def qNameFromQNameValue(value: QNameValue): dom.QName =
-    parseQNameToQNameType(value.getStringValue) match {
-      case PrefixedName(prefix, local) => dom.QName(local, Namespace(prefix, value.getNamespaceURI))
-      case UnprefixedName(local)       => dom.QName(local)
-    }
+    dom.QName(
+      value.getLocalName,
+      Namespace(value.getPrefix, value.getNamespaceURI)
+    )
 
   def qNameFromStringValue(value: String, bindingContext: BindingContext): dom.QName =
     parseQNameToQNameType(value) match {

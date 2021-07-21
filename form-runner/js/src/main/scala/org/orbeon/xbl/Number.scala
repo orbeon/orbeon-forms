@@ -13,6 +13,7 @@
   */
 package org.orbeon.xbl
 
+import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants, EventNames}
 import org.scalajs.dom
@@ -69,8 +70,9 @@ object Number {
 
             // Don't set value if not needed, so not to unnecessarily disturb the cursor position
             stateOpt foreach { state =>
-              if (visibleInputElem.value != state.editValue)
-                visibleInputElem.value = state.editValue
+              if (readValue(visibleInputElem, state.decimalSeparator) != state.editValue) {
+                writeValue(visibleInputElem, state.decimalSeparator, state.editValue)
+              }
             }
 
             setInputTypeIfNeeded("number")
@@ -83,8 +85,8 @@ object Number {
 
             scribe.debug(s"reacting to event ${e.`type`}")
 
-            setInputTypeIfNeeded("text")
             updateStateAndSendValueToServer()
+            setInputTypeIfNeeded("text")
 
             // Always update visible value with XForms value:
             //
@@ -114,6 +116,7 @@ object Number {
             scribe.debug(s"reacting to event ${e.`type`}")
 
             if (Set(10, 13)(e.which)) {
+              e.preventDefault()
               updateStateAndSendValueToServer()
               AjaxClient.fireEvent(
                 AjaxEvent(
@@ -178,7 +181,7 @@ object Number {
           visibleInputElemOpt foreach { visibleInputElem =>
             stateOpt foreach { state =>
 
-              val visibleInputElemValue = visibleInputElem.value
+              val visibleInputElemValue = readValue(visibleInputElem, state.decimalSeparator)
 
               val stateUpdated =
                 updateStateAndSendValueToServerIfNeeded(
@@ -194,19 +197,19 @@ object Number {
         def updateVisibleValue(): Unit =
           companion.visibleInputElemOpt foreach { visibleInputElem =>
 
-          val hasFocus = visibleInputElem eq dom.document.activeElement
+            val hasFocus = visibleInputElem eq dom.document.activeElement
 
-          stateOpt foreach { state =>
-            visibleInputElem.value =
-              if (hasFocus)
-                state.editValue
-              else
-                state.displayValue
+            stateOpt foreach { state =>
+              val newValue =
+                  if (hasFocus) state.editValue
+                  else          state.displayValue
+              writeValue(visibleInputElem, state.decimalSeparator, newValue)
+            }
           }
-        }
 
         def setInputTypeIfNeeded(typeValue: String): Unit = {
 
+          // Only switch to `type="number"` if the OS decimal separator is the same as the field decimal separator
           // See https://github.com/orbeon/orbeon-forms/issues/2545
           def hasNativeDecimalSeparator(separator: Char): Boolean =
             hasToLocaleString &&
@@ -221,10 +224,29 @@ object Number {
             timers.setTimeout(0.millis) {
               visibleInputElemOpt foreach { visibleInputElem =>
                 $(visibleInputElem).attr("type", typeValue)
+                // Set again the `input.value`, as otherwise we might loose the value (switching the type to `number`
+                // if the current value is `1,2`), or be incorrect (switching the type to `text` if the current value
+                // is `1.2` and the decimal separator `,`)
+                updateVisibleValue()
               }
             }
           }
         }
+
+        def readValue(input: html.Input, decimalSeparator: Char): String = {
+          val convertFromMobile = mobileConversionNeeded(input, decimalSeparator)
+          input.value.pipeIf(convertFromMobile, _.replace('.', decimalSeparator))
+        }
+
+        def writeValue(input: html.Input, decimalSeparator: Char, value: String): Unit = {
+          val convertForMobile = mobileConversionNeeded(input, decimalSeparator)
+          input.value = value.pipeIf(convertForMobile, _.replace(decimalSeparator, '.'))
+        }
+
+        // On mobile, we set the field to `type="number"`, so the format of `value` always uses a `.`
+        // as decimal separator
+        def mobileConversionNeeded(input: html.Input, decimalSeparator: Char): Boolean =
+          input.`type` == "number" && decimalSeparator != '.'
       }
     }
 }

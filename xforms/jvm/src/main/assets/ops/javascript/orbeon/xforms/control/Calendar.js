@@ -47,7 +47,7 @@
       changeEvent = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, value, "xxforms-value");
       return ORBEON.xforms.server.AjaxServer.fireEvent(changeEvent);
     };
-    if (YD.hasClass(document.body, "xforms-ios")) {
+    if (YAHOO.env.ua.webkit && YAHOO.env.ua.mobile) {
       initUnder = function(node) {
         var cssClass, forDate, forTime, inJS, input, toISO, toJS, type, _i, _len, _ref, _ref1, _results;
         forDate = ["input.xforms-type-date", DateTime.magicDateToJSDate, DateTime.jsDateToISODate, "date"];
@@ -114,7 +114,7 @@
             }
             return _results;
           } else {
-            return setValue(event.control, event.newValue);
+            return setValue(event.control, event.newValue.substring(0, 10));
           }
         }
       });

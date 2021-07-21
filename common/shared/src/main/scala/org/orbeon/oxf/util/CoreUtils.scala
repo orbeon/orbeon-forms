@@ -17,8 +17,9 @@ object CoreUtils {
 
   implicit class PipeOps[A](private val a: A) extends AnyVal {
     // Pipe operator
-    def pipe[B] (f: A => B) = f(a)
-    def |>  [B] (f: A => B) = pipe(f)
+    def pipe[B] (f: A => B            ): B = f(a)
+    def |>  [B] (f: A => B            ): B = pipe(f)
+    def pipeIf  (b: Boolean, f: A => A): A = if (b) f(a) else a
     // Kestrel / K Combinator (known as tap in Ruby/Underscore)
     def kestrel[B](f: A => B): A = { f(a); a }
     def |!>    [B](f: A => B): A = kestrel(f)

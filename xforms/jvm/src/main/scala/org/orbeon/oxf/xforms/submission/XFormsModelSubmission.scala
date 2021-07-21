@@ -469,17 +469,21 @@ class XFormsModelSubmission(
       new RedirectReplacer(containingDocument)
     } else {
       // Error code received
-      throw new XFormsSubmissionException(
-        thisSubmission,
-        "xf:submission for submission id: " + getId + ", error code received when submitting instance: " + connectionResult.statusCode,
-        "processing submission response",
-        null,
-        new XFormsSubmitErrorEvent(
+      if (p.replaceType == ReplaceType.All && connectionResult.hasContent) {
+        // For `replace="all"`, if we received content, which might be an error page, we still want to serve it
+        new AllReplacer(thisSubmission, containingDocument)
+      } else
+        throw new XFormsSubmissionException(
           thisSubmission,
-          ErrorType.ResourceError,
-          connectionResult.some
+          "xf:submission for submission id: " + getId + ", error code received when submitting instance: " + connectionResult.statusCode,
+          "processing submission response",
+          null,
+          new XFormsSubmitErrorEvent(
+            thisSubmission,
+            ErrorType.ResourceError,
+            connectionResult.some
+          )
         )
-      )
     }
   }
 

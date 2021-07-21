@@ -21,8 +21,8 @@ val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.0"
 val EnumeratumCirceVersion        = "1.6.0"
 val ShapelessVersion              = "2.3.4"
-val ScalaXmlVersion               = "1.3.0" // When upgrading: make sure we don't regress on https://github.com/orbeon/orbeon-forms/issues/4927
-val ScalaAsyncVersion             = "0.10.0"
+val ScalaXmlVersion               = "1.2.0" // When upgrading: make sure we don't regress on https://github.com/orbeon/orbeon-forms/issues/4927
+val ScalaAsyncVersion             = "1.0.0"
 val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
 val AutowireVersion               = "0.2.6"
@@ -34,15 +34,15 @@ val ScalaCollectionCompatVersion  = "2.2.0"
 
 // Java libraries
 val JUnitInterfaceVersion         = "0.11"
-val Slf4jVersion                  = "1.7.31"
+val Slf4jVersion                  = "1.7.32"
 val HttpComponentsVersion         = "4.5.13"
 val Log4jVersion                  = "1.2.17"
-val CommonsIoVersion              = "2.10.0"
+val CommonsIoVersion              = "2.11.0"
 val FlyingSaucerVersion           = "9.1.22"
-val TinkVersion                   = "1.6.0"
+val TinkVersion                   = "1.6.1"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.0"
-val AntVersion                    = "1.10.10"
+val AntVersion                    = "1.10.11"
 
 // "Provided" Java libraries
 val ServletApiVersion             = "4.0.1"
@@ -105,7 +105,7 @@ val CoreLibraryDependencies = Seq(
   "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
   "mysql"                       % "mysql-connector-java"            % "8.0.25"          % Test,
-  "org.postgresql"              % "postgresql"                      % "42.2.22"         % Test,
+  "org.postgresql"              % "postgresql"                      % "42.2.23"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
   "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,

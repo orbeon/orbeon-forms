@@ -52,8 +52,12 @@
         <xbl:implementation>
             <!-- Local model -->
             <xf:model id="inspector-model">
-                <xf:action ev:event="xforms-enabled" ev:observer="inspector-group" ev:target="inspector-group">
+                <xf:action event="fr-update-models">
                     <!-- Initialize itemset, excluding the inspector's model -->
+
+                    <xf:delete
+                        ref="instance('inspector-itemset')/*"/>
+
                     <xf:action iterate="xxf:list-models()[. != xxf:absolute-id('inspector-model')]">
                         <xf:var name="current-model-id" value="." as="xs:string"/>
                         <xf:action context="instance('inspector-itemset')">
@@ -119,6 +123,13 @@
             <xf:group id="inspector-group" model="inspector-model" class="fr-xforms-inspector">
                 <xh:div class="fr-xforms-inspector-title">Orbeon Forms XForms Inspector</xh:div>
 
+                <xf:dispatch
+                    event="xforms-enabled"
+                    target="#observer"
+
+                    name="fr-update-models"
+                    targetid="inspector-model"/>
+
                 <xf:group xxbl:scope="outer" appearance="xxf:internal">
                     <!-- Do this within a group otherwise listening to #document doesn't work -->
                     <!-- Catch error in action handler and do not let propagation occur -->
@@ -129,6 +140,16 @@
                         <xf:dispatch name="fr-log" targetid="fr-xforms-inspector" xxbl:scope="inner">
                             <xf:property name="fr-messages" value="event('element')"/>
                         </xf:dispatch>
+                    </xf:action>
+
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/4946 -->
+                    <xf:action
+                        event="fr-iteration-added"
+                        observer="#document">
+                        <xf:dispatch
+                            xxbl:scope="inner"
+                            name="fr-update-models"
+                            targetid="inspector-model"/>
                     </xf:action>
                 </xf:group>
 

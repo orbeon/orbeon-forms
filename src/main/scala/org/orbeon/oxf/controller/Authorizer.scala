@@ -138,13 +138,14 @@ object Authorizer extends Logging {
           proxiedHeaders + (OrbeonRemoteAddress -> Option(request.getRemoteAddr).toList)
         }
 
-        val content = HttpMethodsWithRequestBody(method) option
-          StreamedContent(
-            EmptyInputStream,
-            Some("application/octet-stream"),
-            Some(0L),
-            None
-          )
+        val content =
+          HttpMethodsWithRequestBody(method) option
+            StreamedContent(
+              EmptyInputStream,
+              Some("application/octet-stream"),
+              Some(0L),
+              None
+            )
 
         debug("Delegating to authorizer", Seq("url" -> newURL.toString))
 
@@ -163,7 +164,8 @@ object Authorizer extends Logging {
           )
 
         // TODO: state must be saved in session, not anywhere else; why is this configurable globally?
-        try ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true)(_ => true)
+        try
+          ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true)(_ => true)
         catch {
           case HttpStatusCodeException(code, _, _) =>
             debug("Unauthorized", Seq("code" -> code.toString))

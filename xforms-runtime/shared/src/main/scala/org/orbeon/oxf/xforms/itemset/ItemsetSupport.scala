@@ -247,7 +247,7 @@ object ItemsetSupport {
                       // - trim the value
                       // - if the value is blank, it can't be used and the item is excluded
                       //
-                      if (select1Control.staticControl.isMultiple)
+                      if (staticControl.isMultiple)
                         rawValue flatMap (_.trimAllToOpt)
                       else
                         rawValue
@@ -301,7 +301,7 @@ object ItemsetSupport {
                     if (required)
                       throw new ValidationException(
                         "`xf:item` or `xf:itemset` must contain an `xf:label` element",
-                        select1Control.getLocationData
+                        staticControl.locationData
                       )
                     else
                       None

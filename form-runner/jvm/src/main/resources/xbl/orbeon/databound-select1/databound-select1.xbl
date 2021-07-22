@@ -155,10 +155,8 @@
                     <xf:label/>
                     <xf:value/>
                 </xf:item>
-                <!-- Make sure to restore the evaluation context to the local instance. We don't switch scopes or
-                     models here because the select1 is bound via the xxf:binding() function. So if we don't
-                     change the context explicitly, the itemset will evaluate in the wrong context (and fail to
-                     produce the correct result). -->
+                <!-- Switch to the outer scope so that a nested `xf:itemset` evaluates in that scope.
+                     https://github.com/orbeon/orbeon-forms/issues/4595 -->
                 <xf:choices context="$itemset" xxbl:scope="outer">
                     <!-- Itemset unconventionally evaluates wrt inner scope -->
                     <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>

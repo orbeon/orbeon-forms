@@ -524,7 +524,7 @@ class PathMapXPathDependencies(
 
     assert(inRefresh || inBindingUpdate)
 
-    val resultCacheKey = buildRepeatResultCacheKey(control, control.bindingAnalysis.toList, controlEffectiveId)
+    val resultCacheKey = buildRepeatResultCacheKey(control, control.valueAnalysis.toList, controlEffectiveId)
 
     val cached = resultCacheKey flatMap modifiedValueCacheForRepeats.get
     val (updateResult, valueAnalysis) =

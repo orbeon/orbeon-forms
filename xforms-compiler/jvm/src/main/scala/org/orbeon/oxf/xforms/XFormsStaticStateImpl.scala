@@ -96,7 +96,7 @@ class XFormsStaticStateImpl(
   // export dynamicProperties._
   def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean =
     staticProperties.isPEFeatureEnabled(featureRequested, featureName)
-    
+
   def isClientStateHandling               : Boolean          = staticProperties.isClientStateHandling
   def isServerStateHandling               : Boolean          = staticProperties.isServerStateHandling
   def isXPathAnalysis                     : Boolean          = staticProperties.isXPathAnalysis

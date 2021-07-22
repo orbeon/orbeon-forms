@@ -441,7 +441,7 @@ class PathMapXPathDependencies(
       analyses match {
         case analyses if analyses.nonEmpty && (analyses forall (_.figuredOutDependencies)) =>
 
-          val allDependentModelsPrefixedIdsIt = analyses.iterator flatMap(_.dependentModels.iterator)
+          val allDependentModelsPrefixedIdsIt = analyses.iterator flatMap (_.dependentModels.iterator)
 
           // TODO: This could be cached in the ElementAnalysis. Would need for binding, value, LHHA, itemset.
           val maxDependentModelDepth =
@@ -524,7 +524,7 @@ class PathMapXPathDependencies(
 
     assert(inRefresh || inBindingUpdate)
 
-    val resultCacheKey = buildRepeatResultCacheKey(control, control.bindingAnalysis.toList, controlEffectiveId: String)
+    val resultCacheKey = buildRepeatResultCacheKey(control, control.bindingAnalysis.toList, controlEffectiveId)
 
     val cached = resultCacheKey flatMap modifiedValueCacheForRepeats.get
     val (updateResult, valueAnalysis) =
@@ -620,7 +620,7 @@ class PathMapXPathDependencies(
       }
     }
 
-    buildRepeatResultCacheKey(control, analysesOrEmpty, controlEffectiveId: String) match {
+    buildRepeatResultCacheKey(control, analysesOrEmpty, controlEffectiveId) match {
       case Some(key) => modifiedLHHACacheForRepeats.getOrElseUpdate(key, requireUpdate)
       case None      => requireUpdate
     }

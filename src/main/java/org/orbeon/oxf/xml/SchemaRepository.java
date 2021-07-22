@@ -61,7 +61,6 @@ public class SchemaRepository {
 
         SCHEMAS.put(PipelineProcessor.PIPELINE_NAMESPACE_URI, "schemas/pipeline.rng");
         SCHEMAS.put(AggregatorProcessor.AGGREGATOR_NAMESPACE_URI, "schemas/aggregator.rng");
-        SCHEMAS.put(DelegationProcessor.DELEGATION_NAMESPACE_URI, "schemas/delegation.rng");
         SCHEMAS.put(URLGenerator.URL_NAMESPACE_URI, "schemas/url-generator-config.rng");
 
         SCHEMAS.put(RedirectProcessor.REDIRECT_SCHEMA_URI, "schemas/redirect.rng");

@@ -494,10 +494,6 @@
     </processor>
 
     <!-- Other processors -->
-    <processor name="oxf:delegation">
-        <class name="org.orbeon.oxf.processor.DelegationProcessor"/>
-    </processor>
-
     <processor name="oxf:key-pair">
         <class name="org.orbeon.oxf.processor.generator.KeyPairGenerator"/>
     </processor>

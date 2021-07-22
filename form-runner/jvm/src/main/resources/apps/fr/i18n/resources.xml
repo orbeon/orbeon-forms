@@ -2950,11 +2950,11 @@
                 </clear>
                 <remove>
                     <label>Löschen</label>
-                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                    <hint>Zeile aus dem Wiederholungsraster entfernen</hint>
                 </remove>
                 <add-another>
-                    <label todo="true">[Add Another]</label>
-                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                    <label>Weitere hinzufügen</label>
+                    <hint>Weitere Zeile zum Wiederholungsraster hinzufügen</hint>
                 </add-another>
             </grid>
             <section>
@@ -2963,7 +2963,7 @@
                     <hint todo="true">[Remove Iteration from the Repeated Section]</hint>
                 </remove>
                 <add-another>
-                    <label todo="true">[Add Another]</label>
+                    <label>Weitere hinzufügen</label>
                     <hint todo="true">[Add Another Iteration to the Repeated Section]</hint>
                 </add-another>
             </section>

@@ -1058,6 +1058,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings)
   .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(JSDependenciesPlugin)
   .dependsOn(
     commonJS % "test->test;compile->compile",
     xformsCommonJS
@@ -1080,6 +1081,9 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,
       "io.github.cquiroz"      %%% "scala-java-time"  % "2.0.0"
     ),
+
+    jsDependencies                      += "org.webjars" % "jquery" % "1.12.0" / "1.12.0/jquery.js",
+    Test / jsDependencies               += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
 
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",

@@ -17,6 +17,7 @@ import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.saxon.om
+import org.orbeon.scaxon.SimplePath._
 import shapeless.syntax.typeable._
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
 
@@ -42,10 +43,12 @@ object NodeInfoConversions {
         if (nodeInfo.getNodeKind == org.w3c.dom.Node.ATTRIBUTE_NODE)
           dom.Attribute(dom.QName(nodeInfo.getLocalPart, dom.Namespace(nodeInfo.getPrefix, nodeInfo.getURI)), nodeInfo.getStringValue)
         else
-          StaticXPath.tinyTreeToOrbeonDom(if (nodeInfo.getParent.isInstanceOf[DocumentNodeInfoType]) nodeInfo.getParent
-        else
-          nodeInfo
-      )
+          StaticXPath.tinyTreeToOrbeonDom(
+            if ((nodeInfo.getParent ne null) && nodeInfo.getParent.isDocument)
+              nodeInfo.getParent
+            else
+              nodeInfo
+        )
     }
 
   def extractAsMutableDocument(elementOrDocument: om.NodeInfo): DocumentWrapper =

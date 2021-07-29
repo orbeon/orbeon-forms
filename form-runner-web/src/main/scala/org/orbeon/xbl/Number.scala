@@ -229,21 +229,21 @@ object Number {
             }
           }
         }
-
-        def readValue(input: html.Input, decimalSeparator: Char): String = {
-          val convertFromMobile = mobileConversionNeeded(input, decimalSeparator)
-          input.value.pipeIf(convertFromMobile, _.replace('.', decimalSeparator))
-        }
-
-        def writeValue(input: html.Input, decimalSeparator: Char, value: String): Unit = {
-          val convertForMobile = mobileConversionNeeded(input, decimalSeparator)
-          input.value = value.pipeIf(convertForMobile, _.replace(decimalSeparator, '.'))
-        }
-
-        // On mobile, we set the field to `type="number"`, so the format of `value` always uses a `.`
-        // as decimal separator
-        def mobileConversionNeeded(input: html.Input, decimalSeparator: Char): Boolean =
-          input.`type` == "number" && decimalSeparator != '.'
       }
+
+      private def readValue(input: html.Input, decimalSeparator: Char): String = {
+        val convertFromMobile = mobileConversionNeeded(input, decimalSeparator)
+        input.value.pipeIf(convertFromMobile, _.replace('.', decimalSeparator))
+      }
+
+      private def writeValue(input: html.Input, decimalSeparator: Char, value: String): Unit = {
+        val convertForMobile = mobileConversionNeeded(input, decimalSeparator)
+        input.value = value.pipeIf(convertForMobile, _.replace(decimalSeparator, '.'))
+      }
+
+      // On mobile, we set the field to `type="number"`, so the format of `value` always uses a `.`
+      // as decimal separator
+      private def mobileConversionNeeded(input: html.Input, decimalSeparator: Char): Boolean =
+        input.`type` == "number" && decimalSeparator != '.'
     }
 }

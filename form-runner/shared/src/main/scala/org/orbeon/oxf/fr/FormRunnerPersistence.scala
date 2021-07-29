@@ -429,12 +429,12 @@ trait FormRunnerPersistence {
   }
 
   // Retrieves the metadata for a form from the persistence layer
-  def readFormMetadata(
+  def readFormMetadataOpt(
     appName  : String,
     formName : String,
-    version  : FormDefinitionVersion)((implicit
+    version  : FormDefinitionVersion)(implicit
     logger   : IndentedLogger
-  ): Option[DocumentNodeInfoType] = {
+  ): Option[NodeInfo] = {
     val formsDoc = readDocument(
       createFormMetadataPathAndQuery(
         app         = appName,

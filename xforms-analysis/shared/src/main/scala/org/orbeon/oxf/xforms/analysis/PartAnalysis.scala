@@ -62,6 +62,7 @@ trait PartAnalysisRuntimeOps extends PartGlobalOps {
   def isTopLevelPart: Boolean
 
   def iterateGlobals: Iterator[Global]
+  def iterateModels: Iterator[Model]
 
   def functionLibrary: FunctionLibrary
 

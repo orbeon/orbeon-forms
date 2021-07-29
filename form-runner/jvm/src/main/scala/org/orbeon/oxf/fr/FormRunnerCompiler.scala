@@ -77,17 +77,24 @@ class FormRunnerCompiler extends ProcessorImpl {
 
             val entriesIt =
               urlOptIt.flatten map { uri =>
-                ManifestEntry(new URI(uri), ContentTypes.XmlContentType)
+                ManifestEntry(new URI(uri), ContentTypes.XmlContentType.some)
               }
 
             entriesIt.toList
           }
 
-          val formInstanceDataAttachments = {
+          // This also looks for attachments in datasets. Usually, dataset instances are not available
+          // in the form definition. However, it is possible to manually create a form definition with
+          // an embedded dataset. We might even provide facilities to do this in the future. And if that
+          // is the case, we allow datasets referring to attachments, in which case we collect those as
+          // well in addition to attachments referred to by the main form data.
+          val formDataAndDatasetInstancesAttachments = {
 
-            val opt =
-              staticState.topLevelPart.findControlAnalysis(FormInstance) collect {
-                case instance: Instance =>
+            val instancesIt =
+              staticState.topLevelPart.iterateModels flatMap (_.instances.valuesIterator) collect {
+                case  i if i.staticId == FormInstance           => i
+                case  i if i.staticId.startsWith("fr-dataset-") => i
+              } map { instance =>
 
                   val fbBasePath             = "/fr/service/persistence/crud/orbeon/builder/data/"
                   val topLevelBasePath       = FormRunner.createFormDefinitionBasePath(appName, formName)
@@ -119,15 +126,16 @@ class FormRunnerCompiler extends ProcessorImpl {
                   ) map { awh =>
                     val holder    = awh.holder
                     val uri       = holder.getStringValue.trimAllToEmpty
-                    val mediatype = awh.holder.attValue("mediatype")
+                    val mediatype = awh.holder.attValueOpt("mediatype").flatMap(_.trimAllToOpt)
+
                     ManifestEntry(new URI(uri), mediatype)
                   }
               }
 
-            opt.toList.flatten
+            instancesIt.flatten.toList
           }
 
-          val distinctResources = (formInstanceDataAttachments ::: cacheableResourcesToInclude).distinct
+          val distinctResources = (formDataAndDatasetInstancesAttachments ::: cacheableResourcesToInclude).distinct
 
           val useZipFormat =
             ec.getRequest.getFirstParamAsString("format").contains("zip")
@@ -145,7 +153,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
               val manifest =
                 (
-                  ManifestEntry(jsonFormPath, jsonFormPath, ContentTypes.XmlContentType) :: distinctResources
+                  ManifestEntry(jsonFormPath, jsonFormPath, ContentTypes.XmlContentType.some) :: distinctResources
                 ).asJson.noSpaces
 
               val entry = new ZipEntry(ManifestEntry.JsonFilename)

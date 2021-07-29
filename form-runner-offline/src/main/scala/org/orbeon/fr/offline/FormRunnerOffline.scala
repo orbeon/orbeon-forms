@@ -242,7 +242,7 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
           url                = updatedUrlString,
           statusCode         = StatusCode.Ok,
           headers            = Map.empty,
-          content            = StreamedContent(new Uint8ArrayInputStream(data), contentType.some, data.length.toLong.some, None),
+          content            = StreamedContent(new Uint8ArrayInputStream(data), contentType, data.length.toLong.some, None),
           dontHandleResponse = false,
         )
       }

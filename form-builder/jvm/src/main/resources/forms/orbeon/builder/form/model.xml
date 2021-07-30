@@ -616,7 +616,8 @@
                 'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
                 (
                     'data',
-                    'bindings'
+                    'bindings',
+                    'for-form-builder'
                 ),
                 (
                     xxf:call-xpl(
@@ -629,8 +630,9 @@
                             'data'
                         ),
                         'data'
-                    )                ,
-                    xxf:instance('fb-components-instance')
+                    ),
+                    xxf:instance('fb-components-instance'),
+                    xf:element('for-form-builder', 'false')
                 ),
                 'data'
             )"
@@ -648,7 +650,8 @@
                 'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
                 (
                     'data',
-                    'bindings'
+                    'bindings',
+                    'for-form-builder'
                 ),
                 (
                     xxf:call-xpl(
@@ -657,7 +660,8 @@
                         instance('fb-form-instance'),
                         'data'
                     ),
-                    xxf:instance('fb-components-instance')
+                    xxf:instance('fb-components-instance'),
+                    xf:element('for-form-builder', 'false')
                 ),
                 'data'
             )"

@@ -10,6 +10,7 @@ import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput}
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Submission}
@@ -135,7 +136,10 @@ class FormRunnerCompiler extends ProcessorImpl {
             instancesIt.flatten.toList
           }
 
-          val distinctResources = (formDataAndDatasetInstancesAttachments ::: cacheableResourcesToInclude).distinct
+          // NOTE: Some resources could be the same but with different of missing `contentType`. We must ensure that
+          // the zip paths are unique, so we keep distinct resources based on that criteria.
+          val distinctResources =
+            (formDataAndDatasetInstancesAttachments ::: cacheableResourcesToInclude).keepDistinctBy(_.zipPath)
 
           val useZipFormat =
             ec.getRequest.getFirstParamAsString("format").contains("zip")

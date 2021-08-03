@@ -65,14 +65,18 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     }
 
   def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String =
-    throw new NotImplementedError("resolveResourceURL")
+    if (url.startsWith("data:"))
+      url
+    else
+      throw new NotImplementedError("resolveResourceURL")
 
   def resolveRenderURL(
     containingDocument : XFormsContainingDocument,
     currentElement     : dom.Element,
     url                : String,
     skipRewrite        : Boolean
-  ): String = throw new NotImplementedError("resolveRenderURL")
+  ): String =
+    throw new NotImplementedError("resolveRenderURL")
 
   def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String =
     throw new NotImplementedError("rewriteURL")

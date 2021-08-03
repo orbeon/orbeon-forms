@@ -226,7 +226,7 @@ class XFormsOutputControl(
       if (externalValue.nonAllBlank) {
         // External value is not blank, rewrite as absolute path. Two cases:
         // - URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
-        // - URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
+        // - URL is default value:  /ops/images/xforms/foo.gif      => [/context][/version]/ops/images/xforms/foo.gif
         XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
       } else
         // Empty value, return as is

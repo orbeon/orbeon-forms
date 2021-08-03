@@ -39,7 +39,6 @@ class OrbeonProxyPortletTest extends AnyFunSpec {
       s"/${optionalPath}apps/fr/style/images/pixelmixer/bubble_64.png",
       s"/${optionalPath}apps/fr/style/orbeon-navbar-logo.png",
       s"/${optionalPath}ops/images/xforms/calendar.png",
-      s"/${optionalPath}ops/images/xforms/spacer.gif",
       s"/${optionalPath}ops/yui/assets/skins/sam/sprite.png",
       s"/${optionalPath}xbl/orbeon/california-plate/images/platetahoe_small.jpg",
 

@@ -878,7 +878,7 @@
         <output name="response">
             <controls>
                 <xh:span id="my-output" class="xforms-control xforms-output xforms-mediatype-image xforms-disabled">
-                    <xh:img id="my-output≡≡c" class="xforms-output-output" src="/ops/images/xforms/spacer.gif"/>
+                    <xh:img id="my-output≡≡c" class="xforms-output-output" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="/>
                 </xh:span>
             </controls>
         </output>
@@ -934,8 +934,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-output" relevant="false">
-                            <xxf:value>/orbeon/ops/images/xforms/spacer.gif</xxf:value>
-
+                            <xxf:value>data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==</xxf:value>
                         </xxf:control>
                     </xxf:control-values>
                 </xxf:action>
@@ -968,7 +967,7 @@
         <output name="response">
             <controls xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:span id="my-group" class="xforms-group">
-                    <xh:img src="/ops/images/xforms/spacer.gif" alt="" id="my-image"/>
+                    <xh:img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" id="my-image"/>
                 </xh:span>
             </controls>
         </output>
@@ -1020,7 +1019,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute for="my-image" name="src">/orbeon/ops/images/xforms/spacer.gif</xxf:attribute>
+                        <xxf:attribute for="my-image" name="src">data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==</xxf:attribute>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

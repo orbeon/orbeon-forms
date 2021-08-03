@@ -290,7 +290,7 @@
                 )
             ]/@src
         )[1]/string()[
-            . != '/ops/images/xforms/spacer.gif'
+            . != 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
         ]
     </property>
 

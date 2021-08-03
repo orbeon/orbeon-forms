@@ -362,7 +362,9 @@ object XFormsNames {
   val XFORMS_SERVER_SUBMIT = "/xforms-server-submit"
 
   // TODO: Move to handlers
-  val DUMMY_IMAGE_URI    = "/ops/images/xforms/spacer.gif"
-  val DUMMY_SCRIPT_URI   = "data:text/javascript;base64,KGZ1bmN0aW9uKCl7fSgpKTsK" // empty self-calling function
+  // NOTE: We could use a short SVG image but it's not guaranteed to be 1x1 IIUC.
+  //     data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E
+  val DUMMY_IMAGE_URI    = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" // smallest GIF 1x1 transparent image
+  val DUMMY_SCRIPT_URI   = "data:text/javascript;base64,KGZ1bmN0aW9uKCl7fSgpKTsK"                       // empty self-calling function
   val CALENDAR_IMAGE_URI = "/ops/images/xforms/calendar.png"
 }

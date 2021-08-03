@@ -14,7 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, XFormsNames}
 import org.scalajs.dom.document
 import org.scalajs.jquery.JQuery
 
@@ -52,9 +52,7 @@ object WPaint {
       def readwrite() = ()
 
       private def backgroundImageChanged(): Unit = {
-        val imageSrc = imageEl.attr("src").get
-        val imageIsEmpty = imageSrc.endsWith("spacer.gif")
-        if (imageIsEmpty) {
+        if (imageEl.attr("src") contains XFormsNames.DUMMY_IMAGE_URI) {
             wpaintElA.addClass("xforms-hidden")
             if (wpaintElC != null) {
                 wpaintElC.detach()

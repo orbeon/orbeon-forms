@@ -51,7 +51,6 @@ object FormBuilderApp extends App {
 
     FormRunnerApp.onPageContainsFormsMarkup()
 
-    StaticUpload
     DialogItemset
     ControlDnD
     SectionGridEditor

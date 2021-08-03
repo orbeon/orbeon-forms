@@ -63,13 +63,15 @@
                     <xf:value value="."/>
                 </xf:header>
             </xf:output>
+            <xf:group
+                fr:keep-if-design-time="true"
+                ref=".[xxf:is-blank(xxf:binding('fr-image'))]">
+                <xh:i class="fa fa-fw fa-lg fa-photo"/>
+            </xf:group>
             <fr:attachment
                 fr:keep-if-design-time="true"
                 class="fr-image-attach"
-                ref="
-                    if (fr:is-design-time())
-                    then xxf:binding('fr-image')
-                    else ()"/>
+                ref="xxf:binding('fr-image')"/>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

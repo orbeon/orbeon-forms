@@ -375,6 +375,7 @@
                     (*:variable | *:var)[
                         @name = (
                             'control-name',
+                            'source-path',
                             'control-value',
                             'path',
                             'parameter',

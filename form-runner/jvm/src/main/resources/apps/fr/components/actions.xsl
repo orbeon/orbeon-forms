@@ -729,23 +729,42 @@
                             <xsl:for-each select="$request-actions">
                                 <xsl:copy>
                                     <xsl:copy-of select="@*"/>
+                                    <!-- Create variable with value -->
+                                    <xsl:if test="p:has-class('fr-set-service-value-action') or p:has-class('fr-set-database-service-value-action')">
+                                        <xsl:choose>
+                                            <xsl:when test="exists(*:var[@name = 'control-name'])">
+                                                <xsl:copy-of select="(*:variable | *:var)[@name = 'control-name']"/>
+                                                <xf:var
+                                                    name="value"
+                                                    value="
+                                                        frf:resolveTargetRelativeToActionSource(
+                                                            xxf:get-request-attribute('fr-action-source'),
+                                                            $control-name,
+                                                            true()
+                                                        )"/>
+                                            </xsl:when>
+                                            <!-- https://github.com/orbeon/orbeon-forms/issues/4955 -->
+                                            <xsl:when test="exists(*:var[@name = 'source-path'])">
+                                                <xf:var
+                                                    name="value"
+                                                    context="instance('fr-form-instance')"
+                                                    value="{*:var[@name = 'source-path']/@value}"/>
+                                            </xsl:when>
+                                            <xsl:otherwise/>
+                                        </xsl:choose>
+                                    </xsl:if>
                                     <xsl:choose>
                                         <xsl:when test="p:has-class('fr-set-service-value-action')">
                                             <!-- Keep parameters but override implementation -->
-                                            <xsl:copy-of select="(*:variable | *:var)[@name = ('control-name', 'path')]"/>
+                                            <xsl:copy-of select="(*:variable | *:var)[@name = 'path']"/>
                                             <!-- Set value -->
                                             <xf:setvalue
                                                 ref="$path"
-                                                value="
-                                                    frf:resolveTargetRelativeToActionSource(
-                                                        xxf:get-request-attribute('fr-action-source'),
-                                                        $control-name,
-                                                        true()
-                                                    )"/>
+                                                value="$value"/>
                                         </xsl:when>
                                         <xsl:when test="p:has-class('fr-set-database-service-value-action')">
                                             <!-- Keep parameters but override implementation -->
-                                            <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'parameter')]"/>
+                                            <xsl:apply-templates select="(*:variable | *:var)[@name = 'parameter']"/>
                                             <!-- Set value and escape single quotes -->
                                             <xf:setvalue
                                                 xmlns:sql="http://orbeon.org/oxf/xml/sql"
@@ -754,13 +773,7 @@
                                                     concat(
                                                         '''',
                                                         replace(
-                                                            string(
-                                                                frf:resolveTargetRelativeToActionSource(
-                                                                    xxf:get-request-attribute('fr-action-source'),
-                                                                    $control-name,
-                                                                    true()
-                                                                )
-                                                            ),
+                                                            string($value),
                                                             '''',
                                                             ''''''
                                                         ),

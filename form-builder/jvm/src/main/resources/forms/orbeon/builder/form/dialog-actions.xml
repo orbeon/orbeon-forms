@@ -258,7 +258,6 @@
             <xf:group ref="$instance/fb:action" appearance="xxf:internal">
 
                 <!-- Set Service Request Values -->
-
                 <xf:group ref="
                     .[
                         exists(
@@ -300,34 +299,60 @@
                             <xh:div class="fb-action-options">
 
                                 <xf:select1
-                                    appearance="search"
-                                    ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
-                                    class="fb-action-option-2-col-span-1">
-                                    <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
-                                    <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                        <!-- Try to build a reasonably user-friendly label -->
-                                        <xf:label
-                                            value="
-                                                utils:truncateWithEllipsis(
-                                                    for $name in frf:controlNameFromId(@id)
-                                                    return
-                                                        concat(
-                                                            $current-resources/*[name() = $name]/label,
-                                                            ' (',
-                                                            $name,
-                                                            ')'
-                                                        ),
-                                                    60,
-                                                    6
-                                                )"/>
-                                        <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
-                                    </xf:itemset>
+                                    ref="*:var/@name[. != 'path']"
+                                    class="fb-action-option-3-col-span-1">
+                                    <xf:item>
+                                        <xf:label ref="$form-resources/components/parameters-editor/type/item[@id = 0]"/>
+                                        <xf:value>control-name</xf:value>
+                                    </xf:item>
+                                    <xf:item>
+                                        <xf:label ref="$form-resources/components/parameters-editor/type/item[@id = 1]"/>
+                                        <xf:value>source-path</xf:value>
+                                    </xf:item>
+                                    <xf:action event="xforms-select">
+                                        <xf:setvalue ref="../(@value | @select)"/>
+                                    </xf:action>
                                 </xf:select1>
+
+                                <!-- `xxf:xforms11-switch="true"` is for dropdowns in hidden cases to be non-relevant -->
+                                <xf:switch caseref="*:var/@name[. != 'path']" xxf:xforms11-switch="true">
+                                    <xf:case value="'control-name'">
+                                        <xf:select1
+                                            appearance="search"
+                                            ref="*:var[@name[. != 'path']]/(@value | @select)"
+                                            class="fb-action-option-3-col-span-1">
+                                            <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
+                                            <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                                <!-- Try to build a reasonably user-friendly label -->
+                                                <xf:label
+                                                    value="
+                                                        utils:truncateWithEllipsis(
+                                                            for $name in frf:controlNameFromId(@id)
+                                                            return
+                                                                concat(
+                                                                    $current-resources/*[name() = $name]/label,
+                                                                    ' (',
+                                                                    $name,
+                                                                    ')'
+                                                                ),
+                                                            60,
+                                                            6
+                                                        )"/>
+                                                <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                    </xf:case>
+                                    <xf:case value="'source-path'">
+                                        <xf:input
+                                            class="fb-action-option-3-col-span-1"
+                                            ref="*:var[@name[. != 'path']]/(@value | @select)"/>
+                                    </xf:case>
+                                </xf:switch>
 
                                 <xf:input
                                     ref="(*:variable | *:var)[@name = 'path']/(@value | @select)[1]"
                                     incremental="true"
-                                    class="fb-action-option-2-col-span-1">
+                                    class="fb-action-option-3-col-span-1">
                                     <xf:label ref="$form-resources/dialog-actions/destination-xpath/label" appearance="minimal"/>
                                 </xf:input>
 
@@ -400,34 +425,60 @@
                             <xh:div class="fb-action-options">
 
                                 <xf:select1
-                                    appearance="search"
-                                    ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]"
-                                    class="fb-action-option-2-col-span-1">
-                                    <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
-                                    <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                        <!-- Try to build a reasonably user-friendly label -->
-                                        <xf:label
-                                            value="
-                                                utils:truncateWithEllipsis(
-                                                    for $name in frf:controlNameFromId(@id)
-                                                    return
-                                                        concat(
-                                                            $current-resources/*[name() = $name]/label,
-                                                            ' (',
-                                                            $name,
-                                                            ')'
-                                                        ),
-                                                    60,
-                                                    6
-                                                )"/>
-                                        <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
-                                    </xf:itemset>
+                                    ref="*:var/@name[. != 'path']"
+                                    class="fb-action-option-3-col-span-1">
+                                    <xf:item>
+                                        <xf:label ref="$form-resources/components/parameters-editor/type/item[@id = 0]"/>
+                                        <xf:value>control-name</xf:value>
+                                    </xf:item>
+                                    <xf:item>
+                                        <xf:label ref="$form-resources/components/parameters-editor/type/item[@id = 1]"/>
+                                        <xf:value>source-path</xf:value>
+                                    </xf:item>
+                                    <xf:action event="xforms-select">
+                                        <xf:setvalue ref="../(@value | @select)"/>
+                                    </xf:action>
                                 </xf:select1>
+
+                                <!-- `xxf:xforms11-switch="true"` is for dropdowns in hidden cases to be non-relevant -->
+                                <xf:switch caseref="*:var/@name[. != 'path']" xxf:xforms11-switch="true">
+                                    <xf:case value="'control-name'">
+                                        <xf:select1
+                                            appearance="search"
+                                            ref="*:var[@name[. != 'path']]/(@value | @select)"
+                                            class="fb-action-option-3-col-span-1">
+                                            <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
+                                            <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                                <!-- Try to build a reasonably user-friendly label -->
+                                                <xf:label
+                                                    value="
+                                                        utils:truncateWithEllipsis(
+                                                            for $name in frf:controlNameFromId(@id)
+                                                            return
+                                                                concat(
+                                                                    $current-resources/*[name() = $name]/label,
+                                                                    ' (',
+                                                                    $name,
+                                                                    ')'
+                                                                ),
+                                                            60,
+                                                            6
+                                                        )"/>
+                                                <xf:value value="concat('''', frf:controlNameFromId(@id), '''')"/>
+                                            </xf:itemset>
+                                        </xf:select1>
+                                    </xf:case>
+                                    <xf:case value="'source-path'">
+                                        <xf:input
+                                            class="fb-action-option-3-col-span-1"
+                                            ref="*:var[@name[. != 'path']]/(@value | @select)"/>
+                                    </xf:case>
+                                </xf:switch>
 
                                 <xf:input
                                     ref="(*:variable | *:var)[@name = 'parameter']/(@value | @select)[1]"
                                     incremental="true"
-                                    class="fb-action-option-2-col-span-1">
+                                    class="fb-action-option-3-col-span-1">
                                     <xf:label ref="$form-resources/dialog-actions/parameter-number/label" appearance="minimal"/>
                                 </xf:input>
 
@@ -793,7 +844,12 @@
                         required="true()"/>
 
                     <xf:bind ref="xf:action/xf:action[@class = ('fr-set-database-service-value-action', 'fr-set-service-value-action')]">
-                        <xf:bind ref="(*:variable | *:var)/(@value | @select)[1]" required="true()"/>
+                        <xf:bind
+                            ref="(*:variable | *:var)/(@value | @select)[1]"
+                            required="true()"/>
+                        <xf:bind
+                            ref="(*:variable | *:var)[@name = ('path', 'source-path')]/(@value | @select)[1]"
+                            type="xxf:xpath2"/>
                     </xf:bind>
                 </xf:bind>
                 <!-- xforms-submit-done -->

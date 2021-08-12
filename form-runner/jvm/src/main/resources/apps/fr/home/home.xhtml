@@ -994,6 +994,7 @@
                                     <xf:var name="ops"                  value="xxf:split(@operations)"/>
                                     <xf:var name="can-navigate-summary" value="$local-available and $ops = ('*', 'update', 'read', 'delete')"/>
                                     <xf:var name="can-navigate-new"     value="$local-available and $ops = ('*', 'create')"/>
+                                    <xf:var name="form-version"         value="(form-version/string(), '1')[1]"/>
 
                                     <xf:var
                                         name="link-to"
@@ -1014,7 +1015,7 @@
                                                     '/',
                                                     $link-to,
                                                     '?form-version=',
-                                                    form-version
+                                                    $form-version
                                                 )
                                             else
                                                 ()"/>
@@ -1028,7 +1029,17 @@
                                                     id="document-selection">
                                                     <xf:item>
                                                         <xf:label/>
-                                                        <xf:value context="$current" value="string-join((application-name, form-name, form-version), '/')"/>
+                                                        <xf:value
+                                                            context="$current"
+                                                            value="
+                                                                string-join(
+                                                                    (
+                                                                        application-name,
+                                                                        form-name,
+                                                                        $form-version
+                                                                    ),
+                                                                    '/'
+                                                                )"/>
                                                     </xf:item>
                                                 </xf:select>
                                             </xh:td>
@@ -1121,9 +1132,9 @@
                                         </xh:td>
                                         <xh:td class="fr-home-version">
                                             <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
-                                                <xf:output ref=".[$link]" value="form-version"/>
+                                                <xf:output ref=".[$link]" value="$form-version"/>
                                             </xh:a>
-                                            <xf:output ref=".[not($link)]" value="form-version"/>
+                                            <xf:output ref=".[not($link)]" value="$form-version"/>
                                         </xh:td>
                                         <xh:td>
                                             <xf:var name="title" value="(title[@xml:lang = $fr-lang], title)[1]"/>

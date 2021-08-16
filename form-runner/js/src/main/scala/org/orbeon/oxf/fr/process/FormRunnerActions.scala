@@ -169,7 +169,7 @@ trait FormRunnerActions {
         liveData          = formInstance.root,
         migrate           = Some(maybeMigrateData),
         toBaseURI         = "", // local save
-        fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
+        fromBasePaths     = List(createFormDataBasePath(app, form, ! isDraft, document)),
         toBasePath        = createFormDataBasePath(app, form,   isDraft, document),
         filename          = "data.xml",
         commonQueryString = s"valid=$dataValid&$DataFormatVersionName=${databaseDataFormatVersion.entryName}" + querySuffix,

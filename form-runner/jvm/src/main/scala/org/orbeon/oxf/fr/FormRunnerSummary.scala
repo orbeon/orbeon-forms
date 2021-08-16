@@ -72,7 +72,7 @@ trait FormRunnerSummary {
       liveData           = data.root,
       migrate            = None,
       toBaseURI          = "", // local save
-      fromBasePath       = createFormDataBasePath(app, form, isDraft = false, fromDocument),
+      fromBasePaths      = List(createFormDataBasePath(app, form, isDraft = false, fromDocument)),
       toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),
       filename           = "data.xml",
       commonQueryString  = s"$DataFormatVersionName=${databaseDataFormatVersion.entryName}",

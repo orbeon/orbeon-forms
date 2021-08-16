@@ -484,7 +484,7 @@ trait FormRunnerPersistence {
   // Return all nodes which refer to data attachments
   //@XPathFunction
   def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String): ju.List[NodeInfo] =
-    collectAttachments(data.getRoot, fromBasePath, fromBasePath, forceAttachments = true).map(_.holder).asJava
+    collectAttachments(data.getRoot, List(fromBasePath), fromBasePath, forceAttachments = true).map(_.holder).asJava
 
   //@XPathFunction
   def clearMissingUnsavedDataAttachmentReturnFilenamesJava(data: NodeInfo): ju.List[String] = {
@@ -497,7 +497,7 @@ trait FormRunnerPersistence {
           // NOTE: `basePath` is not relevant in our use of `collectAttachments` here, but
           // we don't just want to pass a magic string in. So we still compute `basePath`.
           val basePath = createFormDataBasePath(app, form, isDraft = false, documentId)
-          collectAttachments(data.getRoot, basePath, basePath, forceAttachments = false).map(_.holder)
+          collectAttachments(data.getRoot, List(basePath), basePath, forceAttachments = false).map(_.holder)
         case _ =>
           Nil
       }
@@ -535,9 +535,9 @@ trait FormRunnerPersistence {
 
   def collectAttachments(
     data             : NodeInfo,
-    fromBasePath     : String,
+    fromBasePaths    : Iterable[String],
     toBasePath       : String,
-    forceAttachments : Boolean
+    forceAttachments : Boolean // `true` when pushing to/pulling from remote system or when using duplicate
   ): List[AttachmentWithHolder] = {
     for {
       holder        <- data.descendant(Node).toList
@@ -545,7 +545,7 @@ trait FormRunnerPersistence {
       beforeURL     = holder.stringValue.trimAllToEmpty
       isUploaded    = isUploadedFileURL(beforeURL)
       if isUploaded ||
-        isAttachmentURLFor(fromBasePath, beforeURL) && ! isAttachmentURLFor(toBasePath, beforeURL) ||
+        fromBasePaths.exists(isAttachmentURLFor(_, beforeURL)) && ! isAttachmentURLFor(toBasePath, beforeURL) ||
         isAttachmentURLFor(toBasePath, beforeURL) && forceAttachments
     } yield {
       // Here we could decide to use a nicer extension for the file. But since initially the filename comes from
@@ -569,7 +569,7 @@ trait FormRunnerPersistence {
     liveData          : DocumentNodeInfoType,
     migrate           : Option[DocumentNodeInfoType => DocumentNodeInfoType],
     toBaseURI         : String,
-    fromBasePath      : String,
+    fromBasePaths     : Iterable[String],
     toBasePath        : String,
     filename          : String,
     commonQueryString : String,
@@ -583,7 +583,8 @@ trait FormRunnerPersistence {
     val savedData = migrate.map(_(liveData)).getOrElse(liveData)
 
     // Find all instance nodes containing file URLs we need to upload
-    val attachmentsWithHolder  = collectAttachments(savedData, fromBasePath, toBasePath, forceAttachments)
+    val attachmentsWithHolder =
+      collectAttachments(savedData, fromBasePaths, toBasePath, forceAttachments)
 
     def updateHolder(holder: NodeInfo, afterURL: String, isEncryptedAtRest: Boolean): Unit = {
       setvalue(holder, afterURL)

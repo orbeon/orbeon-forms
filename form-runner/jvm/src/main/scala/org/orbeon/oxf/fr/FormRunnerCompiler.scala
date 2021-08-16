@@ -47,7 +47,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
           val (jsonString, staticState) = XFormsCompiler.compile(formDocument)
 
-          val cacheableResourcesToInclude = {
+          val cacheableResourcesToIncludeManifests = {
 
             // Find all the languages used and return a comma-separated list of them
             val usedLangsOpt =
@@ -89,57 +89,53 @@ class FormRunnerCompiler extends ProcessorImpl {
           // an embedded dataset. We might even provide facilities to do this in the future. And if that
           // is the case, we allow datasets referring to attachments, in which case we collect those as
           // well in addition to attachments referred to by the main form data.
-          val formDataAndDatasetInstancesAttachments = {
+          val formDataAndDatasetInstanceAttachmentManifests = {
 
-            val instancesIt =
+            val manifestsIt =
               staticState.topLevelPart.iterateModels flatMap (_.instances.valuesIterator) collect {
                 case  i if i.staticId == FormInstance           => i
                 case  i if i.staticId.startsWith("fr-dataset-") => i
               } map { instance =>
 
-                  val fbBasePath             = "/fr/service/persistence/crud/orbeon/builder/data/"
-                  val topLevelBasePath       = FormRunner.createFormDefinitionBasePath(appName, formName)
-                  val appLibraryBasePath     = FormRunner.createFormDefinitionBasePath(appName, "library")
-                  val orbeonLibraryBasePath  = FormRunner.createFormDefinitionBasePath("orbeon", "library")
+                val basePaths =
+                  List(
+                    "/fr/service/persistence/crud/orbeon/builder/data/",
+                    FormRunner.createFormDefinitionBasePath(appName, formName),
+                    FormRunner.createFormDefinitionBasePath(appName, "library"),
+                    FormRunner.createFormDefinitionBasePath("orbeon", "library")
+                  )
 
-                  val dataDoc =
-                    XFormsInstanceSupport.extractDocument(
-                      instance.inlineRootElemOpt.get, // FIXME: `get`
-                      instance.excludeResultPrefixes,
-                      instance.readonly,
-                      instance.exposeXPathTypes,
-                      removeInstanceData = false
-                    )
+                val dataDoc =
+                  XFormsInstanceSupport.extractDocument(
+                    instance.inlineRootElemOpt.get, // FIXME: `get`
+                    instance.excludeResultPrefixes,
+                    instance.readonly,
+                    instance.exposeXPathTypes,
+                    removeInstanceData = false
+                  )
 
-                  def collectAttachmentsFor(basePath: String) =
-                    FormRunner.collectAttachments(
-                      data             = dataDoc,
-                      fromBasePath     = basePath,
-                      toBasePath       = basePath,
-                      forceAttachments = true
-                    )
+                FormRunner.collectAttachments(
+                  data             = dataDoc,
+                  fromBasePaths    = basePaths,
+                  toBasePath       = "/dummy", // TODO: `Option`?
+                  forceAttachments = true
+                ) map { awh =>
 
-                  (
-                    collectAttachmentsFor(fbBasePath)         :::
-                    collectAttachmentsFor(topLevelBasePath)   :::
-                    collectAttachmentsFor(appLibraryBasePath) :::
-                    collectAttachmentsFor(orbeonLibraryBasePath)
-                  ) map { awh =>
-                    val holder    = awh.holder
-                    val uri       = holder.getStringValue.trimAllToEmpty
-                    val mediatype = awh.holder.attValueOpt("mediatype").flatMap(_.trimAllToOpt)
+                  val holder    = awh.holder
+                  val uri       = holder.getStringValue.trimAllToEmpty
+                  val mediatype = awh.holder.attValueOpt("mediatype").flatMap(_.trimAllToOpt)
 
-                    ManifestEntry(new URI(uri), mediatype)
-                  }
-              }
+                  ManifestEntry(new URI(uri), mediatype)
+                }
+            }
 
-            instancesIt.flatten.toList
+            manifestsIt.flatten.toList
           }
 
           // NOTE: Some resources could be the same but with different of missing `contentType`. We must ensure that
           // the zip paths are unique, so we keep distinct resources based on that criteria.
           val distinctResources =
-            (formDataAndDatasetInstancesAttachments ::: cacheableResourcesToInclude).keepDistinctBy(_.zipPath)
+            (formDataAndDatasetInstanceAttachmentManifests ::: cacheableResourcesToIncludeManifests).keepDistinctBy(_.zipPath)
 
           val useZipFormat =
             ec.getRequest.getFirstParamAsString("format").contains("zip")

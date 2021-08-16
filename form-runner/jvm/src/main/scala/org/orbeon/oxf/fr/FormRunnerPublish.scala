@@ -40,17 +40,25 @@ trait FormRunnerPublish {
 
     val documentOpt = documentOrEmpty.trimAllToOpt
 
-    val fromBasePath = documentOpt match {
-      case Some(document) => createFormDataBasePath("orbeon", "builder", isDraft = false, document)
-      case None           => createFormDefinitionBasePath(app, form)
-    }
+    val fromBasePath =
+      documentOpt match {
+        case Some(document) => createFormDataBasePath("orbeon", "builder", isDraft = false, document)
+        case None           => createFormDefinitionBasePath(app, form)
+      }
+
+    val basePaths =
+      List(
+        fromBasePath,
+        FormRunner.createFormDefinitionBasePath(app, "library"),
+        FormRunner.createFormDefinitionBasePath("orbeon", "library")
+      )
 
     val (beforeURLs, _, publishedVersion) =
       putWithAttachments(
         liveData          = xhtml.root,
         migrate           = None,
         toBaseURI         = toBaseURI,
-        fromBasePath      = fromBasePath,
+        fromBasePaths     = basePaths,
         toBasePath        = createFormDefinitionBasePath(app, form),
         filename          = "form.xhtml",
         commonQueryString = documentOpt map (document => encodeSimpleQuery(List("document" -> document))) getOrElse "",
@@ -68,5 +76,4 @@ trait FormRunnerPublish {
       )
     )
   }
-
 }

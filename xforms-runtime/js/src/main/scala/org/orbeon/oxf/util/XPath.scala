@@ -28,7 +28,7 @@ import scala.util.control.NonFatal
 object XPath extends XPathTrait {
 
   private val DebugExplainExpressions = false
-  private val LogAndExplainErrors     = true
+  private val LogAndExplainErrors     = false
 
   val GlobalConfiguration: StaticXPath.SaxonConfiguration = new Configuration {
 

@@ -36,7 +36,7 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers
 import scala.scalajs.js.typedarray.{ArrayBuffer, Uint8Array}
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 
 trait FormRunnerProcessor {
@@ -341,29 +341,27 @@ object FormRunnerOffline extends App with FormRunnerProcessor {
 
       timers.setTimeout(0) {
         compileAndCacheFormIfNeededF(serializedBundle, appName, formName, formVersion) map { compiledForm =>
-          try {
-            OfflineSupport.renderCompiledForm(
-              container.some,
-              compiledForm,
-              FormRunnerFunctionLibraryList,
-              Some(
-                new XFormsURIResolver {
-                  def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
-                    urlString match {
-                      case "input:instance" => createFormParamInstance(appName, formName, formVersion, mode, documentId.toOption)
-                      case _                => throw new UnsupportedOperationException(s"resolving `$urlString")
-                    }
-                  def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo =
-                    throw new UnsupportedOperationException(s"resolving readonly `$urlString")
-                }
-              )
+          OfflineSupport.renderCompiledForm(
+            container.some,
+            compiledForm,
+            FormRunnerFunctionLibraryList,
+            Some(
+              new XFormsURIResolver {
+                def readAsDom4j(urlString: String, credentials: BasicCredentials): Document =
+                  urlString match {
+                    case "input:instance" => createFormParamInstance(appName, formName, formVersion, mode, documentId.toOption)
+                    case _                => throw new UnsupportedOperationException(s"resolving `$urlString")
+                  }
+                def readAsTinyTree(configuration: Configuration, urlString: String, credentials: BasicCredentials): NodeInfo =
+                  throw new UnsupportedOperationException(s"resolving readonly `$urlString")
+              }
             )
-          } finally {
-            XFormsUI.hideModalProgressPanelImmediate()
-          }
-        } foreach { runtimeForm =>
-          // Complete the outer promise/future
-          promise.success(runtimeForm)
+          )
+        } andThen {
+          case _ => XFormsUI.hideModalProgressPanelImmediate()
+        } onComplete {
+          case Success(runtimeForm) => promise.success(runtimeForm)
+          case Failure(t)           => promise.failure(t)
         }
       }
     })

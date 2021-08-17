@@ -365,7 +365,7 @@
                             fr:form-title(),
                             $title-from-output,
                             '{replace(xh:head/xh:title, '''', '''''')}',
-                            $fr-resources/untitled-form
+                            xxf:r('untitled-form', 'fr-fr-resources')
                         )[
                             normalize-space()
                         ][1]
@@ -388,7 +388,7 @@
                 <xf:output
                     model="fr-form-model"
                     value="xxf:format-message(
-                               $fr-resources/errors/form-title,
+                               xxf:r('errors.form-title', 'fr-fr-resources'),
                                (
                                    xxf:instance('fr-error-summary-instance')/visible-counts/(if (count((@error, @warning, @info)[. gt 0]) gt 1) then 3 else if (@error gt 0) then 0 else if (@warning gt 0) then 1 else if (@info gt 0) then 2 else 4),
                                    xxf:instance('fr-error-summary-instance')/visible-counts/xs:integer(@alert),

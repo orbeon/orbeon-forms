@@ -101,6 +101,7 @@
                     <xf:property name="error-type" value="event('error-type')"/>
                     <xf:property name="permitted"  value="event('permitted')"/>
                     <xf:property name="actual"     value="event('actual')"/>
+                    <xf:property name="message"    value="event('message')"/>
                 </xf:dispatch>
 
             </fr:attachment>

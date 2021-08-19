@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.xbl
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.fr.library.FRComponentParam
+import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.fr.{AppForm, XMLNames}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -40,7 +40,7 @@ object FormRunnerXblSupport extends XBLSupport {
       boundElement.attributeValueOpt(paramName)
 
     def fromMetadataAndProperties(paramName: QName) =
-      FRComponentParam.fromMetadataAndProperties(
+      FRComponentParamSupport.fromMetadataAndProperties(
         partAnalysis  = partAnalysisCtx,
         directNameOpt = directNameOpt,
         paramName     = paramName
@@ -61,9 +61,9 @@ object FormRunnerXblSupport extends XBLSupport {
       }
 
     def isDesignTime =
-      partAnalysisCtx.ancestorIterator.lastOption()   flatMap
-        FRComponentParam.findConstantMetadataRootElem flatMap
-        FRComponentParam.appFormFromMetadata          contains
+      partAnalysisCtx.ancestorIterator.lastOption()          flatMap
+        FRComponentParamSupport.findConstantMetadataRootElem flatMap
+        FRComponentParamSupport.appFormFromMetadata          contains
         FormBuilderAppName
 
     def keepIfDesignTime =

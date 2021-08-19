@@ -42,6 +42,9 @@ object Names {
   val FormVersion         = "form-version"
   val CreatedWithVersion  = "created-with-version"
   val WorkflowStage       = "workflow-stage"
+  val LibraryVersions     = "library-versions"
 
   val LibraryFormName     = "library"
+  val OrbeonFormName      = "orbeon"
+  val AppFormName         = "app"
 }

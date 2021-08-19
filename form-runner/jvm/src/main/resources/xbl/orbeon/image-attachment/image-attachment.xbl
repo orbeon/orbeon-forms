@@ -108,7 +108,7 @@
             <xf:output mediatype="image/*" ref="$binding[xxf:non-blank()]">
                 <xf:filename  ref="@filename"  xxbl:scope="outer"/>
                 <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
-                <xf:header ref="fr:form-version()">
+                <xf:header ref="fr:attachment-form-version()">
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
                     <xf:value value="."/>
                 </xf:header>

@@ -364,7 +364,7 @@
                         <xf:label ref="@filename"/>
                         <xf:filename  ref="@filename" />
                         <xf:mediatype ref="@mediatype"/>
-                        <xf:header ref="fr:form-version()">
+                        <xf:header ref="fr:attachment-form-version()">
                             <xf:name>Orbeon-Form-Definition-Version</xf:name>
                             <xf:value value="."/>
                         </xf:header>

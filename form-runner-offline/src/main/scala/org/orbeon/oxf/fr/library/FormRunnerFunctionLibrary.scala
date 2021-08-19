@@ -30,6 +30,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction def formName                 : String         = FormRunnerParams().form
   @XPathFunction def documentId               : Option[String] = FormRunnerParams().document
   @XPathFunction def formVersion              : Int            = FormRunnerParams().formVersion
+  @XPathFunction def attachmentFormVersion    : Int            = FRComponentParamSupport.formAttachmentVersion(FormRunnerParams())
 
   @XPathFunction def formTitle                : Option[String] = FormRunner.formTitleFromMetadata
   @XPathFunction def lang                     : String         = FormRunner.currentLang

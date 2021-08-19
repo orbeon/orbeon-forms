@@ -1,16 +1,17 @@
 package org.orbeon.oxf.fr.library
 
-import cats.syntax.option._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
-import shapeless.syntax.typeable._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value._
 import org.orbeon.dom.QName
-import org.orbeon.oxf.fr.{AppForm, Names}
+import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams, Names}
 import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.function.XFormsFunction
+import shapeless.syntax.typeable._
 
 
 object FRComponentParamSupport {
@@ -84,5 +85,60 @@ object FRComponentParamSupport {
     fromMetadataInstance       orElse
       fromPropertiesWithSuffix orElse
       fromPropertiesWithoutSuffix
+  }
+
+  // https://github.com/orbeon/orbeon-forms/issues/4919
+  def formAttachmentVersion(implicit p: FormRunnerParams): Int =
+    if (FormRunner.isDesignTime || p.mode == "test") {
+      // The form definition is not published yet and we need to figure out the library form version
+
+      val appsIt =
+        for {
+          staticControl <- XFormsFunction.context.container.associatedControlOpt.flatMap(_.staticControlOpt).iterator
+          ancestor      <- ElementAnalysis.ancestorsIterator(staticControl, includeSelf = false)
+          if ancestor.isInstanceOf[ComponentControl]
+          app           <- FormRunner.findAppFromSectionTemplateUri(ancestor.element.getNamespaceURI)
+        } yield
+          app
+
+      val appOpt = appsIt.nextOption()
+
+      if (appOpt.isDefined) {
+
+        val libraryVersionOpt =
+          for {
+            sourceControl                     <- XFormsFunction.context.container.associatedControlOpt
+            part                              = sourceControl.container.partAnalysis
+            metadata                          <- FRComponentParamSupport.findConstantMetadataRootElem(part)
+            (orbeonVersionOpt, appVersionOpt) = findLibraryVersions(metadata)
+            libraryVersion                    <- if (appOpt.contains(Names.OrbeonFormName)) orbeonVersionOpt else appVersionOpt
+          } yield
+            libraryVersion
+
+        libraryVersionOpt map (_.toInt) getOrElse 1
+
+      } else {
+        p.formVersion
+      }
+    } else {
+      // All static attachments are copied to the published form definition and therefore use the form definition version
+      p.formVersion
+    }
+
+  def findLibraryVersions(metadataRootElem: om.NodeInfo): (Option[Int], Option[Int]) = {
+
+    val libraryVersionsOpt =
+      for
+        (libraryVersions <- metadataRootElem firstChildOpt Names.LibraryVersions)
+      yield
+        (
+          libraryVersions elemValueOpt Names.OrbeonFormName map (_.toInt),
+          libraryVersions elemValueOpt Names.AppFormName    map (_.toInt)
+        )
+
+    libraryVersionsOpt match {
+      case Some(versions) => versions
+      case None           => (None, None)
+    }
   }
 }

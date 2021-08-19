@@ -159,7 +159,8 @@ private object FormRunnerFunctions {
   )
 
   val IntGettersByName = List(
-    "form-version"                -> (() => FormRunnerParams().formVersion)
+    "form-version"                -> (() => FormRunnerParams().formVersion),
+    "attachment-form-version"     -> (() => FRComponentParamSupport.formAttachmentVersion(FormRunnerParams()))
   )
 
   val DateTimeGettersByName = List(

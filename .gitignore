@@ -5,6 +5,7 @@ target/
 build-local.properties
 .idea/
 .idea.bak*
+.bsp
 exist-data*
 _exist-data*
 lib/xerces-2.12-orbeon-jar/

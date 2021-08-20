@@ -73,15 +73,6 @@ class PersistenceProxyProcessor extends ProcessorImpl {
 
 private object PersistenceProxyProcessor {
 
-  val FormPath                       = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
-  val DataPath                       = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
-  val DataCollectionPath             = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
-  val SearchPath                     = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
-  val ReEncryptAppFormPath           = """/fr/service/persistence(/reencrypt/([^/]+)/([^/]+))""".r
-  val PublishedFormsMetadataPath     = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
-  val ReindexPath                    =   "/fr/service/persistence/reindex"
-  val ReEncryptStatusPath            =   "/fr/service/persistence/reencrypt"
-
   val FrEncryptClass                 = "fr-encrypt"
 
   val RawDataFormatVersion           = "raw"

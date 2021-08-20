@@ -5,7 +5,9 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.fr.Names.{FormInstance, FormResources}
+import org.orbeon.oxf.fr.Names.{FormInstance, FormResources, MetadataInstance}
+import org.orbeon.oxf.fr.library.FRComponentParamSupport
+import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -82,6 +84,21 @@ class FormRunnerCompiler extends ProcessorImpl {
               }
 
             entriesIt.toList
+          }
+
+          val (orbeonLibraryVersionOpt, appLibraryVersionOpt) = {
+
+            val libraryVersionsOpt =
+              staticState.topLevelPart.findControlAnalysis(MetadataInstance) collect {
+                case instance: Instance => instance.constantContent
+              } collect {
+                case Some(metadataRoot) => FRComponentParamSupport.findLibraryVersions(metadataRoot.rootElement)
+              }
+
+            libraryVersionsOpt match {
+              case Some(versions) => versions
+              case None           => (None, None)
+            }
           }
 
           // This also looks for attachments in datasets. Usually, dataset instances are not available
@@ -177,12 +194,22 @@ class FormRunnerCompiler extends ProcessorImpl {
                   URLRewriter.REWRITE_MODE_ABSOLUTE
                 )
 
+              import FormRunnerPersistence._
+
+              val attachmentVersionOpt =
+                path match {
+                  case FormPath(x, Names.OrbeonFormName, Names.LibraryFormName, _) => orbeonLibraryVersionOpt
+                  case FormPath(_, _,                    Names.LibraryFormName, _) => appLibraryVersionOpt
+                  case DataPath(_, Names.OrbeonFormName, "builder", "data", _, _)  => formVersion.toInt.some
+                  case _                                                           => None
+                }
+
               Connection.connectNow(
                 method          = GET,
                 url             = new URI(resolvedAbsoluteUrl),
                 credentials     = None,
                 content         = None,
-                headers         = Map(), // TODO: form version for Form Runner attachments
+                headers         = Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*),
                 loadState       = true,
                 saveState       = true,
                 logBody         = false

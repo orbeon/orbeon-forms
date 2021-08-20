@@ -42,9 +42,23 @@ object Names {
   val FormVersion         = "form-version"
   val CreatedWithVersion  = "created-with-version"
   val WorkflowStage       = "workflow-stage"
-  val LibraryVersions     = "library-versions"
 
-  val LibraryFormName     = "library"
-  val OrbeonFormName      = "orbeon"
-  val AppFormName         = "app"
+  // We have the following app/form names for libraries:
+  //
+  // - orbeon/library
+  // - my-app/library
+  //
+  // And within the form metadata, we have:
+  //
+  //     <library-versions>
+  //       <orbeon>3</orbeon>
+  //       <app>2</app>
+  //     </library-versions>
+  //
+  val LibraryVersionsElemName      = "library-versions"
+  val GlobalLibraryVersionElemName = "orbeon" // don't change this even if the global library name is customized as this is used in the form definition
+  val AppLibraryVersionElemName    = "app"
+
+  val LibraryFormName              = "library"
+  val GlobalLibraryAppName         = "orbeon"
 }

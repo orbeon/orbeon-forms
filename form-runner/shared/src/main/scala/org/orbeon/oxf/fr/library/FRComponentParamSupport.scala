@@ -111,7 +111,7 @@ object FRComponentParamSupport {
             part                              = sourceControl.container.partAnalysis
             metadata                          <- FRComponentParamSupport.findConstantMetadataRootElem(part)
             (orbeonVersionOpt, appVersionOpt) = findLibraryVersions(metadata)
-            libraryVersion                    <- if (appOpt.contains(Names.OrbeonFormName)) orbeonVersionOpt else appVersionOpt
+            libraryVersion                    <- if (appOpt.contains(Names.GlobalLibraryAppName)) orbeonVersionOpt else appVersionOpt
           } yield
             libraryVersion
 
@@ -129,11 +129,11 @@ object FRComponentParamSupport {
 
     val libraryVersionsOpt =
       for
-        (libraryVersions <- metadataRootElem firstChildOpt Names.LibraryVersions)
+        (libraryVersions <- metadataRootElem firstChildOpt Names.LibraryVersionsElemName)
       yield
         (
-          libraryVersions elemValueOpt Names.OrbeonFormName map (_.toInt),
-          libraryVersions elemValueOpt Names.AppFormName    map (_.toInt)
+          libraryVersions elemValueOpt Names.GlobalLibraryVersionElemName map (_.toInt),
+          libraryVersions elemValueOpt Names.AppLibraryVersionElemName    map (_.toInt)
         )
 
     libraryVersionsOpt match {

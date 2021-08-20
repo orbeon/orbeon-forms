@@ -27,6 +27,10 @@ trait FormRunnerSectionTemplateOps {
   private val MatchesComponentUriLibraryRegex = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
   private val MatchesSectionTemplateUriRegex  = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
 
+  // For XSLT callers
+  //@XPathFunction
+  def globalLibraryAppName: String = Names.GlobalLibraryAppName
+
   def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {
 
     // All xbl:binding elements available for section templates
@@ -49,9 +53,11 @@ trait FormRunnerSectionTemplateOps {
 
   def sectionTemplateForSection(frSectionComponent: XFormsComponentControl): Option[XFormsComponentControl] = {
 
-    // Find the concrete section template component (component:foo)
+    // Find the concrete section template component (`component:foo`)
     // A bit tricky because there might not be an id on the component element:
-    // <component:eid xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
+    //
+    //     <component:eid xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
+    //
     val sectionTemplateElementOpt =
       frSectionComponent.staticControl.descendants find
       (c => matchesComponentURI(c.element.getNamespaceURI))

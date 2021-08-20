@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.Names.AppName
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.SaxonUtils
@@ -42,15 +43,15 @@ trait FormRunnerPublish {
 
     val fromBasePath =
       documentOpt match {
-        case Some(document) => createFormDataBasePath("orbeon", "builder", isDraft = false, document)
+        case Some(document) => createFormDataBasePath(AppForm.FormBuilder.app, AppForm.FormBuilder.form, isDraft = false, document)
         case None           => createFormDefinitionBasePath(app, form)
       }
 
     val basePaths =
       List(
         fromBasePath,
-        FormRunner.createFormDefinitionBasePath(app, "library"),
-        FormRunner.createFormDefinitionBasePath("orbeon", "library")
+        FormRunner.createFormDefinitionBasePath(app,                        Names.LibraryFormName),
+        FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName)
       )
 
     val (beforeURLs, _, publishedVersion) =

@@ -116,10 +116,10 @@ class FormRunnerCompiler extends ProcessorImpl {
 
                 val basePaths =
                   List(
-                    "/fr/service/persistence/crud/orbeon/builder/data/",
+                    s"/fr/service/persistence/crud/${AppForm.FormBuilder.app}/${AppForm.FormBuilder.form}/data/",
                     FormRunner.createFormDefinitionBasePath(appName, formName),
-                    FormRunner.createFormDefinitionBasePath(appName, "library"),
-                    FormRunner.createFormDefinitionBasePath("orbeon", "library")
+                    FormRunner.createFormDefinitionBasePath(appName, Names.LibraryFormName),
+                    FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName)
                   )
 
                 val dataDoc =
@@ -198,10 +198,10 @@ class FormRunnerCompiler extends ProcessorImpl {
 
               val attachmentVersionOpt =
                 path match {
-                  case FormPath(x, Names.OrbeonFormName, Names.LibraryFormName, _) => orbeonLibraryVersionOpt
-                  case FormPath(_, _,                    Names.LibraryFormName, _) => appLibraryVersionOpt
-                  case DataPath(_, Names.OrbeonFormName, "builder", "data", _, _)  => formVersion.toInt.some
-                  case _                                                           => None
+                  case FormPath(_, Names.GlobalLibraryAppName, Names.LibraryFormName, _)                => orbeonLibraryVersionOpt
+                  case FormPath(_, _,                          Names.LibraryFormName, _)                => appLibraryVersionOpt
+                  case DataPath(_, AppForm.FormBuilder.app,    AppForm.FormBuilder.form, "data", _, _)  => formVersion.toInt.some
+                  case _                                                                                => None
                 }
 
               Connection.connectNow(

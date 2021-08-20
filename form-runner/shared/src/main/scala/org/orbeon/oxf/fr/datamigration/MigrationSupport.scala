@@ -36,8 +36,6 @@ object MigrationSupport {
 
   val AllMigrationOps: List[MigrationOps] = List(MigrationOps48, MigrationOps20191)
 
-  val FormBuilderAppName = AppForm("orbeon", "builder")
-
   // `val migrationsFromForm: (ops: MigrationOps) => ops.M ` = ops => ...`
   class MigrationsFromForm(
     outerDocument        : DocumentNodeInfoType,
@@ -220,7 +218,7 @@ object MigrationSupport {
     pruneMetadata : Boolean
   ): Option[DocumentWrapper] =
     appForm match {
-      case FormBuilderAppName => None
+      case AppForm.FormBuilder => None
       case _ =>
         val mutableData = copyDocumentKeepInstanceData(data)
 

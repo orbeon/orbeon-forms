@@ -49,7 +49,7 @@
             value="$metadata/form-name/string()"/>
 
         <!-- Store versions -->
-        <xf:action iterate="'orbeon', $app">
+        <xf:action iterate="frf:globalLibraryAppName(), $app">
             <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
                 <xf:property name="app"                        value="."/>
                 <xf:property name="form"                       value="'library'"/>
@@ -78,7 +78,7 @@
         <xf:var
             name="elem-name"
             value="
-                if (event('app') = 'orbeon') then
+                if (event('app') = frf:globalLibraryAppName()) then
                     'orbeon'
                 else
                     'app'"/>
@@ -148,7 +148,7 @@
         <xf:var
             name="elem-name"
             value="
-                if (event('app') = 'orbeon') then
+                if (event('app') = frf:globalLibraryAppName()) then
                     'orbeon'
                 else
                     'app'"/>

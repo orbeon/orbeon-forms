@@ -116,7 +116,7 @@ private object PersistenceProxyProcessor {
     checkDataFormatVersionIfNeeded(request, app, form, formOrData)
 
     val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains("data.xml")
-    val isFormBuilder    = app == "orbeon" && form == "builder"
+    val isFormBuilder    = AppForm(app, form) == AppForm.FormBuilder
 
     val requestContent = HttpMethodsWithRequestBody(request.getMethod) option {
 

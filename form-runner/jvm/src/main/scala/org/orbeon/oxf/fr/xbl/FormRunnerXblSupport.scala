@@ -27,8 +27,6 @@ object FormRunnerXblSupport extends XBLSupport {
   private val FRKeepIfParamQName      = QName("keep-if-param-non-blank", XMLNames.FRNamespace)
   private val FRKeepIfDesignTimeQName = QName("keep-if-design-time",     XMLNames.FRNamespace)
 
-  private val FormBuilderAppName = AppForm("orbeon", "builder")
-
   def keepElement(
     partAnalysisCtx : PartAnalysisForXblSupport,
     boundElement    : Element,
@@ -64,7 +62,7 @@ object FormRunnerXblSupport extends XBLSupport {
       partAnalysisCtx.ancestorIterator.lastOption()          flatMap
         FRComponentParamSupport.findConstantMetadataRootElem flatMap
         FRComponentParamSupport.appFormFromMetadata          contains
-        FormBuilderAppName
+        AppForm.FormBuilder
 
     def keepIfDesignTime =
       elem.attributeValueOpt(FRKeepIfDesignTimeQName) match {

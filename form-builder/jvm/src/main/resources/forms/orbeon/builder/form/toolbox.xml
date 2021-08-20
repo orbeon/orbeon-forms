@@ -223,17 +223,18 @@
                             <xf:group ref=".[$has-section-component]">
 
                                 <xf:var
-                                    name="is-orbeon-library"
+                                    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                                    name="is-global-library"
                                     value="
                                         frf:findAppFromSectionTemplateUri(
                                             namespace-uri-for-prefix('component', .)
-                                        ) = 'orbeon'
+                                        ) = frf:globalLibraryAppName()
                                 "/>
 
                                 <xf:var
                                     name="elem-name"
                                     value="
-                                        if ($is-orbeon-library) then
+                                        if ($is-global-library) then
                                             'orbeon'
                                         else
                                             'app'"/>

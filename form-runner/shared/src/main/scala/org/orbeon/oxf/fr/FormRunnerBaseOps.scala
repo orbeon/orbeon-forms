@@ -67,6 +67,10 @@ case class AppForm(app: String, form: String) {
   val toList = List(app, form)
 }
 
+object AppForm {
+  val FormBuilder: AppForm = AppForm("orbeon", "builder")
+}
+
 trait FormRunnerBaseOps {
 
   val LanguageParam          = "fr-language"
@@ -334,7 +338,7 @@ trait FormRunnerBaseOps {
 
   private val ReadonlyModes = Set("view", "pdf", "email", "controls")
 
-  def isDesignTime(implicit p: FormRunnerParams)  : Boolean = p.app == "orbeon" && p.form == "builder"
+  def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
   def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ReadonlyModes(p.mode)
 
   def isEmbeddable: Boolean = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"

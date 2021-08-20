@@ -19,9 +19,9 @@ import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.IOSupport
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions
+
 
 trait FormBuilderSupport extends XFormsSupport {
 

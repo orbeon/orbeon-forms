@@ -110,8 +110,8 @@ object FRComponentParamSupport {
             sourceControl                     <- XFormsFunction.context.container.associatedControlOpt
             part                              = sourceControl.container.partAnalysis
             metadata                          <- FRComponentParamSupport.findConstantMetadataRootElem(part)
-            (orbeonVersionOpt, appVersionOpt) = findLibraryVersions(metadata)
-            libraryVersion                    <- if (appOpt.contains(Names.GlobalLibraryAppName)) orbeonVersionOpt else appVersionOpt
+            (globalVersionOpt, appVersionOpt) = findLibraryVersions(metadata)
+            libraryVersion                    <- if (appOpt.contains(Names.GlobalLibraryAppName)) globalVersionOpt else appVersionOpt
           } yield
             libraryVersion
 

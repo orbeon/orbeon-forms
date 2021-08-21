@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 
+import cats.syntax.option._
 import java.net.URI
 import java.{util => ju}
 import enumeratum.EnumEntry.Lowercase
@@ -26,8 +27,9 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
+import org.orbeon.oxf.http.{BasicCredentials, StreamedContent}
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.http.HttpMethod.{GET, PUT}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
@@ -259,6 +261,8 @@ object FormRunnerPersistence {
 
 trait FormRunnerPersistence {
 
+  private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(FormRunnerPersistence.getClass))
+
   import FormRunnerPersistence._
   import org.orbeon.oxf.fr.FormRunner._
 
@@ -272,9 +276,10 @@ trait FormRunnerPersistence {
   def isUploadedFileURL(value: String): Boolean =
     value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
 
+  // `documentOrEmpty` can be empty and if so won't be included. Ideally should be `Option[String]`.
   //@XPathFunction
-  def createFormDataBasePath(app: String, form: String, isDraft: Boolean, document: String): String =
-    CRUDBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: document :: "" :: Nil mkString "/"
+  def createFormDataBasePath(app: String, form: String, isDraft: Boolean, documentOrEmpty: String): String =
+    CRUDBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: documentOrEmpty.trimAllToOpt.toList ::: "" :: Nil mkString "/"
 
   //@XPathFunction
   def createFormDefinitionBasePath(app: String, form: String): String =
@@ -350,9 +355,8 @@ trait FormRunnerPersistence {
   private def readConnectionResult(
     method          : HttpMethod,
     urlString       : String,
-    customHeaders   : Map[String, List[String]])(
-    implicit logger : IndentedLogger
-  ): ConnectionResult = {
+    customHeaders   : Map[String, List[String]]
+  ): Option[DocumentNodeInfoType] = {
 
     implicit val externalContext         : ExternalContext = CoreCrossPlatformSupport.externalContext
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
@@ -578,7 +582,7 @@ trait FormRunnerPersistence {
     liveData          : DocumentNodeInfoType,
     migrate           : Option[DocumentNodeInfoType => DocumentNodeInfoType],
     toBaseURI         : String,
-    fromBasePaths     : Iterable[String],
+    fromBasePaths     : Iterable[(String, Int)],
     toBasePath        : String,
     filename          : String,
     commonQueryString : String,
@@ -589,11 +593,13 @@ trait FormRunnerPersistence {
     workflowStage     : Option[String] = None
   ): (Seq[String], Seq[String], Int) = {
 
+    implicit val externalContext: ExternalContext = CoreCrossPlatformSupport.externalContext
+
     val savedData = migrate.map(_(liveData)).getOrElse(liveData)
 
     // Find all instance nodes containing file URLs we need to upload
     val attachmentsWithHolder =
-      collectAttachments(savedData, fromBasePaths, toBasePath, forceAttachments)
+      collectAttachments(savedData, fromBasePaths.map(_._1), toBasePath, forceAttachments)
 
     def updateHolder(holder: NodeInfo, afterURL: String, isEncryptedAtRest: Boolean): Unit = {
       setvalue(holder, afterURL)
@@ -607,33 +613,67 @@ trait FormRunnerPersistence {
 
     def saveAllAttachments(): List[AttachmentWithEncryptedAtRest] = {
 
-      attachmentsWithHolder.map { case AttachmentWithHolder(beforeURL, afterURL, migratedHolder) =>
-        // Copy holder, so we're not blocked in case there are other background uploads; TODO: check if still needed
-        val holderCopy   = NodeInfoConversions.extractAsMutableDocument(migratedHolder).rootElement
+      attachmentsWithHolder.map { case AttachmentWithHolder(beforeUrl, afterUrl, migratedHolder) =>
+
         val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
-        val isEncryptedAtRestOpt =
-          sendThrowOnError("fr-create-update-attachment-submission", Map(
-            "holder"         -> Some(holderCopy),
-            "path-to-holder" -> Some(pathToHolder),
-            "resource"       -> Some(PathUtils.appendQueryString(toBaseURI + afterURL, commonQueryString)),
-            "username"       -> username,
-            "password"       -> password,
-            "form-version"   -> formVersion)
-          ) map { doneEvent =>
 
-            val isEncryptedAtRest = {
-              val responseHeaders =
-                asScalaSeq(doneEvent.getAttribute("response-headers")).asInstanceOf[Seq[NodeInfo]]
-              responseHeaders.exists { header: NodeInfo =>
-                header / "name"  === OrbeonDidEncryptHeader &&
-                header / "value" === "true"
-              }
+        val resolvedAbsoluteBeforeUrl =
+          URLRewriterUtils.rewriteServiceURL(
+            externalContext.getRequest,
+            beforeUrl,
+            URLRewriter.REWRITE_MODE_ABSOLUTE
+          )
+
+        val attachmentVersionOpt =
+          fromBasePaths collectFirst { case (path, version) if beforeUrl.startsWith(path) => version }
+
+        val getCxr =
+          Connection.connectNow(
+            method          = GET,
+            url             = new URI(resolvedAbsoluteBeforeUrl),
+            credentials     = None,
+            content         = None,
+            headers         = Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*),
+            loadState       = true,
+            saveState       = true,
+            logBody         = false
+          )
+
+        val isEncryptedAtRest =
+          ConnectionResult.withSuccessConnection(getCxr, closeOnSuccess = true) { is =>
+
+            val headers =
+              (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
+              (OrbeonPathToHolder -> List(pathToHolder))                             ::
+              Nil
+
+            val resolvedAbsoluteAfterUrl =
+              URLRewriterUtils.rewriteServiceURL(
+                externalContext.getRequest,
+                PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString),
+                URLRewriter.REWRITE_MODE_ABSOLUTE
+              )
+
+            val putCxr =
+              Connection.connectNow(
+                method          = PUT,
+                url             = new URI(resolvedAbsoluteAfterUrl),
+                credentials     = username map (BasicCredentials(_, password, preemptiveAuth = false, domain = None)),
+                content         = StreamedContent(is, ContentTypes.OctetStreamContentType.some, contentLength = None, title = None).some,
+                headers         = headers.toMap,
+                loadState       = true,
+                saveState       = true,
+                logBody         = false
+              )
+
+            ConnectionResult.withSuccessConnection(putCxr, closeOnSuccess = true) { _ =>
+              val isEncryptedAtRest = putCxr.headers.get(OrbeonDidEncryptHeader).exists(_.contains("true"))
+              updateHolder(migratedHolder, afterUrl, isEncryptedAtRest)
+              isEncryptedAtRest
             }
-
-            updateHolder(migratedHolder, afterURL, isEncryptedAtRest)
-            isEncryptedAtRest
           }
-        AttachmentWithEncryptedAtRest(beforeURL, afterURL, isEncryptedAtRestOpt.getOrElse(false))
+
+        AttachmentWithEncryptedAtRest(beforeUrl, afterUrl, isEncryptedAtRest)
       }
     }
 

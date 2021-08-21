@@ -198,7 +198,7 @@ trait FormRunnerActions {
         liveData          = formInstance.root,
         migrate           = Some(maybeMigrateData),
         toBaseURI         = "", // local save
-        fromBasePaths     = List(createFormDataBasePath(app, form, ! isDraft, document)),
+        fromBasePaths     = List(createFormDataBasePath(app, form, ! isDraft, document) -> 1), // data is never versioned so `1`
         toBasePath        = createFormDataBasePath(app, form,   isDraft, document),
         filename          = "data.xml",
         commonQueryString = s"valid=$dataValid&$DataFormatVersionName=${databaseDataFormatVersion.entryName}" + querySuffix,

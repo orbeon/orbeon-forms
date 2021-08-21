@@ -116,7 +116,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
                 val basePaths =
                   List(
-                    s"/fr/service/persistence/crud/${AppForm.FormBuilder.app}/${AppForm.FormBuilder.form}/data/",
+                    FormRunner.createFormDataBasePath(AppForm.FormBuilder.app, AppForm.FormBuilder.form, isDraft = false, documentOrEmpty = ""),
                     FormRunner.createFormDefinitionBasePath(appName, formName),
                     FormRunner.createFormDefinitionBasePath(appName, Names.LibraryFormName),
                     FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName)
@@ -136,13 +136,8 @@ class FormRunnerCompiler extends ProcessorImpl {
                   fromBasePaths    = basePaths,
                   toBasePath       = "/dummy", // TODO: `Option`?
                   forceAttachments = true
-                ) map { awh =>
-
-                  val holder    = awh.holder
-                  val uri       = holder.getStringValue.trimAllToEmpty
-                  val mediatype = awh.holder.attValueOpt("mediatype").flatMap(_.trimAllToOpt)
-
-                  ManifestEntry(new URI(uri), mediatype)
+                ) map { case FormRunner.AttachmentWithHolder(fromPath, _, holder) =>
+                  ManifestEntry(new URI(fromPath), holder.attValueOpt("mediatype").flatMap(_.trimAllToOpt))
                 }
             }
 

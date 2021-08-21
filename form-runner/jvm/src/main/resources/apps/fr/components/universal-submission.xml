@@ -138,22 +138,4 @@
         </xf:header>
     </xf:submission>
 
-    <!-- Submission to create/update an attachment -->
-    <xf:submission
-        id="fr-create-update-attachment-submission"
-        validate="false"
-        method="put"
-        serialization="application/octet-stream"
-        ref="event('holder')"
-        resource="{event('resource')}"
-        xxf:username="{event('username')}"
-        xxf:password="{event('password')}"
-        replace="none">
-
-        <xf:header ref="event('form-version')[xxf:non-blank()]">
-            <xf:name>Orbeon-Form-Definition-Version</xf:name>
-            <xf:value value="."/>
-        </xf:header>
-    </xf:submission>
-
 </xf:model>

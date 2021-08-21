@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.Names.AppName
+import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.SaxonUtils
@@ -23,6 +23,7 @@ import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+
 
 trait FormRunnerPublish {
 
@@ -41,17 +42,25 @@ trait FormRunnerPublish {
 
     val documentOpt = documentOrEmpty.trimAllToOpt
 
-    val fromBasePath =
+    val fromBasePathWithVersion =
       documentOpt match {
-        case Some(document) => createFormDataBasePath(AppForm.FormBuilder.app, AppForm.FormBuilder.form, isDraft = false, document)
-        case None           => createFormDefinitionBasePath(app, form)
+        case Some(document) => (createFormDataBasePath(AppForm.FormBuilder.app, AppForm.FormBuilder.form, isDraft = false, document), 1)
+        case None           => (createFormDefinitionBasePath(app, form),                                                              formVersion.toInt)
       }
 
-    val basePaths =
+    // `xhtml` must always be a form definition and must have form metadata
+    val frDocCtx: FormRunnerDocContext = new FormRunnerDocContext {
+      val formDefinitionRootElem: NodeInfo = xhtml.rootElement
+    }
+
+    val (globalVersionOpt, appVersionOpt) =
+      FRComponentParamSupport.findLibraryVersions(frDocCtx.metadataRootElem)
+
+    val basePathsWithVersions =
       List(
-        fromBasePath,
-        FormRunner.createFormDefinitionBasePath(app,                        Names.LibraryFormName),
-        FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName)
+        fromBasePathWithVersion,
+        (FormRunner.createFormDefinitionBasePath(app,                        Names.LibraryFormName), appVersionOpt.getOrElse(1)),
+        (FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName), globalVersionOpt.getOrElse(1))
       )
 
     val (beforeURLs, _, publishedVersion) =
@@ -59,7 +68,7 @@ trait FormRunnerPublish {
         liveData          = xhtml.root,
         migrate           = None,
         toBaseURI         = toBaseURI,
-        fromBasePaths     = basePaths,
+        fromBasePaths     = basePathsWithVersions,
         toBasePath        = createFormDefinitionBasePath(app, form),
         filename          = "form.xhtml",
         commonQueryString = documentOpt map (document => encodeSimpleQuery(List("document" -> document))) getOrElse "",

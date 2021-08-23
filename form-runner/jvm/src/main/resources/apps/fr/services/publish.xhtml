@@ -62,6 +62,14 @@
                 name="form"
                 value="$metadata/form-name"/>
 
+            <xf:var
+                name="orbeon-library-version"
+                value="$metadata/library-versions/orbeon"/>
+
+            <xf:var
+                name="app-library-version"
+                value="$metadata/library-versions/app"/>
+
             <!-- Either provided via path or via URL parameter (can be missing) -->
             <xf:var
                 name="document-id"
@@ -269,7 +277,15 @@
                 id="read-toolbox-submission"
                 serialization="none"
                 method="get"
-                resource="/fr/service/custom/orbeon/builder/toolbox?application={$app}&amp;form={$form}"
+                resource="/fr/service/custom/orbeon/builder/toolbox?application={
+                    $app
+                }&amp;form={
+                    $form
+                }&amp;orbeon-library-version={
+                    $orbeon-library-version
+                }&amp;app-library-version={
+                    $app-library-version
+                }"
                 replace="instance"
                 instance="fr-components-instance"
                 xxf:readonly="true">

@@ -15,12 +15,11 @@ package org.orbeon.oxf.util
 
 import java.io._
 import java.{lang => jl}
-
 import org.log4s
 import org.orbeon.oxf.http.{DateHeaders, HttpStatusCodeException, StatusCode, StreamedContent, Headers => HttpHeaders}
 import org.orbeon.oxf.util.Logging._
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
 case class ConnectionResult(
@@ -121,24 +120,31 @@ object ConnectionResult {
     )
   }
 
-  def withSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream => T): T =
-    tryWithSuccessConnection(cxr, closeOnSuccess)(body).get
+  def trySuccessConnection(cxr: ConnectionResult): Try[ConnectionResult] =
+    cxr match {
+      case ConnectionResult(_, _, _, _, _, _) if cxr.isSuccessResponse =>
+        Success(cxr)
+      case ConnectionResult(_, statusCode, _, _, _, _) =>
+        cxr.close()
+        Failure(HttpStatusCodeException(if (statusCode != StatusCode.Ok) statusCode else StatusCode.InternalServerError))
+    }
 
-  def tryWithSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream => T): Try[T] = Try {
+  def tryBody[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream => T): Try[T] = Try {
     try {
-      cxr match {
-        case ConnectionResult(_, _, _, StreamedContent(inputStream, _, _, _), _, _) if cxr.isSuccessResponse =>
-          val result = body(inputStream)
-          if (closeOnSuccess)
-            cxr.close() // this eventually calls `InputStream.close()`
-          result
-        case ConnectionResult(_, statusCode, _, _, _, _) =>
-          throw HttpStatusCodeException(if (statusCode != StatusCode.Ok) statusCode else StatusCode.InternalServerError)
-      }
+      val result = body(cxr.content.inputStream)
+      if (closeOnSuccess)
+        cxr.close() // this eventually calls `InputStream.close()`
+      result
     } catch {
       case NonFatal(t) =>
         cxr.close()
         throw t
     }
   }
+
+  def withSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream => T): T =
+    tryWithSuccessConnection(cxr, closeOnSuccess)(body).get
+
+  def tryWithSuccessConnection[T](cxr: ConnectionResult, closeOnSuccess: Boolean)(body: InputStream => T): Try[T] =
+    trySuccessConnection(cxr) flatMap (tryBody(_, closeOnSuccess)(body))
 }

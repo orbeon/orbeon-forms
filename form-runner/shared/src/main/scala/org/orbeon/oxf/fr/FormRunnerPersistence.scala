@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 
 import cats.syntax.option._
+
 import java.net.URI
 import java.{util => ju}
 import enumeratum.EnumEntry.Lowercase
@@ -51,7 +52,9 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.{BasicNamespaceMapping, XFormsCrossPlatformSupport}
 
 import java.{util => ju}
+import java.io.InputStream
 import scala.jdk.CollectionConverters._
+import scala.util.{Failure, Success, Try}
 
 
 sealed trait FormOrData extends EnumEntry with Lowercase
@@ -611,26 +614,30 @@ trait FormRunnerPersistence {
         )
     }
 
-    def saveAllAttachments(): List[AttachmentWithEncryptedAtRest] = {
+    def trySaveAllAttachments(): Try[List[AttachmentWithEncryptedAtRest]] =
+      TryUtils.sequenceLazily(attachmentsWithHolder) { case AttachmentWithHolder(beforeUrl, afterUrl, migratedHolder) =>
 
-      attachmentsWithHolder.map { case AttachmentWithHolder(beforeUrl, afterUrl, migratedHolder) =>
-
-        val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
-
-        val resolvedAbsoluteBeforeUrl =
+        def rewriteServiceUrl(url: String) =
           URLRewriterUtils.rewriteServiceURL(
             externalContext.getRequest,
-            beforeUrl,
+            url,
             URLRewriter.REWRITE_MODE_ABSOLUTE
           )
+
+        val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
 
         val attachmentVersionOpt =
           fromBasePaths collectFirst { case (path, version) if beforeUrl.startsWith(path) => version }
 
-        val getCxr =
+        // We used to use an XForms submission here which handled reading as well as writing. But that
+        // didn't allow for passing HTTP headers when reading, and we need this for versioning headers.
+        // So we now do all the work "natively", which is better anyway.
+        // https://github.com/orbeon/orbeon-forms/issues/4919
+
+        def connectGet: ConnectionResult =
           Connection.connectNow(
             method          = GET,
-            url             = new URI(resolvedAbsoluteBeforeUrl),
+            url             = new URI(rewriteServiceUrl(beforeUrl)),
             credentials     = None,
             content         = None,
             headers         = Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*),
@@ -639,43 +646,39 @@ trait FormRunnerPersistence {
             logBody         = false
           )
 
-        val isEncryptedAtRest =
-          ConnectionResult.withSuccessConnection(getCxr, closeOnSuccess = true) { is =>
+        def connectPut(is: InputStream): ConnectionResult = {
 
-            val headers =
-              (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
-              (OrbeonPathToHolder -> List(pathToHolder))                             ::
-              Nil
+          val headers =
+            (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
+            (OrbeonPathToHolder -> List(pathToHolder))                             ::
+            Nil
 
-            val resolvedAbsoluteAfterUrl =
-              URLRewriterUtils.rewriteServiceURL(
-                externalContext.getRequest,
-                PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString),
-                URLRewriter.REWRITE_MODE_ABSOLUTE
-              )
+          Connection.connectNow(
+            method          = PUT,
+            url             = new URI(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString))),
+            credentials     = username map (BasicCredentials(_, password, preemptiveAuth = false, domain = None)),
+            content         = StreamedContent(is, ContentTypes.OctetStreamContentType.some, contentLength = None, title = None).some,
+            headers         = headers.toMap,
+            loadState       = true,
+            saveState       = true,
+            logBody         = false
+          )
+        }
 
-            val putCxr =
-              Connection.connectNow(
-                method          = PUT,
-                url             = new URI(resolvedAbsoluteAfterUrl),
-                credentials     = username map (BasicCredentials(_, password, preemptiveAuth = false, domain = None)),
-                content         = StreamedContent(is, ContentTypes.OctetStreamContentType.some, contentLength = None, title = None).some,
-                headers         = headers.toMap,
-                loadState       = true,
-                saveState       = true,
-                logBody         = false
-              )
+        def getOrbeonDidEncryptHeader(cxr: ConnectionResult): Boolean = {
+          val isEncryptedAtRest = cxr.headers.get(OrbeonDidEncryptHeader).exists(_.contains("true"))
+          updateHolder(migratedHolder, afterUrl, isEncryptedAtRest)
+          isEncryptedAtRest
+        }
 
-            ConnectionResult.withSuccessConnection(putCxr, closeOnSuccess = true) { _ =>
-              val isEncryptedAtRest = putCxr.headers.get(OrbeonDidEncryptHeader).exists(_.contains("true"))
-              updateHolder(migratedHolder, afterUrl, isEncryptedAtRest)
-              isEncryptedAtRest
-            }
-          }
-
-        AttachmentWithEncryptedAtRest(beforeUrl, afterUrl, isEncryptedAtRest)
+        for {
+          successGetCxr     <- ConnectionResult.trySuccessConnection(connectGet)
+          putCxr            <- ConnectionResult.tryBody(successGetCxr, closeOnSuccess = true)(connectPut)
+          successPutCxr     <- ConnectionResult.trySuccessConnection(putCxr)
+          isEncryptedAtRest <- ConnectionResult.tryBody(successPutCxr, closeOnSuccess = true)(_ => getOrbeonDidEncryptHeader(successPutCxr))
+        } yield
+          AttachmentWithEncryptedAtRest(beforeUrl, afterUrl, isEncryptedAtRest)
       }
-    }
 
     def saveXmlData(migratedData: DocumentNodeInfoType) =
       sendThrowOnError("fr-create-update-submission", Map(
@@ -688,7 +691,7 @@ trait FormRunnerPersistence {
       ))
 
     // First upload the attachments
-    val attachmentsWithEncryptedAtRest = saveAllAttachments()
+    val attachmentsWithEncryptedAtRest = trySaveAllAttachments().get
 
     val versionOpt =
       // Save and try to retrieve returned version

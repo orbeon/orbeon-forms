@@ -44,4 +44,20 @@ object TryUtils {
     def iterator: Iterator[U] = t.toOption.iterator
   }
 
+  // Sequence a bunch of `Try`s:
+  //
+  // - lazily apply `f()` to the elements
+  // - return a `Success` iif all applications of `f()` are successful
+  // - else return the first `Failure`
+  // - all subsequent elements are ignored in case of failure
+  def sequenceLazily[T, U](iterable: Iterable[T])(f: T => Try[U]): Try[List[U]] = {
+
+    val tryIt = iterable.iterator.map(f)
+
+    val success = tryIt.takeWhile(_.isSuccess).map(_.get).toList
+    if (success.size != iterable.size)
+      tryIt.next() map (dummy => List(dummy)) // so we don't use `asInstanceOf`
+    else
+      Success(success)
+  }
 }

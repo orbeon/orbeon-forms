@@ -44,8 +44,8 @@
 
     <taskdef resource="proguard/ant/task.properties">
         <classpath>
-            <pathelement location="lib_ant/proguard-6.2.2.jar"/>
-            <pathelement location="lib_ant/proguard-annotations-6.2.2.jar"/>
+            <pathelement location="lib_ant/proguard-7.1.1.jar"/>
+            <pathelement location="lib_ant/proguard-ant-7.1.1.jar"/>
         </classpath>
     </taskdef>
 

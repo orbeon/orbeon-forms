@@ -538,7 +538,6 @@ object Connection extends ConnectionTrait {
         propertySet.getNonBlankString(propertyName + ".private").toList mkString " "
     }
 
-
     def sessionCookieFromIncomingCapitalized(
       externalContext   : ExternalContext,
       nativeRequest     : HttpServletRequest,

@@ -16,19 +16,16 @@ package org.orbeon.oxf.fr
 
 import cats.syntax.option._
 
-import java.net.URI
-import java.{util => ju}
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.scaxon
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
-
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
-import org.orbeon.oxf.http.{BasicCredentials, StreamedContent}
+import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StreamedContent}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, PUT}
 import org.orbeon.oxf.util.CoreUtils._
@@ -51,10 +48,11 @@ import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.{BasicNamespaceMapping, XFormsCrossPlatformSupport}
 
-import java.{util => ju}
+import java.net.URI
+import java.{util ⇒ ju}
 import java.io.InputStream
 import scala.jdk.CollectionConverters._
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 
 sealed trait FormOrData extends EnumEntry with Lowercase
@@ -359,7 +357,7 @@ trait FormRunnerPersistence {
     method          : HttpMethod,
     urlString       : String,
     customHeaders   : Map[String, List[String]]
-  ): Option[DocumentNodeInfoType] = {
+  ): ConnectionResult = {
 
     implicit val externalContext         : ExternalContext = CoreCrossPlatformSupport.externalContext
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
@@ -399,8 +397,7 @@ trait FormRunnerPersistence {
   // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
   def readDocument(
     urlString       : String,
-    customHeaders   : Map[String, List[String]])(
-    implicit logger : IndentedLogger
+    customHeaders   : Map[String, List[String]]
   ): Option[DocumentNodeInfoType] = {
 
     val cxr = readConnectionResult(HttpMethod.GET, urlString, customHeaders)
@@ -475,8 +472,7 @@ trait FormRunnerPersistence {
   def readDocumentFormVersion(
     appName         : String,
     formName        : String,
-    documentId      : String)(
-    implicit logger : IndentedLogger
+    documentId      : String
   ): Option[Int] = {
     val path = createFormDataBasePath(appName, formName, isDraft = false, documentId) + "data.xml"
     val headers = readHeaders(path, Map.empty)

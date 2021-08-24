@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.util
 
-import org.orbeon.errorified.Exceptions
-
 import scala.language.{implicitConversions, reflectiveCalls}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
+
 
 object TryUtils {
 
@@ -29,21 +28,10 @@ object TryUtils {
     }
   }
 
-  private val RootThrowablePF: PartialFunction[Throwable, Try[Nothing]] = {
-    case NonFatal(t) => Failure(Exceptions.getRootThrowable(t))
-  }
-
   implicit class TryOps[U](private val t: Try[U]) extends AnyVal {
 
     def onFailure(f: PartialFunction[Throwable, Any]): Try[U] =
       t recoverWith new OnFailurePF(f)
-
-    def rootFailure: Try[U] = {
-      if (t.isFailure)
-        t recoverWith RootThrowablePF
-      else
-        t
-    }
 
     def doEitherWay(f: => Any): Try[U] =
       try t match {

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import cats.syntax.option._
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
@@ -123,8 +124,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     bind attValueOpt "name"
 
   def findBindAndPathStatically(inDoc: NodeInfo, controlName: String): Option[BindPath] =
-    findBindByName(inDoc, controlName) map { bindNode =>
-      BindPath(bindNode, buildBindPath(bindNode))
+    findBindByName(inDoc, controlName) flatMap { bindNode =>
+      buildBindPath(bindNode) map (BindPath(bindNode, _))
     }
 
   // If `contextItemOpt` is `None`, don't search for holders.
@@ -307,14 +308,20 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     // Also, specific case for Form Builder: drop language predicate, as we want to index/return values
     // for all languages. So far, this is handled as a special case, as this is not something that happens
     // in other forms.
-    def buildBindPath(bind: NodeInfo): List[PathElem] =
-      (bind ancestorOrSelf XFBindTest flatMap bindRefOpt).reverse.tail map { bindRef =>
-        PathElem(
-          if (bindRef.endsWith(FBLangPredicate))
-            bindRef.dropRight(FBLangPredicate.length)
-          else
-            bindRef
-        )
-      } toList
+    def buildBindPath(bind: NodeInfo): Option[List[PathElem]] =
+      (bind ancestorOrSelf XFBindTest flatMap bindRefOpt).reverse match {
+        case _ #:: tail =>
+          tail.map(bindRef =>
+            PathElem(
+              if (bindRef.endsWith(FBLangPredicate))
+                bindRef.dropRight(FBLangPredicate.length)
+              else
+                bindRef
+            )
+          ).toList.some
+        case _ =>
+          // https://github.com/orbeon/orbeon-forms/issues/4972
+          None
+      }
   }
 }

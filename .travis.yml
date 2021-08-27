@@ -53,6 +53,7 @@ install:
   sudo rm /usr/local/bin/sbt
   sudo ln -s $HOME/sbt/bin/sbt /usr/local/bin/sbt
 before_script:
+- sudo /etc/init.d/mysql stop
 - wget https://repo.mysql.com//mysql-apt-config_0.8.10-1_all.deb
 - sudo dpkg -i mysql-apt-config_0.8.10-1_all.deb
 - sudo apt-get update -q

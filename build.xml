@@ -152,28 +152,58 @@
     </target>
 
     <target name="embedding-jar" depends="war-common">
+<!--    <target name="embedding-jar" depends="prepare">-->
         <local name="temp.jar"/>
         <tempfile property="temp.jar" prefix="proguard" suffix=".jar" destdir="build/temp" deleteonexit="true"/>
         <proguard>
             -verbose
             -dontobfuscate
             -dontnote
-            -dontwarn
-            -ignorewarnings
             -forceprocessing
             -optimizations !method/inlining/unique,!method/inlining/short
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,!bcmail-*.jar,!bcprov-*.jar,**.jar;)
-            -outjars     ${temp.jar}(**.class,!**)
+            <!--            -whyareyoukeeping class org.orbeon.saxon.om.NodeInfo-->
 
-            -libraryjars ${java.home}/jmods(java/**.class)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!orbeon-form-builder*.jar,!orbeon-form-runner*.jar,orbeon-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(scala-*.jar,parboiled*.jar,enumeratum*.jar,circe-*.jar,cats-*.jar,jawn-*.jar,sbinary*.jar,log4s*.jar,shapeless*.jar,autowire*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(commons-fileupload-*.jar,commons-pool-*.jar,commons-io-*,commons-lang3-*.jar,commons-codec-*.jar,commons-collections-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(saxon-*.jar,http*.jar,jcl-over-slf4j-*.jar,log4j-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/ehcache-core-2.6.11.jar
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(jcifs-*.jar,tink-*.jar,gson-*.jar,protobuf-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(javax.activation-*.jar;)
+
+<!--            -ignorewarnings-->
+            -dontwarn net.sf.ehcache.**
+            -dontwarn org.apache.http.auth.KerberosCredentials
+            -dontwarn org.apache.http.impl.auth.**
+            -dontwarn org.apache.http.impl.client.cache.memcached.**
+            -dontwarn org.orbeon.saxon.ant.**
+            -dontwarn org.orbeon.saxon.xqj.**
+            -dontwarn com.google.crypto.tink.**
+            -dontwarn com.google.protobuf.**
+            -dontwarn org.apache.log4j.net.**
+            -dontwarn org.orbeon.apache.xerces.**
+            -dontwarn org.orbeon.oxf.xml.xerces.**
+            -dontwarn scala.collection.immutable.VM
+            -dontwarn scala.reflect.**
+            -dontwarn scala.tools.nsc.**
+            -dontwarn javax.jms.**
+            -dontwarn javax.mail.**
+            -dontwarn org.orbeon.oxf.processor.**
+            -dontwarn org.orbeon.oxf.util.ImageMetadata**
+            -dontwarn org.orbeon.xforms.**
+            -dontwarn org.orbeon.oxf.xforms.**
+
+            -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.32.jar
 
-            -libraryjars lib/proguard/javax.servlet-api-3.0.1.jar
-            -libraryjars lib/proguard/portlet-api_2.0.jar
-            -libraryjars lib/proguard/liferay-portal-service-6.1.1.jar
-            -libraryjars lib/proguard/liferay-portal-kernel-7.0.jar
+            -libraryjars lib/proguard/(javax.servlet-api-*.jar;)
+            -libraryjars lib/proguard/(portlet-api-*.jar;)
+            -libraryjars lib/proguard/(liferay-portal-service-*.jar;)
+            -libraryjars lib/proguard/(liferay-portal-kernel-*.jar;)
+
+            -outjars     ${temp.jar}(**.class,!**)
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.fr.embedding.servlet.ServletFilter
@@ -220,28 +250,58 @@
     </target>
 
     <target name="proxy-portlet-jar" depends="war-common">
+<!--    <target name="proxy-portlet-jar" depends="prepare">-->
         <local name="temp.jar"/>
         <tempfile property="temp.jar" prefix="proguard" suffix=".jar" destdir="build/temp" deleteonexit="true"/>
         <proguard>
             -verbose
             -dontobfuscate
             -dontnote
-            -dontwarn
-            -ignorewarnings
             -forceprocessing
             -optimizations !method/inlining/unique,!method/inlining/short
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,!bcmail-*.jar,!bcprov-*.jar,**.jar;)
-            -outjars     ${temp.jar}(**.class,!**)
+            <!--            -whyareyoukeeping class org.orbeon.saxon.om.NodeInfo-->
 
-            -libraryjars ${java.home}/jmods(java/**.class)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!orbeon-form-builder*.jar,!orbeon-form-runner*.jar,orbeon-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(scala-*.jar,parboiled*.jar,enumeratum*.jar,circe-*.jar,cats-*.jar,jawn-*.jar,sbinary*.jar,log4s*.jar,shapeless*.jar,autowire*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(commons-fileupload-*.jar,commons-pool-*.jar,commons-io-*,commons-lang3-*.jar,commons-codec-*.jar,commons-collections-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(saxon-*.jar,http*.jar,jcl-over-slf4j-*.jar,log4j-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/ehcache-core-2.6.11.jar
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(jcifs-*.jar,tink-*.jar,gson-*.jar,protobuf-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(javax.activation-*.jar;)
+
+<!--            -ignorewarnings-->
+            -dontwarn net.sf.ehcache.**
+            -dontwarn org.apache.http.auth.KerberosCredentials
+            -dontwarn org.apache.http.impl.auth.**
+            -dontwarn org.apache.http.impl.client.cache.memcached.**
+            -dontwarn org.orbeon.saxon.ant.**
+            -dontwarn org.orbeon.saxon.xqj.**
+            -dontwarn com.google.crypto.tink.**
+            -dontwarn com.google.protobuf.**
+            -dontwarn org.apache.log4j.net.**
+            -dontwarn org.orbeon.apache.xerces.**
+            -dontwarn org.orbeon.oxf.xml.xerces.**
+            -dontwarn scala.collection.immutable.VM
+            -dontwarn scala.reflect.**
+            -dontwarn scala.tools.nsc.**
+            -dontwarn javax.jms.**
+            -dontwarn javax.mail.**
+            -dontwarn org.orbeon.oxf.processor.**
+            -dontwarn org.orbeon.oxf.util.ImageMetadata**
+            -dontwarn org.orbeon.xforms.**
+            -dontwarn org.orbeon.oxf.xforms.**
+
+            -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.32.jar
 
-            -libraryjars lib/proguard/javax.servlet-api-3.0.1.jar
-            -libraryjars lib/proguard/portlet-api_2.0.jar
-            -libraryjars lib/proguard/liferay-portal-service-6.1.1.jar
-            -libraryjars lib/proguard/liferay-portal-kernel-7.0.jar
+            -libraryjars lib/proguard/(javax.servlet-api-*.jar;)
+            -libraryjars lib/proguard/(portlet-api-*.jar;)
+            -libraryjars lib/proguard/(liferay-portal-service-*.jar;)
+            -libraryjars lib/proguard/(liferay-portal-kernel-*.jar;)
+
+            -outjars     ${temp.jar}(**.class,!**)
 
             <!-- Seeds: servlet filter and the public API -->
             -keep public class org.orbeon.oxf.portlet.OrbeonProxyPortlet
@@ -289,6 +349,7 @@
     </target>
 
     <target name="xforms-filter-jar" depends="war-common">
+<!--    <target name="xforms-filter-jar" depends="prepare">-->
 
         <local name="temp.jar"/>
         <tempfile property="temp.jar" prefix="proguard" suffix=".jar" destdir="build/temp" deleteonexit="true"/>
@@ -296,22 +357,51 @@
             -verbose
             -dontobfuscate
             -dontnote
-            -dontwarn
-            -ignorewarnings
             -forceprocessing
             -optimizations !method/inlining/unique,!method/inlining/short
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-*.jar,!itext-*.jar,!metadata-extractor-*.jar,!mail-*.jar,!exist*.jar,!liferay*.jar,!bcmail-*.jar,!bcprov-*.jar,**.jar;)
-            -outjars     ${temp.jar}(**.class,!**)
+            <!--            -whyareyoukeeping class org.orbeon.saxon.om.NodeInfo-->
 
-            -libraryjars ${java.home}/jmods(java/**.class)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!orbeon-form-builder*.jar,!orbeon-form-runner*.jar,orbeon-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(scala-*.jar,parboiled*.jar,enumeratum*.jar,circe-*.jar,cats-*.jar,jawn-*.jar,sbinary*.jar,log4s*.jar,shapeless*.jar,autowire*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(commons-fileupload-*.jar,commons-pool-*.jar,commons-io-*,commons-lang3-*.jar,commons-codec-*.jar,commons-collections-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(saxon-*.jar,http*.jar,jcl-over-slf4j-*.jar,log4j-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/ehcache-core-2.6.11.jar
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(jcifs-*.jar,tink-*.jar,gson-*.jar,protobuf-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(javax.activation-*.jar;)
+
+<!--            -ignorewarnings-->
+            -dontwarn net.sf.ehcache.**
+            -dontwarn org.apache.http.auth.KerberosCredentials
+            -dontwarn org.apache.http.impl.auth.**
+            -dontwarn org.apache.http.impl.client.cache.memcached.**
+            -dontwarn org.orbeon.saxon.ant.**
+            -dontwarn org.orbeon.saxon.xqj.**
+            -dontwarn com.google.crypto.tink.**
+            -dontwarn com.google.protobuf.**
+            -dontwarn org.apache.log4j.net.**
+            -dontwarn org.orbeon.apache.xerces.**
+            -dontwarn org.orbeon.oxf.xml.xerces.**
+            -dontwarn scala.collection.immutable.VM
+            -dontwarn scala.reflect.**
+            -dontwarn scala.tools.nsc.**
+            -dontwarn javax.jms.**
+            -dontwarn javax.mail.**
+            -dontwarn org.orbeon.oxf.processor.**
+            -dontwarn org.orbeon.oxf.util.ImageMetadata**
+            -dontwarn org.orbeon.xforms.**
+            -dontwarn org.orbeon.oxf.xforms.**
+
+            -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 
             -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.32.jar
 
-            -libraryjars lib/proguard/javax.servlet-api-3.0.1.jar
-            -libraryjars lib/proguard/portlet-api_2.0.jar
-            -libraryjars lib/proguard/liferay-portal-service-6.1.1.jar
-            -libraryjars lib/proguard/liferay-portal-kernel-7.0.jar
+            -libraryjars lib/proguard/(javax.servlet-api-*.jar;)
+            -libraryjars lib/proguard/(portlet-api-*.jar;)
+            -libraryjars lib/proguard/(liferay-portal-service-*.jar;)
+            -libraryjars lib/proguard/(liferay-portal-kernel-*.jar;)
+
+            -outjars     ${temp.jar}(**.class,!**)
 
             -keep public class org.orbeon.oxf.servlet.OrbeonXFormsFilter {
                 public static *;

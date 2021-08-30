@@ -13,6 +13,7 @@
   */
 package org.orbeon.fr
 
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.{ControlOps, Names}
 import org.orbeon.xforms._
 import org.scalajs.dom.html
@@ -45,7 +46,7 @@ object FormRunnerAPI extends js.Object {
   ): Boolean =
     Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
 
-val wizard: FormRunnerWizardAPI.type = FormRunnerWizardAPI
+  val wizard: FormRunnerWizardAPI.type = FormRunnerWizardAPI
 }
 
 object FormRunnerWizardAPI extends js.Object {

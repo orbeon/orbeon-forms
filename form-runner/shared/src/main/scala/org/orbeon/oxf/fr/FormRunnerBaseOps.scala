@@ -76,7 +76,6 @@ object AppForm {
 trait FormRunnerBaseOps {
 
   val LanguageParam          = "fr-language"
-  val EmbeddableParam        = "orbeon-embeddable"
   val FormVersionParam       = "form-version"
 
   val LiferayLanguageHeader  = "orbeon-liferay-language"
@@ -345,7 +344,8 @@ trait FormRunnerBaseOps {
   def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
   def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ReadonlyModes(p.mode)
 
-  def isEmbeddable: Boolean = inScopeContainingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) contains "true"
+  def isEmbeddable: Boolean =
+    inScopeContainingDocument.getRequestParameters.get(ExternalContext.EmbeddableParam) map (_.head) contains "true"
 
   sealed trait MessageAppearance extends EnumEntry with Lowercase
   object MessageAppearance extends Enum[MessageAppearance] {

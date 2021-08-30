@@ -53,6 +53,8 @@ case class Credentials(
   */
 object ExternalContext {
 
+  val EmbeddableParam                          = "orbeon-embeddable"
+
   val StandardCharacterEncoding       : String = CharsetNames.Utf8
   val StandardHeaderCharacterEncoding : String = StandardCharacterEncoding
   val StandardFormCharacterEncoding   : String = StandardCharacterEncoding

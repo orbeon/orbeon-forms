@@ -278,7 +278,7 @@ class ServletExternalContext(
                 location,
                 URLRewriter.REWRITE_MODE_ABSOLUTE_PATH
               ),
-              List("orbeon-embeddable" -> "true")
+              List(ExternalContext.EmbeddableParam -> "true")
             )
           else
             location

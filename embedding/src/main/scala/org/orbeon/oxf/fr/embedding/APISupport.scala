@@ -179,7 +179,7 @@ object APISupport {
     PathUtils.appendQueryString("/fr/", query getOrElse "")
 
   def formRunnerURL(baseURL: String, path: String, embeddable: Boolean) =
-    PathUtils.appendQueryString(baseURL.dropTrailingSlash + path, if (embeddable) "orbeon-embeddable=true" else "")
+    PathUtils.appendQueryString(baseURL.dropTrailingSlash + path, if (embeddable) s"${ExternalContext.EmbeddableParam}=true" else "")
 
   def requestHeaders(req: HttpServletRequest) =
     for {

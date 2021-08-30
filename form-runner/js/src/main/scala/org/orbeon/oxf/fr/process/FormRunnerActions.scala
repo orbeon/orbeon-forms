@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._

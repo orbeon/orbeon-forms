@@ -15,7 +15,6 @@ package org.orbeon.oxf.servlet
 
 import java.io._
 import java.{util => ju}
-
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http.{Headers, HttpMethod, StatusCode}
@@ -314,12 +313,10 @@ class ServletExternalContext(
   private lazy val requestImpl = new RequestImpl
   def getRequest: ExternalContext.Request = requestImpl
 
-  private def isEmbedded: Boolean = {
-    // NOTE: use request.getHeaderValuesMap() which normalizes header names to lowercase. This is important if
-    // the headers map is generated internally as in that case it might be lowercase already.
-    val clientHeaderOpt = Headers.firstItemIgnoreCase(requestImpl.headerValuesMap, Headers.OrbeonClient)
-    clientHeaderOpt exists Headers.EmbeddedClientValues.contains
-  }
+  // NOTE: use request.getHeaderValuesMap() which normalizes header names to lowercase. This is important if
+  // the headers map is generated internally as in that case it might be lowercase already.
+  private def isEmbedded: Boolean =
+    Headers.isEmbeddedFromHeaders(requestImpl.headerValuesMap)
 
   // NOTE: This whole logic below could be used by ServletExternalContext and PortletExternalContext
   // Check if there is an override of container type. This is currently used by the proxy portlet and by

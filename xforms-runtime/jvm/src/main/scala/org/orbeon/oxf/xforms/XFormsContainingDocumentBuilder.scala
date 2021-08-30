@@ -114,7 +114,7 @@ object XFormsContainingDocumentBuilder {
           containerType         = containerType,
           containerNamespace    = StringUtils.defaultIfEmpty(request.getContainerNamespace, ""),
           versionedPathMatchers = versionedPathMatchers.asScala.toList,
-          isEmbedded            = isEmbeddedFromHeaders(requestHeaders),
+          isEmbedded            = Headers.isEmbeddedFromHeaders(requestHeaders),
           forceInlineResources  = isPortletContainerOrRemoteFromHeaders(containerType, requestHeaders)
         )
 
@@ -185,7 +185,7 @@ object XFormsContainingDocumentBuilder {
               containerType         = containerType,
               containerNamespace    = dynamicState.containerNamespace.orNull,
               versionedPathMatchers = dynamicState.decodePathMatchers,
-              isEmbedded            = isEmbeddedFromHeaders(requestHeaders),
+              isEmbedded            = Headers.isEmbeddedFromHeaders(requestHeaders),
               forceInlineResources  = isPortletContainerOrRemoteFromHeaders(containerType, requestHeaders)
             )
           ) getOrElse
@@ -198,12 +198,8 @@ object XFormsContainingDocumentBuilder {
         throw OrbeonLocationException.wrapException(t, XmlExtendedLocationData(null, "re-initializing XForms containing document".some))
     }
 
-  private def isEmbeddedFromHeaders(headers: Map[String, List[String]]) =
-    Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) exists Headers.EmbeddedClientValues
-
   private def isPortletContainerOrRemoteFromHeaders(containerType: String, headers: Map[String, List[String]]) =
     containerType == "portlet" || (Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletClient)
-
 
   // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
   // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.

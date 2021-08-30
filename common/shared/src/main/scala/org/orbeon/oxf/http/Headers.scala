@@ -150,6 +150,9 @@ object Headers {
     "Content-Disposition" -> ("attachment; filename*=UTF-8''" + filenameEncodedForHeader)
   }
 
+  def isEmbeddedFromHeaders[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Boolean =
+    Headers.firstItemIgnoreCase(headers, OrbeonClient) exists EmbeddedClientValues
+
   // List of common HTTP headers
   val CommonHeaders = Seq(
     "Accept",

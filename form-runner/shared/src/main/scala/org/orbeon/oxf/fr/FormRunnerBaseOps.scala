@@ -344,6 +344,9 @@ trait FormRunnerBaseOps {
   def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
   def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ReadonlyModes(p.mode)
 
+  def isEmbeddedFromHeaders: Boolean =
+    inScopeContainingDocument.isEmbedded
+
   def isEmbeddable: Boolean =
     inScopeContainingDocument.getRequestParameters.get(ExternalContext.EmbeddableParam) map (_.head) contains "true"
 

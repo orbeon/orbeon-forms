@@ -144,6 +144,7 @@ private object FormRunnerFunctions {
     "is-pe"                       -> (() => Version.isPE),
     "is-design-time"              -> (() => FormRunner.isDesignTime(FormRunnerParams())),
     "is-readonly-mode"            -> (() => FormRunner.isReadonlyMode(FormRunnerParams())),
+    "is-embedded"                 -> (() => FormRunner.isEmbeddedFromHeaders),
     "is-noscript"                 -> (() => false),
     "is-form-data-valid"          -> (() => countValidationsByLevel(ErrorLevel) == 0),
     "is-form-data-saved"          -> (() => FormRunner.isFormDataSaved),

@@ -44,6 +44,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction def isPe                     : Boolean        = CoreCrossPlatformSupport.isPE
   @XPathFunction def isDesignTime             : Boolean        = FormRunner.isDesignTime(FormRunnerParams())
   @XPathFunction def isReadonlyMode           : Boolean        = FormRunner.isReadonlyMode(FormRunnerParams())
+  @XPathFunction def isEmbedded               : Boolean        = FormRunner.isEmbeddedFromHeaders
   @XPathFunction def isNoscript               : Boolean        = false
 //  @XPathFunction def isFormDataValid          : Boolean        = countValidationsByLevel(ErrorLevel) == 0 // 2021-06-04: unused
   @XPathFunction def isFormDataSaved          : Boolean        = FormRunner.isFormDataSaved

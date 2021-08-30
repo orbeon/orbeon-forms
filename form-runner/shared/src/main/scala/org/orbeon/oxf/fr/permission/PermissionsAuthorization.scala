@@ -120,7 +120,7 @@ object PermissionsAuthorization {
         }
       case RolesAnyOf(permissionRoles) =>
         permissionRoles.exists(permissionRoleName =>
-          currentUser.toList flatMap (_.roles) exists {
+          currentUser.toList.flatMap(_.roles) exists {
             case SimpleRole(userRoleName) =>
               userRoleName == permissionRoleName
             case ParametrizedRole(userRoleName, userOrganizationName) =>
@@ -128,8 +128,7 @@ object PermissionsAuthorization {
                 check match {
                   case CheckWithDataUser(_, dataOrganizationOpt) =>
                     dataOrganizationOpt.exists(_.levels.contains(userOrganizationName))
-                  case CheckWithoutDataUser(optimistic) =>
-                    optimistic
+                  case CheckWithoutDataUser(optimistic) => optimistic
                   case CheckAssumingOrganizationMatch   => true
                 }
               )

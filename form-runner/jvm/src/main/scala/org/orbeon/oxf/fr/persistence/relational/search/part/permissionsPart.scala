@@ -21,9 +21,11 @@ import org.orbeon.oxf.util.CoreUtils._
 object permissionsPart {
 
   def apply(permissions: SearchPermissions) =
-    if (permissions.authorizedBasedOnRole)
+    if (permissions.authorizedBasedOnRolePessimistic) {
+      // If we know the user is authorized to access all data just based on the role, then we don't need to add SQL
+      // filtering data the user has access to
       NilPart
-    else {
+    } else {
       val usernameGroupnameTest = {
 
         val usernameTest = permissions.authorizedIfUsername.isDefined.option("c.username = ?")

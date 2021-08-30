@@ -55,16 +55,19 @@ trait SearchLogic extends SearchRequestParser {
           }
       }
 
+    def authorizedBasedOnRole(optimistic: Boolean) = {
+      val check                = PermissionsAuthorization.CheckWithoutDataUser(optimistic)
+      val authorizedOperations = PermissionsAuthorization.authorizedOperations(formPermissions, user, check)
+      Operations.allowsAny(authorizedOperations, searchOperations)
+    }
+
     SearchPermissions(
       formPermissions,
-      authorizedBasedOnRole         = {
-        val check                = PermissionsAuthorization.CheckWithoutDataUser(optimistic = false)
-        val authorizedOperations = PermissionsAuthorization.authorizedOperations(formPermissions, user, check)
-        Operations.allowsAny(authorizedOperations, searchOperations)
-      },
-      authorizedIfUsername          = hasPermissionCond(Owner).option(request.username).flatten,
-      authorizedIfGroup             = hasPermissionCond(Group).option(request.group).flatten,
-      authorizedIfOrganizationMatch = SearchOps.authorizedIfOrganizationMatch(formPermissions, user)
+      authorizedBasedOnRoleOptimistic  = authorizedBasedOnRole(optimistic = true),
+      authorizedBasedOnRolePessimistic = authorizedBasedOnRole(optimistic = false),
+      authorizedIfUsername             = hasPermissionCond(Owner).option(request.username).flatten,
+      authorizedIfGroup                = hasPermissionCond(Group).option(request.group).flatten,
+      authorizedIfOrganizationMatch    = SearchOps.authorizedIfOrganizationMatch(formPermissions, user)
     )
   }
 
@@ -74,7 +77,7 @@ trait SearchLogic extends SearchRequestParser {
     val user             = PermissionsAuthorization.currentUserFromSession
     val permissions      = computePermissions(request, user, version)
     val hasNoPermissions =
-      ! permissions.authorizedBasedOnRole               &&
+      ! permissions.authorizedBasedOnRoleOptimistic     &&
       permissions.authorizedIfUsername         .isEmpty &&
       permissions.authorizedIfGroup            .isEmpty &&
       permissions.authorizedIfOrganizationMatch.isEmpty

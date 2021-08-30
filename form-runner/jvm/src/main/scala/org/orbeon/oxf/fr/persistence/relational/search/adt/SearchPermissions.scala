@@ -14,9 +14,10 @@
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
 case class SearchPermissions(
-  formPermissions               : org.orbeon.oxf.fr.permission.Permissions,
-  authorizedBasedOnRole         : Boolean,
-  authorizedIfUsername          : Option[String],
-  authorizedIfGroup             : Option[String],
-  authorizedIfOrganizationMatch : List[String]
+  formPermissions                  : org.orbeon.oxf.fr.permission.Permissions,
+  authorizedBasedOnRoleOptimistic  : Boolean,
+  authorizedBasedOnRolePessimistic : Boolean,
+  authorizedIfUsername             : Option[String],
+  authorizedIfGroup                : Option[String],
+  authorizedIfOrganizationMatch    : List[String]
 )

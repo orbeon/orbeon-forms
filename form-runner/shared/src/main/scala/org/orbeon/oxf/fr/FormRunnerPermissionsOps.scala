@@ -53,7 +53,7 @@ trait FormRunnerPermissionsOps {
     val operations  = PermissionsAuthorization.authorizedOperations(
       permissions,
       currentUser,
-      PermissionsAuthorization.CheckWithoutDataUser(optimistic = false)
+      PermissionsAuthorization.CheckWithoutDataUser(optimistic = true)
     )
     Operations.serialize(operations)
   }

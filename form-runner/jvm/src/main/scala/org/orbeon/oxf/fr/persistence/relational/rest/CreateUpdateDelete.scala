@@ -382,35 +382,39 @@ trait CreateUpdateDelete
     }
 
     def checkAuthorized(existing: Option[Row]): Unit = {
-      val authorized =
-        if (req.forData) {
-          existing match {
-            case Some(existing) =>
+        val authorized =
+          if (req.forData) {
+            existing match {
+              case Some(existing) =>
 
-              // Check we're allowed to update or delete this resource
-              val createdBy     = existing.createdBy
-              val organization  = existing.organization.map(_._2)
-              val authorizedOps = PermissionsAuthorization.authorizedOperations(
-                formPermissions,
-                PermissionsAuthorization.currentUserFromSession,
-                CheckWithDataUser(createdBy, organization)
-              )
-              val requiredOp    = if (delete) Delete else Update
-              Operations.allows(authorizedOps, requiredOp)
-            case None =>
-              // For deletes, if there is no data to delete, it is a 403 if could not read, update,
-              // or delete if it existed (otherwise code later will return a 404)
-              val authorizedOps = PermissionsAuthorization.authorizedOperations(
-                formPermissions,
-                PermissionsAuthorization.currentUserFromSession,
-                CheckWithoutDataUser(optimistic = false)
-              )
-              val requiredOps   = if (delete) List(Read, Update, Delete) else List(Create)
-              Operations.allowsAny(authorizedOps, requiredOps)
-          }
-        } else {
-          // Operations on deployed forms are always authorized
-          true
+                // Check we're allowed to update or delete this resource
+                val createdBy     = existing.createdBy
+                val organization  = existing.organization.map(_._2)
+                val authorizedOps = PermissionsAuthorization.authorizedOperations(
+                  formPermissions,
+                  PermissionsAuthorization.currentUserFromSession,
+                  CheckWithDataUser(createdBy, organization)
+                )
+                val requiredOp    = if (delete) Delete else Update
+                Operations.allows(authorizedOps, requiredOp)
+              case None =>
+                val authorizedOps =
+                  if (delete)
+                    // For deletes, if there is no data to delete, it unclear we think a 404 is clearer than a 403, so
+                    // let this check pass, and some code later will return a 404
+                    SpecificOperations(List(Delete))
+                  else
+                    PermissionsAuthorization.authorizedOperations(
+                      formPermissions,
+                      PermissionsAuthorization.currentUserFromSession,
+                      CheckWithoutDataUser(optimistic = false)
+                    )
+                val requiredOps   = if (delete) List(Delete) else List(Create)
+                Operations.allowsAny(authorizedOps, requiredOps)
+            }
+          } else {
+            // Operations on deployed forms are always authorized
+            true
         }
 
       if (! authorized)

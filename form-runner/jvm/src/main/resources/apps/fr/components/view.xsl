@@ -626,7 +626,7 @@
             class="fr-user-nav"
             ref=".[
                 xxf:property('oxf.fr.authentication.user-menu.enable') and
-                not(xxf:get-request-parameter('orbeon-embeddable') = 'true')
+                not(fr:is-embedded())
             ]">
             <xh:ul class="nav pull-right">
                 <xh:li class="dropdown">

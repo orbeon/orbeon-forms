@@ -41,7 +41,7 @@
     <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
-    <!-- Same logic as in `persistence-model.xml` -->
+    <!-- Same logic as in `fr:is-background()` -->
     <xsl:variable
         name="is-background"
         select="starts-with(doc('input:request')/*/request-path, '/fr/service/') and $mode = ('new', 'edit')"

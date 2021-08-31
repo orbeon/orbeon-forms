@@ -47,10 +47,7 @@
     <xf:var
         name="is-background"
         value="
-            starts-with(xxf:get-request-path(), '/fr/service/') and
-            (: For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
-               probably, as they also need to send an XML response back. :)
-            $mode = ('new', 'edit') and
+            fr:is-background() and
             (: PE only :)
             (fr:is-pe() or frf:sendError(404))"/>
 

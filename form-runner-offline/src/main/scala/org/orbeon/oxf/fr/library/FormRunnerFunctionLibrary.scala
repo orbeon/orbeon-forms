@@ -58,6 +58,10 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction def canDelete                : Boolean        = FormRunner.canDelete
   @XPathFunction def ownsLeaseOrNoneRequired  : Boolean        = FormRunner.userOwnsLeaseOrNoneRequired
 
+  @XPathFunction
+  def isBackground()(implicit xfc: XFormsFunction.Context): Boolean =
+    FormRunner.isBackground(xfc, FormRunnerParams())
+
   @XPathFunction(name = "created-dateTime")
   def createdDateTime                         : Option[java.time.Instant] = FormRunner.documentCreatedDate.map(java.time.Instant.ofEpochMilli)
   @XPathFunction(name = "modified-dateTime")

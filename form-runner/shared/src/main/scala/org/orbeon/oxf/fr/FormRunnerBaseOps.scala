@@ -23,7 +23,6 @@ import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.model.XFormsInstance
@@ -34,6 +33,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -346,6 +346,11 @@ trait FormRunnerBaseOps {
 
   def isEmbeddedFromHeaders: Boolean =
     inScopeContainingDocument.isEmbedded
+
+  // For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
+  // probably, as they also need to send an XML response back.
+  def isBackground(implicit xfc: XFormsFunction.Context, p: FormRunnerParams): Boolean =
+    xfc.containingDocument.getRequestPath.startsWith("/fr/service/") && (p.mode == "new" || p.mode == "edit")
 
   def isEmbeddable: Boolean =
     inScopeContainingDocument.getRequestParameters.get(ExternalContext.EmbeddableParam) map (_.head) contains "true"

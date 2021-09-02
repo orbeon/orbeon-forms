@@ -423,9 +423,9 @@
                         <fr:title/>
                         <!-- These are typically to the right -->
                         <fr:language-selector/>
-                        <xh:div>
-                            xxx: <xf:output value="fr:workflow-stage-value()"/>
-                        </xh:div>
+<!--                        <xh:div>-->
+<!--                            xxx: <xf:output value="fr:workflow-stage-value()"/>-->
+<!--                        </xh:div>-->
                         <fr:status-icons/>
                         <fr:user-nav/>
                     </xsl:variable>

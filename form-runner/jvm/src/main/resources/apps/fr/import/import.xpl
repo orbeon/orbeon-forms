@@ -132,13 +132,13 @@
 
                                 <xf:setvalue ref="instance('fr-import-stats')/succeeded" value="xs:integer(.) + 1"/>
                                 <xf:action type="xpath">
-                                    xxf:set-session-attribute('org.orbeon.fr.import.succeeded', instance('fr-import-stats')/succeeded)
+                                    xxf:set-session-attribute('org.orbeon.fr.import.succeeded', instance('fr-import-stats')/succeeded/xs:integer(.))
                                 </xf:action>
                             </xf:action>
 
                             <xf:setvalue ref="instance('fr-import-stats')/processed" value="xs:integer(.) + 1"/>
                             <xf:action type="xpath">
-                                xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed)
+                                xxf:set-session-attribute('org.orbeon.fr.import.processed', instance('fr-import-stats')/processed/xs:integer(.))
                             </xf:action>
 
                         </xf:action>

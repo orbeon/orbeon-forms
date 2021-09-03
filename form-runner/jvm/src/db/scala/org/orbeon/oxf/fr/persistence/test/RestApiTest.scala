@@ -259,8 +259,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         HttpAssert.del(DataURL, Unspecified, 403, manager)
         HttpAssert.del(DataURL, Unspecified, 204, admin)
 
-        // Status code when deleting non-existent data depends on permissions
-        HttpAssert.del(DataURL, Unspecified, 403, guest)
+        // Always return a 404 if the data doesn't exist, irrelevant of the permissions
+        // https://github.com/orbeon/orbeon-forms/issues/4979#issuecomment-912742633
+        HttpAssert.del(DataURL, Unspecified, 404, guest)
         HttpAssert.del(DataURL, Unspecified, 404, clerk)
         HttpAssert.del(DataURL, Unspecified, 404, manager)
         HttpAssert.del(DataURL, Unspecified, 404, admin)

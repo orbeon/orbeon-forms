@@ -386,5 +386,4 @@ object ProcessInterpreter {
   // TODO: Obtain action name automatically.
   def missingArgument(action: String, name: String) =
     throw new IllegalArgumentException(s"$action: `$name` parameter is required")
-
 }

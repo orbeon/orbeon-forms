@@ -27,7 +27,7 @@
             <config>
                 <include>/request/request-path</include>
                 <include>/request/headers/header[name = 'orbeon-datasource']</include>
-                <include>/request/parameters/parameter[name = 'all-versions']</include>
+                <include>/request/parameters/parameter[name = ('all-versions', 'modified-since')]</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -54,6 +54,7 @@
 
                 <provider><xsl:value-of select="$matcher-groups[1]"/></provider>
                 <all-versions><xsl:value-of select="$request/parameters/parameter[name = 'all-versions']/value = 'true'"/></all-versions>
+                <modified-since><xsl:value-of select="$request/parameters/parameter[name = 'modified-since']/value"/></modified-since>
             </request>
         </p:input>
         <p:output name="data" id="request-description"/>
@@ -85,11 +86,17 @@
                                       MAX(last_modified_time) last_modified_time
                                     FROM
                                       orbeon_form_definition
-                                    <xsl:if test="/request/app != ''">
+                                    <xsl:if test="/request/app != '' or /request/modified-since != ''">
                                       WHERE
-                                        app = <sql:param type="xs:string" select="/request/app"/>
+                                        <xsl:if test="/request/app != ''">
+                                            app = <sql:param type="xs:string" select="/request/app"/>
+                                        </xsl:if>
+                                        <xsl:if test="/request/modified-since != ''">
+                                            <xsl:if test="/request/app != ''">AND</xsl:if>
+                                            last_modified_time > <sql:param type="xs:dateTime" select="/request/modified-since"/>
+                                        </xsl:if>
                                         <xsl:if test="/request/form != ''">
-                                          AND form = <sql:param type="xs:string" select="/request/form"/>
+                                            AND form = <sql:param type="xs:string" select="/request/form"/>
                                         </xsl:if>
                                     </xsl:if>
                                     GROUP BY

@@ -789,9 +789,11 @@
 
                     <xf:group ref="instance('fr-summary-instance')" xxf:update="full">
 
-                        <xf:var name="show-created"        value="xxf:property(string-join(('oxf.fr.summary.show-created'       , $app, $form), '.'))"/>
-                        <xf:var name="show-last-modified"  value="xxf:property(string-join(('oxf.fr.summary.show-last-modified' , $app, $form), '.'))"/>
-                        <xf:var name="show-workflow-stage" value="xxf:property(string-join(('oxf.fr.summary.show-workflow-stage', $app, $form), '.'))"/>
+                        <xf:var name="show-created"          value="xxf:property(string-join(('oxf.fr.summary.show-created'       ,   $app, $form), '.'))"/>
+                        <xf:var name="show-last-modified"    value="xxf:property(string-join(('oxf.fr.summary.show-last-modified' ,   $app, $form), '.'))"/>
+                        <xf:var name="show-workflow-stage"   value="xxf:property(string-join(('oxf.fr.summary.show-workflow-stage',   $app, $form), '.'))"/>
+                        <xf:var name="show-username"         value="xxf:property(string-join(('oxf.fr.summary.show-username',         $app, $form), '.'))"/>
+                        <xf:var name="show-last-modified-by" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified-by', $app, $form), '.'))"/>
 
                         <div class="fr-summary-table-div">
                             <xf:var name="have-drafts" value="exists(document[@draft = 'true'])"/>
@@ -809,6 +811,12 @@
                                         <xh:col/>
                                     </xf:group>
                                     <xf:group ref="''[$show-last-modified]">
+                                        <xh:col/>
+                                    </xf:group>
+                                     <xf:group ref="''[$show-username]">
+                                        <xh:col/>
+                                    </xf:group>
+                                     <xf:group ref="''[$show-last-modified-by]">
                                         <xh:col/>
                                     </xf:group>
                                     <xf:group ref="''[$show-workflow-stage]">
@@ -835,6 +843,16 @@
                                         <xf:group ref="''[$show-last-modified]">
                                             <xh:th>
                                                 <xf:output value="$fr-resources/summary/titles/last-modified"/>
+                                            </xh:th>
+                                        </xf:group>
+                                        <xf:group ref="''[$show-username]">
+                                            <xh:th>
+                                                <xf:output value="$fr-resources/summary/titles/username"/>
+                                            </xh:th>
+                                        </xf:group>
+                                        <xf:group ref="''[$show-last-modified-by]">
+                                            <xh:th>
+                                                <xf:output value="$fr-resources/summary/titles/last-modified-by"/>
                                             </xh:th>
                                         </xf:group>
                                         <xf:group ref="''[$show-workflow-stage]">
@@ -982,6 +1000,30 @@
                                                         </xf:group>
                                                     </xh:td>
                                                 </xf:group>
+                                                <xf:group ref="''[$show-username]">
+                                                    <xh:td class="fr-td">
+                                                        <xf:group ref=".[$edit-view != '']">
+                                                            <xh:a href="{$current-document-href}">
+                                                                <xf:output value="$document/@username"/>
+                                                            </xh:a>
+                                                        </xf:group>
+                                                        <xf:group ref=".[$edit-view = '']">
+                                                            <xf:output value="$document/@username"/>
+                                                        </xf:group>
+                                                    </xh:td>
+                                                </xf:group>
+                                                <xf:group ref="''[$show-last-modified-by]">
+                                                    <xh:td class="fr-td">
+                                                        <xf:group ref=".[$edit-view != '']">
+                                                            <xh:a href="{$current-document-href}">
+                                                                <xf:output value="$document/@last-modified-by"/>
+                                                            </xh:a>
+                                                        </xf:group>
+                                                        <xf:group ref=".[$edit-view = '']">
+                                                            <xf:output value="$document/@last-modified-by"/>
+                                                        </xf:group>
+                                                    </xh:td>
+                                                </xf:group>
                                                 <xf:group ref="''[$show-workflow-stage]">
                                                     <xh:td class="fr-td">
                                                         <xf:group ref=".[$edit-view != '']">
@@ -1116,7 +1158,7 @@
                                     </xf:repeat>
                                     <xf:group ref=".[not(document)]">
                                         <xh:tr>
-                                            <xh:td colspan="{4 + count(instance('fr-search-instance')/*[@summary-field = 'true'])}">
+                                            <xh:td colspan="{7 + count(instance('fr-search-instance')/*[@summary-field = 'true'])}">
                                                 <xf:output id="fr-no-form-data" class="alert" mediatype="text/html" value="xxf:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
                                             </xh:td>
                                         </xh:tr>

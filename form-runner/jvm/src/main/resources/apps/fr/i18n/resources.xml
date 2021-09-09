@@ -176,6 +176,8 @@
                 <created>Created</created>
                 <last-modified>Modified</last-modified>
                 <workflow-stage>Workflow stage</workflow-stage>
+                <username>Created By</username>
+                <last-modified-by>Last Modified By</last-modified-by>
                 <selected>Selected</selected>
                 <refresh>This operation will refresh the page</refresh>
                 <toc>Table of Contents</toc>
@@ -672,6 +674,8 @@
                 <created>Création</created>
                 <last-modified>Modification</last-modified>
                 <workflow-stage>Étape du workflow</workflow-stage>
+                <username>Créé par</username>
+                <last-modified-by>Modifié par</last-modified-by>
                 <selected>Sélection</selected>
                 <refresh>Cette opération rafraichit la page</refresh>
                 <toc>Table des matières</toc>
@@ -1160,6 +1164,8 @@
                 <created>Creado</created>
                 <last-modified>Modificación</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Seleccionado</selected>
                 <refresh>Este botón actualizará la página</refresh>
                 <toc>Tabla de contenidos</toc>
@@ -1644,6 +1650,8 @@
                 <created>Opprettet</created>
                 <last-modified>Sist endret</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Valgt</selected>
                 <refresh>Denne operasjonen vil laste siden på nytt</refresh>
                 <toc>Innholdsfortegnelse</toc>
@@ -2125,6 +2133,8 @@
                 <created>Дата создания</created>
                 <last-modified>Дата изменения</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Выбрана</selected>
                 <refresh>Эта операция потребует перезагрузки страницы</refresh>
                 <toc>Оглавление</toc>
@@ -2611,6 +2621,8 @@
                 <created>Creato</created>
                 <last-modified>Modificato</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Selezionato</selected>
                 <refresh>Questa operazione aggiorna la pagina</refresh>
                 <toc>Tabella dei contenuti</toc>
@@ -3104,6 +3116,8 @@
                 <created>Erstellt</created>
                 <last-modified>Änderungsdatum</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Ausgewählt</selected>
                 <refresh>Diese Operation wird die Seite aktualisieren</refresh>
                 <toc>Inhaltstabelle</toc>
@@ -3597,6 +3611,8 @@
                 <created>Luotu</created>
                 <last-modified>Viimeksi muokattu</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Valittu</selected>
                 <refresh>Tämä toiminto lataa sivun uudelleen</refresh>
                 <toc>Sisällysluettelo</toc>
@@ -4090,6 +4106,8 @@
                 <created>Skapad</created>
                 <last-modified>Ändrad</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Vald</selected>
                 <refresh>Uppdatera sidan</refresh>
                 <toc>Innehållsförteckning</toc>
@@ -4583,6 +4601,8 @@
                 <created>Aangemaakt</created>
                 <last-modified>Bewerkt</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Geselecteerd</selected>
                 <refresh>Deze bewerking zal de pagina doen verversen</refresh>
                 <toc>Inhoudsopgave</toc>
@@ -5075,6 +5095,8 @@
                 <created>Criado</created>
                 <last-modified>Modificado</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Seleccionado</selected>
                 <refresh>Esta operação irá refrescar a página</refresh>
                 <toc>Tablea de Conteúdos</toc>
@@ -5561,6 +5583,8 @@
                 <created>Oprettet</created>
                 <last-modified>Senest ændret</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Valgt</selected>
                 <refresh>Dette indlæser siden igen</refresh>
                 <toc>Indholdsfortegnelse</toc>
@@ -6047,6 +6071,8 @@
                 <created>Utworzony</created>
                 <last-modified>Zmodyfikowany</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <username todo="true">Created By</username>
+                <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Wybrany</selected>
                 <refresh>Ta operacja spowoduje odświeżenie strony</refresh>
                 <toc>Spis treści</toc>

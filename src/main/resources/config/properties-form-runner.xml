@@ -103,6 +103,8 @@
     <property as="xs:boolean" name="oxf.fr.summary.show-created.*.*"                            value="true"/>
     <property as="xs:boolean" name="oxf.fr.summary.show-last-modified.*.*"                      value="true"/>
     <property as="xs:boolean" name="oxf.fr.summary.show-workflow-stage.*.*"                     value="false"/>
+    <property as="xs:boolean" name="oxf.fr.summary.show-username.*.*"                           value="false"/>
+    <property as="xs:boolean" name="oxf.fr.summary.show-last-modified-by.*.*"                   value="false"/>
     <property as="xs:boolean" name="oxf.fr.summary.show-version-selector.*.*"                   value="true"/>
     <property as="xs:string"  name="oxf.fr.summary.buttons.*.*">
         home review pdf delete duplicate new

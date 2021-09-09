@@ -33,12 +33,15 @@ trait SearchResult extends SearchRequestParser {
       <documents search-total={count.toString}>{
         documents.map(doc =>
           <document
-            created        ={DateUtils.formatIsoDateTimeUtc(doc.metadata.created.getTime)}
-            last-modified  ={DateUtils.formatIsoDateTimeUtc(doc.metadata.lastModifiedTime.getTime)}
-            workflow-stage ={doc.metadata.workflowStage.map(xml.Text(_))}
-            name           ={doc.metadata.documentId}
-            draft          ={doc.metadata.draft.toString}
-            operations     ={doc.operations.mkString(" ")}>{
+            created         ={DateUtils.formatIsoDateTimeUtc(doc.metadata.created.getTime)}
+            last-modified   ={DateUtils.formatIsoDateTimeUtc(doc.metadata.lastModifiedTime.getTime)}
+            username        ={doc.metadata.username.getOrElse("")}
+            groupname       ={doc.metadata.groupname.getOrElse("")}
+            last-modified-by={Option(doc.metadata.lastModifiedBy).getOrElse("")}
+            workflow-stage  ={doc.metadata.workflowStage.map(xml.Text(_))}
+            name            ={doc.metadata.documentId}
+            draft           ={doc.metadata.draft.toString}
+            operations      ={doc.operations.mkString(" ")}>{
 
             <details>{
               request.columns.map { requestColumn =>

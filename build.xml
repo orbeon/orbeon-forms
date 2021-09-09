@@ -19,7 +19,7 @@
 
     <property file="build-local.properties"/>
 
-    <property name="saxon.jar"     value="saxon-9-1-0-8_orbeon_20160615.jar"/>
+    <property name="saxon.jar"     value="saxon-9-1-0-8_orbeon_20210903.jar"/>
 
     <!-- Expose environment variables -->
     <property environment="env"/>

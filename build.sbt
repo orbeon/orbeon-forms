@@ -43,7 +43,7 @@ val CirceVersion                  = "0.13.0"
 val EnumeratumVersion             = "1.6.1"
 val EnumeratumCirceVersion        = "1.6.1"
 val ShapelessVersion              = "2.3.4"
-val ScalaXmlVersion               = "2.0.0" // see https://github.com/orbeon/orbeon-forms/issues/4927
+val ScalaXmlVersion               = "2.0.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes issues
 val Parboiled2Version             = "2.2.1"
 val AutowireVersion               = "0.3.2"
@@ -343,7 +343,6 @@ lazy val commonSettings = Seq(
     "-language:higherKinds",
     "-language:existentials",
     "-deprecation",
-    "-Xasync"
     // Consider the following flags
 //    "-feature",
 //    "-unchecked",
@@ -1259,8 +1258,8 @@ lazy val orbeonWarJS = orbeonWar.js
     libraryDependencies            ++= Seq(
       "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
-      "io.monix"               %%% "monix"          % "3.2.2",
-      "org.scala-lang.modules" %%  "scala-async"    % ScalaAsyncVersion % Provided
+      "org.scala-lang.modules" %%  "scala-async"    % ScalaAsyncVersion % Provided,
+      "io.monix"               %%% "monix"          % "3.4.0"
     ),
 
     Test / parallelExecution                := false,

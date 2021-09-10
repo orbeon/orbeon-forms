@@ -48,7 +48,7 @@ object ControlLabelHintTextEditor {
     def clickOrFocus(event: dom.Event): Unit = {
       val target = $(event.target)
       val eventOnEditor        = target.closest(".fb-label-editor").is("*")
-      val eventOnMceFloatPanel = target.closest(".mce-floatpanel" ).is("*")
+      val eventOnMceFloatPanel = target.closest(".tox-dialog" ).is("*")
       val eventOnControlLabel  =
           // Click on label or element inside label
           (target.is(LabelHintSelector) || target.parents(LabelHintSelector).is("*")) &&

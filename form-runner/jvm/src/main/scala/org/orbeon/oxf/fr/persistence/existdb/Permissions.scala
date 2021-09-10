@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.existdb
 
-import org.orbeon.oxf.externalcontext.Organization
+import org.orbeon.oxf.externalcontext.{Organization, UserAndGroup}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner}
@@ -24,6 +24,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.compat._
+
 
 object Permissions {
 
@@ -44,8 +45,10 @@ object Permissions {
       val permissions         = PermissionsXML.parse(permissionsElOrNull)
       val currentUser         = PermissionsAuthorization.currentUserFromSession
       val checkWithDataUser   = CheckWithDataUser(
-        username     = Option(metadataFromDB).map(_.child("username" ).stringValue),
-        groupname    = Option(metadataFromDB).map(_.child("groupname").stringValue),
+        userAndGroup = UserAndGroup.fromStrings(
+          Option(metadataFromDB).map(_.child("username" ).stringValue).getOrElse(""),
+          Option(metadataFromDB).map(_.child("groupname").stringValue).getOrElse("")
+        ),
         organization = Option(metadataFromDB).map(metadataEl => {
           val levelsEls = metadataEl.child("organization").child("level").map(_.stringValue)
           Organization(levelsEls.to(List))
@@ -66,5 +69,4 @@ object Permissions {
     def httpResponse = NetUtils.getExternalContext.getResponse
     httpResponse.setHeader("Orbeon-Operations", Operations.serialize(authorizedOperations).mkString(" "))
   }
-
 }

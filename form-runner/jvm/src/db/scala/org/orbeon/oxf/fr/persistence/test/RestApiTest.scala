@@ -18,7 +18,7 @@ import java.io.ByteArrayInputStream
 import org.junit.Test
 import org.orbeon.dom
 import org.orbeon.dom.Document
-import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
+import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole, UserAndGroup}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.db._
@@ -34,6 +34,7 @@ import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatestplus.junit.AssertionsForJUnit
 
 import scala.util.Random
+
 
 /**
  * Test the persistence API (for now specifically the MySQL persistence layer), in particular:
@@ -208,9 +209,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
       val data    = <data/>.toDocument
       val guest   = None
-      val clerk   = Some(Credentials("tom", Some("clerk")  , List(SimpleRole("clerk"  )), Nil))
-      val manager = Some(Credentials("jim", Some("manager"), List(SimpleRole("manager")), Nil))
-      val admin   = Some(Credentials("tim", Some("admin")  , List(SimpleRole("admin"  )), Nil))
+      val clerk   = Some(Credentials(UserAndGroup("tom", Some("clerk")  ), List(SimpleRole("clerk"  )), Nil))
+      val manager = Some(Credentials(UserAndGroup("jim", Some("manager")), List(SimpleRole("manager")), Nil))
+      val admin   = Some(Credentials(UserAndGroup("tim", Some("admin")  ), List(SimpleRole("admin"  )), Nil))
 
       {
         val DataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
@@ -275,11 +276,11 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val formURL   = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
 
       // Users
-      val c1User   = Some(Credentials("c1User"  , None, Nil, List(Organization(List("a", "b", "c")))))
-      val c2User   = Some(Credentials("c2User"  , None, Nil, List(Organization(List("a", "b", "c")))))
-      val cManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "c")), Nil))
-      val bManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "b")), Nil))
-      val dManager = Some(Credentials("cManager", None, List(ParametrizedRole("manager", "d")), Nil))
+      val c1User   = Some(Credentials(UserAndGroup("c1User"  , None), Nil, List(Organization(List("a", "b", "c")))))
+      val c2User   = Some(Credentials(UserAndGroup("c2User"  , None), Nil, List(Organization(List("a", "b", "c")))))
+      val cManager = Some(Credentials(UserAndGroup("cManager", None), List(ParametrizedRole("manager", "c")), Nil))
+      val bManager = Some(Credentials(UserAndGroup("cManager", None), List(ParametrizedRole("manager", "b")), Nil))
+      val dManager = Some(Credentials(UserAndGroup("cManager", None), List(ParametrizedRole("manager", "d")), Nil))
 
       val dataURL   = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
       val dataBody  = HttpCall.XML(<gaga/>.toDocument)

@@ -13,13 +13,14 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole}
+import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, UserAndGroup}
 import org.orbeon.oxf.fr.permission.Operation.{Delete, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+
 import scala.collection.compat._
 
 object SearchOps {
@@ -57,10 +58,7 @@ object SearchOps {
         Option(metadataOrNullEl)
           .flatMap(_.firstChildOpt(name))
           .map(_.stringValue)
-          .flatMap(_.trimAllToOpt)
 
-      val username     = childValue("username")
-      val groupname    = childValue("groupname")
       val organization = {
         val levels = Option(metadataOrNullEl)
           .flatMap(_.firstChildOpt("organization"))
@@ -68,7 +66,13 @@ object SearchOps {
         levels.map(Organization.apply)
       }
 
-      CheckWithDataUser(username, groupname, organization)
+      CheckWithDataUser(
+        UserAndGroup.fromStrings(
+          childValue("username").getOrElse(""),
+          childValue("groupname").getOrElse("")
+        ),
+        organization
+      )
     }
 
     val operations =

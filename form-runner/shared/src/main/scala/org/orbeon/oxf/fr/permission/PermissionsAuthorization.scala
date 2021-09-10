@@ -24,8 +24,7 @@ object PermissionsAuthorization {
 
   sealed trait PermissionsCheck
   case class CheckWithDataUser(
-    username     : Option[String],
-    groupname    : Option[String],
+    userAndGroup : Option[UserAndGroup],
     organization : Option[Organization]
   )                                          extends PermissionsCheck
   case class CheckWithoutDataUser(
@@ -64,8 +63,8 @@ object PermissionsAuthorization {
     condition match {
       case Owner =>
         check match {
-          case CheckWithDataUser(dataUsernameOpt, _, _) =>
-            (currentUser map (_.username), dataUsernameOpt) match {
+          case CheckWithDataUser(dataUserAndGroupOpt, _) =>
+            (currentUser map (_.userAndGroup.username), dataUserAndGroupOpt.map(_.username)) match {
               case (Some(currentUsername), Some(dataUsername)) if currentUsername == dataUsername => true
               case _ => false
             }
@@ -74,8 +73,8 @@ object PermissionsAuthorization {
         }
       case Group =>
         check match {
-          case CheckWithDataUser(_, dataGroupnameOpt, _) =>
-            (currentUser flatMap (_.group), dataGroupnameOpt) match {
+          case CheckWithDataUser(dataUserAndGroupOpt, _) =>
+            (currentUser flatMap (_.userAndGroup.groupname), dataUserAndGroupOpt.flatMap(_.groupname)) match {
               case (Some(currentUsername), Some(dataGroupnameOpt)) if currentUsername == dataGroupnameOpt => true
               case _ => false
             }
@@ -90,7 +89,7 @@ object PermissionsAuthorization {
             case ParametrizedRole(userRoleName, userOrganizationName) =>
               userRoleName == permissionRoleName && (
                 check match {
-                  case CheckWithDataUser(_, _, dataOrganizationOpt) =>
+                  case CheckWithDataUser(_, dataOrganizationOpt) =>
                     dataOrganizationOpt.exists(_.levels.contains(userOrganizationName))
                   case CheckWithoutDataUser(optimistic) =>
                     optimistic

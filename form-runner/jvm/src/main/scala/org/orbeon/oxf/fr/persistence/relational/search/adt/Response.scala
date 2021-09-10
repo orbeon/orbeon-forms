@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
+import org.orbeon.oxf.externalcontext.UserAndGroup
+
 import java.sql.Timestamp
 
 case class DocumentMetaData(
   documentId       : String,
   draft            : Boolean,
-  created          : Timestamp,
+  createdTime      : Timestamp,
   lastModifiedTime : Timestamp,
-  lastModifiedBy   : String,
+  createdBy        : Option[UserAndGroup],
+  lastModifiedBy   : Option[UserAndGroup],
   workflowStage    : Option[String],
-  username         : Option[String],
-  groupname        : Option[String],
   organizationId   : Option[Int]
 )
 

@@ -23,8 +23,10 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
 
   val TestCredentials =
     Credentials(
-      "employee@orbeon.com",
-      Some("employee"),
+      UserAndGroup(
+        "employee@orbeon.com",
+        Some("employee")
+      ),
       List(
         SimpleRole("Administrator"),
         SimpleRole("Power User"),
@@ -169,17 +171,19 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
             ]
           }
         """,
-          Credentials(
+        Credentials(
+          UserAndGroup(
             "employee@orbeon.com",
-            Some("employee"),
-            List(
-              SimpleRole("Administrator"),
-              SimpleRole("Power User"),
-              ParametrizedRole("Organization Owner", "Orbeon San Mateo"),
-              ParametrizedRole("Organization Administrator", "Orbeon San Mateo")
-            ),
-            Nil
-          )
+            Some("employee")
+          ),
+          List(
+            SimpleRole("Administrator"),
+            SimpleRole("Power User"),
+            ParametrizedRole("Organization Owner", "Orbeon San Mateo"),
+            ParametrizedRole("Organization Administrator", "Orbeon San Mateo")
+          ),
+          Nil
+        )
       ),
       (
         "missing roles and organizations",
@@ -191,12 +195,14 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
             ]
           }
         """,
-          Credentials(
+        Credentials(
+          UserAndGroup(
             "employee@orbeon.com",
-            Some("employee"),
-            Nil,
-            Nil
-          )
+            Some("employee")
+          ),
+          Nil,
+          Nil
+        )
       ),
       (
         "missing groups, roles and organizations",
@@ -205,13 +211,15 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
             "username": "employee@orbeon.com"
           }
         """,
-          Credentials(
+        Credentials(
+          UserAndGroup(
             "employee@orbeon.com",
-            None,
-            Nil,
-            Nil
-          )
+            None
+          ),
+          Nil,
+          Nil
         )
+      )
     )
 
     for ((description, json, credentials) <- expectedPassing)

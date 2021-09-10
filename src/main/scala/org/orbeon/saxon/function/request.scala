@@ -71,12 +71,12 @@ trait RequestFunction extends DefaultFunctionSupport with RuntimeDependentFuncti
 
 class Username extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
-    NetUtils.getExternalContext.getRequest.credentials map (_.username)
+    NetUtils.getExternalContext.getRequest.credentials map (_.userAndGroup.username)
 }
 
 class UserGroup extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
-    NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)
+    NetUtils.getExternalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)
 }
 
 class UserRoles extends DefaultFunctionSupport with RuntimeDependentFunction {

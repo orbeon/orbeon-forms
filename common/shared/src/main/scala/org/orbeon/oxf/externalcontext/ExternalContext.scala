@@ -16,11 +16,11 @@ package org.orbeon.oxf.externalcontext
 import java.io._
 import java.net.URL
 import java.{util => ju}
-
 import enumeratum.{Enum, EnumEntry}
 import enumeratum.values.{IntEnum, IntEnumEntry}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.jdk.CollectionConverters._
 import scala.collection.immutable
@@ -31,13 +31,25 @@ sealed trait UserRole   { def roleName: String }
 case class   SimpleRole      (roleName: String)                           extends UserRole
 case class   ParametrizedRole(roleName: String, organizationName: String) extends UserRole
 
+case class UserAndGroup(
+  username  : String,        // non-blank
+  groupname : Option[String]
+)
+
+object UserAndGroup {
+  def fromStrings(username: String, groupname: String): Option[UserAndGroup] =
+    Option(username).flatMap(_.trimAllToOpt).map(UserAndGroup(_, Option(groupname).flatMap(_.trimAllToOpt)))
+
+  def fromStringsOrThrow(username: String, groupname: String): UserAndGroup =
+    fromStrings(username, groupname).getOrElse(throw new IllegalArgumentException("missing username"))
+}
+
 case class Organization(
-  levels       : List[String] // levels from root to leaf
+  levels : List[String] // levels from root to leaf
 )
 
 case class Credentials(
-  username      : String,
-  group         : Option[String],
+  userAndGroup  : UserAndGroup,
   roles         : List[UserRole],
   organizations : List[Organization]
 ) {
@@ -117,7 +129,7 @@ object ExternalContext {
     def credentials: Option[Credentials]
 
     // For Java callers
-    def getUsername: String = credentials map (_.username) orNull
+    def getUsername: String = credentials map (_.userAndGroup.username) orNull
 
     def isUserInRole(role: String): Boolean
 

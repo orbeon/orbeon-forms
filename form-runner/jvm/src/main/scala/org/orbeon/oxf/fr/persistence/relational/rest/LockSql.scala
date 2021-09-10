@@ -14,9 +14,11 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.io.IOUtils.useAndClose
-import java.sql.{Connection, ResultSet}
+import org.orbeon.oxf.externalcontext.UserAndGroup
 
+import java.sql.Connection
 import org.orbeon.oxf.fr.persistence.relational.Provider
+
 
 object LockSql {
 
@@ -44,8 +46,7 @@ object LockSql {
           Some(Lease(
             timeout  = resultSet.getInt("timeout"),
             lockInfo = LockInfo(
-              username  = resultSet.getString("username"),
-              groupname = Option(resultSet.getString("groupname"))
+              UserAndGroup.fromStringsOrThrow(resultSet.getString("username"), resultSet.getString("groupname"))
             )
           ))
         } else {
@@ -56,13 +57,12 @@ object LockSql {
   }
 
   def updateLease(
-    connection  : Connection,
-    provider    : Provider,
-    reqDataPart : DataPart,
-    username    : String,
-    groupname   : Option[String],
-    timeout     : Int
-  )             : Unit = {
+    connection   : Connection,
+    provider     : Provider,
+    reqDataPart  : DataPart,
+    userAndGroup : UserAndGroup,
+    timeout      : Int
+  )              : Unit = {
     val sql =
       s"""UPDATE orbeon_form_data_lease
          |   SET username    = ?,
@@ -71,8 +71,8 @@ object LockSql {
          | WHERE document_id = ?
        """.stripMargin
     useAndClose(connection.prepareStatement(sql)) { ps =>
-      ps.setString(1, username)
-      ps.setString(2, groupname.orNull)
+      ps.setString(1, userAndGroup.username)
+      ps.setString(2, userAndGroup.groupname.orNull)
       ps.setInt   (3, timeout)
       ps.setString(4, reqDataPart.documentId)
       ps.executeUpdate()
@@ -80,13 +80,12 @@ object LockSql {
   }
 
   def createLease(
-    connection  : Connection,
-    provider    : Provider,
-    reqDataPart : DataPart,
-    username    : String,
-    groupname   : Option[String],
-    timeout     : Int
-  )             : Unit = {
+    connection   : Connection,
+    provider     : Provider,
+    reqDataPart  : DataPart,
+    userAndGroup : UserAndGroup,
+    timeout      : Int
+  )              : Unit = {
     val sql =
       s"""INSERT
          |  INTO orbeon_form_data_lease (
@@ -99,8 +98,8 @@ object LockSql {
        """.stripMargin
     useAndClose(connection.prepareStatement(sql)) { ps =>
       ps.setString(1, reqDataPart.documentId)
-      ps.setString(2, username)
-      ps.setString(3, groupname.orNull)
+      ps.setString(2, userAndGroup.username)
+      ps.setString(3, userAndGroup.groupname.orNull)
       ps.setInt   (4, timeout)
       ps.executeUpdate()
     }
@@ -121,5 +120,4 @@ object LockSql {
       ps.executeUpdate()
     }
   }
-
 }

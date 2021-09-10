@@ -15,15 +15,17 @@ package org.orbeon.oxf.fr
 
 import enumeratum._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSupport, ExternalContext, ServletPortletRequest, SimpleRole}
+import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSupport, ExternalContext, ServletPortletRequest, SimpleRole, UserAndGroup}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.webapp.{OrbeonSessionListener, UserRolesFacade}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.slf4j.LoggerFactory
 
 import scala.util.control.NonFatal
+
 
 object FormRunnerAuth {
 
@@ -169,7 +171,7 @@ object FormRunnerAuth {
 
           Logger.debug(s"using `$authMethod` method")
 
-          val usernameOpt    = Option(userRoles.getRemoteUser)
+          val usernameOpt    = Option(userRoles.getRemoteUser).flatMap(_.trimAllToOpt)
           val rolesStringOpt = propertySet.getNonBlankString(ContainerRolesPropertyName)
 
           Logger.debug(s"usernameOpt: `$usernameOpt`, roles property: `$rolesStringOpt`")
@@ -193,9 +195,8 @@ object FormRunnerAuth {
                   SimpleRole(roleName)
 
               Credentials(
-                username      = username,
+                userAndGroup  = UserAndGroup.fromStringsOrThrow(username, rolesList.headOption.map(_.roleName).getOrElse("")),
                 roles         = rolesList,
-                group         = rolesList.headOption map (_.roleName),
                 organizations = Nil
               )
           }
@@ -243,9 +244,8 @@ object FormRunnerAuth {
                 headerList(HeaderRolesPropertyName) flatMap splitRoles flatMap splitWithinRole map SimpleRole.apply
 
               Credentials(
-                username      = username,
+                userAndGroup  = UserAndGroup.fromStringsOrThrow(username, headerList(HeaderGroupPropertyName).headOption.getOrElse("")),
                 roles         = roles,
-                group         = headerList(HeaderGroupPropertyName).headOption,
                 organizations = Nil
               )
             } kestrel

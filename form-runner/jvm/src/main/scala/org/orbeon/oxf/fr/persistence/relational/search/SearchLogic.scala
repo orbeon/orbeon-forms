@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import java.sql.Timestamp
-import org.orbeon.oxf.externalcontext.{Credentials, Organization}
+import org.orbeon.oxf.externalcontext.{Credentials, Organization, UserAndGroup}
 import org.orbeon.oxf.fr.FormDefinitionVersion
 import org.orbeon.oxf.fr.permission.Operation.{Delete, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
@@ -31,6 +31,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.SQLUtils._
 
 import scala.collection.mutable
+
 
 trait SearchLogic extends SearchRequestParser {
 
@@ -165,12 +166,11 @@ trait SearchLogic extends SearchRequestParser {
                 DocumentMetaData(
                   documentId       = documentsResultSet.getString                 ("document_id"),
                   draft            = documentsResultSet.getString                 ("draft") == "Y",
-                  created          = documentsResultSet.getTimestamp              ("created"),
+                  createdTime      = documentsResultSet.getTimestamp              ("created"),
                   lastModifiedTime = documentsResultSet.getTimestamp              ("last_modified_time"),
-                  lastModifiedBy   = documentsResultSet.getString                 ("last_modified_by"),
+                  createdBy        = UserAndGroup.fromStrings(documentsResultSet.getString("username"),         documentsResultSet.getString("groupname")),
+                  lastModifiedBy   = UserAndGroup.fromStrings(documentsResultSet.getString("last_modified_by"), ""),
                   workflowStage    = Option(documentsResultSet.getString          ("stage")),
-                  username         = Option(documentsResultSet.getString          ("username")),
-                  groupname        = Option(documentsResultSet.getString          ("groupname")),
                   organizationId   = RelationalUtils.getIntOpt(documentsResultSet, "organization_id")
                 ),
                 DocumentValue(
@@ -194,12 +194,11 @@ trait SearchLogic extends SearchRequestParser {
         val documents = documentsMetadataValues.map{ case (metadata, values) =>
             def readFromDatabase(id: Int) = OrganizationSupport.read(connection, OrganizationId(id)).get
             val organization              = metadata.organizationId.map(id => organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
-            val check                     = CheckWithDataUser(metadata.username, metadata.groupname, organization)
+            val check                     = CheckWithDataUser(metadata.createdBy, organization)
             val operations                = PermissionsAuthorization.authorizedOperations(permissions.formPermissions, user, check)
             Document(metadata, Operations.serialize(operations), values)
           }
         (documents, searchCount)
       }
     }
-
 }

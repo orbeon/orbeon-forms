@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.fr.persistence.test
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import org.orbeon.oxf.externalcontext.UserAndGroup
 
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.scalatest.funspec.AnyFunSpecLike
+
 
 class LockInfoTest extends AnyFunSpecLike {
 
@@ -27,14 +29,13 @@ class LockInfoTest extends AnyFunSpecLike {
 
       // Serialized
       val outputStream = new ByteArrayOutputStream()
-      LockInfo.serialize(LockInfo(username, groupname), outputStream)
+      LockInfo.serialize(LockInfo(UserAndGroup(username, groupname)), outputStream)
 
       // Parse
       val inputStream = new ByteArrayInputStream(outputStream.toByteArray)
       val lockInfo    = LockInfo.parse(inputStream)
 
-      assert(lockInfo.username  === username)
-      assert(lockInfo.groupname === groupname)
+      assert(lockInfo.userAndGroup == UserAndGroup(username, groupname) )
     }
   }
 }

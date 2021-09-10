@@ -14,12 +14,14 @@
 package org.orbeon.oxf.fr.persistence.test
 
 import org.junit.Test
+import org.orbeon.oxf.externalcontext.UserAndGroup
 import org.orbeon.oxf.fr.persistence.db.Connect
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging, NetUtils}
 import org.scalatestplus.junit.AssertionsForJUnit
+
 
 class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit with XMLSupport with Logging {
 
@@ -32,8 +34,8 @@ class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit wit
       implicit val externalContext = NetUtils.getExternalContext
 
       val dataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
-      val homerLockInfo = LockInfo("hsimpson", Some("simpsons"))
-      val margeLockInfo = LockInfo("msimpson", Some("simpsons"))
+      val homerLockInfo = LockInfo(UserAndGroup("hsimpson", Some("simpsons")))
+      val margeLockInfo = LockInfo(UserAndGroup("msimpson", Some("simpsons")))
 
       // Homer locks, Marge can't lock, and Homer can lock again
       HttpAssert.lock(dataURL, homerLockInfo, expectedCode = 200)
@@ -47,5 +49,4 @@ class LockUnlockTest extends ResourceManagerTestBase with AssertionsForJUnit wit
       HttpAssert.unlock(dataURL, margeLockInfo, expectedCode = 200)
     }
   }
-
 }

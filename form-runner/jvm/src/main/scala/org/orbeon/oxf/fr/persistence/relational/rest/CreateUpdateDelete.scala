@@ -20,6 +20,7 @@ import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.io.IOUtils._
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
+import org.orbeon.oxf.externalcontext.UserAndGroup
 import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerPersistence, Names}
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
@@ -200,10 +201,9 @@ trait CreateUpdateDelete
           // which row we read this from.
           Some(Row(
             created      = resultSet.getTimestamp("created"),
-            username     = if (req.forData) Option(resultSet.getString("username" ))                     else None,
-            group        = if (req.forData) Option(resultSet.getString("groupname"))                     else None,
-            organization = if (req.forData) OrganizationSupport.readFromResultSet(connection, resultSet) else None,
-            formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))                     else None,
+            createdBy    = if (req.forData) UserAndGroup.fromStrings(resultSet.getString("username"), resultSet.getString("groupname")) else None,
+            organization = if (req.forData) OrganizationSupport.readFromResultSet(connection, resultSet)                                else None,
+            formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))                                                    else None,
             stage        = None // We don't need to know about the stage of a possible existing row
           ))
         } else {
@@ -388,13 +388,12 @@ trait CreateUpdateDelete
             case Some(existing) =>
 
               // Check we're allowed to update or delete this resource
-              val username      = existing.username
-              val groupname     = existing.group
+              val createdBy     = existing.createdBy
               val organization  = existing.organization.map(_._2)
               val authorizedOps = PermissionsAuthorization.authorizedOperations(
                 formPermissions,
                 PermissionsAuthorization.currentUserFromSession,
-                CheckWithDataUser(username, groupname, organization)
+                CheckWithDataUser(createdBy, organization)
               )
               val requiredOp    = if (delete) Delete else Update
               Operations.allows(authorizedOps, requiredOp)

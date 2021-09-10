@@ -14,21 +14,18 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import java.io.{InputStream, OutputStream, OutputStreamWriter}
-
 import org.orbeon.dom.Document
 import org.orbeon.oxf.util
 import org.orbeon.io.IOUtils.useAndClose
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.externalcontext.UserAndGroup
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.SimplePath._
 
 import scala.xml.Elem
 
-case class LockInfo(
-  username  : String,
-  groupname : Option[String]
-)
+
+case class LockInfo(userAndGroup: UserAndGroup)
 
 object LockInfo {
 
@@ -37,8 +34,8 @@ object LockInfo {
         <d:lockscope><d:exclusive/></d:lockscope>
         <d:locktype><d:write/></d:locktype>
         <d:owner>
-            <fr:username>{lockInfo.username}</fr:username>
-            <fr:groupname>{lockInfo.groupname.getOrElse("")}</fr:groupname>
+            <fr:username>{lockInfo.userAndGroup.username}</fr:username>
+            <fr:groupname>{lockInfo.userAndGroup.groupname.getOrElse("")}</fr:groupname>
         </d:owner>
     </d:lockinfo>
 
@@ -57,8 +54,7 @@ object LockInfo {
     val username  = owner / "username"
     val groupname = owner / "groupname"
     LockInfo(
-      username  = username.stringValue,
-      groupname = trimAllToOpt(groupname.stringValue)
+      UserAndGroup.fromStringsOrThrow(username.stringValue, groupname.stringValue)
     )
   }
 }

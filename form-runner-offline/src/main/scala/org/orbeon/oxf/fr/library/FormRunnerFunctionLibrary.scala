@@ -35,8 +35,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
   @XPathFunction def formTitle                : Option[String] = FormRunner.formTitleFromMetadata
   @XPathFunction def lang                     : String         = FormRunner.currentLang
   @XPathFunction def workflowStageValue       : Option[String] = FormRunner.documentWorkflowStage
-  @XPathFunction def username                 : Option[String] = CoreCrossPlatformSupport.externalContext.getRequest.credentials map     (_.username)
-  @XPathFunction def userGroup                : Option[String] = CoreCrossPlatformSupport.externalContext.getRequest.credentials flatMap (_.group)
+  @XPathFunction def username                 : Option[String] = CoreCrossPlatformSupport.externalContext.getRequest.credentials map     (_.userAndGroup.username)
+  @XPathFunction def userGroup                : Option[String] = CoreCrossPlatformSupport.externalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)
 //  @XPathFunction def relevantFormValuesString : String         = FormRunnerMetadata.findAllControlsWithValues(html = false) // 2021-06-04: unused
   @XPathFunction def wizardCurrentPageName    : Option[String] = Wizard.wizardCurrentPageNameOpt
 

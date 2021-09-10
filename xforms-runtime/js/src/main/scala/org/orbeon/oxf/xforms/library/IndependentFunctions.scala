@@ -92,15 +92,15 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def username: Option[String] =
-    CoreCrossPlatformSupport.externalContext.getRequest.credentials map (_.username)
+    CoreCrossPlatformSupport.externalContext.getRequest.credentials map (_.userAndGroup.username)
 
   @XPathFunction
   def getRemoteUser: Option[String] = // `= username`
-    CoreCrossPlatformSupport.externalContext.getRequest.credentials map (_.username)
+    CoreCrossPlatformSupport.externalContext.getRequest.credentials map (_.userAndGroup.username)
 
   @XPathFunction
   def userGroup: Option[String] =
-    CoreCrossPlatformSupport.externalContext.getRequest.credentials flatMap (_.group)
+    CoreCrossPlatformSupport.externalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)
 
   @XPathFunction
   def userRoles: Iterable[String] =

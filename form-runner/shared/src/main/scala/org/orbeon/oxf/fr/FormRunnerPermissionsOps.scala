@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.externalcontext.{Credentials, Organization}
+import org.orbeon.oxf.externalcontext.{Credentials, Organization, UserAndGroup}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.http.Headers
@@ -67,7 +67,7 @@ trait FormRunnerPermissionsOps {
   ): Seq[String] = {
     val permissions = PermissionsXML.parse(permissionsElement)
     val user        = CoreCrossPlatformSupport.externalContext.getRequest.credentials
-    val check       = CheckWithDataUser(Option(dataUsername), Option(dataGroupname), None)
+    val check       = CheckWithDataUser(UserAndGroup.fromStrings(dataUsername, dataGroupname), None)
     Operations.serialize(PermissionsAuthorization.authorizedOperations(permissions, user, check))
   }
 
@@ -102,10 +102,10 @@ trait FormRunnerPermissionsOps {
       }
     }
 
-    allOperationsIfNoPermissionsDefined(permissionsElOrNull) { permissions =>
+    allOperationsIfNoPermissionsDefined(permissionsElOrNull) { _ =>
       val rolesOperations       = authorizedOperationsBasedOnRoles(permissionsElOrNull, currentUser)
-      val ownerOperations       = ownerGroupMemberOperations(currentUser map     (_.username), dataUsername,  "owner")
-      val groupMemberOperations = ownerGroupMemberOperations(currentUser flatMap (_.group),    dataGroupname, "group-member")
+      val ownerOperations       = ownerGroupMemberOperations(currentUser map     (_.userAndGroup.username), dataUsername,  "owner")
+      val groupMemberOperations = ownerGroupMemberOperations(currentUser flatMap (_.userAndGroup.groupname),    dataGroupname, "group-member")
       (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
     }
   }

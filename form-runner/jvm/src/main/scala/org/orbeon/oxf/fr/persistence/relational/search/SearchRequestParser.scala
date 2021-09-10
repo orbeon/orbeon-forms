@@ -42,8 +42,8 @@ trait SearchRequestParser {
         val searchElement   = searchDocument.rootElement
         val queryEls        = searchElement.child("query").toList
         val draftsElOpt     = searchElement.child("drafts").headOption
-        val username        = httpRequest.credentials map     (_.username)
-        val group           = httpRequest.credentials flatMap (_.group)
+        val username        = httpRequest.credentials map     (_.userAndGroup.username)
+        val group           = httpRequest.credentials flatMap (_.userAndGroup.groupname)
         val operationsElOpt = searchElement.child("operations").headOption
 
         SearchRequest(

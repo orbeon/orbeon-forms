@@ -13,24 +13,24 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole}
+import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, SimpleRole, UserAndGroup}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization._
 import org.orbeon.oxf.fr.permission._
 import org.scalatest.funspec.AnyFunSpec
 
+
 class FormRunnerPermissionsTest extends AnyFunSpec {
 
   val guest =
     Credentials(
-      username      = "juser",
-      group         = None,
+      userAndGroup  = UserAndGroup("juser", None),
       roles         = Nil,
       organizations = Nil
     )
 
-  val juser    = guest.copy(username = "juser")
-  val jmanager = guest.copy(username = "jmanager")
+  val juser    = guest.copy(userAndGroup = guest.userAndGroup.copy(username = "juser"))
+  val jmanager = guest.copy(userAndGroup = guest.userAndGroup.copy(username = "jmanager"))
 
   val clerkPermissions = DefinedPermissions(List(
     Permission(List(RolesAnyOf(List("clerk"))), SpecificOperations(List(Read)))
@@ -87,8 +87,7 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
         clerkAndManagerPermissions,
         Some(juser),
         CheckWithDataUser(
-          username     = None,
-          groupname    = None,
+          userAndGroup = None,
           organization = None
         )
       )
@@ -100,8 +99,7 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
         clerkAndManagerPermissions,
         Some(juser),
         CheckWithDataUser(
-          username     = Some("juser"),
-          groupname    = None,
+          userAndGroup = Some(UserAndGroup("juser", None)),
           organization = None
         )
       )
@@ -113,8 +111,7 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
       describe("With known user") {
 
         val dataUser = CheckWithDataUser(
-          username     = Some("juser"),
-          groupname    = None,
+          userAndGroup = Some(UserAndGroup("juser", None)),
           organization = Some(Organization(List("a", "b", "c")))
         )
 

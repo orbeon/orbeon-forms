@@ -22,26 +22,26 @@ import org.orbeon.scaxon.NodeConversions
 trait SearchResult extends SearchRequestParser {
 
   def outputResult(
-                    request   : SearchRequest,
-                    documents : List[Document],
-                    count     : Int,
-                    receiver  : XMLReceiver)
-  : Unit = {
+    request   : SearchRequest,
+    documents : List[Document],
+    count     : Int,
+    receiver  : XMLReceiver
+  ): Unit = {
 
     // Produce XML result
     val documentsElem =
       <documents search-total={count.toString}>{
         documents.map(doc =>
           <document
-            created         ={DateUtils.formatIsoDateTimeUtc(doc.metadata.created.getTime)}
-            last-modified   ={DateUtils.formatIsoDateTimeUtc(doc.metadata.lastModifiedTime.getTime)}
-            username        ={doc.metadata.username.getOrElse("")}
-            groupname       ={doc.metadata.groupname.getOrElse("")}
-            last-modified-by={Option(doc.metadata.lastModifiedBy).getOrElse("")}
-            workflow-stage  ={doc.metadata.workflowStage.map(xml.Text(_))}
-            name            ={doc.metadata.documentId}
-            draft           ={doc.metadata.draft.toString}
-            operations      ={doc.operations.mkString(" ")}>{
+            created             ={DateUtils.formatIsoDateTimeUtc(doc.metadata.createdTime.getTime)}
+            last-modified       ={DateUtils.formatIsoDateTimeUtc(doc.metadata.lastModifiedTime.getTime)}
+            created-by          ={doc.metadata.createdBy.map(_.username).getOrElse("")}
+            created-by-groupname={doc.metadata.createdBy.flatMap(_.groupname).getOrElse("")}
+            last-modified-by    ={doc.metadata.lastModifiedBy.map(_.username).getOrElse("")}
+            workflow-stage      ={doc.metadata.workflowStage.map(xml.Text(_))}
+            name                ={doc.metadata.documentId}
+            draft               ={doc.metadata.draft.toString}
+            operations          ={doc.operations.mkString(" ")}>{
 
             <details>{
               request.columns.map { requestColumn =>
@@ -67,5 +67,4 @@ trait SearchResult extends SearchRequestParser {
 
     NodeConversions.elemToSAX(documentsElem, receiver)
   }
-
 }

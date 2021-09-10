@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.CoreUtils._
 
 import scala.util.control.NonFatal
 
+
 object RelationalUtils extends Logging {
 
   implicit val Logger = new IndentedLogger(LoggerFactory.createLogger("org.orbeon.relational"))

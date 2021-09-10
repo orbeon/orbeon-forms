@@ -133,8 +133,8 @@ private object FormRunnerFunctions {
     "form-title"                  -> (() => FormRunner.formTitleFromMetadata.orNull),
     "lang"                        -> (() => FormRunner.currentLang),
     "workflow-stage-value"        -> (() => FormRunner.documentWorkflowStage.orNull),
-    "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.username) orNull),
-    "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.group)    orNull),
+    "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.userAndGroup.username) orNull),
+    "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.userAndGroup.groupname) orNull),
     "relevant-form-values-string" -> (() => FormRunnerMetadata.findAllControlsWithValues(html = false)),
     "wizard-current-page-name"    -> (() => Wizard.wizardCurrentPageNameOpt.orNull)
   )

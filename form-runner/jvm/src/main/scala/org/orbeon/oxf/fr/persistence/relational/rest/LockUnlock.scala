@@ -36,9 +36,9 @@ trait LockUnlock extends RequestResponse {
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) =>
       leaseStatus match {
         case DoesNotExist =>
-          LockSql.createLease(connection, req.provider, dataPart, reqLockInfo.username, reqLockInfo.groupname, timeout)
+          LockSql.createLease(connection, req.provider, dataPart, reqLockInfo.userAndGroup, timeout)
         case ExistsCanUse =>
-          LockSql.updateLease(connection, req.provider, dataPart, reqLockInfo.username, reqLockInfo.groupname, timeout)
+          LockSql.updateLease(connection, req.provider, dataPart, reqLockInfo.userAndGroup, timeout)
         case ExistsCanNotUse(existingLease) =>
           issueLockedResponse(existingLease)
       }
@@ -73,7 +73,7 @@ trait LockUnlock extends RequestResponse {
       httpResponse.setStatus(StatusCode.Locked)
       httpResponse.setHeader(Headers.ContentType, ContentTypes.XmlContentType)
       httpResponse.getOutputStream.pipe(useAndClose(_)(os =>
-        LockInfo.serialize(LockInfo(existingLease.lockInfo.username, existingLease.lockInfo.groupname), os)
+        LockInfo.serialize(LockInfo(existingLease.lockInfo.userAndGroup), os)
       ))
     }
 
@@ -109,7 +109,7 @@ trait LockUnlock extends RequestResponse {
               LockSql.readLease(connection, req.provider, dataPart) match {
                 case Some(lease) =>
                   val canUseExistingLease =
-                    reqLockInfo.username == lease.lockInfo.username || lease.timeout <= 0
+                    reqLockInfo.userAndGroup.username == lease.lockInfo.userAndGroup.username || lease.timeout <= 0
                   if (canUseExistingLease)
                     callThunk(ExistsCanUse)
                   else

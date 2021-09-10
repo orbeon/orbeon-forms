@@ -14,8 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import java.sql.{PreparedStatement, Timestamp}
-
-import org.orbeon.oxf.externalcontext.Organization
+import org.orbeon.oxf.externalcontext.{Organization, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationSupport => _}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
@@ -30,8 +29,7 @@ trait CreateCols extends RequestResponse with Common {
 
   case class Row(
     created      : Timestamp,
-    username     : Option[String],
-    group        : Option[String],
+    createdBy    : Option[UserAndGroup],
     organization : Option[(Int, Organization)],
     formVersion  : Option[Int],
     stage        : Option[String]
@@ -69,7 +67,7 @@ trait CreateCols extends RequestResponse with Common {
       case false => None
       case true  => existingRow match {
         case Some(row) => row.organization.map(_._1)
-        case None => currentUserOrganization.map(_.underlying)
+        case None      => currentUserOrganization.map(_.underlying)
       }
     }
 
@@ -203,7 +201,7 @@ trait CreateCols extends RequestResponse with Common {
           name          = "username",
           value         = DynamicColValue(
             placeholder = "?" ,
-            paramSetter = param(_.setString, existingRow.flatMap(_.username).getOrElse(requestUsername.orNull))
+            paramSetter = param(_.setString, existingRow.flatMap(_.createdBy).map(_.username).getOrElse(requestUsername.orNull))
           )
         )
     ) ::: (
@@ -212,7 +210,7 @@ trait CreateCols extends RequestResponse with Common {
           name          = "groupname",
           value         = DynamicColValue(
             placeholder = "?",
-            paramSetter = param(_.setString, existingRow.flatMap(_.group).getOrElse(requestGroup.orNull))
+            paramSetter = param(_.setString, existingRow.flatMap(_.createdBy).flatMap(_.groupname).getOrElse(requestGroup.orNull))
           )
         )
     ) ::: (

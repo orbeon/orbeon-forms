@@ -36,9 +36,9 @@ object CredentialsSupport {
 
     import org.orbeon.oxf.util.CoreUtils._
 
-    val usernameArray    = Array(credentials.username)
+    val usernameArray    = Array(credentials.userAndGroup.username)
     val credentialsArray = Array(serializeCredentials(credentials, encodeForHeader = true))
-    val groupNameArray   = credentials.group.toArray
+    val groupNameArray   = credentials.userAndGroup.groupname.toArray
     val roleNamesArray   = credentials.roles collect { case r: SimpleRole => r.roleName } toArray
 
     (                              Headers.OrbeonUsernameLower    -> usernameArray)    ::
@@ -85,10 +85,10 @@ object CredentialsSupport {
 
     Json.fromFields(
       List(
-        Symbols.Username      -> Json.fromString(encode(credentials.username)),
-        Symbols.Groups        -> Json.arr(credentials.group         map encode map Json.fromString toVector: _*),
-        Symbols.Roles         -> Json.arr(credentials.roles         map serializeRole              toVector: _*),
-        Symbols.Organizations -> Json.arr(credentials.organizations map serializeOrganization      toVector: _*)
+        Symbols.Username      -> Json.fromString(encode(credentials.userAndGroup.username)),
+        Symbols.Groups        -> Json.arr(credentials.userAndGroup.groupname map encode map Json.fromString toVector: _*),
+        Symbols.Roles         -> Json.arr(credentials.roles          map serializeRole              toVector: _*),
+        Symbols.Organizations -> Json.arr(credentials.organizations  map serializeOrganization      toVector: _*)
       )
     ).noSpaces
   }
@@ -177,8 +177,7 @@ object CredentialsSupport {
           }
 
         Credentials(
-          username      = username,
-          group         = groupOpt,
+          userAndGroup  = UserAndGroup.fromStringsOrThrow(username, groupOpt.getOrElse("")),
           roles         = roles.toList,
           organizations = organizations.toList
         )

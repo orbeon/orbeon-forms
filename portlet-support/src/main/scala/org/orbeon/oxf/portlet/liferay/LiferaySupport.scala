@@ -15,7 +15,7 @@ package org.orbeon.oxf.portlet.liferay
 
 import javax.portlet._
 import com.liferay.portal.kernel.language.LanguageUtil
-import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSupport, Organization, ParametrizedRole, SimpleRole}
+import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSupport, Organization, ParametrizedRole, SimpleRole, UserAndGroup}
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.jdk.CollectionConverters._
@@ -70,8 +70,7 @@ object LiferaySupport {
 
     CredentialsSupport.serializeCredentials(
       Credentials(
-        username      = username,
-        group         = Option(u.getGroup) map (_.getDescriptiveName),
+        userAndGroup  = UserAndGroup.fromStringsOrThrow(username, Option(u.getGroup).map(_.getDescriptiveName).getOrElse("")),
         roles         = simpleRoles ++: parametrizedRoles,
         organizations = ancestorOrSelfLiferayOrgs map(org => Organization(org map (_.getName)))
       ),

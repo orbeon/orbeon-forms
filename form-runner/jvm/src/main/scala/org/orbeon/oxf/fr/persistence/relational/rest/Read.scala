@@ -15,9 +15,10 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.apache.commons.io.input.ReaderInputStream
 
-import java.io.{ByteArrayInputStream, OutputStreamWriter, StringReader}
+import java.io.{ByteArrayInputStream, StringReader}
 import org.orbeon.io.IOUtils._
-import org.orbeon.io.{CharsetNames, IOUtils}
+import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.externalcontext.UserAndGroup
 import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunnerPersistence}
 import org.orbeon.oxf.fr.permission.Operation.Read
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
@@ -31,6 +32,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{ContentTypes, DateUtils, NetUtils}
 
 import java.sql.Timestamp
+
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
@@ -121,8 +123,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
             // Info about the owner, which will be used to check the user can access the data
             val dataUser = req.forData.option(CheckWithDataUser(
-              username     = Option(resultSet.getString("username")),
-              groupname    = Option(resultSet.getString("groupname")),
+              userAndGroup = UserAndGroup.fromStrings(resultSet.getString("username"), resultSet.getString("groupname")),
               organization = OrganizationSupport.readFromResultSet(connection, resultSet).map(_._2)
             ))
 

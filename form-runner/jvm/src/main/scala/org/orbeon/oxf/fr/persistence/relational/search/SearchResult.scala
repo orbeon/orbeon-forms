@@ -35,9 +35,9 @@ trait SearchResult extends SearchRequestParser {
           <document
             created             ={DateUtils.formatIsoDateTimeUtc(doc.metadata.createdTime.getTime)}
             last-modified       ={DateUtils.formatIsoDateTimeUtc(doc.metadata.lastModifiedTime.getTime)}
-            created-by          ={doc.metadata.createdBy.map(_.username).getOrElse("")}
-            created-by-groupname={doc.metadata.createdBy.flatMap(_.groupname).getOrElse("")}
-            last-modified-by    ={doc.metadata.lastModifiedBy.map(_.username).getOrElse("")}
+            created-by          ={doc.metadata.createdBy.map(_.username).map(xml.Text(_))}
+            created-by-groupname={doc.metadata.createdBy.flatMap(_.groupname).map(xml.Text(_))}
+            last-modified-by    ={doc.metadata.lastModifiedBy.map(_.username).map(xml.Text(_))}
             workflow-stage      ={doc.metadata.workflowStage.map(xml.Text(_))}
             name                ={doc.metadata.documentId}
             draft               ={doc.metadata.draft.toString}

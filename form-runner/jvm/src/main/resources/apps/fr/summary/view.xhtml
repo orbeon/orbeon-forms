@@ -792,7 +792,7 @@
                         <xf:var name="show-created"          value="xxf:property(string-join(('oxf.fr.summary.show-created'       ,   $app, $form), '.'))"/>
                         <xf:var name="show-last-modified"    value="xxf:property(string-join(('oxf.fr.summary.show-last-modified' ,   $app, $form), '.'))"/>
                         <xf:var name="show-workflow-stage"   value="xxf:property(string-join(('oxf.fr.summary.show-workflow-stage',   $app, $form), '.'))"/>
-                        <xf:var name="show-username"         value="xxf:property(string-join(('oxf.fr.summary.show-username',         $app, $form), '.'))"/>
+                        <xf:var name="show-created-by"       value="xxf:property(string-join(('oxf.fr.summary.show-created-by',       $app, $form), '.'))"/>
                         <xf:var name="show-last-modified-by" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified-by', $app, $form), '.'))"/>
 
                         <div class="fr-summary-table-div">
@@ -813,7 +813,7 @@
                                     <xf:group ref="''[$show-last-modified]">
                                         <xh:col/>
                                     </xf:group>
-                                     <xf:group ref="''[$show-username]">
+                                     <xf:group ref="''[$show-created-by]">
                                         <xh:col/>
                                     </xf:group>
                                      <xf:group ref="''[$show-last-modified-by]">
@@ -845,9 +845,9 @@
                                                 <xf:output value="$fr-resources/summary/titles/last-modified"/>
                                             </xh:th>
                                         </xf:group>
-                                        <xf:group ref="''[$show-username]">
+                                        <xf:group ref="''[$show-created-by]">
                                             <xh:th>
-                                                <xf:output value="$fr-resources/summary/titles/username"/>
+                                                <xf:output value="$fr-resources/summary/titles/created-by"/>
                                             </xh:th>
                                         </xf:group>
                                         <xf:group ref="''[$show-last-modified-by]">
@@ -1000,15 +1000,15 @@
                                                         </xf:group>
                                                     </xh:td>
                                                 </xf:group>
-                                                <xf:group ref="''[$show-username]">
+                                                <xf:group ref="''[$show-created-by]">
                                                     <xh:td class="fr-td">
                                                         <xf:group ref=".[$edit-view != '']">
                                                             <xh:a href="{$current-document-href}">
-                                                                <xf:output value="$document/@username"/>
+                                                                <xf:output value="$document/@created-by"/>
                                                             </xh:a>
                                                         </xf:group>
                                                         <xf:group ref=".[$edit-view = '']">
-                                                            <xf:output value="$document/@username"/>
+                                                            <xf:output value="$document/@created-by"/>
                                                         </xf:group>
                                                     </xh:td>
                                                 </xf:group>

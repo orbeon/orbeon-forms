@@ -176,7 +176,7 @@
                 <created>Created</created>
                 <last-modified>Modified</last-modified>
                 <workflow-stage>Workflow stage</workflow-stage>
-                <username>Created By</username>
+                <created-by>Created By</created-by>
                 <last-modified-by>Last Modified By</last-modified-by>
                 <selected>Selected</selected>
                 <refresh>This operation will refresh the page</refresh>
@@ -674,7 +674,7 @@
                 <created>Création</created>
                 <last-modified>Modification</last-modified>
                 <workflow-stage>Étape du workflow</workflow-stage>
-                <username>Créé par</username>
+                <created-by>Créé par</created-by>
                 <last-modified-by>Modifié par</last-modified-by>
                 <selected>Sélection</selected>
                 <refresh>Cette opération rafraichit la page</refresh>
@@ -1164,7 +1164,7 @@
                 <created>Creado</created>
                 <last-modified>Modificación</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Seleccionado</selected>
                 <refresh>Este botón actualizará la página</refresh>
@@ -1650,7 +1650,7 @@
                 <created>Opprettet</created>
                 <last-modified>Sist endret</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Valgt</selected>
                 <refresh>Denne operasjonen vil laste siden på nytt</refresh>
@@ -2133,7 +2133,7 @@
                 <created>Дата создания</created>
                 <last-modified>Дата изменения</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Выбрана</selected>
                 <refresh>Эта операция потребует перезагрузки страницы</refresh>
@@ -2621,7 +2621,7 @@
                 <created>Creato</created>
                 <last-modified>Modificato</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Selezionato</selected>
                 <refresh>Questa operazione aggiorna la pagina</refresh>
@@ -3116,7 +3116,7 @@
                 <created>Erstellt</created>
                 <last-modified>Änderungsdatum</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Ausgewählt</selected>
                 <refresh>Diese Operation wird die Seite aktualisieren</refresh>
@@ -3611,7 +3611,7 @@
                 <created>Luotu</created>
                 <last-modified>Viimeksi muokattu</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Valittu</selected>
                 <refresh>Tämä toiminto lataa sivun uudelleen</refresh>
@@ -4106,7 +4106,7 @@
                 <created>Skapad</created>
                 <last-modified>Ändrad</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Vald</selected>
                 <refresh>Uppdatera sidan</refresh>
@@ -4601,7 +4601,7 @@
                 <created>Aangemaakt</created>
                 <last-modified>Bewerkt</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Geselecteerd</selected>
                 <refresh>Deze bewerking zal de pagina doen verversen</refresh>
@@ -5095,7 +5095,7 @@
                 <created>Criado</created>
                 <last-modified>Modificado</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Seleccionado</selected>
                 <refresh>Esta operação irá refrescar a página</refresh>
@@ -5583,7 +5583,7 @@
                 <created>Oprettet</created>
                 <last-modified>Senest ændret</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Valgt</selected>
                 <refresh>Dette indlæser siden igen</refresh>
@@ -6071,7 +6071,7 @@
                 <created>Utworzony</created>
                 <last-modified>Zmodyfikowany</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
-                <username todo="true">Created By</username>
+                <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
                 <selected>Wybrany</selected>
                 <refresh>Ta operacja spowoduje odświeżenie strony</refresh>

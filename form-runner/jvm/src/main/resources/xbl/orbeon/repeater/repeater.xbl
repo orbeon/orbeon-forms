@@ -259,7 +259,9 @@
                                         <!-- Let the outside world know -->
                                         <xf:dispatch
                                             targetid="fr-repeater-binding"
-                                            name="fr-iteration-removed"/>
+                                            name="fr-iteration-removed">
+                                            <xf:property name="index" value="$p"/>
+                                        </xf:dispatch>
                                     </xf:action>
 
                                     <!-- NOTES:

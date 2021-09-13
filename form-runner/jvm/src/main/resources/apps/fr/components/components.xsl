@@ -23,7 +23,8 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+        xmlns:Wizard="java:org.orbeon.xbl.Wizard">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
     <xsl:import href="actions.xsl"/>
@@ -690,6 +691,7 @@
             <xsl:if test="$enable-initial-focus">
                 <xf:setfocus
                     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+                    if="not(Wizard:isWizardSeparateToc())"
                     event="xforms-ready"
                     control="fr-view-component"
                     includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"

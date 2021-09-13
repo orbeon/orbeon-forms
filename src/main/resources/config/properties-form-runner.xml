@@ -109,9 +109,9 @@
     </property>
 
     <!-- Whether simple data migration takes place by default -->
-    <property as="xs:string" name="oxf.fr.detail.data-migration.*.*"                            value="disabled"/>
+    <property as="xs:string"  name="oxf.fr.detail.data-migration.*.*"                           value="disabled"/>
 
-    <property as="xs:boolean" name="oxf.fr.detail.warn-when-data-unsafe.*.*"                    value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.warn-when-data-unsafe.*.*"                    value="true"/>
 
     <property as="xs:string"  name="oxf.fr.detail.lhha-order.*.*"                               value="help label control alert hint"/>
     <property as="xs:boolean" name="oxf.fr.detail.static-readonly-hint.*.*"                     value="false"/>

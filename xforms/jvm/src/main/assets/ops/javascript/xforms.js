@@ -1387,11 +1387,13 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayTime(jsDate);
                 }
             } else if (
+                // Legacy non-mobile date: populate with formatted value
                 jControl.is('.xforms-type-date') &&
                 ! ORBEON.xforms.XBL.isComponent(jControl)
             ) {
                 // Date control
                 if (! ORBEON.util.Utils.isIOS()) {
+                    // Only handle the non-iOS case, as the iOS case is handled in `Calendar.js`
                     var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
                     var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayDate(jsDate);
                     if (jControl.is('.xforms-input-appearance-minimal')) {
@@ -2502,10 +2504,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                                     ORBEON.util.DateTime.magicTimeToJSDate, ORBEON.util.DateTime.jsDateToFormatDisplayTime);
                     }
 
-                    // Fire change event
+                    // Fire change event if the control has a value
                     var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(target);
-                    var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, controlCurrentValue, "xxforms-value");
-                    ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                    if (! _.isUndefined(controlCurrentValue)) {
+                        var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, controlCurrentValue, "xxforms-value");
+                        ORBEON.xforms.server.AjaxServer.fireEvent(event);
+                    }
                 }
             }
         },

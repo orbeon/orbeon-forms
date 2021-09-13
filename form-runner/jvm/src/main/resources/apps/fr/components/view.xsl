@@ -430,19 +430,37 @@
 
             <!-- Communicate to the client whether the data is safe -->
             <xf:var
-                name="fr-data-safe"
-                model="fr-persistence-model"
-                ref="instance('fr-persistence-instance')/data-safe"
-                value="data(.)">
-                <xf:action
-                    type="javascript"
-                    event="xforms-enabled xforms-value-changed"
-                    if="xxf:property(string-join(('oxf.fr.detail.warn-when-data-unsafe', fr:app-name(), fr:form-name()), '.'))">
+                name  = "fr-data-safe"
+                id    = "fr-data-safe"
+                model = "fr-persistence-model"
+                ref   = "instance('fr-persistence-instance')/data-safe"
+                value = "data(.)"/>
+            <xf:var
+                name  = "fr-warn-when-data-unsafe"
+                id    = "fr-warn-when-data-unsafe"
+                value ="
+                    let $property :=
+                        xxf:property(
+                            string-join(
+                                ('oxf.fr.detail.warn-when-data-unsafe', fr:app-name(), fr:form-name()),
+                                '.'
+                            )
+                        )
+                    return
+                        (: Support boolean property for backward compatibility :)
+                        if   ($property instance of xs:boolean)
+                        then $property
+                        else xxf:evaluate-avt($property) = 'true'
+                    "/>
+            <xf:action
+                event    = "xforms-enabled xforms-value-changed"
+                observer = "fr-data-safe fr-warn-when-data-unsafe">
+                <xf:action type="javascript">
                     <xf:param name="uuid" value="xxf:document-id()"/>
-                    <xf:param name="safe" value="."/>
+                    <xf:param name="safe" value="$fr-data-safe = 'true' or not($fr-warn-when-data-unsafe)"/>
                     <xf:body>ORBEON.fr.private.API.setDataStatus(uuid, safe == "true")</xf:body>
                 </xf:action>
-            </xf:var>
+            </xf:action>
 
             <!-- Expose document id to JavaScript -->
             <xf:output id="fr-parameters-instance-document" ref="fr:document-id()" class="xforms-hidden"/>
@@ -497,7 +515,7 @@
                      non-repeated. We could use `javascript-lifecycle` and initialize the menus for the legacy
                      grids as well but decided not to. We should update the repeated grids in Form Builder to
                      use the non-legacy grids and then remove this. -->
-                <fr:grid repeat="content" ref="''" template="()"/>
+                <fr:grid repeat="content" ref="xf:element('_')" template="()"/>
             </xsl:if>
         </xh:span>
     </xsl:template>

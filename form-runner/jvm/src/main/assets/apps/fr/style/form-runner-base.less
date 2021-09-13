@@ -126,17 +126,23 @@
         display: none;
     }
 
-    // Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox)
-    .xforms-trigger button, .xforms-trigger input {
-        white-space: nowrap;
+    .xforms-trigger {
+
+        // Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox)
+        button, input {
+            white-space: nowrap;
+        }
+
+        // Updates to Bootstrap btn-link
+        button.btn-link {
+            white-space: normal;
+            text-align: inherit;
+            text-decoration: underline;
+            font-size: inherit;
+            padding: 0 0 2px 0;
+        }
     }
 
-    // Updates to Bootstrap btn-link
-    button.btn-link {
-        text-decoration: underline;
-        font-size: inherit;
-        padding: 0 0 2px 0;
-    }
 
     // Upload control information
     .xforms-upload-info {

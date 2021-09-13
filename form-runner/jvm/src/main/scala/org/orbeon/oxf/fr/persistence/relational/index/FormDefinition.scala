@@ -68,6 +68,8 @@ trait FormDefinition {
           "substring"
         else if (control == "select")
           "token"
+        else if (control == "select1")
+          "exact"
         else
           "substring"
 

@@ -154,7 +154,19 @@ class NumberSupportTest extends AnyFunSpec {
       (" 42 ",            '.', Some(','), Some(2), true,  "42"            ),
       (" 42 ",            '.', Some(','), None,    true,  "42"            ),
       ("abcd",            '.', Some(','), Some(2), true,  "abcd"          ),
-      ("  abcd  ",        '.', Some(','), Some(2), true,  "  abcd  "      ) // Q: Should trim?
+      ("  abcd  ",        '.', Some(','), Some(2), true,  "  abcd  "      ), // Q: Should trim?
+
+      // Polish
+      ("123,456",         ',', Some(' '), None, true,  "123.456"          ),
+      ("123 456",         ',', Some(' '), None, true,  "123456"           ),
+      ("123.456",         ',', Some(' '), None, true,  "123.456"          ),
+      ("123.456.789",     ',', Some(' '), None, true,  "123≡456≡789"      ), // `.` → `≡` not needed, see comment in `storageValue`
+
+      // French
+      ("123.456,789",     ',', Some('.'), None, true,  "123456.789"       ),
+      ("123,456.789",     ',', Some('.'), None, true,  "123.456789"       ),
+      ("123.456.789",     ',', Some('.'), None, true,  "123456789"        ),
+      ("123,456,789",     ',', Some('.'), None, true,  "123,456,789"      ),
     )
 
     for (t @ (value, decimalSeparator, groupingSeparatorOpt, digitsAfterDecimalOpt, roundWhenStoring, expected) <- Expected)

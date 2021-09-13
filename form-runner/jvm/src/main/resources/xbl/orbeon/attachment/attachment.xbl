@@ -319,7 +319,8 @@
             <fr:dnd-repeat
                 ref="
                     if ($multiple) then
-                        $binding/_[xxf:non-blank(string(.))]
+                        (: Using `*:_` to support `_` in the instance being in non-empty default namespace :)
+                        $binding/*:_[xxf:non-blank(string(.))]
                     else
                         $binding[xxf:non-blank(string(.))]">
 
@@ -460,8 +461,14 @@
                         <xf:insert
                             if="$multiple"
                             context="$binding"
-                            ref="_"
-                            origin="instance()"/>
+                            ref="*"
+                            origin="
+                                (: Create an `_` element respecting the default namespace in the instance, if any :)
+                                xf:element(
+                                    resolve-QName('_', $binding),
+                                    (instance()/@*, instance()/string())
+                                )
+                            "/>
 
                         <xf:action if="not($multiple)">
                             <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">

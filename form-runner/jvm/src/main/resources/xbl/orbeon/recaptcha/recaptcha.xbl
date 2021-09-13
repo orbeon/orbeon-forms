@@ -85,7 +85,6 @@
                             </xf:action>
                             <!-- User value entered by the user: do verification -->
                             <xf:action if="$did-enter-value">
-                                <xf:message level="xxf:log-debug" value="saxon:serialize(instance('verify-request'), 'xml')"/>
                                 <!-- Call API doing the verification -->
                                 <xf:send submission="verify-submission"/>
                                 <!-- Reset response, so the next time they are changed we only run the verification when both new values are updated -->

@@ -34,7 +34,9 @@ case class   ParametrizedRole(roleName: String, organizationName: String) extend
 case class UserAndGroup(
   username  : String,        // non-blank
   groupname : Option[String]
-)
+) {
+  require(username.nonAllBlank)
+}
 
 object UserAndGroup {
   def fromStrings(username: String, groupname: String): Option[UserAndGroup] =

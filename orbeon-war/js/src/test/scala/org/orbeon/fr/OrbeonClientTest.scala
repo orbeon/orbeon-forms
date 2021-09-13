@@ -136,19 +136,19 @@ class OrbeonClientTest extends AsyncFunSpec {
       NodeFetch(
         urlToLoad,
         new RequestInit {
-          var method         : js.UndefOr[HttpMethod]         = HttpMethod.GET
-          var body           : js.UndefOr[BodyInit]           = js.undefined
-          var headers        : js.UndefOr[HeadersInit]        = sessionCookie map (c => js.defined(js.Dictionary("Cookie" -> c))) getOrElse js.undefined
-          var referrer       : js.UndefOr[String]             = js.undefined
-          var referrerPolicy : js.UndefOr[ReferrerPolicy]     = js.undefined
-          var mode           : js.UndefOr[RequestMode]        = js.undefined
-          var credentials    : js.UndefOr[RequestCredentials] = js.undefined
-          var cache          : js.UndefOr[RequestCache]       = js.undefined
-          var redirect       : js.UndefOr[RequestRedirect]    = RequestRedirect.follow // only one supported with the polyfill
-          var integrity      : js.UndefOr[String]             = js.undefined
-          var keepalive      : js.UndefOr[Boolean]            = js.undefined
-          var signal         : js.UndefOr[AbortSignal]        = js.undefined
-          var window         : js.UndefOr[Null]               = null
+          method         = HttpMethod.GET
+          body           = js.undefined
+          headers        = sessionCookie map (c => js.defined(js.Dictionary("Cookie" -> c))) getOrElse js.undefined
+          referrer       = js.undefined
+          referrerPolicy = js.undefined
+          mode           = js.undefined
+          credentials    = js.undefined
+          cache          = js.undefined
+          redirect       = RequestRedirect.follow // only one supported with the polyfill
+          integrity      = js.undefined
+          keepalive      = js.undefined
+          signal         = js.undefined
+          window         = null
         }
       )
 
@@ -195,7 +195,7 @@ class OrbeonClientTest extends AsyncFunSpec {
       simpleServerRequest(s"$OrbeonHAProxyUrl/xforms-espresso/") flatMap { res =>
 
         val setCookieHeaders =
-          res.headers.get("Set-Cookie").toList
+          Option(res.headers.get("Set-Cookie")).toList
 
         val HeaderStart = s"JSESSIONID=$serverPrefix~"
 

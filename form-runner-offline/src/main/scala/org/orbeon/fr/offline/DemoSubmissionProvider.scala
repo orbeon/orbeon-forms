@@ -78,7 +78,7 @@ object DemoSubmissionProvider extends SubmissionProvider {
             }
           case HttpMethod.PUT =>
 
-            if (logger.isDebugEnabled && req.headers.get(Headers.ContentType).exists(_.contains("xml"))) {
+            if (logger.isDebugEnabled && Option(req.headers.get(Headers.ContentType)).exists(_.contains("xml"))) {
               val body = new TextDecoder().decode(req.body.get)
               debug(s"PUT body", List("body" -> body))
             }
@@ -87,9 +87,9 @@ object DemoSubmissionProvider extends SubmissionProvider {
             val existing = store.contains(req.url.pathname)
             store += req.url.pathname ->
               FormData(
-                req.headers.get(Headers.ContentType).toOption,
+                Option(req.headers.get(Headers.ContentType)),
                 req.body.getOrElse(throw new IllegalArgumentException),
-                req.headers.get("Orbeon-Workflow-Stage").toOption
+                Option(req.headers.get("Orbeon-Workflow-Stage"))
               )
 
             new SubmissionResponse {

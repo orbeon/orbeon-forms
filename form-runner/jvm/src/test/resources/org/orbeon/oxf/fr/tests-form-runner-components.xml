@@ -823,7 +823,7 @@
         </output>
     </test>
 
-    <test description="`fr:number`: `1.2` is invalid if grouping separator is `,`" name="oxf:pipeline">
+    <test description="`fr:number`: `1.2` is valid if the decimal separator is `.` as long as the grouping separator isn't `,`" name="oxf:pipeline">
         <input name="config" href="oxf:/org/orbeon/oxf/xforms/wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -863,7 +863,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <number xxf:error="invalid">1≡2</number>
+            <number>1.2</number>
         </output>
     </test>
 

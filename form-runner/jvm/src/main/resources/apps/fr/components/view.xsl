@@ -613,6 +613,7 @@
             <!-- Group to scope variables -->
             <xf:group appearance="xxf:internal" model="fr-error-summary-model">
                 <!-- Link to form content or to errors if any -->
+                <!-- See https://github.com/orbeon/orbeon-forms/issues/4993 -->
                 <xh:a class="fr-goto-content" href="#{{if (xs:integer(counts/@error) gt 0) then 'fr-errors' else 'fr-form'}}">
 <!--                <xh:a class="fr-goto-content" href="#{{if (counts/@error gt 0) then 'fr-errors' else 'fr-form'}}">-->
                     <xf:output model="fr-form-model" value="$fr-resources/summary/labels/goto-content"/>

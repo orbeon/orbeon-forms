@@ -54,7 +54,6 @@ class ProcessParserTest extends AnyFunSpec {
     for ((process, expected) <- Expected)
       it(s"must parse `$process`") {
         val r = ProcessParser.parse(process)
-        println(s"xxx $r")
         assert(expected == r)
       }
   }

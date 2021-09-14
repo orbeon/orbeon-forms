@@ -289,7 +289,7 @@ object XPathFunctionAnnotationMacro {
     // TODO: Would like to keep `..$annottees` but that gets scope into a block?
     val result = q"""..$results"""
 
-//    println("xxx XPathFunctionAnnotationMacro result:")
+//    println("`XPathFunctionAnnotationMacro` result:")
 //    println(result)
 
     c.Expr[Any](result)

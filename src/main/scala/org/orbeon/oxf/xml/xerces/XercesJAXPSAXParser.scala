@@ -156,7 +156,7 @@ object XercesJAXPSAXParser {
   private[xerces] class XercesDefaultValidationErrorHandler extends DefaultHandler {
     private var errorCount = 0
 
-    // XXX Fix message i18n
+    // TODO: Fix message i18n.
     @throws[SAXException]
     override def error(e: SAXParseException): Unit = {
       if (errorCount >= XercesDefaultValidationErrorHandler.ERROR_COUNT_LIMIT) {

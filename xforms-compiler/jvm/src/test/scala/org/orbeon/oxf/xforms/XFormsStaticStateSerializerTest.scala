@@ -24,9 +24,7 @@ class XFormsStaticStateSerializerTest
 
         val (template, staticState) = PartAnalysisBuilder.createFromDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
-        val jsonString = XFormsStaticStateSerializer.serialize(template, staticState)
-
-        println(s"xxxx $jsonString")
+        XFormsStaticStateSerializer.serialize(template, staticState)
       }
     }
   }

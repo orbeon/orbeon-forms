@@ -41,8 +41,6 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
   def getSessionAttribute(attributeName: String, contentType: String = XmlContentType): Iterable[om.Item] = {
 
     // TODO: Handle XML tree
-    println(s"xxx getSessionAttribute `$attributeName`")
-
     CoreCrossPlatformSupport.externalContext.getRequest.sessionOpt.toList flatMap { session =>
       session.getAttribute(attributeName).toList collect {
         case v: om.Item => List(v)
@@ -76,8 +74,6 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def setRequestAttribute(attributeName: String, items: Iterable[om.Item]): Unit = {
-
-    println(s"xxx setRequestAttribute `$attributeName` with type `${items map (_.getClass.getName) mkString ", "}`")
 
     val request = CoreCrossPlatformSupport.externalContext.getRequest
 

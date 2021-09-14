@@ -372,7 +372,7 @@ object XFormsStaticStateSerializer {
     }
 
     implicit val encodeAttributeControl: Encoder[AttributeControl] = (a: AttributeControl) => Json.obj(
-      "foo" -> Json.fromString("bar") // XXX FIXME
+      "foo" -> Json.fromString("bar") // XXX FIXME xxx
     )
 
     implicit val encodeLangRef           : Encoder[LangRef]           = deriveEncoder

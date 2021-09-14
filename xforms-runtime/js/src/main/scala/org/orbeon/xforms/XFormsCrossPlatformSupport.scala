@@ -341,10 +341,6 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
         println("Fatal: " + exception.getMessage)
     })
 
-    println(s"xxxx parsing $systemId")
-    val t1 = System.currentTimeMillis()
     parser.parse(source)
-    val t2 = System.currentTimeMillis()
-    println(s"xxxx time = ${t2 - t1} ms")
   }
 }

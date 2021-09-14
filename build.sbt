@@ -171,6 +171,7 @@ ThisBuild / traceLevel                  := 0
 // Restrict the number of concurrent linker processes so we don't run out of memory
 Global / concurrentRestrictions += Tags.limit(ScalaJSTags.Link, 1)
 Global / concurrentRestrictions += Tags.exclusive(ScalaJSTags.Link)
+Assets / concurrentRestrictions += Tags.exclusive(Tags.Compile)
 Global / parallelExecution := false
 
 def copyFilesToExplodedWarLib(files: Seq[Attributed[File]]): Unit =

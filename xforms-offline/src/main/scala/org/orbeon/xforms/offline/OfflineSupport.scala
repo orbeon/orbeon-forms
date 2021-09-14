@@ -125,7 +125,7 @@ object OfflineSupport {
             // NOP: Response already sent out by a submission
     //        indentedLogger.logDebug("", "handling response for submission with replace=\"all\"")
 
-            println(s"xxx `isGotSubmissionReplaceAll`")
+            warn(s"`XFormsContainingDocument.isGotSubmissionReplaceAll == true`: NOP")
 
           } else if (nonJavaScriptLoads.nonEmpty) {
             // 2. Got at least one xf:load which is not a JavaScript call
@@ -139,7 +139,7 @@ object OfflineSupport {
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
     //        SAXUtils.streamNullDocument(xmlReceiver)
 
-            println(s"xxx `nonJavaScriptLoad s`")
+            warn(s"`XFormsContainingDocument.nonJavaScriptLoads.nonEmpty`: NOP")
 
           } else {
             // 3. Regular case: produce a document

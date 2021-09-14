@@ -50,7 +50,7 @@ object XPath extends XPathTrait {
   ): Any =
     withEvaluation(compiledExpression) { xpathExpression =>
 
-      Logger.debug(s"xxxx evaluateSingle for `${compiledExpression.string}`")
+      Logger.debug(s"`XPath.evaluateSingle()` for `${compiledExpression.string}`")
 
       val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
 
@@ -70,14 +70,6 @@ object XPath extends XPathTrait {
 
         xpathExpression.getInternalExpression.explain(new StandardLogger(new PrintStream(System.out)))
       }
-
-//      if (compiledExpression.string.contains("""oxf.fr.detail.pdf.disable-if-invalid""")) {
-//        println(s"xxxx evaluateSingle for `$compiledExpression`")
-//
-//        val r = variableResolver(new om.StructuredQName("", "", "app"), xpathContext)
-//
-//        println(s"xxxx result is $r, ${r.getClass.getName}")
-//      }
 
       withFunctionContext(functionContext) {
         val iterator = xpathExpression.iterate(dynamicContext)

@@ -100,7 +100,7 @@ class ClientGridTest extends AnyFunSpec {
         |  DdEeebFff |
         |GgddHh bIiii|
         |    hh J Kkk|
-      """.stripMargin.trim.replaceAllLiterally("|", "") // use `|` on the right as editors remove spaces
+      """.stripMargin.trim.replace("|", "") // use `|` on the right as editors remove spaces
 
     it(s"must must analyze as expected") {
       assert(

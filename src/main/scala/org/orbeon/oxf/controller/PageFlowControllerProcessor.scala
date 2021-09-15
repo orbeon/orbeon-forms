@@ -537,7 +537,7 @@ object PageFlowControllerProcessor {
       matchResult   : MatchResult,
       mustAuthorize : Boolean = true)(implicit
       logger        : IndentedLogger
-    )
+    ): Unit
   }
 
   case class FileRoute(routeElement: FileElement) extends Route with Logging {
@@ -548,7 +548,7 @@ object PageFlowControllerProcessor {
       matchResult   : MatchResult,
       mustAuthorize : Boolean = true)(implicit
       logger        : IndentedLogger
-    ) = {
+    ): Unit = {
       debug("processing route", Seq("route" -> this.toString))
       if (ec.getRequest.getMethod == HttpMethod.GET)
         ResourceServer.serveResource(ec.getRequest.getRequestPath, routeElement.versioned)

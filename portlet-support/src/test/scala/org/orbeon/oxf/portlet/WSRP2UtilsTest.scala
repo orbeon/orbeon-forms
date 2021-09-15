@@ -39,7 +39,7 @@ class WSRP2UtilsTest extends AnyFunSpec {
       for ((query, extracted) <- expected) {
         // Test with both separators
         assert(extracted === decode(query))
-        assert(extracted === decode(query.replaceAllLiterally("&", "&amp;")))
+        assert(extracted === decode(query.replace("&", "&amp;")))
       }
     }
   }

@@ -7,7 +7,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 import javax.servlet.{Filter, FilterChain, FilterConfig, ReadListener, ServletInputStream, ServletRequest, ServletResponse}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // To enable, add the following to your `web.xml`, before all the other filters.
 //

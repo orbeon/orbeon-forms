@@ -53,7 +53,7 @@ object PathUtils {
 
   // Recombine a path/query and parameters into a resulting URL
   def recombineQuery(pathQuery: String, params: IterableOnce[(String, String)])(implicit ed: UrlEncoderDecoder): String =
-    pathQuery + (if (params.isEmpty) "" else (if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params))
+    pathQuery + (if (params.toIterator.isEmpty) "" else (if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params))
 
   // Decode a query string into a list of pairs
   // We assume that there are no spaces in the input query
@@ -83,7 +83,7 @@ object PathUtils {
     separator  : String = "&")(implicit
     ed         : UrlEncoderDecoder
   ): String =
-    parameters map { case (name, value) => ed.encode(name) + '=' + ed.encode(value) } mkString separator
+    parameters.toIterator map { case (name, value) => ed.encode(name) + '=' + ed.encode(value) } mkString separator
 
   // Find a path extension
   def findExtension(path: String): Option[String] =

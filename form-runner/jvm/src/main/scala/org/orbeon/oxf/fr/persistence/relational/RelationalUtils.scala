@@ -60,7 +60,7 @@ object RelationalUtils extends Logging {
     * [2]: http://commons.apache.org/proper/commons-lang/article3_0.html
     * [3]: http://www.jguru.com/faq/view.jsp?EID=8881
     */
-  def sqlString(text: String): String = "'" + text.replaceAllLiterally("'", "''") + "'"
+  def sqlString(text: String): String = "'" + text.replace("'", "''") + "'"
 
   def getIntOpt(resultSet: ResultSet, columnLabel: String): Option[Int] = {
     val readInt = resultSet.getInt(columnLabel)

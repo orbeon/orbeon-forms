@@ -179,7 +179,7 @@ private object FlatView {
   // On Oracle names: http://docs.oracle.com/cd/E11882_01/server.112/e10592/sql_elements008.htm
   def xmlToSQLId(id: String) =
     id
-    .replaceAllLiterally("-", "_")    // dash to underscore
+    .replace("-", "_")                // dash to underscore
     .toUpperCase                      // to uppercase
     .replaceAll("""[^A-Z0-9_]""", "") // only keep alphanumeric or underscore
     .dropWhile(_ == '_')              // remove starting underscores

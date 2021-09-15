@@ -35,7 +35,7 @@ object PermissionsXML {
               case Owner => <owner/>
               case Group => <group-member/>
               case RolesAnyOf(roles) =>
-                val escapedSpaces = roles.map(_.replaceAllLiterally(" ", "%20"))
+                val escapedSpaces = roles.map(_.replace(" ", "%20"))
                 val anyOfAttValue = escapedSpaces.mkString(" ")
                   <user-role any-of={anyOfAttValue}/>
             }}
@@ -64,7 +64,7 @@ object PermissionsXML {
             case "user-role"    =>
               val anyOfAttValue = conditionEl.attValue("any-of")
               val rawRoles      = anyOfAttValue.splitTo[List](" ")
-              val roles         = rawRoles.map(_.replaceAllLiterally("%20", " "))
+              val roles         = rawRoles.map(_.replace("%20", " "))
               RolesAnyOf(roles)
             case _ => throw new RuntimeException("")
           }

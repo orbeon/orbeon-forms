@@ -38,7 +38,7 @@ class LoadingIndicator extends js.Object { // so that properties/methods can be 
         // Show the indicator after a delay
         val delay = Properties.delayBeforeDisplayLoading.get()
         if (delay > 0)
-          js.timers.setTimeout(delay)(showIfNotAlreadyVisible _)
+          js.timers.setTimeout(delay)(showIfNotAlreadyVisible())
         else
           showIfNotAlreadyVisible()
       } else {

@@ -53,7 +53,7 @@ object StaticItemsetSupport {
         case other                               => r += other
       }
 
-      (l.result, r.result)
+      (l.result(), r.result())
     } else {
       (Nil, items)
     }

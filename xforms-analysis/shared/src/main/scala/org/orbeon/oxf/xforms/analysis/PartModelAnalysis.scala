@@ -56,8 +56,8 @@ trait PartModelAnalysis extends TransientState {
     modelsByScope.get(scope) flatMap
       (_ find (_.bindsById.contains(bindStaticId))) orNull
 
-  def getModelsForScope(scope: Scope): Seq[Model] =
-    modelsByScope.getOrElse(scope, Seq())
+  def getModelsForScope(scope: Scope): collection.Seq[Model] =
+    modelsByScope.getOrElse(scope, Nil)
 
   def findInstanceInScope(scope: Scope, instanceStaticId: String): Option[Instance] =
     getModelsForScope(scope).iterator flatMap

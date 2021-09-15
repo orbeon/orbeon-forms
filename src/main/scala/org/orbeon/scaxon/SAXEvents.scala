@@ -111,7 +111,7 @@ class DocumentAndElementsCollector extends XMLReceiverAdapter {
   import org.orbeon.scaxon.SAXEvents._
 
   private var _events = ListBuffer[SAXEvent]()
-  def events = _events.result
+  def events: List[SAXEvent] = _events.result()
 
   override def startDocument()                                                               : Unit = _events += StartDocument
   override def endDocument()                                                                 : Unit = _events += EndDocument
@@ -126,7 +126,7 @@ class AllCollector extends XMLReceiverAdapter {
   import org.orbeon.scaxon.SAXEvents._
 
   private var _events = ListBuffer[SAXEvent]()
-  def events: List[SAXEvent] = _events.result
+  def events: List[SAXEvent] = _events.result()
 
   override def setDocumentLocator(locator: Locator)                                          : Unit = _events += DocumentLocator(locator)
   override def startDocument()                                                               : Unit = _events += StartDocument

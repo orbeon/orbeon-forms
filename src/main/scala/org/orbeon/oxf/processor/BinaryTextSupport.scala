@@ -115,7 +115,7 @@ object BinaryTextSupport {
       attributes.addAttribute("", "status-code", "status-code", "CDATA", Integer.toString(statusCode))
 
     if (headers ne null)
-      headers.toIterator filterNot (nameValue => HeadersToFilter(nameValue._1)) foreach { case (name, value) =>
+      headers.iterator filterNot (nameValue => HeadersToFilter(nameValue._1)) foreach { case (name, value) =>
         require((name ne null) && (value ne null))
         attributes.addAttribute("", name, name, "CDATA", value)
       }

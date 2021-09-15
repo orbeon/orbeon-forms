@@ -163,7 +163,7 @@ class EventHandler(
     val isDispatchActionNoTargetId =
       isDispatchAction(element.getQName)   &&
         element.hasAttribute(TARGET_QNAME) &&
-        ! element.hasAttribute(TARGETID_QNAME)
+        (! element.hasAttribute(TARGETID_QNAME))
 
     val targetTokens                = attSet(element, XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME) ++ (if (isDispatchActionNoTargetId) Set.empty else attSet(element, XML_EVENTS_TARGET_ATTRIBUTE_QNAME))
     val targetsPrefixedIdsAndHashes = targetTokens flatMap (targetHashResolver orElse staticIdResolver)

@@ -28,19 +28,19 @@ class ForwardingXMLReceiver extends XMLReceiver {
   private var forwardContent = false
   private var forwardLexical = false
 
-  def this(xmlReceiver: XMLReceiver) {
+  def this(xmlReceiver: XMLReceiver) = {
     this()
     setXMLReceiver(xmlReceiver)
   }
 
-  def this(contentHandler: ContentHandler, lexicalHandler: LexicalHandler) {
+  def this(contentHandler: ContentHandler, lexicalHandler: LexicalHandler) = {
     this()
     this.contentHandler = contentHandler
     this.lexicalHandler = lexicalHandler
     setForward(true)
   }
 
-  def this(contentHandler: ContentHandler) {
+  def this(contentHandler: ContentHandler) = {
     this()
     setContentHandler(contentHandler)
   }

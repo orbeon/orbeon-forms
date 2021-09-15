@@ -51,7 +51,7 @@ trait GridOps extends ContainerOps {
   private def addMissingCellIds(grids: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Unit = {
 
     val toAnnotate = grids descendant CellTest filterNot (_.hasId)
-    val ids        = nextTmpIds(count = toAnnotate.size).toIterator
+    val ids        = nextTmpIds(count = toAnnotate.size).iterator
 
     toAnnotate foreach (ensureAttribute(_, "id", ids.next()))
   }
@@ -59,7 +59,7 @@ trait GridOps extends ContainerOps {
   private def addMissingGridIds(grids: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Unit = {
 
     val toAnnotate = grids filterNot (_.hasId)
-    val ids        = nextIds("grid", toAnnotate.size).toIterator
+    val ids        = nextIds("grid", toAnnotate.size).iterator
 
     toAnnotate foreach (ensureAttribute(_, "id", ids.next()))
   }
@@ -294,7 +294,7 @@ trait GridOps extends ContainerOps {
   private val SimpleAVTRegex = """^\{(.+)\}$""".r
 
   def trimSimpleAVT(s: String): String = s match {
-    case SimpleAVTRegex(v) => v.replaceAllLiterally("{{", "{").replaceAllLiterally("}}", "}")
+    case SimpleAVTRegex(v) => v.replace("{{", "{").replace("}}", "}")
     case v                 => v
   }
 
@@ -323,7 +323,7 @@ trait GridOps extends ContainerOps {
       int > 0 option int.toString
     } catch {
       case _: NumberFormatException =>
-        val escaped = value.replaceAllLiterally("{", "{{").replaceAllLiterally("}", "}}")
+        val escaped = value.replace("{", "{{").replace("}", "}}")
         Some(s"{$escaped}")
     }
   }

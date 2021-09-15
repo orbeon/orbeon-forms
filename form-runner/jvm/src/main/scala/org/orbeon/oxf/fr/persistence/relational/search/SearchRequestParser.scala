@@ -69,7 +69,7 @@ trait SearchRequestParser {
                 val filterOpt = trimAllToOpt(c.stringValue)
                 Column(
                   // Filter `[1]` predicates (see https://github.com/orbeon/orbeon-forms/issues/2922)
-                  path       = c.attValue("path").replaceAllLiterally("[1]", ""),
+                  path       = c.attValue("path").replace("[1]", ""),
                   filterType  = filterOpt match {
                     case None => FilterType.None
                     case Some(filter) =>

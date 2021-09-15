@@ -184,7 +184,7 @@ object Controls {
       sourceControlEffectiveId,
       targetStaticId,
       followIndexes = true
-    ).toIterator flatMap
+    ).iterator flatMap
       XFormsRepeatControl.findAllRepeatedControls
 
   def resolveControlsById(

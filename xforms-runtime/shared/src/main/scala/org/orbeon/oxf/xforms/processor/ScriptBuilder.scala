@@ -41,7 +41,7 @@ object ScriptBuilder {
 
   def escapeJavaScriptInsideScript (js: String): String = {
     // Method from https://stackoverflow.com/a/23983448/5295
-    js.replaceAllLiterally("</script", "</scr\\ipt")
+    js.replace("</script", "</scr\\ipt")
   }
 
   def writeScripts(shareableScripts: Iterable[ShareableScript], write: String => Unit): Unit =

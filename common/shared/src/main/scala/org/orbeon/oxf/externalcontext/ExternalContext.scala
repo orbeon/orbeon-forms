@@ -171,19 +171,19 @@ object ExternalContext {
 
     def isCommitted: Boolean
     def reset(): Unit
-    def setContentType(contentType: String)
-    def setStatus(status: Int)
-    def setContentLength(len: Int)
-    def setHeader(name: String, value: String)
-    def addHeader(name: String, value: String)
+    def setContentType(contentType: String): Unit
+    def setStatus(status: Int): Unit
+    def setContentLength(len: Int): Unit
+    def setHeader(name: String, value: String): Unit
+    def addHeader(name: String, value: String): Unit
 
     def sendError(code: Int): Unit
 
     def getCharacterEncoding: String
 
-    def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean)
+    def sendRedirect(location: String, isServerSide: Boolean, isExitPortal: Boolean): Unit
 
-    def setPageCaching(lastModified: Long)
+    def setPageCaching(lastModified: Long): Unit
 
     /**
       * Set expiration headers for resources.
@@ -206,7 +206,7 @@ object ExternalContext {
   }
 
   trait SessionListener extends java.io.Serializable {
-    def sessionDestroyed(session: Session)
+    def sessionDestroyed(session: Session): Unit
   }
 
   trait Session {
@@ -214,12 +214,12 @@ object ExternalContext {
     def getId: String
     def getLastAccessedTime: Long
     def getMaxInactiveInterval: Int
-    def invalidate()
+    def invalidate(): Unit
     def isNew: Boolean
-    def setMaxInactiveInterval(interval: Int)
+    def setMaxInactiveInterval(interval: Int): Unit
 
-    def addListener(sessionListener: SessionListener)
-    def removeListener(sessionListener: SessionListener)
+    def addListener(sessionListener: SessionListener): Unit
+    def removeListener(sessionListener: SessionListener): Unit
 
     def getAttribute     (name: String               , scope: SessionScope = SessionScope.Local): Option[AnyRef]
     def setAttribute     (name: String, value: AnyRef, scope: SessionScope = SessionScope.Local): Unit
@@ -283,7 +283,7 @@ trait WebAppContext {
 
   // Call all webAppDestroyed listeners
   def webAppDestroyed(): Unit =
-    webAppListenersOption.toIterator flatMap (_.iterator) foreach { listener =>
+    webAppListenersOption.iterator flatMap (_.iterator) foreach { listener =>
       try {
         listener.webAppDestroyed()
       } catch {
@@ -313,7 +313,7 @@ class WebAppListeners extends Serializable {
     _listeners = _listeners filter (_ ne listener)
 
   def iterator: Iterator[WebAppListener] =
-    _listeners.reverse.toIterator
+    _listeners.reverseIterator
 }
 
 private object WebAppContext {

@@ -29,7 +29,7 @@ trait PartGlobalOps {
   def getMark(prefixedId: String): Option[SAXStore#Mark]
 
   // Models
-  def getModelsForScope(scope: Scope): Seq[Model]
+  def getModelsForScope(scope: Scope): collection.Seq[Model]
   def getInstances(modelPrefixedId: String): Seq[Instance]
 
   // Controls

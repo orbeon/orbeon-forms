@@ -193,7 +193,7 @@ object ToolboxOps {
 
       val newSectionName = controlNameFromId(nextId("section"))
       val newGridName    = controlNameFromId(nextId("grid"))
-      val newCellIdsIt   = nextTmpIds(count = 2).toIterator
+      val newCellIdsIt   = nextTmpIds(count = 2).iterator
 
       val precedingSectionName = after flatMap getControlNameOpt
 
@@ -271,7 +271,7 @@ object ToolboxOps {
       val (into, after, grid) = findGridInsertionPoint
 
       val newGridName  = controlNameFromId(nextId("grid"))
-      val newCellIdsIt = nextTmpIds(count = 2).toIterator
+      val newCellIdsIt = nextTmpIds(count = 2).iterator
 
       // The grid template
       val gridTemplate: NodeInfo =

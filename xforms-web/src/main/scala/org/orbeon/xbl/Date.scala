@@ -131,11 +131,11 @@ private class DateCompanion extends XBLCompanionWithState {
         // Orbeon Forms format:         https://doc.orbeon.com/configuration/properties/xforms#for-xf-input
         // bootstrap-datepicker format: https://bootstrap-datepicker.readthedocs.io/en/latest/options.html#format
         datePicker.options.format = newFormat
-          .replaceAllLiterally("[D]"  , "d"   )
-          .replaceAllLiterally("[D01]", "dd"  )
-          .replaceAllLiterally("[M]"  , "m"   )
-          .replaceAllLiterally("[M01]", "mm"  )
-          .replaceAllLiterally("[Y]"  , "yyyy")
+          .replace("[D]"  , "d"   )
+          .replace("[D01]", "dd"  )
+          .replace("[M]"  , "m"   )
+          .replace("[M01]", "mm"  )
+          .replace("[Y]"  , "yyyy")
 
         // Don't set if `null` as that means we have a value which is not a date, and if we set it to `null`
         // we will cause the value to be emptied.

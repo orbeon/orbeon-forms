@@ -62,7 +62,7 @@ class SequenceReader(var iterator: ju.Iterator[Reader]) extends Reader {
     while (reader ne null)
   }
 
-  private def nextReader() {
+  private def nextReader(): Unit = {
     if (reader ne null)
       reader.close()
     if (iterator.hasNext) {

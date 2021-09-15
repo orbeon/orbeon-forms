@@ -147,7 +147,7 @@ trait ControlOps extends ResourcesOps {
     }
 
     // Start with top-level
-    ensureBind(topLevelBind, names.toIterator)
+    ensureBind(topLevelBind, names.iterator)
   }
 
   // Iterate over the given bind followed by all of its descendants, depth-first
@@ -347,7 +347,7 @@ trait ControlOps extends ResourcesOps {
       } else
         parents
 
-    ensure(List(rootElem), holders.toIterator)
+    ensure(List(rootElem), holders.iterator)
   }
 
   // Insert data and resource holders for all languages
@@ -686,7 +686,7 @@ trait ControlOps extends ResourcesOps {
       val expr = compiledExpr.expression.getInternalExpression
 
       if (xpathString.contains(s"$$$oldName") && DependencyAnalyzer.containsVariableReference(expr, oldName))
-        updateNode(xpathString.replaceAllLiterally(s"$$$oldName", s"$$$newName"))(att)
+        updateNode(xpathString.replace(s"$$$oldName", s"$$$newName"))(att)
     }
 
     // Replace references in templates, including email templates

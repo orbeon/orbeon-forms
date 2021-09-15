@@ -14,7 +14,7 @@
 package org.orbeon.oxf.servlet
 
 import javax.servlet.http.HttpSession
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope

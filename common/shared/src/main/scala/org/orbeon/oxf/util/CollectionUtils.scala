@@ -34,7 +34,7 @@ object CollectionUtils {
     for ((name, value) <- parameters)
       result.getOrElseUpdate(name, cbf.newBuilder) += value
 
-    result map { case (k, v) => k -> v.result } toList
+    result map { case (k, v) => k -> v.result() } toList
   }
 
   // Extensions on Iterator[T]

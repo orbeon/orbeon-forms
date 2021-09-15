@@ -48,14 +48,14 @@ class InspectingXMLReceiver(val xmlReceiver: XMLReceiver) extends ForwardingXMLR
   private var documentEnded = false
   private val namespaceContext = new NamespaceContext
 
-  override def startDocument() {
+  override def startDocument(): Unit = {
     if (documentStarted)
       throw new ValidationException("startDocument() called twice", XmlLocationData(locator))
     documentStarted = true
     super.startDocument()
   }
 
-  override def endDocument() {
+  override def endDocument(): Unit = {
     if (elementStack.size != 0)
       throw new ValidationException("Document ended before all the elements are closed", XmlLocationData(locator))
     if (documentEnded)
@@ -64,7 +64,7 @@ class InspectingXMLReceiver(val xmlReceiver: XMLReceiver) extends ForwardingXMLR
     super.endDocument()
   }
 
-  override def startElement(uri: String, localname: String, qname: String, attributes: Attributes) {
+  override def startElement(uri: String, localname: String, qname: String, attributes: Attributes): Unit = {
     namespaceContext.startElement()
     val error = checkInDocument
     if (error != null)
@@ -77,7 +77,7 @@ class InspectingXMLReceiver(val xmlReceiver: XMLReceiver) extends ForwardingXMLR
     super.startElement(uri, localname, qname, attributes)
   }
 
-  override def endElement(uri: String, localname: String, qname: String) {
+  override def endElement(uri: String, localname: String, qname: String): Unit = {
     val error = checkInElement
     if (error != null)
       throw new ValidationException(error + ": element " + qname, XmlLocationData(locator))
@@ -91,14 +91,14 @@ class InspectingXMLReceiver(val xmlReceiver: XMLReceiver) extends ForwardingXMLR
     super.endElement(uri, localname, qname)
   }
 
-  override def characters(chars: Array[Char], start: Int, length: Int) {
+  override def characters(chars: Array[Char], start: Int, length: Int): Unit = {
     val error = checkInElement
     if (error != null)
       throw new ValidationException(error + ": '" + new String(chars, start, length) + "'", XmlLocationData(locator))
     super.characters(chars, start, length)
   }
 
-  override def setDocumentLocator(locator: Locator) {
+  override def setDocumentLocator(locator: Locator): Unit = {
     this.locator = locator
     super.setDocumentLocator(locator)
   }

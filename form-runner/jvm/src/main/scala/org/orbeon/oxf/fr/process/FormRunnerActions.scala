@@ -411,7 +411,7 @@ trait FormRunnerActions {
         // `headers`, we handle line breaks here.
         // https://github.com/orbeon/orbeon-forms/issues/4295
         def updateLineBreaks(s: String) =
-          s.replaceAllLiterally("\\r\\n", "\n").replaceAllLiterally("\\n", "\n")
+          s.replace("\\r\\n", "\n").replace("\\n", "\n")
 
         val propertiesAsPairs =
           SendParameterKeys map (key => key -> findParamValue(key))

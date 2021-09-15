@@ -181,7 +181,7 @@ object XMLParsing {
   }
 
   // 2020-10-13: 1 external caller in processors
-  def parseDocumentFragment(reader: Reader, xmlReceiver: XMLReceiver) {
+  def parseDocumentFragment(reader: Reader, xmlReceiver: XMLReceiver): Unit = {
     val xmlReader = newSAXParser(ParserConfiguration.Plain).getXMLReader
     xmlReader.setContentHandler(new XMLFragmentReceiver(xmlReceiver))
     val readers = new ju.ArrayList[Reader](3)

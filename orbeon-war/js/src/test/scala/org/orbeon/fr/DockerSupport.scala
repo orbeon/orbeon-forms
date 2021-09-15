@@ -38,7 +38,7 @@ object DockerSupport {
     scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
   def replacePaths(s: String): String =
-    s.replaceAllLiterally("$BASE_DIRECTORY", BaseDirectory).replaceAllLiterally("$HOME", OS.homedir())
+    s.replace("$BASE_DIRECTORY", BaseDirectory).replace("$HOME", OS.homedir())
 
   def withInfo[T](message: => String)(body: => T): T =
     try {
@@ -51,7 +51,7 @@ object DockerSupport {
   def runProcessSync(cmd: String, params: String): String = {
 
     val replacedCmd    = replacePaths(cmd)
-    val replacedParams = replacePaths(params).trim.replaceAllLiterally("\n", " ")
+    val replacedParams = replacePaths(params).trim.replace("\n", " ")
 
     withInfo(s"trying to run execFileSync: $replacedCmd $replacedParams") {
       (node.ChildProcess.execFileSync(replacedCmd, replacedParams.jsSplit(" ")): Any) match {

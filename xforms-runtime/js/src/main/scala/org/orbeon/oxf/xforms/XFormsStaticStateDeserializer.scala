@@ -297,7 +297,7 @@ object XFormsStaticStateDeserializer {
 
           val childIt =
             if (c.value.asObject.exists(_.contains("children")))
-              c.downField("children").values.toIterator.flatten map {
+              c.downField("children").values.iterator.flatten map {
                 case s if s.isString => s.asString.map(dom.Text.apply).toRight(throw new IllegalArgumentException)
                 case s if s.isObject => decodeElement.decodeJson(s)
                 case s               => throw new IllegalArgumentException

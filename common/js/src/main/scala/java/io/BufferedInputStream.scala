@@ -38,7 +38,7 @@ class BufferedInputStream(private[this] var in: InputStream, size: Int) extends 
     count - pos + localIn.available
   }
 
-  override def close() {
+  override def close(): Unit = {
     buf = null
     val localIn = in
     in = null

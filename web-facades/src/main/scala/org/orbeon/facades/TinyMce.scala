@@ -65,7 +65,7 @@ object TinyMce {
 
   @js.native
   trait TinyMceEvent extends js.Object {
-    def add(f: js.Function1[TinyMceEditor, Unit])
+    def add(f: js.Function1[TinyMceEditor, Unit]): Unit
   }
 
   trait TinyMceConfig extends js.Object {

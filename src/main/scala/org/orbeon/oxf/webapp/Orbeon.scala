@@ -81,7 +81,7 @@ object Orbeon {
       val runMode = RunMode.getRunMode(context.initParameters)
       logger.info(s"Using run mode: $runMode")
 
-      rawPropertiesURL.replaceAllLiterally("${" + RunMode.RunModeProperty + "}", runMode)
+      rawPropertiesURL.replace("${" + RunMode.RunModeProperty + "}", runMode)
     }
 
     logger.info(s"Using root properties file: $propertiesURL")

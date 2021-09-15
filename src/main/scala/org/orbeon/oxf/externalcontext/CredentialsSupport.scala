@@ -54,10 +54,10 @@ object CredentialsSupport {
 
     def maybeEncodeJsStringContent(s: String): String = {
       val urlEncoded    = URLEncoder.encode(s, ExternalContext.StandardHeaderCharacterEncoding)
-      val spacesEncoded = s.replaceAllLiterally(" ", "%20")
+      val spacesEncoded = s.replace(" ", "%20")
 
-      if (urlEncoded.replaceAllLiterally("+", "%20") != spacesEncoded)
-        urlEncoded.replaceAllLiterally("+", " ")
+      if (urlEncoded.replace("+", "%20") != spacesEncoded)
+        urlEncoded.replace("+", " ")
       else
         s
     }

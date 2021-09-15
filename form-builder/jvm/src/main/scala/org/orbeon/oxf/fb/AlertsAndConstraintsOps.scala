@@ -74,7 +74,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     // Extract from XML
     val allValidations = {
-      val idsIterator = nextTmpIds(token = Names.Validation, count = validationElemsSeq.size).toIterator
+      val idsIterator = nextTmpIds(token = Names.Validation, count = validationElemsSeq.size).iterator
       validationElemsSeq map (v => v -> (v attValue "type")) flatMap {
         case (e, Required.name) => Some(RequiredValidation.fromXml(e, idsIterator))
         case (e, "datatype")    => Some(DatatypeValidation.fromXml(e, idsIterator, inDoc, controlName))

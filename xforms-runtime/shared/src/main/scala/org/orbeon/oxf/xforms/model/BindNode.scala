@@ -202,7 +202,7 @@ object BindNode {
 
   def failedValidationsForHighestLevel(nodeInfo: om.NodeInfo) =
     collectFailedValidationsForHighestLevel(
-      Option(InstanceData.getLocalInstanceData(nodeInfo, false))
+      Option(InstanceData.getLocalInstanceData(nodeInfo, forUpdate = false))
       map (_.getBindNodes.asScala)
       getOrElse Nil
     )

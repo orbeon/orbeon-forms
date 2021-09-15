@@ -113,8 +113,8 @@ trait ModelBinds extends BindTree {
     import ElementAnalysis.attQNameSet
 
     def canBeCustomMIP(qName: QName) =
-      qName.namespace.prefix.nonEmpty &&
-      ! qName.namespace.prefix.startsWith("xml") &&
+      qName.namespace.prefix.nonEmpty              &&
+      (! qName.namespace.prefix.startsWith("xml")) &&
       (StandardCustomMIPsQNames(qName) || ! NeverCustomMIPsURIs(qName.namespace.uri))
 
     selfModel.element.attributeOpt(XXFORMS_CUSTOM_MIPS_QNAME) match {

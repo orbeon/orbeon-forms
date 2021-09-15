@@ -103,7 +103,7 @@ class RuntimeBind(
               binds.iterationsForContextItem += item -> (currentBindIteration :: existingIterations)
             }
 
-            contextStack.popBinding
+            contextStack.popBinding()
             currentPosition += 1
           }
           result
@@ -121,7 +121,7 @@ class RuntimeBind(
       } else
         Nil
 
-    contextStack.popBinding
+    contextStack.popBinding()
 
     (items, bindNodes)
   }

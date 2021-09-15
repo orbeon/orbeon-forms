@@ -30,7 +30,7 @@ trait ParametersAndAttributes {
   // Mutable context attributes backed by the actual context
   lazy val attributes = new collection.mutable.Map[String, AnyRef] {
     def get(k: String) = Option(getAttribute(k))
-    def iterator = getAttributeNames map (k => k -> getAttribute(k)) toIterator
+    def iterator = getAttributeNames map (k => k -> getAttribute(k)) iterator
     override def size = getAttributeNames.size
     def +=(kv: (String, AnyRef)) = { setAttribute(kv._1, kv._2); this }
     def -=(k: String) = { removeAttribute(k); this }
@@ -41,8 +41,8 @@ trait ParametersAndAttributes {
 
   protected def getAttribute(k: String): AnyRef
   protected def getAttributeNames: Seq[String]
-  protected def setAttribute(k: String, v: AnyRef)
-  protected def removeAttribute(k: String)
+  protected def setAttribute(k: String, v: AnyRef): Unit
+  protected def removeAttribute(k: String): Unit
 }
 
 trait OrbeonWebApp {

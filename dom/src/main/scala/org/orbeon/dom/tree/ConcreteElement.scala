@@ -244,7 +244,7 @@ class ConcreteElement(var qname: QName)
   }
 
   //  FIXME: These all make copies of the content. But some callers rely on this to prevent concurrent changes.
-  def jElementIterator(): ju.Iterator[Element] = jElements.iterator()
+  def jElementIterator: ju.Iterator[Element] = jElements.iterator()
   def jElementIterator(name: String): ju.Iterator[Element] = jElements(name).iterator()
 
   def jAttributes: ju.List[Attribute] =

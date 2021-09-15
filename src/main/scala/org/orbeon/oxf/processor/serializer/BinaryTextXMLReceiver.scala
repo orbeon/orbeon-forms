@@ -52,7 +52,7 @@ class BinaryTextXMLReceiver(
   require(! forceEncoding    || isNotBlank(requestedEncoding.get))
 
   val responseOpt  = output.left.toOption
-  val outputStream = responseOpt map (_.getOutputStream) getOrElse output.right.get
+  val outputStream = responseOpt map (_.getOutputStream) getOrElse output.getOrElse(throw new NoSuchElementException)
 
   private val prefixMappings = new mutable.HashMap[String, String]
 

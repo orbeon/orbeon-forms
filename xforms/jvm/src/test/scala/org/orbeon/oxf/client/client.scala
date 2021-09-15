@@ -159,7 +159,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
     def fieldText =
       nativeControlUnder(e.attribute("id").get).underlying.getAttribute("value")
 
-    def findAll(by: By) = e.underlying.findElements(by).asScala.toIterator
+    def findAll(by: By) = e.underlying.findElements(by).asScala.iterator
 
     // Firefox: name(input) = 'INPUT' and local-name(input) = 'input'.
     // Chrome:  name(input) = 'input' and local-name(input) = 'input'.

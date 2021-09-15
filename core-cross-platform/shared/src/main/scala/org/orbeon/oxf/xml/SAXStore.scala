@@ -127,7 +127,7 @@ final class SAXStore extends ForwardingXMLReceiver {
     private[oxf] var attributeCountBufferPosition = 0
     private[oxf] var stringBuilderPosition        = 0
 
-    def this(store: SAXStore, id: String) {
+    def this(store: SAXStore, id: String) = {
       this()
       this._id = id
       this.eventBufferPosition          = store.eventBufferPosition
@@ -140,7 +140,7 @@ final class SAXStore extends ForwardingXMLReceiver {
       rememberMark()
     }
 
-    def this(values: Array[Int], id: String) {
+    def this(values: Array[Int], id: String) = {
       this()
       this._id = id
 

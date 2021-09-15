@@ -149,11 +149,11 @@ object Instance {
 
   def isProcessorInputScheme(uri: String): Boolean =
     uri.startsWith(ProcessorInputScheme) &&
-      ! uri.startsWith(ProcessorInputScheme + "/")
+      (! uri.startsWith(ProcessorInputScheme + "/"))
 
   def isProcessorOutputScheme(uri: String): Boolean =
     uri.startsWith(ProcessorOutputScheme) &&
-      ! uri.startsWith(ProcessorOutputScheme + "/")
+      (! uri.startsWith(ProcessorOutputScheme + "/"))
 
   def timeToLiveOrDefault(element: Element): Long =
     element.attributeValueOpt(XXFORMS_TIME_TO_LIVE_QNAME) flatMap (_.trimAllToOpt) map (_.toLong) getOrElse -1L

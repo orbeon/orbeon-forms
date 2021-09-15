@@ -43,7 +43,7 @@ object ProcessTemplateSupport {
     val templateWithPositions =
       MatchTemplateKey.replaceAllIn(templateWithNames, m => {
         Matcher.quoteReplacement("{" + nameToPos(m.group(1)).toString)
-      }).replaceAllLiterally("'", "''")
+      }).replace("'", "''")
 
     MessageFormatter.format(
       MessageFormatCache(templateWithPositions),

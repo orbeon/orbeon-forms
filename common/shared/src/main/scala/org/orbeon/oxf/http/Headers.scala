@@ -143,7 +143,7 @@ object Headers {
     // This is what the XPath `encode-for-uri()` does. Here we use the URLEncoder, which does
     // application/x-www-form-urlencoded encoding, which seems to differ from RFC 5987 in that the space is
     // encoded as a "+". Also see https://stackoverflow.com/a/2678602/5295.
-    val filenameEncodedForHeader = URLEncoder.encode(contentFilename, CharsetNames.Utf8).replaceAllLiterally("+", "%20")
+    val filenameEncodedForHeader = URLEncoder.encode(contentFilename, CharsetNames.Utf8).replace("+", "%20")
 
     // All browsers since IE7, Safari 5 support the `filename*=UTF-8''` syntax to indicate that the filename is
     // UTF-8 percent encoded. Also see https://stackoverflow.com/a/6745788/5295.

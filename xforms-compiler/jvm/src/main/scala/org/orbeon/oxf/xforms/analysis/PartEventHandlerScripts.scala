@@ -67,7 +67,7 @@ trait PartEventHandlerScripts {
       StaticScriptBuilder.scriptTypeFromElem(e, default) contains scriptType
 
     def findForActionIt(action: String, scriptType: ScriptType, default: Option[ScriptType]) =
-      controlTypes.get(action).toIterator.flatMap(_.values).filter(elemHasScriptType(_, scriptType, default))
+      controlTypes.get(action).iterator.flatMap(_.values).filter(elemHasScriptType(_, scriptType, default))
 
     def findForScriptTypeIt(scriptType: ScriptType) =
       findForActionIt(ActionActionName,  scriptType, None) ++

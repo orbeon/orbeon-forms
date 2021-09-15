@@ -611,7 +611,7 @@ object FormBuilderXPathApi {
     val newDatatype =
       DatatypeValidation.fromXml(
         validationElem  = newDatatypeValidationElem,
-        newIds          = nextTmpIds(token = Names.Validation, count = 1).toIterator,
+        newIds          = nextTmpIds(token = Names.Validation, count = 1).iterator,
         inDoc           = ctx.formDefinitionRootElem,
         controlName     = controlName
       ).datatypeQName

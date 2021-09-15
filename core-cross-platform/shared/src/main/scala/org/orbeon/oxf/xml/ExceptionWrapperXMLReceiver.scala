@@ -178,7 +178,7 @@ class ExceptionWrapperXMLReceiver(out: ContentHandler Either XMLReceiver) extend
     sb.toString
   }
 
-  private def mapPrefixIfNeeded(declaredPrefixes: ju.Set[String], uri: String, qName: String, sb: jl.StringBuilder) {
+  private def mapPrefixIfNeeded(declaredPrefixes: ju.Set[String], uri: String, qName: String, sb: jl.StringBuilder): Unit = {
     val prefix = XMLUtils.prefixFromQName(qName)
     if (prefix.length > 0 && !declaredPrefixes.contains(prefix)) {
       sb.append(" xmlns:")

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.portlet
 
 import javax.portlet.PortletSession
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope

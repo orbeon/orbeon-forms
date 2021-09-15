@@ -109,13 +109,43 @@
                     </xh:td>
                     <xh:td>
                         <!-- Condition -->
-                        <xf:select1 ref="$action1/@if">
+                        <xf:var name="if-attribute" value="$action1/@if"/>
+                        <xf:var name="is-predefined-condition" value="$if-attribute = ('true()', '$fr-mode=''new''')"/>
+                        <xf:select1 ref="
+                            (: Bind to transient element, so the dropdown is never invalid, and set the value
+                               of the attribute on `xforms-select` :)
+                            xf:element('_', string($if-attribute))">
+
                             <xf:label ref="$form-resources/dialog-actions/event-condition/label"/>
+                            <xf:alert/>
                             <xf:itemset ref="$form-resources/dialog-actions/event-condition/item">
-                                <xf:label ref="label"/>
-                                <xf:value ref="value"/>
+                                <xf:label ref="."/>
+                                <xf:value
+                                    ref="
+                                        if (@id = 'always') then
+                                            'true()'
+                                        else if (@id = 'new-only') then
+                                            '$fr-mode=''new'''
+                                        else if ($is-predefined-condition) then
+                                            (: If we have a predefined condition, choosing formula resets the value :)
+                                            ''
+                                        else
+                                            $if-attribute"/>
                             </xf:itemset>
+                            <xf:setvalue
+                                event="xforms-select"
+                                ref="$if-attribute"
+                                value="event('xxf:item-value')"/>
+
                         </xf:select1>
+                        <xf:input id="if-formula" ref="$if-attribute[not($is-predefined-condition)]" incremental="true">
+                            <xf:label ref="$form-resources/dialog-control-settings/formula/label" appearance="minimal"/>
+                            <xf:alert ref="$form-resources/dialog-control-settings/formula/alert"/>
+                            <xf:setfocus
+                                event="xforms-enabled"
+                                if="xxf:is-blank()"
+                                control="if-formula"/>
+                        </xf:input>
                     </xh:td>
                 </xh:tr>
                 <xh:tr>
@@ -748,6 +778,7 @@
                 <xf:bind ref="@id" calculate="concat(../../name, '-binding')"/>
                 <!-- Action that triggers the submission -->
                 <xf:bind ref="xf:action[1]">
+                    <xf:bind ref="@if"          required="true()" type="xxf:XPath2"/>
                     <xf:bind ref="@fb:event"    required="true()" name="event"/>
                     <xf:bind ref="@ev:observer" required="true()"/>
                     <xf:bind name="submission-bind" ref="xf:send/@submission" required="true()"/>

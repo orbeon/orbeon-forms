@@ -22,16 +22,17 @@ val DefaultOrbeonFormsVersion     = "2021.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
-val SaxonVersion                  = "10.0.0.63-SNAPSHOT"
-val XercesVersion                 = "2.11.0.11-SNAPSHOT"
-val SaxVersion                    = "2.0.2.8-SNAPSHOT"
-val ScalaJsDomVersion             = "1.2.0"
-val ScalaJsJQueryVersion          = "0.9.6"
-val ScribeVersion                 = "2.7.13"
-val PerfolationVersion            = "1.1.7"
-val ScalaJsStubsVersion           = "1.0.0" // can be different from Scala.js version
-val ScalaJsTimeVersion            = "2.0.0"
-val ScalaJsLocalesVersion         = "1.1.0"
+val SaxonVersion                     = "10.0.0.63-SNAPSHOT"
+val XercesVersion                    = "2.11.0.11-SNAPSHOT"
+val SaxVersion                       = "2.0.2.8-SNAPSHOT"
+val ScalaJsDomVersion                = "1.2.0"
+val ScalaJsJQueryVersion             = "0.9.6"
+val ScribeVersion                    = "2.7.13"
+val PerfolationVersion               = "1.1.7"
+val ScalaJsStubsVersion              = "1.0.0" // can be different from Scala.js version
+val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
+val ScalaJsTimeVersion               = "2.0.0"
+val ScalaJsLocalesVersion            = "1.1.0"
 
 // Scala libraries for Scala JVM only
 val Parboiled1Version             = "1.3.1"
@@ -489,6 +490,9 @@ lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) 
   .settings(
     name := "orbeon-dom",
     crossScalaVersions := supportedScalaVersions
+  )
+  .jsSettings(
+    libraryDependencies += "org.scala-js" %%% "scalajs-fake-weakreferences" % ScalaJsFakeWeakReferencesVersion
   )
 
 lazy val domJVM = dom.jvm.dependsOn(commonJVM)

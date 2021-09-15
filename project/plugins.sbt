@@ -17,12 +17,3 @@ libraryDependencies += "org.scala-js" %% "scalajs-env-jsdom-nodejs" % "1.0.0" //
 // Apparently needed for sbt-web
 resolvers += Resolver.typesafeRepo("releases")
 resolvers += Resolver.sonatypeRepo("releases")
-
-// For artifacts published locally
-// https://github.com/sbt/sbt-uglify/pull/23
-//resolvers += Resolver.file("ivy-local", file("ivy-local"))(Resolver.ivyStylePatterns)
-
-// Needed for sbt-cross
-//addSbtPlugin     ("org.scala-native"    % "sbt-cross"            % "0.1.0-SNAPSHOT")
-//addSbtPlugin     ("org.scala-native"    % "sbt-scalajs-cross"    % "0.1.0-SNAPSHOT")
-//resolvers += Resolver.sonatypeRepo("snapshots")

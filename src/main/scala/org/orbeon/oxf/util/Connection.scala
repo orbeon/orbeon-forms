@@ -579,7 +579,8 @@ object Connection extends ConnectionTrait {
                   "client"        -> (if (client == InternalHttpClient) "internal" else "Apache"),
                   "effective URL" -> effectiveConnectionUriNoPassword.toString,
                   "method"        -> method.entryName
-                ) ++ (cleanCapitalizedHeaders mapValues (_ mkString ",")))
+                ) ++ cleanCapitalizedHeaders.view.mapValues(_ mkString ",")
+              )
             }
 
             // Create result

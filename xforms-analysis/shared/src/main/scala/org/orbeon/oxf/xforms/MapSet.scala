@@ -15,13 +15,13 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.common.OXFException
 
-import scala.collection.generic.Growable
 import scala.collection.{mutable => m}
+
 
 /**
  * Collection containing a number of distinct sets indexed by a map.
  */
-class MapSet[A, B] extends Iterable[(A, B)] with Growable[(A, B)] {
+class MapSet[A, B] extends Iterable[(A, B)] with m.Growable[(A, B)] {
 
   val map = new m.LinkedHashMap[A, m.LinkedHashSet[B]]
 
@@ -47,8 +47,10 @@ class MapSet[A, B] extends Iterable[(A, B)] with Growable[(A, B)] {
   def iterator: Iterator[(A, B)] = map.iterator flatMap { case (key, values) => values.iterator map ((key, _)) }
 
   // Growable
-  def +=(elem: (A, B)): this.type = { put(elem._1, elem._2); this }
+  def addOne(elem: (A, B)): MapSet.this.type = { put(elem._1, elem._2); this }
   def clear(): Unit = map.clear()
+
+  override def knownSize: Int = super.knownSize
 }
 
 object MapSet {

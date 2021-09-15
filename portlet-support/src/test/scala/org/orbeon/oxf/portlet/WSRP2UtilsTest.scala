@@ -36,7 +36,8 @@ class WSRP2UtilsTest extends AnyFunSpec {
         )
     )
 
-    def decode(s: String) = PathUtils.decodeQueryStringPortlet(s).mapValues(_.toList)
+    def decode(s: String) =
+      PathUtils.decodeQueryStringPortlet(s).view.mapValues(_.toList).toMap
 
     it ("must satisfy expectations") {
       for ((query, extracted) <- expected) {

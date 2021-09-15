@@ -200,14 +200,15 @@ object SubmissionUtils {
       url             = resolvedAbsoluteUrl,
       credentials     = None,
       content         = None,
-      headers         = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        url              = resolvedAbsoluteUrl,
-        hasCredentials   = false,
-        customHeaders    = Map.empty,
-        headersToForward = Connection.headersToForwardFromProperty,
-        cookiesToForward = Connection.cookiesToForwardFromProperty,
-        getHeader        = headersGetter
-      ) mapValues (_.toList),
+      headers         =
+        Connection.buildConnectionHeadersCapitalizedIfNeeded(
+          url              = resolvedAbsoluteUrl,
+          hasCredentials   = false,
+          customHeaders    = Map.empty,
+          headersToForward = Connection.headersToForwardFromProperty,
+          cookiesToForward = Connection.cookiesToForwardFromProperty,
+          getHeader        = headersGetter
+        ).view.mapValues(_.toList).toMap,
       loadState       = true,
       saveState       = true,
       logBody         = BaseSubmission.isLogBody

@@ -178,17 +178,21 @@ trait ModelContainer {
 
   self: XBLContainer =>
 
-  private var _models = Seq.empty[XFormsModel]
-  def models: Seq[XFormsModel] = _models
+  private var _models: List[XFormsModel] = Nil
+  def models: List[XFormsModel] = _models
 
   // Create and index models corresponding to this container's scope
   def addAllModels(): Unit =
-    _models =
-      for {
-        model <- partAnalysis.getModelsForScope(innerScope)
-        modelEffectiveId = model.prefixedId + XFormsId.getEffectiveIdSuffixWithSeparator(effectiveId)
-      } yield
-        new XFormsModel(self, modelEffectiveId, model)
+    _models = {
+      val v =
+        for {
+          model <- partAnalysis.getModelsForScope(innerScope).view
+          modelEffectiveId = model.prefixedId + XFormsId.getEffectiveIdSuffixWithSeparator(effectiveId)
+        } yield
+          new XFormsModel(self, modelEffectiveId, model)
+
+      v.toList
+    }
 
   def initializeModels(eventsToDispatch: List[String]): Unit =
     for (eventName <- eventsToDispatch) {
@@ -496,8 +500,8 @@ trait ContainerResolver {
 
   protected def initializeNestedControls(collector: ErrorEventCollector): Unit = ()
 
+  // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
   private def findFirstControlEffectiveId: Option[String] =
-    // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
     getChildrenControls(containingDocument.controls).headOption map (_.effectiveId)
 
   def getChildrenControls(controls: XFormsControls): Iterable[XFormsControl] =

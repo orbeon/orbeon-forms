@@ -17,6 +17,7 @@ import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.security.SecureRandom
+import scala.collection.parallel.CollectionConverters._
 
 
 // NOTE: hmac is tested via XFormsUploadControlTest

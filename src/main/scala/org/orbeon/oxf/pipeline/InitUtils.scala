@@ -31,6 +31,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{AttributesToMap, PipelineUtils}
 import org.orbeon.saxon.om.NodeInfo
 
+import java.util
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
@@ -240,35 +241,35 @@ object InitUtils {
 
   // Read-only view of the properties as a Map
   private object PropertiesMap extends Map[String, String] {
-    def get(key: String) = Properties.instance.getPropertySet.getObjectOpt(key) map (_.toString)
-    def iterator         = Properties.instance.getPropertySet.keySet.iterator map (key => key -> this(key))
+    def get(key: String): Option[String] = Properties.instance.getPropertySet.getObjectOpt(key) map (_.toString)
+    def iterator: Iterator[(String, String)] = Properties.instance.getPropertySet.keySet.iterator map (key => key -> this(key))
 
-    def -(key: String)                    = Map() ++ this - key
-    def +[B1 >: String](kv: (String, B1)) = Map() ++ this + kv
+    def removed(key: String): Map[String, String] = Map() ++ this - key
+    def updated[V1 >: String](key: String, value: V1): Map[String, V1] = Map() ++ this + (key -> value)
   }
 
   // Read-only view of the ServletContext initialization parameters as a Map
   private class ServletContextInitMap(servletContext: ServletContext) extends Map[String, String] {
-    def get(key: String) = Option(servletContext.getInitParameter(key))
-    def iterator         = servletContext.getInitParameterNames.asScala map (key => key -> this(key))
+    def get(key: String): Option[String] = Option(servletContext.getInitParameter(key))
+    def iterator: Iterator[(String, String)] = servletContext.getInitParameterNames.asScala map (key => key -> this(key))
 
-    def -(key: String)                    = Map() ++ this - key
-    def +[B1 >: String](kv: (String, B1)) = Map() ++ this + kv
+    def removed(key: String): Map[String, String] = Map() ++ this - key
+    def updated[V1 >: String](key: String, value: V1): Map[String, V1] = Map() ++ this + (key -> value)
   }
 
   // View of the HttpSession properties as a Map
   class SessionMap(session: HttpSession) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
-    def getAttribute(s: String)                  = session.getAttribute(s)
-    def getAttributeNames                        = session.getAttributeNames
-    def removeAttribute(s: String): Unit         = session.removeAttribute(s)
-    def setAttribute(s: String, o: AnyRef): Unit = session.setAttribute(s, o)
+    def getAttribute(s: String): AnyRef             = session.getAttribute(s)
+    def getAttributeNames: util.Enumeration[String] = session.getAttributeNames
+    def removeAttribute(s: String): Unit            = session.removeAttribute(s)
+    def setAttribute(s: String, o: AnyRef): Unit    = session.setAttribute(s, o)
   })
 
   // View of the HttpServletRequest properties as a Map
   class RequestMap(request: HttpServletRequest) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
-    def getAttribute(s: String)                  = request.getAttribute(s)
-    def getAttributeNames                        = request.getAttributeNames
-    def removeAttribute(s: String): Unit         = request.removeAttribute(s)
-    def setAttribute(s: String, o: AnyRef): Unit = request.setAttribute(s, o)
+    def getAttribute(s: String): AnyRef             = request.getAttribute(s)
+    def getAttributeNames: util.Enumeration[String] = request.getAttributeNames
+    def removeAttribute(s: String): Unit            = request.removeAttribute(s)
+    def setAttribute(s: String, o: AnyRef): Unit    = request.setAttribute(s, o)
   })
 }

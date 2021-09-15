@@ -270,8 +270,8 @@ object XFormsStaticStateSerializer {
       (distinct, distinct.zipWithIndex.toMap)
     }
 
-    def convertMapSet(m: MapSet[String, String]) =
-      m.map.mapValues { set =>
+    def convertMapSet(m: MapSet[String, String]): Map[String, mutable.LinkedHashSet[String]] =
+      m.map.view.mapValues { set =>
         set map {
           case "" => ""
           case s  => splitAnalysisPath(s) map { case (isAtt, qName) =>
@@ -279,7 +279,7 @@ object XFormsStaticStateSerializer {
             if (isAtt) "@" + p.toString else p.toString
           } mkString "/"
         }
-      }
+      } toMap
 
     implicit val encodeScope: Encoder[Scope] = (a: Scope) => {
 
@@ -291,7 +291,7 @@ object XFormsStaticStateSerializer {
       val prefix = a.fullPrefix
 
       val (simplyPrefixed, other) =
-        a.idMap.toIterable.partition { case (k, v) => v == prefix + k }
+        a.idMap.toIterable.partition { case (k, v) => v == prefix + k } // CHECK: `.toIterable` needed here?
 
       if (simplyPrefixed.nonEmpty)
         b += "simplyPrefixed" -> simplyPrefixed.map(_._1).asJson
@@ -353,7 +353,7 @@ object XFormsStaticStateSerializer {
         if (a.allowedExternalEvents.nonEmpty)
           b += "allowedExternalEvents"       -> a.allowedExternalEvents.asJson
         if (a.constantInstances.nonEmpty)
-          b += "constantInstances"           -> a.constantInstances.toIterable.asJson // NOTE: Keep `.toIterable` to trigger right encoder.
+          b += "constantInstances"           -> (a.constantInstances: Iterable[((Int, Int), StaticXPath.DocumentNodeInfoType)]).asJson // `Iterable[?]` to trigger right encoder
 
       Json.fromFields(b)
     }

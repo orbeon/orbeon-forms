@@ -312,7 +312,7 @@ trait BindingLoader extends Logging {
 
     val newBindings =
       for {
-        xblPath              <- paths.to(List)
+        xblPath              <- paths.iterator.toList
         (elem, lastModified) = readXBLResource(xblPath)
         newBinding           <- extractXBLBindings(Some(xblPath), lastModified, elem)
       } yield

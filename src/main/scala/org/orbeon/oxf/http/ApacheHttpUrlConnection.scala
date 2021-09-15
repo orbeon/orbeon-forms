@@ -64,7 +64,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.h
             credentials   = credentialsFromURL(url),
             cookieStore   = new BasicCookieStore,
             method        = HttpMethod.withNameInsensitive(Option(method) getOrElse "GET"),
-            headers       = _requestHeaders mapValues (_.toList) toMap,
+            headers       = _requestHeaders.view.mapValues(_.toList).toMap,
             content       = None
           )(
             connectionCtx = None
@@ -84,7 +84,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.h
 
   // NOTE: No caller in our code
   override def getRequestProperties =
-    (_requestHeaders mapValues (_.asJava) toMap) asJava
+    _requestHeaders.view.mapValues(_.asJava).toMap.asJava
 
   override def getInputStream =
     withConnection(_.content.stream)
@@ -93,7 +93,7 @@ class ApacheHttpUrlConnection(url: URL)(implicit client: HttpClient[org.apache.h
     withConnection(_.headers.get(Headers.capitalizeCommonOrSplitHeader(name)) flatMap (_.lastOption) orNull)
 
   override def getHeaderFields =
-    withConnection(_.headers.mapValues(_.asJava).toMap.asJava)
+    withConnection(_.headers.view.mapValues(_.asJava).toMap.asJava)
 
   override def getResponseCode =
     withConnection(_.statusCode)

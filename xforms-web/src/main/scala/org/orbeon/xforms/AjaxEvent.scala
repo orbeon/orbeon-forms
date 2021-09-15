@@ -168,12 +168,12 @@ class AjaxEvent(args: js.Any*) extends js.Object {
         WireAjaxEventWithTarget(
           eventName,
           targetId,
-          properties mapValues (_.toString) toMap
+          properties.view.mapValues(_.toString).toMap
         )
       case None =>
         WireAjaxEventWithoutTarget(
           eventName,
-          properties mapValues (_.toString) toMap
+          properties.view.mapValues(_.toString).toMap
         )
     }
 

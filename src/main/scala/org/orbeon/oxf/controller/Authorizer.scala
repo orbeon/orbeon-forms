@@ -134,7 +134,7 @@ object Authorizer extends Logging {
         val allHeaders = {
 
           val proxiedHeaders =
-            proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, request = true).toMap mapValues (_.toList)
+            proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, request = true).toMap.view.mapValues(_.toList)
 
           proxiedHeaders + (OrbeonRemoteAddress -> Option(request.getRemoteAddr).toList)
         }

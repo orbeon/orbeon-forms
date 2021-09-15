@@ -56,7 +56,7 @@ abstract class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient
     content      : Option[StreamedContent]
   )(implicit
     connectionCtx: Option[ConnectionContextSupport.ConnectionContext] // unused for external HTTP connections
-  ): HttpResponse = {
+  ): org.orbeon.oxf.http.HttpResponse = {
 
     val uri = URI.create(url)
 
@@ -163,7 +163,7 @@ abstract class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient
 
     val response = httpClient.execute(requestMethod, httpContext)
 
-    new HttpResponse {
+    new org.orbeon.oxf.http.HttpResponse {
 
       lazy val statusCode =
         response.getStatusLine.getStatusCode

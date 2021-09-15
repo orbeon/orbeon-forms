@@ -55,9 +55,7 @@ trait PartControlsAnalysis extends TransientState {
       // Nicely group the results in a two-level map
       // NOTE: We assume only one control per forPrefixedId/attributeName combination, hence the assert
       val newAttributes =
-        triples groupBy
-          (_.forPrefixedId) mapValues
-            (_ groupBy (_.attributeName) mapValues { _.ensuring(_.size == 1).head.attributeControl })
+        triples.groupBy(_.forPrefixedId).view.mapValues(_.groupBy(_.attributeName).view.mapValues(_.ensuring(_.size == 1).head.attributeControl))
 
       // Accumulate new attributes into existing map by combining values for a given "for id"
       // NOTE: mapValues above ok, since we accumulate the values below into new immutable Maps.

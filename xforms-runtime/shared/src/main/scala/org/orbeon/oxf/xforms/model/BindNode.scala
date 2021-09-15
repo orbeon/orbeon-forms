@@ -23,8 +23,9 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.w3c.dom.Node.ELEMENT_NODE
 
 import java.{util => ju}
-import scala.collection.{breakOut, mutable}
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
+
 
 // Holds MIPs associated with a given RuntimeBind iteration
 // The constructor automatically adds the BindNode to the instance data node if any.
@@ -129,9 +130,9 @@ object BindNode {
     if (bindNodes eq null)
       Map.empty[String, String]
     else if (bindNodes.size == 1)
-      bindNodes.get(0)._customMips.filterKeys(_.contains(':')) // NOTE: `filterKeys` is a view on the original map.
+      bindNodes.get(0)._customMips.view.filterKeys(_.contains(':')).toMap // CHECK: `.toMap` expensive?
     else
-      bindNodes.asScala.reverse.foldLeft(Map.empty[String, String])(_ ++ _._customMips).filterKeys(_.contains(':')) // NOTE: `filterKeys` is a view on the original map.
+      bindNodes.asScala.reverse.foldLeft(Map.empty[String, String])(_ ++ _._customMips).view.filterKeys(_.contains(':')).toMap // CHECK: `.toMap` expensive?
 
   // NOTE: This finds the first custom MIP with the given name found.
   def findCustomMip(bindNodes: ju.List[BindNode], mipName: String): Option[String] =
@@ -191,7 +192,7 @@ object BindNode {
         builder ++= failed
       }
 
-      buildersByLevel.map { case (k, v) => k -> v.result()} (breakOut)
+      (buildersByLevel.view map { case (k, v) => k -> v.result()}).toMap
     }
 
   // Get all failed constraints for the highest level only, combining BindNodes if needed.

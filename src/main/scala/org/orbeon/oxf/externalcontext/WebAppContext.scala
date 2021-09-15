@@ -29,11 +29,11 @@ trait ParametersAndAttributes {
 
   // Mutable context attributes backed by the actual context
   lazy val attributes = new collection.mutable.Map[String, AnyRef] {
-    def get(k: String) = Option(getAttribute(k))
-    def iterator = getAttributeNames map (k => k -> getAttribute(k)) iterator
-    override def size = getAttributeNames.size
-    def +=(kv: (String, AnyRef)) = { setAttribute(kv._1, kv._2); this }
-    def -=(k: String) = { removeAttribute(k); this }
+    def get(k: String): Option[AnyRef] = Option(getAttribute(k))
+    def iterator: Iterator[(String, AnyRef)] = getAttributeNames map (k => k -> getAttribute(k)) iterator
+    override def size: Int = getAttributeNames.size
+    def addOne(kv: (String, AnyRef)): this.type = { setAttribute(kv._1, kv._2); this }
+    def subtractOne(k: String)      : this.type = { removeAttribute(k); this }
   }
 
   protected def getInitParameter(s: String): String

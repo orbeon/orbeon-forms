@@ -39,7 +39,8 @@ val ScalaJsTimeVersion               = "2.6.0"
 val ScalaJsLocalesVersion            = "1.4.1"
 
 // Scala libraries for Scala JVM only
-val Parboiled1Version             = "1.3.1"
+val Parboiled1Version                = "1.3.1"
+val ScalaLoggingVersion              = "3.9.4"
 
 // Shared Scala libraries
 val CatsVersion                   = "2.12.0"
@@ -50,6 +51,7 @@ val EnumeratumVersion             = "1.7.4"
 val EnumeratumCirceVersion        = "1.7.4"
 val ShapelessVersion              = "2.3.7"
 val ScalaXmlVersion               = "2.3.0"  // see https://github.com/orbeon/orbeon-forms/issues/4927
+val ScalaParallelCollectionsVersion = "1.0.3"
 val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes issues
 //val ScalaAsyncVersion             = "1.0.1"
 val Parboiled2Version             = "2.5.1"
@@ -179,10 +181,11 @@ val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition fr
 
 lazy val scala212 = "2.12.20"
 lazy val scala213 = "2.13.14"
+lazy val mainScalaVersion       = scala213
 lazy val supportedScalaVersions = List(scala212, scala213)
 
 // "ThisBuild is a Scope encompassing all projects"
-ThisBuild / scalaVersion                := scala212
+ThisBuild / scalaVersion                := mainScalaVersion
 ThisBuild / organization                := "org.orbeon"
 ThisBuild / version                     := orbeonVersionFromProperties.value
 ThisBuild / orbeonVersionFromProperties := sys.props.get("orbeon.version") getOrElse DefaultOrbeonFormsVersion
@@ -368,7 +371,9 @@ lazy val commonSettings = Seq(
     "-language:higherKinds",
     "-language:existentials",
     "-deprecation",
-//    "-Xasync",
+    "-Ymacro-annotations", // for Scala 2.13
+//    "-Xsource:3", // for Scala 2.13 -> Scala 3 migration
+//    "-Xasync", // for `scala-async` 1.0.0 or greater
     // Consider the following flags
 //    "-feature",
 //    "-unchecked",
@@ -695,6 +700,8 @@ lazy val formRunnerJVM = formRunner.jvm
     libraryDependencies += "jakarta.servlet" % "jakarta.servlet-api" % JakartaServletApiVersion % Provided,
     libraryDependencies += "javax.portlet"   % "portlet-api"         % PortletApiVersion        % Provided,
 
+    libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion,
+
     libraryDependencies                ++= Seq(
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",
@@ -1011,8 +1018,8 @@ lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossTy
   )
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scala212,
-      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+      "org.scala-lang" % "scala-reflect" % mainScalaVersion,
+//      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
     )
   )
 
@@ -1085,7 +1092,7 @@ lazy val xformsCompilerJVM = xformsCompiler.jvm
   )
   .settings(jUnitTestOptions: _*)
   .settings(
-    libraryDependencies += compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" % Test cross CrossVersion.full)
+//    libraryDependencies += compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" % Test cross CrossVersion.full)
   )
 
 lazy val xformsCompilerJS = xformsCompiler.js
@@ -1132,11 +1139,10 @@ lazy val xformsRuntimeJS = xformsRuntime.js
   )
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scala212,
-      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
+      "org.scala-lang" % "scala-reflect" % mainScalaVersion,
+//      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
     )
   )
-
 
 lazy val xformsWeb = (project in file("xforms-web"))
   .settings(commonSettings: _*)
@@ -1240,8 +1246,8 @@ lazy val coreCrossPlatform = (crossProject(JVMPlatform, JSPlatform).crossType(Cr
   .settings(
     libraryDependencies ++= Seq(
       "org.parboiled"   %%% "parboiled"     % Parboiled2Version,
-      "org.scala-lang"  %   "scala-reflect" % scala212,
-      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
+      "org.scala-lang"  %   "scala-reflect" % mainScalaVersion,
+//      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
     ),
 
     libraryDependencies ++= Seq(
@@ -1307,7 +1313,8 @@ lazy val core = (project in file("src"))
   .settings(jUnitTestOptions: _*)
   .settings(
     DebugTest / javaOptions            += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005",
-    libraryDependencies                ++= CoreLibraryDependencies
+    libraryDependencies                ++= CoreLibraryDependencies,
+    libraryDependencies                 += "org.scala-lang.modules" %% "scala-parallel-collections" % ScalaParallelCollectionsVersion % Test,
   )
 
 // Common types for Javax and Jakarta servlets

@@ -379,7 +379,7 @@ object XFormsStaticStateDeserializer {
         map <- c.as[mutable.LinkedHashMap[String, mutable.LinkedHashSet[String]]]
       } yield {
         val ms = new MapSet[String, String]
-        ms.map ++= map.mapValues(_ map convertPaths)
+        ms.map ++= map.view.mapValues(_ map convertPaths)
         ms
       }
     }

@@ -426,7 +426,7 @@ object ClientEvents extends Logging with XMLReceiverSupport {
         XFormsEventFactory.createEvent(
           eventName  = event.eventName,
           target     = eventTarget,
-          properties = event.properties mapValues Some.apply,
+          properties = event.properties.view.mapValues(Some.apply),
           bubbles    = true, // the default; we don't allow the client to pass those
           cancelable = true  // the default; we don't allow the client to pass those
         )

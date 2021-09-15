@@ -99,7 +99,7 @@ object PathUtils {
     separator  : String = "&")(implicit
     ed         : UrlEncoderDecoder
   ): String =
-    parameters.toIterator map { case (name, value) => ed.encode(name) + '=' + ed.encode(value) } mkString separator
+    parameters.iterator map { case (name, value) => ed.encode(name) + '=' + ed.encode(value) } mkString separator
 
   // Find a path extension
   def findExtension(path: String): Option[String] =

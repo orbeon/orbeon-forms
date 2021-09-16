@@ -134,7 +134,7 @@ object SaxonUtils {
   }
 
   // Whether two sequences contain identical items
-  def compareItemSeqs(nodeset1: Seq[Item], nodeset2: Seq[Item]): Boolean =
+  def compareItemSeqs(nodeset1: Iterable[Item], nodeset2: Iterable[Item]): Boolean =
     nodeset1.size == nodeset2.size &&
       (nodeset1.iterator.zip(nodeset2.iterator) forall (compareItems _).tupled)
 

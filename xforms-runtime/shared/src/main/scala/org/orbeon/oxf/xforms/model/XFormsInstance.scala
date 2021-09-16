@@ -464,7 +464,7 @@ trait XFormsInstanceIndex {
       }
     )
 
-  private def combineMappings(mappings: Seq[(String, Element)]) =
+  private def combineMappings(mappings: Iterable[(String, Element)]): Unit =
     for ((id, element) <- mappings)
       addId(id, element)
 }

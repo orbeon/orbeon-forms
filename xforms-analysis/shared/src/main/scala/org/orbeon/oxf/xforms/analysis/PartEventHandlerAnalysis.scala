@@ -32,7 +32,7 @@ trait PartEventHandlerAnalysis {
   private[PartEventHandlerAnalysis] var _keyboardHandlers: List[EventHandler] = Nil
 
   // Register new event handlers
-  def registerEventHandlers(eventHandlers: Seq[EventHandler])(implicit logger: IndentedLogger): Unit = {
+  def registerEventHandlers(eventHandlers: Iterable[EventHandler])(implicit logger: IndentedLogger): Unit = {
 
     val tuples =
       for {

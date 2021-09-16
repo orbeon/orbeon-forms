@@ -22,12 +22,12 @@ import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.xforms.XFormsNames.APPEARANCE_QNAME
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
-import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import scala.collection.compat._
+
 
 trait BindingOps {
 
@@ -113,8 +113,8 @@ trait BindingOps {
     elemName : QName,
     datatype : QName,
     lang     : String,
-    bindings : Seq[NodeInfo]
-  ): Seq[(Option[String], String, Option[String], String)] = {
+    bindings : Iterable[NodeInfo]
+  ): Iterable[(Option[String], String, Option[String], String)] = {
 
     def metadataOpt(bindingOpt: Option[NodeInfo]) =
       bindingOpt.to(List) flatMap bindingMetadata headOption
@@ -125,7 +125,7 @@ trait BindingOps {
     } collect {
       case (appearanceOpt, Some(metadata)) =>
 
-        def findMetadata(elems: Seq[NodeInfo]) = {
+        def findMetadata(elems: Iterable[NodeInfo]) = {
 
           def fromLang  = elems find (_.attValue("lang") == lang)
           def fromFirst = elems.headOption

@@ -42,7 +42,7 @@ object ElementAnalysisTreeBuilder {
     partAnalysisCtx : PartAnalysisContextForTree,
     parentElem      : WithChildrenTrait,
     builder         : Builder,
-    children        : Option[Seq[(Element, Scope)]] = None)(implicit // allow explicit children so we can force processing of lazy bindings
+    children        : Option[Iterable[(Element, Scope)]] = None)(implicit // allow explicit children so we can force processing of lazy bindings
     indentedLogger  : IndentedLogger
   ): Unit = {
     parentElem.addChildren( // TODO: consider have children add themselves to the parent?
@@ -149,7 +149,7 @@ object ElementAnalysisTreeBuilder {
     partAnalysisCtx : NestedPartAnalysis,
     e               : ComponentControl)(implicit
     indentedLogger  : IndentedLogger
-  ): Seq[(Element, Scope)] =
+  ): Iterable[(Element, Scope)] =
     componentChildren(partAnalysisCtx, e, honorLazy = false)
 
   // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
@@ -200,7 +200,7 @@ object ElementAnalysisTreeBuilder {
       e               : ComponentControl,
       honorLazy       : Boolean)(implicit
       indentedLogger  : IndentedLogger
-    ): Seq[(Element, Scope)] =
+    ): Iterable[(Element, Scope)] =
       if (! e.hasLazyBinding || ! honorLazy) {
 
         val abstractBinding =
@@ -299,14 +299,14 @@ object ElementAnalysisTreeBuilder {
       partAnalysisCtx : PartAnalysisContextForTree,
       e               : WithChildrenTrait)(implicit
       indentedLogger  : IndentedLogger
-    ): Seq[(Element, Scope)] = {
+    ): Iterable[(Element, Scope)] = {
 
       import VariableAnalysis.VariableQNames
       import EventHandler.isAction
       import LHHA.isLHHA
       import SelectionControlUtil.TopLevelItemsetQNames
 
-      def allChildren: Seq[(Element, Scope)] =
+      def allChildren: Iterable[(Element, Scope)] =
         e.element.elements map ((_, e.containerScope))
 
       e match {

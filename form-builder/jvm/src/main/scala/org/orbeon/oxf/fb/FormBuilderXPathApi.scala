@@ -297,7 +297,7 @@ object FormBuilderXPathApi {
 
   // Find all resource holders and elements which are unneeded because the resources are blank
   //@XPathFunction
-  def findBlankHelpHoldersAndElements(inDoc: NodeInfo): Seq[NodeInfo] = {
+  def findBlankHelpHoldersAndElements(inDoc: NodeInfo): Iterable[NodeInfo] = {
 
     // Create context explicitly based on the document passed, as the node might not be
     // in the main Form Builder instance yet.
@@ -325,7 +325,7 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def nextValidationIds(inDoc: NodeInfo, count: Int): Seq[String] =
+  def nextValidationIds(inDoc: NodeInfo, count: Int): Iterable[String] =
     FormBuilder.nextTmpIds(token = Names.Validation, count = count)(FormBuilderDocContext(inDoc))
 
   //@XPathFunction
@@ -404,7 +404,7 @@ object FormBuilderXPathApi {
     FormBuilder.getControlResourceOrEmpty(controlName, lhh)(FormBuilderDocContext())
 
   //@XPathFunction
-  def getControlLhhtParams(controlName: String, lhh: String): Seq[NodeInfo] =
+  def getControlLhhtParams(controlName: String, lhh: String): Iterable[NodeInfo] =
     lhhatChildrenParams(FormBuilder.getControlLhhat(controlName, lhh)(FormBuilderDocContext()))
 
   //@XPathFunction
@@ -505,14 +505,14 @@ object FormBuilderXPathApi {
     FormBuilderDocContext().formBuilderModel.get.unsafeGetVariableAsNodeInfo("current-resources")
 
   //@XPathFunction
-  def getAllControlsWithIds: Seq[NodeInfo] =
+  def getAllControlsWithIds: Iterable[NodeInfo] =
     FormRunner.getAllControlsWithIds(FormBuilderDocContext().formDefinitionRootElem) filterNot { elem =>
       // https://github.com/orbeon/orbeon-forms/issues/4786
       FormRunner.IsContainer(elem) || FormRunner.isSectionTemplateContent(elem)
     }
 
   //@XPathFunction
-  def getControlsLabelValueItemset: Seq[NodeInfo] = {
+  def getControlsLabelValueItemset: Iterable[NodeInfo] = {
     val resourceMap = currentResources.child(*).map(r => r.localname -> r).toMap
     getAllControlsWithIds.map { control =>
       val controlId    = control.attValue("id")
@@ -525,7 +525,7 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def getControlItemsGroupedByValue(controlName: String): Seq[NodeInfo] =
+  def getControlItemsGroupedByValue(controlName: String): Iterable[NodeInfo] =
     FormBuilder.getControlItemsGroupedByValue(controlName)(FormBuilderDocContext())
 
   //@XPathFunction
@@ -560,7 +560,7 @@ object FormBuilderXPathApi {
 
   // Return all classes that need to be added to an editable section
   //@XPathFunction
-  def sectionCanDoClasses(container: NodeInfo): Seq[String] = {
+  def sectionCanDoClasses(container: NodeInfo): Iterable[String] = {
 
     val directionClasses =
       ContainerDirectionCheck collect { case (direction, check) if check(container) => "fb-can-move-" + direction.entryName }

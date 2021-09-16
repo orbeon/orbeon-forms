@@ -43,8 +43,8 @@ class ControlsComparator(
   import breaks._
 
   def diffChildren(
-    left             : Seq[XFormsControl],
-    right            : Seq[XFormsControl],
+    left             : Iterable[XFormsControl],
+    right            : Iterable[XFormsControl],
     fullUpdateBuffer : Option[SAXStore])(implicit
     receiver         : XMLReceiver
   ): Unit = {

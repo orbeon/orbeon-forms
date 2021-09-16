@@ -24,7 +24,7 @@ object FormRunnerTemplatesOps {
   // Make sure all template instances reflect the current bind structure
   def updateTemplates(
     ancestorContainerNames : Option[Set[String]],
-    componentBindings      : Seq[NodeInfo])(implicit
+    componentBindings      : Iterable[NodeInfo])(implicit
     ctx                    : FormRunnerDocContext
   ): Unit =
     for {
@@ -39,7 +39,7 @@ object FormRunnerTemplatesOps {
 
   def createTemplateContentFromBindName(
     bindName : String,
-    bindings : Seq[NodeInfo])(implicit
+    bindings : Iterable[NodeInfo])(implicit
     ctx      : FormRunnerDocContext
   ): Option[NodeInfo] =
     findBindByName(ctx.formDefinitionRootElem, bindName) map (createTemplateContentFromBind(_, bindings))
@@ -50,7 +50,7 @@ private val AttributeRe = "@(.+)".r
   // This checks each control binding in case the control specifies a custom data holder.
   def createTemplateContentFromBind(
     startBindElem : NodeInfo,
-    bindings      : Seq[NodeInfo])(implicit
+    bindings      : Iterable[NodeInfo])(implicit
     ctx           : FormRunnerDocContext
   ): NodeInfo = {
 

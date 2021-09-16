@@ -496,8 +496,8 @@ object XFormsServer {
 
     def diffControls(
       containingDocument             : XFormsContainingDocument,
-      state1                         : Seq[XFormsControl],
-      state2                         : Seq[XFormsControl],
+      state1                         : Iterable[XFormsControl],
+      state2                         : Iterable[XFormsControl],
       valueChangeControlIdsAndValues : Map[String, String],
       isTestMode                     : Boolean)(implicit
       xmlReceiver                    : XMLReceiver,
@@ -605,7 +605,7 @@ object XFormsServer {
       )
 
     def outputMessagesInfo(
-      messages    : Seq[Message])(implicit
+      messages    : Iterable[Message])(implicit
       xmlReceiver : XMLReceiver
     ): Unit =
       for (message <- messages)

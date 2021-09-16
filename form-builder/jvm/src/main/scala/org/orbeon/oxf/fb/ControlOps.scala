@@ -367,7 +367,7 @@ trait ControlOps extends ResourcesOps {
   // Insert data and resource holders for all languages
   def insertHolders(
     controlElement       : NodeInfo,
-    dataHolders          : Seq[NodeInfo],
+    dataHolders          : Iterable[NodeInfo],
     resourceHolders      : Seq[(String, Seq[NodeInfo])],
     precedingControlName : Option[String])(implicit
     ctx                  : FormBuilderDocContext
@@ -540,7 +540,7 @@ trait ControlOps extends ResourcesOps {
   def isItemsetHTMLMediatype(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =
     hasHTMLMediatype(findControlByName(ctx.formDefinitionRootElem, controlName).toList child "itemset" child "label")
 
-  def setHTMLMediatype(lhhaElems: Seq[NodeInfo], isHTML: Boolean): Unit =
+  def setHTMLMediatype(lhhaElems: Iterable[NodeInfo], isHTML: Boolean): Unit =
     lhhaElems foreach { lhhaElem =>
       if (isHTML)
         insert(into = lhhaElem, origin = attributeInfo("mediatype", "text/html"))

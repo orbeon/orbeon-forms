@@ -172,7 +172,7 @@ object BindNode {
       getOrElse Nil
     )
 
-  private def collectFailedValidationsForAllLevels(bindNodes: Seq[BindNode]): Validations =
+  private def collectFailedValidationsForAllLevels(bindNodes: Iterable[BindNode]): Validations =
     if (bindNodes.isEmpty)
       EmptyValidations
     else if (bindNodes.size == 1)

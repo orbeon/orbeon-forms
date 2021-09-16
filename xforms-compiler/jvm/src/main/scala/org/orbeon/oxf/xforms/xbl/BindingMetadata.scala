@@ -153,7 +153,7 @@ trait BindingMetadata extends Logging {
 
   // ==== XBLBindings API
 
-  def extractInlineXBL(inlineXBL: Seq[Element], scope: Scope): Unit =
+  def extractInlineXBL(inlineXBL: Iterable[Element], scope: Scope): Unit =
     _xblIndex foreach { index =>
 
       val (newIndex, newBindings) = BindingLoader.extractAndIndexFromElements(index, inlineXBL)

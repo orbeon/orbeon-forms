@@ -500,7 +500,7 @@ trait ContainerResolver {
     // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
     getChildrenControls(containingDocument.controls).headOption map (_.getEffectiveId)
 
-  def getChildrenControls(controls: XFormsControls): Seq[XFormsControl] =
+  def getChildrenControls(controls: XFormsControls): Iterable[XFormsControl] =
     associatedControlOpt match {
       case Some(container: XFormsContainerControl) => container.children
       case _                                       => Nil

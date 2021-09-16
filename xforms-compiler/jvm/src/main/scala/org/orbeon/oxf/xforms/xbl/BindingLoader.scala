@@ -247,7 +247,7 @@ trait BindingLoader extends Logging {
 
   def extractAndIndexFromElements(
     index    : BindingIndex[IndexableBinding],
-    elements : Seq[Element]
+    elements : Iterable[Element]
   ): (BindingIndex[IndexableBinding], List[AbstractBinding]) = {
 
     val newBindings =

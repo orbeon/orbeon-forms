@@ -172,7 +172,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       )
     }
 
-  def hasHTMLMediatype(nodes: Seq[NodeInfo]): Boolean =
+  def hasHTMLMediatype(nodes: Iterable[NodeInfo]): Boolean =
     nodes exists (element => (element attValue "mediatype") == "text/html")
 
   //@XPathFunction

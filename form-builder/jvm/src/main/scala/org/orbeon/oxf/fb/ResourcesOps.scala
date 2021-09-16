@@ -61,7 +61,7 @@ trait ResourcesOps extends BaseOps {
   def getControlResourcesWithLang(
     controlName  : String,
     resourceName : String,
-    langs        : Seq[String])(implicit
+    langs        : Iterable[String])(implicit
     ctx          : FormBuilderDocContext
   ): Seq[(String, Seq[NodeInfo])] = {
     val langsSet = langs.toSet
@@ -266,7 +266,7 @@ trait ResourcesOps extends BaseOps {
   // NOTE: Also return `Nil` if there are any children `fr:param`.
   def holdersToRemoveIfHasBlankOrMissingLHHAForAllLangs(
     controlName  : String,
-    lhhaElements : Seq[NodeInfo],
+    lhhaElements : Iterable[NodeInfo],
     lhhaName     : String)(implicit
     ctx          : FormBuilderDocContext
   ): (Boolean, Seq[NodeInfo]) = {

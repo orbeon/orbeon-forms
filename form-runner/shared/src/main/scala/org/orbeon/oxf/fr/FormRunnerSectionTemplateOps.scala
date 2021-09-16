@@ -34,7 +34,7 @@ trait FormRunnerSectionTemplateOps {
   def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {
 
     // All xbl:binding elements available for section templates
-    def availableSectionTemplateXBLBindings(componentBindings: Seq[NodeInfo]) =
+    def availableSectionTemplateXBLBindings(componentBindings: Iterable[NodeInfo]) =
       componentBindings filter (_.attClasses("fr-section-component"))
 
     val bindingsForSectionTemplates =

@@ -164,7 +164,7 @@ trait ContainerOps extends ControlOps {
 
         // Try to move resource elements to a good place
         // TODO: We move the container resource holder, but we should also move together the contained controls' resource holders
-        def firstControl(s: Seq[NodeInfo]) =
+        def firstControl(s: Iterable[NodeInfo]) =
           s find (getControlNameOpt(_).isDefined)
 
         def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) => NodeInfo): Unit =

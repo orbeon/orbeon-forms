@@ -23,7 +23,7 @@ class StaticStateDocument(val xmlDocument: Document) {
 
   // Pointers to nested elements
   def rootControl: Element = staticStateElement.element("root")
-  def xblElements: Seq[Element] = rootControl.elements(XBL_XBL_QNAME)
+  def xblElements: Iterable[Element] = rootControl.elements(XBL_XBL_QNAME)
 
   // TODO: if staticStateDocument contains XHTML document, get controls and models from there?
 

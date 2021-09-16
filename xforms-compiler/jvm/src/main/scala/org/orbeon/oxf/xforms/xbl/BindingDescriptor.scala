@@ -67,7 +67,7 @@ object BindingDescriptor {
     oldAppearances   : Set[String],
     newDatatype      : QName,
     newAppearanceOpt : Option[String],
-    bindings         : Seq[NodeInfo]
+    bindings         : Iterable[NodeInfo]
   ): Option[(QName, Option[String])] = {
 
     val descriptors = getAllRelevantDescriptors(bindings)
@@ -101,7 +101,7 @@ object BindingDescriptor {
     searchElemName    : QName,
     searchDatatype    : QName,
     searchAppearances : Set[String],
-    descriptors       : Seq[BindingDescriptor]
+    descriptors       : Iterable[BindingDescriptor]
   ): (QName, Option[String]) = {
 
     val virtualNameAndAppearanceOpt =
@@ -126,8 +126,8 @@ object BindingDescriptor {
   def possibleAppearancesWithBindings(
     elemName : QName,
     datatype : QName,
-    bindings : Seq[NodeInfo]
-  ): Seq[(Option[String], Option[NodeInfo], Boolean)] = {
+    bindings : Iterable[NodeInfo]
+  ): Iterable[(Option[String], Option[NodeInfo], Boolean)] = {
 
     val Datatype1 = datatype
     val Datatype2 = ModelDefs.getVariationTypeOrKeep(datatype)
@@ -202,7 +202,7 @@ object BindingDescriptor {
       )(binding)
   }
 
-  def getAllRelevantDescriptors(bindings: Seq[NodeInfo]): Seq[BindingDescriptor] =
+  def getAllRelevantDescriptors(bindings: Iterable[NodeInfo]): Iterable[BindingDescriptor] =
     getAllSelectorsWithPF(
       bindings,
       (ns, binding) =>
@@ -215,7 +215,7 @@ object BindingDescriptor {
   def findMostSpecificWithoutDatatype(
     searchElemName    : QName,
     searchAppearances : Set[String],
-    searchDescriptors : Seq[BindingDescriptor]
+    searchDescriptors : Iterable[BindingDescriptor]
   ): Option[BindingDescriptor] = {
 
     def findByNameAndAppearance =
@@ -248,7 +248,7 @@ object BindingDescriptor {
     searchElemName    : QName,
     searchDatatype    : QName,
     searchAppearances : Set[String],
-    descriptors       : Seq[BindingDescriptor]
+    descriptors       : Iterable[BindingDescriptor]
   ): Option[BindingDescriptor] =
     if (StringQNames(searchDatatype))
       findMostSpecificWithoutDatatype(searchElemName, searchAppearances, descriptors)
@@ -263,8 +263,8 @@ object BindingDescriptor {
 
     def findRelatedDescriptors(
         searchDescriptor : BindingDescriptor,
-        descriptors      : Seq[BindingDescriptor]
-    ): Seq[BindingDescriptor] =
+        descriptors      : Iterable[BindingDescriptor]
+    ): Iterable[BindingDescriptor] =
       descriptors filter (d => d.binding == searchDescriptor.binding)
 
     def qNameFromElementSelector(selectorOpt: Option[SimpleElementSelector], ns: NamespaceMapping): Option[QName] =
@@ -314,9 +314,9 @@ object BindingDescriptor {
     }
 
     def getAllSelectorsWithPF(
-      bindings  : Seq[NodeInfo],
+      bindings  : Iterable[NodeInfo],
       collector : (NamespaceMapping, NodeInfo) => PartialFunction[Selector, BindingDescriptor]
-    ): Seq[BindingDescriptor] = {
+    ): Iterable[BindingDescriptor] = {
 
       def getBindingSelectorsAndNamespaces(bindingElem: NodeInfo) =
         (bindingElem attValue "element", NamespaceMapping(bindingElem.namespaceMappings.toMap))
@@ -335,7 +335,7 @@ object BindingDescriptor {
     def findStaticBindingInRelated(
       searchElemName     : QName,
       searchAppearances  : Set[String],
-      relatedDescriptors : Seq[BindingDescriptor]
+      relatedDescriptors : Iterable[BindingDescriptor]
     ): Option[(QName, Option[String])] = {
 
       def findByNameAndAppearance =
@@ -382,7 +382,7 @@ object BindingDescriptor {
       searchElemName    : QName,
       searchDatatype    : QName,
       searchAppearances : Set[String],
-      descriptors       : Seq[BindingDescriptor]
+      descriptors       : Iterable[BindingDescriptor]
     ): Option[BindingDescriptor] = {
 
       val Datatype1 = searchDatatype
@@ -416,7 +416,7 @@ object BindingDescriptor {
 
     def findRelatedVaryNameAndAppearance(
       searchDatatype     : QName,
-      relatedDescriptors : Seq[BindingDescriptor]
+      relatedDescriptors : Iterable[BindingDescriptor]
     ): Option[BindingDescriptor] = {
 
       val Datatype1 = searchDatatype

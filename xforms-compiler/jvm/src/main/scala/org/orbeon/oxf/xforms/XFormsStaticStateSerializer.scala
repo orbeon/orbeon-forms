@@ -404,7 +404,7 @@ object XFormsStaticStateSerializer {
         }
 
       if (children.nonEmpty)
-        b += "children" -> Json.arr(children: _*)
+        b += "children" -> Json.fromValues(children)
 
       Json.fromFields(b)
     }

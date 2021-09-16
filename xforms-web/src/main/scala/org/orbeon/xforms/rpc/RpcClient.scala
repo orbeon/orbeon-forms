@@ -65,7 +65,7 @@ object RpcClient
     pending.get(id.toInt) match {
       case Some(promise) =>
         pending -= id.toInt
-        promise.complete(Success(parse(URIUtils.decodeURIComponent(response)).right.get))
+        promise.complete(Success(parse(URIUtils.decodeURIComponent(response)).getOrElse(throw new NoSuchElementException)))
       case None =>
         println(s"RPC: got incorrect id in response: $id")
     }

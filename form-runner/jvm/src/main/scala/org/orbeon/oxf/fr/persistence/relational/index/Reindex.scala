@@ -56,7 +56,7 @@ trait Reindex extends FormDefinition {
       whatToReindex match {
         case AllData => (
           Nil,
-          (ps: PreparedStatement) => Unit
+          (_: PreparedStatement) => ()
         )
         case DataForDocumentId(id) => (
           List("document_id = ?"),

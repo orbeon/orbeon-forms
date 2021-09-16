@@ -300,7 +300,7 @@ object ErrorSummary {
 
   implicit object IntIteratorOrdering extends Ordering[Iterator[Int]] {
     def compare(x: Iterator[Int], y: Iterator[Int]): Int =
-      x.zipAll(y, 0, 0) dropWhile { case (a, b) => a == b } nextOption() match {
+      (x.zipAll(y, 0, 0) dropWhile { case (a, b) => a == b }).nextOption() match {
         case Some((a, b)) => a.compare(b)
         case None         => 0
       }

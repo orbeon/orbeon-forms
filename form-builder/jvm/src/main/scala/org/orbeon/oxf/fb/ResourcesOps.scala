@@ -232,7 +232,7 @@ trait ResourcesOps extends BaseOps {
     controlName  : String,
     resourceName : String,
     count        : Int = 1,
-    langs        : Seq[String])(implicit
+    langs        : Seq[String])(implicit // TODO: `langs` is not used. Oversight or correct?
     ctx          : FormBuilderDocContext
   ): Seq[(String, Seq[NodeInfo])] =
     allLangs(resourcesRoot) map

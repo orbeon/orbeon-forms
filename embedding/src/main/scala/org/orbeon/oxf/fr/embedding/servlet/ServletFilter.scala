@@ -56,8 +56,8 @@ class ServletEmbeddingContextWithResponse(
 
   def writer                                 = out.fold(identity, _.getWriter)
   def outputStream                           = Try(out.fold(_ => throw new IllegalStateException, _.getOutputStream))
-  def setHeader(name: String, value: String) = out.right.foreach(_.setHeader(name, value))
-  override def setStatusCode(code: Int)      = out.right.foreach(_.setStatus(code))
+  def setHeader(name: String, value: String) = out.foreach(_.setHeader(name, value))
+  override def setStatusCode(code: Int)      = out.foreach(_.setStatus(code))
 
   def decodeURL(encoded: String) = {
 

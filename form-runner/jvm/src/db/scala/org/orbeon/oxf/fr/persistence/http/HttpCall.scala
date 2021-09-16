@@ -90,7 +90,7 @@ private[persistence] object HttpCall {
       // Check operations
       expectedResponse.operations.foreach { expectedOperations =>
         val actualOperationsString = actualHeaders.get("orbeon-operations").map(_.head)
-        val actualOperationsList   = actualOperationsString.to[List].flatMap(_.splitTo[List]())
+        val actualOperationsList   = actualOperationsString.toList.flatMap(_.splitTo[List]())
         val actualOperations       = Operations.parse(actualOperationsList)
         assert(expectedOperations == actualOperations)
       }

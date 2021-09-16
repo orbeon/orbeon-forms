@@ -270,10 +270,11 @@ trait GridOps extends ContainerOps {
         val currentCell  = Cell.findOriginCell(gridModel, currentCellNode).get
         val MinimumWidth = currentCell.w
 
-        val availableCellOpt =
+        val availableCellOpt = {
           gridModel.cells.iterator.flatten dropWhile (_ != currentCell) drop 1 collect {
             case c @ Cell(Some(cellNode), None, _, _, _, _) if ! cellNode.hasChildElement => c
-          } nextOption()
+          }
+        }.nextOption()
 
         val newCell =
           availableCellOpt match {

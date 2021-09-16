@@ -20,7 +20,7 @@ import org.scalatestplus.junit.AssertionsForJUnit
 
 class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
 
-  @Test def lhhaFunctions() {
+  @Test def lhhaFunctions(): Unit = {
 
     this setupDocument
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"

@@ -10,7 +10,7 @@ import org.xml.sax.ext.LexicalHandler
 class SimpleForwardingXMLReceiver(out: ContentHandler Either XMLReceiver) extends XMLReceiver {
 
   private var contentHandler: ContentHandler = out.fold(identity, identity)
-  private var lexicalHandler: LexicalHandler = out.right.getOrElse(null)
+  private var lexicalHandler: LexicalHandler = out.getOrElse(null)
 
   require(contentHandler ne null)
 

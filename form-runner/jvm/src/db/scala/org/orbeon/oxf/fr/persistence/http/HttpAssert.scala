@@ -32,9 +32,9 @@ private[persistence] object HttpAssert extends XMLSupport {
     def areEqual(left: Operations, right: Any): Boolean =
       (left, right) match {
         case (SpecificOperations(leftSpecific), SpecificOperations(rightSpecific)) =>
-          leftSpecific.to[Set] === rightSpecific.to[Set]
+          leftSpecific.toSet == rightSpecific.toSet
         case _ =>
-          left === right
+          left == right
       }
   }
 
@@ -65,29 +65,29 @@ private[persistence] object HttpAssert extends XMLSupport {
 
     expected match {
       case ExpectedBody(body, expectedOperations, expectedFormVersion, expectedStage) =>
-        assert(resultCode === 200)
+        assert(resultCode == 200)
         // Check body
         body match {
           case HttpCall.XML(expectedDoc) =>
             val resultDoc = IOSupport.readDom4j(new ByteArrayInputStream(resultBody.get))
             assertXMLDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc)
           case HttpCall.Binary(expectedFile) =>
-            assert(resultBody.get === expectedFile)
+            assert(resultBody.get == expectedFile)
         }
         // Check operations
         val resultOperationsString = headers.get("orbeon-operations").map(_.head)
-        val resultOperationsList = resultOperationsString.to[List].flatMap(_.splitTo[List]())
+        val resultOperationsList = resultOperationsString.toList.flatMap(_.splitTo[List]())
         val resultOperations = Operations.parse(resultOperationsList)
-        assert(expectedOperations === resultOperations)
+        assert(expectedOperations == resultOperations)
         // Check form version
         val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
-        assert(expectedFormVersion === resultFormVersion)
+        assert(expectedFormVersion == resultFormVersion)
         // Check stage
         val resultStage = headers.get(StageHeader.HeaderNameLower).map(_.head).map(Stage.apply(_, ""))
-        assert(expectedStage === resultStage)
+        assert(expectedStage == resultStage)
 
       case ExpectedCode(expectedCode) =>
-        assert(resultCode === expectedCode)
+        assert(resultCode == expectedCode)
     }
   }
 
@@ -102,7 +102,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Unit = {
     val actualCode = HttpCall.post(url, version, body, credentials)
-    assert(actualCode === expectedCode)
+    assert(actualCode == expectedCode)
   }
 
   def put(
@@ -117,7 +117,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Unit = {
     val actualCode = HttpCall.put(url, version, stage, body, credentials)
-    assert(actualCode === expectedCode)
+    assert(actualCode == expectedCode)
   }
 
   def del(
@@ -130,7 +130,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Unit = {
     val actualCode = HttpCall.del(url, version, credentials)
-    assert(actualCode === expectedCode)
+    assert(actualCode == expectedCode)
   }
 
   def lock(
@@ -142,7 +142,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Unit = {
     val actualCode = HttpCall.lock(url, lockInfo, 60)
-    assert(actualCode === expectedCode)
+    assert(actualCode == expectedCode)
   }
 
   def unlock(
@@ -154,6 +154,6 @@ private[persistence] object HttpAssert extends XMLSupport {
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
   ): Unit = {
     val actualCode = HttpCall.unlock(url, lockInfo)
-    assert(actualCode === expectedCode)
+    assert(actualCode == expectedCode)
   }
 }

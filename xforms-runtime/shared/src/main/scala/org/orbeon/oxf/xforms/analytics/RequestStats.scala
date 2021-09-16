@@ -34,9 +34,9 @@ trait RequestStats {
   var xpathCompiled         : Int
   var xpathEvaluated        : Int
 
-  def afterInitialResponse()
-  def afterUpdateResponse()
-  def addXPathStat(expr: String, time: Long)
+  def afterInitialResponse(): Unit
+  def afterUpdateResponse(): Unit
+  def addXPathStat(expr: String, time: Long): Unit
   def withXPath[T](expr: => String)(body: => T): T
 
   // For Java callers

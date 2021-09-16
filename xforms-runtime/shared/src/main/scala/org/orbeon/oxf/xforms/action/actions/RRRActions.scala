@@ -23,7 +23,7 @@ import org.orbeon.xforms.XFormsNames._
 
 
 trait RRRFunctions {
-  def setFlag(model: XFormsModel, applyDefaults: Boolean)
+  def setFlag(model: XFormsModel, applyDefaults: Boolean): Unit
   def createEvent(model: XFormsModel): XFormsEvent
 }
 

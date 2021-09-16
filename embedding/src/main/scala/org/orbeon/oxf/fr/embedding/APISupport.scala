@@ -99,7 +99,7 @@ object APISupport {
               content = contentFromRequest,
               url     = url,
               path    = sanitizedResourcePath,
-              headers = proxyCapitalizeAndCombineHeaders(requestHeaders(req).to[List], request = true).to[List],
+              headers = proxyCapitalizeAndCombineHeaders(requestHeaders(req).toList, request = true).toList,
               params  = Nil
             )
           )
@@ -138,7 +138,7 @@ object APISupport {
           content = Some(contentFromRequest),
           url     = settings.formRunnerURL.dropTrailingSlash + XFormsServerSubmit,
           path    = XFormsServerSubmit,
-          headers = proxyCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).to[List], request = true).to[List],
+          headers = proxyCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).toList, request = true).toList,
           params  = Nil
         ))
 

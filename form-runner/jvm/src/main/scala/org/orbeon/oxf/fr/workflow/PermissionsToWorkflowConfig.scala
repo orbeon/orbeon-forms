@@ -47,7 +47,7 @@ object PermissionsToWorkflowConfig {
             actorToOperations.map { case (actor, operations) =>
               val perspectives = perspectivesFromOperations(operations)
               perspectives.map(perspective => perspective -> actor)
-            }.flatten.to[List]
+            }.flatten.toList
 
           // Group by perspective
           val perspectiveToActors: Map[PermissionPerspective, List[Availability]] =
@@ -64,7 +64,7 @@ object PermissionsToWorkflowConfig {
                 ToAnyoneAvailability
               else {
                 val availabilityRules = actors.collect { case ToUsersAvailability(availabilityRule) => availabilityRule }
-                ToUsersAvailability(GroupingAvailabilityRule(AnyCombinator, availabilityRules.to[Vector]))
+                ToUsersAvailability(GroupingAvailabilityRule(AnyCombinator, availabilityRules.toVector))
               }
             perspective.builder(availability)
           }
@@ -83,7 +83,7 @@ object PermissionsToWorkflowConfig {
       Stage("saved", "")
     )
 
-    WorkflowConfig(stages, buttons.to[Vector], perspectives.to[Vector])
+    WorkflowConfig(stages, buttons.toVector, perspectives.toVector)
   }
 
   def predefinedButton(name: ButtonName): Button =
@@ -204,7 +204,7 @@ object PermissionsToWorkflowConfig {
         } else {
           None
         }
-      (creatorOpt ++ otherPerspectiveOpt).to[List]
+      (creatorOpt ++ otherPerspectiveOpt).toList
     }
 
     val summaryViewButtons       = Vector("home"   , "review", "pdf",                            "new")

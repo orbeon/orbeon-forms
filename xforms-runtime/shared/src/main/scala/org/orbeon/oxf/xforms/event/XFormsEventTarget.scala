@@ -41,7 +41,7 @@ trait XFormsEventTarget extends XFormsObject {
 
   def allowExternalEvent(eventName: String): Boolean
 
-  def addListener(eventName: String, listener: EventListener)
-  def removeListener(eventName: String, listener: Option[EventListener])
+  def addListener(eventName: String, listener: EventListener): Unit
+  def removeListener(eventName: String, listener: Option[EventListener]): Unit
   def getListeners(eventName: String): immutable.Seq[EventListener]
 }

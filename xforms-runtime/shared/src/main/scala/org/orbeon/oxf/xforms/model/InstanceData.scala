@@ -438,7 +438,7 @@ class InstanceData private () {
     else
       Option(transientAnnotations.get(name))
 
-  def this(locationData: LocationData) {
+  def this(locationData: LocationData) = {
     this()
     this.locationData = locationData
   }

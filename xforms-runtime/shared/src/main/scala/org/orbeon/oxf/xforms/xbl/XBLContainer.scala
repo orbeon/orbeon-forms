@@ -221,7 +221,7 @@ trait ModelContainer {
   // slower than using an Iterator (profiler).
   def searchContainedModels(staticId: String, contextItemOpt: Option[om.Item]): Option[XFormsObject] =
     isRelevant && models.nonEmpty flatOption {
-      models.iterator flatMap (_.findObjectById(staticId, contextItemOpt)) nextOption()
+      (models.iterator flatMap (_.findObjectById(staticId, contextItemOpt))).nextOption()
     }
 
   def restoreModelsState(deferRRR: Boolean): Unit = {
@@ -316,7 +316,7 @@ trait ContainerResolver {
     findObjectByEffectiveId(effectiveId).orNull
 
   def findObjectByEffectiveId(effectiveId: String): Option[XFormsObject] =
-    allModels flatMap (_.findObjectByEffectiveId(effectiveId)) nextOption()
+    (allModels flatMap (_.findObjectByEffectiveId(effectiveId))).nextOption()
 
   /**
    * Return the current repeat index for the given xf:repeat id, -1 if the id is not found.
@@ -476,13 +476,13 @@ trait ContainerResolver {
   // Recursively find the instance containing the specified node
   def instanceForNodeOpt(nodeInfo: om.NodeInfo): Option[XFormsInstance] =
     isRelevant flatOption {
-      allModels flatMap (_.findInstanceForNode(nodeInfo)) nextOption()
+      (allModels flatMap (_.findInstanceForNode(nodeInfo))).nextOption()
     }
 
   // Locally find the instance with the specified id, searching in any relevant model
   def findInstance(instanceStaticId: String): Option[XFormsInstance] =
     isRelevant && models.nonEmpty flatOption {
-      models.iterator flatMap (_.findInstance(instanceStaticId)) nextOption()
+      (models.iterator flatMap (_.findInstance(instanceStaticId))).nextOption()
     }
 
   // Find the instance in this or descendant containers

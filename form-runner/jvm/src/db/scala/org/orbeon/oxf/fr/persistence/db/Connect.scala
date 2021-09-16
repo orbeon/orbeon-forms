@@ -103,7 +103,7 @@ private[persistence] object Connect {
   }
 
   private def waitUntilCanConnect(datasourceDescriptor: DatasourceDescriptor): Unit = {
-    def tryConnecting() = Try(withConnection(datasourceDescriptor)(_ => Unit))
+    def tryConnecting() = Try(withConnection(datasourceDescriptor)(_ => ()))
     while (tryConnecting().isFailure) Thread.sleep(100)
   }
 

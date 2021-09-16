@@ -56,7 +56,7 @@ class XXFormsResource extends XFormsFunction {
 
           val javaNamedParamsIt = params.iterator map {
             case (key, value) =>
-              val javaParamOpt = asScalaIterator(Value.asIterator(value)) map Value.convertToJava nextOption()
+              val javaParamOpt = (asScalaIterator(Value.asIterator(value)) map Value.convertToJava).nextOption()
               key.getStringValue -> javaParamOpt.orNull
           }
 

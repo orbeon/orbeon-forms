@@ -125,7 +125,7 @@ class EmailValidator extends Serializable {
    * @param allowLocal Should local addresses be considered valid?
    * @param allowTld   Should TLDs be allowed?
    */
-  def this(allowLocal: Boolean, allowTld: Boolean) {
+  def this(allowLocal: Boolean, allowTld: Boolean) = {
     this()
     this.allowTld = allowTld
 //    this.domainValidator = DomainValidator.getInstance(allowLocal)
@@ -136,9 +136,8 @@ class EmailValidator extends Serializable {
    *
    * @param allowLocal Should local addresses be considered valid?
    */
-  def this(allowLocal: Boolean) {
+  def this(allowLocal: Boolean) =
     this(allowLocal, allowTld = false)
-  }
 
   /**
    * <p>Checks if a field has a valid e-mail address.</p>

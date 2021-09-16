@@ -232,7 +232,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         controlBindPathHoldersResourcesList map { controlBindPathHoldersResources =>
           val path = controlBindPathHoldersResources.path
           val adjustedBindPathElems =
-            (pathMigrationFunctions.iterator flatMap (_.apply(path)) nextOption()) getOrElse path
+            (pathMigrationFunctions.iterator flatMap (_.apply(path))).nextOption() getOrElse path
           controlBindPathHoldersResources.copy(path = adjustedBindPathElems)
         }
     }

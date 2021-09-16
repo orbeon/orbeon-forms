@@ -341,7 +341,7 @@ object XFormsControl {
   // Base trait for a control property (label, itemset, etc.)
   trait ControlProperty[T >: Null] {
     def value(): T
-    def handleMarkDirty(force: Boolean = false)
+    def handleMarkDirty(force: Boolean = false): Unit
     def copy: ControlProperty[T]
   }
 
@@ -361,8 +361,8 @@ object XFormsControl {
     protected def isRelevant: Boolean
     protected def wasRelevant: Boolean
     protected def requireUpdate: Boolean
-    protected def notifyCompute()
-    protected def notifyOptimized()
+    protected def notifyCompute(): Unit
+    protected def notifyOptimized(): Unit
 
     protected def evaluateValue(): T
     protected def nonRelevantValue: T = null

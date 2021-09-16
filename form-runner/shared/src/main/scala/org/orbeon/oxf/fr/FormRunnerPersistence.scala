@@ -49,7 +49,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.{BasicNamespaceMapping, XFormsCrossPlatformSupport}
 
 import java.net.URI
-import java.{util ⇒ ju}
+import java.{util => ju}
 import java.io.InputStream
 import scala.jdk.CollectionConverters._
 import scala.util.Try

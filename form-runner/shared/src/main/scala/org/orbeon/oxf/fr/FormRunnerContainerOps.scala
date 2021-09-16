@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._

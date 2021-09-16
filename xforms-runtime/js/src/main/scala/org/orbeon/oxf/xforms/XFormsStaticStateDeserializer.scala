@@ -305,7 +305,7 @@ object XFormsStaticStateDeserializer {
             else
               Iterator.empty
 
-            Right(childIt map (_.right.get)) // TODO: `.get`; ideally should get the first error
+            Right(childIt map (_.getOrElse(throw new NoSuchElementException))) // TODO: `.get`; ideally should get the first error
         }
       } yield {
         val r = dom.Element(collectedQNames(nameIndex))
@@ -448,7 +448,7 @@ object XFormsStaticStateDeserializer {
                   componentControl
                 }
 
-              componentControl.right.get // XXX TODO
+              componentControl.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case XFORMS_MODEL_QNAME            =>
 
@@ -475,7 +475,7 @@ object XFormsStaticStateDeserializer {
                   model
                 }
 
-              model.right.get // XXX TODO
+              model.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case XFORMS_SUBMISSION_QNAME       => new Submission            (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
             case XFORMS_INPUT_QNAME            => new InputControl          (index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope)
@@ -502,7 +502,7 @@ object XFormsStaticStateDeserializer {
                     valueLiteral
                   )
 
-              caseControl.right.get // XXX TODO
+              caseControl.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case XFORMS_INSTANCE_QNAME =>
 
@@ -564,7 +564,7 @@ object XFormsStaticStateDeserializer {
                   r
                 }
 
-              instance.right.get // XXX TODO
+              instance.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case XFORMS_BIND_QNAME =>
 
@@ -612,7 +612,7 @@ object XFormsStaticStateDeserializer {
 
             //              var figuredAllBindRefAnalysis: Boolean = false
 
-              staticBind.right.get // XXX TODO
+              staticBind.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case XFORMS_OUTPUT_QNAME | XXFORMS_TEXT_QNAME =>
 
@@ -630,7 +630,7 @@ object XFormsStaticStateDeserializer {
                     staticValue
                   )
 
-              output.right.get // XXX TODO
+              output.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case XFORMS_SELECT_QNAME | XFORMS_SELECT1_QNAME =>
 
@@ -647,7 +647,7 @@ object XFormsStaticStateDeserializer {
                     mustEncodeValues
                   ) |!> (_.itemsetAnalysis = itemsetAnalysis)
 
-              select.right.get // XXX TODO
+              select.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case qName if LHHA.QNamesSet(qName) =>
 
@@ -669,7 +669,7 @@ object XFormsStaticStateDeserializer {
                     hasLocalLeftAppearance
                   )
 
-              lhha.right.get // XXX TODO
+              lhha.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case qName: QName if EventHandler.isAction(qName) =>
 
@@ -742,7 +742,7 @@ object XFormsStaticStateDeserializer {
                           isIfNonRelevant,
                           isXBLHandler
                         ) with WithExpressionOrConstantTrait {
-                          val expressionOrConstant: Either[String, String] = c.get[Either[String, String]]("expressionOrConstant").right.get // XXX TODO
+                          val expressionOrConstant: Either[String, String] = c.get[Either[String, String]]("expressionOrConstant").getOrElse(throw new NoSuchElementException) // XXX TODO
                         }
                       else
                         new EventHandler(
@@ -774,14 +774,14 @@ object XFormsStaticStateDeserializer {
                     eh
                   }
 
-                eventHandler.right.get // XXX TODO
+                eventHandler.getOrElse(throw new NoSuchElementException) // XXX TODO
 
               } else {
                 if (EventHandler.isContainerAction(element.getQName))
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithChildrenTrait
                 else if (element.getQName == XFORMS_MESSAGE_QNAME)
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait with WithExpressionOrConstantTrait {
-                    val expressionOrConstant: Either[String, String] = c.get[Either[String, String]]("expressionOrConstant").right.get // XXX TODO
+                    val expressionOrConstant: Either[String, String] = c.get[Either[String, String]]("expressionOrConstant").getOrElse(throw new NoSuchElementException) // XXX TODO
                   }
                 else
                   new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with ActionTrait
@@ -824,7 +824,7 @@ object XFormsStaticStateDeserializer {
                     )
                 }
 
-              variable.right.get // XXX TODO
+              variable.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             // Itemsets
             case XFORMS_CHOICES_QNAME | XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME =>
@@ -839,7 +839,7 @@ object XFormsStaticStateDeserializer {
                 } yield
                   new NestedNameOrValueControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, expressionOrConstant)
 
-              nestedNameOrValueControl.right.get // XXX TODO
+              nestedNameOrValueControl.getOrElse(throw new NoSuchElementException) // XXX TODO
 
             case XFORMS_COPY_QNAME =>
               new ElementAnalysis(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope) with RequiredSingleNode

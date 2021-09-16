@@ -349,7 +349,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
           val javaNamedParamsIt = params.keyValuePairs.iterator.asScala map {
             case org.orbeon.saxon.ma.map.KeyValuePair(key, value) =>
 
-              val javaParamOpt = value.asIterable.iterator.asScala map SequenceTool.convertToJava nextOption()
+              val javaParamOpt = (value.asIterable.iterator.asScala map SequenceTool.convertToJava).nextOption()
               key.getStringValue -> javaParamOpt.orNull
           }
 

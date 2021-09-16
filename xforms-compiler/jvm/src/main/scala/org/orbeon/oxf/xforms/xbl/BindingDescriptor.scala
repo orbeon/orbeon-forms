@@ -318,10 +318,10 @@ object BindingDescriptor {
       collector : (NamespaceMapping, NodeInfo) => PartialFunction[Selector, BindingDescriptor]
     ): Iterable[BindingDescriptor] = {
 
-      def getBindingSelectorsAndNamespaces(bindingElem: NodeInfo) =
+      def getBindingSelectorsAndNamespaces(bindingElem: NodeInfo): (String, NamespaceMapping) =
         (bindingElem attValue "element", NamespaceMapping(bindingElem.namespaceMappings.toMap))
 
-      def descriptorsForSelectors(selectors: String, ns: NamespaceMapping, binding: NodeInfo) =
+      def descriptorsForSelectors(selectors: String, ns: NamespaceMapping, binding: NodeInfo): List[BindingDescriptor] =
         CSSSelectorParser.parseSelectors(selectors) collect collector(ns, binding)
 
       for {

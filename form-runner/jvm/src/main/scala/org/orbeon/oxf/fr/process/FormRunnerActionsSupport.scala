@@ -46,7 +46,7 @@ object FormRunnerActionsSupport {
 
     val (path, params) = splitQueryDecodeParams(uri)
 
-    val incomingParamNames = (params map (_._1)).to[Set]
+    val incomingParamNames = (params map (_._1)).toSet
 
     // Give priority to parameters on the URI, see:
     // https://github.com/orbeon/orbeon-forms/issues/3861

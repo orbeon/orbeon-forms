@@ -88,14 +88,14 @@ class XFormsContextStack {
   private var head: BindingContext = null
 
   // Constructor for `XFormsModel` and `XBLContainer`
-  def this(container: XBLContainer) {
+  def this(container: XBLContainer) = {
     this()
     this.container = container
     this.containingDocument = container.getContainingDocument
   }
 
   // Constructor for `XFormsModelAction` and `XFormsActionInterpreter`
-  def this(container: XBLContainer, parentBindingContext: BindingContext) {
+  def this(container: XBLContainer, parentBindingContext: BindingContext) = {
     this()
     this.container = container
     this.containingDocument = this.container.getContainingDocument

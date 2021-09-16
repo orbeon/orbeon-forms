@@ -20,7 +20,7 @@ import org.scalatestplus.junit.AssertionsForJUnit
 
 class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
 
-  @Test def repeatAncestors() {
+  @Test def repeatAncestors(): Unit = {
 
     this setupDocument
       <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"

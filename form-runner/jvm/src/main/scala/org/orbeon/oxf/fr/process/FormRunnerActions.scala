@@ -527,7 +527,7 @@ trait FormRunnerActions {
         for {
           (name, (valueFromCurrent, keepValue)) <- StateParams
           valueFromPath                         = params collectFirst { case (`name`, v) => v }
-          effectiveValue                        = valueFromPath getOrElse valueFromCurrent.apply
+          effectiveValue                        = valueFromPath getOrElse valueFromCurrent()
           if ! forNavigate || forNavigate && (valueFromPath.isDefined || keepValue(effectiveValue)) // keep parameter if explicit!
         } yield
           name -> effectiveValue

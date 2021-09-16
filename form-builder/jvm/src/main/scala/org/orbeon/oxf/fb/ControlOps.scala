@@ -204,7 +204,7 @@ trait ControlOps extends ResourcesOps {
         findTemplateInstance(ctx.formDefinitionRootElem, controlName) ++=
         findResourceHolders (controlName)
 
-      buffer.result
+      buffer.result()
     }
 
     // Prepend control element

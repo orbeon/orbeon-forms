@@ -22,8 +22,8 @@ object XFormsStaticStateCache {
   import Private._
 
   trait CacheTracer {
-    def digestAndTemplateStatus(digestIfFound: Option[String])
-    def staticStateStatus(found: Boolean, digest: String)
+    def digestAndTemplateStatus(digestIfFound: Option[String]): Unit
+    def staticStateStatus(found: Boolean, digest: String): Unit
   }
 
   def storeDocument(staticState: XFormsStaticState): Unit =

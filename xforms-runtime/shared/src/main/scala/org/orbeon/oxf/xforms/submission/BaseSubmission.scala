@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.xforms.{UrlType, XFormsCrossPlatformSupport}
 
 trait SubmissionProcess {
-  def process(request: ExternalContext.Request, response: ExternalContext.Response)
+  def process(request: ExternalContext.Request, response: ExternalContext.Response): Unit
 }
 
 abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Submission {

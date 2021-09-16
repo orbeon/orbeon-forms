@@ -117,7 +117,7 @@ object XFormsModelBinds {
   // 1. Doesn't check whether a TLD is known, as there are two many of those now (2015) and changing constantly.
   // 2. Doesn't support IP addresses (we probably could, but we don't care right now).
   //
-  object EmailValidatorNoDomainValidation extends EmailValidator(false) {
+  object EmailValidatorNoDomainValidation extends EmailValidator(allowLocal = false) {
 
     private val DomainLabelRegex = "\\p{Alnum}(?>[\\p{Alnum}-]*\\p{Alnum})*"
     private val TopLabelRegex    = "\\p{Alpha}{2,}"

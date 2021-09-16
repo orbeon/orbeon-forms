@@ -607,18 +607,18 @@ object XFormsStaticStateSerializer {
         case c: WithExpressionOrConstantTrait => // includes `NestedNameOrValueControl` and `xf:message` action
           b += "expressionOrConstant" -> c.expressionOrConstant.asJson
 //          // xf:range (skip!)
-//        case _: UploadControl          => Nil
-//        case _: SwitchControl          => Nil
-//        case _: GroupControl           => Nil
-//        case _: DialogControl          => Nil
-//        case _: AttributeControl       => Nil // ok, all extracted from attributes
-//        case _: RepeatControl          => Nil
-//        case _: RepeatIterationControl => Nil
-//        case _: InputControl           => Nil
-//        case _: TriggerControl         => Nil // ok
-//        case _: TextareaControl        => Nil // ok
-//        case _: SecretControl          => Nil // ok
-        case _                         => Nil
+//        case _: UploadControl          =>
+//        case _: SwitchControl          =>
+//        case _: GroupControl           =>
+//        case _: DialogControl          =>
+//        case _: AttributeControl       => // ok, all extracted from attributes
+//        case _: RepeatControl          =>
+//        case _: RepeatIterationControl =>
+//        case _: InputControl           =>
+//        case _: TriggerControl         => // ok
+//        case _: TextareaControl        => // ok
+//        case _: SecretControl          => // ok
+        case _                         =>
       }
 
     implicit lazy val encodeMapSet: Encoder[MapSet[String, String]] = (a: MapSet[String, String]) =>

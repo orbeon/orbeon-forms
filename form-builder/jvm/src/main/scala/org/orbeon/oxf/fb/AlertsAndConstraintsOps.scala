@@ -377,7 +377,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
       <validation type="datatype" id={idOpt.orNull} level={level.entryName} default-alert={alert.isEmpty.toString}>
         <builtin-type>{builtinTypeString}</builtin-type>
         <builtin-type-required>{builtinTypeRequired}</builtin-type-required>
-        <schema-type>{datatype.right.toOption map (_.qualifiedName) getOrElse ""}</schema-type>
+        <schema-type>{datatype.toOption map (_.qualifiedName) getOrElse ""}</schema-type>
         {alertOrPlaceholder(alert, forLang)}
       </validation>
     }

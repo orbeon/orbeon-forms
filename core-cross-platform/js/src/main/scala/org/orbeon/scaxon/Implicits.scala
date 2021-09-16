@@ -78,5 +78,5 @@ object Implicits {
     def hasNext: Boolean = current ne null
   }
 
-  def asScalaSeq(i: SequenceIterator): coll.Seq[Item] = asScalaIterator(i).to(List)
+  def asScalaSeq(i: SequenceIterator): Seq[Item] = asScalaIterator(i).to(List)
 }

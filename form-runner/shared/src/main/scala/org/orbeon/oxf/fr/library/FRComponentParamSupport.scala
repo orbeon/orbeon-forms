@@ -70,14 +70,18 @@ object FRComponentParamSupport {
       partAnalysis.ancestorOrSelfIterator flatMap findConstantMetadataRootElem
 
     def fromMetadataInstance: Option[StringValue] =
-      iterateMetadataInParts                                flatMap
+      (
+        iterateMetadataInParts                                flatMap
         (findHierarchicalElem(directNameOpt, paramName, _)) map
-        StringValue.makeStringValue                         nextOption()
+        StringValue.makeStringValue
+      ).nextOption()
 
     def fromPropertiesWithSuffix: Option[AtomicValue] =
-      iterateMetadataInParts flatMap
+      (
+        iterateMetadataInParts flatMap
         appFormFromMetadata  flatMap
-        (appForm => XXFormsComponentParam.fromProperties(paramName, appForm.toList, directNameOpt)) nextOption()
+        (appForm => XXFormsComponentParam.fromProperties(paramName, appForm.toList, directNameOpt))
+      ).nextOption()
 
     def fromPropertiesWithoutSuffix: Option[AtomicValue] =
       XXFormsComponentParam.fromProperties(paramName, Nil, directNameOpt)

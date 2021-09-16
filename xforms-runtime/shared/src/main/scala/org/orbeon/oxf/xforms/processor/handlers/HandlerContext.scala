@@ -158,7 +158,7 @@ class HandlerContext(
   def popComponentContext(): Unit =
     componentContextStack = componentContextStack.tail
 
-  def pushCaseContext(visible: Boolean) {
+  def pushCaseContext(visible: Boolean): Unit = {
 
     val currentVisible =
       if (caseContextStack.isEmpty)

@@ -23,8 +23,8 @@ import org.orbeon.saxon.om
 
 trait XPathDependencies {
 
-  def markValueChanged     (model: XFormsModel, nodeInfo: om.NodeInfo)
-  def markStructuralChange (model: XFormsModel, instanceOpt: Option[XFormsInstance])
+  def markValueChanged     (model: XFormsModel, nodeInfo: om.NodeInfo): Unit
+  def markStructuralChange (model: XFormsModel, instanceOpt: Option[XFormsInstance]): Unit
 
   def rebuildDone          (model: XFormsModel): Unit // called even if no work was done during `doRebuild()`
   def recalculateDone      (model: XFormsModel): Unit

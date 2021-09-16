@@ -33,9 +33,9 @@ import org.orbeon.scaxon.XPath._
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
-import scala.collection.Seq
 import scala.util.control.{Breaks, ControlThrowable, NonFatal}
 import scala.util.{Failure, Success, Try}
+
 
 // Independent process interpreter
 trait ProcessInterpreter extends Logging {
@@ -126,7 +126,7 @@ trait ProcessInterpreter extends Logging {
     def runSubProcess(process: String): Try[Any] = {
 
       def runAction(action: ActionNode) =
-        withDebug("process: running action", Seq("action" -> action.toString)) {
+        withDebug("process: running action", List("action" -> action.toString)) {
           // Push and pop the stack frame (for suspend/resume)
           val result = (
             AllAllowedActions
@@ -134,7 +134,7 @@ trait ProcessInterpreter extends Logging {
             apply     action.params
           )
 
-          debugResults(Seq("result" -> (if (result.isSuccess) "success" else "failure")))
+          debugResults(List("result" -> (if (result.isSuccess) "success" else "failure")))
 
           result
         }
@@ -152,16 +152,16 @@ trait ProcessInterpreter extends Logging {
             withStackFrame(group, pos) {
               nextCombinator match {
                 case ThenCombinator =>
-                  debug("process: combining with then", Seq("action" -> nextExpr.toString))
+                  debug("process: combining with then", List("action" -> nextExpr.toString))
                   tried flatMap (_ => runExpr(nextExpr))
                 case RecoverCombinator =>
-                  debug("process: combining with recover", Seq("action" -> nextExpr.toString))
+                  debug("process: combining with recover", List("action" -> nextExpr.toString))
                   tried recoverWith {
                     case t: ControlThrowable =>
                       debug("process: rethrowing ControlThrowable")
                       throw t
                     case NonFatal(t) =>
-                      debug("process: recovering", Seq("throwable" -> OrbeonFormatter.format(t)))
+                      debug("process: recovering", List("throwable" -> OrbeonFormatter.format(t)))
                       runExpr(nextExpr)
                   }
               }
@@ -222,7 +222,7 @@ trait ProcessInterpreter extends Logging {
 
   // Main entry point for starting a literal process
   def runProcess(scope: String, process: String): Try[Any] =
-    withDebug("process: running", Seq("process" -> process)) {
+    withDebug("process: running", List("process" -> process)) {
       transactionStart()
       // Scope the process (for suspend/resume)
       withEmptyStack(scope) {
@@ -329,7 +329,7 @@ trait ProcessInterpreter extends Logging {
     )
 
   // TODO
-  def evaluate(expr: String, item: Item = xpathContext): Seq[Any] =
+  def evaluate(expr: String, item: Item = xpathContext): collection.Seq[Any] =
     eval(
       item            = item,
       expr            = expr,

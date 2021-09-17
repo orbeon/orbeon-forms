@@ -33,6 +33,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.no.min.js"/>
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ru.min.js"/>
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pl.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.da.min.js"/>
 
     <xbl:binding
         id="fr-date"

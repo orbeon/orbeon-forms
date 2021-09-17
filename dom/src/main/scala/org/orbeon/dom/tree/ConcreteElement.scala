@@ -7,6 +7,7 @@ import org.xml.sax.Attributes
 
 import scala.jdk.CollectionConverters._
 
+
 private object ConcreteElement {
 
   val DefaultContentListSize = 2 // ORBEON: default was 5
@@ -39,9 +40,10 @@ class ConcreteElement(var qname: QName)
 
   protected var _attributes     = new ju.ArrayList[Attribute](DefaultContentListSize)
   private var _internalContent  = new ju.ArrayList[Node](DefaultContentListSize)
-  protected def internalContent = _internalContent
+  protected def internalContent: ju.List[Node] with ju.RandomAccess = _internalContent
 
-  def jContent = new ContentListFacade[Node](this, internalContent)
+  def jContent: ju.List[Node] with ju.RandomAccess =
+    new ContentListFacade[Node](this, internalContent)
 
   /**
    * Stores the parent branch of this node which is either a Document if this

@@ -11,7 +11,9 @@ import org.orbeon.dom.{IllegalAddException, Node}
  * is backed by the branch such that changes to the list will be reflected in
  * the branch and changes to the branch will be reflected in this list.
  */
-class ContentListFacade[T <: Node](val branch: AbstractBranch, val branchContent: ju.List[T]) extends ju.AbstractList[T] {
+class ContentListFacade[T <: Node](val branch: AbstractBranch, val branchContent: ju.List[T])
+  extends ju.AbstractList[T]
+     with ju.RandomAccess {
 
   override def add(node: T): Boolean = {
     branch.childAdded(node)

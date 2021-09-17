@@ -36,11 +36,12 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
-import scala.annotation.tailrec
 import scala.collection.Searching._
-import scala.collection.SeqLike
 import scala.collection.compat._
-import scala.collection.generic.IsSeqLike
+import scala.collection.Searching._
+import scala.collection.mutable.IndexedSeqOps
+import scala.collection.{IterableFactoryDefaults, IterableOnce, Iterator, SeqFactory, StrictOptimizedSeqOps, mutable}
+import scala.math.Ordering
 
 
 object ErrorSummary {
@@ -415,16 +416,17 @@ object ErrorSummary {
 
       val rootElem = errorsInstanceDoc.rootElement
 
-      // We work with the underlying DOM here
-      val newElemForSorting  = unsafeUnwrapElement(newErrorElem)
-      val rootElemDomContent = unsafeUnwrapElement(rootElem).content
+      import CustomJavaConversions._
 
-      import BinarySearching._
+      // We work with the underlying DOM here
+      val newElemForSorting   = unsafeUnwrapElement(newErrorElem)
+      val rootElemDomJContent = unsafeUnwrapElement(rootElem).jContent
+      val rootElemDomContent  = rootElemDomJContent.asScala
 
       val insertionPoint =
-        rootElemDomContent.binarySearch(newElemForSorting, 0, rootElemDomContent.length) match {
+        rootElemDomContent.search(newElemForSorting, 0, rootElemDomContent.length) match {
           case InsertionPoint(p) => p
-          case Found(i)          => throw new IllegalStateException // must not be an existing error; we know because we search for it above
+          case Found(_)          => throw new IllegalStateException // must not be an existing error; we know because we search for it above
         }
 
       val afterElemList =
@@ -444,25 +446,53 @@ object ErrorSummary {
   }
 }
 
-// This is lifted from scala's `Searching`, as we have a `Buffer` and the original implementation only enables binary search
-// if the collection is an `IndexedSearch`. Since our `Buffer` is not an `IndexedSeq`, the test fails and linear search
-// is used instead. But we know our `Buffer` is backed by an indexed Java collection. So here we allow direct access to the
-// `binarySearch` method.
-object BinarySearching {
-  class BinarySearchImpl[A, Repr](coll: SeqLike[A, Repr]) {
-    @tailrec
-    final def binarySearch[B >: A](elem: B, from: Int, to: Int)(implicit ord: Ordering[B]): SearchResult = {
-      if (to == from) InsertionPoint(from) else {
-        val idx = from + (to - from - 1) / 2
-        math.signum(ord.compare(elem, coll(idx))) match {
-          case -1 => binarySearch(elem, from, idx)(ord)
-          case  1 => binarySearch(elem, idx + 1, to)(ord)
-          case  _ => Found(idx)
-        }
-      }
+// This is so that we can convert `ju.RandomAccess` `ju.List` to an `IndexedBuffer`, which is necessary
+// to be able to get a binary search.
+object CustomJavaConversions {
+
+  import java.{util => ju}
+  import scala.jdk.CollectionConverters._
+
+  implicit class ListHasAsScala[A](l: ju.List[A] with ju.RandomAccess) {
+    def asScala: mutable.IndexedBuffer[A] = l match {
+      case null                           => null
+      case _                              => JRandomAccessListWrapper(l)
     }
   }
 
-  implicit def binarySearch[Repr, A](coll: Repr)
-    (implicit fr: IsSeqLike[Repr]): BinarySearchImpl[fr.A, Repr] = new BinarySearchImpl(fr.conversion(coll))
+  case class JRandomAccessListWrapper[A](underlying: ju.List[A] with ju.RandomAccess)
+    extends mutable.IndexedBuffer[A]
+      with IndexedSeqOps[A, JRandomAccessListWrapper, JRandomAccessListWrapper[A]]
+      with StrictOptimizedSeqOps[A, JRandomAccessListWrapper, JRandomAccessListWrapper[A]]
+      with IterableFactoryDefaults[A, JRandomAccessListWrapper]
+      with Serializable {
+    def length = underlying.size
+    override def knownSize: Int = if (underlying.isEmpty) 0 else super.knownSize
+    override def isEmpty = underlying.isEmpty
+    override def iterator: Iterator[A] = underlying.iterator.asScala
+    def apply(i: Int) = underlying.get(i)
+    def update(i: Int, elem: A) = underlying.set(i, elem)
+    def prepend(elem: A) = { underlying.subList(0, 0) add elem; this }
+    def addOne(elem: A): this.type = { underlying add elem; this }
+    def insert(idx: Int,elem: A): Unit = underlying.subList(0, idx).add(elem)
+    def insertAll(i: Int, elems: IterableOnce[A]) = {
+      val ins = underlying.subList(0, i)
+      elems.iterator.foreach(ins.add(_))
+    }
+    def remove(i: Int) = underlying.remove(i)
+    def clear() = underlying.clear()
+    // Note: Clone cannot just call underlying.clone because in Java, only specific collections
+    // expose clone methods.  Generically, they're protected.
+    override def clone(): JRandomAccessListWrapper[A] = JRandomAccessListWrapper(new ju.ArrayList[A](underlying))
+    override def patchInPlace(from: Int, patch: scala.collection.IterableOnce[A], replaced: Int): this.type = {
+      remove(from, replaced)
+      insertAll(from, patch)
+      this
+    }
+    def remove(from: Int, n: Int): Unit = underlying.subList(from, from+n).clear()
+    override def iterableFactory = ???
+    override def subtractOne(elem: A): this.type = { underlying.remove(elem.asInstanceOf[AnyRef]); this }
+  }
+
+//  object JRandomAccessListWrapper extends SeqFactory.Delegate[mutable.IndexedBuffer](JRandomAccessListWrapper)
 }

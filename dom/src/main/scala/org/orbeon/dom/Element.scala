@@ -12,6 +12,8 @@ import scala.jdk.CollectionConverters._
  */
 trait Element extends Branch {
 
+  override def jContent: ju.List[Node] with ju.RandomAccess
+
   def getQName: QName
   def getNamespace: Namespace
   def getNamespaceForPrefix(prefix: String): Namespace

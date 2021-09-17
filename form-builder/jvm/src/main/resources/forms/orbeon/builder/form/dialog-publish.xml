@@ -40,7 +40,7 @@
         <xf:setvalue ref="instance()/existing-version"      value="-1"/>
         <xf:setvalue ref="instance()/existing-comment"/>
         <xf:setvalue ref="instance()/latest-version"        value="-1"/>
-        <xf:setvalue ref="instance()/selected-version"      value="'next'"/>
+        <xf:setvalue ref="instance()/selected-version"/><!-- https://github.com/orbeon/orbeon-forms/issues/5001 -->
         <xf:setvalue ref="instance()/selected-comment"/>
 
         <xf:dispatch name="fr-read-versions" targetid="fr-versioning-model">
@@ -51,7 +51,7 @@
             <xf:property name="callback-id"                value="'fb-publish-model'"/>
         </xf:dispatch>
 
-        <xf:setfocus control="fb-publish-publish"/>
+        <xf:setfocus control="fb-publish-selected-version"/>
     </xf:action>
 
     <!-- Switch to display initial / success / error cases -->
@@ -104,7 +104,8 @@
                     <fr:grid>
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 ref="instance()/selected-version">
+                                <!-- https://github.com/orbeon/orbeon-forms/issues/5001 -->
+                                <xf:select1 ref="instance()/selected-version" appearance="dropdown" id="fb-publish-selected-version">
                                     <xf:label value="$form-resources/dialog-publish/version"/>
                                     <xf:item>
                                         <xf:label value="xxf:format-message($form-resources/dialog-publish/create-new-version-item, $latest-version + 1)"/>
@@ -183,7 +184,7 @@
                     <!-- Publish button -->
                     <xf:trigger xxf:modal="true" id="fb-publish-publish" appearance="xxf:primary">
                         <xf:label value="$form-resources/dialog-publish/publish"/>
-                        <xf:action event="DOMActivate">
+                        <xf:action event="DOMActivate" if="valid(instance())">
                             <xf:dispatch name="fb-publish-form" targetid="fr-form-model">
                                 <xf:property name="doc"                      value="xxf:instance('fb-form-instance')"/>
                                 <xf:property name="app"                      value="$app"/>
@@ -336,7 +337,7 @@
                 <existing-comment/>                               <!-- set by `fb-read-form-definition` -->
 
                 <available>true</available>
-                <selected-version>next</selected-version>
+                <selected-version/>
                 <selected-comment/>
             </publish>
         </xf:instance>
@@ -344,6 +345,8 @@
         <xf:bind
             ref="published-attachments | published-version | existing-version | latest-version"
             type="xs:integer"/>
+
+        <xf:bind ref="selected-version" required="true()"/>
 
         <xf:var name="app"                  value="instance()/app/string()"/>
         <xf:var name="form"                 value="instance()/form/string()"/>

@@ -21,7 +21,6 @@ import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om
 import org.orbeon.xml.NamespaceMapping
 
-import scala.collection.{Map, Seq}
 import scala.jdk.CollectionConverters._
 
 
@@ -32,11 +31,11 @@ object XPath {
   def evalOne(
       item            : om.Item,
       expr            : String,
-      namespaces      : NamespaceMapping                     = NamespaceMapping.EmptyMapping,
-      variables       : Map[String, ValueRepresentationType] = null,
-      reporter        : Reporter                             = null,
-      functionContext : FunctionContext                      = null)(
-      implicit library: FunctionLibrary                      = null
+      namespaces      : NamespaceMapping                                = NamespaceMapping.EmptyMapping,
+      variables       : collection.Map[String, ValueRepresentationType] = null,
+      reporter        : Reporter                                        = null,
+      functionContext : FunctionContext                                 = null)(
+      implicit library: FunctionLibrary                                 = null
   ): om.Item =
     evaluateSingleKeepItems(
       List(item).asJava,
@@ -56,12 +55,12 @@ object XPath {
   def eval(
       item            : om.Item,
       expr            : String,
-      namespaces      : NamespaceMapping                     = NamespaceMapping.EmptyMapping,
-      variables       : Map[String, ValueRepresentationType] = null,
-      reporter        : Reporter                             = null,
-      functionContext : FunctionContext                      = null)(
-      implicit library: FunctionLibrary                      = null
-  ): Seq[Any] =
+      namespaces      : NamespaceMapping                                = NamespaceMapping.EmptyMapping,
+      variables       : collection.Map[String, ValueRepresentationType] = null,
+      reporter        : Reporter                                        = null,
+      functionContext : FunctionContext                                 = null)(
+      implicit library: FunctionLibrary                                 = null
+  ): collection.Seq[Any] =
     evaluate(item,
       expr,
       namespaces,
@@ -76,11 +75,11 @@ object XPath {
   def evalValueTemplate(
       item            : om.Item,
       expr            : String,
-      namespaces      : NamespaceMapping                     = NamespaceMapping.EmptyMapping,
-      variables       : Map[String, ValueRepresentationType] = null,
-      reporter        : Reporter                             = null,
-      functionContext : FunctionContext                      = null)(
-      implicit library: FunctionLibrary                      = null
+      namespaces      : NamespaceMapping                                = NamespaceMapping.EmptyMapping,
+      variables       : collection.Map[String, ValueRepresentationType] = null,
+      reporter        : Reporter                                        = null,
+      functionContext : FunctionContext                                 = null)(
+      implicit library: FunctionLibrary                                 = null
   ): String =
     evaluateAsAvt(
       item,

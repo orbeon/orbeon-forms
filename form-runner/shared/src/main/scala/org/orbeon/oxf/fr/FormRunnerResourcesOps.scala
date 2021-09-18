@@ -25,8 +25,8 @@ import java.net.URI
 trait FormRunnerResourcesOps {
 
   //@XPathFunction
-  def allLangs    (resourcesRootElem: NodeInfo): collection.Seq[String]   = allResources(resourcesRootElem) attValue "*:lang"
-  def allResources(resourcesRootElem: NodeInfo): collection.Seq[NodeInfo] = resourcesRootElem child "resource"
+  def allLangs    (resourcesRootElem: NodeInfo): collection.Seq[String] = allResources(resourcesRootElem) attValue "*:lang"
+  def allResources(resourcesRootElem: NodeInfo): NodeColl               = resourcesRootElem child "resource"
 
   //@XPathFunction
   def resourcesInstanceRootElemOpt(inDoc: NodeInfo): Option[NodeInfo] = frc.inlineInstanceRootElem(inDoc, FormResources)

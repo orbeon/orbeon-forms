@@ -76,11 +76,11 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     (includeSelf list container) ++ (container precedingSibling * filter IsContainer)
 
   // Find ancestor sections and grids and root
-  def findAncestorContainersLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): collection.Seq[NodeInfo] =
+  def findAncestorContainersLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): NodeColl =
     (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
 
   //@XPathFunction
-  def findAncestorSectionsLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): collection.Seq[NodeInfo] =
+  def findAncestorSectionsLeafToRoot(descendant: NodeInfo, includeSelf: Boolean = false): NodeColl =
     findAncestorContainersLeafToRoot(descendant, includeSelf) filter IsSection
 
   // Find ancestor section and grid names from root to leaf
@@ -116,15 +116,15 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   }
 
   // A container's children containers
-  def childrenContainers(container: NodeInfo): collection.Seq[NodeInfo] =
+  def childrenContainers(container: NodeInfo): NodeColl =
     container / * filter IsContainer
 
   // A container's children grids (including repeated grids)
-  def childrenGrids(container: NodeInfo): collection.Seq[NodeInfo] =
+  def childrenGrids(container: NodeInfo): NodeColl =
     container / * filter IsGrid
 
   // Find all ancestor repeats from leaf to root
-  def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): collection.Seq[NodeInfo] =
+  def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): NodeColl =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter isRepeat
 
   //@XPathFunction
@@ -132,7 +132,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     findAncestorRepeats(descendantOrSelf, includeSelf) flatMap getControlNameOpt
 
   // Find all ancestor sections from leaf to root
-  def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): collection.Seq[NodeInfo] =
+  def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): NodeColl =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsSection
 
   def findRepeatIterationName(controlName: String)(implicit ctx: FormRunnerDocContext): Option[String] =
@@ -144,7 +144,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     } yield
       getBindNameOrEmpty(iterationBind)
 
-  def findNestedControls(containerElem: NodeInfo): collection.Seq[NodeInfo] =
+  def findNestedControls(containerElem: NodeInfo): NodeColl =
     containerElem descendant (NodeInfoCell.CellTest || NodeInfoCell.TdTest) flatMap findCellNestedControl
 
   def findCellNestedControl(containerElem: NodeInfo): Option[NodeInfo] =

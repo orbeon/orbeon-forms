@@ -492,7 +492,7 @@ trait ControlOps extends ResourcesOps {
     resourceChanged || mediatypeChanged || paramsChanged
   }
 
-  def lhhatChildrenParams(lhhatNodes: collection.Seq[NodeInfo]): collection.Seq[NodeInfo] =
+  def lhhatChildrenParams(lhhatNodes: collection.Seq[NodeInfo]): NodeColl =
     lhhatNodes child FRParamTest
 
   def setControlLHHATParams(
@@ -528,7 +528,7 @@ trait ControlOps extends ResourcesOps {
   }
 
   // Find a control's LHHAT (there can be more than one for alerts)
-  def getControlLhhat(controlName: String, lhhaName: String)(implicit ctx: FormBuilderDocContext): collection.Seq[NodeInfo] =
+  def getControlLhhat(controlName: String, lhhaName: String)(implicit ctx: FormBuilderDocContext): NodeColl =
     findControlByName(controlName).toList child controlLHHATQName(lhhaName)
 
   // For a given control and LHHAT type, whether the mediatype on the LHHAT is HTML
@@ -700,10 +700,10 @@ trait ControlOps extends ResourcesOps {
     XFormsId(staticId, containerIds.toList, 1 to repeatDepth map (_ => 1) toList).toEffectiveId
   }
 
-  def findNewActions(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
+  def findNewActions(implicit ctx: FormBuilderDocContext): NodeColl =
     ctx.modelElem child FRActionTest
 
-  def findLegacyActions(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
+  def findLegacyActions(implicit ctx: FormBuilderDocContext): NodeColl =
     ctx.modelElem child FBActionTest filter (_.id.endsWith("-binding"))
 
   // See also `controls.xsl` for the handling of `replaceVarReferencesWithFunctionCalls()`. Unfortunately there is

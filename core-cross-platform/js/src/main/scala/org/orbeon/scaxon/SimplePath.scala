@@ -30,6 +30,8 @@ import scala.jdk.CollectionConverters._
 // full XPath expressions, as those need to be compiled, cached, and run, and can be very complex.
 object SimplePath {
 
+  type NodeColl = LazyList[NodeInfo]
+
   import Private._
 
   case class URIQualifiedName(uri: String, localName: String) {
@@ -139,18 +141,18 @@ object SimplePath {
     // Return an element's attributes
     // Q: Should functions taking a String match on no namespace only?
     // Q: If the QName is specified, zero or one attribute can be returned. Should return `Option`?
-    def /@(attName: String): Seq[NodeInfo] = /@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
-    def /@(attName: QName): Seq[NodeInfo] = /@(new NodeQNameTest((attName.namespace.uri, attName.localName), Some(Type.ATTRIBUTE)))
-    def /@(attName: (String, String)): Seq[NodeInfo] = /@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
-    def /@(test: Test): Seq[NodeInfo] = find(AxisInfo.ATTRIBUTE, test)
+    def /@(attName: String): NodeColl = /@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
+    def /@(attName: QName): NodeColl = /@(new NodeQNameTest((attName.namespace.uri, attName.localName), Some(Type.ATTRIBUTE)))
+    def /@(attName: (String, String)): NodeColl = /@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
+    def /@(test: Test): NodeColl = find(AxisInfo.ATTRIBUTE, test)
 
-    def namespaceNodes: Seq[NodeInfo] = find(AxisInfo.NAMESPACE, AnyTest)
+    def namespaceNodes: NodeColl = find(AxisInfo.NAMESPACE, AnyTest)
 
     // The following doesn't work right now because the DESCENDANT axis doesn't include attributes
-//        def //@(attName: String): Seq[NodeInfo] = //@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
-//        def //@(attName: QName): Seq[NodeInfo] = //@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
-//        def //@(attName: (String, String)): Seq[NodeInfo] = //@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
-//        def //@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
+//        def //@(attName: String): NodeColl = //@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
+//        def //@(attName: QName): NodeColl = //@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
+//        def //@(attName: (String, String)): NodeColl = //@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
+//        def //@(test: Test): NodeColl = find(Axis.DESCENDANT, test)
 
     def root: NodeInfo = nodeInfo.getRoot // Saxon 10: may or may not be a document node
     def rootElement = root / * head
@@ -181,23 +183,23 @@ object SimplePath {
     }
 
     def attValueOpt(attName: String) = /@(attName) match {
-      case Seq() => None
-      case s     => Some(s.stringValue)
+      case LazyList() => None
+      case s          => Some(s.stringValue)
     }
 
     def attValueOpt(attName: QName) = /@(attName) match {
-      case Seq() => None
-      case s     => Some(s.stringValue)
+      case LazyList() => None
+      case s          => Some(s.stringValue)
     }
 
     def attValueOpt(test: Test) = /@(test) match {
-      case Seq() => None
-      case s     => Some(s.stringValue)
+      case LazyList() => None
+      case s          => Some(s.stringValue)
     }
 
     def attValueNonBlankOpt(attName: String) = /@(attName) match {
-      case Seq() => None
-      case s     => Some(s.stringValue) filter (_.nonAllBlank)
+      case LazyList() => None
+      case s          => Some(s.stringValue) filter (_.nonAllBlank)
     }
 
     def attValueNonBlankOrThrow(attName: String): String =
@@ -209,13 +211,13 @@ object SimplePath {
     def elemValue(elemName: QName)  = /(elemName).stringValue
 
     def elemValueOpt(elemName: String) = /(elemName) match {
-      case Seq() => None
-      case s     => Some(s.stringValue)
+      case LazyList() => None
+      case s          => Some(s.stringValue)
     }
 
     def elemValueOpt(elemName: QName) = /(elemName) match {
-      case Seq() => None
-      case s     => Some(s.stringValue)
+      case LazyList() => None
+      case s          => Some(s.stringValue)
     }
 
     def elemWithLangOpt(elemName: QName, lang: String): Option[NodeInfo] =
@@ -229,17 +231,17 @@ object SimplePath {
     def parentOption: Option[NodeInfo] = Option(nodeInfo.getParent)
     def parentUnsafe: NodeInfo = parentOption getOrElse (throw new NoSuchElementException)
 
-    def ancestor(test: Test): Seq[NodeInfo] = find(AxisInfo.ANCESTOR, test)
-    def ancestorOrSelf (test: Test): Seq[NodeInfo] = find(AxisInfo.ANCESTOR_OR_SELF, test)
-    def descendant(test: Test): Seq[NodeInfo] = find(AxisInfo.DESCENDANT, test)
-    def descendantOrSelf(test: Test): Seq[NodeInfo] = find(AxisInfo.DESCENDANT_OR_SELF, test)
+    def ancestor(test: Test): NodeColl = find(AxisInfo.ANCESTOR, test)
+    def ancestorOrSelf (test: Test): NodeColl = find(AxisInfo.ANCESTOR_OR_SELF, test)
+    def descendant(test: Test): NodeColl = find(AxisInfo.DESCENDANT, test)
+    def descendantOrSelf(test: Test): NodeColl = find(AxisInfo.DESCENDANT_OR_SELF, test)
 
-    def preceding(test: Test): Seq[NodeInfo] = find(AxisInfo.PRECEDING, test) // TODO: use Type/NODE?
-    def following(test: Test): Seq[NodeInfo] = find(AxisInfo.FOLLOWING, test) // TODO: use Type/NODE?
+    def preceding(test: Test): NodeColl = find(AxisInfo.PRECEDING, test) // TODO: use Type/NODE?
+    def following(test: Test): NodeColl = find(AxisInfo.FOLLOWING, test) // TODO: use Type/NODE?
 
-    def precedingSibling(test: Test): Seq[NodeInfo] = find(AxisInfo.PRECEDING_SIBLING, test) // TODO: use Type/NODE?
-    def followingSibling(test: Test): Seq[NodeInfo] = find(AxisInfo.FOLLOWING_SIBLING, test) // TODO: use Type/NODE?
-    def sibling(test: Test): Seq[NodeInfo] = precedingSibling(test) ++ followingSibling(test)
+    def precedingSibling(test: Test): NodeColl = find(AxisInfo.PRECEDING_SIBLING, test) // TODO: use Type/NODE?
+    def followingSibling(test: Test): NodeColl = find(AxisInfo.FOLLOWING_SIBLING, test) // TODO: use Type/NODE?
+    def sibling(test: Test): NodeColl = precedingSibling(test) ++ followingSibling(test)
 
     def namespaces        = find(AxisInfo.NAMESPACE, AnyTest)
     def namespaceMappings = namespaces map (n => n.getLocalPart -> n.getStringValue)
@@ -319,34 +321,35 @@ object SimplePath {
     private def hasNonEmptyChildNode: Boolean =
       nodeInfo child Text exists (_.stringValue.nonEmpty)
 
-    private def find(axisNumber: Int, test: Test): Seq[NodeInfo] = {
-      // We know the result contains only NodeInfo, but ouch, this is a cast!
-      val iterator = Implicits.asScalaIterator(nodeInfo.iterateAxis(axisNumber, test.test(nodeInfo))).asInstanceOf[Iterator[NodeInfo]]
-      // FIXME: We should instead return the Iterator. This means all callers need to be adjusted.
-      iterator.toStream
-    }
+    private def find(axisNumber: Int, test: Test): NodeColl =
+      Implicits.asScalaIterator(nodeInfo.iterateAxis(axisNumber, test.test(nodeInfo)))
+        .asInstanceOf[Iterator[NodeInfo]] // we know the result contains only `NodeInfo`, but ouch, this is a cast!
+        .to(LazyList)
   }
 
   // Operations on sequences of NodeInfo
-  implicit class NodeInfoSeqOps(private val seq: Seq[NodeInfo]) extends AnyVal {
+  implicit class NodeInfoSeqOps(private val _seq: Iterable[NodeInfo]) extends AnyVal {
+
+    @inline
+    private def lazyList = _seq.to(LazyList)
 
     // Semantic is the same as XPath: at least one value must match
-    def ===(s: String) = seq exists (_ === s)
+    def ===(s: String) = lazyList exists (_ === s)
     def !==(s: String) = ! ===(s)
 
-    def /(test: Test): Seq[NodeInfo] = seq flatMap (_ / test)
+    def /(test: Test): NodeColl = lazyList flatMap (_ / test)
 
-    def /@(attName: String): Seq[NodeInfo] = seq flatMap (_ /@ attName)
-    def /@(attName: QName): Seq[NodeInfo] = seq flatMap (_ /@ attName)
-    def /@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ /@ attName)
-    def /@(test: Test): Seq[NodeInfo] = seq flatMap (_ /@ test)
+    def /@(attName: String): NodeColl = lazyList flatMap (_ /@ attName)
+    def /@(attName: QName): NodeColl = lazyList flatMap (_ /@ attName)
+    def /@(attName: (String, String)): NodeColl = lazyList flatMap (_ /@ attName)
+    def /@(test: Test): NodeColl = lazyList flatMap (_ /@ test)
 
     def elemWithLangOpt(elemName: QName, lang: String): Option[NodeInfo] =
-      seq flatMap (_.elemWithLangOpt(elemName, lang)) headOption
+      lazyList flatMap (_.elemWithLangOpt(elemName, lang)) headOption
 
-    def ids: Seq[String] = seq flatMap (_.idOpt)
+    def ids: Seq[String] = lazyList flatMap (_.idOpt)
 
-    def namespaceNodes: Seq[NodeInfo] = seq flatMap (_.namespaceNodes)
+    def namespaceNodes: NodeColl = lazyList flatMap (_.namespaceNodes)
 
     def att(attName: String)      = /@(attName)
     def att(test: Test)           = /@(test)
@@ -357,30 +360,30 @@ object SimplePath {
     def attValue(attName: String) = /@(attName) map (_.stringValue)
     def attValue(attName: QName)  = /@(attName) map (_.stringValue)
 
-    def self(test: Test) = seq flatMap (_ self test)
-    def parent(test: Test) = seq flatMap (_ parent test)
+    def self(test: Test) = lazyList flatMap (_ self test)
+    def parent(test: Test) = lazyList flatMap (_ parent test)
 
-    def ancestor(test: Test): Seq[NodeInfo] = seq flatMap (_ ancestor test)
-    def ancestorOrSelf (test: Test): Seq[NodeInfo] = seq flatMap (_ ancestorOrSelf test)
-    def descendant(test: Test): Seq[NodeInfo] = seq flatMap (_ descendant test)
-    def descendantOrSelf(test: Test): Seq[NodeInfo] = seq flatMap (_ descendantOrSelf test)
+    def ancestor(test: Test): NodeColl = lazyList flatMap (_ ancestor test)
+    def ancestorOrSelf (test: Test): NodeColl = lazyList flatMap (_ ancestorOrSelf test)
+    def descendant(test: Test): NodeColl = lazyList flatMap (_ descendant test)
+    def descendantOrSelf(test: Test): NodeColl = lazyList flatMap (_ descendantOrSelf test)
 
-    def preceding(test: Test): Seq[NodeInfo] = seq flatMap (_ preceding test)
-    def following(test: Test): Seq[NodeInfo] = seq flatMap (_ following test)
+    def preceding(test: Test): NodeColl = lazyList flatMap (_ preceding test)
+    def following(test: Test): NodeColl = lazyList flatMap (_ following test)
 
-    def precedingSibling(test: Test) = seq flatMap (_ precedingSibling test)
-    def followingSibling(test: Test) = seq flatMap (_ followingSibling test)
-    def sibling(test: Test) = seq flatMap (_ sibling test)
+    def precedingSibling(test: Test) = lazyList flatMap (_ precedingSibling test)
+    def followingSibling(test: Test) = lazyList flatMap (_ followingSibling test)
+    def sibling(test: Test) = lazyList flatMap (_ sibling test)
 
     // The string value is not defined on sequences. We take the first value, for convenience, like in XPath 2.0's
     // XPath 1.0 compatibility mode.
-    def stringValue = seq match {
-      case Seq() => ""
-      case Seq(nodeInfo, _*) => nodeInfo.getStringValue
+    def stringValue = lazyList match {
+      case LazyList()             => ""
+      case LazyList(nodeInfo, _*) => nodeInfo.getStringValue
     }
 
     def effectiveBooleanValue: Boolean =
-      SaxonUtils.effectiveBooleanValue(new ListIterator(seq.asJava))
+      SaxonUtils.effectiveBooleanValue(new ListIterator(lazyList.asJava))
   }
 
   private object Private {
@@ -395,7 +398,7 @@ object SimplePath {
     // HACK because of compiler limitation:
     // "implementation restriction: nested class is not allowed in value class
     //  This restriction is planned to be removed in subsequent releases."
-    def prefixesForURIImpl(uri: String, ops: NodeInfoOps): Seq[String] =
+    def prefixesForURIImpl(uri: String, ops: NodeInfoOps): LazyList[String] =
       ops.namespaceMappings collect { case (prefix, `uri`) => prefix }
   }
 }

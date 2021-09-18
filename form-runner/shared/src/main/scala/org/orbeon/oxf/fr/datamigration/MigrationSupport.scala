@@ -58,16 +58,16 @@ object MigrationSupport {
       }
   }
 
-  def findAllGrids(repeat: Boolean)(implicit ctx: FormRunnerDocContext): collection.Seq[NodeInfo] =
+  def findAllGrids(repeat: Boolean)(implicit ctx: FormRunnerDocContext): NodeColl =
     ctx.bodyElem descendant * filter
       frc.IsGrid filter
       (_.ancestor(XXFDialogTest).isEmpty) filter
       (g => frc.isRepeat(g) ^ ! repeat)
 
-  def findLegacyRepeatedGrids(implicit ctx: FormRunnerDocContext): collection.Seq[NodeInfo] =
+  def findLegacyRepeatedGrids(implicit ctx: FormRunnerDocContext): NodeColl =
     findAllGrids(repeat = true) filter frc.isLegacyRepeat
 
-  def findLegacyUnrepeatedGrids(implicit ctx: FormRunnerDocContext): collection.Seq[NodeInfo] =
+  def findLegacyUnrepeatedGrids(implicit ctx: FormRunnerDocContext): NodeColl =
     findAllGrids(repeat = false) filter frc.isLegacyUnrepeatedGrid
 
   def findAllMigrations(metadataRootElem: NodeInfo): List[(MigrationVersion, String)] =

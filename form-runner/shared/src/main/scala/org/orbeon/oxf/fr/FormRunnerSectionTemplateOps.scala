@@ -124,7 +124,7 @@ trait FormRunnerSectionTemplateOps {
 
   // Find top-level `xf:bind`, which is the one without a `ref`
   // Q: There is a `xf:bind` making `instance('fr-form-instance')` readonly in certain cases; is it really needed?
-  def findXblBinds(bindingElem: NodeInfo): collection.Seq[NodeInfo] = {
+  def findXblBinds(bindingElem: NodeInfo): NodeColl = {
     val els =
       bindingElem                         /
         fr.XMLNames.XBLImplementationTest /

@@ -329,7 +329,7 @@ object FormRunnerPersistence {
   // See `SimpleDataMigrationTest` for example for versions. They must start with two integers separated by `.`.
   def findFormDefinitionFormatFromStringVersions(versions: collection.Seq[String]): Option[DataFormatVersion] = {
 
-    def parseVersions: Seq[(Int, Int)] =
+    def parseVersions: collection.Seq[(Int, Int)] =
       for {
         version <- versions
         trimmed <- version.trimAllToOpt // DEBATE: We shouldn't have to trim or ignore blank lines.

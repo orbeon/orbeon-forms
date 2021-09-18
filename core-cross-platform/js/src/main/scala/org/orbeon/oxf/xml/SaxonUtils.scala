@@ -305,7 +305,7 @@ object SaxonUtils {
   def getStructuredQNameURI      (qName: om.StructuredQName): String = qName.getURI
 
   def itemIterator(i: om.Item): SequenceIterator = SingletonIterator.makeIterator(i)
-  def listIterator(s: Seq[om.Item]): SequenceIterator = new ListIterator(s.asJava)
+  def listIterator(s: collection.Seq[om.Item]): SequenceIterator = new ListIterator(s.asJava)
   def emptyIterator: SequenceIterator = EmptyIterator.getInstance
   def valueAsIterator(v: ValueRepresentationType): SequenceIterator = if (v eq null) emptyIterator else v.iterate()
 
@@ -318,7 +318,7 @@ object SaxonUtils {
     m
   }
 
-  def newArrayItem(v: Seq[GroundedValue]): Item =
+  def newArrayItem(v: collection.Seq[GroundedValue]): Item =
     new ImmutableArrayItem(ImmList.fromList(v.asJava))
 
   def hasXPathNumberer(lang: String): Boolean =

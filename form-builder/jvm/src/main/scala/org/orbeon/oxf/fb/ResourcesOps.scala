@@ -67,7 +67,7 @@ trait ResourcesOps extends BaseOps {
     resourceName : String,
     langs        : Iterable[String])(implicit
     ctx          : FormBuilderDocContext
-  ): Seq[(String, Seq[NodeInfo])] = {
+  ): collection.Seq[(String, collection.Seq[NodeInfo])] = {
     val langsSet = langs.toSet
     findResourceHoldersWithLang(controlName, resourcesRoot) collect {
       case (lang, holder) if langsSet(lang) => lang -> (holder child resourceName)
@@ -109,7 +109,7 @@ trait ResourcesOps extends BaseOps {
     findControlByName(controlName) exists (e => FormBuilder.hasEditor(e, "item-hint"))
 
   // Get the control's items for all languages
-  def getControlItemsGroupedByValue(controlName: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] = {
+  def getControlItemsGroupedByValue(controlName: String)(implicit ctx: FormBuilderDocContext): collection.Seq[NodeInfo] = {
 
     val localResourcesRoot = resourcesRoot
 
@@ -201,7 +201,7 @@ trait ResourcesOps extends BaseOps {
     resourceName : String,
     count        : Int)(implicit
     ctx          : FormBuilderDocContext
-  ): Seq[NodeInfo] =
+  ): collection.Seq[NodeInfo] =
     ensureResourceHoldersForLang(controlName, resourceName, count, currentLang)
 
   def ensureResourceHoldersForLang(
@@ -210,7 +210,7 @@ trait ResourcesOps extends BaseOps {
     count        : Int,
     lang         : String)(implicit
     ctx          : FormBuilderDocContext
-  ): Seq[NodeInfo] = {
+  ): collection.Seq[NodeInfo] = {
 
     val rootResourceElemForLang = resourcesElemForLangOrDefault(lang)
 
@@ -247,7 +247,7 @@ trait ResourcesOps extends BaseOps {
     count        : Int = 1,
     langs        : Seq[String])(implicit // TODO: `langs` is not used. Oversight or correct?
     ctx          : FormBuilderDocContext
-  ): Seq[(String, Seq[NodeInfo])] =
+  ): collection.Seq[(String, collection.Seq[NodeInfo])] =
     allLangs(resourcesRoot) map
       (lang => lang -> ensureResourceHoldersForLang(controlName, resourceName, count, lang))
 
@@ -260,7 +260,7 @@ trait ResourcesOps extends BaseOps {
       { case (`lang`, holder) => holder }
 
   // Find control resource holders
-  def findResourceHolders(controlName: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
+  def findResourceHolders(controlName: String)(implicit ctx: FormBuilderDocContext): collection.Seq[NodeInfo] =
     findResourceHoldersWithLang(controlName, resourcesRoot) map (_._2)
 
   // For the given bind and lang, find all associated resource holders
@@ -282,7 +282,7 @@ trait ResourcesOps extends BaseOps {
     lhhaElements : Iterable[NodeInfo],
     lhhaName     : String)(implicit
     ctx          : FormBuilderDocContext
-  ): (Boolean, Seq[NodeInfo]) = {
+  ): (Boolean, collection.Seq[NodeInfo]) = {
 
     val hasParams =
       lhhaElements exists (e => FormBuilder.lhhatChildrenParams(e).nonEmpty)

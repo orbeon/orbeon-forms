@@ -316,7 +316,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     data      : Option[NodeInfo],
     predicate : NodeInfo => Boolean)(implicit
     ctx       : FormRunnerDocContext
-  ): Seq[ControlBindPathHoldersResources] =
+  ): collection.Seq[ControlBindPathHoldersResources] =
     searchControlBindPathHoldersInDoc(
       controlElems   = ctx.bodyElemOpt.toList descendant * filter IsControl,
       contextItemOpt = data map (_.rootElement),
@@ -329,7 +329,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     sectionPredicate : NodeInfo => Boolean,
     controlPredicate : NodeInfo => Boolean)(implicit
     ctx              : FormRunnerDocContext
-  ): Seq[ControlBindPathHoldersResources] =
+  ): collection.Seq[ControlBindPathHoldersResources] =
     for {
       section         <- frc.findSectionsWithTemplates
       if sectionPredicate(section)
@@ -368,7 +368,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     contextItemOpt : Option[NodeInfo],
     predicate      : NodeInfo => Boolean)(implicit
     ctx            : FormRunnerDocContext
-  ): Seq[ControlBindPathHoldersResources] =
+  ): collection.Seq[ControlBindPathHoldersResources] =
     for {
       control                              <- controlElems
       if predicate(control)
@@ -520,7 +520,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     // in other forms.
     def buildBindPath(bind: NodeInfo): Option[List[PathElem]] =
       (bind ancestorOrSelf XFBindTest flatMap bindRefOpt).reverse match {
-        case _ #:: tail =>
+        case collection.Seq(_, tail @ _*) =>
           tail.map(bindRef =>
             PathElem(
               if (bindRef.endsWith(FBLangPredicate))

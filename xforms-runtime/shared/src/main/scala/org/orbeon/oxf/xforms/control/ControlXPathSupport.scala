@@ -70,7 +70,7 @@ trait ControlXPathSupport {
   // 6 usages
   def evaluateAsString(
     xpathString        : String,
-    contextItems       : Seq[om.Item],
+    contextItems       : collection.Seq[om.Item],
     contextPosition    : Int,
     collector          : ErrorEventCollector,
     contextMessage     : String,

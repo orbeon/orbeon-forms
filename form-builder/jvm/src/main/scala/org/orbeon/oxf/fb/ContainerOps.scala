@@ -45,20 +45,20 @@ trait ContainerOps extends ControlOps {
     findInViewTryIndex(staticId) filter IsContainer
   }
 
-  def findNestedContainers(containerElem: NodeInfo): Seq[NodeInfo] =
+  def findNestedContainers(containerElem: NodeInfo): NodeColl =
     containerElem descendant FRContainerTest
 
   // Find all siblings of the given element with the given name, excepting the given element
-  def findSiblingsWithName(element: NodeInfo, siblingName: String): Seq[NodeInfo] =
+  def findSiblingsWithName(element: NodeInfo, siblingName: String): NodeColl =
     element parent * child * filter
       (_.name == siblingName) filterNot
       (_ == element)
 
   // Return all the container controls in the view
-  def getAllContainerControlsWithIds(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
+  def getAllContainerControlsWithIds(implicit ctx: FormRunnerDocContext): NodeColl =
     getAllControlsWithIds filter IsContainer
 
-  def getAllContainerControls(inDoc: NodeInfo): Seq[NodeInfo] = getFormRunnerBodyElem(inDoc) descendant * filter IsContainer
+  def getAllContainerControls(inDoc: NodeInfo): NodeColl = getFormRunnerBodyElem(inDoc) descendant * filter IsContainer
 
   // A container can be removed if it's not the last one at that level
   def canDeleteContainer(containerElem: NodeInfo): Boolean =

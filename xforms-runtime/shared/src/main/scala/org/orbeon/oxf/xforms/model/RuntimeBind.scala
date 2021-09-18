@@ -71,7 +71,7 @@ class RuntimeBind(
     val itemsAsScala = items.asScala
     val itemsSize    = itemsAsScala.size
 
-    val bindNodes: Seq[BindNode] =
+    val bindNodes: collection.Seq[BindNode] =
       if (itemsAsScala.nonEmpty) {
         // Only then does it make sense to create BindNodes
         val childrenStaticBinds = staticBind.childrenBinds

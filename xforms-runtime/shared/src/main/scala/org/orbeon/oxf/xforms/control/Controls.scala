@@ -130,7 +130,7 @@ object Controls {
     bindingContext  : BindingContext,
     parentOption    : Option[XFormsControl],
     staticElement   : ElementAnalysis,
-    idSuffix        : Seq[Int],
+    idSuffix        : collection.Seq[Int],
     collector       : ErrorEventCollector
   ): Option[XFormsControl] = {
 
@@ -176,8 +176,8 @@ object Controls {
   def buildChildren(
     control   : XFormsControl,
     children  : => Iterable[ElementAnalysis],
-    buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int], ErrorEventCollector) => Option[XFormsControl],
-    idSuffix  : Seq[Int],
+    buildTree : (XBLContainer, BindingContext, ElementAnalysis, collection.Seq[Int], ErrorEventCollector) => Option[XFormsControl],
+    idSuffix  : collection.Seq[Int],
     collector : ErrorEventCollector
   ): Unit = {
     // Start with the context within the current control
@@ -627,7 +627,7 @@ object Controls {
 
   private def visitSiblings(
     listener : XFormsControlVisitorListener,
-    children : Seq[XFormsControl],
+    children : collection.Seq[XFormsControl],
     collector: ErrorEventCollector
   ): Unit =
     for (currentControl <- children) {

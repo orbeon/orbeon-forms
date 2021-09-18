@@ -38,7 +38,7 @@ trait FormRunnerSectionTemplateOps {
   //@XPathFunction
   def globalLibraryAppName: String = Names.GlobalLibraryAppName
 
-  def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {
+  def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: collection.Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {
 
     // All xbl:binding elements available for section templates
     def availableSectionTemplateXBLBindings(componentBindings: Iterable[NodeInfo]): Iterable[NodeInfo] =
@@ -124,7 +124,7 @@ trait FormRunnerSectionTemplateOps {
 
   // Find top-level `xf:bind`, which is the one without a `ref`
   // Q: There is a `xf:bind` making `instance('fr-form-instance')` readonly in certain cases; is it really needed?
-  def findXblBinds(bindingElem: NodeInfo): Seq[NodeInfo] = {
+  def findXblBinds(bindingElem: NodeInfo): collection.Seq[NodeInfo] = {
     val els =
       bindingElem                         /
         fr.XMLNames.XBLImplementationTest /

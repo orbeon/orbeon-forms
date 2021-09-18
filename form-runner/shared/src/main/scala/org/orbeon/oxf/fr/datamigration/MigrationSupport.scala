@@ -58,16 +58,16 @@ object MigrationSupport {
       }
   }
 
-  def findAllGrids(repeat: Boolean)(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
+  def findAllGrids(repeat: Boolean)(implicit ctx: FormRunnerDocContext): collection.Seq[NodeInfo] =
     ctx.bodyElem descendant * filter
       frc.IsGrid filter
       (_.ancestor(XXFDialogTest).isEmpty) filter
       (g => frc.isRepeat(g) ^ ! repeat)
 
-  def findLegacyRepeatedGrids(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
+  def findLegacyRepeatedGrids(implicit ctx: FormRunnerDocContext): collection.Seq[NodeInfo] =
     findAllGrids(repeat = true) filter frc.isLegacyRepeat
 
-  def findLegacyUnrepeatedGrids(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
+  def findLegacyUnrepeatedGrids(implicit ctx: FormRunnerDocContext): collection.Seq[NodeInfo] =
     findAllGrids(repeat = false) filter frc.isLegacyUnrepeatedGrid
 
   def findAllMigrations(metadataRootElem: NodeInfo): List[(MigrationVersion, String)] =
@@ -86,9 +86,9 @@ object MigrationSupport {
   def buildGridMigrations[M](
     outerDocument         : DocumentNodeInfoType,
     availableXBLBindings  : Option[DocumentNodeInfoType],
-    migrationsForBinding  : (DocumentNodeInfoType, Boolean) => Seq[M],
+    migrationsForBinding  : (DocumentNodeInfoType, Boolean) => collection.Seq[M],
     updateWithBindingPath : (M, List[PathElem]) => M
-  ): Seq[M] = {
+  ): collection.Seq[M] = {
 
     implicit val ctx = new InDocFormRunnerDocContext(outerDocument)
 
@@ -107,7 +107,7 @@ object MigrationSupport {
           )
       }
 
-    def migrationsForSectionTemplate(section: NodeInfo): Seq[M] = {
+    def migrationsForSectionTemplate(section: NodeInfo): collection.Seq[M] = {
 
       val sectionName    = frc.getControlNameOpt(section).get            // section must have a name
       val xblBindingName = frc.sectionTemplateBindingName(section).get   // section must have a binding

@@ -208,12 +208,12 @@ object BindNode {
     )
 
   private def collectFailedValidationsForHighestLevel(
-    bindNodes : Seq[BindNode]
+    bindNodes : collection.Seq[BindNode]
   ): Option[(ValidationLevel, List[StaticBind.MIP])] =
     collectFailedValidationsForLevel(bindNodes, _.highestValidationLevel)
 
   private def collectFailedValidationsForLevel(
-    bindNodes : Seq[BindNode],
+    bindNodes : collection.Seq[BindNode],
     findLevel : BindNode => Option[ValidationLevel]
   ): Option[(ValidationLevel, List[StaticBind.MIP])] =
     if (bindNodes.isEmpty)

@@ -298,7 +298,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
     ControlsIterator(containerControl, includeCurrent) filter (_.isRelevant) foreach
       (_.onDestroy(update = true))
 
-  def children: Seq[XFormsControl] = _root match {
+  def children: collection.Seq[XFormsControl] = _root match {
     case Some(root) => root.children
     case None       => Nil
   }

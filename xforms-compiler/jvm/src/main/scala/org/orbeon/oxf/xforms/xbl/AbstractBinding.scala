@@ -214,7 +214,7 @@ object AbstractBinding {
     bindingElem  : Element, // `<xbl:binding>`
     path         : Option[String],
     lastModified : Long,
-    scripts      : Seq[HeadElement]
+    scripts      : collection.Seq[HeadElement]
   ): AbstractBinding = {
 
     assert(bindingElem ne null)

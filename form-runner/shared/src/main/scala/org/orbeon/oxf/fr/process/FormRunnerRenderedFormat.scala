@@ -112,7 +112,7 @@ object FormRunnerRenderedFormat {
     } yield
       URI.create(path) -> node.localname
 
-  def listPdfTemplates: Seq[PdfTemplate] =
+  def listPdfTemplates: collection.Seq[PdfTemplate] =
     formAttachmentsInstance map (_.rootElement) map extractPdfTemplates getOrElse Nil
 
   // https://github.com/orbeon/orbeon-forms/issues/5918

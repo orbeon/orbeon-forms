@@ -62,7 +62,7 @@ class EmailTest
     val data =
       TransformerUtils.extractAsMutableDocument(instance child * head)
 
-    def valuesForSearch(search: => Seq[ControlBindPathHoldersResources]) = {
+    def valuesForSearch(search: => collection.Seq[ControlBindPathHoldersResources]) = {
 
       val searchResult = search
 

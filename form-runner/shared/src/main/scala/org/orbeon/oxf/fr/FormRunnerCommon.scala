@@ -26,7 +26,7 @@ object FormRunnerCommon {
   //
   case class BindPath                       (                   bind: NodeInfo, path: List[PathElem])
   case class BindPathHolders                (                   bind: NodeInfo, path: List[PathElem], holders: Option[List[NodeInfo]])
-  case class ControlBindPathHoldersResources(control: NodeInfo, bind: NodeInfo, path: List[PathElem], holders: Option[List[NodeInfo]], resources: Seq[(String, NodeInfo)])
+  case class ControlBindPathHoldersResources(control: NodeInfo, bind: NodeInfo, path: List[PathElem], holders: Option[List[NodeInfo]], resources: collection.Seq[(String, NodeInfo)])
 
   // Do this to avoid IntelliJ failing to see the specific `FormRunner` instance
   @inline def frc: FormRunnerCommon    = org.orbeon.oxf.fr.FormRunner

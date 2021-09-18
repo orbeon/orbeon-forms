@@ -49,7 +49,7 @@ trait GridOps extends ContainerOps {
   def addMissingGridIds(bodyElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
     addMissingGridIds(bodyElem descendantOrSelf GridTest)
 
-  private def addMissingCellIds(grids: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Unit = {
+  private def addMissingCellIds(grids: collection.Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Unit = {
 
     val toAnnotate = grids descendant CellTest filterNot (_.hasId)
     val ids        = nextTmpIds(count = toAnnotate.size).iterator
@@ -57,7 +57,7 @@ trait GridOps extends ContainerOps {
     toAnnotate foreach (ensureAttribute(_, "id", ids.next()))
   }
 
-  private def addMissingGridIds(grids: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Unit = {
+  private def addMissingGridIds(grids: collection.Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Unit = {
 
     val toAnnotate = grids filterNot (_.hasId)
     val ids        = nextIds("grid", toAnnotate.size).iterator
@@ -438,11 +438,11 @@ trait GridOps extends ContainerOps {
     Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = false, transpose = false).cells.lengthCompare(1) > 0
 
   // Find the new td to select if we are removing the currently selected td
-  def findNewCellToSelect(cellsToDelete: Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
+  def findNewCellToSelect(cellsToDelete: collection.Seq[NodeInfo])(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
     findSelectedCell match {
       case Some(selectedCell) if cellsToDelete contains selectedCell =>
 
-        def findCells(find: Test => Seq[NodeInfo], selectedCell: NodeInfo) =
+        def findCells(find: Test => collection.Seq[NodeInfo], selectedCell: NodeInfo) =
           find(CellTest)                                                            intersect
           (findAncestorContainersLeafToRoot(selectedCell).last descendant CellTest) filterNot
           (cellsToDelete contains _)                                                headOption

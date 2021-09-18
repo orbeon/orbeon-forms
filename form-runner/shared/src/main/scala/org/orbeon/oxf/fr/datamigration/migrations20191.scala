@@ -59,7 +59,7 @@ object MigrationOps20191 extends MigrationOps {
     legacyGridsOnly      : Boolean
   ): Option[MigrationSet20191] = {
 
-    def migrationsForBinding(doc: DocumentNodeInfoType, topLevel: Boolean): Seq[Migration20191] = {
+    def migrationsForBinding(doc: DocumentNodeInfoType, topLevel: Boolean): collection.Seq[Migration20191] = {
       implicit val ctx = new InDocFormRunnerDocContext(doc)
       for {
         gridElem       <- if (legacyGridsOnly) findLegacyUnrepeatedGrids else findAllGrids(repeat = false)
@@ -274,4 +274,9 @@ object MigrationOps20191 extends MigrationOps {
     (migrationSet.migrations exists (m => path.startsWith(m.containerPath ::: m.newGridElem :: Nil))) option {
       path.dropRight(2) ::: path.last :: Nil
     }
+
+  private object Private {
+    def applyPath(mutableData: NodeInfo, path: i.Seq[PathElem]): collection.Seq[NodeInfo] =
+      path.foldLeft(Seq(mutableData): collection.Seq[NodeInfo]) { case (e, p) => e child p.value }
+  }
 }

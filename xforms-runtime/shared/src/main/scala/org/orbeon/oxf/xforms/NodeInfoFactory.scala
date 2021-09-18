@@ -19,8 +19,6 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om
 
-import scala.collection.Seq
-
 
 object NodeInfoFactory {
 
@@ -34,7 +32,7 @@ object NodeInfoFactory {
 
   def elementInfo(
     qName                             : dom.QName,
-    content                           : Seq[om.Item] = Nil,
+    content                           : collection.Seq[om.Item] = Nil,
     removeInstanceDataFromClonedNodes : Boolean   = true
   ): om.NodeInfo = {
     val newElement = Wrapper.wrap(dom.Element(qName))

@@ -284,7 +284,7 @@ trait FormRunnerBaseOps extends FormRunnerPlatform {
   def isTemplateId(id: String): Boolean = id endsWith TemplateSuffix
 
   // Find all template instances
-  def templateInstanceElements(inDoc: NodeInfo): Seq[NodeInfo] =
+  def templateInstanceElements(inDoc: NodeInfo): collection.Seq[NodeInfo] =
     getModelElem(inDoc) / XFInstanceTest filter (e => isTemplateId(e.id))
 
   // Get the root element of instances

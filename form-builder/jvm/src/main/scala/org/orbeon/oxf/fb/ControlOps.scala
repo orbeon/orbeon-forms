@@ -140,7 +140,7 @@ trait ControlOps extends ResourcesOps {
           case Seq(bind: NodeInfo, _*) => bind
           case _ =>
 
-            val newBind: Seq[NodeInfo] =
+            val newBind: collection.Seq[NodeInfo] =
               <xf:bind
                 id={bindId(bindName)}
                 ref={bindName}
@@ -379,7 +379,7 @@ trait ControlOps extends ResourcesOps {
   def insertHolders(
     controlElement       : NodeInfo,
     dataHolders          : Iterable[NodeInfo],
-    resourceHolders      : Seq[(String, Seq[NodeInfo])],
+    resourceHolders      : collection.Seq[(String, collection.Seq[NodeInfo])],
     precedingControlName : Option[String])(implicit
     ctx                  : FormBuilderDocContext
   ): Unit = {
@@ -492,7 +492,7 @@ trait ControlOps extends ResourcesOps {
     resourceChanged || mediatypeChanged || paramsChanged
   }
 
-  def lhhatChildrenParams(lhhatNodes: Seq[NodeInfo]): Seq[NodeInfo] =
+  def lhhatChildrenParams(lhhatNodes: collection.Seq[NodeInfo]): collection.Seq[NodeInfo] =
     lhhatNodes child FRParamTest
 
   def setControlLHHATParams(
@@ -528,7 +528,7 @@ trait ControlOps extends ResourcesOps {
   }
 
   // Find a control's LHHAT (there can be more than one for alerts)
-  def getControlLhhat(controlName: String, lhhaName: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
+  def getControlLhhat(controlName: String, lhhaName: String)(implicit ctx: FormBuilderDocContext): collection.Seq[NodeInfo] =
     findControlByName(controlName).toList child controlLHHATQName(lhhaName)
 
   // For a given control and LHHAT type, whether the mediatype on the LHHAT is HTML
@@ -578,7 +578,7 @@ trait ControlOps extends ResourcesOps {
     count       : Int,
     replace     : Boolean)(implicit
     ctx         : FormBuilderDocContext
-  ): Seq[NodeInfo] = {
+  ): collection.Seq[NodeInfo] = {
 
     val control  = findControlByName(controlName).get
     val existing = getControlLhhat(controlName, lhhaName)

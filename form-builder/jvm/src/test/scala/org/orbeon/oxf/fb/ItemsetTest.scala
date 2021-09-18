@@ -212,7 +212,7 @@ class ItemsetTest
           }</resources>
         }
 
-        def assertNewControlResources(expected: Seq[(String, Seq[NodeInfo])]): Unit = {
+        def assertNewControlResources(expected: collection.Seq[(String, collection.Seq[NodeInfo])]): Unit = {
           val expectedResources =
             <resources>{
               expected map { case (lang, items) =>

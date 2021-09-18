@@ -1006,7 +1006,7 @@ object ToolboxOps {
         origin = containerControlElem
       ).head
 
-    def resourceHolders(resourceElems: Seq[NodeInfo]): Seq[(String, Seq[NodeInfo])] =
+    def resourceHolders(resourceElems: collection.Seq[NodeInfo]): collection.Seq[(String, collection.Seq[NodeInfo])] =
       for {
         resourceElem <- resourceElems
         lang = resourceElem attValue "*:lang"

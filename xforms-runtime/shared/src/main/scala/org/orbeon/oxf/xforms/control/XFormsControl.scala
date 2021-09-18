@@ -38,6 +38,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.xml.sax.Attributes
 
+
 /**
  * Represents an XForms control.
  *
@@ -249,8 +250,8 @@ class XFormsControl(
 
   // Build children controls if any, delegating the actual construction to the given `buildTree` function
   def buildChildren(
-    buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int], ErrorEventCollector) => Option[XFormsControl],
-    idSuffix : Seq[Int],
+    buildTree: (XBLContainer, BindingContext, ElementAnalysis, collection.Seq[Int], ErrorEventCollector) => Option[XFormsControl],
+    idSuffix : collection.Seq[Int],
     collector: ErrorEventCollector
   ): Unit =
     staticControl match {

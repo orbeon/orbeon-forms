@@ -271,7 +271,7 @@ object MigrationOps48 extends MigrationOps {
         frc.findRepeatIterationName(controlName).get
     }
 
-    def migrationsForBinding(legacyGridsOnly: Boolean)(implicit ctx: FormRunnerDocContext): Seq[Migration48] =
+    def migrationsForBinding(legacyGridsOnly: Boolean)(implicit ctx: FormRunnerDocContext): collection.Seq[Migration48] =
       for {
         gridElem               <- if (legacyGridsOnly) findLegacyRepeatedGrids else findAllGrids(repeat = true)
         gridName               = frc.getControlName(gridElem)

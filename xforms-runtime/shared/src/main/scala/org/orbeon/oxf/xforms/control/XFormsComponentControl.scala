@@ -527,8 +527,8 @@ class XFormsComponentControl(
 
   // Simply delegate but switch the container
   override def buildChildren(
-    buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int], ErrorEventCollector) => Option[XFormsControl],
-    idSuffix : Seq[Int],
+    buildTree: (XBLContainer, BindingContext, ElementAnalysis, collection.Seq[Int], ErrorEventCollector) => Option[XFormsControl],
+    idSuffix : collection.Seq[Int],
     collector: ErrorEventCollector
   ): Unit =
     if (staticControl.hasConcreteBinding)

@@ -70,13 +70,13 @@ class XFormsRepeatControl(
   setLocal(new XFormsRepeatControlLocal)
 
   // The repeat's sequence binding
-  final override def bindingEvenIfNonRelevant: Seq[om.Item] =
+  final override def bindingEvenIfNonRelevant: collection.Seq[om.Item] =
     Option(bindingContext) filter (_.newBind) map (_.nodeset.asScala) getOrElse Nil
 
   def getStartIndex: Int = staticControl.startIndex
 
   override def supportsRefreshEvents = true
-  override def children: Seq[XFormsRepeatIterationControl] = super.children.asInstanceOf[Seq[XFormsRepeatIterationControl]]
+  override def children: collection.Seq[XFormsRepeatIterationControl] = super.children.asInstanceOf[collection.Seq[XFormsRepeatIterationControl]]
 
   override def onCreate(
     restoreState: Boolean,
@@ -246,9 +246,9 @@ class XFormsRepeatControl(
     * NOTE: The new binding context must have been set on this control before calling.
     */
   def updateIterations(
-    oldRepeatItems: Seq[om.Item],
+    oldRepeatItems: collection.Seq[om.Item],
     collector     : ErrorEventCollector
-  ): (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
+  ): (collection.Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
 
     // NOTE: The following assumes the nodesets have changed
 
@@ -512,7 +512,7 @@ class XFormsRepeatControl(
         Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, localRefreshInfo.oldRepeatIndex, getIndex), collector)
     }
 
-  private def findItemIndexes(items1: Seq[om.Item], items2: Seq[om.Item]) = {
+  private def findItemIndexes(items1: collection.Seq[om.Item], items2: collection.Seq[om.Item]) = {
 
     def indexOfItem(otherItem: om.Item) =
       items2 indexWhere (SaxonUtils.compareItems(_, otherItem))
@@ -542,8 +542,8 @@ class XFormsRepeatControl(
   }
 
   override def buildChildren(
-    buildTree : (XBLContainer, BindingContext, ElementAnalysis, Seq[Int], ErrorEventCollector) => Option[XFormsControl],
-    idSuffix  : Seq[Int],
+    buildTree : (XBLContainer, BindingContext, ElementAnalysis, collection.Seq[Int], ErrorEventCollector) => Option[XFormsControl],
+    idSuffix  : collection.Seq[Int],
     collector : ErrorEventCollector
   ): Unit = {
 
@@ -573,9 +573,9 @@ object XFormsRepeatControl {
 
   case class RefreshInfo(
     isNodesetChanged            : Boolean,
-    newIterations               : Seq[XFormsRepeatIterationControl],
-    movedIterationsOldPositions : Seq[Int],
-    movedIterationsNewPositions : Seq[Int],
+    newIterations               : collection.Seq[XFormsRepeatIterationControl],
+    movedIterationsOldPositions : List[Int],
+    movedIterationsNewPositions : List[Int],
     oldRepeatIndex              : Int
   )
 
@@ -650,7 +650,7 @@ object XFormsRepeatControl {
   }
 
   // Find indexes for the given repeats in the current document
-  private def findIndexes(tree: ControlTree, repeats: Seq[RepeatControl], index: XFormsRepeatControl => Int) =
+  private def findIndexes(tree: ControlTree, repeats: collection.Seq[RepeatControl], index: XFormsRepeatControl => Int) =
     repeats.foldLeft(m.LinkedHashMap[String, Int]()) {
       (indexes, repeat) =>
 
@@ -669,7 +669,7 @@ object XFormsRepeatControl {
         })
     }
 
-  private def suffixForRepeats(indexes: collection.Map[String, Int], repeats: Seq[RepeatControl]) =
+  private def suffixForRepeats(indexes: collection.Map[String, Int], repeats: collection.Seq[RepeatControl]) =
     repeats map (repeat => indexes(repeat.prefixedId)) mkString RepeatIndexSeparatorString
 
   private def addSuffix(prefixedId: String, suffix: String) =

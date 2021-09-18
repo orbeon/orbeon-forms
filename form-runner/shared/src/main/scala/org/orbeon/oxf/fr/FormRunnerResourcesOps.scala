@@ -25,13 +25,13 @@ import java.net.URI
 trait FormRunnerResourcesOps {
 
   //@XPathFunction
-  def allLangs    (resourcesRootElem: NodeInfo): Seq[String]   = allResources(resourcesRootElem) attValue "*:lang"
-  def allResources(resourcesRootElem: NodeInfo): Seq[NodeInfo] = resourcesRootElem child "resource"
+  def allLangs    (resourcesRootElem: NodeInfo): collection.Seq[String]   = allResources(resourcesRootElem) attValue "*:lang"
+  def allResources(resourcesRootElem: NodeInfo): collection.Seq[NodeInfo] = resourcesRootElem child "resource"
 
   //@XPathFunction
   def resourcesInstanceRootElemOpt(inDoc: NodeInfo): Option[NodeInfo] = frc.inlineInstanceRootElem(inDoc, FormResources)
 
-  def allLangsWithResources(resourcesRootElem: NodeInfo): Seq[(String, NodeInfo)] =
+  def allLangsWithResources(resourcesRootElem: NodeInfo): collection.Seq[(String, NodeInfo)] =
     allLangs(resourcesRootElem) zip allResources(resourcesRootElem)
 
   def formResourcesInGivenLangOrFirst(formResourcesRootElem: NodeInfo, lang: String): NodeInfo =
@@ -40,7 +40,7 @@ trait FormRunnerResourcesOps {
   // Same as above but doesn't require a Form Builder context
   // NOTE: Support an entirely missing resources instance (for tests).
   // TODO: Migrate to `findResourceHoldersWithLangUseDocUseContext`.
-  def findResourceHoldersWithLangUseDoc(inDoc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
+  def findResourceHoldersWithLangUseDoc(inDoc: NodeInfo, controlName: String): collection.Seq[(String, NodeInfo)] =
     resourcesInstanceRootElemOpt(inDoc)             orElse
       resourcesInstanceDocFromUrlOpt(inDoc)         map
       (findResourceHoldersWithLang(controlName, _)) getOrElse
@@ -49,11 +49,11 @@ trait FormRunnerResourcesOps {
   def findResourceHoldersWithLangUseDocUseContext(
     controlName : String)(implicit
     ctx         : FormRunnerDocContext
-  ): Seq[(String, NodeInfo)] =
+  ): collection.Seq[(String, NodeInfo)] =
     findResourceHoldersWithLang(controlName, ctx.resourcesRootElem)
 
   // Find control resource holders with their language
-  def findResourceHoldersWithLang(controlName: String, resourcesRootElem: NodeInfo): Seq[(String, NodeInfo)] =
+  def findResourceHoldersWithLang(controlName: String, resourcesRootElem: NodeInfo): collection.Seq[(String, NodeInfo)] =
     for {
       (lang, resource) <- allLangsWithResources(resourcesRootElem)
       holder           <- resource child controlName headOption // there *should* be only one

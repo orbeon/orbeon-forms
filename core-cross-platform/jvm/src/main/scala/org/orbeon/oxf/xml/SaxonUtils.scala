@@ -315,7 +315,7 @@ object SaxonUtils {
   def getStructuredQNameURI      (qName: om.StructuredQName): String = qName.getNamespaceURI
 
   def itemIterator(i: om.Item): SequenceIterator = SingletonIterator.makeIterator(i)
-  def listIterator(s: Seq[om.Item]): SequenceIterator = new ListIterator(s.asJava)
+  def listIterator(s: collection.Seq[om.Item]): SequenceIterator = new ListIterator(s.asJava)
   def emptyIterator: SequenceIterator = EmptyIterator.getInstance
   def valueAsIterator(v: ValueRepresentationType): SequenceIterator = Value.asIterator(v)
 

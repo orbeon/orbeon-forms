@@ -69,7 +69,7 @@ object XFormsAPI {
 
   // xf:setvalue
   // @return the node whose value was set, if any
-  def setvalue(ref: Seq[om.NodeInfo], value: String): Option[(om.NodeInfo, Boolean)] =
+  def setvalue(ref: collection.Seq[om.NodeInfo], value: String): Option[(om.NodeInfo, Boolean)] =
     ref.headOption map { nodeInfo =>
 
       val (docOpt, indentedLoggerOpt) = findDocAndLoggerFromActionOrScope
@@ -128,15 +128,15 @@ object XFormsAPI {
   // xf:insert
   // @return the inserted nodes
   def insert[T <: om.Item](
-    origin                            : Seq[T],
-    into                              : Seq[om.NodeInfo] = Nil,
-    after                             : Seq[om.NodeInfo] = Nil,
-    before                            : Seq[om.NodeInfo] = Nil,
+    origin                            : collection.Seq[T],
+    into                              : collection.Seq[om.NodeInfo] = Nil,
+    after                             : collection.Seq[om.NodeInfo] = Nil,
+    before                            : collection.Seq[om.NodeInfo] = Nil,
     doDispatch                        : Boolean       = true,
     requireDefaultValues              : Boolean       = false,
     searchForInstance                 : Boolean       = true,
     removeInstanceDataFromClonedNodes : Boolean       = true
-  ): Seq[T] =
+  ): collection.Seq[T] =
     if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
 
       val (docOpt, indentedLoggerOpt) = findDocAndLoggerFromActionOrScope
@@ -170,9 +170,9 @@ object XFormsAPI {
 
   // xf:delete
   def delete(
-    ref           : Seq[om.NodeInfo],
+    ref           : collection.Seq[om.NodeInfo],
     doDispatch    : Boolean = true
-  ): Seq[om.NodeInfo] =
+  ): collection.Seq[om.NodeInfo] =
     if (ref.nonEmpty) {
 
       val (docOpt, indentedLoggerOpt) = findDocAndLoggerFromActionOrScope
@@ -246,8 +246,8 @@ object XFormsAPI {
   // nodes.
   def ensureAttribute(element: om.NodeInfo, attName: QName, value: String): Unit =
     element /@ attName match {
-      case Seq()        => insert(into = element, origin = attributeInfo(attName, value))
-      case Seq(att, _*) => setvalue(att, value)
+      case collection.Seq()        => insert(into = element, origin = attributeInfo(attName, value))
+      case collection.Seq(att, _*) => setvalue(att, value)
     }
 
   // NOTE: The value is by-name and used only if needed
@@ -276,7 +276,7 @@ object XFormsAPI {
 
   def context[T](xpath: String)(body: => T): T = throw new NotImplementedError("context")
   def context[T](item: om.Item)(body: => T): T = throw new NotImplementedError("context")
-  def event[T](attributeName: String): Seq[om.Item] = throw new NotImplementedError("event")
+  def event[T](attributeName: String): collection.Seq[om.Item] = throw new NotImplementedError("event")
 
   // The xf:dispatch action
   def dispatch(

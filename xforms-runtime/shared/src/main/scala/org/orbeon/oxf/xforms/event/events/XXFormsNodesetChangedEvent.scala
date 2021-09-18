@@ -32,7 +32,7 @@ class XXFormsNodesetChangedEvent(
 
   def this(
     target                : XFormsControl,
-    newIterations         : Seq[XFormsRepeatIterationControl],
+    newIterations         : collection.Seq[XFormsRepeatIterationControl],
     oldIterationPositions : Seq[Int],
     newIterationPositions : Seq[Int]
   ) = {
@@ -42,7 +42,7 @@ class XXFormsNodesetChangedEvent(
     this.newIterationPositionsOpt = Option(newIterationPositions)
   }
 
-  private var newIterationsOpt        : Option[Seq[Int]] = None
+  private var newIterationsOpt        : Option[collection.Seq[Int]] = None
   private var oldIterationPositionsOpt: Option[Seq[Int]] = None
   private var newIterationPositionsOpt: Option[Seq[Int]] = None
 

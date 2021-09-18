@@ -43,7 +43,7 @@ import shapeless.syntax.typeable._
  *   constructor!
  * - all property values are:
  *   - Java values (including `NodeInfo`)
- *   - `Seq` of Java values
+ *   - `collection.Seq` of Java values
  *   - `Either` of the above (2020-02-27)
  * - for Java/Scala consumers, use `property[T]`
  * - for XPath consumers, use `getAttribute`
@@ -120,9 +120,9 @@ abstract class XFormsEvent(
     // empty node-set is returned."
 
     def handleOneLevel(any: Any): SequenceIterator = any match {
-      case s: Seq[_]       => listIterator(s map SaxonUtilsDependsOnXPath.anyToItemIfNeeded)
-      case e: Either[_, _] => e.fold(handleOneLevel, handleOneLevel)
-      case other           => itemIterator(SaxonUtilsDependsOnXPath.anyToItemIfNeeded(other))
+      case s: collection.Seq[_] => listIterator(s map SaxonUtilsDependsOnXPath.anyToItemIfNeeded)
+      case e: Either[_, _]      => e.fold(handleOneLevel, handleOneLevel)
+      case other                => itemIterator(SaxonUtilsDependsOnXPath.anyToItemIfNeeded(other))
     }
 
     allProperties.applyOrElse(name, { name: String => warnUnsupportedIfNeeded(name); None }) map handleOneLevel getOrElse emptyIterator
@@ -198,8 +198,8 @@ object XFormsEvent {
   }
 
   private def emptyIterator = SaxonUtils.emptyIterator
-  private def itemIterator   (i: Item)      = if (i ne null)  SaxonUtils.itemIterator(i) else emptyIterator
-  private def listIterator   (s: Seq[Item]) = if (s.nonEmpty) SaxonUtils.listIterator(s) else emptyIterator
+  private def itemIterator   (i: Item)                 = if (i ne null)  SaxonUtils.itemIterator(i) else emptyIterator
+  private def listIterator   (s: collection.Seq[Item]) = if (s.nonEmpty) SaxonUtils.listIterator(s) else emptyIterator
 
   def xxfName(name: String): String = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
 

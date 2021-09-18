@@ -24,7 +24,7 @@ trait XFormsContainerControl extends VisitableTrait {
   private def hasChildren = (_children ne null) && _children.nonEmpty
 
   // Get all the direct children controls (never null)
-  def children: Seq[XFormsControl] = Option(_children) getOrElse Seq.empty
+  def children: collection.Seq[XFormsControl] = Option(_children) getOrElse Seq.empty
 
   // Add a child control
   def addChild(control: XFormsControl): Unit = {

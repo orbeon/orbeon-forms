@@ -50,7 +50,7 @@ object XFormsInsertAction {
     containingDocumentOpt             : Option[XFormsContainingDocument],
     insertPosition                    : InsertPosition,
     insertLocation                    : (NonEmptyList[om.NodeInfo], Int) Either om.NodeInfo,
-    originItemsOpt                    : Option[Seq[om.Item]],
+    originItemsOpt                    : Option[collection.Seq[om.Item]],
     doClone                           : Boolean,
     doDispatch                        : Boolean,
     requireDefaultValues              : Boolean,

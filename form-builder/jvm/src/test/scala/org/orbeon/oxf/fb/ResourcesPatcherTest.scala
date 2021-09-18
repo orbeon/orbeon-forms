@@ -330,7 +330,7 @@ class ResourcesPatcherTest
                 s"duplicate names under `${left.name}`: ${duplicates mkString ", "}$commonMessageSuffix"
               )
 
-              def elemNames(elems: Seq[NodeInfo]) =
+              def elemNames(elems: collection.Seq[NodeInfo]) =
                 elems map (_.name) mkString ("[", ", ", "]")
 
               def errorSuffix =

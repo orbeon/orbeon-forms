@@ -14,7 +14,6 @@
 package org.orbeon.scaxon
 
 import org.orbeon.dom._
-import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.parser.Token
@@ -23,6 +22,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.tree.iter.ListIterator
 
+import scala.collection.Seq
 import scala.jdk.CollectionConverters._
 
 

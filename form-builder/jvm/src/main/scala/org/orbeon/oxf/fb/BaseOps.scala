@@ -165,7 +165,11 @@ trait BaseOps extends Logging {
   def debugDumpDocument(message: String)(implicit ctx: FormBuilderDocContext): Unit =
     debug(message, Seq("doc" -> TransformerUtils.tinyTreeToString(ctx.formDefinitionRootElem)))
 
-  def insertElementsImposeOrder(into: Seq[NodeInfo], origin: Seq[NodeInfo], order: Seq[String]): Seq[NodeInfo] = {
+  def insertElementsImposeOrder(
+    into   : collection.Seq[NodeInfo],
+    origin : collection.Seq[NodeInfo],
+    order  : collection.Seq[String]
+  ): collection.Seq[NodeInfo] = {
     val name            = origin.head.localname
     val namesUntil      = (order takeWhile (_ != name)) :+ name toSet
     val elementsBefore  = into child * filter (e => namesUntil(e.localname))

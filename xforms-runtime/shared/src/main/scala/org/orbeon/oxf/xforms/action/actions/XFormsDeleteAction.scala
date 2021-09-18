@@ -127,7 +127,7 @@ object XFormsDeleteAction extends Logging {
 
   def doDelete(
     containingDocumentOpt : Option[XFormsContainingDocument],
-    collectionToUpdate    : Seq[om.Item],
+    collectionToUpdate    : collection.Seq[om.Item],
     deleteIndexOpt        : Option[Int],
     doDispatch            : Boolean,
     collector             : ErrorEventCollector
@@ -164,7 +164,7 @@ object XFormsDeleteAction extends Logging {
 
   private def doDeleteItems(
     containingDocumentOpt  : Option[XFormsContainingDocument],
-    itemsToDelete          : Seq[om.Item],
+    itemsToDelete          : collection.Seq[om.Item],
     deleteIndexForEventOpt : Option[Int],
     doDispatch             : Boolean,
     collector              : ErrorEventCollector

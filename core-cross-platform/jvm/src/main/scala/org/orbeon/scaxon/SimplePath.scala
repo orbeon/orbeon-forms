@@ -22,6 +22,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.tinytree.TinyTree // moved in Saxon 10
 
+import scala.collection.Seq
 import scala.jdk.CollectionConverters._
 
 

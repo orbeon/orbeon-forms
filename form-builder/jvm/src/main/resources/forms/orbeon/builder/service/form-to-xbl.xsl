@@ -382,8 +382,14 @@
                          See: https://github.com/orbeon/orbeon-forms/issues/738 -->
                     <!-- NOTE: This won't be needed once all code uses xxf:r(). -->
                     <xf:var
+                        fr:keep-if-design-time="false"
                         name="form-resources"
                         value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"
+                        as="element(resource)"/>
+                    <xf:var
+                        fr:keep-if-design-time="true"
+                        name="form-resources"
+                        value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]"
                         as="element(resource)"/>
 
                     <!-- Copy section content -->

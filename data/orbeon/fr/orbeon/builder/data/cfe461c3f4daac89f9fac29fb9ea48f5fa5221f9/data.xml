@@ -24,7 +24,6 @@
                                 <traveler-name/>
                                 <traveler-birth-date/>
                             </master-grid-iteration>
-
                         </master-grid>
                     </master-section>
                     <detail-section>
@@ -37,19 +36,12 @@
                                 <meal>none</meal>
                                 <comment/>
                             </grid-3>
-
-
-
-
-
-
                         </detail-section-iteration>
                     </detail-section>
                     <section-1>
                         <grid-1>
                             <control-1/>
                         </grid-1>
-
                     </section-1>
                 </form>
             </xf:instance>
@@ -87,19 +79,12 @@
                             <xf:bind id="meal-bind" ref="meal" name="meal" required="true()" xxf:default="'none'"/>
                             <xf:bind id="comment-bind" ref="comment" name="comment"/>
                         </xf:bind>
-
-
-
-
-
-
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="section-1-bind" ref="section-1" name="section-1">
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
                         <xf:bind id="control-1-bind" ref="control-1" name="control-1"/>
                     </xf:bind>
-
                 </xf:bind>
             </xf:bind>
             <xf:instance xxf:readonly="true" id="fr-form-metadata" xxf:exclude-result-prefixes="#all">
@@ -107,14 +92,13 @@
                     <application-name>orbeon</application-name>
                     <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
                     <updated-with-version>2017.2-SNAPSHOT PE</updated-with-version>
+                    <updated-with-version>2021.1-SNAPSHOT PE</updated-with-version>
                     <form-name>travel</form-name>
                     <title xml:lang="en">Travel Form</title>
                     <description xml:lang="en">This form showcases Orbeon Forms's support for synchronized master-detail views, with paging and custom repetition labels in the wizard.</description>
                     <library-versions>
                         <orbeon>1</orbeon>
                     </library-versions>
-
-
                     <wizard>true</wizard>
                     <wizard-mode>strict</wizard-mode>
                     <data-migration>enabled</data-migration>
@@ -264,7 +248,8 @@
                     <fr:grid id="master-grid-grid" bind="master-grid-bind" repeat="content"
                              template="instance('master-grid-template')"
                              apply-defaults="true"
-                             fb:initial-iterations="first">
+                             fb:initial-iterations="first"
+                             number-rows="true">
                         <fr:c x="1" y="1" w="9">
                             <xf:input id="traveler-name-control" bind="traveler-name-bind">
                                 <xf:label ref="$form-resources/traveler-name/label"/>

@@ -72,6 +72,7 @@
                     <data-migration>enabled</data-migration>
                     <updated-with-version>2019.1-SNAPSHOT PE</updated-with-version>
                     <updated-with-version>2017.2-SNAPSHOT PE</updated-with-version>
+                    <updated-with-version>2021.1-SNAPSHOT PE</updated-with-version>
                     <migration version="4.8.0">[{ "path": "master-section/master-grid", "iteration-name": "master-grid-iteration" }]</migration>
                     <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"detail-section"},{"value":"detail-section-iteration"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"traveler-name-readonly"},{"value":"traveler-birth-date-readonly"},{"value":"frequent-traveler-number"},{"value":"gender"},{"value":"meal"},{"value":"comment"}],"topLevel":true},{"containerPath":[{"value":"section-1"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"control-1"}],"topLevel":true}]}</migration>
                 </metadata>
@@ -213,7 +214,11 @@
             <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="master-section-section" bind="master-section-bind">
                     <xf:label ref="$form-resources/master-section/label"/>
-                    <fr:grid id="master-grid-grid" bind="master-grid-bind" repeat="content" template="instance('master-grid-template')" apply-defaults="true" fb:initial-iterations="first">
+                    <fr:grid id="master-grid-grid" bind="master-grid-bind" repeat="content"
+                             template="instance('master-grid-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first"
+                             number-rows="true">
                         <fr:c x="1" y="1" w="9">
                             <xf:input id="traveler-name-control" bind="traveler-name-bind">
                                 <xf:label ref="$form-resources/traveler-name/label"/>

@@ -144,7 +144,6 @@
 
         <!-- Section bind -->
         <xsl:variable name="section-bind" select="$fr-form-model//xf:bind[@id = concat($section-name, '-bind')]" as="element(xf:bind)"/>
-        <xsl:variable name="section-name" select="$section-bind/((@ref, @nodeset)[1])" as="xs:string"/>
         <xsl:variable name="model-id"     select="concat($section-name, '-model')" as="xs:string"/>
 
         <!-- Section instance data element -->
@@ -391,6 +390,11 @@
                         name="form-resources"
                         value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]"
                         as="element(resource)"/>
+
+                    <xh:div fr:keep-if-design-time="true" class="fb-section-template-details">
+                        <xh:i class="fa fa-fw fa-puzzle-piece"/>
+                        <xsl:value-of select="concat(doc('input:parameters')/*/app, ' / ',  $section-name)"/>
+                    </xh:div>
 
                     <!-- Copy section content -->
                     <xsl:copy-of select="$fr-section/*"/>

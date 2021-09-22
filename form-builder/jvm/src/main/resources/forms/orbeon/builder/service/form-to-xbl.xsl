@@ -393,7 +393,7 @@
 
                     <xh:div fr:keep-if-design-time="true" class="fb-section-template-details">
                         <xh:i class="fa fa-fw fa-puzzle-piece"/>
-                        <xsl:value-of select="concat(doc('input:parameters')/*/app, ' / ',  $section-name)"/>
+                        <xsl:value-of select="concat(doc('input:parameters')/*/app, ' / ',  $section-name, ' / v', doc('input:parameters')/*/form-version, '')"/>
                     </xh:div>
 
                     <!-- Copy section content -->

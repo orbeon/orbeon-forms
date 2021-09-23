@@ -5516,25 +5516,25 @@
                 <move-up>Flyt op</move-up>
                 <move-down>Flyt ned</move-down>
                 <clear>
-                    <label todo="true">[Clear Line]</label>
+                    <label>Ryd denne linje</label>
                 </clear>
                 <remove>
                     <label>Fjern</label>
-                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                    <hint>Fjern denne enhed</hint>
                 </remove>
                 <add-another>
-                    <label>Tilføj endnu en</label>
-                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                    <label>Tilføj</label>
+                    <hint>Tilføj enhed</hint>
                 </add-another>
             </grid>
             <section>
                 <remove>
                     <label>Fjern</label>
-                    <hint todo="true">[Remove Line from the Repeated Grid]</hint>
+                    <hint>Fjern denne sektion</hint>
                 </remove>
                 <add-another>
-                    <label>Tilføj endnu en</label>
-                    <hint todo="true">[Add Another Line to the Repeated Grid]</hint>
+                    <label>Tilføj</label>
+                    <hint>Tilføj sektion</hint>
                 </add-another>
             </section>
             <date-time>

@@ -3043,7 +3043,7 @@
                 <move-up>Nach oben verschieben</move-up>
                 <move-down>Nach unten verschieben</move-down>
                 <clear>
-                    <label todo="true">[Clear Line]</label>
+                    <label>Zeile löschen</label>
                 </clear>
                 <remove>
                     <label>Löschen</label>

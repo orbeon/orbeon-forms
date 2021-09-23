@@ -228,7 +228,7 @@
                                                                 <xf:group ref=".[$fr-repeater-can-remove]">
                                                                     <xh:button
                                                                         class="btn btn-link fr-repeater-remove-button"
-                                                                        aria-label="{{xxf:r('components.grid.remove.hint', '|fr-fr-resources|')}}">
+                                                                        title="{{xxf:r('components.section.remove.hint', '|fr-fr-resources|')}}">
                                                                         <xh:i class="fa fa-fw fa-minus-circle"/>
                                                                     </xh:button>
                                                                 </xf:group>

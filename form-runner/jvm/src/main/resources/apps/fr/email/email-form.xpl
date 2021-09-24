@@ -141,7 +141,6 @@
         <p:output name="data" id="attachments"/>
     </p:processor>
 
-
     <!-- Build email message -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input  name="data"          href="#instance"/>

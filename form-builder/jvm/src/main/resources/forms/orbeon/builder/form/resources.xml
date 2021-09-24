@@ -1200,6 +1200,7 @@
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow and Permissions</label>
+
             <custom-operations>Define custom operations for this form</custom-operations>
             <operation-label>Label</operation-label>
             <predefined-label>Predefined</predefined-label>
@@ -2494,8 +2495,8 @@
             <delete>Supprimer</delete>
         </dialog-permissions>
         <dialog-workflow>
-          <label>Workflow et Permissions</label>
-	  
+            <label>Workflow et Permissions</label>
+
             <custom-operations>Personaliser les opérations pour le formulaire courant</custom-operations>
             <operation-label>Libellé</operation-label>
             <predefined-label>Prédéfini</predefined-label>
@@ -10331,7 +10332,7 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
-            
+
             <operations>
                 <label todo="true">[Operations]</label>
                 <item>

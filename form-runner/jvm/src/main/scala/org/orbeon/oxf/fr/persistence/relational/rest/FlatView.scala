@@ -18,7 +18,7 @@ import java.sql.Connection
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
+import org.orbeon.oxf.fr.persistence.relational.Provider.{DB2, Oracle, PostgreSQL, SQLServer}
 import org.orbeon.io.IOUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
@@ -26,9 +26,8 @@ import org.orbeon.scaxon.SimplePath._
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-private object FlatView {
 
-  val SupportedProviders: Set[Provider] = Set(PostgreSQL)
+private object FlatView {
 
   case class Col(extractExpression: String, colName: String)
   val MetadataPairs           =
@@ -52,19 +51,11 @@ private object FlatView {
     }
 
     // Delete view if it exists
-    // - Only for DB2 and postgresql; on Oracle we can use "OR REPLACE" when creating the view.
-    if (req.provider == PostgreSQL) {
+    // With Oracle we can use "OR REPLACE" when creating the view.
+    if (Set[Provider](DB2, SQLServer, PostgreSQL)(req.provider)) {
       val viewExists = {
-        val sqlQuery =
-          s"""|SELECT *
-              |  FROM information_schema.views
-              | WHERE table_name = ?
-              |       AND table_schema = current_schema()
-              |              |""".stripMargin
-
-        useAndClose(connection.prepareStatement(sqlQuery)) { ps =>
-          // On PostgreSQL, the name is stored in lower case in `information_schema.views`
-          ps.setString(1, if (req.provider == PostgreSQL) viewName.toLowerCase else viewName)
+        useAndClose(connection.prepareStatement(Provider.flatViewExistsQuery(req.provider))) { ps =>
+          ps.setString(1, Provider.flatViewExistsParam(req.provider, viewName))
           useAndClose(ps.executeQuery())(_.next())
         }
       }
@@ -75,11 +66,7 @@ private object FlatView {
     // Compute columns in the view
     val cols = {
       val userCols  = extractPathsCols(RequestReader.xmlDocument()) map { case (path, col) =>
-        val extractFunction = req.provider match {
-          case PostgreSQL => s"(xpath('/*/$path/text()', d.xml))[1]::text"
-          case _          => throw new UnsupportedOperationException
-        }
-        Col(extractFunction, col)
+        Col(Provider.flatViewExtractFunction(req.provider, path), col)
       }
       MetadataPairs.iterator ++ userCols
     }
@@ -88,24 +75,13 @@ private object FlatView {
     // - Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations.
     locally {
       val query =
-        s"""|CREATE VIEW $viewName AS
-            |SELECT  ${cols map { case Col(col, name) => col + " " + name} mkString ", "}
-            |  FROM  orbeon_form_data d,
-            |        (
-            |            SELECT   max(last_modified_time) last_modified_time,
-            |                     app, form, document_id
-            |              FROM   orbeon_form_data d
-            |             WHERE       app   = '${escapeSQL(req.app)}'
-            |                     AND form  = '${escapeSQL(req.form)}'
-            |                     AND draft = 'N'
-            |            GROUP BY app, form, document_id
-            |        ) m
-            | WHERE      d.last_modified_time = m.last_modified_time
-            |        AND d.app                = m.app
-            |        AND d.form               = m.form
-            |        AND d.document_id        = m.document_id
-            |        AND d.deleted            = 'N'
-            |""".stripMargin
+        Provider.flatViewCreateView(
+          req.provider,
+          req.app,
+          req.form,
+          viewName,
+          cols map { case Col(col, name) => col + " " + name} mkString ", "
+        )
       useAndClose(connection.prepareStatement(query))(_.executeUpdate())
     }
   }
@@ -245,7 +221,4 @@ private object FlatView {
 
   def joinParts(parts: List[String], max: Int) =
     fitParts(parts, max) mkString "_"
-
-  def escapeSQL(s: String) =
-    s.replaceAllLiterally("'", "''")
 }

@@ -42,6 +42,7 @@ import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
 import org.xml.sax.InputSource
 
+
 object RequestReader {
 
   object IdAtt {
@@ -489,11 +490,11 @@ trait CreateUpdateDelete
 
       // Create flat view if needed
       if (
-        requestFlatView                           &&
-        FlatView.SupportedProviders(req.provider) &&
-        req.forForm                               &&
-        ! req.forAttachment                       &&
-        ! delete                                  &&
+        requestFlatView                                   &&
+        Provider.FlatViewSupportedProviders(req.provider) &&
+        req.forForm                                       &&
+        ! req.forAttachment                               &&
+        ! delete                                          &&
         req.form != Names.LibraryFormName
       ) withDebug("CRUD: creating flat view") {
         FlatView.createFlatView(req, connection)

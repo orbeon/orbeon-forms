@@ -306,7 +306,6 @@
                                                         name="namespacedId"
                                                         value="$namespaced-id"/>
                                                     <xf:body>
-                                                        console.log("namespacedId", namespacedId);
                                                         ORBEON.builder.controlAdded.fire(namespacedId);
                                                     </xf:body>
                                                 </xf:action>

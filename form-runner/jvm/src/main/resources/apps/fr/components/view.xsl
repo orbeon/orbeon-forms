@@ -323,6 +323,7 @@
                             control="fr-view-component"
                             visited="true"
                             recurse="true"/>
+
                     </xf:group>
                 </xsl:when>
                 <xsl:otherwise>

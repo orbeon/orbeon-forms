@@ -205,7 +205,12 @@ object Provider extends Enum[Provider] {
     def escapeSQL(s: String): String =
       s.replace("'", "''")
 
-    s"""|CREATE  ${""} VIEW $viewName AS
+    val orReplace =
+      provider match {
+        case _          => ""
+      }
+
+    s"""|CREATE  $orReplace VIEW $viewName AS
         |SELECT  $cols
         |  FROM  orbeon_form_data d,
         |        (

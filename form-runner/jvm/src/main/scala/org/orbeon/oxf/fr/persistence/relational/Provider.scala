@@ -230,5 +230,11 @@ object Provider extends Enum[Provider] {
         |""".stripMargin
   }
 
+
   val FlatViewSupportedProviders: Set[Provider] = Set(PostgreSQL)
+
+  def idColGetter(provider: Provider): Option[String] =
+    provider match {
+      case _      => None
+    }
 }

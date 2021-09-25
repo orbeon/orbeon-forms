@@ -306,8 +306,7 @@ trait CreateUpdateDelete
     // Do insert, unless we're deleting draft data
     val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
     if (! deletingDataDraft) {
-      val possibleCols = insertCols(req, existingRow, delete, versionToSet, currentUserOrganization(connection, req))
-      val includedCols = possibleCols.filter(_.included)
+      val includedCols = insertCols(req, existingRow, delete, versionToSet, currentUserOrganization(connection, req))
       val colNames     = includedCols.map(_.name).mkString(", ")
       val colValues    =
         includedCols

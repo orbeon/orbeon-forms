@@ -33,6 +33,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.no.min.js"/>
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ru.min.js"/>
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pl.min.js"/>
+    <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.da.min.js"/>
 
     <xbl:binding
         id="fr-date"
@@ -61,6 +62,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
             <display-name lang="nl">Datum</display-name>
             <display-name lang="sv">Datum</display-name>
             <display-name lang="pt">Data</display-name>
+			<display-name lang="da">Dato</display-name>
             <icon>
                 <icon-class>fa fa-fw fa-calendar</icon-class>
             </icon>
@@ -142,6 +144,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
                         <resource xml:lang="de"><format>MTJ</format></resource>
                         <resource xml:lang="pl"><format>YMD</format></resource>
                         <resource xml:lang="hu"><format>HNÉ</format></resource>
+						<resource xml:lang="da"><format>MDÅ</format></resource>
                     </_>
                 </xf:instance>
             </xf:model>

@@ -167,7 +167,7 @@
 
             -libraryjars ${java.home}/lib/rt.jar(java/**.class)
 
-            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.30.jar
+            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.32.jar
 
             -libraryjars lib/proguard/javax.servlet-api-3.0.1.jar
             -libraryjars lib/proguard/portlet-api_2.0.jar
@@ -235,7 +235,7 @@
 
             -libraryjars ${java.home}/lib/rt.jar(java/**.class)
 
-            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.30.jar
+            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.32.jar
 
             -libraryjars lib/proguard/javax.servlet-api-3.0.1.jar
             -libraryjars lib/proguard/portlet-api_2.0.jar
@@ -305,7 +305,7 @@
 
             -libraryjars ${java.home}/lib/rt.jar(java/**.class)
 
-            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.30.jar
+            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.32.jar
 
             -libraryjars lib/proguard/javax.servlet-api-3.0.1.jar
             -libraryjars lib/proguard/portlet-api_2.0.jar
@@ -381,8 +381,8 @@
                 <include name="orbeon-proxy-portlet.jar"/>
             </lib>
             <lib dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
-                <include name="slf4j-api-1.7.30.jar"/>
-                <include name="slf4j-log4j12-1.7.30.jar"/>
+                <include name="slf4j-api-1.7.32.jar"/>
+                <include name="slf4j-log4j12-1.7.32.jar"/>
                 <include name="log4j-1.2.17.jar"/>
             </lib>
         </war>
@@ -396,7 +396,7 @@
                 <include name="orbeon-embedding.jar"/>
             </lib>
             <lib dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
-                <include name="slf4j-api-1.7.30.jar"/>
+                <include name="slf4j-api-1.7.32.jar"/>
             </lib>
             <zipfileset dir="descriptors/embedding" prefix="">
                 <include name="*.jsp"/>

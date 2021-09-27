@@ -63,18 +63,19 @@ trait FormRunnerSectionTemplateOps {
   def matchesComponentURI(uri: String): Boolean =
     MatchesComponentUriLibraryRegex.findFirstIn(uri).isDefined
 
-  def findXblXblForSectionTemplateNamespace(inDoc: NodeInfo, sectionTemplateNamespaceUri: String): Option[NodeInfo] = {
+  def findXblXblForSectionTemplateNamespace(publishedFormDoc: NodeInfo, sectionTemplateNamespaceUri: String): Option[NodeInfo] = {
 
-    val xblEls =
+    val xblXblEls =
       for {
-        xblEl <- inDoc.rootElement / fr.XMLNames.XHHeadTest / fr.XMLNames.XBLXBLTest
-        componentNamespace = xblEl.namespaces.find(_.getLocalPart == "component")
-        if componentNamespace.exists(_.getStringValue == sectionTemplateNamespaceUri)
+        xblXblEl    <- publishedFormDoc.rootElement / fr.XMLNames.XHHeadTest / fr.XMLNames.XBLXBLTest
+        xblBindings = xblXblEl / *
+        if xblBindings.exists(FormRunner.bindingFirstURIQualifiedName(_).uri == sectionTemplateNamespaceUri)
       } yield
-        xblEl
+        xblXblEl
 
-    assert(xblEls.length <=1, s"expect no more than one `<xbl:xbl>` container for the namespace `$sectionTemplateNamespaceUri`")
-    xblEls.headOption
+    assert(xblXblEls.length <= 1, s"expect no more than one `<xbl:xbl>` container for the namespace `$sectionTemplateNamespaceUri`")
+    xblXblEls.headOption
+
   }
 
   def findXblBindingForLocalname(xblElem: NodeInfo, componentLocalname: String): Option[NodeInfo] = {

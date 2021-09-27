@@ -68,8 +68,8 @@ trait FormRunnerSummary {
     val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
 
     putWithAttachments(
-      data               = data.root,
-      migrate            = identity,
+      liveData           = data.root,
+      migrate            = None,
       toBaseURI          = "", // local save
       fromBasePath       = createFormDataBasePath(app, form, isDraft = false, fromDocument),
       toBasePath         = createFormDataBasePath(app, form, isDraft = false, toDocument),

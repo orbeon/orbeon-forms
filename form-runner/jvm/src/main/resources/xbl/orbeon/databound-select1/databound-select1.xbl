@@ -49,14 +49,14 @@
             <editors static-itemset="false"/>
             <templates>
                 <view>
-                    <fr:databound-select1 id="" appearance="minimal" ref="" resource="">
+                    <fr:databound-select1 id="" appearance="minimal" ref="" resource="/fr/service/custom/orbeon/controls/countries?all=true">
                         <xf:label ref=""/>
                         <xf:hint ref=""/>
                         <xf:help ref=""/>
                         <xf:alert ref=""/>
-                        <xf:itemset ref="item">
-                            <xf:label ref="label"/>
-                            <xf:value ref="value"/>
+                        <xf:itemset ref="/countries/country">
+                            <xf:label ref="name"/>
+                            <xf:value ref="us-code"/>
                         </xf:itemset>
                     </fr:databound-select1>
                 </view>

@@ -1084,15 +1084,11 @@
                 </item>
             </event-type>
             <event-condition>
-                <label>Condition</label>
-                <item>
-                    <label>Run in all modes</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Run in "new" mode only</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <label>Run condition</label>
+                <item id="always">Always</item>
+                <item id="new-only">In "new" mode only</item>
+                <item id="formula">When formula evaluates to true</item>
+                <formula>Formula</formula>
             </event-condition>
             <event-control>
                 <label>Control</label>
@@ -1204,6 +1200,7 @@
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow and Permissions</label>
+
             <custom-operations>Define custom operations for this form</custom-operations>
             <operation-label>Label</operation-label>
             <predefined-label>Predefined</predefined-label>
@@ -2384,14 +2381,10 @@
             </event-type>
             <event-condition>
                 <label>Condition d'exécution</label>
-                <item>
-                    <label>Tous les modes</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Mode "création" seulement</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <item id="always">Toujours</item>
+                <item id="new-only">Dans le mode "création" seulement</item>
+                <item id="formula">Quand la formule s'évalue à vrai</item>
+                <formula>Formule</formula>
             </event-condition>
             <event-control>
                 <label>Contrôle</label>
@@ -2502,8 +2495,8 @@
             <delete>Supprimer</delete>
         </dialog-permissions>
         <dialog-workflow>
-          <label>Workflow et Permissions</label>
-	  
+            <label>Workflow et Permissions</label>
+
             <custom-operations>Personaliser les opérations pour le formulaire courant</custom-operations>
             <operation-label>Libellé</operation-label>
             <predefined-label>Prédéfini</predefined-label>
@@ -3693,15 +3686,11 @@
                 <!--</item>-->
             <!--</event-type>-->
             <event-condition>
-                <label todo="true">[Condition]</label>
-                <item>
-                    <label todo="true">[Run in all modes]</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label todo="true">[Run in "new" mode only]</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <label todo="true">[Run condition]</label>
+                <item todo="true" id="always">[Always]</item>
+                <item todo="true" id="new-only">[In "new" mode only]</item>
+                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
                 <label>Kontroll</label>
@@ -5002,15 +4991,11 @@
                 <!--</item>-->
             <!--</event-type>-->
             <event-condition>
-                <label todo="true">[Condition]</label>
-                <item>
-                    <label todo="true">[Run in all modes]</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label todo="true">[Run in "new" mode only]</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <label todo="true">[Run condition]</label>
+                <item todo="true" id="always">[Always]</item>
+                <item todo="true" id="new-only">[In "new" mode only]</item>
+                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
                 <label>Элемент</label>
@@ -6304,15 +6289,11 @@
                 <!--</item>-->
             <!--</event-type>-->
             <event-condition>
-                <label>Condizione</label>
-                <item>
-                    <label>Esegui sempre</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Esegui sulla creazione solo</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <label>Condizione d'esecuzione</label>
+                <item id="always">Esegui sempre</item>
+                <item id="new-only">Esegui sulla creazione solo</item>
+                <item id="formula">Esegui in base alla formula</item>
+                <formula>Formula</formula>
             </event-condition>
             <event-control>
                 <label>Controllo</label>
@@ -7608,14 +7589,10 @@
             <!--</event-type>-->
             <event-condition>
                 <label>Bedingung</label>
-                <item>
-                    <label>Läuft immer</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Läuft nur beim Erstellen</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <item id="always">Läuft immer</item>
+                <item id="new-only">Läuft nur beim Erstellen</item>
+                <item id="formula">Läuft nach formeln</item>
+                <formula>Formeln</formula>
             </event-condition>
             <event-control>
                 <label>Steuerelement</label>
@@ -8913,14 +8890,10 @@
             <!--</event-type>-->
             <event-condition>
                 <label>Tila</label>
-                <item>
-                    <label>Aja aina</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Aja vain luonnin yhteydessä</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <item id="always">Aja aina</item>
+                <item id="new-only">Aja vain luonnin yhteydessä</item>
+                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
                 <label>Kontrolli</label>
@@ -10215,14 +10188,10 @@
             <!--</event-type>-->
             <event-condition>
                 <label>Condición</label>
-                <item>
-                    <label>Ejecutar Siempre</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Ejecutar solamente al Inicio</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <item id="always">Ejecutar Siempre</item>
+                <item id="new-only">Ejecutar solamente al Inicio</item>
+                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
                 <label>Control</label>
@@ -10363,7 +10332,7 @@
 
             <stage-name todo="true">[Stage Name]</stage-name>
             <default-stage todo="true">[Default]</default-stage>
-            
+
             <operations>
                 <label todo="true">[Operations]</label>
                 <item>
@@ -11497,14 +11466,10 @@
             </event-type>
             <event-condition>
                 <label>Conditie</label>
-                <item>
-                    <label>Start altijd</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Start alleen bij aanmaken</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <item id="always">Start altijd</item>
+                <item id="new-only">Start alleen bij aanmaken</item>
+                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
                 <label>Control</label>
@@ -12806,14 +12771,10 @@
             <!--</event-type>-->
             <event-condition>
                 <label>Condição</label>
-                <item>
-                    <label>Correr sempre</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Correr apenas em criação</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <item id="always">Correr sempre</item>
+                <item id="new-only">Correr apenas em criação</item>
+                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
                 <label>Controlo</label>
@@ -14116,14 +14077,10 @@
             <!--</event-type>-->
             <event-condition>
                 <label>Villkor</label>
-                <item>
-                    <label>Kör alltid</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Kör bara när nytt formulär fylls i</label>
-                    <value>$fr-mode='new'</value>
-                </item>
+                <item id="always">Kör alltid</item>
+                <item id="new-only">Kör bara när nytt formulär fylls i</item>
+                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
                 <label>Kontroll</label>

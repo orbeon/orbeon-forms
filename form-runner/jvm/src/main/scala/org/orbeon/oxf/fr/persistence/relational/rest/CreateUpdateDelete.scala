@@ -42,6 +42,7 @@ import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
 import org.xml.sax.InputSource
 
+
 object RequestReader {
 
   object IdAtt {
@@ -305,8 +306,7 @@ trait CreateUpdateDelete
     // Do insert, unless we're deleting draft data
     val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
     if (! deletingDataDraft) {
-      val possibleCols = insertCols(req, existingRow, delete, versionToSet, currentUserOrganization(connection, req))
-      val includedCols = possibleCols.filter(_.included)
+      val includedCols = insertCols(req, existingRow, delete, versionToSet, currentUserOrganization(connection, req))
       val colNames     = includedCols.map(_.name).mkString(", ")
       val colValues    =
         includedCols
@@ -489,11 +489,11 @@ trait CreateUpdateDelete
 
       // Create flat view if needed
       if (
-        requestFlatView                           &&
-        FlatView.SupportedProviders(req.provider) &&
-        req.forForm                               &&
-        ! req.forAttachment                       &&
-        ! delete                                  &&
+        requestFlatView                                   &&
+        Provider.FlatViewSupportedProviders(req.provider) &&
+        req.forForm                                       &&
+        ! req.forAttachment                               &&
+        ! delete                                          &&
         req.form != Names.LibraryFormName
       ) withDebug("CRUD: creating flat view") {
         FlatView.createFlatView(req, connection)

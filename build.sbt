@@ -22,7 +22,7 @@ val EnumeratumVersion             = "1.6.0"
 val EnumeratumCirceVersion        = "1.6.0"
 val ShapelessVersion              = "2.3.4"
 val ScalaXmlVersion               = "1.2.0" // When upgrading: make sure we don't regress on https://github.com/orbeon/orbeon-forms/issues/4927
-val ScalaAsyncVersion             = "1.0.1"
+val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes issues
 val Parboiled1Version             = "1.3.1"
 val SprayJsonVersion              = "1.3.2" // 1.3.5 converts to `TreeMap` and breaks order in tests
 val AutowireVersion               = "0.2.6"
@@ -101,10 +101,10 @@ val CoreLibraryDependencies = Seq(
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.9.0"           % Test,
-  "com.google.code.gson"        % "gson"                            % "2.8.7"           % Test,
+  "com.google.code.gson"        % "gson"                            % "2.8.8"           % Test,
   "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
-  "mysql"                       % "mysql-connector-java"            % "8.0.25"          % Test,
+  "mysql"                       % "mysql-connector-java"            % "8.0.26"          % Test,
   "org.postgresql"              % "postgresql"                      % "42.2.23"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
   "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,

@@ -14,9 +14,9 @@
 package org.orbeon.oxf.fr.persistence.relational
 
 import java.sql.{Connection, ResultSet}
-
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
+
 import javax.xml.transform.stream.StreamSource
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.oxf.util.CoreUtils._
+
 
 sealed trait Provider extends EnumEntry with Lowercase
 
@@ -177,4 +178,63 @@ object Provider extends Enum[Provider] {
         )
     }
   }
+
+  def flatViewExistsQuery(provider: Provider): String =
+    provider match{
+      case PostgreSQL   =>
+                          s"""|SELECT *
+                              |  FROM information_schema.views
+                              | WHERE     table_name   = ?
+                              |       AND table_schema = current_schema()
+                              |""".stripMargin
+      case _            => throw new UnsupportedOperationException
+    }
+
+  // On PostgreSQL, the name is stored in lower case in `information_schema.views`
+  def flatViewExistsParam(provider: Provider, viewName: String): String =
+    if (provider == PostgreSQL) viewName.toLowerCase else viewName
+
+  def flatViewExtractFunction(provider: Provider, path: String): String =
+    provider match {
+      case PostgreSQL => s"(xpath('/*/$path/text()', d.xml))[1]::text"
+      case _          => throw new UnsupportedOperationException
+    }
+
+  def flatViewCreateView(provider: Provider, app: String, form: String, viewName: String, cols: String): String = {
+
+    def escapeSQL(s: String): String =
+      s.replace("'", "''")
+
+    val orReplace =
+      provider match {
+        case _          => ""
+      }
+
+    s"""|CREATE  $orReplace VIEW $viewName AS
+        |SELECT  $cols
+        |  FROM  orbeon_form_data d,
+        |        (
+        |            SELECT   max(last_modified_time) last_modified_time,
+        |                     app, form, document_id
+        |              FROM   orbeon_form_data d
+        |             WHERE       app   = '${escapeSQL(app)}'
+        |                     AND form  = '${escapeSQL(form)}'
+        |                     AND draft = 'N'
+        |            GROUP BY app, form, document_id
+        |        ) m
+        | WHERE      d.last_modified_time = m.last_modified_time
+        |        AND d.app                = m.app
+        |        AND d.form               = m.form
+        |        AND d.document_id        = m.document_id
+        |        AND d.deleted            = 'N'
+        |""".stripMargin
+  }
+
+
+  val FlatViewSupportedProviders: Set[Provider] = Set(PostgreSQL)
+
+  def idColGetter(provider: Provider): Option[String] =
+    provider match {
+      case _      => None
+    }
 }

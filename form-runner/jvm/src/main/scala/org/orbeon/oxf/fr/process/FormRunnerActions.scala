@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.fr.process
 
+import org.orbeon.dom
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
@@ -25,7 +27,7 @@ import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{ContentTypes, NetUtils}
+import org.orbeon.oxf.util.{ContentTypes, NetUtils, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI
@@ -193,8 +195,8 @@ trait FormRunnerActions {
 
       // Save
       val (beforeURLs, afterURLs, _) = putWithAttachments(
-        data              = formInstance.root,
-        migrate           = maybeMigrateData,
+        liveData          = formInstance.root,
+        migrate           = Some(maybeMigrateData),
         toBaseURI         = "", // local save
         fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
         toBasePath        = createFormDataBasePath(app, form,   isDraft, document),

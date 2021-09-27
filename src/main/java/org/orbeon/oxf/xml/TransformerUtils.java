@@ -55,8 +55,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-import static net.sf.ehcache.terracotta.SerializationHelper.serializeToString;
-
 /**
  * Utility class for XSLT and other transformations.
  */

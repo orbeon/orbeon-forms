@@ -2441,7 +2441,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     var relatedTarget = event.relatedTarget || document.activeElement;
                     var relatedControl = ORBEON.xforms.Events._findAncestorFocusableControl(relatedTarget);
                     if (relatedControl == null) {
-                        ORBEON.xforms.Globals.currentFocusControlId = null;
+                        ORBEON.xforms.Globals.currentFocusControlId      = null;
+                        ORBEON.xforms.Globals.currentFocusControlElement = null;
                         var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, "xxforms-blur");
                         ORBEON.xforms.server.AjaxServer.fireEvent(event);
                     }

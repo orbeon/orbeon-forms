@@ -16,12 +16,12 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import java.sql.Connection
 
 import enumeratum._
-import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 
 import scala.util.Try

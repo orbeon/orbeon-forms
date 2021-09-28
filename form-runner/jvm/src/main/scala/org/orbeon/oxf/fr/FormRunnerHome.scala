@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerPersistence.findProvider
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.DateUtilsUsingSaxon
 import org.orbeon.oxf.util.PathUtils._
@@ -84,7 +85,7 @@ trait FormRunnerHome {
   private def collectForms(forms: SequenceIterator, p: NodeInfo => Boolean = _ => true): Iterator[Form] =
     asScalaIterator(forms) collect { case form: NodeInfo if p(form) => Form(form) }
 
-  private def formsForSelection(selection: String, forms: SequenceIterator) = {
+  private def formsForSelection(selection: String, forms: SequenceIterator): Iterator[Form] = {
 
     def appFormVersion(s: String) = {
       val parts = s.splitTo[List]("/")
@@ -180,6 +181,13 @@ trait FormRunnerHome {
   //@XPathFunction
   def canUpgradeRemote(selection: String, forms: SequenceIterator) =
     formsForSelection(selection, forms) forall (_.isRemote)
+
+  //@XPathFunction
+  def canReEncrypt(selection: String, forms: SequenceIterator): Boolean =
+    formsForSelection(selection, forms).forall { form =>
+      val provider = findProvider(form.app, form.form, FormOrData.Data).get
+      providerPropertyAsBoolean(provider, property = "reencrypt", default = false)
+    }
 
   // NOTE: It would be great if we could work on typed data, whether created from XML, JSON or an object
   // serialization. Here we juggle between XML and typed data.

@@ -77,15 +77,19 @@ private object PersistenceProxyProcessor {
   val DataPath                       = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
   val DataCollectionPath             = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
   val SearchPath                     = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
+  val ReEncryptAppFormPath           = """/fr/service/persistence(/reencrypt/([^/]+)/([^/]+))""".r
   val PublishedFormsMetadataPath     = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
   val ReindexPath                    =   "/fr/service/persistence/reindex"
+  val ReEncryptStatusPath            =   "/fr/service/persistence/reencrypt"
+
+  val FrEncryptClass                 = "fr-encrypt"
 
   val RawDataFormatVersion           = "raw"
   val AllowedDataFormatVersionParams = Set() ++ (DataFormatVersion.values map (_.entryName)) + RawDataFormatVersion
 
   val FRRelevantQName                = QName("relevant", XMLNames.FRNamespace)
 
-  val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
+  val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.HEAD, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
   val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
 
   implicit val Logger                = new IndentedLogger(LoggerFactory.createLogger(PersistenceProxyProcessor.getClass))
@@ -98,8 +102,10 @@ private object PersistenceProxyProcessor {
       case DataPath(path, app, form, _, _, filename)   => proxyRequest               (request, response, app, form, FormOrData.Data, Some(filename), path)
       case DataCollectionPath(path, app, form)         => proxyRequest               (request, response, app, form, FormOrData.Data, None          , path)
       case SearchPath(path, app, form)                 => proxyRequest               (request, response, app, form, FormOrData.Data, None          , path)
+      case ReEncryptAppFormPath(path, app, form)       => proxyRequest               (request, response, app, form, FormOrData.Form, None          , path)
       case PublishedFormsMetadataPath(path, app, form) => proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
-      case ReindexPath                                 => proxyReindex(request, response)
+      case ReindexPath                                 => proxyReindex               (request, response)
+      case ReEncryptStatusPath                         => proxyReEncryptStatus       (request, response)
       case _                                           => throw new OXFException(s"Unsupported path: $incomingPath")
     }
   }
@@ -128,9 +134,20 @@ private object PersistenceProxyProcessor {
         case None          => request.getInputStream
       }
 
-      val (bodyInputStream, bodyContentLength) =
-        FieldEncryption.encryptDataIfNecessary(request, requestInputStream, app, form, filename)
-          .getOrElse(requestInputStream -> request.contentLengthOpt)
+      val inputData = requestInputStream -> request.contentLengthOpt
+      val (bodyInputStream, bodyContentLength) = formOrData match {
+        case FormOrData.Form =>
+          // Don't encrypt form definitions
+          inputData
+        case FormOrData.Data =>
+          FieldEncryption.encryptDataIfNecessary(
+            request,
+            requestInputStream,
+            app,
+            form,
+            isDataXmlRequest && ! isFormBuilder
+          ).getOrElse(inputData)
+      }
 
       StreamedContent(
         bodyInputStream,
@@ -151,97 +168,106 @@ private object PersistenceProxyProcessor {
     val requestForData = formOrData == FormOrData.Data && request.getMethod == HttpMethod.GET
     val transforms     = requestForData.flatList {
 
-      if (isDataXmlRequest && ! isFormBuilder) {
+        if (isDataXmlRequest && ! isFormBuilder) {
 
-        // Prune non-relevant nodes, if we're asked to do it
-        // https://doc.orbeon.com/form-runner/apis/persistence-api/crud#url-parameters
-        val removeNonRelevantTransform = {
-          val nonrelevantParamValue      = request.getFirstParamAsString(NonRelevantName)
-          val requestedRelevanceHandling = nonrelevantParamValue.flatMap(RelevanceHandling.withNameLowercaseOnlyOption)
-          requestedRelevanceHandling match {
-            case Some(Keep)      | None => None
-            case Some(Remove)           => Some(parsePruneAndSerializeXmlData _)
-            case Some(r @ Empty)        => throw new UnsupportedOperationException(s"${r.entryName}")
+          // Prune non-relevant nodes, if we're asked to do it
+          // https://doc.orbeon.com/form-runner/apis/persistence-api/crud#url-parameters
+          val removeNonRelevantTransform = {
+            val nonrelevantParamValue      = request.getFirstParamAsString(NonRelevantName)
+            val requestedRelevanceHandling = nonrelevantParamValue.flatMap(RelevanceHandling.withNameLowercaseOnlyOption)
+            requestedRelevanceHandling match {
+              case Some(Keep)      | None => None
+              case Some(Remove)           => Some(parsePruneAndSerializeXmlData _)
+              case Some(r @ Empty)        => throw new UnsupportedOperationException(s"${r.entryName}")
+            }
           }
-        }
 
-        List(removeNonRelevantTransform).flatten
+          // Decrypt data
+          val decryptTransform = Some(FieldEncryption.decryptDataXmlTransform _)
 
-      } else if (isDataXmlRequest && isFormBuilder | formOrData == FormOrData.Form) {
+          List(removeNonRelevantTransform, decryptTransform).flatten
 
-        // Special case of form definitions
-        request.getFirstParamAsString(FormDefinitionFormatVersionName).map(DataFormatVersion.withName) match {
-          case Some(dstVersion) =>
-            // We are explicitly asked to downgrade a form definition format
-            // The database may contain a form definition in any format
+        } else if (isDataXmlRequest && isFormBuilder | formOrData == FormOrData.Form) {
 
-            def migrate(is: InputStream, os: OutputStream): Unit = {
+          // Special case of form definitions
+          request.getFirstParamAsString(FormDefinitionFormatVersionName).map(DataFormatVersion.withName) match {
+            case Some(dstVersion) =>
+              // We are explicitly asked to downgrade a form definition format
+              // The database may contain a form definition in any format
 
-              val formDoc =
-                new DocumentWrapper(TransformerUtils.readDom4j(is, null, false, false), null, XPath.GlobalConfiguration)
+              def migrate(is: InputStream, os: OutputStream): Unit = {
 
-              val migrationsFromForm =
-                new MigrationsFromForm(
-                  outerDocument        = formDoc,
-                  availableXBLBindings = None, // XXX ok?
-                  legacyGridsOnly      = false
-                )
+                val formDoc =
+                  new DocumentWrapper(TransformerUtils.readDom4j(is, null, false, false), null, XPath.GlobalConfiguration)
 
-              // 1. All grids must have ids for what follows
+                val migrationsFromForm =
+                  new MigrationsFromForm(
+                    outerDocument        = formDoc,
+                    availableXBLBindings = None, // XXX ok?
+                    legacyGridsOnly      = false
+                  )
+
+                // 1. All grids must have ids for what follows
 //                FormBuilder.addMissingGridIds(ctx.bodyElem)
 
-              // 2. Migrate inline instance data
-              val frDocCtx: FormRunnerDocContext = new FormRunnerDocContext {
-                val formDefinitionRootElem: NodeInfo = formDoc.rootElement
+                // 2. Migrate inline instance data
+                val frDocCtx: FormRunnerDocContext = new FormRunnerDocContext {
+                  val formDefinitionRootElem: NodeInfo = formDoc.rootElement
+                }
+
+                // If we don't find a version in the form definition, it means it was last updated with a version older than 2018.2
+                // TODO: We should discriminate between 4.8.0 and 4.0.0 ideally. Currently we don't have a user use case but it would
+                //   be good for correctness.
+                val srcVersionFromMetadataOrGuess =
+                  findFormDefinitionFormatFromStringVersions(
+                    (frDocCtx.metadataRootElem / "updated-with-version" ++ frDocCtx.metadataRootElem / "created-with-version") map
+                      (_.stringValue)
+                  ) getOrElse DataFormatVersion.V480
+
+                MigrationSupport.migrateDataInPlace(
+                  dataRootElem     = (frDocCtx.dataInstanceElem child *).head.asInstanceOf[NodeWrapper],
+                  srcVersion       = srcVersionFromMetadataOrGuess,
+                  dstVersion       = dstVersion,
+                  findMigrationSet = migrationsFromForm
+                )
+
+                // 3. Migrate other aspects such as binds and controls
+                MigrationSupport.migrateOtherInPlace(
+                  formRootElem     = formDoc,
+                  srcVersion       = srcVersionFromMetadataOrGuess,
+                  dstVersion       = dstVersion,
+                  findMigrationSet = migrationsFromForm
+                )
+
+                // Serialize out the result
+                val receiver =
+                  TransformerUtils.getIdentityTransformerHandler |!>
+                    (_.setResult(new StreamResult(os)))
+
+                receiver.getTransformer |!>
+                  (_.setOutputProperty(OutputKeys.ENCODING,                     CharsetNames.Utf8)) |!>
+                  (_.setOutputProperty(OutputKeys.METHOD,                       "xml"))             |!>
+                  (_.setOutputProperty(OutputKeys.VERSION,                      "1.0"))             |!>
+                  (_.setOutputProperty(OutputKeys.INDENT,                       "no"))              |!>
+                  (_.setOutputProperty(TransformerUtils.INDENT_AMOUNT_PROPERTY, "0"))
+
+                TransformerUtils.writeTinyTree(formDoc, receiver)
               }
 
-              // If we don't find a version in the form definition, it means it was last updated with a version older than 2018.2
-              // TODO: We should discriminate between 4.8.0 and 4.0.0 ideally. Currently we don't have a user use case but it would
-              //   be good for correctness.
-              val srcVersionFromMetadataOrGuess =
-                findFormDefinitionFormatFromStringVersions(
-                  (frDocCtx.metadataRootElem / "updated-with-version" ++ frDocCtx.metadataRootElem / "created-with-version") map
-                    (_.stringValue)
-                ) getOrElse DataFormatVersion.V480
+              List(migrate _)
 
-              MigrationSupport.migrateDataInPlace(
-                dataRootElem     = (frDocCtx.dataInstanceElem child *).head.asInstanceOf[NodeWrapper],
-                srcVersion       = srcVersionFromMetadataOrGuess,
-                dstVersion       = dstVersion,
-                findMigrationSet = migrationsFromForm
-              )
+            case None => Nil
+          }
+        } else {
 
-              // 3. Migrate other aspects such as binds and controls
-              MigrationSupport.migrateOtherInPlace(
-                formRootElem     = formDoc,
-                srcVersion       = srcVersionFromMetadataOrGuess,
-                dstVersion       = dstVersion,
-                findMigrationSet = migrationsFromForm
-              )
-
-              // Serialize out the result
-              val receiver =
-                TransformerUtils.getIdentityTransformerHandler |!>
-                  (_.setResult(new StreamResult(os)))
-
-              receiver.getTransformer |!>
-                (_.setOutputProperty(OutputKeys.ENCODING,                     CharsetNames.Utf8)) |!>
-                (_.setOutputProperty(OutputKeys.METHOD,                       "xml"))             |!>
-                (_.setOutputProperty(OutputKeys.VERSION,                      "1.0"))             |!>
-                (_.setOutputProperty(OutputKeys.INDENT,                       "no"))              |!>
-                (_.setOutputProperty(TransformerUtils.INDENT_AMOUNT_PROPERTY, "0"))
-
-              TransformerUtils.writeTinyTree(formDoc, receiver)
-            }
-
-            List(migrate _)
-
-          case None => Nil
+          // Decrypt attachment if we're told to do so
+          filename.isDefined.flatList {
+            val decryptHeader     = request.getFirstHeader(FormRunnerPersistence.OrbeonDecryptHeaderLower)
+            val isEncryptedAtRest = decryptHeader.contains(true.toString)
+            isEncryptedAtRest.list(FieldEncryption.decryptAttachmentTransform _)
+          }
         }
-      } else {
-        Nil
       }
-    }
 
     proxyRequest(request, requestContent, serviceURI, headers, response, transforms)
   }
@@ -300,13 +326,15 @@ private object PersistenceProxyProcessor {
     response           : Response,
     responseTransforms : List[(InputStream, OutputStream) => Unit]
   ): Unit =
-    IOUtils.useAndClose(proxyEstablishConnection(request, requestContent, serviceURI, headers)) { cxr =>
-
+    IOUtils.useAndClose(proxyEstablishConnection(request, requestContent, serviceURI, headers)) { connectionResult =>
       // Proxy status code
-      response.setStatus(cxr.statusCode)
+      response.setStatus(connectionResult.statusCode)
       // Proxy incoming headers
-      cxr.content.contentType foreach (response.setHeader(Headers.ContentType, _))
-      proxyCapitalizeAndCombineHeaders(cxr.headers, request = false) foreach (response.setHeader _).tupled
+      proxyCapitalizeAndCombineHeaders(connectionResult.headers, request = false) foreach (response.setHeader _).tupled
+
+      // Proxy content type
+      val responseContentType = connectionResult.content.contentType
+      responseContentType.foreach(response.setHeader(Headers.ContentType, _))
 
       @tailrec
       def applyTransforms(
@@ -326,9 +354,10 @@ private object PersistenceProxyProcessor {
       }
 
       val doTransforms =
-        cxr.statusCode == HttpStatus.SC_OK
+        connectionResult.statusCode == HttpStatus.SC_OK
+
       applyTransforms(
-        cxr.content.inputStream,
+        connectionResult.content.inputStream,
         response.getOutputStream,
         if (doTransforms) responseTransforms else Nil
       )
@@ -449,6 +478,34 @@ private object PersistenceProxyProcessor {
         val serviceURI = baseURI + "/reindex"
         proxyRequest(request, None, serviceURI, headers, response, Nil)
       }
+    )
+  }
+
+  def proxyReEncryptStatus(
+    request  : Request,
+    response : Response
+  ): Unit = {
+
+    val dataProviders = getProviders(usableFor = FormOrData.Data)
+
+    val dataProvidersWithReEncryptSupport =
+      dataProviders.filter { provider =>
+        FormRunner.providerPropertyAsBoolean(provider, "reencrypt", default = false)
+      }
+
+    returnAggregatedDocument(
+      root     = "forms",
+      content  =
+        dataProvidersWithReEncryptSupport.flatMap { provider =>
+          val (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
+          val serviceURI         = baseURI + "/reencrypt"
+          val cxr                = proxyEstablishConnection(request, None, serviceURI, headers)
+          ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
+            val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
+            forms / "forms" / "form"
+          }
+        },
+      response = response
     )
   }
 

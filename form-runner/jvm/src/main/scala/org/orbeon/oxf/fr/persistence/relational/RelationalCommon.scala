@@ -14,59 +14,18 @@
 package org.orbeon.oxf.fr.persistence.relational
 
 import java.sql.Connection
-
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{SearchRequest, SearchVersion}
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
+import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
 
 object RelationalCommon {
 
   def joinColumns(cols: Seq[String], t1: String, t2: String): String =
     cols.map(c => s"$t1.$c = $t2.$c").mkString(" AND ")
-
-  /**
-    * Finds in the database what form version is used for an app/form and optional document id:
-    *
-    * 1. If only the app/form are provided, it returns the latest version of a published, non-deleted, form.
-    * We wouldn't want to return a version of a deleted published form, as running a GET for the latest
-    * form definition for an app/form, we would here return the version of a deleted form (and then 404 as we
-    * can't find that form in the database).
-    *
-    * 2. If the document id is provided, it returns the form version used for that document. We could return the
-    * form version for a deleted document, but decided against it for consistency with what we do when returning
-    * the form version for app/form. (A benefit of returning the version of a deleted data is that this could
-    * allow Form Runner to return a 510 to the browser. Without it, since Form Runner starts by reading the form
-    * definition, it will fail if that version isn't found. But this isn't a real benefit since right now the
-    * Page Flow Controller doesn't know how to return a 510.)
-    */
-  def formVersion(connection: Connection, app: String, form: String, docId: Option[String]): Option[Int] = {
-    val table = s"orbeon_form_${if (docId.isEmpty) "definition" else "data"}"
-    val versionSql =
-      s"""|SELECT max(t.form_version)
-          |FROM   $table t,
-          |       (
-          |           SELECT   max(last_modified_time) last_modified_time, app, form, form_version
-          |           FROM     $table
-          |           WHERE    app = ?
-          |                    AND form = ?
-          |                    ${docId.map(_ => "and document_id = ?").getOrElse("")}
-          |           GROUP BY app, form, form_version
-          |       ) m
-          |WHERE  ${joinColumns(Seq("last_modified_time", "app", "form", "form_version"), "t", "m")}
-          |       AND t.deleted = 'N'
-          |""".stripMargin
-    useAndClose(connection.prepareStatement(versionSql)) { ps =>
-      ps.setString(1, app)
-      ps.setString(2, form)
-      docId.foreach(ps.setString(3, _))
-      useAndClose(ps.executeQuery()) { rs =>
-        rs.next()
-        val version = rs.getInt(1)
-        if (rs.wasNull()) None else Some(version)
-      }
-    }
-  }
 
   /**
     * For every request, there is a corresponding specific form version number. In the request, that specific version
@@ -76,29 +35,33 @@ object RelationalCommon {
     *
     * Throws `HttpStatusCodeException` if `ForDocument` and the document is not found.
     */
-  def requestedFormVersion(connection: Connection, req: RequestCommon): Int = {
-
-    def latest: Option[Int] =
-      formVersion(connection, req.app, req.form, None)
+  def requestedFormVersion(req: RequestCommon): Int =
 
     req.version match {
-      case Unspecified        => latest.getOrElse(1)
-      case Next               => latest.map(_ + 1).getOrElse(1)
+      case Unspecified        => Private.latest(req.app, req.form).getOrElse(1)
+      case Next               => Private.latest(req.app, req.form).map(_ + 1).getOrElse(1)
       case Specific(v)        => v
-      case ForDocument(docId) => formVersion(connection, req.app, req.form, Some(docId))
-        .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
+      case ForDocument(docId) =>
+        FormRunner.readDocumentFormVersion(req.app, req.form, docId)
+          .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
     }
-  }
 
-  def requestedFormVersion(connection: Connection, req: SearchRequest): Option[Int] = {
-
-    def latest: Option[Int] =
-      formVersion(connection, req.app, req.form, None)
+  def requestedFormVersion(req: SearchRequest): FormDefinitionVersion =
 
     req.version match {
-      case SearchVersion.Unspecified  => Some(latest.getOrElse(1))
-      case SearchVersion.All          => None
-      case SearchVersion.Specific(v)  => Some(v)
+      case SearchVersion.Unspecified  => Private.latest(req.app, req.form).map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
+      case SearchVersion.All          => FormDefinitionVersion.Latest
+      case SearchVersion.Specific(v)  => FormDefinitionVersion.Specific(v)
     }
+
+  private object Private {
+
+    def latest(app: String, form: String): Option[Int] =
+      for {
+        metadata    <- FormRunner.readFormMetadataOpt(app, form, FormDefinitionVersion.Latest)
+        formVersion <- metadata.child("forms").child("form").child("form-version").headOption
+      } yield
+        formVersion.stringValue.toInt
+
   }
 }

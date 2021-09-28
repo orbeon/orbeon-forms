@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import java.sql.Timestamp
-
 import org.orbeon.oxf.externalcontext.{Credentials, Organization}
+import org.orbeon.oxf.fr.FormDefinitionVersion
 import org.orbeon.oxf.fr.permission.Operation.{Delete, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
@@ -34,10 +34,14 @@ import scala.collection.mutable
 
 trait SearchLogic extends SearchRequestParser {
 
-  private def computePermissions(request: SearchRequest, user: Option[Credentials]): SearchPermissions = {
+  private def computePermissions(
+    request    : SearchRequest,
+    user       : Option[Credentials],
+    version    : FormDefinitionVersion
+  ): SearchPermissions = {
 
     val searchOperations     = request.anyOfOperations.getOrElse(List(Read, Update, Delete))
-    val formPermissionsElOpt = RelationalUtils.readFormPermissions(request.app, request.form)
+    val formPermissionsElOpt = RelationalUtils.readFormPermissions(request.app, request.form, version)
     val formPermissions      = PermissionsXML.parse(formPermissionsElOpt.orNull)
 
     def hasPermissionCond(condition: Condition): Boolean =
@@ -65,8 +69,9 @@ trait SearchLogic extends SearchRequestParser {
 
   def doSearch(request: SearchRequest): (List[Document], Int) =  {
 
+    val version          = requestedFormVersion(request)
     val user             = PermissionsAuthorization.currentUserFromSession
-    val permissions      = computePermissions(request, user)
+    val permissions      = computePermissions(request, user, version)
     val hasNoPermissions =
       ! permissions.authorizedBasedOnRole               &&
       permissions.authorizedIfUsername         .isEmpty &&
@@ -79,9 +84,8 @@ trait SearchLogic extends SearchRequestParser {
     else
       RelationalUtils.withConnection { connection =>
 
-        val versionOpt  = requestedFormVersion(connection, request)
         val commonParts = List(
-          commonPart         (request, connection, versionOpt),
+          commonPart         (request, connection, version),
           draftsPart         (request),
           permissionsPart    (permissions),
           columnFilterPart   (request),

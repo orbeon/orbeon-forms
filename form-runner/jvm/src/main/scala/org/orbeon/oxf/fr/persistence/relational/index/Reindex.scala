@@ -14,12 +14,11 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import java.sql.{Connection, PreparedStatement}
-
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence}
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
@@ -168,7 +167,7 @@ trait Reindex extends FormDefinition {
     }
 
     // Get all the row from orbeon_form_data that are "latest" and not deleted
-    val xmlCol = Provider.xmlCol(provider, "d")
+    val xmlCol = Provider.xmlColSelect(provider, "d")
     val currentDataSql =
       s"""  SELECT d.id,
          |         d.created,
@@ -185,7 +184,7 @@ trait Reindex extends FormDefinition {
          |         d.draft,
          |         $xmlCol
          |$currentFromWhere
-         |ORDER BY app, form
+         |ORDER BY app, form, form_version
          |""".stripMargin
 
     useAndClose(connection.prepareStatement(currentDataSql)) { ps =>
@@ -196,6 +195,7 @@ trait Reindex extends FormDefinition {
         case class FormIndexedControls(
           app             : String,
           form            : String,
+          formVersion     : Int,
           indexedControls : Seq[IndexedControl]
         )
 
@@ -205,17 +205,18 @@ trait Reindex extends FormDefinition {
         while (currentData.next() && StatusStore.getStatus != Status.Stopping) {
 
           Backend.setProviderDocumentNext()
-          val app = currentData.getString("app")
-          val form = currentData.getString("form")
+          val app         = currentData.getString("app")
+          val form        = currentData.getString("form")
+          val formVersion = currentData.getInt   ("form_version")
 
           // Get indexed controls for current app/form
           val indexedControls: Seq[IndexedControl] = prevIndexedControls match {
-            case Some(FormIndexedControls(`app`, `form`, indexedControls)) =>
+            case Some(FormIndexedControls(`app`, `form`, `formVersion`, indexedControls)) =>
               // Use indexed controls from previous iteration
               indexedControls
             case _ =>
               // Compute indexed controls reading the form definition
-              FormRunner.readPublishedForm(app, form)(RelationalUtils.Logger) match {
+              FormRunner.readPublishedForm(app, form, FormDefinitionVersion.Specific(formVersion))(RelationalUtils.Logger) match {
                 case None =>
                   RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
                   Seq.empty
@@ -306,7 +307,7 @@ trait Reindex extends FormDefinition {
             }
           }
           // Pass current indexed controls to the next iteration
-          prevIndexedControls = Some(FormIndexedControls(app, form, indexedControls))
+          prevIndexedControls = Some(FormIndexedControls(app, form, formVersion, indexedControls))
         }
       }
     }

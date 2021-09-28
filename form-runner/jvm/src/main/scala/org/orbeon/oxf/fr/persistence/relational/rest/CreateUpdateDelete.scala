@@ -15,13 +15,12 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import java.io.{ByteArrayOutputStream, InputStream, Writer}
 import java.sql.{Array => _, _}
-
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.io.IOUtils._
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerPersistence, Names}
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerPersistence, Names}
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUser}
@@ -188,7 +187,7 @@ trait CreateUpdateDelete
       val position = Iterator.from(1)
       ps.setString(position.next(), req.app)
       ps.setString(position.next(), req.form)
-      if (! req.forData)     ps.setInt   (position.next(), requestedFormVersion(connection, req))
+      if (! req.forData)     ps.setInt   (position.next(), requestedFormVersion(req))
 
       req.dataPart foreach (dataPart => ps.setString(position.next(), dataPart.documentId))
 
@@ -221,7 +220,7 @@ trait CreateUpdateDelete
   private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Int = {
 
     val table = tableName(req)
-    val versionToSet = existingRow.flatMap(_.formVersion).getOrElse(requestedFormVersion(connection, req))
+    val versionToSet = existingRow.flatMap(_.formVersion).getOrElse(requestedFormVersion(req))
 
     // If for data, start by deleting any draft document and draft attachments
     req.dataPart match {
@@ -299,6 +298,16 @@ trait CreateUpdateDelete
             }
         }
 
+        // 1. In `CreateUpdateDelete.scala`:
+        //   1.1. Above, we read/write from/to orbeon_i_current/orbeon_i_control_text (remove drafts)
+        //   1.2. Below, we write      to      orbeon_form_data                       (write data)
+        // 2. In `Reindex.scala`:
+        //   2.1. 1st,   we read       from    orbeon_form_data                       (get data to index)
+        //   2.2. 2nd,   we write      to      orbeon_i_current/orbeon_i_control_text (update the index)
+        // This can lease to a deadlock, hence here doing a commit after deleting the drafts.
+        // The downside is that if writing the data (1.2) fails, with the commit we'll have lost the draft, which seems negligible.
+        connection.commit()
+
       case _ =>
 
     }
@@ -340,126 +349,130 @@ trait CreateUpdateDelete
 
     debug("CRUD: handling change request", List("delete" -> delete.toString, "request" -> req.toString))
 
-    // Read before establishing a connection, so we don't use two simultaneous connections
+    val existing =
+      RelationalUtils.withConnection { connection =>
+        existingRow(connection, req)
+      }
+    val versionToSet = existing.flatMap(_.formVersion).getOrElse(requestedFormVersion(req))
+
+    // Read outside of a `withConnection` block, so we don't use two simultaneous connections
     val formPermissions = {
-      val elOpt = req.forData.option(RelationalUtils.readFormPermissions(req.app, req.form)).flatten
+      val elOpt = req.forData.option(RelationalUtils.readFormPermissions(req.app, req.form, FormDefinitionVersion.Specific(versionToSet))).flatten
       PermissionsXML.parse(elOpt.orNull)
     }
-
     debug("CRUD: form permissions", List("permissions" -> formPermissions.toString))
 
+    // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:
+    // - For correctness: e.g., a PUT for a document id is an invalid request, but if we start by checking
+    //   permissions, we might not find the document and return a 400 instead.
+    // - For efficiency: when we can, it's better to 400 right away without accessing the database.
+    def checkVersionInitial(): Unit = {
+
+      val badVersion =
+        // Only GET for form definitions can request a version for a given document
+        req.version.isInstanceOf[ForDocument] ||
+        // Delete: no version can be specified
+        req.forData && delete && ! (req.version == Unspecified)
+
+      if (badVersion)
+        debug("CRUD: bad version", List("status code" -> StatusCode.BadRequest.toString))
+
+      if (badVersion)
+        throw HttpStatusCodeException(StatusCode.BadRequest)
+    }
+
+    def checkAuthorized(existing: Option[Row]): Unit = {
+      val authorized =
+        if (req.forData) {
+          existing match {
+            case Some(existing) =>
+
+              // Check we're allowed to update or delete this resource
+              val username      = existing.username
+              val groupname     = existing.group
+              val organization  = existing.organization.map(_._2)
+              val authorizedOps = PermissionsAuthorization.authorizedOperations(
+                formPermissions,
+                PermissionsAuthorization.currentUserFromSession,
+                CheckWithDataUser(username, groupname, organization)
+              )
+              val requiredOp    = if (delete) Delete else Update
+              Operations.allows(authorizedOps, requiredOp)
+            case None =>
+              // For deletes, if there is no data to delete, it is a 403 if could not read, update,
+              // or delete if it existed (otherwise code later will return a 404)
+              val authorizedOps = PermissionsAuthorization.authorizedOperations(
+                formPermissions,
+                PermissionsAuthorization.currentUserFromSession,
+                CheckWithoutDataUser(optimistic = false)
+              )
+              val requiredOps   = if (delete) List(Read, Update, Delete) else List(Create)
+              Operations.allowsAny(authorizedOps, requiredOps)
+          }
+        } else {
+          // Operations on deployed forms are always authorized
+          true
+        }
+
+      if (! authorized)
+        debug("CRUD: not authorized", List("status code" -> StatusCode.Forbidden.toString))
+
+      if (! authorized)
+        throw HttpStatusCodeException(StatusCode.Forbidden)
+    }
+
+    def checkVersionWithExisting(existing: Option[Row]): Unit = {
+
+      def isUpdate =
+        ! delete && existing.nonEmpty
+
+      def isCreate =
+        ! delete && existing.isEmpty
+
+      def existingVersionOpt =
+        existing flatMap (_.formVersion)
+
+      def isUnspecifiedOrSpecificVersion =
+        req.version match {
+          case Unspecified       => true
+          case Specific(version) => existingVersionOpt.contains(version)
+          case _                 => false
+        }
+
+      def isSpecificVersion =
+        req.version.isInstanceOf[Specific]
+
+      val badVersion =
+        (req.forData && isUpdate && ! isUnspecifiedOrSpecificVersion) ||
+        (req.forData && isCreate && ! isSpecificVersion)
+
+      if (badVersion)
+        debug("CRUD: bad version", List("status code" -> StatusCode.BadRequest.toString))
+
+      if (badVersion)
+        throw HttpStatusCodeException(StatusCode.BadRequest)
+    }
+
+    def checkDocExistsForDelete(existing: Option[Row]): Unit = {
+      // We can't delete a document that doesn't exist
+      val nothingToDelete = delete && existing.isEmpty
+
+      debug("CRUD: nothing to delete", List("status code" -> StatusCode.NotFound.toString))
+
+      if (nothingToDelete)
+        throw HttpStatusCodeException(StatusCode.NotFound)
+    }
+
+    // Checks
+    checkVersionInitial()
+
+    debug("CRUD: retrieved existing row", List("existing" -> existing.isDefined.toString))
+
+    checkAuthorized(existing)
+    checkVersionWithExisting(existing)
+    checkDocExistsForDelete(existing)
+
     RelationalUtils.withConnection { connection =>
-
-      // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:
-      // - For correctness: e.g., a PUT for a document id is an invalid request, but if we start by checking
-      //   permissions, we might not find the document and return a 400 instead.
-      // - For efficiency: when we can, it's better to 400 right away without accessing the database.
-      def checkVersionInitial(): Unit = {
-
-        val badVersion =
-          // Only GET for form definitions can request a version for a given document
-          req.version.isInstanceOf[ForDocument] ||
-          // Delete: no version can be specified
-          req.forData && delete && ! (req.version == Unspecified)
-
-        if (badVersion)
-          debug("CRUD: bad version", List("status code" -> StatusCode.BadRequest.toString))
-
-        if (badVersion)
-          throw HttpStatusCodeException(StatusCode.BadRequest)
-      }
-
-      def checkAuthorized(existing: Option[Row]): Unit = {
-        val authorized =
-          if (req.forData) {
-            existing match {
-              case Some(existing) =>
-
-                // Check we're allowed to update or delete this resource
-                val username      = existing.username
-                val groupname     = existing.group
-                val organization  = existing.organization.map(_._2)
-                val authorizedOps = PermissionsAuthorization.authorizedOperations(
-                  formPermissions,
-                  PermissionsAuthorization.currentUserFromSession,
-                  CheckWithDataUser(username, groupname, organization)
-                )
-                val requiredOp    = if (delete) Delete else Update
-                Operations.allows(authorizedOps, requiredOp)
-              case None =>
-                // For deletes, if there is no data to delete, it is a 403 if could not read, update,
-                // or delete if it existed (otherwise code later will return a 404)
-                val authorizedOps = PermissionsAuthorization.authorizedOperations(
-                  formPermissions,
-                  PermissionsAuthorization.currentUserFromSession,
-                  CheckWithoutDataUser(optimistic = false)
-                )
-                val requiredOps   = if (delete) List(Read, Update, Delete) else List(Create)
-                Operations.allowsAny(authorizedOps, requiredOps)
-            }
-          } else {
-            // Operations on deployed forms are always authorized
-            true
-          }
-
-        if (! authorized)
-          debug("CRUD: not authorized", List("status code" -> StatusCode.Forbidden.toString))
-
-        if (! authorized)
-          throw HttpStatusCodeException(StatusCode.Forbidden)
-      }
-
-      def checkVersionWithExisting(existing: Option[Row]): Unit = {
-
-        def isUpdate =
-          ! delete && existing.nonEmpty
-
-        def isCreate =
-          ! delete && existing.isEmpty
-
-        def existingVersionOpt =
-          existing flatMap (_.formVersion)
-
-        def isUnspecifiedOrSpecificVersion =
-          req.version match {
-            case Unspecified       => true
-            case Specific(version) => existingVersionOpt.contains(version)
-            case _                 => false
-          }
-
-        def isSpecificVersion =
-          req.version.isInstanceOf[Specific]
-
-        val badVersion =
-          (req.forData && isUpdate && ! isUnspecifiedOrSpecificVersion) ||
-          (req.forData && isCreate && ! isSpecificVersion)
-
-        if (badVersion)
-          debug("CRUD: bad version", List("status code" -> StatusCode.BadRequest.toString))
-
-        if (badVersion)
-          throw HttpStatusCodeException(StatusCode.BadRequest)
-      }
-
-      def checkDocExistsForDelete(existing: Option[Row]): Unit = {
-        // We can't delete a document that doesn't exist
-        val nothingToDelete = delete && existing.isEmpty
-
-        debug("CRUD: nothing to delete", List("status code" -> StatusCode.NotFound.toString))
-
-        if (nothingToDelete)
-          throw HttpStatusCodeException(StatusCode.NotFound)
-      }
-
-      // Checks
-      checkVersionInitial()
-      val existing = existingRow(connection, req)
-
-      debug("CRUD: retrieved existing row", List("existing" -> existing.isDefined.toString))
-
-      checkAuthorized(existing)
-      checkVersionWithExisting(existing)
-      checkDocExistsForDelete(existing)
 
       // Update database
       val versionSet = store(connection, req, existing, delete)

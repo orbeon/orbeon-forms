@@ -16,12 +16,13 @@ package org.orbeon.oxf.fr.persistence.existdb
 import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
+
 import scala.collection.compat._
 
 object Permissions {
@@ -38,8 +39,8 @@ object Permissions {
     implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(Permissions.getClass))
 
     val authorizedOperations = {
-      val formMetadata = FormRunner.readFormMetadata(app, form).ensuring(_.isDefined, "can't find form metadata for data").get
-      val permissionsElOrNull = (formMetadata / "forms" / "form" / "permissions").headOption.orNull
+      val formMetadataOpt     = FormRunner.readFormMetadataOpt(app, form, FormDefinitionVersion.Latest)
+      val permissionsElOrNull = formMetadataOpt.flatMap(_.firstChildOpt("permissions")).orNull
       val permissions = PermissionsXML.parse(permissionsElOrNull)
       val currentUser = PermissionsAuthorization.currentUserFromSession
       val checkWithDataUser = CheckWithDataUser(

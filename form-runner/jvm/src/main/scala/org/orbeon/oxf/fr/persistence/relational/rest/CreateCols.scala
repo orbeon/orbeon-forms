@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import java.sql.{PreparedStatement, Timestamp}
+
 import org.orbeon.oxf.externalcontext.Organization
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationSupport => _}
@@ -60,8 +61,8 @@ trait CreateCols extends RequestResponse with Common {
     currentUserOrganization: => Option[OrganizationId]
   ): List[Col]  = {
 
-    val xmlCol = "xml"
-    val xmlVal = if (req.provider == PostgreSQL) "XMLPARSE( DOCUMENT ? )" else "?"
+    val xmlCol = Provider.xmlColUpdate(req.provider)
+    val xmlVal = Provider.xmlValUpdate(req.provider)
     val isFormDefinition = req.forForm && !req.forAttachment
     val now = new Timestamp(System.currentTimeMillis())
     val organizationToSet = req.forData match {
@@ -89,7 +90,7 @@ trait CreateCols extends RequestResponse with Common {
               value         = StaticColValue(getter)
             )
           )
-        case None => Nil
+        case _ => Nil
       }
     ) ::: List(
       Col(
@@ -202,7 +203,7 @@ trait CreateCols extends RequestResponse with Common {
           name          = "username",
           value         = DynamicColValue(
             placeholder = "?" ,
-	    paramSetter = param(_.setString, existingRow.flatMap(_.username).getOrElse(requestUsername.orNull))
+	          paramSetter = param(_.setString, existingRow.flatMap(_.username).getOrElse(requestUsername.orNull))
           )
         )
     ) ::: (
@@ -211,7 +212,7 @@ trait CreateCols extends RequestResponse with Common {
           name          = "groupname",
           value         = DynamicColValue(
             placeholder = "?",
-	    paramSetter = param(_.setString, existingRow.flatMap(_.group).getOrElse(requestUsername.orNull))
+	          paramSetter = param(_.setString, existingRow.flatMap(_.group).getOrElse(requestUsername.orNull))
           )
         )
     ) ::: (

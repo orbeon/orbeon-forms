@@ -32,7 +32,7 @@ class CRUD
       val req = request
 
       httpRequest.getMethod match {
-        case HttpMethod.GET    => get(req)
+        case HttpMethod.GET | HttpMethod.HEAD => getOrHead(req, httpRequest.getMethod)
         case HttpMethod.PUT    => change(req, delete = false)
         case HttpMethod.DELETE => change(req, delete = true)
         case HttpMethod.LOCK   => lock(req)

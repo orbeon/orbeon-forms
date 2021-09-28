@@ -21,10 +21,9 @@ import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.fr.FormRunner.properties
+import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
-import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.pipeline.api.FunctionLibrary
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CoreUtils._
@@ -32,7 +31,6 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.{NodeInfoFactory, XFormsStaticStateImpl}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -105,6 +103,18 @@ object FormRunnerPersistence {
   val NonRelevantName                     = "nonrelevant"
 
   val PersistenceDefaultDataFormatVersion = DataFormatVersion.V400
+
+  val OrbeonPathToHolder                  = "Orbeon-Path-To-Holder"
+  val OrbeonPathToHolderLower             = OrbeonPathToHolder.toLowerCase
+  val OrbeonDidEncryptHeader              = "Orbeon-Did-Encrypt"
+  val OrbeonDidEncryptHeaderLower         = OrbeonDidEncryptHeader.toLowerCase
+  val OrbeonDecryptHeader                 = "Orbeon-Decrypt"
+  val OrbeonDecryptHeaderLower            = OrbeonDecryptHeader.toLowerCase
+  val AttachmentEncryptedAttributeName    = QName("attachment-encrypted", XMLNames.FRNamespace)
+  val ValueEncryptedAttributeName         = QName("value-encrypted"     , XMLNames.FRNamespace)
+  val LagacyValueEncryptedAttributeName   = QName("encrypted")
+  val AttachmentEncryptedAttribute        = NodeInfoFactory.attributeInfo(AttachmentEncryptedAttributeName, true.toString)
+  val ValueEncryptedAttribute             = NodeInfoFactory.attributeInfo(ValueEncryptedAttributeName     , true.toString)
 
   val CRUDBasePath                        = "/fr/service/persistence/crud"
   val FormMetadataBasePath                = "/fr/service/persistence/form"
@@ -319,9 +329,12 @@ trait FormRunnerPersistence {
   def isActiveProvider(provider: String): Boolean =
     providerPropertyAsBoolean(provider, "active", default = true)
 
-  // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
-  def readDocument(urlString: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
-
+  private def readConnectionResult(
+    method          : HttpMethod,
+    urlString       : String,
+    customHeaders   : Map[String, List[String]])(
+    implicit logger : IndentedLogger
+  ): ConnectionResult = {
     implicit val externalContext          = NetUtils.getExternalContext
     implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
@@ -339,14 +352,14 @@ trait FormRunnerPersistence {
     val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
       url              = url,
       hasCredentials   = false,
-      customHeaders    = Map(),
+      customHeaders    = customHeaders,
       headersToForward = Connection.headersToForwardFromProperty,
       cookiesToForward = Connection.cookiesToForwardFromProperty,
       Connection.getHeaderFromRequest(request)
     )
 
-    val cxr = Connection.connectNow(
-      method      = GET,
+    Connection.connectNow(
+      method      = method,
       url         = url,
       credentials = None,
       content     = None,
@@ -355,6 +368,16 @@ trait FormRunnerPersistence {
       saveState   = true,
       logBody     = false
     )
+  }
+
+  // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
+  def readDocument(
+    urlString       : String,
+    customHeaders   : Map[String, List[String]])(
+    implicit logger : IndentedLogger
+  ): Option[DocumentInfo] = {
+
+    val cxr = readConnectionResult(HttpMethod.GET, urlString, customHeaders)
 
     // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the test
     // on status code),  but the MySQL persistence layer returns a [200 with an empty body][1] (thus a body is
@@ -362,24 +385,73 @@ trait FormRunnerPersistence {
     //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
     ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { is =>
       // do process XInclude, so FB's model gets included
-      TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, rewrittenURLString, true, false)
+      TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, urlString, true, false)
     } toOption
   }
 
-  // Retrieves a form definition from the persistence layer
-  def readPublishedForm(appName: String, formName: String)(implicit logger: IndentedLogger): Option[DocumentInfo] =
-    readDocument(createFormDefinitionBasePath(appName, formName) + "form.xhtml")
+  def readHeaders(
+    urlString       : String,
+    customHeaders   : Map[String, List[String]])(
+    implicit logger : IndentedLogger
+  ): Map[String, List[String]] = {
+    val cxr = readConnectionResult(HttpMethod.HEAD, urlString, customHeaders)
+    cxr.headers
+  }
 
-  // Retrieves the metadata for a form from the persistence layer
-  def readFormMetadata(appName: String, formName: String)(implicit logger: IndentedLogger): Option[DocumentInfo] =
-    readDocument(
+  // Retrieves a form definition from the persistence layer
+  def readPublishedForm(
+    appName         : String,
+    formName        : String,
+    version         : FormDefinitionVersion)(
+    implicit logger : IndentedLogger
+  ): Option[DocumentInfo] = {
+    val path = createFormDefinitionBasePath(appName, formName) + "form.xhtml"
+    val customHeaders = version match {
+      case FormDefinitionVersion.Latest            => Map.empty[String, List[String]]
+      case FormDefinitionVersion.Specific(version) => Map(OrbeonFormDefinitionVersion -> List(version.toString))
+    }
+    readDocument(path, customHeaders)
+  }
+
+  // Retrieves the `<form>` element with the metadata for a form from the persistence layer
+  def readFormMetadataOpt(
+    appName         : String,
+    formName        : String,
+    version         : FormDefinitionVersion)(
+    implicit logger : IndentedLogger
+  ): Option[NodeInfo] = {
+
+    val formsDoc = readDocument(
       createFormMetadataPathAndQuery(
         app         = appName,
         form        = formName,
-        allVersions = false,
+        allVersions = version != FormDefinitionVersion.Latest,
         allForms    = true
-      )
+      ),
+      Map.empty
     )
+
+    val formElements = formsDoc.get / "forms" / "form"
+    val formByVersion = version match {
+      case FormDefinitionVersion.Specific(v) =>
+        formElements.find(_.child("form-version").stringValue == v.toString)
+      case FormDefinitionVersion.Latest =>
+        None
+    }
+
+    formByVersion.orElse(formElements.headOption)
+  }
+
+  def readDocumentFormVersion(
+    appName         : String,
+    formName        : String,
+    documentId      : String)(
+    implicit logger : IndentedLogger
+  ): Option[Int] = {
+    val path = createFormDataBasePath(appName, formName, isDraft = false, documentId) + "data.xml"
+    val headers = readHeaders(path, Map.empty)
+    headers.get(Version.OrbeonFormDefinitionVersion).map(_.head).map(_.toInt)
+  }
 
   // Whether the form data is valid as per the error summary
   // We use instance('fr-error-summary-instance')/valid and not valid() because the instance validity may not be
@@ -441,6 +513,12 @@ trait FormRunnerPersistence {
     holder            : NodeInfo
   )
 
+  case class AttachmentWithEncryptedAtRest(
+    fromPath          : String,
+    toPath            : String,
+    isEncryptedAtRest : Boolean
+  )
+
   def collectAttachments(
     data             : DocumentInfo,
     fromBasePath     : String,
@@ -493,25 +571,45 @@ trait FormRunnerPersistence {
     // Find all instance nodes containing file URLs we need to upload
     val attachmentsWithHolder  = collectAttachments(savedData, fromBasePath, toBasePath, forceAttachments)
 
-    def updateHolder(holder: NodeInfo, afterURL: String): Unit =
+    def updateHolder(holder: NodeInfo, afterURL: String, isEncryptedAtRest: Boolean): Unit = {
       setvalue(holder, afterURL)
+      XFormsAPI.delete(holder /@ AttachmentEncryptedAttributeName)
+      if (isEncryptedAtRest)
+        XFormsAPI.insert(
+          into   = holder,
+          origin = AttachmentEncryptedAttribute
+        )
+    }
 
-    def saveAllAttachments(): Unit = {
+    def saveAllAttachments(): List[AttachmentWithEncryptedAtRest] = {
 
-      attachmentsWithHolder.foreach { case AttachmentWithHolder(beforeURL, afterURL, migratedHolder) =>
+      attachmentsWithHolder.map { case AttachmentWithHolder(beforeURL, afterURL, migratedHolder) =>
         // Copy holder, so we're not blocked in case there are other background uploads; TODO: check if still needed
         val holderCopy   = TransformerUtils.extractAsMutableDocument(migratedHolder).rootElement
         val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
-        sendThrowOnError("fr-create-update-attachment-submission", Map(
-          "holder"         -> Some(holderCopy),
-          "path-to-holder" -> Some(pathToHolder),
-          "resource"       -> Some(PathUtils.appendQueryString(toBaseURI + afterURL, commonQueryString)),
-          "username"       -> username,
-          "password"       -> password,
-          "form-version"   -> formVersion)
-        ).foreach { _ =>
-          updateHolder(migratedHolder, afterURL)
-        }
+        val isEncryptedAtRestOpt =
+          sendThrowOnError("fr-create-update-attachment-submission", Map(
+            "holder"         -> Some(holderCopy),
+            "path-to-holder" -> Some(pathToHolder),
+            "resource"       -> Some(PathUtils.appendQueryString(toBaseURI + afterURL, commonQueryString)),
+            "username"       -> username,
+            "password"       -> password,
+            "form-version"   -> formVersion)
+          ) map { doneEvent =>
+
+            val isEncryptedAtRest = {
+              val responseHeaders =
+                asScalaSeq(doneEvent.getAttribute("response-headers")).asInstanceOf[Seq[NodeInfo]]
+              responseHeaders.exists { header: NodeInfo =>
+                header / "name"  === OrbeonDidEncryptHeader &&
+                header / "value" === "true"
+              }
+            }
+
+            updateHolder(migratedHolder, afterURL, isEncryptedAtRest)
+            isEncryptedAtRest
+          }
+        AttachmentWithEncryptedAtRest(beforeURL, afterURL, isEncryptedAtRestOpt.getOrElse(false))
       }
     }
 
@@ -526,7 +624,7 @@ trait FormRunnerPersistence {
       ))
 
     // First upload the attachments
-    saveAllAttachments()
+    val attachmentsWithEncryptedAtRest = saveAllAttachments()
 
     val versionOpt =
       // Save and try to retrieve returned version
@@ -552,8 +650,8 @@ trait FormRunnerPersistence {
     // If data isn't migrated, then it has already been updated (and doing it again would fail)
     // FIXME: if no migration happens *and* sending an attachment failed, then the URL will still updated in the data
     if (migrate.isDefined)
-      attachmentsWithHolder.foreach {
-        case AttachmentWithHolder(beforeURL, afterURL, _) =>
+      attachmentsWithEncryptedAtRest.foreach {
+        case AttachmentWithEncryptedAtRest(beforeURL, afterURL, isEncryptedAtRest) =>
           val holder = {
             scaxon.XPath.evalOne(
               item       = liveData,
@@ -562,7 +660,7 @@ trait FormRunnerPersistence {
               variables  = Map("beforeURL" -> new StringValue(beforeURL))
             )(XFormsFunctionLibrary).asInstanceOf[NodeInfo]
           }
-          updateHolder(holder, afterURL)
+          updateHolder(holder, afterURL, isEncryptedAtRest)
       }
 
     (

@@ -203,7 +203,7 @@ trait CreateCols extends RequestResponse with Common {
           name          = "username",
           value         = DynamicColValue(
             placeholder = "?" ,
-	          paramSetter = param(_.setString, existingRow.flatMap(_.username).getOrElse(requestUsername.orNull))
+            paramSetter = param(_.setString, existingRow.flatMap(_.username).getOrElse(requestUsername.orNull))
           )
         )
     ) ::: (
@@ -212,7 +212,7 @@ trait CreateCols extends RequestResponse with Common {
           name          = "groupname",
           value         = DynamicColValue(
             placeholder = "?",
-	          paramSetter = param(_.setString, existingRow.flatMap(_.group).getOrElse(requestUsername.orNull))
+            paramSetter = param(_.setString, existingRow.flatMap(_.group).getOrElse(requestGroup.orNull))
           )
         )
     ) ::: (

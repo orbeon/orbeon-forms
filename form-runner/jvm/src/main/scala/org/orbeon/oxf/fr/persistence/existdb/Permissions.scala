@@ -41,9 +41,9 @@ object Permissions {
     val authorizedOperations = {
       val formMetadataOpt     = FormRunner.readFormMetadataOpt(app, form, FormDefinitionVersion.Latest)
       val permissionsElOrNull = formMetadataOpt.flatMap(_.firstChildOpt("permissions")).orNull
-      val permissions = PermissionsXML.parse(permissionsElOrNull)
-      val currentUser = PermissionsAuthorization.currentUserFromSession
-      val checkWithDataUser = CheckWithDataUser(
+      val permissions         = PermissionsXML.parse(permissionsElOrNull)
+      val currentUser         = PermissionsAuthorization.currentUserFromSession
+      val checkWithDataUser   = CheckWithDataUser(
         username     = Option(metadataFromDB).map(_.child("username" ).stringValue),
         groupname    = Option(metadataFromDB).map(_.child("groupname").stringValue),
         organization = Option(metadataFromDB).map(metadataEl => {

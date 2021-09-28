@@ -33,11 +33,11 @@ class CRUD
 
       httpRequest.getMethod match {
         case HttpMethod.GET | HttpMethod.HEAD => getOrHead(req, httpRequest.getMethod)
-        case HttpMethod.PUT    => change(req, delete = false)
-        case HttpMethod.DELETE => change(req, delete = true)
-        case HttpMethod.LOCK   => lock(req)
-        case HttpMethod.UNLOCK => unlock(req)
-        case _                 => httpResponse.setStatus(405)
+        case HttpMethod.PUT                   => change(req, delete = false)
+        case HttpMethod.DELETE                => change(req, delete = true)
+        case HttpMethod.LOCK                  => lock(req)
+        case HttpMethod.UNLOCK                => unlock(req)
+        case _                                => httpResponse.setStatus(405)
       }
     } catch {
       case e: HttpStatusCodeException =>

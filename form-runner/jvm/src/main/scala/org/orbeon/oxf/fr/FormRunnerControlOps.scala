@@ -225,7 +225,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     predicate : NodeInfo => Boolean
   ): Seq[ControlBindPathHoldersResources] =
     searchControlBindPathHoldersInDoc(
-      controlElems       = body descendant * filter IsControl,
+      controlElems   = body descendant * filter IsControl,
       inDoc          = body,
       contextItemOpt = data map (_.rootElement),
       predicate      = predicate

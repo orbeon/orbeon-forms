@@ -18,7 +18,6 @@ import java.sql.Connection
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.Provider.{DB2, Oracle, PostgreSQL, SQLServer}
 import org.orbeon.io.IOUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
@@ -51,8 +50,7 @@ private object FlatView {
     }
 
     // Delete view if it exists
-    // With Oracle we can use "OR REPLACE" when creating the view.
-    if (Set[Provider](DB2, SQLServer, PostgreSQL)(req.provider)) {
+    if (Provider.flatViewDelete(req.provider)) {
       val viewExists = {
         useAndClose(connection.prepareStatement(Provider.flatViewExistsQuery(req.provider))) { ps =>
           ps.setString(1, Provider.flatViewExistsParam(req.provider, viewName))

@@ -111,6 +111,10 @@
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
                     <xf:value value="."/>
                 </xf:header>
+                <xf:header ref="$binding[@fr:attachment-encrypted = 'true']">
+                    <xf:name>Orbeon-Decrypt</xf:name>
+                    <xf:value>true</xf:value>
+                </xf:header>
             </xf:output>
         </xbl:template>
     </xbl:binding>

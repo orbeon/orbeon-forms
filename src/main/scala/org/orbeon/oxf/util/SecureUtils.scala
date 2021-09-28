@@ -15,15 +15,13 @@ package org.orbeon.oxf.util
 
 import java.security.{MessageDigest, SecureRandom, Security}
 
-import javax.crypto.Cipher
-import javax.crypto.Mac
-import javax.crypto.SecretKey
-import javax.crypto.SecretKeyFactory
+import com.google.crypto.tink.subtle.{AesGcmJce, Base64 => TinkBase64}
+import javax.crypto.{Cipher, Mac, SecretKey, SecretKeyFactory}
 import javax.crypto.spec.{IvParameterSpec, PBEKeySpec, SecretKeySpec}
 import org.apache.commons.pool.BasePoolableObjectFactory
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.properties.Properties
 
 object SecureUtils extends SecureUtilsTrait {
 
@@ -39,6 +37,24 @@ object SecureUtils extends SecureUtilsTrait {
     propertySet.getNonBlankString(XFormsPasswordProperty) orElse
       propertySet.getNonBlankString(PasswordProperty) getOrElse
       (throw new OXFException(PasswordProperty + "property is not set"))
+  }
+
+  object Tink {
+
+    private lazy val aead = {
+      val messageDigest = MessageDigest.getInstance("SHA-256")
+      messageDigest.update(getPassword.getBytes(CharsetNames.Utf8))
+      val key256Bit = messageDigest.digest()
+      // 128-bit key needed by implementation
+      // Shortening is ok https://security.stackexchange.com/a/34797/49208
+      val key128Bit = key256Bit.take(16)
+      new AesGcmJce(key128Bit)
+    }
+
+    def encrypt(plaintext  : Array[Byte]): Array[Byte] = aead.encrypt(plaintext,  null)
+    def decrypt(ciphertext : Array[Byte]): Array[Byte] = aead.decrypt(ciphertext, null)
+    def encrypt(plaintext  : String     ): String      = TinkBase64.encode(encrypt(plaintext.getBytes(CharsetNames.Utf8)))
+    def decrypt(ciphertext : String     ): String      = new String(decrypt(TinkBase64.decode(ciphertext)), CharsetNames.Utf8)
   }
 
   private def getKeyLength: Int =

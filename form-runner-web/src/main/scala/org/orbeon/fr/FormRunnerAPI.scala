@@ -13,17 +13,15 @@
   */
 package org.orbeon.fr
 
-import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.{ControlOps, Names}
 import org.orbeon.xforms._
 import org.scalajs.dom.html
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
 
-object FormRunnerAPI extends js.Object {
+object FormRunnerAPI extends FormRunnerEmbeddingAPI {
 
   def findControlsByName(
     controlName : String,

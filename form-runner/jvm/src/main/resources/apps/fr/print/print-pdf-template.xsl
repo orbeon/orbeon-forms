@@ -64,6 +64,7 @@
         select=
             "
                 'xbl-fr-image-attachment',
+                'xbl-fr-handwritten-signature',
                 'xbl-fr-wpaint'
             "
         as="xs:string*"/>
@@ -151,7 +152,6 @@
                     </xsl:variable>
 
                     <xsl:if test="$component-name">
-
                         <xsl:variable
                             name="type"
                             as="xs:string?"

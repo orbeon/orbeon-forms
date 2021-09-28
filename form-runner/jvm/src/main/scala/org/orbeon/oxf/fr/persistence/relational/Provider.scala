@@ -41,6 +41,23 @@ object Provider extends Enum[Provider] {
       case _          => s"$tableName.xml xml"
     }
 
+  def xmlColSelect(provider: Provider, tableName: String): String =
+    provider match {
+      case PostgreSQL => s"$tableName.xml as xml"
+      case _          => s"$tableName.xml xml"
+    }
+
+  def xmlColUpdate(provider: Provider): String =
+    provider match {
+      case _      => "xml"
+    }
+
+  def xmlValUpdate(provider: Provider): String =
+    provider match {
+      case PostgreSQL => "XMLPARSE( DOCUMENT ? )"
+      case _          => "?"
+    }
+
   def xmlContains(provider: Provider): String =
     provider match {
       case MySQL      => "xml like ?"

@@ -3,7 +3,7 @@
  */
 package org.orbeon.oxf.fr.persistence.proxy
 
-import java.io.InputStream
+import java.io.{InputStream, OutputStream}
 
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext.Request

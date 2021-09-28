@@ -196,6 +196,11 @@ object Provider extends Enum[Provider] {
     }
   }
 
+  private val FlatViewMustDelete: Set[Provider] = Set(PostgreSQL)
+
+  def flatViewDelete(provider: Provider): Boolean =
+    FlatViewMustDelete(provider)
+
   def flatViewExistsQuery(provider: Provider): String =
     provider match{
       case PostgreSQL   =>

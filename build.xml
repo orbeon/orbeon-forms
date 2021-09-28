@@ -796,7 +796,13 @@
             password=""/>
     </target>
 
-    <!-- NOTE: You need to comment out the eXist security filter for this to work -->
+    <!--
+        For this to work:
+
+        - Comment out the eXist security filter in web.xml.
+        - Enable the xmlrpc servlet in web.xml.
+        - Start Orbeon Forms and access a form that requires eXist first.
+    -->
     <target name="exist-import-sample-data-to-localhost" depends="exist-task">
         <!-- Store config first -->
         <xdb:store

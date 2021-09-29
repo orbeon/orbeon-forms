@@ -35,6 +35,9 @@ object DateUtilsUsingSaxon {
   private val EpochDateTime = new DateTimeValue(1970, 1, 1, 0, 0, 0, 0, 0)
   private val EpochDate     = new DateValue(1970, 1, 1, 0) // CalendarValue.NO_TIMEZONE
 
+  def isISODateOrDateTime(value: String): Boolean =
+    tryParseISODateOrDateTime(value, TimeZone.Default).isDefined
+
   // Parse a date in XML Schema-compatible ISO format:
   //
   // - Format for a dateTime: [-]yyyy-mm-ddThh:mm:ss[.fff*][([+|-]hh:mm | Z)]

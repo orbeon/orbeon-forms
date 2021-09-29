@@ -29,8 +29,6 @@
 
     <property as="xs:string"  name="oxf.xforms.location-mode"                                value="smart"/>
 
-    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                            value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.combine-resources"                            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.resources.encode-version"                     value="false"/>
     <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                      value="0"/>
 

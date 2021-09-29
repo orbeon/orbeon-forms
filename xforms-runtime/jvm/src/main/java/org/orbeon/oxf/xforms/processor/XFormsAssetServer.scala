@@ -24,7 +24,6 @@ import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.http.{Headers, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsAssetPaths._
@@ -297,8 +296,8 @@ object XFormsAssetServer {
   import XFormsAssetPaths._
 
   val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
-  val DynamicResourcesPath       = XFormServerPrefix + "dynamic/"
   val NamespaceParameter         = "ns"
+  val UpdatesParameter           = "updates"
 
   implicit def indentedLogger: IndentedLogger = Loggers.getIndentedLogger("resources")
 

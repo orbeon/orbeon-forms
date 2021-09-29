@@ -584,7 +584,6 @@ lazy val formRunnerJVM = formRunner.jvm
     // Package Scala.js output into `orbeon-form-runner.jar`
     // This stores the optimized version. For development we need something else.
     (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerWeb / Compile / fullOptJS).value.data, FormRunnerResourcesPathInWar),
-    (Compile / packageBin / mappings) ++= scalaJsFiles((formRunnerOffline / Compile / fullOptJS).value.data, FormRunnerResourcesPathInWar)
   )
 
 lazy val formRunnerJS = formRunner.js
@@ -796,7 +795,6 @@ lazy val xformsJVM = xforms.jvm
     // Package Scala.js output into `orbeon-xforms.jar`
     // This stores the optimized version. For development we need something else.
     (Compile / packageBin / mappings) ++= scalaJsFiles((xformsWeb     / Compile / fullOptJS).value.data, XFormsResourcesPathInWar),
-    (Compile / packageBin / mappings) ++= scalaJsFiles((xformsOffline / Compile / fullOptJS).value.data, XFormsResourcesPathInWar),
   )
 
 lazy val xformsJS = xforms.js
@@ -958,105 +956,6 @@ lazy val xformsRuntimeJS = xformsRuntime.js
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scala212,
       compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
-    )
-  )
-
-lazy val xformsOffline = (project in file("xforms-offline"))
-  .settings(commonSettings: _*)
-  .settings(commonScalaJsSettings)
-  .enablePlugins(ScalaJSPlugin)
-  .dependsOn(
-    xformsRuntimeJS,
-    xformsWeb,
-    webFacades
-  )
-  .settings(
-    Compile / unmanagedJars      := Nil,
-    Compile / unmanagedClasspath := Nil
-  )
-  .settings(
-    name := "orbeon-xforms-offline",
-
-    // TODO: review
-    libraryDependencies            ++= Seq(
-      "com.lihaoyi"            %%% "autowire"         % AutowireVersion,
-      "org.scala-lang.modules" %%% "scala-xml"        % ScalaXmlVersion,
-      "com.outr"               %%% "scribe"           % ScribeVersion,
-      "com.outr"               %%% "perfolation"      % PerfolationVersion, // to avoid dependency on `scala-java-locales`
-      "org.scala-js"           %%% "scalajs-dom"      % ScalaJsDomVersion,
-      "be.doeraene"            %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
-      "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,
-      "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,
-      "io.github.cquiroz"      %%% "scala-java-time"  % "2.0.0"
-    ),
-
-    libraryDependencies ++= Seq(
-      "io.circe" %%% "circe-core",
-      "io.circe" %%% "circe-generic",
-      "io.circe" %%% "circe-parser"
-    ).map(_ % CirceVersion),
-
-    fastOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (Compile / fastOptJS).value.data,
-      (ThisBuild / baseDirectory).value,
-      XFormsResourcesPathInWar
-    ),
-
-    fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (Compile / fullOptJS).value.data,
-      (ThisBuild / baseDirectory).value,
-      XFormsResourcesPathInWar
-    )
-  )
-
-lazy val formRunnerOffline = (project in file("form-runner-offline"))
-  .settings(commonSettings: _*)
-  .settings(commonScalaJsSettings)
-  .enablePlugins(ScalaJSPlugin)
-  .dependsOn(
-    xformsOffline,
-    formRunnerWeb,
-    formRunnerJS
-  )
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scala212,
-      compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
-    )
-  )
-  .settings(
-    Compile / unmanagedJars      := Nil,
-    Compile / unmanagedClasspath := Nil
-  )
-  .settings(
-    name := "orbeon-form-runner-offline",
-
-    // TODO: review
-    libraryDependencies            ++= Seq(
-      "org.scala-lang.modules" %%% "scala-xml"        % ScalaXmlVersion,
-      "org.scala-js"           %%% "scalajs-dom"      % ScalaJsDomVersion,
-      "be.doeraene"            %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
-      "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,
-      "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,
-      "io.github.cquiroz"      %%% "scala-java-time"  % "2.0.0"
-    ),
-
-    libraryDependencies ++= Seq(
-      "io.circe" %%% "circe-core",
-      "io.circe" %%% "circe-generic",
-      "io.circe" %%% "circe-parser"
-    ).map(_ % CirceVersion),
-
-    fastOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (Compile / fastOptJS).value.data,
-      (ThisBuild / baseDirectory).value,
-      FormRunnerResourcesPathInWar
-    ),
-
-    fullOptJSToLocalResources := copyScalaJSToExplodedWar(
-      (Compile / fullOptJS).value.data,
-      (ThisBuild / baseDirectory).value,
-      FormRunnerResourcesPathInWar
     )
   )
 
@@ -1290,11 +1189,9 @@ lazy val root = (project in file("."))
     core,
     xformsJVM,
     xformsWeb,
-//    xformsOffline,
     formRunnerJVM,
     formRunnerJS,
     formRunnerWeb,
-    formRunnerOffline,
     formBuilderJVM,
     formBuilderJS,
     embedding,

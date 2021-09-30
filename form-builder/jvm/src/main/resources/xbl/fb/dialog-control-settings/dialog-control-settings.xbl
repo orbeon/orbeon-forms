@@ -49,7 +49,18 @@
                 <xf:var name="standard-classes"             value="$resources/dialog-control-settings/(options | email-options)/item/value/string(), 'fr-attachment', 'fr-static-attachment'"/>
                 <xf:var name="control-classes"              value="xxf:split($control/@class)"/>
 
-                <xf:setvalue ref="$i/standard-classes"      value="string-join($control-classes[. = $standard-classes], ' ')"/>
+                <!-- Imply 'fr-index' as needed but for the UI only -->
+                <xf:var
+                    name="effective-standard-classes"
+                    value="
+                        let $distinct    := distinct-values($control-classes[. = $standard-classes]),
+                            $has-summary := $distinct = ('fr-summary', 'fr-search'),
+                            $has-index   := $distinct = 'fr-index',
+                            $filtered    := if ($has-summary and not($has-index)) then ($distinct, 'fr-index') else $distinct
+                        return
+                            $filtered"/>
+
+                <xf:setvalue ref="$i/standard-classes"      value="string-join($effective-standard-classes, ' ')"/>
                 <xf:setvalue ref="$i/custom-classes"        value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
                 <!-- Figure which one of label, hint, help, or text the control supports -->
@@ -367,6 +378,7 @@
                             fbf:renameControlIfNeeded($old-name, $new-name, false())
                         </xf:action>
                         <!-- Write classes -->
+                        <!-- The implied 'fr-index' is not set if we already have summary classes -->
                         <xf:var
                             name="classes"
                             value="
@@ -869,10 +881,6 @@
                                                                     (
                                                                         $selected-values   = ('fr-summary', 'fr-search')
                                                                         and $current-value = 'fr-index'
-                                                                    ) or
-                                                                    (
-                                                                        $selected-values   = 'fr-index'
-                                                                        and $current-value = ('fr-summary', 'fr-search')
                                                                     )
                                                                 )"/>
                                                         <xf:var
@@ -880,11 +888,20 @@
                                                             value="
                                                                 $i/standard-classes/
                                                                 (if ($checkbox-disabled) then string() else .)"/>
-                                                        <xf:select ref="$checkbox-binding" appearance="full">
+                                                        <xf:select ref="$checkbox-binding" appearance="full" class="fb-control-settings-{{substring-after($current-value, 'fr-')}}">
                                                             <xf:itemset ref="$item-to-show">
                                                                 <xf:label ref="label"/>
                                                                 <xf:value ref="value"/>
                                                             </xf:itemset>
+                                                            <!--
+                                                                We don't like to update values of another checkbox when one is selected, but
+                                                                we accept this way of doing things here as we indent the Summary checkboxes
+                                                                under the `fr-index` checkbox, which makes it clear to the user what is
+                                                                happening.
+                                                            -->
+                                                            <xf:action event="xforms-select" if="$current-value = ('fr-summary', 'fr-search')">
+                                                                <xf:setvalue ref="$i/standard-classes" value="string-join((xxf:split(.)[. != 'fr-index'], 'fr-index'), ' ')"/>
+                                                            </xf:action>
                                                         </xf:select>
                                                     </xf:repeat>
                                                 </xf:group>

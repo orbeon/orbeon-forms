@@ -219,7 +219,12 @@
                     <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-document"/>
                     <xh:div class="fr-top-alert-buttons">
                         <xf:group>
-                            <xf:setvalue event="DOMActivate" ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
+                                <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
+                                <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
+                                <xf:setvalue ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                            </xf:action>
                             <xf:trigger>
                                 <xf:label value="$fr-resources/detail/draft-singleton/open-saved"/>
                                 <xf:send event="DOMActivate" submission="fr-get-document-submission">
@@ -239,7 +244,12 @@
                     <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-never-saved"/>
                     <xh:div class="fr-top-alert-buttons">
                         <xf:group>
-                            <xf:setvalue event="DOMActivate" ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                            <xf:action event="DOMActivate">
+                                <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
+                                <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
+                                <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
+                                <xf:setvalue ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                            </xf:action>
                             <xf:trigger>
                                 <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
                             </xf:trigger>
@@ -261,7 +271,12 @@
                         <xf:group>
                             <xf:trigger>
                                 <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
-                                <xf:setvalue event="DOMActivate" ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-before-data"/>
+                                    <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-data"/>
+                                    <xf:dispatch targetid="fr-form-model" name="fr-run-form-load-action-after-controls"/>
+                                    <xf:setvalue ref="xxf:instance('fr-persistence-instance')/found-document-message-to-show"/>
+                                </xf:action>
                             </xf:trigger>
                             <xf:trigger xxf:modal="true">
                                 <xf:label value="$fr-resources/detail/draft-singleton/view-drafts"/>

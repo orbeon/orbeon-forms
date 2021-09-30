@@ -74,6 +74,68 @@
         value="exists(xxf:get-request-attribute('fr-form-data')) or
                exists(xxf:get-request-parameter('fr-form-data'))"/>
 
+    <!--
+        Running *before* the data is ready. At this point:
+        - all instances are created (`xforms-model-construct`)
+        - RRR has been done on all models except `fr-form-model`
+        - other initializations upon `xforms-model-construct-done` have not yet been done
+    -->
+    <xf:action event="xxforms-instances-ready" observer="fr-form-model">
+
+        <!-- For new documents, see if we have drafts -->
+        <xf:action if="$mode = 'new'">
+
+            <xf:var name="is-singleton" value="xxf:instance('fr-form-metadata')/singleton = 'true'"/>
+
+            <xf:action if="$is-singleton">
+
+                <!-- Is there any data for this form that the user can edit? -->
+                <xf:setvalue context="instance('fr-search-request')/drafts" value="'include'"/>
+                <xf:send submission="fr-search-submission"/>
+                <xf:var name="existing-docs" value="instance('fr-search-response')/document"/>
+
+                <xf:action if="count($existing-docs) = 1">
+                    <xf:load resource="edit/{$existing-docs/@name}"/>
+                </xf:action>
+                <xf:action if="count($existing-docs) > 1">
+                    <xf:setvalue
+                        ref="instance('fr-persistence-instance')/found-document-message-to-show"
+                        value="'found-multiple-docs-for-singleton'"/>
+                </xf:action>
+
+            </xf:action>
+
+            <xf:action if="not($is-singleton) and not($is-submit)"><!-- https://github.com/orbeon/orbeon-forms/issues/4546 -->
+
+                <!-- Do we have updatable drafts for documents that were never saved? -->
+                <xf:action if="$autosave-enabled">
+                    <xf:insert
+                        context="instance('fr-search-request')"
+                        origin="
+                            xf:element('drafts', (xf:attribute('for-never-saved-document', 'true'), 'only')),
+                            xf:element('operations', xf:attribute('any-of', 'update'))
+                        "/>
+                    <xf:send  submission="fr-search-submission"/>
+                    <xf:var name="drafts-found" value="count(instance('fr-search-response')/document)"/>
+
+                    <!-- Remember to show the dialog upon xforms-ready -->
+                    <xf:setvalue
+                        if="$drafts-found > 0"
+                        ref="instance('fr-persistence-instance')/found-document-message-to-show"
+                        value="if ($drafts-found = 1) then 'found-draft-for-never-saved' else 'found-drafts-for-never-saved'"/>
+                </xf:action>
+
+            </xf:action>
+
+        </xf:action>
+
+        <xf:dispatch
+            if="xxf:is-blank(instance('fr-persistence-instance')/found-document-message-to-show)"
+            name="fr-run-form-load-action-before-data"
+            targetid="fr-form-model"/>
+
+    </xf:action>
+
     <!-- 1. Model initialization when we have a specific app and form -->
     <xf:action
         event="xforms-model-construct-done"
@@ -234,53 +296,6 @@
                 <xf:action if="not($lease-enabled)">
                     <xf:dispatch name="fr-load-document" target="fr-persistence-model"/>
                 </xf:action>
-            </xf:action>
-
-            <!-- For new documents, see if we have drafts -->
-            <xf:action if="$mode = 'new'">
-
-                <xf:var name="is-singleton" value="xxf:instance('fr-form-metadata')/singleton = 'true'"/>
-
-                <xf:action if="$is-singleton">
-
-                    <!-- Is there any data for this form that the user can edit? -->
-                    <xf:setvalue context="instance('fr-search-request')/drafts" value="'include'"/>
-                    <xf:send submission="fr-search-submission"/>
-                    <xf:var name="existing-docs" value="instance('fr-search-response')/document"/>
-
-                    <xf:action if="count($existing-docs) = 1">
-                        <xf:load resource="edit/{$existing-docs/@name}"/>
-                    </xf:action>
-                    <xf:action if="count($existing-docs) > 1">
-                        <xf:setvalue
-                            ref="instance('fr-persistence-instance')/found-document-message-to-show"
-                            value="'found-multiple-docs-for-singleton'"/>
-                    </xf:action>
-
-                </xf:action>
-
-                <xf:action if="not($is-singleton) and not($is-submit)"><!-- https://github.com/orbeon/orbeon-forms/issues/4546 -->
-
-                    <!-- Do we have updatable drafts for documents that were never saved? -->
-                    <xf:action if="$autosave-enabled">
-                        <xf:insert
-                            context="instance('fr-search-request')"
-                            origin="
-                                xf:element('drafts', (xf:attribute('for-never-saved-document', 'true'), 'only')),
-                                xf:element('operations', xf:attribute('any-of', 'update'))
-                            "/>
-                        <xf:send  submission="fr-search-submission"/>
-                        <xf:var name="drafts-found" value="count(instance('fr-search-response')/document)"/>
-
-                        <!-- Remember to show the dialog upon xforms-ready -->
-                        <xf:setvalue
-                            if="$drafts-found > 0"
-                            ref="instance('fr-persistence-instance')/found-document-message-to-show"
-                            value="if ($drafts-found = 1) then 'found-draft-for-never-saved' else 'found-drafts-for-never-saved'"/>
-                    </xf:action>
-
-                </xf:action>
-
             </xf:action>
 
             <!-- Don't allow if we didn't get a submit and we don't have the proper id depending on the mode
@@ -543,23 +558,18 @@
 
     </xf:action>
 
-    <!--
-        For actions running *before* the data is ready. At this point:
-
-        - all instances are created (`xforms-model-construct`)
-        - RRR has been done on all models except `fr-form-model`
-        - other initializations upon `xforms-model-construct-done` have not yet been done
-    -->
-    <xf:action event="xxforms-instances-ready" observer="fr-form-model">
-        <xf:dispatch name="fr-run-form-load-action-before-data" targetid="fr-form-model"/>
-    </xf:action>
-
     <xf:action event="xforms-model-construct-done" observer="fr-form-model">
-        <xf:dispatch name="fr-run-form-load-action-after-data" targetid="fr-form-model"/>
+        <xf:dispatch
+            if="xxf:is-blank(instance('fr-persistence-instance')/found-document-message-to-show)"
+            name="fr-run-form-load-action-after-data"
+            targetid="fr-form-model"/>
     </xf:action>
 
     <xf:action event="xforms-ready" observer="fr-form-model">
-        <xf:dispatch name="fr-run-form-load-action-after-controls" targetid="fr-form-model"/>
+        <xf:dispatch
+            if="xxf:is-blank(instance('fr-persistence-instance')/found-document-message-to-show)"
+            name="fr-run-form-load-action-after-controls"
+            targetid="fr-form-model"/>
     </xf:action>
 
     <xf:action event="xforms-ready">

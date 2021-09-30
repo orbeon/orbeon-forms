@@ -344,7 +344,6 @@
                                                     appearance="minimal"
                                                     ref="$repeat-context[$can-add]"
                                                     id="fr-grid-add"
-                                                    tabindex="-1"
                                                     xxf:title="{{xxf:r('components.grid.add-another.hint', '|fr-fr-resources|')}}">
                                                     <xf:label><xh:i class="fa fa-fw fa-plus-circle "/></xf:label>
                                                 </xf:trigger>
@@ -522,7 +521,6 @@
                                                     appearance="minimal"
                                                     ref="$repeat-context[$can-remove]"
                                                     id="fr-grid-remove"
-                                                    tabindex="-1"
                                                     xxf:title="{{xxf:r('components.grid.remove.hint', '|fr-fr-resources|')}}">
                                                     <xf:label><xh:i class="fa fa-fw fa-minus-circle"/></xf:label>
                                                     <xf:dispatch

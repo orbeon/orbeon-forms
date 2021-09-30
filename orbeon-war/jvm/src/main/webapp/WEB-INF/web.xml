@@ -144,7 +144,7 @@
         <!--
         <init-param>
             <param-name>content-security-policy</param-name>
-            <param-value>default-src 'self'</param-value>
+            <param-value>default-src 'self'; img-src 'self' data:</param-value>
         </init-param>
         -->
     </filter>

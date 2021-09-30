@@ -869,6 +869,10 @@
                                                                     (
                                                                         $selected-values   = ('fr-summary', 'fr-search')
                                                                         and $current-value = 'fr-index'
+                                                                    ) or
+                                                                    (
+                                                                        $selected-values   = 'fr-index'
+                                                                        and $current-value = ('fr-summary', 'fr-search')
                                                                     )
                                                                 )"/>
                                                         <xf:var
@@ -881,16 +885,6 @@
                                                                 <xf:label ref="label"/>
                                                                 <xf:value ref="value"/>
                                                             </xf:itemset>
-                                                            <!--
-                                                                The logic to handle `fr-index` in conjunction with 'fr-summary' and 'fr-search' could be refined. But
-                                                                I dont like the idea that if you select 'fr-summary' and then deselect it, then `fr-index` remains
-                                                                selected event if it wasn't before. And if you do deselect it, then this would be unexpected if
-                                                                it was selected before. So maybe it's better to just let this option as the user picks it, and
-                                                                then we filter the classes appropriately when we save them to the form.
-                                                            -->
-<!--                                                            <xf:action event="xforms-select" if="$current-value = ('fr-summary', 'fr-search')">-->
-<!--                                                                <xf:setvalue ref="$i/standard-classes" value="string-join((xxf:split(.)[. != 'fr-index'], 'fr-index'), ' ')"/>-->
-<!--                                                            </xf:action>-->
                                                         </xf:select>
                                                     </xf:repeat>
                                                 </xf:group>

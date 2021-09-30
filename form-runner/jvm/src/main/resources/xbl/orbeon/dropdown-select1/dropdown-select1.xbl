@@ -92,6 +92,15 @@
                 </xf:itemset>
                 <!-- Copy user items -->
                 <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                <!-- Forward events -->
+                <xf:dispatch
+                    event="xforms-select xforms-deselect"
+                    propagate="stop"
+
+                    targetid="fr-dropdown-select1"
+                    name="{event('xxf:type')}">
+                    <xf:property name="xxf:item-value" value="event('xxf:item-value')"/>
+                </xf:dispatch>
             </xf:select1>
         </xbl:template>
     </xbl:binding>

@@ -367,7 +367,14 @@
                             fbf:renameControlIfNeeded($old-name, $new-name, false())
                         </xf:action>
                         <!-- Write classes -->
-                        <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
+                        <xf:var
+                            name="classes"
+                            value="
+                                let $distinct    := distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes))),
+                                    $has-summary := $distinct = ('fr-summary', 'fr-search'),
+                                    $filtered    := if ($has-summary) then $distinct[. != 'fr-index'] else $distinct
+                                return
+                                    $filtered"/>
                         <xf:delete if="count($classes) = 0" ref="$control/@class"/>
                         <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('class', string-join($classes, ' '))"/>
 
@@ -838,23 +845,30 @@
                                                         ]
                                                     "/>
                                                 <xf:group ref=".[exists($items-to-show)]">
+                                                    <xf:var name="selected-values"   value="xxf:split($i/standard-classes)"/>
                                                     <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
                                                         <xf:var name="item-to-show"      value="."/>
-                                                        <xf:var name="selected-values"   value="xxf:split($i/standard-classes)"/>
                                                         <xf:var name="current-value"     value="$item-to-show/value"/>
                                                         <xf:var
                                                             name="checkbox-disabled"
                                                             value="
                                                                 (: Don't disable this checkbox if checked, for backward compatibility :)
-                                                                not($current-value = $selected-values) and
+                                                                (
+                                                                    $current-value = 'fr-index'
+                                                                    or not($current-value = $selected-values)
+                                                                ) and
                                                                 (
                                                                     (
                                                                         $selected-values   = 'fr-encrypt'
-                                                                        and $current-value = ('fr-summary', 'fr-search')
+                                                                        and $current-value = ('fr-summary', 'fr-search', 'fr-index')
+                                                                    ) or
+                                                                    (
+                                                                        $selected-values   = ('fr-summary', 'fr-search', 'fr-index')
+                                                                        and $current-value = 'fr-encrypt'
                                                                     ) or
                                                                     (
                                                                         $selected-values   = ('fr-summary', 'fr-search')
-                                                                        and $current-value = 'fr-encrypt'
+                                                                        and $current-value = 'fr-index'
                                                                     )
                                                                 )"/>
                                                         <xf:var
@@ -867,6 +881,16 @@
                                                                 <xf:label ref="label"/>
                                                                 <xf:value ref="value"/>
                                                             </xf:itemset>
+                                                            <!--
+                                                                The logic to handle `fr-index` in conjunction with 'fr-summary' and 'fr-search' could be refined. But
+                                                                I dont like the idea that if you select 'fr-summary' and then deselect it, then `fr-index` remains
+                                                                selected event if it wasn't before. And if you do deselect it, then this would be unexpected if
+                                                                it was selected before. So maybe it's better to just let this option as the user picks it, and
+                                                                then we filter the classes appropriately when we save them to the form.
+                                                            -->
+<!--                                                            <xf:action event="xforms-select" if="$current-value = ('fr-summary', 'fr-search')">-->
+<!--                                                                <xf:setvalue ref="$i/standard-classes" value="string-join((xxf:split(.)[. != 'fr-index'], 'fr-index'), ' ')"/>-->
+<!--                                                            </xf:action>-->
                                                         </xf:select>
                                                     </xf:repeat>
                                                 </xf:group>

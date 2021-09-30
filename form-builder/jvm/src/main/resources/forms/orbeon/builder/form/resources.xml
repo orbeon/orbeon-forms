@@ -470,6 +470,10 @@
                     <value>fr-search</value>
                 </item>
                 <item>
+                    <label>Index control</label>
+                    <value>fr-index</value>
+                </item>
+                <item>
                     <label>Encrypt data at rest</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -1772,6 +1776,10 @@
                     <value>fr-search</value>
                 </item>
                 <item>
+                    <label>Inclure dans l'index</label>
+                    <value>fr-index</value>
+                </item>
+                <item>
                     <label>Crypter les données au repos</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -3055,6 +3063,10 @@
                 <item>
                     <label>Vis i søk</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Index control]</label>
+                    <value>fr-index</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
@@ -4370,6 +4382,10 @@
                     <value>fr-search</value>
                 </item>
                 <item>
+                    <label todo="true">[Index control]</label>
+                    <value>fr-index</value>
+                </item>
+                <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -5683,6 +5699,10 @@
                     <value>fr-search</value>
                 </item>
                 <item>
+                    <label todo="true">[Index control]</label>
+                    <value>fr-index</value>
+                </item>
+                <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -6986,6 +7006,10 @@
                 <item>
                     <label>In Suche anzeigen</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Index control]</label>
+                    <value>fr-index</value>
                 </item>
                 <item>
                     <label>Daten in der Datenbank verschlüsseln</label>
@@ -8296,6 +8320,10 @@
                     <value>fr-search</value>
                 </item>
                 <item>
+                    <label todo="true">[Index control]</label>
+                    <value>fr-index</value>
+                </item>
+                <item>
                     <label todo="true">[Encrypt data at rest]</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -9599,6 +9627,10 @@
                 <item>
                     <label>Mostrar en Búsquedas</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Index control]</label>
+                    <value>fr-index</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
@@ -10907,6 +10939,10 @@
                     <value>fr-search</value>
                 </item>
                 <item>
+                    <label todo="true">[Index control]</label>
+                    <value>fr-index</value>
+                </item>
+                <item>
                     <label>Encrypt gegevens in rust</label>
                     <value>fr-encrypt</value>
                 </item>
@@ -12190,6 +12226,10 @@
                 <item>
                     <label>Mostrar na Pesquisa</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Index control]</label>
+                    <value>fr-index</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
@@ -13502,6 +13542,10 @@
                 <item>
                     <label>Visa i sökning</label>
                     <value>fr-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Index control]</label>
+                    <value>fr-index</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>

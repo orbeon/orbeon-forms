@@ -24,8 +24,9 @@ trait FormDefinition {
 
   private val FRSummary       = "fr-summary"
   private val FRSearch        = "fr-search"
+  private val FRIndex         = "fr-index"
 
-  private val ClassesPredicate = Set(FRSummary, FRSearch)
+  private val ClassesPredicate = Set(FRSummary, FRSearch, FRIndex)
 
   // Returns the controls that are searchable from a form definition
   def findIndexedControls(

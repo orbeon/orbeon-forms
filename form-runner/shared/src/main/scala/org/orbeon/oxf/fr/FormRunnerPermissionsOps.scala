@@ -58,21 +58,7 @@ trait FormRunnerPermissionsOps {
     Operations.serialize(operations)
   }
 
-  //@XPathFunction
-  def xpathAllAuthorizedOperations(
-    permissionsElement : NodeInfo,
-    dataUsername       : String,
-    dataGroupname      : String
-    // TODO: take additional organization parameter
-  ): Seq[String] = {
-    val permissions = PermissionsXML.parse(permissionsElement)
-    val user        = CoreCrossPlatformSupport.externalContext.getRequest.credentials
-    val check       = CheckWithDataUser(UserAndGroup.fromStrings(dataUsername, dataGroupname), None)
-    Operations.serialize(PermissionsAuthorization.authorizedOperations(permissions, user, check))
-  }
-
-  // Used by persistence layers (relational, eXist) and by xpathAllAuthorizedOperations and
-  // allAuthorizedOperationsAssumingOwnerGroupMember
+  // Used by persistence layers (relational, eXist) and allAuthorizedOperationsAssumingOwnerGroupMember
   def allAuthorizedOperations(
     permissionsElOrNull : NodeInfo,
     dataUsername        : Option[String],

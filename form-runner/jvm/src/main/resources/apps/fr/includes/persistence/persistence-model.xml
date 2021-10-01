@@ -55,16 +55,13 @@
     <xf:var
         name="autosave-enabled"
         value="
-            frf:isAutosaveSupported($app, $form)                and
-            not($is-background)                                 and
-            $autosave-delay gt 0                                and
-            xxf:non-blank(xxf:username())                       and
-            frf:xpathAllAuthorizedOperations(
-                 xxf:instance('fr-form-metadata')/permissions,
-                 xxf:username(),
-                 xxf:user-group()
-            ) = ('*', 'update')                                 and
-            $mode = ('new', 'edit')                             and
+            frf:isAutosaveSupported($app, $form)                              and
+            not($is-background)                                               and
+            $autosave-delay gt 0                                              and
+            xxf:non-blank(xxf:username())                                     and
+            (: Don't autosave if users only have the `new` permission :)
+            xxf:split(instance('fr-authorized-operations')) = ('*', 'update') and
+            $mode = ('new', 'edit')                                           and
             not($is-fb)"/>
 
     <!-- NOTE: This value is only valid during form initialization, because the request attribute won't be present in

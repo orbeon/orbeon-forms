@@ -295,17 +295,10 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.pdf.format.attachment-metadata">
-        for $info in (.//*[@class = 'xforms-upload-info']) return
-            string-join(
-                $info/*[
-                    @class = (
-                        'xforms-upload-filename',
-                        'xforms-upload-mediatype',
-                        'xforms-upload-size'
-                    )
-                ]/string()[normalize-space()],
-                ', '
-            )
+        string-join(
+            .//*[tokenize(@class, '\s+') = 'fr-attachment-filename']/string()[normalize-space()],
+            ', '
+        )
     </property>
 
     <property as="xs:string"  name="oxf.fr.pdf.format.fr-autocomplete">
@@ -323,6 +316,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select1.*"                  value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-us-state.*"                     value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-attachment.anyURI"              value="attachment-metadata"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-attachment.string"              value="attachment-metadata"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-image-attachment.anyURI"        value="attachment-url"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-wpaint.*"                       value="attachment-url"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-number.*"                       value="input-string"/>

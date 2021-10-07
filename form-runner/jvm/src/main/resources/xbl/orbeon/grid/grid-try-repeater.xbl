@@ -113,11 +113,9 @@
                                 <!--</xf:var>-->
                             <!--</xsl:if>-->
 
-                            <!-- NOTE: We need a better way to get the Form Runner mode. -->
                             <xf:var
                                 name="view-mode"
-                                value="xxf:readonly(xxf:binding('fr-grid-binding')) or
-                                       xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email', 'controls')"/>
+                                value="xxf:readonly(xxf:binding('fr-grid-binding')) or fr:is-readonly-mode()"/>
                         </xsl:if>
 
                         <!-- Grid table -->

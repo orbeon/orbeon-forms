@@ -47,11 +47,6 @@
         select="starts-with(doc('input:request')/*/request-path, '/fr/service/') and $mode = ('new', 'edit')"
         as="xs:boolean"/>
 
-    <xsl:variable
-        name="disable-calculations"
-        select="$is-background and doc('input:request')/*/parameters/parameter[name = 'disable-calculations']/value = 'true'"
-        as="xs:boolean"/>
-
     <!-- Either the model with id fr-form-model, or the first model -->
     <xsl:variable name="fr-form-model"    select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
     <xsl:variable name="fr-form-model-id" select="generate-id($fr-form-model)"/>
@@ -63,6 +58,40 @@
     <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'"         as="xs:boolean"/>
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
+
+    <!-- MIP filtering -->
+    <xsl:variable
+        name="disable-calculate-in-readonly-modes"
+        as="xs:boolean"
+        select="
+            $fr-form-metadata/readonly-disable-calculate = 'true' or
+            p:property(string-join(('oxf.fr.detail.readonly.disable-calculate', $app, $form), '.')) = true()"/>
+
+    <xsl:variable
+        name="disable-calculate"
+        select="
+            (
+                $mode = ('view', 'pdf', 'test-pdf', 'email', 'controls') (: fr:is-readonly-mode() :) and
+                $disable-calculate-in-readonly-modes
+            ) or (
+                ($is-background or $mode = 'test-pdf') and
+                doc('input:request')/*/parameters/parameter[name = ('disable-calculations', 'disable-calculate')]/value = 'true'
+            )"
+        as="xs:boolean"/>
+
+    <xsl:variable
+        name="disable-default"
+        select="
+            ($is-background or $mode = 'test-pdf') and
+            doc('input:request')/*/parameters/parameter[name = 'disable-default']/value = 'true'"
+        as="xs:boolean"/>
+
+    <xsl:variable
+        name="disable-relevant"
+        select="
+            ($is-background or $mode = 'test-pdf') and
+             doc('input:request')/*/parameters/parameter[name = 'disable-relevant']/value = 'true'"
+        as="xs:boolean"/>
 
     <!-- Properties -->
     <xsl:variable
@@ -746,6 +775,7 @@
 
     </xsl:template>
 
+
     <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:instance[1]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
@@ -764,10 +794,39 @@
          that happened, only simple bindings were supported. See https://github.com/orbeon/orbeon-forms/issues/2395 -->
     <xsl:template match="/xh:html/xh:head/xbl:xbl/xbl:binding[starts-with(@element, 'fr|')]"/>
 
-    <!-- Disable all calculations if requested (background mode only) -->
+    <!-- MIP filtering -->
+
+    <xsl:template
+        match="xf:bind/@relevant[$disable-relevant and not(. = ('false()', 'true()'))]"
+        mode="filter-mips"/>
+
+    <xsl:template
+        match="xf:bind/@xxf:default[$disable-default]"
+        mode="filter-mips"/>
+
+    <xsl:template
+        match="xf:bind/@calculate[$disable-calculate]"
+        mode="filter-mips"/>
+
     <xsl:template
         match="
-            /xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:bind//@calculate[$disable-calculations] |
-            /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/xf:bind//@calculate[$disable-calculations]"/>
+            /xh:html/xh:head//
+                xf:model[
+                    generate-id() = $candidate-action-models-ids
+                ]/xf:bind[1]">
+
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:choose>
+                <xsl:when test="$disable-calculate or $disable-relevant">
+                    <xsl:apply-templates select="node()" mode="filter-mips"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates select="node()"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:copy>
+
+    </xsl:template>
 
 </xsl:stylesheet>

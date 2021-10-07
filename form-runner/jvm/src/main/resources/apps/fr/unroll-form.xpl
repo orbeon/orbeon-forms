@@ -57,7 +57,7 @@
             <config>
                 <include>/request/request-path</include>
                 <include>/request/request-uri</include>
-                <include>/request/parameters/parameter[name = 'disable-calculations']</include>
+                <include>/request/parameters/parameter[name = ('disable-calculations', 'disable-calculate', 'disable-default', 'disable-relevant')]</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>

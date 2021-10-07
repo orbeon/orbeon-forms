@@ -146,7 +146,7 @@
         if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
 
         <!-- Handle loading of initial data for new/test/edit/view/pdf/email modes only -->
-        <xf:action if="$mode = ('new', 'test', 'edit', 'view', 'pdf', 'email', 'controls')">
+        <xf:action if="$mode = ('new', 'test', 'edit') or fr:is-readonly-mode()">
 
             <xf:var name="is-new-id" value="xxf:is-blank($document)"/>
             <xf:var name="is-xml-submit" value="$is-submit and exists(xxf:get-request-attribute('fr-form-data'))"/>
@@ -261,7 +261,7 @@
                     value="
                         xxf:property(string-join(('oxf.fr.detail.lease.enabled', $app, $form), '.')) and
                         frf:isLeaseSupported($app, $form) and
-                        not($mode = ('pdf', 'view')) and
+                        not(fr:is-readonly-mode())        and
                         not($is-background)
                     "/>
                 <xf:setvalue ref="$lease-enabled-elem" value="$lease-enabled"/>
@@ -397,11 +397,11 @@
                 could be removed in the future if need be.
             -->
             <xf:var name="unauthorized-access" value="
-                ($mode = ('new', 'import', 'validate')         and not($ops = ('*', 'create')))            or
-                ($mode = 'edit'                                and not($ops = ('*', 'update')
-                                                                       or $is-submit and $ops = 'create')) or
-                ($mode = ('view', 'pdf', 'controls', 'email')  and not($ops = ('*', 'read')
-                                                                       or $is-submit and $ops = 'create')) or
+                ($mode = ('new', 'import', 'validate') and not($ops = ('*', 'create')))            or
+                ($mode = 'edit'                        and not($ops = ('*', 'update')
+                                                               or $is-submit and $ops = 'create')) or
+                (fr:is-readonly-mode()                 and not($ops = ('*', 'read')
+                                                               or $is-submit and $ops = 'create')) or
                 not(
                     $mode = (
                         'new',      'import',    'validate',

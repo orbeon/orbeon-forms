@@ -28,7 +28,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Review</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Delete</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Import</import>
@@ -44,6 +44,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validate</validate>
+            <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Submit</submit>

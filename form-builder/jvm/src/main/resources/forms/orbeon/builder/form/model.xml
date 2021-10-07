@@ -28,6 +28,7 @@
         fb-test-form-show-dialog
         fb-test-formulas-show-dialog
         fb-test-offline-show-dialog
+        fb-test-pdf
         xxforms-rpc-request"
     xxf:xpath-analysis="false"
     xxf:expose-xpath-types="true"
@@ -674,6 +675,65 @@
         xxf:target="fb-test-iframe"
         xxf:show-progress="false"
     />
+    
+    <!-- TODO: Reduce duplication with above submission if possible. -->
+    <xf:submission
+        id="fb-test-pdf-submission"
+        ref="
+            xxf:call-xpl(
+                'oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                (
+                    'data',
+                    'bindings',
+                    'for-form-builder'
+                ),
+                (
+                    xxf:call-xpl(
+                        'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                        'data',
+                        instance('fb-form-instance'),
+                        'data'
+                    ),
+                    xxf:instance('fb-components-instance'),
+                    xf:element('for-form-builder', 'false')
+                ),
+                'data'
+            )"
+        method="post"
+        replace="all"
+        resource="/fr/service/{bind('application-name-bind')}/{bind('form-name-bind')}/test-pdf?{
+            string-join(
+                for $p in instance('fb-test-pdf-submission-params')/@*[xxf:non-blank(.)]
+                return
+                    concat(name($p), '=', encode-for-uri(string($p))),
+                '&amp;'
+            )
+        }"
+        xxf:target="_blank"
+        xxf:show-progress="false"
+    />
+
+    <!-- The `disable-*` parameters are "sticky" and stored when the dialog applies changes. -->
+    <xf:instance id="fb-test-pdf-submission-params">
+        <params
+            disable-default=""
+            disable-calculate=""
+            disable-relevant=""
+            fr-form-data=""/>
+    </xf:instance>
+
+    <xf:action event="xforms-submit" observer="fb-test-pdf-submission">
+        <!-- Only change parameters that are passed -->
+        <xf:setvalue
+            iterate="instance('fb-test-pdf-submission-params')/@*"
+            if="starts-with(name(context()), 'disable-') and exists(event(name(context())))"
+            ref="."
+            value="event(name(context()))"/>
+        <!-- But always update the data -->
+        <xf:setvalue
+            ref="instance('fb-test-pdf-submission-params')/@fr-form-data"
+            value="event('fr-form-data')"/>
+    </xf:action>
 
     <!-- Global variables -->
     <xf:instance id="fb-variables">
@@ -758,6 +818,13 @@
     <xf:action event="fb-test-offline-show-dialog">
         <xxf:show dialog="fb-test-dialog"/>
         <xf:send submission="fb-test-offline-submission"/>
+    </xf:action>
+
+    <!-- Dispatched from the client -->
+    <xf:action event="fb-test-pdf">
+        <xf:send submission="fb-test-pdf-submission">
+            <xf:property name="fr-form-data" value="event('fr-form-data')"/>
+        </xf:send>
     </xf:action>
 
     <!-- Publish form operation -->

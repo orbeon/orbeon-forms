@@ -115,6 +115,14 @@
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(pdf|tiff)(/([^/^.]+))?"
              view="print/print-form.xpl"/>
 
+        <!-- Test form PDF "inline" (when being edited) with new empty document -->
+    <page path="/fr/service/([^/^.]+)/([^/^.]+)/(test-pdf)"
+          model="inline-test-model.xpl" view="print/pdf-view.xpl">
+        <setvalue ref="/*/app"      matcher-group="1"/>
+        <setvalue ref="/*/form"     matcher-group="2"/>
+        <setvalue ref="/*/mode"     matcher-group="3"/>
+    </page>
+
     <!-- Generate HTML to be saved -->
     <page path="/fr/service/save-locally/save-generate" view="save-locally/save-generate.xpl"/>
 

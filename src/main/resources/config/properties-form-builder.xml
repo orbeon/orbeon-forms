@@ -138,6 +138,10 @@
         xf:dispatch(name = "fb-test-offline")
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.process.test-pdf.orbeon.builder">
+        xf:dispatch(name = "fb-show-dialog", targetid = "dialog-test-pdf")
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.process.publish.orbeon.builder">
         xf:show(
             dialog = "fb-publish-dialog",

@@ -1184,6 +1184,12 @@
         <dialog-test>
             <label>Form Preview</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label>Test PDF Production</label>
+            <disable-default>Disable the evaluation of "Initial Values" formulas</disable-default>
+            <disable-calculate>Disable the evaluation of "Calculated Values" formulas</disable-calculate>
+            <disable-relevant>Show controls, grids, and sections with dynamic visibility</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Orbeon Forms PE Feature</label>
             <message>
@@ -2496,8 +2502,14 @@
 
         </dialog-actions>
         <dialog-test>
-            <label>Prévisualisation du formulaire</label>
+            <label>Test du formulaire</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label>Test de la production PDF</label>
+            <disable-default>Désactiver l'évaluation des formules "Valeur initiale"</disable-default>
+            <disable-calculate>Désactiver l'évaluation des formules "Valeur calculée"</disable-calculate>
+            <disable-relevant>Montrer les contrôles, grilles, et sections avec visibilité dynamique</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Fonction Orbeon Forms PE</label>
             <message>
@@ -3822,6 +3834,12 @@
         <dialog-test>
             <label>Skjemaforhåndsvisning</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label todo="true">Test PDF Production</label>
+            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
+            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
+            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Orbeon Forms PE-funksjonalitet</label>
             <message>
@@ -5145,6 +5163,12 @@
         <dialog-test>
             <label>Предварительный просмотр формы</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label todo="true">Test PDF Production</label>
+            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
+            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
+            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Возможность Orbeon Forms PE</label>
             <message>
@@ -6461,6 +6485,12 @@
         <dialog-test>
             <label>Anteprima del modulo</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label todo="true">Test PDF Production</label>
+            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
+            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
+            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Funzioni di Orbeon Forms PE</label>
             <message>
@@ -7778,6 +7808,12 @@
         <dialog-test>
             <label>Formularvorschau</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label todo="true">Test PDF Production</label>
+            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
+            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
+            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Eigenschaften der Orbeon Forms PE</label>
             <message>
@@ -9097,6 +9133,12 @@
         <dialog-test>
             <label>Lomakkeen esikatselu</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label todo="true">Test PDF Production</label>
+            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
+            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
+            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Orbeon-lomakkeiden PE-toiminnot</label>
             <message>
@@ -10413,6 +10455,12 @@
         <dialog-test>
             <label>Vista Previa del Formulario</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label todo="true">Test PDF Production</label>
+            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
+            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
+            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Características de Orbeon Forms PE</label>
             <message>
@@ -11709,6 +11757,12 @@
         <dialog-test>
             <label>Form voorvertoning</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label todo="true">Test PDF Production</label>
+            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
+            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
+            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Orbeon Forms PE functie</label>
             <message>
@@ -13032,6 +13086,12 @@
         <dialog-test>
             <label>Previsualização do formulário</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label todo="true">Test PDF Production</label>
+            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
+            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
+            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Característica do Orbeon Forms PE </label>
             <message>
@@ -14356,6 +14416,12 @@
         <dialog-test>
             <label>Förhandsvisa formulär</label>
         </dialog-test>
+        <dialog-test-pdf>
+            <label todo="true">Test PDF Production</label>
+            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
+            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
+            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+        </dialog-test-pdf>
         <dialog-pe>
             <label>Funktioner i Orbeon Forms PE</label>
             <message>

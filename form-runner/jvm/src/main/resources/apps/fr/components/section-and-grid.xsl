@@ -70,7 +70,7 @@
                 <xsl:attribute name="readonly">true</xsl:attribute>
             </xsl:if>
 
-            <xsl:if test="$use-view-appearance and $view-appearance = 'wizard' and not($mode = ('view', 'pdf', 'email', 'controls'))">
+            <xsl:if test="$use-view-appearance and $view-appearance = 'wizard' and not($mode = ('view', 'pdf', 'test-pdf', 'email', 'controls') (: fr:is-readonly-mode() :))">
                 <xsl:copy-of select="@page-size"/>
             </xsl:if>
 

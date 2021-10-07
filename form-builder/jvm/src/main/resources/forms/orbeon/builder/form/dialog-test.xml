@@ -29,6 +29,15 @@
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xh:span>
+            <xf:trigger>
+                <xf:label mediatype="text/html" value="$fr-resources/buttons/test-pdf"/>
+                <xf:action event="DOMActivate">
+                    <xf:dispatch name="fb-show-dialog" targetid="dialog-test-pdf">
+                        <xf:property name="for-form-being-tested" value="true()"/>
+                    </xf:dispatch>
+                </xf:action>
+            </xf:trigger>
+
             <xf:trigger appearance="xxf:primary">
                 <xf:label mediatype="text/html" value="$fr-resources/buttons/close"/>
                 <xxf:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>

@@ -752,6 +752,32 @@
                                     </xf:action>
                                 </fb:dialog-pdf>
 
+                                <fb:dialog-test-pdf           id="dialog-test-pdf"           ref="$form"      resources-ref="$form-resources">
+                                    <xf:action event="fb-apply">
+
+                                        <!-- Set these globally so they stay "sticky" -->
+                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-calculate" value="event('disable-calculate')"/>
+                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-default"   value="event('disable-default')"/>
+                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-relevant"  value="event('disable-relevant')"/>
+
+                                        <xf:action if="event('for-form-being-tested') = true()">
+                                            <!-- Run indirectly by asking the form being tested to prepare data -->
+                                            <xf:action type="javascript">
+                                                window.document.getElementById("fb-test-iframe").contentWindow.ORBEON.xforms.Document.dispatchEvent(
+                                                    {
+                                                        targetId:  'fr-form-model',
+                                                        eventName: 'fb-test-pdf'
+                                                    }
+                                                );
+                                            </xf:action>
+                                        </xf:action>
+                                        <xf:action if="not(event('for-form-being-tested') = true())">
+                                            <!-- Run directly -->
+                                            <xf:send submission="fb-test-pdf-submission"/>
+                                        </xf:action>
+                                    </xf:action>
+                                </fb:dialog-test-pdf>
+
                                 <xf:group bind="fb-toolbox-workflow-bind">
                                     <fb:workflow20201
                                         id="fb-workflow20201-dialog"

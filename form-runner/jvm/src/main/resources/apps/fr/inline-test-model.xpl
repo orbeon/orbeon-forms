@@ -24,7 +24,7 @@
     <p:param type="input" name="instance"/>
     <!-- Form in XHTML+XForms format -->
     <p:param type="output" name="data"/>
-    <!-- Instance usable by the view -->
+    <!-- Page detail (app, form, document, and mode) -->
     <p:param type="output" name="instance"/>
 
     <!-- NOTE: It's disappointing that we have to use oxf:request/oxf:regexp rather than using the page flow
@@ -40,7 +40,7 @@
     </p:processor>
 
     <p:processor name="oxf:regexp">
-        <p:input name="config"><config>/fr/([^/]+)/([^/]+)/(test)/?</config></p:input>
+        <p:input name="config"><config>/fr/(?:service/)?([^/]+)/([^/]+)/(test(-pdf)?)/?</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>

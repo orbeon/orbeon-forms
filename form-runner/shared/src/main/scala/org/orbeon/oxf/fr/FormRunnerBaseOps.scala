@@ -339,7 +339,9 @@ trait FormRunnerBaseOps {
     }
   }
 
-  private val ReadonlyModes = Set("view", "pdf", "email", "controls")
+  // NOTE: `tiff` and `test-pdf` are reduced to `pdf` at the XForms level, but not at the XSLT level. We don't
+  // yet expose this to XSLT, but we might in the future, so check on those modes as well.
+  private val ReadonlyModes = Set("view", "pdf", "email", "controls", "tiff", "test-pdf")
 
   def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
   def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ReadonlyModes(p.mode)

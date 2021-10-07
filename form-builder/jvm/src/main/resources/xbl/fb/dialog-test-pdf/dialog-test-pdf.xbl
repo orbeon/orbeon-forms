@@ -1,0 +1,129 @@
+<!--
+  Copyright (C) 2017 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+
+    xmlns:array="http://www.w3.org/2005/xpath-functions/array">
+
+    <xbl:binding id="fb-dialog-test-pdf" element="fb|dialog-test-pdf">
+        <xbl:handlers>
+            <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
+                <xf:setvalue
+                    ref="$i/for-form-being-tested"
+                    value="event('for-form-being-tested') = true()"/>
+                <!-- Keep local values between runs -->
+                <xxf:show dialog="dialog"/>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="cancel-trigger" >
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="valid($i)">
+                <xf:dispatch name="fb-apply" target="fb-dialog-test-pdf">
+                    <xf:property name="for-form-being-tested" value="$i/for-form-being-tested/data(.)"/>
+                    <xf:property name="disable-calculate"     value="$i/disable-calculate/data(.)"/>
+                    <xf:property name="disable-default"       value="$i/disable-default/data(.)"/>
+                    <xf:property name="disable-relevant"      value="$i/disable-relevant/data(.)"/>
+                </xf:dispatch>
+                <xxf:hide dialog="dialog"/>
+            </xbl:handler>
+            <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="not(valid($i))">
+                <xxf:setvisited
+                    control="dialog"
+                    recurse="true"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <xf:model id="model">
+                <xf:instance id="i">
+                    <_>
+                        <for-form-being-tested/>
+                        <disable-calculate/>
+                        <disable-default/>
+                        <disable-relevant/>
+                    </_>
+                </xf:instance>
+
+                <xf:bind
+                    ref="for-form-being-tested | disable-calculate | disable-default | disable-relevant"
+                    type="xf:boolean"
+                    xxf:default="false()"/>
+
+                <xf:var name="i" value="instance()"/>
+
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xf:group id="container" appearance="xxf:internal">
+
+                <!-- Bindings specified on control -->
+                <xf:var name="form"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
+                <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+
+                <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-test-pdf-dialog">
+                    <xf:label ref="xxf:r('dialog-test-pdf.label', '|fr-form-resources|')"/>
+
+                    <xf:var
+                        name="languages"
+                        value="instance('fr-languages-instance')/language[not(@exclude = 'true')]"/>
+
+                    <xh:div>
+                        <fr:grid>
+                            <fr:c x="1" y="1" w="12">
+                                <fr:checkbox-input ref="disable-default" appearance="checkbox">
+                                    <xf:label ref="xxf:r('dialog-test-pdf.disable-default', '|fr-form-resources|')"/>
+                                </fr:checkbox-input>
+                            </fr:c>
+                            <fr:c x="1" y="2" w="12">
+                                <fr:checkbox-input ref="disable-calculate">
+                                    <xf:label ref="xxf:r('dialog-test-pdf.disable-calculate', '|fr-form-resources|')"/>
+                                </fr:checkbox-input>
+                            </fr:c>
+                            <fr:c x="1" y="3" w="12">
+                                <fr:checkbox-input ref="disable-relevant" appearance="checkbox">
+                                    <xf:label ref="xxf:r('dialog-test-pdf.disable-relevant', '|fr-form-resources|')"/>
+                                </fr:checkbox-input>
+                            </fr:c>
+                        </fr:grid>
+                    </xh:div>
+
+<!--                        fr-use-pdf-template-->
+
+                    <!--<fr:xforms-inspector/>-->
+
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:group id="triggers">
+                            <xf:trigger id="save-trigger" appearance="xxf:primary">
+                                <xf:label ref="xxf:r('continue.label', '|fr-form-resources|')"/>
+                            </xf:trigger>
+                            <xf:output ref="xxf:r('or.label', '|fr-form-resources|')"/>
+                            <xf:trigger appearance="minimal" id="cancel-trigger">
+                                <xf:label ref="xxf:r('cancel.label', '|fr-form-resources|')"/>
+                            </xf:trigger>
+                        </xf:group>
+                    </xh:div>
+
+                </xxf:dialog>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

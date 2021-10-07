@@ -240,12 +240,11 @@
         name="use-view-appearance"
         as="xs:boolean"
         select="
+            $mode = 'import' or
             not(
-                $mode != 'import' and (
-                    not($mode = ('edit', 'new', 'test', 'compile')) or
-                    $is-form-builder                                or
-                    $view-appearance = 'full'
-                )
+                not($mode = ('edit', 'new', 'test', 'compile')) or (: intentionally no test on 'test-pdf' :)
+                $is-form-builder                                or
+                $view-appearance = 'full'
             )"/>
 
     <xsl:variable
@@ -524,7 +523,7 @@
                 return
                     if (
                         $mode = 'view' or (
-                            $mode = ('pdf', 'email') and (
+                            $mode = ('pdf', 'test-pdf', 'email') and (
                                 (: TODO: Consider `fr:use-pdf-template()` function :)
                                 xxf:get-request-parameter('fr-use-pdf-template') = 'false' or
                                 not(xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')
@@ -538,7 +537,7 @@
             xxf:encrypt-item-values="{{
                 for $mode in fr:mode()
                 return not(
-                    $mode = ('pdf', 'email') and
+                    $mode = ('pdf', 'test-pdf', 'email') and
                     (: TODO: Consider `fr:use-pdf-template()` function :)
                     xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '' and
                     not(xxf:get-request-parameter('fr-use-pdf-template') = 'false')
@@ -566,7 +565,7 @@
             }}"
             xxf:no-updates="{{
                 (:
-                    This covers at least: 'email', 'pdf', 'tiff', 'controls', 'validate', 'import',
+                    This covers at least: 'email', 'pdf', 'test-pdf', 'tiff', 'controls', 'validate', 'import',
                     'schema', 'duplicate', 'attachments', 'publish', but also 'new' and 'edit' when
                     used in background mode, see https://github.com/orbeon/orbeon-forms/issues/3318.
                     The idea is that all services are non-interactive.
@@ -577,7 +576,8 @@
                 string-join(
                     (
                         @xxf:external-events,
-                        if ($copy-custom-model) then doc($custom-model)/*/@xxf:external-events else ()
+                        if ($copy-custom-model) then doc($custom-model)/*/@xxf:external-events else (),
+                        'fb-test-pdf'
                     ),
                     ' '
                 )
@@ -668,8 +668,14 @@
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->
             <xf:instance id="fr-parameters-instance" src="input:instance"/>
-            <!-- Internally, reduce `tiff` mode to `pdf` mode so as to avoid checking everywhere for a new mode -->
-            <xf:bind ref="instance('fr-parameters-instance')/mode" xxf:default="if (. = 'tiff') then 'pdf' else ."/>
+            <!-- Internally, at the XForms level, reduce modes so as to avoid checking everywhere for a new mode -->
+            <xf:bind
+                ref="instance('fr-parameters-instance')/mode"
+                xxf:default="
+                    if (. = ('tiff', 'test-pdf')) then
+                        'pdf'
+                    else
+                        ."/>
 
         </xf:model>
 
@@ -830,6 +836,30 @@
             </xsl:if>
             <xsl:copy-of select="fr:common-dataset-actions-impl(.)"/>
             <xsl:copy-of select="fr:common-service-actions-impl(.)"/>
+
+            <!-- Helper for Form Builder test only -->
+            <xf:action
+                event="fb-test-pdf"
+                if="fr:mode() = 'test'"
+                type="javascript"
+                xmlns:saxon="http://saxon.sf.net/"
+                xmlns:XFormsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
+<!--                <xf:param-->
+<!--                    name="data"-->
+<!--                    value="XFormsUtils:encodeXmlFromNodeInfo(instance('fr-form-instance'))"/>-->
+                <xf:param
+                    name="data"
+                    value="string(saxon:string-to-base64Binary(xxf:serialize(instance('fr-form-instance'), 'xml'), 'UTF-8'))"/>
+                <xf:body>
+                    window.parent.ORBEON.xforms.Document.dispatchEvent(
+                        {
+                            targetId:   'fr-form-model',
+                            eventName:  'fb-test-pdf',
+                            properties: { 'fr-form-data': data }
+                        }
+                    );
+                </xf:body>
+            </xf:action>
 
         </xsl:copy>
 

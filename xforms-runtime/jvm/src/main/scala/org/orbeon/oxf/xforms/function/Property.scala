@@ -73,8 +73,8 @@ class Property extends XFormsFunction with RuntimeDependentFunction {
         // Property in the xxforms namespace: return our properties
         Option(getContainingDocument(xpathContext).getProperty(local)) map
           (v => SaxonUtils.convertJavaObjectToSaxonObject(v).asInstanceOf[Item]) orNull
-      case (uri, local) =>
-        throw new XPathException(s"Unknown property: property('${stringArgument(0)}')")
+      case (_, _) =>
+        throw new XPathException(s"Unknown property: `property('${stringArgument(0)}')`")
     }
   }
 

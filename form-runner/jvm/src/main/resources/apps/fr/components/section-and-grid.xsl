@@ -35,6 +35,10 @@
     </xsl:template>
 
     <!-- NOTE: This won't be needed once XBL components properties can be inherited at the form level -->
+    <!-- 2021-10-07: Not quite true, at least not for all cases. We could easily implement something like `keep-if-param-non-blank`.
+         This needs to be done at the XBL processing level, since the components use XSLT to produce different content, at least
+         with `collapsible`. So for example `keep-if-param-is` and `keep-if-param-is-not`. For `animate` this creates and attribute
+         and we'd need some extra support. Other changes are probably not possible via parameters. -->
     <xsl:template match="xh:body//fr:section | xbl:binding/xbl:template//fr:section">
 
         <xsl:param name="section-level" tunnel="yes" select="1"/>

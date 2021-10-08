@@ -187,17 +187,23 @@
                             page-break-before: always;
                         }
 
-                        pre {
-                            page-break-inside: auto;
-                        }
+                        // Keep the label with its control
+                        // It would seem that the first rule below should be enough, but in some cases at least it
+                        // isn't, and second rule is necessary for the label and the field not to be on separate pages
+                        .xforms-label                           { page-break-after : avoid }
+                        .xforms-textarea pre, span.xforms-field { page-break-before: avoid }
+
+                        // Avoid breaking text areas and inputs, unless their content is quite long
+                        // The selectors here match the corresponding template selector in `print-pdf-notemplate.xsl`
+                        .xforms-textarea pre                 { page-break-inside: avoid }
+                        .xforms-textarea pre.fr-long-content { page-break-inside: auto  }
+                        span.xforms-field                    { page-break-inside: avoid }
+                        span.xforms-field.fr-long-content    { page-break-inside: auto  }
 
                         blockquote {
                             page-break-inside: auto;
                         }
 
-                        .fr-grid-td .xforms-label {
-                            page-break-after: avoid; // keep with the control that follows
-                        }
                       }
                   }
             }

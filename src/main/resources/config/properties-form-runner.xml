@@ -172,6 +172,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.pdf.barcode.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.disable-if-invalid.*.*"                   value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.hyperlinks.*.*"                           value="true"/>
+    <property as="xs:integer" name="oxf.fr.detail.pdf.long-content-threshold.*.*"               value="512"/>
 
     <property as="xs:string"  name="oxf.fr.detail.tiff.filename.*.*"                            value=""/>
     <property as="xs:string"  name="oxf.fr.detail.tiff.compression.type.*.*"                    value="LZW"/>

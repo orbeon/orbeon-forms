@@ -23,15 +23,16 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
-    <xsl:variable name="app"              select="doc('input:parameters')/*/app/string()"/>
-    <xsl:variable name="form"             select="doc('input:parameters')/*/form/string()"/>
-    <xsl:variable name="mode"             select="doc('input:parameters')/*/mode/string()"/>
-    <xsl:variable name="hyperlinks"       select="p:property(string-join(('oxf.fr.detail.pdf.hyperlinks', $app, $form), '.')) = true()"/>
+    <xsl:variable name="app"                    select="doc('input:parameters')/*/app/string()"/>
+    <xsl:variable name="form"                   select="doc('input:parameters')/*/form/string()"/>
+    <xsl:variable name="mode"                   select="doc('input:parameters')/*/mode/string()"/>
+    <xsl:variable name="hyperlinks"             select="p:property(string-join(('oxf.fr.detail.pdf.hyperlinks', $app, $form), '.')) = true()"/>
+    <xsl:variable name="long-content-threshold" select="p:property(string-join(('oxf.fr.detail.pdf.long-content-threshold', $app, $form), '.'))"/>
 
     <!-- MAYBE: Support URL parameters as well for #4206. Should they be trusted? -->
-    <xsl:variable name="metadata"         select="frf:metadataInstanceRootOpt(doc('input:xforms'))"/>
-    <xsl:variable name="page-orientation" select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-orientation', $app, $form, $mode)"/>
-    <xsl:variable name="page-size"        select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-size',        $app, $form, $mode)"/>
+    <xsl:variable name="metadata"               select="frf:metadataInstanceRootOpt(doc('input:xforms'))"/>
+    <xsl:variable name="page-orientation"       select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-orientation', $app, $form, $mode)"/>
+    <xsl:variable name="page-size"              select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-size',        $app, $form, $mode)"/>
 
     <!--
         Remove portlet namespace from ids if present. Do this because in a portlet environment, the CSS
@@ -95,7 +96,9 @@
         </xsl:element>
     </xsl:template>
 
-    <!-- Hyperlink URLs in fields -->
+    <!-- 1. Hyperlink URLs in fields -->
+    <!-- 2. Adds a class `fr-long-content` on fields whose value exceeds a certain threshold, so the CSS
+            can allow breaking only those fields across pages -->
     <xsl:template
         match="
             *:pre[
@@ -103,13 +106,27 @@
             ]
             |
             *:span[
-                p:has-class('xforms-field') and p:has-class('xforms-input', ..)
+                p:has-class('xforms-field')
             ]"
         mode="#all">
 
         <xsl:element name="{local-name()}">
-            <xsl:apply-templates select="@*" mode="#current"/>
-            <xsl:apply-templates select="saxon:parse(frf:hyperlinkURLs(string(), $hyperlinks))" mode="#current"/>
+
+            <xsl:variable name="new-content" select="saxon:parse(frf:hyperlinkURLs(string(), $hyperlinks))"/>
+            <xsl:variable name="is-long-content" select="string-length($new-content) > $long-content-threshold"/>
+            <xsl:apply-templates select="@* except @class" mode="#current"/>
+            <xsl:if test="$is-long-content or exists(@class)">
+                <xsl:attribute name="class" select="
+                    string-join(
+                        (
+                            if ($is-long-content) then 'fr-long-content' else (),
+                            @class
+                        ),
+                        ' '
+                    )"/>
+            </xsl:if>
+            <xsl:apply-templates select="$new-content" mode="#current"/>
+
         </xsl:element>
     </xsl:template>
 

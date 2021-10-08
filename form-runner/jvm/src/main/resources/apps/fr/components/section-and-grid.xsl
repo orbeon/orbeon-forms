@@ -22,18 +22,6 @@
 
     <xsl:variable name="starting-section-level" select="2"/>
 
-    <!-- TODO: Move to separate file. -->
-    <xsl:template match="
-            xh:body//xf:output[exists(xf:label) and empty(@appearance)] |
-            xbl:binding/xbl:template//xf:output[exists(xf:label) and empty(@appearance)]">
-        <xsl:copy>
-            <xsl:for-each select="$calculated-value-appearance[. != 'full']"><!-- `full` is the default so don't bother adding the attribute in this case -->
-                <xsl:attribute name="appearance" select="."/>
-            </xsl:for-each>
-            <xsl:apply-templates select="@* | node()"/>
-        </xsl:copy>
-    </xsl:template>
-
     <!-- NOTE: This won't be needed once XBL components properties can be inherited at the form level -->
     <!-- 2021-10-07: Not quite true, at least not for all cases. We could easily implement something like `keep-if-param-non-blank`.
          This needs to be done at the XBL processing level, since the components use XSLT to produce different content, at least

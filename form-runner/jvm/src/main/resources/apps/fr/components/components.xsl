@@ -32,6 +32,7 @@
 
     <!-- Import components -->
     <xsl:import href="view.xsl"/>
+    <xsl:import href="controls.xsl"/>
     <xsl:import href="buttons.xsl"/>
     <xsl:import href="section-and-grid.xsl"/> <!-- pass properties -->
     <xsl:import href="legacy-repeat.xsl"/>    <!-- convert legacy fr:repeat to fr:grid -->

@@ -60,7 +60,7 @@ object BindingDescriptor {
   import Private._
 
   // Return a new element name and appearance for the control if needed.
-  // See `BindingDescriptorTest.testNewElementName()` for examples.
+  // See `BindingDescriptorTest`'s "New element name" test for examples.
   def newElementName(
     oldElemName      : QName,
     oldDatatype      : QName,
@@ -94,7 +94,7 @@ object BindingDescriptor {
   // Find the virtual name and appearance for the control given its element name, datatype, and appearances.
   // See `BindingDescriptorTest` for examples.
   //
-  // The virtual name is the name the control would have if we natively supported datatype bindings. We don't support
+  // The virtual name is the name the control would have if we natively supported datatype bindings. We don't
   // support them because datatypes can change dynamically at runtime and that is a big change, see:
   // https://github.com/orbeon/orbeon-forms/issues/1248
   def findVirtualNameAndAppearance(
@@ -120,7 +120,7 @@ object BindingDescriptor {
           }
         )
 
-    virtualNameAndAppearanceOpt getOrElse (searchElemName, searchAppearances.headOption) // ASSUMPTION: Take first appearance.
+    virtualNameAndAppearanceOpt getOrElse (searchElemName, searchAppearances.headOption) // ASSUMPTION: Take first appearance. 2021-10-08: `Set` is not ordered!
   }
 
   def possibleAppearancesWithBindings(

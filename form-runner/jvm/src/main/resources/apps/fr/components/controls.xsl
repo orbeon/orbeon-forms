@@ -12,6 +12,63 @@
     xmlns:map="http://www.w3.org/2005/xpath-functions/map"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array">
 
+    <xsl:variable
+        name="controls-roots-for-pdf-appearance"
+        select="
+            if ($mode = ('pdf', 'test-pdf')) then
+                ($body, /xh:html/xh:head/xbl:xbl/xbl:binding[p:has-class('fr-section-component')]/xbl:template)
+            else
+                ()"/>
+
+    <xsl:function name="fr:direct-name-for-select1-element" as="xs:string">
+        <xsl:param name="elem" as="element()"/>
+        <xsl:value-of select="
+            if (local-name($elem) = 'select1' and $elem/@appearance = 'dropdown') then
+                'dropdown-select1'
+            else if (local-name($elem) = 'select1' and $elem/@appearance = 'search') then
+                'dropdown-select1-search'
+            else
+                local-name($elem)"/>
+    </xsl:function>
+
+    <!-- For now only support `xf:select1[appearance ~= dropdown]` and `xf:select1[appearance ~= search]`. The databound
+         controls (`fr:databound-select1` and `fr:databound-select1`) don't currently have an `xf:select1` representation. -->
+    <xsl:variable
+        name="controls-to-check-for-pdf-appearance"
+        select="$controls-roots-for-pdf-appearance//(
+            fr:dropdown-select1         | (: output as `fr:dropdown-select1` or `xf:select1[appearance ~= dropdown]` :)
+            fr:dropdown-select1-search  | (: output as `xf:select1[appearance ~= search]`                            :)
+            xf:select1[
+                @appearance = ('dropdown', 'search')
+            ][
+                exists(@fr:pdf-appearance) or
+                exists(
+                    map:get(
+                        $select1-pdf-appearances,
+                        fr:direct-name-for-select1-element(.)
+                    )
+                )
+            ]
+        )"/>
+
+    <xsl:variable
+        name="controls-to-check-for-pdf-appearance-ids"
+        select="$controls-to-check-for-pdf-appearance/generate-id()"/>
+
+    <!-- NOTE: The `xf:label` rule below matches `select1` controls and if it matches this one won't match. But we shouldn't have
+         common cases where the `xf:label` is missing as Form Builder adds that element. -->
+    <xsl:template
+        match="
+            fr:*      [generate-id() = $controls-to-check-for-pdf-appearance-ids] |
+            xf:select1[generate-id() = $controls-to-check-for-pdf-appearance-ids]"
+        mode="within-controls">
+        <!-- For now this only applies to controls that have an `xf:select1` binding -->
+        <xsl:element name="xf:select1">
+            <xsl:apply-templates select="@* except (@appearance, @fr:pdf-appearance)" mode="#current"/>
+            <xsl:attribute name="appearance" select="(@fr:pdf-appearance, map:get($select1-pdf-appearances, fr:direct-name-for-select1-element(.)))[1]"/>
+            <xsl:apply-templates select="node()" mode="#current"/>
+        </xsl:element>
+    </xsl:template>
 
     <xsl:template
         match="xf:output[exists(xf:label) and empty(@appearance)]"

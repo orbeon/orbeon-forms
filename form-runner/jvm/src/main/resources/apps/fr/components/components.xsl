@@ -24,6 +24,7 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+        xmlns:map="http://www.w3.org/2005/xpath-functions/map"
         xmlns:Wizard="java:org.orbeon.xbl.Wizard">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
@@ -376,6 +377,41 @@
                             'minimal',
                 'minimal'
             )[1]"/>
+
+    <!-- Map of XBL direct names to form-level `pdf-appearance` values if any -->
+    <xsl:variable
+        name="select1-pdf-appearances"
+        select="
+            if ($mode = ('pdf', 'test-pdf')) then
+                map:merge(
+                    for $name in (
+                        (: Use direct names :)
+                        'dropdown-select1',
+                        'dropdown-select1-search'
+                    ) return
+                        map:entry(
+                            $name,
+                            (
+                                (: From form metadata :)
+                                $fr-form-metadata/xbl/fr:*[local-name() = $name]/@fr:pdf-appearance[normalize-space()]/string(),
+                                (: From properties :)
+                                p:property(
+                                    string-join(
+                                        (
+                                            'oxf.xforms.xbl.fr',
+                                            $name,
+                                            'pdf-appearance',
+                                            $app,
+                                            $form
+                                        ),
+                                        '.'
+                                    )
+                                )[normalize-space()]
+                            )[1]
+                        )
+                )
+            else
+                map:merge(())"/>
 
     <xsl:variable
         name="section-insert"
@@ -798,7 +834,6 @@
         </xsl:copy>
 
     </xsl:template>
-
 
     <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:instance[1]">
         <xsl:copy>

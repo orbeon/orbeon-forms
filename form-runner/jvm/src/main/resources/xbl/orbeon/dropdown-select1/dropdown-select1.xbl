@@ -56,6 +56,72 @@
                     </fr:dropdown-select1>
                 </view>
             </templates>
+            <control-details>
+                <xf:model xmlns="" id="fb-editor-dropdown-select1-model">
+
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                        <xf:var name="c" value="."/>
+                        <xf:setvalue ref="$c" value="instance()/@*[local-name() = name($c)]"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <pdf-appearance/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                        <_>
+                            <resource xml:lang="en">
+                                <automatic-pdf>Automatic PDF</automatic-pdf>
+                                <selected-only>Show the selected value only</selected-only>
+                                <show-all>Show all values as radio buttons</show-all>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <automatic-pdf>PDF automatique</automatic-pdf>
+                                <selected-only>Montrer la valeur sélectionnée seulement</selected-only>
+                                <show-all>Montrer toutes les valeurs comme boutons radio</show-all>
+                            </resource>
+                        </_>
+                    </xf:instance>
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-dropdown-select1-grid">
+                    <xh:tr>
+                        <xh:td colspan="6">
+                            <xf:select1 ref="instance('local')/pdf-appearance" appearance="full" id="show-all-items-control">
+                                <xf:label ref="xxf:r('automatic-pdf')"/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('selected-only')"/>
+                                    <xf:value>dropdown</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('show-all')"/>
+                                    <xf:value>full</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
+                    </xh:tr>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-dropdown-select1-action"
+                    event="xforms-value-changed"
+                    observer="show-all-items-control">
+
+                    <xf:var name="name"      value="name(event('xxf:binding'))"/>
+                    <xf:var name="new-value" value="string(event('xxf:binding'))"/>
+                    <xf:insert
+                        context="instance()"
+                        if="xxf:non-blank($new-value)"
+                        origin="xf:attribute(concat('fr:', $name), $new-value)"/>
+                    <xf:delete
+                        if="xxf:is-blank($new-value)"
+                        ref="instance()/@*[local-name() = $name]"/>
+                </xf:action>
+            </control-details>
         </metadata>
 
         <xbl:implementation>

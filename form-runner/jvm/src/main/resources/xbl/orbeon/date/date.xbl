@@ -113,7 +113,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
                     </xh:tr>
                 </fr:grid>
                 <xf:action
-                     id="fb-editor-date-action"
+                    id="fb-editor-date-action"
                     event="xforms-value-changed"
                     observer="field-width-control">
 

@@ -14,16 +14,14 @@
 <xsl:stylesheet
     version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:xh="http://www.w3.org/1999/xhtml"
-    xmlns:xbl="http://www.w3.org/ns/xbl">
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <!-- Convert legacy fr:repeat to new fr:grid XBL with @repeat attribute -->
-    <xsl:template match="xh:body//fr:repeat | xxf:dialog//fr:repeat | xbl:binding/xbl:template//fr:repeat">
+    <!-- Convert legacy `fr:repeat` to `fr:grid` XBL with `@repeat` attribute -->
+    <!-- 2021-10-08: This itself is now the "old" format, as the new format uses `repeat="content"`. -->
+    <xsl:template match="fr:repeat" mode="within-controls within-dialogs">
         <fr:grid repeat="true">
-            <xsl:copy-of select="@* except (@appearance, @columns, @repeat)"/>
-            <xsl:copy-of select="node()"/>
+            <xsl:apply-templates select="@* except (@appearance, @columns, @repeat)" mode="#current"/>
+            <xsl:apply-templates select="node()" mode="#current"/>
         </fr:grid>
     </xsl:template>
 

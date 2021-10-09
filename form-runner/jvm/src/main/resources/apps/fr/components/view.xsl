@@ -328,7 +328,7 @@
                 <xsl:when test="not($use-view-appearance)">
                     <xf:group id="fr-view-component" class="fr-view-appearance-full">
 
-                        <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
+                        <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()" mode="within-controls"/>
 
                         <!-- Keep markup even in `view` mode for form caching. -->
                         <xxf:setvisited
@@ -374,7 +374,7 @@
                         -->
                         <xsl:attribute name="validation-mode" select="$validation-mode"/>
 
-                        <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
+                        <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()" mode="within-controls"/>
                         <!-- Optional inner buttons -->
                         <xsl:choose>
                             <xsl:when test="exists($custom-inner-buttons)">
@@ -758,7 +758,7 @@
 
     <xsl:template name="fr-dialogs">
         <!-- Copy custom dialogs under fr:dialogs only (other dialogs will be left in place) -->
-        <xsl:apply-templates select=".//fr:dialogs//xxf:dialog"/>
+        <xsl:apply-templates select=".//fr:dialogs//xxf:dialog" mode="within-dialogs"/>
 
         <!-- Misc standard dialogs -->
         <xi:include href="oxf:/apps/fr/includes/clear-dialog.xhtml"            xxi:omit-xml-base="true"/>

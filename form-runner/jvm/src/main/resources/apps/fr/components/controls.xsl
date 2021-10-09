@@ -13,25 +13,24 @@
     xmlns:array="http://www.w3.org/2005/xpath-functions/array">
 
 
-    <xsl:template match="
-            xh:body//xf:output[exists(xf:label) and empty(@appearance)] |
-            xbl:binding/xbl:template//xf:output[exists(xf:label) and empty(@appearance)]">
+    <xsl:template
+        match="xf:output[exists(xf:label) and empty(@appearance)]"
+        mode="within-controls">
         <xsl:copy>
             <xsl:for-each select="$calculated-value-appearance[. != 'full']"><!-- `full` is the default so don't bother adding the attribute in this case -->
                 <xsl:attribute name="appearance" select="."/>
             </xsl:for-each>
-            <xsl:apply-templates select="@* | node()"/>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 
     <!-- Add a default xf:alert for those fields which don't have one. Only do this within grids and dialogs. -->
     <!-- Q: Do we really need this? -->
     <xsl:template
-        match="
-            xh:body//fr:grid//xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]
-          | xh:body//xxf:dialog//xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]">
+        match="fr:grid//xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]"
+        mode="within-controls">
         <xsl:copy>
-            <xsl:apply-templates select="@* | node()"/>
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
         </xsl:copy>
     </xsl:template>
@@ -44,10 +43,11 @@
             xf:hint           [exists(fr:param)] |
             xf:alert          [exists(fr:param)] |
             fr:text           [exists(fr:param)] |
-            fr:iteration-label[exists(fr:param)]">
+            fr:iteration-label[exists(fr:param)]"
+        mode="within-controls">
 
         <xsl:copy>
-            <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="@*" mode="#current"/>
 
             <xsl:variable
                 name="expr"

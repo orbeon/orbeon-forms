@@ -818,6 +818,14 @@
          that happened, only simple bindings were supported. See https://github.com/orbeon/orbeon-forms/issues/2395 -->
     <xsl:template match="/xh:html/xh:head/xbl:xbl/xbl:binding[starts-with(@element, 'fr|')]"/>
 
+    <!-- Handle transformations of section template controls -->
+    <xsl:template match="/xh:html/xh:head/xbl:xbl/xbl:binding[p:has-class('fr-section-component')]/xbl:template">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="node()" mode="within-controls"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- MIP filtering -->
 
     <xsl:template

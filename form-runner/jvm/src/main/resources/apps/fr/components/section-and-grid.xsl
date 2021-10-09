@@ -22,12 +22,11 @@
 
     <xsl:variable name="starting-section-level" select="2"/>
 
-    <!-- NOTE: This won't be needed once XBL components properties can be inherited at the form level -->
     <!-- 2021-10-07: Not quite true, at least not for all cases. We could easily implement something like `keep-if-param-non-blank`.
          This needs to be done at the XBL processing level, since the components use XSLT to produce different content, at least
          with `collapsible`. So for example `keep-if-param-is` and `keep-if-param-is-not`. For `animate` this creates and attribute
          and we'd need some extra support. Other changes are probably not possible via parameters. -->
-    <xsl:template match="xh:body//fr:section | xbl:binding/xbl:template//fr:section">
+    <xsl:template match="fr:section" mode="within-controls">
 
         <xsl:param name="section-level" tunnel="yes" select="1"/>
 
@@ -75,8 +74,8 @@
                 <xsl:copy-of select="@page-size"/>
             </xsl:if>
 
-            <xsl:apply-templates select="@* except @page-size"/>
-            <xsl:apply-templates select="node()">
+            <xsl:apply-templates select="@* except @page-size" mode="#current"/>
+            <xsl:apply-templates select="node()" mode="#current">
                 <xsl:with-param name="section-level" select="$section-level + 1" tunnel="yes"/>
             </xsl:apply-templates>
 
@@ -84,18 +83,16 @@
     </xsl:template>
 
     <!-- For https://github.com/orbeon/orbeon-forms/issues/3011 -->
-    <xsl:template
-        match="xh:body//fr:section/*[frf:isSectionTemplateContent(.)] |
-               xbl:binding/xbl:template//fr:section/*[frf:isSectionTemplateContent(.)]">
+    <xsl:template match="fr:section/*[frf:isSectionTemplateContent(.)]" mode="within-controls">
         <xsl:param name="section-level" tunnel="yes"/><!-- must be nested within `fr:section` -->
         <xsl:copy>
-            <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="@*" mode="#current"/>
             <xsl:attribute name="base-level" select="$section-level - 1 + $starting-section-level - 1"/>
-            <xsl:apply-templates select="node()"/>
+            <xsl:apply-templates select="node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="xh:body//fr:grid[frf:isRepeat(.)] | xbl:binding/xbl:template//fr:grid[frf:isRepeat(.)]">
+    <xsl:template match="fr:grid[frf:isRepeat(.)]" mode="within-controls within-dialogs">
         <xsl:copy>
             <!-- Set repeat appearance if available and needed -->
             <xsl:if
@@ -113,8 +110,8 @@
                     $grid-insert != 'index'">
                 <xsl:attribute name="insert" select="$grid-insert"/>
             </xsl:if>
-            <xsl:apply-templates select="@*"/>
-            <xsl:apply-templates select="node()"/>
+            <xsl:apply-templates select="@*" mode="#current"/>
+            <xsl:apply-templates select="node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 

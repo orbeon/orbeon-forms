@@ -431,6 +431,13 @@
                 <item id="a4">A4</item>
                 <item id="legal">Legal</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label>Calculations in readonly modes (review, PDF)</label>
+                <hint/>
+                <item id="default">Use property</item>
+                <item id="false">Enable</item>
+                <item id="true">Disable</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label>Browser page layout</label>
                 <hint>Whether the form take a fixed or fluid width</hint>
@@ -1737,6 +1744,13 @@
                 <item id="a4">A4</item>
                 <item id="legal">Legal</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label>Valeurs calculées dans les modes en lecture seule (visualisation, PDF)</label>
+                <hint/>
+                <item id="default">Utiliser la propriété</item>
+                <item id="false">Activées</item>
+                <item id="true">Désactivées</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label>Mise en page dans le navigateur</label>
                 <hint>Montrer le formulaire en largeur fixe ou fluide dans le navigateur</hint>
@@ -3026,6 +3040,13 @@
                 <item id="a4" todo="true">[A4]</item>
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <hint/>
+                <item todo="true" id="default">Use property</item>
+                <item todo="true" id="false">Enable</item>
+                <item todo="true" id="true">Disable</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label todo="true">[Browser page layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
@@ -4343,6 +4364,13 @@
                 <item id="a4" todo="true">[A4]</item>
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <hint/>
+                <item todo="true" id="default">Use property</item>
+                <item todo="true" id="false">Enable</item>
+                <item todo="true" id="true">Disable</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label todo="true">[Browser page layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
@@ -5660,6 +5688,13 @@
                 <item id="a4" todo="true">[A4]</item>
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <hint/>
+                <item todo="true" id="default">Use property</item>
+                <item todo="true" id="false">Enable</item>
+                <item todo="true" id="true">Disable</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label todo="true">[Browser page layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
@@ -6969,6 +7004,13 @@
                 <item id="a4" todo="true">[A4]</item>
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <hint/>
+                <item todo="true" id="default">Use property</item>
+                <item todo="true" id="false">Enable</item>
+                <item todo="true" id="true">Disable</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label todo="true">[Browser page layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
@@ -8281,6 +8323,13 @@
                 <item id="a4" todo="true">[A4]</item>
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <hint/>
+                <item todo="true" id="default">Use property</item>
+                <item todo="true" id="false">Enable</item>
+                <item todo="true" id="true">Disable</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label todo="true">[Browser page layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
@@ -9590,6 +9639,13 @@
                 <item id="a4" todo="true">[A4]</item>
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <hint/>
+                <item todo="true" id="default">Use property</item>
+                <item todo="true" id="false">Enable</item>
+                <item todo="true" id="true">Disable</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label todo="true">[Browser page layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
@@ -10900,6 +10956,13 @@
                 <item id="a4" todo="true">[A4]</item>
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <hint/>
+                <item todo="true" id="default">Use property</item>
+                <item todo="true" id="false">Enable</item>
+                <item todo="true" id="true">Disable</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label todo="true">[Browser page layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
@@ -12189,6 +12252,13 @@
                 <item id="a4" todo="true">[A4]</item>
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <hint/>
+                <item todo="true" id="default">Use property</item>
+                <item todo="true" id="false">Enable</item>
+                <item todo="true" id="true">Disable</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label todo="true">[Browser page layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>
@@ -13505,6 +13575,13 @@
                 <item id="a4" todo="true">[A4]</item>
                 <item id="legal" todo="true">[Legal]</item>
             </rendered-page-size>
+            <readonly-disable-calculate>
+                <label todo="true">Calculations in readonly modes (review, PDF)</label>
+                <hint/>
+                <item todo="true" id="default">Use property</item>
+                <item todo="true" id="false">Enable</item>
+                <item todo="true" id="true">Disable</item>
+            </readonly-disable-calculate>
             <html-page-layout>
                 <label todo="true">[Browser page layout]</label>
                 <hint todo="true">[Whether the form take a fixed or fluid width]</hint>

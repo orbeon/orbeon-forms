@@ -401,6 +401,7 @@
                 <xf:property name="data-migration"                value="()"/>
                 <xf:property name="rendered-page-orientation"     value="()"/>
                 <xf:property name="rendered-page-size"            value="()"/>
+                <xf:property name="readonly-disable-calculate"    value="()"/>
                 <xf:property name="relevant"                      value="()"/>
                 <xf:property name="readonly"                      value="()"/>
                 <xf:property name="html-page-layout"              value="()"/>
@@ -436,6 +437,7 @@
                 <xf:property name="data-migration"                value="()"/>
                 <xf:property name="rendered-page-orientation"     value="()"/>
                 <xf:property name="rendered-page-size"            value="()"/>
+                <xf:property name="readonly-disable-calculate"    value="()"/>
                 <xf:property name="relevant"                      value="()"/>
                 <xf:property name="readonly"                      value="()"/>
                 <xf:property name="html-page-layout"              value="()"/>
@@ -453,23 +455,24 @@
             <xf:bind ref="xf:model[@id = 'fr-form-model']" id="fb-form-model-bind">
                 <!-- Form metadata (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-metadata']/*" id="metadata-bind">
-                    <xf:bind id="application-name-bind"          ref="application-name"/>
-                    <xf:bind id="form-name-bind"                 ref="form-name"/>
-                    <xf:bind id="title-bind"                     ref="title[@xml:lang = $fb-lang]"/>
-                    <xf:bind id="description-bind"               ref="description[@xml:lang = $fb-lang]"/>
-                    <xf:bind id="created-with-version-bind"      ref="created-with-version"/>
-                    <xf:bind id="singleton-bind"                 ref="singleton"/>
-                    <xf:bind id="wizard-bind"                    ref="wizard"/>
-                    <xf:bind id="wizard-mode-bind"               ref="wizard-mode"/>
-                    <xf:bind id="wizard-subsections-nav-bind"    ref="wizard-subsections-nav"/>
-                    <xf:bind id="wizard-subsections-toc-bind"    ref="wizard-subsections-toc"/>
-                    <xf:bind id="email-bind"                     ref="email"/>
-                    <xf:bind id="data-migration-bind"            ref="data-migration"/>
-                    <xf:bind id="rendered-page-orientation-bind" ref="rendered-page-orientation"/>
-                    <xf:bind id="rendered-page-size-bind"        ref="rendered-page-size"/>
-                    <xf:bind id="html-page-layout-bind"          ref="html-page-layout"/>
-                    <xf:bind id="xbl-bind"                       ref="xbl"/>
-                    <xf:bind id="library-versions-bind"          ref="library-versions">
+                    <xf:bind id="application-name-bind"           ref="application-name"/>
+                    <xf:bind id="form-name-bind"                  ref="form-name"/>
+                    <xf:bind id="title-bind"                      ref="title[@xml:lang = $fb-lang]"/>
+                    <xf:bind id="description-bind"                ref="description[@xml:lang = $fb-lang]"/>
+                    <xf:bind id="created-with-version-bind"       ref="created-with-version"/>
+                    <xf:bind id="singleton-bind"                  ref="singleton"/>
+                    <xf:bind id="wizard-bind"                     ref="wizard"/>
+                    <xf:bind id="wizard-mode-bind"                ref="wizard-mode"/>
+                    <xf:bind id="wizard-subsections-nav-bind"     ref="wizard-subsections-nav"/>
+                    <xf:bind id="wizard-subsections-toc-bind"     ref="wizard-subsections-toc"/>
+                    <xf:bind id="email-bind"                      ref="email"/>
+                    <xf:bind id="data-migration-bind"             ref="data-migration"/>
+                    <xf:bind id="rendered-page-orientation-bind"  ref="rendered-page-orientation"/>
+                    <xf:bind id="rendered-page-size-bind"         ref="rendered-page-size"/>
+                    <xf:bind id="html-page-layout-bind"           ref="html-page-layout"/>
+                    <xf:bind id="readonly-disable-calculate-bind" ref="readonly-disable-calculate"/>
+                    <xf:bind id="xbl-bind"                        ref="xbl"/>
+                    <xf:bind id="library-versions-bind"           ref="library-versions">
                         <xf:bind
                             ref="orbeon | app"
                             name="orbeon-or-app"

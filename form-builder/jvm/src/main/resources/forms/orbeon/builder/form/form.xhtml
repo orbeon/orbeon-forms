@@ -630,6 +630,14 @@
                                                 origin="xf:element($n, event($n))"/>
                                         </xf:action>
 
+                                        <xf:delete
+                                            bind="readonly-disable-calculate-bind"/>
+                                        <xf:insert
+                                            if="event('readonly-disable-calculate') = ('true', 'false')"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('readonly-disable-calculate', event('readonly-disable-calculate'))"/>
+
                                         <xf:action iterate="'relevant', 'readonly'" type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
                                             fbf:writeAndNormalizeCalculatedMip((), ., event(.))
                                         </xf:action>

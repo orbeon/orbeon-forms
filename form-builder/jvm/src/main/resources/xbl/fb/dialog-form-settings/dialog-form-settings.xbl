@@ -117,6 +117,10 @@
                 </xf:action>
 
                 <xf:setvalue
+                    ref="$i/readonly-disable-calculate"
+                    value="(event('readonly-disable-calculate')[. = ('true', 'false')], 'default')[1]"/>
+
+                <xf:setvalue
                     iterate="'relevant', 'readonly'"
                     ref="$i/*[name() = context()]"
                     value="event(context())"/>
@@ -315,6 +319,7 @@
                     <xf:property name="data-migration"                value="$i/data-migration/string()"/>
                     <xf:property name="rendered-page-orientation"     value="$i/rendered-page-orientation/string()"/>
                     <xf:property name="rendered-page-size"            value="$i/rendered-page-size/string()"/>
+                    <xf:property name="readonly-disable-calculate"    value="$i/readonly-disable-calculate/string()"/>
                     <xf:property name="relevant"                      value="$i/relevant/string()"/>
                     <xf:property name="readonly"                      value="$i/readonly/string()"/>
                     <xf:property name="html-page-layout"              value="$i/html-page-layout/string()"/>
@@ -380,6 +385,7 @@
                         <wizard-subsections-toc/>
                         <rendered-page-orientation/>
                         <rendered-page-size/>
+                        <readonly-disable-calculate/>
 <!--                        <relevant/>-->
                         <readonly/>
                         <html-page-layout/>
@@ -931,6 +937,18 @@
                             <fr:tab visible="$is-form-settings">
                                 <fr:label ref="$resources/dialog-control-settings/tab-formulas/label"/>
                                 <fr:grid>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="readonly-disable-calculate" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/readonly-disable-calculate/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/readonly-disable-calculate/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/readonly-disable-calculate/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="@id"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
                                     <xh:tr>
                                         <xh:td>
                                             <fb:boolean-or-formula ref="readonly" resources-ref="$resources">

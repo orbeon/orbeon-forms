@@ -61,6 +61,7 @@
                             <xf:property name="data-migration"                value="bind('data-migration-bind')"/>
                             <xf:property name="rendered-page-orientation"     value="bind('rendered-page-orientation-bind')"/>
                             <xf:property name="rendered-page-size"            value="bind('rendered-page-size-bind')"/>
+                            <xf:property name="readonly-disable-calculate"    value="bind('readonly-disable-calculate-bind')"/>
                             <xf:property name="relevant"                      value="fbf:readDenormalizedCalculatedMip((), 'relevant')"/>
                             <xf:property name="readonly"                      value="fbf:readDenormalizedCalculatedMip((), 'readonly')"/>
                             <xf:property name="html-page-layout"              value="bind('html-page-layout-bind')"/>

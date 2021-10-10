@@ -182,6 +182,8 @@
     <property as="xs:string"  name="oxf.fr.detail.rendered-page-orientation.*.*"                value="portrait"/>
     <property as="xs:string"  name="oxf.fr.detail.rendered-page-size.*.*"                       value="letter"/>
 
+    <property as="xs:boolean" name="oxf.fr.detail.readonly.disable-calculate.*.*"               value="false"/>
+
     <property as="xs:string" name="oxf.fr.email.pdf.filename.*.*">
         concat(
             fr:form-title(),

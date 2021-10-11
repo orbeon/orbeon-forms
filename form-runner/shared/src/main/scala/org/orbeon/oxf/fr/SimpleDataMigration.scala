@@ -266,7 +266,7 @@ object SimpleDataMigration {
           parents flatMap { parent =>
 
             val deleteOps =
-              parent / * filter (e => ! allBindNames(e.localname)) map { e =>
+              parent / * filter (e => e.namespaceURI == "" && ! allBindNames(e.localname)) map { e =>
                 DataMigrationOp.Delete(e)
               }
 

@@ -45,7 +45,7 @@
                        xxf:instance('fr-form-instance')/root(),
                        xxf:instance('fr-form-metadata')/root(),
                        instance('fr-send-submission-params')/@data-format-version,
-                       instance('fr-send-submission-params')/@prune-metadata = true()
+                       instance('fr-send-submission-params')/@prune-metadata = 'true'
                    )"
         replace="{instance('fr-send-submission-params')/@replace}"
         instance="fr-send-submission-response"

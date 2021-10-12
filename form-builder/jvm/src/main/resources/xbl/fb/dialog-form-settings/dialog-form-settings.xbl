@@ -145,7 +145,7 @@
                         value="''"/>
                 </xf:action>
 
-                <!-- Process fb:control-details -->
+                <!-- Process `fb:control-details` -->
 
                 <!-- Initialize specific control settings -->
                 <!-- NOTE: Part of this is duplicated in `dialog-control-settings.xbl`. -->
@@ -202,16 +202,30 @@
                             origin="$mutable-control-details/xf:model/*"/>
 
                         <xf:var
+                            name="control-metadata"
+                            value="$control-details/.."/>
+
+                        <xf:var
+                            name="xbl-binding"
+                            value="$control-metadata/.."/>
+
+                        <xf:var
                             name="view-template"
                             value="
                                 (
-                                    $control-details/../fb:templates/fb:view/*,
-                                    $control-details/../fb:template/*
+                                    $control-metadata/fb:templates/fb:view/*,
+                                    $control-metadata/fb:template/*
                                 )[1]"/>
+
+                        <!-- Don't use `node-name($view-template)` as we did before as we want a uniquely identifiable name. We
+                             remove the `appearance` attribute so we cannot use that. -->
+                        <xf:var
+                            name="direct-name"
+                            value="fbf:directNameFromBinding($xbl-binding)"/>
 
                         <xf:var
                             name="existing-params"
-                            value="(event('xbl')/*[node-name(.) = node-name($view-template)])[1]"/>
+                            value="(event('xbl')/*[name(.) = $direct-name])[1]"/>
 
                         <xf:insert
                             context="$inserted//xf:instance"
@@ -220,7 +234,7 @@
                                     $existing-params
                                 else
                                     xf:element(
-                                        node-name($view-template),
+                                        $direct-name,
                                         (: Also copy attributes that are always there on the view template :)
                                         $view-template/(@* except (@id, @appearance, @ref, @bind))
                                     )"/>

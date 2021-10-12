@@ -15,7 +15,9 @@ package org.orbeon.oxf.fb
 
 import io.circe.parser
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
+import org.orbeon.css.CSSSelectorParser
 import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
+import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
@@ -30,6 +32,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor
 import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
@@ -39,6 +42,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.compat._
 
@@ -454,6 +458,34 @@ object FormBuilderXPathApi {
       builtinDatatype,
       desiredAppearance
     )(FormBuilderDocContext()).to(Array)
+
+  //@XPathFunction
+  def directNameFromBinding(
+    bindingElem: NodeInfo
+  ): String = {
+
+    import org.orbeon.scaxon.SimplePath._
+
+    val selectors =
+      CSSSelectorParser.parseSelectors(bindingElem.attValue(XFormsNames.ELEMENT_QNAME))
+
+    val bindingNs = NamespaceMapping(bindingElem.namespaceMappings.toMap)
+
+    val directNameOpt =
+      selectors collectFirst BindingDescriptor.directBindingPF(bindingNs, None) flatMap (_.elementName)
+
+    // We wish we could just pass back a `QName` but we don't have the glue to do that. So we pass
+    // a qualified name, but this means we need to have a prefix which matches the in-scope namespaces.
+    val updatedDirectNameOpt =
+      for {
+        directName <- directNameOpt
+        uri        =  directName.namespace.uri
+        newPrefix  <- bindingNs.mapping collectFirst { case (p, `uri`) => p }
+      } yield
+        QName(directName.localName, newPrefix, uri).qualifiedName
+
+    updatedDirectNameOpt.orNull
+  }
 
   //@XPathFunction
   def isValidListOfMediatypeRanges(s: String): Boolean = {

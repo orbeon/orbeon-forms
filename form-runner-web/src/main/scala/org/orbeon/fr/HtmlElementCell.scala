@@ -33,7 +33,7 @@ object HtmlElementCell {
     def hasChildElement(u: Element)                   : Boolean            = u.children.nonEmpty
 
     def cellsForGrid   (u: Element)                   : List[html.Element] = u.querySelectorAll(".fr-grid-td").to(List).asInstanceOf[List[html.Element]]
-    def gridForCell    (u: Element)                   : Element            = u.closest(".fr-grid-body").get
+    def gridForCell    (u: Element)                   : Element            = u.closest(".xbl-fr-grid").get
 
     def maxGridWidth(u: Element): Int =
       if (u.firstElementChild.classList.contains("fr-grid-24")) 24 else 12

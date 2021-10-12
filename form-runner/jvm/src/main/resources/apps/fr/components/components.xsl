@@ -61,36 +61,59 @@
 
     <!-- MIP filtering -->
     <xsl:variable
+        name="disable-relevant-param-opt"
+        as="xs:boolean?"
+        select="
+            doc('input:request')/*/parameters/parameter[
+                name  = 'disable-relevant' and
+                value = ('true', 'false')
+            ]/value/xs:boolean(.)"/>
+
+    <xsl:variable
+        name="disable-default-param-opt"
+        as="xs:boolean?"
+        select="
+            doc('input:request')/*/parameters/parameter[
+                name  = 'disable-default' and
+                value = ('true', 'false')
+            ]/value/xs:boolean(.)"/>
+
+    <xsl:variable
         name="disable-calculate-in-readonly-modes"
         as="xs:boolean"
         select="
-            $fr-form-metadata/readonly-disable-calculate = 'true' or
-            p:property(string-join(('oxf.fr.detail.readonly.disable-calculate', $app, $form), '.')) = true()"/>
+            $fr-form-metadata/readonly-disable-calculate = 'true' or (
+                not($fr-form-metadata/readonly-disable-calculate = 'false') and
+                p:property(string-join(('oxf.fr.detail.readonly.disable-calculate', $app, $form), '.')) = true()
+            )"/>
 
     <xsl:variable
-        name="disable-calculate"
-        select="
-            (
-                $mode = ('view', 'pdf', 'test-pdf', 'email', 'controls') (: fr:is-readonly-mode() :) and
-                $disable-calculate-in-readonly-modes
-            ) or (
-                ($is-background or $mode = 'test-pdf') and
-                doc('input:request')/*/parameters/parameter[name = ('disable-calculations', 'disable-calculate')]/value = 'true'
-            )"
+        name="disable-relevant"
+        select="($is-background or $mode = 'test-pdf') and $disable-relevant-param-opt"
         as="xs:boolean"/>
 
     <xsl:variable
         name="disable-default"
-        select="
-            ($is-background or $mode = 'test-pdf') and
-            doc('input:request')/*/parameters/parameter[name = 'disable-default']/value = 'true'"
+        select="($is-background or $mode = 'test-pdf') and $disable-default-param-opt"
         as="xs:boolean"/>
 
     <xsl:variable
-        name="disable-relevant"
+        name="disable-calculate-param-opt"
+        as="xs:boolean?"
         select="
-            ($is-background or $mode = 'test-pdf') and
-             doc('input:request')/*/parameters/parameter[name = 'disable-relevant']/value = 'true'"
+            doc('input:request')/*/parameters/parameter[
+                name  = ('disable-calculations', 'disable-calculate') and
+                value = ('true', 'false')
+            ]/value/xs:boolean(.)"/>
+
+    <xsl:variable
+        name="disable-calculate"
+        select="
+            if (($is-background or $mode = 'test-pdf') and $disable-calculate-param-opt) then
+                $disable-calculate-param-opt
+            else
+                $mode = ('view', 'pdf', 'test-pdf', 'email', 'controls') (: fr:is-readonly-mode() :) and
+                $disable-calculate-in-readonly-modes"
         as="xs:boolean"/>
 
     <!-- Properties -->
@@ -818,7 +841,7 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xsl:choose>
-                <xsl:when test="$disable-calculate or $disable-relevant">
+                <xsl:when test="$disable-relevant or $disable-default or $disable-calculate">
                     <xsl:apply-templates select="node()" mode="filter-mips"/>
                 </xsl:when>
                 <xsl:otherwise>

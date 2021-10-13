@@ -841,15 +841,10 @@
             <xf:action
                 event="fb-test-pdf"
                 if="fr:mode() = 'test'"
-                type="javascript"
-                xmlns:saxon="http://saxon.sf.net/"
-                xmlns:XFormsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
-<!--                <xf:param-->
-<!--                    name="data"-->
-<!--                    value="XFormsUtils:encodeXmlFromNodeInfo(instance('fr-form-instance'))"/>-->
+                type="javascript">
                 <xf:param
                     name="data"
-                    value="string(saxon:string-to-base64Binary(xxf:serialize(instance('fr-form-instance'), 'xml'), 'UTF-8'))"/>
+                    value="frf:encodeFormDataToSubmit(instance('fr-form-instance'))"/>
                 <xf:body>
                     window.parent.ORBEON.xforms.Document.dispatchEvent(
                         {

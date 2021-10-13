@@ -30,3 +30,4 @@ object FormRunner
   with FormRunnerHome
   with FormRunnerPublish
   with FormRunnerResourcesOps
+  with FormRunnerEncodeDecode

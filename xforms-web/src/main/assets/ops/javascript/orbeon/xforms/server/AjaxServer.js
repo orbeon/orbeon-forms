@@ -1264,7 +1264,7 @@
                                             if (target == "_blank")
                                                 // Use target name that we can reuse, in case opening the window works
                                                 target = Math.random().toString().substring(2);
-                                            // Don't use "noopener" as we do need to close that window!
+                                            // Don't use "noopener" as we do need to use that window to test on it!
                                             var newWindow = window.open("about:blank", target);
                                             if (newWindow && newWindow.close) {
                                                 return false;

@@ -501,7 +501,7 @@ class PathMapXPathDependencies(
               "binding requires update",
               List(
                 "effective id" -> controlEffectiveId,
-                "XPath"        -> control.bindingAnalysis.get.xpathString
+                "XPath"        -> control.bindingAnalysis.map(_.xpathString).orNull // XPath can be missing in offline
               )
             )
 
@@ -558,7 +558,7 @@ class PathMapXPathDependencies(
               "value requires update",
               List(
                 "effective id" -> controlEffectiveId,
-                "XPath"        -> tempValueAnalysis.get.xpathString
+                "XPath"        -> tempValueAnalysis.map(_.xpathString).orNull // XPath can be missing in offline
               )
             )
 
@@ -719,7 +719,7 @@ class PathMapXPathDependencies(
             List(
               "prefixed id" -> bind.prefixedId,
               "MIP name"    -> mip.name,
-              "XPath"       -> valueAnalysis.get.xpathString
+              "XPath"       -> valueAnalysis.map(_.xpathString).orNull // XPath can be missing in offline
             )
           )
 

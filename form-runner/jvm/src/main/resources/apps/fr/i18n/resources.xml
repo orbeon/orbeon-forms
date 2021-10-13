@@ -524,7 +524,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Accueil</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Supprimer</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importer</import>
@@ -540,6 +540,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Envoyer</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Valider</validate>
+            <test-pdf>&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Envoyer</submit>
@@ -1023,7 +1024,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Inicio</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Ver</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Eliminar</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importar</import>
@@ -1039,6 +1040,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validar</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</submit>
@@ -1508,7 +1510,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Hjem</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Vis</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Slett</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importer</import>
@@ -1524,6 +1526,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Epost</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Validate]</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send inn</submit>
@@ -1992,7 +1995,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; На главную</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Проверить</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Удалить</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Импорт</import>
@@ -2008,6 +2011,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Отправить</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Validate]</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Отправить</submit>
@@ -2474,7 +2478,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Recensione</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Cancella</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importa</import>
@@ -2490,6 +2494,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Invia modulo</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Valida</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Presenta</submit>
@@ -2969,7 +2974,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Übersicht</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Löschen</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importieren</import>
@@ -2985,6 +2990,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Senden</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validieren</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Abschicken</submit>
@@ -3464,7 +3470,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Koti</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Käy läpi</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; Näytä PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Näytä PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Poista</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Tuo</import>
@@ -3480,6 +3486,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Lähetä</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Sähköposti</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Tarkista oikeellisuus</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Toimita</submit>
@@ -3959,7 +3966,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Start</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Granska</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Ta bort</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importera</import>
@@ -3975,6 +3982,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Skicka</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Mejla</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Godkänn</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Skicka</submit>
@@ -4454,7 +4462,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Start</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Review</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Verwijderen</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importeren</import>
@@ -4470,6 +4478,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Sturen</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; E-mail</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Valideren</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Indienen</submit>
@@ -4948,7 +4957,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Início</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Rever</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Apagar</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importar</import>
@@ -4964,6 +4973,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validar</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Submeter</submit>
@@ -5442,7 +5452,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Hjem</home>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Opsummering</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"&gt;&lt;/i&gt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove-sign"&gt;&lt;/i&gt; Slet</delete>
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importér</import>
@@ -5458,6 +5468,7 @@
             <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send</send>
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Validér]</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Send ind</submit>
@@ -5924,7 +5935,7 @@
 
             <home>&lt;i class="fa fa-fw fa-home"/&lt; Home</home>
             <review>&lt;i class="fa fa-fw fa-eye"/&lt; Przeglądaj</review>
-            <pdf>&lt;i class="fa fa-fw fa-print"/&lt; PDF</pdf>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"/&lt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"/&lt; TIFF</tiff>
             <delete>&lt;i class="fa fa-fw fa-remove"/&lt; Usuń</delete>
             <import>&lt;i class="fa fa-fw fa-upload"/&lt; Importuj</import>
@@ -5940,6 +5951,7 @@
             <send>&lt;i class="icon-arrow-right"/&lt; Wyślij</send>
             <email>&lt;i class="fa fa-fw fa-envelope"/&lt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"/&lt; Zweryfikuj</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
             <submit>&lt;i class="icon-arrow-right"/&lt; Złóż</submit>

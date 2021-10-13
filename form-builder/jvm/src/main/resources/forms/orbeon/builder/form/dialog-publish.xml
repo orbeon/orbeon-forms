@@ -346,7 +346,7 @@
             ref="published-attachments | published-version | existing-version | latest-version"
             type="xs:integer"/>
 
-        <xf:bind ref="selected-version" required="true()"/>
+        <xf:bind ref="selected-version" required="$versioning-supported"/>
 
         <xf:var name="app"                  value="instance()/app/string()"/>
         <xf:var name="form"                 value="instance()/form/string()"/>

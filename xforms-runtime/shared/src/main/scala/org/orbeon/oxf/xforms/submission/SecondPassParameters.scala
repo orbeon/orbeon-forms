@@ -45,7 +45,7 @@ object SecondPassParameters {
     implicit val refContext         = p.refContext
 
     // Maybe: See if we can resolve `xml:base` early to detect absolute URLs early as well.
-    // actionOrResource = XFormsUtils.resolveXMLBase(containingDocument, getSubmissionElement(), NetUtils.encodeHRRI(temp, true)).toString();
+    // `actionOrResource = resolveXMLBase(containingDocument, getSubmissionElement(), NetUtils.encodeHRRI(temp, true)).toString`
     val actionOrResource =
       stringAvtTrimmedOpt(staticSubmission.avtActionOrResource) match {
         case Some(resolved) =>

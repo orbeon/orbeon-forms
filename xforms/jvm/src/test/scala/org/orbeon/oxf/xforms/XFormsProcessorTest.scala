@@ -13,8 +13,12 @@
   */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.test.ProcessorTestBase
 import org.orbeon.oxf.xforms.state.XFormsStateManager
+import org.orbeon.oxf.xml.{EncodeDecode, TransformerUtils}
+
+import javax.xml.transform.TransformerException
 
 
 class XFormsProcessorTest
@@ -23,3 +27,19 @@ class XFormsProcessorTest
     XFormsStateManager.sessionCreated,
     XFormsStateManager.sessionDestroyed
   )
+
+object XFormsProcessorTest {
+  //@XPathFunction
+  def encodeW3CDomToStringForTests(node: org.w3c.dom.Node): String =
+    try
+      EncodeDecode.encodeXML(
+        TransformerUtils.domToDom4jDocument(node),
+        XFormsGlobalProperties.isGZIPState,
+        encrypt  = true,
+        location = false
+      )
+    catch {
+      case e: TransformerException =>
+        throw new OXFException(e)
+    }
+}

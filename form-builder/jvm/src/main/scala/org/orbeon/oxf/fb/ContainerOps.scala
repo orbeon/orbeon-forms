@@ -40,7 +40,7 @@ trait ContainerOps extends ControlOps {
 
   def findContainerById(containerId: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
     // Support effective id, to make it easier to use from XForms (i.e. no need to call
-    // XFormsUtils.getStaticIdFromId every time)
+    // `XFormsId.getStaticIdFromId` every time)
     val staticId = XFormsId.getStaticIdFromId(containerId)
     findInViewTryIndex(ctx.formDefinitionRootElem, staticId) filter IsContainer
   }

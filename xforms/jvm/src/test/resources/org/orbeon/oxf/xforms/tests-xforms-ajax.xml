@@ -410,8 +410,8 @@
                                     </xsl:variable>
                                     <xxf:property name="value">
                                         <xsl:value-of
-                                            xmlns:XFormsUtils="java:org.orbeon.oxf.xforms.XFormsUtils"
-                                            select="XFormsUtils:encodeXMLAsDOM($server-events)"/>
+                                            xmlns:XFormsProcessorTest="java:org.orbeon.oxf.xforms.XFormsProcessorTest"
+                                            select="XFormsProcessorTest:encodeW3CDomToStringForTests($server-events)"/>
                                     </xxf:property>
                                 </xxf:event>
                                 <xxf:event name="xxforms-value" source-control-id="input"><xxf:property name="value">4</xxf:property></xxf:event>
@@ -428,8 +428,8 @@
                                     </xsl:variable>
                                     <xxf:property name="value">
                                         <xsl:value-of
-                                            xmlns:XFormsUtils="java:org.orbeon.oxf.xforms.XFormsUtils"
-                                            select="XFormsUtils:encodeXMLAsDOM($server-events)"/>
+                                            xmlns:XFormsProcessorTest="java:org.orbeon.oxf.xforms.XFormsProcessorTest"
+                                            select="XFormsProcessorTest:encodeW3CDomToStringForTests($server-events)"/>
                                     </xxf:property>
                                 </xxf:event>
                                 <xxf:event name="xxforms-value" source-control-id="input"><xxf:property name="value">7</xxf:property></xxf:event>

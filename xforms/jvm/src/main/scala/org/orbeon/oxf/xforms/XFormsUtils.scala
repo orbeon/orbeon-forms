@@ -13,12 +13,10 @@
  */
 package org.orbeon.oxf.xforms
 
-import javax.xml.transform.TransformerException
-import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.XFormsCrossPlatformSupport
-import org.w3c.dom
+
+import javax.xml.transform.TransformerException
 
 
 object XFormsUtils {
@@ -27,7 +25,12 @@ object XFormsUtils {
   //@XPathFunction
   def encodeXMLAsDOM(node: org.w3c.dom.Node): String =
     try
-      EncodeDecode.encodeXML(TransformerUtils.domToDom4jDocument(node), XFormsGlobalProperties.isGZIPState, true, false)
+      EncodeDecode.encodeXML(
+        TransformerUtils.domToDom4jDocument(node),
+        XFormsGlobalProperties.isGZIPState,
+        encrypt  = true,
+        location = false
+      )
     catch {
       case e: TransformerException =>
         throw new OXFException(e)

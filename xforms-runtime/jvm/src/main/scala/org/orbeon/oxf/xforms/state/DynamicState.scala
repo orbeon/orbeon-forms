@@ -247,7 +247,7 @@ object DynamicState {
 
   // Create a DynamicState from an encoded string representation
   def apply(encoded: String): DynamicState = {
-    val bytes = EncodeDecode.decodeBytes(encoded, false)
+    val bytes = EncodeDecode.decodeBytes(encoded, forceEncryption = false)
     fromByteArray[DynamicState](bytes)
   }
 

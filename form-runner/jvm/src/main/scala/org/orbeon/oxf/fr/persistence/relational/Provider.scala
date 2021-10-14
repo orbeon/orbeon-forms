@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational
 import java.sql.{Connection, ResultSet}
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
+import org.orbeon.dom.saxon.DocumentWrapper
 
 import javax.xml.transform.stream.StreamSource
 import org.orbeon.io.IOUtils._
@@ -24,6 +25,8 @@ import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.oxf.util.CoreUtils._
+
+import java.io.StringReader
 
 
 sealed trait Provider extends EnumEntry with Lowercase
@@ -83,15 +86,28 @@ object Provider extends Enum[Provider] {
   def textEquals(provider: Provider, colName: String): String =
     s"$colName = ?"
 
-  def readXmlColumn(provider: Provider, resultSet: ResultSet): DocumentInfo = {
-    provider match {
-      case PostgreSQL =>
-        val xmlString = resultSet.getString("xml")
-        TransformerUtils.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, false)
-      case _ =>
-        val dataClob = resultSet.getClob("xml")
-        val source = new StreamSource(dataClob.getCharacterStream)
-        TransformerUtils.readTinyTree(XPath.GlobalConfiguration, source, false)
+  def readXmlColumn(
+    provider              : Provider,
+    resultSet             : ResultSet,
+    returnMutableDocument : Boolean = false
+  ): DocumentInfo = {
+
+    val xmlReader =
+      provider match {
+        case PostgreSQL =>
+          val xmlString = resultSet.getString("xml")
+          new StringReader(xmlString)
+        case _ =>
+          val dataClob = resultSet.getClob("xml")
+          dataClob.getCharacterStream
+      }
+
+    val source = new StreamSource(xmlReader)
+    if (returnMutableDocument) {
+      val xmlDom = TransformerUtils.readDom4j(source, false)
+      new DocumentWrapper(xmlDom, null, XPath.GlobalConfiguration)
+    } else {
+      TransformerUtils.readTinyTree(XPath.GlobalConfiguration, source, false)
     }
   }
 

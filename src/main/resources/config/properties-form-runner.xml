@@ -336,9 +336,14 @@
     <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                       value='expand-all'/>
 
     <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*">
-        if ("xxf:get-request-method() = 'GET'")
-        then navigate(uri = "/fr/{fr:app-name()}/{fr:form-name()}/edit/{fr:document-id()}")
-        else edit
+        if ("xxf:get-request-method() = 'GET'") then
+            navigate(
+                uri =
+                    "/fr/{fr:app-name()}/{fr:form-name()}/edit/{fr:document-id()}{
+                    if (xxf:get-request-parameter('draft') = 'true') then '?draft=true' else ''}"
+            )
+        else
+            edit
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.clear.*.*" >

@@ -28,7 +28,8 @@
         fb-test-form-show-dialog
         fb-test-formulas-show-dialog
         fb-test-offline-show-dialog
-        fb-test-pdf
+        fb-test-pdf-show-dialog
+        fb-test-pdf-with-data
         xxforms-rpc-request"
     xxf:xpath-analysis="false"
     xxf:expose-xpath-types="true"
@@ -675,7 +676,7 @@
         xxf:target="fb-test-iframe"
         xxf:show-progress="false"
     />
-    
+
     <!-- TODO: Reduce duplication with above submission if possible. -->
     <xf:submission
         id="fb-test-pdf-submission"
@@ -842,7 +843,7 @@
     </xf:action>
 
     <!-- Dispatched from the client -->
-    <xf:action event="fb-test-pdf">
+    <xf:action event="fb-test-pdf-with-data">
         <xf:send submission="fb-test-pdf-submission">
             <xf:property name="fr-form-data" value="event('fr-form-data')"/>
         </xf:send>

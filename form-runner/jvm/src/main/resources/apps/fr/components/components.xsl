@@ -577,7 +577,7 @@
                     (
                         @xxf:external-events,
                         if ($copy-custom-model) then doc($custom-model)/*/@xxf:external-events else (),
-                        'fb-test-pdf'
+                        'fb-test-pdf-prepare-data'
                     ),
                     ' '
                 )
@@ -847,7 +847,7 @@
 
             <!-- Helper for Form Builder test only -->
             <xf:action
-                event="fb-test-pdf"
+                event="fb-test-pdf-prepare-data"
                 if="fr:mode() = 'test'"
                 type="javascript">
                 <xf:param
@@ -857,7 +857,7 @@
                     window.parent.ORBEON.xforms.Document.dispatchEvent(
                         {
                             targetId:   'fr-form-model',
-                            eventName:  'fb-test-pdf',
+                            eventName:  'fb-test-pdf-with-data',
                             properties: { 'fr-form-data': data }
                         }
                     );

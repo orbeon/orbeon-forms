@@ -160,21 +160,21 @@
                                 <fr:attachment id="pdf-upload-control" bind="pdf-upload-bind" class="fr-attachment" >
                                     <xf:label ref="$resources/dialog-pdf/pdf-upload/label"/>
                                     <xf:hint ref="$resources/dialog-pdf/pdf-upload/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                 </fr:attachment>
                             </fr:c>
                             <fr:c x="7" y="1" w="3" h="1">
                                 <xf:input id="attachment-name-control" bind="attachment-name-bind">
                                     <xf:label ref="$resources/dialog-pdf/attachment-name/label"/>
                                     <xf:hint ref="$resources/dialog-pdf/attachment-name/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                 </xf:input>
                             </fr:c>
                             <fr:c x="10" y="1" w="3">
                                 <xf:select1 id="attachment-language-control" bind="attachment-language-bind"  appearance="dropdown">
                                     <xf:label ref="$resources/dialog-pdf/attachment-language/label"/>
                                     <xf:hint ref="$resources/dialog-pdf/attachment-language/hint"/>
-                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                     <xf:choices>
                                         <xf:label ref="$resources/dialog-add-language/common"/>
                                         <xf:itemset ref="xxf:sort($languages[@top = 'true'], @english-name, 'text', 'ascending')">

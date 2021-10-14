@@ -6486,10 +6486,10 @@
             <label>Anteprima del modulo</label>
         </dialog-test>
         <dialog-test-pdf>
-            <label todo="true">Test PDF Production</label>
-            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
-            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
-            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+            <label>Test della produzione PDF</label>
+            <disable-default>Disabilitare la valutazione delle formule “Valore iniziale”</disable-default>
+            <disable-calculate>Disabilitare la valutazione delle formule “Valore calcolato”</disable-calculate>
+            <disable-relevant>Mostrare i controlli, le griglie e le sezioni con visibilità dinamica</disable-relevant>
         </dialog-test-pdf>
         <dialog-pe>
             <label>Funzioni di Orbeon Forms PE</label>
@@ -7809,10 +7809,10 @@
             <label>Formularvorschau</label>
         </dialog-test>
         <dialog-test-pdf>
-            <label todo="true">Test PDF Production</label>
-            <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
-            <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
-            <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+            <label>Test der PDF-Erzeugung</label>
+            <disable-default>Auswertung der Formeln “Initialwert” deaktivieren</disable-default>
+            <disable-calculate>Auswertung der Formeln “Berechneter Wert” deaktivieren</disable-calculate>
+            <disable-relevant>Steuerelemente, Raster und Abschnitte mit dynamischer Sichtbarkeit anzeigen</disable-relevant>
         </dialog-test-pdf>
         <dialog-pe>
             <label>Eigenschaften der Orbeon Forms PE</label>

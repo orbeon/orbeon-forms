@@ -76,7 +76,7 @@ object ResourceManagerSupport {
     // Run processor registry so we can use XPL
     val registry = new XMLProcessorRegistry
     val processorsXML = "processors.xml"
-    val doc = ResourceManagerWrapper.instance.getContentAsDOM4J(processorsXML, ParserConfiguration.XIncludeOnly, true)
+    val doc = ResourceManagerWrapper.instance.getContentAsOrbeonDom(processorsXML, ParserConfiguration.XIncludeOnly, true)
     val config = PipelineUtils.createDOMGenerator(doc, processorsXML, DOMGenerator.ZeroValidity, processorsXML)
 
     PipelineUtils.connect(config, "data", registry, "config")

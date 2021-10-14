@@ -613,7 +613,7 @@ object StaticBindBuilder {
       // function can be used to retrieve them once that is fixed.
       // def elementCustomMIPs =
       //     for {
-      //         elem          <- Dom4j.elements(element).toList
+      //         elem          <- elements(element).toList
       //         if bindTree.isCustomMIP(elem.getQName)
       //         value         <- Option(elem.attributeValue(VALUE_QNAME))
       //         customMIPName = buildCustomMIPName(elem.getQualifiedName)

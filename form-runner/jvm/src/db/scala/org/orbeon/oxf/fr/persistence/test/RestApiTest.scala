@@ -392,7 +392,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       def filterResultBody(bytes: Array[Byte]) = {
 
-        val doc = IOSupport.readDom4j(new ByteArrayInputStream(bytes))
+        val doc = IOSupport.readOrbeonDom(new ByteArrayInputStream(bytes))
 
         for {
           formElem             <- doc.getRootElement.elements("form")

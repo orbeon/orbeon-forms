@@ -116,7 +116,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                             try {
 
                                 // Read XQuery into String
-                                final Document xqueryDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
+                                final Document xqueryDocument = readCacheInputAsOrbeonDom(pipelineContext, INPUT_CONFIG);
                                 String xqueryBody;
                                 if (XMLConstants.XS_STRING_QNAME().equals(Extensions.resolveAttValueQNameJava(xqueryDocument.getRootElement(), XMLConstants.XSI_TYPE_QNAME(), false))) {
                                     // Content is text under an XML root element

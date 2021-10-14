@@ -134,7 +134,7 @@ public class ImageServer extends ProcessorImpl {
             final ImageConfig imageConfig = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_IMAGE), new CacheableInputReader<ImageConfig>() {
                 public ImageConfig read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
-                    final Document imageConfigDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_IMAGE);
+                    final Document imageConfigDocument = readCacheInputAsOrbeonDom(pipelineContext, INPUT_IMAGE);
                     final ImageConfig result = new ImageConfig();
 
                     // Read URL

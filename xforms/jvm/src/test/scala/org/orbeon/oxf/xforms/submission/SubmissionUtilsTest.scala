@@ -25,7 +25,7 @@ class SubmissionUtilsTest extends AnyFunSpec {
     it("must serialize the basic case") {
 
       val doc: Document =
-        elemToDom4j(
+        elemToOrbeonDom(
           <PersonName title="Mr">
             <GivenName>René</GivenName>
           </PersonName>
@@ -37,7 +37,7 @@ class SubmissionUtilsTest extends AnyFunSpec {
     it("must serialize empty values") {
 
       val doc: Document =
-        elemToDom4j(
+        elemToOrbeonDom(
           <PersonName title="Mr">
             <GivenName>René</GivenName>
             <LastName/>
@@ -50,7 +50,7 @@ class SubmissionUtilsTest extends AnyFunSpec {
     it("must ignore non-leaf elements") {
 
       val doc: Document =
-        elemToDom4j(
+        elemToOrbeonDom(
           <PersonName title="Mr">
             <GivenName>René</GivenName>
             <LastName/>
@@ -64,7 +64,7 @@ class SubmissionUtilsTest extends AnyFunSpec {
     it("must encode line breaks") {
 
       val doc: Document =
-        elemToDom4j(
+        elemToOrbeonDom(
           <Comment>This will be
 a new line</Comment>
         )

@@ -38,7 +38,7 @@ trait BindingLoader extends Logging {
   def getPropertySet: PropertySet
   def lastModifiedByPath(path: String): Long
   def existsByPath(path: String): Boolean
-  def contentAsDOM4J(path: String): Document
+  def contentAsOrbeonDom(path: String): Document
 
   def findXblAssets(xbl: Set[QName]): (List[String], List[String]) = {
 
@@ -396,7 +396,7 @@ trait BindingLoader extends Logging {
       Transform.readDocumentOrSimplifiedStylesheet(
         Transform.InlineReadDocument(
           xblPath,
-          contentAsDOM4J(xblPath),
+          contentAsOrbeonDom(xblPath),
           lastModified
         )
       ).getRootElement,
@@ -445,8 +445,8 @@ object BindingLoader extends BindingLoader {
     rm.exists(path)
   }
 
-  def contentAsDOM4J(path: String): Document = {
+  def contentAsOrbeonDom(path: String): Document = {
     debug("reading content", List("path" -> path))
-    rm.getContentAsDOM4J(path, ParserConfiguration.XIncludeOnly, false)
+    rm.getContentAsOrbeonDom(path, ParserConfiguration.XIncludeOnly, false)
   }
 }

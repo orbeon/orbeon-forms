@@ -45,7 +45,7 @@ public class SignatureProcessor extends ProcessorImpl {
         final ProcessorOutput output = new ProcessorOutputImpl(SignatureProcessor.this, name) {
             public void readImpl(PipelineContext context, final XMLReceiver xmlReceiver) {
                 try {
-                    final Document privDoc = readCacheInputAsDOM4J(context, INPUT_PRIVATE_KEY);
+                    final Document privDoc = readCacheInputAsOrbeonDom(context, INPUT_PRIVATE_KEY);
                     final String privString = XPathUtils.selectStringValueNormalize(privDoc, "/private-key");
                     final byte[] privBytes = Base64.decode(privString);
                     final PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(privBytes);
@@ -59,7 +59,7 @@ public class SignatureProcessor extends ProcessorImpl {
                     xmlReceiver.startElement("", SIGNED_DATA_ELEMENT, SIGNED_DATA_ELEMENT, SAXUtils.EMPTY_ATTRIBUTES);
                     xmlReceiver.startElement("", DATA_ELEMENT, DATA_ELEMENT, SAXUtils.EMPTY_ATTRIBUTES);
 
-                    final Document data = readCacheInputAsDOM4J(context, INPUT_DATA);
+                    final Document data = readCacheInputAsOrbeonDom(context, INPUT_DATA);
                     final String dataStr = IOSupport.domToStringJava(data);
                     dsa.update(dataStr.getBytes(CharsetNames.Utf8()));
                     final String sig = Base64.encode(dsa.sign(), true);

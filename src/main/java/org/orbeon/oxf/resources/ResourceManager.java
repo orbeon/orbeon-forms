@@ -32,16 +32,16 @@ import java.io.InputStream;
 public interface ResourceManager {
 
     /**
-     * Gets a DOM4J document for the specified key. The key must point to an XML
+     * Gets an Orbeon DOM `Document` for the specified key. The key must point to an XML
      * document, or a OXFException is raised.
      *
      * @param key a Resource Manager key
      * @return  a document element
      */
-    org.orbeon.dom.Document getContentAsDOM4J(String key);
+    org.orbeon.dom.Document getContentAsOrbeonDom(String key);
 
     /**
-     * Gets a DOM4J document for the specified key. The key must point to an XML
+     * Gets an Orbeon DOM document for the specified key. The key must point to an XML
      * document, or a OXFException is raised.
      *
      *
@@ -49,7 +49,7 @@ public interface ResourceManager {
      * @param parserConfiguration   parser configuration
      * @param handleLexical         whether the XML parser must output SAX LexicalHandler events, including comments  @return  a document element
      */
-    org.orbeon.dom.Document getContentAsDOM4J(String key, ParserConfiguration parserConfiguration, boolean handleLexical);
+    org.orbeon.dom.Document getContentAsOrbeonDom(String key, ParserConfiguration parserConfiguration, boolean handleLexical);
 
     /**
      * Gets a document form the resource manager and send SAX events to the specified receiver. the key must point to an

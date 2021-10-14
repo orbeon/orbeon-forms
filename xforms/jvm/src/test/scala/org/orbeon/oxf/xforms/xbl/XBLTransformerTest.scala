@@ -48,12 +48,12 @@ class XBLTransformerTest extends AnyFunSpec with XMLSupport {
     for ((description, bound, shadow, expected) <- data)
       it(description) {
         assertXMLDocumentsIgnoreNamespacesInScope(
-          elemToDom4j(expected),
+          elemToOrbeonDom(expected),
           XBLTransformer.transform(
             partAnalysisCtx       = null, // just for tests, we assume it's not going to be used
             xblSupport            = None,
-            shadowTreeDocument    = elemToDom4j(shadow),
-            boundElement          = elemToDom4jElem(bound),
+            shadowTreeDocument    = elemToOrbeonDom(shadow),
+            boundElement          = elemToOrbeonDomElem(bound),
             abstractBindingOpt    = None,
             excludeNestedHandlers = false,
             excludeNestedLHHA     = false,

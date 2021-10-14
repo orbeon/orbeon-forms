@@ -49,10 +49,10 @@ public class ProcessorDefinition {
     }
 
     /**
-     * Add an input with the given name and dom4j Element.
+     * Add an input with the given name and Orbeon DOM Element.
      *
      * @param name    the name of the input, for example "config"
-     * @param element the dom4j Element containing the XML document connected to the input
+     * @param element the Orbeon DOM Element containing the XML document connected to the input
      */
     public void addInput(String name, Element element) {
         entries.put(name, element);
@@ -70,7 +70,7 @@ public class ProcessorDefinition {
 
     /**
      * Return the configured mappings for the processor inputs. Keys are of type String and refer to
-     * input names. Values are of type String (which must be valid URLs) or dom4j Element
+     * input names. Values are of type String (which must be valid URLs) or Orbeon DOM Element
      * (containing an XML document).
      *
      * @return Map of name -> String or Element processor inputs mappings

@@ -41,7 +41,7 @@ class RepeatedSectionsTest
         setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, numberRows = false, usePaging = false, "", "", "", "", applyDefaults = false, "")
 
         val expected =
-          elemToDom4j(
+          elemToOrbeonDom(
             <form>
               <my-section>
                 <my-section-iteration>
@@ -80,7 +80,7 @@ class RepeatedSectionsTest
         renameControlIfNeeded("my-section", "foo")
 
         val expected =
-          elemToDom4j(
+          elemToOrbeonDom(
             <form>
               <foo>
                 <foo-iteration>
@@ -118,7 +118,7 @@ class RepeatedSectionsTest
         renameControlIterationIfNeeded("my-section", "foo", None, Some("bar"))
 
         val expected =
-          elemToDom4j(
+          elemToOrbeonDom(
             <form>
               <my-section>
                 <bar>
@@ -208,7 +208,7 @@ class RepeatedSectionsTest
         moveSectionRight(findControlByName(doc, "other-section").get)
 
         val expected =
-          elemToDom4j(
+          elemToOrbeonDom(
             <form>
               <my-section>
                 <my-section-iteration>
@@ -246,7 +246,7 @@ class RepeatedSectionsTest
         setRepeatProperties("my-section", repeat = false, userCanAddRemove = true, numberRows = false, usePaging = false, "", "", "", "", applyDefaults = false, "")
 
         val expected =
-          elemToDom4j(
+          elemToOrbeonDom(
             <form>
               <my-section>
                 <grid-1>
@@ -291,7 +291,7 @@ class RepeatedSectionsTest
 
         // Expect 1 iteration of `my-grid`
         val expected =
-          elemToDom4j(
+          elemToOrbeonDom(
             <my-section-iteration>
               <grid-1>
                 <my-input/>
@@ -321,7 +321,7 @@ class RepeatedSectionsTest
 
         // Expect 2 iterations of `my-grid`
         val expected =
-          elemToDom4j(
+          elemToOrbeonDom(
             <my-section-iteration>
               <grid-1>
                 <my-input/>
@@ -362,7 +362,7 @@ class RepeatedSectionsTest
 
         // Expect new control in 2 iterations in the template
         val expected =
-          elemToDom4j(
+          elemToOrbeonDom(
             <my-section-iteration>
               <grid-1>
                 <my-input/>
@@ -397,7 +397,7 @@ class RepeatedSectionsTest
 
         // Expect 1 iteration of `my-grid`
         val expected =
-          elemToDom4j(
+          elemToOrbeonDom(
             <my-section-iteration>
               <grid-1>
                 <my-input/>

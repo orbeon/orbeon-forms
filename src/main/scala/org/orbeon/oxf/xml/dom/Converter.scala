@@ -20,6 +20,6 @@ import org.orbeon.dom
 object Converter {
 
   implicit class ScalaElemConverterOps(private val e: scala.xml.Elem) extends AnyVal {
-    def toDocument: dom.Document = IOSupport.readDom4j(e.toString)
+    def toDocument: dom.Document = IOSupport.readOrbeonDom(e.toString)
   }
 }

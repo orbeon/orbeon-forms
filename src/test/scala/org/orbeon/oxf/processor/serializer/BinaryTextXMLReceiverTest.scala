@@ -36,7 +36,7 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xsi:type="xs:base64Binary"/>.toDocument
 
-    TransformerUtils.writeDom4j(document, receiver)
+    TransformerUtils.writeOrbeonDom(document, receiver)
 
     assert("application/octet-stream" === response.contentType)
   }
@@ -52,7 +52,7 @@ class BinaryTextXMLReceiverTest extends ResourceManagerTestBase with AssertionsF
           xsi:type="xs:base64Binary"
           content-type={contentType}/>.toDocument
 
-      TransformerUtils.writeDom4j(document, receiver)
+      TransformerUtils.writeOrbeonDom(document, receiver)
 
       assert(contentType === response.contentType)
     }

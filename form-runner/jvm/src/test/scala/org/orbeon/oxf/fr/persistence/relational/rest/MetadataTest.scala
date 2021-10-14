@@ -45,6 +45,6 @@ class MetadataTest extends ResourceManagerTestBase with AssertionsForJUnit with 
         <available>false</available>
       </metadata>.toDocument
 
-    assertXMLDocumentsIgnoreNamespacesInScope(expected, metadataOpt map IOSupport.readDom4j get)
+    assertXMLDocumentsIgnoreNamespacesInScope(expected, metadataOpt map IOSupport.readOrbeonDom get)
   }
 }

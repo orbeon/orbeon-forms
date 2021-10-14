@@ -33,7 +33,7 @@ public class DeepThoughtProcessor extends SimpleProcessor {
 
     public void generateDouble(PipelineContext context, ContentHandler contentHandler) throws SAXException {
 
-        // Get number from input using DOM4J
+        // Get number from input using Orbeon DOM
         final Document numberDocument = readInputAsOrbeonDom(context, "number");
         final String numberString = numberDocument.getRootElement().getStringValue();
         final int number = Integer.parseInt(numberString);

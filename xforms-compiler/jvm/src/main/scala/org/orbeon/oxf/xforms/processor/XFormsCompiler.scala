@@ -22,7 +22,7 @@ class XFormsCompiler extends ProcessorImpl {
 
           implicit val rcv = xmlReceiver
 
-          val formDocument = readCacheInputAsDOM4J(pipelineContext, "data")
+          val formDocument = readCacheInputAsOrbeonDom(pipelineContext, "data")
           val (jsonString, _) = XFormsCompiler.compile(formDocument)
           XFormsCompiler.outputJson(jsonString)
         }

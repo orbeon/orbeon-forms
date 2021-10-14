@@ -147,7 +147,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                 // Write "foreign" object to new SAX store
                 resultStore = new SAXStore();
                 if (value instanceof Document) {
-                    // dom4j document
+                    // Orbeon DOM document
                     final LocationSAXWriter saxWriter = new LocationSAXWriter();
                     saxWriter.setContentHandler(resultStore);
                     saxWriter.setLexicalHandler(resultStore);

@@ -55,7 +55,7 @@ class StaticStateDocument(val xmlDocument: Document) {
   def getOrComputeDigest(digest: Option[String]): String =
     digest getOrElse {
       val digestContentHandler = new DigestContentHandler
-      TransformerUtils.writeDom4j(xmlDocument, digestContentHandler)
+      TransformerUtils.writeOrbeonDom(xmlDocument, digestContentHandler)
       NumberUtils.toHexString(digestContentHandler.getResult)
     }
 

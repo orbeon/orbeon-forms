@@ -25,7 +25,7 @@ public class ErrorProcessor extends ProcessorImpl {
     }
 
     public void start(PipelineContext context) {
-        Document config = readCacheInputAsDOM4J(context, INPUT_CONFIG);
+        Document config = readCacheInputAsOrbeonDom(context, INPUT_CONFIG);
         throw new ValidationException(config.getStringValue(),
                 (LocationData) config.getRootElement().getData());
     }

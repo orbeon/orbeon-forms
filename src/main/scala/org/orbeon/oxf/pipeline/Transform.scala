@@ -43,9 +43,9 @@ object Transform {
     rm.exists(path)
   }
 
-  def contentAsDOM4J(path: String)(implicit logger: IndentedLogger): Document = {
+  def contentAsOrbeonDom(path: String)(implicit logger: IndentedLogger): Document = {
     debug("reading content", List("path" -> path))
-    rm.getContentAsDOM4J(path, ParserConfiguration.XIncludeOnly, false)
+    rm.getContentAsOrbeonDom(path, ParserConfiguration.XIncludeOnly, false)
   }
 
   // Transform a document
@@ -88,7 +88,7 @@ object Transform {
   def createPipelineConfig(transformQName: QName, lastModified: Long): PipelineConfig = {
 
     val pipelineDoc =
-      NodeConversions.elemToDom4j(
+      NodeConversions.elemToOrbeonDom(
         <p:config
           xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -149,7 +149,7 @@ object Transform {
 
     def normalizeReadDocument(doc: ReadDocument)(implicit logger: IndentedLogger): InlineReadDocument =
       doc match {
-        case FileReadDocument(path) => InlineReadDocument(path, contentAsDOM4J(path), lastModifiedByPath(path))
+        case FileReadDocument(path) => InlineReadDocument(path, contentAsOrbeonDom(path), lastModifiedByPath(path))
         case d: InlineReadDocument  => d
       }
 
@@ -177,7 +177,7 @@ object Transform {
         new PipelineProcessor(createPipelineConfig(transformQName, normalizedTransform.lastModified))
 
       val nullDoc =
-        NodeConversions.elemToDom4j(
+        NodeConversions.elemToOrbeonDom(
           <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         )
 

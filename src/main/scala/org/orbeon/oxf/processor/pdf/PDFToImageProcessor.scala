@@ -20,7 +20,7 @@ import javax.imageio.{IIOImage, ImageIO, ImageTypeSpecifier, ImageWriteParam}
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.icepdf.core.pobjects.{Page, Document => ICEDocument}
 import org.icepdf.core.util.GraphicsRenderingHints
-import org.orbeon.dom.{Element => DOM4JElement}
+import org.orbeon.dom.{Element => OrbeonDomElem}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
@@ -72,10 +72,10 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
 
               val configElem = readInputAsOrbeonDom(pipelineContext, input).getRootElement
 
-              def elemValue(elem: DOM4JElement) =
+              def elemValue(elem: OrbeonDomElem) =
                 Option(elem) map (_.getStringValue) flatMap trimAllToOpt
 
-              def floatValue(elem: DOM4JElement) =
+              def floatValue(elem: OrbeonDomElem) =
                 elemValue(elem) map (_.toFloat)
 
               val scale  = floatValue(configElem.element("scale")) getOrElse 1f

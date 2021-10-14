@@ -49,7 +49,7 @@ class ResourcesPatcher extends SimpleProcessor  {
 
     // Transform and write out the document
     ResourcesPatcher.transform(resourcesDocument, appForm, langs)(Properties.instance.getPropertySet)
-    TransformerUtils.writeDom4j(resourcesDocument, xmlReceiver)
+    TransformerUtils.writeOrbeonDom(resourcesDocument, xmlReceiver)
   }
 }
 

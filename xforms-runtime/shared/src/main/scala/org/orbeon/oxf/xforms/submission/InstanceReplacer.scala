@@ -107,7 +107,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
               Converter.jsonStringToXmlStream(SubmissionUtils.readTextContent(connectionResult.content).get, receiver)
               receiver.getDocument
             } else {
-              XFormsCrossPlatformSupport.readDom4j(is, connectionResult.url, isHandleXInclude, handleLexical = true)
+              XFormsCrossPlatformSupport.readOrbeonDom(is, connectionResult.url, isHandleXInclude, handleLexical = true)
             }
           )
         } else {

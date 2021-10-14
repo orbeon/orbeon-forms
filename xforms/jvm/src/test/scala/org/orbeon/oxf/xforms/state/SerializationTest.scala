@@ -58,10 +58,10 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
   @Test def saxStore(): Unit = {
 
     // Serialize then deserialize
-    val saxStore = TransformerUtils.dom4jToSAXStore(simpleDoc, false)
+    val saxStore = TransformerUtils.orbeonDomToSAXStore(simpleDoc, false)
     val serializedBytes = toByteSeq(saxStore)
     val deserializedSAXStore = fromByteSeq[SAXStore](serializedBytes)
-    val deserializedDoc = TransformerUtils.saxStoreToDom4jDocument(deserializedSAXStore)
+    val deserializedDoc = TransformerUtils.saxStoreToOrbeonDomDocument(deserializedSAXStore)
 
     // Compare
     assertXMLDocumentsIgnoreNamespacesInScope(simpleDoc, deserializedDoc)
@@ -71,7 +71,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
     // Transform to SAXStore while collecting marks
     val saxStore = new SAXStore
-    TransformerUtils.writeDom4j(simpleDoc, new ForwardingXMLReceiver(saxStore) {
+    TransformerUtils.writeOrbeonDom(simpleDoc, new ForwardingXMLReceiver(saxStore) {
       override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
         // Mark all elements with an id
         Option(attributes.getValue("id")) foreach
@@ -100,7 +100,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
     // All actual documents
     val actualDocs =
       deserializedSAXStore.getMarks.asScala map
-        TransformerUtils.saxStoreMarkToDom4jDocument
+        TransformerUtils.saxStoreMarkToOrbeonDomDocument
 
     // Compare all
     assert(actualDocs.size === expectedDocs.size)

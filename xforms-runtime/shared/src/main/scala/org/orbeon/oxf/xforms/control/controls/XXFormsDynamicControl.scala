@@ -405,7 +405,7 @@ object XXFormsDynamicControl {
   def findXBLChange(partAnalysis: PartAnalysis, node: om.NodeInfo): Option[(String, Element)] = {
 
     if (node.getNodeKind == SaxonUtils.NamespaceType)
-      None // can't find ancestors of namespace nodes with dom4j
+      None // can't find ancestors of namespace nodes with Orbeon DOM
     else {
 
       val isNodeLHHA =

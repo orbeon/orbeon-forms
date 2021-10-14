@@ -98,7 +98,7 @@ public class TraxTransformer extends ProcessorImpl {
 
                         // Create template handler
                         if (transformerFactory == null) {
-                            final Node config = readCacheInputAsDOM4J(context, INPUT_TRANSFORMER_CONFIG);
+                            final Node config = readCacheInputAsOrbeonDom(context, INPUT_TRANSFORMER_CONFIG);
                             final String transformerClass = XPathUtils.selectStringValueNormalize(config, "/config/class");
                             transformerFactory = TransformerUtils.getFactory(transformerClass);
                         }

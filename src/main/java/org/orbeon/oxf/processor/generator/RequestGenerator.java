@@ -207,7 +207,7 @@ public class RequestGenerator extends ProcessorImpl {
                 final State state = (State) digestState;
                 if (state.requestDocument == null) {
                     // Read config document
-                    final Document config = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
+                    final Document config = readCacheInputAsOrbeonDom(pipelineContext, INPUT_CONFIG);
 
                     // Try to find stream-type attribute
                     final QName streamTypeQName = Extensions.resolveAttValueQNameJava(config.getRootElement(), "stream-type");
@@ -217,7 +217,7 @@ public class RequestGenerator extends ProcessorImpl {
                     state.isSessionScope = "session".equals(config.getRootElement().attributeValue("stream-scope"));
 
                     // Read and store request
-                    state.requestDocument = readRequestAsDOM4J(pipelineContext, config);
+                    state.requestDocument = readRequestAsOrbeonDom(pipelineContext, config);
 
                     // Check if the body was requested
                     state.bodyRequested = XPathUtils.selectSingleNode(state.requestDocument, "/*/body") != null;
@@ -321,11 +321,11 @@ public class RequestGenerator extends ProcessorImpl {
         return uriExpiringWithRequest;
     }
 
-    private Document readRequestAsDOM4J(PipelineContext pipelineContext, Node config) {
+    private Document readRequestAsOrbeonDom(PipelineContext pipelineContext, Node config) {
         // Get complete request document from pipeline context, or create it if not there
         final Context context = getContext(pipelineContext);
         if (context.wholeRequest == null)
-            context.wholeRequest = readWholeRequestAsDOM4J(getRequest(pipelineContext), context);
+            context.wholeRequest = readWholeRequestAsOrbeonDom(getRequest(pipelineContext), context);
         final Document result = (Document) context.wholeRequest.deepCopy();
 
         // Filter the request based on the config input
@@ -339,7 +339,7 @@ public class RequestGenerator extends ProcessorImpl {
             element.addElement(elementName).addText(text);
     }
 
-    public static Document readWholeRequestAsDOM4J(final ExternalContext.Request request, final Context context) {
+    public static Document readWholeRequestAsOrbeonDom(final ExternalContext.Request request, final Context context) {
 
         final Document document = Document.apply();
         final Element requestElement = document.addElement("request");

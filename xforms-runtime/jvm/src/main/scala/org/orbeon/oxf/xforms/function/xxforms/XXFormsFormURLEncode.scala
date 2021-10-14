@@ -27,7 +27,7 @@ class XXFormsFormURLEncode extends FunctionSupport {
 
     itemArgument(0) match {
       case node: NodeInfo =>
-        val document = TransformerUtils.tinyTreeToDom4j(node)
+        val document = TransformerUtils.tinyTreeToOrbeonDom(node)
         SubmissionUtils.createWwwFormUrlEncoded(document, "&")
       case _ =>
         null

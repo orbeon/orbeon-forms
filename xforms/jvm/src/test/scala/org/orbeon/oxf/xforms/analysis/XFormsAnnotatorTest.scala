@@ -33,7 +33,7 @@ class XFormsAnnotatorTest
      with ResourceManagerSupport
      with AnyFunSpecLike {
 
-  private val xmlDoc = elemToDom4j(
+  private val xmlDoc = elemToOrbeonDom(
     <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
@@ -99,7 +99,7 @@ class XFormsAnnotatorTest
 
     val metadata = Metadata.apply(new IdGenerator(1), isTopLevelPart = true)
 
-    TransformerUtils.writeDom4j(xmlDoc, new XFormsAnnotator(metadata))
+    TransformerUtils.writeOrbeonDom(xmlDoc, new XFormsAnnotator(metadata))
 
     it("provides namespace information for elements") {
 

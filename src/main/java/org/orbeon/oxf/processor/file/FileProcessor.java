@@ -58,7 +58,7 @@ public class FileProcessor extends ProcessorImpl {
     public void start(PipelineContext context) {
         try {
             // Read config
-            final Document config = readCacheInputAsDOM4J(context, INPUT_CONFIG);
+            final Document config = readCacheInputAsOrbeonDom(context, INPUT_CONFIG);
 
             for (Iterator i = XPathUtils.selectNodeIterator(config, "/*/*"); i.hasNext();) {
                 final Element currentElement = (Element) i.next();

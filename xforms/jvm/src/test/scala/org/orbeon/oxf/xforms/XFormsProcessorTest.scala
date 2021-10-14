@@ -33,7 +33,7 @@ object XFormsProcessorTest {
   def encodeW3CDomToStringForTests(node: org.w3c.dom.Node): String =
     try
       EncodeDecode.encodeXML(
-        TransformerUtils.domToDom4jDocument(node),
+        TransformerUtils.domToOrbeonDomDocument(node),
         XFormsGlobalProperties.isGZIPState,
         encrypt  = true,
         location = false

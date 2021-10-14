@@ -32,7 +32,7 @@ public class SessionSerializer extends ProcessorImpl {
             ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
             SAXStore store = new SAXStore();
-            Document document = readCacheInputAsDOM4J(context, INPUT_DATA);
+            Document document = readCacheInputAsOrbeonDom(context, INPUT_DATA);
             Element value = document.getRootElement();
             if (value == null)
                 throw new OXFException("Session serializer input data is null");

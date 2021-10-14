@@ -39,8 +39,8 @@ object LockInfo {
         </d:owner>
     </d:lockinfo>
 
-  def toDom4j(lockInfo: LockInfo): Document =
-    NodeConversions.elemToDom4j(elem(lockInfo))
+  def toOrbeonDom(lockInfo: LockInfo): Document =
+    NodeConversions.elemToOrbeonDom(elem(lockInfo))
 
   def serialize(lockInfo: LockInfo, outputStream: OutputStream): Unit = {
     val el     = elem(lockInfo)

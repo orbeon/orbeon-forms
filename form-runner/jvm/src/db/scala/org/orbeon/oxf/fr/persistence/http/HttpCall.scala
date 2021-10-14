@@ -108,7 +108,7 @@ private[persistence] object HttpCall {
         }
         expectedBody match {
           case HttpCall.XML(expectedDoc) =>
-            val resultDoc  = IOSupport.readDom4j(new ByteArrayInputStream(actualBody))
+            val resultDoc  = IOSupport.readOrbeonDom(new ByteArrayInputStream(actualBody))
             if (! Comparator.compareDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc))
               assert(
                 resultDoc.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
@@ -282,7 +282,7 @@ private[persistence] object HttpCall {
       externalContext          : ExternalContext,
       coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
     ): Int = {
-      val body = Some(XML(LockInfo.toDom4j(lockInfo)))
+      val body = Some(XML(LockInfo.toOrbeonDom(lockInfo)))
       useAndClose(request(url, method, Version.Unspecified, None, body, None, timeout))(_.httpResponse.statusCode)
     }
   }

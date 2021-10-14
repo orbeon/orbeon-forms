@@ -106,11 +106,11 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public Document readAsDom4j(String urlString, BasicCredentials credentials) {
+    public Document readAsOrbeonDom(String urlString, BasicCredentials credentials) {
         try {
             final SAXSource source = (SAXSource) resolve(urlString, null, credentials);
             // XInclude handled by source if needed
-            return TransformerUtils.readDom4j(source, false);
+            return TransformerUtils.readOrbeonDom(source, false);
         } catch (Exception e) {
             throw OrbeonLocationException.wrapException(e, BasicLocationData.apply(urlString, -1, -1));
         }

@@ -39,14 +39,14 @@ class DOMSerializer extends ProcessorImpl {
 
   override def start(pipelineContext: PipelineContext): Unit = {
     // Q: should use Context instead?
-    pipelineContext.setAttribute(this, readCacheInputAsDOM4J(pipelineContext, INPUT_DATA))
+    pipelineContext.setAttribute(this, readCacheInputAsOrbeonDom(pipelineContext, INPUT_DATA))
   }
 
   def runGetW3CDocument(pipelineContext: PipelineContext): W3CDocument =
     readCacheInputAsDOM(pipelineContext, INPUT_DATA)
 
   def runGetDocument(pipelineContext: PipelineContext): Document =
-    readCacheInputAsDOM4J(pipelineContext, INPUT_DATA)
+    readCacheInputAsOrbeonDom(pipelineContext, INPUT_DATA)
 
   def runGetTinyTree(pipelineContext: PipelineContext): DocumentInfo =
     readCacheInputAsTinyTree(pipelineContext, XPath.GlobalConfiguration, INPUT_DATA)

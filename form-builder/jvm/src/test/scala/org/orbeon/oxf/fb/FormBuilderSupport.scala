@@ -49,10 +49,10 @@ trait FormBuilderSupport extends XFormsSupport {
     }
 
   def prettyPrintElem(elem: NodeInfo): Unit =
-    println(TransformerUtils.tinyTreeToDom4j(elem).getRootElement.serializeToString(XMLWriter.PrettyFormat))
+    println(TransformerUtils.tinyTreeToOrbeonDom(elem).getRootElement.serializeToString(XMLWriter.PrettyFormat))
 
   private def formBuilderDoc(url: String): Document =
-    NodeConversions.elemToDom4j(
+    NodeConversions.elemToOrbeonDom(
       <xh:html
         xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xf="http://www.w3.org/2002/xforms"

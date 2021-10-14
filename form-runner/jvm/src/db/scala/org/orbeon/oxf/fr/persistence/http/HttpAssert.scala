@@ -69,7 +69,7 @@ private[persistence] object HttpAssert extends XMLSupport {
         // Check body
         body match {
           case HttpCall.XML(expectedDoc) =>
-            val resultDoc = IOSupport.readDom4j(new ByteArrayInputStream(resultBody.get))
+            val resultDoc = IOSupport.readOrbeonDom(new ByteArrayInputStream(resultBody.get))
             assertXMLDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc)
           case HttpCall.Binary(expectedFile) =>
             assert(resultBody.get == expectedFile)

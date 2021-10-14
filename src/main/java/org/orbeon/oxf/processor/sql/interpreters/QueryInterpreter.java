@@ -424,7 +424,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                     if (value instanceof Element) {
                                                         // We have a Document - convert it to DOM
 
-                                                        // TEMP HACK: We can't seem to be able to convert directly from dom4j to regular DOM (NAMESPACE_ERR from Xerces)
+                                                        // TEMP HACK: We can't seem to be able to convert directly from Orbeon DOM to W3C DOM (NAMESPACE_ERR from Xerces)
 
 //                                                            DOMResult domResult = new DOMResult();
 //                                                            TransformerUtils.getIdentityTransformer().transform(new DocumentSource(xmlFragmentDocument), domResult);xxx

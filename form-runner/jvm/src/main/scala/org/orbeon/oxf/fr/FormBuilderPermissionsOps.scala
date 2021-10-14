@@ -41,7 +41,7 @@ trait FormBuilderPermissionsOps {
     val resourceManager = ResourceManagerWrapper.instance
 
     supportedPaths collectFirst
-      {case key if resourceManager.exists(key) => resourceManager.getContentAsDOM4J(key)} map
+      {case key if resourceManager.exists(key) => resourceManager.getContentAsOrbeonDom(key)} map
       (new DocumentWrapper(_, null, XPath.GlobalConfiguration))
   }
 

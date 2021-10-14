@@ -112,7 +112,7 @@ public class XPathProcessor extends ProcessorImpl {
                     ? (Element) result
                     : ((Document) result).getRootElement();
             final String systemId = ProcessorSupport.makeSystemId(element);
-            // TODO: Should probably use Dom4jUtils.createDocumentCopyParentNamespaces() or equivalent to handle namespaces better
+            // TODO: Should probably use createDocumentCopyParentNamespaces() or equivalent to handle namespaces better
             // -> could maybe simply get the list of namespaces in scope on both sides, and output start/endPrefixMapping()
             final DOMGenerator domGenerator = new DOMGenerator
                     (element, "xpath result doc", DOMGenerator.ZeroValidity, systemId);

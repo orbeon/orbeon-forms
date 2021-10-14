@@ -55,13 +55,13 @@ public abstract class ResourceManagerBase implements ResourceManager {
         lastModifiedMap = new ExpirationMap(minReloadInterval);
     }
 
-    public org.orbeon.dom.Document getContentAsDOM4J(String key) {
+    public org.orbeon.dom.Document getContentAsOrbeonDom(String key) {
         final LocationSAXContentHandler lch = new LocationSAXContentHandler();
         getContentAsSAX(key, lch);
         return lch.getDocument();
     }
 
-    public org.orbeon.dom.Document getContentAsDOM4J(String key, ParserConfiguration parserConfiguration, boolean handleLexical) {
+    public org.orbeon.dom.Document getContentAsOrbeonDom(String key, ParserConfiguration parserConfiguration, boolean handleLexical) {
         final LocationSAXContentHandler lch = new LocationSAXContentHandler();
         getContentAsSAX(key, lch, parserConfiguration, handleLexical);
         return lch.getDocument();

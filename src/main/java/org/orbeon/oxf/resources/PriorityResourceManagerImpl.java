@@ -81,18 +81,18 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         }
     }
 
-    public Document getContentAsDOM4J(final String key) {
+    public Document getContentAsOrbeonDom(final String key) {
         return (Document) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                return resourceManager.getContentAsDOM4J(key);
+                return resourceManager.getContentAsOrbeonDom(key);
             }
         });
     }
 
-    public Document getContentAsDOM4J(final String key, final ParserConfiguration parserConfiguration, final boolean handleLexical) {
+    public Document getContentAsOrbeonDom(final String key, final ParserConfiguration parserConfiguration, final boolean handleLexical) {
         return (Document) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                return resourceManager.getContentAsDOM4J(key, parserConfiguration, handleLexical);
+                return resourceManager.getContentAsOrbeonDom(key, parserConfiguration, handleLexical);
             }
         });
     }

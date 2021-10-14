@@ -19,7 +19,7 @@ import org.orbeon.dom.io.SAXWriter
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.saxon.tree.util.DocumentNumberAllocator
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
+import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReceiver}
 import org.orbeon.saxon.expr.{XPathContext, parser}
 import org.orbeon.saxon.expr.parser.OptimizerOptions

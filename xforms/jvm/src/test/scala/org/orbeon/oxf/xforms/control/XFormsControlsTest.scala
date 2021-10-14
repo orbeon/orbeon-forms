@@ -116,7 +116,7 @@ class XFormsControlsTest
 //    @Test
 //    public void testOutputControlRewrite() {
 //
-//        final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
+//        final Document document = readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
 //        final DocumentWrapper documentWrapper = new DocumentWrapper(document, null, new Configuration());
 //        final Element outputElement = (Element) ((NodeWrapper) XPathCache.evaluateSingle(new PipelineContext(), documentWrapper, "(//xh:body//xf:output)[1]", BasicNamespaceMapping.Mapping, null, null, null, null, null)).getUnderlyingNode();
 //

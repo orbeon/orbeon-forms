@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms
 
 import java.{lang => jl}
-
 import cats.syntax.option._
+
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.Document
 import org.orbeon.io.StringBuilderWriter
@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.{IndentedLogger, NumberUtils, WhitespaceMatching}
 import org.orbeon.oxf.xforms.analysis.{IdGenerator, Metadata, XFormsAnnotator, XFormsExtractor}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
+import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.xforms.XXBLScope
 
 

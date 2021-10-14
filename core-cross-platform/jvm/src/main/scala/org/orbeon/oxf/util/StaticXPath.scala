@@ -14,7 +14,6 @@
 package org.orbeon.oxf.util
 
 import java.{lang => jl}
-
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.{OutputKeys, Result, Source}
 import org.orbeon.datatypes.LocationData
@@ -22,7 +21,7 @@ import org.orbeon.dom
 import org.orbeon.dom.io.SAXWriter
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
+import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, ShareableXPathStaticContext, XMLReceiver}
 import org.orbeon.saxon.`type`.{BuiltInAtomicType, ItemType, Type}
 import org.orbeon.saxon.event.{ComplexContentOutputter, NamespaceReducer, Sender}

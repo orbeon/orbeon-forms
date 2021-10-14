@@ -553,7 +553,7 @@ object XFormsStaticStateDeserializer {
                         credentials           = credentials,
                         excludeResultPrefixes = excludeResultPrefixes,
                         inlineRootElemOpt     = inlineRootElemOpt,
-//                        inlineRootElemOpt     = inlineRootElemStringOpt.map(s => XFormsCrossPlatformSupport.readDom4j(s).getRootElement),
+//                        inlineRootElemOpt     = inlineRootElemStringOpt.map(s => XFormsCrossPlatformSupport.readOrbeonDom(s).getRootElement),
                         useInlineContent      = useInlineContent,
                         useExternalContent    = useExternalContent,
                         instanceSource        = instanceSource,

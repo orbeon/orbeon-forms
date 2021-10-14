@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
+import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XXBLScope
 import org.orbeon.xforms.xbl.Scope
@@ -131,7 +131,7 @@ object XBLBindingBuilder {
       val baseURI = boundElement map (_.resolveXMLBase(None, ".").toString) getOrElse "."
       val fullAnnotatedTree = annotateShadowTree(partAnalysisCtx.metadata, rawTree, containerScope.fullPrefix)
 
-      TransformerUtils.writeDom4j(
+      TransformerUtils.writeOrbeonDom(
         fullAnnotatedTree,
         new ScopeExtractor(partAnalysisCtx, None, innerScope, outerScope, startScope, containerScope.fullPrefix, baseURI)
       )
@@ -152,7 +152,7 @@ object XBLBindingBuilder {
     identity.setResult(documentResult)
 
     // FIXME: This adds `xml:base` on root element.
-    TransformerUtils.writeDom4j(shadowTree, new XFormsAnnotator(identity, null, metadata, false) {
+    TransformerUtils.writeOrbeonDom(shadowTree, new XFormsAnnotator(identity, null, metadata, false) {
       // Use prefixed id for marks and namespaces to avoid clashes between top-level controls and shadow trees
       protected override def rewriteId(id: String): String = prefix + id
     })
@@ -278,7 +278,7 @@ object XBLBindingBuilder {
         val extractorDocument = new LocationDocumentResult
         extractorOutput.setResult(extractorDocument)
 
-        TransformerUtils.writeDom4j(rawTree,
+        TransformerUtils.writeOrbeonDom(rawTree,
           new WhitespaceXMLReceiver(
             new XFormsAnnotator(
               templateOutput,
@@ -314,7 +314,7 @@ object XBLBindingBuilder {
 
       if (logShadowTrees)
         debugResults(Seq(
-          "full tree"    -> TransformerUtils.saxStoreToDom4jDocument(templateTree).getRootElement.serializeToString(),
+          "full tree"    -> TransformerUtils.saxStoreToOrbeonDomDocument(templateTree).getRootElement.serializeToString(),
           "compact tree" -> compactTree.getRootElement.serializeToString()
         ))
 

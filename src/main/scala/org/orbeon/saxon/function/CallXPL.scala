@@ -83,10 +83,10 @@ class CallXPL extends FunctionSupportJava {
               }
             processorDefinition.addInput(inputName, inputElement)
           case _ =>
-            // Copy to dom4j
+            // Copy to Orbeon DOM
             //                            final DocumentInfo inputDocumentInfo = TransformerUtils.readTinyTree(inputNodeInfo);
             //                            processorDefinition.addInput(inputName, inputDocumentInfo);
-            val inputDocument = TransformerUtils.tinyTreeToDom4j(inputNodeInfo)
+            val inputDocument = TransformerUtils.tinyTreeToOrbeonDom(inputNodeInfo)
             processorDefinition.addInput(inputName, inputDocument.getRootElement)
         }
       }

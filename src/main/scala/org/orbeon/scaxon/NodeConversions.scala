@@ -28,17 +28,17 @@ object NodeConversions {
   def elemToSAX(e: Elem, xmlReceiver: XMLReceiver): Unit =
     XMLParsing.stringToSAX(e.toString, "", xmlReceiver, ParserConfiguration.Plain, handleLexical = true)
 
-  def elemToDom4j(e: Elem): Document =
-    IOSupport.readDom4j(e.toString)
+  def elemToOrbeonDom(e: Elem): Document =
+    IOSupport.readOrbeonDom(e.toString)
 
-  def elemToDom4jElem(e: Elem): Element =
-    IOSupport.readDom4j(e.toString).getRootElement
+  def elemToOrbeonDomElem(e: Elem): Element =
+    IOSupport.readOrbeonDom(e.toString).getRootElement
 
   def elemToDocumentInfo(e: Elem, readonly: Boolean = true): om.DocumentInfo =
     if (readonly)
       TransformerUtils.stringToTinyTree(util.XPath.GlobalConfiguration, e.toString, false, false)
     else
-      new DocumentWrapper(elemToDom4j(e), null, util.XPath.GlobalConfiguration)
+      new DocumentWrapper(elemToOrbeonDom(e), null, util.XPath.GlobalConfiguration)
 
   def nodeInfoToElem(nodeInfo: om.NodeInfo): Elem =
     scala.xml.XML.loadString(TransformerUtils.tinyTreeToString(nodeInfo))

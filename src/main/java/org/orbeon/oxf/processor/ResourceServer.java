@@ -46,7 +46,7 @@ public class ResourceServer extends ProcessorImpl {
     public void start(PipelineContext context) {
         try {
             // Read config input into a String, cache if possible
-            final org.orbeon.dom.Node configNode = readCacheInputAsDOM4J(context, INPUT_CONFIG);
+            final org.orbeon.dom.Node configNode = readCacheInputAsOrbeonDom(context, INPUT_CONFIG);
 
             // Get config URL first
             String urlString = XPathUtils.selectStringValueNormalize(configNode, "url");

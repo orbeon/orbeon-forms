@@ -263,16 +263,16 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   ): DocumentNodeInfoType =
     TransformerUtils.stringToTinyTree(configuration, string, handleXInclude, handleLexical)
 
-  def readDom4j(xmlString: String): dom.Document =
-    IOSupport.readDom4j(xmlString)
+  def readOrbeonDom(xmlString: String): dom.Document =
+    IOSupport.readOrbeonDom(xmlString)
 
-  def readDom4j(
+  def readOrbeonDom(
     inputStream    : InputStream,
     systemId       : String,
     handleXInclude : Boolean,
     handleLexical  : Boolean
   ): dom.Document =
-    TransformerUtils.readDom4j(inputStream, systemId, handleXInclude, handleLexical)
+    TransformerUtils.readOrbeonDom(inputStream, systemId, handleXInclude, handleLexical)
 
   def hmacString(text: String, encoding: String): String =
     SecureUtils.hmacString(text, encoding)

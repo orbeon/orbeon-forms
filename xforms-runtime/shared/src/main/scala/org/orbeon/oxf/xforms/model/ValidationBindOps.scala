@@ -221,7 +221,7 @@ trait ValidationBindOps extends Logging {
               currentNodeInfo.getParent
 
           if ((namespaceNodeInfo ne null) && namespaceNodeInfo.getNodeKind == Node.ELEMENT_NODE) {
-            // ASSUMPTION: Binding to dom4j-backed node (which InstanceData assumes too)
+            // ASSUMPTION: Binding to Orbeon DOM-backed node (which `InstanceData` assumes too)
             val namespaceElem    = unsafeUnwrapElement(namespaceNodeInfo)
             val namespaceMapping = NamespaceMapping(namespaceElem.getNamespaceContextNoDefault)
             isOptionalAndEmpty || XPath.isXPath2ExpressionOrValueTemplate(

@@ -575,7 +575,7 @@ trait XFormsModelInstances {
             // Read result as XML
             // TODO: use submission code?
             if (! instance.readonly)
-              Left(XFormsCrossPlatformSupport.readDom4j(is, connectionResult.url, false, true))
+              Left(XFormsCrossPlatformSupport.readOrbeonDom(is, connectionResult.url, false, true))
             else
               Right(XFormsCrossPlatformSupport.readTinyTree(XPath.GlobalConfiguration, is, connectionResult.url, false, true))
           }
@@ -586,7 +586,7 @@ trait XFormsModelInstances {
 
           // TODO: Handle validating and handleXInclude!
           if (! instance.readonly)
-            Left(uriResolver.readAsDom4j(absoluteURLString, instance.credentials.orNull))
+            Left(uriResolver.readAsOrbeonDom(absoluteURLString, instance.credentials.orNull))
           else
             Right(uriResolver.readAsTinyTree(XPath.GlobalConfiguration, absoluteURLString, instance.credentials.orNull))
       }

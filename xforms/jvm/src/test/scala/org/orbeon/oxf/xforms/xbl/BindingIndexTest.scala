@@ -93,10 +93,10 @@ class BindingIndexTest extends AnyFunSpec {
     val encapsulated =
       s"""<root $namespacesString>$xmlElem</root>"""
 
-    IOSupport.readDom4j(encapsulated).getRootElement.elements.head
+    IOSupport.readOrbeonDom(encapsulated).getRootElement.elements.head
   }
 
-  def assertElemMatched(index: BindingIndex[IndexableBinding], xmlElem: String, binding: IndexableBinding) = {
+  def assertElemMatched(index: BindingIndex[IndexableBinding], xmlElem: String, binding: IndexableBinding): Unit = {
 
     val elem = parseXMLElemWithNamespaces(xmlElem)
     val atts = elem.attributes map (a => a.getQName -> a.getValue)

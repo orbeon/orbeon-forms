@@ -36,7 +36,7 @@ public class PropertiesTest extends TestCase {
             "</properties>";
 
     protected void setUp() throws Exception {
-        propertyStore = PropertyStore.parse(IOSupport.readDom4j(PROPERTIES));
+        propertyStore = PropertyStore.parse(IOSupport.readOrbeonDom(PROPERTIES));
     }
 
     public void testWildcardMatches() {

@@ -50,7 +50,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
         final ProcessorOutput output = new ProcessorOutputImpl(SignatureVerifierProcessor.this, name) {
             public void readImpl(PipelineContext context, final XMLReceiver xmlReceiver) {
                 try {
-                    final Document pubDoc = readCacheInputAsDOM4J(context, INPUT_PUBLIC_KEY);
+                    final Document pubDoc = readCacheInputAsOrbeonDom(context, INPUT_PUBLIC_KEY);
                     final String pubString = XPathUtils.selectStringValueNormalize(pubDoc, "/public-key");
                     final byte[] pubBytes = Base64.decode(pubString);
                     final X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(pubBytes);

@@ -189,9 +189,9 @@ trait XFormsCrossPlatformSupportTrait {
     handleLexical  : Boolean
   ): DocumentNodeInfoType
 
-  def readDom4j(xmlString: String): dom.Document
+  def readOrbeonDom(xmlString: String): dom.Document
 
-  def readDom4j(
+  def readOrbeonDom(
     inputStream    : InputStream,
     systemId       : String,
     handleXInclude : Boolean,

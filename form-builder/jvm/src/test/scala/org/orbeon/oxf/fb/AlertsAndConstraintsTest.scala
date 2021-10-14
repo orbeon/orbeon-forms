@@ -181,7 +181,7 @@ class AlertsAndConstraintsTest
               </resource>
             </resources>.toDocument
 
-          assertXMLDocumentsIgnoreNamespacesInScope(expectedResources, TransformerUtils.tinyTreeToDom4j(currentResources parent * head))
+          assertXMLDocumentsIgnoreNamespacesInScope(expectedResources, TransformerUtils.tinyTreeToOrbeonDom(currentResources parent * head))
         }
 
         locally {
@@ -223,7 +223,7 @@ class AlertsAndConstraintsTest
               </resource>
             </resources>.toDocument
 
-          assertXMLDocumentsIgnoreNamespacesInScope(expectedResources, TransformerUtils.tinyTreeToDom4j(currentResources parent * head))
+          assertXMLDocumentsIgnoreNamespacesInScope(expectedResources, TransformerUtils.tinyTreeToOrbeonDom(currentResources parent * head))
         }
       }
     }
@@ -555,7 +555,7 @@ class AlertsAndConstraintsTest
   private def assertAlertsXML(left: List[sx.Elem], right: Seq[NodeInfo]): Unit = {
 
     left zip right foreach {
-      case (l, r) => assertXMLDocumentsIgnoreNamespacesInScope(l.toDocument, TransformerUtils.tinyTreeToDom4j(r))
+      case (l, r) => assertXMLDocumentsIgnoreNamespacesInScope(l.toDocument, TransformerUtils.tinyTreeToOrbeonDom(r))
     }
 
     assert(left.size === right.size)

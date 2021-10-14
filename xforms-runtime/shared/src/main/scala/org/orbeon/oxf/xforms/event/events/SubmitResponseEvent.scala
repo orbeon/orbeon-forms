@@ -131,7 +131,7 @@ private object SubmitResponseEvent {
       tempURIOpt flatMap { tempURI =>
 
         // TODO: RFC 7303 says that content type charset must take precedence with any XML mediatype.
-        // Should modify readTinyTree() and readDom4j()
+        // Should modify `readTinyTree()` and `readOrbeonDom()`
         def tryXML: Try[String Either DocumentNodeInfoType] =
           Try {
             Right(

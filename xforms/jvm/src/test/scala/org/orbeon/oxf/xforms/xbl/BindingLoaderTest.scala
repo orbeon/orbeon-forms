@@ -112,7 +112,7 @@ class BindingLoaderTest extends DocumentTestBase with AssertionsForJUnit {
     def existsByPath(path: String) =
       Docs.contains(path)
 
-    def contentAsDOM4J(path: String) = {
+    def contentAsOrbeonDom(path: String) = {
       contentRead += path
       Docs(path)
     }

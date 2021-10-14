@@ -30,8 +30,8 @@ import org.orbeon.oxf.xforms.xbl.{XBLBindingBuilder, XBLSupport}
 import org.orbeon.oxf.xforms.{StaticStateBits, XFormsGlobalProperties, XFormsStaticStateImpl, _}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult
 import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.dom.LocationDocumentResult
 import org.orbeon.saxon.functions.{FunctionLibrary, FunctionLibraryList}
 import org.orbeon.xforms.XFormsNames.XFORMS_BIND_QNAME
 import org.orbeon.xforms.xbl.Scope
@@ -223,7 +223,7 @@ object PartAnalysisBuilder {
     val prefix               = startScope.fullPrefix
 
     // Read the input through the annotator and gather namespace mappings
-    TransformerUtils.writeDom4j(
+    TransformerUtils.writeOrbeonDom(
       formDocument,
       new WhitespaceXMLReceiver(
         new Annotator(

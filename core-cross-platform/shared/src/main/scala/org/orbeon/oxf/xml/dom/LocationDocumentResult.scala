@@ -1,8 +1,8 @@
-package org.orbeon.oxf.xml.dom4j
+package org.orbeon.oxf.xml.dom
+
+import org.orbeon.dom.io.DocumentSource
 
 import javax.xml.transform.sax.SAXResult
-import org.orbeon.dom.io.DocumentSource
-import org.orbeon.oxf.xml.dom.{LocationSAXContentHandler, LocationSAXWriter}
 
 
 class LocationDocumentResult

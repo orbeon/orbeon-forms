@@ -32,10 +32,10 @@ trait XMLSupport extends AssertionsForJUnit {
     }
 
   def assertXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Unit =
-    assertXMLDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
+    assertXMLDocumentsIgnoreNamespacesInScope(tinyTreeToOrbeonDom(left), tinyTreeToOrbeonDom(right))
 
   def assertXMLElementsIgnoreNamespacesInScope(left: NodeInfo, right: NodeInfo): Unit =
-    assertXMLDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
+    assertXMLDocumentsIgnoreNamespacesInScope(tinyTreeToOrbeonDom(left), tinyTreeToOrbeonDom(right))
 
   def assertXMLDocumentsIgnoreNamespacesInScope(left: JDocument, right: JDocument): Unit = {
 

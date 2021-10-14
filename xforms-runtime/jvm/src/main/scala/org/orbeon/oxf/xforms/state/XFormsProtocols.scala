@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.state
 
 import java.io._
-
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.dom.{Document, Namespace, QName}
@@ -22,7 +21,7 @@ import org.orbeon.oxf.util.PathMatcher
 import org.orbeon.oxf.xforms.model.InstanceCaching
 import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats._
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom4j.LocationDocumentSource
+import org.orbeon.oxf.xml.dom.LocationDocumentSource
 import org.orbeon.xforms.DelayedEvent
 import sbinary.Operations._
 import sbinary._
@@ -46,7 +45,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
     def allowedClass: Class[DynamicState] = classOf[DynamicState]
   }
 
-  implicit object Dom4jFormat extends Format[Document] {
+  implicit object OrbeonDomFormat extends Format[Document] {
     def writes(output: Output, document: Document): Unit = {
       val identity = TransformerUtils.getXMLIdentityTransformer
       identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
@@ -54,7 +53,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
     }
 
     def reads(input: Input): Document =
-      TransformerUtils.readDom4j(new JavaInputStream(input), null, false, false)
+      TransformerUtils.readOrbeonDom(new JavaInputStream(input), null, false, false)
   }
 
   implicit object ControlFormat extends Format[ControlState] {

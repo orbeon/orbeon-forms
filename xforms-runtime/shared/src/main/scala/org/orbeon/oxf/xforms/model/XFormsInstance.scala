@@ -239,7 +239,7 @@ class XFormsInstance(
       case _ =>
     }
 
-  // Return the instance document as a dom4j Document
+  // Return the instance document as an Orbeon DOM `Document`
   // If the instance is readonly, this returns `None`. Callers should use root() whenever possible.
   def underlyingDocumentOpt: Option[Document] =
     _documentInfo match {
@@ -342,7 +342,7 @@ class XFormsInstance(
 //
 // Implementation notes:
 //
-// - set an IdGetter on DocumentWrapper when a new Dom4j DocumentWrapper is set on the instance
+// - set an IdGetter on DocumentWrapper when a new Orbeon DOM DocumentWrapper is set on the instance
 // - index all elements with an attribute whose local name is "id"
 // - initial index is created the first time an id is required
 // - upon subsequent document updates (insert, delete, setvalue), the index is incrementally updated
@@ -486,7 +486,7 @@ object XFormsInstance extends Logging {
     )
 
   def createDocumentInfo(doc: Document Either DocumentNodeInfoType, exposeXPathTypes: Boolean): DocumentNodeInfoType = doc match {
-    case Left(dom4jDocument) => XFormsInstanceSupport.wrapDocument(dom4jDocument, exposeXPathTypes)
+    case Left(domDocument)   => XFormsInstanceSupport.wrapDocument(domDocument, exposeXPathTypes)
     case Right(documentInfo) => documentInfo
   }
 
@@ -494,7 +494,7 @@ object XFormsInstance extends Logging {
     if (readonly)
       XFormsCrossPlatformSupport.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
     else
-      XFormsInstanceSupport.wrapDocument(XFormsCrossPlatformSupport.readDom4j(xmlString), exposeXPathTypes)
+      XFormsInstanceSupport.wrapDocument(XFormsCrossPlatformSupport.readOrbeonDom(xmlString), exposeXPathTypes)
 
   // Take a non-wrapped DocumentInfo and wrap it if needed
   def wrapDocumentInfo(documentInfo: DocumentNodeInfoType, readonly: Boolean, exposeXPathTypes: Boolean): DocumentNodeInfoType = {

@@ -104,7 +104,7 @@ object Provider extends Enum[Provider] {
 
     val source = new StreamSource(xmlReader)
     if (returnMutableDocument) {
-      val xmlDom = TransformerUtils.readDom4j(source, false)
+      val xmlDom = TransformerUtils.readOrbeonDom(source, false)
       new DocumentWrapper(xmlDom, null, XPath.GlobalConfiguration)
     } else {
       TransformerUtils.readTinyTree(XPath.GlobalConfiguration, source, false)

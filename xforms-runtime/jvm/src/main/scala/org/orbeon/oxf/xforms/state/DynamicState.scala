@@ -151,7 +151,7 @@ case class DynamicState(
     List(("response", decodeLastAjaxResponse)) collect {
       case (elementName, Some(saxStore)) =>
         val templateElement = rootElement.addElement(elementName)
-        val document = TransformerUtils.saxStoreToDom4jDocument(saxStore)
+        val document = TransformerUtils.saxStoreToOrbeonDomDocument(saxStore)
         templateElement.add(document.getRootElement.detach())
     }
 

@@ -40,8 +40,8 @@ class FormRunnerCompiler extends ProcessorImpl {
           implicit val rcv = xmlReceiver
           implicit val ec  = CoreCrossPlatformSupport.externalContext
 
-          val params       = readCacheInputAsDOM4J(pipelineContext, "instance")
-          val formDocument = readCacheInputAsDOM4J(pipelineContext, "data")
+          val params       = readCacheInputAsOrbeonDom(pipelineContext, "instance")
+          val formDocument = readCacheInputAsOrbeonDom(pipelineContext, "data")
 
           val appName     = params.getRootElement.element("app").getText
           val formName    = params.getRootElement.element("form").getText

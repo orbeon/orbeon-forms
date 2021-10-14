@@ -62,7 +62,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
     outputStream    : OutputStream
   ): Unit =  {
 
-    val configDocument = readCacheInputAsDOM4J(pipelineContext, "model")// TODO: should we use "config"?
+    val configDocument = readCacheInputAsOrbeonDom(pipelineContext, "model")// TODO: should we use "config"?
     val configRoot = configDocument.getRootElement
     val templateRoot = configRoot.element("template")
 

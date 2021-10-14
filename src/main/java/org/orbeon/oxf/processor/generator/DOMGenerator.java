@@ -48,7 +48,7 @@ import javax.xml.transform.dom.DOMSource;
 public final class DOMGenerator extends ProcessorImpl {
 
     /**
-     * Abstraction that lets use either DOM4J or W3C document as source.
+     * Abstraction that lets use either Orbeon DOM or W3C document as source.
      */
     private static abstract class SourceFactory {
         private final String systemID;
@@ -66,11 +66,11 @@ public final class DOMGenerator extends ProcessorImpl {
         }
     }
 
-    private static class DOM4JSourceFactory extends SourceFactory {
+    private static class OrbeonDomSourceFactory extends SourceFactory {
 
         private final org.orbeon.dom.Document doc;
 
-        DOM4JSourceFactory(final org.orbeon.dom.Document d, final String sid, boolean clone) {
+        OrbeonDomSourceFactory(final org.orbeon.dom.Document d, final String sid, boolean clone) {
             super(sid);
             doc = clone ? (org.orbeon.dom.Document) d.deepCopy() : d;
         }
@@ -170,7 +170,7 @@ public final class DOMGenerator extends ProcessorImpl {
      */
 
     public DOMGenerator(final org.orbeon.dom.Element e, final String id, Object v, final String sid) {
-        this(id, v, new DOM4JSourceFactory(makeCopyDoc(e), sid, false));
+        this(id, v, new OrbeonDomSourceFactory(makeCopyDoc(e), sid, false));
     }
 
     /**
@@ -180,7 +180,7 @@ public final class DOMGenerator extends ProcessorImpl {
      *            document.
      */
     public DOMGenerator(final org.orbeon.dom.Document d, final String id, Object v, final String sid) {
-        this(id, v, new DOM4JSourceFactory(d, sid, true));
+        this(id, v, new OrbeonDomSourceFactory(d, sid, true));
     }
 
     public DOMGenerator(final NodeInfo nodeInfo, final String id, Object v, final String sid) {

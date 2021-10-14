@@ -39,7 +39,7 @@ public class RequestSecurityGenerator extends ProcessorImpl {
                 ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 if (externalContext == null)
                     throw new OXFException("Missing external context object in RequestSecurityGenerator");
-                Node config = readCacheInputAsDOM4J(context, INPUT_CONFIG);
+                Node config = readCacheInputAsOrbeonDom(context, INPUT_CONFIG);
                 try {
                     xmlReceiver.startDocument();
                     String rootElementName = "request-security";

@@ -217,7 +217,7 @@ class NodeWrapper protected (
 
   private def getAdjustedChildrenIt(p: NodeWrapper): java.util.ListIterator[Node] =
     if (p.getNodeKind == Type.DOCUMENT) {
-      // This is an attempt to work around a DOM4J bug
+      // This is an attempt to work around an Orbeon DOM bug
       // ORBEON: What bug was that? Can we remove this and fix the issue in org.orbeon.dom?
       // 2020-08-31: Confirming that just removing this code causes tests to fail.
       val document = p.node.asInstanceOf[Document]

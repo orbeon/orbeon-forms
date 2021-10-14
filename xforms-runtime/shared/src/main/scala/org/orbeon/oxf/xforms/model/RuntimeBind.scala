@@ -96,7 +96,7 @@ class RuntimeBind(
 
             // Create mapping context item -> iteration
             // NOTE: There might already be a mapping.
-            // NOTE: Indexing nodes is probably not efficient with Dom4j, as nodes don't implement hashCode!
+            // NOTE: Indexing nodes is probably not efficient with the Orbeon DOM, as nodes don't implement hashCode!
             // 2017-10-19:We have our own DOM, can we improve on this?
             if (! childrenBindsHaveSingleNodeContext) {
               val existingIterations = binds.iterationsForContextItem.getOrElseUpdate(item, Nil)

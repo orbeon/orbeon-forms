@@ -615,8 +615,8 @@ public class XFormsModelSchemaValidator {
         final XMLSchemaReader reader = new XMLSchemaReader(controller, saxParserFactory);
 
 //        TransformerUtils.writeTinyTree(schemaElementInfo, reader);
-        // TODO: We create an entirely new dom4j document here because otherwise the transformation picks the whole document
-        TransformerUtils.writeDom4j(Extensions.createDocumentCopyParentNamespacesJava(schemaElement, false), reader);
+        // TODO: We create an entirely new Orbeon DOM document here because otherwise the transformation picks the whole document
+        TransformerUtils.writeOrbeonDom(Extensions.createDocumentCopyParentNamespacesJava(schemaElement, false), reader);
 
         return reader.getResult();
     }

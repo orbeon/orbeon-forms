@@ -160,7 +160,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     // Create transformer if we did not find one in cache
                     if (templatesInfo == null) {
                         // Get transformer configuration
-                        final Node config = readCacheInputAsDOM4J(pipelineContext, INPUT_TRANSFORMER);
+                        final Node config = readCacheInputAsOrbeonDom(pipelineContext, INPUT_TRANSFORMER);
                         final String transformerClass = XPathUtils.selectStringValueNormalize(config, "/config/class");
                         // Create transformer
                         // NOTE: createTransformer() handles its own exceptions

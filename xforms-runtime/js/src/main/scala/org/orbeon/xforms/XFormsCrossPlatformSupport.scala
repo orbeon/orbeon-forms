@@ -240,7 +240,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     result()
   }
 
-  def readDom4j(xmlString: String): dom.Document = {
+  def readOrbeonDom(xmlString: String): dom.Document = {
 
     val (receiver, result) = newDomReceiver
 
@@ -255,7 +255,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     result()
   }
 
-  def readDom4j(
+  def readOrbeonDom(
     inputStream    : InputStream,
     systemId       : String,
     handleXInclude : Boolean,

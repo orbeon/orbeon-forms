@@ -165,14 +165,14 @@ private object PEVersion {
   def tryReadLicense: Try[Document] = {
 
     def fromResourceManager =
-      Try(ResourceManagerWrapper.instance.getContentAsDOM4J(LicensePath))
+      Try(ResourceManagerWrapper.instance.getContentAsOrbeonDom(LicensePath))
 
     def fromHomeDirectory =
       Try {
         val path = System.getProperty("user.home").dropTrailingSlash + "/.orbeon/license.xml"
 
         useAndClose(new FileInputStream(new File(path))) { is =>
-          IOSupport.readDom4j(is, path, ParserConfiguration.Plain)
+          IOSupport.readOrbeonDom(is, path, ParserConfiguration.Plain)
         }
       }
 
@@ -185,7 +185,7 @@ private object PEVersion {
 
       // Remove blank spaces as that's the way it was signed
       val inputLicenseDocument =
-        IOSupport.readDom4j(rawDocument.getRootElement.serializeToString(XMLWriter.CompactFormat))
+        IOSupport.readOrbeonDom(rawDocument.getRootElement.serializeToString(XMLWriter.CompactFormat))
 
       // Connect pipeline
       val serializer = {

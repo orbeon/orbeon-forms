@@ -27,7 +27,7 @@ object EncodeDecode {
     // Get SAXStore
     // TODO: This is not optimal since we create a second in-memory representation. Should stream instead.
     // NOTE: We don't encode XML comments and use only the `ContentHandler` interface
-    val saxStore = TransformerUtils.dom4jToSAXStore(document, location)
+    val saxStore = TransformerUtils.orbeonDomToSAXStore(document, location)
 
     // Serialize SAXStore to bytes
     // TODO: This is not optimal since we create a third in-memory representation. Should stream instead.
@@ -46,7 +46,7 @@ object EncodeDecode {
     val saxStore = SAXStoreBinaryFormat.deserialize(bytes)
 
     // Deserialize `SAXStore` to `Document`
-    TransformerUtils.saxStoreToDom4jDocument(saxStore)
+    TransformerUtils.saxStoreToOrbeonDomDocument(saxStore)
   }
 
   // 2016-09-14: `encrypt = false` only when encoding static state when using server-side state handling, and

@@ -40,7 +40,7 @@ object Transforms {
 
         // Read document and component bindings
         val formDoc =
-          new DocumentWrapper(TransformerUtils.readDom4j(is, null, false, false), null, XPath.GlobalConfiguration)
+          new DocumentWrapper(TransformerUtils.readOrbeonDom(is, null, false, false), null, XPath.GlobalConfiguration)
 
         val frDocCtx: FormRunnerDocContext = new FormRunnerDocContext {
           val formDefinitionRootElem: NodeInfo = formDoc.rootElement

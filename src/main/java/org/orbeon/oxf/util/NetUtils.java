@@ -699,7 +699,7 @@ public class NetUtils {
     }
 
     public static void debugLogRequestAsXML(final ExternalContext.Request request) {
-        System.out.println(IOSupport.domToPrettyStringJava(RequestGenerator.readWholeRequestAsDOM4J(request, null)));
+        System.out.println(IOSupport.domToPrettyStringJava(RequestGenerator.readWholeRequestAsOrbeonDom(request, null)));
     }
 
     /**

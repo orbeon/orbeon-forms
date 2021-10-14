@@ -712,7 +712,7 @@ object ToolboxOps {
             Some(
               Transform.InlineReadDocument(
                 "",
-                TransformerUtils.tinyTreeToDom4j(
+                TransformerUtils.tinyTreeToOrbeonDom(
                   elementInfo("xcv", xcvContent map { case (xcvEntry, content) => elementInfo(xcvEntry.entryName, content) })
                 ),
                 0L

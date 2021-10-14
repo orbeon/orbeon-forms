@@ -25,7 +25,7 @@ object IOSupport {
   import Private._
 
   def prettyfy(xmlString: String): String =
-    readDom4j(xmlString).getRootElement.serializeToString(XMLWriter.PrettyFormat)
+    readOrbeonDom(xmlString).getRootElement.serializeToString(XMLWriter.PrettyFormat)
 
   def domToPrettyStringJava(doc: Document): String =
     doc.getRootElement.serializeToString(XMLWriter.PrettyFormat)
@@ -36,19 +36,19 @@ object IOSupport {
   def domToStringJava(elem: Document): String =
     elem.getRootElement.serializeToString(XMLWriter.DefaultFormat)
 
-  def readDom4j(reader: Reader): Document =
+  def readOrbeonDom(reader: Reader): Document =
     createSAXReader.read(reader)
 
-  def readDom4j(reader: Reader, uriString: String): Document =
+  def readOrbeonDom(reader: Reader, uriString: String): Document =
     createSAXReader.read(reader, uriString)
 
-  def readDom4j(xmlString: String): Document =
+  def readOrbeonDom(xmlString: String): Document =
     createSAXReader(ParserConfiguration.Plain).read(new StringReader(xmlString))
 
-  def readDom4j(is: InputStream, uri: String, parserConfiguration: ParserConfiguration): Document =
+  def readOrbeonDom(is: InputStream, uri: String, parserConfiguration: ParserConfiguration): Document =
     createSAXReader(parserConfiguration).read(is, uri)
 
-  def readDom4j(is: InputStream): Document =
+  def readOrbeonDom(is: InputStream): Document =
     createSAXReader(ParserConfiguration.Plain).read(is)
 
   private object Private {

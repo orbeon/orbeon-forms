@@ -79,7 +79,7 @@ class UploaderProcessor extends ProcessorImpl {
                 <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                   <xxf:action>
                     <xxf:server-events>{
-                      EncodeDecode.encodeXML(NodeConversions.elemToDom4j(serverEvents), XFormsGlobalProperties.isGZIPState, true, false)
+                      EncodeDecode.encodeXML(NodeConversions.elemToOrbeonDom(serverEvents), XFormsGlobalProperties.isGZIPState, true, false)
                     }</xxf:server-events>
                   </xxf:action>
                 </xxf:event-response>

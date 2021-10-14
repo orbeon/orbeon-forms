@@ -37,7 +37,7 @@ public class RedirectProcessor extends ProcessorImpl {
     public void start(PipelineContext context) {
         try {
             // Read the data stream entirely
-            final Document node = readCacheInputAsDOM4J(context, INPUT_DATA);
+            final Document node = readCacheInputAsOrbeonDom(context, INPUT_DATA);
 
             // Is this a server-side redirect?
             final String serverSideString = XPathUtils.selectStringValueNormalize(node, "redirect-url/server-side");

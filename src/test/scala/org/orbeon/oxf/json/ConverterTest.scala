@@ -178,7 +178,7 @@ object ConverterTest {
   /*@XPathFunction*/ def expectedXmlStrings: List[DocumentInfo] = ExpectedJsonToXml map (_._2) map (elemToDocumentInfo(_, readonly = true))
 
   /*@XPathFunction*/ def compareXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Boolean =
-    Comparator.compareDocumentsIgnoreNamespacesInScope(tinyTreeToDom4j(left), tinyTreeToDom4j(right))
+    Comparator.compareDocumentsIgnoreNamespacesInScope(tinyTreeToOrbeonDom(left), tinyTreeToOrbeonDom(right))
 }
 
 class ConverterTest extends AnyFunSpecLike with XMLSupport {
@@ -191,9 +191,9 @@ class ConverterTest extends AnyFunSpecLike with XMLSupport {
       for ((json, xml) <- ExpectedJsonToXml) {
         val store = new SAXStore
         Converter.jsonStringToXmlStream(json, store)
-        val resultXML = TransformerUtils.saxStoreToDom4jDocument(store)
+        val resultXML = TransformerUtils.saxStoreToOrbeonDomDocument(store)
 
-        assertXMLDocumentsIgnoreNamespacesInScope(elemToDom4j(xml), resultXML)
+        assertXMLDocumentsIgnoreNamespacesInScope(elemToOrbeonDom(xml), resultXML)
       }
     }
   }

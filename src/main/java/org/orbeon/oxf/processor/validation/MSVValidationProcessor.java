@@ -113,7 +113,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
                 try {
                     // Read config input ot determine of we should decorate or not
                     // Would be nice to validate it, but we can't simply use the schema on the input as usual (recursion)
-                    final Document configDoc = readCacheInputAsDOM4J(context, INPUT_CONFIG);
+                    final Document configDoc = readCacheInputAsOrbeonDom(context, INPUT_CONFIG);
                     final boolean decorateOutput = Boolean.valueOf(XPathUtils.selectStringValueNormalize(configDoc, "/config/decorate")).booleanValue();
 
                     final Schema schema = readCacheInputAsObject(context,

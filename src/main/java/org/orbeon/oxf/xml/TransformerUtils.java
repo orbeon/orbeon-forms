@@ -15,9 +15,7 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.dom.Document;
 import org.orbeon.dom.io.DocumentSource;
-import org.orbeon.dom.io.XMLWriter;
 import org.orbeon.dom.saxon.DocumentWrapper;
-import org.orbeon.dom.Node.NodeOps;
 import org.orbeon.io.CharsetNames;
 import org.orbeon.io.StringBuilderWriter;
 import org.orbeon.oxf.common.OXFException;
@@ -27,8 +25,8 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler;
 import org.orbeon.oxf.xml.dom.LocationSAXWriter;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
+import org.orbeon.oxf.xml.dom.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom.LocationDocumentSource;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.TransformerFactoryImpl;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -37,7 +35,6 @@ import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import scala.Tuple2;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
@@ -229,13 +226,13 @@ public class TransformerUtils {
     }
 
     /**
-     * Transform a W3C DOM node into a dom4j document
+     * Transform a W3C DOM node into an Orbeon DOM document
      *
      * @param   node    W3C DOM node
      * @return  dom4j document
      * @throws TransformerException
      */
-    public static Document domToDom4jDocument(org.w3c.dom.Node node) throws TransformerException {
+    public static Document domToOrbeonDomDocument(org.w3c.dom.Node node) throws TransformerException {
         final Transformer identity = getIdentityTransformer();
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.transform(new DOMSource(node), documentResult);
@@ -243,12 +240,12 @@ public class TransformerUtils {
     }
 
     /**
-     * Transform a SAXStore into a dom4j document
+     * Transform a SAXStore into an Orbeon DOM document
      *
      * @param   saxStore input SAXStore
-     * @return  dom4j document
+     * @return  Orbeon DOM document
      */
-    public static Document saxStoreToDom4jDocument(SAXStore saxStore) {
+    public static Document saxStoreToOrbeonDomDocument(SAXStore saxStore) {
         final TransformerXMLReceiver identity = getIdentityTransformerHandler();
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.setResult(documentResult);
@@ -260,8 +257,8 @@ public class TransformerUtils {
         return documentResult.getDocument();
     }
 
-    // Transform a SAXStore mark into a dom4j document
-    public static Document saxStoreMarkToDom4jDocument(SAXStore.Mark mark) {
+    // Transform a SAXStore mark into an Orbeon DOM document
+    public static Document saxStoreMarkToOrbeonDomDocument(SAXStore.Mark mark) {
         final TransformerXMLReceiver identity = getIdentityTransformerHandler();
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.setResult(documentResult);
@@ -301,8 +298,8 @@ public class TransformerUtils {
      */
     public static org.w3c.dom.Document saxStoreToDomDocument(SAXStore saxStore) {
         try {
-            // Convert to dom4j and then to DOM
-            return TransformerUtils.dom4jToDomDocument(saxStoreToDom4jDocument(saxStore));
+            // Convert to Orbeon DOM and then to W3C DOM
+            return TransformerUtils.orbeonDomToW3CDomDocument(saxStoreToOrbeonDomDocument(saxStore));
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
@@ -320,10 +317,10 @@ public class TransformerUtils {
     }
 
     /**
-     * Transform a dom4j Document into a TinyTree.
+     * Transform an Orbeon DOM Document into a TinyTree.
      */
     // Only used by `Instance`
-    public static DocumentInfo dom4jToTinyTree(Configuration configuration, Document document, boolean location) {
+    public static DocumentInfo orbeonDomToTinyTree(Configuration configuration, Document document, boolean location) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         try {
             final Transformer identity = getIdentityTransformer(configuration);
@@ -335,13 +332,13 @@ public class TransformerUtils {
     }
 
     /**
-     * Transform a dom4j document into a W3C DOM document
+     * Transform an Orbeon DOM document into a W3C DOM document
      *
      * @param   document dom4j document
      * @return  W3C DOM document
      * @throws TransformerException
      */
-    public static org.w3c.dom.Document dom4jToDomDocument(Document document) throws TransformerException {
+    public static org.w3c.dom.Document orbeonDomToW3CDomDocument(Document document) throws TransformerException {
         final Transformer identity = getIdentityTransformer();
         final DOMResult domResult = new DOMResult();
         identity.transform(new DocumentSource(document), domResult);
@@ -354,20 +351,20 @@ public class TransformerUtils {
     }
 
     /**
-     * Transform an InputStream to a dom4j Document.
+     * Transform an `InputStream` to an Orbeon DOM `Document`.
      */
-    public static Document readDom4j(InputStream inputStream, String systemId, boolean handleXInclude, boolean handleLexical) {
-        final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
+    public static Document readOrbeonDom(InputStream inputStream, String systemId, boolean handleXInclude, boolean handleLexical) {
+        final LocationSAXContentHandler domResult = new LocationSAXContentHandler();
         {
             final TransformerURIResolver resolver;
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
                 resolver = new TransformerURIResolver(ParserConfiguration.Plain());
-                xmlReceiver = new XIncludeReceiver(null, dom4jResult, null, resolver);
+                xmlReceiver = new XIncludeReceiver(null, domResult, null, resolver);
             } else {
                 resolver = null;
-                xmlReceiver = dom4jResult;
+                xmlReceiver = domResult;
             }
             try {
                 XMLParsing.inputStreamToSAX(inputStream, systemId, xmlReceiver, ParserConfiguration.Plain(), handleLexical, null);
@@ -376,25 +373,25 @@ public class TransformerUtils {
                     resolver.close();
             }
         }
-        return dom4jResult.getDocument();
+        return domResult.getDocument();
 
     }
 
     /**
-     * Transform an InputStream to a dom4j Document.
+     * Transform an InputStream to an Orbeon DOM Document.
      */
-    public static Document readDom4j(Source source, boolean handleXInclude) {
-        final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
+    public static Document readOrbeonDom(Source source, boolean handleXInclude) {
+        final LocationSAXContentHandler domResult = new LocationSAXContentHandler();
         {
             final TransformerURIResolver resolver;
             final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
                 resolver = new TransformerURIResolver(ParserConfiguration.Plain());
-                xmlReceiver = new XIncludeReceiver(null, dom4jResult, null, resolver);
+                xmlReceiver = new XIncludeReceiver(null, domResult, null, resolver);
             } else {
                 resolver = null;
-                xmlReceiver = dom4jResult;
+                xmlReceiver = domResult;
             }
             try {
                 sourceToSAX(source, xmlReceiver);
@@ -403,7 +400,7 @@ public class TransformerUtils {
                     resolver.close();
             }
         }
-        return dom4jResult.getDocument();
+        return domResult.getDocument();
 
     }
 
@@ -469,9 +466,9 @@ public class TransformerUtils {
     }
 
     /**
-     * Transform a TinyTree to a dom4j document.
+     * Transform a TinyTree to an Orbeon DOM document.
      */
-    public static Document tinyTreeToDom4j(NodeInfo nodeInfo) {
+    public static Document tinyTreeToOrbeonDom(NodeInfo nodeInfo) {
         try {
             final Transformer identity = getXMLIdentityTransformer();
             final LocationDocumentResult documentResult = new LocationDocumentResult();
@@ -486,7 +483,7 @@ public class TransformerUtils {
     }
 
     public static DocumentWrapper extractAsMutableDocument(NodeInfo elementOrDocument) {
-        return new DocumentWrapper(tinyTreeToDom4j(elementOrDocument), null, XPath.GlobalConfiguration());
+        return new DocumentWrapper(tinyTreeToOrbeonDom(elementOrDocument), null, XPath.GlobalConfiguration());
     }
 
     /**
@@ -548,10 +545,10 @@ public class TransformerUtils {
     }
 
     /**
-     * Transform a dom4j Node to SAX events.
+     * Transform an Orbeon DOM Node to SAX events.
      */
-    public static void writeDom4j(org.orbeon.dom.Document document, XMLReceiver xmlReceiver) {
-        // NOTE: Use dom4j directly instead of sourceToSAX as performance is better
+    public static void writeOrbeonDom(org.orbeon.dom.Document document, XMLReceiver xmlReceiver) {
+        // NOTE: Use Orbeon DOM directly instead of sourceToSAX as performance is better
         final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
         locationSAXWriter.setContentHandler(xmlReceiver);
         locationSAXWriter.setLexicalHandler(xmlReceiver);
@@ -559,9 +556,9 @@ public class TransformerUtils {
     }
 
     /**
-     * Transform a dom4j Node to SAX events.
+     * Transform an Orbeon DOM Node to SAX events.
      */
-    public static void writeDom4j(org.orbeon.dom.Node node, ContentHandler contentHandler) {
+    public static void writeOrbeonDom(org.orbeon.dom.Node node, ContentHandler contentHandler) {
         sourceToSAX(new LocationDocumentSource(node.getDocument()), contentHandler);
     }
 
@@ -590,9 +587,9 @@ public class TransformerUtils {
     }
 
     /**
-     * Transform a dom4j document to a SAXStore.
+     * Transform an Orbeon DOM document to a SAXStore.
      */
-    public static SAXStore dom4jToSAXStore(Document document, boolean location) {
+    public static SAXStore orbeonDomToSAXStore(Document document, boolean location) {
         final SAXStore saxStore = new SAXStore();
         sourceToSAX(location ? new LocationDocumentSource(document) : new DocumentSource(document), saxStore);
         return saxStore;

@@ -41,7 +41,7 @@ class ItemsetTest
         def assertControl(controlName: String, expectedItems: Seq[Elem]): Unit = {
 
           val actualItems =
-            FormBuilder.getControlItemsGroupedByValue(controlName) map TransformerUtils.tinyTreeToDom4j
+            FormBuilder.getControlItemsGroupedByValue(controlName) map TransformerUtils.tinyTreeToOrbeonDom
 
           for ((expected, actual) <- expectedItems.zipAll(actualItems, null, null))
             assertXMLDocumentsIgnoreNamespacesInScope(expected.toDocument, actual)

@@ -45,7 +45,7 @@ public class AggregatorProcessor extends ProcessorImpl {
 
                 try {
                     // Read config
-                    final Element config = readCacheInputAsDOM4J(context, INPUT_CONFIG).getRootElement();
+                    final Element config = readCacheInputAsOrbeonDom(context, INPUT_CONFIG).getRootElement();
                     final String rootQName = config.element("root").getText();
                     final String rootPrefix;
                     final String rootLocalName;

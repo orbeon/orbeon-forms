@@ -280,6 +280,7 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     // TODO: https://github.com/orbeon/orbeon-forms/issues/3088
+    @Deprecated
     public org.orbeon.dom.Document readInputAsDOM4J(PipelineContext context, ProcessorInput input) {
         return readInputAsOrbeonDom(context, input);
     }
@@ -307,7 +308,13 @@ public abstract class ProcessorImpl implements Processor {
         });
     }
 
+    // TODO: https://github.com/orbeon/orbeon-forms/issues/3088
+    @Deprecated
     public org.orbeon.dom.Document readCacheInputAsDOM4J(PipelineContext context, String inputName) {
+        return readCacheInputAsOrbeonDom(context, inputName);
+    }
+
+    public org.orbeon.dom.Document readCacheInputAsOrbeonDom(PipelineContext context, String inputName) {
         return readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader<org.orbeon.dom.Document>() {
             public org.orbeon.dom.Document read(PipelineContext context, ProcessorInput input) {
                 return readInputAsOrbeonDom(context, input);

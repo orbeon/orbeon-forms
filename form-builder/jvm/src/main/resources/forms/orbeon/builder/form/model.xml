@@ -714,11 +714,17 @@
     />
 
     <!-- The `disable-*` parameters are "sticky" and stored when the dialog applies changes. -->
+    <!-- The `*pdf-template-*` parameters are also stored when the dialog applies changes. -->
     <xf:instance id="fb-test-pdf-submission-params">
         <params
             disable-default=""
             disable-calculate=""
             disable-relevant=""
+
+            fr-use-pdf-template=""
+            fr-pdf-template-name=""
+            fr-pdf-template-lang=""
+
             fr-form-data=""/>
     </xf:instance>
 
@@ -826,6 +832,13 @@
     <xf:action event="fb-test-offline-show-dialog">
         <xxf:show dialog="fb-test-dialog"/>
         <xf:send submission="fb-test-offline-submission"/>
+    </xf:action>
+
+    <xf:action event="fb-test-pdf-show-dialog">
+        <xf:dispatch name="fb-show-dialog" targetid="dialog-test-pdf">
+            <xf:property name="for-form-being-tested" value="false()"/>
+            <xf:property name="pdf-templates"         value="bind('pdf-attachments-bind')[xxf:non-blank()]"/>
+        </xf:dispatch>
     </xf:action>
 
     <!-- Dispatched from the client -->

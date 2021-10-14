@@ -871,8 +871,12 @@ div.orbeon.orbeon-portlet-div {
 
     // https://github.com/orbeon/orbeon-forms/issues/3277
     // There shouldn't be an `.xforms-label-appearance-minimal` anyway if the `minimal label works.
-    .xbl-fr-grid .fr-grid .xbl-component .xforms-label-appearance-minimal {
-        display: none;
+    .xbl-fr-grid .fr-grid {
+        .xbl-component, .xforms-control {
+            .xforms-label-appearance-minimal {
+                display: none;
+            }
+        }
     }
 
     .fb-dialog-control-settings {

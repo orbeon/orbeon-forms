@@ -31,7 +31,16 @@
                 <xf:setvalue
                     ref="$i/for-form-being-tested"
                     value="event('for-form-being-tested') = true()"/>
-                <!-- Keep local values between runs -->
+                <!-- PDF templates if any -->
+                <xf:delete
+                    ref="$i/pdf-templates/* | $i/selected-pdf-template/*"/>
+                <xf:insert
+                    context="$i/pdf-templates"
+                    origin="event('pdf-templates')"/>
+                <xf:insert
+                    context="$i/selected-pdf-template"
+                    origin="event('pdf-templates')[1]"/>
+                <!-- Keep other local preferences between runs -->
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
             <xbl:handler event="DOMActivate" observer="cancel-trigger" >
@@ -43,6 +52,9 @@
                     <xf:property name="disable-calculate"     value="$i/disable-calculate/data(.)"/>
                     <xf:property name="disable-default"       value="$i/disable-default/data(.)"/>
                     <xf:property name="disable-relevant"      value="$i/disable-relevant/data(.)"/>
+                    <xf:property name="use-pdf-template"      value="$i/use-pdf-template/data(.)"/>
+                    <xf:property name="pdf-template-name"     value="if ($i/use-pdf-template/data(.)) then $i/selected-pdf-template/*/@name/string() else ()"/>
+                    <xf:property name="pdf-template-lang"     value="if ($i/use-pdf-template/data(.)) then $i/selected-pdf-template/*/@lang/string() else ()"/>
                 </xf:dispatch>
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
@@ -60,13 +72,26 @@
                         <disable-calculate/>
                         <disable-default/>
                         <disable-relevant/>
+                        <pdf-templates/>
+                        <selected-pdf-template/>
+                        <use-pdf-template/>
                     </_>
                 </xf:instance>
 
                 <xf:bind
-                    ref="for-form-being-tested | disable-calculate | disable-default | disable-relevant"
+                    ref="for-form-being-tested | disable-calculate | disable-default | disable-relevant | use-pdf-template"
                     type="xf:boolean"
                     xxf:default="false()"/>
+
+                <xf:bind
+                    ref="use-pdf-template"
+                    relevant="fr:is-pe()"
+                    readonly="count(../pdf-templates/*) = 0"/>
+
+                <xf:bind
+                    ref="selected-pdf-template"
+                    relevant="fr:is-pe()"
+                    readonly="../use-pdf-template = false() or count(../pdf-templates/*) lt 2"/>
 
                 <xf:var name="i" value="instance()"/>
 
@@ -103,12 +128,29 @@
                                     <xf:label ref="xxf:r('dialog-test-pdf.disable-relevant', '|fr-form-resources|')"/>
                                 </fr:checkbox-input>
                             </fr:c>
+                            <fr:c x="1" y="4" w="6">
+                                <fr:checkbox-input ref="use-pdf-template" appearance="checkbox">
+                                    <xf:label ref="xxf:r('dialog-test-pdf.use-pdf-template', '|fr-form-resources|')"/>
+                                </fr:checkbox-input>
+                            </fr:c>
+                            <fr:c x="7" y="4" w="6">
+                                <xf:select1 ref="selected-pdf-template">
+                                    <xf:label appearance="minimal">Name</xf:label>
+                                    <xf:itemset ref="$i/pdf-templates/pdf">
+                                        <xf:label ref="
+                                            let $name := @name[xxf:non-blank()],
+                                                $lang := @lang[xxf:non-blank()],
+                                                $lang-part := if (exists($lang)) then concat('(', $lang, ')') else ()
+                                            return
+                                                string-join(($name, $lang-part), ' ')"/>
+                                        <xf:copy ref="."/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </fr:c>
                         </fr:grid>
                     </xh:div>
 
-<!--                        fr-use-pdf-template-->
-
-                    <!--<fr:xforms-inspector/>-->
+<!--                    <fr:xforms-inspector/>-->
 
                     <xh:div class="fr-dialog-buttons">
                         <xf:group id="triggers">

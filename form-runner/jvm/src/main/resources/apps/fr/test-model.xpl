@@ -61,6 +61,8 @@
     </p:processor>
 
     <!-- Store document in the request for further access down the line -->
+    <!-- Unsure if needed here. This is needed in `inline-test-model.xpl` as `print-pdf-template.xpl`
+         finds the form definition this way. But just when testing the form this might not be needed. -->
     <p:processor name="oxf:scope-serializer">
         <p:input name="config">
             <config>

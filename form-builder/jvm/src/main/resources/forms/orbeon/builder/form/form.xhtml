@@ -766,9 +766,12 @@
                                     <xf:action event="fb-apply">
 
                                         <!-- Set these globally so they stay "sticky" -->
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-calculate" value="event('disable-calculate')"/>
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-default"   value="event('disable-default')"/>
-                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-relevant"  value="event('disable-relevant')"/>
+                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-calculate"    value="event('disable-calculate')"/>
+                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-default"      value="event('disable-default')"/>
+                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@disable-relevant"     value="event('disable-relevant')"/>
+                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-use-pdf-template"  value="event('use-pdf-template')"/>
+                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-template-name" value="event('pdf-template-name')"/>
+                                        <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-template-lang" value="event('pdf-template-lang')"/>
 
                                         <xf:action if="event('for-form-being-tested') = true()">
                                             <!-- Run indirectly by asking the form being tested to prepare data -->

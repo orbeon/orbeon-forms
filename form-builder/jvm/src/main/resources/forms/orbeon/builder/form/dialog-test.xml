@@ -15,8 +15,6 @@
       xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
@@ -34,6 +32,7 @@
                 <xf:action event="DOMActivate">
                     <xf:dispatch name="fb-show-dialog" targetid="dialog-test-pdf">
                         <xf:property name="for-form-being-tested" value="true()"/>
+                        <xf:property name="pdf-templates"         value="bind('pdf-attachments-bind')[xxf:non-blank()]"/>
                     </xf:dispatch>
                 </xf:action>
             </xf:trigger>

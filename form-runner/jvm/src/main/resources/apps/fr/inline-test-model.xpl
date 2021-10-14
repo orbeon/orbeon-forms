@@ -45,6 +45,18 @@
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
 
+    <!-- Store document in the request for further access down the line -->
+    <!-- This is needed as `print-pdf-template.xpl` finds the form definition this way. -->
+    <p:processor name="oxf:scope-serializer">
+        <p:input name="config">
+            <config>
+                <key>fr-form-definition</key>
+                <scope>request</scope>
+            </config>
+        </p:input>
+        <p:input name="data" href="#instance"/>
+    </p:processor>
+
     <!-- Incoming submission goes to model's data output -->
     <p:processor name="oxf:identity">
         <p:input name="data" href="#instance"/>

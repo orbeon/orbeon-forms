@@ -594,19 +594,6 @@ public class TransformerUtils {
         sourceToSAX(location ? new LocationDocumentSource(document) : new DocumentSource(document), saxStore);
         return saxStore;
     }
-
-    public static String domToString(Node node) {
-        try {
-            Transformer transformer = getXMLIdentityTransformer();
-            DOMSource source = new DOMSource(node);
-
-            StringBuilderWriter writer = new StringBuilderWriter(new StringBuilder());
-            transformer.transform(source, new StreamResult(writer));
-            return writer.result();
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
-    }
 }
 
 class TransformerWrapper extends Transformer {

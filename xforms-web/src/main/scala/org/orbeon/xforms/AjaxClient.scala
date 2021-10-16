@@ -312,7 +312,7 @@ object AjaxClient {
     var shortDelay       : FiniteDuration = _
     var incrementalDelay : FiniteDuration = _
 
-    var ajaxRequestInProgress : Boolean = false              // actual Ajax request has started and not yet successfully completed including response processing
+    var ajaxRequestInProgress: Boolean = false // actual Ajax request has started and not yet successfully completed including response processing
   }
 
   private object Private {

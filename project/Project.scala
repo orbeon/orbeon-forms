@@ -97,12 +97,12 @@ object OrbeonWebappPlugin {
 
   def projectSettings: Seq[Setting[_]] =
     Seq(
-      sourceDirectory in webappPrepare := (sourceDirectory in Compile).value / "webapp",
-      target          in webappPrepare := (target in Compile).value / "webapp",
+      webappPrepare / sourceDirectory  := (Compile / sourceDirectory).value / "webapp",
+      webappPrepare / target           := (Compile / target).value / "webapp",
       webappPrepare                    := webappPrepareTask.value,
       webappPostProcess                := { _ => () },
       webappWebInfClasses              := false,
-      watchSources ++= ((sourceDirectory in webappPrepare).value ** "*").get
+      watchSources ++= ((webappPrepare / sourceDirectory).value ** "*").get
     ) ++
       Defaults.packageTaskSettings(Keys.`package`, webappPrepare)
 
@@ -128,10 +128,10 @@ object OrbeonWebappPlugin {
             out
       }).apply(in)
 
-    val webappSrcDir = (sourceDirectory in webappPrepare).value
-    val webappTarget = (target in webappPrepare).value
+    val webappSrcDir = (webappPrepare / sourceDirectory).value
+    val webappTarget = (webappPrepare / target).value
 
-    val classpath    = (fullClasspath in Runtime).value
+    val classpath    = (Runtime / fullClasspath).value
     val webInfDir    = webappTarget / "WEB-INF"
     val webappLibDir = webInfDir / "lib"
 
@@ -148,7 +148,7 @@ object OrbeonWebappPlugin {
       (webappSrcDir ** "*").get.toSet
     )
 
-    val thisArtifact = (packagedArtifact in (Compile, packageBin)).value._1
+    val thisArtifact = (Compile / packageBin / packagedArtifact).value._1
 
     // The following is a lot by trial and error. We assume `exportJars := true` in projects. `fullClasspath` then contains
     // only JAR files. From there, we collect those which are "artifacts". This includes our own artifacts, but also managed
@@ -185,8 +185,8 @@ object OrbeonWebappPlugin {
     val providedClasspath =
       myFindUnmanagedJars(Provided,
         unmanagedBase.value,
-        (includeFilter in unmanagedJars).value,
-        (excludeFilter in unmanagedJars).value
+        (unmanagedJars / includeFilter).value,
+        (unmanagedJars / excludeFilter).value
       )
 
     val providedJars = providedClasspath.to[List].map(_.data).to[Set]

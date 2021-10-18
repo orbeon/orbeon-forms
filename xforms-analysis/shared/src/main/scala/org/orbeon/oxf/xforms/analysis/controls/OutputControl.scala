@@ -46,6 +46,6 @@ class OutputControl(
   override protected val allowedExtensionAttributes: Set[QName] =
     (isImageMediatype set XXFORMS_ALT_QNAME) ++ (isDownloadAppearance set XXFORMS_TARGET_QNAME)
 
-  override protected def externalEventsDef: Set[String] = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE, XFORMS_FOCUS)
+  override protected def externalEventsDef: Set[String] = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE, XFORMS_FOCUS, XXFORMS_BLUR)
   override val externalEvents: Set[String] = externalEventsDef
 }

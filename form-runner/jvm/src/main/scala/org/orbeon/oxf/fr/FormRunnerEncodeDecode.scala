@@ -28,6 +28,7 @@ trait FormRunnerEncodeDecode {
     }
 
   // Only used by the "Test PDF" feature as of 2021-10-13.
+  //@XPathFunction
   def encodeFormDataToSubmit(document: om.NodeInfo): String =
     encodeXmlNodeInfo(document, compress = true, encrypt = true)
 

@@ -217,16 +217,6 @@
                                 instance()/published-version/data(.)
                             )
                         )"/>
-                <!-- Display response content if present -->
-                <!-- 2021-10-13: Consider removing this entirely  it is not working as the instance is in a different model.
-                      If we make it accessible, then it shows text from the form definition, which is not expected. -->
-<!--                <xf:var name="response" value="instance('fr-create-update-submission-response')/string()"/>-->
-                <xf:var name="response" value="''"/>
-                <xf:group ref="$response[xxf:non-blank()]">
-                    <xh:div class="fb-publish-message">
-                        <xf:output value="." mediatype="text/html"/>
-                    </xh:div>
-                </xf:group>
                 <xf:var name="buttons" value="xxf:split(xxf:property('oxf.fb.publish.buttons'))[. = ('new', 'summary')]"/>
                 <xf:group
                     ref=".[

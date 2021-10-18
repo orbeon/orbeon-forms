@@ -111,7 +111,8 @@
     <xsl:variable
         name="disable-calculate"
         select="
-            if (($is-background or $mode = 'test-pdf') and $disable-calculate-param-opt) then
+            (: The parameter takes precedence :)
+            if (($is-background or $mode = 'test-pdf') and exists($disable-calculate-param-opt)) then
                 $disable-calculate-param-opt
             else
                 $mode = ('view', 'pdf', 'test-pdf', 'email', 'controls') (: fr:is-readonly-mode() :) and

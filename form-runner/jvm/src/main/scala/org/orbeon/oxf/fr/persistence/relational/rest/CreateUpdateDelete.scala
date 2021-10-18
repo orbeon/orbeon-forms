@@ -508,7 +508,7 @@ trait CreateUpdateDelete
         ! delete                                          &&
         req.form != Names.LibraryFormName
       ) withDebug("CRUD: creating flat view") {
-        FlatView.createFlatView(req, connection)
+        FlatView.createFlatView(req, versionSet, connection)
       }
 
       // Inform caller of the form definition version used

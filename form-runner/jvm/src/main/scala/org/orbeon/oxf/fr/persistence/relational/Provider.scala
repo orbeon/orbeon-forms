@@ -238,7 +238,7 @@ object Provider extends Enum[Provider] {
       case _          => throw new UnsupportedOperationException
     }
 
-  def flatViewCreateView(provider: Provider, app: String, form: String, viewName: String, cols: String): String = {
+  def flatViewCreateView(provider: Provider, app: String, form: String, version: String, viewName: String, cols: String): String = {
 
     def escapeSQL(s: String): String =
       s.replace("'", "''")
@@ -253,16 +253,18 @@ object Provider extends Enum[Provider] {
         |  FROM  orbeon_form_data d,
         |        (
         |            SELECT   max(last_modified_time) last_modified_time,
-        |                     app, form, document_id
+        |                     app, form, form_version, document_id
         |              FROM   orbeon_form_data d
-        |             WHERE       app   = '${escapeSQL(app)}'
-        |                     AND form  = '${escapeSQL(form)}'
-        |                     AND draft = 'N'
-        |            GROUP BY app, form, document_id
+        |             WHERE       app          = '${escapeSQL(app)}'
+        |                     AND form         = '${escapeSQL(form)}'
+        |                     AND form_version = $version
+        |                     AND draft        = 'N'
+        |            GROUP BY app, form, form_version, document_id
         |        ) m
         | WHERE      d.last_modified_time = m.last_modified_time
         |        AND d.app                = m.app
         |        AND d.form               = m.form
+        |        AND d.form_version       = m.form_version
         |        AND d.document_id        = m.document_id
         |        AND d.deleted            = 'N'
         |""".stripMargin

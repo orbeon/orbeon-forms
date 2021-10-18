@@ -41,12 +41,12 @@ private object FlatView {
   //
   // - https://github.com/orbeon/orbeon-forms/issues/1069
   // - https://github.com/orbeon/orbeon-forms/issues/1571
-  def createFlatView(req: Request, connection: Connection): Unit = {
+  def createFlatView(req: Request, version: Int, connection: Connection): Unit = {
 
     val viewName = {
-      val appXML  = xmlToSQLId(req.app)
-      val formXML = xmlToSQLId(req.form)
-      TablePrefix + joinParts(List(appXML, formXML), MaxNameLength - TablePrefix.length)
+      val app  = xmlToSQLId(req.app)
+      val form = xmlToSQLId(req.form)
+      TablePrefix + joinParts(List(app, form, version.toString), MaxNameLength - TablePrefix.length)
     }
 
     // Delete view if it exists
@@ -77,6 +77,7 @@ private object FlatView {
           req.provider,
           req.app,
           req.form,
+          version.toString,
           viewName,
           cols map { case Col(col, name) => col + " " + name} mkString ", "
         )

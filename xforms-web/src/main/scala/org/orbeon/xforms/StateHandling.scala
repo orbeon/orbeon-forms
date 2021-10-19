@@ -21,6 +21,7 @@ import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom
 import org.scalajs.dom.HashChangeEvent
 
+import scala.collection.immutable
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
 import scala.scalajs.js.annotation.JSExport
@@ -32,11 +33,9 @@ object StateHandling {
   // Restore state after hash changes
   def initializeHashChangeListener(): Unit =
     GlobalEventListenerSupport.addListener(
-      dom.window,
-      "hashchange",
-      (_: HashChangeEvent) => {
-        Private.rawState.foreach(Private.replaceState)
-      }
+      target = dom.window,
+      name   = "hashchange",
+      fn     = (_: HashChangeEvent) => Private.varStateOpt.foreach(Private.replaceState)
     )
 
   case class ClientState(
@@ -48,7 +47,7 @@ object StateHandling {
 
   object StateResult extends Enum[StateResult] {
 
-    val values = findValues
+    val values: immutable.IndexedSeq[StateResult] = findValues
 
     case class  Uuid(uuid: String)    extends StateResult
     case class  Restore(uuid: String) extends StateResult
@@ -147,20 +146,36 @@ object StateHandling {
 
   private object Private {
 
-    var rawState: Option[Dictionary[String]] = None
+    // When present, state is a `js.Dictionary[String]` mapping form ids to serialized state
+    var varStateOpt: Option[Dictionary[String]] = None
 
-    def replaceState(state: Dictionary[String]): Unit = {
-      Private.rawState = Some(state)
+    def replaceState(newState: Dictionary[String]): Unit = {
+      Private.varStateOpt = Some(newState)
+      saveStateToHistory(newState)
+    }
+
+    def findRawState: Option[Dictionary[String]] = {
+
+      // Update `varStateOpt` and history state as needed
+      (varStateOpt, Option(dom.window.history.state)) match {
+        // State found in variable: save to history, which can help getting around Firefox issue 1183881
+        case (Some(varState), _) => saveStateToHistory(varState)
+        // State found in history ony, so save it to the variable
+        case (None, Some(state)) => varStateOpt = Some(state.asInstanceOf[js.Dictionary[String]])
+        // No state found (which means we might be in trouble)
+        case (None, None)        => // nop
+      }
+
+      // Just return `varStateOpt` as it is now up-to-date
+      varStateOpt
+    }
+
+    def saveStateToHistory(state: Dictionary[String]): Unit =
       dom.window.history.replaceState(
         statedata = state,
         title     = "",
         url       = null
       )
-    }
 
-    // Assume the state is a `js.Dictionary[String]` mapping form ids to serialized state
-    def findRawState: Option[Dictionary[String]] =
-      Option(dom.window.history.state) map
-        (_.asInstanceOf[js.Dictionary[String]])
   }
 }

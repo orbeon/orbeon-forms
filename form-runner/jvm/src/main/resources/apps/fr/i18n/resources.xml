@@ -728,9 +728,9 @@
                 <save-progress-success>Travail en cours enregistré avec succès!</save-progress-success>
                 <email-success>Email envoyé avec succès!</email-success>
                 <form-validation-error>Le document contient des erreurs de validation. Veuillez ressayer après les avoir corrigées.</form-validation-error>
-                <database-error>Une erreur s'est produite en communiquant avec la base de données. Veuillez contacter votre l'administrateur système.</database-error>
-                <service-error>Une erreur s'est produite en communiquant avec un service. Veuillez contacter votre l'administrateur système.</service-error>
-                <process-error>Une erreur s'est produite en exécutant le processus. Veuillez contacter votre l'administrateur système.</process-error>
+                <database-error>Une erreur s'est produite en communiquant avec la base de données. Veuillez contacter votre administrateur système.</database-error>
+                <service-error>Une erreur s'est produite en communiquant avec un service. Veuillez contacter votre administrateur système.</service-error>
+                <process-error>Une erreur s'est produite en exécutant le processus. Veuillez contacter votre administrateur système.</process-error>
                 <wizard-prev-error>Veuillez corriger les erreurs avant de revenir en arrière</wizard-prev-error>
                 <wizard-next-error>Veuillez corriger les erreurs avant d'avancer</wizard-next-error>
                 <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas enregistrées.</clear-confirm-message>

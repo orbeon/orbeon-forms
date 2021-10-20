@@ -165,6 +165,15 @@ class XFormsSelect1Control(
     None
   }
 
+  // We take selection controls to be visited as soon as a selection is made, without requiring the field to loose
+  // the focus, as browsers implementation of focus events on selection controls is inconsistent, and considering the
+  // field visited on selection is generally what is expected by form authors (see issue #5040)
+  protected def markVisitedOnSelectDeselect(event: XFormsEvent): Unit =
+    event match {
+      case _: XFormsDeselectEvent | _: XFormsSelectEvent => visited = true
+      case _                                             => // nop
+    }
+
   override def performDefaultAction(event: XFormsEvent): Unit = {
     event match {
       case deselect: XFormsDeselectEvent =>
@@ -228,6 +237,7 @@ class XFormsSelect1Control(
         }
       case _ =>
     }
+    markVisitedOnSelectDeselect(event)
     super.performDefaultAction(event)
   }
 

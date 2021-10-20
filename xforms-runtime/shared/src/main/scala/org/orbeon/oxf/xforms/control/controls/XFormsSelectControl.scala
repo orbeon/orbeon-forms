@@ -175,6 +175,7 @@ class XFormsSelectControl(
     }
     // Make sure not to call the method of XFormsSelect1Control
     // We should *not* use inheritance this way here!
+    markVisitedOnSelectDeselect(event)
     super.valueControlPerformDefaultAction(event)
   }
 }

@@ -64,6 +64,14 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/open-select1/open-select1.css"/>
         </xbl:resources>
+
+        <xbl:handlers>
+            <!-- As done for XForms selection controls, consider the control visited on selection -->
+            <xbl:handler event="xforms-select xforms-deselect" observer="select1">
+                <xxf:setvisited control="fr-open-select1"/>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:template xxbl:transform="oxf:unsafe-xslt" xmlns:oxf="http://www.orbeon.com/oxf/processors">
             <xsl:transform version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>

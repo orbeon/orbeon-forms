@@ -53,8 +53,20 @@
             </templates>
         </metadata>
 
+        <xbl:handlers>
+            <!-- As done for XForms selection controls, consider the control visited on selection -->
+            <xbl:handler event="xforms-select xforms-deselect" observer="select1">
+                <xxf:setvisited control="fr-yesno-input-binding"/>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:template>
-            <xf:select1 appearance="full xxf:horizontal" ref="xxf:binding('fr-yesno-input-binding')" xbl:attr="xxf:encrypt-item-values">
+            <xf:select1
+                id="select1"
+                appearance="full xxf:horizontal"
+                ref="xxf:binding('fr-yesno-input-binding')"
+                xbl:attr="xxf:encrypt-item-values">
+
                 <xf:item>
                     <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
                     <xf:value>true</xf:value>
@@ -63,8 +75,8 @@
                     <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
                     <xf:value>false</xf:value>
                 </xf:item>
-            </xf:select1>
 
+            </xf:select1>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

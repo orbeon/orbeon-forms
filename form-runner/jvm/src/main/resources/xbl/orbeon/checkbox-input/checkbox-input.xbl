@@ -58,8 +58,16 @@
             <xbl:style src="/xbl/orbeon/checkbox-input/checkbox-input.css"/>
         </xbl:resources>
 
+        <xbl:handlers>
+            <!-- As done for XForms selection controls, consider the control visited on selection -->
+            <xbl:handler event="xforms-select xforms-deselect" observer="select">
+                <xxf:setvisited control="fr-checkbox-input-binding"/>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:template>
             <xf:select
+                id="select"
                 appearance="full"
                 ref="xxf:binding('fr-checkbox-input-binding')"
                 xbl:attr="xxf:encrypt-item-values"

@@ -66,6 +66,14 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/box-select/box-select.css"/>
         </xbl:resources>
+
+        <xbl:handlers>
+            <!-- As done for XForms selection controls, consider the control visited on selection -->
+            <xbl:handler event="xforms-select xforms-deselect" observer="select">
+                <xxf:setvisited control="fr-box-select-binding"/>
+            </xbl:handler>
+        </xbl:handlers>
+
         <xbl:template>
             <xf:select id="select" appearance="full" ref="xxf:binding('fr-box-select-binding')" xbl:attr="xxf:encrypt-item-values">
                 <xbl:content include=":root > xf|itemset, :root > xf|item, :root > xf|choice"/>

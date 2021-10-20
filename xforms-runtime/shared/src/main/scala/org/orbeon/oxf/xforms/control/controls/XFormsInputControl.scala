@@ -21,6 +21,8 @@ import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.controls.InputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
+import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsInputHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
@@ -53,6 +55,14 @@ class XFormsInputControl(
   private def unformatTransform(v: String) = unformat match {
     case Some(expr) => evaluateAsString(expr, Seq(stringToStringValue(v)), 1) getOrElse ""
     case None       => v
+  }
+
+  override def performDefaultAction(event: XFormsEvent): Unit = {
+    // The boolean input is rendered as a checkbox, so consider it visited on selection/deselection, to be consistent
+    // with what are doing for other selection controls
+    if (getBuiltinTypeName == "boolean" && event.isInstanceOf[XXFormsValueEvent])
+      visited = true
+    super.performDefaultAction(event)
   }
 
   override def evaluateExternalValue() : Unit = {

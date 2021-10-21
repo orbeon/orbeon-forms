@@ -189,7 +189,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
       // "by performing a setvalue action if the caseref attribute is specified and indicates a node. If the
       // node is readonly or if the toggle action does not indicate a case in the switch, then no value change
       // occurs and therefore no change of the selected case occurs"
-      _caserefBinding flatMap (item => StaticDataModel.isWritableItem(item).left.toOption) foreach { writableNode =>
+      _caserefBinding flatMap (item => StaticDataModel.isWritableItem(item).toOption) foreach { writableNode =>
 
         val newValue = caseValue(caseControlToSelect.staticControl)
 

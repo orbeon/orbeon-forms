@@ -57,11 +57,11 @@ object StaticDataModel {
    * - element nodes containing other elements
    * - items not backed by a mutable node (which are read-only)
    */
-  def isWritableItem(item: Item): VirtualNodeType Either Reason = item match {
-    case _: AtomicValue                                => Right(ReadonlyNodeReason)
-    case node: VirtualNodeType if node.hasChildElement => Right(DisallowedNodeReason)
-    case node: VirtualNodeType                         => Left(node)
-    case _: DocumentNodeInfoType                       => Right(DisallowedNodeReason) // XXX TODO: review this test
-    case _                                             => Right(ReadonlyNodeReason)
+  def isWritableItem(item: Item): Reason Either VirtualNodeType = item match {
+    case _: AtomicValue                                => Left(ReadonlyNodeReason)
+    case node: VirtualNodeType if node.hasChildElement => Left(DisallowedNodeReason)
+    case node: VirtualNodeType                         => Right(node)
+    case _: DocumentNodeInfoType                       => Left(DisallowedNodeReason) // XXX TODO: review this test
+    case _                                             => Left(ReadonlyNodeReason)
   }
 }

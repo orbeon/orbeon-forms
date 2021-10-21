@@ -33,7 +33,6 @@ import org.orbeon.oxf.xml.SaxonUtils
  */
 object DataModel {
 
-
   /**
    * Return the value of a bound item, whether a NodeInfo or an AtomicValue.
    *
@@ -71,11 +70,11 @@ object DataModel {
     assert(newValue ne null)
 
     isWritableItem(nodeInfo) match {
-      case Left(virtualNode) =>
+      case Right(virtualNode) =>
         setValueForNode(virtualNode.getUnderlyingNode.asInstanceOf[dom.Node], newValue)
         onSuccess()
         true
-      case Right(reason) =>
+      case Left(reason) =>
         onError(reason)
         false
     }

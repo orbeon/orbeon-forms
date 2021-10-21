@@ -231,7 +231,6 @@
                 <xf:var name="buttons" value="xxf:split(xxf:property('oxf.fb.publish.buttons'))[. = ('new', 'summary')]"/>
                 <xf:group
                     ref=".[
-                        xxf:is-blank($response) and
                         exists($buttons) and
                         instance()/available = 'true'
                     ]"

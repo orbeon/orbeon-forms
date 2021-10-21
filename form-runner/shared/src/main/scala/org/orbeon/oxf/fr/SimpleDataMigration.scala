@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr
 
 import enumeratum.EnumEntry.Lowercase
-import org.log4s.Logger
-import org.orbeon.exception.OrbeonFormatter
+import cats.syntax.option._
+import org.log4s
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.LoggerFactory
@@ -29,11 +29,42 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
-import scala.collection.compat._
 
 object SimpleDataMigration {
 
   import Private._
+
+  import enumeratum._
+
+  sealed trait DataMigrationBehavior extends EnumEntry with Lowercase
+
+  object DataMigrationBehavior extends Enum[DataMigrationBehavior] {
+
+    val values = findValues
+
+    case object Enabled   extends DataMigrationBehavior
+    case object Disabled  extends DataMigrationBehavior
+    case object HolesOnly extends DataMigrationBehavior
+    case object Error     extends DataMigrationBehavior
+  }
+
+  sealed trait DataMigrationOp
+
+  object DataMigrationOp {
+    case class Insert(parentElem: om.NodeInfo, after: Option[String], template: Option[om.NodeInfo]) extends DataMigrationOp
+    case class Delete(elem: om.NodeInfo)                                                             extends DataMigrationOp
+  }
+
+  trait FormOps {
+
+    type DocType
+    type BindType
+
+    def findFormBindsRoot: Option[BindType]
+    def templateIterationNamesToRootElems: Map[String, om.NodeInfo]
+    def bindChildren(bind: BindType): List[BindType]
+    def bindNameOpt(bind: BindType): Option[String]
+  }
 
   // Attempt to fill/remove holes in an instance given:
   //
@@ -49,56 +80,100 @@ object SimpleDataMigration {
     enclosingModelAbsoluteId : String,
     templateInstanceRootElem : om.NodeInfo,
     dataToMigrateRootElem    : om.NodeInfo
-  ): Option[om.NodeInfo] =
-    try {
+  ): Option[om.NodeInfo] = {
 
-      require(XFormsId.isAbsoluteId(enclosingModelAbsoluteId))
-      require(templateInstanceRootElem.isElement)
-      require(dataToMigrateRootElem.isElement)
+    val doc = inScopeContainingDocument
 
-      implicit val doc = inScopeContainingDocument
+    val maybeMigrated =
+      dataMaybeWithSimpleMigrationUseOps(
+        enclosingModelAbsoluteId = enclosingModelAbsoluteId,
+        templateInstanceRootElem = templateInstanceRootElem,
+        dataToMigrateRootElem    = dataToMigrateRootElem,
+        dataMigrationBehavior    = getConfiguredDataMigrationBehavior(doc.staticState))(
+        formOps                  = new ContainingDocumentOps(inScopeContainingDocument, enclosingModelAbsoluteId)
+      )
 
-      getConfiguredDataMigrationBehavior(doc.staticState) match {
-        case DataMigrationBehavior.Disabled =>
-          None
-        case DataMigrationBehavior.Enabled =>
-
-          val dataToMigrateRootElemMutable =
-            MigrationSupport.copyDocumentKeepInstanceData(dataToMigrateRootElem.root).rootElement
-
-          val ops =
-            gatherMigrationOps(
-              enclosingModelAbsoluteId = enclosingModelAbsoluteId,
-              templateInstanceRootElem = templateInstanceRootElem,
-              dataToMigrateRootElem    = dataToMigrateRootElemMutable
-            )
-
-          if (ops.nonEmpty) {
-            performMigrationOps(ops)
-            Some(dataToMigrateRootElemMutable)
-          } else
-            None
-
-        case DataMigrationBehavior.Error =>
-          val ops = gatherMigrationOps(enclosingModelAbsoluteId, templateInstanceRootElem, dataToMigrateRootElem)
-          if (ops.nonEmpty)
-            FormRunner.sendError(StatusCode.InternalServerError) // TODO: Which error is best?
-          else
-            None
-      }
-    } catch {
-      case t: Throwable =>
-        logger.error(OrbeonFormatter.format(t))
-        throw t
+    maybeMigrated map {
+      case Left(_)  => FormRunner.sendError(StatusCode.InternalServerError) // TODO: Which error is best?
+      case Right(v) => v
     }
+  }
 
+  def dataMaybeWithSimpleMigrationUseOps(
+    enclosingModelAbsoluteId : String,
+    templateInstanceRootElem : om.NodeInfo,
+    dataToMigrateRootElem    : om.NodeInfo,
+    dataMigrationBehavior    : DataMigrationBehavior)(implicit
+    formOps                  : FormOps
+  ): Option[List[DataMigrationOp] Either om.NodeInfo] = {
+
+    require(XFormsId.isAbsoluteId(enclosingModelAbsoluteId))
+    require(templateInstanceRootElem.isElement)
+    require(dataToMigrateRootElem.isElement)
+
+    dataMigrationBehavior match {
+      case DataMigrationBehavior.Disabled =>
+        None
+      case DataMigrationBehavior.Enabled | DataMigrationBehavior.HolesOnly =>
+
+        val dataToMigrateRootElemMutable =
+          MigrationSupport.copyDocumentKeepInstanceData(dataToMigrateRootElem.root).rootElement
+
+        val ops =
+          gatherMigrationOps(
+            enclosingModelAbsoluteId = enclosingModelAbsoluteId,
+            templateInstanceRootElem = templateInstanceRootElem,
+            dataToMigrateRootElem    = dataToMigrateRootElemMutable
+          )
+
+        lazy val deleteOps =
+          ops collect {
+            case delete: DataMigrationOp.Delete => delete
+          }
+
+        val mustMigrate =
+          ops.nonEmpty && (
+            dataMigrationBehavior == DataMigrationBehavior.Enabled ||
+            dataMigrationBehavior == DataMigrationBehavior.HolesOnly && deleteOps.isEmpty
+          )
+
+        val mustRaiseError =
+          ops.nonEmpty && dataMigrationBehavior == DataMigrationBehavior.HolesOnly && deleteOps.nonEmpty
+
+        if (mustMigrate) {
+          performMigrationOps(ops)
+          Some(Right(dataToMigrateRootElemMutable))
+        } else if (mustRaiseError) {
+          Left(deleteOps).some
+        } else {
+          None
+        }
+
+      case DataMigrationBehavior.Error =>
+
+        val ops =
+          gatherMigrationOps(
+            enclosingModelAbsoluteId = enclosingModelAbsoluteId,
+            templateInstanceRootElem = templateInstanceRootElem,
+            dataToMigrateRootElem    = dataToMigrateRootElem
+          )
+
+        if (ops.nonEmpty)
+          Left(ops).some
+        else
+          None
+    }
+  }
+
+  // This is used in `form-to-xbl.xsl`, see:
+  // https://github.com/orbeon/orbeon-forms/issues/3829
   //@XPathFunction
   def iterateBinds(
     enclosingModelAbsoluteId : String,
     dataRootElem             : om.NodeInfo
   ): om.SequenceIterator = {
 
-    implicit val doc = inScopeContainingDocument
+    val ops = new ContainingDocumentOps(inScopeContainingDocument, enclosingModelAbsoluteId)
 
     def processLevel(
       parents          : List[om.NodeInfo],
@@ -119,11 +194,11 @@ object SimpleDataMigration {
           )
         }
 
-      scanBinds(binds, findOps)
+      scanBinds(ops)(binds, findOps)
     }
 
     // The root bind has id `fr-form-binds` at the top-level as well as within section templates
-    findFormBindsRoot(findEnclosingModel(enclosingModelAbsoluteId)).toList flatMap { bind =>
+    ops.findFormBindsRoot.toList flatMap { bind =>
       processLevel(
         parents = List(dataRootElem),
         binds   = bind.childrenBinds,
@@ -134,30 +209,10 @@ object SimpleDataMigration {
 
   private object Private {
 
-    val logger: Logger = LoggerFactory.createLogger("org.orbeon.fr.data-migration")
+    val logger: log4s.Logger = LoggerFactory.createLogger("org.orbeon.fr.data-migration")
 
     val DataMigrationFeatureName  = "data-migration"
     val DataMigrationPropertyName = s"oxf.fr.detail.$DataMigrationFeatureName"
-
-    import enumeratum._
-
-    sealed trait DataMigrationBehavior extends EnumEntry with Lowercase
-
-    object DataMigrationBehavior extends Enum[DataMigrationBehavior] {
-
-      val values = findValues
-
-      case object Enabled   extends DataMigrationBehavior
-      case object Disabled  extends DataMigrationBehavior
-      case object Error     extends DataMigrationBehavior
-    }
-
-    sealed trait DataMigrationOp
-
-    object DataMigrationOp {
-      case class Insert(parentElem: om.NodeInfo, after: Option[String], template: Option[om.NodeInfo]) extends DataMigrationOp
-      case class Delete(elem: om.NodeInfo)                                                             extends DataMigrationOp
-    }
 
     def getConfiguredDataMigrationBehavior(staticState: XFormsStaticState): DataMigrationBehavior = {
 
@@ -178,29 +233,22 @@ object SimpleDataMigration {
           "Form Runner simple data migration"
         )
 
-      if (behavior == DataMigrationBehavior.Enabled && ! isFeatureEnabled)
+      if ((behavior == DataMigrationBehavior.Enabled || behavior == DataMigrationBehavior.HolesOnly) && ! isFeatureEnabled)
         DataMigrationBehavior.Error
       else
         behavior
     }
 
-    def findEnclosingModel(enclosingModelAbsoluteId: String)(implicit doc: XFormsContainingDocument): XFormsModel =
-      doc.findObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(enclosingModelAbsoluteId)) flatMap
-        (_.narrowTo[XFormsModel])                                                             getOrElse
-        (throw new IllegalStateException)
-
-    def findFormBindsRoot(enclosingModel: XFormsModel)(implicit doc: XFormsContainingDocument): Option[StaticBind] =
-      enclosingModel.staticModel.bindsById.get(Names.FormBinds)
-
     def scanBinds[T](
-      binds : Seq[StaticBind],
-      find  : (Option[StaticBind], StaticBind, String) => List[T]
+      ops   : FormOps)(
+      binds : Seq[ops.BindType],
+      find  : (Option[ops.BindType], ops.BindType, String) => List[T]
     ): List[T] = {
 
       var result: List[T] = Nil
 
-      binds.scanLeft(None: Option[StaticBind]) { case (prevBindOpt, bind) =>
-        bind.nameOpt foreach { bindName =>
+      binds.scanLeft(None: Option[ops.BindType]) { case (prevBindOpt, bind) =>
+        ops.bindNameOpt(bind) foreach { bindName =>
           result = find(prevBindOpt, bind, bindName) ::: result
         }
         Some(bind)
@@ -209,16 +257,20 @@ object SimpleDataMigration {
       result
     }
 
-    def gatherMigrationOps(
-      enclosingModelAbsoluteId : String,
-      templateInstanceRootElem : om.NodeInfo,
-      dataToMigrateRootElem    : om.NodeInfo)(implicit
-      doc                      : XFormsContainingDocument
-    ): List[DataMigrationOp] = {
+    class ContainingDocumentOps(doc: XFormsContainingDocument, enclosingModelAbsoluteId: String) extends FormOps {
 
-      val enclosingModel = findEnclosingModel(enclosingModelAbsoluteId)
+      type DocType = XFormsContainingDocument
+      type BindType = StaticBind
 
-      val templateIterationNamesToRootElems =
+      private val enclosingModel =
+        doc.findObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(enclosingModelAbsoluteId)) flatMap
+          (_.narrowTo[XFormsModel])                                                             getOrElse
+          (throw new IllegalStateException)
+
+      def findFormBindsRoot: Option[StaticBind] =
+        enclosingModel.staticModel.bindsById.get(Names.FormBinds)
+
+      def templateIterationNamesToRootElems: Map[String, om.NodeInfo] =
         (
           for {
             instance   <- enclosingModel.instancesIterator
@@ -227,6 +279,22 @@ object SimpleDataMigration {
           } yield
             instance.rootElement.localname -> instance.rootElement
         ).toMap
+
+      def bindChildren(bind: StaticBind): List[StaticBind] =
+        bind.childrenBinds
+
+      def bindNameOpt(bind: StaticBind): Option[String] =
+        bind.nameOpt
+    }
+
+    def gatherMigrationOps(
+      enclosingModelAbsoluteId : String,
+      templateInstanceRootElem : om.NodeInfo,
+      dataToMigrateRootElem    : om.NodeInfo)(implicit
+      formOps                  : FormOps
+    ): List[DataMigrationOp] = {
+
+      val templateIterationNamesToRootElems = formOps.templateIterationNamesToRootElems
 
       // How this works:
       //
@@ -255,14 +323,14 @@ object SimpleDataMigration {
       // it is messy and harder to get right.
       def processLevel(
         parents          : List[om.NodeInfo],
-        binds            : List[StaticBind], // use `List` to ensure eager evaluation
+        binds            : List[formOps.BindType], // use `List` to ensure eager evaluation
         templateRootElem : om.NodeInfo,
         path             : List[String]
       ): List[DataMigrationOp] = {
 
-        val allBindNames = binds flatMap (_.nameOpt) toSet
+        val allBindNames = binds.flatMap(formOps.bindNameOpt).toSet
 
-        def findOps(prevBindOpt: Option[StaticBind], bind: StaticBind, bindName: String): List[DataMigrationOp] =
+        def findOps(prevBindOpt: Option[formOps.BindType], bind: formOps.BindType, bindName: String): List[DataMigrationOp] = {
           parents flatMap { parent =>
 
             val deleteOps =
@@ -276,7 +344,7 @@ object SimpleDataMigration {
                   List(
                     DataMigrationOp.Insert(
                       parentElem = parent,
-                      after      = prevBindOpt flatMap (_.nameOpt),
+                      after      = prevBindOpt.flatMap(formOps.bindNameOpt),
                       template   = findElementTemplate(templateRootElem, bindName :: path)
                     )
                   )
@@ -288,7 +356,7 @@ object SimpleDataMigration {
 
                   processLevel(
                     parents          = nodes,
-                    binds            = bind.childrenBinds,
+                    binds            = formOps.bindChildren(bind),
                     templateRootElem = newTemplateRootElem getOrElse templateRootElem,
                     path             = if (newTemplateRootElem.isDefined) Nil else bindName :: path
                   )
@@ -296,23 +364,24 @@ object SimpleDataMigration {
 
             deleteOps ++: nestedOps
           }
+        }
 
-        scanBinds(binds, findOps)
+        scanBinds(formOps)(binds, findOps)
       }
 
       // The root bind has id `fr-form-binds` at the top-level as well as within section templates
-      findFormBindsRoot(enclosingModel).toList flatMap { bind =>
+      formOps.findFormBindsRoot.toList flatMap { bind =>
         processLevel(
           parents          = List(dataToMigrateRootElem),
-          binds            = bind.childrenBinds,
+          binds            = formOps.bindChildren(bind),
           templateRootElem = templateInstanceRootElem,
           path             = Nil
         )
       }
     }
 
-    def performMigrationOps(ops: List[DataMigrationOp]): Unit =
-      ops foreach {
+    def performMigrationOps(migrationOps: List[DataMigrationOp]): Unit =
+      migrationOps foreach {
         case DataMigrationOp.Delete(elem) =>
 
           logger.debug(s"removing element `${elem.localname}` from `${elem.getParent.localname}`")

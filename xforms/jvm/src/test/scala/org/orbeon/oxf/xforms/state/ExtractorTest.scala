@@ -45,7 +45,7 @@ class ExtractorTest
     val ElementsToExclude = Set("properties", "last-id", "template")
     val extractorOutput = new ElementFilterXMLReceiver(
       extractorCollector,
-      (level, uri, localname, _) => ! ElementsToExclude(localname)
+      (_, _, localname, _) => ! ElementsToExclude(localname)
     )
 
     def urlToSAX(

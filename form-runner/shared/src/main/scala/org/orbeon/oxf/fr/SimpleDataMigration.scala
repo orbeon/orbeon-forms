@@ -344,10 +344,11 @@ object SimpleDataMigration {
                 )
               case nodes =>
 
-                // Recurse
+                // If we get a `Some(_)` it means that this bind is for a repeat iteration
                 val newTemplateRootElem =
                   templateIterationNamesToRootElems.get(bindName)
 
+                // Recurse
                 processLevel(
                   parents          = nodes,
                   binds            = formOps.bindChildren(bind),
@@ -359,9 +360,9 @@ object SimpleDataMigration {
         }
 
         // https://github.com/orbeon/orbeon-forms/issues/5041
-        // Only delete if there are no nested bind, for backward compatibility. But is this wrong? IF we don't do this,
-        // we will delete `<_>` for multiple attachments as well as the nested grids in section template data. However,
-        // this probably also means that we'll not delete extra elements nested within other leaves.
+        // Only delete if there are no nested bind, for backward compatibility first. But is this wrong? If we don't do
+        // this, we will delete `<_>` for multiple attachments as well as the nested grids in section template data.
+        // However, this probably also means that we'll not delete extra elements nested within other leaves.
         val deleteOps =
           if (binds.nonEmpty)
             parents / * filter (e => ! allBindNames(e.localname)) map { e =>

@@ -331,42 +331,46 @@ object SimpleDataMigration {
         val allBindNames = binds.flatMap(formOps.bindNameOpt).toSet
 
         def findOps(prevBindOpt: Option[formOps.BindType], bind: formOps.BindType, bindName: String): List[DataMigrationOp] = {
+
           parents flatMap { parent =>
-
-            val deleteOps =
-              parent / * filter (e => e.namespaceURI == "" && ! allBindNames(e.localname)) map { e =>
-                DataMigrationOp.Delete(e)
-              }
-
-            val nestedOps =
-              parent / bindName toList match {
-                case Nil =>
-                  List(
-                    DataMigrationOp.Insert(
-                      parentElem = parent,
-                      after      = prevBindOpt.flatMap(formOps.bindNameOpt),
-                      template   = findElementTemplate(templateRootElem, bindName :: path)
-                    )
+            parent / bindName toList match {
+              case Nil =>
+                List(
+                  DataMigrationOp.Insert(
+                    parentElem = parent,
+                    after      = prevBindOpt.flatMap(formOps.bindNameOpt),
+                    template   = findElementTemplate(templateRootElem, bindName :: path)
                   )
-                case nodes =>
+                )
+              case nodes =>
 
-                  // Recurse
-                  val newTemplateRootElem =
-                    templateIterationNamesToRootElems.get(bindName)
+                // Recurse
+                val newTemplateRootElem =
+                  templateIterationNamesToRootElems.get(bindName)
 
-                  processLevel(
-                    parents          = nodes,
-                    binds            = formOps.bindChildren(bind),
-                    templateRootElem = newTemplateRootElem getOrElse templateRootElem,
-                    path             = if (newTemplateRootElem.isDefined) Nil else bindName :: path
-                  )
-              }
-
-            deleteOps ++: nestedOps
+                processLevel(
+                  parents          = nodes,
+                  binds            = formOps.bindChildren(bind),
+                  templateRootElem = newTemplateRootElem getOrElse templateRootElem,
+                  path             = if (newTemplateRootElem.isDefined) Nil else bindName :: path
+                )
+            }
           }
         }
 
-        scanBinds(formOps)(binds, findOps)
+        // https://github.com/orbeon/orbeon-forms/issues/5041
+        // Only delete if there are no nested bind, for backward compatibility. But is this wrong? IF we don't do this,
+        // we will delete `<_>` for multiple attachments as well as the nested grids in section template data. However,
+        // this probably also means that we'll not delete extra elements nested within other leaves.
+        val deleteOps =
+          if (binds.nonEmpty)
+            parents / * filter (e => ! allBindNames(e.localname)) map { e =>
+              DataMigrationOp.Delete(e)
+            }
+          else
+            Nil
+
+        deleteOps ++: scanBinds(formOps)(binds, findOps)
       }
 
       // The root bind has id `fr-form-binds` at the top-level as well as within section templates

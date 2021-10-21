@@ -31,9 +31,8 @@ abstract class AbstractNode extends Node with Serializable { // TODO: `Serializa
       parent.remove(this)
     } else {
       val document = getDocument
-      if (document ne null) {
+      if (document ne null)
         document.remove(this)
-      }
     }
     setParent(null)
     setDocument(null)

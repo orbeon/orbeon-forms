@@ -238,7 +238,7 @@ private object PersistenceProxyProcessor {
           null,
           new ElementFilterXMLReceiver(
             xmlReceiver = receiver,
-            filter      = (_, _, _, atts) =>
+            keep        = (_, _, _, atts) =>
               atts.getValue(FRRelevantQName.namespace.uri, FRRelevantQName.localName) != "false"
           ),
           ParserConfiguration.Plain,

@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xml
 
 import org.xml.sax.Attributes
-import org.xml.sax.SAXException
+
 
 class ElementFilterXMLReceiver(
   xmlReceiver : XMLReceiver,
-  filter      : (Int, String, String, Attributes) => Boolean
+  keep        : (Int, String, String, Attributes) => Boolean
 ) extends SimpleForwardingXMLReceiver(xmlReceiver) {
 
   private var level: Int = 0
@@ -26,10 +26,10 @@ class ElementFilterXMLReceiver(
 
   override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
     if (filterLevel == -1) {
-      if (! filter(level, uri, localname, attributes))
-        filterLevel = level
-      else
+      if (keep(level, uri, localname, attributes))
         super.startElement(uri, localname, qName, attributes)
+      else
+        filterLevel = level
     }
     level += 1
   }

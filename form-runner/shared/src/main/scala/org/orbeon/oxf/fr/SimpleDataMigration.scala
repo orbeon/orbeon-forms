@@ -20,9 +20,10 @@ import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticState}
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, inScopeContainingDocument, insert}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
-import org.orbeon.oxf.xforms.model.XFormsModel
+import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -205,6 +206,137 @@ object SimpleDataMigration {
         path    = Nil
       )
     }
+  }
+
+  // Merge two XML documents based on binds.
+  // See https://github.com/orbeon/orbeon-forms/issues/4980
+  // This doesn't handle attributes at all. This is probably ok for now because we don't have the use case
+  // of being able to update file attachments metadata, in particular. But in the future we should support
+  // that.
+  def mergeXmlFromBindSchema(
+    srcDocRootElem : om.NodeInfo,
+    dstDocRootElem : om.NodeInfo,
+    ignoreBlankData: Boolean)(
+    formOps        : FormOps
+  ): (Int, Int) = {
+
+    val templateIterationNamesToRootElems = formOps.templateIterationNamesToRootElems
+
+    var allValuesCount = 0
+    var setValuesCount = 0
+
+    def processLevel(
+      parentBind            : formOps.BindType,
+      leftElem              : om.NodeInfo,
+      rightElem             : om.NodeInfo,
+      currentIgnoreBlankData: Boolean
+    ): Unit = {
+
+      formOps.bindChildren(parentBind) match {
+        case Nil =>
+          // Leaf node
+
+          // Data can be copied if there are no nested element. Specific case are:
+          //
+          // - section template content
+          // - multiple attachment using nested array (`<_>`)
+          if (! rightElem.hasChildElement && ! leftElem.hasChildElement) {
+
+            allValuesCount += 1
+
+            val value = leftElem.getStringValue
+
+            if (! currentIgnoreBlankData || value.nonAllBlank) {
+              DataModel.setValue(rightElem, value, onError = r => throw new IllegalArgumentException(r.message))
+              setValuesCount += 1
+            }
+          }
+
+        case childrenBinds =>
+
+          childrenBinds foreach { childBind =>
+
+            formOps.bindNameOpt(childBind) foreach { bindName =>
+
+              templateIterationNamesToRootElems.get(bindName) match {
+                case Some(repeatTemplateInstanceRootElem) =>
+                  // We are a repeated container element (that is, an iteration)
+
+                  // Adjust iterations
+                  val leftSize  = (leftElem / bindName).size
+                  val rightSize = (rightElem / bindName).size
+
+                  // Two different ways to handle new iterations:
+                  //
+                  // - `false`: insert repeat templates then recurse down and copy values only
+                  // - `true`: copy incoming data for new iterations as is and don't recurse
+                  //
+                  // `true` would be more efficient, but there is a risk that unwanted attributes could be copied,
+                  // in particular.
+                  val CopyNewIterations = false
+
+                  if (CopyNewIterations) {
+
+                    if (leftSize > rightSize)
+                      insert(
+                        into   = List(rightElem),
+                        after  = rightElem / *,
+                        origin = leftElem / bindName drop rightSize
+                      )
+
+                    // Recurse into each iteration
+                    (leftElem / bindName take rightSize).zip(rightElem / bindName) foreach { case (childLeft, childRight) =>
+                      processLevel(
+                        parentBind             = childBind,
+                        leftElem               = childLeft,
+                        rightElem              = childRight,
+                        currentIgnoreBlankData = currentIgnoreBlankData
+                      )
+                    }
+
+                  } else {
+
+                    if (leftSize > rightSize)
+                      insert(
+                        into   = List(rightElem),
+                        after  = rightElem / *,
+                        origin = (1 to (leftSize - rightSize)).map(_ => repeatTemplateInstanceRootElem)
+                      )
+
+                    // Recurse into each iteration
+                    (leftElem / bindName).zip(rightElem / bindName).zipWithIndex foreach { case ((childLeft, childRight), index) =>
+                      processLevel(
+                        parentBind             = childBind,
+                        leftElem               = childLeft,
+                        rightElem              = childRight,
+                        currentIgnoreBlankData = if (index < rightSize) currentIgnoreBlankData else false // data in new iterations always wins
+                      )
+                    }
+                  }
+                case None =>
+                  // We are a non-repeated container element: just recurse
+                  processLevel(
+                    parentBind             = childBind,
+                    leftElem               = (leftElem firstChildOpt bindName).getOrElse(throw new IllegalArgumentException(s"missing element in source: `${bindName}`")),
+                    rightElem              = (rightElem firstChildOpt bindName).getOrElse(throw new IllegalArgumentException(s"missing element in destination: `${bindName}`")),
+                    currentIgnoreBlankData = currentIgnoreBlankData
+                  )
+              }
+            }
+          }
+      }
+    }
+
+    formOps.findFormBindsRoot foreach { bind =>
+      processLevel(
+        parentBind             = bind,
+        leftElem               = srcDocRootElem,
+        rightElem              = dstDocRootElem,
+        currentIgnoreBlankData = ignoreBlankData
+      )
+    }
+
+    (allValuesCount, setValuesCount)
   }
 
   private object Private {

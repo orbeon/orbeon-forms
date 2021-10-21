@@ -447,7 +447,7 @@ trait FormRunnerPersistence {
     readDocument(path, customHeaders)
   }
 
-  // Retrieves the metadata for a form from the persistence layer
+  // Retrieves from the persistence layer the metadata for a form, return an `Option[<form>]`
   def readFormMetadataOpt(
     appName  : String,
     formName : String,

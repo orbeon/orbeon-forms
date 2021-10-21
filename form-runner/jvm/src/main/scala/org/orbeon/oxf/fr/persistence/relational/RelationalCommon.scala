@@ -59,7 +59,7 @@ object RelationalCommon {
     def latest(app: String, form: String): Option[Int] =
       for {
         metadata    <- FormRunner.readFormMetadataOpt(app, form, FormDefinitionVersion.Latest)
-        formVersion <- metadata.child("forms").child("form").child("form-version").headOption
+        formVersion <- metadata.child("form-version").headOption
       } yield
         formVersion.stringValue.toInt
 

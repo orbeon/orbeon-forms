@@ -81,13 +81,10 @@ trait XMLReceiverSupport {
       receiver.characters(chars, 0, chars.length)
     }
 
-  def addAttributes(attributesImpl: AttributesImpl, atts: Iterable[(String, String)]): Unit =
-    atts foreach {
-      case (name, value) =>
-        require(name ne null)
-        if (value ne null)
-          attributesImpl.addAttribute("", name, name, "CDATA", value)
-    }
+  def comment(text: String)(implicit receiver: XMLReceiver): Unit = {
+    val chars = text.toCharArray
+    receiver.comment(chars, 0, chars.length)
+  }
 
   // NOTE: Encode attributes as space-separated XML attribute-like pairs
   def processingInstruction(name: String, atts: Seq[(String, String)] = Nil)(implicit receiver: XMLReceiver): Unit =
@@ -95,6 +92,14 @@ trait XMLReceiverSupport {
       name,
       atts map { case (name, value) => s"""$name="${value.escapeXmlForAttribute}"""" } mkString " "
     )
+
+  private def addAttributes(attributesImpl: AttributesImpl, atts: Iterable[(String, String)]): Unit =
+    atts foreach {
+      case (name, value) =>
+        require(name ne null)
+        if (value ne null)
+          attributesImpl.addAttribute("", name, name, "CDATA", value)
+    }
 
   implicit def pairsToAttributes(atts: Iterable[(String, String)]): Attributes = {
     val saxAtts = new AttributesImpl

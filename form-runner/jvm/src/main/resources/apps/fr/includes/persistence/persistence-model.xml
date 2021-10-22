@@ -27,6 +27,7 @@
     <xf:var name="parameters"           value="xxf:instance('fr-parameters-instance')"/>
     <xf:var name="app"                  value="fr:app-name()"/>
     <xf:var name="form"                 value="fr:form-name()"/>
+    <xf:var name="form-version"         value="fr:form-version()"/>
     <xf:var name="document-element"     value="$parameters/document"/>
     <xf:var name="document"             value="$document-element/string()"/>
     <xf:var name="mode"                 value="fr:mode()"/>
@@ -626,6 +627,10 @@
             ref="instance('fr-search-request')"
             replace="instance"
             instance="fr-search-response">
+        <xf:header ref="$form-version[xxf:non-blank()]">
+            <xf:name>Orbeon-Form-Definition-Version</xf:name>
+            <xf:value value="."/>
+        </xf:header>
         <!-- Remove documents we can't update (search might still return them if we can only ready them) -->
         <xf:delete
             event="xforms-submit-done"

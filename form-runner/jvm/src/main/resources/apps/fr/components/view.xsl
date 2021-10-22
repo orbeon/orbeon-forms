@@ -214,6 +214,13 @@
             xxf:element="div"
         >
             <xh:i class="fa fa-file-o" aria-hidden="true"/>
+            <xf:var
+                name="form-version-param"
+                model="fr-persistence-model"
+                value="
+                    if (xxf:is-blank($form-version)) then ''
+                    else concat('form-version=', $form-version)
+                "/>
             <xf:switch caseref="$persistence-instance/found-document-message-to-show">
                 <xf:case value="'found-draft-for-document'">
                     <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-document"/>
@@ -280,7 +287,12 @@
                             </xf:trigger>
                             <xf:trigger xxf:modal="true">
                                 <xf:label value="$fr-resources/detail/draft-singleton/view-drafts"/>
-                                <xf:load event="DOMActivate" resource="/fr/{$app}/{$form}/summary?drafts-for-never-saved-document=true" model="fr-persistence-model"/>
+                                <xf:load
+                                    event="DOMActivate"
+                                    model="fr-persistence-model"
+                                    resource="/fr/{$app}/{$form}/summary?drafts-for-never-saved-document=true{{
+                                        if (xxf:non-blank($form-version-param)) then '&amp;' else ''}}{{
+                                        $form-version-param}}"/>
                             </xf:trigger>
                         </xf:group>
                     </xh:div>
@@ -291,7 +303,12 @@
                         <xf:group>
                             <xf:trigger xxf:modal="true">
                                 <xf:label value="$fr-resources/detail/draft-singleton/multiple-docs-view-data"/>
-                                <xf:load event="DOMActivate" resource="/fr/{$app}/{$form}/summary" model="fr-persistence-model"/>
+                                <xf:load
+                                    event="DOMActivate"
+                                    model="fr-persistence-model"
+                                    resource="/fr/{$app}/{$form}/summary{{
+                                        if (xxf:non-blank($form-version-param)) then '?' else ''}}{{
+                                        $form-version-param}}"/>
                             </xf:trigger>
                         </xf:group>
                     </xh:div>

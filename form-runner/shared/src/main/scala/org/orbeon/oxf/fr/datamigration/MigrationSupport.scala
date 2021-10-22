@@ -301,4 +301,7 @@ object MigrationSupport {
 
     mutableData
   }
+
+  def applyPath(mutableData: NodeInfo, path: i.Seq[PathElem]): Seq[NodeInfo] =
+    path.foldLeft(Seq(mutableData)) { case (e, p) => e child p.value }
 }

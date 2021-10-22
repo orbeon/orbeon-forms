@@ -49,7 +49,6 @@ case class MigrationSet20191(migrations: List[Migration20191]) extends Migration
 
 object MigrationOps20191 extends MigrationOps {
 
-  import Private._
   import io.circe.generic.auto._
   import io.circe.syntax._
 
@@ -266,10 +265,4 @@ object MigrationOps20191 extends MigrationOps {
     (migrationSet.migrations exists (m => path.startsWith(m.containerPath ::: m.newGridElem :: Nil))) option {
       path.dropRight(2) ::: path.last :: Nil
     }
-
-  private object Private {
-
-    def applyPath(mutableData: NodeInfo, path: i.Seq[PathElem]): Seq[NodeInfo] =
-      path.foldLeft(Seq(mutableData)) { case (e, p) => e child p.value }
-  }
 }

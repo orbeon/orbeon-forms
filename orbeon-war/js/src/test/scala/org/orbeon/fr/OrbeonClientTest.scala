@@ -79,7 +79,7 @@ class OrbeonClientTest extends AsyncFunSpec {
   val TomcatImageName     = "tomcat:8.5-jdk8-openjdk-slim"
   val HAProxyImageName    = "haproxy:1.7"
 
-  val CookieTimeout       = 60.seconds
+  val CookieTimeout       = 120.seconds
 
   case class OrbeonWindow(window: Window, documentAPI: DocumentTrait, ajaxServer: AjaxServerTrait)
 

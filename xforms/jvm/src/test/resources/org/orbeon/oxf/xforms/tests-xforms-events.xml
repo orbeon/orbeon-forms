@@ -1008,7 +1008,7 @@
                         <xxf:control id="plate⊙1">
                             <xxf:value>777</xxf:value>
                         </xxf:control>
-                        <xxf:control id="leased⊙1">
+                        <xxf:control id="leased⊙1" visited="true">
                             <xxf:value>leased</xxf:value>
                         </xxf:control>
                         <xxf:control id="plate⊙2">

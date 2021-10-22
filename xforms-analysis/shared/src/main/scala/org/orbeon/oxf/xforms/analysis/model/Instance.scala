@@ -167,7 +167,7 @@ object Instance {
     )
 
   // Extract a document and adjust namespaces if requested
-  // NOTE: Should implement exactly as per XSLT 2.0
+  // NOTE: Should implement exactly as per XForms 2.0
   // NOTE: Should implement namespace fixup, the code below can break serialization
   def extractDocHandlePrefixes(element: Element, excludeResultPrefixes : Set[String]): Document =
     excludeResultPrefixes match {

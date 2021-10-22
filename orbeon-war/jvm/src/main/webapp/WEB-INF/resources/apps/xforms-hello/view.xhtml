@@ -21,12 +21,22 @@
         <xh:title>XForms Hello</xh:title>
         <xf:model>
             <xf:instance>
-                <_/>
+                <first-name xmlns=""/>
             </xf:instance>
-            <xf:bind ref="." type="xf:boolean"/>
         </xf:model>
     </xh:head>
     <xh:body>
-        <xf:input ref="."/>
+        <xh:p>
+            <xh:i>This example is described in details in the <xh:a href="http://doc.orbeon.com/xforms/tutorial/introduction.html">Orbeon
+            Forms Tutorial</xh:a>.</xh:i>
+        </xh:p>
+        <xh:p>
+            <xf:input ref="/first-name" incremental="true">
+                <xf:label>Please enter your first name:</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"/>
+        </xh:p>
     </xh:body>
 </xh:html>

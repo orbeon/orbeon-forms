@@ -460,6 +460,7 @@
 
     <property as="xs:boolean" name="oxf.fr.import.allow-invalid-documents.*.*"                  value="false"/>
     <property as="xs:boolean" name="oxf.fr.import.restrict-to-latest-version.*.*"               value="false"/>
+    <property as="xs:string"  name="oxf.fr.import.allowed-formats.*.*"                          value="excel-headings xml-metadata"/>
     <property as="xs:string"  name="oxf.fr.import.default-format.*.*"                           value="excel-headings"/>
     <property as="xs:boolean" name="oxf.fr.import.show-app-form-names.*.*"                      value="true"/>
     <property as="xs:string"  name="oxf.fr.import.forward-parameters.*.*"                       value=""/>

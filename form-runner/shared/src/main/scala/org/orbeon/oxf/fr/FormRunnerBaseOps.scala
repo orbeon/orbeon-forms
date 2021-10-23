@@ -298,6 +298,12 @@ trait FormRunnerBaseOps {
       metadataElem.firstChildOpt("title")                map
       (_.stringValue)
 
+  // TODO: unify with above
+  def formDescriptionFromMetadataElem(metadataElem: NodeInfo, requestedLang: String): Option[String] =
+    metadataElem.elemWithLangOpt("description", requestedLang) orElse
+      metadataElem.firstChildOpt("description")                map
+      (_.stringValue)
+
   // Captcha support
   //@XPathFunction
   def captchaPassed: Boolean = persistenceInstance.rootElement / "captcha" === "true"

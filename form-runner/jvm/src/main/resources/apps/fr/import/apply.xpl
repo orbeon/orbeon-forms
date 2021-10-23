@@ -52,53 +52,74 @@
         <p:output name="instance" id="parameters-with-version"/>
     </p:processor>
 
+    <!-- This is read lazily by the Excel processor if data is needed -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" href="#parameters" transform="oxf:unsafe-xslt">
+            <config xsl:version="2.0">
+
+                <xsl:variable name="params" select="/*"/>
+
+                <xsl:variable
+                    name="resource"
+                    select="
+                        concat(
+                            '/fr/service/persistence/crud/',
+                            $params/app,
+                            '/',
+                            $params/form,
+                            '/data/',
+                            p:get-request-parameter('document-id'),
+                            '/data.xml'
+                        )"/>
+
+                <url><xsl:value-of select="p:rewrite-service-uri($resource, true())"/></url>
+                <mode>xml</mode>
+                <handle-xinclude>false</handle-xinclude>
+                <cache-control><use-local-cache>false</use-local-cache><conditional-get>false</conditional-get></cache-control>
+
+            </config>
+        </p:input>
+        <p:output name="data" id="form-data"/>
+    </p:processor>
+
     <!-- Extract rows -->
     <p:choose href="#instance">
-        <p:when test="/*/file-format = 'excel-named-ranges'">
+        <p:when test="/*/file-format = 'xml-metadata'">
 
-            <!-- This is read lazily by the Excel processor if data is needed -->
             <p:processor name="oxf:url-generator">
-                <p:input name="config" href="#parameters" transform="oxf:unsafe-xslt">
+                <p:input name="config" transform="oxf:xslt" href="#instance">
                     <config xsl:version="2.0">
-
-                        <xsl:variable name="params" select="/*"/>
-
-                        <xsl:variable
-                            name="resource"
-                            select="
-                                concat(
-                                    '/fr/service/persistence/crud/',
-                                    $params/app,
-                                    '/',
-                                    $params/form,
-                                    '/data/',
-                                    p:get-request-parameter('document-id'),
-                                    '/data.xml'
-                                )"/>
-
-                        <url><xsl:value-of select="p:rewrite-service-uri($resource, true())"/></url>
+                        <url><xsl:value-of select="/*/file"/></url>
+                        <content-type><xsl:value-of select="/*/file/@mediatype"/></content-type>
+                        <cache-control><use-local-cache>false</use-local-cache></cache-control>
                         <mode>xml</mode>
-                        <handle-xinclude>false</handle-xinclude>
-                        <cache-control><use-local-cache>false</use-local-cache><conditional-get>false</conditional-get></cache-control>
-
                     </config>
                 </p:input>
-                <p:output name="data" id="form-data"/>
+                <p:output name="data" id="xml-content"/>
             </p:processor>
 
+            <p:processor name="fr:xml-import">
+                <p:input  name="params" href="#parameters"/>
+                <p:input  name="data"   href="#form-data"/>
+                <p:input  name="form"   href="#xhtml-fr-xforms"/>
+                <p:input  name="file"   href="#xml-content" debug="xxx xml-content"/>
+                <p:output name="data"   id="rows-or-stats-and-data"/>
+            </p:processor>
+        </p:when>
+        <p:when test="/*/file-format = 'excel-named-ranges'">
             <p:processor name="fr:extract-rows-from-excel-with-named-ranges">
                 <p:input  name="params" href="#parameters"/>
                 <p:input  name="data"   href="#form-data"/>
                 <p:input  name="form"   href="#xhtml-fr-xforms"/>
                 <p:input  name="file"   href="#zip"/>
-                <p:output name="rows"   id="rows"/>
+                <p:output name="data"   id="rows-or-stats-and-data"/>
             </p:processor>
         </p:when>
         <p:otherwise>
             <p:processor name="oxf:pipeline">
                 <p:input  name="config" href="extract-rows-from-excel-with-headings.xpl"/>
                 <p:input  name="file"   href="#zip"/>
-                <p:output name="rows"   id="rows"/>
+                <p:output name="rows"   id="rows-or-stats-and-data"/>
             </p:processor>
         </p:otherwise>
     </p:choose>
@@ -135,7 +156,7 @@
     <p:processor name="oxf:xforms-to-xhtml">
         <p:input  name="annotated-document" href="#full-form"/>
         <p:input  name="instance"           href="#parameters-with-version"/>
-        <p:input  name="data"               href="#rows"/>
+        <p:input  name="data"               href="#rows-or-stats-and-data"/>
         <p:output name="document"           ref="data" id="binary-document"/>
     </p:processor>
 

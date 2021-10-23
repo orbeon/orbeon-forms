@@ -410,8 +410,8 @@
                 <label>Upload</label>
             </upload>
             <file>
-                <label>Excel file to import</label>
-                <hint>File must be in Excel 2007 format (.xlsx)</hint>
+                <label>File to import</label>
+                <hint>File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
                 <alert>Missing file</alert>
             </file>
             <validation>
@@ -910,8 +910,8 @@
                 <label>Télécharger vers le serveur</label>
             </upload>
             <file>
-                <label>Importer le fichier Excel</label>
-                <hint>Le fichier doit être au format Excel 2007 (.xlsx)</hint>
+                <label>Importer le fichier</label>
+                <hint>Le fichier doit être au format Excel 2007 (.xlsx) ou XML (.xml)</hint>
                 <alert>Fichier manquant</alert>
             </file>
             <validation>
@@ -1396,8 +1396,8 @@
                 <label todo="true">Upload</label>
             </upload>
             <file>
-                <label todo="true">Excel file to import</label>
-                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
+                <label todo="true">File to import</label>
+                <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
                 <alert todo="true">Missing file</alert>
             </file>
             <validation>
@@ -1881,8 +1881,8 @@
                 <label todo="true">Upload</label>
             </upload>
             <file>
-                <label todo="true">Excel file to import</label>
-                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
+                <label todo="true">File to import</label>
+                <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
                 <alert todo="true">Missing file</alert>
             </file>
             <validation>
@@ -2364,8 +2364,8 @@
                 <label todo="true">Upload</label>
             </upload>
             <file>
-                <label todo="true">Excel file to import</label>
-                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
+                <label todo="true">File to import</label>
+                <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
                 <alert todo="true">Missing file</alert>
             </file>
             <validation>
@@ -2860,8 +2860,8 @@
                 <label>Caricamento</label>
             </upload>
             <file>
-                <label>File Excel da importare</label>
-                <hint>Il file dev'essere nel formato Excel 2007 (.xlsx)</hint>
+                <label>File da importare</label>
+                <hint>Il file dev'essere nel formato Excel 2007 (.xlsx) o XML (.xml)</hint>
                 <alert>File mancante</alert>
             </file>
             <validation>
@@ -3356,8 +3356,8 @@
                 <label>Hochladen</label>
             </upload>
             <file>
-                <label>Excel Datei zum Importieren</label>
-                <hint>Datei muss in Excel 2007 Format sein (.xlsx)</hint>
+                <label>Datei zum Importieren</label>
+                <hint>Datei muss in Excel 2007 Format (.xlsx) oder XML (.xml) sein</hint>
                 <alert>Fehlende Datei</alert>
             </file>
             <validation>
@@ -3852,8 +3852,8 @@
                 <label todo="true">Upload</label>
             </upload>
             <file>
-                <label todo="true">Excel file to import</label>
-                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
+                <label todo="true">File to import</label>
+                <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
                 <alert todo="true">Missing file</alert>
             </file>
             <validation>
@@ -4348,8 +4348,8 @@
                 <label todo="true">Upload</label>
             </upload>
             <file>
-                <label todo="true">Excel file to import</label>
-                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
+                <label todo="true">File to import</label>
+                <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
                 <alert todo="true">Missing file</alert>
             </file>
             <validation>
@@ -4843,8 +4843,8 @@
                 <label todo="true">Upload</label>
             </upload>
             <file>
-                <label todo="true">Excel file to import</label>
-                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
+                <label todo="true">File to import</label>
+                <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
                 <alert todo="true">Missing file</alert>
             </file>
             <validation>
@@ -5338,8 +5338,8 @@
                 <label todo="true">Upload</label>
             </upload>
             <file>
-                <label todo="true">Excel file to import</label>
-                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
+                <label todo="true">File to import</label>
+                <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
                 <alert todo="true">Missing file</alert>
             </file>
             <validation>
@@ -5821,8 +5821,8 @@
                 <label todo="true">Upload</label>
             </upload>
             <file>
-                <label todo="true">Excel file to import</label>
-                <hint todo="true">File must be in Excel 2007 format (.xlsx)</hint>
+                <label todo="true">File to import</label>
+                <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
                 <alert todo="true">Missing file</alert>
             </file>
             <validation>
@@ -6316,8 +6316,8 @@
                 <label>Wrzucić plik</label>
             </upload>
             <file>
-                <label>Plik Excel z danymi do importu</label>
-                <hint>Plik musi być w formacie Excel 2007 (.xlsx)</hint>
+                <label>Plik z danymi do importu</label>
+                <hint todo="true">Plik musi być w formacie Excel 2007 (.xlsx)</hint>
                 <alert>Brakujący plik</alert>
             </file>
             <validation>

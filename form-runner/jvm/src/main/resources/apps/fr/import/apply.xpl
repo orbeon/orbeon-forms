@@ -84,7 +84,7 @@
 
     <!-- Extract rows -->
     <p:choose href="#instance">
-        <p:when test="/*/file-format = 'xml-metadata'">
+        <p:when test="/*/file-format = 'xml-form-structure-and-data'">
 
             <p:processor name="oxf:url-generator">
                 <p:input name="config" transform="oxf:xslt" href="#instance">

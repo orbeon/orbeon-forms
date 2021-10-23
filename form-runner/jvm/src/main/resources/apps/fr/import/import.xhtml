@@ -48,7 +48,7 @@
                 name="allowed-formats"
                 value="
                     xxf:split(xxf:property(string-join(('oxf.fr.import.allowed-formats', $app, $form), '.')))[
-                        . = ('excel-headings', 'excel-named-ranges', 'xml-metadata')
+                        . = ('excel-headings', 'excel-named-ranges', 'xml-form-structure-and-data')
                     ]"/>
 
             <xf:var
@@ -56,7 +56,7 @@
                 value="
                     (
                         xxf:property(string-join(('oxf.fr.import.default-format', $app, $form), '.'))[
-                            . = ('excel-headings', 'excel-named-ranges', 'xml-metadata')
+                            . = ('excel-headings', 'excel-named-ranges', 'xml-form-structure-and-data')
                         ][
                             . = $allowed-formats
                         ],
@@ -175,7 +175,7 @@
                     <xf:bind ref="stats/(total | processed | succeeded)" type="xs:integer" readonly="true()"/>
                     <xf:bind ref="stats/(all-values-count | set-values-count | counts/@*)" type="xs:integer" readonly="true()"/>
                 </xf:bind>
-                <xf:bind ref="import" id="import-bind" relevant="not($file-format = ('excel-named-ranges', 'xml-metadata'))">
+                <xf:bind ref="import" id="import-bind" relevant="not($file-format = ('excel-named-ranges', 'xml-form-structure-and-data'))">
                     <xf:bind id="fr-keep-existing-records-bind" ref="keep-existing-records"/>
                     <xf:bind id="fr-import-invalid-data-bind"   ref="import-invalid-data"/>
 
@@ -836,7 +836,7 @@
                         </xh:tr>
                     </fr:grid>
                     <xf:group ref="stats[$validating or $validation-done]">
-                        <xf:group ref=".[not(bind('file-format-bind') = ('excel-named-ranges', 'xml-metadata'))]">
+                        <xf:group ref=".[not(bind('file-format-bind') = ('excel-named-ranges', 'xml-form-structure-and-data'))]">
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td>
@@ -858,7 +858,7 @@
                                 </xh:tr>
                             </fr:grid>
                         </xf:group>
-                        <xf:group ref=".[bind('file-format-bind') = ('excel-named-ranges', 'xml-metadata')]">
+                        <xf:group ref=".[bind('file-format-bind') = ('excel-named-ranges', 'xml-form-structure-and-data')]">
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td>
@@ -941,7 +941,7 @@
                                         <xh:span class="alert alert-{if ($some-invalid) then 'warning' else 'success'}">
                                             <xf:output
                                                 value="
-                                                    if (bind('file-format-bind') = ('excel-named-ranges', 'xml-metadata')) then
+                                                    if (bind('file-format-bind') = ('excel-named-ranges', 'xml-form-structure-and-data')) then
                                                         if ($some-invalid) then
                                                             xxf:format-message(
                                                                 xxf:r('import.invalid-document-message', '|fr-fr-resources|'),
@@ -1214,7 +1214,7 @@
             <fr:inner-buttons>
                 <fr:wizard-prev-button/>
                 <fr:wizard-next-button/>
-                <xf:group ref=".[bind('file-format-bind') = ('excel-named-ranges', 'xml-metadata')]">
+                <xf:group ref=".[bind('file-format-bind') = ('excel-named-ranges', 'xml-form-structure-and-data')]">
                     <xf:submit
                         ref="if ($validation-completed) then . else ''"
                         submission="fr-import-submit-new-form-submission">

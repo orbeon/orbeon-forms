@@ -32,6 +32,9 @@ trait FormRunnerResourcesOps {
   def allLangsWithResources(resourcesRootElem: NodeInfo): Seq[(String, NodeInfo)] =
     allLangs(resourcesRootElem) zip allResources(resourcesRootElem)
 
+  def formResourcesInGivenLangOrFirst(formResourcesRootElem: NodeInfo, lang: String): NodeInfo =
+    allResources(formResourcesRootElem).find(_.attValue("*:lang") == lang).getOrElse(allResources(formResourcesRootElem).head)
+
   // Same as above but doesn't require a Form Builder context
   // NOTE: Support an entirely missing resources instance (for tests).
   // TODO: Migrate to `findResourceHoldersWithLangUseDocUseContext`.

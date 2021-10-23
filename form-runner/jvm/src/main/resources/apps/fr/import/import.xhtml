@@ -52,20 +52,6 @@
                     ]"/>
 
             <xf:var
-                name="default-format"
-                value="
-                    (
-                        xxf:property(string-join(('oxf.fr.import.default-format', $app, $form), '.'))[
-                            . = ('excel-headings', 'excel-named-ranges', 'xml-form-structure-and-data')
-                        ][
-                            . = $allowed-formats
-                        ],
-                        $allowed-formats[1]
-                    )[1]"/>
-
-<!--            <xf:message event="xforms-ready" value="string-join($allowed-formats, ' / ')"/>-->
-
-            <xf:var
                 name="show-start-over-button"
                 value="xxf:property(string-join(('oxf.fr.import.show-start-over-button', $app, $form), '.')) = true()"/>
 
@@ -167,8 +153,28 @@
                         readonly="true()"/>
                 </xf:bind>
                 <xf:bind ref="upload" id="upload-bind">
-                    <xf:bind ref="file" required="true()"/>
-                    <xf:bind ref="file-format" id="file-format-bind" name="file-format" xxf:default="$default-format"/>
+                    <xf:bind
+                            ref="file"
+                            id="file-bind"
+                            name="file"
+                            required="true()"
+                            constraint="
+                                xxf:is-blank() or
+                                @mediatype = ('text/xml', 'application/xml') and
+                                    $allowed-formats = 'xml-form-structure-and-data' or
+                                @mediatype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' and
+                                    $allowed-formats = ('excel-headings', 'excel-named-ranges')"/>
+                    <xf:bind
+                            ref="file-format"
+                            id="file-format-bind"
+                            name="file-format"
+                            calculate="
+                                if ($file/@mediatype = ('text/xml', 'application/xml')) then
+                                    'xml-form-structure-and-data'
+                                else if ($file/@mediatype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') then
+                                    $allowed-formats[. = ('excel-headings', 'excel-named-ranges')][1]
+                                else
+                                    ."/>
                 </xf:bind>
                 <xf:bind ref="validate" id="validate-bind">
                     <xf:bind ref="validating" constraint="$validation-completed"/>

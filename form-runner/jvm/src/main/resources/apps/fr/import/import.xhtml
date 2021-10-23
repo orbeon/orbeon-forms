@@ -180,6 +180,7 @@
                     <xf:bind ref="validating" constraint="$validation-completed"/>
                     <xf:bind ref="stats/(total | processed | succeeded)" type="xs:integer" readonly="true()"/>
                     <xf:bind ref="stats/(all-values-count | set-values-count | counts/@*)" type="xs:integer" readonly="true()"/>
+                    <xf:bind ref="stats/errors" id="validate-stats-errors-bind"/>
                 </xf:bind>
                 <xf:bind ref="import" id="import-bind" relevant="not($file-format = ('excel-named-ranges', 'xml-form-structure-and-data'))">
                     <xf:bind id="fr-keep-existing-records-bind" ref="keep-existing-records"/>
@@ -938,13 +939,32 @@
                     <!-- Validation results when available -->
                     <xf:group context="stats" ref=".[$validation-done]">
 
-                        <xf:var name="some-invalid" value="bind('fr-import-invalid-count-bind') gt 0"/>
+                        <xf:var
+                            name="format-invalid"
+                            value="exists(bind('validate-stats-errors-bind')/error)"/>
+
+                        <xf:var
+                            name="some-invalid"
+                            value="bind('fr-import-invalid-count-bind') gt 0"/>
 
                         <xf:group ref=".[not($validation-canceled)]">
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td colspan="2">
-                                        <xh:span class="alert alert-{if ($some-invalid) then 'warning' else 'success'}">
+                                        <xf:group bind="validate-stats-errors-bind" class="alert alert-error">
+                                            <xh:ul>
+                                                <xf:repeat ref="error">
+                                                    <xh:li><xf:output value="."/></xh:li>
+                                                </xf:repeat>
+                                            </xh:ul>
+                                        </xf:group>
+                                    </xh:td>
+                                </xh:tr>
+                                <xh:tr>
+                                    <xh:td colspan="2">
+                                        <xf:group
+                                            ref=".[not($format-invalid)]"
+                                            class="alert alert-{if ($some-invalid) then 'warning' else 'success'}">
                                             <xf:output
                                                 value="
                                                     if (bind('file-format-bind') = ('excel-named-ranges', 'xml-form-structure-and-data')) then
@@ -971,7 +991,7 @@
                                                                 xs:integer(processed)
                                                             )"
                                             />
-                                        </xh:span>
+                                        </xf:group>
                                     </xh:td>
                                 </xh:tr>
                             </fr:grid>

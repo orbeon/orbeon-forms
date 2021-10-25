@@ -166,16 +166,26 @@
                 </xf:bind>
                 <xf:bind ref="upload" id="upload-bind">
                     <xf:bind
-                            ref="file"
-                            id="file-bind"
-                            name="file"
-                            required="true()"
-                            constraint="
-                                xxf:is-blank() or
-                                @mediatype = ('text/xml', 'application/xml') and
-                                    $allowed-formats = 'xml-form-structure-and-data' or
-                                @mediatype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' and
-                                    $allowed-formats = ('excel-headings', 'excel-named-ranges')"/>
+                        ref="file"
+                        id="file-bind"
+                        name="file"
+                        required="true()"
+                        constraint="
+                            xxf:upload-mediatypes(
+                                string-join(
+                                    (
+                                        if ($allowed-formats = 'xml-form-structure-and-data') then
+                                            ('text/xml', 'application/xml')
+                                        else
+                                            (),
+                                        if ($allowed-formats = ('excel-headings', 'excel-named-ranges')) then
+                                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                                        else
+                                            ()
+                                    ),
+                                    ' '
+                                )
+                            )"/>
                     <xf:bind
                             ref="file-format"
                             id="file-format-bind"

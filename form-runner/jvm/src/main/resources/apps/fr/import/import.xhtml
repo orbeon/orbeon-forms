@@ -784,9 +784,18 @@
                         <xh:tr>
                             <xh:td colspan="3">
 
-                                <fr:attachment ref="file">
+                                <fr:attachment ref="file" >
                                     <xf:label ref="xxf:r('import.file.label', '|fr-fr-resources|')"/>
-                                    <xf:hint  ref="xxf:r('import.file.hint',  '|fr-fr-resources|')"/>
+                                    <xf:hint
+                                        ref="
+                                            string-join(
+                                                (
+                                                    xxf:r('import.file.excel-headings-format',               '|fr-fr-resources|')[$allowed-formats = 'excel-headings'],
+                                                    xxf:r('import.file.excel-named-ranges-format',           '|fr-fr-resources|')[$allowed-formats = 'excel-named-ranges'],
+                                                    xxf:r('import.file.xml-form-structure-and-data-format',  '|fr-fr-resources|')[$allowed-formats = 'xml-form-structure-and-data']
+                                                ),
+                                                ', '
+                                            )"/>
                                     <xf:alert ref="xxf:r('import.file.alert', '|fr-fr-resources|')"/>
 
                                     <!-- 2021-03-26: This event does not get dispatched! -->

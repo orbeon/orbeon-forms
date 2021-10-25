@@ -412,7 +412,10 @@
             <file>
                 <label>File to import</label>
                 <hint>File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-                <alert>Missing file</alert>
+                <alert>Missing or unsupported file</alert>
+                <excel-headings-format>Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format>Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format>Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label>Validation</label>
@@ -912,7 +915,10 @@
             <file>
                 <label>Importer le fichier</label>
                 <hint>Le fichier doit être au format Excel 2007 (.xlsx) ou XML (.xml)</hint>
-                <alert>Fichier manquant</alert>
+                <alert>Fichier manquant ou non supporté</alert>
+                <excel-headings-format>Format Excel 2007 avec en-têtes nommés (.xslx)</excel-headings-format>
+                <excel-named-ranges-format>Format Excel 2007 avec cellules nommées (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format>Format export Orbeon XML (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label>Validation</label>
@@ -1398,7 +1404,10 @@
             <file>
                 <label todo="true">File to import</label>
                 <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-                <alert todo="true">Missing file</alert>
+                <alert todo="true">Missing or unsupported file</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label todo="true">Validation</label>
@@ -1883,7 +1892,10 @@
             <file>
                 <label todo="true">File to import</label>
                 <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-                <alert todo="true">Missing file</alert>
+                <alert todo="true">Missing or unsupported file</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label todo="true">Validation</label>
@@ -2366,7 +2378,10 @@
             <file>
                 <label todo="true">File to import</label>
                 <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-                <alert todo="true">Missing file</alert>
+                <alert todo="true">Missing or unsupported file</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label todo="true">Validation</label>
@@ -2862,7 +2877,10 @@
             <file>
                 <label>File da importare</label>
                 <hint>Il file dev'essere nel formato Excel 2007 (.xlsx) o XML (.xml)</hint>
-                <alert>File mancante</alert>
+                <alert todo="true">File mancante</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label>Validazione</label>
@@ -3358,7 +3376,10 @@
             <file>
                 <label>Datei zum Importieren</label>
                 <hint>Datei muss in Excel 2007 Format (.xlsx) oder XML (.xml) sein</hint>
-                <alert>Fehlende Datei</alert>
+                <alert todo="true">Fehlende Datei</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label>Validierung</label>
@@ -3854,7 +3875,10 @@
             <file>
                 <label todo="true">File to import</label>
                 <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-                <alert todo="true">Missing file</alert>
+                <alert todo="true">Missing or unsupported file</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label todo="true">Validation</label>
@@ -4350,7 +4374,10 @@
             <file>
                 <label todo="true">File to import</label>
                 <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-                <alert todo="true">Missing file</alert>
+                <alert todo="true">Missing or unsupported file</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label todo="true">Validation</label>
@@ -4845,7 +4872,10 @@
             <file>
                 <label todo="true">File to import</label>
                 <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-                <alert todo="true">Missing file</alert>
+                <alert todo="true">Missing or unsupported file</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label todo="true">Validation</label>
@@ -5340,7 +5370,10 @@
             <file>
                 <label todo="true">File to import</label>
                 <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-                <alert todo="true">Missing file</alert>
+                <alert todo="true">Missing or unsupported file</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label todo="true">Validation</label>
@@ -5823,7 +5856,10 @@
             <file>
                 <label todo="true">File to import</label>
                 <hint todo="true">File must be in Excel 2007 format (.xlsx) or XML format (.xml)</hint>
-                <alert todo="true">Missing file</alert>
+                <alert todo="true">Missing or unsupported file</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>
             </file>
             <validation>
                 <label todo="true">Validation</label>
@@ -6318,7 +6354,10 @@
             <file>
                 <label>Plik z danymi do importu</label>
                 <hint todo="true">Plik musi być w formacie Excel 2007 (.xlsx)</hint>
-                <alert>Brakujący plik</alert>
+                <alert todo="true">Brakujący plik</alert>
+                <excel-headings-format todo="true">Excel 2007 with named headings format (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 with named ranges format (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML export format (.xml)</xml-form-structure-and-data-format>e
             </file>
             <validation>
                 <label>Walidacja</label>

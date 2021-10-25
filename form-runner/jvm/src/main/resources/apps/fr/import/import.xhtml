@@ -47,9 +47,21 @@
             <xf:var
                 name="allowed-formats"
                 value="
-                    xxf:split(xxf:property(string-join(('oxf.fr.import.allowed-formats', $app, $form), '.')))[
-                        . = ('excel-headings', 'excel-named-ranges', 'xml-form-structure-and-data')
-                    ]"/>
+                    let $all-formats := ('excel-headings', 'excel-named-ranges', 'xml-form-structure-and-data'),
+                        $req-allowed-formats :=
+                            xxf:split(xxf:get-request-parameter('allowed-formats'))[
+                                . = $all-formats
+                            ],
+                        $prop-allowed-formats :=
+                            xxf:split(xxf:property(string-join(('oxf.fr.import.allowed-formats', $app, $form), '.')))[
+                                . = $all-formats
+                            ]
+                    return
+                        if (empty($req-allowed-formats)) then
+                            $prop-allowed-formats
+                        else
+                            $req-allowed-formats[. = $prop-allowed-formats]
+                    "/>
 
             <xf:var
                 name="show-start-over-button"
@@ -756,7 +768,7 @@
                                 </xf:output>
                             </xh:td>
                         </xh:tr>
-                     </fr:grid>
+                    </fr:grid>
 
                     <fr:grid>
                         <xh:tr>

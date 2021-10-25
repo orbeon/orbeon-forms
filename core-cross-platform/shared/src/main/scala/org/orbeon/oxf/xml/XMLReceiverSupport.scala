@@ -19,6 +19,7 @@ import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.immutable.Seq
 
+
 trait XMLReceiverSupport {
 
   support =>
@@ -34,14 +35,25 @@ trait XMLReceiverSupport {
     localName : String,
     prefix    : String = "",
     uri       : String = "",
-    atts      : Attributes = XMLReceiverSupport.EmptyAttributes)(
+    atts      : Attributes = XMLReceiverSupport.EmptyAttributes,
+    extraNs   : Seq[(String, String)] = Nil)(
     body      : => T)(implicit
     receiver  : XMLReceiver
   ): T = {
+
+    extraNs foreach { case (prefix, uri) =>
+      receiver.startPrefixMapping(prefix, uri)
+    }
+
     val qName = XMLUtils.buildQName(prefix, localName)
     receiver.startElement(uri, localName, qName, atts)
     val result = body
     receiver.endElement(uri, localName, qName)
+
+    extraNs foreach { case (prefix, _) =>
+      receiver.endPrefixMapping(prefix)
+    }
+
     result
   }
 

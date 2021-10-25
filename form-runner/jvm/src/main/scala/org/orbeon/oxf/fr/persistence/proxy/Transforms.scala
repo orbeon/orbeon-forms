@@ -8,10 +8,10 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.findFormDefinitionFormatFromStrin
 import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
-import org.orbeon.oxf.fr.{DataFormatVersion, FormRunnerDocContext, FormRunnerTemplatesOps}
+import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunnerDocContext, FormRunnerTemplatesOps}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{IndentedLogger, NetUtils, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util.{IndentedLogger, URLRewriterUtils, XPath}
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
@@ -24,6 +24,30 @@ import javax.xml.transform.stream.StreamResult
 
 
 object Transforms {
+
+  // TODO: Move this.
+  def loadComponentBindings(
+    appForm         : AppForm,
+    frDocCtx        : FormRunnerDocContext)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): DocumentInfo = {
+
+      val orbeonLibraryVersion = (frDocCtx.metadataRootElem / "library-versions" / "orbeon").stringValue.trimAllToOpt.getOrElse(1)
+      val appLibraryVersion    = (frDocCtx.metadataRootElem / "library-versions" / "app").stringValue.trimAllToOpt.getOrElse(1)
+
+      SubmissionUtils.readTinyTree(
+        headersGetter       = _ => None, // Q: Do we need any header forwarding here?
+        resolvedAbsoluteUrl = new URI(
+          URLRewriterUtils.rewriteServiceURL(
+            externalContext.getRequest,
+            s"/fr/service/custom/orbeon/builder/toolbox?application=${appForm.app}&form=${appForm.form}&orbeon-library-version=$orbeonLibraryVersion&app-library-version=$appLibraryVersion",
+            URLRewriter.REWRITE_MODE_ABSOLUTE
+          )
+        ),
+        handleXInclude = false
+      )
+    }
 
   def migrateFormDefinition(
     dstVersion      : DataFormatVersion,
@@ -46,25 +70,7 @@ object Transforms {
           val formDefinitionRootElem: NodeInfo = formDoc.rootElement
         }
 
-        val componentBindings: DocumentInfo = {
-
-          implicit val externalContext: ExternalContext = NetUtils.getExternalContext
-
-          val orbeonLibraryVersion = (frDocCtx.metadataRootElem / "library-versions" / "orbeon").stringValue.trimAllToOpt.getOrElse(1)
-          val appLibraryVersion    = (frDocCtx.metadataRootElem / "library-versions" / "app").stringValue.trimAllToOpt.getOrElse(1)
-
-          SubmissionUtils.readTinyTree(
-            headersGetter       = _ => None, // Q: Do we need any header forwarding here?
-            resolvedAbsoluteUrl = new URI(
-              URLRewriterUtils.rewriteServiceURL(
-                NetUtils.getExternalContext.getRequest,
-                s"/fr/service/custom/orbeon/builder/toolbox?application=$app&form=$form&orbeon-library-version=$orbeonLibraryVersion&app-library-version=$appLibraryVersion",
-                URLRewriter.REWRITE_MODE_ABSOLUTE
-              )
-            ),
-            handleXInclude = false
-          )
-        }
+        val componentBindings = loadComponentBindings(AppForm(app, form), frDocCtx)
 
         val migrationsFromForm =
           new MigrationsFromForm(

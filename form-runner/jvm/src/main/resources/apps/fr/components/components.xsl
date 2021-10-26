@@ -46,7 +46,7 @@
     <!-- Same logic as in `fr:is-background()` -->
     <xsl:variable
         name="is-background"
-        select="starts-with(doc('input:request')/*/request-path, '/fr/service/') and $mode = ('new', 'edit')"
+        select="starts-with(doc('input:request')/*/request-path, '/fr/service/') and $mode = ('new', 'edit', 'export')"
         as="xs:boolean"/>
 
     <!-- Either the model with id fr-form-model, or the first model -->
@@ -674,6 +674,10 @@
                 xxf:default="
                     if (. = ('tiff', 'test-pdf')) then
                         'pdf'
+                    else if (. = ('export') and xxf:is-blank(../document)) then
+                        'new'
+                    else if (. = ('export') and xxf:non-blank(../document)) then
+                        'edit'
                     else
                         ."/>
 

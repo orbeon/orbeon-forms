@@ -506,19 +506,29 @@
             <xf:delete
                 ref="instance('fr-background-response-instance')/data"/>
 
+            <!-- Crude way of detecting export, might have to fix later! -->
+            <xf:var
+                name="is-export"
+                value="xxf:get-request-method() = 'GET'"/>
+
             <xf:action
                 if="instance('fr-background-response-instance')/process-success/data(.) and (: process must be successful :)
-                    xxf:get-request-parameter('return-data') = 'true'                   and (: caller must request data   :)
-                    xxf:property(                                                           (: property must allow it     :)
-                        string-join(
-                            (
-                                'oxf.fr.detail.service',
-                                 if ($is-background) then 'background' else 'foreground',
-                                 'enable-return-data',
-                                 $app,
-                                 $form
-                             ),
-                            '.'
+                    (
+                        $is-export                                                      or  (: export causes data out     :)
+                        (
+                            xxf:get-request-parameter('return-data') = 'true'           and (: caller must request data   :)
+                            xxf:property(                                                   (: the property allows it     :)
+                                string-join(
+                                    (
+                                        'oxf.fr.detail.service',
+                                         if ($is-background) then 'background' else 'foreground',
+                                         'enable-return-data',
+                                         $app,
+                                         $form
+                                     ),
+                                    '.'
+                                )
+                            )
                         )
                     )">
 

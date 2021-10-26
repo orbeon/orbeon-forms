@@ -416,10 +416,11 @@ class SimpleDataMigrationTest
 
     val counts =
       SimpleDataMigration.mergeXmlFromBindSchema(
-        srcDocRootElem  = NewFormData.rootElement,
-        dstDocRootElem  = result.rootElement,
-        ignoreBlankData = true)(
-        formOps         = formOps
+        srcDocRootElem           = NewFormData.rootElement,
+        dstDocRootElem           = result.rootElement,
+        ignoreBlankData          = true,
+        allowMissingElemInSource = false)(
+        formOps                  = formOps
       )
 
     it("must pass migration of elements in main form and section templates") {

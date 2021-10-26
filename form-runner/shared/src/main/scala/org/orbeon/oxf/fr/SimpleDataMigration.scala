@@ -214,9 +214,10 @@ object SimpleDataMigration {
   // of being able to update file attachments metadata, in particular. But in the future we should support
   // that.
   def mergeXmlFromBindSchema(
-    srcDocRootElem : om.NodeInfo,
-    dstDocRootElem : om.NodeInfo,
-    ignoreBlankData: Boolean)(
+    srcDocRootElem          : om.NodeInfo,
+    dstDocRootElem          : om.NodeInfo,
+    ignoreBlankData         : Boolean,
+    allowMissingElemInSource: Boolean)(
     formOps        : FormOps
   ): (Int, Int) = {
 
@@ -315,12 +316,19 @@ object SimpleDataMigration {
                   }
                 case None =>
                   // We are a non-repeated container element: just recurse
-                  processLevel(
-                    parentBind             = childBind,
-                    leftElem               = (leftElem firstChildOpt bindName).getOrElse(throw new IllegalArgumentException(s"missing element in source: `${bindName}`")),
-                    rightElem              = (rightElem firstChildOpt bindName).getOrElse(throw new IllegalArgumentException(s"missing element in destination: `${bindName}`")),
-                    currentIgnoreBlankData = currentIgnoreBlankData
-                  )
+
+                  leftElem firstChildOpt bindName match {
+                    case Some(leftChildElem) =>
+                      processLevel(
+                        parentBind             = childBind,
+                        leftElem               = leftChildElem,
+                        rightElem              = (rightElem firstChildOpt bindName).getOrElse(throw new IllegalArgumentException(s"missing element in destination: `${bindName}`")),
+                        currentIgnoreBlankData = currentIgnoreBlankData
+                      )
+                    case None if ! allowMissingElemInSource =>
+                        (leftElem firstChildOpt bindName).getOrElse(throw new IllegalArgumentException(s"missing element in source: `${bindName}`"))
+                    case None =>
+                  }
               }
             }
           }

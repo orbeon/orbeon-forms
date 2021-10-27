@@ -389,27 +389,27 @@
                 <xf:property name="description-mediatype"         value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
                 <xf:property name="created-with-version"          value="bind('created-with-version-bind')"/>
                 <xf:property name="updated-with-versions"         value="bind('metadata-bind')/updated-with-version/string()"/>
-                <xf:property name="singleton"                     value="()"/>
-                <xf:property name="attachment-max-size"           value="-2"/>
-                <xf:property name="attachment-max-size-aggregate" value="-2"/>
-                <xf:property name="attachment-mediatypes"         value="()"/>
-                <xf:property name="wizard"                        value="()"/>
-                <xf:property name="wizard-mode"                   value="()"/>
-                <xf:property name="wizard-subsections-nav"        value="()"/>
-                <xf:property name="wizard-subsections-toc"        value="()"/>
-                <xf:property name="labels"                        value="()"/>
-                <xf:property name="hints"                         value="()"/>
-                <xf:property name="data-migration"                value="()"/>
-                <xf:property name="rendered-page-orientation"     value="()"/>
-                <xf:property name="rendered-page-size"            value="()"/>
-                <xf:property name="readonly-disable-calculate"    value="()"/>
-                <xf:property name="relevant"                      value="()"/>
-                <xf:property name="readonly"                      value="()"/>
-                <xf:property name="html-page-layout"              value="()"/>
-                <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')/string()"/>
-                <xf:property name="email"                         value="()"/>
-                <xf:property name="xbl"                           value="()"/>
-                <xf:property name="component-bindings"            value="()"/>
+                <xf:property name="singleton"                     value="bind('singleton-bind')"/>
+                <xf:property name="attachment-max-size"           value="bind('attachment-max-size-bind')"/>
+                <xf:property name="attachment-max-size-aggregate" value="bind('attachment-max-size-aggregate-bind')"/>
+                <xf:property name="attachment-mediatypes"         value="bind('attachment-mediatypes-bind')"/>
+                <xf:property name="wizard"                        value="bind('wizard-bind')"/>
+                <xf:property name="wizard-mode"                   value="bind('wizard-mode-bind')"/>
+                <xf:property name="wizard-subsections-nav"        value="bind('wizard-subsections-nav-bind')"/>
+                <xf:property name="wizard-subsections-toc"        value="bind('wizard-subsections-toc-bind')"/>
+                <xf:property name="labels"                        value="bind('labels-bind')"/>
+                <xf:property name="hints"                         value="bind('hints-bind')"/>
+                <xf:property name="data-migration"                value="bind('data-migration-bind')"/>
+                <xf:property name="rendered-page-orientation"     value="bind('rendered-page-orientation-bind')"/>
+                <xf:property name="rendered-page-size"            value="bind('rendered-page-size-bind')"/>
+                <xf:property name="readonly-disable-calculate"    value="bind('readonly-disable-calculate-bind')"/>
+                <xf:property name="relevant"                      value="fbf:readDenormalizedCalculatedMip((), 'relevant')"/>
+                <xf:property name="readonly"                      value="fbf:readDenormalizedCalculatedMip((), 'readonly')"/>
+                <xf:property name="html-page-layout"              value="bind('html-page-layout-bind')"/>
+                <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')"/>
+                <xf:property name="email"                         value="bind('email-bind')"/>
+                <xf:property name="xbl"                           value="bind('xbl-bind')"/>
+                <xf:property name="component-bindings"            value="$component-bindings"/>
             </xf:dispatch>
 
             <xxf:show
@@ -425,27 +425,27 @@
                 <xf:property name="description-mediatype"         value="(if (exists($requested-description)) then 'text/plain' else (), bind('description-bind')/@mediatype/string())[1]"/>
                 <xf:property name="created-with-version"          value="bind('created-with-version-bind')"/>
                 <xf:property name="updated-with-versions"         value="bind('metadata-bind')/updated-with-version/string()"/>
-                <xf:property name="singleton"                     value="()"/>
-                <xf:property name="attachment-max-size"           value="-2"/>
-                <xf:property name="attachment-max-size-aggregate" value="-2"/>
-                <xf:property name="attachment-mediatypes"         value="()"/>
-                <xf:property name="wizard"                        value="()"/>
-                <xf:property name="wizard-mode"                   value="()"/>
-                <xf:property name="wizard-subsections-nav"        value="()"/>
-                <xf:property name="wizard-subsections-toc"        value="()"/>
-                <xf:property name="labels"                        value="()"/>
-                <xf:property name="hints"                         value="()"/>
-                <xf:property name="data-migration"                value="()"/>
-                <xf:property name="rendered-page-orientation"     value="()"/>
-                <xf:property name="rendered-page-size"            value="()"/>
-                <xf:property name="readonly-disable-calculate"    value="()"/>
-                <xf:property name="relevant"                      value="()"/>
-                <xf:property name="readonly"                      value="()"/>
-                <xf:property name="html-page-layout"              value="()"/>
-                <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')/string()"/>
-                <xf:property name="email"                         value="()"/>
-                <xf:property name="xbl"                           value="()"/>
-                <xf:property name="component-bindings"            value="()"/>
+                <xf:property name="singleton"                     value="bind('singleton-bind')"/>
+                <xf:property name="attachment-max-size"           value="bind('attachment-max-size-bind')"/>
+                <xf:property name="attachment-max-size-aggregate" value="bind('attachment-max-size-aggregate-bind')"/>
+                <xf:property name="attachment-mediatypes"         value="bind('attachment-mediatypes-bind')"/>
+                <xf:property name="wizard"                        value="bind('wizard-bind')"/>
+                <xf:property name="wizard-mode"                   value="bind('wizard-mode-bind')"/>
+                <xf:property name="wizard-subsections-nav"        value="bind('wizard-subsections-nav-bind')"/>
+                <xf:property name="wizard-subsections-toc"        value="bind('wizard-subsections-toc-bind')"/>
+                <xf:property name="labels"                        value="bind('labels-bind')"/>
+                <xf:property name="hints"                         value="bind('hints-bind')"/>
+                <xf:property name="data-migration"                value="bind('data-migration-bind')"/>
+                <xf:property name="rendered-page-orientation"     value="bind('rendered-page-orientation-bind')"/>
+                <xf:property name="rendered-page-size"            value="bind('rendered-page-size-bind')"/>
+                <xf:property name="readonly-disable-calculate"    value="bind('readonly-disable-calculate-bind')"/>
+                <xf:property name="relevant"                      value="fbf:readDenormalizedCalculatedMip((), 'relevant')"/>
+                <xf:property name="readonly"                      value="fbf:readDenormalizedCalculatedMip((), 'readonly')"/>
+                <xf:property name="html-page-layout"              value="bind('html-page-layout-bind')"/>
+                <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')"/>
+                <xf:property name="email"                         value="bind('email-bind')"/>
+                <xf:property name="xbl"                           value="bind('xbl-bind')"/>
+                <xf:property name="component-bindings"            value="$component-bindings"/>
             </xxf:show>
         </xf:action>
     </xf:action>

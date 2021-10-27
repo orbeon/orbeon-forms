@@ -102,7 +102,7 @@
                 <p:input  name="params" href="#parameters"/>
                 <p:input  name="data"   href="#form-data"/>
                 <p:input  name="form"   href="#xhtml-fr-xforms"/>
-                <p:input  name="file"   href="#xml-content" debug="xxx xml-content"/>
+                <p:input  name="file"   href="#xml-content"/>
                 <p:output name="data"   id="rows-or-stats-and-data"/>
             </p:processor>
         </p:when>

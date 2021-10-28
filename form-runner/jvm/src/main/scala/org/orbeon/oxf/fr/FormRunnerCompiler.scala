@@ -13,6 +13,7 @@ import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput}
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Submission}
@@ -24,6 +25,7 @@ import org.orbeon.xforms.ManifestEntry
 
 import java.net.URI
 import java.util.zip.{ZipEntry, ZipOutputStream}
+import scala.util.{Failure, Success}
 
 
 class FormRunnerCompiler extends ProcessorImpl {
@@ -213,10 +215,17 @@ class FormRunnerCompiler extends ProcessorImpl {
 
             // Write static attachments and other resources
             distinctResources.iterator foreach { manifestEntry =>
-              ConnectionResult.withSuccessConnection(connect(manifestEntry.uri), closeOnSuccess = true) { is =>
-                val entry = new ZipEntry(manifestEntry.zipPath)
-                zos.putNextEntry(entry)
-                IOUtils.copyStreamAndClose(is, zos, doCloseOut = false)
+              
+              val entryResult =
+                ConnectionResult.tryWithSuccessConnection(connect(manifestEntry.uri), closeOnSuccess = true) { is =>
+                  val entry = new ZipEntry(manifestEntry.zipPath)
+                  zos.putNextEntry(entry)
+                  IOUtils.copyStreamAndClose(is, zos, doCloseOut = false)
+                }
+
+              entryResult match {
+                case Success(_) => debug(s"success retrieving attachment when compiling form `${manifestEntry.uri}`")
+                case Failure(_) => warn (s"failure retrieving attachment when compiling form `${manifestEntry.uri}`")
               }
             }
 

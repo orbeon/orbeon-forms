@@ -161,6 +161,7 @@
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.no.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.ru.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pl.min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.da.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js"/>
                 <xh:script src="/ops/yui/datasource/datasource.js"/>
                 <xh:script src="/ops/yui/autocomplete/autocomplete.js"/>

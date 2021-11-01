@@ -46,20 +46,24 @@ object PermissionsAuthorization {
     }
 
   private def authorizedOperations(
-    permission  : Permission,
-    currentUser : Option[Credentials],
-    check       : PermissionsCheck
+    permission     : Permission,
+    currentUserOpt : Option[Credentials],
+    check          : PermissionsCheck
   ): Operations = {
 
     def allConditionsPass(check: PermissionsCheck): Boolean =
-      permission.conditions.forall(conditionPasses(_, currentUser, check))
+      permission.conditions.forall(conditionPasses(_, currentUserOpt, check))
 
     // For `Create`, we can't have data, so check if the conditions would match on the data created by
     // the current user, if that user was allowed to create the data
     lazy val checkWithCurrentUser = CheckWithDataUser(
-      username     = currentUser.map(_.username),
-      groupname    = currentUser.flatMap(_.group),
-      organization = currentUser.flatMap(_.defaultOrganization)
+      userAndGroup = currentUserOpt.map { currentUser =>
+        UserAndGroup (
+          username     = currentUser.userAndGroup.username,
+          groupname    = currentUser.userAndGroup.groupname
+        )
+      },
+      organization = currentUserOpt.flatMap(_.defaultOrganization)
     )
 
     permission.operations match {

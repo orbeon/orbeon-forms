@@ -27,6 +27,11 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
+    <xsl:variable
+        name="library-name"
+        as="xs:string"
+        select="doc('input:parameters')/*/app/string()"/>
+
     <!-- Namespace URI e.g. http://orbeon.org/oxf/xml/form-builder/component/APP/FORM -->
     <xsl:variable
         name="component-namespace"
@@ -35,7 +40,7 @@
         string-join(
             (
                 'http://orbeon.org/oxf/xml/form-builder/component',
-                doc('input:parameters')/*/app,
+                $library-name,
                 doc('input:parameters')/*/form
             ),
             '/'
@@ -59,21 +64,31 @@
 
     <!-- Distinct source ids for the given action -->
     <!-- NOTE: Source can also be a model -->
-    <xsl:function name="fr:action-sources" as="xs:string*">
+    <xsl:function name="fr:action-observer-ids" as="xs:string*">
         <xsl:param name="action" as="element(xf:action)"/>
         <xsl:sequence select="distinct-values($action/xf:action[1]/@*:observer/p:split())"/>
     </xsl:function>
 
-    <!-- Distinct destination ids for the given action -->
-    <xsl:function name="fr:action-destinations" as="xs:string*">
+    <xsl:function name="fr:action-destination-control-ids" as="xs:string*">
         <xsl:param name="action" as="element(xf:action)"/>
-        <xsl:sequence select="distinct-values($action//(*:variable | *:var)[@name = 'control-name']/(@value, @select)/replace(., '''([^..]*)''', '$1-control'))"/>
+        <xsl:sequence
+            select="
+                distinct-values(
+                    $action//
+                    (*:variable | *:var)[
+                        @name = 'control-name' and
+                        parent::*/@class = (
+                            'fr-itemset-action', 'fr-set-control-value-action'
+                        )
+                    ]/
+                    (@value, @select)/
+                    replace(., '''([^..]*)''', '$1-control')
+                )"/>
     </xsl:function>
 
-    <!-- Distinct action elements for which the given id is a source or destination or both -->
-    <xsl:function name="fr:action-for-id" as="element(xf:action)*">
+    <xsl:function name="fr:action-for-affected-control-id" as="element(xf:action)*">
         <xsl:param name="id" as="xs:string"/>
-        <xsl:sequence select="$actions[$id = distinct-values((fr:action-sources(.), fr:action-destinations(.)))]"/>
+        <xsl:sequence select="$actions[$id = fr:action-destination-control-ids(.)]"/>
     </xsl:function>
 
     <xsl:function name="fr:title" as="xs:string">
@@ -88,8 +103,18 @@
       <xsl:sequence select="distinct-values($arg1[not(. = $arg2)])"/>
     </xsl:function>
 
-    <xsl:variable name="all-action-sources"      select="distinct-values($actions/fr:action-sources(.))"/>
-    <xsl:variable name="all-action-destinations" select="distinct-values($actions/fr:action-destinations(.))"/>
+    <xsl:variable
+        name="all-distinct-action-observer-ids"
+        select="distinct-values($actions/fr:action-observer-ids(.))"/>
+
+    <xsl:variable
+        name="all-action-destination-control-ids"
+        select="distinct-values($actions/fr:action-destination-control-ids(.))"/>
+
+    <xsl:variable
+        name="all-actions-without-destination-controls"
+        select="
+            $actions[empty(fr:action-destination-control-ids(.))]"/>
 
     <!-- Generate XBL container -->
     <xsl:template match="/">
@@ -118,6 +143,39 @@
          xxf:default expressions to test on the mode. See: https://github.com/orbeon/orbeon-forms/issues/786 -->
     <xsl:template match="xf:bind/@xxf:default">
         <xsl:attribute name="{name()}" select="concat('if ($fr-mode = (''new'', ''test'')) then (', ., ') else .')"/>
+    </xsl:template>
+
+    <!-- Replace the event name and observer for actions that will get a new listener under `<xbl:handler>`. Actions
+         that listen to the model are not modified. Assume `@*:observer` doesn't hold `fr-form-model` alongside another
+         observer. -->
+    <xsl:template match="xf:action/xf:action[1][exists(@*:observer) and @*:observer != 'fr-form-model']/@*:event" mode="filter-actions">
+        <xsl:attribute
+            name="event"
+            select="concat('fr-call-user-', frf:actionNameFromBindingId(../../@id), '-action')"/>
+    </xsl:template>
+
+    <xsl:template match="xf:action/xf:action[1][exists(@*:observer) and @*:observer != 'fr-form-model']/@*:observer" mode="filter-actions">
+        <xsl:param name="model-id" tunnel="yes"/>
+        <xsl:attribute
+            name="observer"
+            select="$model-id"/>
+    </xsl:template>
+
+    <xsl:template match="xf:action[@class = 'fr-set-service-value-action']" mode="filter-actions">
+        <xsl:param name="model-id"                    tunnel="yes"/>
+        <xsl:param name="this-section-maybe-controls" tunnel="yes"/>
+        <xsl:copy>
+            <xsl:copy-of select="@*"/>
+            <!-- Keep parameters -->
+            <xsl:copy-of select="(*:variable | *:var)[@name = ('control-name', 'path')]"/>
+            <!-- Add variable if needed -->
+            <xsl:variable
+                name="control-name"
+                select="for $v in (*:variable | *:var)[@name = 'control-name'][1]/@value return substring($v, 2, string-length($v) - 2)"/>
+            <xsl:if test="not($this-section-maybe-controls/@id/frf:controlNameFromId(.) = $control-name)">
+                <xf:var name="library-name" value="'{$library-name}'"/>
+            </xsl:if>
+        </xsl:copy>
     </xsl:template>
 
     <!-- When copying actions, update references to fr-form-model (which gets a new id) -->
@@ -152,7 +210,7 @@
 
         <!-- Binding ids must be unique as the xbl:xbl of the section templates are embedded into the published forms.
              So make the ids unique. See https://github.com/orbeon/orbeon-forms/issues/142 -->
-        <xsl:variable name="binding-id" select="concat(doc('input:parameters')/*/app, '-',  $section-name)" as="xs:string"/>
+        <xsl:variable name="binding-id" select="concat($library-name, '-',  $section-name)" as="xs:string"/>
 
         <!-- Figure out which actions and services are used by the component -->
 
@@ -163,12 +221,36 @@
 
         <!-- ==== Actions and services ============================================================================= -->
 
-        <!-- Controls under this section which are the source or destination of an action or both -->
-        <xsl:variable name="action-controls" select="$fr-section//*[@id = ($all-action-sources, $all-action-destinations)]"/>
-        <!-- Unique xf:action elements which use controls under this section -->
-        <xsl:variable name="relevant-actions" select="$actions[@id = distinct-values($action-controls/@id/fr:action-for-id(.)/@id)]"/>
+        <!-- See https://github.com/orbeon/orbeon-forms/issues/5005 for rationale of the (new with 2021.1) logic -->
+
+        <!-- We could refine this test, but since `id`s are unique we should be ok -->
+        <xsl:variable
+            name="this-section-maybe-controls"
+            select="$fr-section//*[exists(@id)]"/>
+
+        <!-- All controls that can be affected by any action -->
+        <xsl:variable
+            name="this-section-controls-affected-by-actions"
+            select="$this-section-maybe-controls[@id = $all-action-destination-control-ids]"/>
+
+        <xsl:variable
+            name="relevant-actions"
+            select="
+                $actions[
+                    @id = distinct-values($this-section-controls-affected-by-actions/@id/fr:action-for-affected-control-id(.)/@id) or (
+                        @id = $all-actions-without-destination-controls/@id and
+                        fr:action-observer-ids(.) = $this-section-maybe-controls/@id
+                    )
+                ]"/>
+
         <!-- Unique service ids used by relevant actions -->
-        <xsl:variable name="relevant-service-ids" select="distinct-values($relevant-actions/xf:action[position() = (2, 3)]/@*:observer/replace(., '(.*)-submission$', '$1'))"/>
+        <xsl:variable
+            name="relevant-service-ids"
+            select="
+                distinct-values(
+                    $relevant-actions/xf:action[position() = (2, 3)]/@*:observer/replace(., '(.*)-submission$', '$1')
+                )"/>
+
         <!-- Unique service instances and submissions used by relevant actions -->
         <xsl:variable
             name="relevant-services"
@@ -213,6 +295,57 @@
                     </view>
                 </templates>
             </metadata>
+
+            <!-- Handlers for actions that listen to events from controls-->
+            <xbl:handlers>
+                <xsl:for-each select="$relevant-actions[exists(xf:action[1][exists(@*:observer) and @*:observer != 'fr-form-model'])]">
+
+                    <xsl:variable name="current-action"          select="."/>
+                    <xsl:variable name="current-action-listener" select="$current-action/xf:action[1]"/>
+                    <xsl:variable name="current-events"          select="$current-action-listener/@*:event/p:split()"/>
+                    <xsl:variable name="current-observers"       select="$current-action-listener/@*:observer/p:split()"/>
+
+                    <xsl:if test="exists($current-observers[. = $this-section-maybe-controls/@id])">
+                        <!-- Observers within this section -->
+                        <xbl:handler
+                            event="{$current-events}"
+                            observer="{$current-observers[. = $this-section-maybe-controls/@id]}">
+
+                            <xf:dispatch
+                                name="fr-call-user-{frf:actionNameFromBindingId($current-action/@id)}-action"
+                                targetid="{$model-id}">
+                                <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                            </xf:dispatch>
+
+                        </xbl:handler>
+                    </xsl:if>
+
+                    <xsl:if test="exists($current-observers[not(. = $this-section-maybe-controls/@id)])">
+                        <!-- Observers within other sections -->
+                        <xbl:handler
+                            xxbl:scope="outer"
+                            xxf:phantom="true"
+                            observer="fr-view-component"
+                            event="{$current-events}"
+                            if="frf:controlMatchesNameAndLibrary(event('xxf:absolute-targetid'), ({
+                                string-join(
+                                    for $o in $current-observers
+                                    return concat('''', frf:controlNameFromId($o), ''''),
+                                    ','
+                                )
+                            }), '{$library-name}')">
+
+                            <xf:dispatch
+                                xxbl:scope="inner"
+                                name="fr-call-user-{frf:actionNameFromBindingId($current-action/@id)}-action"
+                                targetid="{$model-id}">
+                                <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                            </xf:dispatch>
+
+                        </xbl:handler>
+                    </xsl:if>
+                </xsl:for-each>
+            </xbl:handlers>
 
             <!-- XBL implementation -->
             <xbl:implementation>
@@ -346,7 +479,8 @@
                     <!-- Services and actions -->
                     <xsl:if test="exists(($relevant-services, $relevant-actions))">
                         <xsl:apply-templates select="$relevant-services, $relevant-actions" mode="filter-actions">
-                            <xsl:with-param name="model-id" tunnel="yes" select="$model-id"/>
+                            <xsl:with-param name="model-id"                    tunnel="yes" select="$model-id"/>
+                            <xsl:with-param name="this-section-maybe-controls" tunnel="yes" select="$this-section-maybe-controls"/>
                         </xsl:apply-templates>
                     </xsl:if>
 

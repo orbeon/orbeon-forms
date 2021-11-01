@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI.topLevelInstance
-import org.orbeon.oxf.xforms.control.{Controls, XFormsSingleNodeControl}
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -34,6 +34,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.compat._
+import scala.collection.mutable
 
 
 trait FormRunnerActionsOps extends FormRunnerBaseOps {
@@ -74,12 +75,14 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   def resolveTargetRelativeToActionSource(
     actionSourceAbsoluteId : String,
     targetControlName      : String,
-    followIndexes          : Boolean
+    followIndexes          : Boolean,
+    libraryName            : String
   ): ValueRepresentationType =
     resolveTargetRelativeToActionSourceOpt(
       actionSourceAbsoluteId,
       targetControlName,
-      followIndexes
+      followIndexes,
+      libraryName.trimAllToOpt
     ) map (new SequenceExtent(_)) orNull
 
   //@XPathFunction
@@ -99,6 +102,81 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     ) map (new SequenceExtent(_)) orNull
   }
 
+  def resolveTargetRelativeToActionSourceFromControlsUseLibraryOpt(
+    container              : XBLContainer,
+    actionSourceAbsoluteId : String,
+    targetControlName      : String,
+    followIndexes          : Boolean,
+    libraryName            : String
+  ): Option[Iterator[NodeInfo]] = {
+
+    // Use "library name" because this becomes the section name in the XBL component:
+    //
+    // - `component:my-address`
+    // - `xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/(orbeon|acme)/library"`
+    //
+    // We obviously don't know the enclosing form's enclosing section name when producing the section
+    // template XBL. So we can only rely on the component name.
+    //
+    // What we'd like to say is "get the value from a section component coming from library `acme`'s
+    // section `my-address". But since control names are unique in the library, we don't need to
+    // specify the section name. So we only need to specify the library name.
+
+    val libraryUri = s"${Controls.SectionTemplateUriPrefix}$libraryName/library"
+
+    // All the section controls in the given library
+    val allSectionTemplateControls =
+      container.containingDocument.getControls.getCurrentControlTree.getSectionControls.toList collect {
+        case s if s.staticControl.element.getNamespaceURI == libraryUri && s.isRelevant => s
+      }
+
+    val uniqueSectionTemplateControlsStaticIds =
+      allSectionTemplateControls.map(_.staticControl.staticId).to[mutable.LinkedHashSet]
+
+    // The function can be called from multiple places, but we expect that it can be called:
+    //
+    // 1. from within a library section
+    // 2. from the top-level scope
+    //
+    val resolvingSourceControlEffectiveId = {
+
+      val contextWithinLibrarySectionOpt =
+        container.ancestorsIterator.flatMap(_.associatedControlOpt).find(_.element.getNamespaceURI == libraryUri)
+
+      contextWithinLibrarySectionOpt match {
+        case Some(containingSection) => containingSection.effectiveId
+        case None                    => XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId)// TODO: CHECK container.associatedControlOpt.getOrElse(container.containingDocument)
+      }
+    }
+
+    val resolvedSectionsIt =
+      uniqueSectionTemplateControlsStaticIds.iterator flatMap { uniqueSectionTemplateControlsStaticId =>
+        Controls.resolveControlsById(
+          containingDocument       = container.containingDocument,
+          sourceControlEffectiveId = resolvingSourceControlEffectiveId,
+          targetStaticId           = uniqueSectionTemplateControlsStaticId,
+          followIndexes            = followIndexes
+        ).iterator.collect { case section: XFormsComponentControl => section }
+      }
+
+    val nestedIt =
+      resolvedSectionsIt map { section =>
+
+        val root = section.innerRootControl
+
+        resolveTargetRelativeToActionSourceFromControlsOpt(
+          container              = root.container,
+          actionSourceAbsoluteId = root.absoluteId,
+          targetControlName      = targetControlName,
+          followIndexes          = followIndexes
+        )
+      }
+
+    val it = nestedIt.flatten.flatten
+
+    it.nonEmpty option it
+  }
+
   def resolveTargetRelativeToActionSourceFromControlsOpt(
     container              : XBLContainer,
     actionSourceAbsoluteId : String,
@@ -106,7 +184,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     followIndexes          : Boolean
   ): Option[Iterator[NodeInfo]] = {
 
-    def findControls =
+    val findControls =
       Controls.resolveControlsById(
         containingDocument       = container.containingDocument,
         sourceControlEffectiveId = XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId),
@@ -153,17 +231,31 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   def resolveTargetRelativeToActionSourceOpt(
     actionSourceAbsoluteId : String,
     targetControlName      : String,
-    followIndexes          : Boolean
+    followIndexes          : Boolean,
+    libraryNameOpt         : Option[String]
   ): Option[Iterator[Item]] = {
 
     val container = XFormsFunction.context.container
 
-    resolveTargetRelativeToActionSourceFromControlsOpt(
-      container,
-      actionSourceAbsoluteId,
-      targetControlName,
-      followIndexes
-    ) orElse
+    {
+      libraryNameOpt match {
+        case Some(libraryName) =>
+          resolveTargetRelativeToActionSourceFromControlsUseLibraryOpt(
+            container,
+            actionSourceAbsoluteId,
+            targetControlName,
+            followIndexes,
+            libraryName
+          )
+        case None =>
+          resolveTargetRelativeToActionSourceFromControlsOpt(
+            container,
+            actionSourceAbsoluteId,
+            targetControlName,
+            followIndexes
+          )
+      }
+    } orElse
       resolveTargetRelativeToActionSourceFromControlsFromBindOpt(
         container,
         XFormsFunction.context.modelOpt,
@@ -435,4 +527,10 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       case (name, isRepeat @ false) => List(name, isRepeat.toString, "none")
     }
   }
+
+  val ActionBindingSuffix = "-binding"
+
+  //@XPathFunction
+  def actionNameFromBindingId(bindingId: String): String =
+    bindingId.substring(0, bindingId.length - ActionBindingSuffix.length)
 }

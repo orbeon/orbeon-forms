@@ -180,8 +180,8 @@ class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
         </xh:body>
       </xh:html>.toDocument
 
-  private def resolveAllNodeValues(actionSourceAbsoluteId: String, targetControlName: String, followIndexes: Boolean) =
-    FormRunner.resolveTargetRelativeToActionSource(actionSourceAbsoluteId, targetControlName, followIndexes) match {
+  private def resolveAllNodeValues(actionSourceAbsoluteId: String, targetControlName: String, followIndexes: Boolean): List[String] =
+    FormRunner.resolveTargetRelativeToActionSource(actionSourceAbsoluteId, targetControlName, followIndexes, "") match {
       case value: Value   => asScalaIterator(value.iterate()) map (_.getStringValue) toList
       case node: NodeInfo => List(node.getStringValue)
     }

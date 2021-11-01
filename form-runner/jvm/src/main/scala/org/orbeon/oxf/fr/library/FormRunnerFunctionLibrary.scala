@@ -103,12 +103,14 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     Fun("control-string-value", classOf[FRControlStringValue], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE),
-      Arg(BOOLEAN, EXACTLY_ONE)
+      Arg(BOOLEAN, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
     )
 
     Fun("control-typed-value", classOf[FRControlTypedValue], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE),
-      Arg(BOOLEAN, EXACTLY_ONE)
+      Arg(BOOLEAN, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
     )
 
     Fun("component-param-value", classOf[FRComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
@@ -274,7 +276,8 @@ private object FormRunnerFunctions {
       FormRunner.resolveTargetRelativeToActionSourceOpt(
         actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
         targetControlName      = stringArgument(0),
-        followIndexes          = booleanArgumentOpt(1) getOrElse false
+        followIndexes          = booleanArgumentOpt(1) getOrElse false,
+        libraryNameOpt         = stringArgumentOpt(2)
       ) map {
         _ map (_.getStringValue): SequenceIterator
       } getOrElse
@@ -292,7 +295,8 @@ private object FormRunnerFunctions {
         FormRunner.resolveTargetRelativeToActionSourceOpt(
           actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
           targetControlName      = stringArgument(0),
-          followIndexes          = booleanArgumentOpt(1) getOrElse false
+          followIndexes          = booleanArgumentOpt(1) getOrElse false,
+          libraryNameOpt         = stringArgumentOpt(2)
         ) getOrElse
           Iterator.empty
 

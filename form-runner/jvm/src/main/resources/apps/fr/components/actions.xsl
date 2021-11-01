@@ -25,7 +25,7 @@
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
-    <xsl:import href="oxf:/apps/fr/components/actions-common.xsl"/>
+    <xsl:import href="actions-common.xsl"/>
 
     <xsl:function name="fr:has-known-action-event" as="xs:boolean">
         <xsl:param name="elem" as="element()"/>
@@ -39,6 +39,13 @@
 
                 )
         "/>
+    </xsl:function>
+
+    <xsl:function name="fr:has-action-call-event" as="xs:boolean">
+        <xsl:param name="elem" as="element()"/>
+        <xsl:sequence
+            select="($elem/@event, $elem/@ev:event)[1] =
+                concat('fr-call-user-', frf:actionNameFromBindingId($elem/parent::xf:action/@id), '-action')"/>
     </xsl:function>
 
     <xsl:function name="fr:has-action" as="xs:boolean">
@@ -76,7 +83,7 @@
                 name="resolved-data-holders"
                 value="
                     if (empty($at)) then
-                        frf:resolveTargetRelativeToActionSource($action-source, $control-name, false())
+                        frf:resolveTargetRelativeToActionSource($action-source, $control-name, false(), ())
                     else
                         frf:resolveTargetRelativeToActionSourceFromBinds('{$model-id}', $control-name)[
                             if ($at = 'end') then
@@ -679,10 +686,10 @@
             <xsl:variable name="model-id" select="../@id/string()"/>
 
             <!-- Main event handler to start the action -->
-            <xsl:for-each select="xf:action[fr:has-known-action-event(.)][1]">
+            <xsl:for-each select="xf:action[fr:has-known-action-event(.) or fr:has-action-call-event(.)][1]">
 
-                <xsl:variable name="action" select="."/>
-                <xsl:variable name="var"    select="$action/xf:var[@name = 'iterate-control-name']"/>
+                <xsl:variable name="action"                   select="."/>
+                <xsl:variable name="iterate-control-name-var" select="$action/xf:var[@name = 'iterate-control-name']"/>
 
                 <xsl:copy>
                     <xsl:copy-of select="$action/@*"/>
@@ -692,20 +699,22 @@
                         <xsl:attribute name="if">fr:mode()='new'</xsl:attribute>
                     </xsl:if>
 
-                    <!-- Choose to iterate or not on `$iterate-control-name` -->
-                    <!-- Also store the absolute id of the source in the request -->
+                    <!-- 1. Choose to iterate or not on `$iterate-control-name`.
+                         2. Also store the absolute id of the action source in the request.
+                            If the action source is passed from the listener via 'action-source' we just use it (also
+                            case of section templates). -->
                     <xsl:choose>
-                        <xsl:when test="exists($var)">
-                            <xsl:copy-of select="$var"/>
-                            <xf:action iterate="frf:findRepeatedControlsForTarget(event('xxf:absolute-targetid'), $iterate-control-name)">
+                        <xsl:when test="exists($iterate-control-name-var)">
+                            <xsl:copy-of select="$iterate-control-name-var"/>
+                            <xf:action iterate="frf:findRepeatedControlsForTarget(event('action-source'), event('xxf:absolute-targetid'))[1], $iterate-control-name)">
                                 <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', string(.))</xf:action>
                             </xf:action>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', event('xxf:absolute-targetid'))</xf:action>
+                            <xf:action type="xpath">xxf:set-request-attribute('fr-action-source', (event('action-source'), event('xxf:absolute-targetid'))[1])</xf:action>
                         </xsl:otherwise>
                     </xsl:choose>
-                    <xsl:copy-of select="$action/* except $var"/>
+                    <xsl:copy-of select="$action/* except $iterate-control-name-var"/>
                 </xsl:copy>
             </xsl:for-each>
 
@@ -734,13 +743,15 @@
                                         <xsl:choose>
                                             <xsl:when test="exists(*:var[@name = 'control-name'])">
                                                 <xsl:copy-of select="(*:variable | *:var)[@name = 'control-name']"/>
+                                                <xsl:variable name="library-name" select="(*:variable | *:var)[@name = 'library-name']"/>
                                                 <xf:var
                                                     name="value"
                                                     value="
                                                         frf:resolveTargetRelativeToActionSource(
                                                             xxf:get-request-attribute('fr-action-source'),
                                                             $control-name,
-                                                            true()
+                                                            true(),
+                                                            {if (exists($library-name)) then $library-name/@value else '()'}
                                                         )"/>
                                             </xsl:when>
                                             <!-- https://github.com/orbeon/orbeon-forms/issues/4955 -->
@@ -811,13 +822,15 @@
                                     <xsl:when test="p:has-class('fr-set-control-value-action')">
                                         <!-- Keep parameters but override implementation -->
                                         <xsl:copy-of select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
+
                                         <!-- Set values (we choose to set all targets returned) -->
                                         <xf:setvalue
                                             iterate="
                                                 frf:resolveTargetRelativeToActionSource(
                                                     xxf:get-request-attribute('fr-action-source'),
                                                     $control-name,
-                                                    true()
+                                                    true(),
+                                                    ()
                                                 )"
                                             ref="."
                                             value="$control-value"/>

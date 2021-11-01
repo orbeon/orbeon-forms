@@ -164,7 +164,7 @@
                         <xf:var name="value" value="'before'"/>
                         <xf:rebuild/>
                         <xf:recalculate/>
-                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-before', true())">
+                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-before', true(), ())">
                            <xf:setvalue ref="." value="$value"/>
                        </xf:action>
                     </xf:action>
@@ -175,7 +175,7 @@
                         <xf:action>
                             <xf:var
                                 name="value"
-                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control1', true())"/>
+                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control1', true(), ())"/>
                             <xf:setvalue
                                 ref="/request/control1"
                                 value="$value"/>
@@ -183,7 +183,7 @@
                         <xf:action>
                             <xf:var
                                 name="value"
-                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control2', true())"/>
+                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control2', true(), ())"/>
                             <xf:setvalue
                                 ref="/request/control2"
                                 value="$value"/>
@@ -191,7 +191,7 @@
                         <xf:action>
                             <xf:var
                                 name="value"
-                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control3', true())"/>
+                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control3', true(), ())"/>
                             <xf:setvalue
                                 ref="/*/param3"
                                 value="$value"/>
@@ -210,7 +210,7 @@
                         <xf:var name="value" value="/response/foo"/>
                         <xf:rebuild/>
                         <xf:recalculate/>
-                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-foo', true())">
+                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-foo', true(), ())">
                            <xf:setvalue ref="." value="$value"/>
                        </xf:action>
                     </xf:action>
@@ -218,7 +218,7 @@
                         <xf:var name="value" value="/response/bar"/>
                         <xf:rebuild/>
                         <xf:recalculate/>
-                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-bar', true())">
+                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-bar', true(), ())">
                            <xf:setvalue ref="." value="$value"/>
                        </xf:action>
                     </xf:action>
@@ -232,7 +232,7 @@
                         <xf:action>
                             <xf:var
                                 name="value"
-                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control4', true())"/>
+                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control4', true(), ())"/>
                             <xf:setvalue
                                 ref="/request/control4"
                                 value="$value"/>
@@ -240,7 +240,7 @@
                         <xf:action>
                             <xf:var
                                 name="value"
-                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control5', true())"/>
+                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control5', true(), ())"/>
                             <xf:setvalue
                                 ref="/*/param5"
                                 value="$value"/>
@@ -248,7 +248,7 @@
                         <xf:action>
                             <xf:var
                                 name="value"
-                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control6', true())"/>
+                                value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control6', true(), ())"/>
                             <xf:setvalue
                                 xmlns:sql="http://orbeon.org/oxf/xml/sql"
                                 ref="/sql:config/sql:query/sql:param[2]/(@value | @select)[1]"
@@ -289,7 +289,7 @@
                         <xf:var name="value" value="'after'"/>
                         <xf:rebuild/>
                         <xf:recalculate/>
-                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-after', true())">
+                        <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-after', true(), ())">
                            <xf:setvalue ref="." value="$value"/>
                        </xf:action>
                     </xf:action>
@@ -307,7 +307,7 @@
                             <xf:var name="value" value="'in-if'"/>
                             <xf:rebuild/>
                             <xf:recalculate/>
-                            <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-in-if', true())">
+                            <xf:action iterate="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control-in-if', true(), ())">
                                 <xf:setvalue ref="." value="$value"/>
                             </xf:action>
                         </xf:action>

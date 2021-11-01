@@ -61,7 +61,7 @@
                         concat(
                             'frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute(''fr-action-source''), ''',
                             $to-control-name,
-                            ''', true())'
+                            ''', true(), ())'
                         )"/>
             </xsl:otherwise>
         </xsl:choose>
@@ -408,7 +408,7 @@
                                 <xsl:variable name="control" select="@control/string()" as="xs:string"/>
                                 <xf:var
                                     name="value"
-                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), '{$control}', true())"/>
+                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), '{$control}', true(), ())"/>
                             </xsl:when>
                             <xsl:when test="exists(@value)">
                                 <xsl:variable name="value" select="@value/string()" as="xs:string"/>

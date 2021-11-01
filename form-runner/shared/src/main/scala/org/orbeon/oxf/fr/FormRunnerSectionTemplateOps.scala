@@ -13,13 +13,19 @@
  */
 package org.orbeon.oxf.fr
 
+import java.{util => ju}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
-import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
+import org.orbeon.oxf.xml.TransformerUtils.extractAsMutableDocument
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeInfoConversions.extractAsMutableDocument
 import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
+import org.orbeon.xforms.XFormsId
+
+import scala.jdk.CollectionConverters._
 
 
 trait FormRunnerSectionTemplateOps {
@@ -49,6 +55,29 @@ trait FormRunnerSectionTemplateOps {
   def findAppFromSectionTemplateUri(uri: String): Option[String] = uri match {
     case MatchesComponentUriLibraryRegex(app) => Option(app)
     case _ => None
+  }
+
+  //@XPathFunction
+  def controlMatchesNameAndLibrary(controlAbsoluteId: String, controlNames: ju.List[String], libraryName: String): Boolean = {
+
+    val controlName =
+      FormRunner.controlNameFromIdOpt(XFormsId.getStaticIdFromId(XFormsId.absoluteIdToEffectiveId(controlAbsoluteId)))
+
+    def nameMatches =
+      controlNames.asScala.exists(controlName.contains)
+
+    def libraryNameMatches = {
+
+      val libraryUri = s"${Controls.SectionTemplateUriPrefix}$libraryName/library"
+
+      inScopeContainingDocument.getControls.getCurrentControlTree.findControl(XFormsId.absoluteIdToEffectiveId(controlAbsoluteId))
+        .exists(
+          _.container.ancestorsIterator.flatMap(_.associatedControlOpt)
+            .exists(_.element.getNamespaceURI == libraryUri)
+        )
+    }
+
+    nameMatches && libraryNameMatches
   }
 
   def sectionTemplateForSection(frSectionComponent: XFormsComponentControl): Option[XFormsComponentControl] = {

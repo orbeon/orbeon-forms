@@ -28,6 +28,11 @@ import scala.collection.compat._
 
 object Controls {
 
+  // Special for Form Runner
+  // It's not ideal to have this here, but we currently don't have a pluggable way for Form Runner to indicate to
+  // XForms that some controls should be indexed.
+  val SectionTemplateUriPrefix = "http://orbeon.org/oxf/xml/form-builder/component/"
+
   // Create the entire tree of control from the root
   def createTree(
     containingDocument : XFormsContainingDocument,
@@ -52,7 +57,7 @@ object Controls {
 
   // Create a new repeat iteration for insertion into the current tree of controls
   def createRepeatIterationTree(
-    containingDocument : XFormsContainingDocument,
+    containingDocument : XFormsContainingDocument, // TODO: unused
     controlIndex       : ControlIndex,
     repeatControl      : XFormsRepeatControl,
     iterationIndex     : Int

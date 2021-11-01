@@ -14,19 +14,20 @@
 package org.orbeon.oxf.xforms
 
 import java.{util => ju}
-
+import org.orbeon.dom.QName
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{CollectionUtils, IndentedLogger}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls._
-import org.orbeon.oxf.xforms.control.{Controls, XFormsContainerControl, XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsContainerControl, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.xforms.XFormsNames._
 
 import scala.collection.{mutable => m}
 import scala.jdk.CollectionConverters._
+
 
 private class ControlIndex {
 
@@ -36,7 +37,14 @@ private class ControlIndex {
 
   // HashMap[Type = String, LinkedHashMap[EffectiveId = String, Control = XFormsControl]]
   // No need for order here
-  private val _controlTypes = new ju.HashMap[String, ju.LinkedHashMap[String, XFormsControl]]
+  private val _controlTypes    = new ju.HashMap[QName, ju.LinkedHashMap[String, XFormsControl]]
+  private val _sectionControls = new ju.LinkedHashMap[String, XFormsComponentControl]()
+
+  private def collectSectionControl(control: XFormsControl): Option[XFormsComponentControl] = control match {
+    case s: XFormsComponentControl
+      if s.staticControl.element.getNamespaceURI.startsWith(Controls.SectionTemplateUriPrefix) => Some(s)
+    case _                                                                                     => None
+  }
 
   private def mustMapControl(control: XFormsControl): Boolean = control match {
     case _: XFormsUploadControl | _: XFormsRepeatControl | _: XXFormsDialogControl => true
@@ -54,12 +62,17 @@ private class ControlIndex {
 
     // Remember by control type (for certain controls we know we need)
     if (mustMapControl(control)) {
-      var controlsMap = _controlTypes.get(control.localName)
+      val controlQName = control.staticControl.element.getQName
+      var controlsMap = _controlTypes.get(controlQName)
       if (controlsMap eq null) {
         controlsMap = new ju.LinkedHashMap[String, XFormsControl] // need for order here!
-        _controlTypes.put(control.localName, controlsMap)
+        _controlTypes.put(controlQName, controlsMap)
       }
       controlsMap.put(control.getEffectiveId, control)
+    } else {
+      collectSectionControl(control) foreach { componentControl =>
+        _sectionControls.put(componentControl.getEffectiveId, componentControl)
+      }
     }
   }
 
@@ -74,19 +87,27 @@ private class ControlIndex {
 
     // Remove by control type (for certain controls we know we need)
     if (mustMapControl(control)) {
-      val controlsMap = _controlTypes.get(control.localName)
+      val controlQName = control.staticControl.element.getQName
+      val controlsMap = _controlTypes.get(controlQName)
       if (controlsMap ne null)
         controlsMap.remove(control.getEffectiveId)
+    } else {
+      collectSectionControl(control) foreach { componentControl =>
+        _sectionControls.remove(componentControl.getEffectiveId)
+      }
     }
   }
 
   def effectiveIdsToControls: collection.Map[String, XFormsControl] = _effectiveIdsToControls.asScala
 
   // WARNING: Caller must ensure consistency of `name` and `T`!
-  def controlsOfName[T <: XFormsControl](name: String): Iterable[T] = {
+  def controlsOfName[T <: XFormsControl](name: QName): Iterable[T] = {
     val result = _controlTypes.get(name)
     if (result ne null) result.asScala.values.asInstanceOf[Iterable[T]] else Nil
   }
+
+  def sectionControls: ju.Collection[XFormsComponentControl] =
+    _sectionControls.values()
 }
 
 // Represent a tree of XForms controls
@@ -278,7 +299,8 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   def findRepeatControl(effectiveId: String): Option[XFormsRepeatControl] =
     findControl(effectiveId) flatMap CollectionUtils.collectByErasedType[XFormsRepeatControl]
 
-  def getUploadControls     : Iterable[XFormsUploadControl]    = _controlIndex.controlsOfName[XFormsUploadControl](UPLOAD_NAME)
-  def getRepeatControls     : Iterable[XFormsRepeatControl]    = _controlIndex.controlsOfName[XFormsRepeatControl](REPEAT_NAME)
-  def getDialogControls     : Iterable[XXFormsDialogControl]   = _controlIndex.controlsOfName[XXFormsDialogControl](XXFORMS_DIALOG_NAME)
+  def getUploadControls     : Iterable[XFormsUploadControl]    = _controlIndex.controlsOfName[XFormsUploadControl](XFORMS_UPLOAD_QNAME)
+  def getRepeatControls     : Iterable[XFormsRepeatControl]    = _controlIndex.controlsOfName[XFormsRepeatControl](XFORMS_REPEAT_QNAME)
+  def getDialogControls     : Iterable[XXFormsDialogControl]   = _controlIndex.controlsOfName[XXFormsDialogControl](XXFORMS_DIALOG_QNAME)
+  def getSectionControls    : Iterable[XFormsComponentControl] = _controlIndex.sectionControls.asScala
 }

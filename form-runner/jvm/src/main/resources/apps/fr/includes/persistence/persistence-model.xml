@@ -52,6 +52,11 @@
             (: PE only :)
             (fr:is-pe() or frf:sendError(404))"/>
 
+    <!-- Crude way of detecting export, might have to fix later! -->
+    <xf:var
+        name="is-export"
+        value="$is-background and xxf:get-request-method() = 'GET'"/>
+
     <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
     <xf:var
         name="autosave-enabled"
@@ -462,7 +467,12 @@
                                     QName('http://orbeon.org/oxf/xml/form-runner', 'fr:illegal-state'),
                                     concat('unexpected event received: ', $name)
                                 ),
-                        if ($is-background) then 'background' else 'foreground',
+                        if ($is-export) then
+                            'export'
+                        else if ($is-background) then
+                            'background'
+                        else
+                            'foreground',
                         $mode
                     ),
                     '.'
@@ -505,11 +515,6 @@
 
             <xf:delete
                 ref="instance('fr-background-response-instance')/data"/>
-
-            <!-- Crude way of detecting export, might have to fix later! -->
-            <xf:var
-                name="is-export"
-                value="xxf:get-request-method() = 'GET'"/>
 
             <xf:action
                 if="instance('fr-background-response-instance')/process-success/data(.) and (: process must be successful :)

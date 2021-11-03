@@ -17,7 +17,7 @@
 package java.io
 
 
-class BufferedInputStream(private[this] var in: InputStream, size: Int) extends FilterInputStream(in) {
+class BufferedInputStream(private var is: InputStream, size: Int) extends FilterInputStream(is) {
 
   if (size <= 0)
     throw new IllegalArgumentException("size must be > 0")
@@ -32,7 +32,7 @@ class BufferedInputStream(private[this] var in: InputStream, size: Int) extends 
     this(in, 8192)
 
   override def available: Int = {
-    val localIn = in // 'in' could be invalidated by close()
+    val localIn = is // 'in' could be invalidated by close()
     if (buf == null || localIn == null)
       throw new IOException("Stream is closed")
     count - pos + localIn.available
@@ -40,8 +40,8 @@ class BufferedInputStream(private[this] var in: InputStream, size: Int) extends 
 
   override def close(): Unit = {
     buf = null
-    val localIn = in
-    in = null
+    val localIn = is
+    is = null
     if (localIn != null)
       localIn.close()
   }
@@ -90,7 +90,7 @@ class BufferedInputStream(private[this] var in: InputStream, size: Int) extends 
   override def read: Int = {
     // Use local refs since buf and in may be invalidated by an unsynchronized close()
     var localBuf = buf
-    val localIn = in
+    val localIn = is
     if (localBuf == null || localIn == null)
       throw new IOException("Stream is closed")
     // Are there buffered bytes available?
@@ -122,7 +122,7 @@ class BufferedInputStream(private[this] var in: InputStream, size: Int) extends 
       throw new IndexOutOfBoundsException
     if (length == 0)
       return 0
-    val localIn = in
+    val localIn = is
     if (localIn == null)
       throw new IOException("Stream is closed")
 
@@ -181,7 +181,7 @@ class BufferedInputStream(private[this] var in: InputStream, size: Int) extends 
 
   override def skip(amount: Long): Long = {
     val localBuf = buf
-    val localIn = in
+    val localIn = is
     if (localBuf == null)
       throw new IOException("Stream is closed")
     if (amount < 1)

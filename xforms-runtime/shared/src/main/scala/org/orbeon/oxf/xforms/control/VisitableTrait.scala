@@ -22,10 +22,10 @@ import org.orbeon.oxf.xforms.state.ControlState
 trait VisitableTrait extends XFormsControl {
 
   // Whether the control has been visited
-  private[this] var _visited = false
+  private var _visited = false
 
   // Previous values for refresh
-  private[this] var _wasVisited = false
+  private var _wasVisited = false
 
   override def visited: Boolean = _visited
 

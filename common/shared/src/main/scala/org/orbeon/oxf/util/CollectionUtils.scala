@@ -70,7 +70,7 @@ object CollectionUtils {
 
     def iterateOpt[T <: AnyRef](start: T)(f: T => Option[T]): Iterator[T] = new AbstractIterator[T] {
 
-      private[this] var _next: Option[T] = Some(start)
+      private var _next: Option[T] = Some(start)
 
       def hasNext: Boolean = _next.isDefined
 

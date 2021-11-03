@@ -37,7 +37,7 @@ trait PartAnalysis
   private def partAnalysisIterator(start: Option[PartAnalysis]): Iterator[PartAnalysis] =
     new Iterator[PartAnalysis] {
 
-      private[this] var theNext = start
+      private var theNext = start
 
       def hasNext: Boolean = theNext.isDefined
 

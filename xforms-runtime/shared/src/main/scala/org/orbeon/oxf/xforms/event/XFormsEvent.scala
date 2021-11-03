@@ -74,8 +74,8 @@ abstract class XFormsEvent(
   def lazyProperties: PropertyGetter = EmptyGetter
 
   // Mutable phase and observer as the event is being dispatched
-  private[this] var _currentPhase: Phase = _
-  private[this] var _currentObserver: XFormsEventTarget = _
+  private var _currentPhase: Phase = _
+  private var _currentObserver: XFormsEventTarget = _
 
   final def currentPhase: Phase = _currentPhase
   final def currentPhase_=(currentPhase: Phase): Unit = _currentPhase = currentPhase

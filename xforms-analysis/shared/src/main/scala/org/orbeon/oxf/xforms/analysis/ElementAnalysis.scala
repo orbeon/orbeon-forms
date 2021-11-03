@@ -248,7 +248,7 @@ object ElementAnalysis {
     nextElem : ElementAnalysis => Option[ElementAnalysis]
   ) extends Iterator[ElementAnalysis] {
 
-    private[this] var theNext = start
+    private var theNext = start
 
     def hasNext: Boolean = theNext.isDefined
     def next(): ElementAnalysis = {

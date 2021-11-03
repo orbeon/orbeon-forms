@@ -297,55 +297,61 @@
             </metadata>
 
             <!-- Handlers for actions that listen to events from controls-->
-            <xbl:handlers>
-                <xsl:for-each select="$relevant-actions[exists(xf:action[1][exists(@*:observer) and @*:observer != 'fr-form-model'])]">
+            <xsl:variable
+                name="relevant-actions-triggered-by-controls"
+                select="$relevant-actions[exists(xf:action[1][exists(@*:observer) and @*:observer != 'fr-form-model'])]"/>
 
-                    <xsl:variable name="current-action"          select="."/>
-                    <xsl:variable name="current-action-listener" select="$current-action/xf:action[1]"/>
-                    <xsl:variable name="current-events"          select="$current-action-listener/@*:event/p:split()"/>
-                    <xsl:variable name="current-observers"       select="$current-action-listener/@*:observer/p:split()"/>
+            <xsl:if test="exists($relevant-actions-triggered-by-controls)">
+                <xbl:handlers>
+                    <xsl:for-each select="$relevant-actions-triggered-by-controls">
 
-                    <xsl:if test="exists($current-observers[. = $this-section-maybe-controls/@id])">
-                        <!-- Observers within this section -->
-                        <xbl:handler
-                            event="{$current-events}"
-                            observer="{$current-observers[. = $this-section-maybe-controls/@id]}">
+                        <xsl:variable name="current-action"          select="."/>
+                        <xsl:variable name="current-action-listener" select="$current-action/xf:action[1]"/>
+                        <xsl:variable name="current-events"          select="$current-action-listener/@*:event/p:split()"/>
+                        <xsl:variable name="current-observers"       select="$current-action-listener/@*:observer/p:split()"/>
 
-                            <xf:dispatch
-                                name="fr-call-user-{frf:actionNameFromBindingId($current-action/@id)}-action"
-                                targetid="{$model-id}">
-                                <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
-                            </xf:dispatch>
+                        <xsl:if test="exists($current-observers[. = $this-section-maybe-controls/@id])">
+                            <!-- Observers within this section -->
+                            <xbl:handler
+                                event="{$current-events}"
+                                observer="{$current-observers[. = $this-section-maybe-controls/@id]}">
 
-                        </xbl:handler>
-                    </xsl:if>
+                                <xf:dispatch
+                                    name="fr-call-user-{frf:actionNameFromBindingId($current-action/@id)}-action"
+                                    targetid="{$model-id}">
+                                    <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                                </xf:dispatch>
 
-                    <xsl:if test="exists($current-observers[not(. = $this-section-maybe-controls/@id)])">
-                        <!-- Observers within other sections -->
-                        <xbl:handler
-                            xxbl:scope="outer"
-                            xxf:phantom="true"
-                            observer="fr-view-component"
-                            event="{$current-events}"
-                            if="frf:controlMatchesNameAndLibrary(event('xxf:absolute-targetid'), ({
-                                string-join(
-                                    for $o in $current-observers
-                                    return concat('''', frf:controlNameFromId($o), ''''),
-                                    ','
-                                )
-                            }), '{$library-name}')">
+                            </xbl:handler>
+                        </xsl:if>
 
-                            <xf:dispatch
-                                xxbl:scope="inner"
-                                name="fr-call-user-{frf:actionNameFromBindingId($current-action/@id)}-action"
-                                targetid="{$model-id}">
-                                <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
-                            </xf:dispatch>
+                        <xsl:if test="exists($current-observers[not(. = $this-section-maybe-controls/@id)])">
+                            <!-- Observers within other sections -->
+                            <xbl:handler
+                                xxbl:scope="outer"
+                                xxf:phantom="true"
+                                observer="fr-view-component"
+                                event="{$current-events}"
+                                if="frf:controlMatchesNameAndLibrary(event('xxf:absolute-targetid'), ({
+                                    string-join(
+                                        for $o in $current-observers
+                                        return concat('''', frf:controlNameFromId($o), ''''),
+                                        ','
+                                    )
+                                }), '{$library-name}')">
 
-                        </xbl:handler>
-                    </xsl:if>
-                </xsl:for-each>
-            </xbl:handlers>
+                                <xf:dispatch
+                                    xxbl:scope="inner"
+                                    name="fr-call-user-{frf:actionNameFromBindingId($current-action/@id)}-action"
+                                    targetid="{$model-id}">
+                                    <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
+                                </xf:dispatch>
+
+                            </xbl:handler>
+                        </xsl:if>
+                    </xsl:for-each>
+                </xbl:handlers>
+            </xsl:if>
 
             <!-- XBL implementation -->
             <xbl:implementation>

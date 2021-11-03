@@ -498,7 +498,15 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     repeatedGridOrSectionName : String,
     atOrNull                  : String,
     lastIsNone                : Boolean // for `fr:repeat-clear` where the last position must not be specified
-  ): SequenceIterator = {
+  ): SequenceIterator =
+    findContainerDetailsCompileTimeImpl(inDoc, repeatedGridOrSectionName, atOrNull, lastIsNone)
+
+  def findContainerDetailsCompileTimeImpl(
+    inDoc                     : NodeInfo,
+    repeatedGridOrSectionName : String,
+    atOrNull                  : String,
+    lastIsNone                : Boolean // for `fr:repeat-clear` where the last position must not be specified
+  ): Iterator[String] = {
 
     val namesWithIsRepeat =
       FormRunner.findControlByName(inDoc, repeatedGridOrSectionName).toList  flatMap
@@ -523,8 +531,8 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     }
 
     namesWithIsRepeat.reverseIterator flatMap {
-      case (name, isRepeat @ true)  => List(name, isRepeat.toString, PositionType.asString(positionsIt.next()))
-      case (name, isRepeat @ false) => List(name, isRepeat.toString, "none")
+      case (name, isRepeat @ true)  => Iterator(name, isRepeat.toString, PositionType.asString(positionsIt.next()))
+      case (name, isRepeat @ false) => Iterator(name, isRepeat.toString, "none")
     }
   }
 

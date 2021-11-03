@@ -361,7 +361,7 @@ object XPathCache extends XPathCacheTrait {
 
   private object Private {
 
-    // This is the in-memory XPath exprssion cache, simply implemented as a `Map`
+    // This is the in-memory XPath expression cache, simply implemented as a `Map`
     private var cache = Map[String, (XPathExpression, IndependentContext)]()
 
     def evaluateImpl(

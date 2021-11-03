@@ -69,8 +69,6 @@ object Connection extends ConnectionTrait {
     externalContext : ExternalContext
   ): Eval[ConnectionResult] = Eval.now { // Eval.later
 
-    println(s"connectNow for $url")
-
     val urlString = url.toString
 
     def fromResourceResolver: Option[ConnectionResult] =
@@ -111,9 +109,9 @@ object Connection extends ConnectionTrait {
               def next(): Iterator.Entry[Short] = {
 
                 if (current == -1) {
-                  entry.update(true, 0)
+                  entry.update(done = true, 0)
                 } else {
-                  entry.update(false, current.toShort)
+                  entry.update(done = false, current.toShort)
                   current = is.read()
                 }
                 entry

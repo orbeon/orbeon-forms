@@ -126,7 +126,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
     // All the section controls in the given library
     val allSectionTemplateControls =
-      container.containingDocument.getControls.getCurrentControlTree.getSectionControls.toList collect {
+      container.containingDocument.controls.getCurrentControlTree.getSectionControls.toList collect {
         case s if s.staticControl.element.getNamespaceURI == libraryUri && s.isRelevant => s
       }
 

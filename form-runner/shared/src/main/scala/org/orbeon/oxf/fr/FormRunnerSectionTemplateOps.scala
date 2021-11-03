@@ -19,9 +19,8 @@ import org.orbeon.oxf.fr
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
-import org.orbeon.oxf.xml.TransformerUtils.extractAsMutableDocument
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.NodeInfoConversions.extractAsMutableDocument
+import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
 import org.orbeon.xforms.XFormsId
 
@@ -47,7 +46,7 @@ trait FormRunnerSectionTemplateOps {
       availableSectionTemplateXBLBindings(xblElems / fr.XMLNames.XBLBindingTest)
 
     bindingsForSectionTemplates map { binding =>
-      FormRunner.bindingFirstURIQualifiedName(binding) -> extractAsMutableDocument(binding)
+      FormRunner.bindingFirstURIQualifiedName(binding) -> NodeInfoConversions.extractAsMutableDocument(binding)
     } toMap
   }
 
@@ -70,7 +69,7 @@ trait FormRunnerSectionTemplateOps {
 
       val libraryUri = s"${Controls.SectionTemplateUriPrefix}$libraryName/library"
 
-      inScopeContainingDocument.getControls.getCurrentControlTree.findControl(XFormsId.absoluteIdToEffectiveId(controlAbsoluteId))
+      inScopeContainingDocument.controls.getCurrentControlTree.findControl(XFormsId.absoluteIdToEffectiveId(controlAbsoluteId))
         .exists(
           _.container.ancestorsIterator.flatMap(_.associatedControlOpt)
             .exists(_.element.getNamespaceURI == libraryUri)

@@ -67,7 +67,7 @@ object StaticXPath extends StaticXPathTrait {
     super.setNamePool(GlobalNamePool)
     super.setDocumentNumberAllocator(GlobalDocumentNumberAllocator)
     super.getExtensionBinder("java").asInstanceOf[JavaExtensionLibrary]
-      .declareJavaClass("http://www.w3.org/2005/xpath-functions/math", classOf[org.orbeon.saxon.exslt.Math])
+      .declareJavaClass("http://www.w3.org/2005/xpath-functions/math", classOf[ExsltWithPiAndPowFunctions])
 
     // See https://github.com/orbeon/orbeon-forms/issues/3468
     // We decide not to use a pool for now as creating a parser is fairly cheap

@@ -98,6 +98,7 @@ object XPathCache extends XPathCacheTrait {
     }
   }
 
+  // Offline: only used by `XFormsContextStack`
   def evaluateKeepItemsJava(
     contextItems       : ju.List[om.Item],
     contextPosition    : Int,
@@ -355,8 +356,21 @@ object XPathCache extends XPathCacheTrait {
     xpathString  : String,
     reporter     : Reporter
   ): Any = {
-    XPath.Logger.debug(s"NIY: `XPathCache.evaluateSingleWithContext()` for `$xpathString`")
-    ???
+
+    XPath.Logger.debug(s"`XPathCache.evaluateSingleWithContext()` for `$xpathString`")
+
+    evaluate(
+      contextItems       = Option(contextItem).toList.asJava,
+      contextPosition    = 1,
+      xpathString        = xpathString,
+      namespaceMapping   = xpathContext.namespaceMapping,
+      variableToValueMap = xpathContext.variableToValueMap,
+      functionLibrary    = xpathContext.functionLibrary,
+      functionContext    = xpathContext.functionContext,
+      baseURI            = xpathContext.baseURI,
+      locationData       = xpathContext.locationData,
+      reporter           = reporter,
+    ).asScala.headOption.orNull
   }
 
   private object Private {

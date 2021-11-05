@@ -70,12 +70,12 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
       containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(eval)
       // Tell caller he doesn't need to do anything
       None
-    }  else if (p.isDeferredSubmissionSecondPass) {
+    } else if (p.isDeferredSubmissionSecondPass) {
       // Tell XFCD that we have a submission replace="all" ready for a second pass
       // Tell caller he doesn't need to do anything
       containingDocument.setReplaceAllEval(eval)
       None
-    }  else {
+    } else {
       // Just run it now
       Option(eval.value)
     }

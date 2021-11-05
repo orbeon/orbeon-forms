@@ -117,23 +117,20 @@ trait XFormsSupport extends MockitoSugar {
       getValueControl(controlEffectiveId).storeExternalValue(value)
     }
 
-  def setControlValueWithEventSearchNested(controlEffectiveId: String, value: String): Unit = {
-
-    def process(target: XFormsEventTarget) = {
-      ClientEvents.processEvent(document, new XXFormsValueEvent(target, value))
-      document.afterExternalEvents(true)
-      document.afterUpdateResponse()
-      document.beforeExternalEvents(null, true)
-    }
-
+  def setControlValueWithEventSearchNested(controlEffectiveId: String, value: String): Unit =
     getObject(controlEffectiveId) match {
       case c: XFormsControl =>
         ControlsIterator(c, includeSelf = true) collectFirst {
-          case vc: XFormsValueControl if vc.allowExternalEvent(EventNames.XXFormsValue) =>  vc
-        } foreach process
+          case vc: XFormsValueControl if vc.allowExternalEvent(EventNames.XXFormsValue) =>
+            vc
+        } foreach { target =>
+          ClientEvents.processEvent(document, new XXFormsValueEvent(target, value))
+            document.afterExternalEvents(true)
+            document.afterUpdateResponse()
+            document.beforeExternalEvents(null, isAjaxRequest = true)
+        }
       case _ =>
     }
-  }
 
   def isRelevant(controlEffectiveId: String) = getObject(controlEffectiveId).asInstanceOf[XFormsControl].isRelevant
   def isRequired(controlEffectiveId: String) = getSingleNodeControl(controlEffectiveId).isRequired

@@ -101,7 +101,7 @@ class IndentedLogger(val logger: log4s.Logger, val debugEnabled: Boolean, val in
       indentation.indentation += 1
     }
 
-  def endHandleOperation(): Unit =
+  def endHandleOperation(success: Boolean = true): Unit =
     if (debugEnabled) {
       val resultParameters = stack.head.resultParameters
       indentation.indentation -= 1
@@ -119,7 +119,11 @@ class IndentedLogger(val logger: log4s.Logger, val debugEnabled: Boolean, val in
             else
               timeParams
 
-          logDebug(operation.`type`, "end " + operation.message, newParams: _*)
+          logDebug(
+            operation.`type`,
+            s"end ${operation.message} with ${if (success) "success" else "failure"}",
+            newParams: _*
+          )
         case _ =>
       }
     }

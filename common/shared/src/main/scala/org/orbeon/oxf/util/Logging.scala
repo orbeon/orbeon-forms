@@ -15,6 +15,8 @@ package org.orbeon.oxf.util
 
 import org.log4s.LogLevel
 
+import scala.util.control.NonFatal
+
 
 // More Scala-friendly indented logger API
 trait Logging {
@@ -44,14 +46,20 @@ trait Logging {
 
   // Debug block with optional parameters
   def withDebug[T](message: => String, parameters: => Seq[(String, String)] = Nil)(body: => T)(implicit logger: IndentedLogger): T = {
+    val debugEnabled = logger.debugEnabled
+    var success = true
     try {
-      if (logger.debugEnabled)
+      if (debugEnabled)
         logger.startHandleOperation("", message, flattenTuples(parameters): _*)
 
       body
+    } catch {
+      case NonFatal(t) =>
+        success = false
+        throw t
     } finally {
-      if (logger.debugEnabled)
-        logger.endHandleOperation()
+      if (debugEnabled)
+        logger.endHandleOperation(success)
     }
   }
 

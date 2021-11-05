@@ -18,7 +18,17 @@ import enumeratum._
 
 sealed trait                                                        Operations
 case object AnyOperation                                    extends Operations
-case class  SpecificOperations(operations: List[Operation]) extends Operations
+case class  SpecificOperations(operations: List[Operation]) extends Operations {
+
+  implicit object OperationsOrdering extends Ordering[Operation] {
+    def compare(x: Operation, y: Operation): Int = x.entryName.compare(y.entryName)
+  }
+
+  override def equals(otherAny: Any) = otherAny match {
+    case otherOperations: SpecificOperations => operations.sorted == otherOperations.operations.sorted
+    case _                                   => false
+  }
+}
 
 sealed trait Operation extends EnumEntry with Lowercase
 

@@ -937,7 +937,7 @@
     </xsl:template>
 
     <!-- Match itemsets of controls which can be the target of an itemset action -->
-    <xsl:template match="xf:itemset[../@id = $itemset-actions-control-ids]">
+    <xsl:template match="xf:itemset[../@id = $itemset-actions-control-ids]" mode="within-controls">
         <xsl:copy>
             <!-- Update `@ref` attribute to disable the default itemset if an `@fr:itemsetid` attribute is present -->
             <xsl:if test="@ref">

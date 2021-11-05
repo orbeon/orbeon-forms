@@ -14,16 +14,36 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
+import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.xforms.Constants
+
 import scala.collection.compat._
+import scala.reflect.ClassTag
+
 
 class ItemsetActionTest
   extends DocumentTestBase
      with ResourceManagerSupport
      with AnyFunSpecLike
      with FormRunnerSupport {
+
+  private val Logger = LoggerFactory.createLogger(classOf[ItemsetActionTest])
+  private implicit val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
+
+  def resolveObjectAssert[T: ClassTag](
+    staticOrAbsoluteId : String,
+    sourceEffectiveId  : String       = Constants.DocumentId,
+    indexes            : List[Int]    = Nil,
+    container          : XBLContainer = document
+  ): T =
+    resolveObject[T](
+      staticOrAbsoluteId, sourceEffectiveId, indexes, container
+    ).getOrElse(throw new AssertionError(s"object `$staticOrAbsoluteId` not found`"))
 
   describe("Form Runner itemset actions") {
 
@@ -37,8 +57,8 @@ class ItemsetActionTest
         withFormRunnerDocument(processorService, doc) {
 
           def resolveCityAndZipControls(indexes: List[Int]) = {
-            val cityControl = resolveObject[XFormsComponentControl]("city-control", indexes = indexes).get
-            val zipControl  = resolveObject[XFormsComponentControl]("zip-control", cityControl.effectiveId, indexes).get
+            val cityControl = resolveObjectAssert[XFormsComponentControl]("city-control", indexes = indexes)
+            val zipControl  = resolveObjectAssert[XFormsComponentControl]("zip-control", cityControl.effectiveId, indexes)
 
             cityControl -> zipControl
           }
@@ -120,7 +140,7 @@ class ItemsetActionTest
 
           import Counts._
 
-          def assertSectionIteration(stateControl: XFormsComponentControl, stateValue: String, expected: List[(List[Int], String, String)]) = {
+          def assertSectionIteration(stateControl: XFormsComponentControl, stateValue: String, expected: List[(List[Int], String, String)]): Unit = {
 
             val sectionIndex = expected.head._1.head
 
@@ -143,7 +163,7 @@ class ItemsetActionTest
                 assertItemsetsChange(indexes, city, zip)
 
                 performGridAction(
-                  resolveObject[XFormsControl]("city-zip-grid-control", indexes = indexes take 1).get,
+                  resolveObjectAssert[XFormsControl]("city-zip-grid-control", indexes = indexes take 1),
                   "fr-insert-below"
                 )
 
@@ -169,41 +189,51 @@ class ItemsetActionTest
             }
           }
 
-          // One top-level map after initial state
-          assert(1 === countAttributes("itemsetid"))
-          assert(1 === countAttributes("itemsetmap"))
+          withDebug("check initial state") {
+            // One top-level map after initial state
+            assert(1 === countAttributes("itemsetid"))
+            assert(1 === countAttributes("itemsetmap"))
+          }
 
-          assertSectionIteration(
-            stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(1)).get,
-            stateValue   = "CA",
-            expected     = List(
-              (List(1, 1), "Los Angeles",   "90001"),
-              (List(1, 2), "Beverly Hills", "90212"),
-              (List(1, 3), "Hermosa Beach", "90254")
+          withDebug("checking section iteration 1") {
+            assertSectionIteration(
+              stateControl = resolveObjectAssert[XFormsComponentControl]("state-control", indexes = List(1)),
+              stateValue   = "CA",
+              expected     = List(
+                (List(1, 1), "Los Angeles",   "90001"),
+                (List(1, 2), "Beverly Hills", "90212"),
+                (List(1, 3), "Hermosa Beach", "90254")
+              )
             )
-          )
+          }
 
           // New section iteration
-          performSectionAction(
-            resolveObject[XFormsControl]("states-section-control").get,
-            "fr-insert-below"
-          )
-
-          assertSectionIteration(
-            stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(2)).get,
-            stateValue   = "LA",
-            expected     = List(
-              (List(2, 1), "Metairie",      "70001"),
-              (List(2, 2), "Belle Chasse",  "70037"),
-              (List(2, 3), "Des Allemands", "70030")
+          withDebug("inserting new section iteration") {
+            performSectionAction(
+              resolveObjectAssert[XFormsControl]("states-section-control"),
+              "fr-insert-below"
             )
-          )
+          }
+
+          withDebug("inserting new section iteration 2") {
+            assertSectionIteration(
+              stateControl = resolveObjectAssert[XFormsComponentControl]("state-control", indexes = List(2)),
+              stateValue   = "LA",
+              expected     = List(
+                (List(2, 1), "Metairie",      "70001"),
+                (List(2, 2), "Belle Chasse",  "70037"),
+                (List(2, 3), "Des Allemands", "70030")
+              )
+            )
+          }
 
           // Itemset internationalization
-          def assertStateItemsetsContain(label: String) =
-            for (sectionIndex <- 1 to 2) {
-              val stateControl = resolveObject[XFormsComponentControl]("state-control", indexes = List(sectionIndex)).get
-              assert(getItemsetSearchNested(stateControl).get.allItemsIterator exists (_.label.label == label))
+          def assertStateItemsetsContain(label: String): Unit =
+            withDebug("checking state itemset contains `$label`") {
+              for (sectionIndex <- 1 to 2) {
+                val stateControl = resolveObjectAssert[XFormsComponentControl]("state-control", indexes = List(sectionIndex))
+                assert(getItemsetSearchNested(stateControl).get.allItemsIterator exists (_.label.label == label))
+              }
             }
 
           assertStateItemsetsContain("California")
@@ -216,10 +246,12 @@ class ItemsetActionTest
 
           // Remove 2nd iteration
           withAssertNewCountsAndWindowsAndOrphans(List("itemsetid" -> -8, "itemsetmap" -> -1)) {
-            performSectionAction(
-              resolveObject[XFormsControl]("states-section-control").get,
-              "fr-remove"
-            )
+            withDebug("removing section iteration") {
+              performSectionAction(
+                resolveObjectAssert[XFormsControl]("states-section-control"),
+                "fr-remove"
+              )
+            }
           }
         }
       }

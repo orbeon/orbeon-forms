@@ -72,7 +72,8 @@ private[persistence] object HttpAssert extends XMLSupport {
             val resultDoc = IOSupport.readOrbeonDom(new ByteArrayInputStream(resultBody.get))
             assertXMLDocumentsIgnoreNamespacesInScope(resultDoc, expectedDoc)
           case HttpCall.Binary(expectedFile) =>
-            assert(resultBody.get == expectedFile)
+            // Compare `java.lang.Array[Byte]` with `sameElements`, as `==` always returns `false` on `java.lang.Array`
+            assert(resultBody.get sameElements expectedFile)
         }
         // Check operations
         val resultOperationsString = headers.get("orbeon-operations").map(_.head)

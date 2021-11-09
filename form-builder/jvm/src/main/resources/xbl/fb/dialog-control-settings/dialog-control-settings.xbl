@@ -1354,7 +1354,7 @@
                                 <xsl:element name="{$custom-control-settings}" namespace="{$namespace-uri}">
                                     <xsl:attribute name="id" select="'fb-custom-control-settings'"/>
 
-                                    <!--  Allow component to update datatype -->
+                                    <!-- Allow component to update datatype -->
                                     <xf:setvalue
                                         event="fb-update-datatype"
                                         if="xxf:non-blank(event('datatype'))"

@@ -19,22 +19,18 @@ import org.apache.http.entity.mime.content.{InputStreamBody, StringBody}
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
-import org.orbeon.dom.{Document, Element, QName, VisitorSupport}
+import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
-import org.orbeon.oxf.processor.XPLConstants
-import org.orbeon.oxf.processor.converter.{TextConverterBase, XMLConverter}
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.PathUtils.splitQuery
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, SaxonConfiguration}
 import org.orbeon.oxf.util.StringUtils.StringOps
-import org.orbeon.oxf.util.{Base64, Connection, CoreCrossPlatformSupport, IndentedLogger, NetUtils, PathUtils, SecureUtils, URLRewriterUtils, UploadProgress, XPath}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
@@ -42,15 +38,13 @@ import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.IOSupport
-import org.xml.sax.{ContentHandler, InputSource}
-import org.xml.sax.ext.LexicalHandler
+import org.xml.sax.InputSource
 
 import java.io._
 import java.net.{URI, URISyntaxException}
 import java.nio.charset.Charset
 import javax.xml.transform.dom.{DOMResult, DOMSource}
 import javax.xml.transform.sax.TransformerHandler
-import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.{Result, Transformer}
 import scala.util.control.NonFatal
 

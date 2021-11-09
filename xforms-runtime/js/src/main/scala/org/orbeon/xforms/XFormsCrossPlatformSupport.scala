@@ -23,7 +23,7 @@ import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.util.StaticXPath._
-import org.orbeon.oxf.util.{Base64, Connection, CoreCrossPlatformSupport, Exceptions, IndentedLogger, StaticXPath, UploadProgress}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.XMLReceiver

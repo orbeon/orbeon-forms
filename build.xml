@@ -19,8 +19,6 @@
 
     <property file="build-local.properties"/>
 
-    <property name="saxon.jar"     value="saxon-9-1-0-8_orbeon_20210903.jar"/>
-
     <!-- Expose environment variables -->
     <property environment="env"/>
 
@@ -225,7 +223,6 @@
     </target>
 
     <target name="war-common" depends="prepare">
-
         <exec executable="sbt" failonerror="true">
             <!-- sbt options are in `.sbtopts` -->
             <arg value="-Dorbeon.version=${release.number}"/>
@@ -233,13 +230,6 @@
             <arg value="project root"/>
             <arg value="package"/>
         </exec>
-
-        <!-- Make sure we remove PathMap from Saxon as we have our own implementation -->
-        <delete file="orbeon-war/jvm/target/webapp/WEB-INF/lib/${saxon.jar}"/>
-        <jar destfile="orbeon-war/jvm/target/webapp/WEB-INF/lib/${saxon.jar}">
-            <zipfileset src="lib/runtime/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
-        </jar>
-
     </target>
 
     <target name="orbeon-dev-war" depends="war-common" description="Create exploded WAR">

@@ -22,7 +22,7 @@ val DefaultOrbeonFormsVersion     = "2021.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
-val SaxonVersion                     = "10.0.0.63-SNAPSHOT"
+val SaxonJsVersion                   = "10.0.0.63-SNAPSHOT"
 val XercesVersion                    = "2.11.0.11-SNAPSHOT"
 val SaxVersion                       = "2.0.2.8-SNAPSHOT"
 val ScalaJsDomVersion                = "1.2.0"
@@ -54,6 +54,7 @@ val Log4sVersion                  = "1.10.0"
 val ScalaCollectionCompatVersion  = "2.2.0"
 
 // Java libraries
+val SaxonJvmVersion               = "9.1.0.8.3"
 val JUnitInterfaceVersion         = "0.11"
 val Slf4jVersion                  = "1.7.32"
 val HttpComponentsVersion         = "4.5.13"
@@ -73,6 +74,7 @@ val LiferayPortalKernelVersion    = "5.3.0"
 
 
 val CoreLibraryDependencies = Seq(
+  "org.orbeon"                  %% "saxon"                          % SaxonJvmVersion,
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
   "com.chuusai"                 %% "shapeless"                      % ShapelessVersion,
@@ -1080,7 +1082,7 @@ lazy val coreCrossPlatformJS = coreCrossPlatform.js
   .settings(
     libraryDependencies ++= Seq(
       "org.xml"    %%% "sax"       % SaxVersion,
-      "org.orbeon" %%% "saxon"     % SaxonVersion,
+      "org.orbeon" %%% "saxon"     % SaxonJsVersion,
       "org.orbeon" %%% "xerces"    % XercesVersion,
       "com.chuusai" %% "shapeless" % ShapelessVersion,
     ),

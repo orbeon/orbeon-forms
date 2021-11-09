@@ -34,6 +34,9 @@ object DropTrigger {
                 )
               )
             )
+
+            // Avoid navigation to "#"
+            e.preventDefault()
           }
         }: js.ThisFunction)
       }

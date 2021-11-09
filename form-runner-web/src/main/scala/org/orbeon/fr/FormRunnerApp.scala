@@ -19,6 +19,7 @@ import org.orbeon.xforms.{App, XFormsApp}
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 
+
 // Scala.js starting point for Form Runner
 object FormRunnerApp extends App {
 
@@ -51,6 +52,7 @@ object FormRunnerApp extends App {
     xbl.Grid
     xbl.Repeater
     xbl.DndRepeat
+    xbl.DropTrigger
     xbl.Tabbable
     xbl.Number
     xbl.TreeSelect1

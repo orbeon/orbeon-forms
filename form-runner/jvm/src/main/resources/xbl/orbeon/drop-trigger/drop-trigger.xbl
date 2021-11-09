@@ -1,0 +1,54 @@
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-drop-trigger-binding"
+        element="fr|drop-trigger"
+        xxf:external-events="fr-activate"
+        xxbl:mode="binding javascript-lifecycle"
+        xxbl:container="span">
+
+        <xbl:handlers>
+            <xbl:handler
+                event="fr-activate"
+                target="#observer"
+                if="event('fr-value') = xxf:itemset('hidden-select', 'xml')//item/value"
+                type="xpath">
+                xxf:instance('fr-form-instance')/fr:run-process-by-name('oxf.fr.detail.process', event('fr-value'))
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:template>
+
+            <!-- Hidden select to hold itemset -->
+            <xf:var name="binding" value="xxf:binding('fr-drop-trigger-binding')"/>
+
+            <xf:select ref="$binding" appearance="xxf:internal" id="hidden-select">
+                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+            </xf:select>
+            <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
+
+            <!-- Bootstrap dropdown/dropup layout -->
+            <!-- TODO: configurable dropup/dropdown -->
+            <xh:div class="btn-group dropup">
+              <xh:button class="btn" data-orbeon-value="{$items[1]/value}">
+                  <xf:output value="$items[1]/label" mediatype="text/html"/>
+              </xh:button>
+              <xh:button class="btn dropdown-toggle" data-toggle="dropdown">
+                <xh:span class="caret"/>
+              </xh:button>
+              <xh:ul class="dropdown-menu">
+                  <xf:repeat ref="$items[position() gt 1]">
+                      <xh:li><xh:a href="#" data-orbeon-value="{value}"><xf:output value="label" mediatype="text/html"/></xh:a></xh:li>
+                  </xf:repeat>
+              </xh:ul>
+            </xh:div>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

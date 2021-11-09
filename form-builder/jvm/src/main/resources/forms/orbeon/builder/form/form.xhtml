@@ -89,6 +89,8 @@
                 <xf:repeat ref="$buttons-names">
                     <xf:var name="button-name" value="."/>
                     <xf:var name="primary"     value="position() = last()"/>
+                    <xf:var name="parts"       value="xxf:split($button-name, '|')[xxf:non-blank()]"/>
+                    <xf:var name="is-multiple" value="count($parts) gt 1"/>
 
                     <xf:var
                         name="class"
@@ -104,7 +106,16 @@
                     <fr:process-button
                         name="{$button-name}"
                         class="{$class}"
-                        ref="xxf:instance('fb-triggers-instance')/other"/>
+                        ref="if ($is-multiple) then () else xxf:instance('fb-triggers-instance')/other"/>
+
+                    <fr:drop-trigger
+                        class="{$class}"
+                        ref="if (not($is-multiple)) then () else xxf:instance('fb-triggers-instance')/other">
+                        <xf:itemset ref="$parts">
+                            <xf:label value="xxf:r(concat('buttons.', .), '|fr-fr-resources|')"/>
+                            <xf:value value="."/>
+                        </xf:itemset>
+                    </fr:drop-trigger>
 
                 </xf:repeat>
 
@@ -503,7 +514,6 @@
                                     <xf:case id="fb-ie-warning-case-off"/>
                                 </xf:switch>
                             </xf:group>
-
 
                             <!-- Some common form edition functions -->
                             <xf:group ref="instance('fb-form-instance')" appearance="xxf:internal">

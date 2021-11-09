@@ -74,7 +74,7 @@ val LiferayPortalKernelVersion    = "5.3.0"
 
 
 val CoreLibraryDependencies = Seq(
-  "org.orbeon"                  %% "saxon"                          % SaxonJvmVersion,
+  "org.orbeon"                  % "saxon"                           % SaxonJvmVersion, // Java library!
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
   "com.chuusai"                 %% "shapeless"                      % ShapelessVersion,

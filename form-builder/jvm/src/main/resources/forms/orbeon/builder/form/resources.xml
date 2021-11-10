@@ -317,8 +317,8 @@
                     <alert>Missing or incorrect value</alert>
                 </name>
                 <xpath>
-                    <label>XPath Expression</label>
-                    <alert>Incorrect XPath expression</alert>
+                    <label>Formula</label>
+                    <alert>Incorrect formula</alert>
                 </xpath>
                 <control>
                     <label>Control</label>
@@ -326,7 +326,7 @@
                 </control>
                 <type>
                     <item id="0">Control Value</item>
-                    <item id="1">XPath Expression</item>
+                    <item id="1">Formula</item>
                     <item id="2">All Control Values</item>
                     <item id="3">Link to the "edit" page</item>
                     <item id="4">Link to the "view" page</item>
@@ -1636,8 +1636,8 @@
                     <alert>Valeur manquante ou incorrecte</alert>
                 </name>
                 <xpath>
-                    <label>Expression XPath</label>
-                    <alert>Expression XPath incorrecte</alert>
+                    <label>Formule</label>
+                    <alert>Formule incorrecte</alert>
                 </xpath>
                 <control>
                     <label>Contrôle</label>
@@ -2938,8 +2938,8 @@
                     <alert todo="true">[Missing or incorrect value]</alert>
                 </name>
                 <xpath>
-                    <label todo="true">[XPath Expression]</label>
-                    <alert todo="true">[Incorrect XPath expression]</alert>
+                    <label todo="true">[Formula]</label>
+                    <alert todo="true">[Incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -2947,7 +2947,7 @@
                 </control>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
-                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
                     <item id="3" todo="true">[Link to the "edit" page]</item>
                     <item id="4" todo="true">[Link to the "view" page]</item>
@@ -4268,8 +4268,8 @@
                     <alert todo="true">[Missing or incorrect value]</alert>
                 </name>
                 <xpath>
-                    <label todo="true">[XPath Expression]</label>
-                    <alert todo="true">[Incorrect XPath expression]</alert>
+                    <label todo="true">[Formula]</label>
+                    <alert todo="true">[Incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -4277,7 +4277,7 @@
                 </control>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
-                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
                     <item id="3" todo="true">[Link to the "edit" page]</item>
                     <item id="4" todo="true">[Link to the "view" page]</item>
@@ -5598,8 +5598,8 @@
                     <alert todo="true">[Missing or incorrect value]</alert>
                 </name>
                 <xpath>
-                    <label todo="true">[XPath Expression]</label>
-                    <alert todo="true">[Incorrect XPath expression]</alert>
+                    <label todo="true">[Formula]</label>
+                    <alert todo="true">[Incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -5607,7 +5607,7 @@
                 </control>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
-                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
                     <item id="3" todo="true">[Link to the "edit" page]</item>
                     <item id="4" todo="true">[Link to the "view" page]</item>
@@ -6920,8 +6920,8 @@
                     <alert>Fehlender oder falscher Wert</alert>
                 </name>
                 <xpath>
-                    <label>XPath Ausdruck</label>
-                    <alert>Ungültiger XPath Ausdruck</alert>
+                    <label>Formel Ausdruck</label>
+                    <alert>Ungültiger formel Ausdruck</alert>
                 </xpath>
                 <control>
                     <label>Steuerelement</label>
@@ -6929,7 +6929,7 @@
                 </control>
                 <type>
                     <item id="0">Steuerelement-Wert</item>
-                    <item id="1">XPath Ausdruck</item>
+                    <item id="1">Formel Ausdruck</item>
                     <item id="2">Werte aller Steuerelemente</item>
                     <item id="3" todo="true">[Link to the "edit" page]</item>
                     <item id="4" todo="true">[Link to the "view" page]</item>
@@ -8245,8 +8245,8 @@
                     <alert todo="true">[Missing or incorrect value]</alert>
                 </name>
                 <xpath>
-                    <label todo="true">[XPath Expression]</label>
-                    <alert todo="true">[Incorrect XPath expression]</alert>
+                    <label todo="true">[Formula]</label>
+                    <alert todo="true">[Incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -8254,7 +8254,7 @@
                 </control>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
-                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
                     <item id="3" todo="true">[Link to the "edit" page]</item>
                     <item id="4" todo="true">[Link to the "view" page]</item>
@@ -9567,8 +9567,8 @@
                     <alert todo="true">[Missing or incorrect value]</alert>
                 </name>
                 <xpath>
-                    <label todo="true">[XPath Expression]</label>
-                    <alert todo="true">[Incorrect XPath expression]</alert>
+                    <label todo="true">[Formula]</label>
+                    <alert todo="true">[Incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -9576,7 +9576,7 @@
                 </control>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
-                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
                     <item id="3" todo="true">[Link to the "edit" page]</item>
                     <item id="4" todo="true">[Link to the "view" page]</item>
@@ -10890,8 +10890,8 @@
                     <alert>Ontbrekende of ongeldige waarde</alert>
                 </name>
                 <xpath>
-                    <label>XPath expressie</label>
-                    <alert>Oneldige XPath expressie</alert>
+                    <label>Formule expressie</label>
+                    <alert>Oneldige formule</alert>
                 </xpath>
                 <control>
                     <label>Control</label>
@@ -10899,7 +10899,7 @@
                 </control>
                 <type>
                     <item id="0">Control-waarde</item>
-                    <item id="1">XPath expressie</item>
+                    <item id="1">Formule</item>
                     <item id="2">Alle control-waarden</item>
                     <item id="3" todo="true">[Link to the "edit" page]</item>
                     <item id="4" todo="true">[Link to the "view" page]</item>
@@ -12192,8 +12192,8 @@
                     <alert todo="true">[Missing or incorrect value]</alert>
                 </name>
                 <xpath>
-                    <label todo="true">[XPath Expression]</label>
-                    <alert todo="true">[Incorrect XPath expression]</alert>
+                    <label todo="true">[Formula]</label>
+                    <alert todo="true">[Incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -12201,7 +12201,7 @@
                 </control>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
-                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
                     <item id="3" todo="true">[Link to the "edit" page]</item>
                     <item id="4" todo="true">[Link to the "view" page]</item>
@@ -13521,8 +13521,8 @@
                     <alert todo="true">[Missing or incorrect value]</alert>
                 </name>
                 <xpath>
-                    <label todo="true">[XPath Expression]</label>
-                    <alert todo="true">[Incorrect XPath expression]</alert>
+                    <label todo="true">[Formula]</label>
+                    <alert todo="true">[Incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -13530,7 +13530,7 @@
                 </control>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
-                    <item id="1" todo="true">[XPath Expression]</item>
+                    <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
                     <item id="3" todo="true">[Link to the "edit" page]</item>
                     <item id="4" todo="true">[Link to the "view" page]</item>

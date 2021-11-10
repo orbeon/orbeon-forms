@@ -156,14 +156,14 @@ object StateHandling {
 
     def findRawState: Option[Dictionary[String]] = {
 
-      // Update `varStateOpt` and history state as needed
+      // Update `varStateOpt` from history, or vice versa, as needed
+      // Saving to history can help getting around Firefox issue 1183881
+      // Avoid calling `saveStateToHistory()` unless necessary, to avoid hitting Safari rate-limit on `replaceState()`
       (varStateOpt, Option(dom.window.history.state)) match {
-        // State found in variable: save to history, which can help getting around Firefox issue 1183881
-        case (Some(varState), _) => saveStateToHistory(varState)
-        // State found in history ony, so save it to the variable
-        case (None, Some(state)) => varStateOpt = Some(state.asInstanceOf[js.Dictionary[String]])
-        // No state found (which means we might be in trouble)
-        case (None, None)        => // nop
+        case (Some(_)       , Some(_)    ) => // nop (all good)
+        case (Some(varState), None       ) => saveStateToHistory(varState)
+        case (None          , Some(state)) => varStateOpt = Some(state.asInstanceOf[js.Dictionary[String]])
+        case (None          , None       ) => // nop (nothing we can do here; we might be in trouble later)
       }
 
       // Just return `varStateOpt` as it is now up-to-date

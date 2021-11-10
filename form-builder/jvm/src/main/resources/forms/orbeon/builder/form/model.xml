@@ -799,9 +799,17 @@
         <xf:setvalue ref="if (rr = 'calculate') then calculate-errors else validate-errors" value=". + 1"/>
     </xf:action>
 
-    <xf:action type="javascript" event="fb-test-form fb-test-formulas fb-test-offline">
-        <xf:param name="eventName" value="concat(event('xxf:type'), '-show-dialog')"/>
-        <xf:body>ORBEON.builder.private.API.updateTestIframeAndDispatch(eventName)</xf:body>
+    <xf:action event="fb-test-form fb-test-formulas fb-test-offline">
+        <xf:var
+            name="show-pe-dialog"
+            value="not($is-pe) and event('xxf:type') = ('fb-test-formulas', 'fb-test-offline')"/>
+        <xf:action if="not($show-pe-dialog)" type="javascript">
+            <xf:param name="eventName" value="concat(event('xxf:type'), '-show-dialog')"/>
+            <xf:body>ORBEON.builder.private.API.updateTestIframeAndDispatch(eventName)</xf:body>
+        </xf:action>
+        <xf:action if="$show-pe-dialog">
+            <xf:dispatch name="fr-show" targetid="fb-pe-dialog" />
+        </xf:action>
     </xf:action>
 
     <!-- Dispatched from the client, see above action -->

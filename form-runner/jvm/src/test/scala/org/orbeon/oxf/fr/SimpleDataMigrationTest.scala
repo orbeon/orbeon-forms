@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.fr.excel.ExcelSupport.FormDefinitionOps
+import org.orbeon.oxf.fr.importexport.FormDefinitionOps
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
 import org.orbeon.oxf.util.ContentTypes

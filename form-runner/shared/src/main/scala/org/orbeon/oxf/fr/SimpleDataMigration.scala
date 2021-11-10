@@ -13,17 +13,18 @@
   */
 package org.orbeon.oxf.fr
 
-import enumeratum.EnumEntry.Lowercase
 import cats.syntax.option._
+import enumeratum.EnumEntry.Lowercase
 import org.log4s
+import org.orbeon.oxf.fr.SimpleDataMigration.FormOps
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticState}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, inScopeContainingDocument, insert}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticState}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -34,7 +35,6 @@ import shapeless.syntax.typeable._
 object SimpleDataMigration {
 
   import Private._
-
   import enumeratum._
 
   sealed trait DataMigrationBehavior extends EnumEntry with Lowercase
@@ -397,36 +397,6 @@ object SimpleDataMigration {
       result
     }
 
-    class ContainingDocumentOps(doc: XFormsContainingDocument, enclosingModelAbsoluteId: String) extends FormOps {
-
-      type DocType = XFormsContainingDocument
-      type BindType = StaticBind
-
-      private val enclosingModel =
-        doc.findObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(enclosingModelAbsoluteId)) flatMap
-          (_.narrowTo[XFormsModel])                                                             getOrElse
-          (throw new IllegalStateException)
-
-      def findFormBindsRoot: Option[StaticBind] =
-        enclosingModel.staticModel.bindsById.get(Names.FormBinds)
-
-      def templateIterationNamesToRootElems: Map[String, om.NodeInfo] =
-        (
-          for {
-            instance   <- enclosingModel.instancesIterator
-            instanceId = instance.getId
-            if FormRunner.isTemplateId(instanceId)
-          } yield
-            instance.rootElement.localname -> instance.rootElement
-        ).toMap
-
-      def bindChildren(bind: StaticBind): List[StaticBind] =
-        bind.childrenBinds
-
-      def bindNameOpt(bind: StaticBind): Option[String] =
-        bind.nameOpt
-    }
-
     def gatherMigrationOps(
       enclosingModelAbsoluteId : String,
       templateInstanceRootElem : om.NodeInfo,
@@ -547,4 +517,34 @@ object SimpleDataMigration {
           // Template for the element was not found. Error?
       }
   }
+}
+
+class ContainingDocumentOps(doc: XFormsContainingDocument, enclosingModelAbsoluteId: String) extends FormOps {
+
+  type DocType = XFormsContainingDocument
+  type BindType = StaticBind
+
+  private val enclosingModel =
+    doc.findObjectByEffectiveId(XFormsId.absoluteIdToEffectiveId(enclosingModelAbsoluteId)) flatMap
+      (_.narrowTo[XFormsModel])                                                             getOrElse
+      (throw new IllegalStateException)
+
+  def findFormBindsRoot: Option[StaticBind] =
+    enclosingModel.staticModel.bindsById.get(Names.FormBinds)
+
+  def templateIterationNamesToRootElems: Map[String, om.NodeInfo] =
+    (
+      for {
+        instance   <- enclosingModel.instancesIterator
+        instanceId = instance.getId
+        if FormRunner.isTemplateId(instanceId)
+      } yield
+        instance.rootElement.localname -> instance.rootElement
+    ).toMap
+
+  def bindChildren(bind: StaticBind): List[StaticBind] =
+    bind.childrenBinds
+
+  def bindNameOpt(bind: StaticBind): Option[String] =
+    bind.nameOpt
 }

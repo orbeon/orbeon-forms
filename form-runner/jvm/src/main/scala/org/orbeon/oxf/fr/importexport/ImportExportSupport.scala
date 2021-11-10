@@ -6,7 +6,6 @@ import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, DataMigrati
 import org.orbeon.oxf.fr.XMLNames.FRNamespace
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
-import org.orbeon.oxf.fr.excel.ExcelExport.RepeatsPref
 import org.orbeon.oxf.util.CollectionUtils.IteratorExt._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -21,6 +20,18 @@ import org.orbeon.xforms.XFormsId
 
 
 object ImportExportSupport {
+
+  sealed trait RepeatsPref
+  object RepeatsPref {
+    case object FollowFormDefinition     extends RepeatsPref
+    case class  AtLeast     (count: Int) extends RepeatsPref
+    case class  Exactly     (count: Int) extends RepeatsPref
+  }
+
+  sealed trait ExportError
+  object ExportError {
+    case class UnsupportedRepeat(desc: String) extends ExportError
+  }
 
   val HiddenClasses = Set("xforms-hidden", "hidden-field") // TODO: the latter is custom, should be configurable
 

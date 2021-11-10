@@ -34,6 +34,21 @@
     <xsl:variable name="page-orientation"       select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-orientation', $app, $form, $mode)"/>
     <xsl:variable name="page-size"              select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-size',        $app, $form, $mode)"/>
 
+    <xsl:variable
+        name="empty-grids-ids"
+        select="
+            //*:div[
+                p:has-class('xbl-fr-grid') and
+                empty(
+                    .//*[
+                        p:has-class('fr-grid-td') and (
+                            exists(*[not(p:has-class('xforms-disabled'))]) or
+                            p:non-blank(.)
+                        )
+                    ]
+                )
+            ]/generate-id()"/>
+
     <!--
         Remove portlet namespace from ids if present. Do this because in a portlet environment, the CSS
         retrieved by oxf:xhtml-to-pdf doesn't know about the namespace. Not doing so, the CSS won't apply
@@ -143,6 +158,13 @@
              <xsl:text>&#160;</xsl:text>
          </xsl:element>
      </xsl:template>
+
+    <!-- Remove empty grids -->
+    <!-- See https://github.com/orbeon/orbeon-forms/issues/5051 -->
+    <xsl:template
+        match="*:div[p:has-class('xbl-fr-grid') and $empty-grids-ids = generate-id()]"
+        mode="#all"
+        priority="100"/>
 
     <!-- Start grid content -->
     <xsl:template match="*:div[p:has-class('xbl-fr-grid')]" mode="#all">

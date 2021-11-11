@@ -344,6 +344,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       existingNSMapping orElse newNSMapping
   }
 
+  // NOTE: Don't call this for `Required` as this doesn't look at nested elements.
   def readDenormalizedCalculatedMip(
     bindElem    : NodeInfo,
     mip         : ModelDefs.ComputedMIP,
@@ -356,6 +357,31 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       hasCalculate = hasCalculate(bindElem),
       isTypeString = isTypeStringUpdateNsIfNeeded(bindElem, _)
     )
+
+  // NOTE: There is something similar in `AlertsAndConstraintsOps` but for Form Builder use.
+  def readDenormalizedCalculatedMipHandleChildElement(
+    bindElem : NodeInfo,
+    mip      : ModelDefs.ComputedMIP
+  ): List[String] = {
+
+    def mipAtts (bind: NodeInfo, mip: ModelDefs.MIP) = bind /@ mip.aName
+    def mipElems(bind: NodeInfo, mip: ModelDefs.MIP) = bind / mip.eName
+
+    def fromAttribute(a: NodeInfo) = a.stringValue
+    def fromElement(e: NodeInfo)   = e.attValue(XFormsNames.VALUE_QNAME)
+
+    def attributeValidations = mipAtts (bindElem, mip) map fromAttribute
+    def elementValidations   = mipElems(bindElem, mip) map fromElement
+
+    (attributeValidations ++ elementValidations).map(mipValue =>
+      denormalizeMipValue(
+        mip          = mip,
+        mipValue     = mipValue.some,
+        hasCalculate = hasCalculate(bindElem),
+        isTypeString = _ => false // unused!
+      )
+    ).toList
+  }
 
   // When *writing* a value to the form definition, return the attribute value if the value doesn't
   // match its default value, otherwise return `None`.
@@ -437,7 +463,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     mip          : ModelDefs.ComputedMIP,
     mipValue     : Option[String],
     hasCalculate : => Boolean,
-    isTypeString : String => Boolean
+    isTypeString : String => Boolean // shouldn't be needed as `Type` is not a `ComputedMIP`!
   ): String = {
 
     // Start by normalizing

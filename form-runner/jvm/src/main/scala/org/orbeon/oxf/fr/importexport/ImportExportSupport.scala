@@ -293,7 +293,7 @@ object ImportExportSupport {
     }
 
   def isBindReadonly(bind: om.NodeInfo)(implicit ctx: FormRunnerDocContext): Boolean =
-    FormRunner.readDenormalizedCalculatedMip(bind, ModelDefs.Readonly, ModelDefs.Readonly.aName) == FormRunner.TrueExpr
+    FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Readonly).contains(FormRunner.TrueExpr)
 
   def iterateAncestorOrSelfBinds(b: om.NodeInfo): Iterator[om.NodeInfo] =
     iterateFrom[om.NodeInfo](b, _ parent XMLNames.XFBindTest headOption)
@@ -311,7 +311,7 @@ object ImportExportSupport {
           ! (control.namespaceURI == XMLNames.FR && control.localname == "hidden")  && // `fr:hidden`
           ! (control.namespaceURI == XMLNames.XF && control.localname == "trigger") && // `xf:trigger`
           ! controlIsHiddenWithCss(control)                                         &&
-          FormRunner.readDenormalizedCalculatedMip(bind, ModelDefs.Relevant, ModelDefs.Relevant.aName) != FormRunner.FalseExpr
+          ! FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Relevant).contains(FormRunner.FalseExpr)
         }
 
         (cbphr, visible)
@@ -321,7 +321,7 @@ object ImportExportSupport {
     controlIsHiddenWithCss(control) || {
       FormRunner.searchControlBindPathHoldersInDoc(List(control), ctx.formDefinitionRootElem, ctx.dataRootElem.some, _ => true).headOption exists {
         case FormRunner.ControlBindPathHoldersResources(_, bind, _, _, _) =>
-          FormRunner.readDenormalizedCalculatedMip(bind, ModelDefs.Relevant, ModelDefs.Relevant.aName) == FormRunner.FalseExpr
+          FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Relevant).contains(FormRunner.FalseExpr)
       }
     }
 

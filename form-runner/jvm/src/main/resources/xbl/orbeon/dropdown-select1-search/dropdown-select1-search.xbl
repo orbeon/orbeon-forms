@@ -56,7 +56,7 @@
             <icon>
                 <icon-class>fa fa-fw fa-search</icon-class>
             </icon>
-            <editors static-itemset="true"/>
+            <editors static-itemset="true" item-hint="true"/>
             <templates>
                 <!-- Provide a view template for Form Builder so that CSS resources are loaded -->
                 <view>
@@ -68,6 +68,7 @@
                         <xf:itemset ref="item">
                             <xf:label ref="label"/>
                             <xf:value ref="value"/>
+                            <xf:hint ref="hint"/>
                         </xf:itemset>
                     </xf:select1>
                 </view>

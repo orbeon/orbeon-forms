@@ -46,7 +46,7 @@
                 <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>
             </icon>
             <datatype>xf:string</datatype>
-            <editors static-itemset="false"/>
+            <editors static-itemset="false" item-hint="true"/>
             <templates>
                 <view>
                     <fr:databound-select1 id="" appearance="minimal" ref="" resource="/fr/service/custom/orbeon/controls/countries?all=true">
@@ -57,6 +57,7 @@
                         <xf:itemset ref="/countries/country">
                             <xf:label ref="name"/>
                             <xf:value ref="us-code"/>
+                            <xf:hint ref="''"/>
                         </xf:itemset>
                     </fr:databound-select1>
                 </view>
@@ -66,7 +67,7 @@
                     <xf:bind ref="@resource"/>
                     <xf:bind ref="xf:itemset">
                         <xf:bind
-                            ref="@ref | xf:label/@ref | xf:value/@ref"
+                            ref="@ref | xf:label/@ref | xf:value/@ref | xf:hint/@ref"
                             type="xxf:XPath2"
                             required="true()"/>
                     </xf:bind>
@@ -86,28 +87,39 @@
                             <xf:input ref="@resource">
                                 <xf:label ref="xxf:r('dialog-http-services.resource.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-http-services.resource.hint',  '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('alerts.required',                     '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
-                        <xh:td colspan="2">
+                        <xh:td>
                             <xf:input ref="xf:itemset/@ref">
                                 <xf:label ref="xxf:r('dialog-actions.items.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.items.hint',  '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('alerts.xpath',               '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
-                    </xh:tr>
-                    <xh:tr>
                         <xh:td>
                             <xf:input ref="xf:itemset/xf:label/@ref">
                                 <xf:label ref="xxf:r('dialog-actions.item-label.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.item-label.hint',  '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('alerts.xpath',                    '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
+                    </xh:tr>
+                    <xh:tr>
                         <xh:td>
                             <xf:input ref="xf:itemset/xf:value/@ref">
                                 <xf:label ref="xxf:r('dialog-actions.item-value.label', '|fr-form-resources|')"/>
                                 <xf:hint  ref="xxf:r('dialog-actions.item-value.hint',  '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('alerts.xpath',                    '|fr-form-resources|')"/>
+                            </xf:input>
+                        </xh:td>
+                        <xh:td>
+                            <xf:input ref="xf:itemset/xf:hint/@ref">
+                                <xf:label ref="xxf:r('dialog-actions.item-hint.label', '|fr-form-resources|')"/>
+                                <xf:hint  ref="xxf:r('dialog-actions.item-hint.hint',  '|fr-form-resources|')"/>
+                                <xf:alert ref="xxf:r('alerts.xpath',                   '|fr-form-resources|')"/>
                             </xf:input>
                         </xh:td>
                     </xh:tr>

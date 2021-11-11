@@ -41,7 +41,7 @@
             <icon>
                 <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>
             </icon>
-            <editors static-itemset="true"/>
+            <editors static-itemset="true" item-hint="true"/>
             <templates>
                 <view>
                     <fr:dropdown-select1 id="" ref="" xmlns="">
@@ -52,6 +52,7 @@
                         <xf:itemset ref="">
                             <xf:label ref="label"/>
                             <xf:value ref="value"/>
+                            <xf:hint ref="hint"/>
                         </xf:itemset>
                     </fr:dropdown-select1>
                 </view>

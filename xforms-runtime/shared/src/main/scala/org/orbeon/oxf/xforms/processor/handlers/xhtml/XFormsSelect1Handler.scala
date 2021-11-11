@@ -561,9 +561,12 @@ class XFormsSelect1Handler(
     val itemClasses      = XFormsSelect1Handler.getItemClasses(item, null)
     val optionAttributes = getIdClassXHTMLAttributes(XMLReceiverSupport.EmptyAttributes, itemClasses, null)
 
-    // Add item attributes to option
+    // Add item attributes to `<option>`
     XFormsSelect1Handler.addItemAttributes(item, optionAttributes)
     optionAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue(encode))
+    item.hint.foreach { hint =>
+      optionAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, hint.label)
+    }
 
     // Figure out whether what items are selected
     // Don't output more than one `selected` in the case of single-selection, see:

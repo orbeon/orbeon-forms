@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr
 
 import cats.syntax.option._
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.dom.QName
+import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.{findMigrationForVersion, findMigrationOps}
 import org.orbeon.oxf.fr.datamigration.PathElem
@@ -143,7 +143,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
   // Find data holders (there can be more than one with repeats)
   def findDataHolders(controlName: String)(implicit ctx: FormRunnerDocContext): List[NodeInfo] =
-    findBindPathHoldersInDocument(ctx.formDefinitionRootElem, controlName, Some(ctx.dataRootElem)) flatMap (_.holders) getOrElse Nil
+    findBindPathHoldersInDocument(ctx.formDefinitionRootElem, controlName, ctx.dataRootElem.some) flatMap (_.holders) getOrElse Nil
 
   // If `contextItemOpt` is `None`, don't search for holders.
   def findBindPathHoldersInDocument(

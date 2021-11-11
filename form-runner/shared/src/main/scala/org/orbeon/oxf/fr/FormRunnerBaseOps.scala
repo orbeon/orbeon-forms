@@ -40,6 +40,7 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 import scala.collection.immutable
 import scala.util.Try
 
+
 // The standard Form Runner parameters
 case class FormRunnerParams(
   app         : String,
@@ -47,7 +48,14 @@ case class FormRunnerParams(
   formVersion : Int,
   document    : Option[String],
   mode        : String
-)
+) {
+
+  def appForm: AppForm =
+    AppForm(app, form)
+
+  def appFormVersion: FormRunnerParams.AppFormVersion =
+    (appForm, formVersion)
+}
 
 object FormRunnerParams {
 
@@ -63,6 +71,8 @@ object FormRunnerParams {
       mode        = paramsRootElem elemValue "mode"
     )
   }
+
+  type AppFormVersion = (AppForm, Int)
 }
 
 case class AppForm(app: String, form: String) {

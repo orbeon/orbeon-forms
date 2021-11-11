@@ -49,6 +49,24 @@ object Transforms {
       )
     }
 
+  def readFormData(
+    appForm         : AppForm,
+    documentId      : String)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): DocumentInfo =
+    SubmissionUtils.readTinyTree(
+      headersGetter       = _ => None, // Q: Do we need any header forwarding here?
+      resolvedAbsoluteUrl = new URI(
+        URLRewriterUtils.rewriteServiceURL(
+          externalContext.getRequest,
+          s"/fr/service/persistence/crud/${appForm.app}/${appForm.form}/data/$documentId/data.xml",
+          URLRewriter.REWRITE_MODE_ABSOLUTE
+        )
+      ),
+      handleXInclude = false
+    )
+
   def migrateFormDefinition(
     dstVersion      : DataFormatVersion,
     app             : String,

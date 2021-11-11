@@ -2,12 +2,16 @@ package org.orbeon.oxf.fr.importexport
 
 import cats.syntax.option._
 import org.orbeon.dom.QName
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, DataMigrationOp}
 import org.orbeon.oxf.fr.XMLNames.FRNamespace
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
+import org.orbeon.oxf.fr.persistence.proxy.Transforms
 import org.orbeon.oxf.util.CollectionUtils.IteratorExt._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
@@ -389,4 +393,22 @@ object ImportExportSupport {
       val items = resources.find(_._1 == requestedLang).toList map (_._2) child "item"
       items map (item => item.elemValue("label") -> item.elemValue("value"))
     }
+
+  def readFormDataIfDocumentIdPresent(
+    appForm         : AppForm)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): Option[(DocumentNodeInfoType, DataMigrationBehavior.Disabled.type)] = {
+
+    val documentIdOpt =
+      externalContext.getRequest.getFirstParamAsString("document-id").flatMap(_.trimAllToOpt)
+
+    // Form data is optional and we also need the app/form name in that case
+    documentIdOpt map { documentId =>
+      (
+        Transforms.readFormData(appForm, documentId),
+        DataMigrationBehavior.Disabled
+      )
+    }
+  }
 }

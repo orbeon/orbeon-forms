@@ -52,36 +52,6 @@
         <p:output name="instance" id="parameters-with-version"/>
     </p:processor>
 
-    <!-- This is read lazily by the Excel processor if data is needed -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="#parameters" transform="oxf:unsafe-xslt">
-            <config xsl:version="2.0">
-
-                <xsl:variable name="params" select="/*"/>
-
-                <xsl:variable
-                    name="resource"
-                    select="
-                        concat(
-                            '/fr/service/persistence/crud/',
-                            $params/app,
-                            '/',
-                            $params/form,
-                            '/data/',
-                            p:get-request-parameter('document-id'),
-                            '/data.xml'
-                        )"/>
-
-                <url><xsl:value-of select="p:rewrite-service-uri($resource, true())"/></url>
-                <mode>xml</mode>
-                <handle-xinclude>false</handle-xinclude>
-                <cache-control><use-local-cache>false</use-local-cache><conditional-get>false</conditional-get></cache-control>
-
-            </config>
-        </p:input>
-        <p:output name="data" id="form-data"/>
-    </p:processor>
-
     <!-- Extract rows -->
     <p:choose href="#instance">
         <p:when test="/*/file-format = 'xml-form-structure-and-data'">
@@ -100,7 +70,6 @@
 
             <p:processor name="fr:xml-import">
                 <p:input  name="params" href="#parameters"/>
-                <p:input  name="data"   href="#form-data"/>
                 <p:input  name="form"   href="#xhtml-fr-xforms"/>
                 <p:input  name="file"   href="#xml-content"/>
                 <p:output name="data"   id="rows-or-stats-and-data"/>
@@ -109,7 +78,6 @@
         <p:when test="/*/file-format = 'excel-named-ranges'">
             <p:processor name="fr:extract-rows-from-excel-with-named-ranges">
                 <p:input  name="params" href="#parameters"/>
-                <p:input  name="data"   href="#form-data"/>
                 <p:input  name="form"   href="#xhtml-fr-xforms"/>
                 <p:input  name="file"   href="#zip"/>
                 <p:output name="data"   id="rows-or-stats-and-data"/>

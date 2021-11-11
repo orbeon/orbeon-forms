@@ -708,7 +708,7 @@
                     concat(name($p), '=', encode-for-uri(string($p))),
                 '&amp;'
             )
-        }"
+        }&amp;fr-language={$fb-lang}"
         xxf:target="_blank"
         xxf:show-progress="false"
     />

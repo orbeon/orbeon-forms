@@ -599,30 +599,34 @@
                     0
                 )
             "
-            xxf:static-readonly-hint="{{
-                xxf:property(
-                    string-join(
-                        (
-                            'oxf.fr.detail.static-readonly-hint',
-                            fr:app-name(),
-                            fr:form-name()
-                        ),
-                        '.'
-                    )
-                )
-            }}"
-            xxf:static-readonly-alert="{{
-                xxf:property(
-                    string-join(
-                        (
-                            'oxf.fr.detail.static-readonly-alert',
-                            fr:app-name(),
-                            fr:form-name()
-                        ),
-                        '.'
-                    )
-                )
-            }}"
+            xxf:static-readonly-hint="{
+                if ($mode = 'test-pdf') then
+                    'false'
+                else
+                    '{xxf:property(
+                        string-join(
+                            (
+                                ''oxf.fr.detail.static-readonly-hint'',
+                                fr:app-name(),
+                                fr:form-name()
+                            ),
+                            ''.''
+                        )
+                    )}'}"
+            xxf:static-readonly-alert="{
+                if ($mode = 'test-pdf') then
+                    'false'
+                else
+                    '{xxf:property(
+                        string-join(
+                            (
+                                ''oxf.fr.detail.static-readonly-alert'',
+                                fr:app-name(),
+                                fr:form-name()
+                            ),
+                            ''.''
+                        )
+                    )}'}"
         >
 
             <!-- Override if specified -->

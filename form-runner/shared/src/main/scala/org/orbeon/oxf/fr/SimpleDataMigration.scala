@@ -216,6 +216,7 @@ object SimpleDataMigration {
   def mergeXmlFromBindSchema(
     srcDocRootElem          : om.NodeInfo,
     dstDocRootElem          : om.NodeInfo,
+    isElementReadonly       : om.NodeInfo => Boolean,
     ignoreBlankData         : Boolean,
     allowMissingElemInSource: Boolean)(
     formOps        : FormOps
@@ -247,7 +248,7 @@ object SimpleDataMigration {
 
             val value = leftElem.getStringValue
 
-            if (! currentIgnoreBlankData || value.nonAllBlank) {
+            if ((! currentIgnoreBlankData || value.nonAllBlank) && ! isElementReadonly(rightElem)) {
               DataModel.setValue(rightElem, value, onError = r => throw new IllegalArgumentException(r.message))
               setValuesCount += 1
             }

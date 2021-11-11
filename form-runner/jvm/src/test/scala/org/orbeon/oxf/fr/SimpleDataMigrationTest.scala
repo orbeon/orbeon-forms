@@ -418,6 +418,7 @@ class SimpleDataMigrationTest
       SimpleDataMigration.mergeXmlFromBindSchema(
         srcDocRootElem           = NewFormData.rootElement,
         dstDocRootElem           = result.rootElement,
+        isElementReadonly        = _ => false,
         ignoreBlankData          = true,
         allowMissingElemInSource = false)(
         formOps                  = formOps

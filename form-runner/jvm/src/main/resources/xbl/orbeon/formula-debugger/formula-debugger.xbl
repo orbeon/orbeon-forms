@@ -40,7 +40,7 @@
             <xf:model id="local-model">
 
                 <xf:instance id="local" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
-                    <_ filter="false" mip="calculate"/>
+                    <_ filter="false" mip="default"/>
                 </xf:instance>
 
                 <xf:bind ref="@filter" type="xs:boolean"/>
@@ -129,23 +129,28 @@
                                     <xf:select1 appearance="minimal" id="fr-mip-filter" ref="$fr-formulas-local/@mip" class="fr-mip-filter">
                                         <xf:label ref="'Formula Type'"/>
                                         <xf:item>
-                                            <xf:label>Calculate</xf:label>
-                                            <xf:value>calculate</xf:value>
-                                        </xf:item>
-                                        <xf:item>
-                                            <xf:label>Default</xf:label>
+                                            <xf:label>Initial Value</xf:label>
+<!--                                            <xf:label ref="xxf:r('dialog-control-settings.default')"/>-->
                                             <xf:value>default</xf:value>
                                         </xf:item>
                                         <xf:item>
-                                            <xf:label>Relevant</xf:label>
+                                            <xf:label>Calculated Value</xf:label>
+<!--                                            <xf:label ref="xxf:r('dialog-control-settings.calculate')"/>-->
+                                            <xf:value>calculate</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label>Visibility</xf:label>
+<!--                                            <xf:label ref="xxf:r('dialog-control-settings.visibility')"/>-->
                                             <xf:value>relevant</xf:value>
                                         </xf:item>
                                         <xf:item>
                                             <xf:label>Required</xf:label>
+<!--                                            <xf:label ref="xxf:r('dialog-control-settings.required')"/>-->
                                             <xf:value>required</xf:value>
                                         </xf:item>
                                         <xf:item>
-                                            <xf:label>Readonly</xf:label>
+                                            <xf:label>Read-Only</xf:label>
+<!--                                            <xf:label ref="xxf:r('dialog-control-settings.readonly')"/>-->
                                             <xf:value>readonly</xf:value>
                                         </xf:item>
                                     </xf:select1>
@@ -206,7 +211,7 @@
                                     </xh:td>
                                     <xh:td colspan="4">
                                         <xf:output id="fr-control-expr-output" class="fr-xpath-expr" ref="expr" appearance="minimal">
-                                            <xf:label ref="'Expression'"/>
+                                            <xf:label ref="'Formula'"/>
                                         </xf:output>
                                     </xh:td>
                                     <xh:td colspan="2">

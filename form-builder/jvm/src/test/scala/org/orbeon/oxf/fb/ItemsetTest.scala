@@ -52,17 +52,23 @@ class ItemsetTest
           val expectedDropdownItems = List(
             <item>
               <label lang="en">First choice</label>
+              <hint lang="en"/>
               <label lang="fr">Premier choix</label>
+              <hint lang="fr"/>
               <value>one</value>
             </item>,
             <item>
               <label lang="en">Second choice</label>
+              <hint lang="en"/>
               <label lang="fr">Second choix</label>
+              <hint lang="fr"/>
               <value>two</value>
             </item>,
             <item>
               <label lang="en">Third choice</label>
+              <hint lang="en"/>
               <label lang="fr">Troisième choix</label>
+              <hint lang="fr"/>
               <value>three</value>
             </item>
           )
@@ -106,17 +112,23 @@ class ItemsetTest
             <items>
               <item>
                 <label lang="en">Third choice</label>
+                <hint lang="en"/>
                 <label lang="fr">Troisième choix</label>
+                <hint lang="fr"/>
                 <value>three</value>
               </item>
               <item>
                 <label lang="en">First choice</label>
+                <hint lang="en"/>
                 <label lang="fr">Premier choix</label>
+                <hint lang="fr"/>
                 <value>one</value>
               </item>
               <item>
                 <label lang="en">Fourth choice</label>
+                <hint lang="en"/>
                 <label lang="fr">Quatrième choix</label>
+                <hint lang="fr"/>
                 <value>four</value>
               </item>
             </items>

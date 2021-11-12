@@ -121,44 +121,50 @@
                                 index="1"/>
                         </xf:action>
 
-                        <fr:section>
-                            <xf:label>Form Builder Formula Viewer</xf:label>
+                        <fr:section collapsible="false">
+                            <xf:label ref="xxf:r('buttons.test-formulas', '|fr-fr-resources|')" mediatype="text/html"/>
 
-                            <xf:select1 appearance="minimal" id="fr-mip-filter" ref="$fr-formulas-local/@mip" class="fr-mip-filter">
-                                <xf:label ref="'Formula Type'"/>
-                                <xf:item>
-                                    <xf:label>Calculate</xf:label>
-                                    <xf:value>calculate</xf:value>
-                                </xf:item>
-                                <xf:item>
-                                    <xf:label>Default</xf:label>
-                                    <xf:value>default</xf:value>
-                                </xf:item>
-                                <xf:item>
-                                    <xf:label>Relevant</xf:label>
-                                    <xf:value>relevant</xf:value>
-                                </xf:item>
-                                <xf:item>
-                                    <xf:label>Required</xf:label>
-                                    <xf:value>required</xf:value>
-                                </xf:item>
-                                <xf:item>
-                                    <xf:label>Readonly</xf:label>
-                                    <xf:value>readonly</xf:value>
-                                </xf:item>
-                            </xf:select1>
-
-                            <fr:checkbox-input id="fr-check" ref="$fr-formulas-local/@filter" appearance="minimal" class="fr-formula-filter">
-                                <xf:label ref="'Show related rows only'"/>
-                            </fr:checkbox-input>
-
-                            <xh:div class="table table-bordered fr-formula-legend">
-                                <xh:div class="fr-direct-dependency">Direct dependency</xh:div>
-                                <xh:div class="fr-direct-influence">Direct influence</xh:div>
-                                <xh:div class="fr-transitive-dependency">Transitive dependency</xh:div>
-                                <xh:div class="fr-transitive-influence">Transitive influence</xh:div>
-                                <xh:div class="xforms-repeat-selected-item-1">Current selection</xh:div>
-                            </xh:div>
+                            <fr:grid>
+                                <fr:c y="1" x="1" w="2">
+                                    <xf:select1 appearance="minimal" id="fr-mip-filter" ref="$fr-formulas-local/@mip" class="fr-mip-filter">
+                                        <xf:label ref="'Formula Type'"/>
+                                        <xf:item>
+                                            <xf:label>Calculate</xf:label>
+                                            <xf:value>calculate</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label>Default</xf:label>
+                                            <xf:value>default</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label>Relevant</xf:label>
+                                            <xf:value>relevant</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label>Required</xf:label>
+                                            <xf:value>required</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label>Readonly</xf:label>
+                                            <xf:value>readonly</xf:value>
+                                        </xf:item>
+                                    </xf:select1>
+                                </fr:c>
+                                <fr:c y="2" x="1" w="12">
+                                    <fr:checkbox-input id="fr-check" ref="$fr-formulas-local/@filter" appearance="minimal" class="fr-formula-filter">
+                                        <xf:label ref="'Show related rows only'"/>
+                                    </fr:checkbox-input>
+                                </fr:c>
+                                <fr:c y="3" x="1" w="12">
+                                    <xh:div class="table table-bordered fr-formula-legend">
+                                        <xh:div class="fr-transitive-dependency">Transitive dependency</xh:div>
+                                        <xh:div class="fr-direct-dependency">Direct dependency</xh:div>
+                                        <xh:div class="xforms-repeat-selected-item-1">Current selection</xh:div>
+                                        <xh:div class="fr-direct-influence">Direct influence</xh:div>
+                                        <xh:div class="fr-transitive-influence">Transitive influence</xh:div>
+                                    </xh:div>
+                                </fr:c>
+                            </fr:grid>
 
                             <!-- TODO: show sections/grids/repeats information, and whether `$foo` resolves to *all* or a subset of values -->
                             <!-- TODO: help for selection controls; how to show options? like in Form Runner Summary page? -->

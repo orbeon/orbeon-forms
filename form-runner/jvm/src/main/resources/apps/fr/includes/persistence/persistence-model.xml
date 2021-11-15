@@ -540,10 +540,16 @@
                 <xf:insert
                     ref="instance('fr-background-response-instance')/document-id"
                     origin="
-                        let $data-format-version  := (xxf:get-request-parameter('data-format-version'), '4.0.0')[1],
+                        let $data-format-version  :=
+                                if ($is-export) then
+                                    '2019.1.0' (: don't use the parameter as the output is only used internally :)
+                                 else
+                                    (xxf:get-request-parameter('data-format-version'), '4.0.0')[1],
                             $prune-metadata-param := xxf:get-request-parameter('prune-metadata'),
                             $prune-metadata       :=
-                                if (exists($prune-metadata-param)) then
+                                if ($is-export) then
+                                    false() (: don't use the parameter as the output is only used internally :)
+                                else if (exists($prune-metadata-param)) then
                                     $prune-metadata-param = 'true'
                                 else if ($data-format-version = 'edge') then
                                     false()

@@ -19,8 +19,8 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames._
 
 
 object ImportExportSupport {
@@ -205,7 +205,7 @@ object ImportExportSupport {
   def prepareFormRunnerDocContextOrThrow(
     form              : om.NodeInfo,
     appFormVersionOpt : Option[(AppForm, Int)],
-    formDataOpt       : Option[(om.DocumentInfo, DataMigrationBehavior)]
+    formDataOpt       : Option[(om.DocumentInfo, DataFormatVersion, DataMigrationBehavior)]
   ): FormRunnerDocContext =
     prepareFormRunnerDocContext(form, appFormVersionOpt, formDataOpt)
       .getOrElse(throw new IllegalArgumentException("data migration error"))
@@ -213,7 +213,7 @@ object ImportExportSupport {
   def prepareFormRunnerDocContext(
     form              : om.NodeInfo,
     appFormVersionOpt : Option[(AppForm, Int)],
-    formDataOpt       : Option[(om.DocumentInfo, DataMigrationBehavior)]
+    formDataOpt       : Option[(om.DocumentInfo, DataFormatVersion, DataMigrationBehavior)]
   ): List[DataMigrationOp] Either FormRunnerDocContext = {
 
     val (metadataRootElem, templateDataRootElem, excludeResultPrefixes) = {
@@ -239,7 +239,7 @@ object ImportExportSupport {
 
     val dataMaybeMigrated =
       (appFormVersionOpt, formDataOpt) match {
-        case (Some((appForm, _)), Some((formData, dataMigrationBehavior))) =>
+        case (Some((appForm, _)), Some((formData, inputDataFormat, dataMigrationBehavior))) =>
 
           // TODO: Move this to function and reuse from `persistence-model.xml`
           val dataMaybeGridMigrated =
@@ -247,7 +247,7 @@ object ImportExportSupport {
               appForm             = appForm,
               data                = formData,
               metadataRootElemOpt = metadataRootElem.some,
-              srcVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm.app, appForm.form),
+              srcVersion          = inputDataFormat,
               dstVersion          = DataFormatVersion.Edge,
               pruneMetadata       = false
             )
@@ -398,7 +398,7 @@ object ImportExportSupport {
     appForm         : AppForm)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Option[(DocumentNodeInfoType, DataMigrationBehavior.Disabled.type)] = {
+  ): Option[(DocumentNodeInfoType, DataFormatVersion, DataMigrationBehavior.Disabled.type)] = {
 
     val documentIdOpt =
       externalContext.getRequest.getFirstParamAsString("document-id").flatMap(_.trimAllToOpt)
@@ -407,6 +407,7 @@ object ImportExportSupport {
     documentIdOpt map { documentId =>
       (
         Transforms.readFormData(appForm, documentId),
+        FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm.app, appForm.form),
         DataMigrationBehavior.Disabled
       )
     }

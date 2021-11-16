@@ -35,8 +35,8 @@ object DatasourceDescriptor {
           name      = provider.entryName,
           driver    = "com.mysql.cj.jdbc.Driver",
           url       = "jdbc:mysql://localhost:3306/",
-          username  = "orbeon",
-          password  = "password",
+          username  = "root",
+          password  = "",
           switchDB  = "USE orbeon"
         )
       case PostgreSQL =>

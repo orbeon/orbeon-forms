@@ -75,7 +75,8 @@ private class DateCompanion extends XBLCompanionWithState {
       containerElem.querySelector(".add-on").addEventListener(EventNames.KeyDown, onIconKeypress)
       inputEl.on(EventNames.KeyPress, (e: JQueryEventObject) => onInputKeypress(e))
       inputEl.on(EventNames.Change,   ()                     => onInputChangeUpdateDatePicker())
-      datePicker.onChangeDate(        ()                     => onDateSelectedUpdateStateAndSendValueToServer())
+
+      enableDatePickerChangeListener()
       datePicker.onHide(              ()                     => { inputEl.focus() }) // Set focus back on field when done with the picker
       datePicker.onShow(              ()                     => { inputEl.focus() }) // For date picker to be usable with the keyboard
       Language.onLangChange(
@@ -109,13 +110,24 @@ private class DateCompanion extends XBLCompanionWithState {
       } else {
         newValue.trimAllToOpt match {
           case Some(newValue) =>
+
             JSDateUtils.isoDateToStringUsingLocalTimezone(newValue) match {
               case Some(date) =>
                 datePicker.setDate(date)
               case None       =>
-                // https://github.com/orbeon/orbeon-forms/issues/4828
+                // https://github.com/orbeon/orbeon-forms/issues/4794
+                // Issue: `clearDates()` itself sets the value of the field AND causes the `onChangeDate` listener
+                // to run and send a blank value to the server. The listener for `clearDates()` runs synchronously
+                // and so runs before what follows below here.
+                // Now there is at least one issue, which is that when opening the date picker with a value like
+                // `2021-11-33` in the field the picker shows a year of `1933`. We'd probably like to be something
+                // closer to either a guess of the date entered, or the current date, but not `1933`. I tried a few
+                // options, including `update()` on the picker, passing a `new js.Date()`, etc. but nothing does it.
+                // I think we need a better date picker.
+                disableDatePickerChangeListener()
                 datePicker.clearDates()
                 inputEl.prop("value", newValue)
+                enableDatePickerChangeListener()
             }
           case None           =>
             datePicker.clearDates()
@@ -160,6 +172,12 @@ private class DateCompanion extends XBLCompanionWithState {
     inputEl.focus()
 
   private object Private {
+
+    def enableDatePickerChangeListener(): Unit =
+      datePicker.onChangeDate(        ()                     => onDateSelectedUpdateStateAndSendValueToServer())
+
+    def disableDatePickerChangeListener(): Unit =
+      datePicker.offChangeDate()
 
     private def getInputFieldValue: String =
       inputEl.prop("value").asInstanceOf[String]
@@ -246,6 +264,7 @@ private object DatePickerFacade {
 
   implicit class DatePickerOps(private val datePicker: DatePicker) extends AnyVal {
     def onChangeDate(f: js.Function0[Unit]) : Unit              = datePicker.on("changeDate", f)
+    def offChangeDate()                     : Unit              = datePicker.off("changeDate")
     def onHide      (f: js.Function0[Unit]) : Unit              = datePicker.on("hide", f)
     def onShow      (f: js.Function0[Unit]) : Unit              = datePicker.on("show", f)
     def getDate                             : js.Date           = datePicker.datepicker("getDate").asInstanceOf[js.Date]

@@ -22,23 +22,29 @@ import scala.util.Try
 object JSDateUtils {
 
   // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
-  def isoDateToStringUsingLocalTimezone(dateString: String): Option[js.Date] = Try {
+  def isoDateToStringUsingLocalTimezone(dateString: String): Option[js.Date] =
+    if (js.Date.parse(dateString).isNaN) // this catches for example `2021-13-01` and `2021-11-32` but not `2021-11-31`!
+      None
+    else
+      Try {
 
-    // Use `substring` to trim potential timezone
-    val beforeChrist = dateString.startsWith("-")
-    val dateLength   = if (beforeChrist) 11 else 10
-    val dateParts    = dateString.substring(0, dateLength).splitTo[List]("-")
+        // Use `substring` to trim potential timezone
+        val beforeChrist = dateString.startsWith("-")
+        val dateLength   = if (beforeChrist) 11 else 10
+        val dateParts    = dateString.substring(0, dateLength).splitTo[List]("-")
 
-    new js.Date(
-      year    = dateParts(0).toInt * (if (beforeChrist) -1 else 1),
-      month   = dateParts(1).toInt - 1,
-      date    = dateParts(2).toInt,
-      hours   = 0,
-      minutes = 0,
-      seconds = 0,
-      ms      = 0
-    )
-  } toOption
+        // TODO: Validate impossible dates like `2021-11-31` non-leap year values
+
+        new js.Date(
+          year    = dateParts(0).toInt * (if (beforeChrist) -1 else 1),
+          month   = dateParts(1).toInt - 1,
+          date    = dateParts(2).toInt,
+          hours   = 0,
+          minutes = 0,
+          seconds = 0,
+          ms      = 0
+        )
+      } toOption
 
   def dateToISOStringUsingLocalTimezone(date: js.Date): String = {
 

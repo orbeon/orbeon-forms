@@ -20,6 +20,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.xforms.analysis.model.ValidationLevel
+import shapeless.syntax.typeable._
+
 
 class DOMActivateEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsUIEvent(DOM_ACTIVATE, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = true) {
@@ -140,7 +142,7 @@ private object XFormsValueChangeEvent {
   val XXFValue = xxfName("value")
 
   def properties(target: XFormsEventTarget): PropertyGetter = {
-    case XXFValue => Option(target) collect { case v: XFormsValueControl => v.getValue }
+    case XXFValue => target.cast[XFormsValueControl].flatMap(_.valueOpt)
   }
 }
 

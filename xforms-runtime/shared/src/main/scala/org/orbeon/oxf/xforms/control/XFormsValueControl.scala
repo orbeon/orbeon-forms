@@ -96,6 +96,9 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     _value
   }
 
+  final def valueOpt: Option[String] =
+    Option(getValue)
+
   final def isEmptyValue: Boolean = XFormsModelBinds.isEmptyValue(getValue)
 
   def evaluateExternalValue(): Unit =

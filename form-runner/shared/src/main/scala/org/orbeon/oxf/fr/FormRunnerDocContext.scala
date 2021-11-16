@@ -13,22 +13,22 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 
 
 trait FormRunnerDocContext {
 
-  def formDefinitionRootElem: NodeInfo
+  def formDefinitionRootElem: om.NodeInfo
 
-  lazy val modelElem             = FormRunner.getModelElem(formDefinitionRootElem)
-  lazy val dataInstanceElem      = FormRunner.instanceElemFromModelElem(modelElem, Names.FormInstance).get
-  lazy val metadataInstanceElem  = FormRunner.instanceElemFromModelElem(modelElem, Names.MetadataInstance).get
-  lazy val resourcesInstanceElem = FormRunner.instanceElemFromModelElem(modelElem, Names.FormResources).get
-  lazy val topLevelBindElem      = FormRunner.findTopLevelBindFromModelElem(modelElem)
-  lazy val bodyElem              = FormRunner.getFormRunnerBodyElem(formDefinitionRootElem)
+  lazy val modelElem             : om.NodeInfo         = FormRunner.getModelElem(formDefinitionRootElem)
+  lazy val dataInstanceElem      : om.NodeInfo         = FormRunner.instanceElemFromModelElem(modelElem, Names.FormInstance).get
+  lazy val metadataInstanceElem  : om.NodeInfo         = FormRunner.instanceElemFromModelElem(modelElem, Names.MetadataInstance).get
+  lazy val resourcesInstanceElem : om.NodeInfo         = FormRunner.instanceElemFromModelElem(modelElem, Names.FormResources).get
+  lazy val topLevelBindElem      : Option[om.NodeInfo] = FormRunner.findTopLevelBindFromModelElem(modelElem)
+  lazy val bodyElem              : om.NodeInfo         = FormRunner.getFormRunnerBodyElem(formDefinitionRootElem)
 
-  lazy val dataRootElem          = dataInstanceElem      / * head
-  lazy val metadataRootElem      = metadataInstanceElem  / * head
-  lazy val resourcesRootElem     = resourcesInstanceElem / * head
+  lazy val dataRootElem          : om.NodeInfo         = dataInstanceElem      / * head
+  lazy val metadataRootElem      : om.NodeInfo         = metadataInstanceElem  / * head
+  lazy val resourcesRootElem     : om.NodeInfo         = resourcesInstanceElem / * head
 }

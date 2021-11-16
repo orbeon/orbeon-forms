@@ -55,7 +55,6 @@ trait StaticLHHASupport extends ElementAnalysis {
     lhh(lhhaType) match {
       case Some(lhh) => lhh.isPlaceholder
       case None      => false
-
     }
 
   // Make `var` for `fullOpt` error "Assignment to immutable field beforeAfterTokensOpt"

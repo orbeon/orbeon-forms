@@ -155,7 +155,7 @@ class XBLContainer(
   def findScopeRoot(prefixedId: String): XBLContainer = {
     val scope = partAnalysis.scopeForPrefixedId(prefixedId)
     if (scope eq null)
-      throw new IllegalArgumentException("Prefixed id not found in current part: " + prefixedId)
+      throw new IllegalArgumentException(s"Prefixed id not found in current part: `$prefixedId`")
     findScopeRoot(scope)
   }
 

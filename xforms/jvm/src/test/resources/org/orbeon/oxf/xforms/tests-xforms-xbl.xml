@@ -5217,6 +5217,66 @@
         </output>
     </test>
 
+    <test description="#5058: Incorrect context of xbl:handler observing an internal XBL component" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="i" xxf:exclude-result-prefixes="#all">
+                            <_/>
+                        </xf:instance>
+                        <!-- Cause a value change -->
+                        <xf:setvalue
+                            event="xforms-ready"
+                            ref="instance()"
+                            value="42"/>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding value">
+                            <xbl:template/>
+                        </xbl:binding>
+                        <xbl:binding id="fr-toto" element="fr|toto" xxbl:mode="binding">
+                            <xbl:handlers>
+                                <xbl:handler observer="my-gaga" event="xforms-value-changed">
+                                    <!-- This failed before the fix -->
+                                    <xf:dispatch targetid="fr-toto" name="my-value-changed">
+                                        <xf:property name="my-value" value="event('xxf:value')"/>
+                                    </xf:dispatch>
+                                </xbl:handler>
+                            </xbl:handlers>
+                            <xbl:template>
+                                <fr:gaga id="my-gaga" ref="xxf:binding('fr-toto')"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:toto ref="instance()">
+                        <xf:message event="my-value-changed" value="event('my-value')"/>
+                    </fr:toto>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="i" model-id="model">
+                                <_>42</_>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:message level="modal">42</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

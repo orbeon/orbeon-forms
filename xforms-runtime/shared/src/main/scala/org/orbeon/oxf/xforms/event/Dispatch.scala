@@ -217,11 +217,15 @@ object Dispatch extends Logging {
     val containingDocument = event.containingDocument
 
     // Find dynamic context within which the event handler runs
-    val (container, handlerEffectiveId, xpathContext) =
+    val (container, handlerEffectiveId, xpathContext) = {
+
+      def isHandlerDirectlyNested(componentControl: XFormsComponentControl) =
+        eventHandler.parent.exists(_ eq componentControl.staticControl)
+
       eventObserver match {
 
         // Observer is the XBL component itself but from the "inside"
-        case componentControl: XFormsComponentControl if eventHandler.isXBLHandler =>
+        case componentControl: XFormsComponentControl if eventHandler.isXBLHandler && isHandlerDirectlyNested(componentControl) =>
 
           if (componentControl.canRunEventHandlers(event)) {
 
@@ -257,6 +261,7 @@ object Dispatch extends Logging {
               return
           }
       }
+    }
 
     val handlerIsRelevant =
       containingDocument.findControlByEffectiveId(handlerEffectiveId) map (_.isRelevant) getOrElse {

@@ -48,8 +48,8 @@ object XFormsSelect1Handler {
   // Support `XFormsValueControl` only for the legacy boolean `xf:input`
   def dataValueFromControl(control: XFormsValueControl): Option[(Item.Value[om.NodeInfo], Boolean)] =
     control match {
-      case c: XFormsSelect1Control => c.boundItemOpt     map (i => c.getCurrentItemValueFromData(i) -> c.staticControl.excludeWhitespaceTextNodesForCopy)
-      case c: XFormsValueControl   => Option(c.getValue) map (v => Left(v)                          -> false)
+      case c: XFormsSelect1Control => c.boundItemOpt map (i => c.getCurrentItemValueFromData(i) -> c.staticControl.excludeWhitespaceTextNodesForCopy)
+      case c: XFormsValueControl   => c.valueOpt     map (v => Left(v)                          -> false)
       case null                    => None
     }
 

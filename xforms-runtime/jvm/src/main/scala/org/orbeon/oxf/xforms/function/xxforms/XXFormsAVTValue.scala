@@ -34,8 +34,9 @@ class XXFormsAVTValue extends XFormsFunction {
       attControlAnalysis <- Option(XFormsFunction.context.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
       control            <- findRelevantControls(attControlAnalysis.staticId, followIndexes = true).headOption
       attControl         <- CollectionUtils.collectByErasedType[XXFormsAttributeControl](control)
+      value              <- attControl.valueOpt
     } yield
-      attControl.getValue
+      value
   }
 
 

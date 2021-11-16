@@ -168,7 +168,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def value(staticOrAbsoluteId: String, followIndexes: Boolean = true)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
     XFormsFunction.findRelevantControls(staticOrAbsoluteId, followIndexes) flatMap
-      (_.narrowTo[XFormsValueControl]) map (_.getValue)
+      (_.narrowTo[XFormsValueControl]) flatMap (_.valueOpt)
 
   @XPathFunction
   def formattedValue(staticOrAbsoluteId: String, followIndexes: Boolean = true)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Iterable[String] =
@@ -182,8 +182,9 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       attControlAnalysis <- Option(xfc.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
       control            <- findRelevantControls(attControlAnalysis.staticId, followIndexes = true).headOption
       attControl         <- control.narrowTo[XXFormsAttributeControl]
+      value              <- attControl.valueOpt
     } yield
-      attControl.getValue
+      value
 
   @XPathFunction
   def componentContext()(implicit xfc: XFormsFunction.Context): Iterable[om.Item] =

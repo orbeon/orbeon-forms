@@ -195,5 +195,5 @@ object XXFormsAttributeControl {
     }
 
   def getExternalValueHandleSrc(concreteControl: XXFormsAttributeControl, attributeControl: AttributeControl): String =
-    getExternalValueHandleSrc(Option(concreteControl) map (_.getValue) orNull, attributeControl.attributeName, attributeControl.forName)
+    getExternalValueHandleSrc(Option(concreteControl) flatMap (_.valueOpt) orNull, attributeControl.attributeName, attributeControl.forName)
 }

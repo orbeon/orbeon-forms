@@ -24,7 +24,7 @@ class XXFormsValue extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
     implicit val ctx = xpathContext
-    relevantControls(0, booleanArgument(1, default = true)) flatMap (_.narrowTo[XFormsValueControl]) map (_.getValue)
+    relevantControls(0, booleanArgument(1, default = true)) flatMap (_.narrowTo[XFormsValueControl]) flatMap (_.valueOpt)
   }
 
   // TODO: PathMap

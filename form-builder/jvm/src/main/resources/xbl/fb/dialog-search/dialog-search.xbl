@@ -31,13 +31,14 @@
                     <xf:property name="open-settings" value="instance()/open-settings = 'true'"/>
                 </xf:dispatch>
             </xbl:handler>
-            <xbl:handler observer="control-selector" event="xforms-value-changed" if="xxf:non-blank(event('xxf:value'))">
-                <xf:action/>
-                <xxf:hide dialog="dialog"/>
-                <xf:dispatch name="fb-apply" target="fb-dialog-search">
-                    <xf:property name="control-name" value="xxf:non-blank(event('xxf:value'))"/>
-                </xf:dispatch>
-            </xbl:handler>
+            <!-- FIXME: commented, otherwise throws: "Prefixed id not found in current part: dialog-search≡grid≡control-selector≡xf-4558" -->
+<!--            <xbl:handler observer="control-selector" event="xforms-value-changed">-->
+<!--                <xf:message value="event('xxf:value')"/>-->
+<!--                <xxf:hide dialog="dialog"/>-->
+<!--                <xf:dispatch name="fb-apply" target="fb-dialog-search">-->
+<!--                    <xf:property name="control-name" value="event('xxf:value')"/>-->
+<!--                </xf:dispatch>-->
+<!--            </xbl:handler>-->
             <xbl:handler event="xxforms-dialog-close" observer="dialog">
                 <!-- Clean-up internal instance upon dialog close -->
                 <xf:delete ref="instance('controls-label-value-itemset')/*"/>
@@ -70,9 +71,11 @@
 
                 <xh:div>
 
-                    <fr:grid>
+                    <fr:grid id="grid">
                         <xh:tr>
                             <xh:td colspan="11">
+                                <!-- An element YUI can set the focus on that doesn't steal the focus from the input in the dropdown -->
+                                <xh:a/>
                                 <xf:select1 appearance="search" ref="instance()/control-name" id="control-selector">
                                     <xf:label appearance="minimal" ref="$resources/components/parameters-editor/control/label"/>
                                     <xf:alert ref="$resources/components/parameters-editor/control/alert"/>
@@ -83,26 +86,23 @@
                                 </xf:select1>
                             </xh:td>
                             <xh:td>
-                                <fr:checkbox-input ref="instance()/open-settings">
-
-                                </fr:checkbox-input>
+<!--                                <fr:checkbox-input ref="instance()/open-settings">-->
+<!--                                </fr:checkbox-input>-->
                             </xh:td>
                         </xh:tr>
                     </fr:grid>
 
-                    <!--<fr:xforms-inspector/>-->
-
-                        <xh:div class="fr-dialog-buttons">
-                            <xf:group id="triggers">
-                                <xf:trigger id="save-trigger" appearance="xxf:primary">
-                                    <xf:label ref="$resources/apply/label"/>
-                                </xf:trigger>
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:group id="triggers">
+                            <xf:trigger id="save-trigger" appearance="xxf:primary">
+                                <xf:label ref="$resources/apply/label"/>
+                            </xf:trigger>
 <!--                                <xf:output value="$resources/or/label"/>-->
 <!--                                <xf:trigger appearance="minimal" id="cancel-trigger">-->
 <!--                                    <xf:label ref="$resources/cancel/label"/>-->
 <!--                                </xf:trigger>-->
-                            </xf:group>
-                        </xh:div>
+                        </xf:group>
+                    </xh:div>
 
                 </xh:div>
             </xxf:dialog>

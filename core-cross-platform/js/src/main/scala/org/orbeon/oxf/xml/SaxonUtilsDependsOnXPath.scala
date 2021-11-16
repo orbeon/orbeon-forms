@@ -30,7 +30,7 @@ object SaxonUtilsDependsOnXPath extends SaxonUtilsDependsOnXPathTrait {
       case v: String      => StringValue.makeStringValue(v)
       case v: BigDecimal  => new BigDecimalValue(v)
       case v: BigInteger  => new BigIntegerValue(v)
-      case v: Array[Byte] => new HexBinaryValue(v.asInstanceOf[Array[Byte]])
+      case v: Array[Byte] => new HexBinaryValue(v)
       case _              => throw new XPathException("Java object cannot be converted to an XQuery value")
     }
 }

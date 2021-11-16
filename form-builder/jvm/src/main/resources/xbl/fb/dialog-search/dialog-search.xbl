@@ -14,28 +14,19 @@
         <xbl:handlers>
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
                 <!-- Clear selection -->
-                <xf:setvalue iterate="instance()//*[not(*)]" ref="."/>
+                <xf:setvalue iterate="instance()/control-name" ref="."/>
                 <!-- Update items -->
                 <xf:insert
                     context="instance('controls-label-value-itemset')"
                     origin="fbf:getControlsLabelValueItemset()"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
-            <xbl:handler event="DOMActivate" observer="cancel-trigger" >
-                <xxf:hide dialog="dialog"/>
-            </xbl:handler>
-            <xbl:handler event="DOMActivate" observer="save-trigger">
-                <xxf:hide dialog="dialog"/>
-                <xf:dispatch name="fb-apply" target="fb-dialog-search">
-                    <xf:property name="control-name"  value="instance()/control-name[xxf:non-blank()]"/>
-                    <xf:property name="open-settings" value="instance()/open-settings = 'true'"/>
-                </xf:dispatch>
-            </xbl:handler>
             <xbl:handler observer="control-selector" event="xforms-value-changed">
                 <xf:var name="v" value="event('xxf:value')"/>
                 <xxf:hide dialog="dialog"/>
                 <xf:dispatch name="fb-apply" target="fb-dialog-search">
-                    <xf:property name="control-name" value="$v"/>
+                    <xf:property name="control-name"  value="$v"/>
+                    <xf:property name="open-settings" value="instance()/open-settings = 'true'"/>
                 </xf:dispatch>
             </xbl:handler>
             <xbl:handler event="xxforms-dialog-close" observer="dialog">
@@ -49,7 +40,7 @@
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
                     <_>
                         <control-name/>
-                        <open-settings/>
+                        <open-settings>false</open-settings>
                     </_>
                 </xf:instance>
 
@@ -60,49 +51,30 @@
             </xf:model>
         </xbl:implementation>
         <xbl:template>
-
-            <!-- Bindings specified on control -->
-            <xf:var name="form"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
-            <xf:var name="resources"><xxf:value value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
-
-            <xxf:dialog id="dialog" appearance="minimal" level="modal" class="fb-search-dialog">
-                <xf:label ref="$resources/dialog-search/label"/>
+            <xxf:dialog id="dialog" appearance="minimal" level="modal" class="fb-dialog-search">
+                <xf:label ref="xxf:r('dialog-search.label', '|fr-form-resources|')"/>
 
                 <xh:div>
 
+                    <!-- An element YUI can set the focus on that doesn't steal the focus from the input in the dropdown -->
+                    <xh:a/>
+
                     <fr:grid id="grid">
-                        <xh:tr>
-                            <xh:td colspan="11">
-                                <!-- An element YUI can set the focus on that doesn't steal the focus from the input in the dropdown -->
-                                <xh:a/>
-                                <xf:select1 appearance="search" ref="instance()/control-name" id="control-selector">
-                                    <xf:label appearance="minimal" ref="$resources/components/parameters-editor/control/label"/>
-                                    <xf:alert ref="$resources/components/parameters-editor/control/alert"/>
-                                    <xf:itemset ref="instance('controls-label-value-itemset')/item">
-                                        <xf:label value="@label"/>
-                                        <xf:value value="@value"/>
-                                    </xf:itemset>
-                                </xf:select1>
-                            </xh:td>
-                            <xh:td>
-<!--                                <fr:checkbox-input ref="instance()/open-settings">-->
-<!--                                </fr:checkbox-input>-->
-                            </xh:td>
-                        </xh:tr>
+                        <fr:c x="1" y="1" w="7" h="1">
+                            <xf:select1 appearance="search" ref="instance()/control-name" id="control-selector">
+                                <xf:label appearance="minimal" ref="xxf:r('components.parameters-editor.control.label', '|fr-form-resources|')"/>
+                                <xf:itemset ref="instance('controls-label-value-itemset')/item">
+                                    <xf:label value="@label"/>
+                                    <xf:value value="@value"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="8" y="1" w="5" h="1">
+                            <fr:checkbox-input ref="instance()/open-settings">
+                                <xf:label ref="xxf:r('dialog-search.open-settings.label', '|fr-form-resources|')"/>
+                            </fr:checkbox-input>
+                        </fr:c>
                     </fr:grid>
-
-                    <xh:div class="fr-dialog-buttons">
-                        <xf:group id="triggers">
-                            <xf:trigger id="save-trigger" appearance="xxf:primary">
-                                <xf:label ref="$resources/apply/label"/>
-                            </xf:trigger>
-<!--                                <xf:output value="$resources/or/label"/>-->
-<!--                                <xf:trigger appearance="minimal" id="cancel-trigger">-->
-<!--                                    <xf:label ref="$resources/cancel/label"/>-->
-<!--                                </xf:trigger>-->
-                        </xf:group>
-                    </xh:div>
-
                 </xh:div>
             </xxf:dialog>
         </xbl:template>

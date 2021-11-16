@@ -850,6 +850,9 @@
         </dialog-add-language>
         <dialog-search>
             <label>Search Controls</label>
+            <open-settings>
+                <label>Open Settings Dialog</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>XML Schema Upload</label>
@@ -2171,6 +2174,9 @@
         </dialog-add-language>
         <dialog-search>
             <label>Chercher les contrôles</label>
+            <open-settings>
+                <label>Ouvrir les paramètres du contrôle</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>Insertion de schéma XML</label>
@@ -3474,6 +3480,9 @@
         </dialog-add-language>
         <dialog-search>
             <label todo="true">Search Controls</label>
+            <open-settings>
+                <label todo="true">Open Settings Dialog</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>XML-skjemaopplasting</label>
@@ -4803,7 +4812,10 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label>Search Controls</label>
+            <label todo="true">Search Controls</label>
+            <open-settings>
+                <label todo="true">Open Settings Dialog</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>Загрузка схемы XML</label>
@@ -6126,7 +6138,10 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label>Search Controls</label>
+            <label todo="true">Search Controls</label>
+            <open-settings>
+                <label todo="true">Open Settings Dialog</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>Carica schema XML</label>
@@ -7450,7 +7465,10 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label>Search Controls</label>
+            <label todo="true">Search Controls</label>
+            <open-settings>
+                <label todo="true">Open Settings Dialog</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>XML-Schema hochladen</label>
@@ -8776,7 +8794,10 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label>Search Controls</label>
+            <label todo="true">Search Controls</label>
+            <open-settings>
+                <label todo="true">Open Settings Dialog</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>XML-skeeman lähettäminen</label>
@@ -10099,7 +10120,10 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label>Search Controls</label>
+            <label todo="true">Search Controls</label>
+            <open-settings>
+                <label todo="true">Open Settings Dialog</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>Subir Esquema XML</label>
@@ -11430,7 +11454,10 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label>Search Controls</label>
+            <label todo="true">Search Controls</label>
+            <open-settings>
+                <label todo="true">Open Settings Dialog</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>XML Schema uploaden</label>
@@ -12732,7 +12759,10 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label>Search Controls</label>
+            <label todo="true">Search Controls</label>
+            <open-settings>
+                <label todo="true">Open Settings Dialog</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>Carregar o XML Schema</label>
@@ -14063,7 +14093,10 @@
             </remove-language>
         </dialog-add-language>
         <dialog-search>
-            <label>Search Controls</label>
+            <label todo="true">Search Controls</label>
+            <open-settings>
+                <label todo="true">Open Settings Dialog</label>
+            </open-settings>
         </dialog-search>
         <dialog-upload-schema>
             <label>Ladda upp XML-schema</label>

@@ -736,6 +736,7 @@
                                         event="fb-apply"
                                         if="xxf:non-blank(event('control-name'))">
 
+                                        <!-- Expand ancestor sections -->
                                         <xf:dispatch
                                             iterate="
                                                 for $elem in reverse(
@@ -748,7 +749,18 @@
                                             name="fr-expand"
                                             targetid="{concat('|fb≡', ., '|')}"/>
 
-                                        <xf:action type="xpath">fbf:selectCellForControlId(concat(event('control-name'), '-control'))</xf:action>
+                                        <xf:dispatch
+                                            if="event('open-settings')"
+                                            name="fb-show-dialog"
+                                            targetid="dialog-control-settings">
+                                            <xf:property
+                                                name="control-id"
+                                                value="frf:findControlIdByName(instance('fb-form-instance'), event('control-name'))"/>
+                                        </xf:dispatch>
+
+                                        <xf:action
+                                            if="not(event('open-settings'))"
+                                            type="xpath">fbf:selectCellForControlId(concat(event('control-name'), '-control'))</xf:action>
                                     </xf:action>
                                 </fb:dialog-search>
 

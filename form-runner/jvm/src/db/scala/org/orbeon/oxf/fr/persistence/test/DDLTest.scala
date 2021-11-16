@@ -43,15 +43,16 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Loggi
       val statement = connection.createStatement
       SQL.executeStatements(provider, statement, sql)
       val query = provider match {
-        // On Oracle
-        // - Column order is "non-relevant", so we order by column name instead of position
-        // - We don't test on the owner with `= user` because the user is still `sys` after
-        //   `ALTER SESSION SET CURRENT_SCHEMA = c##orbeon`
         case MySQL =>
           """   SELECT *
             |     FROM information_schema.columns
             |    WHERE table_name = ?
             |          AND table_schema = DATABASE()
+            | ORDER BY ordinal_position"""
+        case PostgreSQL =>
+          """   SELECT *
+            |     FROM information_schema.columns
+            |    WHERE table_name = ?
             | ORDER BY ordinal_position"""
       }
       Connect.getTableNames(provider, connection).map { tableName =>

@@ -31,14 +31,13 @@
                     <xf:property name="open-settings" value="instance()/open-settings = 'true'"/>
                 </xf:dispatch>
             </xbl:handler>
-            <!-- FIXME: commented, otherwise throws: "Prefixed id not found in current part: dialog-search≡grid≡control-selector≡xf-4558" -->
-<!--            <xbl:handler observer="control-selector" event="xforms-value-changed">-->
-<!--                <xf:message value="event('xxf:value')"/>-->
-<!--                <xxf:hide dialog="dialog"/>-->
-<!--                <xf:dispatch name="fb-apply" target="fb-dialog-search">-->
-<!--                    <xf:property name="control-name" value="event('xxf:value')"/>-->
-<!--                </xf:dispatch>-->
-<!--            </xbl:handler>-->
+            <xbl:handler observer="control-selector" event="xforms-value-changed">
+                <xf:var name="v" value="event('xxf:value')"/>
+                <xxf:hide dialog="dialog"/>
+                <xf:dispatch name="fb-apply" target="fb-dialog-search">
+                    <xf:property name="control-name" value="$v"/>
+                </xf:dispatch>
+            </xbl:handler>
             <xbl:handler event="xxforms-dialog-close" observer="dialog">
                 <!-- Clean-up internal instance upon dialog close -->
                 <xf:delete ref="instance('controls-label-value-itemset')/*"/>

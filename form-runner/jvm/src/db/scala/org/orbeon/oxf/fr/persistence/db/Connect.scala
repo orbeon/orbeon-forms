@@ -28,8 +28,7 @@ import scala.util.Try
 private[persistence] object Connect {
 
   val ProvidersTestedAutomatically: List[Provider] = List(
-    Provider.MySQL//,
-    //Provider.PostgreSQL
+    Provider.withName(sys.env("DB"))
   )
 
   def withOrbeonTables[T]

@@ -60,7 +60,10 @@
                     <xh:a/>
 
                     <fr:grid id="grid">
-                        <fr:c x="1" y="1" w="7" h="1">
+                        <fr:c x="1" y="1" w="1" h="1">
+                            <xh:i class="fa fa-fw fa-search"/>
+                        </fr:c>
+                        <fr:c x="2" y="1" w="6" h="1">
                             <xf:select1 appearance="search" ref="instance()/control-name" id="control-selector">
                                 <xf:label appearance="minimal" ref="xxf:r('components.parameters-editor.control.label', '|fr-form-resources|')"/>
                                 <xf:itemset ref="instance('controls-label-value-itemset')/item">
@@ -70,7 +73,7 @@
                             </xf:select1>
                         </fr:c>
                         <fr:c x="8" y="1" w="5" h="1">
-                            <fr:checkbox-input ref="instance()/open-settings">
+                            <fr:checkbox-input ref="instance()/open-settings" class="fb-open-settings">
                                 <xf:label ref="xxf:r('dialog-search.open-settings.label', '|fr-form-resources|')"/>
                             </fr:checkbox-input>
                         </fr:c>

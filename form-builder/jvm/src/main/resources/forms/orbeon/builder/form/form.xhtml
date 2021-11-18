@@ -785,18 +785,30 @@
                                         <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-template-name" value="event('pdf-template-name')"/>
                                         <xf:setvalue ref="instance('fb-test-pdf-submission-params')/@fr-pdf-template-lang" value="event('pdf-template-lang')"/>
 
-                                        <xf:action if="event('for-form-being-tested') = true()">
+                                        <xf:var
+                                            name="for-form-being-tested"
+                                            value="event('for-form-being-tested') = true()"/>
+
+                                        <xf:action if="$for-form-being-tested">
                                             <!-- Run indirectly by asking the form being tested to prepare data -->
+                                            <!-- NOTE: If `event('use-form-data')` is `false()` we still go through
+                                                 the indirection so we can get the form language. -->
                                             <xf:action type="javascript">
-                                                window.document.getElementById("fb-test-iframe").contentWindow.ORBEON.xforms.Document.dispatchEvent(
-                                                    {
-                                                        targetId:  'fr-form-model',
-                                                        eventName: 'fb-test-pdf-prepare-data'
-                                                    }
-                                                );
+                                                <xf:param
+                                                    name="useFormData"
+                                                    value="event('use-form-data')"/>
+                                                <xf:body>
+                                                    window.document.getElementById("fb-test-iframe").contentWindow.ORBEON.xforms.Document.dispatchEvent(
+                                                        {
+                                                            targetId:  'fr-form-model',
+                                                            eventName: 'fb-test-pdf-prepare-data',
+                                                            properties: { 'use-form-data': useFormData }
+                                                        }
+                                                    );
+                                                </xf:body>
                                             </xf:action>
                                         </xf:action>
-                                        <xf:action if="not(event('for-form-being-tested') = true())">
+                                        <xf:action if="not($for-form-being-tested)">
                                             <!-- Run directly -->
                                             <xf:send submission="fb-test-pdf-submission">
                                                 <xf:property name="fr-form-data" value="''"/>

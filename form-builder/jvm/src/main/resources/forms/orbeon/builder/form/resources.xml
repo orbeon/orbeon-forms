@@ -1189,6 +1189,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label>Test PDF Production</label>
+            <use-form-data>Use entered form data</use-form-data>
             <disable-default>Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate>Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant>Show controls, grids, and sections with dynamic visibility</disable-relevant>
@@ -2513,6 +2514,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label>Test de la production PDF</label>
+            <use-form-data>Utiliser les données entrées</use-form-data>
             <disable-default>Désactiver l'évaluation des formules "Valeur initiale"</disable-default>
             <disable-calculate>Désactiver l'évaluation des formules "Valeur calculée"</disable-calculate>
             <disable-relevant>Montrer les contrôles, grilles, et sections avec visibilité dynamique</disable-relevant>
@@ -3847,6 +3849,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
+            <use-form-data todo="true">Use entered form data</use-form-data>
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
@@ -5180,6 +5183,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
+            <use-form-data todo="true">Use entered form data</use-form-data>
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
@@ -6506,6 +6510,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label>Test della produzione PDF</label>
+            <use-form-data todo="true">Use entered form data</use-form-data>
             <disable-default>Disabilitare la valutazione delle formule “Valore iniziale”</disable-default>
             <disable-calculate>Disabilitare la valutazione delle formule “Valore calcolato”</disable-calculate>
             <disable-relevant>Mostrare i controlli, le griglie e le sezioni con visibilità dinamica</disable-relevant>
@@ -7833,6 +7838,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label>Test der PDF-Erzeugung</label>
+            <use-form-data todo="true">Use entered form data</use-form-data>
             <disable-default>Auswertung der Formeln “Initialwert” deaktivieren</disable-default>
             <disable-calculate>Auswertung der Formeln “Berechneter Wert” deaktivieren</disable-calculate>
             <disable-relevant>Steuerelemente, Raster und Abschnitte mit dynamischer Sichtbarkeit anzeigen</disable-relevant>
@@ -9162,6 +9168,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
+            <use-form-data todo="true">Use entered form data</use-form-data>
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
@@ -10488,6 +10495,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
+            <use-form-data todo="true">Use entered form data</use-form-data>
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
@@ -11794,6 +11802,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
+            <use-form-data todo="true">Use entered form data</use-form-data>
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
@@ -13127,6 +13136,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
+            <use-form-data todo="true">Use entered form data</use-form-data>
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
@@ -14461,6 +14471,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label todo="true">Test PDF Production</label>
+            <use-form-data todo="true">Use entered form data</use-form-data>
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>

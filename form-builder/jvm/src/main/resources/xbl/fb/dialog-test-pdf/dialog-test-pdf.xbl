@@ -49,6 +49,7 @@
             <xbl:handler event="DOMActivate" observer="save-trigger prefix-input suffix-input" if="valid($i)">
                 <xf:dispatch name="fb-apply" target="fb-dialog-test-pdf">
                     <xf:property name="for-form-being-tested" value="$i/for-form-being-tested/data(.)"/>
+                    <xf:property name="use-form-data"         value="$i/use-form-data/data(.)"/>
                     <xf:property name="disable-calculate"     value="$i/disable-calculate/data(.)"/>
                     <xf:property name="disable-default"       value="$i/disable-default/data(.)"/>
                     <xf:property name="disable-relevant"      value="$i/disable-relevant/data(.)"/>
@@ -69,6 +70,7 @@
                 <xf:instance id="i">
                     <_>
                         <for-form-being-tested/>
+                        <use-form-data/>
                         <disable-calculate/>
                         <disable-default/>
                         <disable-relevant/>
@@ -77,6 +79,18 @@
                         <use-pdf-template/>
                     </_>
                 </xf:instance>
+
+                <xf:bind
+                    ref="use-form-data"
+                    type="xf:boolean"
+                    relevant="../for-form-being-tested/data(.)"
+                    xxf:default="true()"
+                />
+
+                <xf:bind
+                    ref="disable-default"
+                    type="xf:boolean"
+                    readonly="../for-form-being-tested/data(.) and ../use-form-data/data(.)"/>
 
                 <xf:bind
                     ref="for-form-being-tested | disable-calculate | disable-default | disable-relevant | use-pdf-template"
@@ -114,16 +128,21 @@
                     <xh:div>
                         <fr:grid>
                             <fr:c x="1" y="1" w="12">
+                                <fr:checkbox-input ref="use-form-data" appearance="checkbox">
+                                    <xf:label ref="xxf:r('dialog-test-pdf.use-form-data', '|fr-form-resources|')"/>
+                                </fr:checkbox-input>
+                            </fr:c>
+                            <fr:c x="1" y="2" w="12">
                                 <fr:checkbox-input ref="disable-default" appearance="checkbox">
                                     <xf:label ref="xxf:r('dialog-test-pdf.disable-default', '|fr-form-resources|')"/>
                                 </fr:checkbox-input>
                             </fr:c>
-                            <fr:c x="1" y="2" w="12">
+                            <fr:c x="1" y="3" w="12">
                                 <fr:checkbox-input ref="disable-calculate">
                                     <xf:label ref="xxf:r('dialog-test-pdf.disable-calculate', '|fr-form-resources|')"/>
                                 </fr:checkbox-input>
                             </fr:c>
-                            <fr:c x="1" y="3" w="12">
+                            <fr:c x="1" y="4" w="12">
                                 <fr:checkbox-input ref="disable-relevant" appearance="checkbox">
                                     <xf:label ref="xxf:r('dialog-test-pdf.disable-relevant', '|fr-form-resources|')"/>
                                 </fr:checkbox-input>

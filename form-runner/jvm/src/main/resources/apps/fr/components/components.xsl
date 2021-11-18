@@ -853,7 +853,7 @@
                 type="javascript">
                 <xf:param
                     name="data"
-                    value="frf:encodeFormDataToSubmit(instance('fr-form-instance'))"/>
+                    value="if (event('use-form-data') = 'true') then frf:encodeFormDataToSubmit(instance('fr-form-instance')) else ''"/>
                 <xf:param
                     name="lang"
                     value="fr:lang()"/>

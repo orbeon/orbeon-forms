@@ -709,7 +709,7 @@
                     concat(name($p), '=', encode-for-uri(string($p))),
                 '&amp;'
             )
-        }&amp;fr-language={$fb-lang}"
+        }&amp;fr-remember-language=false"
         xxf:target="_blank"
         xxf:show-progress="false"
     />
@@ -726,7 +726,9 @@
             fr-pdf-template-name=""
             fr-pdf-template-lang=""
 
-            fr-form-data=""/>
+            fr-form-data=""
+            fr-language=""
+        />
     </xf:instance>
 
     <xf:action event="xforms-submit" observer="fb-test-pdf-submission">
@@ -740,6 +742,9 @@
         <xf:setvalue
             ref="instance('fb-test-pdf-submission-params')/@fr-form-data"
             value="event('fr-form-data')"/>
+        <xf:setvalue
+            ref="instance('fb-test-pdf-submission-params')/@fr-language"
+            value="event('language')"/>
     </xf:action>
 
     <!-- Global variables -->
@@ -846,6 +851,7 @@
     <xf:action event="fb-test-pdf-with-data">
         <xf:send submission="fb-test-pdf-submission">
             <xf:property name="fr-form-data" value="event('fr-form-data')"/>
+            <xf:property name="language"     value="event('language')"/>
         </xf:send>
     </xf:action>
 

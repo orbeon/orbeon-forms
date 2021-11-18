@@ -854,12 +854,15 @@
                 <xf:param
                     name="data"
                     value="frf:encodeFormDataToSubmit(instance('fr-form-instance'))"/>
+                <xf:param
+                    name="lang"
+                    value="fr:lang()"/>
                 <xf:body>
                     window.parent.ORBEON.xforms.Document.dispatchEvent(
                         {
                             targetId:   'fr-form-model',
                             eventName:  'fb-test-pdf-with-data',
-                            properties: { 'fr-form-data': data }
+                            properties: { 'fr-form-data': data, 'language': lang }
                         }
                     );
                 </xf:body>

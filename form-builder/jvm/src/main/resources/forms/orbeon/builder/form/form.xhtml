@@ -798,7 +798,10 @@
                                         </xf:action>
                                         <xf:action if="not(event('for-form-being-tested') = true())">
                                             <!-- Run directly -->
-                                            <xf:send submission="fb-test-pdf-submission"/>
+                                            <xf:send submission="fb-test-pdf-submission">
+                                                <xf:property name="fr-form-data" value="''"/>
+                                                <xf:property name="language"     value="$fb-lang"/>
+                                            </xf:send>
                                         </xf:action>
                                     </xf:action>
                                 </fb:dialog-test-pdf>

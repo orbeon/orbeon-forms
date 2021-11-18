@@ -609,7 +609,7 @@
             )"
         method="post"
         replace="all"
-        resource="/fr/{bind('application-name-bind')}/{bind('form-name-bind')}/test"
+        resource="/fr/{bind('application-name-bind')}/{bind('form-name-bind')}/test?fr-language={$fb-lang}"
         xxf:target="fb-test-iframe"
         xxf:show-progress="false"
     />

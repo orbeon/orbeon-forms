@@ -175,8 +175,6 @@ Third-party software
 This product includes software developed by the [Apache Software Foundation](https://www.apache.org/):
 
 - [Ant](https://ant.apache.org/)
-- [Avalon](https://avalon.apache.org/closed.html)
-- [Axis](https://axis.apache.org/)
 - [Commons](https://commons.apache.org/)
 - [HttpComponents](https://hc.apache.org/)
 - [log4j](https://logging.apache.org/log4j/)
@@ -192,7 +190,7 @@ In addition, this product includes the following software:
 - [Ehcache](https://www.ehcache.org/)
 - [eXist](https://exist-db.org/)
 - [Flying Saucer](https://code.google.com/archive/p/flying-saucer/)
-- [iText](https://itextpdf.com/)
+- [OpenPDF](https://github.com/LibrePDF/OpenPDF)
 - Jaxen
 - [JCIFS](https://www.jcifs.org/)
 - [JTidy](http://jtidy.sourceforge.net/)
@@ -200,7 +198,7 @@ In addition, this product includes the following software:
 - [Saxon](http://saxon.sourceforge.net/)
 - [SAXPath](https://sourceforge.net/projects/saxpath)
 - [Scala](https://www.scala-lang.org/)
-- [ScalaTest](http://www.scalatest.org/)
+- [ScalaTest](https://www.scalatest.org/)
 - Sun Multi-Schema XML Validator
 - TagSoup
 - [YUI Library](https://yuilibrary.com/)

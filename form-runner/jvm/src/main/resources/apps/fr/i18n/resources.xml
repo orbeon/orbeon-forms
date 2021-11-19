@@ -373,7 +373,7 @@
             </titles>
             <messages>
                 <no-forms>You don't have access to any deployed forms.</no-forms>
-                <publish-confirmation>Are you sure you want to {0,choice,0#make available|1#make unavailable|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
+                <publish-confirmation>Are you sure you want to {0,choice,0#make available|1#make unavailable|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}? This operation cannot be undone.</publish-confirmation>
                 <reindexing-confirmation>While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?</reindexing-confirmation>
                 <reencrypt-confirmation>We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?</reencrypt-confirmation>
             </messages>
@@ -878,7 +878,7 @@
             </titles>
             <messages>
                 <no-forms>Vous n'avez accès à aucun formulaire déployé.</no-forms>
-                <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#rendre disponible|1#rendre non disponible|2#mettre à jour|3#supprimer} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
+                <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#rendre disponible|1#rendre non disponible|2#mettre à jour|3#supprimer} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}? Cette opération ne peut pas être annulée.</publish-confirmation>
                 <reindexing-confirmation>Pendant le réindexage, certaines fonctionnalités, comme les pages de sommaires de Form Runner, ne fonctionneront pas comme prévu. Nous vous recommandons donc d'effectuez le réindexage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de réindexage?</reindexing-confirmation>
                 <reencrypt-confirmation>Nous vous recommandons d'effectuez le recryptage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de recryptage?</reencrypt-confirmation>
             </messages>

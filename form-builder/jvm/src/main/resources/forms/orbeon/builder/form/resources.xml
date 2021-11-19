@@ -6510,7 +6510,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label>Test della produzione PDF</label>
-            <use-form-data todo="true">Use entered form data</use-form-data>
+            <use-form-data>Utilizzare i dati immessi</use-form-data>
             <disable-default>Disabilitare la valutazione delle formule “Valore iniziale”</disable-default>
             <disable-calculate>Disabilitare la valutazione delle formule “Valore calcolato”</disable-calculate>
             <disable-relevant>Mostrare i controlli, le griglie e le sezioni con visibilità dinamica</disable-relevant>
@@ -7838,7 +7838,7 @@
         </dialog-test>
         <dialog-test-pdf>
             <label>Test der PDF-Erzeugung</label>
-            <use-form-data todo="true">Use entered form data</use-form-data>
+            <use-form-data>Eingegebene Daten verwenden</use-form-data>
             <disable-default>Auswertung der Formeln “Initialwert” deaktivieren</disable-default>
             <disable-calculate>Auswertung der Formeln “Berechneter Wert” deaktivieren</disable-calculate>
             <disable-relevant>Steuerelemente, Raster und Abschnitte mit dynamischer Sichtbarkeit anzeigen</disable-relevant>

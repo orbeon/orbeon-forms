@@ -349,6 +349,8 @@
                 <navigate-new>Navigate to New</navigate-new>
                 <upgrade-local>Upgrade local form definitions</upgrade-local>
                 <upgrade-remote>Upgrade remote form definitions</upgrade-remote>
+                <delete-local>Delete local forms</delete-local>
+                <delete-remote>Delete remote forms</delete-remote>
                 <reencrypt>Re-encrypt form definitions</reencrypt>
                 <reload-resources>Reload resources</reload-resources>
             </buttons>
@@ -371,7 +373,7 @@
             </titles>
             <messages>
                 <no-forms>You don't have access to any deployed forms.</no-forms>
-                <publish-confirmation>Are you sure you want to {0,choice,0#make available|1#make unavailable|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
+                <publish-confirmation>Are you sure you want to {0,choice,0#make available|1#make unavailable|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
                 <reindexing-confirmation>While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?</reindexing-confirmation>
                 <reencrypt-confirmation>We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?</reencrypt-confirmation>
             </messages>
@@ -852,6 +854,8 @@
                 <navigate-new>Naviguer à la page de création</navigate-new>
                 <upgrade-local>Mettre à jour les formulaires locaux</upgrade-local>
                 <upgrade-remote>Mettre à jour les formulaires distants</upgrade-remote>
+                <delete-local>Supprimer les formulaires locaux</delete-local>
+                <delete-remote>Supprimer les formulaires distants</delete-remote>
                 <reencrypt>Réencrypter les formulaires</reencrypt>
                 <reload-resources>Recharger les resources</reload-resources>
             </buttons>
@@ -874,7 +878,7 @@
             </titles>
             <messages>
                 <no-forms>Vous n'avez accès à aucun formulaire déployé.</no-forms>
-                <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#rendre disponible|1#rendre non disponible|2#mettre à jour} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
+                <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#rendre disponible|1#rendre non disponible|2#mettre à jour|3#supprimer} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
                 <reindexing-confirmation>Pendant le réindexage, certaines fonctionnalités, comme les pages de sommaires de Form Runner, ne fonctionneront pas comme prévu. Nous vous recommandons donc d'effectuez le réindexage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de réindexage?</reindexing-confirmation>
                 <reencrypt-confirmation>Nous vous recommandons d'effectuez le recryptage alors que le système n'est pas en cours d'opération. Êtes-vous sûr de vouloir continuer avec l'operation de recryptage?</reencrypt-confirmation>
             </messages>
@@ -1341,6 +1345,8 @@
                 <navigate-new>Ir a nuevo</navigate-new>
                 <upgrade-local>Actualizar Formularios locales</upgrade-local>
                 <upgrade-remote>Actualizar Formularios remotos</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -1363,7 +1369,7 @@
             </titles>
             <messages>
                 <no-forms>No tiene permisos para ningún formulario de Producción</no-forms>
-                <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?</publish-confirmation>
+                <publish-confirmation>Está seguro de {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} formularios}?</publish-confirmation>
                 <reindexing-confirmation>Mientras se reindexa algunas funcionalidades no estarán disponibles, como ser el Form Runner. Por lo que se recomienda ejecutar la reindexación con el sistema fuera de línea. Esta seguro que quiere proceder con la reindexación ?</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
@@ -1829,6 +1835,8 @@
                 <navigate-new todo="true">[Navigate to New]</navigate-new>
                 <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
                 <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -1851,7 +1859,7 @@
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
-                <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+                <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
@@ -2315,6 +2323,8 @@
                 <navigate-new todo="true">[Navigate to New]</navigate-new>
                 <upgrade-local todo="true">[Upgrade local form definitions]</upgrade-local>
                 <upgrade-remote todo="true">[Upgrade remote form definitions]</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -2337,7 +2347,7 @@
             </titles>
             <messages>
                 <no-forms todo="true">[You don't have access to any deployed forms.]</no-forms>
-                <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+                <publish-confirmation todo="true">[Are you sure you want to {0,choice,0#publish|1#unpublish|2#upgrade|3#delete} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
@@ -2814,6 +2824,8 @@
                 <navigate-new>Passa a Nuovo</navigate-new>
                 <upgrade-local>Aggiorna le definizioni dei moduli locali</upgrade-local>
                 <upgrade-remote>Aggiorna le definizioni dei moduli remoti</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -2836,7 +2848,7 @@
             </titles>
             <messages>
                 <no-forms>Non hai accesso a nessuno dei moduli distributi.</no-forms>
-                <publish-confirmation todo="true">Sei sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#aggiornare} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
+                <publish-confirmation todo="true">Sei sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di|2#aggiornare|3#cancellare} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
@@ -3313,6 +3325,8 @@
                 <navigate-new>Gehe zu Neu</navigate-new>
                 <upgrade-local>Lokale Formulardefinition aktualisieren</upgrade-local>
                 <upgrade-remote>Formulardefinition auf Remote-System aktualisieren</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -3335,7 +3349,7 @@
             </titles>
             <messages>
                 <no-forms>Sie haben keinen Zugang zu den bereitgestellten Formularen.</no-forms>
-                <publish-confirmation todo="true">Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} Formulare} {0,choice,0#veröffentlichen |1#verbergen|2#aktualisiern} wollen?</publish-confirmation>
+                <publish-confirmation todo="true">Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} Formulare} {0,choice,0#veröffentlichen |1#verbergen|2#aktualisiern|3#löschen} wollen?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
@@ -3812,6 +3826,8 @@
                 <navigate-new>Luo uusi</navigate-new>
                 <upgrade-local>Päivitä paikallisen lomakkeen määritykset</upgrade-local>
                 <upgrade-remote>Päivitä etälomakkeen määritykset</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -3834,7 +3850,7 @@
             </titles>
             <messages>
                 <no-forms>Sinulla ei ole pääsyä yhteenkään lomakkeeseen.</no-forms>
-                <publish-confirmation>Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi|2#upgrade} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
+                <publish-confirmation todo="true">Haluatko varmasti{0,choice,0#julkaista|1#merkata vanhaksi|2#upgrade|3#delete} {1,choice,1#yhden lomakkeen|1&lt;{1,number,integer} lomaketta}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
@@ -4311,6 +4327,8 @@
                 <navigate-new>Gå till Skapa</navigate-new>
                 <upgrade-local>Uppgradera lokala formulärdefinitioner</upgrade-local>
                 <upgrade-remote>Uppgradera formulärdefinitioner på servern</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -4333,7 +4351,7 @@
             </titles>
             <messages>
                 <no-forms>Du har inte tillgång till några publicerade formulär.</no-forms>
-                <publish-confirmation>Bekräfta {0,choice,0#publicering|1#upphävande av publicering|2#uppgradering} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
+                <publish-confirmation todo="true">Bekräfta {0,choice,0#publicering|1#upphävande av publicering|2#uppgradering|3#delete} av {1,choice,1#ett formulär|1&lt;{1,number,integer} formulär}.</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
@@ -4809,6 +4827,8 @@
                 <navigate-new>Naar nieuw</navigate-new>
                 <upgrade-local>Upgrade lokale formdefinities</upgrade-local>
                 <upgrade-remote>Upgrade externe formdefinities</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -4831,7 +4851,7 @@
             </titles>
             <messages>
                 <no-forms>U hebt geen toegang tot de actieve forms.</no-forms>
-                <publish-confirmation>Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden}?</publish-confirmation>
+                <publish-confirmation todo="true">Weet u zeker dat u {1,choice,1#één form|1&lt;{1,number,integer} forms} wilt {0,choice,0#publiceren|1#verwijderen|2#upgraden|3#delete}?</publish-confirmation>
                 <reindexing-confirmation>Tijdens het herindexeren werken bepaalde functies, zoals de Form Runner samenvattingpagina's, mogelijk niet zoals verwacht. We raden u om die reden aan om te herindexeren als uw systeem offline is. Weet u zeker dat het herindexeren wilt starten?</reindexing-confirmation>
                 <reencrypt-confirmation>We adviseren u het vernieuwen van de encryptie te doen als het systeem offline is. Weet u zeker dat u door wilt gaan met her-encryptie?</reencrypt-confirmation>
             </messages>
@@ -5307,6 +5327,8 @@
                 <navigate-new>Ir para Novo</navigate-new>
                 <upgrade-local>Actualizar definições de formulário local</upgrade-local>
                 <upgrade-remote>Actualizar definições de formulário remoto</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -5329,7 +5351,7 @@
             </titles>
             <messages>
                 <no-forms>Não tem acesso a quaisquer formulários.</no-forms>
-                <publish-confirmation>Tem a certeza que quer {0,choice,0#publicar|1#não publicar} {1,choice,1#um formulário|1&lt;{1,number,integer} formulários}?</publish-confirmation>
+                <publish-confirmation todo="true">Tem a certeza que quer {0,choice,0#publicar|1#não publicar|2#upgrade|3#delete} {1,choice,1#um formulário|1&lt;{1,number,integer} formulários}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
@@ -5793,6 +5815,8 @@
                 <navigate-new>Gå til ny</navigate-new>
                 <upgrade-local>Opgrader lokal blanket-definitioner</upgrade-local>
                 <upgrade-remote>Opgrader remote blanket-definitioner</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -5815,7 +5839,7 @@
             </titles>
             <messages>
                 <no-forms>Du har ikke adgang til nogen udsendte blanketter.</no-forms>
-                <publish-confirmation>Er du sikker på du vil {0,choice,0#offentliggøre|1#afpublisére} {1,choice,1#en blanket|1&lt;{1,number,integer} blanketter}?</publish-confirmation>
+                <publish-confirmation todo="true">Er du sikker på du vil {0,choice,0#offentliggøre|1#afpublisére|2#upgrade|3#delete} {1,choice,1#en blanket|1&lt;{1,number,integer} blanketter}?</publish-confirmation>
                 <reindexing-confirmation todo="true">[While reindexing, some features, like Form Runner summary pages, won't work as expected. As such, we recommend you perform reindexing while the system is offline. Are you sure you want to proceed with reindexing?]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
             </messages>
@@ -6291,6 +6315,8 @@
                 <navigate-new>Przejdź do nowych</navigate-new>
                 <upgrade-local>Aktualizuj lokalne definicje formularzy</upgrade-local>
                 <upgrade-remote>Aktualizuj zdalne definicje formularzy</upgrade-remote>
+                <delete-local todo="true">Delete local forms</delete-local>
+                <delete-remote todo="true">Delete remote forms</delete-remote>
                 <reencrypt>Ponownie zaszyfruj definicje formularzy</reencrypt>
                 <reload-resources todo="true">[Reload resources]</reload-resources>
             </buttons>
@@ -6313,7 +6339,7 @@
             </titles>
             <messages>
                 <no-forms>Nie masz dostępu do wdrożonych formularzy.</no-forms>
-                <publish-confirmation>Czy jesteś pewien, że chcesz {0,choice,0#opublikować|1#cofnąć publikację|2#zaktualizować} {1,choice,1#jeden formularz|1&lt;{1,number,integer} formularzy}?</publish-confirmation>
+                <publish-confirmation todo="true">Czy jesteś pewien, że chcesz {0,choice,0#opublikować|1#cofnąć publikację|2#zaktualizować|3#delete} {1,choice,1#jeden formularz|1&lt;{1,number,integer} formularzy}?</publish-confirmation>
                 <reindexing-confirmation>W trakcie reindeksacji niektóre funkcje, jak strony podsumowań Form Runner'a, mogą nie działać prawidłowo. Z tego powodu rekomendujemy, abyś wykonywał reindeksowanie, kiedy system jest offline. Czy jesteś pewien, że chcesz kontynuować reindeksację?</reindexing-confirmation>
                 <reencrypt-confirmation>Zalecamy ponowne szyfrowanie, gdy system jest w trybie offline. Czy na pewno chcesz kontynuować ponowne szyfrowanie?</reencrypt-confirmation>
             </messages>

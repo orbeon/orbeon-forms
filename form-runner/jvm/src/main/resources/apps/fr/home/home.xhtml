@@ -153,6 +153,9 @@
                     <local-upgrade-action/>
                     <remote-upgrade-action/>
 
+                    <local-delete-action/>
+                    <remote-delete-action/>
+
                     <local-unpublish-select/>
                     <local-publish-select/>
                     <remote-unpublish-select/>
@@ -197,6 +200,9 @@
                 <xf:bind ref="new-action"              readonly="not(count(xxf:split(../selection)) = 1 and frf:canNavigateNew(../selection, $forms))"/>
                 <xf:bind ref="local-upgrade-action"    readonly="not(exists($selection) and frf:canUpgradeLocal(../selection, $forms))"/>
                 <xf:bind ref="remote-upgrade-action"   readonly="not(exists($selection) and frf:canUpgradeRemote(../selection, $forms))"/>
+
+                <xf:bind ref="local-delete-action"     readonly="not(exists($selection) and (frf:canUnpublishLocal(../selection,  $forms) or frf:canPublishLocal(../selection,  $forms)))"/>
+                <xf:bind ref="remote-delete-action"    readonly="not(exists($selection) and (frf:canUnpublishRemote(../selection, $forms) or frf:canPublishRemote(../selection, $forms)))"/>
 
                 <xf:bind ref="local-unpublish-select"  readonly="not(frf:canSelectUnpublishedLocal(../selection, $forms))"/>
                 <xf:bind ref="local-publish-select"    readonly="not(frf:canSelectPublishedLocal(../selection, $forms))"/>
@@ -347,7 +353,8 @@
                     observer="fr-publish-local-button   fr-publish-remote-button
                               fr-unpublish-local-button fr-unpublish-remote-button
                               fr-local-to-remote-button fr-remote-to-local-button
-                              fr-upgrade-local-button   fr-upgrade-remote-button"
+                              fr-upgrade-local-button   fr-upgrade-remote-button
+                              fr-delete-local-button    fr-delete-remote-button"
                     type="xpath">
                 fr:run-process-by-name('oxf.fr.home.process', substring-before(substring-after(event('xxf:observerid'), 'fr-'), '-button'))
             </xf:action>
@@ -358,7 +365,8 @@
                     confirm-local-publish   confirm-local-unpublish
                     confirm-remote-publish  confirm-remote-unpublish
                     confirm-local-to-remote confirm-remote-to-local
-                    confirm-local-upgrade   confirm-remote-upgrade">
+                    confirm-local-upgrade   confirm-remote-upgrade
+                    confirm-local-delete    confirm-remote-delete">
 
                 <xf:var
                     name="fr-resources"
@@ -369,11 +377,14 @@
                     <xf:property
                         name="message"
                         value="xxf:format-message($fr-resources/home/messages/publish-confirmation, (
-                                   if (event('xxf:type') = ('confirm-local-upgrade', 'confirm-remote-upgrade'))
-                                   then 2
-                                   else if (event('xxf:type') = ('confirm-local-unpublish', 'confirm-remote-unpublish'))
-                                   then 1
-                                   else 0,
+                                   if (event('xxf:type') = ('confirm-local-delete', 'confirm-remote-delete')) then
+                                       3
+                                   else if (event('xxf:type') = ('confirm-local-upgrade', 'confirm-remote-upgrade')) then
+                                       2
+                                   else if (event('xxf:type') = ('confirm-local-unpublish', 'confirm-remote-unpublish')) then
+                                       1
+                                   else
+                                       0,
                                    count($selection)
                                ))"/>
                 </xxf:show>
@@ -385,14 +396,16 @@
                     local-publish   local-unpublish
                     remote-publish  remote-unpublish
                     local-to-remote remote-to-local
-                    local-upgrade   remote-upgrade">
+                    local-upgrade   remote-upgrade
+                    local-delete    remote-delete">
 
-                <xf:var name="local-read"              value="event('xxf:type') = ('local-publish',   'local-unpublish', 'local-to-remote', 'local-upgrade')"/>
-                <xf:var name="local-write"             value="event('xxf:type') = ('local-publish',   'local-unpublish', 'remote-to-local', 'local-upgrade')"/>
+                <xf:var name="local-read"              value="event('xxf:type') = ('local-publish',   'local-unpublish', 'local-to-remote', 'local-upgrade', 'local-delete')"/>
+                <xf:var name="local-write"             value="event('xxf:type') = ('local-publish',   'local-unpublish', 'remote-to-local', 'local-upgrade', 'local-delete')"/>
                 <xf:var name="toggle-to-publish"       value="event('xxf:type') = ('local-publish',   'remote-publish')"/>
                 <xf:var name="toggle-to-unpublish"     value="event('xxf:type') = ('local-unpublish', 'remote-unpublish')"/>
                 <xf:var name="force-attachments"       value="event('xxf:type') = ('local-to-remote', 'remote-to-local')"/>
                 <xf:var name="upgrade-form-definition" value="event('xxf:type') = ('local-upgrade',   'remote-upgrade')"/>
+                <xf:var name="delete"                  value="event('xxf:type') = ('local-delete',    'remote-delete')"/>
 
                 <!-- Invalidate all instances so we don't find stale component libraries in cache -->
                 <xxf:invalidate-instances/>
@@ -405,13 +418,14 @@
                     <xf:var name="form"         value="xxf:split(., '/')[2]"/>
                     <xf:var name="form-version" value="xxf:split(., '/')[3]"/>
 
+                    <!-- We don't strictly need to read when `DELETE`ing, except for adjusting the version? -->
                     <xf:send submission="read-form">
-                        <xf:property name="base-uri"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url"/>
+                        <xf:property name="base-uri"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
                         <xf:property name="app"          value="$app"/>
                         <xf:property name="form"         value="$form"/>
                         <xf:property name="form-version" value="$form-version"/>
-                        <xf:property name="username"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username"/>
-                        <xf:property name="password"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password"/>
+                        <xf:property name="username"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string()"/>
+                        <xf:property name="password"     value="if ($local-read) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string()"/>
                     </xf:send>
 
                     <xf:action if="instance()/error = ''">
@@ -434,17 +448,27 @@
                             name="new-available"
                             value="$toggle-to-publish or ($current-available and not($toggle-to-unpublish))"/>
 
-                        <xf:send if="instance()/error = ''" submission="publish-submission">
-                            <xf:property name="doc"                      value="instance('fr-form')"/>
-                            <xf:property name="document-id"              value="''"/>
-                            <xf:property name="form-definition-version"  value="$form-definition-version"/>
-                            <xf:property name="upgrade-form-definition"  value="$upgrade-form-definition"/>
-                            <xf:property name="remote-server-url"        value="if ($local-write) then () else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
-                            <xf:property name="username"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string() else ()"/>
-                            <xf:property name="password"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string() else ()"/>
-                            <xf:property name="force-attachments"        value="$force-attachments"/>
-                            <xf:property name="available"                value="$new-available"/>
-                        </xf:send>
+                        <xf:action if="instance()/error = ''">
+                            <xf:send if="not($delete)" submission="publish-submission">
+                                <xf:property name="doc"                      value="instance('fr-form')"/>
+                                <xf:property name="document-id"              value="''"/>
+                                <xf:property name="form-definition-version"  value="$form-definition-version"/>
+                                <xf:property name="upgrade-form-definition"  value="$upgrade-form-definition"/>
+                                <xf:property name="remote-server-url"        value="if ($local-write) then () else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
+                                <xf:property name="username"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string() else ()"/>
+                                <xf:property name="password"                 value="if (not($local-write)) then instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string() else ()"/>
+                                <xf:property name="force-attachments"        value="$force-attachments"/>
+                                <xf:property name="available"                value="$new-available"/>
+                            </xf:send>
+                            <xf:send if="$delete" submission="delete-submission">
+                                <xf:property name="base-uri"     value="if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/url/string()"/>
+                                <xf:property name="app"          value="$app"/>
+                                <xf:property name="form"         value="$form"/>
+                                <xf:property name="form-version" value="$form-definition-version"/>
+                                <xf:property name="username"     value="if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/username/string()"/>
+                                <xf:property name="password"     value="if ($local-write) then '' else instance()/remote-servers/remote-server[data(instance()/current-remote-server)]/password/string()"/>
+                            </xf:send>
+                        </xf:action>
 
                     </xf:action>
                 </xf:action>
@@ -459,7 +483,7 @@
                 id="publish-submission"
                 ref="event('doc')"
                 serialization="application/xml"
-                method="post"
+                method="POST"
                 resource="/fr/service/publish?document-id={
                         encode-for-uri(event('document-id'))
                     }&amp;form-definition-version={
@@ -484,12 +508,27 @@
                 <dummy/>
             </xf:instance>
 
+            <xf:submission
+                id="delete-submission"
+                serialization="none"
+                method="DELETE"
+                resource="{event('base-uri')}/fr/service/persistence/crud/{event('app')}/{event('form')}/form/form.xhtml"
+                xxf:username="{event('username')}"
+                xxf:password="{event('password')}"
+                replace="none">
+
+                <xf:header ref="event('form-version')[xxf:non-blank()]">
+                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                    <xf:value value="."/>
+                </xf:header>
+            </xf:submission>
+
             <!-- Form definition -->
             <xf:instance id="fr-form"><dummy/></xf:instance>
 
             <xf:submission
                 id="read-form"
-                method="get"
+                method="GET"
                 serialization="none"
                 resource="{event('base-uri')}/fr/service/persistence/crud/{event('app')}/{event('form')}/form/form.xhtml"
                 xxf:username="{event('username')}"
@@ -510,8 +549,8 @@
 
             </xf:submission>
 
-            <xf:action event="xforms-submit-error" observer="read-form publish-submission">
-
+            <xf:action event="xforms-submit-error" observer="read-form publish-submission delete-submission">
+	      
                 <xf:setvalue
                     ref="error"
                     value="'true'"/>
@@ -787,6 +826,17 @@
                                                 <xxf:invalidate-instance resource="/fr/service/i18n/fr-resources/{$app}/{$form}"/>
                                             </xf:action>
                                         </xf:action>
+                                    </xf:trigger>
+                                </li>
+                                <li role="presentation" class="divider"/>
+                                <li role="presentation" class="{if (xxf:readonly(local-delete-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="local-delete-action" id="fr-delete-local-button">
+                                        <xf:label ref="$fr-resources/home/buttons/delete-local"/>
+                                    </xf:trigger>
+                                </li>
+                                <li role="presentation" class="{if (xxf:readonly(remote-delete-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" role="menuitem" ref="remote-delete-action" id="fr-delete-remote-button">
+                                        <xf:label ref="$fr-resources/home/buttons/delete-remote"/>
                                     </xf:trigger>
                                 </li>
                             </ul>

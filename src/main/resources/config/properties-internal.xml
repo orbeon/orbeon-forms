@@ -445,6 +445,13 @@
     <property as="xs:string"  name="oxf.fr.home.process.upgrade-remote">
         xf:dispatch("confirm-remote-upgrade")   then suspend then xf:dispatch("remote-upgrade")
     </property>
+    <property as="xs:string"  name="oxf.fr.home.process.delete-local">
+        xf:dispatch("confirm-local-delete")    then suspend then xf:dispatch("local-delete")
+    </property>
+    <property as="xs:string"  name="oxf.fr.home.process.delete-remote">
+        xf:dispatch("confirm-remote-delete")   then suspend then xf:dispatch("remote-delete")
+    </property>
+
     <property as="xs:string"  name="oxf.fr.home.process.confirmation-ok">
         resume
     </property>

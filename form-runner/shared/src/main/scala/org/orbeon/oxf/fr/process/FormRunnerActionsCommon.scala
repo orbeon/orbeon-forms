@@ -29,7 +29,6 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.{PathUtils, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
@@ -51,6 +50,7 @@ trait FormRunnerActionsCommon {
   self =>
 
   def runningProcessId: Option[String]
+  def AllowedFormRunnerActions: Map[String, Action]
 
   protected val CommonAllowedFormRunnerActions: Map[String, Action] = Map(
     "pending-uploads"        -> tryPendingUploads,
@@ -379,6 +379,9 @@ trait FormRunnerActionsCommon {
         dispatch(name = "fr-expand", targetId = sectionId)
       }
     }
+}
+
+object FormRunnerActionsCommon {
 
   def findUrlsInstanceRootElem: Option[NodeInfo] =
     urlsInstance map (_.rootElement)

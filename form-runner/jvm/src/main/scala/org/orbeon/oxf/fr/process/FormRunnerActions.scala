@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.EscapeURI
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -68,9 +69,9 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         for {
           format    <- RenderedFormat.values.toList
           (path, _) <- pdfOrTiffPathOpt(
-              urlsInstanceRootElem = findUrlsInstanceRootElem.get,
+              urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
               format               = format,
-              pdfTemplateOpt       = findPdfTemplate(findFrFormAttachmentsRootElem, params, Some(currentFormLang)),
+              pdfTemplateOpt       = findPdfTemplate(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, Some(currentFormLang)),
               defaultLang          = currentFormLang
             )
         } yield
@@ -78,7 +79,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       recombineQuery(
         s"/fr/service/$app/$form/email/$document",
-        pdfTiffParams ::: createPdfOrTiffParams(findFrFormAttachmentsRootElem, params, currentFormLang)
+        pdfTiffParams ::: createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
       )
     } flatMap
       tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE)
@@ -283,7 +284,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       recombineQuery(
         s"/fr/$app/$form/$renderedFormatString/$document",
-        ("fr-rendered-filename" -> fullFilename) :: createPdfOrTiffParams(findFrFormAttachmentsRootElem, params, currentFormLang)
+        ("fr-rendered-filename" -> fullFilename) :: createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
       )
     } flatMap
       tryChangeMode(
@@ -292,6 +293,19 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         formTargetOpt      = Some("_blank"),
         responseIsResource = true
       )
+
+  def clearRenderedFormatsResources(): Try[Any] = Try {
+
+    val childElems = FormRunnerActionsCommon.findUrlsInstanceRootElem.toList child *
+
+    // Remove resource and temporary file if any
+    childElems map (_.stringValue) flatMap trimAllToOpt foreach { path =>
+      XFormsAssetServer.tryToRemoveDynamicResource(path, removeFile = true)
+    }
+
+    // Clear stored paths
+    delete(childElems)
+  }
 
   private val ParamsToExcludeUponModeChange = StateParamNames + DataFormatVersionName
 
@@ -339,10 +353,10 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     Try {
 
       val currentFormLang = FormRunner.currentLang
-      val pdfTemplateOpt  = findPdfTemplate(findFrFormAttachmentsRootElem, params, Some(currentFormLang))
+      val pdfTemplateOpt  = findPdfTemplate(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, Some(currentFormLang))
 
       pdfOrTiffPathOpt(
-        urlsInstanceRootElem = findUrlsInstanceRootElem.get,
+        urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
         format               = format,
         pdfTemplateOpt       = pdfTemplateOpt,
         defaultLang          = currentFormLang
@@ -355,7 +369,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
           val path =
             recombineQuery(
               s"/fr/service/$app/$form/${format.entryName}/$document",
-              createPdfOrTiffParams(findFrFormAttachmentsRootElem, params, currentFormLang)
+              createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
             )
 
           def processSuccessResponse() = {
@@ -364,7 +378,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
             val node =
               getOrCreatePdfTiffPathElemOpt(
-                urlsInstanceRootElem = findUrlsInstanceRootElem.get,
+                urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
                 format               = format,
                 pdfTemplateOpt       = pdfTemplateOpt,
                 defaultLang          = currentFormLang,

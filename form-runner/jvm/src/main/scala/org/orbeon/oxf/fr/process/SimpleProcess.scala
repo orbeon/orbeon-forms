@@ -33,6 +33,7 @@ import org.orbeon.scaxon.SimplePath._
 import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
+
 // Implementation of simple processes
 //
 // - A process is usually associated with a Form Runner button.
@@ -40,11 +41,15 @@ import scala.util.Try
 // - The property specifies a sequence of actions separated by combinators.
 // - Actions are predefined, but some of them are configurable.
 //
-object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFormsActions with Logging {
+object SimpleProcess
+  extends ProcessInterpreter
+     with FormRunnerActions
+     with XFormsActions
+     with Logging {
 
   implicit val logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("process")
 
-  override def extensionActions: Iterable[(String, SimpleProcess.Action)] = AllowedFormRunnerActions ++ AllowedXFormsActions
+  override def extensionActions: Iterable[(String, ProcessInterpreter.Action)] = AllowedFormRunnerActions ++ AllowedXFormsActions
 
   def currentXFormsDocumentId: String = XFormsAPI.inScopeContainingDocument.uuid
 

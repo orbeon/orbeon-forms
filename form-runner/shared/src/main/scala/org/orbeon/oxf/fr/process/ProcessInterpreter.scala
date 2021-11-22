@@ -42,8 +42,6 @@ trait ProcessInterpreter extends Logging {
 
   import ProcessInterpreter._
 
-  type Action       = ActionParams => Try[Any]
-
   val EmptyActionParams: ActionParams = Map.empty
 
   // Must be overridden by implementation
@@ -370,6 +368,7 @@ object ProcessInterpreter {
     )
 
   type ActionParams = Map[Option[String], String]
+  type Action       = ActionParams => Try[Any]
 
   def paramByName(params: ActionParams, name: String): Option[String] =
     params.get(Some(name))

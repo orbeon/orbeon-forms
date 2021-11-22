@@ -23,7 +23,6 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
-//import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.om.Item
 import org.orbeon.scaxon.Implicits._
@@ -44,7 +43,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
 
   implicit val logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("process")
 
-  override def extensionActions: Iterable[(String, SimpleProcess.Action)] = AllowedFormRunnerActions ++ AllowedXFormsActions
+  override def extensionActions: Iterable[(String, ProcessInterpreter.Action)] = AllowedFormRunnerActions ++ AllowedXFormsActions
 
   def currentXFormsDocumentId: String = XFormsAPI.inScopeContainingDocument.uuid
 

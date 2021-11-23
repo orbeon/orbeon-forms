@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory
-import org.orbeon.oxf.xforms.action.XFormsAPI.insert
+import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert}
 import org.orbeon.scaxon.SimplePath._
 
 
@@ -88,12 +88,14 @@ object GridDataMigration {
     pruneMetadata           : Boolean
   ): DocumentNodeInfoType = {
 
+    val appForm = AppForm(app, form)
+
     val dataFormatVersion =
       DataFormatVersion.withNameIncludeEdge(dataFormatVersionString)
 
     val migratedOrDuplicatedData =
       MigrationSupport.migrateDataWithFormMetadataMigrations(
-        appForm             = AppForm(app, form),
+        appForm             = appForm,
         data                = data,
         metadataRootElemOpt = metadataOpt.map(_.rootElement),
         srcVersion          = DataFormatVersion.Edge,
@@ -111,11 +113,16 @@ object GridDataMigration {
       }
 
     // Add `fr:data-format-version` attribute on the root element
-    insert(
-      into       = List(migratedOrDuplicatedData.rootElement),
-      origin     = List(NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, dataFormatVersion.entryName)),
-      doDispatch = false
-    )
+    if (appForm != AppForm.FormBuilder)
+      insert(
+        into       = List(migratedOrDuplicatedData.rootElement),
+        origin     = List(NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, dataFormatVersion.entryName)),
+        doDispatch = false
+      )
+    else
+      delete(
+        ref = migratedOrDuplicatedData.rootElement /@ XMLNames.FRDataFormatVersionQName
+      )
 
     migratedOrDuplicatedData
   }

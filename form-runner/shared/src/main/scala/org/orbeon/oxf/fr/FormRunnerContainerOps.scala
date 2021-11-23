@@ -105,7 +105,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
 
     val namesWithContainers =
       for {
-        container <- findAncestorContainersLeafToRoot(descendant, includeSelf).to(List)
+        container <- findAncestorContainersLeafToRoot(descendant, includeSelf).toList
         name      <- getControlNameOpt(container)
         if includeNonRepeatedGrids || ! (IsGrid(container) && ! isRepeat(container))
       } yield

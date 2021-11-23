@@ -214,7 +214,7 @@ object MigrationOps48 extends MigrationOps {
 
         val containerBindElem = frc.findBindByName(outerDocument, containerName).toList
 
-        val existingGridBindContent = (containerBindElem child *).to(List)
+        val existingGridBindContent = (containerBindElem child *).toList
 
         insert(
           into = containerBindElem,

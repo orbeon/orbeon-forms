@@ -174,13 +174,13 @@ object ToolboxOps {
 
   // TODO: Review these. They are probably not needed as of 2017-10-12.
   //@XPathFunction
-  def canInsertSection(inDoc: NodeInfo) = inDoc ne null
+  def canInsertSection(inDoc: NodeInfo): Boolean = inDoc ne null
 
   //@XPathFunction
-  def canInsertGrid   (inDoc: NodeInfo) = (inDoc ne null) && findSelectedCell(FormBuilderDocContext(inDoc)).isDefined
+  def canInsertGrid   (inDoc: NodeInfo): Boolean = (inDoc ne null) && findSelectedCell(FormBuilderDocContext(inDoc)).isDefined
 
   //@XPathFunction
-  def canInsertControl(inDoc: NodeInfo) = (inDoc ne null) && willEnsureEmptyCellSucceed(FormBuilderDocContext(inDoc))
+  def canInsertControl(inDoc: NodeInfo): Boolean = (inDoc ne null) && willEnsureEmptyCellSucceed(FormBuilderDocContext(inDoc))
 
   //@XPathFunction
   def insertNewSection(withGrid: Boolean): Some[NodeInfo] = {
@@ -1088,7 +1088,7 @@ object ToolboxOps {
       }
 
       // This can impact templates
-      updateTemplatesCheckContainers(findAncestorRepeatNames(insertCellElem).to(Set))
+      updateTemplatesCheckContainers(findAncestorRepeatNames(insertCellElem).toSet)
 
       InsertControl(newControlElem.id)
     }
@@ -1097,7 +1097,7 @@ object ToolboxOps {
   private object Private {
 
     // This is for `insertNewControl`
-    val LHHAResourceNamesToInsert: Set[String] = (LHHA.values.to(Set) - LHHA.Alert) map (_.entryName)
+    val LHHAResourceNamesToInsert: Set[String] = (LHHA.values.toSet - LHHA.Alert) map (_.entryName)
 
     // NOTE: Help is added when needed
     val lhhaTemplate: NodeInfo =

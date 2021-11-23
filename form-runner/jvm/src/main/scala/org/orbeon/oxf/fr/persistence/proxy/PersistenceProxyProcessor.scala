@@ -183,7 +183,7 @@ private object PersistenceProxyProcessor {
 
           List(removeNonRelevantTransform, decryptTransform).flatten
 
-        } else if (isDataXmlRequest && isFormBuilder || formOrData == FormOrData.Form) {
+        } else if (isDataXmlRequest && isFormBuilder) {
           maybeMigrateFormDefinition.toList
         } else {
           // Decrypt attachment if we're told to do so

@@ -13,12 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.datamigration._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI.{delete, insert}
 import org.orbeon.scaxon.SimplePath._
@@ -32,16 +30,26 @@ object GridDataMigration {
     form        : String,
     data        : DocumentNodeInfoType,
     metadataOpt : Option[DocumentNodeInfoType]
-  ): DocumentNodeInfoType =
-    MigrationSupport.migrateDataWithFormMetadataMigrations(
-      appForm             = AppForm(app, form),
-      data                = data,
-      metadataRootElemOpt = metadataOpt.map(_.rootElement),
-      srcVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
-      dstVersion          = DataFormatVersion.Edge,
-      pruneMetadata       = false
-    ) getOrElse
-      data
+  ): DocumentNodeInfoType = {
+
+    val appForm              = AppForm(app, form)
+    val dstDataFormatVersion = DataFormatVersion.Edge
+
+    val migratedOrDuplicatedData =
+      MigrationSupport.migrateDataWithFormMetadataMigrations(
+        appForm             = appForm,
+        data                = data,
+        metadataRootElemOpt = metadataOpt.map(_.rootElement),
+        srcVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
+        dstVersion          = dstDataFormatVersion,
+        pruneMetadata       = false
+      ) getOrElse
+        MigrationSupport.copyDocumentKeepInstanceData(data) // copy so we can handle `fr:data-format-version` below
+
+    updateDataFormatVersion(appForm, dstDataFormatVersion, migratedOrDuplicatedData)
+
+    migratedOrDuplicatedData
+  }
 
   // NOTE: Exposed to some users.
   //@XPathFunction
@@ -90,7 +98,7 @@ object GridDataMigration {
 
     val appForm = AppForm(app, form)
 
-    val dataFormatVersion =
+    val dstDataFormatVersion =
       DataFormatVersion.withNameIncludeEdge(dataFormatVersionString)
 
     val migratedOrDuplicatedData =
@@ -99,30 +107,12 @@ object GridDataMigration {
         data                = data,
         metadataRootElemOpt = metadataOpt.map(_.rootElement),
         srcVersion          = DataFormatVersion.Edge,
-        dstVersion          = dataFormatVersion,
+        dstVersion          = dstDataFormatVersion,
         pruneMetadata       = pruneMetadata
-      ) getOrElse {
-        // Make a copy as we only want to set the `fr:data-format-version` attribute on the migrated data
-        val originalDataClone = new DocumentWrapper(dom.Document(), null, XPath.GlobalConfiguration)
-        insert(
-          into                              = List(originalDataClone),
-          origin                            = List(data.rootElement),
-          removeInstanceDataFromClonedNodes = false // https://github.com/orbeon/orbeon-forms/issues/4911
-        )
-        originalDataClone
-      }
+      ) getOrElse
+        MigrationSupport.copyDocumentKeepInstanceData(data) // copy so we can handle `fr:data-format-version` below
 
-    // Add `fr:data-format-version` attribute on the root element
-    if (appForm != AppForm.FormBuilder)
-      insert(
-        into       = List(migratedOrDuplicatedData.rootElement),
-        origin     = List(NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, dataFormatVersion.entryName)),
-        doDispatch = false
-      )
-    else
-      delete(
-        ref = migratedOrDuplicatedData.rootElement /@ XMLNames.FRDataFormatVersionQName
-      )
+    updateDataFormatVersion(appForm, dstDataFormatVersion, migratedOrDuplicatedData)
 
     migratedOrDuplicatedData
   }
@@ -145,4 +135,21 @@ object GridDataMigration {
       dstVersion          = DataFormatVersion.Edge,
       pruneMetadata       = false
     )
+
+  private def updateDataFormatVersion(
+    appForm                  : AppForm,
+    dataFormatVersion        : DataFormatVersion,
+    migratedOrDuplicatedData : DocumentWrapper
+  ): Unit =
+    if (appForm != AppForm.FormBuilder)
+      insert(
+        into       = List(migratedOrDuplicatedData.rootElement),
+        origin     = List(NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, dataFormatVersion.entryName)),
+        doDispatch = false
+      )
+    else
+      delete(
+        ref        = migratedOrDuplicatedData.rootElement /@ XMLNames.FRDataFormatVersionQName,
+        doDispatch = false
+      )
 }

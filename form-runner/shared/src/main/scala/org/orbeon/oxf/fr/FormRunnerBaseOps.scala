@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
@@ -60,7 +60,7 @@ case class FormRunnerParams(
 object FormRunnerParams {
 
   def apply(): FormRunnerParams =
-    apply(parametersInstance.get.rootElement)
+    apply(frc.parametersInstance.get.rootElement)
 
   def apply(paramsRootElem: NodeInfo): FormRunnerParams = {
     FormRunnerParams(
@@ -84,6 +84,8 @@ object AppForm {
 }
 
 trait FormRunnerBaseOps {
+
+  import FormRunnerBaseOps._
 
   val LanguageParam          = "fr-language"
   val FormVersionParam       = "form-version"
@@ -220,11 +222,11 @@ trait FormRunnerBaseOps {
   def findTopLevelBindFromModelElem(modelElem: NodeInfo): Option[NodeInfo] =
     modelElem / XFBindTest find {
       // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
-      bind => TopLevelBindIds(bind.id) || bindRefOpt(bind).contains("instance('fr-form-instance')")
+      bind => TopLevelBindIds(bind.id) || frc.bindRefOpt(bind).contains("instance('fr-form-instance')")
     }
 
   def buildPropertyName(name: String)(implicit p: FormRunnerParams): String =
-    if (hasAppForm(p.app, p.form))
+    if (frc.hasAppForm(p.app, p.form))
       name :: p.app :: p.form :: Nil mkString "."
     else
       name
@@ -300,7 +302,7 @@ trait FormRunnerBaseOps {
   def formTitleFromMetadata: Option[String] =
     metadataInstance  map
       (_.rootElement) flatMap
-      (formTitleFromMetadataElem(_, currentLang))
+      (formTitleFromMetadataElem(_, frc.currentLang))
 
   //@XPathFunction
   def formTitleFromMetadataElem(metadataElem: NodeInfo, requestedLang: String): Option[String] =
@@ -373,14 +375,6 @@ trait FormRunnerBaseOps {
   def isEmbeddable: Boolean =
     inScopeContainingDocument.getRequestParameters.get(ExternalContext.EmbeddableParam) map (_.head) contains "true"
 
-  sealed trait MessageAppearance extends EnumEntry with Lowercase
-  object MessageAppearance extends Enum[MessageAppearance] {
-    val values: immutable.IndexedSeq[MessageAppearance] = findValues
-
-    case object Dialog    extends MessageAppearance
-    case object Ephemeral extends MessageAppearance
-  }
-
   // Display a success message
   // TODO: support `dialog` appearance, for symmetry with `error-message`
   //@XPathFunction
@@ -421,4 +415,13 @@ trait FormRunnerBaseOps {
   }
 }
 
-object FormRunnerBaseOps extends FormRunnerBaseOps
+object FormRunnerBaseOps extends FormRunnerBaseOps {
+
+  sealed trait MessageAppearance extends EnumEntry with Lowercase
+  object MessageAppearance extends Enum[MessageAppearance] {
+    val values: immutable.IndexedSeq[MessageAppearance] = findValues
+
+    case object Dialog    extends MessageAppearance
+    case object Ephemeral extends MessageAppearance
+  }
+}

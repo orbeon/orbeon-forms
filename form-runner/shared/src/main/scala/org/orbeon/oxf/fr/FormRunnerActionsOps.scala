@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr
 
 import cats.syntax.option._
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
@@ -509,9 +510,9 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
   ): Iterator[String] = {
 
     val namesWithIsRepeat =
-      FormRunner.findControlByName(inDoc, repeatedGridOrSectionName).toList  flatMap
-        (FormRunner.findAncestorContainersLeafToRoot(_, includeSelf = true)) map
-        (e => (FormRunner.controlNameFromId(e.id), FormRunner.isRepeat(e)))
+      frc.findControlByName(inDoc, repeatedGridOrSectionName).toList  flatMap
+        (frc.findAncestorContainersLeafToRoot(_, includeSelf = true)) map
+        (e => (frc.controlNameFromId(e.id), frc.isRepeat(e)))
 
     val repeatDepth = namesWithIsRepeat count (_._2)
 

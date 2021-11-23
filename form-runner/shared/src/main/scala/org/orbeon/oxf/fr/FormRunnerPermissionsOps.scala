@@ -13,12 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.externalcontext.{Credentials, Organization, UserAndGroup}
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
+import org.orbeon.oxf.externalcontext.{Credentials, Organization}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils._
@@ -21,6 +21,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
 import scala.collection.compat._
+
 
 class EmailTest
   extends DocumentTestBase
@@ -67,7 +68,7 @@ class EmailTest
         it(s"must pass with $classNames") {
 
           val (actualValues, actualPaths) = valuesForSearch {
-            searchControlsTopLevelOnly(
+            frc.searchControlsTopLevelOnly(
               body,
               Some(data),
               FormRunner.hasAllClassesPredicate(classNames.splitTo[List]())
@@ -92,7 +93,7 @@ class EmailTest
         it(s"must pass with $classNames") {
 
           val (actualValues, actualPaths) = valuesForSearch {
-            searchControlsUnderSectionTemplates(
+            frc.searchControlsUnderSectionTemplates(
               head,
               body,
               Some(data),

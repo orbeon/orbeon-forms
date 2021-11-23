@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 
@@ -21,12 +22,12 @@ trait FormRunnerDocContext {
 
   def formDefinitionRootElem: om.NodeInfo
 
-  lazy val modelElem             : om.NodeInfo         = FormRunner.getModelElem(formDefinitionRootElem)
-  lazy val dataInstanceElem      : om.NodeInfo         = FormRunner.instanceElemFromModelElem(modelElem, Names.FormInstance).get
-  lazy val metadataInstanceElem  : om.NodeInfo         = FormRunner.instanceElemFromModelElem(modelElem, Names.MetadataInstance).get
-  lazy val resourcesInstanceElem : om.NodeInfo         = FormRunner.instanceElemFromModelElem(modelElem, Names.FormResources).get
-  lazy val topLevelBindElem      : Option[om.NodeInfo] = FormRunner.findTopLevelBindFromModelElem(modelElem)
-  lazy val bodyElem              : om.NodeInfo         = FormRunner.getFormRunnerBodyElem(formDefinitionRootElem)
+  lazy val modelElem             : om.NodeInfo         = frc.getModelElem(formDefinitionRootElem)
+  lazy val dataInstanceElem      : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormInstance).get
+  lazy val metadataInstanceElem  : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.MetadataInstance).get
+  lazy val resourcesInstanceElem : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormResources).get
+  lazy val topLevelBindElem      : Option[om.NodeInfo] = frc.findTopLevelBindFromModelElem(modelElem)
+  lazy val bodyElem              : om.NodeInfo         = frc.getFormRunnerBodyElem(formDefinitionRootElem)
 
   lazy val dataRootElem          : om.NodeInfo         = dataInstanceElem      / * head
   lazy val metadataRootElem      : om.NodeInfo         = metadataInstanceElem  / * head

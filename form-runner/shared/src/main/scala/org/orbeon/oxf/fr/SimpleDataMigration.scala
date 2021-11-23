@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import cats.syntax.option._
 import enumeratum.EnumEntry.Lowercase
 import org.log4s
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.SimpleDataMigration.FormOps
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.http.StatusCode
@@ -95,7 +96,7 @@ object SimpleDataMigration {
       )
 
     maybeMigrated map {
-      case Left(_)  => FormRunner.sendError(StatusCode.InternalServerError) // TODO: Which error is best?
+      case Left(_)  => frc.sendError(StatusCode.InternalServerError) // TODO: Which error is best?
       case Right(v) => v
     }
   }
@@ -360,12 +361,12 @@ object SimpleDataMigration {
       implicit val formRunnerParams = FormRunnerParams()
 
       val behavior =
-        if (FormRunner.isDesignTime)
+        if (frc.isDesignTime)
           DataMigrationBehavior.Disabled
         else
-          FormRunner.metadataInstance map (_.rootElement)                          flatMap
-          (FormRunner.optionFromMetadataOrProperties(_, DataMigrationFeatureName)) flatMap
-          DataMigrationBehavior.withNameOption                                     getOrElse
+          frc.metadataInstance map (_.rootElement)                          flatMap
+          (frc.optionFromMetadataOrProperties(_, DataMigrationFeatureName)) flatMap
+          DataMigrationBehavior.withNameOption                              getOrElse
           DataMigrationBehavior.Disabled
 
       def isFeatureEnabled =
@@ -538,7 +539,7 @@ class ContainingDocumentOps(doc: XFormsContainingDocument, enclosingModelAbsolut
       for {
         instance   <- enclosingModel.instancesIterator
         instanceId = instance.getId
-        if FormRunner.isTemplateId(instanceId)
+        if frc.isTemplateId(instanceId)
       } yield
         instance.rootElement.localname -> instance.rootElement
     ).toMap

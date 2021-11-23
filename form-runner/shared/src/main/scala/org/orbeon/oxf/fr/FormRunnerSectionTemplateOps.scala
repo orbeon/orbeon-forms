@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import java.{util => ju}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
@@ -46,7 +47,7 @@ trait FormRunnerSectionTemplateOps {
       availableSectionTemplateXBLBindings(xblElems / fr.XMLNames.XBLBindingTest)
 
     bindingsForSectionTemplates map { binding =>
-      FormRunner.bindingFirstURIQualifiedName(binding) -> NodeInfoConversions.extractAsMutableDocument(binding)
+      frc.bindingFirstURIQualifiedName(binding) -> NodeInfoConversions.extractAsMutableDocument(binding)
     } toMap
   }
 
@@ -60,7 +61,7 @@ trait FormRunnerSectionTemplateOps {
   def controlMatchesNameAndLibrary(controlAbsoluteId: String, controlNames: ju.List[String], libraryName: String): Boolean = {
 
     val controlName =
-      FormRunner.controlNameFromIdOpt(XFormsId.getStaticIdFromId(XFormsId.absoluteIdToEffectiveId(controlAbsoluteId)))
+      frc.controlNameFromIdOpt(XFormsId.getStaticIdFromId(XFormsId.absoluteIdToEffectiveId(controlAbsoluteId)))
 
     def nameMatches =
       controlNames.asScala.exists(controlName.contains)
@@ -104,7 +105,7 @@ trait FormRunnerSectionTemplateOps {
       for {
         xblXblEl    <- publishedFormDoc.rootElement / fr.XMLNames.XHHeadTest / fr.XMLNames.XBLXBLTest
         xblBindings = xblXblEl / *
-        if xblBindings.exists(FormRunner.bindingFirstURIQualifiedName(_).uri == sectionTemplateNamespaceUri)
+        if xblBindings.exists(frc.bindingFirstURIQualifiedName(_).uri == sectionTemplateNamespaceUri)
       } yield
         xblXblEl
 
@@ -144,15 +145,15 @@ trait FormRunnerSectionTemplateOps {
     sectionNode child * find (e => matchesComponentURI(e.getURI))
 
   def isSectionWithTemplateContent(containerElem: NodeInfo): Boolean =
-    FormRunner.IsSection(containerElem) && (containerElem / * exists isSectionTemplateContent)
+    frc.IsSection(containerElem) && (containerElem / * exists isSectionTemplateContent)
 
   def isSectionTemplateContent(containerElem: NodeInfo): Boolean =
-    (containerElem parent * exists FormRunner.IsSection) &&
+    (containerElem parent * exists frc.IsSection) &&
       MatchesSectionTemplateUriRegex.findFirstIn(containerElem.namespaceURI).nonEmpty
 
   def sectionTemplateBindingName(section: NodeInfo): Option[URIQualifiedName] =
     section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption
 
   def findSectionsWithTemplates(view: NodeInfo) =
-    view descendant * filter FormRunner.IsSection filter (_ / * exists isSectionTemplateContent)
+    view descendant * filter frc.IsSection filter (_ / * exists isSectionTemplateContent)
 }

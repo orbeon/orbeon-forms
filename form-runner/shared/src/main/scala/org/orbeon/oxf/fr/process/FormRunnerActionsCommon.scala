@@ -13,22 +13,17 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.dom
-import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
+import org.orbeon.oxf.fr.{DataStatus, FormRunnerBaseOps, FormRunnerParams, FormRunnerPersistence, GridDataMigration, Names}
 import org.orbeon.oxf.fr.Names._
-import org.orbeon.oxf.fr._
-import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
-import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{PathUtils, XPath}
-import org.orbeon.oxf.xforms.NodeInfoFactory
+import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.actions.XXFormsUpdateValidityAction
@@ -94,7 +89,7 @@ trait FormRunnerActionsCommon {
       val controlId = paramByName(params, "control") getOrElse Names.ViewComponent
 
       // In case of explicit validation mode
-      if (formRunnerProperty("oxf.fr.detail.validation-mode")(FormRunnerParams()) contains "explicit") {
+      if (frc.formRunnerProperty("oxf.fr.detail.validation-mode")(FormRunnerParams()) contains "explicit") {
         inScopeContainingDocument.synchronizeAndRefresh()
         XFormsAPI.resolveAs[XFormsControl](controlId) foreach { control =>
           XXFormsUpdateValidityAction.updateValidity(control, recurse = true)
@@ -103,7 +98,7 @@ trait FormRunnerActionsCommon {
 
       inScopeContainingDocument.synchronizeAndRefresh()
 
-      if (countValidationsByLevel(level) > 0)
+      if (frc.countValidationsByLevel(level) > 0)
         throw new OXFException(s"Data has failed validations for level ${level.entryName}")
     }
 
@@ -135,7 +130,7 @@ trait FormRunnerActionsCommon {
   // It makes sense to update all calculations as needed before saving data
   // https://github.com/orbeon/orbeon-forms/issues/3591
   protected def ensureDataCalculationsAreUpToDate(): Unit =
-    formInstance.model.doRecalculateRevalidate()
+    frc.formInstance.model.doRecalculateRevalidate()
 
   def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
     Try {
@@ -146,7 +141,7 @@ trait FormRunnerActionsCommon {
       val isDraft       = booleanParamByName(params, "draft", default = false)
       val pruneMetadata = booleanParamByName(params, "prune-metadata", default = false)
       val queryXVT      = paramByName(params, "query")
-      val querySuffix   = queryXVT map evaluateValueTemplate map ('&' +) getOrElse ""
+      val querySuffix   = queryXVT map spc.evaluateValueTemplate map ('&' +) getOrElse ""
 
       // Notify that the data is about to be saved
       dispatch(name = "fr-data-save-prepare", targetId = FormModel)
@@ -158,23 +153,23 @@ trait FormRunnerActionsCommon {
           app                     = app,
           form                    = form,
           data                    = originalData,
-          metadataOpt             = metadataInstance.map(_.root),
+          metadataOpt             = frc.metadataInstance.map(_.root),
           dataFormatVersionString = databaseDataFormatVersion.entryName,
           pruneMetadata           = pruneMetadata
         )
 
       // Save
-      val (beforeURLs, afterURLs, _) = putWithAttachments(
-        liveData          = formInstance.root,
+      val (beforeURLs, afterURLs, _) = frc.putWithAttachments(
+        liveData          = frc.formInstance.root,
         migrate           = Some(maybeMigrateData),
         toBaseURI         = "", // local save
-        fromBasePaths     = List(createFormDataBasePath(app, form, ! isDraft, document) -> 1), // data is never versioned so `1`
-        toBasePath        = createFormDataBasePath(app, form,   isDraft, document),
+        fromBasePaths     = List(frc.createFormDataBasePath(app, form, ! isDraft, document) -> 1), // data is never versioned so `1`
+        toBasePath        = frc.createFormDataBasePath(app, form,   isDraft, document),
         filename          = "data.xml",
-        commonQueryString = s"valid=$dataValid&$DataFormatVersionName=${databaseDataFormatVersion.entryName}" + querySuffix,
+        commonQueryString = s"valid=${frc.dataValid}&$DataFormatVersionName=${databaseDataFormatVersion.entryName}" + querySuffix,
         forceAttachments  = false,
         formVersion       = Some(formVersion.toString),
-        workflowStage     = FormRunner.documentWorkflowStage
+        workflowStage     = frc.documentWorkflowStage
       )
 
       // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
@@ -201,7 +196,7 @@ trait FormRunnerActionsCommon {
     }
 
   def tryRelinquishLease(params: ActionParams): Try[Any] = Try {
-    val leaseState = persistenceInstance.rootElement / "lease-state"
+    val leaseState = frc.persistenceInstance.rootElement / "lease-state"
     if (leaseState.stringValue == "current-user") {
       send("fr-relinquish-lease-submission", Map.empty)(_ => ())
       setvalue(leaseState, "relinquished")
@@ -210,10 +205,10 @@ trait FormRunnerActionsCommon {
 
   def tryNewToEdit(params: ActionParams): Try[Any] = Try {
 
-    val modeElement = parametersInstance.get.rootElement / "mode"
+    val modeElement = frc.parametersInstance.get.rootElement / "mode"
     val isNew       = modeElement.stringValue == "new"
 
-    if (isNew && canUpdate) {
+    if (isNew && frc.canUpdate) {
       setvalue(modeElement, "edit")
       // Manual dependency HACK: RR fr-form-model as we have changed mode
       recalculate(FormModel)
@@ -225,40 +220,40 @@ trait FormRunnerActionsCommon {
     val isSafe  = paramByName(params, "status") map (_ == "safe") getOrElse true
     val isDraft = booleanParamByName(params, "draft", default = false)
 
-    val saveStatus     = if (isDraft) Seq.empty else persistenceInstance.rootElement / "data-status"
-    val autoSaveStatus = persistenceInstance.rootElement / "autosave" / "status"
+    val saveStatus     = if (isDraft) Seq.empty else frc.persistenceInstance.rootElement / "data-status"
+    val autoSaveStatus = frc.persistenceInstance.rootElement / "autosave" / "status"
 
     (saveStatus ++ autoSaveStatus) foreach
       (setvalue(_, if (isSafe) DataStatus.Clean.entryName else DataStatus.Dirty.entryName))
   }
 
   def trySetWorkflowStage(params: ActionParams): Try[Any] = Try {
-    val name = paramByNameOrDefault(params, "name").map(evaluateValueTemplate)
-    FormRunner.documentWorkflowStage = name
+    val name = paramByNameOrDefault(params, "name").map(spc.evaluateValueTemplate)
+    frc.documentWorkflowStage = name
     // Manual dependency HACK: RR fr-form-model, as it might use the stage that we just set
     recalculate(FormModel)
   }
 
-  private def messageFromResourceOrParam(params: ActionParams) = {
-    def fromResource = paramByNameOrDefault(params, "resource") map (k => currentFRResources / "detail" / "messages" / k stringValue)
+  private def messageFromResourceOrParam(params: ActionParams): Option[String] = {
+    def fromResource = paramByNameOrDefault(params, "resource") map (k => frc.currentFRResources / "detail" / "messages" / k stringValue)
     def fromParam    = paramByName(params, "message")
 
     fromResource orElse fromParam
   }
 
   def trySuccessMessage(params: ActionParams): Try[Any] =
-    Try(FormRunner.successMessage(messageFromResourceOrParam(params).map(evaluateValueTemplate).get))
+    Try(frc.successMessage(messageFromResourceOrParam(params).map(spc.evaluateValueTemplate).get))
 
   def tryErrorMessage(params: ActionParams): Try[Any] = {
-    val message    = messageFromResourceOrParam(params).map(evaluateValueTemplate).get
-    val appearance = paramByName(params, "appearance").map(MessageAppearance.withName).getOrElse(MessageAppearance.Dialog)
-    Try(FormRunner.errorMessage(message, appearance))
+    val message    = messageFromResourceOrParam(params).map(spc.evaluateValueTemplate).get
+    val appearance = paramByName(params, "appearance").map(FormRunnerBaseOps.MessageAppearance.withName).getOrElse(FormRunnerBaseOps.MessageAppearance.Dialog)
+    Try(frc.errorMessage(message, appearance))
   }
 
   def tryConfirm(params: ActionParams): Try[Any] =
     Try {
-      def defaultMessage = currentFRResources / "detail" / "messages" / "confirmation-dialog-message" stringValue
-      def message        = messageFromResourceOrParam(params).map(evaluateValueTemplate) getOrElse defaultMessage
+      def defaultMessage = frc.currentFRResources / "detail" / "messages" / "confirmation-dialog-message" stringValue
+      def message        = messageFromResourceOrParam(params).map(spc.evaluateValueTemplate) getOrElse defaultMessage
 
       show("fr-confirmation-dialog", Map("message" -> Some(message)))
     }
@@ -272,16 +267,16 @@ trait FormRunnerActionsCommon {
 
   def tryCaptcha(params: ActionParams): Try[Any] =
     Try {
-      if (showCaptcha) {
+      if (frc.showCaptcha) {
         dispatch(name = "fr-verify", targetId = "fr-captcha")
         dispatch(name = "fr-verify", targetId = "fr-view-component")
       }
     }
 
   private val StateParams = List[(String, (() => String, String => Boolean))](
-    LanguageParam    -> (() => currentLang,                             _ => false  ),
-    EmbeddableParam  -> (() => isEmbeddable.toString,                   _ == "true"),
-    FormVersionParam -> (() => FormRunnerParams().formVersion.toString, _ => false  )
+    frc.LanguageParam    -> (() => frc.currentLang, _ => false  ),
+    EmbeddableParam             -> (() => frc.isEmbeddable.toString,        _ == "true"),
+    frc.FormVersionParam -> (() => FormRunnerParams().formVersion.toString, _ => false  )
   )
 
   protected val StateParamNames = StateParams map (_._1) toSet
@@ -294,7 +289,7 @@ trait FormRunnerActionsCommon {
   //
   // We didn't use to propagate `fr-language`, as the current language is kept in the session. But this caused an issue,
   // see https://github.com/orbeon/orbeon-forms/issues/2110. So now we keep it when switching mode only.
-  protected def prependCommonFormRunnerParameters(pathQueryOrUrl: String, forNavigate: Boolean) =
+  protected def prependCommonFormRunnerParameters(pathQueryOrUrl: String, forNavigate: Boolean): String =
     if (! PathUtils.urlHasProtocol(pathQueryOrUrl)) { // heuristic, which might not always be a right guess?
 
       val (path, params) = splitQueryDecodeParams(pathQueryOrUrl)
@@ -330,10 +325,10 @@ trait FormRunnerActionsCommon {
 
       def fromProperties = {
         val propertyName =  params.get(Some("property")) orElse (params.get(None) filterNot isAbsolute) getOrElse "oxf.fr.detail.close.uri"
-        formRunnerProperty(propertyName)
+        frc.formRunnerProperty(propertyName)
       }
 
-      val location  = fromParams orElse fromProperties map evaluateValueTemplate flatMap trimAllToOpt get
+      val location  = fromParams orElse fromProperties map spc.evaluateValueTemplate flatMap trimAllToOpt get
       val targetOpt = params.get(Some("target")) flatMap trimAllToOpt
 
       (location, targetOpt)
@@ -352,7 +347,7 @@ trait FormRunnerActionsCommon {
   def tryExpandInvalidSections(params: ActionParams)  : Try[Any] =
     Try {
       ErrorSummary.sectionsWithVisibleErrors.foreach { sectionName =>
-        val sectionId = FormRunner.sectionId(sectionName)
+        val sectionId = frc.sectionId(sectionName)
         dispatch(name = "fr-expand", targetId = sectionId)
       }
     }
@@ -361,8 +356,8 @@ trait FormRunnerActionsCommon {
 object FormRunnerActionsCommon {
 
   def findUrlsInstanceRootElem: Option[NodeInfo] =
-    urlsInstance map (_.rootElement)
+    frc.urlsInstance map (_.rootElement)
 
   def findFrFormAttachmentsRootElem: Option[NodeInfo] =
-    formAttachmentsInstance map (_.rootElement)
+    frc.formAttachmentsInstance map (_.rootElement)
 }

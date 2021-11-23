@@ -3,6 +3,7 @@ package org.orbeon.oxf.fr.importexport
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, DataMigrationOp}
 import org.orbeon.oxf.fr.XMLNames.FRNamespace
 import org.orbeon.oxf.fr._
@@ -293,7 +294,7 @@ object ImportExportSupport {
 
   def controlIsReadonly(control: om.NodeInfo)(implicit ctx: FormRunnerDocContext): Boolean =
     FormRunner.searchControlBindPathHoldersInDoc(List(control), control, ctx.dataRootElem.some, _ => true).headOption exists {
-      case FormRunner.ControlBindPathHoldersResources(_, bind, _, _, _) => isBindReadonly(bind)
+      case ControlBindPathHoldersResources(_, bind, _, _, _) => isBindReadonly(bind)
     }
 
   def isBindReadonly(bind: om.NodeInfo)(implicit ctx: FormRunnerDocContext): Boolean =
@@ -307,9 +308,9 @@ object ImportExportSupport {
   def controlDetailsWithRelevantAndVisible(
     control : om.NodeInfo)(implicit
     ctx     : FormRunnerDocContext
-  ): Option[(FormRunner.ControlBindPathHoldersResources, Boolean)] =
+  ): Option[(ControlBindPathHoldersResources, Boolean)] =
     FormRunner.searchControlBindPathHoldersInDoc(List(control), ctx.formDefinitionRootElem, ctx.dataRootElem.some, _ => true).headOption map {
-      case cbphr @ FormRunner.ControlBindPathHoldersResources(_, bind, _, _, _) =>
+      case cbphr @ ControlBindPathHoldersResources(_, bind, _, _, _) =>
 
         val visible = {
           ! (control.namespaceURI == XMLNames.FR && control.localname == "hidden")  && // `fr:hidden`
@@ -324,7 +325,7 @@ object ImportExportSupport {
   def controlIsNonRelevantOrNonVisible(control: om.NodeInfo)(implicit ctx: FormRunnerDocContext): Boolean =
     controlIsHiddenWithCss(control) || {
       FormRunner.searchControlBindPathHoldersInDoc(List(control), ctx.formDefinitionRootElem, ctx.dataRootElem.some, _ => true).headOption exists {
-        case FormRunner.ControlBindPathHoldersResources(_, bind, _, _, _) =>
+        case ControlBindPathHoldersResources(_, bind, _, _, _) =>
           FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Relevant).contains(FormRunner.FalseExpr)
       }
     }
@@ -357,7 +358,7 @@ object ImportExportSupport {
         case (cellX, cellW, leafControl, multiple) =>
           controlDetailsWithRelevantAndVisible(leafControl) map ((cellX, cellW, _, multiple))
       } collect {
-        case (cellX, cellW, (FormRunner.ControlBindPathHoldersResources(leafControl, _, _, _, resources), true), multiple) =>
+        case (cellX, cellW, (ControlBindPathHoldersResources(leafControl, _, _, _, resources), true), multiple) =>
           (
             cellX,
             cellW,

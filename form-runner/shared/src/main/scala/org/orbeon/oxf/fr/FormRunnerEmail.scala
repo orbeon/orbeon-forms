@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import cats.syntax.option._
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
@@ -40,10 +41,10 @@ trait FormRunnerEmail {
     data       : NodeInfo,
     classNames : String
   ): SequenceIterator =
-    searchControlsTopLevelOnly(
+    frc.searchControlsTopLevelOnly(
       body      = body,
       data      = Option(data),
-      predicate = hasAllClassesPredicate(classNames.splitTo[List]())
+      predicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
     ) flatMap {
       case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
       case ControlBindPathHoldersResources(_, _, _, None,          _) => Nil
@@ -69,11 +70,11 @@ trait FormRunnerEmail {
     data       : NodeInfo,
     classNames : String
   ): SequenceIterator =
-    searchControlsUnderSectionTemplates(
+    frc.searchControlsUnderSectionTemplates(
       head      = head,
       body      = body,
       data      = Option(data),
-      predicate = hasAllClassesPredicate(classNames.splitTo[List]())
+      predicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
     ) flatMap {
       case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
       case ControlBindPathHoldersResources(_, _, _, None         , _) => Nil
@@ -85,7 +86,7 @@ trait FormRunnerEmail {
     val FormRunnerParams(app, form, version, documentOpt, _) = FormRunnerParams()
 
     val baseUrlNoSlash =
-      formRunnerStandaloneBaseUrl(
+      frc.formRunnerStandaloneBaseUrl(
         CoreCrossPlatformSupport.properties,
         CoreCrossPlatformSupport.externalContext.getRequest
       ).dropTrailingSlash
@@ -93,7 +94,7 @@ trait FormRunnerEmail {
     def build(mode: String, documentId: Option[String]) =
       recombineQuery(
         pathQuery = s"$baseUrlNoSlash/fr/$app/$form/$mode${documentId map ("/" +) getOrElse ""}",
-        params    = List(FormVersionParam -> version.toString)
+        params    = List(frc.FormVersionParam -> version.toString)
       )
 
     linkType match {

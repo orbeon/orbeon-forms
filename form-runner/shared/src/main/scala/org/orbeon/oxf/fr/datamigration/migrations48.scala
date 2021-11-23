@@ -14,11 +14,11 @@
 package org.orbeon.oxf.fr.datamigration
 
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
+import org.orbeon.oxf.fr.DataFormatVersion
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport._
-import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
@@ -212,7 +212,7 @@ object MigrationOps48 extends MigrationOps {
         val containerName = containerPath.last.value // `.last` as is never empty (`NEL`)
         val iterationName = iterationElem.value
 
-        val containerBindElem = findBindByName(outerDocument, containerName).toList
+        val containerBindElem = frc.findBindByName(outerDocument, containerName).toList
 
         val existingGridBindContent = (containerBindElem child *).to(List)
 
@@ -221,9 +221,9 @@ object MigrationOps48 extends MigrationOps {
           origin =
             elementInfo(
               XFormsBindQName,
-              attributeInfo("id",   FormRunner.bindId(iterationName)) ::
-                attributeInfo("ref",  iterationName) ::
-                attributeInfo("name", iterationName) ::
+              attributeInfo("id",   frc.bindId(iterationName)) ::
+                attributeInfo("ref",  iterationName)           ::
+                attributeInfo("name", iterationName)           ::
                 existingGridBindContent
             ),
           doDispatch = false
@@ -257,19 +257,19 @@ object MigrationOps48 extends MigrationOps {
   private object Private {
 
     def gridRepeatIterationName(grid: NodeInfo): String = {
-      val controlName = getControlName(grid)
-      if (isLegacyRepeat(grid))
-        defaultIterationName(controlName)
+      val controlName = frc.getControlName(grid)
+      if (frc.isLegacyRepeat(grid))
+        frc.defaultIterationName(controlName)
       else
-        findRepeatIterationName(grid, controlName).get
+        frc.findRepeatIterationName(grid, controlName).get
     }
 
     def migrationsForBinding(doc: DocumentNodeInfoType, legacyGridsOnly: Boolean): Seq[Migration48] =
       for {
         gridElem               <- if (legacyGridsOnly) findLegacyRepeatedGrids(doc) else findAllGrids(doc, repeat = true)
-        gridName               = getControlName(gridElem)
+        gridName               = frc.getControlName(gridElem)
         iterationName          = gridRepeatIterationName(gridElem)
-        BindPath(_, pathElems) <- findBindAndPathStatically(doc, gridName)
+        BindPath(_, pathElems) <- frc.findBindAndPathStatically(doc, gridName)
       } yield
         Migration48(pathElems, PathElem(iterationName))
 

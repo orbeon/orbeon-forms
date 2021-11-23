@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import java.util.{List => JList}
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
@@ -33,7 +34,6 @@ trait FormRunnerLang {
 
   // TEMP: Picked a different name or `fullOptJS` fails!
   import FormRunnerLangPrivate._
-  import FormRunner._
 
   // The client passes "*" or blank to indicate that there is no current app/form name
   def hasAppForm(app: String, form: String) = app != "*" && app.nonEmpty && form != "*" && form.nonEmpty
@@ -115,9 +115,9 @@ trait FormRunnerLang {
 
     val request = CoreCrossPlatformSupport.externalContext.getRequest
 
-    def fromHeader  = request.getFirstHeader       (LiferayLanguageHeader) map cleanLanguage
-    def fromRequest = request.getFirstParamAsString(LanguageParam)         map cleanLanguage
-    def fromSession = stringFromSession(request, LanguageParam)
+    def fromHeader  = request.getFirstHeader       (frc.LiferayLanguageHeader) map cleanLanguage
+    def fromRequest = request.getFirstParamAsString(frc.LanguageParam)         map cleanLanguage
+    def fromSession = stringFromSession(request, frc.LanguageParam)
 
     requestedLang.trimAllToOpt orElse
       fromHeader               orElse
@@ -177,7 +177,7 @@ trait FormRunnerLang {
 
     def stringFromSession(request: Request, name: String) =
       request.sessionOpt flatMap
-        (_.getAttribute(LanguageParam)) map {
+        (_.getAttribute(frc.LanguageParam)) map {
           case item: Item => item.getStringValue
           case other      => other.toString
         }

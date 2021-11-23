@@ -21,6 +21,7 @@ import org.orbeon.oxf.fb.FormBuilder.{findNestedContainers, _}
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
@@ -31,16 +32,15 @@ import org.orbeon.oxf.util.{NetUtils, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, _}
+import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xml.{SAXStore, TransformerUtils, XMLConstants}
-import org.orbeon.saxon.function.ScopeFunctionSupport
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames
-import org.orbeon.xforms.XFormsNames.{ID_QNAME, VALIDATION_QNAME}
+import org.orbeon.xforms.XFormsNames.ID_QNAME
 
 import scala.collection.compat._
 import scala.collection.mutable

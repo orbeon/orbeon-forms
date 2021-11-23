@@ -13,15 +13,16 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 
+
 object SchemaOps {
 
   def findSchema(inDoc: NodeInfo): Option[NodeInfo] =
-    getModelElem(inDoc) / XSSchemaTest headOption
+    frc.getModelElem(inDoc) / XSSchemaTest headOption
 
   def findSchemaNamespace(inDoc: NodeInfo): Option[String] =
     for {

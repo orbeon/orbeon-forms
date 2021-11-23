@@ -22,6 +22,7 @@ import org.orbeon.scaxon
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
@@ -271,7 +272,6 @@ trait FormRunnerPersistence {
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(FormRunnerPersistence.getClass))
 
   import FormRunnerPersistence._
-  import org.orbeon.oxf.fr.FormRunner._
 
   // Check whether a value correspond to an uploaded file
   //
@@ -489,15 +489,15 @@ trait FormRunnerPersistence {
   // We use instance('fr-error-summary-instance')/valid and not valid() because the instance validity may not be
   // reflected with the use of XBL components.
   def dataValid: Boolean =
-    errorSummaryInstance.rootElement / "valid" === "true"
+    frc.errorSummaryInstance.rootElement / "valid" === "true"
 
   // Return the number of failed validations captured by the error summary for the given level
   def countValidationsByLevel(level: ValidationLevel): Int =
-    (errorSummaryInstance.rootElement / "counts" /@ level.entryName stringValue).toInt
+    (frc.errorSummaryInstance.rootElement / "counts" /@ level.entryName stringValue).toInt
 
   // Return whether the data is saved
   def isFormDataSaved: Boolean =
-    persistenceInstance.rootElement / "data-status" === "clean"
+    frc.persistenceInstance.rootElement / "data-status" === "clean"
 
   // Return all nodes which refer to data attachments
   //@XPathFunction
@@ -511,7 +511,7 @@ trait FormRunnerPersistence {
 
     val unsavedAttachmentHolders =
       documentIdOpt match {
-        case Some(documentId) if isNewOrEditMode(mode) =>
+        case Some(documentId) if frc.isNewOrEditMode(mode) =>
           // NOTE: `basePath` is not relevant in our use of `collectAttachments` here, but
           // we don't just want to pass a magic string in. So we still compute `basePath`.
           val basePath = createFormDataBasePath(app, form, isDraft = false, documentId)
@@ -740,5 +740,5 @@ trait FormRunnerPersistence {
   }
 
   def userOwnsLeaseOrNoneRequired: Boolean =
-    persistenceInstance.rootElement / "lease-owned-by-current-user" === "true"
+    frc.persistenceInstance.rootElement / "lease-owned-by-current-user" === "true"
 }

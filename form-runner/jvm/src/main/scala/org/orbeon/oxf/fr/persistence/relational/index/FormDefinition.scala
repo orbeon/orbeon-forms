@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index
 
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner}
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+
 
 trait FormDefinition {
 
@@ -38,7 +40,7 @@ trait FormDefinition {
     val indexedControlBindPathHolders =
       FormRunner.searchControlsInFormByClass(formDoc, ClassesPredicate, databaseDataFormatVersion)
 
-    indexedControlBindPathHolders map { case FormRunner.ControlBindPathHoldersResources(control, bind, path, _, resources) =>
+    indexedControlBindPathHolders map { case ControlBindPathHoldersResources(control, bind, path, _, resources) =>
       IndexedControl(
         name      = FormRunner.getControlName(control),
         inSearch  = control.attClasses(FRSearch),

@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.Names.FormResources
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
@@ -27,7 +27,7 @@ trait FormRunnerResourcesOps {
   def allResources(resourcesRootElem: NodeInfo): Seq[NodeInfo] = resourcesRootElem child "resource"
 
   //@XPathFunction
-  def resourcesInstanceRootElemOpt(inDoc: NodeInfo): Option[NodeInfo] = inlineInstanceRootElem(inDoc, FormResources)
+  def resourcesInstanceRootElemOpt(inDoc: NodeInfo): Option[NodeInfo] = frc.inlineInstanceRootElem(inDoc, FormResources)
 
   def allLangsWithResources(resourcesRootElem: NodeInfo): Seq[(String, NodeInfo)] =
     allLangs(resourcesRootElem) zip allResources(resourcesRootElem)
@@ -60,7 +60,7 @@ trait FormRunnerResourcesOps {
 
   // Support for `<xf:instance id="" src=""/>`, only for Form Builder's Summary page
   private def resourcesInstanceDocFromUrlOpt(inDoc: NodeInfo): Option[NodeInfo] =
-    instanceElem(inDoc, FormResources) flatMap
+    frc.instanceElem(inDoc, FormResources) flatMap
       (_.attValueOpt("src"))           map
       readUrlAsImmutableXmlDocument    map
       (_.rootElement)

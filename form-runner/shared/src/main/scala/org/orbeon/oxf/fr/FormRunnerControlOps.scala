@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.{findMigrationForVersion, findMigrationOps}
 import org.orbeon.oxf.fr.datamigration.PathElem
@@ -47,15 +48,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   val TrueExpr : String = "true()"
   val FalseExpr: String = "false()"
 
-  // Extensible records would be cool here. see:
-  //
-  // - https://github.com/lampepfl/dotty/issues/964
-  // - https://github.com/milessabin/shapeless/wiki/Feature-overview:-shapeless-2.0.0#extensible-records
-  //
-  case class BindPath                       (                   bind: NodeInfo, path: List[PathElem]                         )
-  case class BindPathHolders                (                   bind: NodeInfo, path: List[PathElem], holders: Option[List[NodeInfo]])
-  case class ControlBindPathHoldersResources(control: NodeInfo, bind: NodeInfo, path: List[PathElem], holders: Option[List[NodeInfo]], resources: Seq[(String, NodeInfo)])
-
   def hasAllClassesPredicate(classNamesList: List[String])(control: NodeInfo): Boolean = {
     val controlClasses = control.attClasses
     classNamesList forall controlClasses.contains
@@ -74,7 +66,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     ControlOps.controlNameFromIdOpt(controlOrBindId).orNull
 
   //@XPathFunction
-  def controlNameFromIdOpt(controlOrBindId: String) =
+  def controlNameFromIdOpt(controlOrBindId: String): Option[String] =
     ControlOps.controlNameFromIdOpt(controlOrBindId)
 
   // Whether the given id is for a control (given its reserved suffix)
@@ -187,26 +179,26 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     formDoc           : DocumentNodeInfoType,
     classes           : Set[String],
     dataFormatVersion : DataFormatVersion
-  ): Seq[FormRunner.ControlBindPathHoldersResources] = {
+  ): Seq[ControlBindPathHoldersResources] = {
     val headOpt = (formDoc / "*:html" / "*:head").headOption
     val bodyOpt = (formDoc / "*:html" / "*:body").headOption
     val controlBindPathHoldersResourcesList =
       bodyOpt.toList flatMap { body =>
 
         val topLevelOnly =
-          FormRunner.searchControlsTopLevelOnly(
+          frc.searchControlsTopLevelOnly(
             body      = body,
             data      = None,
-            predicate = FormRunner.hasAnyClassPredicate(classes)
+            predicate = frc.hasAnyClassPredicate(classes)
           )
 
         val withSectionTemplatesOpt =
           headOpt map { head =>
-            FormRunner.searchControlsUnderSectionTemplates(
+            frc.searchControlsUnderSectionTemplates(
               head      = head,
               body      = body,
               data      = None,
-              predicate = FormRunner.hasAnyClassPredicate(classes)
+              predicate = frc.hasAnyClassPredicate(classes)
             )
           }
 
@@ -224,7 +216,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         // Find the migration functions once and for all
         val pathMigrationFunctions =
           for {
-            metadataElem <- FormRunner.metadataInstanceRootOpt(formDoc).toList
+            metadataElem <- frc.metadataInstanceRootOpt(formDoc).toList
             ops          <- migrationOpsToApply
             json         <- findMigrationForVersion(metadataElem, ops.version)
           } yield
@@ -257,7 +249,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     predicate : NodeInfo => Boolean
   ): Seq[ControlBindPathHoldersResources] =
     for {
-      section         <- FormRunner.findSectionsWithTemplates(body)
+      section         <- frc.findSectionsWithTemplates(body)
       sectionName     <- getControlNameOpt(section).toList
 
       BindPathHolders(
@@ -306,8 +298,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       ControlBindPathHoldersResources(control, bind, path, holders, resourceHoldersWithLang)
 
   def xblBindingForSection(head: NodeInfo, section: NodeInfo): Option[DocumentWrapper] = {
-    val mapping = FormRunner.sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
-    FormRunner.sectionTemplateBindingName(section) flatMap mapping.get
+    val mapping = frc.sectionTemplateXBLBindingsByURIQualifiedName(head / XBLXBLTest)
+    frc.sectionTemplateBindingName(section) flatMap mapping.get
   }
 
   // Return None if no namespace mapping is required OR none can be created

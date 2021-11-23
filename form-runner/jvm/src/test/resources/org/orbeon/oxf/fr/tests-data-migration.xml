@@ -150,7 +150,7 @@
                     <dynamic-state>
                         <instances>
                             <instance id="fr-test-submission-response" model-id="fr-form-model">
-                                <form>
+                                <form fr:data-format-version="4.0.0">
                                     <my-section>
                                         <control-1/>
                                         <control-2 xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:relevant="false"/>

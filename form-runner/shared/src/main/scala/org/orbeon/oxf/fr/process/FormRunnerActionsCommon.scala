@@ -153,38 +153,15 @@ trait FormRunnerActionsCommon {
 
       val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
 
-      def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType = {
-
-        val providerDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
-
-        val databaseData =
-          MigrationSupport.migrateDataWithFormMetadataMigrations(
-            appForm             = AppForm(app, form),
-            data                = originalData,
-            metadataRootElemOpt = metadataInstance.map(_.rootElement),
-            srcVersion          = DataFormatVersion.Edge,
-            dstVersion          = providerDataFormatVersion,
-            pruneMetadata       = pruneMetadata
-          ) getOrElse {
-            // Make a copy as we only want to set the `fr:data-format-version` attribute on the migrated data
-            val originalDataClone = new DocumentWrapper(dom.Document(), null, XPath.GlobalConfiguration)
-            insert(
-              into                              = originalDataClone,
-              origin                            = originalData child *,
-              removeInstanceDataFromClonedNodes = false // https://github.com/orbeon/orbeon-forms/issues/4911
-            )
-            originalDataClone
-          }
-
-        // Add `data-format-version` attribute on the root element
-        insert(
-          into       = databaseData / *,
-          origin     = NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, providerDataFormatVersion.entryName),
-          doDispatch = false
+      def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType =
+        GridDataMigration.dataMaybeMigratedFromEdge(
+          app                     = app,
+          form                    = form,
+          data                    = originalData,
+          metadataOpt             = metadataInstance.map(_.root),
+          dataFormatVersionString = databaseDataFormatVersion.entryName,
+          pruneMetadata           = pruneMetadata
         )
-
-        databaseData
-      }
 
       // Save
       val (beforeURLs, afterURLs, _) = putWithAttachments(

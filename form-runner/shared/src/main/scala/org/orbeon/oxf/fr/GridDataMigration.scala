@@ -13,12 +13,15 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.datamigration._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.xforms.NodeInfoFactory
+import org.orbeon.oxf.xforms.action.XFormsAPI.insert
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsId
 
 
 object GridDataMigration {
@@ -83,16 +86,39 @@ object GridDataMigration {
     metadataOpt             : Option[DocumentNodeInfoType],
     dataFormatVersionString : String,
     pruneMetadata           : Boolean
-  ): DocumentNodeInfoType =
-    MigrationSupport.migrateDataWithFormMetadataMigrations(
-      appForm             = AppForm(app, form),
-      data                = data,
-      metadataRootElemOpt = metadataOpt.map(_.rootElement),
-      srcVersion          = DataFormatVersion.Edge,
-      dstVersion          = DataFormatVersion.withNameIncludeEdge(dataFormatVersionString),
-      pruneMetadata       = pruneMetadata
-    ) getOrElse
-      data
+  ): DocumentNodeInfoType = {
+
+    val dataFormatVersion =
+      DataFormatVersion.withNameIncludeEdge(dataFormatVersionString)
+
+    val migratedOrDuplicatedData =
+      MigrationSupport.migrateDataWithFormMetadataMigrations(
+        appForm             = AppForm(app, form),
+        data                = data,
+        metadataRootElemOpt = metadataOpt.map(_.rootElement),
+        srcVersion          = DataFormatVersion.Edge,
+        dstVersion          = dataFormatVersion,
+        pruneMetadata       = pruneMetadata
+      ) getOrElse {
+        // Make a copy as we only want to set the `fr:data-format-version` attribute on the migrated data
+        val originalDataClone = new DocumentWrapper(dom.Document(), null, XPath.GlobalConfiguration)
+        insert(
+          into                              = List(originalDataClone),
+          origin                            = List(data.rootElement),
+          removeInstanceDataFromClonedNodes = false // https://github.com/orbeon/orbeon-forms/issues/4911
+        )
+        originalDataClone
+      }
+
+    // Add `fr:data-format-version` attribute on the root element
+    insert(
+      into       = List(migratedOrDuplicatedData.rootElement),
+      origin     = List(NodeInfoFactory.attributeInfo(XMLNames.FRDataFormatVersionQName, dataFormatVersion.entryName)),
+      doDispatch = false
+    )
+
+    migratedOrDuplicatedData
+  }
 
   //@XPathFunction
   def dataMigratedToEdgeOrEmpty(

@@ -585,7 +585,7 @@ trait FormRunnerPersistence {
 
   def putWithAttachments(
     liveData          : DocumentNodeInfoType,
-    migrate           : Option[DocumentNodeInfoType => DocumentNodeInfoType],
+    migrate           : Option[DocumentNodeInfoType => DocumentNodeInfoType], // 2021-11-22: only from `trySaveAttachmentsAndData`
     toBaseURI         : String,
     fromBasePaths     : Iterable[(String, Int)],
     toBasePath        : String,

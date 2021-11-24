@@ -45,10 +45,10 @@
     <xsl:variable name="is-editable"              select="exists($edit-ref)"/>
 
     <!-- Determine whether we use the 12-column layout by the presence of a nested `<fr:c>` -->
-    <xsl:variable name="is-12col-input"           select="exists($root/fr:c)"/>
+    <xsl:variable name="is-12or24col-input"       select="exists($root/fr:c)"/>
 
     <!-- NOTE: Later, CSS grids can be used at runtime too -->
-    <xsl:variable name="use-css-grids-output"     select="$is-12col-input and $is-editable"/>
+    <xsl:variable name="use-css-grids-output"     select="$is-12or24col-input and $is-editable"/>
 
     <xsl:variable name="apply-defaults"           select="$root/@apply-defaults = 'true'"/>
 
@@ -65,7 +65,7 @@
         name="rows-array"
         xmlns:cell="java:org.orbeon.oxf.fr.NodeInfoCell"
         select="
-            if ($is-12col-input) then
+            if ($is-12or24col-input) then
                 cell:analyze12ColumnGridAndFillHoles($root, not($use-css-grids-output))
             else
                 cell:analyzeTrTdGridAndFillHoles($root, false())
@@ -74,7 +74,7 @@
     <xsl:variable
         name="grid-rows-if-not-12col-input"
         select="
-            if ($is-12col-input) then
+            if ($is-12or24col-input) then
                 ()
             else
                 ($root/*:body, $root/self::*)[1]/*:tr

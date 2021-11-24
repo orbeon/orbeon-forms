@@ -8,7 +8,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence.findFormDefinitionFormatFromStrin
 import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
-import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunnerDocContext, FormRunnerTemplatesOps}
+import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunnerDocContext, FormRunnerTemplatesOps, GridDataMigration}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, URLRewriterUtils, XPath}
@@ -75,6 +75,8 @@ object Transforms {
     externalContext : ExternalContext
   ): (InputStream, OutputStream) => Unit = {
 
+    val appForm = AppForm(app, form)
+
       // We are explicitly asked to downgrade a form definition format
       // The database may contain a form definition in any format
 
@@ -88,7 +90,7 @@ object Transforms {
           val formDefinitionRootElem: NodeInfo = formDoc.rootElement
         }
 
-        val componentBindings = loadComponentBindings(AppForm(app, form), frDocCtx)
+        val componentBindings = loadComponentBindings(appForm, frDocCtx)
 
         val migrationsFromForm =
           new MigrationsFromForm(
@@ -112,12 +114,17 @@ object Transforms {
               (_.stringValue)
           ) getOrElse DataFormatVersion.V480
 
+        val dataRootElem =
+          frDocCtx.dataRootElem.asInstanceOf[NodeWrapper]
+
         MigrationSupport.migrateDataInPlace(
-          dataRootElem     = frDocCtx.dataRootElem.asInstanceOf[NodeWrapper],
+          dataRootElem     = dataRootElem,
           srcVersion       = srcVersionFromMetadataOrGuess,
           dstVersion       = dstVersion,
           findMigrationSet = migrationsFromForm
         )
+
+        GridDataMigration.updateDataFormatVersionInPlace(appForm, dstVersion, dataRootElem)
 
         // 3. Migrate other aspects such as binds and controls
         MigrationSupport.migrateOtherInPlace(

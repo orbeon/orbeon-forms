@@ -206,16 +206,13 @@
                     context="xxf:instance('fr-form-instance')/root()"
                     origin="
                         let $format-migrated :=
-                            (
-                                grid-migration:dataMigratedToEdgeOrEmpty(
-                                    $app,
-                                    $form,
-                                    $form-data,
-                                    xxf:instance('fr-form-metadata')/root(),
-                                    xxf:get-request-parameter('data-format-version')
-                                ),
-                                $form-data
-                            )[1]/root()/*,
+                            grid-migration:dataMigratedToEdge(
+                                $app,
+                                $form,
+                                $form-data,
+                                xxf:instance('fr-form-metadata')/root(),
+                                xxf:get-request-parameter('data-format-version')
+                            )/root()/*,
                         $simply-migrated :=
                             simple-migration:dataMaybeWithSimpleMigration(
                                 xxf:absolute-id('fr-form-model'),
@@ -833,12 +830,11 @@
 
         <xf:action if="$is-xml">
 
-            <!-- Will be `()` if there is no metadata or no migration map -->
             <xf:var
-                name="body-migrated-opt"
-                as="document-node()?"
+                name="body-migrated"
+                as="document-node()"
                 value="
-                    grid-migration:dataMigratedToEdgeOrEmpty(
+                    grid-migration:dataMigratedToEdge(
                         $app,
                         $form,
                         $body/root(),
@@ -848,12 +844,12 @@
 
             <!-- Be consistent with `fr-get-document-submission` -->
             <xf:delete
-                ref="$body-migrated-opt//(@xxf:relevant, @fr:relevant)"/>
+                ref="$body-migrated//(@xxf:relevant, @fr:relevant)"/>
 
             <!-- See https://github.com/orbeon/orbeon-forms/issues/3935 -->
             <xf:insert
                 context="xxf:instance('fr-form-instance')/root()"
-                origin="($body-migrated-opt, $body/root())[1]"/>
+                origin="$body-migrated"/>
 
         </xf:action>
         <xf:action if="not($is-xml)">

@@ -96,10 +96,8 @@ object GridDataMigration {
     pruneMetadata           : Boolean
   ): DocumentNodeInfoType = {
 
-    val appForm = AppForm(app, form)
-
-    val dstDataFormatVersion =
-      DataFormatVersion.withNameIncludeEdge(dataFormatVersionString)
+    val appForm              = AppForm(app, form)
+    val dstDataFormatVersion = DataFormatVersion.withNameIncludeEdge(dataFormatVersionString)
 
     val migratedOrDuplicatedData =
       MigrationSupport.migrateDataWithFormMetadataMigrations(
@@ -118,23 +116,34 @@ object GridDataMigration {
   }
 
   //@XPathFunction
-  def dataMigratedToEdgeOrEmpty(
+  def dataMigratedToEdge(
     app                     : String,
     form                    : String,
     data                    : DocumentNodeInfoType,
     metadataOpt             : Option[DocumentNodeInfoType],
     dataFormatVersionString : String
-  ): Option[DocumentWrapper] =
-    MigrationSupport.migrateDataWithFormMetadataMigrations(
-      appForm             = AppForm(app, form),
-      data                = data,
-      metadataRootElemOpt = metadataOpt.map(_.rootElement),
-      srcVersion          = dataFormatVersionString.trimAllToOpt    map
-                              DataFormatVersion.withNameIncludeEdge getOrElse
-                              DataFormatVersion.V400,
-      dstVersion          = DataFormatVersion.Edge,
-      pruneMetadata       = false
-    )
+  ): DocumentWrapper = {
+
+    val appForm              = AppForm(app, form)
+    val dstDataFormatVersion = DataFormatVersion.Edge
+
+    val migratedOrDuplicatedData =
+      MigrationSupport.migrateDataWithFormMetadataMigrations(
+        appForm             = appForm,
+        data                = data,
+        metadataRootElemOpt = metadataOpt.map(_.rootElement),
+        srcVersion          = dataFormatVersionString.trimAllToOpt    map
+                                DataFormatVersion.withNameIncludeEdge getOrElse
+                                DataFormatVersion.V400,
+        dstVersion          = dstDataFormatVersion,
+        pruneMetadata       = false
+      ) getOrElse
+        MigrationSupport.copyDocumentKeepInstanceData(data) // copy so we can handle `fr:data-format-version` below
+
+    updateDataFormatVersion(appForm, dstDataFormatVersion, migratedOrDuplicatedData)
+
+    migratedOrDuplicatedData
+  }
 
   private def updateDataFormatVersion(
     appForm                  : AppForm,

@@ -35,7 +35,7 @@ class SendTest
     val Expected =
       List(
         (DataFormatVersion.V400, false, true) ->
-          <form>
+          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
             <section-1>
               <control-1.1/>
               <grid-1>
@@ -50,7 +50,7 @@ class SendTest
             </section-2>
           </form>,
         (DataFormatVersion.V400, true, true) ->
-          <form>
+          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
             <section-1>
               <control-1.1/>
               <grid-1>
@@ -59,7 +59,7 @@ class SendTest
             </section-1>
           </form>,
         (DataFormatVersion.Edge, false, true) ->
-          <form>
+          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
             <section-1>
               <control-1.1/>
               <grid-1>
@@ -78,7 +78,7 @@ class SendTest
             </section-2>
           </form>,
         (DataFormatVersion.Edge, true, true) ->
-          <form>
+          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
             <section-1>
               <control-1.1/>
               <grid-1>
@@ -89,7 +89,7 @@ class SendTest
             </section-1>
           </form>,
         (DataFormatVersion.V400, false, false) ->
-          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
             <section-1>
               <control-1.1 fr:foo="42"/>
               <grid-1>
@@ -105,7 +105,7 @@ class SendTest
             <fr:metadata/>
           </form>,
         (DataFormatVersion.V400, true, false) ->
-          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
             <section-1>
               <control-1.1 fr:foo="42"/>
               <grid-1>
@@ -115,7 +115,7 @@ class SendTest
             <fr:metadata/>
           </form>,
         (DataFormatVersion.Edge, false, false) ->
-          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
             <section-1>
               <control-1.1 fr:foo="42"/>
               <grid-1>
@@ -135,7 +135,7 @@ class SendTest
             <fr:metadata/>
           </form>,
         (DataFormatVersion.Edge, true, false) ->
-          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
             <section-1>
               <control-1.1 fr:foo="42"/>
               <grid-1>

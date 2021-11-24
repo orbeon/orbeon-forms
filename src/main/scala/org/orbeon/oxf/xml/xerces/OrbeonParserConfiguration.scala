@@ -40,8 +40,8 @@ class OrbeonParserConfiguration(val parserConfiguration: ParserConfiguration)
     fXIncludeHandler = new org.orbeon.apache.xerces.xinclude.XIncludeHandler
     setProperty(XIncludeAwareParserConfiguration.XINCLUDE_HANDLER, fXIncludeHandler)
     addCommonComponent(fXIncludeHandler)
-  }
-  else super.setFeature(XIncludeAwareParserConfiguration.XINCLUDE_FEATURE, false)
+  } else
+    super.setFeature(XIncludeAwareParserConfiguration.XINCLUDE_FEATURE, false)
 
 
   // Used by our XercesSAXParserFactoryImpl

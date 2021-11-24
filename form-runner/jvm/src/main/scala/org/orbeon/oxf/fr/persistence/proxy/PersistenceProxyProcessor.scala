@@ -153,7 +153,7 @@ private object PersistenceProxyProcessor {
       NetUtils.encodeQueryString(request.getParameterMap)
     )
 
-    def maybeMigrateFormDefinition =
+    def maybeMigrateFormDefinition: Option[(InputStream, OutputStream) => Unit] =
       request.getFirstParamAsString(FormDefinitionFormatVersionName).map(DataFormatVersion.withName) map { dstVersion =>
         Transforms.migrateFormDefinition(
           dstVersion,

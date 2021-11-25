@@ -111,6 +111,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         def valid             : Boolean = FormRunner.dataValid
         def language          : String  = FormRunner.currentLang
         def dataFormatVersion : String  = findParamValue(DataFormatVersionName) map evaluateValueTemplate get
+        def workflowStage     : String  = FormRunner.documentWorkflowStage.getOrElse("")
       }
 
       // Append query parameters to the URL and evaluate XVTs

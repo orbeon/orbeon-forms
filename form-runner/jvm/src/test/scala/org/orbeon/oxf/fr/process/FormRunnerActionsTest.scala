@@ -13,24 +13,25 @@
  */
 package org.orbeon.oxf.fr.process
 
-import org.orbeon.oxf.fr.DataFormatVersion
 import org.orbeon.oxf.util.StringUtils._
 import org.scalatest.funspec.AnyFunSpec
+
 
 class FormRunnerActionsTest extends AnyFunSpec{
 
   describe("URL update when sending or changing mode") {
 
     object SendProcessParams extends ProcessParams {
-        def runningProcessId  : String  = "123456789"
-        def app               : String  = "acme"
-        def form              : String  = "order"
-        def formVersion       : Int     = 42
-        def document          : String  = "b77484136e0d4631908adba3e42ebe44fa224ed2"
-        def valid             : Boolean = true
-        def language          : String  = "fr"
-        def dataFormatVersion : String  = "edge"
-      }
+      def runningProcessId  : String  = "123456789"
+      def app               : String  = "acme"
+      def form              : String  = "order"
+      def formVersion       : Int     = 42
+      def document          : String  = "b77484136e0d4631908adba3e42ebe44fa224ed2"
+      def valid             : Boolean = true
+      def language          : String  = "fr"
+      def dataFormatVersion : String  = "edge"
+      def workflowStage     : String  = "initial"
+    }
 
     val ServerBase = "https://example.org/"
 
@@ -44,14 +45,14 @@ class FormRunnerActionsTest extends AnyFunSpec{
       (
         "without parameters in the original URL",
         s"$ServerBase",
-        "process app form form-version document valid language data-format-version",
-        s"$ServerBase?process=123456789&app=acme&form=order&form-version=42&document=b77484136e0d4631908adba3e42ebe44fa224ed2&valid=true&language=fr&data-format-version=edge"
+        "process app form form-version document valid language data-format-version workflow-stage",
+        s"$ServerBase?process=123456789&app=acme&form=order&form-version=42&document=b77484136e0d4631908adba3e42ebe44fa224ed2&valid=true&language=fr&data-format-version=edge&workflow-stage=initial"
       ),
       (
         "with parameters in the original URL",
         s"$ServerBase?form-version=2&language=en",
-        "process app form form-version document valid language data-format-version",
-        s"$ServerBase?process=123456789&app=acme&form=order&document=b77484136e0d4631908adba3e42ebe44fa224ed2&valid=true&data-format-version=edge&form-version=2&language=en"
+        "process app form form-version document valid language data-format-version workflow-stage",
+        s"$ServerBase?process=123456789&app=acme&form=order&document=b77484136e0d4631908adba3e42ebe44fa224ed2&valid=true&data-format-version=edge&workflow-stage=initial&form-version=2&language=en"
       )
     )
 
@@ -68,5 +69,4 @@ class FormRunnerActionsTest extends AnyFunSpec{
         assert(expected === actual)
       }
   }
-
 }

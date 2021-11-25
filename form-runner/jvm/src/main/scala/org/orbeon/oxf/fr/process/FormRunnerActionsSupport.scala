@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.fr.FormRunner.FormVersionParam
 import org.orbeon.oxf.fr.FormRunnerPersistence._
+import org.orbeon.oxf.fr.Names
 import org.orbeon.oxf.util.PathUtils.{recombineQuery, splitQueryDecodeParams}
 
 trait ProcessParams {
@@ -26,11 +27,12 @@ trait ProcessParams {
   def valid             : Boolean
   def language          : String
   def dataFormatVersion : String
+  def workflowStage     : String
 }
 
 object FormRunnerActionsSupport {
 
-  def paramsToAppend(processParams: ProcessParams, paramNames: List[String]): List[(String, String)] =
+  private def paramsToAppend(processParams: ProcessParams, paramNames: List[String]): List[(String, String)] =
     paramNames collect {
       case name @ "process"             => name -> processParams.runningProcessId
       case name @ "app"                 => name -> processParams.app
@@ -40,6 +42,7 @@ object FormRunnerActionsSupport {
       case name @ "valid"               => name -> processParams.valid.toString
       case name @ "language"            => name -> processParams.language
       case name @ DataFormatVersionName => name -> processParams.dataFormatVersion
+      case name @ Names.WorkflowStage   => name -> processParams.workflowStage
     }
 
   def updateUriWithParams(processParams: ProcessParams, uri: String, requestedParamNames: List[String]): String = {

@@ -32,6 +32,7 @@
                 <xf:var name="form" value="xxf:binding('fb-dialog-control-settings')"/>
 
                 <xf:action type="xpath">fbf:selectCellForControlId(event('control-id'))</xf:action>
+                <xf:action type="javascript">ORBEON.builder.private.API.moveFocusedCellIntoView();</xf:action>
 
                 <!-- Clear all local values -->
                 <xf:setvalue iterate="$i//*[not(*)] | $i/*//@*" ref="."/>

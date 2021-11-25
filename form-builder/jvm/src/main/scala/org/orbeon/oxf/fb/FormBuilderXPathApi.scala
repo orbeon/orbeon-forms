@@ -157,7 +157,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def selectCellForControlId(controlId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlId)).to(List) flatMap
+    FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlId)).toList flatMap
       (_ parent CellTest) foreach selectCell
   }
 

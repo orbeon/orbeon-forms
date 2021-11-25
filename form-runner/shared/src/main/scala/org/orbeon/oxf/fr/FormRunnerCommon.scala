@@ -21,10 +21,10 @@ object FormRunnerCommon {
 
   // Extensible records would be cool here. see:
   //
-  // - https://github.com/lampepfl/dotty/issues/964
+  // - https://github.com/lampepfl/dotty-feature-requests/issues/8
   // - https://github.com/milessabin/shapeless/wiki/Feature-overview:-shapeless-2.0.0#extensible-records
   //
-  case class BindPath                       (                   bind: NodeInfo, path: List[PathElem]                         )
+  case class BindPath                       (                   bind: NodeInfo, path: List[PathElem])
   case class BindPathHolders                (                   bind: NodeInfo, path: List[PathElem], holders: Option[List[NodeInfo]])
   case class ControlBindPathHoldersResources(control: NodeInfo, bind: NodeInfo, path: List[PathElem], holders: Option[List[NodeInfo]], resources: Seq[(String, NodeInfo)])
 

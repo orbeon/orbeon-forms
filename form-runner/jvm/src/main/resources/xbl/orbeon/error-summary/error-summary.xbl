@@ -373,7 +373,7 @@
                                                                     <xf:action type="javascript">
                                                                         <xf:param name="elemId" value="xxf:client-id(@id)"/>
                                                                         <xf:body>
-									    const elem = window.document.getElementById(elemId);
+                                                                            const elem = window.document.getElementById(elemId);
                                                                             if (elem) {
                                                                                 const offset = -100;
                                                                                 const y = elem.getBoundingClientRect().top + window.pageYOffset + offset;

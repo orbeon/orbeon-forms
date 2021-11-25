@@ -15,6 +15,7 @@ package org.orbeon.builder
 
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
 import org.scalajs.dom
+import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryCallback
 
 import scala.scalajs.js
@@ -47,4 +48,37 @@ object FormBuilderPrivateAPI extends js.Object {
     // Dispatch the event requested
     AjaxClient.fireEvent(AjaxEvent(eventName = eventName, targetId = "fr-form-model"))
   }
+
+  // Here we implement our own `scrollIntoView()` in order to handle positioning better. For example if a control is
+  // below the Form Builder main area, we scroll enough to make it visible at the bottom, and vice-versa if the
+  // control is above the main area.
+  // Right now this doesn't handle scrolling horizontally.
+  def moveFocusedCellIntoView(): Unit =
+    for {
+      selectedElem        <- Option(dom.document.querySelector(".fb-main .fb-selected"))
+      mainElem            <- dom.document.getElementsByClassName("fb-main")(0): js.UndefOr[dom.Element]
+      mainRect            = mainElem.getBoundingClientRect()
+      cellRect            = selectedElem.getBoundingClientRect()
+      isEntirelyContained =
+        cellRect.left   >= mainRect.left   &&
+        cellRect.top    >= mainRect.top    &&
+        cellRect.bottom <= mainRect.bottom &&
+        cellRect.right  <= mainRect.bottom
+      if ! isEntirelyContained
+      mainInnerElem     <- dom.document.getElementsByClassName("fb-main-inner")(0): js.UndefOr[dom.Element]
+      mainInnerRect     = mainInnerElem.getBoundingClientRect()
+    } locally {
+
+      val isBelow = cellRect.bottom > mainRect.bottom
+
+      val scrollTop =
+        if (isBelow)
+          mainRect.top - mainInnerRect.top + cellRect.bottom - mainRect.bottom + 50
+        else
+          mainRect.top - mainInnerRect.top - (mainRect.top - cellRect.top + 50)
+
+      mainElem.asInstanceOf[js.Dynamic].scrollTo(
+        js.Dynamic.literal(top = scrollTop, behavior = "smooth")
+      )
+    }
 }

@@ -430,7 +430,10 @@ object FormBuilderXPathApi {
           case "next"     => currentCell following CellTest
         }
 
-      val cellWithChild = cells find (_.hasChildElement)
+      // Make sure we don't go outside the body when looking for cells
+      // https://github.com/orbeon/orbeon-forms/issues/5073
+      val cellWithChild =
+        cells takeWhile (_ ancestor * exists (_ isSameNodeInfo ctx.bodyElem)) find (_.hasChildElement)
 
       cellWithChild flatMap (_ child * map (_.id) headOption)
     }

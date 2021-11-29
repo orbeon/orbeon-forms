@@ -63,7 +63,7 @@ object FormBuilderPrivateAPI extends js.Object {
         cellRect.left   >= mainRect.left   &&
         cellRect.top    >= mainRect.top    &&
         cellRect.bottom <= mainRect.bottom &&
-        cellRect.right  <= mainRect.bottom
+        cellRect.right  <= mainRect.right
       if ! isEntirelyContained
       mainInnerElem     <- dom.document.getElementsByClassName("fb-main-inner")(0): js.UndefOr[dom.Element]
       mainInnerRect     = mainInnerElem.getBoundingClientRect()

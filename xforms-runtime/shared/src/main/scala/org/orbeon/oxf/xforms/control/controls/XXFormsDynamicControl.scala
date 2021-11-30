@@ -175,7 +175,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     // Create new part
     val (template, partAnalysis) =
       createPartAnalysis(
-        org.orbeon.dom.Document(boundElem.getUnderlyingNode.asInstanceOf[Element].createCopy),
+        org.orbeon.dom.Document(unsafeUnwrapElement(boundElem).createCopy),
         part
       )
 

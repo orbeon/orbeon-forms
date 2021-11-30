@@ -108,11 +108,14 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
   override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
 
+    // Q: Do we need to compare all items? Probably that comparing the single item would be enough.
     if (! SaxonUtils.compareItemSeqs(oldBinding.nodeset.asScala, newBinding.nodeset.asScala)) {
       fullUpdateChange = true
       containingDocument.addControlStructuralChange(prefixedId)
     }
 
+    // `getBoundElement` returns the first item of `newBinding` above, if it's an element. The code doesn't express
+    // this very clearly.
     getBoundElement foreach { boundElem =>
       updateSubTree(create = false, boundElem)
     }
@@ -164,6 +167,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     xblChanges.clear()
     bindChanges.clear()
 
+    // Q: Why not in all cases? This is actually done in `onBindingUpdate()` upon `! update` if the binding has changed.
     if (create && ! containingDocument.initializing)
       containingDocument.addControlStructuralChange(prefixedId)
 

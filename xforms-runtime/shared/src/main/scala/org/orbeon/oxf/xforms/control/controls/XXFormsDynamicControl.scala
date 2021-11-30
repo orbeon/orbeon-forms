@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsCo
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
-import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsModel}
+import org.orbeon.oxf.xforms.model.{NoDefaultsStrategy, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
@@ -102,8 +102,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
   }
 
   override def onDestroy(update: Boolean): Unit = {
-    // TODO: XXX remove child container from parent
-    _nested = None
+    destroyContainerAndControls(getBoundElement flatMap containingDocument.instanceForNodeOpt)
     fullUpdateChange = false
   }
 
@@ -133,6 +132,33 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         processXBLUpdates()
     }
 
+  private def destroyContainerAndControls(outerInstance: Option[XFormsInstance]): Unit = {
+
+    // Remove children controls if any
+    if (getSize > 0) {
+      // PERF: dispatching destruction events takes a lot of time, what can we do besides not dispatching them?
+      //tree.dispatchDestructionEventsForRemovedContainer(this, false)
+      containingDocument.controls.getCurrentControlTree.deindexSubtree(this, includeCurrent = false)
+      clearChildren()
+    }
+
+    _nested foreach { case Nested(container, partAnalysis, _, outerListener) =>
+      // Remove container and associated models
+      container.destroy()
+      // Remove part and associated scopes
+      containingDocument.staticOps.removePart(partAnalysis)
+      // Remove listeners we added to the outer instance (better do this or we will badly leak)
+      // WARNING: Make sure outerListener is the exact same object passed to addListener. There can be a
+      // conversion from a function to a listener, in which case identity won't be preserved!
+      outerInstance foreach (InstanceMirror.removeListener(_, outerListener))
+
+      // For https://github.com/orbeon/orbeon-forms/issues/5071
+      containingDocument.addControlStructuralChange(prefixedId)
+
+      _nested = None
+    }
+  }
+
   private def processFullUpdate(create: Boolean, boundElem: VirtualNodeType): Unit = {
     fullUpdateChange = false
     xblChanges.clear()
@@ -152,25 +178,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     // full update.
     //val dynamicState = DynamicState(this)
 
-    // Remove children controls if any
-    val tree = containingDocument.controls.getCurrentControlTree
-    if (getSize > 0) {
-      // PERF: dispatching destruction events takes a lot of time, what can we do besides not dispatching them?
-      //tree.dispatchDestructionEventsForRemovedContainer(this, false)
-      tree.deindexSubtree(this, includeCurrent = false)
-      clearChildren()
-    }
-
-    _nested foreach { case Nested(container, partAnalysis, _, outerListener) =>
-      // Remove container and associated models
-      container.destroy()
-      // Remove part and associated scopes
-      containingDocument.staticOps.removePart(partAnalysis)
-      // Remove listeners we added to the outer instance (better do this or we will badly leak)
-      // WARNING: Make sure outerListener is the exact same object passed to addListener. There can be a
-      // conversion from a function to a listener, in which case identity won't be preserved!
-      InstanceMirror.removeListener(outerInstance, outerListener)
-    }
+    destroyContainerAndControls(outerInstance.some)
 
     // Create new part
     val (template, partAnalysis) =
@@ -271,7 +279,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
       Controls.restoringInstanceControls orElse ((! create) option InstancesControls(Nil, relevantSwitchState))
 
     def createAndInitializeDynamicSubTree(): Unit =
-      tree.createAndInitializeDynamicSubTree(
+      containingDocument.controls.getCurrentControlTree.createAndInitializeDynamicSubTree(
         container        = childContainer,
         containerControl = this,
         elementAnalysis  = partAnalysis.getTopLevelControls.head,

@@ -140,7 +140,9 @@
                             'next'
                         )/@id"/>
 
-                <xxf:show dialog="dialog"/>
+                <xxf:show
+                    if="not(event('is-prev-or-next'))"
+                    dialog="dialog"/>
 
                 <!-- Focus on the dialog, as min-input and max-input might have asked for focus first and we don't
                      want them to win -->
@@ -287,7 +289,8 @@
                         )/string()"/>
 
                 <xf:dispatch if="exists($new-control-id)" name="fb-load" targetid="fb-dialog-container-settings">
-                    <xf:property name="container" value="fbf:containerById($new-control-id)"/>
+                    <xf:property name="container"       value="fbf:containerById($new-control-id)"/>
+                    <xf:property name="is-prev-or-next" value="true()"/>
                 </xf:dispatch>
 
             </xbl:handler>

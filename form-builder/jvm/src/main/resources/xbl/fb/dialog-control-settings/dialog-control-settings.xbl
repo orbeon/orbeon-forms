@@ -187,7 +187,9 @@
                     <xf:property name="datatype-validation" value="$i/validations/validation[@type = 'datatype']"/>
                 </xf:dispatch>
 
-                <xxf:show dialog="dialog"/>
+                <xxf:show
+                    if="not(event('is-prev-or-next'))"
+                    dialog="dialog"/>
 
                 <!-- Tell custom settings to initialize -->
                 <xf:dispatch name="fb-initialize" targetid="fb-custom-control-settings">
@@ -464,7 +466,8 @@
                         )/string()"/>
 
                 <xf:dispatch if="exists($new-control-id)" name="fb-load" targetid="fb-dialog-control-settings">
-                    <xf:property name="control-id" value="$new-control-id"/>
+                    <xf:property name="control-id"      value="$new-control-id"/>
+                    <xf:property name="is-prev-or-next" value="true()"/>
                 </xf:dispatch>
 
             </xbl:handler>

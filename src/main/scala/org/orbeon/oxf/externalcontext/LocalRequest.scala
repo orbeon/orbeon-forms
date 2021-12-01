@@ -120,6 +120,9 @@ class LocalRequest(
   //
   // 2016-06-09: If we remove support for RequestDispatcherSubmission with #2809, we can probably fix this.
   //
+  // 2021-12-01: #2809 is done as of 2020.1. But Q: Should we keep request attributes, as some are set by for example
+  // users' Servlet filters?
+  //
   lazy val getAttributesMap = {
 
     val newMap = new ju.HashMap[String, AnyRef]

@@ -329,20 +329,18 @@ class ConcreteElement(var qname: QName)
 
   def attributeValue(name: String): String = {
     val attrib = attribute(name)
-    if (attrib eq null) {
+    if (attrib eq null)
       null
-    } else {
+    else
       attrib.getValue
-    }
   }
 
   def attributeValue(qName: QName): String = {
     val attrib = attribute(qName)
-    if (attrib eq null) {
+    if (attrib eq null)
       null
-    } else {
+    else
       attrib.getValue
-    }
   }
 
   def add(att: Attribute): Unit = {

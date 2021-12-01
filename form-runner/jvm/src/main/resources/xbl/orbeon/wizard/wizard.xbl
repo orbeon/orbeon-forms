@@ -696,9 +696,11 @@
                                     id="fr-wizard-submit-hide"
                                     ref="xxf:instance('local')/readwrite[not($validated-mode) or empty($next-top-level-case-ids)]"/>
 
-                                <xh:ul class="nav nav-list" role="navigation">
-                                    <xsl:apply-templates mode="toc-sections"/>
-                                </xh:ul>
+                                <xh:div role="navigation">
+                                    <xh:ul class="nav nav-list">
+                                        <xsl:apply-templates mode="toc-sections"/>
+                                    </xh:ul>
+                                </xh:div>
 
                                 <xh:div class="fr-wizard-navigation{{if (xxf:instance('local')/separate-toc/data(.)) then ' xforms-hidden' else ''}}">
 
@@ -1607,14 +1609,18 @@
 
                             <xsl:choose>
                                 <xsl:when test="$static-subsections-toc = 'all' and exists(.//fr:section)">
-                                    <xh:ul class="nav nav-list" role="navigation">
-                                        <xsl:apply-templates mode="toc-sections"/>
-                                    </xh:ul>
+                                    <xh:div role="navigation">
+                                        <xh:ul class="nav nav-list">
+                                            <xsl:apply-templates mode="toc-sections"/>
+                                        </xh:ul>
+                                    </xh:div>
                                 </xsl:when>
                                 <xsl:when test="$static-subsections-toc = 'active' and exists(.//fr:section)">
-                                    <xh:ul class="nav nav-list{{' xforms-hidden'[not($top-level-section-active)]}}">
-                                        <xsl:apply-templates mode="toc-sections"/>
-                                    </xh:ul>
+                                    <xh:div role="navigation">
+                                        <xh:ul class="nav nav-list{{' xforms-hidden'[not($top-level-section-active)]}}">
+                                            <xsl:apply-templates mode="toc-sections"/>
+                                        </xh:ul>
+                                    </xh:div>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <!-- No content -->

@@ -266,17 +266,9 @@
                                 xxf:text="left"
                                 if="$dialogs-closed">
                                 <xf:action type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
-                                    for $id in $current-td/*/@id
-                                    return
-                                        for $name in frf:controlNameFromIdOpt($id)
-                                        return
-                                            for $prev in fbf:findNextControlId($name, 'previous')
-                                            return
-                                                fbf:selectCellForControlId($prev)
+                                    fbf:selectNextOrPreviousCell($current-td, 'previous', true())
                                 </xf:action>
-                                <xf:action type="javascript">
-                                    ORBEON.builder.private.API.moveFocusedCellIntoView();
-                                </xf:action>
+                                <xf:dispatch name="fb-move-selected-cell-into-view" targetid="fr-form-model"/>
                             </xf:action>
 
                             <xf:action
@@ -285,17 +277,45 @@
                                 xxf:text="right"
                                 if="$dialogs-closed">
                                 <xf:action type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
-                                    for $id in $current-td/*/@id
-                                    return
-                                        for $name in frf:controlNameFromIdOpt($id)
-                                        return
-                                            for $next in fbf:findNextControlId($name, 'next')
-                                            return
-                                                fbf:selectCellForControlId($next)
+                                    fbf:selectNextOrPreviousCell($current-td, 'next', true())
                                 </xf:action>
-                                <xf:action type="javascript">
-                                    ORBEON.builder.private.API.moveFocusedCellIntoView();
+                                <xf:dispatch name="fb-move-selected-cell-into-view" targetid="fr-form-model"/>
+                            </xf:action>
+
+                            <xf:action
+                                observer="#document"
+                                event="keydown"
+                                xxf:text="left"
+                                xxf:modifiers="shift"
+                                if="$dialogs-closed">
+                                <xf:action type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+                                    fbf:selectNextOrPreviousCell($current-td, 'previous', false())
                                 </xf:action>
+                                <xf:dispatch name="fb-move-selected-cell-into-view" targetid="fr-form-model"/>
+                            </xf:action>
+
+                            <xf:action
+                                observer="#document"
+                                event="keydown"
+                                xxf:text="right"
+                                xxf:modifiers="shift"
+                                if="$dialogs-closed">
+                                <xf:action type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+                                    fbf:selectNextOrPreviousCell($current-td, 'next', false())
+                                </xf:action>
+                                <xf:dispatch name="fb-move-selected-cell-into-view" targetid="fr-form-model"/>
+                            </xf:action>
+
+                            <xf:action
+                                xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+                                observer="#document"
+                                event="keydown"
+                                xxf:text="enter"
+                                if="$dialogs-closed and exists(fbf:getCurrentlySelectedCell()/*/@id)">
+
+                                <xf:dispatch name="fb-show-dialog" targetid="dialog-control-settings" >
+                                    <xf:property name="control-id" value="fbf:getCurrentlySelectedCell()/*/@id/string()"/>
+                                </xf:dispatch>
                             </xf:action>
 
 <!--                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command option" xxf:text="t">-->
@@ -740,18 +760,18 @@
                                         event="fb-apply"
                                         if="xxf:non-blank(event('control-name'))">
 
-                                        <!-- Expand ancestor sections -->
+                                        <xf:var
+                                            name="control-id"
+                                            value="frf:findControlIdByName(instance('fb-form-instance'), event('control-name'))"/>
+
+                                        <!-- This is done again if we open the settings dialog, but it's ok -->
+                                        <xf:action type="xpath">
+                                            fbf:selectCellForControlId($control-id)
+                                        </xf:action>
+
                                         <xf:dispatch
-                                            iterate="
-                                                for $elem in reverse(
-                                                    frf:findAncestorSectionsLeafToRoot(
-                                                        fbf:findControlByNameOrEmpty(event('control-name')),
-                                                        false()
-                                                    )
-                                                )
-                                                return $elem/@id"
-                                            name="fr-expand"
-                                            targetid="{concat('|fb≡', ., '|')}"/>
+                                            name="fb-move-selected-cell-into-view"
+                                            targetid="fr-form-model"/>
 
                                         <xf:dispatch
                                             if="event('open-settings')"
@@ -759,20 +779,8 @@
                                             targetid="dialog-control-settings">
                                             <xf:property
                                                 name="control-id"
-                                                value="frf:findControlIdByName(instance('fb-form-instance'), event('control-name'))"/>
+                                                value="$control-id"/>
                                         </xf:dispatch>
-
-                                        <xf:var name="control-id" value="concat(event('control-name'), '-control')"/>xxxx
-
-                                        <xf:action
-                                            if="not(event('open-settings'))"
-                                            type="xpath">
-                                            fbf:selectCellForControlId($control-id)
-                                        </xf:action>
-
-                                        <xf:action type="javascript">
-                                            ORBEON.builder.private.API.moveFocusedCellIntoView();
-                                        </xf:action>
 
                                     </xf:action>
                                 </fb:dialog-search>

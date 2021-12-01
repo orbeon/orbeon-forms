@@ -161,7 +161,11 @@ object FormBuilderXPathApi {
       (_ parent CellTest) foreach selectCell
   }
 
-    // Write back everything
+  //@XPathFunction
+  def getCurrentlySelectedCell(): NodeInfo =
+    findSelectedCell(FormBuilderDocContext()).orNull
+
+  // Write back everything
   //@XPathFunction
   def writeAlertsAndValidationsAsXML(
     controlName      : String,
@@ -422,21 +426,43 @@ object FormBuilderXPathApi {
 
     FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName) flatMap { control =>
 
-      val currentCell = control parent CellTest
-
-      val cells =
-        previousOrNext match {
-          case "previous" => currentCell preceding CellTest
-          case "next"     => currentCell following CellTest
-        }
-
       // Make sure we don't go outside the body when looking for cells
       // https://github.com/orbeon/orbeon-forms/issues/5073
-      val cellWithChild =
-        cells takeWhile (_ ancestor * exists (_ isSameNodeInfo ctx.bodyElem)) find (_.hasChildElement)
+      val firstCellWithChild =
+        (control parent CellTest).headOption flatMap (findPrevOrNextCells(_, previousOrNext, allowEmptyCell = false).headOption)
 
-      cellWithChild flatMap (_ child * map (_.id) headOption)
+      firstCellWithChild flatMap (_ child * map (_.id) headOption)
     }
+  }
+
+  //@XPathFunction
+  def selectNextOrPreviousCell(currentCell: NodeInfo, previousOrNext: String, allowEmptyCell: Boolean): Unit = {
+    implicit val ctx = FormBuilderDocContext()
+    findPrevOrNextCells(currentCell, previousOrNext, allowEmptyCell).headOption foreach selectCell
+  }
+
+  private def findPrevOrNextCells(
+    currentCell    : NodeInfo,
+    previousOrNext : String,
+    allowEmptyCell : Boolean)(implicit
+    ctx            : FormBuilderDocContext
+  ): Seq[NodeInfo] = {
+
+    val prevOrNextCells =
+      previousOrNext match {
+        case "previous" => currentCell preceding CellTest
+        case "next"     => currentCell following CellTest
+      }
+
+    // Make sure we don't go outside the body when looking for cells
+    // https://github.com/orbeon/orbeon-forms/issues/5073
+    val prevOrNextCellsInBody =
+      prevOrNextCells takeWhile (_ ancestor * exists (_ isSameNodeInfo ctx.bodyElem))
+
+    if (allowEmptyCell)
+      prevOrNextCellsInBody
+    else
+      prevOrNextCellsInBody filter (_.hasChildElement)
   }
 
   //@XPathFunction

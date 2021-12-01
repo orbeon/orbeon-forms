@@ -64,7 +64,10 @@
         value="xxf:instance('fb-components-instance')/xbl:xbl/xbl:binding"/>
 
     <!-- FIXME: Probably remove once all usages are gone -->
-    <xf:var name="current-td" value="id(instance('fb-variables')/selected-cell, instance('fb-form-instance'))" as="element()?"/>
+    <xf:var
+        name="current-td"
+        value="id(instance('fb-variables')/selected-cell, instance('fb-form-instance'))"
+        as="element()?"/>
 
     <!-- Main instance -->
     <!-- Index ids on fb-form-instance for performance -->
@@ -953,11 +956,39 @@
     </xf:instance>
 
     <!-- These actions track how many dialogs are open at a given time (for keyboard shortcuts) -->
-    <xf:setvalue ev:event="xxforms-dialog-open" ev:observer="#document"
-        ref="$variables/dialogs-open" value="xs:integer(.) + 1"/>
+    <xf:setvalue
+        event="xxforms-dialog-open"
+        observer="#document"
+        xxf:phantom="true"
+        ref="$variables/dialogs-open"
+        value="xs:integer(.) + 1"/>
 
-    <xf:setvalue ev:event="xxforms-dialog-close" ev:observer="#document"
-        ref="$variables/dialogs-open" value="xs:integer(.) - 1"/>
+    <xf:setvalue
+        event="xxforms-dialog-close"
+        observer="#document"
+        xxf:phantom="true"
+        ref="$variables/dialogs-open"
+        value="xs:integer(.) - 1"/>
+
+    <xf:action event="fb-move-selected-cell-into-view">
+
+        <xf:dispatch
+            iterate="
+                for $elem in reverse(
+                    frf:findAncestorSectionsLeafToRoot(
+                        fbf:getCurrentlySelectedCell(),
+                        false()
+                    )
+                )
+                return $elem/@id"
+            name="fr-expand"
+            targetid="{concat('|fb≡', ., '|')}"/>
+
+        <xf:action type="javascript">
+            ORBEON.builder.private.API.moveFocusedCellIntoView();
+        </xf:action>
+
+    </xf:action>
 
     <!-- Schema upload dialog -->
     <xf:instance id="fb-schema-upload-instance">

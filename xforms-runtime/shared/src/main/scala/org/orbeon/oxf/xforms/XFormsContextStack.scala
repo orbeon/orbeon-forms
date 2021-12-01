@@ -285,7 +285,8 @@ class XFormsContextStack {
 
   private def getBindingContext(scope: Scope): BindingContext = {
     var bindingContext = this.head
-    while (bindingContext.scope ne scope) {
+    // Don't use `ne` as the scope object can be recreated within components that have lazy content!
+    while (bindingContext.scope != scope) {
       bindingContext = bindingContext.parent
       // There must be a matching scope down the line
       assert(bindingContext ne null)

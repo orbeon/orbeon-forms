@@ -410,6 +410,8 @@ object InitSupport {
         }
       }
 
+    private val KeysForWhichToPreventDefault = Set("up", "down", "left", "right")
+
     def initializeKeyListeners(listeners: List[rpc.KeyListener], formElem: html.Form): Unit =
       listeners foreach { case rpc.KeyListener(eventNames, observer, keyText, modifiers) =>
 
@@ -442,7 +444,7 @@ object InitSupport {
             )
           )
 
-          if (modifiers.nonEmpty)
+          if (modifiers.nonEmpty || KeysForWhichToPreventDefault(keyText))
             e.preventDefault()
         }
 

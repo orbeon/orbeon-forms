@@ -260,11 +260,6 @@ class XFormsSubmitEvent(target: XFormsEventTarget, properties: PropertyGetter)
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
-class XXFormsDialogCloseEvent(target: XFormsEventTarget, properties: PropertyGetter)
-  extends XFormsEvent(XXFORMS_DIALOG_CLOSE, target, properties, bubbles = true, cancelable = false) {
-  def this(target: XFormsEventTarget) = this(target, EmptyGetter)
-}
-
 class XXFormsInvalidEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsEvent(XXFORMS_INVALID, target, properties, bubbles = true, cancelable = true) {
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)

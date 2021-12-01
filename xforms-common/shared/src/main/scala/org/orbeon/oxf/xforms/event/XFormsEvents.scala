@@ -85,6 +85,8 @@ object XFormsEvents {
   val XFORMS_SCROLL_LAST          = "xforms-scroll-last"
   val XFORMS_HELP                 = "xforms-help"
   val XFORMS_HINT                 = "xforms-hint"
+  val XFORMS_DIALOG_SHOWN         = "xforms-dialog-shown"
+  val XFORMS_DIALOG_HIDDEN        = "xforms-dialog-hidden"
 
   // DOM events
   val DOM_ACTIVATE                = "DOMActivate"

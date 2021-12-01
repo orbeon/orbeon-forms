@@ -1741,12 +1741,19 @@
 
                     <!-- TODO: we cannot dispatch xxforms-dialog-open to my-dialog before it is enabled -->
 
-                    <xf:insert ev:event="xforms-enabled xforms-disabled xxforms-dialog-open xxforms-dialog-close"
-                                   context="instance('events')" ref="*"
-                                   origin="xf:element('event',
-                                            (xf:attribute('type', event('xxf:type')),
-                                             xf:attribute('target', event('xxf:targetid')),
-                                             xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                    <xf:insert
+                        event="xforms-enabled xforms-disabled xxforms-dialog-open xxforms-dialog-close xforms-dialog-shown xforms-dialog-hidden"
+                        context="instance('events')"
+                        ref="*"
+                        origin="
+                            xf:element(
+                                'event',
+                                (
+                                    xf:attribute('type',    event('xxf:type')),
+                                    xf:attribute('target',  event('xxf:targetid')),
+                                    xf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
+                                )
+                            )"/>
 
                     <xxf:dialog id="my-dialog">
                         <xf:input id="input1" ref="value[1]"/>
@@ -1763,11 +1770,13 @@
                         <instances>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event type="xforms-enabled" target="input1" indexes=""/>
-                                    <event type="xforms-enabled" target="input2" indexes=""/>
-                                    <event type="xxforms-dialog-open" target="my-dialog" indexes=""/>
-                                    <event type="xforms-disabled" target="input1" indexes=""/>
-                                    <event type="xforms-disabled" target="input2" indexes=""/>
+                                    <event type="xforms-enabled"       target="input1"    indexes=""/>
+                                    <event type="xforms-enabled"       target="input2"    indexes=""/>
+                                    <event type="xforms-dialog-shown"  target="my-dialog" indexes=""/>
+                                    <event type="xxforms-dialog-open"  target="my-dialog" indexes=""/>
+                                    <event type="xforms-disabled"      target="input1"    indexes=""/>
+                                    <event type="xforms-disabled"      target="input2"    indexes=""/>
+                                    <event type="xforms-dialog-hidden" target="my-dialog" indexes=""/>
                                     <event type="xxforms-dialog-close" target="my-dialog" indexes=""/>
                                 </events>
                             </instance>

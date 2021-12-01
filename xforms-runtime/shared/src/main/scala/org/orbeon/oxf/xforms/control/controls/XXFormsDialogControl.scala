@@ -13,19 +13,20 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import java.{util => ju}
-
 import org.orbeon.dom.Element
-import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.control.ControlLocalSupport.XFormsControlLocal
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl, XFormsNoSingleNodeContainerControl}
-import org.orbeon.oxf.xforms.event.events.{XFormsFocusEvent, XXFormsDialogCloseEvent, XXFormsDialogOpenEvent}
+import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.state.ControlState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
+import org.orbeon.xforms.XFormsNames.XXFORMS_NAMESPACE_URI
 import org.xml.sax.helpers.AttributesImpl
+
+import java.{util => ju}
+
 
 private case class XXFormsDialogControlLocal(
   var dialogVisible       : Boolean,
@@ -96,23 +97,31 @@ class XXFormsDialogControl(
     event match {
       case dialogOpenEvent: XXFormsDialogOpenEvent =>
 
-        val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
-        localForUpdate.dialogVisible       = true
-        localForUpdate.neighborControlId   = dialogOpenEvent.neighbor
-        localForUpdate.constrainToViewport = dialogOpenEvent.constrainToViewport
+        if (! isDialogVisible) {
+          val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
+          localForUpdate.dialogVisible       = true
+          localForUpdate.neighborControlId   = dialogOpenEvent.neighbor
+          localForUpdate.constrainToViewport = dialogOpenEvent.constrainToViewport
 
-        containingDocument.controls.markDirtySinceLastRequest(true)
-        containingDocument.controls.doPartialRefresh(this)
+          containingDocument.controls.markDirtySinceLastRequest(true)
+          containingDocument.controls.doPartialRefresh(this)
+
+          Dispatch.dispatchEvent(new XFormsDialogShownEvent(this))
+        }
 
       case _: XXFormsDialogCloseEvent =>
 
-        val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
-        localForUpdate.dialogVisible       = false
-        localForUpdate.neighborControlId   = None
-        localForUpdate.constrainToViewport = false
+        if (isDialogVisible) {
+          val localForUpdate = getLocalForUpdate.asInstanceOf[XXFormsDialogControlLocal]
+          localForUpdate.dialogVisible       = false
+          localForUpdate.neighborControlId   = None
+          localForUpdate.constrainToViewport = false
 
-        containingDocument.controls.markDirtySinceLastRequest(false)
-        containingDocument.controls.doPartialRefresh(this)
+          containingDocument.controls.markDirtySinceLastRequest(false)
+          containingDocument.controls.doPartialRefresh(this)
+
+          Dispatch.dispatchEvent(new XFormsDialogHiddenEvent(this))
+        }
 
       case _ =>
     }

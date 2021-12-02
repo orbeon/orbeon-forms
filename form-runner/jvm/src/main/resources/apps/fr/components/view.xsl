@@ -1132,7 +1132,8 @@
                                     'xforms-trigger-appearance-xxforms-',
                                      if ($primary) then
                                         'primary'
-                                     else if ($inverse and position() = last()) then
+                                     (: 2021-12-01: Offline, using `position() doesn't return the correct value. :)
+                                     else if ($inverse and $position = last()) then
                                         'inverse'
                                      else
                                         'default'

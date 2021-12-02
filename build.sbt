@@ -8,6 +8,8 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 resolvers += Resolver.githubPackages("orbeon")
 ThisBuild / githubOwner := "orbeon"
 
+ThisBuild / evictionErrorLevel := Level.Info
+
 // For now, keep ad-hoc list for offline client
 val TimezonesToInclude = Set(
   "America/Los_Angeles",

@@ -957,14 +957,14 @@
 
     <!-- These actions track how many dialogs are open at a given time (for keyboard shortcuts) -->
     <xf:setvalue
-        event="xxforms-dialog-open"
+        event="xforms-dialog-shown"
         observer="#document"
         xxf:phantom="true"
         ref="$variables/dialogs-open"
         value="xs:integer(.) + 1"/>
 
     <xf:setvalue
-        event="xxforms-dialog-close"
+        event="xforms-dialog-hidden"
         observer="#document"
         xxf:phantom="true"
         ref="$variables/dialogs-open"

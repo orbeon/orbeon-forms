@@ -110,27 +110,10 @@ class LocalRequest(
   def getInputStream       = content map (_.inputStream) getOrElse EmptyInputStream
   def getHeaderValuesMap   = _headersIncludingAuthBodyLowercase
 
-  // 2013-09-10: We should start with a fresh attributes map:
-  //
-  //     ju.Collections.synchronizedMap(new ju.HashMap[String, AnyRef])
-  //
-  // However, upon forwarding via RequestDispatcher, this doesn't work. It's unclear why, as Tomcat stores special
-  // attributes in its own ApplicationHttpRequest.specialAttributes. So for now we keep the forward, which was in
-  // place before the 2013-09-10 refactor anyway.
-  //
-  // 2016-06-09: If we remove support for RequestDispatcherSubmission with #2809, we can probably fix this.
-  //
-  // 2021-12-01: #2809 is done as of 2020.1. But Q: Should we keep request attributes, as some are set by for example
-  // users' Servlet filters?
-  //
   lazy val getAttributesMap = {
-
+    // See https://github.com/orbeon/orbeon-forms/issues/5081
     val newMap = new ju.HashMap[String, AnyRef]
-
-    newMap.asScala ++= incomingRequest.getAttributesMap.asScala filter {
-      case (k, _) => k.startsWith("javax.servlet.")
-    }
-
+    newMap.asScala ++= incomingRequest.getAttributesMap.asScala
     ju.Collections.synchronizedMap(newMap)
   }
 

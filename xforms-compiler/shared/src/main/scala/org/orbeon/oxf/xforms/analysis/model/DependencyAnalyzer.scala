@@ -87,12 +87,9 @@ object DependencyAnalyzer {
 
     val bindsDetailsForGivenMip = {
 
-      def iterateBinds(bindsIt: Iterator[StaticBind]): Iterator[StaticBind] =
-        bindsIt flatMap (b => Iterator(b) ++ iterateBinds(b.childrenBindsIt))
-
       val validBindNames = allBindsByName.keySet
 
-      val allBindsIt = iterateBinds(model.topLevelBinds.iterator)
+      val allBindsIt = model.iterateAllBinds
       val detailsIt  = allBindsIt flatMap (b => BindDetails.fromStaticBindMIP(validBindNames, b, b.firstXPathMIP(mip)))
 
       detailsIt.toList

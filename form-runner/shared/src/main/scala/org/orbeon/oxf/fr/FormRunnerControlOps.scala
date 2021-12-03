@@ -416,7 +416,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     ctx      : FormRunnerDocContext
   ): Boolean =
     valueNamespaceMappingScopeIfNeeded(bindElem, value).isDefined &&
-      Set(XMLConstants.XS_STRING_QNAME, XFormsNames.XFORMS_STRING_QNAME)(bindElem.resolveQName(value))
+      ModelDefs.StringQNames(bindElem.resolveQName(value))
 
   private object Private {
 

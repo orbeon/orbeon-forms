@@ -170,4 +170,7 @@ object ModelDefs {
 
   val XFormsTypeNames =
     XForms11TypeNames ++ XForms20TypeNames
+
+  val StringQNames =
+    Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)
 }

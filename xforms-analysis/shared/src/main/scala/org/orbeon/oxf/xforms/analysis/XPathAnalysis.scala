@@ -28,12 +28,16 @@ abstract class XPathAnalysis {
   val xpathString: String
   val figuredOutDependencies: Boolean
 
+  // Used by `intersectsBinding`
   val valueDependentPaths: MapSet[String, String] // instance prefixed id -> paths
+
+  // Used by `intersectsValue`
   val returnablePaths: MapSet[String, String]     // instance prefixed id -> paths
 
   val dependentModels: collection.Set[String]
   val dependentInstances: collection.Set[String]
 
+  // Only used to set `BindTree`
   def returnableInstances: Iterable[String] = returnablePaths.map.keys
 
   def freeTransientState(): Unit = ()

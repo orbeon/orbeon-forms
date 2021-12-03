@@ -268,7 +268,7 @@ class PathMapXPathDependencies(
       controlEffectiveId : String,
       bindingAnalysis    : XPathAnalysis,
       changes            : MapSet[ModelOrInstanceKey, String]
-    ) =
+    ): Boolean =
       intersectsBinding(controlEffectiveId, bindingAnalysis, refreshChangeset) ||
         searchMatchesForInstances(
           controlEffectiveId,

@@ -228,4 +228,120 @@
         </output>
     </test>
 
+    <test description="For #2471: fr:control-string-value() with library argument" name="oxf:pipeline">
+        <input name="config" href="../xforms/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html
+                xmlns:xh="http://www.w3.org/1999/xhtml"
+                xmlns:xf="http://www.w3.org/2002/xforms"
+                xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                <xh:head>
+                    <xf:model
+                        id="fr-form-model"
+                        xxf:expose-xpath-types="true"
+                        xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+
+                        <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
+                            <_>
+                                <my-field-a>42</my-field-a>
+                            </_>
+                        </xf:instance>
+
+                        <xf:bind id="my-field-a-bind" name="my-field-a" ref="my-field-a"/>
+
+                        <xf:action event="xforms-ready">
+                            <xf:message value="concat('root: ', fr:control-string-value('my-field-a', false()))"/>
+                            <xf:message value="concat('root: ', fr:control-string-value('my-field-a', false(), 'a'))"/>
+                            <xf:message value="concat('root: ', fr:control-string-value('my-field-a', false(), 'b'))"/>
+                        </xf:action>
+
+                    </xf:model>
+                    <xbl:xbl
+                        xmlns:xbl="http://www.w3.org/ns/xbl"
+                        xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/a/library">
+                        <xbl:binding id="a-lib-section-a-component" element="component|lib-section-a">
+                            <xbl:implementation>
+                                <xf:model id="lib-section-a-model">
+                                    <xf:instance id="fr-form-instance">
+                                        <_>
+                                            <my-field-a>43</my-field-a>
+                                        </_>
+                                    </xf:instance>
+                                    <xf:bind id="my-field-a-bind" ref="my-field-a" name="my-field-a"/>
+                                    <xf:action event="xforms-ready">
+                                        <xf:message value="concat('library a: ', fr:control-string-value('my-field-a', false()))"/>
+                                        <xf:message value="concat('library a: ', fr:control-string-value('my-field-a', false(), 'a'))"/>
+                                        <xf:message value="concat('library a: ', fr:control-string-value('my-field-a', false(), 'b'))"/>
+                                    </xf:action>
+                                </xf:model>
+                            </xbl:implementation>
+                            <xbl:template>
+                                <xf:input id="my-field-a-control" bind="my-field-a-bind"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                    <xbl:xbl
+                        xmlns:xbl="http://www.w3.org/ns/xbl"
+                        xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/b/library">
+                        <xbl:binding id="b-lib-section-a-component" element="component|lib-section-a">
+                            <xbl:implementation>
+                                <xf:model id="lib-section-a-model">
+                                    <xf:instance id="fr-form-instance">
+                                        <_>
+                                            <my-field-a>44</my-field-a>
+                                        </_>
+                                    </xf:instance>
+                                    <xf:bind id="my-field-a-bind" ref="my-field-a" name="my-field-a"/>
+                                    <xf:action event="xforms-ready">
+                                        <xf:message value="concat('library b: ', fr:control-string-value('my-field-a', false()))"/>
+                                        <xf:message value="concat('library b: ', fr:control-string-value('my-field-a', false(), 'b'))"/>
+                                        <xf:message value="concat('library b: ', fr:control-string-value('my-field-a', false(), 'a'))"/>
+                                    </xf:action>
+                                </xf:model>
+                            </xbl:implementation>
+                            <xbl:template>
+                                <xf:input id="my-field-a-control" bind="my-field-a-bind"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <xf:input id="my-field-a-control" bind="my-field-a-bind"/>
+                    <component:lib-section-a id="component-a" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/a/library"/>
+                    <component:lib-section-a id="component-b" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/b/library"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-field-a-control">
+                            <xxf:value>42</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="component-a≡my-field-a-control">
+                            <xxf:value>43</xxf:value>
+                        </xxf:control>
+                        <xxf:control id="component-b≡my-field-a-control">
+                            <xxf:value>44</xxf:value>
+                        </xxf:control>
+                    </xxf:control-values>
+                    <xxf:message level="modal">library a: 43</xxf:message>
+                    <xxf:message level="modal">library a: 43</xxf:message>
+                    <xxf:message level="modal">library a: 44</xxf:message>
+                    <xxf:message level="modal">library b: 44</xxf:message>
+                    <xxf:message level="modal">library b: 44</xxf:message>
+                    <xxf:message level="modal">library b: 43</xxf:message>
+                    <xxf:message level="modal">root: 42</xxf:message>
+                    <xxf:message level="modal">root: 43</xxf:message>
+                    <xxf:message level="modal">root: 44</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

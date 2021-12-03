@@ -125,14 +125,14 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
 
     val libraryUri = s"${Controls.SectionTemplateUriPrefix}$libraryName/library"
 
-    // All the section controls in the given library
-    val allSectionTemplateControls =
-      container.containingDocument.controls.getCurrentControlTree.getSectionControls.toList collect {
+    // All the section template controls from the given library
+    val allSectionTemplateControlsForLibrary =
+      container.containingDocument.controls.getCurrentControlTree.getSectionTemplateControls.toList collect {
         case s if s.staticControl.element.getNamespaceURI == libraryUri && s.isRelevant => s
       }
 
-    val uniqueSectionTemplateControlsStaticIds =
-      allSectionTemplateControls.map(_.staticControl.staticId).to[mutable.LinkedHashSet]
+    val uniqueSectionTemplateControlsForLibraryStaticIds =
+      allSectionTemplateControlsForLibrary.map(_.staticControl.staticId).to[mutable.LinkedHashSet]
 
     // The function can be called from multiple places, but we expect that it can be called:
     //
@@ -141,17 +141,19 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     //
     val resolvingSourceControlEffectiveId = {
 
-      val contextWithinLibrarySectionOpt =
-        container.ancestorsIterator.flatMap(_.associatedControlOpt).find(_.element.getNamespaceURI == libraryUri)
+      val containingSectionTemplateControlAndAppOpt =
+        container.ancestorsIterator.flatMap(_.associatedControlOpt).flatMap(control =>
+          frc.findAppFromSectionTemplateUri(control.element.getNamespaceURI).map(control ->)).nextOption()
 
-      contextWithinLibrarySectionOpt match {
-        case Some(containingSection) => containingSection.effectiveId
-        case None                    => XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId)// TODO: CHECK container.associatedControlOpt.getOrElse(container.containingDocument)
+      containingSectionTemplateControlAndAppOpt match {
+        case Some((containingSection, _)) => containingSection.effectiveId
+        case None                         => XFormsId.absoluteIdToEffectiveId(actionSourceAbsoluteId)
+        // TODO: CHECK container.associatedControlOpt.getOrElse(container.containingDocument)
       }
     }
 
     val resolvedSectionsIt =
-      uniqueSectionTemplateControlsStaticIds.iterator flatMap { uniqueSectionTemplateControlsStaticId =>
+      uniqueSectionTemplateControlsForLibraryStaticIds.iterator flatMap { uniqueSectionTemplateControlsStaticId =>
         Controls.resolveControlsById(
           containingDocument       = container.containingDocument,
           sourceControlEffectiveId = resolvingSourceControlEffectiveId,

@@ -37,8 +37,8 @@ private class ControlIndex {
 
   // HashMap[Type = String, LinkedHashMap[EffectiveId = String, Control = XFormsControl]]
   // No need for order here
-  private val _controlTypes    = new ju.HashMap[QName, ju.LinkedHashMap[String, XFormsControl]]
-  private val _sectionControls = new ju.LinkedHashMap[String, XFormsComponentControl]()
+  private val _controlTypes            = new ju.HashMap[QName, ju.LinkedHashMap[String, XFormsControl]]
+  private val _sectionTemplateControls = new ju.LinkedHashMap[String, XFormsComponentControl]()
 
   private def collectSectionControl(control: XFormsControl): Option[XFormsComponentControl] = control match {
     case s: XFormsComponentControl
@@ -71,7 +71,7 @@ private class ControlIndex {
       controlsMap.put(control.getEffectiveId, control)
     } else {
       collectSectionControl(control) foreach { componentControl =>
-        _sectionControls.put(componentControl.getEffectiveId, componentControl)
+        _sectionTemplateControls.put(componentControl.getEffectiveId, componentControl)
       }
     }
   }
@@ -93,7 +93,7 @@ private class ControlIndex {
         controlsMap.remove(control.getEffectiveId)
     } else {
       collectSectionControl(control) foreach { componentControl =>
-        _sectionControls.remove(componentControl.getEffectiveId)
+        _sectionTemplateControls.remove(componentControl.getEffectiveId)
       }
     }
   }
@@ -107,7 +107,7 @@ private class ControlIndex {
   }
 
   def sectionControls: ju.Collection[XFormsComponentControl] =
-    _sectionControls.values()
+    _sectionTemplateControls.values()
 }
 
 // Represent a tree of XForms controls
@@ -299,8 +299,8 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   def findRepeatControl(effectiveId: String): Option[XFormsRepeatControl] =
     findControl(effectiveId) flatMap CollectionUtils.collectByErasedType[XFormsRepeatControl]
 
-  def getUploadControls     : Iterable[XFormsUploadControl]    = _controlIndex.controlsOfName[XFormsUploadControl](XFORMS_UPLOAD_QNAME)
-  def getRepeatControls     : Iterable[XFormsRepeatControl]    = _controlIndex.controlsOfName[XFormsRepeatControl](XFORMS_REPEAT_QNAME)
-  def getDialogControls     : Iterable[XXFormsDialogControl]   = _controlIndex.controlsOfName[XXFormsDialogControl](XXFORMS_DIALOG_QNAME)
-  def getSectionControls    : Iterable[XFormsComponentControl] = _controlIndex.sectionControls.asScala
+  def getUploadControls          : Iterable[XFormsUploadControl]    = _controlIndex.controlsOfName[XFormsUploadControl](XFORMS_UPLOAD_QNAME)
+  def getRepeatControls          : Iterable[XFormsRepeatControl]    = _controlIndex.controlsOfName[XFormsRepeatControl](XFORMS_REPEAT_QNAME)
+  def getDialogControls          : Iterable[XXFormsDialogControl]   = _controlIndex.controlsOfName[XXFormsDialogControl](XXFORMS_DIALOG_QNAME)
+  def getSectionTemplateControls : Iterable[XFormsComponentControl] = _controlIndex.sectionControls.asScala
 }

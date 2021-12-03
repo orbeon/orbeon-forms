@@ -483,9 +483,9 @@ object ElementAnalysisTreeXPathAnalyzer {
                     makeValuesDependencies(itemElementAnalysis.bindingAnalysis.get)
                   )
 
-                processElement(LABEL_QNAME, required = true)
+                processElement(LABEL_QNAME,        required = true)
                 processElement(XFORMS_VALUE_QNAME, required = false)
-                processElement(XFORMS_COPY_QNAME, required = false)
+                processElement(XFORMS_COPY_QNAME,  required = false)
 
                 if (e.isFull) {
                   processElement(HELP_QNAME, required = false)

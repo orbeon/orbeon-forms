@@ -232,7 +232,7 @@ class XFormsComponentControl(
       // the context goes inner context -> component binding.
       val contextStack = nestedContainer.getContextStack
       contextStack.setParentBindingContext(bindingContext)
-      contextStack.resetBindingContext
+      contextStack.resetBindingContext()
       contextStack.getCurrentBindingContext
     }
 

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.MapSet
 import org.orbeon.oxf.xml.XMLReceiver
 import org.orbeon.oxf.xml.XMLReceiverSupport._
@@ -97,6 +98,18 @@ object XPathAnalysis {
           write(a.returnablePaths.map.keys,         "returnable-instances", "instance")
         }
     }
+
+  def toTinyTree(
+    xpa      : XPathAnalysis,
+    flagPath : String => Boolean = _ => false
+  ): DocumentNodeInfoType = {
+    val (receiver, result) = StaticXPath.newTinyTreeReceiver
+    implicit val rcv: XMLReceiver = receiver
+    withDocument {
+      XPathAnalysis.writeXPathAnalysis(xpa, flagPath)
+    }
+    result()
+  }
 
   /**
    * Given an internal path, get a display path (for debugging/logging).

@@ -1,15 +1,13 @@
 package org.orbeon.oxf.fr.xbl
 
-import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.fr.Names.FormModel
-import org.orbeon.oxf.util.StaticXPath
+import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis
 import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer.Vertex
 import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs}
-import org.orbeon.oxf.xml.XMLReceiverSupport.withDocument
-import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver}
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.{AtomicValue, EmptySequence, SequenceExtent}
 import org.orbeon.scaxon.Implicits._
@@ -49,17 +47,6 @@ object FormRunnerFormulaDebugger {
 
     val allBindPathsSet = allBindPaths.toSet
 
-    def xpathAnalysisDoc(xpa: XPathAnalysis) = {
-      val (receiver, result) = StaticXPath.newTinyTreeReceiver
-      implicit val rcv: XMLReceiver = receiver
-      withDocument {
-        XPathAnalysis.writeXPathAnalysis(xpa, path =>
-          path.startsWith(instanceString) && ! allBindPathsSet(path)
-        )
-      }
-      result()
-    }
-
     val rows =
       explanation map { case vertex @ Vertex(name, refs, expr, xpa) =>
         SaxonUtils.newMapItem(
@@ -67,7 +54,7 @@ object FormRunnerFormulaDebugger {
             (SaxonUtils.fixStringValue("name"), name),
             (SaxonUtils.fixStringValue("expr"), expr),
             (SaxonUtils.fixStringValue("projectionDeps"), xpa.exists(_.figuredOutDependencies)),
-            (SaxonUtils.fixStringValue("xpath-analysis"), xpa.map(xpathAnalysisDoc).getOrElse(EmptySequence.getInstance)),
+            (SaxonUtils.fixStringValue("xpath-analysis"), xpa.map(XPathAnalysis.toTinyTree(_, path => path.startsWith(instanceString) && ! allBindPathsSet(path))).getOrElse(EmptySequence.getInstance)),
             (SaxonUtils.fixStringValue("refs"), new SequenceExtent(refs.map(_.name).toList)),
             (SaxonUtils.fixStringValue("transitive-refs"), new SequenceExtent((vertex.transitiveRefs -- refs).map(_.name).toList))
           )

@@ -34,7 +34,7 @@ class ClientUserAgentAndJQueryTest extends AnyFunSpec {
     }
     it ("must match the version we are expecting") {
       val jQueryVersion = $.fn.asInstanceOf[js.Dynamic].jquery.asInstanceOf[String]
-      assert(jQueryVersion.startsWith("1."))
+      assert(jQueryVersion.startsWith("3.6"))
     }
   }
 }

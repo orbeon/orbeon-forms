@@ -35,8 +35,7 @@ class XFormsAssetsTest extends AnyFunSpec{
         ],
 
         "js": [
-          { "full": "/ops/jquery/jquery-3.3.1.js",                                         "min": true  },
-          { "full": "/ops/jquery/jquery-browser-mobile.js",                                "min": true  },
+          { "full": "/ops/jquery/jquery-3.6.0.js",                                         "min": true  },
           { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
           { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
           { "full": "/ops/nprogress-0.2.0/nprogress.js",                                   "min": true  },
@@ -83,8 +82,7 @@ class XFormsAssetsTest extends AnyFunSpec{
         ],
 
         "js": [
-          { "full": "/ops/jquery/jquery-3.3.1.js",                                         "min": true  },
-          { "full": "/ops/jquery/jquery-browser-mobile.js",                                "min": true  },
+          { "full": "/ops/jquery/jquery-3.6.0.js",                                         "min": true  },
           { "full": "/apps/fr/style/bootstrap/js/bootstrap.js",                            "min": true  },
           { "full": "/ops/javascript/orbeon/util/jquery-orbeon.js",                        "min": true  },
           { "full": "/ops/nprogress-0.2.0/nprogress.js",                                   "min": true  },

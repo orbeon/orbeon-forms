@@ -28,7 +28,17 @@
             xxf:no-updates="true"
             xxf:xpath-analysis="true"
             xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+
+            <!--
+                About the `fr-parameters-instance`:
+                - We set the `app`/`form` so `findProcessByName` searches for a property with app/form wildcards (#5082)
+                - `<document>` can come from the path
+                - `<form-version>` is unused, comes from `form-definition-version`
+             -->
             <xf:instance id="fr-parameters-instance" src="input:data"/>
+            <xf:bind ref="app"  xxf:default="'orbeon'"/>
+            <xf:bind ref="form" xxf:default="'builder'"/>
+
         </xf:model>
         <xf:model id="fr-form-model">
 
@@ -87,10 +97,6 @@
                 <xf:var
                     name="is-form-definition-posted"
                     value="exists(instance('fr-form-definition-instance')/self::xh:html)"/>
-
-                <xf:action type="xpath" if="$is-form-definition-posted and fr:is-design-time()">
-                    frf:sendError(400)
-                </xf:action>
 
                 <xf:dispatch
                     if="$is-form-definition-posted"

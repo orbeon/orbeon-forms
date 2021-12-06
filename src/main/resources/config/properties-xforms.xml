@@ -109,7 +109,6 @@
 
     <property as="xs:boolean" name="oxf.xforms.minimal-resources"                          value="true"/>
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                          value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"                   value="false"/>
     <property as="xs:boolean" name="oxf.xforms.resources.encode-version"                   value="true"/>
 
     <property as="xs:boolean" name="oxf.xforms.expose-xpath-types"                          value="false"/>

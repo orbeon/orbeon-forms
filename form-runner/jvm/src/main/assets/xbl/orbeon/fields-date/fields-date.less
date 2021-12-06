@@ -7,11 +7,15 @@
             // All the inputs on the same line
             display: inline-block;
 
-            // By default, don't show labels
+            // By default, don't show labels, but don't hide to screen readers
             // Particularly strong rule for Form Builder, to override its `display: table`
             &.xforms-control .xforms-label,
             .fb-main .fb &.xforms-control .xforms-label {
-                display: none;
+                overflow : hidden;
+                display  : block;
+                height   : 0;
+                width    : 0;
+                margin   : 0;
             }
         }
         .xbl-fr-date {

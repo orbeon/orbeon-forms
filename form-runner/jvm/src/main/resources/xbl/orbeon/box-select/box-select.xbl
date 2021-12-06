@@ -30,7 +30,6 @@
     <xbl:binding
         id="fr-box-select-binding"
         element="fr|box-select, xf|select[appearance ~= scroll]"
-        xxbl:label-for="select"
         xxbl:mode="lhha binding value selection">
 
         <!-- Orbeon Form Builder Component Metadata -->
@@ -75,9 +74,11 @@
         </xbl:handlers>
 
         <xbl:template>
-            <xf:select id="select" appearance="full" ref="xxf:binding('fr-box-select-binding')" xbl:attr="xxf:encrypt-item-values">
-                <xbl:content include=":root > xf|itemset, :root > xf|item, :root > xf|choice"/>
-            </xf:select>
+            <xh:div role="group" aria-label="{xxf:label('fr-box-select-binding')}">
+                <xf:select id="select" appearance="full" ref="xxf:binding('fr-box-select-binding')" xbl:attr="xxf:encrypt-item-values">
+                    <xbl:content include=":root > xf|itemset, :root > xf|item, :root > xf|choice"/>
+                </xf:select>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

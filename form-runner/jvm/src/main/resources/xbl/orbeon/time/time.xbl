@@ -22,6 +22,7 @@
     <xbl:binding
         id="fr-time"
         element="fr|time"
+        xxbl:label-for="input"
         xxbl:mode="lhha binding value">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -169,7 +170,7 @@
                 </xh:div>
             </xf:group>
 
-            <xf:input ref="$binding[$view]"/>
+            <xf:input ref="$binding[$view]" id="input"/>
 
         </xbl:template>
     </xbl:binding>

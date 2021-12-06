@@ -27,8 +27,7 @@
         id="fr-dropdown-date-binding"
         element="fr|dropdown-date, xf|input:xxf-type('xs:date')[appearance ~= dropdowns]"
         xxbl:container="span"
-        xxbl:mode="lhha binding value"
-        xxbl:label-for="select1">
+        xxbl:mode="lhha binding value">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -278,7 +277,7 @@
                 </xf:action>
             </xf:var>
 
-            <xf:group class="fr-component-group">
+            <xh:div class="fr-component-group" role="group" aria-label="{xxf:label('fr-dropdown-date-binding')}">
                 <xf:group ref=".[not($view)]">
                     <!-- Don't show fields at all in static readonly mode -->
                     <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
@@ -348,7 +347,7 @@
                     <!-- Static readonly mode -->
                     <xf:input ref="$binding"/>
                 </xf:group>
-            </xf:group>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

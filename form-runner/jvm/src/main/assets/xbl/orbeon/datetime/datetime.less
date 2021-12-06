@@ -11,6 +11,14 @@
             .xbl-fr-date, .xbl-fr-time {
                 // Override natural on date/time components
                 .fr-field-width-natural { max-width: none }
+                // Labels for date and time fields are for accessibility
+                .xforms-label {
+                    overflow : hidden;
+                    display  : block;
+                    height   : 0;
+                    width    : 0;
+                    margin   : 0;
+                }
             }
         }
         &.fr-field-width-natural {

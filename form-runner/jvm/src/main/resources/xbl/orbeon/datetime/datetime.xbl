@@ -24,8 +24,7 @@
         element="
            fr|datetime,
            xf|input:xxf-type('xs:dateTime')"
-        xxbl:mode="lhha binding value"
-        xxbl:label-for="date">
+        xxbl:mode="lhha binding value">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date and Time</display-name>
@@ -206,9 +205,13 @@
             <xf:var
                 name="field-width"
                 value="fr:component-param-value('field-width')"/>
-            <xh:div class="fr-datetime-fields fr-field-width-{$field-width}">
-                <fr:date ref="$local-date[not($view)]" id="date" xxf:title="{xxf:r('date')}"/>
-                <fr:time ref="$local-time[not($view)]" id="time" xxf:title="{xxf:r('time')}"/>
+            <xh:div class="fr-datetime-fields fr-field-width-{$field-width}" role="group" aria-label="{xxf:label('fr-datetime')}">
+                <fr:date ref="$local-date[not($view)]" id="date">
+                    <xf:label ref="xxf:r('date')"/>
+                </fr:date>
+                <fr:time ref="$local-time[not($view)]" id="time">
+                    <xf:label ref="xxf:r('time')"/>
+                </fr:time>
             </xh:div>
             <xf:input ref="$binding[$view]"/>
         </xbl:template>

@@ -28,8 +28,7 @@
     <xbl:binding
         id="fr-fields-date-binding"
         element="fr|fields-date, xf|input:xxf-type('xs:date')[appearance ~= fields]"
-        xxbl:mode="lhha binding value"
-        xxbl:label-for="input">
+        xxbl:mode="lhha binding value">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -116,7 +115,7 @@
                 </xf:action>
             </xf:var>
 
-            <xf:group class="fr-component-group">
+            <xh:div class="fr-component-group" role="group" aria-label="{xxf:label('fr-fields-date-binding')}">
 
                 <!-- Don't show fields at all in static readonly mode -->
                 <xf:group ref=".[not(is-readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">
@@ -129,7 +128,7 @@
                     <xf:var name="title-3"     value="xxf:r('components.date-time.year', '|fr-fr-resources|')"/>
 
                     <!-- navindex is copied to first field, but need one for second field too! -->
-                    <xf:input ref="$ref-1" class="fr-width-2digits" xbl:attr="navindex navindex=tabindex" id="input">
+                    <xf:input ref="$ref-1" class="fr-width-2digits" xbl:attr="navindex navindex=tabindex">
                         <xf:label value="$title-1"/>
                     </xf:input>
                     <xf:input ref="$ref-2" class="fr-width-2digits">
@@ -164,7 +163,7 @@
 
                 <!-- Date picker -->
                 <fr:date ref="$binding"/>
-            </xf:group>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

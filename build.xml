@@ -249,6 +249,8 @@
             <zipfileset dir="orbeon-war/jvm/target/webapp">
                 <!-- Filter local eXist that that might (but shouldn't) be in there -->
                 <exclude name="WEB-INF/exist-data/**"/>
+                <exclude name="WEB-INF/lib/orbeon-embedding.jar"/>
+                <exclude name="WEB-INF/lib/orbeon-proxy-portlet.jar"/>
             </zipfileset>
             <!-- eXist sample database -->
             <zipfileset dir="build/exist-data" prefix="WEB-INF/exist-data">

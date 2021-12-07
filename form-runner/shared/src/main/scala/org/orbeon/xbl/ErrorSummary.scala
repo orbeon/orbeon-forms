@@ -181,12 +181,12 @@ object ErrorSummary {
       )
 
     (event, currentErrorOpt, eventLevelOpt, alertOpt) match {
-      case (_: XFormsValueChangeEvent, Some(currentError), _, Some(alert)) =>
+      case (_: XFormsValuedChangeEvent, Some(currentError), _, Some(alert)) =>
 
         // Just update the alert
         XFormsAPI.setvalue(currentError /@ AlertAttName        , alert)
 
-      case (_: XFormsValueChangeEvent, _, _, _) =>
+      case (_: XFormsValuedChangeEvent, _, _, _) =>
 
         // NOP
 

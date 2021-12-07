@@ -180,8 +180,17 @@ object ErrorSummary {
         ! (errorsInstanceDoc.rootElement / * exists (_.attValue(LevelAttName) == ValidationLevel.ErrorLevel.entryName))
       )
 
-    (currentErrorOpt, eventLevelOpt, alertOpt) match {
-      case (Some(currentError), Some(actualEventLevel), Some(alert)) =>
+    (event, currentErrorOpt, eventLevelOpt, alertOpt) match {
+      case (_: XFormsValueChangeEvent, Some(currentError), _, Some(alert)) =>
+
+        // Just update the alert
+        XFormsAPI.setvalue(currentError /@ AlertAttName        , alert)
+
+      case (_: XFormsValueChangeEvent, _, _, _) =>
+
+        // NOP
+
+      case (_, Some(currentError), Some(actualEventLevel), Some(alert)) =>
 
         val levelAtt      = currentError /@ LevelAttName
         val previousLevel = ValidationLevel.withNameInsensitive(levelAtt.stringValue)
@@ -198,14 +207,14 @@ object ErrorSummary {
             updateValidStatusByScanning()
         }
 
-      case (Some(currentError), _, _) =>
+      case (_, Some(currentError), _, _) =>
 
         XFormsAPI.delete(currentError)
 
         if ((currentError attValue LevelAttName) == ValidationLevel.ErrorLevel.entryName)
           updateValidStatusByScanning()
 
-      case (None, Some(actualEventLevel), Some(alert)) =>
+      case (_, None, Some(actualEventLevel), Some(alert)) =>
 
         insertNewError(
           errorsInstanceDoc,

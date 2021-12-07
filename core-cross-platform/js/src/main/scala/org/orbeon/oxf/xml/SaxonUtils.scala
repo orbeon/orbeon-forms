@@ -310,8 +310,8 @@ object SaxonUtils {
   def emptyIterator: SequenceIterator = EmptyIterator.getInstance
   def valueAsIterator(v: ValueRepresentationType): SequenceIterator = if (v eq null) emptyIterator else v.iterate()
 
-  def selectID(node: NodeInfo, id: String): NodeInfo =
-    node.getTreeInfo.selectID(id, getParent = false)
+  def selectID(node: NodeInfo, id: String): Option[NodeInfo] =
+    Option(node.getTreeInfo.selectID(id, getParent = false))
 
   def newMapItem(map: Map[AtomicValue, ValueRepresentationType]): Item = {
     val m = new HashTrieMap

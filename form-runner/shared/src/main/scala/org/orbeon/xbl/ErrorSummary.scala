@@ -135,7 +135,7 @@ object ErrorSummary {
 
     val absoluteTargetId = XFormsId.effectiveIdToAbsoluteId(event.targetObject.getEffectiveId)
 
-    val currentErrorOpt = Option(SaxonUtils.selectID(errorsInstanceDoc, absoluteTargetId))
+    val currentErrorOpt = SaxonUtils.selectID(errorsInstanceDoc, absoluteTargetId)
 
     def xxfProperty[T](name: String) =
       event.property[T](xxfName(name))

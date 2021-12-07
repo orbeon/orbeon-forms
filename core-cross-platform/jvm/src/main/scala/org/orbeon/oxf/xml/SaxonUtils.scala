@@ -290,8 +290,8 @@ object SaxonUtils {
   def emptyIterator: SequenceIterator = EmptyIterator.getInstance
   def valueAsIterator(v: ValueRepresentationType): SequenceIterator = Value.asIterator(v)
 
-  def selectID(node: NodeInfo, id: String): NodeInfo =
-    node.getDocumentRoot.selectID(id)
+  def selectID(node: NodeInfo, id: String): Option[NodeInfo] =
+    Option(node.getDocumentRoot.selectID(id))
 
   def newMapItem(map: Map[AtomicValue, ValueRepresentationType]): Item =
     MapFunctions.createValue(map)

@@ -132,12 +132,12 @@ class XXFormsUnvisitedEvent(target: XFormsEventTarget, properties: PropertyGette
   def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
-class XFormsValueChangeEvent(target: XFormsEventTarget, properties: PropertyGetter)
+class XFormsValuedChangeEvent(target: XFormsEventTarget, properties: PropertyGetter)
   extends XFormsUIEvent(XFORMS_VALUE_CHANGED, target.asInstanceOf[XFormsControl], properties) {
-  def this(target: XFormsEventTarget) = this(target, XFormsValueChangeEvent.properties(target))
+  def this(target: XFormsEventTarget) = this(target, XFormsValuedChangeEvent.properties(target))
 }
 
-private object XFormsValueChangeEvent {
+private object XFormsValuedChangeEvent {
 
   val XXFValue = xxfName("value")
 

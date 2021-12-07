@@ -199,7 +199,7 @@
                         <!-- Control changes validity -->
                         <xf:action
                             xbl:attr="ev:observer=observer"
-                            ev:event="xforms-enabled xxforms-constraints-changed xforms-disabled xforms-invalid xforms-valid"
+                            ev:event="xforms-enabled xxforms-constraints-changed xforms-disabled xforms-invalid xforms-valid xforms-value-changed"
                             xxf:phantom="true"
                             ev:phase="capture"
                             type="xpath">

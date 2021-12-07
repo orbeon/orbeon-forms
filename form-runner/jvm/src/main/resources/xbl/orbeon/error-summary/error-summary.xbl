@@ -369,7 +369,7 @@
                                                                             value="@alert"/>
                                                                     </span>
                                                                 </xf:label>
-								<xf:action ev:event="DOMActivate">
+								                                <xf:action ev:event="DOMActivate">
                                                                     <xf:action type="javascript">
                                                                         <xf:param name="elemId" value="xxf:client-id(@id)"/>
                                                                         <xf:body>

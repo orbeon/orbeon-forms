@@ -123,7 +123,7 @@ trait FormRunnerBaseOps {
   // only called from the functions above, which search in a form's view, model, or binds, which implies the
   // existence of a form model.
   def formDefinitionHasIndex(inDoc: NodeInfo): Boolean =
-    SaxonUtils.selectID(inDoc, FormModel) ne null
+    SaxonUtils.selectID(inDoc, FormModel).isDefined
 
   def isUnder(node: NodeInfo, under: NodeInfo, includeSelf: Boolean): Boolean =
     if (includeSelf)
@@ -142,7 +142,7 @@ trait FormRunnerBaseOps {
         under descendant * find (_.id == id)
 
     def fromIndex =
-      Option(SaxonUtils.selectID(inDoc, id)) match {
+      SaxonUtils.selectID(inDoc, id) match {
         case elemOpt @ Some(elem) if isUnder(elem, under, includeSelf) => elemOpt
         case Some(_)                                                   => fromSearch
         case None                                                      => None
@@ -166,7 +166,7 @@ trait FormRunnerBaseOps {
     def parentIsNotGridOrLegacyRepeat(n: NodeInfo) =
       n parent FRGridOrLegacyRepeatTest isEmpty
 
-    def fromGroupById = Option(SaxonUtils.selectID(inDoc, "fb-body"))
+    def fromGroupById = SaxonUtils.selectID(inDoc, "fb-body")
     def fromGroup     = inDoc.rootElement / "*:body" descendant XFGroupTest find (_.id == "fb-body")
     def fromFRBody    = inDoc.rootElement / "*:body" descendant FRBodyTest  find parentIsNotGridOrLegacyRepeat
     def fromTemplate  = inDoc.rootElement / XBLTemplateTest headOption

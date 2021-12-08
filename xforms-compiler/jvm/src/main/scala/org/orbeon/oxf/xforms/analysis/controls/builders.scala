@@ -991,7 +991,7 @@ object NestedNameOrValueControlBuilder {
         containerPrefix = containerScope.fullPrefix,
         isWithinRepeat  = parent.exists(_.isWithinRepeat),
         acceptHTML      = false,
-        makeString      = StaticXPath.makeStringExpression
+        makeString      = StaticXPath.makeStringOptExpression
       )
 
     new NestedNameOrValueControl(

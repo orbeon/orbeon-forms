@@ -111,14 +111,13 @@ object LHHAAnalysisBuilder {
     // TODO: figure out whether to allow HTML or not (could default to true?)
 
     val (expressionOrConstant, containsHTML) =
-      XFormsStaticElementValue.findElemBindingOrValueExpression(element) map
-        (Left(_) -> LHHAAnalysis.isHTML(element))                        getOrElse
-        XFormsStaticElementValue.getElementExpressionOrConstant(
-          outerElem       = element,
-          containerPrefix = containerScope.fullPrefix,
-          isWithinRepeat  = parent.exists(_.isWithinRepeat),
-          acceptHTML      = true
-        )
+      XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
+        outerElem       = element,
+        containerPrefix = containerScope.fullPrefix,
+        isWithinRepeat  = parent.exists(_.isWithinRepeat),
+        acceptHTML      = true,
+        makeString      = StaticXPath.makeStringExpression
+      )
 
     val lhhaType: LHHA =
       LHHA.withNameOption(element.getName) getOrElse
@@ -892,11 +891,12 @@ object EventHandlerBuilder {
         isXBLHandler
       ) with WithExpressionOrConstantTrait {
         val (expressionOrConstant, _) =
-          XFormsStaticElementValue.getElementExpressionOrConstant(
+          XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
             outerElem       = element,
             containerPrefix = containerScope.fullPrefix,
             isWithinRepeat  = parent.exists(_.isWithinRepeat),
-            acceptHTML      = false
+            acceptHTML      = false,
+            makeString      = StaticXPath.makeStringExpression
           )
       }
     else
@@ -986,11 +986,12 @@ object NestedNameOrValueControlBuilder {
   ): NestedNameOrValueControl = {
 
     val (expressionOrConstant, _) =
-      XFormsStaticElementValue.getElementExpressionOrConstant(
+      XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
         outerElem       = element,
         containerPrefix = containerScope.fullPrefix,
         isWithinRepeat  = parent.exists(_.isWithinRepeat),
-        acceptHTML      = false
+        acceptHTML      = false,
+        makeString      = StaticXPath.makeStringExpression
       )
 
     new NestedNameOrValueControl(
@@ -1056,11 +1057,12 @@ object MessageActionBuilder {
         with WithExpressionOrConstantTrait {
 
         val (expressionOrConstant, _) =
-          XFormsStaticElementValue.getElementExpressionOrConstant(
+          XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
             outerElem       = element,
             containerPrefix = containerScope.fullPrefix,
             isWithinRepeat  = parent.exists(_.isWithinRepeat),
-            acceptHTML      = false
+            acceptHTML      = false,
+            makeString      = StaticXPath.makeStringExpression
           )
       }
   }

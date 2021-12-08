@@ -1,5 +1,6 @@
 package org.orbeon.oxf.xforms
 
+import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.oxf.xml.dom.Converter._
 import org.scalatest.funspec.AnyFunSpec
 
@@ -71,11 +72,12 @@ class XFormsStaticElementValueTest extends AnyFunSpec {
       it(s"must pass for $desc") {
 
         val (expressionOrConstant, containsHTML) =
-          XFormsStaticElementValue.getElementExpressionOrConstant(
+          XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
             outerElem       = doc.getRootElement,
             containerPrefix = "prefix$",
             isWithinRepeat  = isWithinRepeat,
             acceptHTML      = true,
+            makeString      = StaticXPath.makeStringExpression
           )
 
         assert(expectedExprOrConst  == expressionOrConstant)

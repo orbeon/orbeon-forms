@@ -426,13 +426,12 @@ object ElementAnalysisTreeXPathAnalyzer {
                 val prefixedId = XFormsId.getRelatedEffectiveId(e.prefixedId, staticId)
 
                 val (expressionOrConstant, _) =
-                  XFormsStaticElementValue.findElemBindingOrValueExpression(nestedElement) map
-                  (Left(_) -> LHHAAnalysis.isHTML(nestedElement))                          getOrElse
-                  XFormsStaticElementValue.getElementExpressionOrConstant(
+                  XFormsStaticElementValue.findElementExpressionOrConstantDirectOrNested(
                     outerElem       = nestedElement,
                     containerPrefix = "",    // won't be used
                     isWithinRepeat  = false, // won't be used
-                    acceptHTML      = true
+                    acceptHTML      = true,
+                    makeString      = StaticXPath.makeStringExpression
                   )
 
                 val nestedAnalysis = new LHHAAnalysis( // TODO: Weird! We have LHH, but also `value` and `copy`.

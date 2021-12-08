@@ -31,16 +31,33 @@ object XFormsStaticElementValue {
 
   type XPathExpressionString = String
 
-  def findElemBindingOrValueExpression(elem: dom.Element): Option[String] = {
+  def findElementExpressionOrConstantDirectOrNested(
+    outerElem       : dom.Element,
+    containerPrefix : String,
+    isWithinRepeat  : Boolean,
+    acceptHTML      : Boolean,
+    makeString      : String => String
+  ): (Either[XPathExpressionString, String], Boolean) =
+    findElemBindingOrValueExpression(outerElem) map
+    makeString                                  map
+    (Left(_) -> LHHAAnalysis.isHTML(outerElem)) getOrElse
+    getElementExpressionOrConstant(
+      outerElem       = outerElem,
+      containerPrefix = containerPrefix,
+      isWithinRepeat  = isWithinRepeat,
+      acceptHTML      = acceptHTML
+    )
+
+  private def findElemBindingOrValueExpression(elem: dom.Element): Option[String] = {
 
     def fromValue =
-      elem.attributeValueOpt(XFormsNames.VALUE_QNAME) map StaticXPath.makeStringExpression
+      elem.attributeValueOpt(XFormsNames.VALUE_QNAME)
 
     def fromRef =
-      ElementAnalysis.getBindingExpression(elem) map StaticXPath.makeStringExpression
+      ElementAnalysis.getBindingExpression(elem)
 
     def fromBind =
-      elem.attributeValueOpt(XFormsNames.BIND_QNAME) map (v => StaticXPath.makeStringExpression(s"""bind('$v')"""))
+      elem.attributeValueOpt(XFormsNames.BIND_QNAME) map (v => s"""bind('$v')""")
 
    fromValue orElse fromRef orElse fromBind
   }
@@ -54,7 +71,7 @@ object XFormsStaticElementValue {
   //
   // NOTE: The XBL scope cannot be changed on nested `<xf:output>`.
   //
-  def getElementExpressionOrConstant(
+  private def getElementExpressionOrConstant(
     outerElem       : dom.Element,
     containerPrefix : String,
     isWithinRepeat  : Boolean,
@@ -126,7 +143,9 @@ object XFormsStaticElementValue {
               // Instead, we take `value`, then `ref`, then `bind`.
               // For the outer element, `value` will evaluated relative to `ref` or `bind` if present.
               // TODO: Throw an error for invalid conditions.
-              findElemBindingOrValueExpression(elem) foreach { v =>
+              // 2021-12-07: `elem eq outerElem` should no longer cause the following to call `addExpr()` as we
+              // check `findElemBindingOrValueExpression()` before calling this function.
+              findElemBindingOrValueExpression(elem) map StaticXPath.makeStringExpression foreach { v =>
                 addExpr(v, isHTMLMediatype)
               }
             } else {

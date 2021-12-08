@@ -44,8 +44,9 @@ trait StaticXPathTrait {
   // Compiled expression with source information
   case class CompiledExpression(expression: XPathExpression, string: String, locationData: LocationData)
 
-  def makeStringExpression(expression: String): String =  "string((" + expression + ")[1])"
-  def makeBooleanExpression(expression: String): String =  "boolean(" + expression + ")"
+  def makeStringExpression   (expression: String): String =  "string((" + expression + ")[1])"
+  def makeStringOptExpression(expression: String): String =  "xs:string((" + expression + ")[1])"
+  def makeBooleanExpression  (expression: String): String =  "boolean(" + expression + ")"
 
   val GlobalConfiguration: SaxonConfiguration
 

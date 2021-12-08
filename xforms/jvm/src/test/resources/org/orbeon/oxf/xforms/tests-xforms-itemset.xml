@@ -173,9 +173,11 @@
                         <xh:html>
                             <xh:head>
                                 <xf:model id="model" xxf:encrypt-item-values="false">
+
                                     <xf:instance id="selection">
                                         <value/>
                                     </xf:instance>
+
                                     <!-- All items relevant -->
                                     <xf:instance id="itemset-1">
                                         <items>
@@ -193,6 +195,7 @@
                                             <item id="3"/>
                                         </items>
                                     </xf:instance>
+
                                     <!-- Some items non-relevant due to relevant MIP -->
                                     <xf:instance id="itemset-2">
                                         <items>
@@ -215,6 +218,7 @@
                                         </items>
                                     </xf:instance>
                                     <xf:bind ref="instance('itemset-2')//item[@relevant = 'false']" relevant="false()"/>
+
                                     <xf:instance id="itemset-3">
                                         <items>
                                             <item id="1"/>
@@ -255,6 +259,8 @@
                                 </xf:select>
 
                                 <!-- Some items non-relevant due to value pointing to empty node-set -->
+                                <!-- 2021-12-08: Changed with #4843 as those now create `ChoiceNode`s and remain in the
+                                     itemset! To achieve the same result, filter at the level of the item instead. -->
                                 <xf:select id="select-3" ref=".">
                                     <xf:itemset ref="instance('itemset-3')//item">
                                         <xf:label ref="@id"/>
@@ -284,7 +290,7 @@
                             <xxf:itemset>[{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.3","value":"2.3","children":[{"label":"2.3.1","value":"2.3.1"},{"label":"2.3.2","value":"2.3.2","children":[{"label":"2.3.3","value":"2.3.3"}]}]}]},{"label":"3","value":"3"}]</xxf:itemset>
                         </xxf:control>
                         <xxf:control id="select-3">
-                            <xxf:itemset>[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.three.4","value":"2.three.4"}]}]</xxf:itemset>
+                            <xxf:itemset>[{"label":"1","value":"1"},{"label":"2","value":"2","children":[{"label":"2.1","value":"2.1"},{"label":"2.2","value":"2.2"},{"label":"2.3","children":[{"label":"2.3.1"},{"label":"2.3.2","children":[{"label":"2.3.3"},{"label":"2.three.4","value":"2.three.4"}]}]}]},{"label":"3"}]</xxf:itemset>
                         </xxf:control>
                     </xxf:control-values>
                 </xxf:action>

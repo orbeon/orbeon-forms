@@ -328,12 +328,14 @@
                     <item id="0">Control Value</item>
                     <item id="1">Formula</item>
                     <item id="2">All Control Values</item>
-                    <item id="3">Link to the "edit" page</item>
-                    <item id="4">Link to the "view" page</item>
-                    <item id="5">Link to the "new" page</item>
-                    <item id="6">Link to the "summary" page</item>
-                    <item id="7">Link to the "home" page</item>
-                    <item id="8">Link to the PDF file</item>
+                    <choice label="Link">
+                        <item id="3">Edit page</item>
+                        <item id="4">View page</item>
+                        <item id="5">New page</item>
+                        <item id="6">Summary page</item>
+                        <item id="7">Home page</item>
+                        <item id="8">PDF file</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>
@@ -1649,15 +1651,17 @@
                     <alert>Valeur manquante</alert>
                 </control>
                 <type>
-                    <item id="0">Valeur de contrôle</item>
-                    <item id="1">Expression XPath</item>
+                    <item id="0">Valeur du contrôle</item>
+                    <item id="1">Formule</item>
                     <item id="2">Toutes les valeurs</item>
-                    <item id="3">Lien à la page d'édition</item>
-                    <item id="4">Lien à la page de visualisation</item>
-                    <item id="5">Lien à la page de création</item>
-                    <item id="6">Lien à la page de sommaire</item>
-                    <item id="7">Lien à la page d'accueil</item>
-                    <item id="8">Lien au fichier PDF</item>
+                    <choice label="Lien">
+                        <item id="3">Page d'édition</item>
+                        <item id="4">Page de visualisation</item>
+                        <item id="5">Page de création</item>
+                        <item id="6">Page de sommaire</item>
+                        <item id="7">Page d'accueil</item>
+                        <item id="8">Fichier PDF</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>
@@ -2959,12 +2963,14 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <item id="3" todo="true">[Link to the "edit" page]</item>
-                    <item id="4" todo="true">[Link to the "view" page]</item>
-                    <item id="5" todo="true">[Link to the "new" page]</item>
-                    <item id="6" todo="true">[Link to the "summary" page]</item>
-                    <item id="7" todo="true">[Link to the "home" page]</item>
-                    <item id="8" todo="true">[Link to the PDF file]</item>
+                    <choice todo="true" label="Link">
+                        <item id="3" todo="true">[Edit page]</item>
+                        <item id="4" todo="true">[View page]</item>
+                        <item id="5" todo="true">[New page]</item>
+                        <item id="6" todo="true">[Summary page]</item>
+                        <item id="7" todo="true">[Home page]</item>
+                        <item id="8" todo="true">[PDF file]</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>
@@ -4294,12 +4300,14 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <item id="3" todo="true">[Link to the "edit" page]</item>
-                    <item id="4" todo="true">[Link to the "view" page]</item>
-                    <item id="5" todo="true">[Link to the "new" page]</item>
-                    <item id="6" todo="true">[Link to the "summary" page]</item>
-                    <item id="7" todo="true">[Link to the "home" page]</item>
-                    <item id="8" todo="true">[Link to the PDF file]</item>
+                    <choice todo="true" label="Link">
+                        <item id="3" todo="true">[Edit page]</item>
+                        <item id="4" todo="true">[View page]</item>
+                        <item id="5" todo="true">[New page]</item>
+                        <item id="6" todo="true">[Summary page]</item>
+                        <item id="7" todo="true">[Home page]</item>
+                        <item id="8" todo="true">[PDF file]</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>
@@ -5629,12 +5637,14 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <item id="3" todo="true">[Link to the "edit" page]</item>
-                    <item id="4" todo="true">[Link to the "view" page]</item>
-                    <item id="5" todo="true">[Link to the "new" page]</item>
-                    <item id="6" todo="true">[Link to the "summary" page]</item>
-                    <item id="7" todo="true">[Link to the "home" page]</item>
-                    <item id="8" todo="true">[Link to the PDF file]</item>
+                    <choice todo="true" label="Link">
+                        <item id="3" todo="true">[Edit page]</item>
+                        <item id="4" todo="true">[View page]</item>
+                        <item id="5" todo="true">[New page]</item>
+                        <item id="6" todo="true">[Summary page]</item>
+                        <item id="7" todo="true">[Home page]</item>
+                        <item id="8" todo="true">[PDF file]</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>
@@ -6956,12 +6966,14 @@
                     <item id="0">Steuerelement-Wert</item>
                     <item id="1">Formel Ausdruck</item>
                     <item id="2">Werte aller Steuerelemente</item>
-                    <item id="3" todo="true">[Link to the "edit" page]</item>
-                    <item id="4" todo="true">[Link to the "view" page]</item>
-                    <item id="5" todo="true">[Link to the "new" page]</item>
-                    <item id="6" todo="true">[Link to the "summary" page]</item>
-                    <item id="7" todo="true">[Link to the "home" page]</item>
-                    <item id="8" todo="true">[Link to the PDF file]</item>
+                    <choice todo="true" label="Link">
+                        <item id="3" todo="true">[Edit page]</item>
+                        <item id="4" todo="true">[View page]</item>
+                        <item id="5" todo="true">[New page]</item>
+                        <item id="6" todo="true">[Summary page]</item>
+                        <item id="7" todo="true">[Home page]</item>
+                        <item id="8" todo="true">[PDF file]</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>
@@ -8286,12 +8298,14 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <item id="3" todo="true">[Link to the "edit" page]</item>
-                    <item id="4" todo="true">[Link to the "view" page]</item>
-                    <item id="5" todo="true">[Link to the "new" page]</item>
-                    <item id="6" todo="true">[Link to the "summary" page]</item>
-                    <item id="7" todo="true">[Link to the "home" page]</item>
-                    <item id="8" todo="true">[Link to the PDF file]</item>
+                    <choice todo="true" label="Link">
+                        <item id="3" todo="true">[Edit page]</item>
+                        <item id="4" todo="true">[View page]</item>
+                        <item id="5" todo="true">[New page]</item>
+                        <item id="6" todo="true">[Summary page]</item>
+                        <item id="7" todo="true">[Home page]</item>
+                        <item id="8" todo="true">[PDF file]</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>
@@ -9613,12 +9627,14 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <item id="3" todo="true">[Link to the "edit" page]</item>
-                    <item id="4" todo="true">[Link to the "view" page]</item>
-                    <item id="5" todo="true">[Link to the "new" page]</item>
-                    <item id="6" todo="true">[Link to the "summary" page]</item>
-                    <item id="7" todo="true">[Link to the "home" page]</item>
-                    <item id="8" todo="true">[Link to the PDF file]</item>
+                    <choice todo="true" label="Link">
+                        <item id="3" todo="true">[Edit page]</item>
+                        <item id="4" todo="true">[View page]</item>
+                        <item id="5" todo="true">[New page]</item>
+                        <item id="6" todo="true">[Summary page]</item>
+                        <item id="7" todo="true">[Home page]</item>
+                        <item id="8" todo="true">[PDF file]</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>
@@ -10941,12 +10957,14 @@
                     <item id="0">Control-waarde</item>
                     <item id="1">Formule</item>
                     <item id="2">Alle control-waarden</item>
-                    <item id="3" todo="true">[Link to the "edit" page]</item>
-                    <item id="4" todo="true">[Link to the "view" page]</item>
-                    <item id="5" todo="true">[Link to the "new" page]</item>
-                    <item id="6" todo="true">[Link to the "summary" page]</item>
-                    <item id="7" todo="true">[Link to the "home" page]</item>
-                    <item id="8" todo="true">[Link to the PDF file]</item>
+                    <choice todo="true" label="Link">
+                        <item id="3" todo="true">[Edit page]</item>
+                        <item id="4" todo="true">[View page]</item>
+                        <item id="5" todo="true">[New page]</item>
+                        <item id="6" todo="true">[Summary page]</item>
+                        <item id="7" todo="true">[Home page]</item>
+                        <item id="8" todo="true">[PDF file]</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>
@@ -12248,12 +12266,14 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <item id="3" todo="true">[Link to the "edit" page]</item>
-                    <item id="4" todo="true">[Link to the "view" page]</item>
-                    <item id="5" todo="true">[Link to the "new" page]</item>
-                    <item id="6" todo="true">[Link to the "summary" page]</item>
-                    <item id="7" todo="true">[Link to the "home" page]</item>
-                    <item id="8" todo="true">[Link to the PDF file]</item>
+                    <choice todo="true" label="Link">
+                        <item id="3" todo="true">[Edit page]</item>
+                        <item id="4" todo="true">[View page]</item>
+                        <item id="5" todo="true">[New page]</item>
+                        <item id="6" todo="true">[Summary page]</item>
+                        <item id="7" todo="true">[Home page]</item>
+                        <item id="8" todo="true">[PDF file]</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>
@@ -13582,12 +13602,14 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <item id="3" todo="true">[Link to the "edit" page]</item>
-                    <item id="4" todo="true">[Link to the "view" page]</item>
-                    <item id="5" todo="true">[Link to the "new" page]</item>
-                    <item id="6" todo="true">[Link to the "summary" page]</item>
-                    <item id="7" todo="true">[Link to the "home" page]</item>
-                    <item id="8" todo="true">[Link to the PDF file]</item>
+                    <choice todo="true" label="Link">
+                        <item id="3" todo="true">[Edit page]</item>
+                        <item id="4" todo="true">[View page]</item>
+                        <item id="5" todo="true">[New page]</item>
+                        <item id="6" todo="true">[Summary page]</item>
+                        <item id="7" todo="true">[Home page]</item>
+                        <item id="8" todo="true">[PDF file]</item>
+                    </choice>
                 </type>
             </parameters-editor>
         </components>

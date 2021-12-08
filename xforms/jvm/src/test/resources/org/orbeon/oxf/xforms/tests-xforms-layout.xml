@@ -2516,4 +2516,155 @@
             </controls>
         </output>
     </test>
+
+    <test description="#4843: xf:select1 produces optgroup" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model" xxf:encrypt-item-values="false">
+
+                        <xf:instance id="selection">
+                            <_/>
+                        </xf:instance>
+
+                        <xf:instance id="itemset-1">
+                            <_>
+                                <choices>
+                                    <label>Common Types</label>
+                                    <type label="String">string</type>
+                                    <type label="Boolean">boolean</type>
+                                </choices>
+                                <choices>
+                                    <label>Number Types</label>
+                                    <type label="Decimal">decimal</type>
+                                    <type label="Integer">integer</type>
+                                </choices>
+                                <choices>
+                                    <label>Date and Time Types</label>
+                                    <type label="Date">date</type>
+                                    <type label="Time">time</type>
+                                </choices>
+                            </_>
+                        </xf:instance>
+
+                        <xf:instance id="itemset-2">
+                            <_>
+                                <item id="1"/>
+                                <item id="2">
+                                    <item id="2.1"/>
+                                    <item id="2.2">
+                                        <item id="2.2.1"/>
+                                        <item id="2.2.2">
+                                            <item id="2.2.2.1"/>
+                                            <item id="2.2.2.2"/>
+                                        </item>
+                                    </item>
+                                </item>
+                            </_>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:select1 id="select1-minimal-one-nesting-level" ref="." appearance="minimal">
+                        <xf:itemset ref="instance('itemset-1')//(choices | type)">
+                            <xf:label ref="if (self::choices) then label else if (xxf:non-blank(@label)) then @label else ."/>
+                            <xf:value ref="if (self::choices) then () else ."/>
+                        </xf:itemset>
+                    </xf:select1>
+                    <!-- Only one level of nesting will be preserved as HTML only supports one level -->
+                    <xf:select1 id="select1-minimal-multiple-nesting-level" ref="." appearance="minimal">
+                        <xf:itemset ref="instance('itemset-2')//item">
+                            <xf:label ref="@id"/>
+                            <xf:value ref="if (empty(*)) then @id else ()"/>
+                        </xf:itemset>
+                    </xf:select1>
+                    <!-- Appearance `full`, for now, flattens itemsets with nesting -->
+                    <xf:select1 id="select1-full-multiple-nesting-level" ref="." appearance="full">
+                        <xf:itemset ref="instance('itemset-2')//item">
+                            <xf:label ref="@id"/>
+                            <xf:value ref="if (empty(*)) then @id else ()"/>
+                        </xf:itemset>
+                    </xf:select1>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:span id="select1-minimal-one-nesting-level"
+                         class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                    <xh:select id="select1-minimal-one-nesting-level≡≡c" name="select1-minimal-one-nesting-level">
+                        <xh:optgroup label="Common Types">
+                            <xh:option value="string">String</xh:option>
+                            <xh:option value="boolean">Boolean</xh:option>
+                        </xh:optgroup>
+                        <xh:optgroup label="Number Types">
+                            <xh:option value="decimal">Decimal</xh:option>
+                            <xh:option value="integer">Integer</xh:option>
+                        </xh:optgroup>
+                        <xh:optgroup label="Date and Time Types">
+                            <xh:option value="date">Date</xh:option>
+                            <xh:option value="time">Time</xh:option>
+                        </xh:optgroup>
+                    </xh:select>
+                </xh:span>
+                <xh:span id="select1-minimal-multiple-nesting-level"
+                         class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                    <xh:select id="select1-minimal-multiple-nesting-level≡≡c" name="select1-minimal-multiple-nesting-level">
+                        <xh:option value="1">1</xh:option>
+                        <xh:optgroup label="2">
+                            <xh:option value="2.1">2.1</xh:option>
+                        </xh:optgroup>
+                        <xh:optgroup label="2.2">
+                            <xh:option value="2.2.1">2.2.1</xh:option>
+                        </xh:optgroup>
+                        <xh:optgroup label="2.2.2">
+                            <xh:option value="2.2.2.1">2.2.2.1</xh:option>
+                            <xh:option value="2.2.2.2">2.2.2.2</xh:option>
+                        </xh:optgroup>
+                    </xh:select>
+                </xh:span>
+                <xh:span id="select1-full-multiple-nesting-level"
+                         class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full">
+                    <xh:span class="xforms-items xforms-help-popover-control" role="radiogroup">
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="radio">
+                                <xh:input id="select1-full-multiple-nesting-level≡≡e0" type="radio"
+                                          name="select1-full-multiple-nesting-level" value="1"/>
+                                <xh:span>1</xh:span>
+                            </xh:label>
+                        </xh:span>
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="radio">
+                                <xh:input id="select1-full-multiple-nesting-level≡≡e1" type="radio"
+                                          name="select1-full-multiple-nesting-level" value="2.1"/>
+                                <xh:span>2.1</xh:span>
+                            </xh:label>
+                        </xh:span>
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="radio">
+                                <xh:input id="select1-full-multiple-nesting-level≡≡e2" type="radio"
+                                          name="select1-full-multiple-nesting-level" value="2.2.1"/>
+                                <xh:span>2.2.1</xh:span>
+                            </xh:label>
+                        </xh:span>
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="radio">
+                                <xh:input id="select1-full-multiple-nesting-level≡≡e3" type="radio"
+                                          name="select1-full-multiple-nesting-level" value="2.2.2.1"/>
+                                <xh:span>2.2.2.1</xh:span>
+                            </xh:label>
+                        </xh:span>
+                        <xh:span class="xforms-deselected">
+                            <xh:label class="radio">
+                                <xh:input id="select1-full-multiple-nesting-level≡≡e4" type="radio"
+                                          name="select1-full-multiple-nesting-level" value="2.2.2.2"/>
+                                <xh:span>2.2.2.2</xh:span>
+                            </xh:label>
+                        </xh:span>
+                    </xh:span>
+                </xh:span>
+            </controls>
+        </output>
+    </test>
 </group>

@@ -137,12 +137,20 @@
                         <xf:select1 ref="$current-param" class="fb-param-type" xxf:exclude-whitespace-text-nodes="true">
                             <xf:label>Type</xf:label>
                             <xf:itemset
-                                ref="$resources/components/parameters-editor/type/item[
-                                    (@id = (0 to 1)) or
-                                    (@id = 2        and xxf:component-param-value('all-control-values') = 'true') or
-                                    (@id = (3 to 8) and xxf:component-param-value('form-runner-links')  = 'true')
-                                ]">
-                                <xf:label ref="."/>
+                                ref="
+                                    let $all-control-values := xxf:component-param-value('all-control-values') = 'true',
+                                        $form-runner-links  := xxf:component-param-value('form-runner-links')  = 'true'
+                                    return
+                                        $resources/components/parameters-editor/type//(
+                                            item[
+                                                @id = (0 to 1)                         or
+                                                @id = (2     ) and $all-control-values or
+                                                @id = (3 to 8) and $form-runner-links
+                                            ]
+                                            |
+                                            choice[$form-runner-links or empty(item[@id = (3 to 8)])]
+                                        )">
+                                <xf:label ref="@label, ."/>
                                 <xf:copy
                                     ref="
                                         let $type :=
@@ -152,34 +160,34 @@
                                                 'ExpressionParam'
                                             else if (@id = 2) then
                                                 'AllControlValuesParam'
-                                            else if (@id = (3 to 8)) then
-                                                if (@id = 3) then
-                                                    'LinkToEditPageParam'
-                                                else if (@id = 4) then
-                                                    'LinkToViewPageParam'
-                                                else if (@id = 5) then
-                                                    'LinkToNewPageParam'
-                                                else if (@id = 6) then
-                                                    'LinkToSummaryPageParam'
-                                                else if (@id = 7) then
-                                                    'LinkToHomePageParam'
-                                                else if (@id = 8) then
-                                                    'LinkToPdfParam'
-                                                else
-                                                    error()
+                                            else if (@id = 3) then
+                                                'LinkToEditPageParam'
+                                            else if (@id = 4) then
+                                                'LinkToViewPageParam'
+                                            else if (@id = 5) then
+                                                'LinkToNewPageParam'
+                                            else if (@id = 6) then
+                                                'LinkToSummaryPageParam'
+                                            else if (@id = 7) then
+                                                'LinkToHomePageParam'
+                                            else if (@id = 8) then
+                                                'LinkToPdfParam'
                                             else
-                                                error(),
+                                                (),
                                             $template := instance('values-template')/fr:param[@type = $type]
                                         return
-                                            (
-                                                $template/@type,
-                                                if ($type = $current-param/@type) then
-                                                    $current-param/*             (: keep the currently-selected value as is :)
-                                                else (
-                                                    $current-param/fr:name,      (: always keep the parameter name          :)
-                                                    $template/(* except fr:name) (: but use the other elements if any       :)
-                                                )
-                                           )"/>
+                                            if (exists($type)) then
+                                                (
+                                                    $template/@type,
+                                                    if ($type = $current-param/@type) then
+                                                        $current-param/*             (: keep the currently-selected value as is :)
+                                                    else (
+                                                        $current-param/fr:name,      (: always keep the parameter name          :)
+                                                        $template/(* except fr:name) (: but use the other elements if any       :)
+                                                    )
+                                               )
+                                           else
+                                               ()"/>
                             </xf:itemset>
                         </xf:select1>
 

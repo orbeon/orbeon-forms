@@ -35,7 +35,7 @@ import org.orbeon.oxf.xforms.itemset.StaticItemsetSupport.isSelected
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{SaxonUtils, XMLReceiver, XMLUtils}
 import org.orbeon.saxon.om
-import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.SAXException
@@ -120,7 +120,7 @@ object ItemsetSupport {
 
                     contextStack.pushBinding(domElem, getElementEffectiveId(parentEffectiveId, elem), elem.scope)
 
-                    createValueNode(elem, position) foreach { newItem =>
+                    getValueOrCopyItemValue(elem) map (createValueNode(_, elem, position)) foreach { newItem =>
                       currentContainer.addChildItem(newItem)
                       position += 1
                     }
@@ -138,17 +138,19 @@ object ItemsetSupport {
 
                     for (currentPosition <- 1 to currentSequence.size)
                       withIteration(currentPosition) { currentXPathItem =>
-
                         // We support relevance of items as an extension to XForms
                         // NOTE: If a node is non-relevant, all its descendants will be non-relevant as
                         // well. If a node is non-relevant, it should be as if it had not even been part of
                         // the nodeset.
                         if (XFormsSingleNodeControl.isRelevantItem(currentXPathItem)) {
-                          createValueNode(elem, position) foreach { newItem =>
-                            levelAndStack = updatedLevelAndItemStack(levelAndStack, currentXPathItem)
-                            currentContainer.addChildItem(newItem)
-                            position += 1
-                          }
+                          levelAndStack = updatedLevelAndItemStack(levelAndStack, currentXPathItem) // mutates `currentContainer`!
+                          currentContainer.addChildItem(
+                            getValueOrCopyItemValue(elem) match {
+                              case Some(newValue) => createValueNode(newValue, elem, position)
+                              case None           => createChoiceNode(elem, position)
+                            }
+                          )
+                          position += 1
                         }
 
                       }(contextStack)
@@ -202,7 +204,7 @@ object ItemsetSupport {
                         newItemStack = newItemStack.tail
                         currentContainer = currentContainer.parent
                       }
-                    } else if (newLevel > currentLevel) {
+                    } else /*if (newLevel > currentLevel)*/ {
                       // Going up one level, set new container as last added child
                       currentContainer = currentContainer.lastChild
                     }
@@ -213,18 +215,16 @@ object ItemsetSupport {
                 (newLevel, currentXPathItem :: newItemStack)
               }
 
-              private def createValueNode(elem: ElementAnalysis, position: Int): Option[Item.ValueNode] =
-                getValueOrCopyItemValue(elem) map { value =>
-                  Item.ValueNode(
-                    label      = findLhhValue(findChildElem(elem, LABEL_QNAME), required = true) getOrElse LHHAValue.Empty,
-                    help       = findLhhValue(findChildElem(elem, HELP_QNAME),  required = false),
-                    hint       = findLhhValue(findChildElem(elem, HINT_QNAME),  required = false),
-                    value      = value,
-                    attributes = getAttributes(elem)
-                  )(
-                    position   = position
-                  )
-                }
+              private def createValueNode(value: Item.Value[om.Item], elem: ElementAnalysis, position: Int): Item.ValueNode =
+                Item.ValueNode(
+                  label      = findLhhValue(findChildElem(elem, LABEL_QNAME), required = true) getOrElse LHHAValue.Empty,
+                  help       = findLhhValue(findChildElem(elem, HELP_QNAME),  required = false),
+                  hint       = findLhhValue(findChildElem(elem, HINT_QNAME),  required = false),
+                  value      = value,
+                  attributes = getAttributes(elem)
+                )(
+                  position   = position
+                )
 
               private def createChoiceNode(elem: ElementAnalysis, position: Int): Item.ChoiceNode =
                 Item.ChoiceNode(
@@ -240,6 +240,7 @@ object ItemsetSupport {
                   findChildElem(elem, XFORMS_VALUE_QNAME) map
                     (_.asInstanceOf[WithExpressionOrConstantTrait]) flatMap { valueElem =>
 
+                      // Returns `None` if the result is `()`
                       val rawValue = evaluateExpressionOrConstant(valueElem, parentEffectiveId, pushContextAndModel = true)
 
                       // For multiple selection:

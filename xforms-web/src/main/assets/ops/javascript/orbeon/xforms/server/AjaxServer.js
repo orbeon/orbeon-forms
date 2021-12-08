@@ -161,69 +161,7 @@
                             controlsWithUpdatedItemsets[controlId] = true;
 
                             if ($(documentElement).is('.xforms-select1-appearance-compact, .xforms-select-appearance-compact, .xforms-select1-appearance-minimal')) {
-
-                                // Case of list / combobox
-                                var select = documentElement.getElementsByTagName("select")[0];
-
-                                // Remember selected values
-                                var selectedOptions = _.filter(select.options, function(option) {
-                                    return option.selected;
-                                });
-
-                                var selectedValues = _.map(selectedOptions, function(option) {
-                                    return option.value;
-                                });
-
-                                // Utility function to generate an option
-                                function generateOption(label, value, clazz, selectedValues) {
-                                    var selected = _.contains(selectedValues, value);
-                                    return '<option value="' + ORBEON.common.MarkupUtils.escapeXmlForAttribute(value) + '"'
-                                            + (selected ? ' selected="selected"' : '')
-                                            + (clazz != null ? ' class="' + ORBEON.common.MarkupUtils.escapeXmlForAttribute(clazz) + '"' : '')
-                                            + '>' + label + '</option>';
-                                }
-
-                                // Utility function to generate an item, including its sub-items, and make sure we do not produce nested optgroups
-                                var sb = []; // avoid concatenation to the same string over and over again
-                                var inOptgroup = false;
-                                function generateItem(itemElement) {
-                                    var clazz = null;
-                                    if (! _.isUndefined(itemElement.attributes) && ! _.isUndefined(itemElement.attributes["class"])) {
-                                        // We have a class property
-                                        clazz = itemElement.attributes["class"];
-                                    }
-                                    if (_.isUndefined(itemElement.children)) { // a normal value
-                                        sb[sb.length] =  generateOption(itemElement.label, itemElement.value, clazz, selectedValues);
-                                    }
-                                    else { // containing sub-items
-                                        // the remaining elements: sub-items
-                                        if (inOptgroup) // nested optgroups are not allowed, close the old one
-                                            sb[sb.length] = '</optgroup>';
-                                        // open optgroup
-                                        sb[sb.length] = '<optgroup label="' + ORBEON.common.MarkupUtils.escapeXmlForAttribute(itemElement.label) + '"'
-                                            + (clazz != null ? ' class="' + ORBEON.common.MarkupUtils.escapeXmlForAttribute(clazz) + '"' : '')
-                                            + '">';
-                                        inOptgroup = true;
-                                        // add subitems
-                                        _.each(itemElement.children, function(child) {
-                                            generateItem(child);
-                                        });
-                                        // if necessary, close optgroup
-                                        if (inOptgroup)
-                                            sb[sb.length] = '</optgroup>';
-                                        inOptgroup = false;
-                                    }
-                                }
-
-
-                                // Build new content for the select element
-                                _.each(itemsetTree, function(item) {
-                                    generateItem(item);
-                                });
-
-                                // Set content of select element
-                                select.innerHTML = sb.join("");
-
+                                ORBEON.xforms.XFormsUi.updateSelectItemset(documentElement, itemsetTree);
                             } else {
 
                                 // Case of checkboxes / radio buttons

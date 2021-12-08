@@ -63,6 +63,41 @@ object XPathCache extends XPathCacheTrait {
     }
   }
 
+  def evaluateSingle(
+    contextItems       : ju.List[om.Item],
+    contextPosition    : Int,
+    xpathString        : String,
+    namespaceMapping   : NamespaceMapping,
+    variableToValueMap : ju.Map[String, ValueRepresentationType],
+    functionLibrary    : FunctionLibrary,
+    functionContext    : FunctionContext,
+    baseURI            : String,
+    locationData       : LocationData,
+    reporter           : Reporter
+  ): Any = {
+    XPath.Logger.debug(s"`XPathCache.evaluateSingle()` for `$xpathString`")
+
+    val (xpathExpression, variables) =
+      getXPathExpression(
+        XPath.GlobalConfiguration,
+        xpathString,
+        namespaceMapping,
+        variableToValueMap,
+        functionLibrary,
+        baseURI,
+        isAVT = false,
+        locationData
+      )
+
+    val (contextItem, contextPos) = adjustContextItem(contextItems, contextPosition)
+
+    withEvaluation(xpathString, locationData, reporter) {
+      withFunctionContext(functionContext) {
+        singleItemToJavaKeepNodeInfoOpt(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables).next())
+      }
+    }
+  }
+
   def evaluateAsExtent(
     contextItems       : ju.List[om.Item],
     contextPosition    : Int,
@@ -218,7 +253,7 @@ object XPathCache extends XPathCacheTrait {
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
-        Option(singleItemToJavaKeepNodeInfoOrNull(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables).next())) map (_.toString)
+        singleItemToJavaKeepNodeInfoOpt(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables).next()) map (_.toString)
       }
     }
   }
@@ -255,8 +290,8 @@ object XPathCache extends XPathCacheTrait {
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
         scalaIteratorToJavaList(
-          Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables)) map
-            itemToJavaKeepNodeInfoOrNull
+          Implicits.asScalaIterator(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables)) flatMap
+            itemToJavaKeepNodeInfoOpt
         )
       }
     }
@@ -540,16 +575,16 @@ object XPathCache extends XPathCacheTrait {
           throw handleXPathException(t, xpathString, "evaluating XPath expression", locationData)
       }
 
-    def singleItemToJavaKeepNodeInfoOrNull(item: om.Item): Any = item match {
-      case null => null
-      case item => itemToJavaKeepNodeInfoOrNull(item)
+    def singleItemToJavaKeepNodeInfoOpt(item: om.Item): Option[Any] = item match {
+      case null => None
+      case item => itemToJavaKeepNodeInfoOpt(item)
     }
 
-    def itemToJavaKeepNodeInfoOrNull(item: om.Item): Any =
+    def itemToJavaKeepNodeInfoOpt(item: om.Item): Option[Any] =
       item match {
-        case v: ObjectValue[_] => v // don't convert for `Array` and `Map` types
-        case v: AtomicValue    => SequenceTool.convertToJava(v)
-        case v                 => v
+        case v: ObjectValue[_] => Option(v) // don't convert for `Array` and `Map` types
+        case v: AtomicValue    => Option(SequenceTool.convertToJava(v))
+        case v                 => Option(v)
       }
   }
 }

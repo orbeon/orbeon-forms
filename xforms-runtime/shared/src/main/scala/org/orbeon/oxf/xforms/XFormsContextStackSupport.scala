@@ -105,18 +105,20 @@ object XFormsContextStackSupport {
       case Left(expr)   =>
 
         def evaluate(currentBindingContext: BindingContext) =
-          XPathCache.evaluateAsStringOpt(
-            contextItems       = currentBindingContext.nodeset,
-            contextPosition    = currentBindingContext.position,
-            xpathString        = expr,
-            namespaceMapping   = childElem.namespaceMapping,
-            variableToValueMap = currentBindingContext.getInScopeVariables,
-            functionLibrary    = contextStack.container.getContainingDocument.functionLibrary,
-            functionContext    = contextStack.getFunctionContext(getElementEffectiveId(parentEffectiveId, childElem)),
-            baseURI            = null,
-            locationData       = childElem.locationData,
-            reporter           = contextStack.container.getContainingDocument.getRequestStats.getReporter
-          )
+          Option(
+            XPathCache.evaluateSingle(
+              contextItems       = currentBindingContext.nodeset,
+              contextPosition    = currentBindingContext.position,
+              xpathString        = expr,
+              namespaceMapping   = childElem.namespaceMapping,
+              variableToValueMap = currentBindingContext.getInScopeVariables,
+              functionLibrary    = contextStack.container.getContainingDocument.functionLibrary,
+              functionContext    = contextStack.getFunctionContext(getElementEffectiveId(parentEffectiveId, childElem)),
+              baseURI            = null,
+              locationData       = childElem.locationData,
+              reporter           = contextStack.container.getContainingDocument.getRequestStats.getReporter
+            )
+          ).map(_.toString)
 
         if (pushContextAndModel)
           withContextAndModelOnly(childElem, parentEffectiveId)(evaluate)

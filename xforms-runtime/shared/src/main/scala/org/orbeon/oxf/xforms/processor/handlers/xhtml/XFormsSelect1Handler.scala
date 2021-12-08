@@ -420,7 +420,10 @@ class XFormsSelect1Handler(
 
                 itemNode match {
                   case item: Item.ChoiceNode =>
-                    assert(item.hasChildren)
+
+                    // We used to `assert` here if there are no children, but there is no real reason to do that as HTML
+                    // supports `<optgroup>` without children.
+                    // See https://github.com/orbeon/orbeon-forms/issues/4843
 
                     val itemClasses = XFormsSelect1Handler.getItemClasses(item, null)
                     val optGroupAttributes = getIdClassXHTMLAttributes(XMLReceiverSupport.EmptyAttributes, itemClasses, null)

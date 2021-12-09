@@ -93,7 +93,7 @@ object XPathCache extends XPathCacheTrait {
 
     withEvaluation(xpathString, locationData, reporter) {
       withFunctionContext(functionContext) {
-        singleItemToJavaKeepNodeInfoOpt(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables).next())
+        singleItemToJavaKeepNodeInfoOpt(evaluateImpl(xpathExpression, contextItem, contextPos, contextItems.size, variableToValueMap, variables).next()).orNull
       }
     }
   }

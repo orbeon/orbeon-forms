@@ -13,12 +13,13 @@
  */
 package org.orbeon.xforms
 
-import org.orbeon.oxf.util.MarkupUtils
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.xforms.facade.{Controls, Utils}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
-import org.scalajs.dom.raw.{Element, Node}
+import org.scalajs.dom.raw.{Element, HTMLElement}
+import scalatags.JsDom
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -26,6 +27,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers
 import scala.scalajs.js.timers.SetTimeoutHandle
+import scalatags.JsDom.all.{value, _}
 
 
 // Progressively migrate contents of xforms.js here
@@ -96,70 +98,41 @@ object XFormsUI {
     def value: String = js.native
   }
 
+  // TODO:
+  //  - Resolve nested `optgroup`s.
+  //  - use direct serialization/deserialization instead of custom JSON.
+  //    See `XFormsSelect1Control.outputAjaxDiffUseClientValue()`.
   @JSExport
   def updateSelectItemset(documentElement: html.Element, itemsetTree: js.Array[ItemsetItem]): Unit =
-    (documentElement.getElementsByTagName("select")(0): js.UndefOr[Element]) foreach {
-      case select: html.Select =>
+    (documentElement.getElementsByTagName("select")(0): js.UndefOr[Element])
+      .flatMap(_.cast[html.Select]) foreach { select =>
 
         val selectedValues =
           select.options.filter(_.selected).map(_.value)
 
-        val sb = new java.lang.StringBuilder
-        var inOptgroup = false
-
-        // 2021-12-08: We need utilities to generate markup!
-        def generateAtt(name: String, value: String) = {
-          sb.append(" ")
-          sb.append(name)
-          sb.append(" =\"")
-          sb.append(MarkupUtils.escapeXmlForAttribute(value))
-          sb.append("\"")
-        }
-
-        def generateOption(label: String, value: String, classOpt: Option[String], selectedValues: js.Array[String]): Unit = {
-          sb.append("<option")
-          generateAtt("value", value)
-          if (selectedValues.contains(value))
-            generateAtt("selected", "selected")
-          classOpt.foreach(generateAtt("class", _))
-          sb.append(">")
-          sb.append(label)
-          sb.append("</option>")
-        }
-
-        def  generateItem(itemElement: ItemsetItem): Unit = {
+        def generateItem(itemElement: ItemsetItem): JsDom.TypedTag[HTMLElement] = {
 
           val classOpt = itemElement.attributes.toOption.flatMap(_.get("class"))
 
           itemElement.children.toOption match {
             case None =>
-              generateOption(itemElement.label, itemElement.value, classOpt, selectedValues)
+              option(
+                (value := itemElement.value)                              ::
+                selectedValues.contains(itemElement.value).list(selected) :::
+                classOpt.toList.map(`class` := _)
+              )(
+                itemElement.label
+              )
             case Some(children) =>
-
-              if (inOptgroup)
-                sb.append("</optgroup>") // nested `optgroup`s are not allowed
-
-              sb.append("<optgroup")
-              generateAtt("label", itemElement.label)
-              classOpt.foreach(generateAtt("class", _))
-              sb.append(">")
-
-              inOptgroup = true
-
-              children.foreach(generateItem)
-
-              if (inOptgroup)
-                  sb.append("</optgroup>")
-
-              inOptgroup = false
+              optgroup(
+                (attr("label") := itemElement.label) :: classOpt.toList.map(`class` := _)
+              ) {
+                children.map(generateItem): _*
+              }
           }
         }
 
-        itemsetTree.foreach(generateItem)
-
-        select.innerHTML = sb.toString
-
-      case _ =>
+        select.replaceChildren(itemsetTree.toList.map(generateItem).map(_.render): _*)
     }
 
   private object Private {

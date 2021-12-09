@@ -51,6 +51,7 @@ val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes is
 //val ScalaAsyncVersion             = "1.0.1"
 val Parboiled2Version             = "2.2.1"
 val AutowireVersion               = "0.3.2"
+val ScalatagsVersion              = "0.9.4"
 val SbinaryVersion                = "0.5.1"
 val Log4sVersion                  = "1.10.0"
 val ScalaCollectionCompatVersion  = "2.2.0"
@@ -981,6 +982,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
 
     libraryDependencies            ++= Seq(
       "com.lihaoyi"            %%% "autowire"         % AutowireVersion,
+      "com.lihaoyi"            %%% "scalatags"        % ScalatagsVersion,
       "org.scala-lang.modules" %%% "scala-xml"        % ScalaXmlVersion,
       "com.outr"               %%% "scribe"           % ScribeVersion,
       "com.outr"               %%% "perfolation"      % PerfolationVersion, // to avoid dependency on `scala-java-locales`

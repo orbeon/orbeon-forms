@@ -382,7 +382,11 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 var formatInputTime = ORBEON.util.Properties.formatInputTime.get();
                 var hours           = (formatInputTime.indexOf("[H]") != -1)
                                       ? jsDate.getHours()                                        // EU time
-                                      : (jsDate.getHours() == 12 ? 12 : jsDate.getHours() % 12); // US time
+                                      : (                                                        // US time
+                                            jsDate.getHours() == 12 ? 12 :
+                                            jsDate.getHours() == 0  ? 12 :
+                                            jsDate.getHours() % 12
+                                        );
                 var minutes         = ":" + ORBEON.util.DateTime._padAZero(jsDate.getMinutes());
                 var seconds         = (formatInputTime.indexOf("[s]") != -1)
                                       ? ":" + ORBEON.util.DateTime._padAZero(jsDate.getSeconds())

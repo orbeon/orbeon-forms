@@ -430,7 +430,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     // Value change
     if (isRelevant && valueChanged)
-      Dispatch.dispatchEvent(new XFormsValuedChangeEvent(this))
+      Dispatch.dispatchEvent(new XFormsValueChangedEvent(this))
 
     // Iteration change
     if (isRelevant && iterationMoved)

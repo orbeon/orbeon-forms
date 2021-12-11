@@ -40,7 +40,7 @@ object XFormsEventFactory {
     XFORMS_INVALID              -> (new XFormsInvalidEvent(_, _)),
     XFORMS_REQUIRED             -> (new XFormsRequiredEvent(_, _)),
     XFORMS_OPTIONAL             -> (new XFormsOptionalEvent(_, _)),
-    XFORMS_VALUE_CHANGED        -> (new XFormsValuedChangeEvent(_, _)),
+    XFORMS_VALUE_CHANGED        -> (new XFormsValueChangedEvent(_, _)),
     XFORMS_DIALOG_SHOWN         -> (new XFormsDialogShownEvent(_, _)),
     XFORMS_DIALOG_HIDDEN        -> (new XFormsDialogHiddenEvent(_, _)),
     // Other events

@@ -132,7 +132,9 @@ object XFormsUI {
           }
         }
 
-        select.replaceChildren(itemsetTree.toList.map(generateItem).map(_.render): _*)
+      // IE 11 doesn't support `replaceChildren()`
+      select.innerHTML = ""
+      itemsetTree.toList.map(generateItem).map(_.render).foreach(select.appendChild)
     }
 
   private object Private {

@@ -45,6 +45,8 @@ trait StaticXPathTrait {
   case class CompiledExpression(expression: XPathExpression, string: String, locationData: LocationData)
 
   def makeStringExpression   (expression: String): String =  "string((" + expression + ")[1])"
+  // This assumes that `xs:` is in scope. It should be in practical cases but it is not correct. With XPath 3.x, could
+  // we use a [`URIQualifiedName`](https://www.w3.org/TR/xpath-31/#prod-xpath31-URIQualifiedName)?
   def makeStringOptExpression(expression: String): String =  "xs:string((" + expression + ")[1])"
   def makeBooleanExpression  (expression: String): String =  "boolean(" + expression + ")"
 

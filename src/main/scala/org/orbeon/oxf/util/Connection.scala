@@ -15,9 +15,9 @@ package org.orbeon.oxf.util
 
 import java.net.URI
 import java.{util => ju}
-
 import cats.Eval
 import cats.syntax.option._
+
 import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
@@ -30,7 +30,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http._
-import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.properties.{Properties, PropertySet}
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
@@ -482,7 +482,7 @@ object Connection extends ConnectionTrait {
               def replacePassword(s: String) = {
                 val colonIndex = s.indexOf(':')
                 if (colonIndex != -1)
-                  s.substring(0, colonIndex + 1) + "xxxxxxxx"
+                  s.substring(0, colonIndex + 1) + PropertySet.PasswordPlaceholder
                 else
                   s
               }

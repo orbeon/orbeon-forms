@@ -318,7 +318,7 @@
                 </name>
                 <xpath>
                     <label>Formula</label>
-                    <alert>Incorrect formula</alert>
+                    <alert>Missing or incorrect formula</alert>
                 </xpath>
                 <control>
                     <label>Control</label>
@@ -1644,7 +1644,7 @@
                 </name>
                 <xpath>
                     <label>Formule</label>
-                    <alert>Formule incorrecte</alert>
+                    <alert>Formule manquante ou incorrecte</alert>
                 </xpath>
                 <control>
                     <label>Contrôle</label>
@@ -2953,7 +2953,7 @@
                 </name>
                 <xpath>
                     <label todo="true">[Formula]</label>
-                    <alert todo="true">[Incorrect formula]</alert>
+                    <alert todo="true">[Missing or incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -4290,7 +4290,7 @@
                 </name>
                 <xpath>
                     <label todo="true">[Formula]</label>
-                    <alert todo="true">[Incorrect formula]</alert>
+                    <alert todo="true">[Missing or incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -5627,7 +5627,7 @@
                 </name>
                 <xpath>
                     <label todo="true">[Formula]</label>
-                    <alert todo="true">[Incorrect formula]</alert>
+                    <alert todo="true">[Missing or incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -8288,7 +8288,7 @@
                 </name>
                 <xpath>
                     <label todo="true">[Formula]</label>
-                    <alert todo="true">[Incorrect formula]</alert>
+                    <alert todo="true">[Missing or incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -9617,7 +9617,7 @@
                 </name>
                 <xpath>
                     <label todo="true">[Formula]</label>
-                    <alert todo="true">[Incorrect formula]</alert>
+                    <alert todo="true">[Missing or incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -12256,7 +12256,7 @@
                 </name>
                 <xpath>
                     <label todo="true">[Formula]</label>
-                    <alert todo="true">[Incorrect formula]</alert>
+                    <alert todo="true">[Missing or incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>
@@ -13592,7 +13592,7 @@
                 </name>
                 <xpath>
                     <label todo="true">[Formula]</label>
-                    <alert todo="true">[Incorrect formula]</alert>
+                    <alert todo="true">[Missing or incorrect formula]</alert>
                 </xpath>
                 <control>
                     <label todo="true">[Control]</label>

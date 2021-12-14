@@ -703,13 +703,13 @@
                                                 template="instance('fb-param-template')">
                                                 <xh:tr>
                                                     <xh:td>
-                                                        <xf:input ref="@name">
+                                                        <xf:input ref="@name" id="request-param-name-input">
                                                             <xf:label value="xxf:r('dialog-http-services.parameter-name.label', '|fr-form-resources|')"/>
                                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                                         </xf:input>
                                                     </xh:td>
                                                     <xh:td>
-                                                        <xf:input ref="@value">
+                                                        <xf:input ref="@value" id="request-param-value-input">
                                                             <xf:label value="xxf:r('dialog-http-services.parameter-default-value.label', '|fr-form-resources|')"/>
                                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                                         </xf:input>

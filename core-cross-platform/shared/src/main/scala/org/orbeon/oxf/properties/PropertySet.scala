@@ -60,7 +60,7 @@ object PropertySet {
 
   private class PropertyNode {
     var property: Option[Property] = None
-    var children: mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
+    val children: mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
   }
 
   def empty: PropertySet = new PropertySet(Map.empty, new PropertyNode)

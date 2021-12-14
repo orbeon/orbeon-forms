@@ -2963,7 +2963,7 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <choice todo="true" label="Link">
+                    <choice todo="true" label="[Link]">
                         <item id="3" todo="true">[Edit page]</item>
                         <item id="4" todo="true">[View page]</item>
                         <item id="5" todo="true">[New page]</item>
@@ -4300,7 +4300,7 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <choice todo="true" label="Link">
+                    <choice todo="true" label="[Link]">
                         <item id="3" todo="true">[Edit page]</item>
                         <item id="4" todo="true">[View page]</item>
                         <item id="5" todo="true">[New page]</item>
@@ -5637,7 +5637,7 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <choice todo="true" label="Link">
+                    <choice todo="true" label="[Link]">
                         <item id="3" todo="true">[Edit page]</item>
                         <item id="4" todo="true">[View page]</item>
                         <item id="5" todo="true">[New page]</item>
@@ -6966,7 +6966,7 @@
                     <item id="0">Steuerelement-Wert</item>
                     <item id="1">Formel Ausdruck</item>
                     <item id="2">Werte aller Steuerelemente</item>
-                    <choice todo="true" label="Link">
+                    <choice todo="true" label="[Link]">
                         <item id="3" todo="true">[Edit page]</item>
                         <item id="4" todo="true">[View page]</item>
                         <item id="5" todo="true">[New page]</item>
@@ -8298,7 +8298,7 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <choice todo="true" label="Link">
+                    <choice todo="true" label="[Link]">
                         <item id="3" todo="true">[Edit page]</item>
                         <item id="4" todo="true">[View page]</item>
                         <item id="5" todo="true">[New page]</item>
@@ -9627,7 +9627,7 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <choice todo="true" label="Link">
+                    <choice todo="true" label="[Link]">
                         <item id="3" todo="true">[Edit page]</item>
                         <item id="4" todo="true">[View page]</item>
                         <item id="5" todo="true">[New page]</item>
@@ -10957,7 +10957,7 @@
                     <item id="0">Control-waarde</item>
                     <item id="1">Formule</item>
                     <item id="2">Alle control-waarden</item>
-                    <choice todo="true" label="Link">
+                    <choice todo="true" label="[Link]">
                         <item id="3" todo="true">[Edit page]</item>
                         <item id="4" todo="true">[View page]</item>
                         <item id="5" todo="true">[New page]</item>
@@ -12266,7 +12266,7 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <choice todo="true" label="Link">
+                    <choice todo="true" label="[Link]">
                         <item id="3" todo="true">[Edit page]</item>
                         <item id="4" todo="true">[View page]</item>
                         <item id="5" todo="true">[New page]</item>
@@ -13602,7 +13602,7 @@
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
                     <item id="2" todo="true">[All Control Values]</item>
-                    <choice todo="true" label="Link">
+                    <choice todo="true" label="[Link]">
                         <item id="3" todo="true">[Edit page]</item>
                         <item id="4" todo="true">[View page]</item>
                         <item id="5" todo="true">[New page]</item>

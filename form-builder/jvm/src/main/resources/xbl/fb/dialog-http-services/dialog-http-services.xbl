@@ -820,13 +820,12 @@
                                                 class="fb-submission-response-headers">
                                                 <xh:tr>
                                                     <xh:td class="fb-nowrap">
-                                                        <xf:output
-                                                            value="name">
+                                                        <xf:output value="name" id="response-header-name-output">
                                                             <xf:label ref="$resources/dialog-http-services/header-name/label"/>
                                                         </xf:output>
                                                     </xh:td>
                                                     <xh:td>
-                                                        <xf:output value="string-join(value, ', ')">
+                                                        <xf:output value="string-join(value, ', ')" id="response-header-value-output">
                                                             <xf:label ref="$resources/dialog-http-services/header-value/label"/>
                                                         </xf:output>
                                                     </xh:td>

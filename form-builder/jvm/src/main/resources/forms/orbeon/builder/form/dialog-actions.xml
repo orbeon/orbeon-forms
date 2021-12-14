@@ -345,7 +345,10 @@
                                     <xf:case value="'source-path'">
                                         <xf:input
                                             class="fb-action-option-3-col-span-1"
-                                            ref="*:var[@name[. != 'path']]/(@value | @select)"/>
+                                            ref="*:var[@name[. != 'path']]/(@value | @select)">
+                                            <xf:label ref="$form-resources/components/parameters-editor/xpath/label" appearance="minimal"/>
+                                            <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
+                                        </xf:input>
                                     </xf:case>
                                 </xf:switch>
 
@@ -354,6 +357,7 @@
                                     incremental="true"
                                     class="fb-action-option-3-col-span-1">
                                     <xf:label ref="$form-resources/dialog-actions/destination-xpath/label" appearance="minimal"/>
+                                    <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                 </xf:input>
 
                             </xh:div>
@@ -471,7 +475,10 @@
                                     <xf:case value="'source-path'">
                                         <xf:input
                                             class="fb-action-option-3-col-span-1"
-                                            ref="*:var[@name[. != 'path']]/(@value | @select)"/>
+                                            ref="*:var[@name[. != 'path']]/(@value | @select)">
+                                            <xf:label ref="$form-resources/components/parameters-editor/xpath/label" appearance="minimal"/>
+                                            <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
+                                        </xf:input>
                                     </xf:case>
                                 </xf:switch>
 
@@ -617,6 +624,7 @@
                                         incremental="true"
                                         class="fb-action-option-3-col-span-1">
                                         <xf:label ref="$form-resources/dialog-actions/source-xpath/label" appearance="minimal"/>
+                                        <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                     </xf:textarea>
                                 </xf:case>
                                 <xf:case value="'fr-itemset-action'">
@@ -637,18 +645,22 @@
                                         <xf:textarea ref="(*:variable | *:var)[@name = 'response-items']/(@value | @select)[1]" id="fb-actions-items" incremental="true" class="fb-action-xpath">
                                             <xf:label ref="$form-resources/dialog-actions/items/label" appearance="minimal"/>
                                             <xf:hint ref="$form-resources/dialog-actions/items/hint"/>
+                                            <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:textarea>
                                         <xf:input ref=".//(*:variable | *:var)[@name = 'item-label']/(@value | @select)[1]" id="fb-actions-label" incremental="true" class="fb-action-xpath">
                                             <xf:label ref="$form-resources/dialog-actions/item-label/label" appearance="minimal"/>
                                             <xf:hint ref="$form-resources/dialog-actions/item-label/hint"/>
+                                            <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:input>
                                         <xf:input ref=".//(*:variable | *:var)[@name = 'item-value']/(@value | @select)[1]" id="fb-actions-value" incremental="true" class="fb-action-xpath">
                                             <xf:label ref="$form-resources/dialog-actions/item-value/label" appearance="minimal"/>
                                             <xf:hint ref="$form-resources/dialog-actions/item-value/hint"/>
+                                            <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:input>
                                         <xf:input ref=".//(*:variable | *:var)[@name = 'item-hint']/(@value | @select)[1]" id="fb-actions-hint" incremental="true" class="fb-action-xpath">
                                             <xf:label ref="$form-resources/dialog-actions/item-hint/label" appearance="minimal"/>
                                             <xf:hint ref="$form-resources/dialog-actions/item-hint/hint"/>
+                                            <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:input>
                                     </xh:div>
                                 </xf:case>

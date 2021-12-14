@@ -704,13 +704,13 @@
                                                 <xh:tr>
                                                     <xh:td>
                                                         <xf:input ref="@name" id="request-param-name-input">
-                                                            <xf:label value="xxf:r('dialog-http-services.parameter-name.label', '|fr-form-resources|')"/>
+                                                            <xf:label ref="xxf:r('dialog-http-services.parameter-name.label', '|fr-form-resources|')"/>
                                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                                         </xf:input>
                                                     </xh:td>
                                                     <xh:td>
                                                         <xf:input ref="@value" id="request-param-value-input">
-                                                            <xf:label value="xxf:r('dialog-http-services.parameter-default-value.label', '|fr-form-resources|')"/>
+                                                            <xf:label ref="xxf:r('dialog-http-services.parameter-default-value.label', '|fr-form-resources|')"/>
                                                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                                                         </xf:input>
                                                     </xh:td>
@@ -821,12 +821,12 @@
                                                 <xh:tr>
                                                     <xh:td class="fb-nowrap">
                                                         <xf:output value="name" id="response-header-name-output">
-                                                            <xf:label ref="$resources/dialog-http-services/header-name/label"/>
+                                                            <xf:label ref="xxf:r('dialog-http-services.header-name.label', '|fr-form-resources|')"/>
                                                         </xf:output>
                                                     </xh:td>
                                                     <xh:td>
                                                         <xf:output value="string-join(value, ', ')" id="response-header-value-output">
-                                                            <xf:label ref="$resources/dialog-http-services/header-value/label"/>
+                                                            <xf:label ref="xxf:r('dialog-http-services.header-value.label', '|fr-form-resources|')"/>
                                                         </xf:output>
                                                     </xh:td>
                                                 </xh:tr>

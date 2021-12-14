@@ -53,7 +53,7 @@
            eternal="true"
            timeToLiveSeconds="0"
            timeToIdleSeconds="0"
-           diskPersistent="true"
+           diskPersistent="false"
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
 

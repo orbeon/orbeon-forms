@@ -104,38 +104,44 @@ object XFormsUI {
   //    See `XFormsSelect1Control.outputAjaxDiffUseClientValue()`.
   @JSExport
   def updateSelectItemset(documentElement: html.Element, itemsetTree: js.Array[ItemsetItem]): Unit =
-    (documentElement.getElementsByTagName("select")(0): js.UndefOr[Element])
-      .flatMap(_.cast[html.Select]) foreach { select =>
+    ((documentElement.getElementsByTagName("select")(0): js.UndefOr[Element]): Any) match {
+        case select: html.Select =>
 
-        val selectedValues =
-          select.options.filter(_.selected).map(_.value)
+          val selectedValues =
+            select.options.filter(_.selected).map(_.value)
 
-        def generateItem(itemElement: ItemsetItem): JsDom.TypedTag[HTMLElement] = {
+          def generateItem(itemElement: ItemsetItem): JsDom.TypedTag[HTMLElement] = {
 
-          val classOpt = itemElement.attributes.toOption.flatMap(_.get("class"))
+            val classOpt = itemElement.attributes.toOption.flatMap(_.get("class"))
 
-          itemElement.children.toOption match {
-            case None =>
-              option(
-                (value := itemElement.value)                              ::
-                selectedValues.contains(itemElement.value).list(selected) :::
-                classOpt.toList.map(`class` := _)
-              )(
-                itemElement.label
-              )
-            case Some(children) =>
-              optgroup(
-                (attr("label") := itemElement.label) :: classOpt.toList.map(`class` := _)
-              ) {
-                children.map(generateItem): _*
-              }
+            itemElement.children.toOption match {
+              case None =>
+                option(
+                  (value := itemElement.value)                              ::
+                  selectedValues.contains(itemElement.value).list(selected) :::
+                  classOpt.toList.map(`class` := _)
+                )(
+                  itemElement.label
+                )
+              case Some(children) =>
+                optgroup(
+                  (attr("label") := itemElement.label) :: classOpt.toList.map(`class` := _)
+                ) {
+                  children.map(generateItem): _*
+                }
+            }
           }
-        }
 
-      // IE 11 doesn't support `replaceChildren()`
-      select.innerHTML = ""
-      itemsetTree.toList.map(generateItem).map(_.render).foreach(select.appendChild)
-    }
+          // IE 11 doesn't support `replaceChildren()`
+          select.innerHTML = ""
+          itemsetTree.toList.map(generateItem).map(_.render).foreach(select.appendChild)
+
+        case _ =>
+          // This should not happen but if it does we'd like to know about it without entirely stopping the
+          // update process so we give the user a chance to recover the form. This should be generalized
+          // once we have migrated `AjaxServer.js` entirely to Scala.
+          scribe.error(s"`<select>` element not found when attempting to update itemset")
+      }
 
   private object Private {
 

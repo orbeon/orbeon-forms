@@ -56,6 +56,8 @@ object PropertySet {
 
   import Private._
 
+  val PasswordPlaceholder = "xxxxxxxx"
+
   private class PropertyNode {
     var property: Option[Property] = None
     var children: mutable.Map[String, PropertyNode] = mutable.LinkedHashMap[String, PropertyNode]()
@@ -193,11 +195,14 @@ class PropertySet private (
   def allPropertiesAsJson: String = {
 
     val jsonProperties =
-      for ((name, prop) <- exactProperties.toList.sortBy(_._1))
-        yield
+      for {
+        (name, prop) <- exactProperties.toList.sortBy(_._1)
+        propType     = prop.typ.toString
+        propValue    = if (name.toLowerCase.contains("password")) PasswordPlaceholder else prop.value.toString
+      } yield
           s"""|  "$name": {
-              |    "type": "${prop.typ.toString.escapeJavaScript}",
-              |    "value": "${prop.value.toString.escapeJavaScript}"
+              |    "type": "${propType.escapeJavaScript}",
+              |    "value": "${propValue.escapeJavaScript}"
               |  }""".stripMargin
 
     jsonProperties mkString ("{\n", ",\n", "\n}")

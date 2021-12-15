@@ -15,6 +15,7 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/default-log4j.xml"/>
+    <property as="xs:anyURI"  name="oxf.log4j2-config"                               value="oxf:/default-log4j2.xml"/>
     <property as="xs:integer" name="oxf.cache.size"                                  value="200"/>
 
 </properties>

@@ -1,0 +1,24 @@
+<Configuration>
+
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%date{ISO8601} %-5level %logger{1} - %message%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!-- So that these are not too noisy during tests -->
+        <Logger name="org.orbeon.lifecycle"                         level="warn"/>
+        <Logger name="org.orbeon.oxf.webapp.ProcessorService"       level="warn"/>
+        <Logger name="org.orbeon.oxf.processor.DatabaseContext"     level="warn"/>
+        <Logger name="org.orbeon.oxf.xforms.processor.XFormsServer" level="warn"/>
+        <Logger name="org.exist.storage.btree.Paged"                level="warn"/>
+        <Logger name="org.exist.storage.DBBroker"                   level="warn"/>
+        <Logger name="org.exist.storage.BrokerPool"                 level="warn"/>
+
+        <Root level="info">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

@@ -15,10 +15,10 @@ package org.orbeon.oxf.xml
 
 import java.io.{InputStream, Reader, StringReader}
 import java.{util => ju}
-
 import javax.xml.parsers._
 import org.orbeon.apache.xerces.impl.{Constants, XMLEntityManager, XMLErrorReporter}
 import org.orbeon.apache.xerces.xni.parser.XMLInputSource
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.resources.URLFactory
@@ -29,6 +29,9 @@ import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl
 import org.w3c.dom.Document
 import org.xml.sax._
+
+import java.net.URL
+import scala.util.Try
 
 
 // 2020-10-13: Some of the methods here should be moved out. There is legacy processor support, as well as
@@ -156,6 +159,8 @@ object XMLParsing {
 
   // Return whether the given string contains well-formed XML.
   //
+  // This doesn't support XInclude.
+  //
   // 2020-10-13: 1 external caller
   def isWellFormedXML(xmlString: String): Boolean = {
     // Empty string is never well-formed XML
@@ -177,6 +182,23 @@ object XMLParsing {
     } catch {
       case _: Exception =>
         false
+    }
+  }
+
+  def tryParsingXml(
+    is           : InputStream,
+    urlString    : String,
+    parserConfig : ParserConfiguration
+  ): Try[Unit] = Try {
+    useAndClose(new TransformerURIResolver(parserConfig)) { resolver =>
+      inputStreamToSAX(
+        is,
+        urlString,
+        new ForwardingXMLReceiver,
+        parserConfig,
+        handleLexical = false,
+        resolver
+      )
     }
   }
 

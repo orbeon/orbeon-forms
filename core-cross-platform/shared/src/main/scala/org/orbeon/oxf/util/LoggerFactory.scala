@@ -17,7 +17,7 @@ import org.log4s
 
 object LoggerFactory {
 
-  val logger: org.log4s.Logger = createLogger(getClass)
+  val logger: org.log4s.Logger = createLogger("org.orbeon.oxf.util.LoggerFactory")
 
   def createLogger(name: String)   : log4s.Logger = org.log4s.getLogger(name)
   def createLogger(clazz: Class[_]): log4s.Logger = org.log4s.getLogger(clazz.getName)

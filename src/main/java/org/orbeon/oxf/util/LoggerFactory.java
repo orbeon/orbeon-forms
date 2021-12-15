@@ -13,18 +13,7 @@
  */
 package org.orbeon.oxf.util;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.xml.DOMConfigurator;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.properties.PropertySet;
 
 public class LoggerFactory {
 
@@ -55,56 +44,5 @@ public class LoggerFactory {
 
     public static Logger createLogger(Class clazz) {
         return Logger.getLogger(clazz.getName());
-    }
-
-    /*
-     * Init basic config until resource manager is setup.
-     */
-    public static void initBasicLogger() {
-        // 2008-07-25 a This has been here for a long time and it is not clear why it was put there. But this doesn't
-        //              seem to be a good idea, and is causing some problem. So: commenting. See discussion in this thread:
-        //              http://discuss.orbeon.com/Problem-with-log-in-orbeon-with-multiple-webapp-td36786.html
-        // LogManager.resetConfiguration();
-        Logger root = Logger.getRootLogger();
-        root.setLevel(Level.INFO);
-        root.addAppender(new ConsoleAppender(new PatternLayout(PatternLayout.DEFAULT_CONVERSION_PATTERN), ConsoleAppender.SYSTEM_ERR));
-    }
-
-    /**
-     * Init log4j. Needs Orbeon Forms Properties system up and running.
-     */
-    public static void initLogger() {
-        try {
-            // Accept both xs:string and xs:anyURI types
-
-            final PropertySet propertySet = Properties.instance().getPropertySet();
-            if (propertySet == null)
-                throw new OXFException("Property set not found.");
-
-            final String log4jConfigURL = propertySet.getStringOrURIAsString(LOG4J_DOM_CONFIG_PROPERTY, false);
-
-            if (log4jConfigURL != null) {
-                final Processor urlGenerator = PipelineUtils.createURLGenerator(log4jConfigURL, true);
-                final DOMSerializer domSerializer = new DOMSerializer();
-                PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, domSerializer, ProcessorImpl.INPUT_DATA);
-                // Candidate for Scala withPipelineContext
-                final PipelineContext pipelineContext = new PipelineContext();
-                boolean success = false;
-                final org.w3c.dom.Element element;
-                try {
-                    urlGenerator.reset(pipelineContext);
-                    domSerializer.reset(pipelineContext);
-                    element = domSerializer.runGetW3CDocument(pipelineContext).getDocumentElement();
-                    success = true;
-                } finally {
-                    pipelineContext.destroy(success);
-                }
-                DOMConfigurator.configure(element);
-            } else {
-                logger.info("Property " + LOG4J_DOM_CONFIG_PROPERTY + " not set. Skipping logging initialization.");
-            }
-        } catch (Throwable e) {
-            logger.error("Cannot load Log4J configuration. Skipping logging initialization", e);
-        }
     }
 }

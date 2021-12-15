@@ -17,7 +17,7 @@ val ServletApiVersion             = "3.0.1"
 val PortletApiVersion             = "2.0"
 val Slf4jVersion                  = "1.7.21"
 val HttpComponentsVersion         = "4.3.5"  // 4.5.2
-val Log4jVersion                  = "1.2.17"
+val Log4j2Version                 = "2.16.0"
 val CommonsIoVersion              = "2.0.1"  // 2.5
 val EnumeratumVersion             = "1.5.6"
 val AutowireVersion               = "0.2.6"
@@ -51,8 +51,10 @@ val CoreLibraryDependencies = Seq(
   "org.apache.httpcomponents"   % "httpcore"                        % "4.3.2",
   "org.slf4j"                   % "jcl-over-slf4j"                  % Slf4jVersion,
   "org.slf4j"                   % "slf4j-api"                       % Slf4jVersion,
-  "org.slf4j"                   % "slf4j-log4j12"                   % Slf4jVersion,
-  "log4j"                       % "log4j"                           % Log4jVersion,
+  "org.apache.logging.log4j"    % "log4j-slf4j-impl"                % Log4j2Version, // move to `log4j-slf4j18-impl` for SLF4J 1.8.x releases or newer; seems like 1.8 is dead and replaced by 2.0; but that's still alpha as of 2021-12
+  "org.apache.logging.log4j"    % "log4j-api"                       % Log4j2Version,
+  "org.apache.logging.log4j"    % "log4j-core"                      % Log4j2Version,
+  "org.apache.logging.log4j"    % "log4j-1.2-api"                   % Log4j2Version, // for eXist JARs
   "com.jcraft"                  % "jsch"                            % "0.1.42", // 0.1.54
   "jcifs"                       % "jcifs"                           % "1.3.17",
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,

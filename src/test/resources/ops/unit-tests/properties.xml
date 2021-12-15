@@ -25,6 +25,7 @@
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                      value="mysql"/>
     <property as="xs:anyURI"  name="oxf.log4j-config"                                       value="oxf:/ops/unit-tests/log4j.xml"/>
+    <property as="xs:anyURI"  name="oxf.log4j2-config"                                      value="oxf:/ops/unit-tests/log4j2.xml"/>
     <property as="xs:boolean" name="oxf.resources.versioned"                                value="false"/>
     <property as="xs:string"  name="oxf.schemas.urn://adress-book"                          value="oxf:/ops/unit-tests/address-book-schema.xml"/>
     <property as="xs:string"  name="oxf.crypto.password"                                    value="UnitTestsOrbeonPassword"/>

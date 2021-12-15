@@ -19,7 +19,7 @@ import org.orbeon.oxf.externalcontext.WebAppContext
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, WebAppResourceManagerImpl}
-import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.util.{Log4jSupport, LoggerFactory}
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.collection.JavaConverters._
@@ -52,7 +52,7 @@ object Orbeon {
     // Check whether logging initialization is disabled
     val initializeLogging = ! context.initParameters.get(LoggingProperty).contains("false")
     if (initializeLogging)
-      LoggerFactory.initBasicLogger()
+      Log4jSupport.initBasicLogger()
 
     // 0. Say hello
     val logger = LoggerFactory.createLogger("org.orbeon.init")
@@ -93,7 +93,7 @@ object Orbeon {
 
     // 4. Initialize log4j with a DOMConfiguration
     if (initializeLogging)
-      LoggerFactory.initLogger()
+      Log4jSupport.initLogger()
 
     // 5. Log properties in debug mode *after* updated logger configuration
     try {

@@ -20,7 +20,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/select2.full.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/select2.full.js"/>
     <xbl:binding
         id="fr-dropdown-select1-search"
         element="
@@ -144,7 +144,7 @@
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css"/>
-            <xbl:style src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/css/select2.css"/>
+            <xbl:style src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/css/select2.css"/>
         </xbl:resources>
 
         <xbl:implementation>

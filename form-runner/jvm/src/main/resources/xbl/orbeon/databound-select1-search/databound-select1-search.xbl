@@ -21,18 +21,18 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/select2.full.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/fr.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/de.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/sv.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/pt.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/it.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/es.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/fi.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/nl.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/ru.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/pl.js"/>
-    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/js/i18n/da.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/select2.full.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/fr.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/de.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/sv.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/pt.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/it.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/es.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/fi.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/nl.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/ru.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/pl.js"/>
+    <xbl:script src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/js/i18n/da.js"/>
     <xbl:binding
         id="fr-databound-select1-search"
         element="
@@ -182,7 +182,7 @@
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.css"/>
-            <xbl:style src="/xbl/orbeon/dropdown-select1-search/select2-4.0.7/css/select2.min.css"/>
+            <xbl:style src="/xbl/orbeon/dropdown-select1-search/select2-4.0.13/css/select2.min.css"/>
         </xbl:resources>
 
         <xbl:handlers>

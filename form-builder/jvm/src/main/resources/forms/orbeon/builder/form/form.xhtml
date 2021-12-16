@@ -311,6 +311,7 @@
                                 observer="#document"
                                 event="keydown"
                                 xxf:text="enter"
+                                xxf:modifiers="shift"
                                 if="$dialogs-closed and exists(fbf:getCurrentlySelectedCell()/*/@id)">
 
                                 <xf:dispatch name="fb-show-dialog" targetid="dialog-control-settings" >

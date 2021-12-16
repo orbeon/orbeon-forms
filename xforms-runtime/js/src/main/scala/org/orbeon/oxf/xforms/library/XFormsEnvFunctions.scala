@@ -151,7 +151,7 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
         rootElemOpt
       case None =>
         xfc.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory)
-          .logWarning("instance()", "instance not found", "instance id", instanceIdOpt.orNull)
+          .logDebug("instance()", "instance not found", "instance id", instanceIdOpt.orNull)
         None
     }
   }

@@ -116,6 +116,26 @@ object Log4jSupport {
         logger.error(t)("Cannot load log4j configuration. Skipping logging initialization.")
     }
 
+  // Inspired by Log4j2 `DefaultConfiguration`
+  class OrbeonDefaultConfiguration
+    extends AbstractConfiguration(null, ConfigurationSource.NULL_SOURCE) {
+
+    setToDefault()
+
+    override protected def setToDefault(): Unit = {
+      setName(DefaultConfigurationName)
+      val layout  = PatternLayout.newBuilder.withPattern(DefaultPattern).withConfiguration(this).build
+      val appender = ConsoleAppender.createDefaultAppenderForLayout(layout) |!> (_.start())
+      appender.start()
+      addAppender(appender)
+      getRootLogger |!>
+        (_.addAppender(appender, null, null)) |!>
+        (_.setLevel(DefaultLevel))
+    }
+
+    override protected def doConfigure(): Unit = ()
+  }
+
   private object Private {
 
     trait LoggerInitError
@@ -126,8 +146,12 @@ object Log4jSupport {
       case class  Other       (t: Throwable) extends LoggerInitError
     }
 
-    val Log4j1ConfigPropName = "oxf.log4j-config"
-    val Log4j2ConfigPropName = "oxf.log4j2-config"
+    val DefaultConfigurationName = "OrbeonDefault"
+    val DefaultLevel             = Level.INFO
+    val DefaultPattern           = "%date{ISO8601} %-5level %logger{1} - %message%n"
+
+    val Log4j1ConfigPropName     = "oxf.log4j-config"
+    val Log4j2ConfigPropName     = "oxf.log4j2-config"
 
     val ConfigPropNamesWithFns: List[(String, (LoggerContext, InputStream, URL) => AbstractConfiguration)] = List(
       Log4j1ConfigPropName -> createLog4j1XmlConfig,
@@ -139,33 +163,5 @@ object Log4jSupport {
 
     def createLog4j2XmlConfig(cxt: LoggerContext, is: InputStream, url: URL): AbstractConfiguration =
       new org.apache.logging.log4j.core.config.xml.XmlConfiguration(cxt, new ConfigurationSource(is, url))
-
-    object OrbeonDefaultConfiguration {
-      val DefaultConfigurationName = "OrbeonDefault"
-      val DefaultLevel             = Level.INFO
-      val DefaultPattern           = "%date{ISO8601} %-5level %logger{1} - %message%n"
-    }
-
-    // Inspired by Log4j2 `DefaultConfiguration`
-    class OrbeonDefaultConfiguration
-      extends AbstractConfiguration(null, ConfigurationSource.NULL_SOURCE) {
-
-      import OrbeonDefaultConfiguration._
-
-      setToDefault()
-
-      override protected def setToDefault(): Unit = {
-        setName(DefaultConfigurationName)
-        val layout  = PatternLayout.newBuilder.withPattern(DefaultPattern).withConfiguration(this).build
-        val appender = ConsoleAppender.createDefaultAppenderForLayout(layout) |!> (_.start())
-        appender.start()
-        addAppender(appender)
-        getRootLogger |!>
-          (_.addAppender(appender, null, null)) |!>
-          (_.setLevel(DefaultLevel))
-      }
-
-      override protected def doConfigure(): Unit = ()
-    }
   }
 }

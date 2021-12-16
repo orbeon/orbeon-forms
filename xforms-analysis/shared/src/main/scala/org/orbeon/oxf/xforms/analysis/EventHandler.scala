@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.dom.{Element, QName}
-import org.orbeon.oxf.util.Logging.warn
+import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.{IndentedLogger, Modifier}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.EventHandler.{ObserverIsPrecedingSibling, TargetIsObserver, isDispatchAction}
@@ -89,12 +89,12 @@ class EventHandler(
   def analyzeEventHandler()(implicit logger: IndentedLogger): Unit = {
 
     def unknownTargetId(id: String) = {
-      warn("unknown id", Seq("id" -> id))
+      debug("unknown id", List("id" -> id))
       Set.empty[String]
     }
 
     def ignoringHandler(attName: String) = {
-      warn(
+      debug(
         s"`$attName` attribute present but does not refer to at least one valid id, ignoring event handler",
         List("element" -> element.toDebugString)
       )

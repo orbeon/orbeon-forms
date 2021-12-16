@@ -74,7 +74,7 @@ class Instance extends XFormsFunction with InstanceTrait {
       case Some(iterator) =>
         iterator
       case None =>
-        XFormsFunction.context.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory).logWarning("instance()", "instance not found", "instance id", instanceId.orNull)
+        XFormsFunction.context.containingDocument.getIndentedLogger(XFormsModel.LoggingCategory).logDebug("instance()", "instance not found", "instance id", instanceId.orNull)
         EmptyIterator.getInstance
     }
   }

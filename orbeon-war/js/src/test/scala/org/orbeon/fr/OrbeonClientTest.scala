@@ -95,7 +95,7 @@ class OrbeonClientTest extends AsyncFunSpec {
         |-v $$HOME/.orbeon/license.xml:/root/.orbeon/license.xml
         |-v $LocalResourcesDir/config/properties-local.xml:$ImageResourcesDir/config/properties-local.xml
         |-v $LocalResourcesDir/config/ehcache.xml:$ImageResourcesDir/config/ehcache.xml
-        |-v $LocalResourcesDir/config/log4j.xml:$ImageResourcesDir/config/log4j.xml
+        |-v $LocalResourcesDir/config/log4j2.xml:$ImageResourcesDir/config/log4j2.xml
         |-v $LocalResourcesDir/tomcat/server.xml:$ImageTomcatDir/conf/server.xml
         |-v $LocalResourcesDir/tomcat/setenv.sh:$ImageTomcatDir/bin/setenv.sh
         |-p $port:8080""".stripMargin,

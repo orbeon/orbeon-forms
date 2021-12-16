@@ -45,9 +45,9 @@ trait StaticXPathTrait {
   case class CompiledExpression(expression: XPathExpression, string: String, locationData: LocationData)
 
   def makeStringExpression   (expression: String): String =  "string((" + expression + ")[1])"
-  // This assumes that `xs:` is in scope. It should be in practical cases but it is not correct. With XPath 3.x, could
-  // we use a [`URIQualifiedName`](https://www.w3.org/TR/xpath-31/#prod-xpath31-URIQualifiedName)?
-  def makeStringOptExpression(expression: String): String =  "xs:string((" + expression + ")[1])"
+  // With XPath 3.x, we could use a [`URIQualifiedName`](https://www.w3.org/TR/xpath-31/#prod-xpath31-URIQualifiedName)
+  // and `Q{http://www.w3.org/2001/XMLSchema}string((expression)[1])`.
+  def makeStringOptExpression(expression: String): String =  "for $_orbeon_private in (" + expression + ")[1] return string($_orbeon_private)"
   def makeBooleanExpression  (expression: String): String =  "boolean(" + expression + ")"
 
   val GlobalConfiguration: SaxonConfiguration

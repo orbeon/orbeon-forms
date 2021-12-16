@@ -684,7 +684,7 @@ public class URLGenerator extends ProcessorImpl {
                             // Include dependency
 
                             // Create handler right here
-                            handler = OXFHandler.PROTOCOL.equals(url.getProtocol())
+                            handler = OXFHandler.Protocol().equals(url.getProtocol())
                                 ? new OXFResourceHandler(new Config(url)) // Should use full config so that headers are forwarded?
                                 : new URLResourceHandler(new Config(url));// Should use full config so that headers are forwarded?
 
@@ -1221,7 +1221,7 @@ public class URLGenerator extends ProcessorImpl {
         public ResourceHandler ensureMainResourceHandler(PipelineContext pipelineContext, Config config) {
             if (mainResourceHandler == null) {
                 // Create and remember handler
-                mainResourceHandler = OXFHandler.PROTOCOL.equals(config.getURL().getProtocol()) ? new OXFResourceHandler(config)
+                mainResourceHandler = OXFHandler.Protocol().equals(config.getURL().getProtocol()) ? new OXFResourceHandler(config)
                         : SystemHandler.PROTOCOL.equals(config.getURL().getProtocol()) ? new SystemResourceHandler(config)
                         : new URLResourceHandler(config);
                 // Make sure it is destroyed when the pipeline ends at the latest

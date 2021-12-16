@@ -80,7 +80,7 @@ public abstract class ResourceManagerBase implements ResourceManager {
             try {
                 XMLParsing.inputStreamToSAX(
                     inputStream,
-                    OXFHandler.PROTOCOL + ":" + key,
+                    OXFHandler.Protocol() + ":" + key,
                     new ForwardingXMLReceiver(xmlReceiver) {
                         public void setDocumentLocator(Locator loc) {
                             locator[0] = loc;

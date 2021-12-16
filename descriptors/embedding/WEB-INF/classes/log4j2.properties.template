@@ -1,0 +1,32 @@
+status = error
+dest = err
+name = OrbeonEmbeddingConfig
+
+appender.CONSOLE.type=Console
+appender.CONSOLE.name=CONSOLE
+appender.CONSOLE.layout.type = PatternLayout
+appender.CONSOLE.layout.pattern = %date{ISO8601} %-5level %logger{1} - %message%n
+
+appender.FILE.type = File
+appender.FILE.name = FILE
+appender.FILE.fileName = /var/log/orbeon-embedding.log
+appender.FILE.layout.type = PatternLayout
+appender.FILE.layout.pattern = %date{ISO8601} %-5level %logger{1} - %message%n
+
+logger.apache-http.name = org.orbeon.private.apache.http
+logger.apache-http.level = error
+logger.apache-http.additivity = false
+logger.apache-http.appenderRef.rolling.ref = CONSOLE
+
+logger.apache-http-wire.name = org.orbeon.private.apache.http.wire
+logger.apache-http-wire.level = error
+logger.apache-http-wire.additivity = false
+logger.apache-http-wire.appenderRef.rolling.ref = CONSOLE
+
+logger.embedding.name = org.orbeon.embedding
+logger.embedding.level = error
+logger.embedding.additivity = false
+logger.embedding.appenderRef.rolling.ref = CONSOLE
+
+rootLogger.level = info
+rootLogger.appenderRef.stdout.ref = CONSOLE

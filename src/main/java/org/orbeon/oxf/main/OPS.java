@@ -33,9 +33,7 @@ import org.orbeon.oxf.processor.serializer.URLSerializer;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLParsing;
@@ -89,7 +87,7 @@ public class OPS {
     public void init() {
 
         // Initialize a basic logging configuration until the resource manager is setup
-        LoggerFactory.initBasicLogger();
+        Log4jSupport.initBasicLogger();
 
         // 2. Initialize resource manager
         // Resources are first searched in a file hierarchy, then from the classloader
@@ -110,7 +108,7 @@ public class OPS {
         Properties.init(Properties.DEFAULT_PROPERTIES_URI);
 
         // 4. Initialize log4j (using the properties this time)
-        LoggerFactory.initLogger();
+        Log4jSupport.initLogger();
 
         // 5. Build processor definition from command-line parameters
         if (otherArgs != null && otherArgs.length == 1) {

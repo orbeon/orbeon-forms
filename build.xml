@@ -148,7 +148,7 @@
             <rule pattern="org.relaxng.datatype.**" result="org.orbeon.msv.relaxng.datatype.@1"/>
         </jarjar>
     </target>
-
+    
     <target name="xforms-filter-jar" depends="war-common">
 <!--    <target name="xforms-filter-jar" depends="prepare">-->
 
@@ -180,7 +180,9 @@
             -dontwarn org.orbeon.saxon.xqj.**
             -dontwarn com.google.crypto.tink.**
             -dontwarn com.google.protobuf.**
-            -dontwarn org.apache.log4j.net.**
+            -dontwarn org.apache.logging.log4j.core.**
+            -dontwarn org.apache.logging.log4j.util.Activator
+            -dontwarn org.slf4j.ext.**
             -dontwarn org.orbeon.apache.xerces.**
             -dontwarn org.orbeon.oxf.xml.xerces.**
             -dontwarn scala.collection.immutable.VM

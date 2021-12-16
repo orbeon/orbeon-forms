@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.{IndentedLogger, Modifier}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.analysis.EventHandler.{ObserverIsPrecedingSibling, TargetIsObserver, isDispatchAction}
 import org.orbeon.oxf.xforms.analysis.controls.{ActionTrait, RepeatIterationControl}
-import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.{Perform, Propagate}
 import org.orbeon.xforms.xbl.Scope

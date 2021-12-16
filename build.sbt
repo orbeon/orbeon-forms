@@ -375,8 +375,10 @@ lazy val xupdate = (project in file("xupdate"))
     name := "orbeon-xupdate",
 
     libraryDependencies ++= Seq(
-      "commons-io" % "commons-io" % CommonsIoVersion,
-      "log4j"      % "log4j"      % Log4jVersion
+      "commons-io"               % "commons-io"    % CommonsIoVersion,
+      "org.apache.logging.log4j" % "log4j-api"     % Log4j2Version,
+      "org.apache.logging.log4j" % "log4j-core"    % Log4j2Version,
+      "org.apache.logging.log4j" % "log4j-1.2-api" % Log4j2Version
     ) map (_.exclude("commons-logging", "commons-logging"))
   )
 

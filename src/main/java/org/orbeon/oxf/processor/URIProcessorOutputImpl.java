@@ -198,7 +198,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
             } else {
 
                 final URL url = URLFactory.createURL(uriReference.context(), uriReference.spec());
-                if (OXFHandler.PROTOCOL.equals(url.getProtocol())) {
+                if (OXFHandler.Protocol().equals(url.getProtocol())) {
                     // oxf: URLs
                     final String key = url.getFile();
                     final long result = ResourceManagerWrapper.instance().lastModified(key, false);

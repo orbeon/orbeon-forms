@@ -6,17 +6,18 @@ import org.apache.logging.log4j.core.config.{AbstractConfiguration, Configuratio
 import org.apache.logging.log4j.core.layout.PatternLayout
 import org.apache.logging.log4j.{Level, LogManager}
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.IOUtils.useAndClose
 import org.orbeon.oxf.util.LoggerFactory.logger
 import org.orbeon.oxf.xml.ForwardingXMLReceiver
 import org.orbeon.oxf.xml.XMLParsing.{ParserConfiguration, inputStreamToSAX}
 
 import java.io.InputStream
 import java.net.URL
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
 
@@ -34,7 +35,7 @@ object Log4jSupport {
   // Initialize Log4j, trying configurations. This requires that the resource manager and properties are available.
   def initLogger(): Unit =
     try {
-      val propertySet = Properties.instance.getPropertySetOrThrow
+      val propertySet = Option(Properties.instance.getPropertySet).getOrElse(throw new OXFException("property set not found"))
 
       val propsWithFns =
         ConfigPropNamesWithFns map { case (propName, fn) =>
@@ -48,32 +49,39 @@ object Log4jSupport {
       val resultStream =
         propsWithFns.toStream map { case (propName, propValue, fn) =>
 
+          // Not available in Scala 2.11
+          def tryToEither[T](t: Try[T]): Either[Throwable, T] =
+            t match {
+              case Success(v) => Right(v)
+              case Failure(t) => Left(t)
+            }
+
           def tryUrl: Either[LoggerInitError, URL] =
-            Try(URLFactory.createURL(propValue))
-              .toEither.left.map(t => LoggerInitError.MalformedUrl(t))
+            tryToEither(Try(URLFactory.createURL(propValue)))
+              .left.map(t => LoggerInitError.MalformedUrl(t))
 
           def tryToFindFile(url: URL): Either[LoggerInitError, InputStream] =
-            Try(url.openStream())
-              .toEither.left.map(t => LoggerInitError.NotFound(t))
+            tryToEither(Try(url.openStream()))
+              .left.map(t => LoggerInitError.NotFound(t))
 
           // When a parsing error or other error occurs with the XML configuration, Log4j2 logs it but then
           // swallows it! So we do our own parsing first so we can detect and report the problem.
           def tryToParseFile(is: InputStream): Either[LoggerInitError, Unit] =
-            tryParsingXml(is, propValue, ParserConfiguration.XINCLUDE_ONLY)
-              .toEither.left.map(t => LoggerInitError.InvalidXml(t))
+            tryToEither(tryParsingXml(is, propValue, ParserConfiguration.XINCLUDE_ONLY))
+              .left.map(t => LoggerInitError.InvalidXml(t))
 
           // `reconfigure()` logs and swallows all `Exception`s!
           def tryToConfigure(is: InputStream, url: URL): Either[LoggerInitError, Unit] =
-            Try(useAndClose(is)(_ => Configurator.reconfigure(fn(log4jContext, is, url))))
-              .toEither.left.map(t => LoggerInitError.Other(t))
+            tryToEither(Try(useAndClose(is)(_ => Configurator.reconfigure(fn(log4jContext, is, url)))))
+              .left.map(t => LoggerInitError.Other(t))
 
           val tryResult =
             for {
-              url <- tryUrl
-              is1 <- tryToFindFile(url)
-              _   <- tryToParseFile(is1)
-              is2 <- tryToFindFile(url)
-              _   <- tryToConfigure(is2, url)
+              url <- tryUrl.right
+              is1 <- tryToFindFile(url).right
+              _   <- tryToParseFile(is1).right
+              is2 <- tryToFindFile(url).right
+              _   <- tryToConfigure(is2, url).right
             } yield
               ()
 

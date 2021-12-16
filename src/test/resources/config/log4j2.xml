@@ -1,4 +1,4 @@
-<Configuration>
+<Configuration status="error" dest="err" name="OrbeonTestConfig">
 
     <Appenders>
         <Console name="ConsoleAppender" target="SYSTEM_OUT">

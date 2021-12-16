@@ -4,7 +4,7 @@
   This files defines 3 appenders. Only one is used by default.
 
 -->
-<Configuration>
+<Configuration status="error" dest="err" name="OrbeonWebAppConfig">
 
     <Appenders>
         <!-- This is the standard log appender to the console (System.out) -->

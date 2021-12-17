@@ -4,10 +4,11 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.util.NetUtils
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
+import java.io.ByteArrayInputStream
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
-import javax.servlet.{Filter, FilterChain, FilterConfig, ReadListener, ServletInputStream, ServletRequest, ServletResponse}
+import javax.servlet._
 import scala.jdk.CollectionConverters._
+
 
 // To enable, add the following to your `web.xml`, before all the other filters.
 //
@@ -31,13 +32,13 @@ class HttpLoggingFilter extends Filter {
     chain           : FilterChain
   ): Unit = {
 
-    val httpRequest         = servletRequest.asInstanceOf[HttpServletRequest]
-    val byteArray           = NetUtils.inputStreamToByteArray(httpRequest.getInputStream)
-    val requestPath         = NetUtils.getRequestPathInfo(httpRequest)
-    val requestBody         = new String(byteArray, CharsetNames.Utf8)
-    val inputStream         = new ByteArrayInputStream(byteArray)
-    val servletInputStream  = new HttpLoggingFilter.ByteArrayServletInputStream(inputStream)
-    val wrappedRequest      = new HttpLoggingFilter.LoggerRequestWrapper(httpRequest, servletInputStream)
+    val httpRequest        = servletRequest.asInstanceOf[HttpServletRequest]
+    val byteArray          = NetUtils.inputStreamToByteArray(httpRequest.getInputStream)
+    val requestPath        = NetUtils.getRequestPathInfo(httpRequest)
+    val requestBody        = new String(byteArray, CharsetNames.Utf8)
+    val inputStream        = new ByteArrayInputStream(byteArray)
+    val servletInputStream = new HttpLoggingFilter.ByteArrayServletInputStream(inputStream)
+    val wrappedRequest     = new HttpLoggingFilter.LoggerRequestWrapper(httpRequest, servletInputStream)
 
     // Log path, headers, and body
     Logger.info(s"request path `$requestPath`")
@@ -51,8 +52,8 @@ class HttpLoggingFilter extends Filter {
   }
 
   // We need to provide those implementation of `init` and `destroy` as long as we support Servlet 3.1 / Tomcat 8.5
-  override def init(config: FilterConfig): Unit = {}
-  override def destroy(): Unit = {}
+  override def init(config: FilterConfig): Unit = ()
+  override def destroy(): Unit = ()
 }
 
 private object HttpLoggingFilter {
@@ -64,9 +65,9 @@ private object HttpLoggingFilter {
 
   class ByteArrayServletInputStream(byteArrayInputStream: ByteArrayInputStream)
       extends ServletInputStream {
-    override def isFinished: Boolean                               = byteArrayInputStream.available() == 0
-    override def isReady: Boolean                                  = true
-    override def setReadListener(readListener: ReadListener): Unit = {}
-    override def read(): Int                                       = byteArrayInputStream.read()
+    def isFinished: Boolean                               = byteArrayInputStream.available() == 0
+    def isReady: Boolean                                  = true
+    def setReadListener(readListener: ReadListener): Unit = ()
+    def read(): Int                                       = byteArrayInputStream.read()
   }
 }

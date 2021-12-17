@@ -47,24 +47,35 @@ object Log4jSupport {
       val resultStream =
         propsWithFns.toStream map { case (propName, propValue, fn) =>
 
+          def tryToEither[T](t: Try[T], wrap: Throwable => LoggerInitError) =
+            t.toEither.left.map(wrap)
+
           def tryUrl: Either[LoggerInitError, URL] =
-            Try(URLFactory.createURL(propValue))
-              .toEither.left.map(t => LoggerInitError.MalformedUrl(t))
+            tryToEither(
+              Try(URLFactory.createURL(propValue)),
+              LoggerInitError.MalformedUrl
+            )
 
           def tryToFindFile(url: URL): Either[LoggerInitError, InputStream] =
-            Try(url.openStream())
-              .toEither.left.map(t => LoggerInitError.NotFound(t))
+            tryToEither(
+              Try(url.openStream()),
+              LoggerInitError.NotFound
+            )
 
           // When a parsing error or other error occurs with the XML configuration, Log4j2 logs it but then
           // swallows it! So we do our own parsing first so we can detect and report the problem.
           def tryToParseFile(is: InputStream): Either[LoggerInitError, Unit] =
-            XMLParsing.tryParsingXml(is, propValue, ParserConfiguration.XIncludeOnly)
-              .toEither.left.map(t => LoggerInitError.InvalidXml(t))
+            tryToEither(
+              XMLParsing.tryParsingXml(is, propValue, ParserConfiguration.XIncludeOnly),
+              LoggerInitError.InvalidXml
+            )
 
           // `reconfigure()` logs and swallows all `Exception`s!
           def tryToConfigure(is: InputStream, url: URL): Either[LoggerInitError, Unit] =
-            Try(useAndClose(is)(_ => Configurator.reconfigure(fn(log4jContext, is, url))))
-              .toEither.left.map(t => LoggerInitError.Other(t))
+            tryToEither(
+              Try(useAndClose(is)(_ => Configurator.reconfigure(fn(log4jContext, is, url)))),
+              LoggerInitError.Other
+            )
 
           val tryResult =
             for {

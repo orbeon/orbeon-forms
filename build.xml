@@ -150,7 +150,8 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,!log4j-api-2.16.0.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.16.0.jar(!META-INF/versions/9/**.class)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
@@ -200,7 +201,8 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,!log4j-api-2.16.0.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.16.0.jar(!META-INF/versions/9/**.class)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
@@ -252,7 +254,8 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,!log4j-api-2.16.0.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.16.0.jar(!META-INF/versions/9/**.class)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar

@@ -150,13 +150,13 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,!log4j-api-2.16.0.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!log4j-api-2.16.0.jar,**.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.16.0.jar(!META-INF/versions/9/**.class)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
 
-            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
+            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.25.jar
 
             -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
@@ -201,13 +201,13 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,!log4j-api-2.16.0.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!log4j-api-2.16.0.jar,**.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.16.0.jar(!META-INF/versions/9/**.class)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
 
-            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
+            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.25.jar
 
             -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
@@ -254,13 +254,13 @@
             -ignorewarnings
             -forceprocessing
 
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.21.jar,!log4j-api-2.16.0.jar,**.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!log4j-api-2.16.0.jar,**.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.16.0.jar(!META-INF/versions/9/**.class)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
 
-            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.21.jar
+            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-1.7.25.jar
 
             -libraryjars lib/provided/javax.servlet-api-3.0.1.jar
             -libraryjars lib/provided/portlet-api_2.0.jar
@@ -358,9 +358,10 @@
                 <include name="orbeon-proxy-portlet.jar"/>
             </lib>
             <lib dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
-                <include name="slf4j-api-1.7.21.jar"/>
-                <include name="slf4j-log4j12-1.7.21.jar"/>
-                <include name="log4j-1.2.17.jar"/>
+                <include name="slf4j-api-1.7.25.jar"/>
+                <include name="log4j-slf4j-impl-2.16.0.jar"/>
+                <include name="log4j-api-2.16.0.jar"/>
+                <include name="log4j-core-2.16.0.jar"/>
             </lib>
         </war>
     </target>
@@ -373,7 +374,7 @@
                 <include name="orbeon-embedding.jar"/>
             </lib>
             <lib dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
-                <include name="slf4j-api-1.7.21.jar"/>
+                <include name="slf4j-api-1.7.25.jar"/>
             </lib>
             <zipfileset dir="descriptors/embedding" prefix="">
                 <include name="*.jsp"/>

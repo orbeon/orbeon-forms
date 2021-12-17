@@ -113,7 +113,7 @@ object Log4jSupport {
 
     } catch {
       case NonFatal(t) =>
-        logger.error(t)("Cannot load log4j configuration. Skipping logging initialization.")
+        logger.error(t)("Cannot load Log4j configuration. Skipping custom logging initialization.")
     }
 
   // Inspired by Log4j2 `DefaultConfiguration`

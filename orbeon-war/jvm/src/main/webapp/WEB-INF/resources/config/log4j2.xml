@@ -1,13 +1,6 @@
-<!--
-  This is the default Orbeon Forms logging configuration.
-
-  This files defines 3 appenders. Only one is used by default.
-
--->
 <Configuration status="error" dest="err" name="OrbeonWebAppConfig">
 
     <Appenders>
-        <!-- This is the standard log appender to the console (System.out) -->
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
             <PatternLayout pattern="%date{ISO8601} %-5level %logger{1} - %message%n"/>
         </Console>

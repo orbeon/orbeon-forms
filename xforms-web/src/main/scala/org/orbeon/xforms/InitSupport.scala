@@ -291,7 +291,7 @@ object InitSupport {
         g.xformsPageLoadedServer()
     }
 
-        // The heartbeat is per servlet session and we only need one. But see https://github.com/orbeon/orbeon-forms/issues/2014.
+    // The heartbeat is per servlet session and we only need one. But see https://github.com/orbeon/orbeon-forms/issues/2014.
     def initializeHeartBeatIfNeeded(): Unit =
       if (! heartBeatInitialized) {
         if (Properties.sessionHeartbeat.get()) {

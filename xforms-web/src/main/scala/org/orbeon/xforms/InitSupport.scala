@@ -135,9 +135,8 @@ object InitSupport {
   @JSExport
   def initializeJavaScriptControlsFromSerialized(initData: String): Unit =
     decode[List[rpc.Control]](initData) match {
-      case Left(_)  =>
-        // TODO: error
-        None
+      case Left(e)  =>
+        scribe.error(s"error decoding serialized controls for `initializeJavaScriptControlsFromSerialized`: ${e.getMessage}")
       case Right(controls) =>
         initializeJavaScriptControls(controls)
     }
@@ -145,9 +144,8 @@ object InitSupport {
   @JSExport
   def destroyJavaScriptControlsFromSerialized(initData: String): Unit =
     decode[List[rpc.Control]](initData) match {
-      case Left(_)  =>
-        // TODO: error
-        None
+      case Left(e)  =>
+        scribe.error(s"error decoding serialized controls for `destroyJavaScriptControlsFromSerialized`: ${e.getMessage}")
       case Right(controls) =>
         destroyJavaScriptControls(controls)
     }

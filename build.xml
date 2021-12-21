@@ -151,7 +151,7 @@
             -forceprocessing
 
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!bcmail-*.jar,!bcprov-*.jar,!bcpkix-*.jar,!openpdf-*.jar,!log4j-api-*.jar,**.jar;)
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.16.0.jar(!META-INF/versions/9/**.class)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.17.0.jar(!META-INF/versions/9/**.class)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
@@ -202,7 +202,7 @@
             -forceprocessing
 
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!bcmail-*.jar,!bcprov-*.jar,!bcpkix-*.jar,!openpdf-*.jar,!log4j-api-*.jar,**.jar;)
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.16.0.jar(!META-INF/versions/9/**.class)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.17.0.jar(!META-INF/versions/9/**.class)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
@@ -255,7 +255,7 @@
             -forceprocessing
 
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(!slf4j-api-1.7.25.jar,!bcmail-*.jar,!bcprov-*.jar,!bcpkix-*.jar,!openpdf-*.jar,!log4j-api-*.jar,**.jar;)
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.16.0.jar(!META-INF/versions/9/**.class)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/log4j-api-2.17.0.jar(!META-INF/versions/9/**.class)
             -outjars     ${temp.jar}(**.class,!**)
 
             -libraryjars ${java.home}/lib/rt.jar
@@ -359,9 +359,9 @@
             </lib>
             <lib dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
                 <include name="slf4j-api-1.7.25.jar"/>
-                <include name="log4j-slf4j-impl-2.16.0.jar"/>
-                <include name="log4j-api-2.16.0.jar"/>
-                <include name="log4j-core-2.16.0.jar"/>
+                <include name="log4j-slf4j-impl-2.17.0.jar"/>
+                <include name="log4j-api-2.17.0.jar"/>
+                <include name="log4j-core-2.17.0.jar"/>
             </lib>
         </war>
     </target>

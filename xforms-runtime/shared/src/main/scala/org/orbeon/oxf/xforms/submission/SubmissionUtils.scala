@@ -67,14 +67,13 @@ object SubmissionUtils {
     refContext         : RefContext,
     containingDocument : XFormsContainingDocument
   ): Option[String] =
-    Option(
-      resolveAttributeValueTemplates(
-        containingDocument,
-        refContext.xpathContext,
-        refContext.refNodeInfo,
-        value
-      )
-    ) flatMap (_.trimAllToOpt)
+    resolveAttributeValueTemplates(
+      containingDocument,
+      refContext.xpathContext,
+      refContext.refNodeInfo,
+      value
+    ) flatMap
+      (_.trimAllToOpt)
 
   /**
    * Resolve attribute value templates (AVTs).
@@ -89,11 +88,11 @@ object SubmissionUtils {
     xpathContext       : XPathCache.XPathContext,
     contextNode        : om.NodeInfo,
     attributeValue     : String
-  ): String = {
-    if (attributeValue == null)
-      return null
-    XPathCache.evaluateAsAvt(xpathContext, contextNode, attributeValue, containingDocument.getRequestStats.getReporter)
-  }
+  ): Option[String] =
+    if (attributeValue eq null)
+      None
+    else
+      Option(XPathCache.evaluateAsAvt(xpathContext, contextNode, attributeValue, containingDocument.getRequestStats.getReporter))
 
   def booleanAvtOpt(
     value              : String)(implicit

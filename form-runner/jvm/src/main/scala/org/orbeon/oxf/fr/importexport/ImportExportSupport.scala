@@ -8,10 +8,13 @@ import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, DataMigrati
 import org.orbeon.oxf.fr.XMLNames.FRNamespace
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
+import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.proxy.Transforms
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CollectionUtils.IteratorExt._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
@@ -395,8 +398,9 @@ object ImportExportSupport {
       items map (item => item.elemValue("label") -> item.elemValue("value"))
     }
 
-  def readFormDataIfDocumentIdPresent(
-    appForm         : AppForm)(implicit
+  def readFormDataIfDocumentIdPresentAndAuthorized(
+    appForm         : AppForm,
+    form            : om.DocumentInfo)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): Option[(DocumentNodeInfoType, DataFormatVersion, DataMigrationBehavior.Disabled.type)] = {
@@ -406,8 +410,41 @@ object ImportExportSupport {
 
     // Form data is optional and we also need the app/form name in that case
     documentIdOpt map { documentId =>
+
+      debug(s"document id provided: `$documentId`")
+
+      val (doc, headers) = Transforms.readFormData(appForm, documentId)
+
+      val permissionsElOpt = {
+
+        val ctx = new FormRunnerDocContext {
+          val formDefinitionRootElem: om.NodeInfo = form.rootElement
+        }
+
+        ctx.metadataRootElem.firstChildOpt(Names.Permissions)
+      }
+
+      // Follow what's done in `persistence-model.xml` for the `edit` mode:
+      //
+      // - if the operations are returned via header, use that
+      // - else get the permissions based on roles
+      //
+      val operations =
+        Operations.parseFromHeaders(headers)
+          .getOrElse(frc.authorizedOperationsBasedOnRoles(permissionsElOpt.orNull))
+
+      debug(s"operations obtained: `$operations`")
+
+      // Make sure we can edit the data
+      if (! frc.isUserAuthorizedBasedOnOperationsAndMode(operations, "edit", isSubmit = false)) {
+        debug(s"user is unauthorized")
+        throw HttpStatusCodeException(StatusCode.Forbidden)
+      }
+
+      debug(s"user is authorized, returning data")
+
       (
-        Transforms.readFormData(appForm, documentId),
+        doc,
         FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm.app, appForm.form),
         DataMigrationBehavior.Disabled
       )

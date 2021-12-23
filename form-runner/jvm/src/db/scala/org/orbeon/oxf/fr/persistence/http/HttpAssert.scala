@@ -76,7 +76,7 @@ private[persistence] object HttpAssert extends XMLSupport {
             assert(resultBody.get sameElements expectedFile)
         }
         // Check operations
-        assert(expectedOperations == Operations.parseFromHeaders(headers))
+        assert(Operations.parseFromHeaders(headers).contains(expectedOperations))
         // Check form version
         val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
         assert(expectedFormVersion == resultFormVersion)

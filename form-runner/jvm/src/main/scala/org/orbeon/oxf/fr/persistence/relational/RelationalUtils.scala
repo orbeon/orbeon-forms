@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner}
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
 import org.orbeon.saxon.om.NodeInfo
@@ -94,5 +94,5 @@ object RelationalUtils extends Logging {
   def readFormPermissions(app: String, form: String, version: FormDefinitionVersion): Option[NodeInfo]=
     FormRunner
       .readFormMetadataOpt(app, form, version)
-      .flatMap(_.firstChildOpt("permissions"))
+      .flatMap(_.firstChildOpt(Names.Permissions))
 }

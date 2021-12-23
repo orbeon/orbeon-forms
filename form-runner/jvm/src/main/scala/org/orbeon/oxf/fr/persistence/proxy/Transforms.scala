@@ -6,9 +6,10 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.FormRunnerPersistence.findFormDefinitionFormatFromStringVersions
 import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
-import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunnerDocContext, FormRunnerTemplatesOps, GridDataMigration}
+import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, URLRewriterUtils, XPath}
@@ -46,7 +47,7 @@ object Transforms {
           )
         ),
         handleXInclude = false
-      )
+      )._1
     }
 
   def readFormData(
@@ -54,7 +55,7 @@ object Transforms {
     documentId      : String)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): DocumentInfo =
+  ): (DocumentInfo, Map[String, List[String]]) =
     SubmissionUtils.readTinyTree(
       headersGetter       = _ => None, // Q: Do we need any header forwarding here?
       resolvedAbsoluteUrl = new URI(

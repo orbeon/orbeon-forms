@@ -14,9 +14,11 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.externalcontext.{Credentials, Organization}
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
@@ -35,7 +37,15 @@ trait FormRunnerPermissionsOps {
 
   //@XPathFunction
   def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo): List[String] =
-    authorizedOperationsBasedOnRoles(permissionsElOrNull)
+    Operations.serialize(authorizedOperationsBasedOnRoles(permissionsElOrNull))
+
+  //@XPathFunction
+  def isUserAuthorizedBasedOnOperationsAndModeXPath(operations: String, mode: String, isSubmit: Boolean): Boolean =
+    isUserAuthorizedBasedOnOperationsAndMode(
+      Operations.parse(operations.splitTo[List]()),
+      mode,
+      isSubmit
+    )
 
   /**
    * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform,
@@ -46,14 +56,54 @@ trait FormRunnerPermissionsOps {
   def authorizedOperationsBasedOnRoles(
     permissionsElOrNull : NodeInfo,
     currentUser         : Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
-  ): List[String] = {
+  ): Operations = {
     val permissions = PermissionsXML.parse(permissionsElOrNull)
-    val operations  = PermissionsAuthorization.authorizedOperations(
+
+    PermissionsAuthorization.authorizedOperations(
       permissions,
       currentUser,
       PermissionsAuthorization.CheckWithoutDataUser(optimistic = true)
     )
-    Operations.serialize(operations)
+  }
+
+  def isUserAuthorizedBasedOnOperationsAndMode(operations: Operations, mode: String, isSubmit: Boolean): Boolean = {
+
+    // Special cases:
+    //
+    // - `schema`: doesn't require any authorized permission as it is simply protected as a service
+    // - `test`: doesn't require any authorized permission, see https://github.com/orbeon/orbeon-forms/issues/2050
+    //
+    // When POSTing data to the page, this is generally considered a "mode change" and doesn't require the
+    // same permissions, especially since the POST is protected by other means. For example, a user with
+    // `create` permission only is allowed to navigate to the `view` page and `edit` page back. This does not
+    // imply that the user need `read` or `update` permissions. Because the current use case is that the user
+    // has at least the `create` permission, we currently require that permission, although this restriction
+    // could be removed in the future if need be.
+
+    def unauthorizedCreation =
+      frc.CreationModes(mode) && ! Operations.allows(operations, Operation.Create)
+
+    def unauthorizedEditing =
+      frc.EditingModes(mode) && ! (
+        Operations.allows(operations, Operation.Update) ||
+        isSubmit && Operations.allows(operations, Operation.Create)
+      )
+
+    def unauthorizedViewing =
+      frc.ReadonlyModes(mode) && ! (
+        Operations.allows(operations, Operation.Read) ||
+        isSubmit && Operations.allows(operations, Operation.Create)
+      )
+
+    def unauthorizedMode =
+      ! frc.AllModes(mode)
+
+    ! (
+      unauthorizedCreation ||
+      unauthorizedEditing  ||
+      unauthorizedViewing  ||
+      unauthorizedMode
+    )
   }
 
   // Used by persistence layers (relational, eXist) and allAuthorizedOperationsAssumingOwnerGroupMember
@@ -87,7 +137,7 @@ trait FormRunnerPermissionsOps {
     }
 
     allOperationsIfNoPermissionsDefined(permissionsElOrNull) { _ =>
-      val rolesOperations       = authorizedOperationsBasedOnRoles(permissionsElOrNull, currentUser)
+      val rolesOperations       = Operations.serialize(authorizedOperationsBasedOnRoles(permissionsElOrNull, currentUser))
       val ownerOperations       = ownerGroupMemberOperations(currentUser map     (_.userAndGroup.username), dataUsername,  "owner")
       val groupMemberOperations = ownerGroupMemberOperations(currentUser flatMap (_.userAndGroup.groupname),    dataGroupname, "group-member")
       (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct

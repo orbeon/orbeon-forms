@@ -42,6 +42,7 @@ object Names {
   val FormVersion         = "form-version"
   val CreatedWithVersion  = "created-with-version"
   val WorkflowStage       = "workflow-stage"
+  val Permissions         = "permissions"
 
   // We have the following app/form names for libraries:
   //

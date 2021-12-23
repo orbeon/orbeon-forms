@@ -56,13 +56,9 @@ object Operations {
     Operation.Delete
   )
 
-  def parseFromHeaders(headers: Map[String, List[String]]): Operations = {
-
-    val actualOperationsString = Headers.firstItemIgnoreCase(headers, FormRunnerPersistence.OrbeonOperations)
-    val actualOperationsList   = actualOperationsString.toList.flatMap(_.splitTo[List]())
-
-    parse(actualOperationsList)
-  }
+  def parseFromHeaders(headers: Map[String, List[String]]): Option[Operations] =
+    Headers.firstItemIgnoreCase(headers, FormRunnerPersistence.OrbeonOperations)
+      .map(v => parse(v.splitTo[List]()))
 
   def parse(stringOperations: List[String]): Operations =
     stringOperations match {

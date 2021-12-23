@@ -413,7 +413,7 @@ trait XFormsModelInstances {
         )
       ),
       handleXInclude = handleXInclude
-    )
+    )._1
   }
 
   // Set instance and associated information if everything went well

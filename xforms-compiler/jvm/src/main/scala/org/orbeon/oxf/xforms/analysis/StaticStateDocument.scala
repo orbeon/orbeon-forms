@@ -70,7 +70,12 @@ class StaticStateDocument(val xmlDocument: Document) {
   // If an existing state is passed in, use it, otherwise encode from XML, encrypting if necessary.
   // NOTE: We do compress the result as we think we can afford this for the static state (probably not so for the dynamic state).
   def asBase64: String =
-    EncodeDecode.encodeXML(xmlDocument, true, isClientStateHandling, true) // `compress = true, encrypt = isClientStateHandling, location = true`
+    EncodeDecode.encodeXML(
+      xmlDocument,
+      compress = true,
+      encrypt  = isClientStateHandling,
+      location = true
+    )
 
   def dump(): Unit =
     println(xmlDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat))

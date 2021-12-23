@@ -279,8 +279,9 @@
                 <xf:setvalue event="xforms-submit"       ref="instance('fr-form-instance')/validate/validating">started</xf:setvalue>
                 <xf:setvalue event="xforms-submit-done"  ref="instance('fr-form-instance')/validate/validating">succeeded</xf:setvalue>
                 <xf:setvalue event="xforms-submit-error" ref="instance('fr-form-instance')/validate/validating">failed</xf:setvalue>
-                <xf:message  event="xforms-submit-error" if="event('response-status-code') != 403">An error occurred while validating the data.</xf:message>
-                <xf:message  event="xforms-submit-error" if="event('response-status-code') = 403">Unauthorized</xf:message>
+
+                <xf:message  event="xforms-submit-error" if="event('response-status-code') != 403" value="xxf:r('import.error-messages.validating',   '|fr-fr-resources|')"/>
+                <xf:message  event="xforms-submit-error" if="event('response-status-code') = 403"  value="xxf:r('import.error-messages.unauthorized', '|fr-fr-resources|')"/>
 
             </xf:submission>
 
@@ -313,7 +314,8 @@
                 <xf:setvalue event="xforms-submit"       ref="instance('fr-form-instance')/import/importing">started</xf:setvalue>
                 <xf:setvalue event="xforms-submit-done"  ref="instance('fr-form-instance')/import/importing">succeeded</xf:setvalue>
                 <xf:setvalue event="xforms-submit-error" ref="instance('fr-form-instance')/import/importing">failed</xf:setvalue>
-                <xf:message  event="xforms-submit-error">An error occurred while importing the data.</xf:message>
+
+                <xf:message  event="xforms-submit-error" value="xxf:r('import.error-messages.importing', '|fr-fr-resources|')"/>
             </xf:submission>
 
             <!-- Delete all data in the given form -->
@@ -328,7 +330,7 @@
                 <xf:send event="xforms-submit-done" submission="fr-import-import-submission"/>
 
                 <!-- Error -->
-                <xf:message event="xforms-submit-error">An error occurred while deleting the data.</xf:message>
+                <xf:message  event="xforms-submit-error" value="xxf:r('import.error-messages.deleting', '|fr-fr-resources|')"/>
             </xf:submission>
 
             <!-- Submit the form data to the form's `new` page -->
@@ -496,7 +498,7 @@
                 <xf:action event="xforms-submit">
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
                 </xf:action>
-                <xf:message event="xforms-submit-error">An error occurred while retrieving the data.</xf:message>
+                <xf:message event="xforms-submit-error" value="xxf:r('import.error-messages.reading-form-data', '|fr-fr-resources|')"/>
             </xf:submission>
 
             <!-- Metadata -->
@@ -586,7 +588,7 @@
 
                 </xf:action>
 
-                <xf:message event="xforms-submit-error">An error occurred while reading form metadata.</xf:message>
+                <xf:message event="xforms-submit-error" value="xxf:r('import.error-messages.reading-form-metadata', '|fr-fr-resources|')"/>
 
             </xf:submission>
 
@@ -617,7 +619,8 @@
 
                 <xf:message
                     event="xforms-submit-error"
-                    if="not(event('response-status-code') = (404, 410))">An error occurred while reading the form definition.</xf:message>
+                    if="not(event('response-status-code') = (404, 410))"
+                    value="xxf:r('import.error-messages.reading-form-definition', '|fr-fr-resources|')"/>
 
                 <xf:setvalue
                     event="xforms-submit-error"

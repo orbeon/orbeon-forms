@@ -378,38 +378,16 @@
                 AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): <xf:output value="string-join($ops, ' ')"/>
             </xf:message>
 
-            <!--
-                If user can't perform the required operations, deny access to this page.
-
-                Special cases:
-
-                - `schema`: doesn't require any authorized permission as it is simply protected as a service
-                - `test`: doesn't require any authorized permission, see https://github.com/orbeon/orbeon-forms/issues/2050
-
-                When POSTing data to the page, this is generally considered a "mode change" and doesn't require the
-                same permissions, especially since the POST is protected by other means. For example, a user with
-                `create` permission only is allowed to navigate to the `view` page and `edit` page back. This does not
-                imply that the user need `read` or `update` permissions. Because the current use case is that the user
-                has at least the `create` permission, we currently require that permission, although this restriction
-                could be removed in the future if need be.
-            -->
-            <xf:var name="unauthorized-access" value="
-                ($mode = ('new', 'import', 'validate') and not($ops = ('*', 'create')))            or
-                ($mode = 'edit'                        and not($ops = ('*', 'update')
-                                                               or $is-submit and $ops = 'create')) or
-                (fr:is-readonly-mode()                 and not($ops = ('*', 'read')
-                                                               or $is-submit and $ops = 'create')) or
-                not(
-                    $mode = (
-                        'new',      'import',    'validate',
-                        'edit',     'view',      'pdf',
-                        'controls', 'email',     'schema',
-                        'test'
-                    )
-                )"/>
-
             <!-- Send an "Unauthorized" error if the user is unauthorized -->
-            <xf:action if="$unauthorized-access" type="xpath">frf:sendError(403)</xf:action>
+            <xf:action
+                if="not(
+                    frf:isUserAuthorizedBasedOnOperationsAndModeXPath(
+                        string-join($ops, ' '),
+                        $mode,
+                        $is-submit
+                    )
+                )"
+                type="xpath">frf:sendError(403)</xf:action>
 
         </xf:action>
 

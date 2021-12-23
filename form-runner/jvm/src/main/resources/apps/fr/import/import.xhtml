@@ -279,7 +279,8 @@
                 <xf:setvalue event="xforms-submit"       ref="instance('fr-form-instance')/validate/validating">started</xf:setvalue>
                 <xf:setvalue event="xforms-submit-done"  ref="instance('fr-form-instance')/validate/validating">succeeded</xf:setvalue>
                 <xf:setvalue event="xforms-submit-error" ref="instance('fr-form-instance')/validate/validating">failed</xf:setvalue>
-                <xf:message  event="xforms-submit-error">An error occurred while validating the data.</xf:message>
+                <xf:message  event="xforms-submit-error" if="event('response-status-code') != 403">An error occurred while validating the data.</xf:message>
+                <xf:message  event="xforms-submit-error" if="event('response-status-code') = 403">Unauthorized</xf:message>
 
             </xf:submission>
 

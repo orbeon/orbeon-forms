@@ -37,7 +37,7 @@ object Operation extends Enum[Operation] {
   val values = findValues
 
   case object Create extends Operation
-  case object Read extends Operation
+  case object Read   extends Operation
   case object Update extends Operation
   case object Delete extends Operation
 }
@@ -57,7 +57,7 @@ object Operations {
       case List("*") =>
         AnyOperation
       case _   =>
-        val operations      = stringOperations.map { operationName =>
+        val operations = stringOperations.map { operationName =>
           val operationOpt = All.find(_.entryName == operationName)
           operationOpt.getOrElse(throw new IllegalArgumentException(s"Unknown operation `$operationName`"))
         }
@@ -85,7 +85,7 @@ object Operations {
 
   def allows(granted: Operations, requested: Operation): Boolean =
     granted match {
-      case AnyOperation => true
+      case AnyOperation                          => true
       case SpecificOperations(grantedOperations) => grantedOperations.contains(requested)
     }
 

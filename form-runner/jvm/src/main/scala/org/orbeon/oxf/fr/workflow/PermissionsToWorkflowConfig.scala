@@ -1,7 +1,8 @@
 package org.orbeon.oxf.fr.workflow
 
-import org.orbeon.oxf.fr.permission.{AnyOperation, DefinedPermissions, Group, Owner, Permissions, RolesAnyOf, SpecificOperations, UndefinedPermissions, Operation => PermissionOperation, Operations => PermissionOperations}
+import org.orbeon.oxf.fr.permission.{Operation => PermissionOperation, Operations => PermissionOperations, _}
 import org.orbeon.oxf.util.CoreUtils._
+
 
 object PermissionsToWorkflowConfig {
 

@@ -13,18 +13,18 @@
   */
 package org.orbeon.oxf.fr.persistence.relational
 
-import java.sql.{Connection, ResultSet}
-import javax.naming.{Context, InitialContext}
-import javax.sql.DataSource
 import org.orbeon.errorified.Exceptions
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner}
-import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.oxf.util.CoreUtils._
 
+import java.sql.{Connection, ResultSet}
+import javax.naming.{Context, InitialContext}
+import javax.sql.DataSource
 import scala.util.control.NonFatal
 
 
@@ -95,30 +95,4 @@ object RelationalUtils extends Logging {
     FormRunner
       .readFormMetadataOpt(app, form, version)
       .flatMap(_.firstChildOpt("permissions"))
-
-  def authorizedOperationsBasedOnRoles(permissionsElOpt: Option[NodeInfo]): Set[String] =
-    crudOperationsIfNoPermissions(
-      permissionsElOpt,
-      permissionsEl => FormRunner.authorizedOperationsBasedOnRoles(permissionsEl).toSet
-    )
-
-  private def crudOperationsIfNoPermissions[T](
-    permissionsElOpt: Option[NodeInfo],
-    operationsFromPermissions: NodeInfo => Set[String]
-  ): Set[String] =
-    permissionsElOpt match {
-      case None =>
-        Set("create", "read", "update", "delete")
-      case Some(permissionsEl) =>
-        operationsFromPermissions(permissionsEl)
-    }
-
-  // Indent every line of a query, for nice formatting when sub-query is embedded in a larger query
-  def indentSubQuery(query: String, amount: Int): String = {
-    query
-      .split('\n')
-      .zipWithIndex
-      .map(line => if (line._2 == 0) line._1 else (" " * amount) + line._1)
-      .mkString("\n")
-  }
 }

@@ -89,7 +89,7 @@ private[persistence] object HttpCall {
 
       // Check operations
       expectedResponse.operations.foreach { expectedOperations =>
-        assert(Operations.parseFromHeaders(actualHeaders).contains(expectedOperations))
+        assert(Operations.parseFromHeaders(actualHeaders).getOrElse(Operations.None) == expectedOperations)
       }
 
       // Check form version

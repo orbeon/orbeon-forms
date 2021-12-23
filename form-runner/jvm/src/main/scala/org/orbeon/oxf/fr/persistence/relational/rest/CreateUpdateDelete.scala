@@ -54,7 +54,7 @@ object RequestReader {
   private val MetadataElementsToKeep = Set(
     "metadata",
     "title",
-    "permissions",
+    Names.Permissions,
     "available"
   )
 

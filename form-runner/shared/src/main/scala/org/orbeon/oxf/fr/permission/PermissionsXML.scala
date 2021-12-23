@@ -71,5 +71,4 @@ object PermissionsXML {
       )
     Permission(conditions, operations)
   }
-
 }

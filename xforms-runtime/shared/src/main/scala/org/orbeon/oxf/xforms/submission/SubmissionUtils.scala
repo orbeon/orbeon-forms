@@ -110,7 +110,7 @@ object SubmissionUtils {
     logger              : IndentedLogger,
     externalContext     : ExternalContext
   ): Array[Byte] =
-    processGETConnection(headersGetter, resolvedAbsoluteUrl) { is =>
+    processGETConnection(headersGetter, resolvedAbsoluteUrl) { case (is, _) =>
       inputStreamToByteArray(is)
     }
 
@@ -127,25 +127,27 @@ object SubmissionUtils {
     handleXInclude      : Boolean)(implicit
     logger              : IndentedLogger,
     externalContext     : ExternalContext
-  ): DocumentNodeInfoType =
-    processGETConnection(headersGetter, resolvedAbsoluteUrl) { is =>
+  ): (DocumentNodeInfoType, Map[String, List[String]]) =
+    processGETConnection(headersGetter, resolvedAbsoluteUrl) { case (is, headers) =>
       XFormsCrossPlatformSupport.readTinyTree(
         XPath.GlobalConfiguration,
         is,
         resolvedAbsoluteUrl.toString,
         handleXInclude,
         true
-      )
+      ) -> headers
     }
 
   private def processGETConnection[T](
     headersGetter       : String => Option[List[String]],
     resolvedAbsoluteUrl : URI)(
-    body                : InputStream => T)(implicit
+    body                : (InputStream, Map[String, List[String]]) => T)(implicit
     logger              : IndentedLogger,
     externalContext     : ExternalContext
-  ): T =
-    ConnectionResult.withSuccessConnection(openGETConnection(headersGetter, resolvedAbsoluteUrl), closeOnSuccess = true)(body)
+  ): T = {
+    val cxr = openGETConnection(headersGetter, resolvedAbsoluteUrl)
+    ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true)(body(_, cxr.headers))
+  }
 
   private def openGETConnection(
     headersGetter       : String => Option[List[String]],

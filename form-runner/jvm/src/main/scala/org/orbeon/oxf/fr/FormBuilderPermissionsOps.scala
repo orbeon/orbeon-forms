@@ -130,7 +130,7 @@ trait FormBuilderPermissionsOps {
       // For each form, compute the operations the user can potentially perform
       val operations = {
         val adminOperation = isAdmin.list("admin")
-        val permissionsElement = formEl.child("permissions").headOption.orNull
+        val permissionsElement = formEl.child(Names.Permissions).headOption.orNull
         val otherOperations = FormRunner.allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement)
         adminOperation ++ otherOperations
       }

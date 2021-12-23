@@ -488,6 +488,15 @@
             <values-found>Values Found</values-found>
             <errors>Errors</errors>
             <warnings>Warnings</warnings>
+            <error-messages>
+                <validating>An error occurred while validating the data.</validating>
+                <importing>An error occurred while importing the data.</importing>
+                <deleting>An error occurred while deleting the data.</deleting>
+                <unauthorized>You are not authorized to access this data.</unauthorized>
+                <reading-form-data>An error occurred while retrieving form data.</reading-form-data>
+                <reading-form-metadata>An error occurred while reading form metadata.</reading-form-metadata>
+                <reading-form-definition>An error occurred while reading the form definition.</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -993,6 +1002,15 @@
             <values-found>Valeurs trouvées</values-found>
             <errors>Erreurs</errors>
             <warnings>Avertissements</warnings>
+            <error-messages>
+                <validating>Une erreur s'est produite lors de la validation des données.</validating>
+                <importing>Une erreur s'est produite lors de l'import des données.</importing>
+                <deleting>Une erreur s'est produite lors de la suppression des données.</deleting>
+                <unauthorized>Vous n'avez pas l'autorisation d'accéder ces données.</unauthorized>
+                <reading-form-data>Une erreur s'est produite lors de la lecture des données du formulaire.</reading-form-data>
+                <reading-form-metadata>Une erreur s'est produite lors de la lecture des métadonnées du formulaire.</reading-form-metadata>
+                <reading-form-definition>Une erreur s'est produite lors de la lecture du formulaire.</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -1484,6 +1502,15 @@
             <values-found todo="true">Values Found</values-found>
             <errors todo="true">Errors</errors>
             <warnings todo="true">Warnings</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -1974,6 +2001,15 @@
             <values-found todo="true">Values Found</values-found>
             <errors todo="true">Errors</errors>
             <warnings todo="true">Warnings</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -2462,6 +2498,15 @@
             <values-found todo="true">Values Found</values-found>
             <errors todo="true">Errors</errors>
             <warnings todo="true">Warnings</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -2963,6 +3008,15 @@
             <values-found>Valori trovati</values-found>
             <errors>Errori</errors>
             <warnings>Avvertenze</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -3464,6 +3518,15 @@
             <values-found>Gefundene Werte</values-found>
             <errors>Fehler</errors>
             <warnings>Warnungen</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -3965,6 +4028,15 @@
             <values-found todo="true">Values Found</values-found>
             <errors todo="true">Errors</errors>
             <warnings todo="true">Warnings</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -4466,6 +4538,15 @@
             <values-found todo="true">Values Found</values-found>
             <errors todo="true">Errors</errors>
             <warnings todo="true">Warnings</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -4966,6 +5047,15 @@
             <values-found todo="true">Values Found</values-found>
             <errors todo="true">Errors</errors>
             <warnings todo="true">Warnings</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -5466,6 +5556,15 @@
             <values-found todo="true">Values Found</values-found>
             <errors todo="true">Errors</errors>
             <warnings todo="true">Warnings</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -5954,6 +6053,15 @@
             <values-found todo="true">Values Found</values-found>
             <errors todo="true">Errors</errors>
             <warnings todo="true">Warnings</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>
@@ -6454,6 +6562,15 @@
             <values-found todo="true">Values Found</values-found>
             <errors todo="true">Errors</errors>
             <warnings todo="true">Warnings</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
         </import>
         <authentication>
             <menu>

@@ -15,6 +15,10 @@ package org.orbeon.oxf.fr.permission
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
+import org.orbeon.oxf.fr.FormRunnerPersistence
+import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.util.StringUtils._
+
 
 sealed trait                                                        Operations
 case object AnyOperation                                    extends Operations
@@ -51,6 +55,14 @@ object Operations {
     Operation.Update,
     Operation.Delete
   )
+
+  def parseFromHeaders(headers: Map[String, List[String]]): Operations = {
+
+    val actualOperationsString = Headers.firstItemIgnoreCase(headers, FormRunnerPersistence.OrbeonOperations)
+    val actualOperationsList   = actualOperationsString.toList.flatMap(_.splitTo[List]())
+
+    parse(actualOperationsList)
+  }
 
   def parse(stringOperations: List[String]): Operations =
     stringOperations match {

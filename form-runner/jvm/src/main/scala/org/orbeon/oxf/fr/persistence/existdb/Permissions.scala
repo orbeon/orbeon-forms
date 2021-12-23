@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr.persistence.existdb
 import org.orbeon.oxf.externalcontext.{Organization, UserAndGroup}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner}
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
@@ -67,6 +67,9 @@ object Permissions {
     val authorized = Operations.allows(authorizedOperations, requiredOperation)
     if (!authorized) throw HttpStatusCodeException(StatusCode.Forbidden)
     def httpResponse = NetUtils.getExternalContext.getResponse
-    httpResponse.setHeader("Orbeon-Operations", Operations.serialize(authorizedOperations).mkString(" "))
+    httpResponse.setHeader(
+      FormRunnerPersistence.OrbeonOperations,
+      Operations.serialize(authorizedOperations).mkString(" ")
+    )
   }
 }

@@ -15,12 +15,12 @@ package org.orbeon.oxf.fr.persistence.http
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.net.URI
-
 import org.orbeon.dom.Document
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.io.IOUtils
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
+import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.fr.persistence.relational.Version.Unspecified
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
@@ -89,10 +89,7 @@ private[persistence] object HttpCall {
 
       // Check operations
       expectedResponse.operations.foreach { expectedOperations =>
-        val actualOperationsString = actualHeaders.get("orbeon-operations").map(_.head)
-        val actualOperationsList   = actualOperationsString.toList.flatMap(_.splitTo[List]())
-        val actualOperations       = Operations.parse(actualOperationsList)
-        assert(expectedOperations == actualOperations)
+        assert(expectedOperations == Operations.parseFromHeaders(actualHeaders))
       }
 
       // Check form version
@@ -236,7 +233,7 @@ private[persistence] object HttpCall {
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
-  ): (Int, Map[String, Seq[String]], Try[Array[Byte]]) =
+  ): (Int, Map[String, List[String]], Try[Array[Byte]]) =
     useAndClose(request(url, GET, version, None, None, credentials)) { chr =>
 
       val httpResponse = chr.httpResponse

@@ -14,8 +14,8 @@
 package org.orbeon.oxf.fr.persistence.http
 
 import java.io.ByteArrayInputStream
-
 import org.orbeon.oxf.externalcontext.{Credentials, ExternalContext}
+import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.permission.{Operations, SpecificOperations}
 import org.orbeon.oxf.fr.persistence.relational.rest.LockInfo
 import org.orbeon.oxf.fr.persistence.relational.{StageHeader, Version}
@@ -76,10 +76,7 @@ private[persistence] object HttpAssert extends XMLSupport {
             assert(resultBody.get sameElements expectedFile)
         }
         // Check operations
-        val resultOperationsString = headers.get("orbeon-operations").map(_.head)
-        val resultOperationsList = resultOperationsString.toList.flatMap(_.splitTo[List]())
-        val resultOperations = Operations.parse(resultOperationsList)
-        assert(expectedOperations == resultOperations)
+        assert(expectedOperations == Operations.parseFromHeaders(headers))
         // Check form version
         val resultFormVersion = headers.get(Version.OrbeonFormDefinitionVersionLower).map(_.head).map(_.toInt)
         assert(expectedFormVersion == resultFormVersion)

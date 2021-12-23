@@ -120,6 +120,7 @@ object FormRunnerPersistence {
 
   val PersistenceDefaultDataFormatVersion = DataFormatVersion.V400
 
+  val OrbeonOperations                    = "Orbeon-Operations"
   val OrbeonPathToHolder                  = "Orbeon-Path-To-Holder"
   val OrbeonPathToHolderLower             = OrbeonPathToHolder.toLowerCase
   val OrbeonDidEncryptHeader              = "Orbeon-Did-Encrypt"

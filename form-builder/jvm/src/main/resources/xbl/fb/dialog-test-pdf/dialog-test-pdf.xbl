@@ -128,12 +128,12 @@
                     <xh:div>
                         <fr:grid>
                             <fr:c x="1" y="1" w="12">
-                                <fr:checkbox-input ref="use-form-data" appearance="checkbox">
+                                <fr:checkbox-input ref="use-form-data">
                                     <xf:label ref="xxf:r('dialog-test-pdf.use-form-data', '|fr-form-resources|')"/>
                                 </fr:checkbox-input>
                             </fr:c>
                             <fr:c x="1" y="2" w="12">
-                                <fr:checkbox-input ref="disable-default" appearance="checkbox">
+                                <fr:checkbox-input ref="disable-default">
                                     <xf:label ref="xxf:r('dialog-test-pdf.disable-default', '|fr-form-resources|')"/>
                                 </fr:checkbox-input>
                             </fr:c>
@@ -143,16 +143,16 @@
                                 </fr:checkbox-input>
                             </fr:c>
                             <fr:c x="1" y="4" w="12">
-                                <fr:checkbox-input ref="disable-relevant" appearance="checkbox">
+                                <fr:checkbox-input ref="disable-relevant">
                                     <xf:label ref="xxf:r('dialog-test-pdf.disable-relevant', '|fr-form-resources|')"/>
                                 </fr:checkbox-input>
                             </fr:c>
-                            <fr:c x="1" y="4" w="6">
-                                <fr:checkbox-input ref="use-pdf-template" appearance="checkbox">
+                            <fr:c x="1" y="5" w="6">
+                                <fr:checkbox-input ref="use-pdf-template">
                                     <xf:label ref="xxf:r('dialog-test-pdf.use-pdf-template', '|fr-form-resources|')"/>
                                 </fr:checkbox-input>
                             </fr:c>
-                            <fr:c x="7" y="4" w="6">
+                            <fr:c x="7" y="6" w="6">
                                 <xf:select1 ref="selected-pdf-template">
                                     <xf:label appearance="minimal">Name</xf:label>
                                     <xf:itemset ref="$i/pdf-templates/pdf">

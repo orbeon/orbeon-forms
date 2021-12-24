@@ -259,6 +259,19 @@
                     name="static-sections-with-paging-case-ids"
                     select="for $id in $static-sections-with-paging-section-ids return concat($id, '-case')"/>
 
+                <xsl:variable
+                    name="static-lazy-section-relevance"
+                    select="
+                        (: limited to `free` mode :)
+                        $static-validate = 'free' and
+                        (: enabled by property :)
+                        p:property(
+                            string-join(
+                                ('oxf.xforms.xbl.fr.wizard.lazy-section-relevance', $static-app, $static-form),
+                                '.'
+                            )
+                        ) = true()"/>
+
                 <xsl:template match="/*">
                     <xf:group appearance="xxf:internal">
                         <xf:group
@@ -1239,8 +1252,12 @@
                                                 <!-- Tell the section whether it needs to be initially open or not (optimization).
                                                      We can't enable this yet in `lax|strict` mode, see:
                                                      https://github.com/orbeon/orbeon-forms/issues/4790#issuecomment-791652516 -->
-                                                <xsl:attribute name="content-nonrelevant-if-collapsed" select="$static-validate = 'free'"/>
-                                                <xsl:attribute name="open" select="concat('{case(''switch'') = ''', $static-section-id, '-case''}')"/>
+                                                <xsl:attribute
+                                                    name="content-nonrelevant-if-collapsed"
+                                                    select="$static-lazy-section-relevance"/>
+                                                <xsl:attribute
+                                                    name="open"
+                                                    select="concat('{case(''switch'') = ''', $static-section-id, '-case''}')"/>
 
                                                 <!-- Update the `changed` token -->
                                                 <xf:action event="xforms-value-changed">

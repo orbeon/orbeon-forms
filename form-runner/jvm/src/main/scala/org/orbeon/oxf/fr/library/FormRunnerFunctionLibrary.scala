@@ -144,6 +144,7 @@ private object FormRunnerFunctions {
   val BooleanGettersByName = List(
     "is-browser-environment"      -> (() => CoreCrossPlatformSupport.isJsEnv),
     "is-pe"                       -> (() => Version.isPE),
+    "is-draft"                    -> (() => FormRunnerParams().isDraft.getOrElse(false)),
     "is-design-time"              -> (() => FormRunner.isDesignTime(FormRunnerParams())),
     "is-readonly-mode"            -> (() => FormRunner.isReadonlyMode(FormRunnerParams())),
     "is-embedded"                 -> (() => FormRunner.isEmbeddedFromHeaders),

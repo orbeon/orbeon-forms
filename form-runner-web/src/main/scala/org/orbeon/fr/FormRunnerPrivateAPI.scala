@@ -71,7 +71,7 @@ object FormRunnerPrivateAPI extends js.Object {
     formElement.submit()
   }
 
-  def newToEdit(documentId: String, isDraft: Boolean): Unit = {
+  def newToEdit(documentId: String, isDraft: String): Unit = {
 
     val location = dom.window.location
 
@@ -82,7 +82,7 @@ object FormRunnerPrivateAPI extends js.Object {
          if (supportsURLSearchParams) {
            val urlSearchParams =  new URLSearchParams(location.search)
            urlSearchParams.delete("draft")
-           if (isDraft) urlSearchParams.set("draft", "true")
+           if (isDraft.toBoolean) urlSearchParams.set("draft", "true")
            urlSearchParams.toString match {
              case ""                     => ""
              case _ @ stringSearchParams => s"?$stringSearchParams"

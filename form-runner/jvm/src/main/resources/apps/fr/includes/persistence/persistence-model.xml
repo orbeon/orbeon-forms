@@ -356,40 +356,43 @@
     <xf:action event="xforms-ready" if="not($mode = ('summary', 'home'))">
 
         <xf:var name="show-drafts-dialog" value="instance('fr-persistence-instance')/found-document-message-to-show != ''"/>
-
         <xf:action if="not($show-drafts-dialog)">
-
-            <!-- Compute authorized operations -->
-            <xf:var name="from-persistence" value="instance('fr-authorized-operations')/@from-persistence"/>
-            <xf:var name="ops" value="
-                    if (exists($from-persistence)) then
-                       xxf:split($from-persistence)
-                    else if ($mode = 'new') then
-                       frf:allAuthorizedOperationsAssumingOwnerGroupMember(xxf:instance('fr-form-metadata')/permissions)
-                    else
-                       frf:authorizedOperationsBasedOnRolesXPath          (xxf:instance('fr-form-metadata')/permissions)
-                "/>
-
-            <xf:setvalue
-                ref="instance('fr-authorized-operations')"
-                value="string-join($ops, ' ')"/>
-
-            <xf:message level="xxf:log-debug">
-                AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): <xf:output value="string-join($ops, ' ')"/>
-            </xf:message>
-
-            <!-- Send an "Unauthorized" error if the user is unauthorized -->
-            <xf:action
-                if="not(
-                    frf:isUserAuthorizedBasedOnOperationsAndModeXPath(
-                        string-join($ops, ' '),
-                        $mode,
-                        $is-submit
-                    )
-                )"
-                type="xpath">frf:sendError(403)</xf:action>
-
+            <xf:dispatch name="fr-compute-authorized-operations" target="fr-persistence-model"/>
         </xf:action>
+    </xf:action>
+
+    <xf:action
+        observer="fr-persistence-model"
+        event="fr-compute-authorized-operations">
+
+        <xf:var name="from-persistence" value="instance('fr-authorized-operations')/@from-persistence"/>
+        <xf:var name="ops" value="
+                if (exists($from-persistence)) then
+                   xxf:split($from-persistence)
+                else if ($mode = 'new') then
+                   frf:allAuthorizedOperationsAssumingOwnerGroupMember(xxf:instance('fr-form-metadata')/permissions)
+                else
+                   frf:authorizedOperationsBasedOnRolesXPath          (xxf:instance('fr-form-metadata')/permissions)
+            "/>
+
+        <xf:setvalue
+            ref="instance('fr-authorized-operations')"
+            value="string-join($ops, ' ')"/>
+
+        <xf:message level="xxf:log-debug">
+            AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): <xf:output value="string-join($ops, ' ')"/>
+        </xf:message>
+
+        <!-- Send an "Unauthorized" error if the user is unauthorized -->
+        <xf:action
+            if="not(
+                frf:isUserAuthorizedBasedOnOperationsAndModeXPath(
+                    string-join($ops, ' '),
+                    $mode,
+                    $is-submit
+                )
+            )"
+            type="xpath">frf:sendError(403)</xf:action>
 
     </xf:action>
 

@@ -25,6 +25,7 @@ trait FormRunnerEmailBackend {
         form        = form,
         formVersion = 1,
         document    = None,
+        isDraft     = None,
         mode        = "email"
       )
 

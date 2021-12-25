@@ -332,8 +332,11 @@
         navigate(uri = "/fr/{fr:app-name()}/{fr:form-name()}/new")
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.validate.*.*"                         value='validate-all'/>
+
+    <!-- Define processes with the name as the corresponding action so we can run those actions with `process:runProcessByName()` -->
     <property as="xs:string"  name="oxf.fr.detail.process.collapse-all.*.*"                     value='collapse-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                       value='expand-all'/>
+    <property as="xs:string" name="oxf.fr.detail.process.new-to-edit.*.*"                       value='new-to-edit'/>
 
     <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*">
         if ("xxf:get-request-method() = 'GET'") then

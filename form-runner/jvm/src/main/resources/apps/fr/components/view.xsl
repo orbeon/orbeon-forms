@@ -264,9 +264,14 @@
                                 <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
                                 <xf:action event="DOMActivate">
                                     <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="xxf:instance('fr-search-response')/document/@name"/>
-                                    <xf:send event="DOMActivate" submission="fr-get-document-submission">
-                                        <xf:property name="data-or-draft" value="'draft'"/>
-                                    </xf:send>
+                                    <xf:setvalue ref="xxf:instance('fr-parameters-instance')/draft">true</xf:setvalue>
+                                     <xf:action event="DOMActivate">
+                                         <xf:send submission="fr-get-document-submission">
+                                             <xf:property name="data-or-draft" value="'draft'"/>
+                                         </xf:send>
+                                         <xf:dispatch name="fr-compute-authorized-operations" target="fr-persistence-model"/>
+                                         <xf:action type="xpath">process:runProcessByName('oxf.fr.detail.process', 'new-to-edit')</xf:action>
+                                     </xf:action>
                                 </xf:action>
                             </xf:trigger>
                         </xf:group>
@@ -516,7 +521,8 @@
                     event="xforms-value-changed"
                     if="$mode-for-save = 'edit'">
                     <xf:param name="documentId" value="fr:document-id()"/>
-                    <xf:body>ORBEON.fr.private.API.newToEdit(documentId)</xf:body>
+                    <xf:param name="isDraft"    value="fr:is-draft()"/>
+                    <xf:body>ORBEON.fr.private.API.newToEdit(documentId, isDraft)</xf:body>
                 </xf:action>
             </xf:var>
 

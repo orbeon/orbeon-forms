@@ -16,12 +16,14 @@ package org.orbeon.fr
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.xforms.{$, Page}
 import org.scalajs.dom
+import org.scalajs.dom.experimental.URLSearchParams
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 import org.scalajs.dom.raw.HTMLFormElement
 import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
+import scala.scalajs.js.UndefOr
 
 
 object FormRunnerPrivateAPI extends js.Object {
@@ -69,17 +71,34 @@ object FormRunnerPrivateAPI extends js.Object {
     formElement.submit()
   }
 
-  def newToEdit(documentId: String): Unit = {
+  def newToEdit(documentId: String, isDraft: Boolean): Unit = {
 
     val location = dom.window.location
 
     if (location.pathname.endsWith(NewPathSuffix)) {
+
+      var newSearch = {
+         val supportsURLSearchParams = global.URLSearchParams.asInstanceOf[UndefOr[URLSearchParams]].isDefined
+         if (supportsURLSearchParams) {
+           val urlSearchParams =  new URLSearchParams(location.search)
+           urlSearchParams.delete("draft")
+           if (isDraft) urlSearchParams.set("draft", "true")
+           urlSearchParams.toString match {
+             case ""                     => ""
+             case _ @ stringSearchParams => s"?$stringSearchParams"
+           }
+         } else {
+           // IE11 is the last browser not to support `URLSearchParams`; in this case, don't bother updating `draft`
+           location.search
+         }
+       }
+
       // `search`: for example `?form-version=42`
       // `hash`: for now not used by Form Runner, but it is safer to keep it
       dom.window.history.replaceState(
         statedata = dom.window.history.state,
         title     = "",
-        url       = s"edit/$documentId${location.search}${location.hash}"
+        url       = s"edit/$documentId${newSearch}${location.hash}"
       )
     }
   }

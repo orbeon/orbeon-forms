@@ -47,6 +47,7 @@ case class FormRunnerParams(
   form        : String,
   formVersion : Int,
   document    : Option[String],
+  isDraft     : Option[Boolean],
   mode        : String
 ) {
 
@@ -68,6 +69,7 @@ object FormRunnerParams {
       form        = paramsRootElem elemValue "form",
       formVersion = Try(paramsRootElem elemValue "form-version" toInt) getOrElse 1, // in `test` mode, for example, `form-version` is blank
       document    = paramsRootElem elemValue "document" trimAllToOpt,
+      isDraft     = paramsRootElem.elemValue("draft").trimAllToOpt.map(_ == "true"),
       mode        = paramsRootElem elemValue "mode"
     )
   }

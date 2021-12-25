@@ -31,6 +31,7 @@
             <config>
                 <include>/request/request-path</include>
                 <include>/request/parameters/parameter[name = 'form-version']</include>
+                <include>/request/parameters/parameter[name = 'draft']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -58,6 +59,7 @@
                     <xsl:value-of select="$request/parameters/parameter[name = 'form-version']/value"/>
                 </form-version>
                 <document><xsl:value-of select="$groups[6]"/></document>
+                <draft><xsl:value-of select="$request/parameters/parameter[name = 'draft']/value"/></draft>
                 <mode><xsl:value-of select="$groups[4]"/></mode>
                 <uuid><xsl:value-of select="$groups[8]"/></uuid>
             </request>

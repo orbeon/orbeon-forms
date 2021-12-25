@@ -51,7 +51,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
   def trySendEmail(params: ActionParams): Try[Any] =
     Try {
-      implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
+      implicit val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
 
@@ -246,21 +246,21 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
   def tryNavigateToReview(params: ActionParams): Try[Any] =
     Try {
-      val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
+      val FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
       s"/fr/$app/$form/view/$document"
     } flatMap
       tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL)
 
   def tryNavigateToEdit(params: ActionParams): Try[Any] =
     Try {
-      val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
+      val FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
       s"/fr/$app/$form/edit/$document"
     } flatMap
       tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL)
 
   def tryOpenRenderedFormat(params: ActionParams): Try[Any] =
     Try {
-      val FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
+      val FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
 
@@ -365,7 +365,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         case Some((_, key)) => key
         case None =>
 
-          implicit val frParams @ FormRunnerParams(app, form, _, Some(document), _) = FormRunnerParams()
+          implicit val frParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
 
           val path =
             recombineQuery(

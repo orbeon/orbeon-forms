@@ -134,7 +134,7 @@ trait FormRunnerActionsCommon {
 
   def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
     Try {
-      val FormRunnerParams(app, form, formVersion, Some(document), _) = FormRunnerParams()
+      val FormRunnerParams(app, form, formVersion, Some(document), _, _) = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
 

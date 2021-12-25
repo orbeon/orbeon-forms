@@ -83,7 +83,7 @@ trait FormRunnerEmail {
   //@XPathFunction
   def buildLinkBackToFormRunner(linkType: String): String = {
 
-    val FormRunnerParams(app, form, version, documentOpt, _) = FormRunnerParams()
+    val FormRunnerParams(app, form, version, documentOpt, isDraftOpt, _) = FormRunnerParams()
 
     val baseUrlNoSlash =
       frc.formRunnerStandaloneBaseUrl(

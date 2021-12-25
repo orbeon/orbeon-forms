@@ -508,7 +508,7 @@ trait FormRunnerPersistence {
   //@XPathFunction
   def clearMissingUnsavedDataAttachmentReturnFilenamesJava(data: NodeInfo): ju.List[String] = {
 
-    val FormRunnerParams(app, form, _, documentIdOpt, mode) = FormRunnerParams()
+    val FormRunnerParams(app, form, _, documentIdOpt, _, mode) = FormRunnerParams()
 
     val unsavedAttachmentHolders =
       documentIdOpt match {

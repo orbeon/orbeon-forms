@@ -60,8 +60,8 @@ trait App {
         val className = tokens.find(! _.startsWith("$")) getOrElse tokens.last
 
         record.methodName match {
-          case Some(name) => new TextOutput(p"$className.$name")
-          case None       => new TextOutput(p"$className")
+          case Some(name) => new TextOutput(s"$className.$name")
+          case None       => new TextOutput(s"$className")
         }
       }
     }

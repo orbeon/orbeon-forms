@@ -262,13 +262,11 @@
                                 <xf:action event="DOMActivate">
                                     <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="xxf:instance('fr-search-response')/document/@name"/>
                                     <xf:setvalue ref="xxf:instance('fr-parameters-instance')/draft">true</xf:setvalue>
-                                     <xf:action event="DOMActivate">
-                                         <xf:send submission="fr-get-document-submission">
-                                             <xf:property name="data-or-draft" value="'draft'"/>
-                                         </xf:send>
-                                         <xf:dispatch name="fr-compute-authorized-operations" target="fr-persistence-model"/>
-                                         <xf:action type="xpath">process:runProcessByName('oxf.fr.detail.process', 'new-to-edit')</xf:action>
-                                     </xf:action>
+                                    <xf:send submission="fr-get-document-submission">
+                                        <xf:property name="data-or-draft" value="'draft'"/>
+                                    </xf:send>
+                                    <xf:dispatch name="fr-compute-authorized-operations" target="fr-persistence-model"/>
+                                    <xf:action type="xpath">process:runProcessByName('oxf.fr.detail.process', 'new-to-edit')</xf:action>
                                 </xf:action>
                             </xf:trigger>
                         </xf:group>

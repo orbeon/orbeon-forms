@@ -38,11 +38,11 @@ object RelationalCommon {
   def requestedFormVersion(req: RequestCommon): Int =
 
     req.version match {
-      case Unspecified        => Private.latest(req.app, req.form).getOrElse(1)
-      case Next               => Private.latest(req.app, req.form).map(_ + 1).getOrElse(1)
-      case Specific(v)        => v
-      case ForDocument(docId) =>
-        FormRunner.readDocumentFormVersion(req.app, req.form, docId)
+      case Unspecified                 => Private.latest(req.app, req.form).getOrElse(1)
+      case Next                        => Private.latest(req.app, req.form).map(_ + 1).getOrElse(1)
+      case Specific(v)                 => v
+      case ForDocument(docId, isDraft) =>
+        FormRunner.readDocumentFormVersion(req.app, req.form, docId, isDraft)
           .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
     }
 

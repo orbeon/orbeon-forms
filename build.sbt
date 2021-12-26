@@ -43,7 +43,7 @@ val ScalaLoggingVersion           = "3.9.4"
 
 // Shared Scala libraries
 val ScalaTestVersion              = "3.1.4"
-val CirceVersion                  = "0.13.0"
+val CirceVersion                  = "0.14.1"
 val EnumeratumVersion             = "1.6.1"
 val EnumeratumCirceVersion        = "1.6.1"
 val ShapelessVersion              = "2.3.4"

@@ -6,6 +6,9 @@ on:
 
 name: Launch Scala Steward
 
+env:
+  GITHUB_TOKEN: ${{ secrets.REPO_GITHUB_TOKEN }}
+
 jobs:
   scala-steward:
     runs-on: ubuntu-latest
@@ -14,4 +17,4 @@ jobs:
       - name: Launch Scala Steward
         uses: scala-steward-org/scala-steward-action@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.REPO_GITHUB_TOKEN }}

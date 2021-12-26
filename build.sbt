@@ -43,8 +43,8 @@ val ScalaLoggingVersion           = "3.9.4"
 // Shared Scala libraries
 val ScalaTestVersion              = "3.2.10"
 val CirceVersion                  = "0.13.0"
-val EnumeratumVersion             = "1.6.1"
-val EnumeratumCirceVersion        = "1.6.1"
+val EnumeratumVersion             = "1.7.0"
+val EnumeratumCirceVersion        = "1.7.0"
 val ShapelessVersion              = "2.3.4"
 val ScalaXmlVersion               = "2.0.1"  // see https://github.com/orbeon/orbeon-forms/issues/4927
 val ScalaAsyncVersion             = "0.10.0" // "1.0.0" with `-Xasync` causes issues

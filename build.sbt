@@ -7,7 +7,7 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 // For our GitHub packages
 resolvers += Resolver.githubPackages("orbeon")
 ThisBuild / githubOwner := "orbeon"
-ThisBuild / githubTokenSource := TokenSource.Environment("REPO_GITHUB_TOKEN") || TokenSource.Environment("GITHUB_TOKEN")
+githubTokenSource := TokenSource.Environment("REPO_GITHUB_TOKEN") || TokenSource.Environment("GITHUB_TOKEN")
 
 ThisBuild / evictionErrorLevel := Level.Info
 

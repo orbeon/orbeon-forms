@@ -33,7 +33,7 @@
     <!-- NOTE: We used to use oxf:url-generator, then switched to oxf:xforms-submission for more header support. We use
          oxf:url-generator again as it is much faster and is enough now that the persistence proxy is in place. -->
     <p:processor name="oxf:url-generator">
-        <p:input name="config" href="#instance" transform="oxf:unsafe-xslt">
+        <p:input name="config" href="#instance" transform="oxf:unsafe-xslt"  debug="XXX URL generator config">
             <config xsl:version="2.0">
 
                 <xsl:variable name="params" select="/*"/>
@@ -52,6 +52,12 @@
                         <name>Orbeon-For-Document-Id</name>
                         <value><xsl:value-of select="$params/document"/></value>
                     </header>
+                    <xsl:if test="p:non-blank($params/draft)">
+                        <header>
+                            <name>Orbeon-For-Document-IsDraft</name>
+                            <value><xsl:value-of select="$params/draft"/></value>
+                        </header>
+                    </xsl:if>
                 </xsl:if>
                 <xsl:if test="not($use-document-id) and $specific-form-version-requested">
                     <header>
@@ -69,9 +75,7 @@
                             $params/app,
                             '/',
                             $params/form,
-                            '/form/form.xhtml',
-                            (: document is available e.g. when editing or viewing a document :)
-                            if ($use-document-id) then concat('?document=', $params/document) else ''
+                            '/form/form.xhtml'
                         )"/>
                 <url>
                     <xsl:value-of select="p:rewrite-service-uri($resource, true())"/>

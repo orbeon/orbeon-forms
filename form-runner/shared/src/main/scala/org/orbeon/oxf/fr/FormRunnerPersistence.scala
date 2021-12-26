@@ -479,9 +479,10 @@ trait FormRunnerPersistence {
   def readDocumentFormVersion(
     appName         : String,
     formName        : String,
-    documentId      : String
+    documentId      : String,
+    isDraft         : Boolean
   ): Option[Int] = {
-    val path = createFormDataBasePath(appName, formName, isDraft = false, documentId) + "data.xml"
+    val path = createFormDataBasePath(appName, formName, isDraft, documentId) + "data.xml"
     val headers = readHeaders(path, Map.empty)
     headers.get(Version.OrbeonFormDefinitionVersion).map(_.head).map(_.toInt)
   }

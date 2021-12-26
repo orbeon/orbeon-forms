@@ -138,14 +138,15 @@ private[persistence] object HttpCall {
       import Version._
 
       val timeoutHeader = timeout.map(t => Headers.Timeout -> List(Headers.TimeoutValuePrefix + t.toString))
-      val versionHeader = version match {
-        case Unspecified             => None
-        case Next                    => Some(OrbeonFormDefinitionVersion -> List("next"))
-        case Specific(version)       => Some(OrbeonFormDefinitionVersion -> List(version.toString))
-        case ForDocument(documentId) => Some(OrbeonForDocumentId         -> List(documentId))
+      val versionHeaders = version match {
+        case Unspecified                      => Nil
+        case Next                             => List(OrbeonFormDefinitionVersion -> List("next"))
+        case Specific(version)                => List(OrbeonFormDefinitionVersion -> List(version.toString))
+        case ForDocument(documentId, isDraft) => List(OrbeonForDocumentId         -> List(documentId),
+                                                      OrbeonForDocumentIsDraft    -> List(isDraft.toString))
       }
       val stageHeader   = stage.map(_.name).map(StageHeader.HeaderName -> List(_))
-      val headers = (timeoutHeader.toList ++ versionHeader.toList ++ stageHeader.toList).toMap
+      val headers = (timeoutHeader.toList ++ versionHeaders ++ stageHeader.toList).toMap
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
         url              = new URI(documentURL),

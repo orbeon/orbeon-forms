@@ -387,7 +387,7 @@ lazy val commonScalaJvmSettings = Seq(
   libraryDependencies ++= Seq(
     "org.scalatestplus" %%% "junit-4-12"     % "3.2.2.0" % Test,
     "org.scalatestplus" %%% "mockito-1-10"   % "3.1.0.0" % Test,
-    "org.scalatestplus" %%% "selenium-3-141" % "3.2.2.0" % Test
+    "org.scalatestplus" %%% "selenium-3-141" % "3.2.10.0" % Test
   )
 )
 

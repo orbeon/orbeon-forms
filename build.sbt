@@ -58,7 +58,7 @@ val ScalaCollectionCompatVersion  = "2.2.0"
 
 // Java libraries
 val SaxonJvmVersion               = "9.1.0.8.3"
-val JUnitInterfaceVersion         = "0.11"
+val JUnitInterfaceVersion         = "0.13.2"
 val Slf4jVersion                  = "1.7.32"
 val HttpComponentsVersion         = "4.5.13"
 val Log4j2Version                 = "2.17.0"
@@ -290,7 +290,7 @@ def jUnitTestArguments(buildBaseDirectory: File) =
 
 def jUnitTestOptions =
   List(
-    libraryDependencies                += "com.novocode" % "junit-interface" % JUnitInterfaceVersion % Test,
+    libraryDependencies                += "com.github.sbt" % "junit-interface" % JUnitInterfaceVersion % Test,
 
     Test / testOptions                 += Tests.Argument(TestFrameworks.JUnit, jUnitTestArguments((ThisBuild / baseDirectory).value): _*),
     Test / testOptions                 += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),

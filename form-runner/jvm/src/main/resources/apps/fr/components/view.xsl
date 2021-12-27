@@ -266,7 +266,7 @@
                                         <xf:property name="data-or-draft" value="'draft'"/>
                                     </xf:send>
                                     <xf:dispatch name="fr-compute-authorized-operations" target="fr-persistence-model"/>
-                                    <xf:action type="xpath">process:runProcessByName('oxf.fr.detail.process', 'new-to-edit')</xf:action>
+                                    <xf:action type="xpath">fr:run-process-by-name('oxf.fr.detail.process', 'new-to-edit')</xf:action>
                                 </xf:action>
                             </xf:trigger>
                         </xf:group>

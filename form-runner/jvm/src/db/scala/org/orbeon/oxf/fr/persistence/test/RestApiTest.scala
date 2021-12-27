@@ -146,8 +146,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       HttpAssert.put(FirstDataURL, Specific(2)      , HttpCall.XML(first), 400)
 
       // Fail with next/for document
-      HttpAssert.put(FirstDataURL, Next              , HttpCall.XML(first), 400)
-      HttpAssert.put(FirstDataURL, ForDocument("123"), HttpCall.XML(first), 400)
+      HttpAssert.put(FirstDataURL, Next                               , HttpCall.XML(first), 400)
+      HttpAssert.put(FirstDataURL, ForDocument("123", isDraft = false), HttpCall.XML(first), 400)
     }
   }
 
@@ -170,9 +170,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       HttpAssert.put(FormURL      , Next       , HttpCall.XML(second), 201)
       HttpAssert.put(FirstDataURL , Specific(1), HttpCall.XML(data)  , 201)
       HttpAssert.put(SecondDataURL, Specific(2), HttpCall.XML(data)  , 201)
-      HttpAssert.get(FormURL, ForDocument("123"), HttpAssert.ExpectedBody(HttpCall.XML(first) , Operations.None, Some(1)))
-      HttpAssert.get(FormURL, ForDocument("456"), HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(2)))
-      HttpAssert.get(FormURL, ForDocument("789"), HttpAssert.ExpectedCode(404))
+      HttpAssert.get(FormURL, ForDocument("123", isDraft = false), HttpAssert.ExpectedBody(HttpCall.XML(first) , Operations.None, Some(1)))
+      HttpAssert.get(FormURL, ForDocument("456", isDraft = false), HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(2)))
+      HttpAssert.get(FormURL, ForDocument("789", isDraft = false), HttpAssert.ExpectedCode(404))
     }
   }
 

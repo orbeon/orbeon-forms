@@ -217,10 +217,7 @@
             <xf:var
                 name="form-version-param"
                 model="fr-persistence-model"
-                value="
-                    if (xxf:is-blank($form-version)) then ''
-                    else concat('form-version=', $form-version)
-                "/>
+                value="concat('form-version=', $form-version)"/>
             <xf:switch caseref="$persistence-instance/found-document-message-to-show">
                 <xf:case value="'found-draft-for-document'">
                     <xf:output value="$fr-resources/detail/draft-singleton/found-draft-for-document"/>

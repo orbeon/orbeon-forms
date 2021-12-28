@@ -73,7 +73,7 @@ val AntVersion                    = "1.10.11"
 val ServletApiVersion             = "4.0.1"
 val PortletApiVersion             = "3.0.1"
 val LiferayPortalServiceVersion   = "6.2.5"
-val LiferayPortalKernelVersion    = "5.4.0"
+val LiferayPortalKernelVersion    = "29.0.0"
 
 
 val CoreLibraryDependencies = Seq(

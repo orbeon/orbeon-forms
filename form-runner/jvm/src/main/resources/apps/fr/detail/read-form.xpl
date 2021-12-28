@@ -33,7 +33,7 @@
     <!-- NOTE: We used to use oxf:url-generator, then switched to oxf:xforms-submission for more header support. We use
          oxf:url-generator again as it is much faster and is enough now that the persistence proxy is in place. -->
     <p:processor name="oxf:url-generator">
-        <p:input name="config" href="#instance" transform="oxf:unsafe-xslt"  debug="XXX URL generator config">
+        <p:input name="config" href="#instance" transform="oxf:unsafe-xslt">
             <config xsl:version="2.0">
 
                 <xsl:variable name="params" select="/*"/>

@@ -39,7 +39,7 @@ val HttpComponentsVersion         = "4.5.13"
 val CommonsIoVersion              = "2.7"
 val FlyingSaucerVersion           = "9.1.20"
 val TinkVersion                   = "1.4.0"
-val Log4j2Version                 = "2.17.0"
+val Log4j2Version                 = "2.17.1"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.0"
 

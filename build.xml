@@ -381,10 +381,10 @@
                 <include name="orbeon-proxy-portlet.jar"/>
             </lib>
             <lib dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
-                <include name="slf4j-api-1.7.30.jar"/>
-                <include name="log4j-slf4j-impl-2.17.0.jar"/>
-                <include name="log4j-api-2.17.0.jar"/>
-                <include name="log4j-core-2.17.0.jar"/>
+                <include name="slf4j-api-*.jar"/>
+                <include name="log4j-slf4j-impl-*.jar"/>
+                <include name="log4j-api-*.jar"/>
+                <include name="log4j-core-*.jar"/>
             </lib>
         </war>
     </target>

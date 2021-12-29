@@ -59,68 +59,68 @@ object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
     var requestTryCount: Int = 0 // attempts to run the current Ajax request done so far
 
     def asyncAjaxRequestWithRetry(
-        requestFormId : String,
-        requestBody   : String | FormData,
-        showProgress  : Boolean,
-        ignoreErrors  : Boolean
-      ): Future[dom.Document] = {
+      requestFormId : String,
+      requestBody   : String | FormData,
+      showProgress  : Boolean,
+      ignoreErrors  : Boolean
+    ): Future[dom.Document] = {
 
-        val requestForm = Page.getForm(requestFormId)
-        requestTryCount += 1
+      val requestForm = Page.getForm(requestFormId)
+      requestTryCount += 1
 
-        // Timeout support using `AbortController`
-        val controller = new AbortController
-        js.timers.setTimeout(Properties.delayBeforeAjaxTimeout.get().millis) {
-          controller.abort()
-        }
+      // Timeout support using `AbortController`
+      val controller = new AbortController
+      js.timers.setTimeout(Properties.delayBeforeAjaxTimeout.get().millis) {
+        controller.abort()
+      }
 
-        val promise = Promise[dom.Document]()
+      val promise = Promise[dom.Document]()
 
-        Support.fetchText(
-          url         = requestForm.xformsServerPath,
-          requestBody = requestBody,
-          contentType = "application/xml".some,
-          formId      = requestFormId,
-          abortSignal = controller.signal.some
-        ).onComplete { response =>
+      Support.fetchText(
+        url         = requestForm.xformsServerPath,
+        requestBody = requestBody,
+        contentType = "application/xml".some,
+        formId      = requestFormId,
+        abortSignal = controller.signal.some
+      ).onComplete { response =>
 
-          // Ignore response if for a form we don't have anymore on the page
-          if (dom.document.body.contains(requestForm.elem)) {
-            response match {
-              case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
-                // We ignore HTTP status and just check that we have a well-formed response document
+        // Ignore response if for a form we don't have anymore on the page
+        if (dom.document.body.contains(requestForm.elem)) {
+          response match {
+            case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>
+              // We ignore HTTP status and just check that we have a well-formed response document
+              Page.loadingIndicator().requestEnded(showProgress)
+              promise.success(responseXml)
+            case Success((503, _, _)) =>
+              // The server returns an explicit 503 when the Ajax server is still busy
+              retryRequestAfterDelay(() =>
+                asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
+                  promise.complete
+              )
+            case Success((_, responseText, responseXmlOpt)) =>
+              // Retry if we DON'T have an explicit error doc or a login
+              if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, ignoreErrors))
+                retryRequestAfterDelay(() =>
+                  asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
+                    promise.complete
+                )
+              else {
                 Page.loadingIndicator().requestEnded(showProgress)
-                promise.success(responseXml)
-              case Success((503, _, _)) =>
-                // The server returns an explicit 503 when the Ajax server is still busy
-                retryRequestAfterDelay(() =>
-                  asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
-                    promise.complete
-                )
-              case Success((_, responseText, responseXmlOpt)) =>
-                // Retry if we DON'T have an explicit error doc or a login
-                if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, ignoreErrors))
-                  retryRequestAfterDelay(() =>
-                    asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
-                      promise.complete
-                  )
-                else {
-                  Page.loadingIndicator().requestEnded(showProgress)
-                  // This was handled by showing a dialog or login
-                  promise.failure(new Throwable) // TODO: It would be good to return another error type.
-                }
-              case Failure(t) =>
-                logAndShowError(t, requestFormId, ignoreErrors)
-                retryRequestAfterDelay(() =>
-                  asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
-                    promise.complete
-                )
-            }
+                // This was handled by showing a dialog or login
+                promise.failure(new Throwable) // TODO: It would be good to return another error type.
+              }
+            case Failure(t) =>
+              logAndShowError(t, requestFormId, ignoreErrors)
+              retryRequestAfterDelay(() =>
+                asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
+                  promise.complete
+              )
           }
         }
-
-        promise.future
       }
+
+      promise.future
+    }
 
     // Retry after a certain delay which increases with the number of consecutive failed request, but which never exceeds
     // a maximum delay.

@@ -108,6 +108,7 @@ trait FormRunnerBaseOps {
   def gridId    (gridName: String)   : String = gridName    + "-grid"
   def sectionId (sectionName: String): String = sectionName + "-section"
   def controlId (controlName: String): String = controlName + "-control"
+  //@XPathFunction
   def templateId(gridName: String)   : String = gridName    + TemplateSuffix
 
   def defaultIterationName(repeatName: String): String =

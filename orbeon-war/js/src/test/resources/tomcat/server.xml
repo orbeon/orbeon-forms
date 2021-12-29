@@ -112,11 +112,13 @@
       <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
                channelSendOptions="6">
           <!-- ORBEON: 6 or 8? -->
-
           <!--<Manager className="org.apache.catalina.ha.session.BackupManager"-->
                    <!--expireSessionsOnShutdown="false"-->
                    <!--notifyListenersOnReplication="true"-->
                    <!--mapSendOptions="6"/>-->
+          <!-- "we don't recommend it for larger clusters — more than 4 nodes or so. Also, when using the DeltaManager,
+               Tomcat will replicate sessions to all nodes, even nodes that don't have the application deployed. To get
+               around these problem, you'll want to use the BackupManager." -->
           <Manager className="org.apache.catalina.ha.session.DeltaManager"
                    expireSessionsOnShutdown="false"
                    notifyListenersOnReplication="true"/>
@@ -137,6 +139,7 @@
               </Sender>
               <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
               <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor"/>
+              <!-- "prints out simple stats on message traffic" -->
               <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
           </Channel>
 

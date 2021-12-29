@@ -234,6 +234,8 @@ object AjaxClient {
     EventQueue.addEventAndUpdateQueueSchedule(event, event.incremental)
   }
 
+  private val ErrorMessageTitle = "JavaScript error in Orbeon Forms client"
+
   // When an exception happens while we communicate with the server, we catch it and show an error in the UI.
   // This is to prevent the UI from becoming totally unusable after an error.
   @JSExport
@@ -247,9 +249,9 @@ object AjaxClient {
     }
 
     // Q: We used to log the JavaScript exception to the console here. In which cases can we do that? How does it help?
-    dom.console.log("JavaScript error", message)
+    dom.console.log(ErrorMessageTitle, message)
 
-    val sb = new StringBuilder("Exception in client-side code.")
+    val sb = new StringBuilder(ErrorMessageTitle)
 
     // We used to log `fileName` and `lineNumber` as well, but those are strictly Firefox features
     Option(message) foreach { m =>
@@ -258,7 +260,7 @@ object AjaxClient {
       sb append "</li></ul>"
     }
 
-    showError("Exception in client-side code", sb.toString, formId, ignoreErrors)
+    showError(ErrorMessageTitle, sb.toString, formId, ignoreErrors)
   }
 
   // Display the error panel and shows the specified detailed message in the detail section of the panel.

@@ -22,6 +22,7 @@ import org.scalajs.dom.html
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
+
 // Companion for `fr:dnd-repeat`
 object AttachmentMultiple {
 
@@ -39,8 +40,6 @@ object AttachmentMultiple {
     new XBLCompanion {
 
       companion =>
-
-      import Private._
 
       override def init(): Unit = {
 
@@ -79,86 +78,83 @@ object AttachmentMultiple {
       private def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
       private def uploadInputOpt    = Option(containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input])
 
-      private object Private {
+      private  object EventSupport extends EventListenerSupport
 
-        object EventSupport extends EventListenerSupport
+      private def browserSupportsFileDrop: Boolean =
+        ! Bowser.msie.contains(true)
 
-        def browserSupportsFileDrop: Boolean =
-          ! Bowser.msie.contains(true)
+      private def registerAllListeners(): Unit = {
+        // "A listener for the dragenter and dragover events are used to indicate valid drop targets,
+        // that is, places where dragged items may be dropped. Most areas of a web page or application
+        // are not valid places to drop data. Thus, the default handling of these events is not to allow
+        // a drop."
+        // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets
 
-        def registerAllListeners(): Unit = {
-          // "A listener for the dragenter and dragover events are used to indicate valid drop targets,
-          // that is, places where dragged items may be dropped. Most areas of a web page or application
-          // are not valid places to drop data. Thus, the default handling of these events is not to allow
-          // a drop."
-          // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#droptargets
+        // "If you want to allow a drop, you must prevent the default handling by cancelling both the dragenter
+        // and dragover events."
 
-          // "If you want to allow a drop, you must prevent the default handling by cancelling both the dragenter
-          // and dragover events."
+        def addClass() =
+          dropElem.classList.add("fr-attachment-dragover")
 
-          def addClass() =
-            dropElem.classList.add("fr-attachment-dragover")
+        def removeClass() =
+          dropElem.classList.remove("fr-attachment-dragover")
 
-          def removeClass() =
-            dropElem.classList.remove("fr-attachment-dragover")
+        def addListenerOnDropElem(name: String, fn: dom.raw.DragEvent => Unit): Unit =
+          EventSupport.addListener(dropElem, name, fn)
 
-          def addListenerOnDropElem(name: String, fn: dom.raw.DragEvent => Unit): Unit =
-            EventSupport.addListener(dropElem, name, fn)
+        addListenerOnDropElem(
+          "drop",
+          ev => {
+            removeClass()
+            if (ev.dataTransfer.types contains "Files") {
+              scribe.debug(s"${ev.`type`} with files")
+              ev.preventDefault()
 
-          addListenerOnDropElem(
-            "drop",
-            ev => {
+              val files = ev.dataTransfer.files
+              for (i <- 0 until files.length) {
+                UploaderClient.uploadEventQueue.add(
+                  event    = UploadEvent(Page.getUploadControl(uploadControlElem), files(i)),
+                  wait     = Properties.delayBeforeIncrementalRequest.get().millis,
+                  waitType = ExecutionWait.MinWait
+                )
+              }
+            }
+          }
+        )
+
+        addListenerOnDropElem(
+          "dragover",
+          ev => {
+            ev.preventDefault() // Necessary to indicate the drop target
+            // "add an entry to L consisting of the string "Files""
+            if (ev.dataTransfer.types contains "Files") {
+              scribe.debug(s"${ev.`type`} with files")
+              addClass()
+            }
+          }
+        )
+
+        addListenerOnDropElem(
+          "dragleave", // doesn't seem like `dragexit` is a thing anymore
+          ev => {
+            scribe.debug(ev.`type`)
+            if (ev.target eq dropElem) {
+              ev.preventDefault()
               removeClass()
-              if (ev.dataTransfer.types contains "Files") {
-                scribe.debug(s"${ev.`type`} with files")
-                ev.preventDefault()
-
-                val files = ev.dataTransfer.files
-                for (i <- 0 until files.length) {
-                  UploaderClient.uploadEventQueue.add(
-                    event    = UploadEvent(Page.getUploadControl(uploadControlElem), files(i)),
-                    wait     = Properties.delayBeforeIncrementalRequest.get().millis,
-                    waitType = ExecutionWait.MinWait
-                  )
-                }
-              }
             }
-          )
+          }
+        )
 
-          addListenerOnDropElem(
-            "dragover",
-            ev => {
-              ev.preventDefault() // Necessary to indicate the drop target
-              // "add an entry to L consisting of the string "Files""
-              if (ev.dataTransfer.types contains "Files") {
-                scribe.debug(s"${ev.`type`} with files")
-                addClass()
-              }
+        EventSupport.addListener(
+          selectLabel,
+          "keydown",
+          (ev: dom.raw.KeyboardEvent) => {
+            if (ev.key == "Enter" || ev.key == " ") {
+              ev.preventDefault() // so that the page doesn't scroll
+              uploadInputOpt foreach (_.click())
             }
-          )
-
-          addListenerOnDropElem(
-            "dragleave", // doesn't seem like `dragexit` is a thing anymore
-            ev => {
-              scribe.debug(ev.`type`)
-              if (ev.target eq dropElem) {
-                ev.preventDefault()
-                removeClass()
-              }
-            }
-          )
-
-          EventSupport.addListener(
-            selectLabel,
-            "keydown",
-            (ev: dom.raw.KeyboardEvent) => {
-              if (ev.key == "Enter" || ev.key == " ") {
-                ev.preventDefault() // so that the page doesn't scroll
-                uploadInputOpt foreach (_.click())
-              }
-            }
-          )
-        }
+          }
+        )
       }
     }
 }

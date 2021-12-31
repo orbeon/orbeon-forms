@@ -2,6 +2,7 @@ import sbt.Keys._
 import org.orbeon.sbt.OrbeonSupport
 import org.orbeon.sbt.OrbeonSupport._
 import org.orbeon.sbt.OrbeonWebappPlugin
+import org.scalajs.linker.interface.ESVersion
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 // For our GitHub packages

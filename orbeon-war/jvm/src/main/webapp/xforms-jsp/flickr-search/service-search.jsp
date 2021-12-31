@@ -18,9 +18,10 @@
 <%@ page import="java.util.Iterator"%>
 <%@ page import="java.net.URLEncoder"%>
 <%@ page import="org.orbeon.oxf.xml.XMLParsing" %>
+<%@ page import="org.orbeon.oxf.xml.ParserConfiguration" %>
 <%
     response.setContentType("application/xml");
-    final SAXReader xmlReader = new SAXReader(XMLParsing.newXMLReader(XMLParsing.ParserConfiguration.PLAIN));
+    final SAXReader xmlReader = new SAXReader(XMLParsing.newXMLReader(ParserConfiguration.Plain()));
 
     // Build URL for query to Flickr
     String flickrURL = "https://www.flickr.com/services/rest/?method=";

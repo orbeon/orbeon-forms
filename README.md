@@ -108,7 +108,7 @@ See the [community](https://www.orbeon.com/community) page. In a nutshell:
 
 - Ask short questions directed to Orbeon on [Twitter](https://twitter.com/intent/tweet?in_reply_to=orbeon&in_reply_to_status_id=261900968369729536&source=webclient&text=%40orbeon+).
 - Ask technical questions on [StackOverflow](https://stackoverflow.com/questions/ask?tags=orbeon) (don't forget the "orbeon" tag).
-- Use the [discussion forum](http://discuss.orbeon.com/) for discussions and feedback.
+- Use the [discussion forum](https://groups.google.com/g/orbeon) for discussions and feedback.
 - For commercial support and licensing:
     - [PE subscriptions](https://www.orbeon.com/pricing)
     - [Dev Support subscriptions](https://www.orbeon.com/services)
@@ -130,7 +130,7 @@ What's happening?
 - [Orbeon Blog](https://blog.orbeon.com/)
 - [Orbeon on Twitter](https://twitter.com/orbeon)
 - [Latest commits on github](https://github.com/orbeon/orbeon-forms/commits/)
-- [Forum archive](http://discuss.orbeon.com/)
+- [Forum archive](https://groups.google.com/g/orbeon)
 
 
 Compiling Orbeon Forms
@@ -185,7 +185,7 @@ This product includes software developed by the [Apache Software Foundation](htt
 - [Ant](https://ant.apache.org/)
 - [Commons](https://commons.apache.org/)
 - [HttpComponents](https://hc.apache.org/)
-- [log4j](https://logging.apache.org/log4j/)
+- [Log4j](https://logging.apache.org/log4j/)
 - [Mime4j](https://james.apache.org/mime4j/)
 - [Xerces](https://xerces.apache.org/xerces-j/)
 
@@ -220,7 +220,7 @@ locations:
 This product makes use of the [Silk Icons](<http://www.famfamfam.com/lab/icons/silk/>), released
 under a Creative Commons Attribution 2.5 License.
 
-This product makes use of the [PixelMixer icons](http://www.iconarchive.com/artist/pixelmixer.html).
+This product makes use of the [PixelMixer icons](https://iconarchive.com/artist/pixelmixer.html).
 
 Please consult the `third-party-licenses` directory for more information
 about individual licenses.

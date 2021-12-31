@@ -320,7 +320,7 @@ private object PersistenceProxyProcessor {
         url              = outgoingURL,
         hasCredentials   = false,
         customHeaders    = persistenceHeaders ++ proxiedHeaders,
-        headersToForward = Set(),                                   // handled by proxyAndCapitalizeHeaders()
+        headersToForward = Set.empty,                               // handled by proxyAndCapitalizeHeaders()
         cookiesToForward = Connection.cookiesToForwardFromProperty, // NOT handled by proxyAndCapitalizeHeaders()
         getHeader        = Connection.getHeaderFromRequest(request)
       )

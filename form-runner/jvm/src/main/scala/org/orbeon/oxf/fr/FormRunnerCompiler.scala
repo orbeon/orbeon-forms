@@ -39,8 +39,9 @@ class FormRunnerCompiler extends ProcessorImpl {
       new ProcessorOutputImpl(FormRunnerCompiler.this, outputName) {
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
-          implicit val rcv = xmlReceiver
-          implicit val ec  = CoreCrossPlatformSupport.externalContext
+          implicit val rcv                      = xmlReceiver
+          implicit val ec                       = CoreCrossPlatformSupport.externalContext
+          implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
           val params       = readCacheInputAsOrbeonDom(pipelineContext, "instance")
           val formDocument = readCacheInputAsOrbeonDom(pipelineContext, "data")
@@ -184,11 +185,13 @@ class FormRunnerCompiler extends ProcessorImpl {
 
             def connect(path: String): ConnectionResult = {
 
-              val resolvedAbsoluteUrl =
-                URLRewriterUtils.rewriteServiceURL(
-                  ec.getRequest,
-                  path,
-                  URLRewriter.REWRITE_MODE_ABSOLUTE
+              val resolvedUri =
+                new URI(
+                  URLRewriterUtils.rewriteServiceURL(
+                    ec.getRequest,
+                    path,
+                    URLRewriter.REWRITE_MODE_ABSOLUTE
+                  )
                 )
 
               import FormRunnerPersistence._
@@ -201,21 +204,31 @@ class FormRunnerCompiler extends ProcessorImpl {
                   case _                                                                                => None
                 }
 
+              val allHeaders =
+                Connection.buildConnectionHeadersCapitalizedIfNeeded(
+                  url              = resolvedUri,
+                  hasCredentials   = false,
+                  customHeaders    = Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*),
+                  headersToForward = Set.empty,
+                  cookiesToForward = Connection.cookiesToForwardFromProperty,
+                  getHeader        = Connection.getHeaderFromRequest(ec.getRequest)
+                )
+
               Connection.connectNow(
-                method          = GET,
-                url             = new URI(resolvedAbsoluteUrl),
-                credentials     = None,
-                content         = None,
-                headers         = Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*),
-                loadState       = true,
-                saveState       = true,
-                logBody         = false
+                method      = GET,
+                url         = resolvedUri,
+                credentials = None,
+                content     = None,
+                headers     = allHeaders,
+                loadState   = true,
+                saveState   = true,
+                logBody     = false
               )
             }
 
             // Write static attachments and other resources
             distinctResources.iterator foreach { manifestEntry =>
-              
+
               val entryResult =
                 ConnectionResult.tryWithSuccessConnection(connect(manifestEntry.uri), closeOnSuccess = true) { is =>
                   val entry = new ZipEntry(manifestEntry.zipPath)

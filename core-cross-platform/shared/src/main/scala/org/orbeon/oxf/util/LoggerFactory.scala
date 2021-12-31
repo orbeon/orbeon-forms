@@ -22,6 +22,5 @@ object LoggerFactory {
   def createLogger(name: String)   : log4s.Logger = org.log4s.getLogger(name)
   def createLogger(clazz: Class[_]): log4s.Logger = org.log4s.getLogger(clazz.getName)
 
-  def createLoggerJava(name: String):    org.slf4j.Logger = createLogger(name).logger
   def createLoggerJava(clazz: Class[_]): org.slf4j.Logger = createLogger(clazz).logger
 }

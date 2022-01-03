@@ -61,22 +61,24 @@
         </xbl:handlers>
 
         <xbl:template>
-            <xf:select1
-                id="select1"
-                appearance="full xxf:horizontal"
-                ref="xxf:binding('fr-yesno-input-binding')"
-                xbl:attr="xxf:encrypt-item-values">
+            <xh:div role="group" aria-label="{xxf:label('fr-yesno-input-binding')}">
+                <xf:select1
+                    id="select1"
+                    appearance="full xxf:horizontal"
+                    ref="xxf:binding('fr-yesno-input-binding')"
+                    xbl:attr="xxf:encrypt-item-values">
 
-                <xf:item>
-                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
-                    <xf:value>true</xf:value>
-                </xf:item>
-                <xf:item>
-                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
-                    <xf:value>false</xf:value>
-                </xf:item>
+                    <xf:item>
+                        <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                        <xf:value>true</xf:value>
+                    </xf:item>
+                    <xf:item>
+                        <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                        <xf:value>false</xf:value>
+                    </xf:item>
 
-            </xf:select1>
+                </xf:select1>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

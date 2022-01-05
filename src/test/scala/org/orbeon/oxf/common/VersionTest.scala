@@ -143,6 +143,9 @@ class VersionTest
         assert(expected.expired                   === license.isExpired)
         assert(expected.buildAfterSubscriptionEnd === license.isBuildAfterSubscriptionEnd)
       }
+      it(s"must not crash on `toString` for `$in`") {
+        license.toString
+      }
     }
   }
 

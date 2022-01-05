@@ -27,11 +27,6 @@ object DateUtils {
   def formatIsoDateTimeUtc(instant: Long): String =
     DateTime.format(Instant.ofEpochMilli(instant))
 
-  // Date format without timezone
-  // 2019-11-12: Used only by `PEVersion`
-  def formatIsoDateNoZone(instant: Long): String =
-    DateTimeFormatter.ISO_LOCAL_DATE.format(Instant.ofEpochMilli(instant))
-
   def formatRfc1123DateTimeGmt(instant: Long): String =
     formatRfc1123DateTimeGmt(Instant.ofEpochMilli(instant))
 

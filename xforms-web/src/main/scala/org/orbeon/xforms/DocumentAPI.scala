@@ -13,7 +13,6 @@
   */
 package org.orbeon.xforms
 
-import io.circe.generic.auto._
 import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom
 import org.scalajs.dom.html

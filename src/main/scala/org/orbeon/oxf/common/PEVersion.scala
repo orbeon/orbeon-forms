@@ -127,9 +127,9 @@ private object PEVersion {
     def isExpired                   = expiration      exists (System.currentTimeMillis() > _)
     def isBuildAfterSubscriptionEnd = subscriptionEnd exists (end => dateFromVersionNumber(versionNumber) exists (_ > end))
 
-    def formattedExpiration      = expiration                           map DateUtils.formatIsoDateNoZone
-    def formattedSubscriptionEnd = subscriptionEnd                      map DateUtils.formatIsoDateNoZone
-    def formattedBuildDate       = dateFromVersionNumber(versionNumber) map DateUtils.formatIsoDateNoZone
+    def formattedExpiration      = expiration                           map DateUtils.formatRfc1123DateTimeGmt
+    def formattedSubscriptionEnd = subscriptionEnd                      map DateUtils.formatRfc1123DateTimeGmt
+    def formattedBuildDate       = dateFromVersionNumber(versionNumber) map DateUtils.formatRfc1123DateTimeGmt
 
     override def toString = {
       val versionString         = version                  map (" for version " + _) getOrElse ""

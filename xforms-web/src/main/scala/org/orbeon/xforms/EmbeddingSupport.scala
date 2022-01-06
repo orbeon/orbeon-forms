@@ -11,7 +11,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 
-
 object EmbeddingSupport {
 
   // Destroy the form's UI data structures and return its UUID if found
@@ -69,7 +68,7 @@ object EmbeddingSupport {
             }
 
         // Assume that first script that starts with `orbeon-` is the baseline
-        val baselineScript = innerScripts.collect {
+        val baselineScript = innerScripts.collectFirst {
           case script @ HeadElement.Reference(src)
             if src.splitTo[List]("/").lastOption.exists(_.startsWith("orbeon-")) => script
         }

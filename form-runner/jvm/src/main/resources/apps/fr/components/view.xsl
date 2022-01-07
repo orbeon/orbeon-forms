@@ -1157,6 +1157,17 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- Annotate `<fr:grid>` element with the `markup` attribute, based on property using app/name, as XSLT inside XBL
+         doesn't have access to the app/form name. Also, we don't pass the app/form and let the XSLT check the property
+         to support the property being changed at runtime. -->
+    <xsl:template match="fr:grid" mode="within-controls">
+        <xsl:copy>
+            <xsl:variable name="markup-property" select="p:property(string-join(('oxf.xforms.xbl.fr.grid.markup', $app, $form), '.'))"/>
+            <xsl:attribute name="markup" select="$markup-property"/>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- TOC: Top-level -->
     <xsl:template match="fr:toc" name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->

@@ -591,7 +591,7 @@ trait ContainingDocumentRequest {
     if (id == null)
       return null
     val containerNamespace = getContainerNamespace
-    if (containerNamespace.length > 0 && id.startsWith(containerNamespace))
+    if (containerNamespace.nonEmpty && id.startsWith(containerNamespace))
       id.substring(containerNamespace.length)
     else
       id

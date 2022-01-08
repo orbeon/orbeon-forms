@@ -18,6 +18,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:variable name="starting-section-level" select="2"/>
@@ -92,26 +93,44 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="fr:grid[frf:isRepeat(.)]" mode="within-controls within-dialogs">
+    <xsl:template match="fr:grid" mode="within-controls">
         <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="fr:grid" mode="within-controls within-dialogs">
+        <xsl:copy>
+
+            <!-- Annotate `<fr:grid>` element with the `markup` attribute, based on property using app/name, as XSLT inside XBL
+                 doesn't have access to the app/form name. Also, we don't pass the app/form and let the XSLT check the property
+                 to support the property being changed at runtime. -->
+            <xsl:variable
+                    name="markup-property"
+                    select="p:property(string-join(('oxf.xforms.xbl.fr.grid.markup', $app, $form), '.'))"/>
+            <xsl:attribute name="markup" select="$markup-property"/>
+
             <!-- Set repeat appearance if available and needed -->
-            <xsl:if
-                test="
-                    empty(@appearance)       and
-                    exists($grid-appearance) and
-                    $grid-appearance != 'full'">
-                <xsl:attribute name="appearance" select="$grid-appearance"/>
+            <xsl:if test="frf:isRepeat(.)">
+                <xsl:if
+                    test="
+                        empty(@appearance)       and
+                        exists($grid-appearance) and
+                        $grid-appearance != 'full'">
+                    <xsl:attribute name="appearance" select="$grid-appearance"/>
+                </xsl:if>
+                <xsl:if
+                    test="
+                        frf:isRepeat(.)          and
+                        empty(@insert)           and
+                        exists($grid-insert)     and
+                        $grid-insert != 'index'">
+                    <xsl:attribute name="insert" select="$grid-insert"/>
+                </xsl:if>
             </xsl:if>
-            <xsl:if
-                test="
-                    frf:isRepeat(.)          and
-                    empty(@insert)           and
-                    exists($grid-insert)     and
-                    $grid-insert != 'index'">
-                <xsl:attribute name="insert" select="$grid-insert"/>
-            </xsl:if>
-            <xsl:apply-templates select="@*" mode="#current"/>
-            <xsl:apply-templates select="node()" mode="#current"/>
+
+            <xsl:apply-templates select="@* | node()" mode="#current"/>
+
         </xsl:copy>
     </xsl:template>
 

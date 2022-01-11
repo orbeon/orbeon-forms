@@ -624,7 +624,7 @@
                                                     for $f in $forms[xxf:split(@operations) = 'admin']
                                                     return
                                                         string-join(
-                                                            ($f/application-name, $f/form-name, $f/form-version),
+                                                            ($f/application-name, $f/form-name, ($f/form-version, '1')[1]),
                                                             '/'
                                                         ),
                                                     ' '
@@ -650,7 +650,7 @@
                                                     for $f in $forms[xxf:split(@operations) = 'admin' and frf:isLocalUnavailable(.)]
                                                     return
                                                         string-join(
-                                                            ($f/application-name, $f/form-name, $f/form-version),
+                                                            ($f/application-name, $f/form-name, ($f/form-version, '1')[1]),
                                                             '/'
                                                         ),
                                                     ' '
@@ -668,7 +668,7 @@
                                                     for $f in $forms[xxf:split(@operations) = 'admin' and frf:isLocalAvailable(.)]
                                                     return
                                                         string-join(
-                                                            ($f/application-name, $f/form-name, $f/form-version),
+                                                            ($f/application-name, $f/form-name, ($f/form-version, '1')[1]),
                                                             '/'
                                                         ),
                                                     ' '
@@ -687,7 +687,7 @@
                                                     for $f in $forms[xxf:split(@operations) = 'admin' and frf:isRemoteUnavailable(.)]
                                                     return
                                                         string-join(
-                                                            ($f/application-name, $f/form-name, $f/form-version),
+                                                            ($f/application-name, $f/form-name, ($f/form-version, '1')[1]),
                                                             '/'
                                                         ),
                                                     ' '
@@ -705,7 +705,7 @@
                                                     for $f in $forms[xxf:split(@operations) = 'admin' and frf:isRemoteAvailable(.)]
                                                     return
                                                         string-join(
-                                                            ($f/application-name, $f/form-name, $f/form-version),
+                                                            ($f/application-name, $f/form-name, ($f/form-version, '1')[1]),
                                                             '/'
                                                         ),
                                                     ' '
@@ -724,7 +724,7 @@
                                                     for $f in $forms[xxf:split(@operations) = 'admin' and frf:isLocalNewer(.)]
                                                     return
                                                         string-join(
-                                                            ($f/application-name, $f/form-name, $f/form-version),
+                                                            ($f/application-name, $f/form-name, ($f/form-version, '1')[1]),
                                                             '/'
                                                         ),
                                                     ' '
@@ -742,7 +742,7 @@
                                                     for $f in $forms[xxf:split(@operations) = 'admin' and frf:isRemoteNewer(.)]
                                                     return
                                                         string-join(
-                                                            ($f/application-name, $f/form-name, $f/form-version),
+                                                            ($f/application-name, $f/form-name, ($f/form-version, '1')[1]),
                                                             '/'
                                                         ),
                                                     ' '

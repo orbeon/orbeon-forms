@@ -30,6 +30,7 @@ import scala.jdk.CollectionConverters._
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
 
+
 class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpecLike with MockitoSugar {
 
   describe("The portlet filter's `amendRequest()` function") {
@@ -89,7 +90,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
     import org.orbeon.oxf.portlet.liferay.FormRunnerAuthFilter._
 
     val amendedRequest =
-      wrapWithOrbeonAuthHeaders(wrapWithLiferayUserHeaders(mockRequest, new LiferayUser {
+      wrapWithOrbeonAuthHeaders(AddLiferayUserHeadersFilter.wrapWithLiferayUserHeaders(mockRequest, new LiferayUser {
         override def userHeaders = LiferaySupport.userHeaders(new MyUser, new MyCompany, tests = true)
       }))
 

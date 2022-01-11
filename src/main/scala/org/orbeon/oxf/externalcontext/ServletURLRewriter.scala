@@ -15,22 +15,23 @@ package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.util.URLRewriterUtils
 
+
 class ServletURLRewriter(private val request: ExternalContext.Request) extends URLRewriter {
 
   // Lazy as `ExternalContext` might be created before PFC runs and sets matchers
   private lazy val pathMatchers = URLRewriterUtils.getPathMatchers
 
   def rewriteActionURL(urlString: String): String =
-    URLRewriterUtils.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+    URLRewriterImpl.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
 
   def rewriteRenderURL(urlString: String): String =
-    URLRewriterUtils.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+    URLRewriterImpl.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
 
   def rewriteActionURL(urlString: String, portletMode: String, windowState: String): String =
-    URLRewriterUtils.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+    URLRewriterImpl.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
 
   def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String =
-    URLRewriterUtils.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+    URLRewriterImpl.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
 
   def rewriteResourceURL(urlString: String, rewriteMode: Int): String =
     URLRewriterUtils.rewriteResourceURL(

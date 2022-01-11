@@ -24,7 +24,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl}
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.PathUtils.splitQuery
@@ -93,7 +93,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   }
 
   def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String =
-    URLRewriterUtils.rewriteURL(request, urlString, rewriteMode)
+    URLRewriterImpl.rewriteURL(request, urlString, rewriteMode)
 
   private def uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument: XFormsContainingDocument, resolvedURI: URI): String =
     if ((containingDocument.isPortletContainer || containingDocument.isEmbedded) && resolvedURI.getFragment != null) {

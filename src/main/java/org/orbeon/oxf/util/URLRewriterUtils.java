@@ -16,8 +16,7 @@ package org.orbeon.oxf.util;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
-import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.externalcontext.URLRewriter$;
+import org.orbeon.oxf.externalcontext.*;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.RegexpMatcher;
 import org.orbeon.oxf.properties.Properties;
@@ -64,19 +63,6 @@ public class URLRewriterUtils {
     }
 
     /**
-     * Rewrite a URL based on the request URL, a URL, and a rewriting mode.
-     *
-     * @param request       incoming request
-     * @param urlString     URL to rewrite
-     * @param rewriteMode   rewrite mode (see ExternalContext.Response)
-     * @return              rewritten URL
-     */
-    public static String rewriteURL(ExternalContext.Request request, String urlString, int rewriteMode) {
-        return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getClientContextPath(urlString),
-                request.getRequestPath(), urlString, rewriteMode);
-    }
-
-    /**
      * Rewrite a service URL. The URL is rewritten against a base URL which is:
      *
      * - specified externally or
@@ -88,33 +74,7 @@ public class URLRewriterUtils {
      * @return                  rewritten URL
      */
     public static String rewriteServiceURL(ExternalContext.Request request, String urlString, int rewriteMode) {
-
-        // NOTE: We used to assert here that the mode required an absolute URL, but as of 2016-03-17 one caller
-        // wants a path.
-
-        // Case where a protocol is specified: the URL is left untouched
-        if (PathUtils.urlHasProtocol(urlString))
-            return urlString;
-
-        final String baseURIProperty = getServiceBaseURI();
-        if (org.apache.commons.lang3.StringUtils.isBlank(baseURIProperty)) {
-            // Property not specified, use request to build base URI
-            return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getClientContextPath(urlString),
-                    request.getRequestPath(), urlString, rewriteMode);
-        } else {
-            // Property specified
-            try {
-                final URI baseURI = new URI(StringUtils.trimAllToEmpty(baseURIProperty));
-                // NOTE: Force absolute URL to be returned in this case anyway
-                return rewriteURL(baseURI.getScheme() != null ? baseURI.getScheme() : request.getScheme(),
-                        baseURI.getHost() != null ? baseURI.getHost() : request.getServerName(),
-                        baseURI.getHost() != null ? baseURI.getPort() : request.getServerPort(),
-                        baseURI.getPath(), "", urlString, rewriteMode);
-
-            } catch (URISyntaxException e) {
-                throw new OXFException("Incorrect base URI property specified: " + baseURIProperty);
-            }
-        }
+        return URLRewriterImpl.rewriteServiceURL(request, urlString, rewriteMode, getServiceBaseURI());
     }
 
     /**
@@ -162,72 +122,6 @@ public class URLRewriterUtils {
     }
 
     /**
-     * Rewrite a URL based on a base URL, a URL, and a rewriting mode.
-     *
-     * @param scheme            base URL scheme
-     * @param host              base URL host
-     * @param port              base URL port
-     * @param contextPath       base URL context path
-     * @param requestPath       base URL request path
-     * @param urlString         URL to rewrite (accept human-readable URI)
-     * @param rewriteMode       rewrite mode (see ExternalContext.Response)
-     * @return                  rewritten URL
-     */
-    private static String rewriteURL(String scheme, String host, int port, String contextPath, String requestPath, String urlString, int rewriteMode) {
-        // Accept human-readable URI
-        urlString = MarkupUtils.encodeHRRI(urlString, true);
-
-        // Case where a protocol is specified: the URL is left untouched (except for human-readable processing)
-        if (PathUtils.urlHasProtocol(urlString))
-            return urlString;
-
-        try {
-            final String baseURLString;
-            {
-                String _baseURLString;
-                // Prepend absolute base if needed
-                if ((rewriteMode & URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()) != 0) {
-                    _baseURLString = scheme + "://" + host + ((port == 80 || port == -1) ? "" : ":" + port);
-                } else {
-                    _baseURLString = "";
-                }
-                // Append context path if needed
-                if ((rewriteMode & URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT()) == 0)
-                    _baseURLString = _baseURLString + contextPath;
-
-                baseURLString = _baseURLString;
-            }
-
-            // Return absolute path URI with query string and fragment identifier if needed
-            if (urlString.startsWith("?")) {
-                // This is a special case that appears to be implemented
-                // in Web browsers as a convenience. Users may use it.
-                return baseURLString + requestPath + urlString;
-            } else if ((rewriteMode & URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE()) != 0 && !urlString.startsWith("/") && !"".equals(urlString)) {
-                // Don't change the URL if it is a relative path and we don't force absolute
-                return urlString;
-            } else {
-                // Regular case, parse the URL
-
-                final URI baseURIWithPath = new URI("http", "example.org", requestPath, null);
-                final URI resolvedURI = baseURIWithPath.resolve(urlString).normalize();// normalize to remove "..", etc.
-
-                // Append path, query and fragment
-                final String query = resolvedURI.getRawQuery();
-                final String fragment = resolvedURI.getRawFragment();
-                final String tempResult = resolvedURI.getRawPath()
-                        + ((query != null) ? "?" + query : "")
-                        + ((fragment != null) ? "#" + fragment : "");
-
-                // Prepend base
-                return baseURLString + tempResult;
-            }
-        } catch (Exception e) {
-            throw new OXFException(e);
-        }
-    }
-
-    /**
      * Rewrite a resource URL, possibly with version information, based on the incoming request as well as a list of
      * path matchers.
      *
@@ -242,7 +136,7 @@ public class URLRewriterUtils {
             // We need to match the URL against the matcher
 
             // 1. Rewrite to absolute path URI without context
-            final String absoluteURINoContext = rewriteURL(request, urlString, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT());
+            final String absoluteURINoContext = URLRewriterImpl.rewriteURL(request, urlString, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT());
             if (PathUtils.urlHasProtocol(absoluteURINoContext))
                 return absoluteURINoContext; // will be an absolute path
 
@@ -261,7 +155,7 @@ public class URLRewriterUtils {
             if (absolutePathNoContext.startsWith("/xforms-server/")) {
                 // Special URL must not be rewritten as resource
                 // TODO: when is this hit?
-                return rewriteURL(request, urlString, rewriteMode);
+                return URLRewriterImpl.rewriteURL(request, urlString, rewriteMode);
             }
 
             // 2. Determine if URL is a platform or application URL based on reserved paths
@@ -271,7 +165,7 @@ public class URLRewriterUtils {
             final String applicationVersion = getApplicationResourceVersion();
             if (!isPlatformURL && (applicationVersion == null || isSeparateDeployment(request))) {
                 // There is no application version OR we are in separate deployment so do usual rewrite
-                return rewriteURL(request, urlString, rewriteMode);
+                return URLRewriterImpl.rewriteURL(request, urlString, rewriteMode);
             }
 
             // 3. Iterate through matchers and see if we get a match
@@ -279,15 +173,15 @@ public class URLRewriterUtils {
                 // 4. Found a match, perform additional rewrite at the beginning
                 final String version = isPlatformURL ? URLRewriterUtils.getOrbeonVersionForClient() : applicationVersion;
                 // Call full method so that we can get the proper client context path
-                return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(),
+                return URLRewriterImpl.rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(),
                         request.getClientContextPath(urlString), request.getRequestPath(), "/" + version + absoluteURINoContext, rewriteMode);
             }
 
             // No match found, perform regular rewrite
-            return rewriteURL(request, urlString, rewriteMode);
+            return URLRewriterImpl.rewriteURL(request, urlString, rewriteMode);
         } else {
             // No Page Flow context, perform regular rewrite
-            return rewriteURL(request, urlString, rewriteMode);
+            return URLRewriterImpl.rewriteURL(request, urlString, rewriteMode);
         }
     }
 

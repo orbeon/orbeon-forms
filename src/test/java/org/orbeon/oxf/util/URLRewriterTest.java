@@ -17,9 +17,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.orbeon.dom.Document;
-import org.orbeon.oxf.externalcontext.ExternalContext;
-import org.orbeon.oxf.externalcontext.TestExternalContext;
-import org.orbeon.oxf.externalcontext.URLRewriter$;
+import org.orbeon.oxf.externalcontext.*;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.properties.Properties;
@@ -82,21 +80,23 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     @Test
     public void testServiceRewrite() {
 
-        // Test with oxf.url-rewriting.service.base-uri is set to http://example.org/cool/service
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteServiceURL(directRequest, "https://foo.com/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteServiceURL(request, "relative/sub/path", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
-        assertEquals("http://example.org/cool/service/bar", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
-        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
-        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2#there", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
-        assertEquals("http://example.org/cool/service?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(directRequest, "?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
+        final String baseURIProperty = URLRewriterUtils.getServiceBaseURI();
 
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteServiceURL(directRequest, "https://foo.com/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteServiceURL(request, "relative/sub/path", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
-        assertEquals("http://example.org/bar", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
-        assertEquals("http://example.org/bar?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
-        assertEquals("http://example.org/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2#there", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
+        // Test with oxf.url-rewriting.service.base-uri is set to http://example.org/cool/service
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteServiceURL(directRequest, "https://foo.com/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE(), baseURIProperty));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteServiceURL(request, "relative/sub/path", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
+        assertEquals("http://example.org/cool/service/bar", URLRewriterImpl.rewriteServiceURL(directRequest, "/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE(), baseURIProperty));
+        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2", URLRewriterImpl.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE(), baseURIProperty));
+        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2#there", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE(), baseURIProperty));
+        assertEquals("http://example.org/cool/service?a=1&amp;b=2", URLRewriterImpl.rewriteServiceURL(directRequest, "?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE(), baseURIProperty));
+
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteServiceURL(directRequest, "https://foo.com/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT(), baseURIProperty));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteServiceURL(request, "relative/sub/path", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
+        assertEquals("http://example.org/bar", URLRewriterImpl.rewriteServiceURL(directRequest, "/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT(), baseURIProperty));
+        assertEquals("http://example.org/bar?a=1&amp;b=2", URLRewriterImpl.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT(), baseURIProperty));
+        assertEquals("http://example.org/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteServiceURL(directRequest, "/bar?a=1&amp;b=2#there", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT(), baseURIProperty));
         // NOTE: Ideally should have a "/" between host name and query
-        assertEquals("http://example.org?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(directRequest, "?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
+        assertEquals("http://example.org?a=1&amp;b=2", URLRewriterImpl.rewriteServiceURL(directRequest, "?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT(), baseURIProperty));
 
         // TODO: test with oxf.url-rewriting.service.base-uri set to absolute path
         // TODO: test without oxf.url-rewriting.service.base-uri set
@@ -107,36 +107,36 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testRewrite() {
         // Test against request
         int mode = URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE();
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteURL(directRequest, "https://foo.com/bar", mode));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteURL(request, "relative/sub/path", mode));
-        assertEquals("http://localhost:8080/orbeon/bar", URLRewriterUtils.rewriteURL(directRequest, "/bar", mode));
-        assertEquals("http://localhost:8080/orbeon/bar?a=1&amp;b=2", URLRewriterUtils.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode));
-        assertEquals("http://localhost:8080/orbeon/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode));
-        assertEquals("http://localhost:8080/orbeon/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteURL(directRequest, "?a=1&amp;b=2", mode));
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(directRequest, "https://foo.com/bar", mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
+        assertEquals("http://localhost:8080/orbeon/bar", URLRewriterImpl.rewriteURL(directRequest, "/bar", mode));
+        assertEquals("http://localhost:8080/orbeon/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode));
+        assertEquals("http://localhost:8080/orbeon/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode));
+        assertEquals("http://localhost:8080/orbeon/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "?a=1&amp;b=2", mode));
 
         mode = URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH();
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteURL(directRequest, "https://foo.com/bar", mode));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteURL(request, "relative/sub/path", mode));
-        assertEquals("/orbeon/bar", URLRewriterUtils.rewriteURL(directRequest, "/bar", mode));
-        assertEquals("/orbeon/bar?a=1&amp;b=2", URLRewriterUtils.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode));
-        assertEquals("/orbeon/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode));
-        assertEquals("/orbeon/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteURL(directRequest, "?a=1&amp;b=2", mode));
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(directRequest, "https://foo.com/bar", mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
+        assertEquals("/orbeon/bar", URLRewriterImpl.rewriteURL(directRequest, "/bar", mode));
+        assertEquals("/orbeon/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode));
+        assertEquals("/orbeon/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode));
+        assertEquals("/orbeon/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "?a=1&amp;b=2", mode));
 
         mode = URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT();
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteURL(directRequest, "https://foo.com/bar", mode));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteURL(request, "relative/sub/path", mode));
-        assertEquals("/bar", URLRewriterUtils.rewriteURL(directRequest, "/bar", mode));
-        assertEquals("/bar?a=1&amp;b=2", URLRewriterUtils.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode));
-        assertEquals("/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode));
-        assertEquals("/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteURL(directRequest, "?a=1&amp;b=2", mode));
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(directRequest, "https://foo.com/bar", mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
+        assertEquals("/bar", URLRewriterImpl.rewriteURL(directRequest, "/bar", mode));
+        assertEquals("/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode));
+        assertEquals("/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode));
+        assertEquals("/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "?a=1&amp;b=2", mode));
 
         mode = URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE();
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteURL(directRequest, "https://foo.com/bar", mode));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteURL(request, "relative/sub/path", mode));
-        assertEquals("/orbeon/bar", URLRewriterUtils.rewriteURL(directRequest, "/bar", mode));
-        assertEquals("/orbeon/bar?a=1&amp;b=2", URLRewriterUtils.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode));
-        assertEquals("/orbeon/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode));
-        assertEquals("/orbeon/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteURL(directRequest, "?a=1&amp;b=2", mode));
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(directRequest, "https://foo.com/bar", mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
+        assertEquals("/orbeon/bar", URLRewriterImpl.rewriteURL(directRequest, "/bar", mode));
+        assertEquals("/orbeon/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2", mode));
+        assertEquals("/orbeon/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(directRequest, "/bar?a=1&amp;b=2#there", mode));
+        assertEquals("/orbeon/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(directRequest, "?a=1&amp;b=2", mode));
     }
 
     @Test
@@ -190,21 +190,23 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     @Test
     public void testServiceRewriteForward() {
 
-        // Test with oxf.url-rewriting.service.base-uri is set to http://example.org/cool/service
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteServiceURL(forwardRequest, "https://foo.com/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteServiceURL(request, "relative/sub/path", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
-        assertEquals("http://example.org/cool/service/bar", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
-        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
-        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2#there", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
-        assertEquals("http://example.org/cool/service?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(forwardRequest, "?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
+        final String baseURIProperty = URLRewriterUtils.getServiceBaseURI();
 
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteServiceURL(forwardRequest, "https://foo.com/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteServiceURL(request, "relative/sub/path", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
-        assertEquals("http://example.org/bar", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
-        assertEquals("http://example.org/bar?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
-        assertEquals("http://example.org/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2#there", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
+        // Test with oxf.url-rewriting.service.base-uri is set to http://example.org/cool/service
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteServiceURL(forwardRequest, "https://foo.com/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE(), baseURIProperty));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteServiceURL(request, "relative/sub/path", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE()));
+        assertEquals("http://example.org/cool/service/bar", URLRewriterImpl.rewriteServiceURL(forwardRequest, "/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE(), baseURIProperty));
+        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2", URLRewriterImpl.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE(), baseURIProperty));
+        assertEquals("http://example.org/cool/service/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2#there", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE(), baseURIProperty));
+        assertEquals("http://example.org/cool/service?a=1&amp;b=2", URLRewriterImpl.rewriteServiceURL(forwardRequest, "?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE(), baseURIProperty));
+
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteServiceURL(forwardRequest, "https://foo.com/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT(), baseURIProperty));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteServiceURL(request, "relative/sub/path", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
+        assertEquals("http://example.org/bar", URLRewriterImpl.rewriteServiceURL(forwardRequest, "/bar", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT(), baseURIProperty));
+        assertEquals("http://example.org/bar?a=1&amp;b=2", URLRewriterImpl.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT(), baseURIProperty));
+        assertEquals("http://example.org/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteServiceURL(forwardRequest, "/bar?a=1&amp;b=2#there", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT(), baseURIProperty));
         // NOTE: Ideally should have a "/" between host name and query
-        assertEquals("http://example.org?a=1&amp;b=2", URLRewriterUtils.rewriteServiceURL(forwardRequest, "?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT()));
+        assertEquals("http://example.org?a=1&amp;b=2", URLRewriterImpl.rewriteServiceURL(forwardRequest, "?a=1&amp;b=2", URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_NO_CONTEXT(), baseURIProperty));
 
         // TODO: test with oxf.url-rewriting.service.base-uri set to absolute path
         // TODO: test without oxf.url-rewriting.service.base-uri set
@@ -214,36 +216,36 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testRewriteForward() {
         // Test against request
         int mode = URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE();
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteURL(forwardRequest, "https://foo.com/bar", mode));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteURL(request, "relative/sub/path", mode));
-        assertEquals("http://localhost:8080/myapp/bar", URLRewriterUtils.rewriteURL(forwardRequest, "/bar", mode));
-        assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode));
-        assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode));
-        assertEquals("http://localhost:8080/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode));
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(forwardRequest, "https://foo.com/bar", mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
+        assertEquals("http://localhost:8080/myapp/bar", URLRewriterImpl.rewriteURL(forwardRequest, "/bar", mode));
+        assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode));
+        assertEquals("http://localhost:8080/myapp/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode));
+        assertEquals("http://localhost:8080/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode));
 
         mode = URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH();
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteURL(forwardRequest, "https://foo.com/bar", mode));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteURL(request, "relative/sub/path", mode));
-        assertEquals("/myapp/bar", URLRewriterUtils.rewriteURL(forwardRequest, "/bar", mode));
-        assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode));
-        assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode));
-        assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode));
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(forwardRequest, "https://foo.com/bar", mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
+        assertEquals("/myapp/bar", URLRewriterImpl.rewriteURL(forwardRequest, "/bar", mode));
+        assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode));
+        assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode));
+        assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode));
 
         mode = URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT();
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteURL(forwardRequest, "https://foo.com/bar", mode));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteURL(request, "relative/sub/path", mode));
-        assertEquals("/bar", URLRewriterUtils.rewriteURL(forwardRequest, "/bar", mode));
-        assertEquals("/bar?a=1&amp;b=2", URLRewriterUtils.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode));
-        assertEquals("/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode));
-        assertEquals("/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode));
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(forwardRequest, "https://foo.com/bar", mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
+        assertEquals("/bar", URLRewriterImpl.rewriteURL(forwardRequest, "/bar", mode));
+        assertEquals("/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode));
+        assertEquals("/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode));
+        assertEquals("/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode));
 
         mode = URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE();
-        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteURL(forwardRequest, "https://foo.com/bar", mode));
-//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteURL(request, "relative/sub/path", mode));
-        assertEquals("/myapp/bar", URLRewriterUtils.rewriteURL(forwardRequest, "/bar", mode));
-        assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterUtils.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode));
-        assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode));
-        assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode));
+        assertEquals("https://foo.com/bar", URLRewriterImpl.rewriteURL(forwardRequest, "https://foo.com/bar", mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterImpl.rewriteURL(request, "relative/sub/path", mode));
+        assertEquals("/myapp/bar", URLRewriterImpl.rewriteURL(forwardRequest, "/bar", mode));
+        assertEquals("/myapp/bar?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2", mode));
+        assertEquals("/myapp/bar?a=1&amp;b=2#there", URLRewriterImpl.rewriteURL(forwardRequest, "/bar?a=1&amp;b=2#there", mode));
+        assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterImpl.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode));
     }
 
     @Test

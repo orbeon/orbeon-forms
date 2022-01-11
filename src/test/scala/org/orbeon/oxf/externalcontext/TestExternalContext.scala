@@ -340,7 +340,7 @@ class TestExternalContext(
       rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
 
     def rewriteResourceURL(urlString: String, rewriteMode: Int) =
-      URLRewriterUtils.rewriteURL(getRequest, urlString, rewriteMode)
+      URLRewriterImpl.rewriteURL(getRequest, urlString, rewriteMode)
 
     def reset()                                                                      = ()
     def sendError(len: Int)                                                          = ()

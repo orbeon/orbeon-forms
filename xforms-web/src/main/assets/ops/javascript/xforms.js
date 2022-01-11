@@ -1795,9 +1795,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // Textarea
                 var textarea = control.getElementsByTagName("textarea")[0];
                 ORBEON.xforms.Controls.setReadonlyOnFormElement(textarea, isReadonly);
-            } else if ((jControl.is('.xforms-trigger')
-                    && ! jControl.is('.xforms-trigger-appearance-minimal'))
-                    || jControl.is('.xforms-submit')) {
+            } else if (jControl.is('.xforms-trigger')
+                    || jControl.is('.xforms-submit' )) {
                 // Button
                 var button = ORBEON.util.Dom.getElementByTagName(control, "button");
                 ORBEON.xforms.Controls.setDisabledOnFormElement(button, isReadonly);
@@ -2502,7 +2501,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
                     // Fire change event if the control has a value
                     var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(target);
-                    if (! _.isUndefined(controlCurrentValue)) {		    
+                    if (! _.isUndefined(controlCurrentValue)) {
                         var event = new ORBEON.xforms.AjaxEvent(null, target.id, controlCurrentValue, "xxforms-value");
                         ORBEON.xforms.AjaxClient.fireEvent(event);
                     }

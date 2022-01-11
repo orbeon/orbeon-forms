@@ -3,6 +3,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.outputDisabledAttribute
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
@@ -34,16 +35,18 @@ class XFormsTriggerMinimalHandler(
     val triggerControl = currentControl.asInstanceOf[XFormsTriggerControl]
     val xmlReceiver = handlerContext.controller.output
 
-    val htmlAnchorAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, triggerControl, addId = true)
-    htmlAnchorAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "btn-link")
+    val buttonAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, triggerControl, addId = true)
+    buttonAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "btn-link")
+    if (isXFormsReadonlyButNotStaticReadonly(triggerControl))
+      outputDisabledAttribute(buttonAttributes)
 
     // Output `xxf:*` extension attributes
-    triggerControl.addExtensionAttributesExceptClassAndAcceptForHandler(htmlAnchorAttributes, XFormsNames.XXFORMS_NAMESPACE_URI)
+    triggerControl.addExtensionAttributesExceptClassAndAcceptForHandler(buttonAttributes, XFormsNames.XXFORMS_NAMESPACE_URI)
 
     // `xh:button`
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
     val spanQName = XMLUtils.buildQName(xhtmlPrefix, XFormsTriggerMinimalHandler.EnclosingElementName)
-    xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, XFormsTriggerMinimalHandler.EnclosingElementName, spanQName, htmlAnchorAttributes)
+    xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, XFormsTriggerMinimalHandler.EnclosingElementName, spanQName, buttonAttributes)
     val labelValue = getTriggerLabel(triggerControl)
     val mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel
     XFormsBaseHandlerXHTML.outputLabelTextIfNotEmpty(labelValue, xhtmlPrefix, mustOutputHTMLFragment, Option(triggerControl.getLocationData))(xmlReceiver)

@@ -37,14 +37,8 @@
         .fr-grid-body .fr-grid-td {
             display: table-cell;
             vertical-align: top;
-            padding: 0 @frGridCellPadding;
             position: relative;
 
-            // Exclude buttons, as we don't want them to take the whole width of the cell
-            &> .xforms-control:not(.xforms-trigger-appearance-full), &> .xbl-component, &> .xforms-group {
-                margin: @frGridCellPadding 0;
-                display: block;
-            }
         }
 
         .fr-grid-head .fr-grid-th {
@@ -80,12 +74,26 @@
 
     .xbl-fr-grid {
 
-        // https://github.com/orbeon/orbeon-forms/issues/4213
-        .fr-grid-td {
+        .fr-grid-th,
+        .fr-grid-td,
+        .fr-repeat-column-left,
+        .fr-repeat-column-number,
+        .fr-repeat-column-right,
+        &.fr-repeat-multiple-rows .fr-grid-head {
+
+            padding: @frGridCellPadding @frGridCellPadding;
+
+            // Exclude buttons, as we don't want them to take the whole width of the cell
+            &> .xforms-control:not(.xforms-trigger-appearance-full), &> .xbl-component, &> .xforms-group {
+                margin: @frGridCellPadding 0;
+                display: block;
+            }
+
+            // https://github.com/orbeon/orbeon-forms/issues/4213
             .input-prepend, .input-append {
                 display: flex;
             }
-        }
+         }
 
         .fr-table {
             max-width: 100%;
@@ -164,14 +172,12 @@
                 &.fr-repeat-multiple-rows .fr-grid-head {
                     border-left: 1px solid #ddd;
                     border-top: 1px solid #ddd;
-                    padding-top: 4px;
-                    padding-bottom: 4px;
                     line-height: 20px;
                     vertical-align: top;
                 }
 
                 .fr-repeat-column-number {
-                    padding: 4px 5px; // this is added by `table-condensed` in the case of a regular table
+                    padding: 4px 5px; // Added by `table-condensed` in the case of a regular table
                 }
 
                 .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {

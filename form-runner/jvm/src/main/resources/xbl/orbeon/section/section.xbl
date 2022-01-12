@@ -27,7 +27,7 @@
         id="fr-section"
         element="fr|section"
         xxf:external-events="fb-set-current-section fb-update-section-label"
-        xxbl:mode="binding lhha custom-lhha">
+        xxbl:mode="binding">
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/section/section.css"/>
@@ -43,6 +43,18 @@
                 <xf:toggle case="case-closed" xxf:deferred-updates="false" xxf:toggle-ancestors="false"/>
             </xbl:handler>
         </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="_" xxf:readonly="true">
+                    <_>
+                        <readonly/>
+                    </_>
+                </xf:instance>
+                <xf:bind ref="readonly" readonly="true()"/>
+            </xf:model>
+        </xbl:implementation>
+
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -88,7 +100,6 @@
                     <xsl:variable name="appearance"                       select="($root/@appearance, 'full')[1]"/>
                     <xsl:variable name="repeat-menu"                      select="$appearance = 'full'    and not($readonly)"/>
                     <xsl:variable name="right-column"                     select="$appearance = 'minimal' and not($readonly)"/>
-                    <xsl:variable name="has-html-label"                   select="$root/xf:label/@mediatype = 'text/html'"/>
 
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
@@ -131,25 +142,18 @@
                                         </xsl:if>
 
                                         <!-- Actual section title -->
-                                        <xsl:choose>
-                                            <xsl:when test="$collapsible">
-                                                <xf:trigger appearance="minimal" class="fr-section-label fr-section-{{if ($open) then 'open' else 'closed'}}">
-                                                    <xf:label value="xxf:label('fr-section')">
-                                                        <xsl:if test="$has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
-                                                    </xf:label>
-                                                    <xf:help  value="xxf:help('fr-section')"/>
-                                                    <xf:hint  value="xxf:hint('fr-section')"/>
-                                                </xf:trigger>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <xf:output appearance="minimal" class="fr-section-label" value="xxf:label('fr-section')">
-                                                    <xsl:if test="$has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
-                                                    <xf:help  value="xxf:help('fr-section')" />
-                                                    <xf:hint  value="xxf:hint('fr-section')" />
-                                                </xf:output>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-
+                                        <xsl:variable
+                                            name="section-opened-closed-class"
+                                            select="
+                                                if ($collapsible)
+                                                then 'fr-section-{if ($open) then ''open'' else ''closed''}'
+                                                else ''"/>
+                                        <xf:trigger appearance="minimal" class="fr-section-label {$section-opened-closed-class}">
+                                            <xsl:if test="not($collapsible)">
+                                                <xsl:attribute name="ref">instance()/readonly</xsl:attribute>
+                                            </xsl:if>
+                                            <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint"/>
+                                        </xf:trigger>
                                     </xf:group>
 
                                 </xsl:element>

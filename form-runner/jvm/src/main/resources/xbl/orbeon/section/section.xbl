@@ -27,7 +27,7 @@
         id="fr-section"
         element="fr|section"
         xxf:external-events="fb-set-current-section fb-update-section-label"
-        xxbl:mode="binding">
+        xxbl:mode="binding lhha custom-lhha">
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/section/section.css"/>
@@ -152,7 +152,9 @@
                                             <xsl:if test="not($collapsible)">
                                                 <xsl:attribute name="ref">instance()/readonly</xsl:attribute>
                                             </xsl:if>
-                                            <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint"/>
+                                            <xf:label value="xxf:label('fr-section')"><xsl:copy-of select="$root/xf:label/@mediatype"/></xf:label>
+                                            <xf:help  value="xxf:help ('fr-section')"><xsl:copy-of select="$root/xf:help /@mediatype"/></xf:help>
+                                            <xf:hint  value="xxf:hint ('fr-section')"><xsl:copy-of select="$root/xf:hint /@mediatype"/></xf:hint>
                                         </xf:trigger>
                                     </xf:group>
 

@@ -15,6 +15,8 @@
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -65,17 +67,19 @@
             </xbl:handler>
         </xbl:handlers>
 
-        <xbl:template>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xf:select
                 id="select"
                 appearance="full"
                 ref="xxf:binding('fr-checkbox-input-binding')"
                 xbl:attr="xxf:encrypt-item-values"
                 class="xforms-help-popover-control"
+                xsl:version="2.0"
             >
-                <xf:help  mediatype="text/html" value="xxf:help('fr-checkbox-input-binding')"/>
+                <xsl:variable name="root" select="/*[1]"/>
+                <xf:help value="xxf:help('fr-checkbox-input-binding')"><xsl:copy-of select="$root/xf:help/@mediatype"/></xf:help>
                 <xf:item>
-                    <xf:label mediatype="text/html" value="xxf:label('fr-checkbox-input-binding')"/>
+                    <xf:label value="xxf:label('fr-checkbox-input-binding')"><xsl:copy-of select="$root/xf:label/@mediatype"/></xf:label>
                     <xf:value xbl:attr="xbl:text=selected-value">true</xf:value>
                 </xf:item>
                 <xf:setvalue

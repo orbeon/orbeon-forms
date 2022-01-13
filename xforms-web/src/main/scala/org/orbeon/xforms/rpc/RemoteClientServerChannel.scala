@@ -110,7 +110,6 @@ object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
                 promise.failure(new Throwable) // TODO: It would be good to return another error type.
               }
             case Failure(t) =>
-              logAndShowError(t, requestFormId, ignoreErrors)
               retryRequestAfterDelay(() =>
                 asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
                   promise.complete

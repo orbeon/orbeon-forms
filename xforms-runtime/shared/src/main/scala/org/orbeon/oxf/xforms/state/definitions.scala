@@ -10,6 +10,7 @@ import org.orbeon.xforms.XFormsId
 sealed trait LockResponse
 object LockResponse {
   case class  Success(lock: Lock)           extends LockResponse
+  case object Busy                          extends LockResponse
   case object Timeout                       extends LockResponse
   case class  Failure(exception: Throwable) extends LockResponse // `InterruptedException | SessionExpiredException`
 }
@@ -43,7 +44,6 @@ case class InstanceState(
 }
 
 case class InstancesControls(instances: List[InstanceState], controls: Map[String, ControlState])
-
 
 case class RequestParameters(
   uuid                         : String,

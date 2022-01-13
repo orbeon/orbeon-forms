@@ -257,6 +257,7 @@ class XFormsStateManagerTest
             result
           } finally
             XFormsStateManager.releaseDocumentLock(lock)
+        case LockResponse.Busy       => fail("Ajax update lock busy (zero timeout)")
         case LockResponse.Timeout    => fail("Ajax update lock timeout exceeded")
         case LockResponse.Failure(t) => throw t
       }

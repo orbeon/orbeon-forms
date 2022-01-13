@@ -36,6 +36,8 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
         try {
           if (lock.tryLock(timeout, TimeUnit.MILLISECONDS))
             LockResponse.Success(lock)
+          else if (timeout == 0L)
+            LockResponse.Busy
           else
             LockResponse.Timeout
         } catch {

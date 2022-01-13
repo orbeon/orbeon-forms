@@ -104,6 +104,9 @@ object XFormsContainingDocumentSupport {
         } finally {
           XFormsStateManager.releaseDocumentLock(lock)
         }
+      case LockResponse.Busy =>
+        LifecycleLogger.eventAssumingRequest("xforms", "document lock busy (zero timeout)", List("uuid" -> params.uuid))
+        Success(block(None))
       case LockResponse.Timeout =>
         LifecycleLogger.eventAssumingRequest("xforms", "document lock timeout", List("uuid" -> params.uuid))
         Success(block(None))

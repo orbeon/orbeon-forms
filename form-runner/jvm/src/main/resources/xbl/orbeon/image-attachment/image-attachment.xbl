@@ -58,6 +58,157 @@
                     </fr:image-attachment>
                 </view>
             </templates>
+
+            <control-details>
+                <xf:model xmlns="">
+
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:action iterate="instance('local')/*">
+                            <xf:var name="c" value="."/>
+                            <xf:setvalue
+                                ref="$c"
+                                value="(instance()/@*[name() = concat('transform-', name($c))], $c/@default)[1]"/>
+                        </xf:action>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <max-width  default=""/>
+                            <max-height default=""/>
+                            <quality    default=""/>
+                            <format     default=""/>
+                        </_>
+                    </xf:instance>
+
+                    <xf:bind ref="instance('local')">
+                        <xf:bind
+                            ref="max-width | max-height"
+                            type="xf:integer"
+                            xxf:whitespace="trim"
+                            constraint="string(.) = '' or xxf:positive()"/>
+                        <xf:bind
+                            ref="quality"
+                            type="xf:integer"
+                            xxf:whitespace="trim"
+                            constraint="string(.) = '' or (xxf:positive() and . le 100)"/>
+                        <xf:bind
+                            ref="format"
+                            type="xf:string"/>
+                        <xf:bind
+                            ref="quality | format"
+                            calculate="
+                                if (
+                                    xxf:is-blank(../max-width/string()) and
+                                    xxf:is-blank(../max-height/string())
+                                ) then
+                                    ''
+                                else
+                                    ."
+                            readonly="
+                                xxf:is-blank(../max-width/string()) and
+                                xxf:is-blank(../max-height/string())"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                        <_>
+                            <resource xml:lang="en">
+                                <max-width>Adjust to maximum width to</max-width>
+                                <max-height>Adjust to maximum height to</max-height>
+                                <quality>Compression quality</quality>
+                                <format>Resulting image format</format>
+                                <preserve>Preserve</preserve>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <max-width>Ajuster la largeur maximale à</max-width>
+                                <max-height>Ajuster la hauteur maximale à</max-height>
+                                <quality>Qualité de la compression</quality>
+                                <format>Format d'image résultant</format>
+                                <preserve>Préserver</preserve>
+                            </resource>
+                        </_>
+                    </xf:instance>
+
+                </xf:model>
+                <fr:grid xmlns="" id="fb-editor-download-grid">
+                    <fr:c x="1" y="1" w="6">
+                        <fr:number ref="instance('local')/max-width" id="max-width-control" suffix="px">
+                            <xf:label ref="xxf:r('max-width')"/>
+                            <xf:alert ref="xxf:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
+                        </fr:number>
+                    </fr:c>
+                    <fr:c x="7" y="1" w="6">
+                        <fr:number ref="instance('local')/max-height" id="max-height-control" suffix="px">
+                            <xf:label ref="xxf:r('max-height')"/>
+                            <xf:alert ref="xxf:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
+                        </fr:number>
+                    </fr:c>
+                    <fr:c x="1" y="2" w="6">
+                        <fr:number
+                            ref="instance('local')/quality"
+                            id="quality-control"
+                            suffix="%"
+                            digits-after-decimal="2"
+                            round-when-storing="true"
+                            round-when-formatting="true">
+                            <xf:label ref="xxf:r('quality')"/>
+                            <xf:alert ref="xxf:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
+                        </fr:number>
+                    </fr:c>
+                    <fr:c x="7" y="2" w="6">
+                        <xf:select1 ref="instance('local')/format" id="format-control">
+                            <xf:label ref="xxf:r('format')"/>
+                            <xf:item>
+                                <xf:label ref="xxf:r('preserve')"/>
+                                <xf:value/>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>JPEG</xf:label>
+                                <xf:value>jpg</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>PNG</xf:label>
+                                <xf:value>png</xf:value>
+                            </xf:item>
+                        </xf:select1>
+                    </fr:c>
+                </fr:grid>
+                <xf:action
+                    id="fb-editor-action"
+                    event="xforms-value-changed"
+                    observer="
+                        max-width-control
+                        max-height-control
+                        quality-control
+                        format-control">
+
+                    <xf:var
+                        name="name"
+                        value="name(event('xxf:binding'))"/>
+
+                    <xf:var
+                        name="new-value"
+                        value="
+                            let $binding := event('xxf:binding'),
+                                $v       := string($binding),
+                                $default := $binding/@default/string()
+                            return
+                                if ($v != $default) then
+                                    $v
+                                else
+                                    ()
+                        "/>
+
+                    <xf:insert
+                        context="instance()"
+                        if="exists($new-value)"
+                        origin="
+                            xf:attribute(concat('transform-', $name), $new-value)"/>
+                    <xf:delete
+                        if="empty($new-value)"
+                        ref="instance()/@*[name() = concat('transform-', $name)]"/>
+                </xf:action>
+            </control-details>
+
         </metadata>
 
         <xbl:template>
@@ -103,6 +254,26 @@
                     <xf:property name="actual"     value="event('actual')"/>
                     <xf:property name="message"    value="event('message')"/>
                 </xf:dispatch>
+
+                <xf:action
+                    event="xxforms-upload-done"
+                    if="exists(
+                        (
+                            fr:component-param-value('transform-max-width'),
+                            fr:component-param-value('transform-max-height'),
+                            fr:component-param-value('transform-quality'),
+                            fr:component-param-value('transform-format')
+                        )
+                    )"
+                    type="xpath">
+                    fr:transform-uploaded-image(
+                        $binding,
+                        fr:component-param-value('transform-max-width'),
+                        fr:component-param-value('transform-max-height'),
+                        fr:component-param-value('transform-quality'),
+                        fr:component-param-value('transform-format')
+                    )
+                </xf:action>
 
             </fr:attachment>
             <xf:output mediatype="image/*" ref="$binding[xxf:non-blank()]">

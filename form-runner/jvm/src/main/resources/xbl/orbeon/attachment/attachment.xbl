@@ -424,6 +424,36 @@
                     <xf:mediatype ref="if ($readonly) then '' else @mediatype"/>
                     <xxf:size     ref="if ($readonly) then '' else @size"/>
 
+                    <!-- Propagate the value to the binding *before* propagating the event (for #3061) -->
+                    <xf:action event="xxforms-upload-done">
+
+                        <xf:insert
+                            if="$multiple"
+                            context="$binding"
+                            ref="*"
+                            origin="
+                                (: Create an `_` element respecting the default namespace in the instance, if any :)
+                                xf:element(
+                                    resolve-QName('_', $binding),
+                                    (instance()/@*, instance()/string())
+                                )
+                            "/>
+
+                        <xf:action if="not($multiple)">
+                            <!-- TODO: move to function library for offline -->
+                            <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
+                                upload:deleteFileIfPossible(string($binding))
+                            </xf:action>
+                            <xf:setvalue
+                                ref="$binding"
+                                value="instance()"/>
+                            <xf:insert
+                                context="$binding"
+                                origin="instance()/@*"/>
+                        </xf:action>
+
+                    </xf:action>
+
                     <!-- Retarget of upload events -->
                     <!-- NOTE: Duplicated logic in image-attachment.xbl -->
                     <xf:dispatch
@@ -456,34 +486,6 @@
                         <xf:property name="actual"     value="event('actual')"/>
                         <xf:property name="message"    value="event('message')"/>
                     </xf:dispatch>
-
-                    <xf:action event="xxforms-upload-done">
-
-                        <xf:insert
-                            if="$multiple"
-                            context="$binding"
-                            ref="*"
-                            origin="
-                                (: Create an `_` element respecting the default namespace in the instance, if any :)
-                                xf:element(
-                                    resolve-QName('_', $binding),
-                                    (instance()/@*, instance()/string())
-                                )
-                            "/>
-
-                        <xf:action if="not($multiple)">
-                            <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
-                                upload:deleteFileIfPossible(string($binding))
-                            </xf:action>
-                            <xf:setvalue
-                                ref="$binding"
-                                value="instance()"/>
-                            <xf:insert
-                                context="$binding"
-                                origin="instance()/@*"/>
-                        </xf:action>
-
-                    </xf:action>
 
                     <xf:action event="xxforms-upload-done xxforms-upload-error">
                         <xf:setvalue

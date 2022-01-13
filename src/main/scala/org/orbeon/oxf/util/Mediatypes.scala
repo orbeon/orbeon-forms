@@ -50,13 +50,19 @@ object Mediatypes {
     )
   }
 
+  def findMediatypeForExtension(extension: String): Option[String] =
+    for {
+      mappings <- mappingsByExtension.get(extension.toLowerCase)
+      mapping  <- mappings.headOption
+    } yield
+      mapping.mediatype
+
   def findMediatypeForPath(path: String): Option[String] =
     for {
       extension <- findExtension(path.toLowerCase)
-      mappings  <- mappingsByExtension.get(extension)
-      mapping   <- mappings.headOption
+      mediatype <- findMediatypeForExtension(extension)
     } yield
-      mapping.mediatype
+      mediatype
 
   def findMediatypeForPathJava(path: String): String =
     findMediatypeForPath(path).orNull

@@ -13,27 +13,29 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import java.net.URI
-
-import org.orbeon.dom.Element
-import org.orbeon.io.{CharsetNames, FileUtils}
+import cats.syntax.option._
+import org.orbeon.dom.{Element, QName}
+import org.orbeon.io.FileUtils
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ContentHandlerOutputStream, PathUtils}
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.util.{ContentHandlerOutputStream, IndentedLogger, PathUtils}
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverAdapter
+import org.orbeon.saxon.om
+import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
+import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl
 
+import java.net.URI
 import scala.util.control.NonFatal
 
 
@@ -45,6 +47,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     with XFormsValueControl
     with SingleNodeFocusableTrait
     with FileMetadata {
+
+  import XFormsUploadControl._
 
   def supportedFileMetadata: Seq[String] = FileMetadata.AllMetadataNames
 
@@ -87,7 +91,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         // Notify that the upload has ended
         containingDocument.endUpload(getUploadUniqueId)
         XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
-        handleUploadedFile(doneEvent.file, doneEvent.filename, doneEvent.contentType, doneEvent.contentLength)
+        handleUploadedFile(doneEvent.file, Option(doneEvent.filename), Option(doneEvent.contentType), Option(doneEvent.contentLength))
         visitWithAncestors()
       case _: XXFormsUploadErrorEvent =>
         // Upload error: sent by the client in case of error
@@ -119,33 +123,25 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
   // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Improvement-to-client-side-server-s
   def getUploadUniqueId: String = getEffectiveId
 
-  // Called either upon Ajax `xxforms-upload-done` or upon client form POST (`replace="all"`)
-  def handleUploadedFile(value: String, filename: String, mediatype: String, size: String): Unit =
-    if (size != "0" || filename != "") {
-      // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
+  def handleUploadedFile(value: String, filename: Option[String], mediatype: Option[String], size: Option[String]): Unit =
+    if (size.exists(_ != "0") || filename.exists(_ != ""))
       storeExternalValueAndMetadata(value, filename, mediatype, size)
-    }
 
   // This can only be called from the client to clear the value
   override def storeExternalValue(value: String): Unit = {
     assert(value == "")
-    storeExternalValueAndMetadata(value, "", "", "")
+    storeExternalValueAndMetadata(value, None, None, None)
   }
 
-  private def storeExternalValueAndMetadata(rawNewValue: String, filename: String, mediatype: String, size: String): Unit =
+  private def storeExternalValueAndMetadata(
+    rawNewValue : String,
+    filename    : Option[String],
+    mediatype   : Option[String],
+    size        : Option[String]
+  ): Unit =
     try {
 
       val oldValueOpt = getValue.trimAllToOpt
-
-      val newTmpFileUriOpt =
-        rawNewValue.trimAllToOpt map (new URI(_).normalize()) match {
-          case someNewValueUri @ Some(newValueUri) if FileUtils.isTemporaryFileUri(newValueUri) =>
-            someNewValueUri
-          case Some(newValueUri) =>
-            throw new OXFException(s"Unexpected incoming value for `xf:upload`: `$newValueUri`")
-          case None =>
-            None
-        }
 
       // Attempt to delete the temporary file both when:
       //
@@ -159,22 +155,15 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       oldValueOpt foreach deleteFileIfPossible
 
       val valueToStore =
-        newTmpFileUriOpt match {
+        normalizeAndCheckRawValue(rawNewValue) match {
           case Some(newValueUri) =>
-
-            val newValueUriString = newValueUri.toString
-
-            // Setting new file
-            val isTargetBase64 = Set(XS_BASE64BINARY_QNAME, XFORMS_BASE64BINARY_QNAME)(valueType)
-            if (isTargetBase64) {
-              val converted = anyURIToBase64Binary(newValueUriString)
-              deleteFileIfPossible(newValueUriString)
-              converted
-            } else {
-              val newFileURL = XFormsCrossPlatformSupport.renameAndExpireWithSession(newValueUriString).toString
-              hmacURL(newFileURL, Option(filename), Option(mediatype), Option(size))
-            }
-
+            prepareValueAsBase64OrUri(
+              newValueUri,
+              filename,
+              mediatype,
+              size,
+              valueType
+            )
           case None =>
 
             // TODO: This should probably take place during refresh instead.
@@ -192,13 +181,13 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       // which is now modified to use boundFileMediatype/boundFilename instead.
 
       // Filename, mediatype and size
-      setFilename(filename)
-      setFileMediatype(mediatype)
-      setFileSize(size)
+      setFilename(filename.getOrElse(""))
+      setFileMediatype(mediatype.getOrElse(""))
+      setFileSize(size.getOrElse(""))
 
     } catch {
       case NonFatal(t) => throw new ValidationException(t, getLocationData)
-    }
+  }
 
   // Don't expose an external value
   override def evaluateExternalValue(): Unit = setExternalValue(null)
@@ -251,7 +240,6 @@ object XFormsUploadControl {
   //@XPathFunction
   def deleteFileIfPossible(urlString: String): Unit =
     XFormsCrossPlatformSupport.deleteFileIfPossible(urlString)
-
 
   // XForms 1.1 mediatype is space-separated, XForms 2 accept is comma-separated like in HTML
   def mediatypeToAccept(s: String): String = s.splitTo() mkString ","
@@ -332,5 +320,87 @@ object XFormsUploadControl {
     )
 
     sb.toString
+  }
+
+  def normalizeAndCheckRawValue(rawNewValue: String): Option[URI] =
+    rawNewValue.trimAllToOpt map (new URI(_).normalize()) match {
+      case someNewValueUri @ Some(newValueUri) if FileUtils.isTemporaryFileUri(newValueUri) =>
+        someNewValueUri
+      case Some(newValueUri) =>
+        throw new OXFException(s"Unexpected incoming value for `xf:upload`: `$newValueUri`")
+      case None =>
+        None
+    }
+
+  private val Base64BinaryQNames = Set(XS_BASE64BINARY_QNAME, XFORMS_BASE64BINARY_QNAME)
+
+  def prepareValueAsBase64OrUri(
+    newValueUri : URI,
+    filename    : Option[String],
+    mediatype   : Option[String],
+    size        : Option[String],
+    valueType   : QName)(implicit
+    logger      : IndentedLogger
+  ): String = {
+
+    val newValueUriString = newValueUri.toString
+
+    if (Base64BinaryQNames(valueType)) {
+      val converted = anyURIToBase64Binary(newValueUriString)
+      deleteFileIfPossible(newValueUriString)
+      converted
+    } else {
+      val newFileURL = XFormsCrossPlatformSupport.renameAndExpireWithSession(newValueUriString).toString
+      hmacURL(newFileURL, filename, mediatype, size)
+    }
+  }
+
+  // NOTE: This is very similar to `storeExternalValueAndMetadata` but this doesn't depend on the
+  // actual control.
+  def updateExternalValueAndMetadata(
+    boundNode   : om.NodeInfo,
+    rawNewValue : String,
+    filename    : Option[String],
+    mediatype   : Option[String],
+    size        : Long)(implicit
+    logger      : IndentedLogger
+  ): Unit = {
+
+    val sizeStringOpt = size.toString.some
+
+    val newTmpFileUriOpt = normalizeAndCheckRawValue(rawNewValue)
+
+    boundNode.getStringValue.trimAllToOpt foreach
+      deleteFileIfPossible
+
+    val valueToStore =
+      newTmpFileUriOpt match {
+        case Some(newValueUri) =>
+          prepareValueAsBase64OrUri(
+            newValueUri,
+            filename,
+            mediatype,
+            sizeStringOpt,
+            XS_ANYURI_QNAME
+          )
+        case None =>
+          ""
+      }
+
+    XFormsAPI.setvalue(
+      List(boundNode),
+      valueToStore
+    )
+
+    List(
+      "filename"  -> filename,
+      "mediatype" -> mediatype,
+      "size"      -> sizeStringOpt
+    ) collect { case (name, Some(value)) =>
+      XFormsAPI.setvalue(
+        boundNode /@ name,
+        value
+      )
+    }
   }
 }

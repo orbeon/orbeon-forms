@@ -69,6 +69,7 @@ val TinkVersion                   = "1.6.1"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.0"
 val AntVersion                    = "1.10.11"
+val ThumbnailatorVersion          = "0.4.16"
 
 // "Provided" Java libraries
 val ServletApiVersion             = "4.0.1"
@@ -580,6 +581,8 @@ lazy val formRunnerJVM = formRunner.jvm
   ).settings(
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion  % Provided,
     libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion  % Provided,
+
+    libraryDependencies += "net.coobird"    % "thumbnailator"    % ThumbnailatorVersion,
 
     libraryDependencies                ++= Seq(
       "io.circe" %%% "circe-core",

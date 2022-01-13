@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.`type`.Type
+import org.orbeon.saxon.`type`.Type.ITEM_TYPE
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.function.{AncestorOrganizations, UserOrganizations, UserRoles}
@@ -121,6 +122,14 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     Fun("created-with-or-newer", classOf[FRCreatedWithOrNewer], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("transform-uploaded-image", classOf[FRTransformUploadedImage], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+      Arg(ITEM_TYPE, EXACTLY_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
     )
   }
 }

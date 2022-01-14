@@ -639,13 +639,29 @@ trait FormRunnerPersistence {
         // So we now do all the work "natively", which is better anyway.
         // https://github.com/orbeon/orbeon-forms/issues/4919
 
+        val customGetHeaders =
+          Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*)
+
+        val resolvedGetUri =
+          new URI(rewriteServiceUrl(beforeUrl))
+
+        val allGetHeaders =
+          Connection.buildConnectionHeadersCapitalizedIfNeeded(
+            url              = resolvedGetUri,
+            hasCredentials   = false,
+            customHeaders    = customGetHeaders,
+            headersToForward = Connection.headersToForwardFromProperty,
+            cookiesToForward = Connection.cookiesToForwardFromProperty,
+            getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest)
+          )
+
         def connectGet: ConnectionResult =
           Connection.connectNow(
             method          = GET,
-            url             = new URI(rewriteServiceUrl(beforeUrl)),
+            url             = resolvedGetUri,
             credentials     = None,
             content         = None,
-            headers         = Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*),
+            headers         = allGetHeaders,
             loadState       = true,
             saveState       = true,
             logBody         = false
@@ -653,19 +669,19 @@ trait FormRunnerPersistence {
 
         def connectPut(is: InputStream): ConnectionResult = {
 
-          val customHeaders =
+          val customPutHeaders =
             (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
             (OrbeonPathToHolder -> List(pathToHolder))                             ::
             Nil
 
-          val resolvedUri =
+          val resolvedPutUri =
             new URI(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
 
-          val allHeaders =
+          val allPutHeaders =
             Connection.buildConnectionHeadersCapitalizedIfNeeded(
-              url              = resolvedUri,
+              url              = resolvedPutUri,
               hasCredentials   = false,
-              customHeaders    = customHeaders.toMap,
+              customHeaders    = customPutHeaders.toMap,
               headersToForward = Connection.headersToForwardFromProperty,
               cookiesToForward = Connection.cookiesToForwardFromProperty,
               getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest)
@@ -673,10 +689,10 @@ trait FormRunnerPersistence {
 
           Connection.connectNow(
             method          = PUT,
-            url             = resolvedUri,
+            url             = resolvedPutUri,
             credentials     = username map (BasicCredentials(_, password, preemptiveAuth = false, domain = None)),
             content         = StreamedContent(is, ContentTypes.OctetStreamContentType.some, contentLength = None, title = None).some,
-            headers         = allHeaders.toMap,
+            headers         = allPutHeaders.toMap,
             loadState       = true,
             saveState       = true,
             logBody         = false

@@ -600,7 +600,8 @@ trait FormRunnerPersistence {
     workflowStage     : Option[String] = None
   ): (Seq[String], Seq[String], Int) = {
 
-    implicit val externalContext: ExternalContext = CoreCrossPlatformSupport.externalContext
+    implicit val externalContext         : ExternalContext               = CoreCrossPlatformSupport.externalContext
+    implicit def coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
     val savedData = migrate.map(_(liveData)).getOrElse(liveData)
 
@@ -652,17 +653,30 @@ trait FormRunnerPersistence {
 
         def connectPut(is: InputStream): ConnectionResult = {
 
-          val headers =
+          val customHeaders =
             (formVersion.toList map (v => OrbeonFormDefinitionVersion -> List(v))) ::: // write all using the form definition version
             (OrbeonPathToHolder -> List(pathToHolder))                             ::
             Nil
 
+          val resolvedUri =
+            new URI(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
+
+          val allHeaders =
+            Connection.buildConnectionHeadersCapitalizedIfNeeded(
+              url              = resolvedUri,
+              hasCredentials   = false,
+              customHeaders    = customHeaders.toMap,
+              headersToForward = Connection.headersToForwardFromProperty,
+              cookiesToForward = Connection.cookiesToForwardFromProperty,
+              getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest)
+            )
+
           Connection.connectNow(
             method          = PUT,
-            url             = new URI(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString))),
+            url             = resolvedUri,
             credentials     = username map (BasicCredentials(_, password, preemptiveAuth = false, domain = None)),
             content         = StreamedContent(is, ContentTypes.OctetStreamContentType.some, contentLength = None, title = None).some,
-            headers         = headers.toMap,
+            headers         = allHeaders.toMap,
             loadState       = true,
             saveState       = true,
             logBody         = false

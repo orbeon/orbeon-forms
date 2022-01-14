@@ -275,7 +275,7 @@ public class RequestGenerator extends ProcessorImpl {
         }
     }
 
-    public static String urlForFileItemCreateIfNeeded(FileItem fileItem, int scope) throws SAXException {
+    public static String urlForFileItemCreateIfNeeded(FileItem fileItem, int scope) {
         // Only a reference to the file is output (xs:anyURI)
         final DiskFileItem diskFileItem = (DiskFileItem) fileItem;
         final String resultUri;

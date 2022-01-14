@@ -139,7 +139,7 @@ class XFormsOutputControl(
       // If the value is a file: we make sure it is signed otherwise we return the default value
 
       def verifiedValueOrDefault(initial: String, value: => String, default: => String) =
-        if ("file".equals(PathUtils.getProtocol(initial)) && ! XFormsUploadControl.verifyMAC(initial))
+        if (PathUtils.getProtocol(initial) == "file" && ! XFormsUploadControl.verifyMAC(initial))
           default
         else
           value

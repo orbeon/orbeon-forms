@@ -49,7 +49,7 @@
 
     <!-- NOTE: Later, CSS grids can be used at runtime too -->
     <xsl:variable name="markup"                   select="/*/@markup/string()"/>
-    <xsl:variable name="use-css-grids-output"     select="$is-12or24col-input and ($is-editable or $markup = 'css-grid')"/>
+    <xsl:variable name="use-css-grids-output"     select="$is-editable or $markup = 'css-grid'"/>
 
     <xsl:variable name="apply-defaults"           select="$root/@apply-defaults = 'true'"/>
 

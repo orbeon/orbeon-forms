@@ -149,12 +149,12 @@ object Log4jSupport {
 
   private object Private {
 
-    trait LoggerInitError
+    sealed trait LoggerInitError
     object LoggerInitError {
-      case class  MalformedUrl(t: Throwable) extends LoggerInitError
-      case class  NotFound    (t: Throwable) extends LoggerInitError
-      case class  InvalidXml  (t: Throwable) extends LoggerInitError
-      case class  Other       (t: Throwable) extends LoggerInitError
+      case class MalformedUrl(t: Throwable) extends LoggerInitError
+      case class NotFound    (t: Throwable) extends LoggerInitError
+      case class InvalidXml  (t: Throwable) extends LoggerInitError
+      case class Other       (t: Throwable) extends LoggerInitError
     }
 
     val DefaultConfigurationName = "OrbeonDefault"

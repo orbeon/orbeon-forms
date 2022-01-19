@@ -100,7 +100,7 @@
                             <xf:select1
                                 id         = "select1"
                                 ref        = "$binding"
-                                appearance = "full"
+                                appearance = "{(/*/@appearance, 'full')[1]}"
                                 xbl:attr   = "appearance xxf:encrypt-item-values"
                                 class      = "xxforms-events-mode-default">
 

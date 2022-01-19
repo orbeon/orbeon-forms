@@ -53,6 +53,7 @@
     <property as="xs:string"  name="oxf.fb.toolbox.group.selection.uri.*.*">
         oxf:/forms/orbeon/builder/xbl/selection-controls.xbl
         oxf:/xbl/orbeon/dropdown-select1/dropdown-select1.xbl
+        oxf:/forms/orbeon/builder/xbl/open-select1-minimal.xbl
         oxf:/xbl/orbeon/dropdown-select1-search/dropdown-select1-search.xbl
         oxf:/xbl/orbeon/databound-select1/databound-select1.xbl
         oxf:/xbl/orbeon/databound-select1-search/databound-select1-search.xbl

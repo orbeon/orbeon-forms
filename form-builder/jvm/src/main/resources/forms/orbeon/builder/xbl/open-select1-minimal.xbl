@@ -1,0 +1,45 @@
+<xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-open-select1-minimal"
+        element="fr|open-select1[appearance ~= minimal]"
+        xxbl:container="span"
+        xxbl:mode="lhha binding value">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Static Dropdown with "Other"</display-name>
+            <display-name lang="es" todo="true">[Dropdown with "Other"]</display-name>
+            <display-name lang="fi" todo="true">[Dropdown with "Other"]</display-name>
+            <display-name lang="fr">Menu déroulant statique avec "Autre"</display-name>
+            <display-name lang="ru" todo="true">[Dropdown with "Other"]</display-name>
+            <display-name lang="de" todo="true">[Dropdown with "Other"]</display-name>
+            <display-name lang="it" todo="true">[Dropdown with "Other"]</display-name>
+            <display-name lang="nl" todo="true">[Dropdown with "Other"]</display-name>
+            <display-name lang="pt" todo="true">[Dropdown with "Other"]</display-name>
+            <display-name lang="sv" todo="true">[Dropdown with "Other"]</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-caret-square-o-down</icon-class>
+            </icon>
+            <editors static-itemset="true" item-hint="true"/>
+            <templates>
+                <view>
+                    <fr:open-select1 id="" ref="" appearance="minimal" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:itemset ref="">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                            <xf:hint  ref="hint"/>
+                        </xf:itemset>
+                    </fr:open-select1>
+                </view>
+            </templates>
+        </metadata>
+
+    </xbl:binding>
+</xbl:xbl>

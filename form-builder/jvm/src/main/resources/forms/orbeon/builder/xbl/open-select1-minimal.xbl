@@ -10,10 +10,10 @@
         xxbl:mode="lhha binding value">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Static Dropdown with "Other"</display-name>
+            <display-name lang="en">Dropdown with "Other"</display-name>
             <display-name lang="es" todo="true">[Dropdown with "Other"]</display-name>
             <display-name lang="fi" todo="true">[Dropdown with "Other"]</display-name>
-            <display-name lang="fr">Menu déroulant statique avec "Autre"</display-name>
+            <display-name lang="fr">Menu déroulant avec "Autre"</display-name>
             <display-name lang="ru" todo="true">[Dropdown with "Other"]</display-name>
             <display-name lang="de" todo="true">[Dropdown with "Other"]</display-name>
             <display-name lang="it" todo="true">[Dropdown with "Other"]</display-name>

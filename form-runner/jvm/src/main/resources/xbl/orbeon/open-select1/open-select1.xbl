@@ -19,13 +19,21 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <!-- Later: Bind to `xf|select1[selection = open]`
-         See: https://github.com/orbeon/orbeon-forms/issues/2479 and
-              https://github.com/orbeon/orbeon-forms/issues/2394
-      -->
+    <!--
+        Later: Bind to `xf|select1[selection = open]`. See:
+
+        - https://github.com/orbeon/orbeon-forms/issues/2479
+        - https://github.com/orbeon/orbeon-forms/issues/2394
+
+        2022-01-19: Added `appearance ~= full` so that Form Builder can propose a choice between this and
+        `appearance ~= minimal`. Put the first appearance first but still bind to no appearance. See:
+
+        - https://github.com/orbeon/orbeon-forms/issues/5172
+    -->
+
     <xbl:binding
         id="fr-open-select1"
-        element="fr|open-select1"
+        element="fr|open-select1[appearance ~= full], fr|open-select1"
         xxbl:container="span"
         xxbl:mode="lhha binding value">
 

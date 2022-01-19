@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.css.CSSSelectorParser.AttributePredicate
 import org.orbeon.dom.QName
+import org.orbeon.oxf.util.CollectionUtils.ListOps
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
@@ -132,7 +133,7 @@ object BindingDescriptor {
     val Datatype1 = datatype
     val Datatype2 = ModelDefs.getVariationTypeOrKeep(datatype)
 
-    val appearancesToBinding =
+    val appearancesToBindingMaybeMultiple =
       getAllRelevantDescriptors(bindings) collect {
         case b @ BindingDescriptor(
             Some(`elemName`),
@@ -153,6 +154,10 @@ object BindingDescriptor {
           ) =>
           (Some(attValue), b.binding, d.isDefined)
       }
+
+    // Keep only the first among identical bindings
+    val appearancesToBinding =
+      appearancesToBindingMaybeMultiple.toList.keepDistinctBy(_._2)
 
     if (appearancesToBinding forall (_._1.isEmpty)) // no appearance -> no choice (#4558)
       Nil

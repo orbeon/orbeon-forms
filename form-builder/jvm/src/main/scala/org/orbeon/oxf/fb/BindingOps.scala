@@ -117,7 +117,7 @@ trait BindingOps {
   ): Iterable[(Option[String], String, Option[String], String)] = {
 
     def metadataOpt(bindingOpt: Option[NodeInfo]) =
-      bindingOpt.to(List) flatMap bindingMetadata headOption
+      bindingOpt.toList flatMap bindingMetadata headOption
 
     possibleAppearancesWithBindings(elemName, datatype, bindings) map {
       case (appearanceOpt, bindingOpt, _) =>

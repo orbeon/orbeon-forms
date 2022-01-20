@@ -175,7 +175,7 @@ object XFormsSelect1Handler {
         outputLabelForStart(
           handlerContext           = xformsHandlerContextForItem,
           attributes               = reusableAttributes,
-          targetControlEffectiveId = null,
+          targetControlEffectiveId = None,
           forEffectiveIdWithNs     = None,
           lhha                     = LHHA.Label,
           elementName              = labelName,
@@ -240,7 +240,7 @@ object XFormsSelect1Handler {
           outputLabelFor(
             handlerContext           = xformsHandlerContextForItem,
             attributes               = reusableAttributes,
-            targetControlEffectiveId = null,
+            targetControlEffectiveId = None,
             forEffectiveIdWithNs     = None,
             lhha                     = LHHA.Help,
             elementName              = "span",
@@ -257,7 +257,7 @@ object XFormsSelect1Handler {
           outputLabelFor(
             handlerContext           = xformsHandlerContextForItem,
             attributes               = reusableAttributes,
-            targetControlEffectiveId = null,
+            targetControlEffectiveId = None,
             forEffectiveIdWithNs     = None,
             lhha                     = LHHA.Hint, elementName = "span",
             labelValue               = hint.label,

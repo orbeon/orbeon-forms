@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import cats.syntax.option._
 import java.{lang => jl}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
@@ -241,17 +242,13 @@ abstract class XFormsBaseHandlerXHTML (
     isExternal               : Boolean
   ): Unit = {
 
-    require(forEffectiveIdWithNs ne null)
+    require(targetControlEffectiveId ne null)
+    require(forEffectiveIdWithNs     ne null)
 
-    val isInternal = lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)
+    val isInternal           = lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)
     val staticLHHAAttributes = lhhaAnalysis.element.attributesAsSax
 
-    if (
-      ! isInternal &&
-      (
-        (staticLHHAAttributes ne null) ||
-        lhha == LHHA.Alert
-      )) {
+    if (! isInternal) {
 
       // If no attributes were found, there is no such label / help / hint / alert
 
@@ -278,7 +275,7 @@ abstract class XFormsBaseHandlerXHTML (
 
       implicit val classes: jl.StringBuilder = new jl.StringBuilder(30)
       // Put user classes first if any
-      if (staticLHHAAttributes ne null) {
+      locally {
         val userClass = staticLHHAAttributes.getValue("class")
         if (userClass ne null)
           appendWithSpace(userClass)
@@ -332,7 +329,7 @@ abstract class XFormsBaseHandlerXHTML (
       XFormsBaseHandlerXHTML.outputLabelFor(
         handlerContext           = handlerContext,
         attributes               = attributes,
-        targetControlEffectiveId = targetControlEffectiveId,
+        targetControlEffectiveId = targetControlEffectiveId.some,
         forEffectiveIdWithNs     = forEffectiveIdWithNs,
         lhha                     = lhha,
         elementName              = elementName,
@@ -409,7 +406,7 @@ object XFormsBaseHandlerXHTML {
   def outputLabelFor(
     handlerContext           : HandlerContext,
     attributes               : Attributes,
-    targetControlEffectiveId : String,
+    targetControlEffectiveId : Option[String],
     forEffectiveIdWithNs     : Option[String],
     lhha                     : LHHA,
     elementName              : String,
@@ -425,7 +422,7 @@ object XFormsBaseHandlerXHTML {
   def outputLabelForStart(
     handlerContext           : HandlerContext,
     attributes               : Attributes,
-    targetControlEffectiveId : String,
+    targetControlEffectiveId : Option[String],
     forEffectiveIdWithNs     : Option[String],
     lhha                     : LHHA,
     elementName              : String,
@@ -433,23 +430,24 @@ object XFormsBaseHandlerXHTML {
   ): Unit = {
 
     require(lhha ne null)
-    require(! addIds || (targetControlEffectiveId ne null))
+    require(! addIds || targetControlEffectiveId.isDefined)
 
     // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
     val newAttribute =
-      if (addIds && (targetControlEffectiveId ne null)) {
-        // Add or replace existing id attribute
-        // NOTE: addIds == true for external LHHA
-        XMLReceiverSupport.addOrReplaceAttribute(
-          attributes,
-          "",
-          "",
-          "id",
-          XFormsBaseHandler.getLHHACIdWithNs(handlerContext.containingDocument, targetControlEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
-        )
-      } else {
-        // Remove existing id attribute if any
-        XMLReceiverSupport.removeAttribute(attributes, "", "id")
+      targetControlEffectiveId match {
+        case Some(targetControlEffectiveId) if addIds =>
+          // Add or replace existing id attribute
+          // NOTE: addIds == true for external LHHA
+          XMLReceiverSupport.addOrReplaceAttribute(
+            attributes,
+            "",
+            "",
+            "id",
+            XFormsBaseHandler.getLHHACIdWithNs(handlerContext.containingDocument, targetControlEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
+          )
+        case _ =>
+          // Remove existing id attribute if any
+          XMLReceiverSupport.removeAttribute(attributes, "", "id")
       }
 
     // Add @for attribute if specified and element is a label

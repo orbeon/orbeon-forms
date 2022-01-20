@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import cats.syntax.option._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{ContainerControl, LHHA}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
@@ -84,7 +85,7 @@ class XFormsGroupDefaultHandler(
       handlerContext           = handlerContext,
       attributes               = reusableAttributes,
       targetControlEffectiveId = effectiveId,
-      forEffectiveIdWithNs     = containingDocument.namespaceId(effectiveId),
+      forEffectiveIdWithNs     = containingDocument.namespaceId(effectiveId).some,
       lhha                     = LHHA.Label,
       elementName              = handlerContext.labelElementName,
       labelValue               = getLabelValue(groupControl),

@@ -139,7 +139,7 @@ class XFormsOutputHTMLHandler(
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs(effectiveId: String): String = null
+  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = None
 
   override def getContainingElementName: String = "div"
 }
@@ -185,7 +185,7 @@ class XFormsOutputImageHandler(
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs(effectiveId: String): String = null
+  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = None
 }
 
 // xf:output[@appearance = 'xxf:text']
@@ -218,7 +218,7 @@ class XFormsOutputTextHandler(
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs(effectiveId: String): String = null
+  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = null
 }
 
 // xf:output[@appearance = 'xxf:download']
@@ -300,5 +300,5 @@ class XFormsOutputDownloadHandler(
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs(effectiveId: String): String = null
+  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = null
 }

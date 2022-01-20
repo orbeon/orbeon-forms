@@ -137,7 +137,7 @@ class XFormsLHHAHandler(
           handleLabelHintHelpAlert(
             lhhaAnalysis             = staticLhha,
             targetControlEffectiveId = XFormsId.getRelatedEffectiveId(lhhaEffectiveId, staticLhha.directTargetControl.staticId), // `id` placed on the label itself
-            forEffectiveIdWithNs     = forEffectiveIdWithNsOpt.flatten.orNull,
+            forEffectiveIdWithNs     = forEffectiveIdWithNsOpt.flatten,
             lhha                     = staticLhha.lhhaType,
             requestedElementNameOpt  = None,
             controlOrNull            = effectiveTargetControlOpt.orNull, // to get the value; Q: When can this be `null`?
@@ -170,7 +170,7 @@ object XFormsLHHAHandler {
     // NOTE: A possibly simpler better solution would be to always use the `foo$bar$$c.1-2-3` scheme for the `@for` id
     // of a control.
     handlerContext.controller.findHandlerFromElem(targetControl.element) match {
-      case Some(handler: XFormsControlLifecyleHandler) => Option(handler.getForEffectiveIdWithNs(targetControlEffectiveId))
+      case Some(handler: XFormsControlLifecyleHandler) => handler.getForEffectiveIdWithNs(targetControlEffectiveId)
       case _                                           => None
     }
   }

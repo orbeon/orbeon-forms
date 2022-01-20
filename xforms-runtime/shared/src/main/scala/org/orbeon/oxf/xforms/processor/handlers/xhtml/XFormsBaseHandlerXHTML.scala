@@ -234,12 +234,14 @@ abstract class XFormsBaseHandlerXHTML (
   final protected def handleLabelHintHelpAlert(
     lhhaAnalysis             : LHHAAnalysis,
     targetControlEffectiveId : String,
-    forEffectiveIdWithNs     : String,
+    forEffectiveIdWithNs     : Option[String],
     lhha                     : LHHA,
     requestedElementNameOpt  : Option[String],
     controlOrNull            : XFormsControl,
     isExternal               : Boolean
   ): Unit = {
+
+    require(forEffectiveIdWithNs ne null)
 
     val isInternal = lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)
     val staticLHHAAttributes = lhhaAnalysis.element.attributesAsSax
@@ -408,7 +410,7 @@ object XFormsBaseHandlerXHTML {
     handlerContext           : HandlerContext,
     attributes               : Attributes,
     targetControlEffectiveId : String,
-    forEffectiveIdWithNs     : String,
+    forEffectiveIdWithNs     : Option[String],
     lhha                     : LHHA,
     elementName              : String,
     labelValue               : String,
@@ -424,7 +426,7 @@ object XFormsBaseHandlerXHTML {
     handlerContext           : HandlerContext,
     attributes               : Attributes,
     targetControlEffectiveId : String,
-    forEffectiveIdWithNs     : String,
+    forEffectiveIdWithNs     : Option[String],
     lhha                     : LHHA,
     elementName              : String,
     addIds                   : Boolean
@@ -451,8 +453,9 @@ object XFormsBaseHandlerXHTML {
       }
 
     // Add @for attribute if specified and element is a label
-    if ((forEffectiveIdWithNs ne null) && elementName == "label")
-      newAttribute.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, forEffectiveIdWithNs)
+    if (elementName == "label")
+      forEffectiveIdWithNs foreach
+        (newAttribute.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, _))
 
     val xhtmlPrefix    = handlerContext.findXHTMLPrefix
     val labelQName     = XMLUtils.buildQName(xhtmlPrefix, elementName)

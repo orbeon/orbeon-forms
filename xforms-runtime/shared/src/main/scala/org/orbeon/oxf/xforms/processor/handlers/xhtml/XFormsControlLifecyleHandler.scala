@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
@@ -129,49 +130,49 @@ abstract class XFormsControlLifecyleHandler(
   // TODO: Those should take the static LHHA
   protected def handleLabel(): Unit =
     handleLabelHintHelpAlert(
-      getStaticLHHA(getPrefixedId, LHHA.Label),
-      getEffectiveId,
-      getForEffectiveIdWithNs(getEffectiveId),
-      LHHA.Label,
-      XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
-      currentControl,
-      isExternal = false
+      lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
+      targetControlEffectiveId = getEffectiveId,
+      forEffectiveIdWithNs     = getForEffectiveIdWithNs(getEffectiveId),
+      lhha                     = LHHA.Label,
+      requestedElementNameOpt  = XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
+      controlOrNull            = currentControl,
+      isExternal               = false
     )
 
   protected def handleAlert(): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyAlert)
       handleLabelHintHelpAlert(
-        getStaticLHHA(getPrefixedId, LHHA.Alert),
-        getEffectiveId,
-        getForEffectiveIdWithNs(getEffectiveId),
-        LHHA.Alert,
-        None,
-        currentControl,
-        isExternal = false
+        lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Alert),
+        targetControlEffectiveId = getEffectiveId,
+        forEffectiveIdWithNs     = getForEffectiveIdWithNs(getEffectiveId),
+        lhha                     = LHHA.Alert,
+        requestedElementNameOpt  = None,
+        controlOrNull            = currentControl,
+        isExternal               = false
       )
 
   protected def handleHint(): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyHint)
       handleLabelHintHelpAlert(
-        getStaticLHHA(getPrefixedId, LHHA.Hint),
-        getEffectiveId,
-        getForEffectiveIdWithNs(getEffectiveId),
-        LHHA.Hint,
-        None,
-        currentControl,
-        isExternal = false
+        lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Hint),
+        targetControlEffectiveId = getEffectiveId,
+        forEffectiveIdWithNs     = getForEffectiveIdWithNs(getEffectiveId),
+        lhha                     = LHHA.Hint,
+        requestedElementNameOpt  = None,
+        controlOrNull            = currentControl,
+        isExternal               = false
       )
 
   protected def handleHelp(): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControl))
       handleLabelHintHelpAlert(
-        getStaticLHHA(getPrefixedId, LHHA.Help),
-        getEffectiveId,
-        getForEffectiveIdWithNs(getEffectiveId),
-        LHHA.Help,
-        None,
-        currentControl,
-        isExternal = false
+        lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Help),
+        targetControlEffectiveId = getEffectiveId,
+        forEffectiveIdWithNs     = getForEffectiveIdWithNs(getEffectiveId),
+        lhha                     = LHHA.Help,
+        requestedElementNameOpt  = None,
+        controlOrNull            = currentControl,
+        isExternal               = false
       )
 
   // Must be overridden by subclasses
@@ -198,8 +199,8 @@ abstract class XFormsControlLifecyleHandler(
 
   // Return the effective id of the element to which label/@for, etc. must point to.
   // Default: point to `foo$bar$$c.1-2-3`
-  def getForEffectiveIdWithNs(effectiveId: String): String =
-    XFormsBaseHandler.getLHHACIdWithNs(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.ControlCode)
+  def getForEffectiveIdWithNs(effectiveId: String): Option[String] =
+    XFormsBaseHandler.getLHHACIdWithNs(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.ControlCode).some
 
   // See https://github.com/orbeon/orbeon-forms/issues/4046
   final lazy val currentControl: XFormsControl =

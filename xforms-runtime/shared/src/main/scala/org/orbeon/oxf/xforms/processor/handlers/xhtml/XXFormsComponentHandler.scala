@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import cats.syntax.option._
 import java.{lang => jl}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -94,37 +95,41 @@ class XXFormsComponentHandler(
 
   // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
   // NOTE: Used by `handleLabel()` if there is a local LHHA, and by `findTargetControlForEffectiveId`.
-  override def getForEffectiveIdWithNs(effectiveId: String): String = {
+  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = {
+
+    def findFromTarget(
+      effectiveTargetControlOrPrefixedId : Either[StaticLHHASupport, String],
+      currentControlSuffix               : String
+    ): Option[String] =
+      effectiveTargetControlOrPrefixedId match {
+        case Left(effectiveTargetControl) =>
+
+          // Push/pop component context so that handler resolution works
+          handlerContext.pushComponentContext(getPrefixedId)
+          try
+            XFormsLHHAHandler.findTargetControlForEffectiveIdWithNs(
+              handlerContext,
+              effectiveTargetControl,
+              effectiveTargetControl.prefixedId + currentControlSuffix
+            )
+          finally
+            handlerContext.popComponentContext()
+
+        case Right(targetPrefixedId) =>
+          containingDocument.namespaceId(targetPrefixedId + currentControlSuffix).some
+      }
 
     import shapeless._
     import syntax.typeable._
 
-    val result =
-      for {
-        staticLhhaSupport                 <- elementAnalysis.narrowTo[StaticLHHASupport]
-        staticLabel                       <- staticLhhaSupport.lhh(Label)
-        effectiveTargetControlOrPrefixedI <- staticLabel.effectiveTargetControlOrPrefixedIdOpt
-        currentControlSuffix              = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
-      } yield
-        effectiveTargetControlOrPrefixedI match {
-          case Left(effectiveTargetControl) =>
-
-            // Push/pop component context so that handler resolution works
-            handlerContext.pushComponentContext(getPrefixedId)
-            try
-              XFormsLHHAHandler.findTargetControlForEffectiveIdWithNs(
-                handlerContext,
-                effectiveTargetControl,
-                effectiveTargetControl.prefixedId + currentControlSuffix
-              )
-            finally
-              handlerContext.popComponentContext()
-
-          case Right(targetPrefixedId) =>
-            Some(containingDocument.namespaceId(targetPrefixedId + currentControlSuffix))
-        }
-
-    result.flatten.orNull
+    for {
+      staticLhhaSupport                  <- elementAnalysis.narrowTo[StaticLHHASupport]
+      staticLabel                        <- staticLhhaSupport.lhh(Label)
+      effectiveTargetControlOrPrefixedId <- staticLabel.effectiveTargetControlOrPrefixedIdOpt
+      currentControlSuffix               = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
+      result                             <- findFromTarget(effectiveTargetControlOrPrefixedId, currentControlSuffix)
+    } yield
+      result
   }
 }
 

@@ -176,7 +176,7 @@ object XFormsSelect1Handler {
           handlerContext           = xformsHandlerContextForItem,
           attributes               = reusableAttributes,
           targetControlEffectiveId = null,
-          forEffectiveIdWithNs     = null,
+          forEffectiveIdWithNs     = None,
           lhha                     = LHHA.Label,
           elementName              = labelName,
           addIds                   = false
@@ -241,7 +241,7 @@ object XFormsSelect1Handler {
             handlerContext           = xformsHandlerContextForItem,
             attributes               = reusableAttributes,
             targetControlEffectiveId = null,
-            forEffectiveIdWithNs     = null,
+            forEffectiveIdWithNs     = None,
             lhha                     = LHHA.Help,
             elementName              = "span",
             labelValue               = help.label,
@@ -258,7 +258,7 @@ object XFormsSelect1Handler {
             handlerContext           = xformsHandlerContextForItem,
             attributes               = reusableAttributes,
             targetControlEffectiveId = null,
-            forEffectiveIdWithNs     = null,
+            forEffectiveIdWithNs     = None,
             lhha                     = LHHA.Hint, elementName = "span",
             labelValue               = hint.label,
             mustOutputHTMLFragment   = hint.isHTML,
@@ -591,12 +591,11 @@ class XFormsSelect1Handler(
     mustSelect
   }
 
-  // TODO: return `Option[String]`
-  override def getForEffectiveIdWithNs(effectiveId: String): String = {
+  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = {
     // For full appearance we don't put a `@for` attribute so that selecting the main label doesn't select the item
     val appearanceTrait = getAppearanceTrait
     if ((appearanceTrait ne null) && appearanceTrait.isFull)
-      null
+      None
     else
       super.getForEffectiveIdWithNs(effectiveId)
   }
@@ -611,7 +610,7 @@ class XFormsSelect1Handler(
       handleLabelHintHelpAlert(
         lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
         targetControlEffectiveId = getEffectiveId,
-        forEffectiveIdWithNs     = null,
+        forEffectiveIdWithNs     = None,
         lhha                     = LHHA.Label,
         requestedElementNameOpt  = "span".some, // make element name a `span`, as a label would need a `for`
         controlOrNull            = currentControl,

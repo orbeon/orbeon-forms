@@ -118,7 +118,7 @@ class XFormsInputHandler(
 
         // Main input field
         locally {
-          val inputIdName = getFirstInputEffectiveIdWithNs(getEffectiveId)
+          val inputIdName = getFirstInputEffectiveIdWithNs(getEffectiveId).getOrElse(throw new IllegalStateException)
           reusableAttributes.clear()
           reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
           if (! isDateMinimal)
@@ -184,7 +184,7 @@ class XFormsInputHandler(
         // Add second field for dateTime's time part
         // NOTE: In the future, we probably want to do this as an XBL component
         if (isDateTime) {
-          val inputIdName = getSecondInputEffectiveId(getEffectiveId)
+          val inputIdName = getSecondInputEffectiveId(getEffectiveId).getOrElse(throw new IllegalStateException)
           reusableAttributes.clear()
           reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
           reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "text")
@@ -230,15 +230,15 @@ class XFormsInputHandler(
   }
 
   // Do as if this was in a component, noscript has to handle that
-  private def getFirstInputEffectiveIdWithNs(effectiveId: String): String =
-    ! isBoolean option XFormsInputHandler.firstInputEffectiveIdWithNs(effectiveId)(containingDocument) orNull
+  private def getFirstInputEffectiveIdWithNs(effectiveId: String): Option[String] =
+    ! isBoolean option XFormsInputHandler.firstInputEffectiveIdWithNs(effectiveId)(containingDocument)
 
   // Do as if this was in a component, noscript has to handle that
-  private def getSecondInputEffectiveId(effectiveId: String): String =
-    isDateTime option containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-2")) orNull
+  private def getSecondInputEffectiveId(effectiveId: String): Option[String] =
+    isDateTime option containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-2"))
 
-  override def getForEffectiveIdWithNs(effectiveId: String): String =
-    isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, 0) getOrElse getFirstInputEffectiveIdWithNs(getEffectiveId)
+  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] =
+    isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, 0) orElse getFirstInputEffectiveIdWithNs(getEffectiveId)
 
   protected override def handleLabel(): Unit =
     if (! (placeHolderInfo exists (_.isLabelPlaceholder)))

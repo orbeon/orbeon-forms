@@ -121,10 +121,10 @@ class XXFormsComponentHandler(
               handlerContext.popComponentContext()
 
           case Right(targetPrefixedId) =>
-            Some(targetPrefixedId + currentControlSuffix)
+            Some(containingDocument.namespaceId(targetPrefixedId + currentControlSuffix))
         }
 
-    result.flatten.map(containingDocument.namespaceId).orNull
+    result.flatten.orNull
   }
 }
 

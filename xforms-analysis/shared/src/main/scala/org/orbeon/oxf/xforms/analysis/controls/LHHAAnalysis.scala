@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.orbeon.dom._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis._
+import org.orbeon.oxf.xforms.event.XFormsEvents.{XFORMS_FOCUS, XXFORMS_BLUR}
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
@@ -67,6 +68,10 @@ class LHHAAnalysis(
   def forRepeatNesting                     : Int               = _forRepeatNesting
   def directTargetControl                  : StaticLHHASupport = _directTargetControlOpt getOrElse (throw new IllegalStateException)
   def effectiveTargetControlOrPrefixedIdOpt: Option[Either[StaticLHHASupport, String]] = _effectiveTargetControlOrPrefixedIdOpt
+
+  // Allow the client telling us that an external LHHA has the focus, for instance in the case of an `<xf:help>`
+  // rendered as a `<button>` in the headings of a repeated grid.
+  override protected def externalEventsDef: Set[String] = super.externalEventsDef ++ Set(XFORMS_FOCUS, XXFORMS_BLUR)
 
   // What we support for alert level/validation:
   //

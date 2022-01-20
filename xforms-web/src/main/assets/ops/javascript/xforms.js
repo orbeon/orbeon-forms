@@ -1932,7 +1932,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
                 // Generic code, trying to find:
                 // P1. A HTML form field
-                var htmlControl = $(control).find("input:visible, textarea:visible, select:visible, button:visible, a:visible");
+                var htmlControl = $(control).find("input:visible, textarea:visible, select:visible, button:visible:not(.xforms-help), a:visible");
                 // P2. A focusable element
                 if (! htmlControl.is('*'))
                     htmlControl = $(control).find("[tabindex]:not([tabindex = '-1']):visible");
@@ -2340,9 +2340,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                             return dialog.element;
                     }
                 } else if (element.className != null) {
-                    if ($(element).is('.xforms-control, .xbl-component')) {
-                        return element;
-                    } else if ($(element).is('.xforms-dialog, .xforms-help, .xforms-alert')) {
+                    if ($(element).is('.xforms-control, .xbl-component, .xforms-dialog')) {
                         return element;
                     }
                 }
@@ -2705,9 +2703,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             // See: http://www.quirksmode.org/js/events_properties.html#button
             if (event.button != 0 && event.button != 1) return;
             var originalTarget = YAHOO.util.Event.getTarget(event);
-            var target = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
+            var controlTarget = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
             // Listeners might be interested in click events even if they don't target an XForms control
-            ORBEON.xforms.Events.clickEvent.fire({target: originalTarget, control: target});
+            ORBEON.xforms.Events.clickEvent.fire({target: originalTarget, control: controlTarget});
             if (YAHOO.lang.isObject(originalTarget) && YAHOO.lang.isBoolean(originalTarget.disabled) && originalTarget.disabled) {
                 // IE calls the click event handler on clicks on disabled controls, which Firefox doesn't.
                 // To make processing more similar on all browsers, we stop going further here if we go a click on a disabled control.
@@ -2715,50 +2713,47 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
 
             var handled = false;
-            if (target != null && ($(target).is('.xforms-trigger, .xforms-submit'))) {
+            if (controlTarget != null && ($(controlTarget).is('.xforms-trigger, .xforms-submit'))) {
                 // Click on trigger
                 event.preventDefault();
-                if (! $(target).is('.xforms-readonly')) {
+                if (! $(controlTarget).is('.xforms-readonly')) {
                     // If this is an anchor and we didn't get a chance to register the focus event,
                     // send the focus event here. This is useful for anchors (we don't listen on the
                     // focus event on those, and for buttons on Safari which does not dispatch the focus
                     // event for buttons.
                     ORBEON.xforms.Events.focus(event);
-                    var event = new ORBEON.xforms.AjaxEvent(null, target.id, null, "DOMActivate");
+                    var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, null, "DOMActivate");
                     ORBEON.xforms.AjaxClient.fireEvent(event);
 
-                    if ($(target).is('.xforms-trigger-appearance-modal, .xforms-submit-appearance-modal')) {
+                    if ($(controlTarget).is('.xforms-trigger-appearance-modal, .xforms-submit-appearance-modal')) {
                         ORBEON.xforms.XFormsUi.displayModalProgressPanel();
                     }
                     handled = true;
                 }
-            } else if (target != null && ! $(target).is('.xforms-static') &&
-                    $(target).is('.xforms-select1-appearance-full, .xforms-select-appearance-full, .xforms-input.xforms-type-boolean')) {
+            } else if (controlTarget != null && ! $(controlTarget).is('.xforms-static') &&
+                    $(controlTarget).is('.xforms-select1-appearance-full, .xforms-select-appearance-full, .xforms-input.xforms-type-boolean')) {
                 // Click on checkbox or radio button
 
                 // Update classes right away to give user visual feedback
-                ORBEON.xforms.Controls._setRadioCheckboxClasses(target);
-                var event = new ORBEON.xforms.AjaxEvent(null, target.id, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value");
+                ORBEON.xforms.Controls._setRadioCheckboxClasses(controlTarget);
+                var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, ORBEON.xforms.Controls.getCurrentValue(controlTarget), "xxforms-value");
                 ORBEON.xforms.AjaxClient.fireEvent(event);
                 handled = true;
-            } else if (target != null && $(target).is('.xforms-upload') && $(originalTarget).is('.xforms-upload-remove')) {
+            } else if (controlTarget != null && $(controlTarget).is('.xforms-upload') && $(originalTarget).is('.xforms-upload-remove')) {
                 // Click on remove icon in upload control
-                var event = new ORBEON.xforms.AjaxEvent(null, target.id, "", "xxforms-value");
+                var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, "", "xxforms-value");
                 ORBEON.xforms.AjaxClient.fireEvent(event);
                 handled = true;
-            } else if (target != null && $(target).is('.xforms-help')) {
+            } else if (originalTarget != null && $(originalTarget).is('.xforms-help')) {
                 // Help image
-
-                // Get control for this help image
-                var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help");
                 if (ORBEON.util.Properties.helpHandler.get()) {
                     // We are sending the xforms-help event to the server and the server will tell us what do to
-                    var event = new ORBEON.xforms.AjaxEvent(null, control.id, null, "xforms-help");
+                    var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, null, "xforms-help");
                     ORBEON.xforms.AjaxClient.fireEvent(event);
                 } else {
                     // If the servers tells us there are no event handlers for xforms-help in the page,
                     // we can avoid a round trip and show the help right away
-                    ORBEON.xforms.Controls.showHelp(control);
+                    ORBEON.xforms.Controls.showHelp(controlTarget);
                 }
                 handled = true;
             }

@@ -76,7 +76,12 @@ class XFormsLHHAHandler(
           val containerAtts =
             getContainerAttributes(uri, localname, attributes, getPrefixedId, getEffectiveId, elementAnalysis, currentControl, None)
 
-          withElement("span", prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAtts) {
+          withElement(
+            localName = lhhaElementName(staticLhha.lhhaType),
+            prefix    = handlerContext.findXHTMLPrefix,
+            uri       = XHTML_NAMESPACE_URI,
+            atts      = containerAtts
+          ) {
             for {
               currentLHHAControl <- currentControl.narrowTo[XFormsLHHAControl]
               externalValue      <- currentLHHAControl.externalValueOpt

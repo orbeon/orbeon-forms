@@ -44,6 +44,10 @@ class XFormsLHHAControl(
   override def storeExternalValue(externalValue: String): Unit =
     throw new OXFException("operation not allowed")
 
+  // Allow the client telling us that an external LHHA has the focus, for instance in the case of an `<xf:help>`
+  // rendered as a `<button>` in the headings of a repeated grid.
+  override def isDirectlyFocusableMaybeWithToggle: Boolean = true
+
   // Special evaluation function, as in the case of LHHA, the nested content of the element is a way to evaluate
   // the value.
   override def computeValue: String = {

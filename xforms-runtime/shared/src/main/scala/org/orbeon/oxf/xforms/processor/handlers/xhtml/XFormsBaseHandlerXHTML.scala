@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
-
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -221,6 +221,16 @@ abstract class XFormsBaseHandlerXHTML (
     evaluatedClassValueOpt foreach appendWithSpace
   }
 
+  final protected def lhhaElementName(lhha: LHHA): String = {
+    lhha match {
+      case LHHA.Label => handlerContext.labelElementName
+      case LHHA.Help  => handlerContext.helpElementName
+      case LHHA.Hint  => handlerContext.hintElementName
+      case LHHA.Alert => handlerContext.alertElementName
+    }
+  }
+
+
   final protected def handleLabelHintHelpAlert(
     lhhaAnalysis             : LHHAAnalysis,
     targetControlEffectiveId : String,
@@ -262,15 +272,7 @@ abstract class XFormsBaseHandlerXHTML (
             (null, false)
         }
 
-      val elementName =
-        requestedElementNameOpt getOrElse {
-          lhha match {
-            case LHHA.Label => handlerContext.labelElementName
-            case LHHA.Help  => handlerContext.helpElementName
-            case LHHA.Hint  => handlerContext.hintElementName
-            case LHHA.Alert => handlerContext.alertElementName
-          }
-        }
+      val elementName = requestedElementNameOpt getOrElse lhhaElementName(lhha)
 
       implicit val classes: jl.StringBuilder = new jl.StringBuilder(30)
       // Put user classes first if any
@@ -317,18 +319,17 @@ abstract class XFormsBaseHandlerXHTML (
       appendWithSpace("xforms-")
       classes.append(lhha.entryName)
 
-      // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
-      val newAttributes =
-        if (staticLHHAAttributes ne null)
-          staticLHHAAttributes
-      else
-          new AttributesImpl
-
       lhhaAnalysis.encodeAndAppendAppearances(classes)
+
+      val attributes = {
+        // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
+        val elementAttributes = if (staticLHHAAttributes ne null) staticLHHAAttributes else new AttributesImpl
+        getIdClassXHTMLAttributes(elementAttributes, classes.toString, null)
+      }
 
       XFormsBaseHandlerXHTML.outputLabelFor(
         handlerContext           = handlerContext,
-        attributes               = getIdClassXHTMLAttributes(newAttributes, classes.toString, null),
+        attributes               = attributes,
         targetControlEffectiveId = targetControlEffectiveId,
         forEffectiveIdWithNs     = forEffectiveIdWithNs,
         lhha                     = lhha,

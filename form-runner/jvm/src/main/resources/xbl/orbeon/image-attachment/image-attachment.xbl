@@ -11,19 +11,14 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-        >
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xbl:binding
         id="fr-image-attachment"
@@ -75,7 +70,7 @@
                         <_>
                             <max-width  default=""/>
                             <max-height default=""/>
-                            <quality    default=""/>
+                            <quality    default="80"/>
                             <format     default=""/>
                         </_>
                     </xf:instance>
@@ -101,7 +96,7 @@
                                     xxf:is-blank(../max-width/string()) and
                                     xxf:is-blank(../max-height/string())
                                 ) then
-                                    ''
+                                    @default
                                 else
                                     ."
                             readonly="
@@ -114,14 +109,26 @@
                             <resource xml:lang="en">
                                 <max-width>Adjust to maximum width to</max-width>
                                 <max-height>Adjust to maximum height to</max-height>
-                                <quality>Compression quality</quality>
+                                <quality>
+                                    <label>Compressed image quality</label>
+                                    <item value="90">High (90%)</item>
+                                    <item value="80">Medium (80%)</item>
+                                    <item value="70">Low (70%)</item>
+                                    <item value="50">Very low (50%)</item>
+                                </quality>
                                 <format>Resulting image format</format>
                                 <preserve>Preserve</preserve>
                             </resource>
                             <resource xml:lang="fr">
                                 <max-width>Ajuster la largeur maximale à</max-width>
                                 <max-height>Ajuster la hauteur maximale à</max-height>
-                                <quality>Qualité de la compression</quality>
+                                <quality>
+                                    <label>Qualité de l'image après compression</label>
+                                    <item value="90">Haute (90%)</item>
+                                    <item value="80">Moyenne (80%)</item>
+                                    <item value="70">Basse (70%)</item>
+                                    <item value="50">Très basse (50%)</item>
+                                </quality>
                                 <format>Format d'image résultant</format>
                                 <preserve>Préserver</preserve>
                             </resource>
@@ -143,16 +150,27 @@
                         </fr:number>
                     </fr:c>
                     <fr:c x="1" y="2" w="6">
-                        <fr:number
+                        <fr:open-select1
                             ref="instance('local')/quality"
+                            appearance="minimal"
                             id="quality-control"
+
+                            type="integer"
+
                             suffix="%"
-                            digits-after-decimal="2"
+                            digits-after-decimal="0"
                             round-when-storing="true"
                             round-when-formatting="true">
-                            <xf:label ref="xxf:r('quality')"/>
+
+                            <xf:label ref="xxf:r('quality.label')"/>
                             <xf:alert ref="xxf:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
-                        </fr:number>
+
+                            <xf:itemset ref="xxf:resource-elements('quality.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+
+                        </fr:open-select1>
                     </fr:c>
                     <fr:c x="7" y="2" w="6">
                         <xf:select1 ref="instance('local')/format" id="format-control">

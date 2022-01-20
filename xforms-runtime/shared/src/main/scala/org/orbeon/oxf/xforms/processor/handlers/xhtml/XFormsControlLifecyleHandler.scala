@@ -131,7 +131,7 @@ abstract class XFormsControlLifecyleHandler(
     handleLabelHintHelpAlert(
       getStaticLHHA(getPrefixedId, LHHA.Label),
       getEffectiveId,
-      getForEffectiveId(getEffectiveId),
+      getForEffectiveIdWithNs(getEffectiveId),
       LHHA.Label,
       XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
       currentControl,
@@ -143,7 +143,7 @@ abstract class XFormsControlLifecyleHandler(
       handleLabelHintHelpAlert(
         getStaticLHHA(getPrefixedId, LHHA.Alert),
         getEffectiveId,
-        getForEffectiveId(getEffectiveId),
+        getForEffectiveIdWithNs(getEffectiveId),
         LHHA.Alert,
         None,
         currentControl,
@@ -155,7 +155,7 @@ abstract class XFormsControlLifecyleHandler(
       handleLabelHintHelpAlert(
         getStaticLHHA(getPrefixedId, LHHA.Hint),
         getEffectiveId,
-        getForEffectiveId(getEffectiveId),
+        getForEffectiveIdWithNs(getEffectiveId),
         LHHA.Hint,
         None,
         currentControl,
@@ -167,7 +167,7 @@ abstract class XFormsControlLifecyleHandler(
       handleLabelHintHelpAlert(
         getStaticLHHA(getPrefixedId, LHHA.Help),
         getEffectiveId,
-        getForEffectiveId(getEffectiveId),
+        getForEffectiveIdWithNs(getEffectiveId),
         LHHA.Help,
         None,
         currentControl,
@@ -191,15 +191,15 @@ abstract class XFormsControlLifecyleHandler(
         "id",
         "id",
         XMLReceiverHelper.CDATA,
-        XFormsBaseHandler.getLHHACId(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode)
+        XFormsBaseHandler.getLHHACIdWithNs(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode)
       )
     containerAttributes
   }
 
   // Return the effective id of the element to which label/@for, etc. must point to.
   // Default: point to `foo$bar$$c.1-2-3`
-  def getForEffectiveId(effectiveId: String): String =
-    XFormsBaseHandler.getLHHACId(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.ControlCode)
+  def getForEffectiveIdWithNs(effectiveId: String): String =
+    XFormsBaseHandler.getLHHACIdWithNs(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.ControlCode)
 
   // See https://github.com/orbeon/orbeon-forms/issues/4046
   final lazy val currentControl: XFormsControl =
@@ -207,7 +207,7 @@ abstract class XFormsControlLifecyleHandler(
 
   final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =
     for {
-      attValue      <- ControlAjaxSupport.findAriaBy(elementAnalysis, currentControl, LHHA.Label, condition = _ => true)(containingDocument)
+      attValue      <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl, LHHA.Label, condition = _ => true)(containingDocument)
       attName       = ControlAjaxSupport.AriaLabelledby
     } locally {
       atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
@@ -216,7 +216,7 @@ abstract class XFormsControlLifecyleHandler(
   final protected def handleAriaByAtts(atts: AttributesImpl): Unit =
     for {
       (lhha, attName) <- ControlAjaxSupport.LhhaWithAriaAttName
-      attValue        <- ControlAjaxSupport.findAriaBy(elementAnalysis, currentControl, lhha, condition = _.isForRepeat)(containingDocument)
+      attValue        <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl, lhha, condition = _.isForRepeat)(containingDocument)
     } locally {
       atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
     }

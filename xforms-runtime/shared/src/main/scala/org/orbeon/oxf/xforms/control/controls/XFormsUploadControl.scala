@@ -209,10 +209,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     added
   }
 
-  override def findAriaByControlEffectiveId: Option[String] =
-    Some(
-      containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input"))
-    )
+  override def findAriaByControlEffectiveIdWithNs: Option[String] =
+    containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input")).some
 
   override def getBackCopy: AnyRef = {
     val cloned = super.getBackCopy.asInstanceOf[XFormsUploadControl]

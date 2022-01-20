@@ -363,8 +363,8 @@ class XFormsSelect1Control(
   }
 
   // https://github.com/orbeon/orbeon-forms/issues/3383
-  override def findAriaByControlEffectiveId: Option[String] =
-    super.findAriaByControlEffectiveId
+  override def findAriaByControlEffectiveIdWithNs: Option[String] =
+    super.findAriaByControlEffectiveIdWithNs
 
   // Don't accept focus if we have the internal appearance
   override def isDirectlyFocusableMaybeWithToggle: Boolean =

@@ -73,5 +73,5 @@ class XFormsRangeControl(
     setExternalValue(updatedValue)
   }
 
-  override def findAriaByControlEffectiveId = None
+  override def findAriaByControlEffectiveIdWithNs = None
 }

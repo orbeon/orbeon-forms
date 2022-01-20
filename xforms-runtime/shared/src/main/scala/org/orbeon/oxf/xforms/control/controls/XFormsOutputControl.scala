@@ -283,12 +283,12 @@ class XFormsOutputControl(
       case _ => false
     }
 
-  override def findAriaByControlEffectiveId: Option[String] =
+  override def findAriaByControlEffectiveIdWithNs: Option[String] =
     if (appearances(XXFORMS_TEXT_APPEARANCE_QNAME) ||
         (staticControlOpt exists (c => c.isDownloadAppearance || c.isImageMediatype || c.isHtmlMediatype)))
       None
     else
-      super.findAriaByControlEffectiveId
+      super.findAriaByControlEffectiveIdWithNs
 
   override def getBackCopy: AnyRef = {
     val cloned = super.getBackCopy.asInstanceOf[XFormsOutputControl]

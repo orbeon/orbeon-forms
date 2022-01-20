@@ -223,8 +223,8 @@ class XFormsInputControl(
   }
 
   // Input needs to point to another element
-  override def findAriaByControlEffectiveId: Option[String] =
-    getBuiltinTypeName != "boolean" option XFormsInputHandler.firstInputEffectiveId(effectiveId)(containingDocument)
+  override def findAriaByControlEffectiveIdWithNs: Option[String] =
+    getBuiltinTypeName != "boolean" option XFormsInputHandler.firstInputEffectiveIdWithNs(effectiveId)(containingDocument)
 }
 
 object XFormsInputControl {

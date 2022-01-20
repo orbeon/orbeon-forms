@@ -41,7 +41,7 @@ class XFormsGroupFieldsetHandler(
       // Handle label classes
       reusableAttributes.clear()
       reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, getLabelClasses(groupControl).toString)
-      reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, XFormsBaseHandler.getLHHACId(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(LHHA.Label)))
+      reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, XFormsBaseHandler.getLHHACIdWithNs(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(LHHA.Label)))
 
       // Output `xh:legend` with label content
       val legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend")

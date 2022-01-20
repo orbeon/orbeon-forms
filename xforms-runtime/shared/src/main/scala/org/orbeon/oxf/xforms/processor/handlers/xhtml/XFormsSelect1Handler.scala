@@ -176,7 +176,8 @@ object XFormsSelect1Handler {
           handlerContext           = xformsHandlerContextForItem,
           attributes               = reusableAttributes,
           targetControlEffectiveId = null,
-          forEffectiveId           = null, lhha = LHHA.Label,
+          forEffectiveIdWithNs     = null,
+          lhha                     = LHHA.Label,
           elementName              = labelName,
           addIds                   = false
         )
@@ -240,7 +241,8 @@ object XFormsSelect1Handler {
             handlerContext           = xformsHandlerContextForItem,
             attributes               = reusableAttributes,
             targetControlEffectiveId = null,
-            forEffectiveId           = null, lhha = LHHA.Help,
+            forEffectiveIdWithNs     = null,
+            lhha                     = LHHA.Help,
             elementName              = "span",
             labelValue               = help.label,
             mustOutputHTMLFragment   = help.isHTML,
@@ -256,7 +258,7 @@ object XFormsSelect1Handler {
             handlerContext           = xformsHandlerContextForItem,
             attributes               = reusableAttributes,
             targetControlEffectiveId = null,
-            forEffectiveId           = null,
+            forEffectiveIdWithNs     = null,
             lhha                     = LHHA.Hint, elementName = "span",
             labelValue               = hint.label,
             mustOutputHTMLFragment   = hint.isHTML,
@@ -590,13 +592,13 @@ class XFormsSelect1Handler(
   }
 
   // TODO: return `Option[String]`
-  override def getForEffectiveId(effectiveId: String): String = {
+  override def getForEffectiveIdWithNs(effectiveId: String): String = {
     // For full appearance we don't put a `@for` attribute so that selecting the main label doesn't select the item
     val appearanceTrait = getAppearanceTrait
     if ((appearanceTrait ne null) && appearanceTrait.isFull)
       null
     else
-      super.getForEffectiveId(effectiveId)
+      super.getForEffectiveIdWithNs(effectiveId)
   }
 
   override def handleLabel(): Unit = {
@@ -609,7 +611,7 @@ class XFormsSelect1Handler(
       handleLabelHintHelpAlert(
         lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
         targetControlEffectiveId = getEffectiveId,
-        forEffectiveId           = null,
+        forEffectiveIdWithNs     = null,
         lhha                     = LHHA.Label,
         requestedElementNameOpt  = "span".some, // make element name a `span`, as a label would need a `for`
         controlOrNull            = currentControl,

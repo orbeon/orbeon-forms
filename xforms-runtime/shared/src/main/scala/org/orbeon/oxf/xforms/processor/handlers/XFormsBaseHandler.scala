@@ -117,7 +117,7 @@ object XFormsBaseHandler {
     control != null && control.isStaticReadonly
 
   // E.g. foo$bar.1-2-3 -> foo$bar$$alert.1-2-3
-  def getLHHACId(
+  def getLHHACIdWithNs(
     containingDocument : XFormsContainingDocument,
     controlEffectiveId : String,
     suffix             : String

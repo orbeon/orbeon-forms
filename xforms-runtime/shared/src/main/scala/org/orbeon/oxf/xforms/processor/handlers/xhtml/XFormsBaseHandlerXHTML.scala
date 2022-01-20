@@ -224,7 +224,7 @@ abstract class XFormsBaseHandlerXHTML (
   final protected def handleLabelHintHelpAlert(
     lhhaAnalysis             : LHHAAnalysis,
     targetControlEffectiveId : String,
-    forEffectiveId           : String,
+    forEffectiveIdWithNs     : String,
     lhha                     : LHHA,
     requestedElementNameOpt  : Option[String],
     controlOrNull            : XFormsControl,
@@ -327,15 +327,15 @@ abstract class XFormsBaseHandlerXHTML (
       lhhaAnalysis.encodeAndAppendAppearances(classes)
 
       XFormsBaseHandlerXHTML.outputLabelFor(
-        handlerContext,
-        getIdClassXHTMLAttributes(newAttributes, classes.toString, null),
-        targetControlEffectiveId,
-        forEffectiveId,
-        lhha,
-        elementName,
-        labelHintHelpAlertValue,
-        mustOutputHTMLFragment,
-        isExternal
+        handlerContext           = handlerContext,
+        attributes               = getIdClassXHTMLAttributes(newAttributes, classes.toString, null),
+        targetControlEffectiveId = targetControlEffectiveId,
+        forEffectiveIdWithNs     = forEffectiveIdWithNs,
+        lhha                     = lhha,
+        elementName              = elementName,
+        labelValue               = labelHintHelpAlertValue,
+        mustOutputHTMLFragment   = mustOutputHTMLFragment,
+        addIds                   = isExternal
       )
     }
   }
@@ -407,14 +407,14 @@ object XFormsBaseHandlerXHTML {
     handlerContext           : HandlerContext,
     attributes               : Attributes,
     targetControlEffectiveId : String,
-    forEffectiveId           : String,
+    forEffectiveIdWithNs     : String,
     lhha                     : LHHA,
     elementName              : String,
     labelValue               : String,
     mustOutputHTMLFragment   : Boolean,
     addIds                   : Boolean
   ): Unit = {
-    outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds)
+    outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveIdWithNs, lhha, elementName, addIds)
     outputLabelTextIfNotEmpty(labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)(handlerContext.controller.output)
     outputLabelForEnd(handlerContext, elementName)
   }
@@ -423,7 +423,7 @@ object XFormsBaseHandlerXHTML {
     handlerContext           : HandlerContext,
     attributes               : Attributes,
     targetControlEffectiveId : String,
-    forEffectiveId           : String,
+    forEffectiveIdWithNs     : String,
     lhha                     : LHHA,
     elementName              : String,
     addIds                   : Boolean
@@ -442,7 +442,7 @@ object XFormsBaseHandlerXHTML {
           "",
           "",
           "id",
-          XFormsBaseHandler.getLHHACId(handlerContext.containingDocument, targetControlEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
+          XFormsBaseHandler.getLHHACIdWithNs(handlerContext.containingDocument, targetControlEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
         )
       } else {
         // Remove existing id attribute if any
@@ -450,8 +450,8 @@ object XFormsBaseHandlerXHTML {
       }
 
     // Add @for attribute if specified and element is a label
-    if ((forEffectiveId ne null) && elementName == "label")
-      newAttribute.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, forEffectiveId)
+    if ((forEffectiveIdWithNs ne null) && elementName == "label")
+      newAttribute.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, forEffectiveIdWithNs)
 
     val xhtmlPrefix    = handlerContext.findXHTMLPrefix
     val labelQName     = XMLUtils.buildQName(xhtmlPrefix, elementName)

@@ -238,7 +238,7 @@ object ControlAjaxSupport {
     LHHA.Help  -> AriaDetails
   )
 
-  def findAriaBy(
+  def findAriaByWithNs(
     staticControl      : ElementAnalysis,
     control            : XFormsControl,
     lhha               : LHHA,
@@ -255,12 +255,12 @@ object ControlAjaxSupport {
       if condition(staticLhha)
     } yield
       if (staticLhha.isLocal) {
-        XFormsBaseHandler.getLHHACId(containingDocument, control.effectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
+        XFormsBaseHandler.getLHHACIdWithNs(containingDocument, control.effectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
       } else {
         val suffix    = XFormsId.getEffectiveIdSuffixParts(control.effectiveId)
         val newSuffix = suffix.take(suffix.size - staticLhha.forRepeatNesting)
 
-        XFormsId.buildEffectiveId(staticLhha.prefixedId, newSuffix)
+        containingDocument.namespaceId(XFormsId.buildEffectiveId(staticLhha.prefixedId, newSuffix))
       }
   }
 }

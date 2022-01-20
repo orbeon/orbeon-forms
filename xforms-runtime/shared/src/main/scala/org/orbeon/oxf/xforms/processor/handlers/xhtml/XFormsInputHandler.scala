@@ -118,7 +118,7 @@ class XFormsInputHandler(
 
         // Main input field
         locally {
-          val inputIdName = getFirstInputEffectiveId(getEffectiveId)
+          val inputIdName = getFirstInputEffectiveIdWithNs(getEffectiveId)
           reusableAttributes.clear()
           reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
           if (! isDateMinimal)
@@ -229,17 +229,16 @@ class XFormsInputHandler(
     }
   }
 
-
   // Do as if this was in a component, noscript has to handle that
-  private def getFirstInputEffectiveId(effectiveId: String): String =
-    ! isBoolean option XFormsInputHandler.firstInputEffectiveId(effectiveId)(containingDocument) orNull
+  private def getFirstInputEffectiveIdWithNs(effectiveId: String): String =
+    ! isBoolean option XFormsInputHandler.firstInputEffectiveIdWithNs(effectiveId)(containingDocument) orNull
 
   // Do as if this was in a component, noscript has to handle that
   private def getSecondInputEffectiveId(effectiveId: String): String =
     isDateTime option containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-2")) orNull
 
-  override def getForEffectiveId(effectiveId: String): String =
-    isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, 0) getOrElse getFirstInputEffectiveId(getEffectiveId)
+  override def getForEffectiveIdWithNs(effectiveId: String): String =
+    isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, 0) getOrElse getFirstInputEffectiveIdWithNs(getEffectiveId)
 
   protected override def handleLabel(): Unit =
     if (! (placeHolderInfo exists (_.isLabelPlaceholder)))
@@ -251,6 +250,6 @@ class XFormsInputHandler(
 }
 
 object XFormsInputHandler {
-  def firstInputEffectiveId(effectiveId: String)(containingDocument: XFormsContainingDocument): String =
+  def firstInputEffectiveIdWithNs(effectiveId: String)(containingDocument: XFormsContainingDocument): String =
     containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-1"))
 }

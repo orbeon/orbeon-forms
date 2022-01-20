@@ -109,11 +109,11 @@ class XFormsLHHAHandler(
           }
 
         if (! mustOmitStaticReadonlyHint(staticLhha, effectiveTargetControlOpt)) {
-          val forEffectiveIdOpt =
+          val forEffectiveIdWithNsOpt =
             staticLhha.lhhaType == LHHA.Label option {
               staticLhha.effectiveTargetControlOrPrefixedIdOpt match {
                 case Some(Left(effectiveTargetControl)) =>
-                  findTargetControlForEffectiveId(
+                  findTargetControlForEffectiveIdWithNs(
                     handlerContext,
                     effectiveTargetControl,
                     XFormsId.getRelatedEffectiveId(lhhaEffectiveId, effectiveTargetControl.staticId)
@@ -121,7 +121,7 @@ class XFormsLHHAHandler(
                 case Some(Right(targetPrefixedId)) =>
                   Some(XFormsId.getRelatedEffectiveId(lhhaEffectiveId, XFormsId.getStaticIdFromId(targetPrefixedId)))
                 case None =>
-                  findTargetControlForEffectiveId(
+                  findTargetControlForEffectiveIdWithNs(
                     handlerContext,
                     staticLhha.directTargetControl,
                     XFormsId.getRelatedEffectiveId(lhhaEffectiveId, staticLhha.directTargetControl.staticId)
@@ -132,7 +132,7 @@ class XFormsLHHAHandler(
           handleLabelHintHelpAlert(
             lhhaAnalysis             = staticLhha,
             targetControlEffectiveId = XFormsId.getRelatedEffectiveId(lhhaEffectiveId, staticLhha.directTargetControl.staticId), // `id` placed on the label itself
-            forEffectiveId           = forEffectiveIdOpt.flatten.orNull,
+            forEffectiveIdWithNs     = forEffectiveIdWithNsOpt.flatten.orNull,
             lhha                     = staticLhha.lhhaType,
             requestedElementNameOpt  = None,
             controlOrNull            = effectiveTargetControlOpt.orNull, // to get the value; Q: When can this be `null`?
@@ -149,7 +149,7 @@ class XFormsLHHAHandler(
 
 object XFormsLHHAHandler {
 
-  def findTargetControlForEffectiveId(
+  def findTargetControlForEffectiveIdWithNs(
     handlerContext           : HandlerContext,
     targetControl            : ElementAnalysis,
     targetControlEffectiveId : String
@@ -165,7 +165,7 @@ object XFormsLHHAHandler {
     // NOTE: A possibly simpler better solution would be to always use the `foo$bar$$c.1-2-3` scheme for the `@for` id
     // of a control.
     handlerContext.controller.findHandlerFromElem(targetControl.element) match {
-      case Some(handler: XFormsControlLifecyleHandler) => Option(handler.getForEffectiveId(targetControlEffectiveId))
+      case Some(handler: XFormsControlLifecyleHandler) => Option(handler.getForEffectiveIdWithNs(targetControlEffectiveId))
       case _                                           => None
     }
   }

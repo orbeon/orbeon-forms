@@ -81,7 +81,7 @@ class XXFormsComponentHandler(
       handleLabelHintHelpAlert(
         lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
         targetControlEffectiveId = getEffectiveId,
-        forEffectiveId           = getForEffectiveId(getEffectiveId),
+        forEffectiveIdWithNs     = getForEffectiveIdWithNs(getEffectiveId),
         lhha                     = LHHA.Label,
         requestedElementNameOpt  = (staticControl.commonBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControl)) option "span",
         controlOrNull            = currentControl,
@@ -94,7 +94,7 @@ class XXFormsComponentHandler(
 
   // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
   // NOTE: Used by `handleLabel()` if there is a local LHHA, and by `findTargetControlForEffectiveId`.
-  override def getForEffectiveId(effectiveId: String): String = {
+  override def getForEffectiveIdWithNs(effectiveId: String): String = {
 
     import shapeless._
     import syntax.typeable._
@@ -112,7 +112,7 @@ class XXFormsComponentHandler(
             // Push/pop component context so that handler resolution works
             handlerContext.pushComponentContext(getPrefixedId)
             try
-              XFormsLHHAHandler.findTargetControlForEffectiveId(
+              XFormsLHHAHandler.findTargetControlForEffectiveIdWithNs(
                 handlerContext,
                 effectiveTargetControl,
                 effectiveTargetControl.prefixedId + currentControlSuffix

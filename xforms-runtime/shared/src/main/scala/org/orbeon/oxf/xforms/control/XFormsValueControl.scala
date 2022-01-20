@@ -344,8 +344,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     if (previousControl.isEmpty && ! isStaticReadonly) {
       for {
         (lhha, attName)          <- ControlAjaxSupport.LhhaWithAriaAttName
-        value                    <- ControlAjaxSupport.findAriaBy(staticControlOpt.get, this, lhha, condition = _.isForRepeat)(containingDocument)
-        ariaByControlEffectiveId <- findAriaByControlEffectiveId
+        value                    <- ControlAjaxSupport.findAriaByWithNs(staticControlOpt.get, this, lhha, condition = _.isForRepeat)(containingDocument)
+        ariaByControlEffectiveId <- findAriaByControlEffectiveIdWithNs
       } locally {
         ControlAjaxSupport.outputAttributeElement(
           previousControl,
@@ -360,8 +360,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
   // Can be overridden by subclasses
   // This is the effective id of the element which may have an `aria-labelledby`, etc. attribute. So an `<input>`, `<textarea>`,
   // etc. HTML element id. This is needed so that the Ajax update can know how to update the attribute.
-  def findAriaByControlEffectiveId: Option[String] =
-    Some(XFormsBaseHandler.getLHHACId(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode))
+  def findAriaByControlEffectiveIdWithNs: Option[String] =
+    Some(XFormsBaseHandler.getLHHACIdWithNs(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode))
 
   protected def outputValueElement(
     attributesImpl : AttributesImpl,

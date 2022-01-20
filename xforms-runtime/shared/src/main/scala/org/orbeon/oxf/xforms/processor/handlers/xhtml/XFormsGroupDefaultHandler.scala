@@ -81,15 +81,15 @@ class XFormsGroupDefaultHandler(
     reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes.toString)
 
     XFormsBaseHandlerXHTML.outputLabelFor(
-      handlerContext,
-      reusableAttributes,
-      effectiveId,
-      effectiveId,
-      LHHA.Label,
-      handlerContext.labelElementName,
-      getLabelValue(groupControl),
-      isHtmlLabel,
-      addIds = false
+      handlerContext           = handlerContext,
+      attributes               = reusableAttributes,
+      targetControlEffectiveId = effectiveId,
+      forEffectiveIdWithNs     = containingDocument.namespaceId(effectiveId),
+      lhha                     = LHHA.Label,
+      elementName              = handlerContext.labelElementName,
+      labelValue               = getLabelValue(groupControl),
+      mustOutputHTMLFragment   = isHtmlLabel,
+      addIds                   = false
     )
   }
 }

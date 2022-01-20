@@ -143,7 +143,15 @@
                                     else  $binding
                                 </xsl:attribute>
                                 <xsl:if test="@type = ('integer', 'decimal')">
-                                    <xsl:copy-of select="@prefix | @suffix"/>
+                                    <xsl:copy-of
+                                        select="
+                                            @prefix                |
+                                            @suffix                |
+                                            @decimal-separator     |
+                                            @grouping-separator    |
+                                            @digits-after-decimal  |
+                                            @round-when-formatting |
+                                            @round-when-storing"/>
                                 </xsl:if>
                                 <xf:label class="xforms-hidden" ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
                             </xsl:element>

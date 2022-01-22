@@ -59,19 +59,27 @@
 
                     <xf:action event="xforms-model-construct-done">
                         <xf:action iterate="instance('local')/*">
-                            <xf:var name="c" value="."/>
+                            <xf:var name="local-elem"  value="."/>
+                            <xf:var name="param-name"  value="name($local-elem)"/>
+                            <xf:var name="control-att" value="instance()/@*[name() = concat('transform-', $param-name)]"/>
                             <xf:setvalue
-                                ref="$c"
-                                value="(instance()/@*[name() = concat('transform-', name($c))], $c/@default)[1]"/>
+                                ref="$local-elem"
+                                value="
+                                    if (empty($control-att)) then
+                                        -1
+                                    else if (xxf:is-blank($control-att)) then
+                                        $local-elem/@default
+                                    else
+                                        $control-att"/>
                         </xf:action>
                     </xf:action>
 
                     <xf:instance id="local" xxf:exclude-result-prefixes="#all">
                         <_>
-                            <max-width  default=""/>
-                            <max-height default=""/>
+                            <max-width  default="-2"/>
+                            <max-height default="-2"/>
                             <quality    default="80"/>
-                            <format     default=""/>
+                            <format     default="-2"/>
                         </_>
                     </xf:instance>
 
@@ -80,46 +88,58 @@
                             ref="max-width | max-height"
                             type="xf:integer"
                             xxf:whitespace="trim"
-                            constraint="string(.) = '' or xxf:positive()"/>
+                            constraint=". = (-1, -2) or xxf:positive()"/>
                         <xf:bind
                             ref="quality"
                             type="xf:integer"
                             xxf:whitespace="trim"
-                            constraint="string(.) = '' or (xxf:positive() and . le 100)"/>
-                        <xf:bind
-                            ref="format"
-                            type="xf:string"/>
-                        <xf:bind
-                            ref="quality | format"
-                            calculate="
-                                if (
-                                    xxf:is-blank(../max-width/string()) and
-                                    xxf:is-blank(../max-height/string())
-                                ) then
-                                    @default
-                                else
-                                    ."
-                            readonly="
-                                xxf:is-blank(../max-width/string()) and
-                                xxf:is-blank(../max-height/string())"/>
+                            constraint=". = -1 or (xxf:positive() and . le 100)"/>
+                        <!-- We don't need or want this fancy logic since it is allowed to override just `quality` or
+                             `format` at the control level. -->
+<!--                        <xf:bind-->
+<!--                            ref="quality | format"-->
+<!--                            calculate="-->
+<!--                                if (-->
+<!--                                    xxf:is-blank(../max-width/string()) and-->
+<!--                                    xxf:is-blank(../max-height/string())-->
+<!--                                ) then-->
+<!--                                    @default-->
+<!--                                else-->
+<!--                                    ."-->
+<!--                            readonly="-->
+<!--                                xxf:is-blank(../max-width/string()) and-->
+<!--                                xxf:is-blank(../max-height/string())"/>-->
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
                         <_>
                             <resource xml:lang="en">
-                                <max-width>Adjust to maximum width to</max-width>
-                                <max-height>Adjust to maximum height to</max-height>
+                                <max-width>
+                                    <label>Adjust to maximum width to</label>
+                                    <item value="-1">Use default</item>
+                                    <item value="-2">No adjustment</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Adjust to maximum height to</label>
+                                </max-height>
                                 <quality>
                                     <label>Compressed image quality</label>
+                                    <item value="-1">Use default</item>
                                     <item value="90">High (90%)</item>
                                     <item value="80">Medium (80%)</item>
                                     <item value="70">Low (70%)</item>
                                     <item value="50">Very low (50%)</item>
                                 </quality>
-                                <format>Resulting image format</format>
-                                <preserve>Preserve</preserve>
+                                <format>
+                                    <label>Resulting image format</label>
+                                    <item value="-1">Use default</item>
+                                    <item value="-2">Preserve</item>
+                                </format>
                             </resource>
                             <resource xml:lang="fr">
+
+                                TODO i18n
+
                                 <max-width>Ajuster la largeur maximale à</max-width>
                                 <max-height>Ajuster la hauteur maximale à</max-height>
                                 <quality>
@@ -138,18 +158,61 @@
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-download-grid">
                     <fr:c x="1" y="1" w="6">
-                        <fr:number ref="instance('local')/max-width" id="max-width-control" suffix="px">
-                            <xf:label ref="xxf:r('max-width')"/>
+                        <fr:open-select1
+                            ref="instance('local')/max-width"
+                            appearance="minimal"
+                            id="max-width-control"
+
+                            type="integer"
+
+                            suffix="px">
+                            <xf:label ref="xxf:r('max-width.label')"/>
                             <xf:alert ref="xxf:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
-                        </fr:number>
+
+                            <xf:itemset ref="xxf:resource-elements('max-width.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+
+                        </fr:open-select1>
                     </fr:c>
                     <fr:c x="7" y="1" w="6">
-                        <fr:number ref="instance('local')/max-height" id="max-height-control" suffix="px">
-                            <xf:label ref="xxf:r('max-height')"/>
+                        <fr:open-select1
+                            ref="instance('local')/max-height"
+                            appearance="minimal"
+                            id="max-height-control"
+
+                            type="integer"
+
+                            suffix="px">
+                            <xf:label ref="xxf:r('max-height.label')"/>
                             <xf:alert ref="xxf:r('components.parameters-editor.name.alert', '|fr-form-resources|')"/>
-                        </fr:number>
+
+                            <xf:itemset ref="xxf:resource-elements('max-width.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+
+                        </fr:open-select1>
                     </fr:c>
                     <fr:c x="1" y="2" w="6">
+                        <xf:select1 ref="instance('local')/format" id="format-control">
+                            <xf:label ref="xxf:r('format.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('format.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+                            <xf:item>
+                                <xf:label>JPEG</xf:label>
+                                <xf:value>jpg</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>PNG</xf:label>
+                                <xf:value>png</xf:value>
+                            </xf:item>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="7" y="2" w="6">
                         <fr:open-select1
                             ref="instance('local')/quality"
                             appearance="minimal"
@@ -172,23 +235,6 @@
 
                         </fr:open-select1>
                     </fr:c>
-                    <fr:c x="7" y="2" w="6">
-                        <xf:select1 ref="instance('local')/format" id="format-control">
-                            <xf:label ref="xxf:r('format')"/>
-                            <xf:item>
-                                <xf:label ref="xxf:r('preserve')"/>
-                                <xf:value/>
-                            </xf:item>
-                            <xf:item>
-                                <xf:label>JPEG</xf:label>
-                                <xf:value>jpg</xf:value>
-                            </xf:item>
-                            <xf:item>
-                                <xf:label>PNG</xf:label>
-                                <xf:value>png</xf:value>
-                            </xf:item>
-                        </xf:select1>
-                    </fr:c>
                 </fr:grid>
                 <xf:action
                     id="fb-editor-action"
@@ -200,30 +246,32 @@
                         format-control">
 
                     <xf:var
-                        name="name"
+                        name="param-name"
                         value="name(event('xxf:binding'))"/>
 
                     <xf:var
                         name="new-value"
                         value="
                             let $binding := event('xxf:binding'),
-                                $v       := string($binding),
+                                $v       := $binding/string(),
                                 $default := $binding/@default/string()
                             return
-                                if ($v != $default) then
-                                    $v
-                                else
+                                if ($v = '-1') then
                                     ()
+                                else if ($v = $default) then
+                                    ''
+                                else
+                                    $v
                         "/>
 
                     <xf:insert
                         context="instance()"
                         if="exists($new-value)"
                         origin="
-                            xf:attribute(concat('transform-', $name), $new-value)"/>
+                            xf:attribute(concat('transform-', $param-name), $new-value)"/>
                     <xf:delete
                         if="empty($new-value)"
-                        ref="instance()/@*[name() = concat('transform-', $name)]"/>
+                        ref="instance()/@*[name() = concat('transform-', $param-name)]"/>
                 </xf:action>
             </control-details>
 

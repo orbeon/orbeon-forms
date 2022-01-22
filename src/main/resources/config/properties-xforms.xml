@@ -199,7 +199,6 @@
         fr:bootstrap-select1
         fr:boolean-input
         fr:yesno-input
-        fr:open-select1
         fr:tree-select1
         fr:dropdown-select1-search
         fr:databound-select1-search

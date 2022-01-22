@@ -77,28 +77,28 @@ object FormRunnerPrivateAPI extends js.Object {
 
     if (location.pathname.endsWith(NewPathSuffix)) {
 
-      var newSearch = {
-         val supportsURLSearchParams = global.URLSearchParams.asInstanceOf[UndefOr[URLSearchParams]].isDefined
-         if (supportsURLSearchParams) {
-           val urlSearchParams =  new URLSearchParams(location.search)
-           urlSearchParams.delete("draft")
-           if (isDraft.toBoolean) urlSearchParams.set("draft", "true")
-           urlSearchParams.toString match {
-             case ""                     => ""
-             case _ @ stringSearchParams => s"?$stringSearchParams"
-           }
-         } else {
-           // IE11 is the last browser not to support `URLSearchParams`; in this case, don't bother updating `draft`
-           location.search
-         }
-       }
+      val newSearch = {
+        val supportsURLSearchParams = global.URLSearchParams.asInstanceOf[UndefOr[URLSearchParams]].isDefined
+        if (supportsURLSearchParams) {
+          val urlSearchParams = new URLSearchParams(location.search)
+          urlSearchParams.delete("draft")
+          if (isDraft.toBoolean) urlSearchParams.set("draft", "true")
+          urlSearchParams.toString match {
+            case ""                 => ""
+            case stringSearchParams => s"?$stringSearchParams"
+          }
+        } else {
+          // IE11 is the last browser not to support `URLSearchParams`; in this case, don't bother updating `draft`
+          location.search
+        }
+      }
 
       // `search`: for example `?form-version=42`
       // `hash`: for now not used by Form Runner, but it is safer to keep it
       dom.window.history.replaceState(
         statedata = dom.window.history.state,
         title     = "",
-        url       = s"edit/$documentId${newSearch}${location.hash}"
+        url       = s"edit/$documentId$newSearch${location.hash}"
       )
     }
   }

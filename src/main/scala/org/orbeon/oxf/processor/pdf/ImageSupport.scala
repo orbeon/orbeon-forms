@@ -13,17 +13,28 @@
  */
 package org.orbeon.oxf.processor.pdf
 
+import net.coobird.thumbnailator.Thumbnails
+import org.apache.commons.fileupload.FileItem
+import org.orbeon.datatypes.Mediatype
+import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.http.HttpMethod.GET
+import org.orbeon.oxf.processor.generator.RequestGenerator
+
 import java.awt.geom.AffineTransform
 import java.awt.image.{AffineTransformOp, BufferedImage}
 import java.io.{ByteArrayOutputStream, InputStream}
-
 import javax.imageio.stream.MemoryCacheImageOutputStream
 import javax.imageio.{IIOImage, ImageIO, ImageWriteParam}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.ImageMetadata
+import org.orbeon.oxf.util.{Connection, ConnectionResult, ImageMetadata, IndentedLogger, Mediatypes, NetUtils, PathUtils}
+import org.orbeon.oxf.util.ImageMetadata.AllMetadata
 
+import java.net.URI
 import scala.jdk.CollectionConverters._
+import scala.util.{Failure, Success, Try}
+
 
 object ImageSupport {
 
@@ -126,4 +137,77 @@ object ImageSupport {
       case None =>
         throw new IllegalArgumentException("can't find encoder for image")
     }
+
+  def maybeTransformImage(
+    existingURi     : URI,
+    maxWidthOpt     : Option[Int],
+    maxHeightOpt    : Option[Int],
+    mediatypeOpt    : Option[Mediatype],
+    qualityOpt      : Option[Float])(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): Try[(URI, Long)] = {
+
+    def connectGet: ConnectionResult =
+      Connection.connectNow(
+        method          = GET,
+        url             = existingURi,
+        credentials     = None,
+        content         = None,
+        headers         = Map.empty,
+        loadState       = false,
+        saveState       = false,
+        logBody         = false
+      )
+
+    // First read the metadata
+    def allMetadataTry(): Try[AllMetadata] =
+      ConnectionResult.tryWithSuccessConnection(connectGet, closeOnSuccess = true)(is =>
+        ImageMetadata.findAllMetadata(is)
+          .fold[Try[AllMetadata]](
+            Failure(new IllegalArgumentException("metadata not found"))
+          )(
+            Success.apply
+          )
+      ).flatten
+
+    def mustTransform(metadata: AllMetadata): Boolean = {
+      maxWidthOpt .exists(metadata.width  >) ||
+      maxHeightOpt.exists(metadata.height >) ||
+      mediatypeOpt.exists(metadata.mediatype !=)
+    }
+
+    def transformToFileItemTry(fileItem: FileItem): Try[Unit] =
+      ConnectionResult.tryWithSuccessConnection(connectGet, closeOnSuccess = true) { is =>
+
+        var b = Thumbnails.of(is)
+        maxWidthOpt foreach { maxWidth =>
+          b = b.width(maxWidth)
+        }
+        maxHeightOpt foreach { maxHeight =>
+          b = b.height(maxHeight)
+        }
+        qualityOpt foreach { quality =>
+          b = b.outputQuality(quality)
+        }
+        mediatypeOpt map (_.toString) flatMap Mediatypes.findExtensionForMediatype foreach { format =>
+          b = b.outputFormat(format)
+        }
+
+        useAndClose(fileItem.getOutputStream) { os =>
+          b.toOutputStream(os)
+        }
+      }
+
+    for {
+      allMetadata <- allMetadataTry()
+      if mustTransform(allMetadata)
+      fileItem    = NetUtils.prepareFileItem(NetUtils.SESSION_SCOPE, logger.logger.logger)
+      _           <- transformToFileItemTry(fileItem)
+    } yield
+      (
+        new URI(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.SESSION_SCOPE)),
+        fileItem.getSize
+      )
+  }
 }

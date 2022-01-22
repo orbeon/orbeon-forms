@@ -138,6 +138,7 @@ val CoreLibraryDependencies = Seq(
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
   "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.69", // for `openpdf`, also pulls `bcprov` and `bcpkix`
   "com.drewnoakes"              % "metadata-extractor"              % "2.16.0",
+  "net.coobird"                 % "thumbnailator"                   % ThumbnailatorVersion,
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
 
   "javax.servlet"               %  "javax.servlet-api"              % ServletApiVersion % Provided,
@@ -581,8 +582,6 @@ lazy val formRunnerJVM = formRunner.jvm
   ).settings(
     libraryDependencies += "javax.servlet" % "javax.servlet-api" % ServletApiVersion  % Provided,
     libraryDependencies += "javax.portlet" %  "portlet-api"      % PortletApiVersion  % Provided,
-
-    libraryDependencies += "net.coobird"    % "thumbnailator"    % ThumbnailatorVersion,
 
     libraryDependencies                ++= Seq(
       "io.circe" %%% "circe-core",

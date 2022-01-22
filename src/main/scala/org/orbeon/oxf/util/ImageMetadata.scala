@@ -13,21 +13,24 @@
  */
 package org.orbeon.oxf.util
 
-import java.io.InputStream
-
 import com.drew.imaging.ImageMetadataReader
+import com.drew.metadata.Metadata
 import com.drew.metadata.bmp.BmpHeaderDirectory
 import com.drew.metadata.gif.GifHeaderDirectory
 import com.drew.metadata.jpeg.JpegDirectory
 import com.drew.metadata.png.PngDirectory
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
+import org.orbeon.datatypes.Mediatype
 
+import java.io.InputStream
 import scala.jdk.CollectionConverters._
 
 
 // Functions to extract image metadata from a stream
 object ImageMetadata {
+
+  case class AllMetadata(mediatype: Mediatype, width: Int, height: Int, orientation: Option[Int])
 
   sealed trait MetadataType extends EnumEntry with Lowercase
 
@@ -46,9 +49,27 @@ object ImageMetadata {
     KnownNamesToMetadataExtractorNames.get(name) flatMap (findMetadata(content, _))
 
   // Try to find the type of the image
-  def findImageMediatype(content: InputStream): Option[String] = {
+  def findImageMediatype(content: InputStream): Option[String] =
+    findImageMediatypeFromMetadata(ImageMetadataReader.readMetadata(content))
+
+  def findAllMetadata(content: InputStream): Option[AllMetadata] = {
+
     val metadata = ImageMetadataReader.readMetadata(content)
 
+    val mediatypeOpt =
+      findImageMediatypeFromMetadata(metadata) collect {
+        case Mediatype(mediatype) => mediatype
+      }
+
+    for {
+      mediatype   <- mediatypeOpt
+      width       <- findMetadataFromMetadataAsInt(metadata, MetadataType.Width)
+      height      <- findMetadataFromMetadataAsInt(metadata, MetadataType.Height)
+    } yield
+      AllMetadata(mediatype, width, height, findMetadataFromMetadataAsInt(metadata, MetadataType.Orientation))
+  }
+
+  private def findImageMediatypeFromMetadata(metadata: Metadata): Option[String] = {
     // Support formats thar are supported by web browsers only
     // http://en.wikipedia.org/wiki/Comparison_of_web_browsers#Image_format_support
     metadata.getDirectories.asScala.iterator collectFirst {
@@ -59,10 +80,15 @@ object ImageMetadata {
     }
   }
 
-  // Try to extract the value of the given metadata item
-  private def findMetadata(content: InputStream, name: String): Option[Any] = {
+  private def findMetadataFromMetadataAsInt(metadata: Metadata, metadataType: MetadataType): Option[Int] =
+    KnownNamesToMetadataExtractorNames.get(metadataType) flatMap (findMetadataFromMetadata(metadata, _)) collect {
+      case i: Int => i.intValue
+      case other =>
+        println(other)
+        42
+    }
 
-    val metadata = ImageMetadataReader.readMetadata(content)
+  private def findMetadataFromMetadata(metadata: Metadata, name: String): Option[Any] = {
 
     val directoryIterator =
       for {
@@ -77,6 +103,10 @@ object ImageMetadata {
       case (directory, map) if map.contains(name) => directory.getObject(map(name))
     }
   }
+
+  // Try to extract the value of the given metadata item
+  private def findMetadata(content: InputStream, name: String): Option[Any] =
+    findMetadataFromMetadata(ImageMetadataReader.readMetadata(content), name)
 
   private val KnownNamesToMetadataExtractorNames = Map[MetadataType, String](
     MetadataType.Width       -> "Image Width",

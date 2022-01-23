@@ -14,24 +14,22 @@
 package org.orbeon.oxf.processor.pdf
 
 import net.coobird.thumbnailator.Thumbnails
-import org.apache.commons.fileupload.FileItem
 import org.orbeon.datatypes.Mediatype
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.ImageMetadata.AllMetadata
+import org.orbeon.oxf.util.{Connection, ConnectionResult, ImageMetadata, IndentedLogger, Mediatypes, NetUtils}
 
 import java.awt.geom.AffineTransform
 import java.awt.image.{AffineTransformOp, BufferedImage}
-import java.io.{ByteArrayOutputStream, InputStream}
+import java.io.{ByteArrayOutputStream, InputStream, OutputStream}
+import java.net.URI
 import javax.imageio.stream.MemoryCacheImageOutputStream
 import javax.imageio.{IIOImage, ImageIO, ImageWriteParam}
-import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, ImageMetadata, IndentedLogger, Mediatypes, NetUtils, PathUtils}
-import org.orbeon.oxf.util.ImageMetadata.AllMetadata
-
-import java.net.URI
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success, Try}
 
@@ -138,7 +136,13 @@ object ImageSupport {
         throw new IllegalArgumentException("can't find encoder for image")
     }
 
-  def maybeTransformImage(
+  // Implementation notes:
+  //
+  // - In this current implementation, this function may dereference and start reading the `URI` twice. This is ok in
+  //   the main use case where the `URI` points to a temporary file on disk.
+  // - In the future, we could separate the writing of the result from this function. Right now, it writes to a new
+  //   temporary file and returns a `URI` pointing to it.
+  def tryMaybeTransformImage(
     existingURi     : URI,
     maxWidthOpt     : Option[Int],
     maxHeightOpt    : Option[Int],
@@ -161,7 +165,7 @@ object ImageSupport {
       )
 
     // First read the metadata
-    def allMetadataTry(): Try[AllMetadata] =
+    def tryReadAllMetadata(): Try[AllMetadata] =
       ConnectionResult.tryWithSuccessConnection(connectGet, closeOnSuccess = true)(is =>
         ImageMetadata.findAllMetadata(is)
           .fold[Try[AllMetadata]](
@@ -177,7 +181,7 @@ object ImageSupport {
       mediatypeOpt.exists(metadata.mediatype !=)
     }
 
-    def transformToFileItemTry(fileItem: FileItem): Try[Unit] =
+    def tryReadAndTransformToOutputStream(os: OutputStream): Try[Unit] =
       ConnectionResult.tryWithSuccessConnection(connectGet, closeOnSuccess = true) { is =>
 
         var b = Thumbnails.of(is)
@@ -194,16 +198,14 @@ object ImageSupport {
           b = b.outputFormat(format)
         }
 
-        useAndClose(fileItem.getOutputStream) { os =>
-          b.toOutputStream(os)
-        }
+        b.toOutputStream(os)
       }
 
     for {
-      allMetadata <- allMetadataTry()
+      allMetadata <- tryReadAllMetadata()
       if mustTransform(allMetadata)
       fileItem    = NetUtils.prepareFileItem(NetUtils.SESSION_SCOPE, logger.logger.logger)
-      _           <- transformToFileItemTry(fileItem)
+      _           <- useAndClose(fileItem.getOutputStream)(tryReadAndTransformToOutputStream)
     } yield
       (
         new URI(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.SESSION_SCOPE)),

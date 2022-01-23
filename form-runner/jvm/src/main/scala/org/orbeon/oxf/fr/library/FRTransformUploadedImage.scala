@@ -40,6 +40,28 @@ class FRTransformUploadedImage extends FunctionSupport with RuntimeDependentFunc
     val hasAtLeastOneTransformParameter =
       maxWidthOpt.isDefined || maxHeightOpt.isDefined || mediatypeOpt.isDefined
 
+    def updateExtensionIfNeeded(filename: String, mediatype: Mediatype): Option[String] = {
+      for {
+        oldExt <- PathUtils.findExtension(filename)
+        newExt <- Mediatypes.findExtensionForMediatype(mediatype.toString)
+        if oldExt != newExt
+        newFilename <- PathUtils.maybeReplaceExtension(filename, newExt)
+      } yield
+        newFilename
+    }
+
+    def updatedFilename(filename: String, mediatypeOpt: Option[Mediatype]): String = {
+
+      val newFilenameOpt =
+        for {
+          mediatype   <- mediatypeOpt
+          newFilename <- updateExtensionIfNeeded(filename, mediatype)
+        } yield
+          newFilename
+
+      newFilenameOpt getOrElse filename
+    }
+
     if (hasAtLeastOneTransformParameter)
       bindingValue.trimAllToOpt foreach { uriString =>
 
@@ -47,7 +69,7 @@ class FRTransformUploadedImage extends FunctionSupport with RuntimeDependentFunc
         require(PathUtils.getProtocol(uriString) == "file")
         require(XFormsUploadControl.verifyMAC(uriString))
 
-        ImageSupport.maybeTransformImage(
+        ImageSupport.tryMaybeTransformImage(
           new URI(uriString),
           maxWidthOpt,
           maxHeightOpt,
@@ -58,7 +80,7 @@ class FRTransformUploadedImage extends FunctionSupport with RuntimeDependentFunc
             XFormsUploadControl.updateExternalValueAndMetadata(
               boundNode   = binding,
               rawNewValue = newUri.toString,
-              filename    = binding attValueOpt "filename", // unchanged
+              filename    = binding attValueOpt "filename" map (updatedFilename(_, mediatypeOpt)),
               mediatype   = mediatypeStringOpt orElse (binding attValueOpt "mediatype"),
               size        = newSize
             )

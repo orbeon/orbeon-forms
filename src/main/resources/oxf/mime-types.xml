@@ -22,8 +22,8 @@
     <!-- Common image formats -->
     <mime-type>
         <name>image/jpeg</name>
+        <pattern>*.jpg</pattern> <!-- most common extension first -->
         <pattern>*.jpeg</pattern>
-        <pattern>*.jpg</pattern>
         <pattern>*.jpe</pattern>
     </mime-type>
     <mime-type>

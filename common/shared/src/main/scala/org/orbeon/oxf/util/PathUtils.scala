@@ -92,6 +92,12 @@ object PathUtils {
       case index => Some(path.substring(index + 1))
     }
 
+  def maybeReplaceExtension(path: String, ext: String): Option[String] =
+    path.lastIndexOf(".") match {
+      case -1    => None
+      case index => Some(path.substring(0, index + 1) + ext)
+    }
+
   // Append a query string to an URL. This adds a '?' or a '&' or nothing, as needed.
   // The given query string is appended without further encoding.
   def appendQueryString(pathQuery: String, queryString: String): String =

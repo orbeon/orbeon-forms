@@ -101,7 +101,7 @@ object Mediatypes {
       private var state: State = DefaultState
       private var name: String = null
 
-      private var buffer = ListBuffer[Mapping]()
+      private val buffer = ListBuffer[Mapping]()
 
       def resultAsList: List[Mapping] = buffer.result()
 

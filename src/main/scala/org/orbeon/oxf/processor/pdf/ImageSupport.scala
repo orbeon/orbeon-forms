@@ -169,8 +169,7 @@ object ImageSupport {
       ConnectionResult.tryWithSuccessConnection(connectGet, closeOnSuccess = true)(is =>
         ImageMetadata.findAllMetadata(is)
           .fold[Try[AllMetadata]](
-            Failure(new IllegalArgumentException("metadata not found"))
-          )(
+            Failure(new IllegalArgumentException("metadata not found")))(
             Success.apply
           )
       ).flatten
@@ -181,21 +180,22 @@ object ImageSupport {
       mediatypeOpt.exists(metadata.mediatype !=)
     }
 
-    def tryReadAndTransformToOutputStream(os: OutputStream): Try[Unit] =
+    def tryReadAndTransformToOutputStream(metadata: AllMetadata, os: OutputStream): Try[Unit] =
       ConnectionResult.tryWithSuccessConnection(connectGet, closeOnSuccess = true) { is =>
 
         var b = Thumbnails.of(is)
-        maxWidthOpt foreach { maxWidth =>
+
+        maxWidthOpt filter (metadata.width >) foreach { maxWidth =>
           b = b.width(maxWidth)
         }
-        maxHeightOpt foreach { maxHeight =>
+        maxHeightOpt filter (metadata.height >) foreach { maxHeight =>
           b = b.height(maxHeight)
-        }
-        qualityOpt foreach { quality =>
-          b = b.outputQuality(quality)
         }
         mediatypeOpt map (_.toString) flatMap Mediatypes.findExtensionForMediatype foreach { format =>
           b = b.outputFormat(format)
+        }
+        qualityOpt foreach { quality =>
+          b = b.outputQuality(quality)
         }
 
         b.toOutputStream(os)
@@ -205,7 +205,7 @@ object ImageSupport {
       allMetadata <- tryReadAllMetadata()
       if mustTransform(allMetadata)
       fileItem    = NetUtils.prepareFileItem(NetUtils.SESSION_SCOPE, logger.logger.logger)
-      _           <- useAndClose(fileItem.getOutputStream)(tryReadAndTransformToOutputStream)
+      _           <- useAndClose(fileItem.getOutputStream)(tryReadAndTransformToOutputStream(allMetadata, _))
     } yield
       (
         new URI(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.SESSION_SCOPE)),

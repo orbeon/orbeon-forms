@@ -2620,7 +2620,7 @@
         </dialog-workflow>
         <xbl-control-settings>
             <field-width>Largeur du champs</field-width>
-            <default>Défaut</default>
+            <default>Utiliser le défaut</default>
             <full>Espace disponible</full>
             <natural>Naturel</natural>
             <learn-settings-below>Plus d'information à propos des configurations ci-dessous</learn-settings-below>

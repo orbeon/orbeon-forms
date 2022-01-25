@@ -137,20 +137,27 @@
                                 </format>
                             </resource>
                             <resource xml:lang="fr">
-
-                                TODO i18n
-
-                                <max-width>Ajuster la largeur maximale à</max-width>
-                                <max-height>Ajuster la hauteur maximale à</max-height>
+                                <max-width>
+                                    <label>Ajuster la largeur maximale à</label>
+                                    <item value="-1">Utiliser le défaut</item>
+                                    <item value="-2">Ne pas ajuster</item>
+                                </max-width>
+                                <max-height>
+                                    <label>Ajuster la hauteur maximale à</label>
+                                </max-height>
                                 <quality>
                                     <label>Qualité de l'image après compression</label>
+                                    <item value="-1">Utiliser le défaut</item>
                                     <item value="90">Haute (90%)</item>
                                     <item value="80">Moyenne (80%)</item>
                                     <item value="70">Basse (70%)</item>
                                     <item value="50">Très basse (50%)</item>
                                 </quality>
-                                <format>Format d'image résultant</format>
-                                <preserve>Préserver</preserve>
+                                <format>
+                                    <label>Format d'image résultant</label>
+                                    <item value="-1">Utiliser le défaut</item>
+                                    <item value="-2">Préserver</item>
+                                </format>
                             </resource>
                         </_>
                     </xf:instance>

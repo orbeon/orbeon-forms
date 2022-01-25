@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsActionInterpreter, XFormsActions}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, EventHandler, PartEventHandlerAnalysis}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -74,7 +74,7 @@ object Dispatch extends Logging {
           return
         }
 
-        staticTarget.handlersForEvent(event.name, handlersForEventImpl(staticOps, staticTarget, _))
+        staticTarget.handlersForEvent(event.name, handlersForEventImpl(target.container.getPartAnalysis, staticTarget, _))
       }
 
       // Call native listeners on target if any
@@ -365,7 +365,7 @@ object Dispatch extends Logging {
 
   // Find all the handlers for the given event name if an event with that name is dispatched to this element.
   // For all relevant observers, find the handlers which match by phase
-  private def handlersForEventImpl(ops: PartGlobalOps, e: ElementAnalysis, eventName: String): HandlerAnalysis = {
+  private def handlersForEventImpl(ops: PartEventHandlerAnalysis, e: ElementAnalysis, eventName: String): HandlerAnalysis = {
 
     // NOTE: For `phase == Target`, `observer eq element`.
     def relevantHandlersForObserverByPhaseAndName(observer: ElementAnalysis, phase: Phase) = {
@@ -469,7 +469,7 @@ object Dispatch extends Logging {
   }
 
   // Find all observers (including in ancestor parts) which either match the current scope or have a phantom handler
-  private def relevantObserversAcrossPartsFromLeafToRoot(ops: PartGlobalOps, e: ElementAnalysis): NonEmptyList[ElementAnalysis] = {
+  private def relevantObserversAcrossPartsFromLeafToRoot(ops: PartEventHandlerAnalysis, e: ElementAnalysis): NonEmptyList[ElementAnalysis] = {
 
     def hasPhantomHandler(observer: ElementAnalysis) =
       ops.getEventHandlersForObserver(observer.prefixedId) exists (_.isPhantom)

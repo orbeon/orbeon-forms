@@ -32,7 +32,8 @@ trait PartAnalysisForStaticMetadataAndProperties {
 
 trait PartAnalysis
   extends PartAnalysisRuntimeOps
-     with PartAnalysisForStaticMetadataAndProperties{
+     with PartAnalysisForStaticMetadataAndProperties
+     with PartEventHandlerAnalysis {
 
   private def partAnalysisIterator(start: Option[PartAnalysis]): Iterator[PartAnalysis] =
     new Iterator[PartAnalysis] {

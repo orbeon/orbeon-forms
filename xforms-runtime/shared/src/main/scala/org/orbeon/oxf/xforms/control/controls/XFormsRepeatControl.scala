@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import java.{util => ju}
-
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.Element
@@ -447,6 +446,8 @@ class XFormsRepeatControl(
           )) {
             // Dispatch destruction events and deindex old iteration
             currentControlTree.dispatchDestructionEventsForRemovedRepeatIteration(removedIteration, includeCurrent = true)
+            // https://github.com/orbeon/orbeon-forms/issues/5189
+            currentControlTree.destroySubtree(removedIteration, includeCurrent = true)
             currentControlTree.deindexSubtree(removedIteration, includeCurrent = true)
           }
 

@@ -652,5 +652,5 @@ object XFormsRepeatControl {
     repeats map (repeat => indexes(repeat.prefixedId)) mkString RepeatIndexSeparatorString
 
   private def addSuffix(prefixedId: String, suffix: String) =
-    prefixedId + (if (suffix.length > 0) RepeatSeparatorString + suffix else "")
+    prefixedId + (if (suffix.nonEmpty) RepeatSeparatorString + suffix else "")
 }

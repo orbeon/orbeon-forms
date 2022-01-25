@@ -42,7 +42,7 @@ trait PartGlobalOps {
   def hasHandlerForEvent(eventName: String): Boolean
   def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean
   def keyboardHandlers: Seq[EventHandler]
-  def getEventHandlersForObserver(observerPrefixedId: String): List[EventHandler]
+//  def getEventHandlersForObserver(observerPrefixedId: String): List[EventHandler]
 
   // XBL
   def iterateGlobals: Iterator[Global]

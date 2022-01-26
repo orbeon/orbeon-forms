@@ -222,15 +222,13 @@ abstract class XFormsBaseHandlerXHTML (
     evaluatedClassValueOpt foreach appendWithSpace
   }
 
-  final protected def lhhaElementName(lhha: LHHA): String = {
+  final protected def lhhaElementName(lhha: LHHA): String =
     lhha match {
       case LHHA.Label => handlerContext.labelElementName
       case LHHA.Help  => handlerContext.helpElementName
       case LHHA.Hint  => handlerContext.hintElementName
       case LHHA.Alert => handlerContext.alertElementName
     }
-  }
-
 
   final protected def handleLabelHintHelpAlert(
     lhhaAnalysis             : LHHAAnalysis,

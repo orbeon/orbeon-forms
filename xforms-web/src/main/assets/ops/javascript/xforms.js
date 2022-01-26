@@ -2542,8 +2542,10 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (control != null) {
                 ORBEON.xforms.Events.keypressEvent.fire({control: control, target: target, keyCode: event.keyCode});
                 // Input field and auto-complete: trigger DOMActive when when enter is pressed
-                if (($(control).is('.xforms-input') && ! $(control).is('.xforms-type-boolean'))
-                        || $(control).is('.xforms-secret')) {
+                var isXFormsInputField = ($(control).is('.xforms-input') && ! $(control).is('.xforms-type-boolean')) ||
+                                          $(control).is('.xforms-secret');
+                var isFocusInOnInput   = $(target).is("input");
+                if (isXFormsInputField && isFocusInOnInput) {
                     if (event.keyCode == 10 || event.keyCode == 13) {
                         // Force a change event if the value has changed, creating a new "change point", which the
                         // browser will use to dispatch a `change` event in the future. Also see issue #1207.

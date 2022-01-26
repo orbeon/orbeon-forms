@@ -91,7 +91,12 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         // Notify that the upload has ended
         containingDocument.endUpload(getUploadUniqueId)
         XFormsCrossPlatformSupport.removeUploadProgress(XFormsCrossPlatformSupport.externalContext.getRequest, this)
-        handleUploadedFile(doneEvent.file, Option(doneEvent.filename), Option(doneEvent.contentType), Option(doneEvent.contentLength))
+        handleUploadedFile(
+          doneEvent.file,
+          Option(doneEvent.filename).map(PathUtils.filenameFromPath), // in case the filename contains a path
+          Option(doneEvent.contentType),
+          Option(doneEvent.contentLength)
+        )
         visitWithAncestors()
       case _: XXFormsUploadErrorEvent =>
         // Upload error: sent by the client in case of error

@@ -14,10 +14,8 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.oxf.util.UploadProgress
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, FileUtils, UploadProgress}
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.FileUtils
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty, MutableControlProperty}
 import org.orbeon.oxf.xforms.control.controls.FileMetadata._
@@ -91,13 +89,8 @@ trait FileMetadata extends XFormsValueControl {
   def setFileMediatype(mediatype: String): Unit =
     setInfoValue(mediatypeElement, mediatype)
 
-  def setFilename(filename: String): Unit = {
-
-    // Depending on web browsers, the filename may contain a path or not (sending the path is fairly insecure and a
-    // bad idea but some browsers do it. For consistency and security we just keep the filename.
-    val justFileName = filename.splitTo[List]("""\/""").lastOption getOrElse ""
-    setInfoValue(filenameElement, justFileName)
-  }
+  def setFilename(filename: String): Unit =
+    setInfoValue(filenameElement, filename)
 
   def setFileSize(size: String): Unit =
     setInfoValue(sizeElement, size)

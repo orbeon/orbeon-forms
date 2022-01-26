@@ -27,7 +27,8 @@ class JSDateUtilsTest extends AnyFunSpec {
     List("2032-12-31"                    ) -> Some(new js.Date(2032, 11, 31, 0, 0, 0, 0)),
     List("2019-01-01", "2019-01-01-08:00") -> Some(new js.Date(2019,  0,  1, 0, 0, 0, 0)),
     List("2021-13-01"                    ) -> None, // There is no month 13
-    List("2021-11-32"                    ) -> None  // There is no day 32
+    List("2021-11-32"                    ) -> None, // There is no day 32
+    List("2021-11-31"                    ) -> None  // November has 30 days
   )
 
   describe("ISO string conversion to JavaScript date") {

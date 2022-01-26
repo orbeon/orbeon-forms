@@ -29,25 +29,23 @@ object JSDateUtils {
     val dateLength   = if (beforeChrist) 11 else 10
     val dateTrimmed  = dateString.substring(0, dateLength)
 
-    if (js.Date.parse(dateTrimmed).isNaN) // this catches for example `2021-13-01` and `2021-11-32` but not `2021-11-31`!
-      None
-    else
-      Try {
-
-        val dateParts    = dateTrimmed.splitTo[List]("-")
-
-        // TODO: Validate impossible dates like `2021-11-31` non-leap year values
-
-        new js.Date(
-          year    = dateParts(0).toInt * (if (beforeChrist) -1 else 1),
-          month   = dateParts(1).toInt - 1,
-          date    = dateParts(2).toInt,
-          hours   = 0,
-          minutes = 0,
-          seconds = 0,
-          ms      = 0
-        )
-      } toOption
+    Try {
+      val List(yearPart, monthPart, dayPart) = dateTrimmed.splitTo[List]("-")
+      new js.Date(
+        year    = yearPart  .toInt * (if (beforeChrist) -1 else 1),
+        month   = monthPart .toInt - 1,
+        date    = dayPart   .toInt,
+        hours   = 0,
+        minutes = 0,
+        seconds = 0,
+        ms      = 0
+      )
+    }.toOption.filter(parsedDate =>
+      // We want return `None` for "2021-11-31", as November has 30 days, but instead of failing,
+      // `new Date(2021, 10, 31)` returns December 1. To detect this case, we can convert the parsed
+      // date back to a string and check that string is the same our input.
+      dateToISOStringUsingLocalTimezone(parsedDate) == dateTrimmed
+    )
   }
 
   def dateToISOStringUsingLocalTimezone(date: js.Date): String = {

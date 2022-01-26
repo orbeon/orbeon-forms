@@ -93,10 +93,14 @@ object PathUtils {
     }
 
   def maybeReplaceExtension(path: String, ext: String): Option[String] =
-    path.lastIndexOf(".") match {
-      case -1    => None
-      case index => Some(path.substring(0, index + 1) + ext)
+    (path.lastIndexOf("."), ext.trimAllToOpt) match {
+      case (-1, _)                   => None
+      case (index, None)             => Some(path.substring(0, index))
+      case (index, Some(trimmedExt)) => Some(path.substring(0, index + 1) + trimmedExt)
     }
+
+  def filenameFromPath(path: String): String =
+    path.splitTo[List]("""\/""").lastOption getOrElse ""
 
   // Append a query string to an URL. This adds a '?' or a '&' or nothing, as needed.
   // The given query string is appended without further encoding.

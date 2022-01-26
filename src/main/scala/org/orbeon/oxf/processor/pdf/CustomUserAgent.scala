@@ -22,7 +22,7 @@ import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.processor.pdf.ImageSupport._
+import org.orbeon.oxf.util.ImageSupport._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, IndentedLogger, NetUtils, URLRewriterUtils}

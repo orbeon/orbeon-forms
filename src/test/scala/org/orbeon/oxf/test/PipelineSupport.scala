@@ -15,6 +15,7 @@ package org.orbeon.oxf.test
 
 import org.orbeon.oxf.externalcontext.ExternalContext.Session
 import org.orbeon.oxf.externalcontext.{ExternalContext, TestExternalContext}
+import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.util.CoreUtils._
@@ -51,4 +52,19 @@ object PipelineSupport {
         )
     )
 
+  def withTestExternalContext[T](
+    sessionCreated   : Session => Any = _ => (),
+    sessionDestroyed : Session => Any = _ => ())(
+    body             : ExternalContext => T
+  ): T =
+    InitUtils.withPipelineContext { pipelineContext =>
+      body(
+        setExternalContext(
+          pipelineContext,
+          PipelineSupport.DefaultRequestUrl,
+          sessionCreated,
+          sessionDestroyed
+        )
+      )
+    }
 }

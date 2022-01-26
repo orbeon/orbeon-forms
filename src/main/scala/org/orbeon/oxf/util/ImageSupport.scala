@@ -11,8 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.processor.pdf
+package org.orbeon.oxf.util
 
+import cats.syntax.option._
 import net.coobird.thumbnailator.Thumbnails
 import org.orbeon.datatypes.Mediatype
 import org.orbeon.io.IOUtils.useAndClose
@@ -22,7 +23,6 @@ import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.ImageMetadata.AllMetadata
-import org.orbeon.oxf.util.{Connection, ConnectionResult, ImageMetadata, IndentedLogger, Mediatypes, NetUtils}
 
 import java.awt.geom.AffineTransform
 import java.awt.image.{AffineTransformOp, BufferedImage}
@@ -143,71 +143,82 @@ object ImageSupport {
   // - In the future, we could separate the writing of the result from this function. Right now, it writes to a new
   //   temporary file and returns a `URI` pointing to it.
   def tryMaybeTransformImage(
-    existingURi     : URI,
+    existingUri     : URI,
     maxWidthOpt     : Option[Int],
     maxHeightOpt    : Option[Int],
     mediatypeOpt    : Option[Mediatype],
     quality         : Float)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Try[(URI, Long)] = {
+  ): Try[Option[(URI, Long)]] = {
 
-    def connectGet: ConnectionResult =
-      Connection.connectNow(
-        method          = GET,
-        url             = existingURi,
-        credentials     = None,
-        content         = None,
-        headers         = Map.empty,
-        loadState       = false,
-        saveState       = false,
-        logBody         = false
-      )
-
-    // First read the metadata
-    def tryReadAllMetadata(): Try[AllMetadata] =
-      ConnectionResult.tryWithSuccessConnection(connectGet, closeOnSuccess = true)(is =>
-        ImageMetadata.findAllMetadata(is)
-          .fold[Try[AllMetadata]](
-            Failure(new IllegalArgumentException("metadata not found")))(
-            Success.apply
-          )
-      ).flatten
-
-    def mustTransform(metadata: AllMetadata): Boolean = {
+    def mustTransform(metadata: AllMetadata): Boolean =
       maxWidthOpt .exists(metadata.width  >) ||
       maxHeightOpt.exists(metadata.height >) ||
       mediatypeOpt.exists(metadata.mediatype !=)
-    }
 
     def tryReadAndTransformToOutputStream(metadata: AllMetadata, os: OutputStream): Try[Unit] =
-      ConnectionResult.tryWithSuccessConnection(connectGet, closeOnSuccess = true) { is =>
+      ConnectionResult.tryWithSuccessConnection(connectGet(existingUri), closeOnSuccess = true) { is =>
 
-        var b = Thumbnails.of(is)
+        var b =
+          Thumbnails.of(is)
+            .width (maxWidthOpt  filter (metadata.width >)  getOrElse metadata.width)
+            .height(maxHeightOpt filter (metadata.height >) getOrElse metadata.height)
 
-        maxWidthOpt filter (metadata.width >) foreach { maxWidth =>
-          b = b.width(maxWidth)
-        }
-        maxHeightOpt filter (metadata.height >) foreach { maxHeight =>
-          b = b.height(maxHeight)
-        }
         mediatypeOpt map (_.toString) flatMap Mediatypes.findExtensionForMediatype foreach { format =>
           b = b.outputFormat(format)
         }
-          b = b.outputQuality(quality)
 
+        b = b.outputQuality(quality)
         b.toOutputStream(os)
       }
 
-    for {
-      allMetadata <- tryReadAllMetadata()
-      if mustTransform(allMetadata)
-      fileItem    = NetUtils.prepareFileItem(NetUtils.SESSION_SCOPE, logger.logger.logger)
-      _           <- useAndClose(fileItem.getOutputStream)(tryReadAndTransformToOutputStream(allMetadata, _))
-    } yield
-      (
-        new URI(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.SESSION_SCOPE)),
-        fileItem.getSize
-      )
+    tryReadAllMetadata(existingUri) match {
+      case Success(allMetadata) if mustTransform(allMetadata) =>
+
+        val fileItem = NetUtils.prepareFileItem(NetUtils.SESSION_SCOPE, logger.logger.logger)
+
+        useAndClose(fileItem.getOutputStream)(tryReadAndTransformToOutputStream(allMetadata, _)) map { _ =>
+          (
+            new URI(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.SESSION_SCOPE)),
+            fileItem.getSize
+          ).some
+        }
+
+      case Success(_) =>
+        Success(None)
+      case Failure(t) =>
+        Failure(t)
+    }
   }
+
+  private def connectGet(
+    existingUri     : URI)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): ConnectionResult =
+    Connection.connectNow(
+      method          = GET,
+      url             = existingUri,
+      credentials     = None,
+      content         = None,
+      headers         = Map.empty,
+      loadState       = false,
+      saveState       = false,
+      logBody         = false
+    )
+
+  // Open for tests
+  private[util] def tryReadAllMetadata(
+    existingUri     : URI)(implicit
+    logger          : IndentedLogger,
+    externalContext : ExternalContext
+  ): Try[AllMetadata] =
+    ConnectionResult.tryWithSuccessConnection(connectGet(existingUri), closeOnSuccess = true)(is =>
+      ImageMetadata.findAllMetadata(is)
+        .fold[Try[AllMetadata]](
+          Failure(new IllegalArgumentException("metadata not found")))(
+          Success.apply
+        )
+    ).flatten
 }

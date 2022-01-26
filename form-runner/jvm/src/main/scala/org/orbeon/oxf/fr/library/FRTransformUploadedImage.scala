@@ -2,9 +2,8 @@ package org.orbeon.oxf.fr.library
 
 import org.orbeon.datatypes.Mediatype
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.processor.pdf.ImageSupport
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, Mediatypes, PathUtils}
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, ImageSupport, IndentedLogger, Mediatypes, PathUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xml.{FunctionSupport, RuntimeDependentFunction}
@@ -76,7 +75,7 @@ class FRTransformUploadedImage extends FunctionSupport with RuntimeDependentFunc
           mediatypeOpt,
           quality
         ) match {
-          case Success((newUri, newSize)) =>
+          case Success(Some((newUri, newSize))) =>
             XFormsUploadControl.updateExternalValueAndMetadata(
               boundNode   = binding,
               rawNewValue = newUri.toString,
@@ -84,6 +83,7 @@ class FRTransformUploadedImage extends FunctionSupport with RuntimeDependentFunc
               mediatype   = mediatypeStringOpt orElse (binding attValueOpt "mediatype"),
               size        = newSize
             )
+          case Success(None) =>
           case Failure(t) =>
             throw t
         }

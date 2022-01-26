@@ -45,16 +45,11 @@ trait XFormsSupport extends MockitoSugar {
   self: DocumentTestBase =>
 
   def withTestExternalContext[T](body: ExternalContext => T): T =
-    InitUtils.withPipelineContext { pipelineContext =>
-      body(
-        PipelineSupport.setExternalContext(
-          pipelineContext,
-          PipelineSupport.DefaultRequestUrl,
-          XFormsStateManager.sessionCreated,
-          XFormsStateManager.sessionDestroyed
-        )
-      )
-    }
+    PipelineSupport.withTestExternalContext(
+      XFormsStateManager.sessionCreated,
+      XFormsStateManager.sessionDestroyed)(
+      body
+    )
 
   def withActionAndDoc[T](url: String)(body: => T): T =
     withActionAndDoc(setupDocument(url))(body)

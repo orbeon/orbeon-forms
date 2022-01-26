@@ -31,8 +31,8 @@ class FRTransformUploadedImage extends FunctionSupport with RuntimeDependentFunc
     val bindingValue = binding.getStringValue
     val maxWidthOpt  = stringArgumentOpt(1).flatMap(_.trimAllToOpt).map(_.toInt)
     val maxHeightOpt = stringArgumentOpt(2).flatMap(_.trimAllToOpt).map(_.toInt)
-    val qualityOpt   = stringArgumentOpt(3).flatMap(_.trimAllToOpt).map(_.toFloat / 100f)
     val formatOpt    = stringArgumentOpt(4).flatMap(_.trimAllToOpt)
+    val quality      = stringArgumentOpt(3).flatMap(_.trimAllToOpt).map(_.toFloat / 100f).getOrElse(0.8f)
 
     val mediatypeStringOpt = formatOpt flatMap Mediatypes.findMediatypeForExtension
     val mediatypeOpt       = mediatypeStringOpt.flatMap(Mediatype.unapply)
@@ -74,7 +74,7 @@ class FRTransformUploadedImage extends FunctionSupport with RuntimeDependentFunc
           maxWidthOpt,
           maxHeightOpt,
           mediatypeOpt,
-          qualityOpt
+          quality
         ) match {
           case Success((newUri, newSize)) =>
             XFormsUploadControl.updateExternalValueAndMetadata(

@@ -147,7 +147,7 @@ object ImageSupport {
     maxWidthOpt     : Option[Int],
     maxHeightOpt    : Option[Int],
     mediatypeOpt    : Option[Mediatype],
-    qualityOpt      : Option[Float])(implicit
+    quality         : Float)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): Try[(URI, Long)] = {
@@ -194,9 +194,7 @@ object ImageSupport {
         mediatypeOpt map (_.toString) flatMap Mediatypes.findExtensionForMediatype foreach { format =>
           b = b.outputFormat(format)
         }
-        qualityOpt foreach { quality =>
           b = b.outputQuality(quality)
-        }
 
         b.toOutputStream(os)
       }

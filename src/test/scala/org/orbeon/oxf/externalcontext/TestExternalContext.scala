@@ -68,7 +68,7 @@ class TestExternalContext(
     private var bodyReader: Reader           = null
 
     private var getInputStreamCalled         = false
-    private var getReaderCalled              = false
+    private val getReaderCalled              = false
 
     lazy val getAttributesMap: ju.Map[String, AnyRef] = {
 

@@ -159,7 +159,7 @@ private class DateCompanion extends XBLCompanionWithState {
 
     if (! (previousStateOpt map (_.excludedDates) contains newExcludedDates)) {
       if (! iOS) {
-        datePicker.options.datesDisabled = newExcludedDates.toJSArray.map(new js.Date(_))
+        datePicker.options.datesDisabled = newExcludedDates.flatMap(JSDateUtils.isoDateToStringUsingLocalTimezone).toJSArray
         datePicker.update()
       }
     }

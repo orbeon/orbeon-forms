@@ -192,6 +192,7 @@
             -dontwarn javax.mail.**
             -dontwarn org.orbeon.oxf.processor.**
             -dontwarn org.orbeon.oxf.util.ImageMetadata**
+            -dontwarn org.orbeon.oxf.util.ImageSupport**
             -dontwarn org.orbeon.xforms.**
             -dontwarn org.orbeon.oxf.xforms.**
 

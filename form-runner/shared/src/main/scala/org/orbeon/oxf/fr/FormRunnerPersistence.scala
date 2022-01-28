@@ -15,43 +15,41 @@ package org.orbeon.oxf.fr
 
 
 import cats.syntax.option._
-
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.scaxon
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
-import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StreamedContent}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, PUT}
+import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StreamedContent}
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
-import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.{BasicNamespaceMapping, XFormsCrossPlatformSupport}
 
+import java.io.InputStream
 import java.net.URI
 import java.{util => ju}
-import java.io.InputStream
 import scala.jdk.CollectionConverters._
 import scala.util.Try
 
@@ -692,7 +690,7 @@ trait FormRunnerPersistence {
             url             = resolvedPutUri,
             credentials     = username map (BasicCredentials(_, password, preemptiveAuth = false, domain = None)),
             content         = StreamedContent(is, ContentTypes.OctetStreamContentType.some, contentLength = None, title = None).some,
-            headers         = allPutHeaders.toMap,
+            headers         = allPutHeaders,
             loadState       = true,
             saveState       = true,
             logBody         = false

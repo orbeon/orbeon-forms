@@ -13,9 +13,10 @@
   */
 package org.orbeon.oxf.fr
 
+import cats.syntax.option._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
-
+import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.SaxonUtils
@@ -38,15 +39,24 @@ trait FormRunnerPublish {
     username         : String,
     password         : String,
     forceAttachments : Boolean,
-    formVersion      : String
+    formVersion      : String // `Option["next" | Int]`
   ): Item = {
 
     val documentOpt = documentOrEmpty.trimAllToOpt
 
-    val fromBasePathWithVersion =
+    val dstFormVersionTrimmedOpt = formVersion.trimAllToOpt
+    val dstFormVersion           = Version(None, None, dstFormVersionTrimmedOpt)
+
+    val fromBasePathWithVersionOpt =
       documentOpt match {
-        case Some(document) => (createFormDataBasePath(AppForm.FormBuilder.app, AppForm.FormBuilder.form, isDraft = false, document), 1)
-        case None           => (createFormDefinitionBasePath(app, form),                                                              formVersion.toInt)
+        case Some(document) =>
+          (createFormDataBasePath(AppForm.FormBuilder.app, AppForm.FormBuilder.form, isDraft = false, document), 1).some
+        case None           =>
+          dstFormVersion match {
+            case Version.Unspecified | Version.Next => None
+            case Version.Specific(version)          => (createFormDefinitionBasePath(app, form), version).some
+            case Version.ForDocument(_, _)          => throw new IllegalStateException
+          }
       }
 
     // `xhtml` must always be a form definition and must have form metadata
@@ -58,8 +68,7 @@ trait FormRunnerPublish {
       FRComponentParamSupport.findLibraryVersions(frDocCtx.metadataRootElem)
 
     val basePathsWithVersions =
-      List(
-        fromBasePathWithVersion,
+      fromBasePathWithVersionOpt.toList ::: List(
         (FormRunner.createFormDefinitionBasePath(app,                        Names.LibraryFormName), appVersionOpt.getOrElse(1)),
         (FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName), globalVersionOpt.getOrElse(1))
       )
@@ -76,7 +85,7 @@ trait FormRunnerPublish {
         forceAttachments  = forceAttachments,
         username          = username.trimAllToOpt,
         password          = password.trimAllToOpt,
-        formVersion       = formVersion.trimAllToOpt,
+        formVersion       = dstFormVersionTrimmedOpt,
         workflowStage     = None
       )
 

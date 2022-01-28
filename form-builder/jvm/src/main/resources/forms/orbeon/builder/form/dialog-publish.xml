@@ -242,9 +242,12 @@
                                 <xf:var
                                     name="version-param"
                                     value="
-                                        if (instance()/selected-version != 'next')
-                                        then concat('?form-version=', instance()/published-version)
-                                        else ''"/>
+                                        let $published-version-string := instance()/published-version/string(),
+                                            $published-version-opt    := if ($published-version-string castable as xs:integer) then xs:integer($published-version-string)[. gt 0] else ()
+                                        return
+                                            if (exists($published-version-opt))
+                                            then concat('?form-version=', $published-version-opt)
+                                            else ''"/>
                                 <xh:a href="/fr/{$app}/{$form}/{.}{$version-param}" target="_blank">
                                     <xf:output value="$form-resources/dialog-publish/*[name() = concat('open-', current())]"/>
                                 </xh:a>

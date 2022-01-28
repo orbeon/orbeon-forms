@@ -13,9 +13,9 @@
         </File>
 
         <RollingFile
-            name="RollingFile"
+            name="RollingFileAppender"
             fileName="../logs/orbeon-rolling.log"
-            filePattern="../logs/orbeon-rolling-%date{MM-dd-yyyy}.log.gz"
+            filePattern="../logs/orbeon-rolling-%date{yyyy-dd-MM}.log.gz"
             ignoreExceptions="false">
             <PatternLayout pattern="%date{ISO8601} %-5level %logger{1} - %message%n"/>
             <Policies>

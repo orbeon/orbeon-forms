@@ -60,7 +60,7 @@ val ScalaCollectionCompatVersion  = "2.6.0"
 // Java libraries
 val SaxonJvmVersion               = "9.1.0.8.3"
 val JUnitInterfaceVersion         = "0.13.3"
-val Slf4jVersion                  = "1.7.33"
+val Slf4jVersion                  = "1.7.35"
 val HttpComponentsVersion         = "4.5.13"
 val Log4j2Version                 = "2.17.1"
 val CommonsIoVersion              = "2.11.0"

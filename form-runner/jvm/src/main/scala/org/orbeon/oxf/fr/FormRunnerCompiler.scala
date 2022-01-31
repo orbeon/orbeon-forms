@@ -119,7 +119,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
                 val basePaths =
                   List(
-                    FormRunner.createFormDataBasePath(AppForm.FormBuilder.app, AppForm.FormBuilder.form, isDraft = false, documentOrEmpty = ""),
+                    FormRunner.createFormDataBasePath(AppForm.FormBuilder.app, AppForm.FormBuilder.form, isDraft = false, documentIdOrEmpty = ""),
                     FormRunner.createFormDefinitionBasePath(appName, formName),
                     FormRunner.createFormDefinitionBasePath(appName, Names.LibraryFormName),
                     FormRunner.createFormDefinitionBasePath(Names.GlobalLibraryAppName, Names.LibraryFormName)

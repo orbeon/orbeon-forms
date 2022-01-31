@@ -31,26 +31,26 @@ trait FormRunnerPublish {
 
   //@XPathFunction
   def publish(
-    xhtml            : NodeInfo,
-    toBaseURI        : String,
-    app              : String,
-    form             : String,
-    documentOrEmpty  : String,
-    username         : String,
-    password         : String,
-    forceAttachments : Boolean,
-    formVersion      : String // `Option["next" | Int]`
+    xhtml             : NodeInfo,
+    toBaseURI         : String,
+    app               : String,
+    form              : String,
+    documentIdOrEmpty : String,
+    username          : String,
+    password          : String,
+    forceAttachments  : Boolean,
+    formVersion       : String // `Option["next" | Int]`
   ): Item = {
 
-    val documentOpt = documentOrEmpty.trimAllToOpt
+    val documentIdOpt = documentIdOrEmpty.trimAllToOpt
 
     val dstFormVersionTrimmedOpt = formVersion.trimAllToOpt
     val dstFormVersion           = Version(None, None, dstFormVersionTrimmedOpt)
 
     val fromBasePathWithVersionOpt =
-      documentOpt match {
-        case Some(document) =>
-          (createFormDataBasePath(AppForm.FormBuilder.app, AppForm.FormBuilder.form, isDraft = false, document), 1).some
+      documentIdOpt match {
+        case Some(documentId) =>
+          (createFormDataBasePath(AppForm.FormBuilder.app, AppForm.FormBuilder.form, isDraft = false, documentId), 1).some
         case None           =>
           dstFormVersion match {
             case Version.Unspecified | Version.Next => None
@@ -81,7 +81,7 @@ trait FormRunnerPublish {
         fromBasePaths     = basePathsWithVersions,
         toBasePath        = createFormDefinitionBasePath(app, form),
         filename          = "form.xhtml",
-        commonQueryString = documentOpt map (document => encodeSimpleQuery(List("document" -> document))) getOrElse "",
+        commonQueryString = documentIdOpt map (documentId => encodeSimpleQuery(List("document" -> documentId))) getOrElse "",
         forceAttachments  = forceAttachments,
         username          = username.trimAllToOpt,
         password          = password.trimAllToOpt,

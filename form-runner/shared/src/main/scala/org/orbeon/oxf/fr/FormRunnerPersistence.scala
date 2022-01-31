@@ -282,10 +282,10 @@ trait FormRunnerPersistence {
   def isUploadedFileURL(value: String): Boolean =
     value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
 
-  // `documentOrEmpty` can be empty and if so won't be included. Ideally should be `Option[String]`.
+  // `documentIdOrEmpty` can be empty and if so won't be included. Ideally should be `Option[String]`.
   //@XPathFunction
-  def createFormDataBasePath(app: String, form: String, isDraft: Boolean, documentOrEmpty: String): String =
-    CRUDBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: documentOrEmpty.trimAllToOpt.toList ::: "" :: Nil mkString "/"
+  def createFormDataBasePath(app: String, form: String, isDraft: Boolean, documentIdOrEmpty: String): String =
+    CRUDBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: documentIdOrEmpty.trimAllToOpt.toList ::: "" :: Nil mkString "/"
 
   //@XPathFunction
   def createFormDefinitionBasePath(app: String, form: String): String =

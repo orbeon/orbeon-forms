@@ -2310,7 +2310,7 @@ az4K</document>
         </output>
     </test>
 
-    <test description="Instance replacement: replace text to default instance" name="oxf:pipeline" only="true">
+    <test description="Instance replacement: replace text to default instance" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>

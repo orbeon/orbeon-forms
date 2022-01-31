@@ -767,7 +767,7 @@
                 <upload-error>Une erreur s'est produite durant le téléchargement vers le serveur. Veuillez ressayer.</upload-error>
                 <upload-error-size>Le fichier téléchargé est trop grand. La taille maximale est {0,number,integer} bytes et la taille reçue est {1,number,integer} bytes.</upload-error-size>
                 <upload-error-mediatype>Le fichier téléchargé est d''un type incorrect.</upload-error-mediatype>
-                <upload-error-file-scan>Le fichier téléchargé a été rejeté par le scanner de fichiers. Veuillez vérifier qu'il ne s'agit pas d'un fichier infecté. Voici le message du scanner de fichiers: "{0}".</upload-error-file-scan>
+                <upload-error-file-scan>Le fichier téléchargé a été rejeté par le scanner de fichiers. Veuillez vérifier qu''il ne s'agit pas d'un fichier infecté. Voici le message du scanner de fichiers: "{0}".</upload-error-file-scan>
                 <lost-attachments>Des fichiers joints ont été perdus suite à un problème sur le serveur. Veuillez vérifier tous vos fichiers joints et les annexer à nouveau si nécessaire.</lost-attachments>
             </messages>
             <draft-singleton>
@@ -1269,7 +1269,7 @@
                 <upload-error>Ha habido un error durante la subida de archivos. Intentelo nuevamente.</upload-error>
                 <upload-error-size>El arvhivo subido es demasiado largo. El largo máximo permitido es {0,number,integer} bytes y el tamaño del archivo subido es {1,number,integer} bytes.</upload-error-size>
                 <upload-error-mediatype>El archivo subido es de tipo incorrecto.</upload-error-mediatype>
-                <upload-error-file-scan>El archivo subido fue rechazado por el escaner de archivos. Asegurese que el archivo no esta infectado.  Este el es mensaje del escaner de archivos: "{0}".</upload-error-file-scan>
+                <upload-error-file-scan>El archivo subido fue rechazado por el escaner de archivos. Asegurese que el archivo no esta infectado. Este el es mensaje del escaner de archivos: "{0}".</upload-error-file-scan>
                 <lost-attachments>Algunos archivos se perdieron debido a un incidente con el servidor. Verifique todos los adjuntos y subalos nuevamente si es necesario.</lost-attachments>
             </messages>
             <draft-singleton>
@@ -1770,7 +1770,7 @@
                 <upload-error todo="true">[There was an error during the upload. Please try again.]</upload-error>
                 <upload-error-size todo="true">[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.]</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
-                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
+                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
                 <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
             </messages>
              <draft-singleton>
@@ -2268,7 +2268,7 @@
                 <upload-error todo="true">[There was an error during the upload. Please try again.]</upload-error>
                 <upload-error-size todo="true">[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.]</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
-                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
+                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
                 <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
             </messages>
              <draft-singleton>
@@ -2774,7 +2774,7 @@
                 <upload-error>È apparso un errore durante il caricamento. Si prega di riprovare.</upload-error>
                 <upload-error-size>Il file caricato è troppo grande. La dimensione massima consentita è di {0,number,integer} byte e la dimensione reale ricevuta è di {1,number,integer} byte.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
-                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
+                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
                 <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
             </messages>
             <draft-singleton>
@@ -3284,7 +3284,7 @@
                 <upload-error>Während dem Hochladen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</upload-error>
                 <upload-error-size>Die hochgeladene Datei ist zu groß. Die maximal zulässige Größe ist {0,number,integer} Bytes und die tatsächlich empfangene Größe ist {1,number,integer} Bytes.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
-                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
+                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
                 <lost-attachments>Einige Beilagen sind aufgrund eines Serverproblems verloren gegangen. Bitte prüfen Sie alle Beilagen und laden Sie diese gegebenenfalls erneut hoch.</lost-attachments>
             </messages>
             <draft-singleton>
@@ -3794,7 +3794,7 @@
                 <upload-error>Tiedoston lähetyksen aikana tapahtui virhe. Yritä uudelleen.</upload-error>
                 <upload-error-size>Lähetettävä tiedosto on liian suuri. Suurin sallittu tiedostokoko on {0,number,integer} tavua ja todellinen vastaanotettu koko on {1,number,integer} tavua.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
-                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
+                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
                 <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
             </messages>
             <draft-singleton>
@@ -4304,7 +4304,7 @@
                 <upload-error>Fel under överföring. Vänligen försök igen.</upload-error>
                 <upload-error-size>Filen är för stor för att överföras. Största storlek är {0,number,integer} bytes.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
-                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
+                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
                 <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
             </messages>
             <draft-singleton>
@@ -5323,7 +5323,7 @@
                 <upload-error>Ocorreu um erro durante o carregamento. Por favor, tente novamente.</upload-error>
                 <upload-error-size>O documento carregado é muito grande. O tamanho máximo permitido são {0, number, integer} bytes e o tamanho recebido são {1, number, integer} bytes.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
-                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
+                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
                 <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
             </messages>
             <draft-singleton>
@@ -5823,7 +5823,7 @@
                 <upload-error>Der skete en fejl under indlæsning. Prøv igen.</upload-error>
                 <upload-error-size>Filen, der indlæses, er for stor. Den maksimale størrelse er {0,number,integer} bytes og der blev indlæst {1,number,integer} bytes.]</upload-error-size>
                 <upload-error-mediatype>Den uploadede fil har ikke en tilladt filtype.</upload-error-mediatype>
-                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
+                <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
                 <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
             </messages>
             <draft-singleton>

@@ -177,7 +177,7 @@ object XXFormsUploadErrorEvent {
           "permitted"  -> Some(permitted.to(List) map (_.toString)),
           "actual"     -> (actual map (_.toString))
         )
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.FileScanReason(message)))) =>
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.FileScanReason(_, message)))) =>
         List(
           "error-type" -> Some("file-scan-error"),
           "message"    -> Some(message)

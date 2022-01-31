@@ -37,14 +37,42 @@ import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 
 
-case class DisallowedMediatypeException(permitted: Set[MediatypeRange], actual: Option[Mediatype]) extends FileUploadException
-case class FileScanException           (message: String)                                           extends FileUploadException
+case class DisallowedMediatypeException(
+  permitted : Set[MediatypeRange],
+  actual    : Option[Mediatype]
+) extends FileUploadException
+
+case class FileScanException(
+  fieldName      : String,
+  fileScanResult : FileScanResult
+) extends FileUploadException
+
+sealed trait FileScanResult {
+  val message: Option[String]
+}
+
+case class FileScanAcceptResult(
+  message    : Option[String],
+  mediatype  : Option[String]              = None,
+  filename   : Option[String]              = None,
+  content    : Option[java.io.InputStream] = None,
+  extension  : Option[Map[String, Any]]    = None
+) extends FileScanResult
+
+case class FileScanRejectResult(
+  message    : Option[String]
+) extends FileScanResult
+
+case class FileScanErrorResult(
+  message   : Option[String],
+  throwable : Option[Throwable]
+) extends FileScanResult
 
 trait MultipartLifecycle {
   def fieldReceived(fieldName: String, value: String)         : Unit
   def fileItemStarting(fieldName: String, fileItem: FileItem) : Option[MaximumSize]
-  def updateProgress(b: Array[Byte], off: Int, len: Int)      : Unit
-  def fileItemState(state: UploadState[DiskFileItem])         : Unit
+  def updateProgress(b: Array[Byte], off: Int, len: Int)      : Option[FileScanResult]
+  def fileItemState(state: UploadState[DiskFileItem])         : Option[FileScanResult]
   def interrupted()                                           : Unit
 }
 
@@ -79,17 +107,17 @@ object Multipart {
 
     // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
     parseMultipartRequest(uploadContext, None, maxSize, headerEncoding, RequestGenerator.getMaxMemorySizeProperty) match {
-      case (nameValues, None) =>
+      case (nameValuesFileScan, None) =>
 
         // Add a listener to destroy file items when the pipeline context is destroyed
-        pipelineContext.addContextListener((_: Boolean) => quietlyDeleteFileItems(nameValues))
+        pipelineContext.addContextListener((_: Boolean) => quietlyDeleteFileItems(nameValuesFileScan))
 
         val foldedValues =
-          nameValues map { case (k, v) => k -> v.fold(identity, identity) }
+          nameValuesFileScan map { case (k, v, f) => (k,  v.fold(identity, identity)) }
 
         combineValues[String, AnyRef, Array](foldedValues).toMap.asJava
-      case (nameValues, Some(t)) =>
-        quietlyDeleteFileItems(nameValues)
+      case (nameValuesFileScan, Some(t)) =>
+        quietlyDeleteFileItems(nameValuesFileScan)
         throw t
     }
   }
@@ -106,7 +134,7 @@ object Multipart {
     maxSize        : MaximumSize,
     headerEncoding : String,
     maxMemorySize  : Int
-  ): (List[(String, UploadItem)], Option[Throwable]) = {
+  ): (List[(String, UploadItem, Option[FileScanAcceptResult])], Option[Throwable]) = {
 
     require(uploadContext ne null)
     require(headerEncoding ne null)
@@ -127,7 +155,7 @@ object Multipart {
     // Parse the request and add file information
     useAndClose(uploadContext.getInputStream) { _ =>
       // This contains all completed values up to the point of failure if any
-      val result = m.ListBuffer[(String, UploadItem)]()
+      val result = m.ListBuffer[(String, UploadItem, Option[FileScanAcceptResult])]()
       try {
         // `getItemIterator` can throw a `SizeLimitExceededException` in particular
         val itemIterator = asScalaIterator(servletFileUpload.getItemIterator(uploadContext))
@@ -152,9 +180,9 @@ object Multipart {
     )
 
   // Delete all items which are of type `FileItem`
-  def quietlyDeleteFileItems(nameValues: List[(String, UploadItem)]): Unit =
+  def quietlyDeleteFileItems[T, U](nameValues: List[(T, UploadItem, U)]): Unit =
     nameValues collect {
-      case (_, Right(fileItem)) => fileItem
+      case (_, Right(fileItem), _) => fileItem
     } foreach {
       fileItem => runQuietly(fileItem.delete())
     }
@@ -170,7 +198,7 @@ object Multipart {
       servletFileUpload : ServletFileUpload,
       fis               : FileItemStream,
       lifecycleOpt      : Option[MultipartLifecycle]
-    ): (String, UploadItem) = {
+    ): (String, UploadItem, Option[FileScanAcceptResult]) = {
 
       val fieldName = fis.getFieldName
 
@@ -182,7 +210,7 @@ object Multipart {
         // by the limiter on the incoming outer input stream.
         val value = Streams.asString(fis.openStream, StandardParameterEncoding)
         lifecycleOpt foreach (_.fieldReceived(fieldName, value))
-        fieldName -> Left(value)
+        (fieldName, Left(value), None)
       } else {
 
         try {
@@ -200,7 +228,8 @@ object Multipart {
             }
 
             val maxSizeForSpecificFileItemOpt =
-              lifecycleOpt flatMap (_.fileItemStarting(fieldName, fileItem)) // can throw `FileScanException`
+              lifecycleOpt flatMap
+                (_.fileItemStarting(fieldName, fileItem)) // can throw `FileScanException`, `IllegalStateException`, `DisallowedMediatypeException`
 
             copyStreamAndClose(
               in  = maxSizeForSpecificFileItemOpt map (
@@ -219,13 +248,14 @@ object Multipart {
                 def write(b: Int) = throw new IllegalStateException
 
                 // We know that this is the only `write` method called by `copyStream`
-                override def write(b: Array[Byte], off: Int, len: Int) = {
-                  lifecycleOpt foreach (_.updateProgress(b, off, len)) // can throw `FileScanException`
-                  fios.write(b, off, len)
-                }
+                override def write(b: Array[Byte], off: Int, len: Int): Unit =
+                  lifecycleOpt flatMap (_.updateProgress(b, off, len)) match {
+                    case None | Some(_: FileScanAcceptResult) => fios.write(b, off, len)
+                    case Some(r)                              => throw FileScanException(fieldName, r) // to the `catch` at the bottom
+                  }
 
-                override def flush() = fios.flush()
-                override def close() = fios.close()
+                override def flush(): Unit = fios.flush()
+                override def close(): Unit = fios.close()
               }
             )
           } catch {
@@ -235,28 +265,31 @@ object Multipart {
               throw t
           }
 
-          lifecycleOpt foreach (_.fileItemState(UploadState.Completed(fileItem))) // can throw `FileScanException`
-          fieldName -> Right(fileItem)
+          lifecycleOpt flatMap (_.fileItemState(UploadState.Completed(fileItem))) match {
+            case Some(r: FileScanAcceptResult) => (fieldName, Right(fileItem), Some(r))
+            case None                          => (fieldName, Right(fileItem), None)
+            case Some(r)                       => throw FileScanException(fieldName, r) // to the `catch` at the bottom
+          }
         } catch {
           case NonFatal(t) =>
-            lifecycleOpt foreach (_.fileItemState(
+            lifecycleOpt foreach (_.fileItemState( // returns `None` anyway for `Interrupted` so we ignore the result
               UploadState.Interrupted(
                Option(Exceptions.getRootThrowable(t))
                collect {
                  case root: SizeLimitExceededException                => Reason.SizeReason(root.getPermittedSize, root.getActualSize)
                  case DisallowedMediatypeException(permitted, actual) => Reason.MediatypeReason(permitted, actual)
-                 case FileScanException(message)                      => Reason.FileScanReason(message)
+                 case FileScanException(fieldName, fileScanResult)    => Reason.FileScanReason(fieldName, fileScanResult.message.getOrElse("xxxxxxxx")) // xxx TODO message
                }
               )
             ))
             throw t
-        }
-      }
-    }
+        } // catch
+      } // ! fis.isFormField
+    } // processSingleStreamItem
 
     def asScalaIterator(i: FileItemIterator): Iterator[FileItemStream] = new Iterator[FileItemStream] {
-      def hasNext = i.hasNext
-      def next()  = i.next()
+      def hasNext: Boolean = i.hasNext
+      def next(): FileItemStream = i.next()
       override def toString = "Iterator wrapping FileItemIterator" // super.toString is dangerous when running in a debugger
     }
   }

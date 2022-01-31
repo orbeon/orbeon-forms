@@ -13,7 +13,11 @@
   */
 package org.orbeon.oxf.xforms.upload.api
 
+import _root_.java.{util => ju}
+import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 import scala.util.Try
+
 
 // Scala API
 trait FileScanProvider {
@@ -21,5 +25,10 @@ trait FileScanProvider {
   def init(): Unit
   def destroy(): Unit
 
-  def startStream(fileName: String, headers: Seq[(String, Seq[String])]): Try[FileScan]
+  def startStream(filename: String, headers: Seq[(String, Seq[String])]): Try[FileScan]
+}
+
+object FileScanProvider {
+  def convertHeadersToJava(headers: Seq[(String, Seq[String])]): ju.Map[String, Array[String]] =
+    mutable.LinkedHashMap(headers map { case (k, v) => k -> v.toArray }: _*).asJava
 }

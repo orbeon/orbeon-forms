@@ -1088,6 +1088,13 @@ lazy val fileScanExample = (project in file("file-scan-example"))
     name := "file-scan-example"
   )
 
+lazy val fileScanExample2 = (project in file("file-scan-v2-example"))
+  .dependsOn(xformsJVM)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "file-scan-v2-example"
+  )
+
 lazy val nodeFacades = (project in file("node-facades"))
   .enablePlugins(ScalaJSPlugin)
   .settings(commonSettings: _*)

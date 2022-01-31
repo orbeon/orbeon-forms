@@ -25,35 +25,35 @@ public class AcmeFileScanProvider extends FileScanProvider {
 
     private static class AcmeFileScan implements FileScan {
 
-        private final String fileName;
+        private final String filename;
         private Map<String, String[]> headers;
 
-        AcmeFileScan(String fileName, Map<String, String[]> headers) {
-            this.fileName = fileName;
+        AcmeFileScan(String filename, Map<String, String[]> headers) {
+            this.filename = filename;
             this.headers  = headers;
         }
 
         public FileScanStatus bytesReceived(byte[] bytes, int offset, int length) {
-            logger.info("Received " + length +" bytes to scan for " + fileName);
+            logger.info("Received " + length +" bytes to scan for " + filename);
             return FileScanStatus.ACCEPT;
         }
 
         public FileScanStatus complete(File file) {
-            logger.info("Completing scan for " + fileName);
+            logger.info("Completing scan for " + filename);
 
-            if (fileName.contains("virus"))
+            if (filename.contains("virus"))
                 return FileScanStatus.REJECT;
             else
                 return FileScanStatus.ACCEPT;
         }
 
         public void abort() {
-            logger.info("Aborting scan for " + fileName);
+            logger.info("Aborting scan for " + filename);
         }
     }
 
-    public FileScan startStream(String fileName, Map<String, String[]> headers) {
-        return new AcmeFileScan(fileName, headers);
+    public FileScan startStream(String filename, Map<String, String[]> headers) {
+        return new AcmeFileScan(filename, headers);
     }
 
     public void init() {

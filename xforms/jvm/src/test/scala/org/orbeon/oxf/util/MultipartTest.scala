@@ -78,7 +78,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
 
     val uploadContext = newTrustedUploadContext(body)
 
-    val (pairs, throwableOpt) =
+    val (triplets, throwableOpt) =
       parseMultipartRequest(
         uploadContext,
         Some(
@@ -92,7 +92,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
         0
       )
 
-    (pairs map { case (a, b) => a -> convertFileItemContent(b) }, throwableOpt map (_.getClass.getName))
+    (triplets map { case (a, b, _) => a -> convertFileItemContent(b) }, throwableOpt map (_.getClass.getName))
   }
 
   describe("Parsing a multipart request which doesn't exceed the maximum size specified") {

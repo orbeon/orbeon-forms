@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.upload
 
 import java.util.ServiceLoader
-
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.commons.fileupload.{FileItem, FileItemHeaders, FileItemHeadersSupport, UploadContext}
 import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
@@ -35,6 +34,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, FileScanResult => JFileScanResult}
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
@@ -47,12 +47,14 @@ import scala.util.control.NonFatal
 import scala.collection.compat._
 import shapeless.syntax.typeable._
 
+import scala.reflect.ClassTag
+
 
 object UploaderServer {
 
   import Private._
 
-  def processUpload(request: Request): (List[(String, UploadItem)], Option[Throwable]) = {
+  def processUpload(request: Request): (List[(String, UploadItem, Option[FileScanAcceptResult])], Option[Throwable]) = {
 
     // Session is required to communicate with the XForms document
     val session = request.sessionOpt getOrElse (throw new IllegalStateException("upload requires a session"))
@@ -115,7 +117,7 @@ object UploaderServer {
     // Mutable state
     private var uuidOpt     : Option[String]                       = None
     private var progressOpt : Option[UploadProgress[DiskFileItem]] = None
-    private var fileScanOpt : Option[FileScan]                     = None
+    private var fileScanOpt : Option[Either[FileScan2, FileScan]]  = None
 
     def fieldReceived(fieldName: String, value: String): Unit =
       if (fieldName == Constants.UuidFieldName) {
@@ -188,7 +190,7 @@ object UploaderServer {
         // the overhead.
         (outerLimiterInputStream.maxBytes, maxUploadSizeForControl) match {
           case (_,                   UnlimitedSize)         => outerLimiterInputStream.maxBytes = UnlimitedSize
-          case (UnlimitedSize, LimitedSize(control))        => throw new IllegalStateException
+          case (UnlimitedSize, LimitedSize(_))              => throw new IllegalStateException
           case (LimitedSize(current), LimitedSize(control)) => outerLimiterInputStream.maxBytes = LimitedSize(current + control)
         }
       }
@@ -217,36 +219,60 @@ object UploaderServer {
         }
       }
 
-      fileScanProviderOpt foreach { fileScanProvider =>
-        fileScanOpt = fileScanProvider.startStream(fileItem.getName, headersOpt map convertFileItemHeaders getOrElse Nil) match {
-          case Success(fs) => Some(fs)
-          case Failure(t)  => throw FileScanException(t.getMessage)
-        }
+      fileScanProviderOpt foreach {
+        case Left(fileScanProviderV2) =>
+          fileScanOpt =
+            Try(fileScanProviderV2.startStream(fileItem.getName, FileScanProvider.convertHeadersToJava(headersOpt map convertFileItemHeaders getOrElse Nil), "???", Map.empty.asJava)) match {
+              case Success(fs) => Some(Left(fs))
+              case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
+            }
+        case Right(fileScanProvider) =>
+          fileScanOpt = fileScanProvider.startStream(fileItem.getName, headersOpt map convertFileItemHeaders getOrElse Nil) match {
+            case Success(fs) => Some(Right(fs))
+            case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
+          }
       }
 
       Some(maxUploadSizeForControl)
     }
 
-    // Can throw
-    def updateProgress(b: Array[Byte], off: Int, len: Int): Unit = {
+    def updateProgress(b: Array[Byte], off: Int, len: Int): Option[FileScanResult] = {
 
       progressOpt foreach (_.receivedSize += len)
 
-      fileScanOpt foreach { fileScan =>
-        withFileScanCall(fileScan.bytesReceived(b, off, len))
+      fileScanOpt map {
+        case Left(fileScan2) => withFileScanCall2(fileScan2.bytesReceived(b, off, len))
+        case Right(fileScan) => withFileScanCall(fileScan.bytesReceived(b, off, len))
       }
     }
 
-    // Can throw
-    def fileItemState(state: UploadState[DiskFileItem]): Unit = {
-
-      state match {
-        case UploadState.Completed(fileItem) => fileScanOpt foreach (fileScan => withFileScanCall(fileScan.complete(fileFromFileItemCreateIfNeeded(fileItem))))
-        case UploadState.Interrupted(_)      => runQuietly(fileScanOpt foreach (_.abort())) // TODO: maybe log?
-        case _ =>
-      }
+    def fileItemState(state: UploadState[DiskFileItem]): Option[FileScanResult] = {
 
       progressOpt foreach (_.state = state)
+
+      state match {
+        case UploadState.Completed(fileItem) =>
+
+          val file = fileFromFileItemCreateIfNeeded(fileItem)
+
+          fileScanOpt map {
+            case Left(fileScan2) => withFileScanCall2(fileScan2.complete(file))
+            case Right(fileScan) => withFileScanCall(fileScan.complete(file))
+          }
+        case UploadState.Interrupted(_) =>
+          try {
+            fileScanOpt foreach {
+              case Left(fileScan2) => fileScan2.abort()
+              case Right(fileScan) => fileScan.abort()
+            }
+          } catch {
+            case NonFatal(t) =>
+              Logger.info(s"error thrown by file scan provider while calling `abort()`: ${OrbeonFormatter.getThrowableMessage(t)}")
+          }
+          None
+        case UploadState.Started =>
+          None
+      }
     }
 
     def interrupted(): Unit = {
@@ -294,28 +320,65 @@ object UploaderServer {
     def fileFromFileItemCreateIfNeeded(fileItem: DiskFileItem): java.io.File =
       new java.io.File(new URI(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE)))
 
-    def withFileScanCall(block: => FileScanStatus): FileScanStatus =
+    def withFileScanCall(block: => FileScanStatus): FileScanResult =
       Try(block) match {
-        case Failure(t)                     => throw FileScanException(t.getMessage)
-        case Success(FileScanStatus.Reject) => throw FileScanException("File scan rejected uploaded content")
-        case Success(FileScanStatus.Error)  => throw FileScanException("File scan returned an error")
-        case Success(FileScanStatus.Accept) => FileScanStatus.Accept
+        case Success(FileScanStatus.Accept) => FileScanAcceptResult(None)
+        case Success(FileScanStatus.Reject) => FileScanRejectResult(Some("File scan rejected uploaded content"))
+        case Success(FileScanStatus.Error)  => FileScanErrorResult(Some("File scan returned an error"), None)
+        case Failure(t)                     => FileScanErrorResult(Option(t.getMessage), Option(t))
       }
 
-    lazy val fileScanProviderOpt: Option[FileScanProvider] =
+    def withFileScanCall2(block: => JFileScanResult): FileScanResult =
+      Try(block) match {
+        case Success(fileScanResponse) => fileScanResultFromJavaApi(fileScanResponse)
+        case Failure(t)                => FileScanErrorResult(message   = Option(t.getMessage), throwable = Option(t))
+      }
+
+    def loadProvider[T <: { def init(): Unit } : ClassTag]: Option[T] = {
       try {
         Version.instance.requirePEFeature("File scan API")
 
-        Option(ServiceLoader.load(classOf[FileScanProvider])) flatMap { serviceLoader =>
-          serviceLoader.iterator.asScala.nextOption() |!> { provider =>
-            Logger.info(s"Initializing file scan provider `${provider.getClass.getName}`")
-            provider.init()
+        val runtimeClass = implicitly[ClassTag[T]].runtimeClass
+
+        Option(ServiceLoader.load(runtimeClass)) flatMap { serviceLoader =>
+          serviceLoader.iterator.asScala.nextOption() map { provider =>
+            Logger.info(s"Initializing file scan provider for class `${runtimeClass.getName}`")
+            val withInit = provider.asInstanceOf[T] // it better be but we can't prove it in code!
+            withInit.init()
+            withInit
           }
         }
       } catch {
         case NonFatal(t) =>
           Logger.error(s"Failed to obtain file scan provider:\n${OrbeonFormatter.format(t)}")
           None
+      }
+    }
+
+    lazy val fileScanProviderOpt: Option[Either[FileScanProvider2, FileScanProvider]] =
+      loadProvider[FileScanProvider2].map(Left.apply)
+        .orElse(loadProvider[FileScanProvider].map(Right.apply))
+
+    // The Java API uses its ADT. Here we convert from that to our native Scala ADT.
+    def fileScanResultFromJavaApi(jfsr: JFileScanResult): FileScanResult =
+      jfsr match {
+        case r: JFileScanResult.FileScanAcceptResult =>
+          FileScanAcceptResult(
+            message    = Option(r.message)  .flatMap(_.trimAllToOpt),
+            mediatype  = Option(r.mediatype).flatMap(_.trimAllToOpt),
+            filename   = Option(r.filename) .flatMap(_.trimAllToOpt),
+            content    = Option(r.content),
+            extension  = Option(r.extension).map(_.asScala.toMap)
+          )
+        case r: JFileScanResult.FileScanRejectResult =>
+          FileScanRejectResult(
+            message = Option(r.message).flatMap(_.trimAllToOpt)
+          )
+        case r: JFileScanResult.FileScanErrorResult  =>
+          FileScanErrorResult(
+            message   = Option(r.message).flatMap(_.trimAllToOpt),
+            throwable = Option(r.throwable)
+          )
       }
   }
 }

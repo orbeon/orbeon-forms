@@ -3285,7 +3285,7 @@
                 <upload-error-size>Die hochgeladene Datei ist zu groß. Die maximal zulässige Größe ist {0,number,integer} Bytes und die tatsächlich empfangene Größe ist {1,number,integer} Bytes.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
                 <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file.  Here is the file scanner message: "{0}".]</upload-error-file-scan>
-                <lost-attachments todo="true">[Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.]</lost-attachments>
+                <lost-attachments>Einige Beilagen sind aufgrund eines Serverproblems verloren gegangen. Bitte prüfen Sie alle Beilagen und laden Sie diese gegebenenfalls erneut hoch.</lost-attachments>
             </messages>
             <draft-singleton>
                 <found-draft>Gefundener Entwurf</found-draft>

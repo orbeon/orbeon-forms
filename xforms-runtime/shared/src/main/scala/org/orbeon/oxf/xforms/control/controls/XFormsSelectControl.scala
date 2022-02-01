@@ -144,7 +144,7 @@ class XFormsSelectControl(
                   eventTarget  = selfControl,
                   locationData = getLocationData,
                   nodeInfo     = boundNode,
-                  valueToSet   = (valueAsLinkedSet(DataModel.getValue(boundNode)) - v) mkString " ",
+                  valueToSet   = valueAsLinkedSet(DataModel.getValue(boundNode)).diff(Set(v)) mkString " ",
                   source       = "deselect",
                   isCalculate  = false,
                   collector    = collector
@@ -166,7 +166,7 @@ class XFormsSelectControl(
                   eventTarget  = selfControl,
                   locationData = getLocationData,
                   nodeInfo     = boundNode,
-                  valueToSet   = (valueAsLinkedSet(DataModel.getValue(boundNode)) + v) mkString " ",
+                  valueToSet   = valueAsLinkedSet(DataModel.getValue(boundNode)).union(Set(v)) mkString " ",
                   source       = "select",
                   isCalculate  = false,
                   collector    = collector

@@ -52,7 +52,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
   val FieldName = "xf-5"
 
   // NOTE: Use `WrappedArray` so that `Array` content comparison works
-  case class FileItemContent(contentType: String, fieldName: String, size: Long, filename: String, content: m.WrappedArray[Byte])
+  case class FileItemContent(contentType: String, fieldName: String, size: Long, filename: String, content: m.ArraySeq[Byte])
 
   def convertFileItemContent(item: UploadItem): Either[String, FileItemContent] = item map { f =>
     FileItemContent(f.getContentType, f.getFieldName, f.getSize, f.getName, inputStreamToByteArray(f.getInputStream))

@@ -46,7 +46,7 @@ object Log4jSupport {
       val log4jContext = LogManager.getContext(false).asInstanceOf[LoggerContext]
 
       val resultStream =
-        propsWithFns.toStream map { case (propName, propValue, fn) =>
+        propsWithFns.to(LazyList) map { case (propName, propValue, fn) =>
 
           def tryToEither[T](t: Try[T], wrap: Throwable => LoggerInitError) =
             t.toEither.left.map(wrap)

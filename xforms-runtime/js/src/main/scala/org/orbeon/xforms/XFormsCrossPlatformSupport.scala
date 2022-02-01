@@ -109,7 +109,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
         case v: org.scalajs.dom.Element =>
           withElement(
             v.tagName,
-            atts = v.attributes.toIterable map { case (name, att) => name -> att.value }
+            atts = v.attributes.toList map { case (name, att) => name -> att.value }
           ) {
             outputFragment(v.childNodes)
           }

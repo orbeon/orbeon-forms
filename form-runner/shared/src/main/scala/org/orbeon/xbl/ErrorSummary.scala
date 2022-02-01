@@ -86,7 +86,7 @@ object ErrorSummary {
     val sectionsWithErrorsIt = invalidControlIds.flatMap { absoluteControlId =>
       val effectiveControlId = XFormsId.absoluteIdToEffectiveId(absoluteControlId)
       val controlOpt         = inScopeContainingDocument.findControlByEffectiveId(effectiveControlId)
-      controlOpt.toIterable flatMap { control =>
+      controlOpt.iterator flatMap { control =>
         val containingSections = FRComponentParamSupport.ancestorSectionsIt(control)
         containingSections.map(_.getId).flatMap(frc.controlNameFromIdOpt)
       }

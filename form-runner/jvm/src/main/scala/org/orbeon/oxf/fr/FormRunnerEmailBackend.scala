@@ -17,7 +17,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xml.NamespaceMapping
 
-import scala.jdk.CollectionConverters.asScalaBufferConverter
+import scala.jdk.CollectionConverters._
 
 
 trait FormRunnerEmailBackend {

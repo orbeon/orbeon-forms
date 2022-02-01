@@ -41,7 +41,7 @@ object Focus {
         val currentChain = containersAndSelf(control).reverse
 
         // Number of common ancestor containers, if any
-        val commonPrefix = previousChain zip currentChain prefixLength { case (previous, current) => previous eq current}
+        val commonPrefix = previousChain zip currentChain segmentLength { case (previous, current) => previous eq current}
 
         // Focus out of the previous control and grouping controls we are leaving
         // Events are dispatched from leaf to root

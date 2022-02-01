@@ -176,7 +176,7 @@ object Wizard {
       XFormsAPI.resolveAs[XFormsVariableControl](staticOrAbsoluteId) flatMap (_.valueOpt)
 
     def booleanValue(value: ValueRepresentationType) = value match {
-      case v: AtomicValue => SaxonUtils.effectiveBooleanValue(v.iterate)
+      case v: AtomicValue => SaxonUtils.effectiveBooleanValue(v.iterate())
       case _              => false
     }
 

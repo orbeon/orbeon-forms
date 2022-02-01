@@ -17,7 +17,7 @@ import javax.portlet._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.wsrp.WSRPSupport
 
-import scala.jdk.CollectionConverters.mapAsJavaMapConverter
+import scala.jdk.CollectionConverters._
 
 
 // Liferay-specific portlet support

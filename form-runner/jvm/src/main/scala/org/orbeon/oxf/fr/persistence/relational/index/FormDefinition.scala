@@ -47,9 +47,9 @@ trait FormDefinition {
   private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
   private def withDynamicItems(
-    resources     : Seq[(String, NodeInfo)],
+    resources     : collection.Seq[(String, NodeInfo)],
     distinctValues: Seq[String]
-  ): Seq[(String, NodeInfo)] = {
+  ): collection.Seq[(String, NodeInfo)] = {
     // Remove empty values as they're not allowed for dropdown values and use them as labels
     val items = distinctValues.filter(_.nonEmpty).map { value =>
       <item>

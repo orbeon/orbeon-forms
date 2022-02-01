@@ -187,7 +187,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
             item       = contextItem,
             expr       = path map (_.value) mkString "/",
             namespaces = namespaces
-          ).asInstanceOf[Seq[NodeInfo]].to(List)
+          ).asInstanceOf[collection.Seq[NodeInfo]].to(List)
         }
       )
     }
@@ -316,7 +316,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     data      : Option[NodeInfo],
     predicate : NodeInfo => Boolean)(implicit
     ctx       : FormRunnerDocContext
-  ): collection.Seq[ControlBindPathHoldersResources] =
+  ): Seq[ControlBindPathHoldersResources] =
     searchControlBindPathHoldersInDoc(
       controlElems   = ctx.bodyElemOpt.toList descendant * filter IsControl,
       contextItemOpt = data map (_.rootElement),
@@ -368,7 +368,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     contextItemOpt : Option[NodeInfo],
     predicate      : NodeInfo => Boolean)(implicit
     ctx            : FormRunnerDocContext
-  ): collection.Seq[ControlBindPathHoldersResources] =
+  ): Seq[ControlBindPathHoldersResources] =
     for {
       control                              <- controlElems
       if predicate(control)

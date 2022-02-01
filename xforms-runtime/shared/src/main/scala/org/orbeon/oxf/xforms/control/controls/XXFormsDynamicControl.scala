@@ -228,13 +228,13 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         ListenerResult.Stop
       }
 
-      def recordChanges(findChange: om.NodeInfo => Option[(String, Element)], changes: Growable[(String, Element)])(nodes: Seq[om.NodeInfo]): ListenerResult = {
+      def recordChanges(findChange: om.NodeInfo => Option[(String, Element)], changes: Growable[(String, Element)])(nodes: collection.Seq[om.NodeInfo]): ListenerResult = {
         val newChanges = nodes flatMap (findChange(_))
         changes ++= newChanges
         if (newChanges.nonEmpty) ListenerResult.Stop else ListenerResult.NextListener
       }
 
-      def changeListener(record: Seq[om.NodeInfo] => ListenerResult): MirrorEventListener = {
+      def changeListener(record: collection.Seq[om.NodeInfo] => ListenerResult): MirrorEventListener = {
         case insert: XFormsInsertEvent              => record(insert.insertedNodes collect { case n: om.NodeInfo => n })
         case delete: XFormsDeleteEvent              => record(delete.deletedNodes)
         case valueChanged: XXFormsValueChangedEvent => record(List(valueChanged.node))

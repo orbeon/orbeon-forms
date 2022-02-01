@@ -29,7 +29,7 @@ trait ConnectionContextSupportPlatform extends ConnectionContextSupportTrait {
   ): T =
     (connectionContextProviderOpt, connectionCtx) match {
       case (Some(provider), Some(ctx)) =>
-        provider.pushContext(ctx, url, method.entryName, headers.mapValues(_.toArray).asJava, extension.asJava)
+        provider.pushContext(ctx, url, method.entryName, headers.view.mapValues(_.toArray).to(Map).asJava, extension.asJava)
         try
           body
         finally

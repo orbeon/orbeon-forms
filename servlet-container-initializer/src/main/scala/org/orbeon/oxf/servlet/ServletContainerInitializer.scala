@@ -18,7 +18,8 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils._
 
 import java.{util => ju}
-import scala.jdk.CollectionConverters.enumerationAsScalaIteratorConverter
+import scala.jdk.CollectionConverters._
+
 
 class JavaxServletContainerInitializer extends javax.servlet.ServletContainerInitializer with CommonContainerInitializer {
   protected val logger: Logger = LoggerFactory.createLogger(classOf[JavaxServletContainerInitializer])

@@ -300,7 +300,7 @@ object FormBuilderXPathApi {
       controlName,
       newAppearance,
       defaultAlertElem,
-      validationElems
+      validationElems.to(List)
     )(FormBuilderDocContext())
 
   //@XPathFunction

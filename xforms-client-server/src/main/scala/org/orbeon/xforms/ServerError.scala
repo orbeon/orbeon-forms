@@ -34,7 +34,7 @@ object ServerError {
 
   def errorsAsHtmlString(errors: IterableOnce[ServerError]): String =
     ul {
-      errors.toList.map { error =>
+      errors.iterator.to(List).map { error =>
         li(
           span(error.message), {
             val tuples = collectTuples(error, description)

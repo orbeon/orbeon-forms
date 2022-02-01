@@ -25,6 +25,7 @@ import org.scalajs.jquery.JQueryEventObject
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 import scala.scalajs.js.UndefOr
+import scala.scalajs.js.JSConverters._
 
 
 object FormRunnerPrivateAPI extends js.Object {
@@ -184,7 +185,7 @@ object FormRunnerPrivateAPI extends js.Object {
       controlLabel,
       validationMessage,
       validationLevel,
-      sectionNames.splitTo[js.Array]()
+      sectionNames.splitTo[Array]().toJSArray
     )
   }
 

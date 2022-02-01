@@ -166,10 +166,10 @@ object ControlAjaxSupport {
       val classes2 = tokenize(class2)
 
       // Classes to remove and to add
-      val toRemove = classes1 -- classes2 map ('-' + _)
-      val toAdd    = classes2 -- classes1 map ('+' + _)
+      val toRemove = classes1.diff(classes2).map("-" + _)
+      val toAdd    = classes2.diff(classes1).map("+" + _)
 
-      toRemove ++ toAdd mkString " "
+      (toRemove ++ toAdd).mkString(" ")
     }
 
   // NOTE: Similar to XFormsSingleNodeControl.addAjaxCustomMIPs. Should unify handling of classes.

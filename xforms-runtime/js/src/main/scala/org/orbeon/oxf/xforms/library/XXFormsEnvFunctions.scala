@@ -8,7 +8,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter, XPathCache}
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
-import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.EventCollector
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction._
@@ -217,8 +217,8 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   @XPathFunction
   def componentContext()(implicit xfc: XFormsFunction.Context): Iterable[om.Item] =
     for {
-      componentControl <- xfc.container.associatedControlOpt.toIterable
-      bindingContext   <- Option(componentControl.bindingContext.parent).toIterable
+      componentControl <- xfc.container.associatedControlOpt.toList
+      bindingContext   <- Option(componentControl.bindingContext.parent).toList
       item             <- bindingContext.nodeset.asScala
     } yield
       item

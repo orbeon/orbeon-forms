@@ -179,7 +179,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       }
 
     val uniqueSectionTemplateControlsForLibraryStaticIds =
-      allSectionTemplateControlsForLibrary.map(_.staticControl.staticId).to[mutable.LinkedHashSet]
+      allSectionTemplateControlsForLibrary.map(_.staticControl.staticId).to(mutable.LinkedHashSet)
 
     // The function can be called from multiple places, but we expect that it can be called:
     //

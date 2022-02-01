@@ -9,7 +9,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import java.io
 import java.net.URI
 import javax.cache.Caching
-import scala.jdk.CollectionConverters.iterableAsScalaIterableConverter
+import scala.jdk.CollectionConverters._
 import scala.util.Try
 import scala.util.control.NonFatal
 

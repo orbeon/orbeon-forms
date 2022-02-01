@@ -433,7 +433,7 @@ trait XFormsInstanceIndex extends BasicIdIndex {
       self.documentInfo.narrowTo[DocumentWrapper] foreach (wrapper => wrapper.setIdGetter(idGetter(wrapper)))
   }
 
-  def updateIndexForInsert(nodes: Seq[om.NodeInfo]): Unit =
+  def updateIndexForInsert(nodes: collection.Seq[om.NodeInfo]): Unit =
     if (hasIdIndex)
       for (node <- nodes)
         combineMappings(mappingsInSubtree(node))

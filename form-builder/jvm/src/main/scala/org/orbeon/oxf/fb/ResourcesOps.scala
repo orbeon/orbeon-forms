@@ -84,7 +84,7 @@ trait ResourcesOps extends BaseOps {
   def setControlResourcesWithLang(
     controlName  : String,
     resourceName : String,
-    langValues   : Seq[(String, Seq[String])])(implicit
+    langValues   : collection.Seq[(String, Seq[String])])(implicit
     ctx          : FormBuilderDocContext
   ): Unit = {
 
@@ -245,7 +245,7 @@ trait ResourcesOps extends BaseOps {
     controlName  : String,
     resourceName : String,
     count        : Int = 1,
-    langs        : Seq[String])(implicit // TODO: `langs` is not used. Oversight or correct?
+    langs        : collection.Seq[String])(implicit // TODO: `langs` is not used. Oversight or correct?
     ctx          : FormBuilderDocContext
   ): collection.Seq[(String, collection.Seq[NodeInfo])] =
     allLangs(resourcesRoot) map

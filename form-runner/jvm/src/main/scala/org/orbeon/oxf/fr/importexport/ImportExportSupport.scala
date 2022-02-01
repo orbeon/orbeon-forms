@@ -374,7 +374,7 @@ object ImportExportSupport {
   def getItemsForControl(
     leafControl                 : om.NodeInfo,
     bind                        : om.NodeInfo,
-    resources                   : Seq[(String, om.NodeInfo)],
+    resources                   : Iterable[(String, om.NodeInfo)],
     requestedLang               : String,
     frResourcesForRequestedLang : om.NodeInfo
   ): Seq[(String, String)] =

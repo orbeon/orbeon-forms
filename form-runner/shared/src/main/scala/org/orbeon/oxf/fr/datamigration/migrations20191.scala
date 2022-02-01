@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames._
@@ -276,7 +277,7 @@ object MigrationOps20191 extends MigrationOps {
     }
 
   private object Private {
-    def applyPath(mutableData: NodeInfo, path: i.Seq[PathElem]): collection.Seq[NodeInfo] =
+    def applyPath(mutableData: NodeInfo, path: List[PathElem]): collection.Seq[NodeInfo] =
       path.foldLeft(Seq(mutableData): collection.Seq[NodeInfo]) { case (e, p) => e child p.value }
   }
 }

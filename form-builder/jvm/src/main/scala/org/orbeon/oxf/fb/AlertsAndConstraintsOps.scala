@@ -59,7 +59,8 @@ trait AlertsAndConstraintsOps extends ControlOps {
     controlName      : String,
     newAppearance    : String,
     defaultAlertElem : NodeInfo,
-    validationElems  : Seq[NodeInfo])(implicit
+    validationElems  : List[NodeInfo]
+  )(implicit
     ctx              : FormBuilderDocContext
   ): Unit = {
 
@@ -68,12 +69,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
     // - writes are destructive: they remove all xf:alert, alert resources, and validations for the control
     // - we don't allow editing the validation id, but we preserve it when possible
 
-    val validationElemsSeq = validationElems.to(List)
-
     // Extract from XML
     val allValidations = {
-      val idsIterator = nextTmpIds(token = Names.Validation, count = validationElemsSeq.size).iterator
-      validationElemsSeq map (v => v -> (v attValue "type")) flatMap {
+      val idsIterator = nextTmpIds(token = Names.Validation, count = validationElems.size).iterator
+      validationElems map (v => v -> (v attValue "type")) flatMap {
         case (e, MipName.Required.name) => Some(RequiredValidation.fromXml(e, idsIterator))
         case (e, "datatype")            => Some(DatatypeValidation.fromXml(e, idsIterator, controlName))
         case (e, _)                     => ConstraintValidation.fromXmlOpt(e, idsIterator)

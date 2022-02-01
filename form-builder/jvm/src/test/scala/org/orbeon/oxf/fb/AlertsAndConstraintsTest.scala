@@ -607,7 +607,7 @@ class AlertsAndConstraintsTest
     ConstraintValidation.fromForm(controlName) map
     (a => a.toXML: NodeInfo) toArray
 
-  private def assertAlertsXML(left: List[sx.Elem], right: Seq[NodeInfo]): Unit = {
+  private def assertAlertsXML(left: List[sx.Elem], right: Iterable[NodeInfo]): Unit = {
 
     left zip right foreach {
       case (l, r) => assertXMLDocumentsIgnoreNamespacesInScope(l.toDocument, TransformerUtils.tinyTreeToOrbeonDom(r))

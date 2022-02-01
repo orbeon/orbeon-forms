@@ -51,7 +51,7 @@ class StaticBind(
       (Extensions.resolveQName(namespaceMapping.mapping.get, _, unprefixedIsNoNamespace = true))
 
   // All XPath MIPs
-  val allMipNamesToXPathMIP: Map[MipName.XPath, List[XPathMIP]] = customMipNameToXPathMIP ++ mipNameToXPathMIP
+  val allMipNamesToXPathMIP: Map[MipName.XPath, List[XPathMIP]] = Map.empty[MipName.XPath, List[XPathMIP]] ++ customMipNameToXPathMIP ++ mipNameToXPathMIP
 
   // All constraint XPath MIPs grouped by level
   val constraintsByLevel: Map[ValidationLevel, List[XPathMIP]] = {

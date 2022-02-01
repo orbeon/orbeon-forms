@@ -96,7 +96,7 @@ private[persistence] object PersistenceProxyProcessor {
       )
 
     def headersFromRequest(request: Request): Map[String, List[String]] =
-      request.getHeaderValuesMap.asScala.mapValues(_.toList).toMap
+      request.getHeaderValuesMap.asScala.view.mapValues(_.toList).toMap
   }
 
   sealed trait VersionAction
@@ -1121,5 +1121,5 @@ private[persistence] object PersistenceProxyProcessor {
   }
 
   private def filterVersioningHeaders(headers: Map[String, List[String]]): Map[String, List[String]] =
-    headers.filterKeys(k => ! Version.AllVersionHeadersLower(k.toLowerCase))
+    headers.view.filterKeys(k => ! Version.AllVersionHeadersLower(k.toLowerCase)).to(Map)
 }

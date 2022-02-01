@@ -47,8 +47,8 @@ class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
       )
     )
 
-  def insertedNodes       = property[Seq[om.NodeInfo]]("inserted-nodes").get
-  def originItems         = property[Seq[om.Item]]("origin-nodes").get
+  def insertedNodes       = property[collection.Seq[om.NodeInfo]]("inserted-nodes").get
+  def originItems         = property[collection.Seq[om.Item]]("origin-nodes").get
   def insertLocationNode  = property[om.NodeInfo]("insert-location-node").get
   def insertLocationIndex = property[Int]("insert-location-index").get
   def position            = property[String]("position").get

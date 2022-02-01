@@ -186,7 +186,7 @@ class XFormsSwitchControl(container: XBLContainer, parent: XFormsControl, elemen
     staticControl.caseControls.head.staticId
 
   // Filter because XXFormsVariableControl can also be a child
-  def getChildrenCases: Seq[XFormsCaseControl] =
+  def getChildrenCases: collection.Seq[XFormsCaseControl] =
     children collect { case c: XFormsCaseControl => c }
 
   def setSelectedCase(caseControlToSelect: XFormsCaseControl, collector: ErrorEventCollector): Unit = {

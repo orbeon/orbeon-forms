@@ -218,6 +218,7 @@ object FormRunnerPersistence {
       .groupBy(_._1)
       .mapValues(_.map(_._2))
       .filter(kv => FormRunner.isActiveProvider(kv._1, properties))
+      .toMap
   }
 
   def providerPropertyName(provider: String, property: String): String =

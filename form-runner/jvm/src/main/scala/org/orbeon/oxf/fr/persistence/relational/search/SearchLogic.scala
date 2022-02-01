@@ -281,7 +281,7 @@ trait SearchLogic {
 
         // The order of the document metadata in the SQL results is already correct, take it as a reference for the final order
         val orderedDocumentMetadata          = rawDocumentMetadataAndValues.map(_._1).distinct
-        val documentValuesByDocumentMetadata = rawDocumentMetadataAndValues.groupBy(_._1).mapValues(_.map(_._2))
+        val documentValuesByDocumentMetadata = rawDocumentMetadataAndValues.groupBy(_._1).view.mapValues(_.map(_._2))
         val documentMetadataAndValues        = orderedDocumentMetadata.map { documentMetadata =>
           // Keep document metadata order and group all values together
           documentMetadata -> documentValuesByDocumentMetadata(documentMetadata)

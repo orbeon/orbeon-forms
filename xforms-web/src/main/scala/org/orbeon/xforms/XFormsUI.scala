@@ -1292,7 +1292,7 @@ object XFormsUI {
                 dom.document.createElement("optgroup").asInstanceOf[html.OptGroup].kestrel { optgroup =>
                   optgroup.label = itemElement.label.getOrElse("")
                   classOpt.foreach(optgroup.className = _)
-                  optgroup.replaceChildren(children.toList.map(generateItem): _*)
+                  optgroup.replaceChildren(children.map(generateItem).toList: _*)
                 }
             }
           }
@@ -1423,7 +1423,7 @@ object XFormsUI {
     // Q: Should this be by form?
     var lastCheckboxChecked: Option[(html.Element, html.Input)] = None
 
-    def nestedInputElems(target: dom.Element): Seq[html.Input] =
+    def nestedInputElems(target: dom.Element): collection.Seq[html.Input] =
       target.getElementsByTagName("input").map(_.asInstanceOf[html.Input])
 
     private def findLoaderElem: Option[raw.Element] =

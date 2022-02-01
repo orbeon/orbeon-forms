@@ -614,7 +614,7 @@ object ToolboxOps {
 
     // Remove the `ignore` set. This is for the case where we don't want to rename the enclosing section.
     val xcvNamesInUse =
-      mutable.LinkedHashSet() ++ iterateNamesInUse(Right(xcvElem)) -- ignore toList
+      (mutable.LinkedHashSet() ++ iterateNamesInUse(Right(xcvElem))).diff(ignore).toList
 
     def toNameWithPrefixSuffix(name: String) = prefix + name + suffix
 

@@ -134,7 +134,7 @@ object RelationalUtils extends Logging {
 
     // Workaround for WildFly (TODO: do we really need it?)
     prefixesToTry
-      .toStream
+      .to(LazyList)
       .map(prefix => Try(InitialContext.doLookup(prefix + name).asInstanceOf[DataSource]))
       .collectFirst { case Success(dataSource) => dataSource }
   }

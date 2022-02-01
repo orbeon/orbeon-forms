@@ -480,7 +480,7 @@ trait ControlOps extends ResourcesOps {
     controlName : String,
     lhht        : String,
     value       : String,
-    params      : Option[Seq[NodeInfo]], // `None` means don't update the params
+    params      : Option[collection.Seq[NodeInfo]], // `None` means don't update the params
     isHTML      : Boolean
   )(implicit
     ctx         : FormBuilderDocContext
@@ -498,7 +498,7 @@ trait ControlOps extends ResourcesOps {
   def setControlLHHATParams(
     controlName : String,
     lhha        : String,
-    params      : Seq[NodeInfo])(implicit
+    params      : collection.Seq[NodeInfo])(implicit
     ctx         : FormBuilderDocContext
   ): Boolean = {
 

@@ -19,7 +19,6 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-      xmlns:saxon="http://saxon.sf.net/"
       xmlns:utils="java:org.orbeon.oxf.util.StringUtils"
 
       id="fb-action-dialog"
@@ -35,6 +34,10 @@
     <xf:var name="instance" value="instance('fb-actions-editor-instance')"/>
     <xf:var name="body"     value="$body" model="fr-form-model"/>
 
+    <xf:var name="action1"  value="$instance/fb:action/xf:action[1]"/>
+    <xf:var name="observer" value="$action1/@ev:observer"/>
+    <xf:var name="event"    value="$action1/@fb:event"/>
+
     <xf:var
         name="all-available-services"
         value="
@@ -48,10 +51,9 @@
                     )
                 )
             ]"/>
-
-    <xf:var name="action1"  value="$instance/fb:action/xf:action[1]"/>
-    <xf:var name="observer" value="$action1/@ev:observer"/>
-    <xf:var name="event"    value="$action1/@fb:event"/>
+    <xf:var
+        name="selected-service"
+        value="$all-available-services[@id = $action1/xf:send/@submission]"/>
 
     <!-- Initialize dialog -->
     <xf:action event="xxforms-dialog-open">
@@ -67,7 +69,7 @@
         <xf:action if="not($binding-name)">
             <xf:insert ref="$instance/*" origin="instance('fb-binding-template')"/>
         </xf:action>
-        <!-- Otherwise copy binding -->
+        <!-- Otherwise, copy binding -->
         <xf:action if="$binding-name">
             <xf:var name="binding-id"                 value="concat($binding-name, '-binding')"/>
             <xf:setvalue ref="$instance/name"         value="$binding-name"/>
@@ -257,17 +259,28 @@
 
             <xf:group ref="$instance/fb:action" appearance="xxf:internal">
 
-                <!-- Set Service Request Values -->
+                <xh:div class="fb-action-options">
+                    <xh:div class="fb-action-option-3-col-span-2">
+                        <xh:label>
+                            <xf:output ref="$form-resources/dialog-actions/source/label"/>
+                        </xh:label>
+                    </xh:div>
+                    <xh:div class="fb-action-option-3-col-span-1">
+                        <xh:label>
+                            <xf:output ref="$form-resources/dialog-actions/destination/label"/>
+                        </xh:label>
+                    </xh:div>
+                </xh:div>
+
+                <!-- Set HTTP Service Parameters -->
                 <xf:group ref="
                     .[
                         exists(
-                            $all-available-services[xxf:has-class('fr-service')]
+                            $selected-service[xxf:has-class('fr-service')]
                         )
                     ]/xf:action[
                         @fb:event = 'xforms-submit'
                     ]/xf:action">
-
-                    <xf:label ref="$form-resources/dialog-actions/request-parameters/label"/>
 
                     <xf:var
                         name="request-actions-container"
@@ -352,8 +365,36 @@
                                     </xf:case>
                                 </xf:switch>
 
+                                <xf:var name="service-id"           value="substring-before($selected-service/@id, '-submission')"/>
+                                <xf:var name="instance-id"          value="concat($service-id, '-instance')"/>
+                                <xf:var name="instance-body-string" value="$model/fb:instance[@id = $instance-id]/*"/>
+                                <xf:var name="instance-body"        value="xf:parse($instance-body-string)"/>
+                                <xf:var name="param-names"          value="$instance-body/*/local-name()"/>
+                                <xf:var name="destination-ref"      value="(*:variable | *:var)[@name = 'path']/(@value | @select)[1]"/>
+                                <xf:var name="is-path-to-param"
+                                    value="
+                                        starts-with($destination-ref, '//') and
+                                        not(contains(substring-after($destination-ref, '//'), '/')) and
+                                        substring-after($destination-ref, '//') = $param-names"/>
+                                <xf:var name="show-parameters-dropdown"
+                                    value="
+                                        $selected-service/@method = ('get', 'delete') and
+                                        (xxf:is-blank($destination-ref) or $is-path-to-param)"/>
+
+                                <!-- Dropdown to select request parameter -->
+                                <xf:group ref=".[$show-parameters-dropdown]">
+                                    <fr:dropdown-select1 ref="$destination-ref" class="fb-action-option-3-col-span-1">
+
+                                        <xf:itemset ref="$instance-body/*">
+                                            <xf:label ref="local-name()"/>
+                                            <xf:value ref="concat('//', local-name())"/>
+                                        </xf:itemset>
+                                    </fr:dropdown-select1>
+                                </xf:group>
+
+                                <!-- Input for XPath expression to request body -->
                                 <xf:input
-                                    ref="(*:variable | *:var)[@name = 'path']/(@value | @select)[1]"
+                                    ref="$destination-ref[not($show-parameters-dropdown)]"
                                     incremental="true"
                                     class="fb-action-option-3-col-span-1">
                                     <xf:label ref="$form-resources/dialog-actions/destination-xpath/label" appearance="minimal"/>
@@ -391,13 +432,11 @@
                 <xf:group ref="
                     .[
                         exists(
-                            $all-available-services[xxf:has-class('fr-database-service')]
+                            $selected-service[xxf:has-class('fr-database-service')]
                         )
                     ]/xf:action[
                         @fb:event = 'xforms-submit'
                     ]/xf:action">
-
-                    <xf:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
 
                     <xf:var
                         name="request-actions-container"

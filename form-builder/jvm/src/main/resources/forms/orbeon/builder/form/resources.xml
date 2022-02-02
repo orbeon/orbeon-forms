@@ -1120,18 +1120,18 @@
                 <label>Service to Call</label>
                 <hint>Service to call when the event happens</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Set Service Request Values</label>
-            </request-parameters>
+            <source>
+                <label>Source</label>
+            </source>
+            <destination>
+                <label>Destination</label>
+            </destination>
             <source-control>
                 <label>Source Control</label>
             </source-control>
             <destination-xpath>
                 <label>Destination XPath Expression</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Set Database Service Parameters</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Parameter number</label>
             </parameter-number>
@@ -2447,18 +2447,18 @@
                 <label>Service à appeler</label>
                 <hint>Service à appeler lorsque l'événement se produit</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Paramêtres de la requête au service</label>
-            </request-parameters>
+            <source>
+                <label>Source</label>
+            </source>
+            <destination>
+                <label>Destination</label>
+            </destination>
             <source-control>
                 <label>Contrôle source</label>
             </source-control>
             <destination-xpath>
                 <label>Expression XPath destination</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Paramêtres de la requête au service base de données</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Numéro de paramètre</label>
             </parameter-number>
@@ -3784,18 +3784,18 @@
                 <label>Tjeneste som kalles</label>
                 <hint>Tjeneste som skal kalles når en hendelse inntrer</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Sett verdiene til tjenesteforespørselen</label>
-            </request-parameters>
+            <source>
+                <label todo="true">[Source]</label>
+            </source>
+            <destination>
+                <label todo="true">[Destination]</label>
+            </destination>
             <source-control>
                 <label>Kildekontroll</label>
             </source-control>
             <destination-xpath>
                 <label>Xpath-uttrykk for destinasjonen</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Sett tjenesteparametre for database</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Parameter number</label>
             </parameter-number>
@@ -5120,18 +5120,18 @@
                 <label>Используемый сервис</label>
                 <hint>К какому сервису обращаться при наступлении события</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Задать параметры вызова HTTP-сервиса</label>
-            </request-parameters>
+            <source>
+                <label todo="true">[Source]</label>
+            </source>
+            <destination>
+                <label todo="true">[Destination]</label>
+            </destination>
             <source-control>
                 <label>Элемент-источник</label>
             </source-control>
             <destination-xpath>
                 <label>Выражение XPath для приемника</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Задать параметры вызова сервиса СУБД</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Номер параметра</label>
             </parameter-number>
@@ -6449,18 +6449,18 @@
                 <label>Servizio da eseguire quando chiamato</label>
                 <hint>Servizio da eseguire quando l'evento si verifica</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Imposti i parametri per la richiesta del servizio</label>
-            </request-parameters>
+            <source>
+                <label todo="true">[Source]</label>
+            </source>
+            <destination>
+                <label todo="true">[Destination]</label>
+            </destination>
             <source-control>
                 <label>Controllo della fonte</label>
             </source-control>
             <destination-xpath>
                 <label>Espressione XPath destinazione</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Imposti parametri per il servizio database</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Numero del parametro</label>
             </parameter-number>
@@ -7779,18 +7779,18 @@
                 <label>Aufzurufender Dienst</label>
                 <hint>Dienst welcher beim Auslösen der Aktion aufgerufen werden soll</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Werte für die Serviceanfrage setzen</label>
-            </request-parameters>
+            <source>
+                <label todo="true">[Source]</label>
+            </source>
+            <destination>
+                <label todo="true">[Destination]</label>
+            </destination>
             <source-control>
                 <label>Steuerelement (Quelle)</label>
             </source-control>
             <destination-xpath>
                 <label>XPath-Ausdruck (Ziel)</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Parameter des Datenbankdienstes setzen</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Parameternummer</label>
             </parameter-number>
@@ -9111,18 +9111,18 @@
                 <label>Palvelu johon soitetaan</label>
                 <hint>Palvelu johon soitetaan tapahtuman tapahtuessa</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Aseta palvelupyyntöarvot</label>
-            </request-parameters>
+            <source>
+                <label todo="true">[Source]</label>
+            </source>
+            <destination>
+                <label todo="true">[Destination]</label>
+            </destination>
             <source-control>
                 <label>Lähdekontrolli</label>
             </source-control>
             <destination-xpath>
                 <label>Kohde XPath-lauseke</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Aseta tietokantapalveluiden parametrit</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Parametrin numero</label>
             </parameter-number>
@@ -10440,18 +10440,18 @@
                 <label>Servicio a Invocar</label>
                 <hint>Servicio a invocar cuando el evento suceda</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Configurar los valores de petición del Servicio</label>
-            </request-parameters>
+            <source>
+                <label todo="true">[Source]</label>
+            </source>
+            <destination>
+                <label todo="true">[Destination]</label>
+            </destination>
             <source-control>
                 <label>Control de Código Fuente</label>
             </source-control>
             <destination-xpath>
                 <label>Destino Expresión XPath</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Configurar Parámetros del Servicio de Base de Datos</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Número de parámetro</label>
             </parameter-number>
@@ -11749,18 +11749,18 @@
                 <label>Service om aan te roepen</label>
                 <hint>Service om aan te roepen bij optreden van event</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Stel Service Request waarden in</label>
-            </request-parameters>
+            <source>
+                <label todo="true">[Source]</label>
+            </source>
+            <destination>
+                <label todo="true">[Destination]</label>
+            </destination>
             <source-control>
                 <label>Bron control</label>
             </source-control>
             <destination-xpath>
                 <label>Doel XPath expressie</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Stel database service-parameters in</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Parameter aantal</label>
             </parameter-number>
@@ -13085,18 +13085,18 @@
                 <label>Serviço a chamar</label>
                 <hint>Serviço a chamar quando o evento ocorre</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Atribuir valores ao pedido do serviço</label>
-            </request-parameters>
+            <source>
+                <label todo="true">[Source]</label>
+            </source>
+            <destination>
+                <label todo="true">[Destination]</label>
+            </destination>
             <source-control>
                 <label>Controlo de fontes </label>
             </source-control>
             <destination-xpath>
                 <label>Expressão XPath de destino</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Atribuir parâmetros ao serviço de base de dados</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Número do parâmetro</label>
             </parameter-number>
@@ -14422,18 +14422,18 @@
                 <label>Tjänst att anropa</label>
                 <hint>Tjänst som ska anropas när händelse triggar kommandot</hint>
             </service-to-call>
-            <request-parameters>
-                <label>Parametervärden för tjänsten</label>
-            </request-parameters>
+            <source>
+                <label todo="true">[Source]</label>
+            </source>
+            <destination>
+                <label todo="true">[Destination]</label>
+            </destination>
             <source-control>
                 <label>Ursprungskontroll</label>
             </source-control>
             <destination-xpath>
                 <label>XPath-uttryck för destinationen</label>
             </destination-xpath>
-            <request-database-parameter>
-                <label>Parametrar för databastjänst</label>
-            </request-database-parameter>
             <parameter-number>
                 <label>Parameternummer</label>
             </parameter-number>

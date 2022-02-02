@@ -738,6 +738,44 @@ div.orbeon.orbeon-portlet-div {
             .dialog-scrollable(600px);
         }
 
+        // On the left, taking most of the space, all for the fields for one line
+        .fb-action-options {
+
+            input, textarea, select {
+                width: 100%;
+            }
+
+            // `N-col-span-M` means that the option take M/N of the available space
+            // E.g. `3-col-span-2` takes 2/3 of the available space for options
+
+            .fb-action-option-2-col-span-1,
+            .fb-action-option-3-col-span-1,
+            .fb-action-option-3-col-span-2 {
+                display: inline-block;
+                vertical-align: top;
+                margin: 0;
+                padding-right: 10px;
+                box-sizing: border-box;
+            }
+
+            @optionsWidth : 700px;
+            @2colWidth    : @optionsWidth/2;
+            @3colWidth    : @optionsWidth/3;
+
+            // So all the options are on the same line
+            min-width: @optionsWidth;
+
+            .fb-action-option-2-col-span-1 { width: @2colWidth }
+            .fb-action-option-3-col-span-1 { width: @3colWidth }
+            .fb-action-option-3-col-span-2 { width: @3colWidth * 2 }
+
+            // We use `appearance="minimal"` on labels
+            label {
+                border-bottom: 1px solid #e5e5e5;
+                margin-bottom: 10px;
+            }
+        }
+
         .xbl-fr-dnd-repeat {
             display: table;
             width: 100%;
@@ -745,43 +783,6 @@ div.orbeon.orbeon-portlet-div {
             // A reorderable line
             .fb-action-iteration {
                 display: table-row;
-
-                // On the left, taking most of the space, all for the fields for one line
-                .fb-action-options {
-
-                    input, textarea, select {
-                        width: 100%;
-                    }
-
-                    // `N-col-span-M` means that the option take M/N of the available space
-                    // E.g. `3-col-span-2` takes 2/3 of the available space for options
-
-                    .fb-action-option-2-col-span-1,
-                    .fb-action-option-3-col-span-1,
-                    .fb-action-option-3-col-span-2 {
-                        display: inline-block;
-                        vertical-align: top;
-                        margin: 0;
-                        padding-right: 10px;
-                        box-sizing: border-box;
-                    }
-
-                    @optionsWidth : 700px;
-                    @2colWidth    : @optionsWidth/2;
-                    @3colWidth    : @optionsWidth/3;
-
-                    // So all the options are on the same line
-                    min-width: @optionsWidth;
-
-                    .fb-action-option-2-col-span-1 { width: @2colWidth }
-                    .fb-action-option-3-col-span-1 { width: @3colWidth }
-                    .fb-action-option-3-col-span-2 { width: @3colWidth * 2 }
-
-                    // We use `appearance="minimal"` on labels
-                    .xforms-label {
-                        display: none;
-                    }
-                }
 
                 // On the right, the buttons to reorder, remove, and add rows
                 .fb-action-buttons {

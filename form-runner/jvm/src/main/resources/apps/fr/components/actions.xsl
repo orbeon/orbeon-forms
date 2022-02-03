@@ -526,7 +526,7 @@
 
         <xsl:variable
             name="right-control"
-            select="frf:findControlByName(., $right-name)"/>
+            select="frf:findControlByNameXPath(., $right-name)"/>
 
         <!-- Pick `apply-defaults` from the destination control.
              https://github.com/orbeon/orbeon-forms/issues/4038 -->

@@ -154,6 +154,6 @@ trait FormRunnerSectionTemplateOps {
   def sectionTemplateBindingName(section: NodeInfo): Option[URIQualifiedName] =
     section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption
 
-  def findSectionsWithTemplates(view: NodeInfo) =
-    view descendant * filter frc.IsSection filter (_ / * exists isSectionTemplateContent)
+  def findSectionsWithTemplates(implicit ctx: FormRunnerDocContext) =
+    ctx.bodyElem descendant * filter frc.IsSection filter (_ / * exists isSectionTemplateContent)
 }

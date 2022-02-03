@@ -81,8 +81,8 @@ class FormBuilderFunctionsTest
       }
 
       it("must find the control element") {
-        assert(findControlByName(doc, Control1).get.uriQualifiedName === URIQualifiedName(XF, "input"))
-        assert(findControlByName(doc, Control1).get.hasIdValue(controlId(Control1)))
+        assert(findControlByName(Control1).get.uriQualifiedName === URIQualifiedName(XF, "input"))
+        assert(findControlByName(Control1).get.hasIdValue(controlId(Control1)))
       }
     }
   }
@@ -93,8 +93,8 @@ class FormBuilderFunctionsTest
       val doc = ctx.formDefinitionRootElem
 
       it("must find the bind element") {
-        assert(findBindByName(doc, Control1).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
-        assert(findBindByName(doc, Control1).get.hasIdValue(bindId(Control1)))
+        assert(findBindByName(Control1).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
+        assert(findBindByName(Control1).get.hasIdValue(bindId(Control1)))
       }
 
       it("must check the content of the value holder") {
@@ -113,7 +113,7 @@ class FormBuilderFunctionsTest
       val doc = ctx.formDefinitionRootElem
 
       it("must find the section name") {
-        assert(findSectionName(doc, Control1).get === Section1)
+        assert(findSectionName(Control1).get === Section1)
         assert(getControlNameOpt(doc descendant "*:section" head).get === Section1)
       }
     }
@@ -127,13 +127,13 @@ class FormBuilderFunctionsTest
 
         ensureBinds(List(Section1, Control2))
 
-        assert(findBindByName(doc, Control2).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
-        assert(findBindByName(doc, Control2).get.hasIdValue(bindId(Control2)))
+        assert(findBindByName(Control2).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
+        assert(findBindByName(Control2).get.hasIdValue(bindId(Control2)))
 
         ensureBinds(List(Section2, "grid-1", Control3))
 
-        assert(findBindByName(doc, Control3).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
-        assert(findBindByName(doc, Control3).get.hasIdValue(bindId(Control3)))
+        assert(findBindByName(Control3).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
+        assert(findBindByName(Control3).get.hasIdValue(bindId(Control3)))
       }
     }
   }
@@ -183,7 +183,7 @@ class FormBuilderFunctionsTest
         val newControlName = newControlNameOption.get
 
         // Test result
-        assert(findControlByName(doc, newControlName).get.hasIdValue(controlId(newControlName)))
+        assert(findControlByName(newControlName).get.hasIdValue(controlId(newControlName)))
 
         val newlySelectedCell = findSelectedCell
         assert(newlySelectedCell.isDefined)
@@ -196,7 +196,7 @@ class FormBuilderFunctionsTest
         val dataHolder = assertDataHolder(newControlName)
         assert((dataHolder.head precedingSibling * head).name === "control-1")
 
-        val controlBind = findBindByName(doc, newControlName).get
+        val controlBind = findBindByName(newControlName).get
         assert(controlBind.hasIdValue(bindId(newControlName)))
         assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
@@ -266,7 +266,7 @@ class FormBuilderFunctionsTest
           val dataHolder = assertDataHolder(containerNames.init.last)
           assert((dataHolder.head precedingSibling * head).name === "grid-1")
 
-          val controlBind = findBindByName(doc, newRepeatName).get
+          val controlBind = findBindByName(newRepeatName).get
           assert(controlBind.hasIdValue(bindId(newRepeatName)))
           assert((controlBind precedingSibling * att "id") === bindId("grid-1"))
 
@@ -289,14 +289,14 @@ class FormBuilderFunctionsTest
           val containerNames = findContainerNamesForModel(newlySelectedCell.get)
           assert(containerNames === List("section-1", newRepeatName, newRepeatIterationName))
 
-          assert(findControlByName(doc, newControlName).get.hasIdValue(controlId(newControlName)))
+          assert(findControlByName(newControlName).get.hasIdValue(controlId(newControlName)))
 
           // NOTE: We should maybe just compare the XML for holders, binds, and resources
           val dataHolder = assertDataHolder(newControlName)
           assert(dataHolder.head precedingSibling * isEmpty)
           assert((dataHolder.head parent * head).name === newRepeatIterationName)
 
-          val controlBind = findBindByName(doc, newControlName).get
+          val controlBind = findBindByName(newControlName).get
           assert(controlBind.hasIdValue(bindId(newControlName)))
           assert((controlBind parent * head).hasIdValue(bindId(newRepeatIterationName)))
 
@@ -449,7 +449,7 @@ class FormBuilderFunctionsTest
 
     def assertSectionsKeepName()(implicit ctx: FormBuilderDocContext) =
       for (sectionName <- SectionNames)
-        assert(findControlByName(ctx.formDefinitionRootElem, sectionName).isDefined, s"for $sectionName")
+        assert(findControlByName(sectionName).isDefined, s"for $sectionName")
 
     def assertUniqueIds()(implicit ctx: FormBuilderDocContext) = {
 
@@ -492,7 +492,7 @@ class FormBuilderFunctionsTest
         for ((sectionName, expectedCount) <- SectionsNamesAndControls) {
 
           val nestedControlsStartingWithMyCount =
-            findNestedControls(findControlByName(ctx.formDefinitionRootElem, sectionName).get) flatMap
+            findNestedControls(findControlByName(sectionName).get) flatMap
             getControlNameOpt count
             (_ startsWith "my-")
 

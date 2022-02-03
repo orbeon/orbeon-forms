@@ -51,8 +51,8 @@ class ClipboardTest
 
         def assertPresent() = {
           assert(Control1 === FormRunner.getControlName(selectedCell / * head))
-          assert(FormRunner.findControlByName(doc, Control1).nonEmpty)
-          assert(FormRunner.findBindByName(doc, Control1).nonEmpty)
+          assert(FormRunner.findControlByName(Control1).nonEmpty)
+          assert(FormRunner.findBindByName(Control1).nonEmpty)
           assert(FormRunner.findDataHolders(Control1).nonEmpty)
           assert(FormBuilder.findCurrentResourceHolder(Control1).nonEmpty)
         }
@@ -64,8 +64,8 @@ class ClipboardTest
         // Selected cell hasn't changed
         assert(FormBuilder.findSelectedCell contains selectedCell)
 
-        assert(FormRunner.findControlByName(doc, Control1).isEmpty)
-        assert(FormRunner.findBindByName(doc, Control1).isEmpty)
+        assert(FormRunner.findControlByName(Control1).isEmpty)
+        assert(FormRunner.findBindByName(Control1).isEmpty)
         assert(FormRunner.findDataHolders(Control1).isEmpty)
         assert(FormBuilder.findCurrentResourceHolder(Control1).isEmpty)
 
@@ -98,12 +98,12 @@ class ClipboardTest
           // Before and after cut
           locally {
             assert(FormBuilder.findContainerById(containerId).nonEmpty)
-            assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
+            assert(FormRunner.findControlByName(nestedControlName).nonEmpty)
 
             FormBuilderRpcApiImpl.containerCut(containerId)
 
             assert(FormBuilder.findContainerById(containerId).isEmpty)
-            assert(FormRunner.findControlByName(doc, nestedControlName).isEmpty)
+            assert(FormRunner.findControlByName(nestedControlName).isEmpty)
 
             assert(initialContainerCount > countContainers)
           }
@@ -114,7 +114,7 @@ class ClipboardTest
           locally {
             ToolboxOps.pasteFromClipboard()
             assert(FormBuilder.findContainerById(containerId).nonEmpty)
-            assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
+            assert(FormRunner.findControlByName(nestedControlName).nonEmpty)
             assert(initialContainerCount === countContainers)
           }
 
@@ -123,7 +123,7 @@ class ClipboardTest
             val Prefix = "my-"
             FormBuilderXPathApi.pasteSectionGridFromClipboard(Prefix, "")
             assert(FormBuilder.findContainerById(Prefix + containerId).nonEmpty)
-            assert(FormRunner.findControlByName(doc, Prefix + nestedControlName).nonEmpty)
+            assert(FormRunner.findControlByName(Prefix + nestedControlName).nonEmpty)
             assert(initialContainerCount + cutContainersCount === countContainers)
           }
 
@@ -131,8 +131,8 @@ class ClipboardTest
           locally {
             val Suffix = "-nice"
             FormBuilderXPathApi.pasteSectionGridFromClipboard("", Suffix)
-            assert(findControlByName(ctx.formDefinitionRootElem, controlNameFromId(containerId) + Suffix).nonEmpty)
-            assert(FormRunner.findControlByName(doc, nestedControlName + Suffix).nonEmpty)
+            assert(findControlByName(controlNameFromId(containerId) + Suffix).nonEmpty)
+            assert(FormRunner.findControlByName(nestedControlName + Suffix).nonEmpty)
             assert(initialContainerCount + cutContainersCount * 2 === countContainers)
           }
 
@@ -162,7 +162,7 @@ class ClipboardTest
 
           assert(expected == findValues(sourceControlName))
 
-          ToolboxOps.cutToClipboard(findControlByName(doc, sourceControlName).get.parentUnsafe)
+          ToolboxOps.cutToClipboard(findControlByName(sourceControlName).get.parentUnsafe)
           ToolboxOps.pasteFromClipboard()
           assert(expected == findValues(sourceControlName))
 
@@ -178,9 +178,9 @@ class ClipboardTest
 
           assert(List(expected) == findValues(sourceControlName))
 
-          ToolboxOps.copyToClipboard(findControlByName(doc, sourceControlName).get.parentUnsafe)
+          ToolboxOps.copyToClipboard(findControlByName(sourceControlName).get.parentUnsafe)
 
-          FormBuilder.selectCell(findControlByName(doc, RepeatedControl1).get.parentUnsafe)
+          FormBuilder.selectCell(findControlByName(RepeatedControl1).get.parentUnsafe)
           ToolboxOps.pasteFromClipboard()
           assert(List(expected)           == findValues(sourceControlName))
           assert(List(expected, expected) == findValues(newControlName))
@@ -191,9 +191,9 @@ class ClipboardTest
         def assertCutPasteRepeatToSingle(sourceControlName: String, newControlName: String, expected: List[String]): Unit = {
 
           assert(expected == findValues(sourceControlName))
-          ToolboxOps.copyToClipboard(findControlByName(doc, sourceControlName).get.parentUnsafe)
+          ToolboxOps.copyToClipboard(findControlByName(sourceControlName).get.parentUnsafe)
 
-          FormBuilder.selectCell(findControlByName(doc, SingleControl).get.parentUnsafe)
+          FormBuilder.selectCell(findControlByName(SingleControl).get.parentUnsafe)
           ToolboxOps.pasteFromClipboard()
           assert(expected           == findValues(sourceControlName))
           assert(List(expected.head) == findValues(newControlName))

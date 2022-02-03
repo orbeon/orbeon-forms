@@ -16,6 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.UndoAction.MoveContainer
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerDocContext
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
@@ -78,6 +79,7 @@ trait SectionOps extends ContainerOps {
     (descendant ancestor "*:section" flatMap getControlNameOpt).head
 
   // Find the section name for a given control name
-  def findSectionName(doc: NodeInfo, controlName: String): Option[String] =
-    findControlByName(doc, controlName) map findSectionName
+  // 2022-02-02: Unused except by test.
+  def findSectionName(controlName: String)(implicit ctx: FormRunnerDocContext): Option[String] =
+    findControlByName(controlName) map findSectionName
 }

@@ -77,30 +77,33 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   // TODO: should be more restrictive
   val IsControl: NodeInfo => Boolean = hasName
 
+  //@XPathFunction
+  def findControlByNameXPath(inDoc: NodeInfo, controlName: String): Option[NodeInfo] =
+    findControlByName(controlName)(new InDocFormRunnerDocContext(inDoc))
+
   // Find a control by name (less efficient than searching by id)
-  def findControlByName(inDoc: NodeInfo, controlName: String): Option[NodeInfo] = (
+  def findControlByName(controlName: String)(implicit ctx: FormRunnerDocContext): Option[NodeInfo] = (
     for {
       suffix  <- PossibleControlSuffixes.iterator
-      control <- findInViewTryIndex(inDoc, controlName + '-' + suffix).iterator
+      control <- findInViewTryIndex(controlName + '-' + suffix).iterator
     } yield
       control
   ).nextOption()
 
   // Find a control id by name
-  def findControlIdByName(inDoc: NodeInfo, controlName: String): Option[String] =
-    findControlByName(inDoc, controlName) map (_.id)
+  def findControlIdByName(controlName: String)(implicit ctx: FormRunnerDocContext): Option[String] =
+    findControlByName(controlName) map (_.id)
 
   // Find a control element by name or null (the empty sequence)
-  //@XPathFunction
-  def findControlByNameOrEmpty(inDoc: NodeInfo, controlName: String): NodeInfo =
-    findControlByName(inDoc, controlName).orNull
+  def findControlByNameOrEmpty(inDoc: NodeInfo, controlName: String)(implicit ctx: FormRunnerDocContext): NodeInfo =
+    findControlByName(controlName).orNull
 
   // Get the control's name based on the control element
   def getControlName(control: NodeInfo): String = getControlNameOpt(control).get
 
   // Get the control's name based on the control element
   def getControlNameOpt(control: NodeInfo): Option[String] =
-    control.idOpt flatMap controlNameFromIdOpt
+    control.idOpt flatMap ControlOps.controlNameFromIdOpt
 
   def hasName(control: NodeInfo): Boolean = getControlNameOpt(control).isDefined
 
@@ -109,13 +112,8 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     bind attValueOpt "ref"
 
   // Find a bind by name
-  def findBindByName(inDoc: NodeInfo, name: String): Option[NodeInfo] =
-    findInBindsTryIndex(inDoc, bindId(name))
-
-  // Find a bind by name or null (the empty sequence)
-  //@XPathFunction
-  def findBindByNameOrEmpty(inDoc: NodeInfo, name: String): NodeInfo =
-    findBindByName(inDoc, name).orNull
+  def findBindByName(name: String)(implicit ctx: FormRunnerDocContext): Option[NodeInfo] =
+    findInBindsTryIndex(bindId(name))
 
   // NOTE: Not sure why we search for anything but id or name, as a Form Runner bind *must* have an id and a name
   def isBindForName(bind: NodeInfo, name: String): Boolean =
@@ -128,22 +126,22 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def findBindName(bind: NodeInfo): Option[String] =
     bind attValueOpt "name"
 
-  def findBindAndPathStatically(inDoc: NodeInfo, controlName: String): Option[BindPath] =
-    findBindByName(inDoc, controlName) flatMap { bindNode =>
+  def findBindAndPathStatically(controlName: String)(implicit ctx: FormRunnerDocContext): Option[BindPath] =
+    findBindByName(controlName) flatMap { bindNode =>
       buildBindPath(bindNode) map (BindPath(bindNode, _))
     }
 
   // Find data holders (there can be more than one with repeats)
   def findDataHolders(controlName: String)(implicit ctx: FormRunnerDocContext): List[NodeInfo] =
-    findBindPathHoldersInDocument(ctx.formDefinitionRootElem, controlName, ctx.dataRootElem.some) flatMap (_.holders) getOrElse Nil
+    findBindPathHoldersInDocument(controlName, ctx.dataRootElem.some) flatMap (_.holders) getOrElse Nil
 
   // If `contextItemOpt` is `None`, don't search for holders.
   def findBindPathHoldersInDocument(
-    inDoc          : NodeInfo,
     controlName    : String,
-    contextItemOpt : Option[Item]
+    contextItemOpt : Option[Item])(implicit
+    ctx            : FormRunnerDocContext
   ): Option[BindPathHolders] =
-    findBindAndPathStatically(inDoc, controlName) map { case BindPath(bind, path) =>
+    findBindAndPathStatically(controlName) map { case BindPath(bind, path) =>
 
       // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be
       // overridden along the way!)
@@ -176,34 +174,30 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     localName == "select" || localName.endsWith("-select")
 
   def searchControlsInFormByClass(
-    formDoc           : DocumentNodeInfoType,
     classes           : Set[String],
-    dataFormatVersion : DataFormatVersion
+    dataFormatVersion : DataFormatVersion)(implicit
+    ctx               : FormRunnerDocContext
   ): Seq[ControlBindPathHoldersResources] = {
-    val headOpt = (formDoc / "*:html" / "*:head").headOption
-    val bodyOpt = (formDoc / "*:html" / "*:body").headOption
-    val controlBindPathHoldersResourcesList =
-      bodyOpt.toList flatMap { body =>
+    val headOpt = (ctx.formDefinitionRootElem / "*:head").headOption
+    val controlBindPathHoldersResourcesList = {
 
-        val topLevelOnly =
-          frc.searchControlsTopLevelOnly(
-            body      = body,
+      val topLevelOnly =
+        frc.searchControlsTopLevelOnly(
+          data      = None,
+          predicate = frc.hasAnyClassPredicate(classes)
+        )
+
+      val withSectionTemplatesOpt =
+        headOpt map { head =>
+          frc.searchControlsUnderSectionTemplates(
+            head      = head,
             data      = None,
             predicate = frc.hasAnyClassPredicate(classes)
           )
+        }
 
-        val withSectionTemplatesOpt =
-          headOpt map { head =>
-            frc.searchControlsUnderSectionTemplates(
-              head      = head,
-              body      = body,
-              data      = None,
-              predicate = frc.hasAnyClassPredicate(classes)
-            )
-          }
-
-        topLevelOnly ++ withSectionTemplatesOpt.toList.flatten
-      }
+      topLevelOnly ++ withSectionTemplatesOpt.toList.flatten
+    }
     dataFormatVersion match {
       case DataFormatVersion.Edge => controlBindPathHoldersResourcesList
       case _                      =>
@@ -216,7 +210,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         // Find the migration functions once and for all
         val pathMigrationFunctions =
           for {
-            metadataElem <- frc.metadataInstanceRootOpt(formDoc).toList
+            metadataElem <- List(ctx.metadataRootElem) // xxx
             ops          <- migrationOpsToApply
             json         <- findMigrationForVersion(metadataElem, ops.version)
           } yield
@@ -231,32 +225,31 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   }
 
   def searchControlsTopLevelOnly(
-    body      : NodeInfo,
     data      : Option[NodeInfo],
-    predicate : NodeInfo => Boolean
+    predicate : NodeInfo => Boolean)(implicit
+    ctx       : FormRunnerDocContext
   ): Seq[ControlBindPathHoldersResources] =
     searchControlBindPathHoldersInDoc(
-      controlElems   = body descendant * filter IsControl,
-      inDoc          = body,
+      controlElems   = ctx.bodyElem descendant * filter IsControl,
       contextItemOpt = data map (_.rootElement),
       predicate      = predicate
     )
 
   def searchControlsUnderSectionTemplates(
     head      : NodeInfo,
-    body      : NodeInfo,
     data      : Option[NodeInfo],
-    predicate : NodeInfo => Boolean
+    predicate : NodeInfo => Boolean)(implicit
+    ctx       : FormRunnerDocContext
   ): Seq[ControlBindPathHoldersResources] =
     for {
-      section         <- frc.findSectionsWithTemplates(body)
+      section         <- frc.findSectionsWithTemplates
       sectionName     <- getControlNameOpt(section).toList
 
       BindPathHolders(
         _,
         sectionPath,
         sectionHoldersOpt
-      )              <- findBindPathHoldersInDocument(body, sectionName, data map (_.rootElement)).toList
+      )              <- findBindPathHoldersInDocument(sectionName, data map (_.rootElement)).toList
 
       contextItemOpt <- sectionHoldersOpt match {
                          case None | Some(Nil) => List(None)
@@ -273,27 +266,26 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         labels
       )              <- searchControlBindPathHoldersInDoc(
                          controlElems   = xblBinding.rootElement / XBLTemplateTest descendant * filter IsControl,
-                         inDoc          = xblBinding,
                          contextItemOpt = contextItemOpt,
                          predicate      = predicate
-                       )
+                       )(new InDocFormRunnerDocContext(xblBinding))
     } yield
       ControlBindPathHoldersResources(control, bind, sectionPath ::: path, holdersOpt, labels)
 
   // NOTE: Return at most one `ControlBindPathHoldersResources` per incoming control element.
   def searchControlBindPathHoldersInDoc(
     controlElems   : Seq[NodeInfo],
-    inDoc          : NodeInfo,
     contextItemOpt : Option[NodeInfo],
-    predicate      : NodeInfo => Boolean
+    predicate      : NodeInfo => Boolean)(implicit
+    ctx            : FormRunnerDocContext
   ): Seq[ControlBindPathHoldersResources] =
     for {
       control                              <- controlElems
       if predicate(control)
       bindId                               <- control.attValueOpt(XFormsNames.BIND_QNAME).toList
       controlName                          <- controlNameFromIdOpt(bindId).toList
-      BindPathHolders(bind, path, holders) <- findBindPathHoldersInDocument(inDoc, controlName, contextItemOpt).toList
-      resourceHoldersWithLang              = FormRunnerResourcesOps.findResourceHoldersWithLangUseDoc(inDoc, controlName)
+      BindPathHolders(bind, path, holders) <- findBindPathHoldersInDocument(controlName, contextItemOpt).toList
+      resourceHoldersWithLang              = FormRunnerResourcesOps.findResourceHoldersWithLangUseDoc(ctx.formDefinitionRootElem, controlName)
     } yield
       ControlBindPathHoldersResources(control, bind, path, holders, resourceHoldersWithLang)
 

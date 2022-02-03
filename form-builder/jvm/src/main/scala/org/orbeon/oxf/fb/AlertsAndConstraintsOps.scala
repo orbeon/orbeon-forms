@@ -132,7 +132,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     val inDoc = ctx.formDefinitionRootElem
 
-    val bind = findBindByName(inDoc, controlName).get
+    val bind = findBindByName(controlName).get
 
     val existingAttributeValidations = mipAtts (bind, mip)
     val existingElementValidations   = mipElems(bind, mip)
@@ -343,7 +343,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     ): Unit = {
       val newDatatype = datatypeQName
       for {
-        controlElem    <- findControlByName(ctx.formDefinitionRootElem, controlName)
+        controlElem    <- findControlByName(controlName)
         oldDatatype    = DatatypeValidation.fromForm(controlName).datatypeQName
         oldAppearances = controlElem attTokens APPEARANCE_QNAME
         (newElemName, newAppearanceAttOpt) <- BindingDescriptor.newElementName(
@@ -393,7 +393,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       val inDoc = ctx.formDefinitionRootElem
 
-      val bind = findBindByName(inDoc, controlName).get // require the bind
+      val bind = findBindByName(controlName).get // require the bind
 
       def builtinOrSchemaType(typ: String): Either[(QName, Boolean), QName] = {
         val qName         = bind.resolveQName(typ)
@@ -425,7 +425,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       val datatype = {
 
-        val bind = findBindByName(inDoc, controlName).get
+        val bind = findBindByName(controlName).get
 
         val builtinTypeStringOpt = (validationElem elemValue "builtin-type").trimAllToOpt
         val builtinTypeRequired  = (validationElem elemValue "builtin-type-required").trimAllToOpt contains "true"
@@ -592,7 +592,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
       val inDoc = ctx.formDefinitionRootElem
 
-      val controlElem                = findControlByName(inDoc, controlName).get
+      val controlElem                = findControlByName(controlName).get
       val alertResourcesForAllLangs  = getControlResourcesWithLang(controlName, "alert", allLangs(resourcesRoot))
 
       def alertFromElement(e: NodeInfo) = {
@@ -659,7 +659,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
     val inDoc = ctx.formDefinitionRootElem
 
-    val bind            = findBindByName(inDoc, controlName).get // require the bind
+    val bind            = findBindByName(controlName).get // require the bind
     val supportedAlerts = AlertDetails.fromForm(controlName)
 
     def findAlertForId(id: String) =

@@ -100,7 +100,8 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     descendant               : NodeInfo,
     includeSelf              : Boolean = false,
     includeIterationElements : Boolean = true,
-    includeNonRepeatedGrids  : Boolean = true
+    includeNonRepeatedGrids  : Boolean = true)(implicit
+    ctx                      : FormRunnerDocContext
   ): List[String] = {
 
     val namesWithContainers =
@@ -115,7 +116,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     val namesFromLeaf =
       if (includeIterationElements)
         namesWithContainers flatMap { name =>
-          findRepeatIterationName(descendant, name).toList ::: name :: Nil
+          findRepeatIterationName(name).toList ::: name :: Nil
         }
       else
         namesWithContainers
@@ -142,15 +143,11 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def findAncestorSections(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): Seq[NodeInfo] =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter IsSection
 
-  //@XPathFunction
-  def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String): String =
-    findRepeatIterationName(inDoc, controlName) getOrElse ""
-
-  def findRepeatIterationName(inDoc: NodeInfo, controlName: String): Option[String] =
+  def findRepeatIterationName(controlName: String)(implicit ctx: FormRunnerDocContext): Option[String] =
     for {
-      control       <- findControlByName(inDoc, controlName)
+      control       <- findControlByName(controlName)
       if controlRequiresNestedIterationElement(control)
-      bind          <- control attValueOpt XFormsNames.BIND_QNAME flatMap (findInBindsTryIndex(inDoc, _))
+      bind          <- control attValueOpt XFormsNames.BIND_QNAME flatMap findInBindsTryIndex
       iterationBind <- bind / XFBindTest headOption // there should be only a single nested bind
     } yield
       getBindNameOrEmpty(iterationBind)
@@ -162,7 +159,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
     containerElem child * find IsControl
 
   // Return all the controls in the view
-  def getAllControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] =
-    getFormRunnerBodyElem(inDoc) descendant * filter
+  def getAllControlsWithIds(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
+    ctx.bodyElem descendant * filter
       (e => isIdForControl(e.id))
 }

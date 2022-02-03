@@ -16,7 +16,7 @@ package org.orbeon.oxf.fb
 import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.XMLNames.{FBInitialIterations, _}
 import org.orbeon.oxf.fr.FormRunner._
-import org.orbeon.oxf.fr.FormRunnerTemplatesOps
+import org.orbeon.oxf.fr.{FormRunnerDocContext, FormRunnerTemplatesOps}
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.util.StringUtils._
@@ -42,7 +42,7 @@ trait ContainerOps extends ControlOps {
     // Support effective id, to make it easier to use from XForms (i.e. no need to call
     // `XFormsId.getStaticIdFromId` every time)
     val staticId = XFormsId.getStaticIdFromId(containerId)
-    findInViewTryIndex(ctx.formDefinitionRootElem, staticId) filter IsContainer
+    findInViewTryIndex(staticId) filter IsContainer
   }
 
   def findNestedContainers(containerElem: NodeInfo): Seq[NodeInfo] =
@@ -55,7 +55,8 @@ trait ContainerOps extends ControlOps {
       (_ == element)
 
   // Return all the container controls in the view
-  def getAllContainerControlsWithIds(inDoc: NodeInfo): Seq[NodeInfo] = getAllControlsWithIds(inDoc) filter IsContainer
+  def getAllContainerControlsWithIds(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
+    getAllControlsWithIds filter IsContainer
 
   def getAllContainerControls(inDoc: NodeInfo): Seq[NodeInfo] = getFormRunnerBodyElem(inDoc) descendant * filter IsContainer
 
@@ -157,8 +158,8 @@ trait ContainerOps extends ControlOps {
 
         // Move bind
         for {
-          bind      <- findBindByName(doc, name)
-          otherBind <- findBindByName(doc, otherName)
+          bind      <- findBindByName(name)
+          otherBind <- findBindByName(otherName)
         } yield
           move(bind, otherBind)
 
@@ -174,7 +175,7 @@ trait ContainerOps extends ControlOps {
                   (moveOp(holder, _))
           }
 
-        val movedContainer = findInViewTryIndex(doc, containerElem.id).get // must get new reference
+        val movedContainer = findInViewTryIndex(containerElem.id).get // must get new reference
 
         (firstControl(movedContainer preceding *), firstControl(movedContainer following *)) match {
           case (Some(preceding), _) => tryToMoveHolders(getControlName(preceding), moveElementAfter)
@@ -231,7 +232,7 @@ trait ContainerOps extends ControlOps {
     // TODO: Remove once `ctx` is used everywhere
     val inDoc = ctx.formDefinitionRootElem
 
-    findControlByName(inDoc, controlName) foreach { control =>
+    findControlByName(controlName) foreach { control =>
 
       val wasRepeat = isRepeat(control)
       val oldInitialIterationsAttribute = FormRunnerTemplatesOps.getInitialIterationsAttribute(control)
@@ -262,15 +263,15 @@ trait ContainerOps extends ControlOps {
         val iterationName = iterationNameOrEmpty.trimAllToOpt getOrElse defaultIterationName(controlName)
 
         // Make sure there are no nested binds
-        val oldNestedBinds = findBindByName(inDoc, controlName).toList / *
+        val oldNestedBinds = findBindByName(controlName).toList / *
         delete(oldNestedBinds)
 
         // Insert nested iteration bind
-        findControlByName(inDoc, controlName) foreach { control =>
+        findControlByName(controlName) foreach { control =>
           ensureBinds(findContainerNamesForModel(control) :+ controlName :+ iterationName)
         }
 
-        val controlBind   = findBindByName(inDoc, controlName)
+        val controlBind   = findBindByName(controlName)
         val iterationBind = controlBind.toList / *
         insert(into = iterationBind, origin = oldNestedBinds)
 
@@ -296,7 +297,7 @@ trait ContainerOps extends ControlOps {
         // Remove bind, holders and template
 
         // Move bind up
-        val controlBind = findBindByName(inDoc, controlName).toList
+        val controlBind = findBindByName(controlName).toList
         val oldNestedBinds = controlBind / * / *
         delete(controlBind / *)
         insert(into = controlBind, origin = oldNestedBinds)

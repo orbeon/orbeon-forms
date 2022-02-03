@@ -63,7 +63,7 @@ class FormBuilderUndoTest
           // Before and after delete container
           locally {
             assert(FormBuilder.findContainerById(containerId).nonEmpty)
-            assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
+            assert(FormRunner.findControlByName(nestedControlName).nonEmpty)
 
             if (isGrid)
               FormBuilder.deleteGridByIdIfPossible(containerId) foreach Undo.pushUserUndoAction
@@ -71,7 +71,7 @@ class FormBuilderUndoTest
               FormBuilder.deleteSectionByIdIfPossible(containerId) foreach Undo.pushUserUndoAction
 
             assert(FormBuilder.findContainerById(containerId).isEmpty)
-            assert(FormRunner.findControlByName(doc, nestedControlName).isEmpty)
+            assert(FormRunner.findControlByName(nestedControlName).isEmpty)
 
             assert(initialContainerCount    > countContainers)
             assert(initialNonContainerCount > countNonContainers)
@@ -82,7 +82,7 @@ class FormBuilderUndoTest
             FormBuilderXPathApi.undoAction()
 
             assert(FormBuilder.findContainerById(containerId).nonEmpty)
-            assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
+            assert(FormRunner.findControlByName(nestedControlName).nonEmpty)
 
             assert(initialContainerCount    === countContainers)
             assert(initialNonContainerCount === countNonContainers)
@@ -95,7 +95,7 @@ class FormBuilderUndoTest
           locally {
             FormBuilderRpcApiImpl.controlDelete(nestedControlId)
 
-            assert(FormRunner.findControlByName(doc, nestedControlName).isEmpty)
+            assert(FormRunner.findControlByName(nestedControlName).isEmpty)
 
             assert(initialContainerCount        === countContainers)
             assert(initialNonContainerCount - 1 === countNonContainers)
@@ -105,7 +105,7 @@ class FormBuilderUndoTest
           locally {
             FormBuilderXPathApi.undoAction()
 
-            assert(FormRunner.findControlByName(doc, nestedControlName).nonEmpty)
+            assert(FormRunner.findControlByName(nestedControlName).nonEmpty)
 
             assert(initialContainerCount    === countContainers)
             assert(initialNonContainerCount === countNonContainers)

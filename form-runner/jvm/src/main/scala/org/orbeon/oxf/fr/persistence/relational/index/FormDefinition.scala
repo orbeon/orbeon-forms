@@ -15,8 +15,9 @@ package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner}
+import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -36,9 +37,22 @@ trait FormDefinition {
     databaseDataFormatVersion : DataFormatVersion
   ): Seq[IndexedControl] = {
 
+    implicit val ctx = new InDocFormRunnerDocContext(formDoc) {
+      override lazy val bodyElem: om.NodeInfo = {
+
+        // For "Form Builder as form definition". This is used by the Summary page and the `reindex()` feature.
+        def fromFbPseudoBody: Option[NodeInfo] =
+          formDoc.rootElement / "*:body" / "*:div" find (_.id == "fb-pseudo-body")
+
+        frc.findFormRunnerBodyElem(formDoc) orElse
+          fromFbPseudoBody                  getOrElse
+          (throw new IllegalArgumentException("missing form body"))
+      }
+    }
+
     // Controls in the view, with the `fr-summary` or `fr-search` class
     val indexedControlBindPathHolders =
-      FormRunner.searchControlsInFormByClass(formDoc, ClassesPredicate, databaseDataFormatVersion)
+      FormRunner.searchControlsInFormByClass(ClassesPredicate, databaseDataFormatVersion)
 
     indexedControlBindPathHolders map { case ControlBindPathHoldersResources(control, bind, path, _, resources) =>
       IndexedControl(

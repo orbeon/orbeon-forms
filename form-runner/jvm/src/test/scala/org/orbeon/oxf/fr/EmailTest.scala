@@ -69,10 +69,9 @@ class EmailTest
 
           val (actualValues, actualPaths) = valuesForSearch {
             frc.searchControlsTopLevelOnly(
-              body,
               Some(data),
               FormRunner.hasAllClassesPredicate(classNames.splitTo[List]())
-            )
+            )(new InDocFormRunnerDocContext(body))
           }
 
           assert(expectedValues === actualValues)
@@ -95,10 +94,9 @@ class EmailTest
           val (actualValues, actualPaths) = valuesForSearch {
             frc.searchControlsUnderSectionTemplates(
               head,
-              body,
               Some(data),
               FormRunner.hasAllClassesPredicate(classNames.splitTo[List]())
-            )
+            )(new InDocFormRunnerDocContext(body))
           }
 
           assert(expectedValues === actualValues)

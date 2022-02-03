@@ -102,7 +102,7 @@ trait ResourcesOps extends BaseOps {
   }
 
   def hasItemHintEditor(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =
-    findControlByName(ctx.formDefinitionRootElem, controlName) exists (e => FormBuilder.hasEditor(e, "item-hint"))
+    findControlByName(controlName) exists (e => FormBuilder.hasEditor(e, "item-hint"))
 
   // Get the control's items for all languages
   def getControlItemsGroupedByValue(controlName: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] = {

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.datamigration
 
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
-import org.orbeon.oxf.fr.DataFormatVersion
+import org.orbeon.oxf.fr.{DataFormatVersion, FormRunnerDocContext, InDocFormRunnerDocContext}
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
@@ -57,6 +57,8 @@ object MigrationOps48 extends MigrationOps {
     legacyGridsOnly      : Boolean
   ): Option[MigrationSet48] = {
 
+    implicit val ctx = new InDocFormRunnerDocContext(outerDocument)
+
     def updateWithBindingPath(migration: Migration48, bindingPath: List[PathElem]): Migration48 =
       migration.copy(containerPath = bindingPath ::: migration.containerPath)
 
@@ -64,7 +66,7 @@ object MigrationOps48 extends MigrationOps {
       MigrationSupport.buildGridMigrations(
         outerDocument         = outerDocument,
         availableXBLBindings  = availableXBLBindings,
-        migrationsForBinding  = (doc, _) => migrationsForBinding(doc, legacyGridsOnly),
+        migrationsForBinding  = (doc, _) => migrationsForBinding(legacyGridsOnly)(new InDocFormRunnerDocContext(doc)),
         updateWithBindingPath = updateWithBindingPath
       )
 
@@ -197,6 +199,8 @@ object MigrationOps48 extends MigrationOps {
     migrationSet  : M
   ): MigrationResult = {
 
+    implicit val ctx = new InDocFormRunnerDocContext(outerDocument)
+
     // NOTE: We don't use the `migrationSet` set here because we need to only check the top-level migrations, and
     // our migration format doesn't keep that information. We can't update that format without breaking
     // backward compatibility. We could migrate the format but we should still handle the old format if we do.
@@ -204,7 +208,7 @@ object MigrationOps48 extends MigrationOps {
 
     // TODO: We could check that the binds map existing ancestors, and still use `migrationSet`.
 
-    val migrations = migrationsForBinding(outerDocument, legacyGridsOnly = true)
+    val migrations = migrationsForBinding(legacyGridsOnly = true)
 
     migrations foreach {
       case Migration48(containerPath, iterationElem) =>
@@ -212,7 +216,7 @@ object MigrationOps48 extends MigrationOps {
         val containerName = containerPath.last.value // `.last` as is never empty (`NEL`)
         val iterationName = iterationElem.value
 
-        val containerBindElem = frc.findBindByName(outerDocument, containerName).toList
+        val containerBindElem = frc.findBindByName(containerName).toList
 
         val existingGridBindContent = (containerBindElem child *).toList
 
@@ -256,20 +260,20 @@ object MigrationOps48 extends MigrationOps {
 
   private object Private {
 
-    def gridRepeatIterationName(grid: NodeInfo): String = {
+    def gridRepeatIterationName(grid: NodeInfo)(implicit ctx: FormRunnerDocContext): String = {
       val controlName = frc.getControlName(grid)
       if (frc.isLegacyRepeat(grid))
         frc.defaultIterationName(controlName)
       else
-        frc.findRepeatIterationName(grid, controlName).get
+        frc.findRepeatIterationName(controlName).get
     }
 
-    def migrationsForBinding(doc: DocumentNodeInfoType, legacyGridsOnly: Boolean): Seq[Migration48] =
+    def migrationsForBinding(legacyGridsOnly: Boolean)(implicit ctx: FormRunnerDocContext): Seq[Migration48] =
       for {
-        gridElem               <- if (legacyGridsOnly) findLegacyRepeatedGrids(doc) else findAllGrids(doc, repeat = true)
+        gridElem               <- if (legacyGridsOnly) findLegacyRepeatedGrids else findAllGrids(repeat = true)
         gridName               = frc.getControlName(gridElem)
         iterationName          = gridRepeatIterationName(gridElem)
-        BindPath(_, pathElems) <- frc.findBindAndPathStatically(doc, gridName)
+        BindPath(_, pathElems) <- frc.findBindAndPathStatically(gridName)
       } yield
         Migration48(pathElems, PathElem(iterationName))
 

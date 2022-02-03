@@ -18,7 +18,7 @@ import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, XMLNames}
+import org.orbeon.oxf.fr.{AppForm, DataFormatVersion, FormRunnerDocContext, InDocFormRunnerDocContext, XMLNames}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
@@ -58,14 +58,14 @@ object MigrationSupport {
       }
   }
 
-  def findAllGrids(doc: DocumentNodeInfoType, repeat: Boolean): Seq[NodeInfo] =
-    frc.getFormRunnerBodyElem(doc) descendant * filter frc.IsGrid filter (g => frc.isRepeat(g) ^ ! repeat)
+  def findAllGrids(repeat: Boolean)(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
+    ctx.bodyElem descendant * filter frc.IsGrid filter (g => frc.isRepeat(g) ^ ! repeat)
 
-  def findLegacyRepeatedGrids(doc: DocumentNodeInfoType): Seq[NodeInfo] =
-    findAllGrids(doc, repeat = true) filter frc.isLegacyRepeat
+  def findLegacyRepeatedGrids(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
+    findAllGrids(repeat = true) filter frc.isLegacyRepeat
 
-  def findLegacyUnrepeatedGrids(doc: DocumentNodeInfoType): Seq[NodeInfo] =
-    findAllGrids(doc, repeat = false) filter frc.isLegacyUnrepeatedGrid
+  def findLegacyUnrepeatedGrids(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
+    findAllGrids(repeat = false) filter frc.isLegacyUnrepeatedGrid
 
   def findMigrationForVersion(metadataRootElem: NodeInfo, version: MigrationVersion): Option[String] =
     metadataRootElem                                        child
@@ -80,12 +80,14 @@ object MigrationSupport {
     updateWithBindingPath : (M, List[PathElem]) => M
   ): Seq[M] = {
 
+    implicit val ctx = new InDocFormRunnerDocContext(outerDocument)
+
     // Process section templates only if bindings are provided
     val (sectionsWithTemplates, xblBindingsByURIQualifiedName) =
       availableXBLBindings match {
         case Some(bindingsDocument) =>
           (
-            frc.findSectionsWithTemplates(frc.getFormRunnerBodyElem(outerDocument)),
+            frc.findSectionsWithTemplates,
             frc.sectionTemplateXBLBindingsByURIQualifiedName(bindingsDocument.rootElement / XBLXBLTest)
           )
         case None =>
@@ -103,7 +105,7 @@ object MigrationSupport {
 
       // NOTE: Don't use findDataHolders. We don't want current holders, as there might be none if there is are
       // currently no iterations around a section template, for example. We must find this statically.
-      val BindPath(_, holderPath) = frc.findBindAndPathStatically(outerDocument, sectionName).head // bind must be found
+      val BindPath(_, holderPath) = frc.findBindAndPathStatically(sectionName).head // bind must be found
 
       migrationsForBinding(xblBinding.root, false) map (updateWithBindingPath(_, holderPath))
     }

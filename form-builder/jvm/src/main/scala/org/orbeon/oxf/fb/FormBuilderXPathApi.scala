@@ -25,7 +25,7 @@ import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerTemplatesOps, Names, SchemaOps}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerTemplatesOps, InDocFormRunnerDocContext, Names, SchemaOps}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -56,7 +56,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlName)) foreach { controlElem =>
+    FormRunner.findControlByName(FormRunner.controlNameFromId(controlName)) foreach { controlElem =>
       assert(FormRunner.isRepeat(controlElem))
       updateTemplatesCheckContainers(FormRunner.findAncestorRepeatNames(controlElem).to(Set))
     }
@@ -94,18 +94,18 @@ object FormBuilderXPathApi {
 
     def findBind =
       if (controlName ne null)
-        FormRunner.findBindByName(ctx.formDefinitionRootElem, controlName)
+        FormRunner.findBindByName(controlName)
       else
-        FormRunner.findInBindsTryIndex(ctx.formDefinitionRootElem, FormBinds)
+        FormRunner.findInBindsTryIndex(FormBinds)
 
     val resultOpt =
       for {
         mip      <- ModelDefs.AllComputedMipsByName.get(mipName)
         bindElem <-
           if (controlName ne null)
-            FormRunner.findBindByName(ctx.formDefinitionRootElem, controlName)
+            FormRunner.findBindByName(controlName)
           else
-            FormRunner.findInBindsTryIndex(ctx.formDefinitionRootElem, FormBinds)
+            FormRunner.findInBindsTryIndex(FormBinds)
       } yield
         FormRunner.readDenormalizedCalculatedMip(bindElem, mip, mipToFBMIPQNames(mip)._1)
 
@@ -157,8 +157,18 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def selectCellForControlId(controlId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlId)).toList flatMap
+    FormRunner.findControlByName(FormRunner.controlNameFromId(controlId)).toList flatMap
       (_ parent CellTest) foreach selectCell
+  }
+
+  //@XPathFunction
+  def findControlIdByName(inDoc: NodeInfo, controlName: String): Option[String] =
+    FormRunner.findControlIdByName(controlName )(new InDocFormRunnerDocContext(inDoc))
+
+  //@XPathFunction
+  def findRepeatIterationNameOrEmpty(inDoc: NodeInfo, controlName: String): String = {
+    implicit val ctx = FormBuilderDocContext(inDoc)
+    FormRunner.findRepeatIterationName(controlName) getOrElse ""
   }
 
   //@XPathFunction
@@ -212,7 +222,7 @@ object FormBuilderXPathApi {
 
       if (doDelete) {
         delete(holders)
-        delete(findControlByName(ctx.formDefinitionRootElem, controlName).toList child controlLHHATQName(lhht))
+        delete(findControlByName(controlName).toList child controlLHHATQName(lhht))
       }
     }
   }
@@ -229,7 +239,7 @@ object FormBuilderXPathApi {
     implicit val ctx = FormBuilderDocContext()
 
     if (isHTML != FormBuilder.isItemsetHTMLMediatype(controlName)) {
-      val itemsetEl = FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName).toList child "itemset"
+      val itemsetEl = FormRunner.findControlByName(controlName).toList child "itemset"
       val labelHintEls = Seq("label", "hint") flatMap (itemsetEl.child(_))
       setHTMLMediatype(labelHintEls, isHTML)
     }
@@ -286,7 +296,7 @@ object FormBuilderXPathApi {
     // Find data holders for all section templates
     val holdersWithRoots =
       for {
-        sectionNode   <- FormRunner.findSectionsWithTemplates(ctx.bodyElem)
+        sectionNode   <- FormRunner.findSectionsWithTemplates
         controlName   <- FormRunner.getControlNameOpt(sectionNode).toList
         holder        <- FormRunner.findDataHolders(controlName) // TODO: What about within repeated sections? Templates ok?
         componentNode <- FormRunner.findComponentNodeForSection(sectionNode)
@@ -339,22 +349,22 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def hasCustomIterationName(controlName: String): Boolean = {
     implicit val ctx = FormBuilderDocContext()
-    FormRunner.findRepeatIterationName(ctx.formDefinitionRootElem, controlName) exists (isCustomIterationName(controlName, _))
+    FormRunner.findRepeatIterationName(controlName) exists (isCustomIterationName(controlName, _))
   }
 
   // NOTE: Value can be a simple AVT
   //@XPathFunction
   def getNormalizedMin(doc: NodeInfo, gridName: String): String =
-    FormBuilder.getNormalizedMin(doc, gridName)
+    FormBuilder.getNormalizedMin(doc, gridName)(new InDocFormRunnerDocContext(doc))
 
   //@XPathFunction
   def getNormalizedFreeze(doc: NodeInfo, gridName: String): String =
-    FormBuilder.getNormalizedFreeze(doc, gridName)
+    FormBuilder.getNormalizedFreeze(doc, gridName)(new InDocFormRunnerDocContext(doc))
 
   // Get the grid's normalized max attribute, the empty sequence if no maximum
   //@XPathFunction
   def getNormalizedMaxOrEmpty(doc: NodeInfo, gridName: String): String =
-    FormBuilder.getNormalizedMax(doc, gridName).orNull
+    FormBuilder.getNormalizedMax(doc, gridName)(new InDocFormRunnerDocContext(doc)).orNull
 
   //@XPathFunction
   def getAllNamesInUse: SequenceIterator = {
@@ -367,7 +377,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    val allContainersWithSettings = getAllContainerControlsWithIds(ctx.formDefinitionRootElem) filter FormRunner.hasContainerSettings
+    val allContainersWithSettings = getAllContainerControlsWithIds filter FormRunner.hasContainerSettings
 
     previousOrNext match {
       case "previous" => allContainersWithSettings takeWhile (n => FormRunner.getControlName(n) != controlName) lastOption
@@ -424,7 +434,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName) flatMap { control =>
+    FormRunner.findControlByName(controlName) flatMap { control =>
 
       // Make sure we don't go outside the body when looking for cells
       // https://github.com/orbeon/orbeon-forms/issues/5073
@@ -539,13 +549,13 @@ object FormBuilderXPathApi {
 
   // Various counts
   //@XPathFunction
-  def countSections        (inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(inDoc)              count FormRunner.IsSection
-  def countAllGrids        (inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant * count FormRunner.IsGrid
-  def countRepeats         (inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(inDoc)              count FormRunner.isRepeat
-  def countSectionTemplates(inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant * count FormRunner.isSectionTemplateContent
+  def countSections        (inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(new InDocFormRunnerDocContext(inDoc)) count FormRunner.IsSection
+  def countAllGrids        (inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant *                   count FormRunner.IsGrid
+  def countRepeats         (inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(new InDocFormRunnerDocContext(inDoc)) count FormRunner.isRepeat
+  def countSectionTemplates(inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant *                   count FormRunner.isSectionTemplateContent
 
   def countGrids           (inDoc: NodeInfo): Int = countAllGrids(inDoc) - countRepeats(inDoc)
-  def countAllNonContainers(inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(inDoc)              count (! FormRunner.IsContainer(_))
+  def countAllNonContainers(inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(new InDocFormRunnerDocContext(inDoc)) count (! FormRunner.IsContainer(_))
   def countAllContainers   (inDoc: NodeInfo): Int = getAllContainerControls(inDoc).size
   def countAllControls     (inDoc: NodeInfo): Int = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
@@ -567,7 +577,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def getAllControlsWithIds: Iterable[NodeInfo] =
-    FormRunner.getAllControlsWithIds(FormBuilderDocContext().formDefinitionRootElem) filterNot { elem =>
+    FormRunner.getAllControlsWithIds(FormBuilderDocContext()) filterNot { elem =>
       // https://github.com/orbeon/orbeon-forms/issues/4786
       FormRunner.IsContainer(elem) || FormRunner.isSectionTemplateContent(elem)
     }
@@ -655,6 +665,13 @@ object FormBuilderXPathApi {
     FormRunner.findControlByNameOrEmpty(ctx.formDefinitionRootElem, controlName)
   }
 
+  // Find a bind by name or null (the empty sequence)
+  //@XPathFunction
+  def findBindByNameOrEmpty(inDoc: NodeInfo, name: String): NodeInfo = {
+    implicit val ctx = FormBuilderDocContext()
+    FormRunner.findBindByName(name).orNull
+  }
+
   //@XPathFunction
   def findNewControlBinding(
     controlName              : String,
@@ -710,7 +727,7 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    FormRunner.findControlByName(ctx.formDefinitionRootElem, controlName) map { controlElem =>
+    FormRunner.findControlByName(controlName) map { controlElem =>
 
       val containerNames =
         FormRunner.findContainerNamesForModel(
@@ -773,7 +790,7 @@ object FormBuilderXPathApi {
     implicit val ctx = FormBuilderDocContext()
 
     for {
-      control <- FormRunner.findControlByName(ctx.formDefinitionRootElem, oldName)
+      control <- FormRunner.findControlByName(oldName)
       xcv     <- ToolboxOps.controlOrContainerElemToXcv(control)
     } locally {
       Undo.pushUserUndoAction(ControlSettings(oldName, newName, xcv))
@@ -849,7 +866,7 @@ object FormBuilderXPathApi {
       case Rename(oldName, newName) =>
         FormBuilder.renameControlIfNeeded(newName, oldName)
       case InsertControl(controlId) =>
-        FormRunner.findControlByName(ctx.formDefinitionRootElem, FormRunner.controlNameFromId(controlId)) map
+        FormRunner.findControlByName(FormRunner.controlNameFromId(controlId)) map
           (_.parentUnsafe) flatMap
           (FormBuilder.deleteControlWithinCell(_))
       case InsertSection(sectionId) =>
@@ -893,7 +910,7 @@ object FormBuilderXPathApi {
         ToolboxOps.containerMerge(sectionId, prefix, suffix)
       case ControlSettings(oldName, newName, xcvElem) =>
         for {
-          controlElem <- FormRunner.findControlByName(ctx.formDefinitionRootElem, newName)
+          controlElem <- FormRunner.findControlByName(newName)
           newXcvElem  <- ToolboxOps.controlOrContainerElemToXcv(controlElem)
         } yield {
 

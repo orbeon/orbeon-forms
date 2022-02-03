@@ -154,7 +154,7 @@ class RepeatedSectionsTest
 
         setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, numberRows = false, usePaging = false, "1", "2", "", "", applyDefaults = false, "")
 
-        val section = findControlByName(doc, "my-section").get
+        val section = findControlByName("my-section").get
 
         assert("1" === section.attValue("min"))
         assert("2" === section.attValue("max"))
@@ -171,7 +171,7 @@ class RepeatedSectionsTest
 
         setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, numberRows = false, usePaging = false, "1 + 1", "count(//*[contains(@foo, '{')])", "", "", applyDefaults = false, "")
 
-        val section = findControlByName(doc, "my-section").get
+        val section = findControlByName("my-section").get
 
         assert("{1 + 1}" === section.attValue("min"))
         assert("{count(//*[contains(@foo, '{{')])}" === section.attValue("max"))
@@ -188,7 +188,7 @@ class RepeatedSectionsTest
 
         setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, numberRows = false, usePaging = false, "3", "4", "2", "", applyDefaults = false, "")
 
-        val section = findControlByName(doc, "my-section").get
+        val section = findControlByName("my-section").get
 
         assert("3" === section.attValue("min"))
         assert("4" === section.attValue("max"))
@@ -205,7 +205,7 @@ class RepeatedSectionsTest
         val doc = ctx.formDefinitionRootElem
 
         setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, numberRows = false, usePaging = false, "", "", "", "", applyDefaults = false, "")
-        moveSectionRight(findControlByName(doc, "other-section").get)
+        moveSectionRight(findControlByName("other-section").get)
 
         val expected =
           elemToOrbeonDom(
@@ -352,7 +352,7 @@ class RepeatedSectionsTest
         setRepeatProperties("my-section", repeat = true, userCanAddRemove = true, numberRows = false, usePaging = false, "", "", "", "", applyDefaults = false, "")
         setRepeatProperties("my-grid",    repeat = true, userCanAddRemove = true, numberRows = false, usePaging = false, "", "", "", "", applyDefaults = false, "first")
 
-        val myTextareaCell = findControlByName(doc, "my-textarea").get.parentUnsafe
+        val myTextareaCell = findControlByName("my-textarea").get.parentUnsafe
 
         FormBuilder.selectCell(myTextareaCell)
 

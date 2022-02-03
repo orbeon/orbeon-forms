@@ -398,7 +398,6 @@ object ToolboxOps {
     val controlDetailsOpt =
       searchControlBindPathHoldersInDoc(
         controlElems   = List(controlOrContainerElem),
-        inDoc          = ctx.formDefinitionRootElem,
         contextItemOpt = Some(ctx.dataRootElem),
         predicate      = _ => true
       ).headOption
@@ -447,7 +446,7 @@ object ToolboxOps {
 
   def controlElementsInCellToXcv(cellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] = {
     val name  = getControlName(cellElem / * head)
-    findControlByName(ctx.formDefinitionRootElem, name) flatMap controlOrContainerElemToXcv
+    findControlByName(name) flatMap controlOrContainerElemToXcv
   }
 
   // Copy control to the clipboard
@@ -692,7 +691,7 @@ object ToolboxOps {
 
           val nestedBindElems = model / XFBindTest / *
 
-          val newElem = TransformerUtils.extractAsMutableDocument(findBindByName(ctx.formDefinitionRootElem, containerName).get).rootElement
+          val newElem = TransformerUtils.extractAsMutableDocument(findBindByName(containerName).get).rootElement
           XFormsAPI.delete(newElem / *)
           XFormsAPI.insert(into = newElem, origin = nestedBindElems)
           newElem
@@ -911,8 +910,8 @@ object ToolboxOps {
       insertPosition match {
         case Some(ContainerPosition(into, after)) =>
 
-          val intoContainerElem     = into  flatMap (findControlByName(ctx.formDefinitionRootElem, _))
-          val afterContainerElemOpt = after flatMap (findControlByName(ctx.formDefinitionRootElem, _))
+          val intoContainerElem     = into  flatMap findControlByName
+          val afterContainerElemOpt = after flatMap findControlByName
 
           // Tricky: Within the `fb-body` top-level container, we need to insert after the `<xf:var>`.
           val afterElemOpt =
@@ -967,7 +966,7 @@ object ToolboxOps {
       findNestedContainers(containerControlElem).iterator filter isRepeat foreach  { containerElem =>
 
       val newControlName = getControlName(containerElem)
-      val bindElem       = findBindByName(ctx.formDefinitionRootElem, newControlName).get
+      val bindElem       = findBindByName(newControlName).get
 
       FormRunnerTemplatesOps.ensureTemplateReplaceContent(
         controlName = newControlName,
@@ -1000,7 +999,7 @@ object ToolboxOps {
     val insertCellElemOpt =
       insertPosition match {
         case Some(ControlPosition(gridName, Coordinate1(x, y))) =>
-          findControlByName(ctx.formDefinitionRootElem, gridName).toList descendant CellTest collectFirst {
+          findControlByName(gridName).toList descendant CellTest collectFirst {
             case cell if NodeInfoCellOps.x(cell).contains(x) && NodeInfoCellOps.y(cell).contains(y) => cell
           }
 
@@ -1020,7 +1019,7 @@ object ToolboxOps {
         val requestedName = getControlName(controlElem)
 
         // Check if name is already in use
-        if (findInViewTryIndex(ctx.formDefinitionRootElem, controlId(requestedName)).isDefined) {
+        if (findInViewTryIndex(controlId(requestedName)).isDefined) {
           // If so create new name
           val newName = controlNameFromId(nextId(XcvEntry.Control.entryName))
 

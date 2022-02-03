@@ -33,3 +33,8 @@ trait FormRunnerDocContext {
   lazy val metadataRootElem      : om.NodeInfo         = metadataInstanceElem  / * head
   lazy val resourcesRootElem     : om.NodeInfo         = resourcesInstanceElem / * head
 }
+
+
+class InDocFormRunnerDocContext(inDoc: om.NodeInfo) extends FormRunnerDocContext {
+  val formDefinitionRootElem: om.NodeInfo = inDoc.rootElement
+}

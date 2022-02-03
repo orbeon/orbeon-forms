@@ -179,7 +179,7 @@
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
                      allows scoping namespaces for XPath expressions validated with xxf:XPath2. -->
                 <xf:delete ref="$i/namespace::node()"/>
-                <xf:insert context="$i" origin="frf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
+                <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
                 <xf:dispatch
                     name="fb-process-xbl-fb-control-details"

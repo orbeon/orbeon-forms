@@ -18,7 +18,7 @@ import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr.Cell.{findOriginCell, nonOverflowingNeighbors}
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{Cell, FormRunner, GridModel}
+import org.orbeon.oxf.fr.{Cell, FormRunner, FormRunnerDocContext, GridModel}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -27,6 +27,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+
 import scala.collection.compat._
 
 /*
@@ -241,7 +242,7 @@ trait GridOps extends ContainerOps {
 
   // Find the currently selected grid cell if any
   def findSelectedCell(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
-    findInViewTryIndex(ctx.formDefinitionRootElem, selectedCellVar.stringValue)
+    findInViewTryIndex(selectedCellVar.stringValue)
 
   // Make the given grid cell selected
   def selectCell(newCellElem: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit =
@@ -302,14 +303,14 @@ trait GridOps extends ContainerOps {
   private val NoMaximum = Set("none")
 
   // NOTE: Value can be a simple AVT
-  def getNormalizedMax(doc: NodeInfo, gridName: String): Option[String] =
-    findControlByName(doc, gridName) flatMap (_ attValueOpt "max") filterNot NoMaximum map trimSimpleAVT
+  def getNormalizedMax(doc: NodeInfo, gridName: String)(implicit ctx: FormRunnerDocContext): Option[String] =
+    FormRunner.findControlByName(gridName) flatMap (_ attValueOpt "max") filterNot NoMaximum map trimSimpleAVT
 
-  def getNormalizedMin(doc: NodeInfo, gridName: String): String =
-    FormRunner.findControlByName(doc, gridName) flatMap (_ attValueOpt "min") map trimSimpleAVT getOrElse "0"
+  def getNormalizedMin(doc: NodeInfo, gridName: String)(implicit ctx: FormRunnerDocContext): String =
+    FormRunner.findControlByName(gridName) flatMap (_ attValueOpt "min") map trimSimpleAVT getOrElse "0"
 
-  def getNormalizedFreeze(doc: NodeInfo, gridName: String): String =
-    FormRunner.findControlByName(doc, gridName) flatMap (_ attValueOpt "freeze") map trimSimpleAVT getOrElse "0"
+  def getNormalizedFreeze(doc: NodeInfo, gridName: String)(implicit ctx: FormRunnerDocContext): String =
+    FormRunner.findControlByName(gridName) flatMap (_ attValueOpt "freeze") map trimSimpleAVT getOrElse "0"
 
   // Convert a min/max/freeze value to a value suitable to be written to the @min/@max/@freeze attributes.
   //

@@ -167,9 +167,7 @@ class GridOpsTest
       def deleteAndCheckSelectedCell(beforeCellId: String, afterCellId: String) =
         withActionAndFBDoc(SectionsGridsDoc) { implicit ctx =>
 
-          val doc = ctx.formDefinitionRootElem
-
-          findInViewTryIndex(doc, beforeCellId) foreach { beforeCell =>
+          findInViewTryIndex(beforeCellId) foreach { beforeCell =>
             selectCell(beforeCell)
             delete(beforeCell)
           }

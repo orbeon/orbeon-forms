@@ -31,7 +31,7 @@ object FormRunnerTemplatesOps {
       templateInstance <- templateInstanceElements(ctx.formDefinitionRootElem)
       repeatName       = controlNameFromId(templateInstance.id)
       if ancestorContainerNames.isEmpty || ancestorContainerNames.exists(_(repeatName))
-      iterationName    <- findRepeatIterationName(ctx.formDefinitionRootElem, repeatName)
+      iterationName    <- findRepeatIterationName(repeatName)
       template         <- createTemplateContentFromBindName(iterationName, componentBindings)
     } locally {
       ensureTemplateReplaceContent(repeatName, template)
@@ -42,7 +42,7 @@ object FormRunnerTemplatesOps {
     bindings : Iterable[NodeInfo])(implicit
     ctx      : FormRunnerDocContext
   ): Option[NodeInfo] =
-    findBindByName(ctx.formDefinitionRootElem, bindName) map (createTemplateContentFromBind(_, bindings))
+    findBindByName(bindName) map (createTemplateContentFromBind(_, bindings))
 
 private val AttributeRe = "@(.+)".r
 
@@ -54,10 +54,9 @@ private val AttributeRe = "@(.+)".r
     ctx           : FormRunnerDocContext
   ): NodeInfo = {
 
-    val inDoc       = startBindElem.getDocumentRoot
     val descriptors = getAllRelevantDescriptors(bindings)
 
-    val allControlsByName = getAllControlsWithIds(inDoc) map (c => controlNameFromId(c.id) -> c) toMap
+    val allControlsByName = getAllControlsWithIds map (c => controlNameFromId(c.id) -> c) toMap
 
     def holderForBind(bind: NodeInfo, topLevel: Boolean): Option[NodeInfo] = {
 

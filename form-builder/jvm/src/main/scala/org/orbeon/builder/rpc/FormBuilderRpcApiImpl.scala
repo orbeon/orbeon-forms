@@ -52,7 +52,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     )
 
     // The client might send this after the control is deleted and we don't want to crash
-    FormRunner.findControlByName(ctx.bodyElem, controlName) foreach { controlElem =>
+    FormRunner.findControlByName(controlName) foreach { controlElem =>
 
       val xcvElemOpt = ToolboxOps.controlOrContainerElemToXcv(controlElem)
 
@@ -207,5 +207,5 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   }
 
   def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =
-    FormRunner.findInViewTryIndex(ctx.formDefinitionRootElem, XFormsId.getStaticIdFromId(id))
+    FormRunner.findInViewTryIndex(XFormsId.getStaticIdFromId(id))
 }

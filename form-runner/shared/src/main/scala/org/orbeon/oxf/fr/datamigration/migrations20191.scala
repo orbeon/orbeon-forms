@@ -16,22 +16,21 @@ package org.orbeon.oxf.fr.datamigration
 import io.circe.parser
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
-import org.orbeon.oxf.fr.FormRunner.{getControlName, precedingSiblingOrSelfContainers, _}
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport._
-import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner}
+import org.orbeon.oxf.fr.{DataFormatVersion, InDocFormRunnerDocContext}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory.{attributeInfo, elementInfo}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsNames._
 
-import scala.collection.{immutable => i}
-import scala.util.{Failure, Success}
 import scala.collection.compat._
+import scala.util.{Failure, Success}
+
 
 case class Migration20191(
   containerPath : List[PathElem],
@@ -61,20 +60,23 @@ object MigrationOps20191 extends MigrationOps {
     legacyGridsOnly      : Boolean
   ): Option[MigrationSet20191] = {
 
-    def migrationsForBinding(doc: DocumentNodeInfoType, topLevel: Boolean): Seq[Migration20191] =
+    def migrationsForBinding(doc: DocumentNodeInfoType, topLevel: Boolean): Seq[Migration20191] = {
+      implicit val ctx = new InDocFormRunnerDocContext(doc)
       for {
-        gridElem       <- if (legacyGridsOnly) findLegacyUnrepeatedGrids(doc) else findAllGrids(doc, repeat = false)
-        gridName       = getControlName(gridElem)
-        afterElem      = precedingSiblingOrSelfContainers(gridElem, includeSelf = false).headOption
-        containerNames = findContainerNamesForModel(gridElem, includeSelf = false, includeIterationElements = true)
+        gridElem       <- if (legacyGridsOnly) findLegacyUnrepeatedGrids else findAllGrids(repeat = false)
+        gridName       = frc.getControlName(gridElem)
+        afterElem      = frc.precedingSiblingOrSelfContainers(gridElem, includeSelf = false).headOption
+        containerNames = frc.findContainerNamesForModel(gridElem, includeSelf = false, includeIterationElements = true)
       } yield
         Migration20191(
           containerPath = containerNames map PathElem.apply,
           newGridElem   = PathElem(gridName),
-          afterElem     = afterElem flatMap getControlNameOpt map PathElem.apply,
-          content       = (findNestedControls(gridElem) map getControlName map PathElem.apply).to(List),
+          afterElem     = afterElem flatMap frc.getControlNameOpt map PathElem.apply,
+          content       = (frc.findNestedControls(gridElem) map frc.getControlName map PathElem.apply).to(List),
           topLevel      = topLevel
         )
+    }
+
 
     def updateWithBindingPath(migration: Migration20191, bindingPath: List[PathElem]): Migration20191 =
       migration.copy(containerPath = bindingPath ::: migration.containerPath)
@@ -170,6 +172,8 @@ object MigrationOps20191 extends MigrationOps {
     migrationSet  : M
   ): MigrationResult = {
 
+    implicit val ctx = new InDocFormRunnerDocContext(outerDocument)
+
     val topLevelMigrations = migrationSet.migrations filter (_.topLevel)
 
     topLevelMigrations foreach {
@@ -178,7 +182,7 @@ object MigrationOps20191 extends MigrationOps {
         val gridName = newGridElem.value
 
         // 1. Binds
-        findBindByName(outerDocument, gridName) foreach { gridBindElem =>
+        frc.findBindByName(gridName) foreach { gridBindElem =>
 
           insert(
             after      = gridBindElem.toList,
@@ -193,7 +197,7 @@ object MigrationOps20191 extends MigrationOps {
         }
 
         // 2. Controls
-        FormRunner.findControlByName(outerDocument, gridName) foreach { gridElem =>
+        frc.findControlByName(gridName) foreach { gridElem =>
           delete(gridElem /@ BIND_QNAME)
         }
     }
@@ -206,6 +210,8 @@ object MigrationOps20191 extends MigrationOps {
     migrationSet  : M
   ): MigrationResult = {
 
+    implicit val ctx = new InDocFormRunnerDocContext(outerDocument)
+
     val topLevelMigrations = migrationSet.migrations filter (_.topLevel)
 
     topLevelMigrations foreach {
@@ -216,12 +222,12 @@ object MigrationOps20191 extends MigrationOps {
 
         // 1. Binds
 
-        val containerBindElem = findBindByName(outerDocument, containerName).toList
+        val containerBindElem = frc.findBindByName(containerName).toList
 
-        val existingBindContent = content flatMap (p => findBindByName(outerDocument, p.value))
+        val existingBindContent = content flatMap (p => frc.findBindByName(p.value))
 
         val afterBindElem =
-          afterElem flatMap (p => findBindByName(outerDocument, p.value)) filter (_.parentOption contains containerBindElem)
+          afterElem flatMap (p => frc.findBindByName(p.value)) filter (_.parentOption contains containerBindElem)
 
         insert(
           into   = containerBindElem,
@@ -229,7 +235,7 @@ object MigrationOps20191 extends MigrationOps {
           origin =
             elementInfo(
               XFormsBindQName,
-              attributeInfo("id",   FormRunner.bindId(gridName)) ::
+              attributeInfo("id",   frc.bindId(gridName)) ::
                 attributeInfo("ref",  gridName) ::
                 attributeInfo("name", gridName) ::
                 existingBindContent
@@ -243,8 +249,8 @@ object MigrationOps20191 extends MigrationOps {
         )
 
         // 2. Controls
-        FormRunner.findControlByName(outerDocument, gridName) foreach { gridElem =>
-          ensureAttribute(gridElem, BIND_QNAME, FormRunner.bindId(FormRunner.controlNameFromId(gridElem.id)))
+        frc.findControlByName(gridName) foreach { gridElem =>
+          ensureAttribute(gridElem, BIND_QNAME, frc.bindId(frc.controlNameFromId(gridElem.id)))
         }
     }
 

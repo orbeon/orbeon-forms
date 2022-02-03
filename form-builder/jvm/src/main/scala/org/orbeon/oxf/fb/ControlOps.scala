@@ -200,7 +200,7 @@ trait ControlOps extends ResourcesOps {
 
       buffer ++=
         findDataHolders     (controlName) ++=
-        findBindByName      (ctx.formDefinitionRootElem, controlName) ++=
+        findBindByName      (controlName) ++=
         findTemplateInstance(ctx.formDefinitionRootElem, controlName) ++=
         findResourceHolders (controlName)
 
@@ -218,7 +218,7 @@ trait ControlOps extends ResourcesOps {
       require(! newName.endsWith(DefaultIterationSuffix), s"control cannot end with `$DefaultIterationSuffix` (#3359)")
 
       // Maybe rename section template content
-      findControlByName(ctx.formDefinitionRootElem, oldName)
+      findControlByName(oldName)
         .filter(FormRunner.isSectionWithTemplateContent)
         .foreach( _ => renameControlIfNeeded(oldName + TemplateContentSuffix, newName + TemplateContentSuffix))
 
@@ -229,7 +229,7 @@ trait ControlOps extends ResourcesOps {
       renameControl (oldName, newName)
       renameTemplate(oldName, newName)
 
-      findControlByName(ctx.formDefinitionRootElem, newName) foreach { newControl =>
+      findControlByName(newName) foreach { newControl =>
         updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to(Set))
       }
 
@@ -246,7 +246,7 @@ trait ControlOps extends ResourcesOps {
     ctx                 : FormBuilderDocContext
   ): Unit = {
 
-    if (findControlByName(ctx.formDefinitionRootElem, oldControlName) exists controlRequiresNestedIterationElement) {
+    if (findControlByName(oldControlName) exists controlRequiresNestedIterationElement) {
 
       val oldName = oldChildElementName getOrElse defaultIterationName(oldControlName)
       val newName = newChildElementName getOrElse defaultIterationName(newControlName)
@@ -260,7 +260,7 @@ trait ControlOps extends ResourcesOps {
   }
 
   def renameControl(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
-    findControlByName(ctx.formDefinitionRootElem, oldName) foreach
+    findControlByName(oldName) foreach
       (renameControlByElement(_, newName))
 
   // Rename the control (but NOT its holders, binds, etc.)
@@ -316,7 +316,7 @@ trait ControlOps extends ResourcesOps {
 
   // Rename a bind
   def renameBinds(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit =
-    findBindByName(ctx.formDefinitionRootElem, oldName) foreach (renameBindElement(_, newName))
+    findBindByName(oldName) foreach (renameBindElement(_, newName))
 
   // Find or create a data holder for the given hierarchy of names
   private def ensureContainers(rootElem: NodeInfo, holders: Seq[(() => NodeInfo, Option[String])]) = {
@@ -423,11 +423,11 @@ trait ControlOps extends ResourcesOps {
     val bindElemOpt =
       controlNameOpt match {
         case Some(controlName) =>
-          findControlByName(ctx.formDefinitionRootElem, controlName) map { control =>
+          findControlByName(controlName) map { control =>
             ensureBinds(findContainerNamesForModel(control) :+ controlName)
           }
         case None =>
-          FormRunner.findInBindsTryIndex(ctx.formDefinitionRootElem, Names.FormBinds)
+          FormRunner.findInBindsTryIndex(Names.FormBinds)
       }
 
     bindElemOpt foreach {bindElem =>
@@ -461,7 +461,7 @@ trait ControlOps extends ResourcesOps {
   def findConcreteControlByName(controlName: String)(implicit ctx: FormBuilderDocContext): Option[XFormsControl] = {
     val model = getFormModel
     for {
-      controlId <- findControlIdByName(ctx.formDefinitionRootElem, controlName)
+      controlId <- findControlIdByName(controlName)
       control   <- model.container.resolveObjectByIdInScope(model.getEffectiveId, controlId) map (_.asInstanceOf[XFormsControl])
     } yield
       control
@@ -519,7 +519,7 @@ trait ControlOps extends ResourcesOps {
 
   // Find a control's LHHAT (there can be more than one for alerts)
   def getControlLhhat(controlName: String, lhhaName: String)(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
-    findControlByName(ctx.formDefinitionRootElem, controlName).toList child controlLHHATQName(lhhaName)
+    findControlByName(controlName).toList child controlLHHATQName(lhhaName)
 
   // For a given control and LHHAT type, whether the mediatype on the LHHAT is HTML
   def isControlLhhatHtmlMediatype(controlName: String, lhha: String)(implicit ctx: FormBuilderDocContext): Boolean =
@@ -538,7 +538,7 @@ trait ControlOps extends ResourcesOps {
 
   // For a given control, whether the mediatype on itemset labels is HTML
   def isItemsetHTMLMediatype(controlName: String)(implicit ctx: FormBuilderDocContext): Boolean =
-    hasHTMLMediatype(findControlByName(ctx.formDefinitionRootElem, controlName).toList child "itemset" child "label")
+    hasHTMLMediatype(findControlByName(controlName).toList child "itemset" child "label")
 
   def setHTMLMediatype(lhhaElems: Iterable[NodeInfo], isHTML: Boolean): Unit =
     lhhaElems foreach { lhhaElem =>
@@ -556,9 +556,7 @@ trait ControlOps extends ResourcesOps {
     ctx         : FormBuilderDocContext
   ): Seq[NodeInfo] = {
 
-    val inDoc = ctx.formDefinitionRootElem
-
-    val control  = findControlByName(inDoc, controlName).get
+    val control  = findControlByName(controlName).get
     val existing = getControlLhhat(controlName, lhhaName)
     val params   = lhhatChildrenParams(existing)
 
@@ -608,7 +606,7 @@ trait ControlOps extends ResourcesOps {
     buildFormBuilderControlEffectiveId(staticId) map XFormsId.effectiveIdToAbsoluteId orNull
 
   def buildFormBuilderControlEffectiveId(staticId: String)(implicit ctx: FormBuilderDocContext): Option[String] =
-    findInViewTryIndex(ctx.formDefinitionRootElem, staticId) map (DynamicControlId + ComponentSeparator + buildControlEffectiveId(_))
+    findInViewTryIndex(staticId) map (DynamicControlId + ComponentSeparator + buildControlEffectiveId(_))
 
   // Set the control's items for all languages
   def setControlItems(controlName: String, items: NodeInfo)(implicit ctx: FormBuilderDocContext): Unit = {
@@ -718,7 +716,7 @@ trait ControlOps extends ResourcesOps {
     // Update legacy actions
     val legacyActions = findLegacyActions
 
-    findControlIdByName(ctx.bodyElem, oldName) foreach { oldControlId =>
+    findControlIdByName(oldName) foreach { oldControlId =>
 
       val newControlId = newName + oldControlId.substringAfter(oldName)
 

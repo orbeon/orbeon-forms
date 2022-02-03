@@ -116,11 +116,11 @@ trait FormRunnerBaseOps {
 
   // Find a view element by id, using the index if possible, otherwise traversing the document
   // NOTE: Searching by traversing if no index should be done directly in the selectID implementation.
-  def findInViewTryIndex(inDoc: NodeInfo, staticId: String): Option[NodeInfo] =
-    findTryIndex(inDoc, staticId, getFormRunnerBodyElem(inDoc), includeSelf = false)
+  def findInViewTryIndex(staticId: String)(implicit ctx: FormRunnerDocContext): Option[NodeInfo] =
+    findTryIndex(staticId, ctx.bodyElem, includeSelf = false)
 
-  def findInBindsTryIndex(inDoc: NodeInfo, id: String): Option[NodeInfo] =
-    findTryIndex(inDoc, id, findTopLevelBind(inDoc).get, includeSelf = true)
+  def findInBindsTryIndex(id: String)(implicit ctx: FormRunnerDocContext): Option[NodeInfo] =
+    findTryIndex(id, ctx.topLevelBindElem.get, includeSelf = true)
 
   // NOTE: This is a rather crude way of testing the presence of the index! But we do know for now that this is
   // only called from the functions above, which search in a form's view, model, or binds, which implies the
@@ -134,9 +134,9 @@ trait FormRunnerBaseOps {
     else
       node ancestor * contains under
 
-  private def findTryIndex(inDoc: NodeInfo, id: String, under: NodeInfo, includeSelf: Boolean): Option[NodeInfo] = {
+  private def findTryIndex(id: String, under: NodeInfo, includeSelf: Boolean): Option[NodeInfo] = {
 
-    val hasIndex = formDefinitionHasIndex(inDoc)
+    val hasIndex = formDefinitionHasIndex(under)
 
     def fromSearch =
       if (includeSelf)
@@ -145,7 +145,7 @@ trait FormRunnerBaseOps {
         under descendant * find (_.id == id)
 
     def fromIndex =
-      SaxonUtils.selectID(inDoc, id) match {
+      SaxonUtils.selectID(under, id) match {
         case elemOpt @ Some(elem) if isUnder(elem, under, includeSelf) => elemOpt
         case Some(_)                                                   => fromSearch
         case None                                                      => None

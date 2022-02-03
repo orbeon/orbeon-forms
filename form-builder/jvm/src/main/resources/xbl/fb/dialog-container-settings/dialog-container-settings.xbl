@@ -61,7 +61,7 @@
                 <xf:setvalue ref="$i/was-custom-iteration-name"      value="$i/was-repeat = true() and fbf:hasCustomIterationName($i/control-name)"/>
                 <xf:setvalue ref="$i/is-custom-iteration-name"       value="$i/was-custom-iteration-name"/>
 
-                <xf:setvalue ref="$i/original-custom-iteration-name" value="if ($i/was-custom-iteration-name = true()) then frf:findRepeatIterationNameOrEmpty($form, $i/control-name) else ''"/>
+                <xf:setvalue ref="$i/original-custom-iteration-name" value="if ($i/was-custom-iteration-name = true()) then fbf:findRepeatIterationNameOrEmpty($form, $i/control-name) else ''"/>
                 <xf:setvalue ref="$i/custom-iteration-name"          value="$i/original-custom-iteration-name"/>
 
                 <xf:setvalue ref="$i/appearance"                     value="($control/@appearance, 'default')[1]"/>
@@ -90,7 +90,7 @@
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
                      allows scoping namespaces for XPath expressions validated with xxf:XPath2. -->
                 <xf:delete ref="$i/namespace::node()"/>
-                <xf:insert context="$i" origin="frf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
+                <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
 
                 <!-- Read Label/Help if we are a section -->
                 <xf:action iterate="$i/(label, help, iteration-label)">

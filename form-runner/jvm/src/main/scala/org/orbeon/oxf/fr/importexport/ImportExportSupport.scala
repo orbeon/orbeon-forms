@@ -197,7 +197,7 @@ object ImportExportSupport {
     bind.attValueOpt(TYPE_QNAME) map bind.resolveQName
 
   def ancestorRepeatNames(controlName: String)(implicit ctx: FormRunnerDocContext): List[String] =
-    FormRunner.findControlByName(ctx.bodyElem, controlName).toList flatMap
+    FormRunner.findControlByName(controlName).toList flatMap
       (c => FormRunner.findAncestorRepeatNames(c, includeSelf = false))
 
   def countRepeatIterations(holders: Option[Seq[om.NodeInfo]]): Int =
@@ -296,7 +296,7 @@ object ImportExportSupport {
   }
 
   def controlIsReadonly(control: om.NodeInfo)(implicit ctx: FormRunnerDocContext): Boolean =
-    FormRunner.searchControlBindPathHoldersInDoc(List(control), control, ctx.dataRootElem.some, _ => true).headOption exists {
+    FormRunner.searchControlBindPathHoldersInDoc(List(control), ctx.dataRootElem.some, _ => true).headOption exists {
       case ControlBindPathHoldersResources(_, bind, _, _, _) => isBindReadonly(bind)
     }
 
@@ -312,7 +312,7 @@ object ImportExportSupport {
     control : om.NodeInfo)(implicit
     ctx     : FormRunnerDocContext
   ): Option[(ControlBindPathHoldersResources, Boolean)] =
-    FormRunner.searchControlBindPathHoldersInDoc(List(control), ctx.formDefinitionRootElem, ctx.dataRootElem.some, _ => true).headOption map {
+    FormRunner.searchControlBindPathHoldersInDoc(List(control), ctx.dataRootElem.some, _ => true).headOption map {
       case cbphr @ ControlBindPathHoldersResources(_, bind, _, _, _) =>
 
         val visible = {
@@ -327,7 +327,7 @@ object ImportExportSupport {
 
   def controlIsNonRelevantOrNonVisible(control: om.NodeInfo)(implicit ctx: FormRunnerDocContext): Boolean =
     controlIsHiddenWithCss(control) || {
-      FormRunner.searchControlBindPathHoldersInDoc(List(control), ctx.formDefinitionRootElem, ctx.dataRootElem.some, _ => true).headOption exists {
+      FormRunner.searchControlBindPathHoldersInDoc(List(control), ctx.dataRootElem.some, _ => true).headOption exists {
         case ControlBindPathHoldersResources(_, bind, _, _, _) =>
           FormRunner.readDenormalizedCalculatedMipHandleChildElement(bind, ModelDefs.Relevant).contains(FormRunner.FalseExpr)
       }

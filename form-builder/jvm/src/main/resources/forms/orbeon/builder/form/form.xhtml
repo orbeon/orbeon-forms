@@ -30,7 +30,7 @@
     </xh:head>
     <xh:body>
 
-        <xh:div class="xforms-hidden">
+        <xh:div class="xforms-hidden" id="fb-pseudo-body">
             <!-- For the summary page -->
             <xf:output id="application-name-control" bind="application-name-bind" class="fr-summary fr-search">
                 <xf:label ref="$form-resources/application-name/label"/>
@@ -763,7 +763,7 @@
 
                                         <xf:var
                                             name="control-id"
-                                            value="frf:findControlIdByName(instance('fb-form-instance'), event('control-name'))"/>
+                                            value="fbf:findControlIdByName(instance('fb-form-instance'), event('control-name'))"/>
 
                                         <!-- This is done again if we open the settings dialog, but it's ok -->
                                         <xf:action type="xpath">

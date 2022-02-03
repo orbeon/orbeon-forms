@@ -42,9 +42,10 @@ trait FormRunnerEmail {
     classNames : String
   ): SequenceIterator =
     frc.searchControlsTopLevelOnly(
-      body      = body,
       data      = Option(data),
       predicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
+    )(
+      new InDocFormRunnerDocContext(body)
     ) flatMap {
       case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
       case ControlBindPathHoldersResources(_, _, _, None,          _) => Nil
@@ -72,9 +73,10 @@ trait FormRunnerEmail {
   ): SequenceIterator =
     frc.searchControlsUnderSectionTemplates(
       head      = head,
-      body      = body,
       data      = Option(data),
       predicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
+    )(
+      new InDocFormRunnerDocContext(body)
     ) flatMap {
       case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
       case ControlBindPathHoldersResources(_, _, _, None         , _) => Nil

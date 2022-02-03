@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsSi
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.{BindVariableResolver, RuntimeBind, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits._
@@ -502,17 +503,18 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     atOrNull                  : String,
     lastIsNone                : Boolean // for `fr:repeat-clear` where the last position must not be specified
   ): SequenceIterator =
-    findContainerDetailsCompileTimeImpl(inDoc, repeatedGridOrSectionName, atOrNull, lastIsNone)
+    findContainerDetailsCompileTimeImpl(inDoc, repeatedGridOrSectionName, atOrNull, lastIsNone)(new InDocFormRunnerDocContext(inDoc))
 
   def findContainerDetailsCompileTimeImpl(
     inDoc                     : NodeInfo,
     repeatedGridOrSectionName : String,
     atOrNull                  : String,
-    lastIsNone                : Boolean // for `fr:repeat-clear` where the last position must not be specified
+    lastIsNone                : Boolean)(implicit // for `fr:repeat-clear` where the last position must not be specified
+    ctx                       : FormRunnerDocContext
   ): Iterator[String] = {
 
     val namesWithIsRepeat =
-      frc.findControlByName(inDoc, repeatedGridOrSectionName).toList  flatMap
+      frc.findControlByName(repeatedGridOrSectionName).toList  flatMap
         (frc.findAncestorContainersLeafToRoot(_, includeSelf = true)) map
         (e => (frc.controlNameFromId(e.id), frc.isRepeat(e)))
 

@@ -2,7 +2,8 @@ package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.{PathUtils, StringUtils}
+import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.StringUtils._
 
 import java.net.{URI, URISyntaxException}
 
@@ -33,7 +34,7 @@ object URLRewriterImpl {
     // Case where a protocol is specified: the URL is left untouched
     if (PathUtils.urlHasProtocol(urlString)) {
       urlString
-    } else if (baseURIProperty.isBlank) {
+    } else if (baseURIProperty.isAllBlank) {
       // Property not specified, use request to build base URI
       rewriteURL(
         request.getScheme,
@@ -48,7 +49,7 @@ object URLRewriterImpl {
 
       val baseURI =
         try
-          new URI(StringUtils.trimAllToEmpty(baseURIProperty))
+          new URI(baseURIProperty.trimAllToEmpty)
         catch {
           case t: URISyntaxException =>
             throw new OXFException(s"Incorrect base URI property specified: `$baseURIProperty`", t)

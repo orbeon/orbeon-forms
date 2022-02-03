@@ -14,12 +14,12 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.Select2
-import org.orbeon.facades.Select2.toJQuerySelect2
+import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
 import org.orbeon.jquery._
 import org.orbeon.xforms.facade.{Controls, Properties, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, ServerValueStore, Support}
+import org.orbeon.xforms._
 import org.scalajs.dom
-import org.scalajs.dom.{FocusEvent, MutationObserver, MutationObserverInit, html}
+import org.scalajs.dom.{MutationObserver, MutationObserverInit, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.collection.mutable
@@ -32,12 +32,14 @@ object Select1Search {
 
 private class Select1SearchCompanion extends XBLCompanion {
 
-  import Private._
+  private val DataPlaceholder              = "data-placeholder"
+  private val DataServicePerformsSearch    = "data-service-performs-search"
+  private val DataInitialLabel             = "data-initial-label"
+  private val DataInitialValue             = "data-initial-value"
 
-  val DataPlaceholder           = "data-placeholder"
-  val DataServicePerformsSearch = "data-service-performs-search"
-  val DataInitialLabel          = "data-initial-label"
-  val DataInitialValue          = "data-initial-value"
+  private val select2SuccessCallbacks      : mutable.Queue[Success] = new mutable.Queue[Select2.Success]
+  private var onXFormsSelect1ValueChangeJs : Option[js.Function]    = None
+  private var mutationObservers            : List[MutationObserver] = Nil
 
   override def init(): Unit = {
     for {
@@ -78,7 +80,7 @@ private class Select1SearchCompanion extends XBLCompanion {
 
         object options extends Select2.Options {
           allowClear     = true
-          ajax           = if (servicePerformsSearch) Select2Ajax else null
+          ajax           = if (servicePerformsSearch) new Select2Ajax(select2SuccessCallbacks, containerElem) else null
           width          = "100%" // For Select2 width to update as the viewport width changes
           placeholder    =
             new Select2.Option {
@@ -132,89 +134,88 @@ private class Select1SearchCompanion extends XBLCompanion {
     success(data)
   }
 
-  private object Private {
+  // TODO: not specific to the autocomplete, should be moved to a utility class
+  private def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit): Unit = {
+    val observer = new MutationObserver((_, _) => listener())
+    mutationObservers = observer :: mutationObservers
 
-    val select2SuccessCallbacks                           = new mutable.Queue[Select2.Success]
-    var onXFormsSelect1ValueChangeJs: Option[js.Function] = None
-    var mutationObservers: List[MutationObserver] = Nil
+    observer.observe(element.get(0), MutationObserverInit(
+      attributes = true,
+      attributeFilter = js.Array(attributeName)
+    ))
+  }
 
-    // TODO: not specific to the autocomplete, should be moved to a utility class
-    def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit): Unit = {
-      val observer = new MutationObserver((_, _) => listener())
-      mutationObservers = observer :: mutationObservers
+  // When the value of the underlying dropdown changed, typically because it set based on that the server tells the client,
+  // tell the Select2 component that the value has changed
+  private def onXFormsSelect1ValueChange(event: js.Dynamic): Unit = {
+    val control  = event.control.asInstanceOf[html.Element]
+    val newValue = event.newValue.asInstanceOf[String]
+    if (containerElem.querySelector(".xforms-select1") == control)
+      $(containerElem).find("select").trigger("change")
+  }
 
-      observer.observe(element.get(0), MutationObserverInit(
-        attributes = true,
-        attributeFilter = js.Array(attributeName)
-      ))
-    }
-
-    // When the value of the underlying dropdown changed, typically because it set based on that the server tells the client,
-    // tell the Select2 component that the value has changed
-    def onXFormsSelect1ValueChange(event: js.Dynamic): Unit = {
-      val control  = event.control.asInstanceOf[html.Element]
-      val newValue = event.newValue.asInstanceOf[String]
-      if (containerElem.querySelector(".xforms-select1") == control)
-        $(containerElem).find("select").trigger("change")
-    }
-
-    def onChange(event: JQueryEventObject): Unit = {
-      val htmlSelect = event.target.asInstanceOf[html.Select]
-      if (htmlSelect.selectedIndex == -1) {
-        // `selectedIndex` is -1 when the value was cleared
-        dispatchFrChange(
-          label = "",
-          value = ""
-        )
-      } else {
-        val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
-        dispatchFrChange(
-          label = selectedOption.text,
-          value = selectedOption.value
-        )
-      }
-    }
-
-    def dispatchFrChange(
-      label : String,
-      value : String
-    ): Unit = {
-      AjaxClient.fireEvent(
-        AjaxEvent(
-          eventName  = "fr-change",
-          targetId   = containerElem.id,
-          properties = Map(
-            "fr-label" -> label,
-            "fr-value" -> value
-          )
-        )
+  private def onChange(event: JQueryEventObject): Unit = {
+    val htmlSelect = event.target.asInstanceOf[html.Select]
+    if (htmlSelect.selectedIndex == -1) {
+      // `selectedIndex` is -1 when the value was cleared
+      dispatchFrChange(
+        label = "",
+        value = ""
+      )
+    } else {
+      val selectedOption = htmlSelect.options(htmlSelect.selectedIndex)
+      dispatchFrChange(
+        label = selectedOption.text,
+        value = selectedOption.value
       )
     }
+  }
 
-    object Select2Ajax extends Select2.Ajax {
-
-      val delay = Properties.delayBeforeIncrementalRequest.get()
-
-      def transport(
-        params  : Select2.Params,
-        success : Select2.Success,
-        failure : js.Function0[Unit]
-      ): Unit = {
-
-        val searchValue = params.data.term.getOrElse("")
-        val searchPage  = params.data.page.getOrElse(1)
-        select2SuccessCallbacks.enqueue(success)
-        AjaxClient.fireEvent(
-          AjaxEvent(
-            eventName  = "fr-search",
-            targetId   = containerElem.id,
-            properties = Map(
-              "fr-search-value" -> searchValue,
-              "fr-search-page"  -> searchPage.toString
-            )
-          )
+  private def dispatchFrChange(
+    label : String,
+    value : String
+  ): Unit = {
+    AjaxClient.fireEvent(
+      AjaxEvent(
+        eventName  = "fr-change",
+        targetId   = containerElem.id,
+        properties = Map(
+          "fr-label" -> label,
+          "fr-value" -> value
         )
-      }
-    }
+      )
+    )
+  }
+
+}
+
+// We shouldn't have to declare the constructor parameters as `val`, but if we don't, at runtime the JavaScript object
+// for doesn't have a property for `select2SuccessCallbacks`, so we get an `undefined` when trying to access it.
+private class Select2Ajax(
+  val select2SuccessCallbacks : mutable.Queue[Success],
+  val containerElem           : html.Element
+) extends Select2.Ajax {
+
+  val delay: Int = Properties.delayBeforeIncrementalRequest.get()
+
+  def transport(
+    params  : Select2.Params,
+    success : Select2.Success,
+    failure : js.Function0[Unit]
+  ): Unit = {
+
+    val searchValue = params.data.term.getOrElse("")
+    val searchPage  = params.data.page.getOrElse(1)
+    select2SuccessCallbacks.enqueue(success)
+    AjaxClient.fireEvent(
+      AjaxEvent(
+        eventName  = "fr-search",
+        targetId   = containerElem.id,
+        properties = Map(
+          "fr-search-value" -> searchValue,
+          "fr-search-page"  -> searchPage.toString
+        )
+      )
+    )
   }
 }

@@ -247,10 +247,10 @@
                         <resource xml:lang="de">
                             <download>Herunterladen</download>
                             <select-file>Datei auswählen</select-file>
-                            <select-files todo="true">[Select Files]</select-files>
-                            <drag todo="true">[Drag files here or use the button below.]</drag>
-                            <empty todo="true">[No attachment.]</empty>
-                            <remove todo="true">[Remove Attachment]</remove>
+                            <select-files>Dateien auswählen</select-files>
+                            <drag>Ziehen Sie Dateien hierher oder verwenden Sie die Schaltfläche unten.</drag>
+                            <empty>Kein Anhang</empty>
+                            <remove>Anhang entfernen</remove>
                         </resource>
                         <resource xml:lang="sv">
                             <download>Ladda ner</download>

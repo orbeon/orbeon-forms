@@ -341,16 +341,9 @@ class NodeWrapper protected (
 
   def hasChildNodes: Boolean =
     node match {
-      case _: Document => true
-      case elem: Element =>
-        val content = elem.jContent
-        for (i <- 0 until content.size) {
-          if (! content.get(i).isInstanceOf[Namespace])
-            return true
-        }
-        false
-      case _ =>
-        false
+      case _: Document   => true
+      case elem: Element => elem.regularNodeIterator.nonEmpty
+      case _             => false
     }
 
   def generateId(buffer: FastStringBuffer): Unit =

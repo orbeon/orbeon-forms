@@ -29,6 +29,8 @@ trait Element extends Branch {
 
   def namespaceForPrefix(prefix: String): Option[String]
 
+  def regularNodeIterator: Iterator[Node]
+
   /**
    * Adds the attribute value of the given local name. If an attribute already
    * exists for the given name it will be replaced.

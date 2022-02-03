@@ -692,6 +692,9 @@ class ConcreteElement(var qname: QName)
       case ns: Namespace => ns
     }
 
+  def regularNodeIterator: Iterator[Node] =
+    internalContent.iterator().asScala filterNot (_.isInstanceOf[Namespace])
+
   private def allInScopeNamespacesAs[T](map: Namespace => T): Map[String, T] = {
 
     var result = Map[String, T]()

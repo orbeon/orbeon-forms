@@ -1,8 +1,5 @@
 package org.orbeon.dom.saxon
 
-import java.util.function.Predicate
-import java.{util => ju}
-
 import org.orbeon.dom
 import org.orbeon.saxon.model.{Type, UType}
 import org.orbeon.saxon.om
@@ -12,6 +9,9 @@ import org.orbeon.saxon.tree.iter.{AxisIterator, LookaheadIterator}
 import org.orbeon.saxon.tree.util.{FastStringBuffer, Navigator, SteppingNode}
 import org.orbeon.saxon.tree.wrapper.{AbstractNodeWrapper, SiblingCountingNode}
 import org.orbeon.saxon.utils.Configuration
+
+import java.util.function.Predicate
+import java.{util => ju}
 
 
 trait NodeWrapper
@@ -209,8 +209,8 @@ trait NodeWrapper
   override def hasChildNodes: Boolean =
     node match {
       case _: dom.Document   => true
-      case elem: dom.Element => elem.nodeIterator.exists(! _.isInstanceOf[dom.Namespace])
-      case _                => false
+      case elem: dom.Element => elem.regularNodeIterator.nonEmpty
+      case _                 => false
     }
 
   private def isElementOnly(nodeTest: Predicate[_ >: om.NodeInfo]): Boolean =

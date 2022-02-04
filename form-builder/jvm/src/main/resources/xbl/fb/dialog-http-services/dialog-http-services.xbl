@@ -85,7 +85,7 @@
                                     return xf:element(
                                         'param',
                                         (
-                                            xf:attribute('name',  name($e)),
+                                            xf:attribute('name',  ($e/@name, name($e))[1]),
                                             xf:attribute('value', string($e))
                                         )
                                     )"/>
@@ -204,7 +204,7 @@
                 </xf:action>
             </xbl:handler>
 
-            <!-- Save and valid -->
+            <!-- Save if valid -->
             <xbl:handler event="DOMActivate" if="valid($i)" observer="fb-service-save">
 
                 <xf:action if="instance('modified') = true()">
@@ -342,8 +342,11 @@
                                         'params',
                                         for $p in $request/params/param
                                             return xf:element(
-                                                $p/@name,
-                                                string($p/@value)
+                                                'param',
+                                                (
+                                                    xf:attribute('name', $p/@name),
+                                                    string($p/@value)
+                                                )
                                             )
                                     )"/>
 
@@ -523,7 +526,6 @@
                         <xf:bind
                             name="param-names"
                             ref="params/param/@name"
-                            type="xs:NCName"
                             required="true()"/>
                         <xf:bind
                             ref="is-binary"

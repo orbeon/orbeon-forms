@@ -63,6 +63,7 @@
         <!-- Clear working values -->
         <xf:setvalue ref="$instance/name"/>
         <xf:setvalue ref="$instance/initial-name"/>
+        <xf:setvalue ref="$instance/parameter-names"/>
         <xf:delete   ref="$instance/fb:action"/>
 
         <!-- Empty binding if no binding id passed -->
@@ -94,6 +95,50 @@
                     ))"/>
             </xf:action>
         </xf:action>
+        <xf:dispatch name="fb-update-how-service-value-are-set" targetid="fb-action-dialog"/>
+
+    </xf:action>
+
+    <xf:action event="fb-update-how-service-value-are-set">
+
+        <xf:var name="action1" value="instance('fb-actions-editor-instance')/fb:action/xf:action[1]"/>
+        <xf:var name="selected-service"     value="$model/fb:submission[@id = $action1/xf:send/@submission]"/>
+        <xf:var name="service-uses-request-parameters" value="$selected-service/@method = ('get', 'delete')"/>
+
+        <xf:action if="$service-uses-request-parameters">
+
+            <!-- Compute possible parameter names, and save in local instance -->
+            <xf:var      name="service-id"               value="substring-before($selected-service/@id, '-submission')"/>
+            <xf:var      name="instance-id"              value="concat($service-id, '-instance')"/>
+            <xf:var      name="instance-body-string"     value="$model/fb:instance[@id = $instance-id]/*"/>
+            <xf:var      name="instance-body"            value="xf:parse($instance-body-string)"/>
+            <xf:var      name="parameter-names"          value="$instance-body/*/((@name, local-name())[1])"/>
+            <xf:setvalue ref="$instance/parameter-names" value="string-join($parameter-names, ' ')"/>
+
+            <!-- Upgrade syntax for setting parameter names:
+                 - From : `<xf:var name="path"           value="//my-param"/>`
+                 - To   : `<xf:var name="parameter-name" value="'my-param'"/>`   -->
+            <xf:action iterate="$instance//xf:action[@class = 'fr-set-service-value-action']/xf:var[@name = 'path']">
+                <xf:var name="is-path-to-param"
+                    value="
+                        starts-with(@value, '//') and
+                        not(contains(substring-after(@value, '//'), '/')) and
+                        substring-after(@value, '//') = $parameter-names"/>
+                <xf:action if="$is-path-to-param">
+                    <xf:setvalue ref="@name"  value="'parameter-name'"/>
+                    <xf:setvalue ref="@value" value="concat('''', substring-after(., '//'), '''')"/>
+                </xf:action>
+            </xf:action>
+
+        </xf:action>
+
+        <xf:action if="not($service-uses-request-parameters)">
+            <xf:action iterate="$instance//xf:action[@class = 'fr-set-service-value-action']/xf:var[@name = 'parameter-name']">
+                <xf:setvalue ref="@name"  value="'path'"/>
+                <xf:setvalue ref="@value" value="concat('//', substring(., 1, string-length(.) - 2))"/>
+            </xf:action>
+        </xf:action>
+
     </xf:action>
 
     <fr:tabbable class="fb-dialog-form-settings-fields">
@@ -247,6 +292,10 @@
                                 <xf:label value="substring-before(@id, '-submission')"/>
                                 <xf:value value="@id"/>
                             </xf:itemset>
+                            <xf:dispatch
+                                event="xforms-value-changed"
+                                name="fb-update-how-service-value-are-set"
+                                targetid="fb-action-dialog"/>
                         </fr:dropdown-select1>
                     </xh:td>
                     <xh:td/>
@@ -286,8 +335,19 @@
                         name="request-actions-container"
                         value="."/>
                     <xf:var
+                        name="set-by"
+                        value="
+                            if ($selected-service/@method = ('get', 'delete'))
+                            then 'parameter-name'
+                            else 'path'"/>
+                    <xf:var
                         name="template"
-                        value="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-service-value-action']"/>
+                        value="
+                            instance('fb-binding-action-template')/
+                            xf:action[
+                                @class = 'fr-set-service-value-action' and
+                                exists(xf:var[@name = $set-by])
+                            ]"/>
 
                     <fr:dnd-repeat
                         ref="
@@ -312,7 +372,7 @@
                             <xh:div class="fb-action-options">
 
                                 <xf:select1
-                                    ref="*:var/@name[. != 'path']"
+                                    ref="*:var/@name[. = ('control-name', 'source-path')]"
                                     class="fb-action-option-3-col-span-1">
                                     <xf:item>
                                         <xf:label ref="$form-resources/components/parameters-editor/type/item[@id = 0]"/>
@@ -328,11 +388,11 @@
                                 </xf:select1>
 
                                 <!-- `xxf:xforms11-switch="true"` is for dropdowns in hidden cases to be non-relevant -->
-                                <xf:switch caseref="*:var/@name[. != 'path']" xxf:xforms11-switch="true">
+                                <xf:switch caseref="*:var/@name[. = ('control-name', 'source-path')]" xxf:xforms11-switch="true">
                                     <xf:case value="'control-name'">
                                         <xf:select1
                                             appearance="search"
-                                            ref="*:var[@name[. != 'path']]/(@value | @select)"
+                                            ref="*:var[@name = ('control-name', 'source-path')]/(@value | @select)"
                                             class="fb-action-option-3-col-span-1">
                                             <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
                                             <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
@@ -358,43 +418,24 @@
                                     <xf:case value="'source-path'">
                                         <xf:input
                                             class="fb-action-option-3-col-span-1"
-                                            ref="*:var[@name[. != 'path']]/(@value | @select)">
+                                            ref="*:var[@name[. = ('control-name', 'source-path')]]/(@value | @select)">
                                             <xf:label ref="$form-resources/components/parameters-editor/xpath/label" appearance="minimal"/>
                                             <xf:alert ref="$form-resources/components/parameters-editor/xpath/alert"/>
                                         </xf:input>
                                     </xf:case>
                                 </xf:switch>
 
-                                <xf:var name="service-id"           value="substring-before($selected-service/@id, '-submission')"/>
-                                <xf:var name="instance-id"          value="concat($service-id, '-instance')"/>
-                                <xf:var name="instance-body-string" value="$model/fb:instance[@id = $instance-id]/*"/>
-                                <xf:var name="instance-body"        value="xf:parse($instance-body-string)"/>
-                                <xf:var name="param-names"          value="$instance-body/*/local-name()"/>
-                                <xf:var name="destination-ref"      value="(*:variable | *:var)[@name = 'path']/(@value | @select)[1]"/>
-                                <xf:var name="is-path-to-param"
-                                    value="
-                                        starts-with($destination-ref, '//') and
-                                        not(contains(substring-after($destination-ref, '//'), '/')) and
-                                        substring-after($destination-ref, '//') = $param-names"/>
-                                <xf:var name="show-parameters-dropdown"
-                                    value="
-                                        $selected-service/@method = ('get', 'delete') and
-                                        (xxf:is-blank($destination-ref) or $is-path-to-param)"/>
-
                                 <!-- Dropdown to select request parameter -->
-                                <xf:group ref=".[$show-parameters-dropdown]">
-                                    <fr:dropdown-select1 ref="$destination-ref" class="fb-action-option-3-col-span-1">
-
-                                        <xf:itemset ref="$instance-body/*">
-                                            <xf:label ref="local-name()"/>
-                                            <xf:value ref="concat('//', local-name())"/>
-                                        </xf:itemset>
-                                    </fr:dropdown-select1>
-                                </xf:group>
+                                <fr:dropdown-select1 ref="xf:var[@name = 'parameter-name']/@value" class="fb-action-option-3-col-span-1">
+                                    <xf:itemset ref="xxf:split($instance/parameter-names)">
+                                        <xf:label ref="."/>
+                                        <xf:value ref="concat('''', ., '''')"/>
+                                    </xf:itemset>
+                                </fr:dropdown-select1>
 
                                 <!-- Input for XPath expression to request body -->
                                 <xf:input
-                                    ref="$destination-ref[not($show-parameters-dropdown)]"
+                                    ref="xf:var[@name = 'path']/@value"
                                     incremental="true"
                                     class="fb-action-option-3-col-span-1">
                                     <xf:label ref="$form-resources/dialog-actions/destination-xpath/label" appearance="minimal"/>
@@ -842,6 +883,7 @@
                 <name/>
                 <initial-name/>
                 <instance-id/>
+                <parameter-names/>
                 <delete-trigger/>
                 <save-test-trigger/>
                 <fb:action/>
@@ -966,10 +1008,15 @@
         <!-- NOTE: The implementation of individual actions is now in actions.xsl. -->
         <xf:instance id="fb-binding-action-template" xxf:readonly="true">
             <action>
-                <!-- Set service value -->
+                <!-- Set service value with path -->
                 <xf:action class="fr-set-service-value-action">
                     <xf:var name="control-name" value=""/>
                     <xf:var name="path" value=""/>
+                </xf:action>
+                <!-- Set service value with parameter name -->
+                <xf:action class="fr-set-service-value-action">
+                    <xf:var name="control-name" value=""/>
+                    <xf:var name="parameter-name" value=""/>
                 </xf:action>
                 <!-- Set database service value -->
                 <xf:action class="fr-set-database-service-value-action">

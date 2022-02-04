@@ -378,6 +378,7 @@
                             'source-path',
                             'control-value',
                             'path',
+                            'parameter-name',
                             'parameter',
                             'response-items',
                             'item-label',

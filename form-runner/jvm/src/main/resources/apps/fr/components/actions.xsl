@@ -450,9 +450,52 @@
                 ]/xf:submission[
                     generate-id() = $service-submissions-ids
                 ]">
+        <xsl:variable
+            name="add-request-parameters-to-resource"
+            select="@serialization = 'application/x-www-form-urlencoded'"/>
+        <xsl:if test="$add-request-parameters-to-resource">
+            <xf:var name="{concat(@id, '-resource')}">
+                <xsl:value-of select="@resource"/>
+            </xf:var>
+        </xsl:if>
         <xsl:copy>
-            <xsl:copy-of select="@* except (@ref | @replace | @instance | @xxf:instance)"/>
-            <xsl:attribute name="ref"      >xxf:instance('fr-service-request-instance')</xsl:attribute>
+            <xsl:copy-of select="@* except (@resource | @ref | @replace | @instance | @xxf:instance | @serialization)"/>
+            <xsl:choose>
+                <!-- Don't rely on XForms URL parameter serialization, as we want to support parameters where the
+                     name is provided through an attribute, e.g. `<param name="my-name">my-value</param>`, this in
+                     addition to the "default" parameters where the name is in the element name, e.g.
+                     `<my-name>my-value</my-value>`. -->
+                <xsl:when test="$add-request-parameters-to-resource">
+                    <xsl:attribute name="serialization" select="'none'"/>
+                    <xsl:attribute name="resource">{
+                        let
+                            $resource-without-params := xxf:evaluate-avt(<xsl:value-of select="concat('$', @id, '-resource')"/>),
+                            $parameters-separator    := if (contains($resource-without-params, '?')) then '&amp;' else '?',
+                            $parameters-list         :=
+                                for $param-element in xxf:instance('fr-service-request-instance')/*
+                                return
+                                    let
+                                        $param-value := $param-element/string(),
+                                        $param-name  :=
+                                            if (exists($param-element/@name))
+                                            then $param-element/@name
+                                            else $param-element/local-name()
+                                    return
+                                        concat(encode-for-uri($param-name), '=', encode-for-uri($param-value)),
+                            $parameters-string := string-join($parameters-list, '&amp;')
+                        return
+                            concat(
+                                $resource-without-params,
+                                $parameters-separator,
+                                $parameters-string
+                            )
+                    }</xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:copy-of select="@resource | @serialization"/>
+                    <xsl:attribute name="ref">xxf:instance('fr-service-request-instance')</xsl:attribute>
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:attribute name="targetref">xxf:instance('fr-service-response-instance')</xsl:attribute>
             <xsl:choose>
                 <!-- See https://github.com/orbeon/orbeon-forms/issues/3945 -->
@@ -766,12 +809,19 @@
                                     </xsl:if>
                                     <xsl:choose>
                                         <xsl:when test="p:has-class('fr-set-service-value-action')">
-                                            <!-- Keep parameters but override implementation -->
-                                            <xsl:copy-of select="(*:variable | *:var)[@name = 'path']"/>
-                                            <!-- Set value -->
-                                            <xf:setvalue
-                                                ref="$path"
-                                                value="$value"/>
+                                            <xsl:if test="exists(*:var[@name = 'path'])">
+                                                <xsl:copy-of select="*:var[@name = 'path']"/>
+                                                <xf:setvalue ref="$path" value="$value"/>
+                                            </xsl:if>
+                                            <xsl:if test="exists(*:var[@name = 'parameter-name'])">
+                                                <xsl:copy-of select="*:var[@name = 'parameter-name']"/>
+                                                <xf:setvalue
+                                                    ref="(
+                                                        /params/param[@name        = $parameter-name],
+                                                        //*          [local-name() = $parameter-name]
+                                                    )[1]"
+                                                    value="$value"/>
+                                            </xsl:if>
                                         </xsl:when>
                                         <xsl:when test="p:has-class('fr-set-database-service-value-action')">
                                             <!-- Keep parameters but override implementation -->

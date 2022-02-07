@@ -20,7 +20,7 @@ import org.orbeon.scaxon.SimplePath._
 
 trait FormRunnerDocContext {
 
-  def formDefinitionRootElem: om.NodeInfo
+  def formDefinitionRootElem: om.NodeInfo // Scala 3: trait parameter
 
   lazy val modelElem             : om.NodeInfo         = frc.getModelElem(formDefinitionRootElem)
   lazy val dataInstanceElem      : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormInstance).get

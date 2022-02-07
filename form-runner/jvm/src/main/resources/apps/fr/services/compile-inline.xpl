@@ -45,10 +45,12 @@
                                    window.ORBEON.fr.FormRunnerOffline.renderFormFromBase64(
                                        document.querySelector(".orbeon"),
                                        document.querySelector("#fr-compiled-form").content.textContent,
-                                       "<xsl:value-of select="doc('input:parameters')/*/app"/>",
-                                       "<xsl:value-of select="doc('input:parameters')/*/form"/>",
-                                       1,
-                                       "test"
+                                       {
+                                            "appName"    : "<xsl:value-of select="doc('input:parameters')/*/app"/>",
+                                            "formName"   : "<xsl:value-of select="doc('input:parameters')/*/form"/>",
+                                            "formVersion": 1,
+                                            "mode"       : "test"
+                                       }
                                    );
                                 });
                             </xh:script>

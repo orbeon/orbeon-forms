@@ -15,7 +15,6 @@ object XXFormsFunctionLibrary
   extends OrbeonFunctionLibrary
     with XXFormsEnvFunctions
     with IndependentFunctions
-    with IndependentRequestFunctions
     with XFormsXXFormsEnvFunctions {
 
   private val XFormsPropertyPrefix = "oxf.xforms."

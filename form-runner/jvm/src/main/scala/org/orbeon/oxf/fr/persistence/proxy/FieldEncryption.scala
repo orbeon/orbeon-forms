@@ -17,7 +17,7 @@ object FieldEncryption {
     requestInputStream : InputStream,
     app                : String,
     form               : String,
-    isDataXmlRequest   : Boolean)(
+    isForXmlData       : Boolean)( // vs. attachment data
     implicit logger    : IndentedLogger
   ): Option[(InputStream, Option[Long])] = None
 

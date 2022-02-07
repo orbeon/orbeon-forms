@@ -127,13 +127,16 @@ private object PersistenceProxyProcessor {
         case FormOrData.Form =>
           // Don't encrypt form definitions
           inputData
+        case FormOrData.Data if isFormBuilder =>
+          // Don't encrypt Form Builder form data either
+          inputData
         case FormOrData.Data =>
           FieldEncryption.encryptDataIfNecessary(
             request,
             requestInputStream,
             app,
             form,
-            isDataXmlRequest && ! isFormBuilder
+            isDataXmlRequest
           ).getOrElse(inputData)
       }
 

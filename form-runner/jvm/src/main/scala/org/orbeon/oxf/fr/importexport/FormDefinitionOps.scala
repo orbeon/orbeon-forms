@@ -1,7 +1,7 @@
 package org.orbeon.oxf.fr.importexport
 
 import org.orbeon.oxf.fr.SimpleDataMigration.FormOps
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerDocContext}
+import org.orbeon.oxf.fr.{FormRunner, InDocFormRunnerDocContext}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames.{XFORMS_BIND_QNAME, XFORMS_INSTANCE_QNAME}
@@ -12,9 +12,7 @@ class FormDefinitionOps(form: om.NodeInfo) extends FormOps {
   type DocType   = om.DocumentInfo
   type BindType  = om.NodeInfo
 
-  private val ctx = new FormRunnerDocContext {
-    val formDefinitionRootElem: om.NodeInfo = form.rootElement
-  }
+  private val ctx = new InDocFormRunnerDocContext(form.rootElement)
 
   def findFormBindsRoot: Option[BindType] =
     ctx.topLevelBindElem

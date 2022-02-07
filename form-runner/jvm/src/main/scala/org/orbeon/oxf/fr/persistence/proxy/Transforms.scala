@@ -88,9 +88,7 @@ object Transforms {
         val formDoc =
           new DocumentWrapper(TransformerUtils.readOrbeonDom(is, null, false, false), null, XPath.GlobalConfiguration)
 
-        val frDocCtx: FormRunnerDocContext = new FormRunnerDocContext {
-          val formDefinitionRootElem: NodeInfo = formDoc.rootElement
-        }
+        val frDocCtx: FormRunnerDocContext = new InDocFormRunnerDocContext(formDoc.rootElement)
 
         // Set an id index to help with migration performance
         // The index is not updated with `insert` and `delete`, but we convinced ourselves that it's ok because:

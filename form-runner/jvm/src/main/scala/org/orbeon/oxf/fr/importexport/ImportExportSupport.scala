@@ -417,9 +417,7 @@ object ImportExportSupport {
 
       val permissionsElOpt = {
 
-        val ctx = new FormRunnerDocContext {
-          val formDefinitionRootElem: om.NodeInfo = form.rootElement
-        }
+        val ctx = new InDocFormRunnerDocContext(form.rootElement)
 
         ctx.metadataRootElem.firstChildOpt(Names.Permissions)
       }

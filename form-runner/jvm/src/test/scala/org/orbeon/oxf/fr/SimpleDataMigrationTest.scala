@@ -408,9 +408,7 @@ class SimpleDataMigrationTest
 
     val formOps = new FormDefinitionOps(FormDefinition)
 
-     val ctx = new FormRunnerDocContext {
-      val formDefinitionRootElem: NodeInfo = FormDefinition.rootElement
-    }
+    val ctx = new InDocFormRunnerDocContext(FormDefinition.rootElement)
 
     val result = TransformerUtils.extractAsMutableDocument(ctx.dataRootElem)
 

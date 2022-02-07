@@ -60,9 +60,7 @@ trait FormRunnerPublish {
       }
 
     // `xhtml` must always be a form definition and must have form metadata
-    val frDocCtx: FormRunnerDocContext = new FormRunnerDocContext {
-      val formDefinitionRootElem: NodeInfo = xhtml.rootElement
-    }
+    val frDocCtx: FormRunnerDocContext = new InDocFormRunnerDocContext(xhtml.rootElement)
 
     val (globalVersionOpt, appVersionOpt) =
       FRComponentParamSupport.findLibraryVersions(frDocCtx.metadataRootElem)

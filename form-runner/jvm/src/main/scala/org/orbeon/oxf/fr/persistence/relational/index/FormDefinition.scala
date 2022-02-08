@@ -38,15 +38,11 @@ trait FormDefinition {
   ): Seq[IndexedControl] = {
 
     implicit val ctx = new InDocFormRunnerDocContext(formDoc) {
-      override lazy val bodyElem: om.NodeInfo = {
+      override lazy val bodyElemOpt: Option[om.NodeInfo] = {
 
         // For "Form Builder as form definition". This is used by the Summary page and the `reindex()` feature.
-        def fromFbPseudoBody: Option[NodeInfo] =
-          formDoc.rootElement / "*:body" / "*:div" find (_.id == "fb-pseudo-body")
-
         frc.findFormRunnerBodyElem(formDoc) orElse
-          fromFbPseudoBody                  getOrElse
-          (throw new IllegalArgumentException("missing form body"))
+          (formDoc.rootElement / "*:body" / "*:div" find (_.id == "fb-pseudo-body"))
       }
     }
 

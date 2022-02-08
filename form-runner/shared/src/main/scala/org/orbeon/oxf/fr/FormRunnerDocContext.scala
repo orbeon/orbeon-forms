@@ -22,16 +22,20 @@ trait FormRunnerDocContext {
 
   def formDefinitionRootElem: om.NodeInfo // Scala 3: trait parameter
 
-  lazy val modelElem             : om.NodeInfo         = frc.getModelElem(formDefinitionRootElem)
-  lazy val dataInstanceElem      : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormInstance).get
-  lazy val metadataInstanceElem  : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.MetadataInstance).get
-  lazy val resourcesInstanceElem : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormResources).get
-  lazy val topLevelBindElem      : Option[om.NodeInfo] = frc.findTopLevelBindFromModelElem(modelElem)
-  lazy val bodyElem              : om.NodeInfo         = frc.getFormRunnerBodyElem(formDefinitionRootElem)
+  lazy val modelElem               : om.NodeInfo         = frc.getModelElem(formDefinitionRootElem)
+  lazy val dataInstanceElem        : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormInstance).get
+  lazy val metadataInstanceElemOpt : Option[om.NodeInfo] = frc.instanceElemFromModelElem(modelElem, Names.MetadataInstance)
+  lazy val resourcesInstanceElem   : om.NodeInfo         = frc.instanceElemFromModelElem(modelElem, Names.FormResources).get
+  lazy val topLevelBindElem        : Option[om.NodeInfo] = frc.findTopLevelBindFromModelElem(modelElem)
+  lazy val bodyElemOpt             : Option[om.NodeInfo] = frc.findFormRunnerBodyElem(formDefinitionRootElem)
 
-  lazy val dataRootElem          : om.NodeInfo         = dataInstanceElem      / * head
-  lazy val metadataRootElem      : om.NodeInfo         = metadataInstanceElem  / * head
-  lazy val resourcesRootElem     : om.NodeInfo         = resourcesInstanceElem / * head
+  lazy val dataRootElem            : om.NodeInfo         = dataInstanceElem      / * head
+  lazy val metadataRootElemOpt     : Option[om.NodeInfo] = metadataInstanceElemOpt.toList firstChildOpt *
+  lazy val resourcesRootElem       : om.NodeInfo         = resourcesInstanceElem / * head
+
+  def metadataInstanceElem         : om.NodeInfo         = metadataInstanceElemOpt.get
+  def metadataRootElem             : om.NodeInfo         = metadataRootElemOpt.get
+  def bodyElem                     : om.NodeInfo         = bodyElemOpt.get
 }
 
 

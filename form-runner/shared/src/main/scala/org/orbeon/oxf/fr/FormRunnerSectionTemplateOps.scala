@@ -155,5 +155,5 @@ trait FormRunnerSectionTemplateOps {
     section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption
 
   def findSectionsWithTemplates(implicit ctx: FormRunnerDocContext) =
-    ctx.bodyElem descendant * filter frc.IsSection filter (_ / * exists isSectionTemplateContent)
+    ctx.bodyElemOpt.toList descendant * filter frc.IsSection filter (_ / * exists isSectionTemplateContent)
 }

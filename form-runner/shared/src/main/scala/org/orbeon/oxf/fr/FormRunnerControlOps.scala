@@ -210,7 +210,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
         // Find the migration functions once and for all
         val pathMigrationFunctions =
           for {
-            metadataElem <- List(ctx.metadataRootElem) // xxx
+            metadataElem <- ctx.metadataRootElemOpt.toList
             ops          <- migrationOpsToApply
             json         <- findMigrationForVersion(metadataElem, ops.version)
           } yield
@@ -230,7 +230,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     ctx       : FormRunnerDocContext
   ): Seq[ControlBindPathHoldersResources] =
     searchControlBindPathHoldersInDoc(
-      controlElems   = ctx.bodyElem descendant * filter IsControl,
+      controlElems   = ctx.bodyElemOpt.toList descendant * filter IsControl,
       contextItemOpt = data map (_.rootElement),
       predicate      = predicate
     )

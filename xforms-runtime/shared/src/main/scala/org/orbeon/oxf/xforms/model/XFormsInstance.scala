@@ -428,13 +428,6 @@ trait XFormsInstanceIndex extends BasicIdIndex {
   import org.orbeon.scaxon.SimplePath._
   import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
-  // Iterator over all ids
-  // TODO: Not useful for Form Builder, because it must search under `<xh:body>` only.
-  def idsIterator: Iterator[String] = {
-    createIndexIfNeeded()
-    if (hasIdIndex) idIndex.keysIterator else Iterator.empty
-  }
-
   def requireNewIndex(): Unit = {
     idIndex = null
     if (instance.indexIds)
@@ -482,8 +475,6 @@ trait XFormsInstanceIndex extends BasicIdIndex {
 }
 
 object XFormsInstance extends Logging {
-
-  import Instance._
 
   // Create an initial instance without caching information
   def apply(model: XFormsModel, instance: Instance, documentInfo: DocumentNodeInfoType): XFormsInstance =

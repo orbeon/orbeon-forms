@@ -79,97 +79,95 @@ object Transforms {
 
     val appForm = AppForm(app, form)
 
-      // We are explicitly asked to downgrade a form definition format
-      // The database may contain a form definition in any format
+    // We are explicitly asked to downgrade a form definition format
+    // The database may contain a form definition in any format
 
-      def migrate(is: InputStream, os: OutputStream): Unit = {
+    (is, os) => {
 
-        // Read document and component bindings
-        val formDoc =
-          new DocumentWrapper(TransformerUtils.readOrbeonDom(is, null, false, false), null, XPath.GlobalConfiguration)
+      // Read document and component bindings
+      val formDoc =
+        new DocumentWrapper(TransformerUtils.readOrbeonDom(is, null, false, false), null, XPath.GlobalConfiguration)
 
-        val frDocCtx: FormRunnerDocContext = new InDocFormRunnerDocContext(formDoc.rootElement)
+      val frDocCtx: FormRunnerDocContext = new InDocFormRunnerDocContext(formDoc)
 
-        // Set an id index to help with migration performance
-        // The index is not updated with `insert` and `delete`, but we convinced ourselves that it's ok because:
-        //
-        // - We only support migrating "down" right now, from 2019.1.0 to 4.8.0.
-        // - Inline data: migration is not affected by id changes.
-        // - Binds: elements are moved down one level.
-        // - Controls: `bind` attributes are removed and that's it.
-        // - Templates: search for controls.
-        object Index extends BasicIdIndex {
-          def documentInfo: DocumentNodeInfoType = formDoc
-        }
-
-        formDoc.setIdGetter(Index.idGetter(formDoc))
-
-        val componentBindings = loadComponentBindings(appForm, frDocCtx)
-
-        val migrationsFromForm =
-          new MigrationsFromForm(
-            outerDocument        = formDoc,
-            availableXBLBindings = componentBindings.some,
-            legacyGridsOnly      = false
-          )
-
-        // 1. All grids must have ids for what follows
-        // This is already the case, since the form definition was created with a version of
-        // Orbeon Forms which places ids everywhere.
-
-        // 2. Migrate inline instance data
-
-        // If we don't find a version in the form definition, it means it was last updated with a version older than 2018.2
-        // TODO: We should discriminate between 4.8.0 and 4.0.0 ideally. Currently we don't have a user use case but it would
-        //   be good for correctness.
-        val srcVersionFromMetadataOrGuess =
-          findFormDefinitionFormatFromStringVersions(
-            (frDocCtx.metadataRootElem / "updated-with-version" ++ frDocCtx.metadataRootElem / "created-with-version") map
-              (_.stringValue)
-          ) getOrElse DataFormatVersion.V480
-
-        val dataRootElem =
-          frDocCtx.dataRootElem.asInstanceOf[NodeWrapper]
-
-        MigrationSupport.migrateDataInPlace(
-          dataRootElem     = dataRootElem,
-          srcVersion       = srcVersionFromMetadataOrGuess,
-          dstVersion       = dstVersion,
-          findMigrationSet = migrationsFromForm
-        )
-
-        GridDataMigration.updateDataFormatVersionInPlace(appForm, dstVersion, dataRootElem)
-
-        // 3. Migrate other aspects such as binds and controls
-        MigrationSupport.migrateOtherInPlace(
-          formRootElem     = formDoc,
-          srcVersion       = srcVersionFromMetadataOrGuess,
-          dstVersion       = dstVersion,
-          findMigrationSet = migrationsFromForm
-        )
-
-        // 4. Migrate templates
-        FormRunnerTemplatesOps.updateTemplates(
-          None,
-          componentBindings.rootElement / XBLXBLTest / XBLBindingTest)(
-          frDocCtx
-        )
-
-        // Serialize out the result
-        val receiver =
-          TransformerUtils.getIdentityTransformerHandler |!>
-            (_.setResult(new StreamResult(os)))
-
-        receiver.getTransformer |!>
-          (_.setOutputProperty(OutputKeys.ENCODING,                     CharsetNames.Utf8)) |!>
-          (_.setOutputProperty(OutputKeys.METHOD,                       "xml"))             |!>
-          (_.setOutputProperty(OutputKeys.VERSION,                      "1.0"))             |!>
-          (_.setOutputProperty(OutputKeys.INDENT,                       "no"))              |!>
-          (_.setOutputProperty(TransformerUtils.INDENT_AMOUNT_PROPERTY, "0"))
-
-        TransformerUtils.writeTinyTree(formDoc, receiver)
+      // Set an id index to help with migration performance
+      // The index is not updated with `insert` and `delete`, but we convinced ourselves that it's ok because:
+      //
+      // - We only support migrating "down" right now, from 2019.1.0 to 4.8.0.
+      // - Inline data: migration is not affected by id changes.
+      // - Binds: elements are moved down one level.
+      // - Controls: `bind` attributes are removed and that's it.
+      // - Templates: search for controls.
+      object Index extends BasicIdIndex {
+        def documentInfo: DocumentNodeInfoType = formDoc
       }
 
-      migrate
+      formDoc.setIdGetter(Index.idGetter(formDoc))
+
+      val componentBindings = loadComponentBindings(appForm, frDocCtx)
+
+      val migrationsFromForm =
+        new MigrationsFromForm(
+          outerDocument        = formDoc,
+          availableXBLBindings = componentBindings.some,
+          legacyGridsOnly      = false
+        )
+
+      // 1. All grids must have ids for what follows
+      // This is already the case, since the form definition was created with a version of
+      // Orbeon Forms which places ids everywhere.
+
+      // 2. Migrate inline instance data
+
+      // If we don't find a version in the form definition, it means it was last updated with a version older than 2018.2
+      // TODO: We should discriminate between 4.8.0 and 4.0.0 ideally. Currently we don't have a user use case but it would
+      //   be good for correctness.
+      val srcVersionFromMetadataOrGuess =
+        findFormDefinitionFormatFromStringVersions(
+          (frDocCtx.metadataRootElem / "updated-with-version" ++ frDocCtx.metadataRootElem / "created-with-version") map
+            (_.stringValue)
+        ) getOrElse DataFormatVersion.V480
+
+      val dataRootElem =
+        frDocCtx.dataRootElem.asInstanceOf[NodeWrapper]
+
+      MigrationSupport.migrateDataInPlace(
+        dataRootElem     = dataRootElem,
+        srcVersion       = srcVersionFromMetadataOrGuess,
+        dstVersion       = dstVersion,
+        findMigrationSet = migrationsFromForm
+      )
+
+      GridDataMigration.updateDataFormatVersionInPlace(appForm, dstVersion, dataRootElem)
+
+      // 3. Migrate other aspects such as binds and controls
+      MigrationSupport.migrateOtherInPlace(
+        formRootElem     = formDoc,
+        srcVersion       = srcVersionFromMetadataOrGuess,
+        dstVersion       = dstVersion,
+        findMigrationSet = migrationsFromForm
+      )
+
+      // 4. Migrate templates
+      FormRunnerTemplatesOps.updateTemplates(
+        None,
+        componentBindings.rootElement / XBLXBLTest / XBLBindingTest)(
+        frDocCtx
+      )
+
+      // Serialize out the result
+      val receiver =
+        TransformerUtils.getIdentityTransformerHandler |!>
+          (_.setResult(new StreamResult(os)))
+
+      receiver.getTransformer |!>
+        (_.setOutputProperty(OutputKeys.ENCODING,                     CharsetNames.Utf8)) |!>
+        (_.setOutputProperty(OutputKeys.METHOD,                       "xml"))             |!>
+        (_.setOutputProperty(OutputKeys.VERSION,                      "1.0"))             |!>
+        (_.setOutputProperty(OutputKeys.INDENT,                       "no"))              |!>
+        (_.setOutputProperty(TransformerUtils.INDENT_AMOUNT_PROPERTY, "0"))
+
+      TransformerUtils.writeTinyTree(formDoc, receiver)
     }
+  }
 }

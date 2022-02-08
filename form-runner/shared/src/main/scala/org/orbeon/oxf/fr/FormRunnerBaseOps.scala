@@ -169,12 +169,12 @@ trait FormRunnerBaseOps {
     def parentIsNotGridOrLegacyRepeat(n: NodeInfo) =
       n parent FRGridOrLegacyRepeatTest isEmpty
 
-    def fromGroupById = SaxonUtils.selectID(inDoc, "fb-body")
+    def fromFbGroupId = SaxonUtils.selectID(inDoc, "fb-body")
     def fromGroup     = inDoc.rootElement / "*:body" descendant XFGroupTest find (_.id == "fb-body")
     def fromFRBody    = inDoc.rootElement / "*:body" descendant FRBodyTest  find parentIsNotGridOrLegacyRepeat
-    def fromTemplate  = inDoc.rootElement / XBLTemplateTest headOption
+    def fromTemplate  = inDoc.rootElement firstChildOpt XBLTemplateTest
 
-    fromGroupById orElse fromGroup orElse fromFRBody orElse fromTemplate
+    fromFbGroupId orElse fromGroup orElse fromFRBody orElse fromTemplate
   }
 
   // Get the form model

@@ -192,9 +192,8 @@
                             <xf:var
                                 name="value"
                                 value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control3', true(), ())"/>
-                            <xf:setvalue
-                                ref="/*/param3"
-                                value="$value"/>
+                            <xf:var name="name">param3</xf:var>
+                            <xf:setvalue ref="(//*[@name = $name], //*[local-name() = $name])[1]" value="$value"/>
                         </xf:action>
                     </xf:action>
                     <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-2-id')</xf:action>
@@ -241,9 +240,8 @@
                             <xf:var
                                 name="value"
                                 value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), 'control5', true(), ())"/>
-                            <xf:setvalue
-                                ref="/*/param5"
-                                value="$value"/>
+                            <xf:var name="name">param5</xf:var>
+                            <xf:setvalue ref="(//*[@name = $name], //*[local-name() = $name])[1]" value="$value"/>
                         </xf:action>
                         <xf:action>
                             <xf:var
@@ -448,7 +446,8 @@
                             <xf:action context="xxf:instance('fr-service-request-instance')">
                                 <xf:action>
                                     <xf:var name="value" context="$original-context" value="foo"/>
-                                    <xf:setvalue ref="/*/my-attachment-id" value="$value"/>
+                                    <xf:var name="name">my-attachment-id</xf:var>
+                                    <xf:setvalue ref="(//*[@name = $name], //*[local-name() = $name])[1]" value="$value"/>
                                 </xf:action>
                             </xf:action>
                             <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-6-id')</xf:action>
@@ -656,7 +655,8 @@
                         <xf:action context="xxf:instance('fr-service-request-instance')">
                             <xf:action>
                                 <xf:var name="value" context="xxf:get-request-attribute('fr-iteration-context-1')" value="."/>
-                                <xf:setvalue ref="/*/text" value="$value"/>
+                                <xf:var name="name">text</xf:var>
+                                <xf:setvalue ref="(//*[@name = $name], //*[local-name() = $name])[1]" value="$value"/>
                             </xf:action>
                         </xf:action>
                         <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-4-id')</xf:action>

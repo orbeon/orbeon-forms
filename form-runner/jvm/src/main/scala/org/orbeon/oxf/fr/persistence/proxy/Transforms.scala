@@ -9,13 +9,14 @@ import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.MigrationsFromForm
-import org.orbeon.oxf.fr.permission.Operations
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, URLRewriterUtils, XPath}
+import org.orbeon.oxf.xforms.model.BasicIdIndex
 import org.orbeon.oxf.xforms.submission.SubmissionUtils
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SimplePath._
 
 import java.io.{InputStream, OutputStream}
@@ -90,6 +91,20 @@ object Transforms {
         val frDocCtx: FormRunnerDocContext = new FormRunnerDocContext {
           val formDefinitionRootElem: NodeInfo = formDoc.rootElement
         }
+
+        // Set an id index to help with migration performance
+        // The index is not updated with `insert` and `delete`, but we convinced ourselves that it's ok because:
+        //
+        // - We only support migrating "down" right now, from 2019.1.0 to 4.8.0.
+        // - Inline data: migration is not affected by id changes.
+        // - Binds: elements are moved down one level.
+        // - Controls: `bind` attributes are removed and that's it.
+        // - Templates: search for controls.
+        object Index extends BasicIdIndex {
+          def documentInfo: DocumentNodeInfoType = formDoc
+        }
+
+        formDoc.setIdGetter(Index.idGetter(formDoc))
 
         val componentBindings = loadComponentBindings(appForm, frDocCtx)
 

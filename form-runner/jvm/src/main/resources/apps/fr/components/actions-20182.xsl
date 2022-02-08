@@ -446,9 +446,9 @@
                                         )"/>
                             </xsl:when>
                             <xsl:when test="./self::fr:url-param">
-                                <xsl:variable name="name" select="@name/string()" as="xs:string"/>
+                                <xf:var name="name"><xsl:value-of select="@name"/></xf:var>
                                 <xf:setvalue
-                                    ref="/*/{$name}"
+                                    ref="(//*[@name = $name], //*[local-name() = $name])[1]"
                                     value="$value"/>
                             </xsl:when>
                         </xsl:choose>

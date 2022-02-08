@@ -92,12 +92,6 @@ object FormBuilderXPathApi {
 
     implicit val ctx = FormBuilderDocContext()
 
-    def findBind =
-      if (controlName ne null)
-        FormRunner.findBindByName(controlName)
-      else
-        FormRunner.findInBindsTryIndex(FormBinds)
-
     val resultOpt =
       for {
         mip      <- ModelDefs.AllComputedMipsByName.get(mipName)
@@ -547,7 +541,6 @@ object FormBuilderXPathApi {
   def findSchemaPrefixOrEmpty(inDoc: NodeInfo) =
     SchemaOps.findSchemaPrefix(inDoc).orNull
 
-  // Various counts
   //@XPathFunction
   def countSections        (inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(new InDocFormRunnerDocContext(inDoc)) count FormRunner.IsSection
   def countAllGrids        (inDoc: NodeInfo): Int = FormRunner.getFormRunnerBodyElem(inDoc) descendant *                   count FormRunner.IsGrid
@@ -660,17 +653,12 @@ object FormBuilderXPathApi {
     FormBuilder.buildFormBuilderControlNamespacedIdOrEmpty(staticId)(FormBuilderDocContext())
 
   //@XPathFunction
-  def findControlByNameOrEmpty(controlName: String): NodeInfo = {
-    implicit val ctx = FormBuilderDocContext()
-    FormRunner.findControlByNameOrEmpty(ctx.formDefinitionRootElem, controlName)
-  }
+  def findControlByNameOrEmpty(controlName: String): NodeInfo =
+    FormRunner.findControlByNameOrEmpty(controlName)(FormBuilderDocContext())
 
-  // Find a bind by name or null (the empty sequence)
   //@XPathFunction
-  def findBindByNameOrEmpty(inDoc: NodeInfo, name: String): NodeInfo = {
-    implicit val ctx = FormBuilderDocContext()
-    FormRunner.findBindByName(name).orNull
-  }
+  def findBindByNameOrEmpty(name: String): NodeInfo =
+    FormRunner.findBindByName(name)(FormBuilderDocContext()).orNull
 
   //@XPathFunction
   def findNewControlBinding(

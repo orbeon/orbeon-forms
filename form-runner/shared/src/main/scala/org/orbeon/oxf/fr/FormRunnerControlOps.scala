@@ -95,7 +95,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     findControlByName(controlName) map (_.id)
 
   // Find a control element by name or null (the empty sequence)
-  def findControlByNameOrEmpty(inDoc: NodeInfo, controlName: String)(implicit ctx: FormRunnerDocContext): NodeInfo =
+  def findControlByNameOrEmpty(controlName: String)(implicit ctx: FormRunnerDocContext): NodeInfo =
     findControlByName(controlName).orNull
 
   // Get the control's name based on the control element

@@ -90,7 +90,7 @@
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
                      allows scoping namespaces for XPath expressions validated with xxf:XPath2. -->
                 <xf:delete ref="$i/namespace::node()"/>
-                <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
+                <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($i/control-name)/namespace::node()"/>
 
                 <!-- Read Label/Help if we are a section -->
                 <xf:action iterate="$i/(label, help, iteration-label)">

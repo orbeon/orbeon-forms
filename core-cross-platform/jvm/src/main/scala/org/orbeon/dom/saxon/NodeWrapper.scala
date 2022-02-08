@@ -510,11 +510,14 @@ class NodeWrapper protected (
   def getDeclaredNamespaces(buffer: Array[Int]): Array[Int] =
     node match {
       case elem: Element =>
-        val namespaces = elem.allInScopeNamespacesAsNodes
-        if (namespaces.isEmpty)
+
+        val nsIt = elem.declaredNamespacesIterator
+
+        if (nsIt.isEmpty)
           NodeInfo.EMPTY_NAMESPACE_LIST
         else {
-          val count = namespaces.size
+
+          val count = elem.declaredNamespacesIterator.size
           val result =
             if ((buffer eq null) || count > buffer.length)
               new Array[Int](count)
@@ -522,10 +525,9 @@ class NodeWrapper protected (
               buffer
           val pool = getNamePool
           var n = 0
-          val i = namespaces.iterator
-          while (i.hasNext) {
-            val namespace = i.next()
-            result(n) = pool.allocateNamespaceCode(namespace._1, namespace._2.uri)
+          while (nsIt.hasNext) {
+            val namespace = nsIt.next()
+            result(n) = pool.allocateNamespaceCode(namespace.prefix, namespace.uri)
             n += 1
           }
           if (count < result.length)

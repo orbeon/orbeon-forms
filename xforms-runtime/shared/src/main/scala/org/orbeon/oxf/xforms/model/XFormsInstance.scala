@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
+import shapeless.syntax.typeable._
 
 import scala.jdk.CollectionConverters._
 
@@ -354,104 +355,40 @@ class XFormsInstance(
 //
 // - should just index "id" and "xml:id"
 // - handle schema xs:ID type as well
-trait XFormsInstanceIndex {
 
-  self: XFormsInstance =>
+trait BasicIdIndex {
 
   import org.orbeon.scaxon.SimplePath._
-  import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
+  import org.w3c.dom.Node.ATTRIBUTE_NODE
 
   import collection.{mutable => m}
 
-  private var idIndex: m.Map[String, List[Element]] = _
+  protected def documentInfo: DocumentNodeInfoType
 
-  // Iterator over all ids
-  // TODO: Not useful for Form Builder, because it must search under `<xh:body>` only.
-  def idsIterator: Iterator[String] = {
-    createIndexIfNeeded()
-    if (idIndex ne null) idIndex.keysIterator else Iterator.empty
-  }
+  def hasIdIndex: Boolean = idIndex ne null
 
-  def requireNewIndex(): Unit = {
-    idIndex = null
-    if (instance.indexIds && self.documentInfo.isInstanceOf[DocumentWrapper]) {
-      val wrapper = self.documentInfo.asInstanceOf[DocumentWrapper]
-      wrapper.setIdGetter(id => {
+  def idGetter(wrapper: DocumentWrapper): String => Element =
+    id => {
 
-        object ElementOrdering extends Ordering[Element] {
-          def compare(x: Element, y: Element): Int =
-            wrapper.wrap(x).compareOrder(wrapper.wrap(y))
-        }
+      object ElementOrdering extends Ordering[Element] {
+        def compare(x: Element, y: Element): Int =
+          wrapper.wrap(x).compareOrder(wrapper.wrap(y))
+      }
 
-        // Lazily create index the first time if needed
-        createIndexIfNeeded()
+      // Lazily create index the first time if needed
+      createIndexIfNeeded()
 
-        // Query index
-        idIndex.get(id) match {
-          case Some(list) if list.size > 1 => list.min(ElementOrdering) // get first in document order
-          case Some(list)                  => list.head                 // empty list not allowed in the map
-          case None                        => null
-        }
-      })
-    }
-  }
-
-  private def createIndexIfNeeded(): Unit =
-    if (idIndex eq null) {
-      idIndex = m.Map()
-      combineMappings(mappingsInSubtree(self.documentInfo))
+      // Query index
+      idIndex.get(id) match {
+        case Some(list) if list.size > 1 => list.min(ElementOrdering) // get first in document order
+        case Some(list)                  => list.head                 // empty list not allowed in the map
+        case None                        => null
+      }
     }
 
-  def updateIndexForInsert(nodes: Seq[om.NodeInfo]): Unit =
-    if (idIndex ne null)
-      for (node <- nodes)
-        combineMappings(mappingsInSubtree(node))
+  protected var idIndex: m.Map[String, List[Element]] = _
 
-  def updateIndexForDelete(nodes: Seq[om.NodeInfo]): Unit =
-    if (idIndex ne null)
-      for (node <- nodes; (id, element) <- mappingsInSubtree(node))
-        removeId(id, element)
-
-  def updateIndexForReplace(formerNode: om.NodeInfo, currentNode: om.NodeInfo): Unit =
-    if (idIndex ne null) {
-      if (currentNode.getNodeKind == ATTRIBUTE_NODE && currentNode.getLocalPart == "id")
-        // Don't use updateIndexForDelete, because formerNode.getParent will fail
-        removeId(formerNode.stringValue, unsafeUnwrapElement(currentNode.parentUnsafe))
-      else if (currentNode.getNodeKind == ELEMENT_NODE)
-        updateIndexForDelete(Seq(formerNode))
-
-      updateIndexForInsert(Seq(currentNode))
-    }
-
-  def updateIndexForValueChange(valueChangeEvent: XXFormsValueChangedEvent): Unit =
-    if ((idIndex ne null) && valueChangeEvent.node.getLocalPart == "id") {
-
-      val parentElement = unsafeUnwrapElement(valueChangeEvent.node.parentUnsafe)
-
-      removeId(valueChangeEvent.oldValue, parentElement)
-      addId(valueChangeEvent.newValue, parentElement)
-    }
-
-  private def idsInSubtree(start: om.NodeInfo) =
-    if (start.getNodeKind == ATTRIBUTE_NODE)
-      start self "id"
-    else
-      start descendantOrSelf * att "id"
-
-  private def mappingsInSubtree(start: om.NodeInfo) =
-    idsInSubtree(start) map (id => id.getStringValue -> unsafeUnwrapElement(id.parentUnsafe))
-
-  private def removeId(id: String, parentElement: Element) = {
-    idIndex.get(id) match {
-      case Some(list) if list.size > 1 =>
-        idIndex(id) = list filter (_ ne parentElement)
-        assert(idIndex(id).nonEmpty)
-      case Some(list)                  => idIndex -= id // don't leave an empty list in the map
-      case None                        => // NOP
-    }
-  }
-
-  private def addId(id: String, element: Element): Unit =
+  protected def addId(id: String, element: Element): Unit =
     idIndex(id) = element :: (
       idIndex.get(id) match {
         case Some(list) =>
@@ -464,9 +401,84 @@ trait XFormsInstanceIndex {
       }
     )
 
-  private def combineMappings(mappings: Iterable[(String, Element)]): Unit =
+  protected def mappingsInSubtree(start: om.NodeInfo): Seq[(String, Element)] =
+    idsInSubtree(start) map (id => id.getStringValue -> unsafeUnwrapElement(id.parentUnsafe))
+
+  protected def combineMappings(mappings: Iterable[(String, Element)]): Unit =
     for ((id, element) <- mappings)
       addId(id, element)
+
+  protected def createIndexIfNeeded(): Unit =
+    if (idIndex eq null) {
+      idIndex = m.Map()
+      combineMappings(mappingsInSubtree(documentInfo))
+    }
+
+  private def idsInSubtree(start: om.NodeInfo) =
+    if (start.getNodeKind == ATTRIBUTE_NODE)
+      start self "id"
+    else
+      start descendantOrSelf * att "id"
+}
+
+trait XFormsInstanceIndex extends BasicIdIndex {
+
+  self: XFormsInstance =>
+
+  import org.orbeon.scaxon.SimplePath._
+  import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
+
+  // Iterator over all ids
+  // TODO: Not useful for Form Builder, because it must search under `<xh:body>` only.
+  def idsIterator: Iterator[String] = {
+    createIndexIfNeeded()
+    if (hasIdIndex) idIndex.keysIterator else Iterator.empty
+  }
+
+  def requireNewIndex(): Unit = {
+    idIndex = null
+    if (instance.indexIds)
+      self.documentInfo.narrowTo[DocumentWrapper] foreach (wrapper => wrapper.setIdGetter(idGetter(wrapper)))
+  }
+
+  def updateIndexForInsert(nodes: Seq[om.NodeInfo]): Unit =
+    if (hasIdIndex)
+      for (node <- nodes)
+        combineMappings(mappingsInSubtree(node))
+
+  def updateIndexForDelete(nodes: Seq[om.NodeInfo]): Unit =
+    if (hasIdIndex)
+      for (node <- nodes; (id, element) <- mappingsInSubtree(node))
+        removeId(id, element)
+
+  def updateIndexForReplace(formerNode: om.NodeInfo, currentNode: om.NodeInfo): Unit =
+    if (hasIdIndex) {
+      if (currentNode.getNodeKind == ATTRIBUTE_NODE && currentNode.getLocalPart == "id")
+        // Don't use updateIndexForDelete, because formerNode.getParent will fail
+        removeId(formerNode.stringValue, unsafeUnwrapElement(currentNode.parentUnsafe))
+      else if (currentNode.getNodeKind == ELEMENT_NODE)
+        updateIndexForDelete(Seq(formerNode))
+
+      updateIndexForInsert(Seq(currentNode))
+    }
+
+  def updateIndexForValueChange(valueChangeEvent: XXFormsValueChangedEvent): Unit =
+    if (hasIdIndex && valueChangeEvent.node.getLocalPart == "id") {
+
+      val parentElement = unsafeUnwrapElement(valueChangeEvent.node.parentUnsafe)
+
+      removeId(valueChangeEvent.oldValue, parentElement)
+      addId(valueChangeEvent.newValue, parentElement)
+    }
+
+  private def removeId(id: String, parentElement: Element): Unit =
+    idIndex.get(id) match {
+      case Some(list) if list.size > 1 =>
+        idIndex(id) = list filter (_ ne parentElement)
+        assert(idIndex(id).nonEmpty)
+      case Some(_)                     => idIndex -= id // don't leave an empty list in the map
+      case None                        => // NOP
+    }
 }
 
 object XFormsInstance extends Logging {

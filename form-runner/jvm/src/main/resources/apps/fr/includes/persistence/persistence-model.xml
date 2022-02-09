@@ -81,8 +81,10 @@
          subsequent updates. -->
     <xf:var
         name="is-submit"
-        value="exists(xxf:get-request-attribute('fr-form-data')) or
-               exists(xxf:get-request-parameter('fr-form-data'))"/>
+        value="
+            exists(xxf:get-request-attribute('fr-form-data')) or
+            xxf:get-request-method() = 'POST' and exists(xxf:get-request-parameter('fr-form-data'))
+        "/>
 
     <!--
         Running *before* the data is ready. At this point:

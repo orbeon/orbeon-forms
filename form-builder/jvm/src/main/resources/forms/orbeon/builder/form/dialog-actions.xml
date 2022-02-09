@@ -24,7 +24,6 @@
       id="fb-action-dialog"
       class="fb-action-dialog"
       level="modal"
-      close="false"
       draggable="true"
       model="fb-actions-editor-model">
 

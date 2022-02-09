@@ -132,10 +132,13 @@
 
         </xf:action>
 
+        <!-- If this is not service that uses parameters, convert (opposite as done above):
+             - From : `<xf:var name="parameter-name" value="'my-param'"/>`
+             - To   : `<xf:var name="path"           value="//my-param"/>` -->
         <xf:action if="not($service-uses-request-parameters)">
             <xf:action iterate="$instance//xf:action[@class = 'fr-set-service-value-action']/xf:var[@name = 'parameter-name']">
                 <xf:setvalue ref="@name"  value="'path'"/>
-                <xf:setvalue ref="@value" value="concat('//', substring(., 1, string-length(.) - 2))"/>
+                <xf:setvalue ref="@value" value="concat('//', substring(., 2, string-length(.) - 2))"/>
             </xf:action>
         </xf:action>
 

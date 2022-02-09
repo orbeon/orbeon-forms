@@ -316,192 +316,194 @@
                     $readonly or
                     (not(xxf:is-blank(string($binding))) and not($multiple))"/>
 
-            <fr:dnd-repeat
-                ref="
-                    if ($multiple) then
-                        (: Using `*:_` to support `_` in the instance being in non-empty default namespace :)
-                        $binding/*:_[xxf:non-blank(string(.))]
-                    else
-                        $binding[xxf:non-blank(string(.))]">
+            <xh:div role="group" aria-label="{xxf:label('fr-attachment')}">
+                <fr:dnd-repeat
+                    ref="
+                        if ($multiple) then
+                            (: Using `*:_` to support `_` in the instance being in non-empty default namespace :)
+                            $binding/*:_[xxf:non-blank(string(.))]
+                        else
+                            $binding[xxf:non-blank(string(.))]">
 
-                <xh:div class="xforms-dnd-item xforms-dnd-moves">
+                    <xh:div class="xforms-dnd-item xforms-dnd-moves">
 
-                    <xh:i class="fr-attachment-icon fa fa-fw {
-                        for $m in @mediatype/string()
-                        return
-                            if (starts-with($m, 'image/')) then
-                                'fa-file-image-o'
-                            else if ($m = 'application/zip') then
-                                'fa-file-archive-o'
-                            else if ($m = 'application/pdf') then
-                                'fa-file-pdf-o'
-                            else if (starts-with($m, 'audio/')) then
-                                'fa-file-audio-o'
-                            else if (starts-with($m, 'video/')) then
-                                'fa-file-video-o'
-                            else if (starts-with($m, 'text/')) then
-                                'fa-file-text-o'
-                            else if ($m = ('application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) then
-                                'fa-file-excel-o'
-                            else if ($m = ('application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) then
-                                'fa-file-word-o'
-                            else if ($m = ('application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation')) then
-                                'fa-file-powerpoint-o'
-                            else
-                                'fa-file-o'
-                    }"/>
+                        <xh:i class="fr-attachment-icon fa fa-fw {
+                            for $m in @mediatype/string()
+                            return
+                                if (starts-with($m, 'image/')) then
+                                    'fa-file-image-o'
+                                else if ($m = 'application/zip') then
+                                    'fa-file-archive-o'
+                                else if ($m = 'application/pdf') then
+                                    'fa-file-pdf-o'
+                                else if (starts-with($m, 'audio/')) then
+                                    'fa-file-audio-o'
+                                else if (starts-with($m, 'video/')) then
+                                    'fa-file-video-o'
+                                else if (starts-with($m, 'text/')) then
+                                    'fa-file-text-o'
+                                else if ($m = ('application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) then
+                                    'fa-file-excel-o'
+                                else if ($m = ('application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) then
+                                    'fa-file-word-o'
+                                else if ($m = ('application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation')) then
+                                    'fa-file-powerpoint-o'
+                                else
+                                    'fa-file-o'
+                        }"/>
 
-                    <xf:output
-                        ref=".[fr:component-param-value('allow-download') = 'false']"
-                        value="@filename"
-                        class="fr-attachment-filename"/>
+                        <xf:output
+                            ref=".[fr:component-param-value('allow-download') = 'false']"
+                            value="@filename"
+                            class="fr-attachment-filename"/>
 
-                    <xf:output
-                        appearance="xxf:download"
-                        ref=".[not(fr:component-param-value('allow-download') = 'false')]"
-                        class="fr-attachment-filename">
+                        <xf:output
+                            appearance="xxf:download"
+                            ref=".[not(fr:component-param-value('allow-download') = 'false')]"
+                            class="fr-attachment-filename">
 
-                        <xf:label ref="@filename"/>
-                        <xf:filename  ref="@filename" />
-                        <xf:mediatype ref="@mediatype"/>
-                        <xf:header ref="fr:attachment-form-version()">
-                            <xf:name>Orbeon-Form-Definition-Version</xf:name>
-                            <xf:value value="."/>
-                        </xf:header>
-                        <xf:header ref="$binding[@fr:attachment-encrypted = 'true']">
-                            <xf:name>Orbeon-Decrypt</xf:name>
-                            <xf:value>true</xf:value>
-                        </xf:header>
-                    </xf:output>
+                            <xf:label ref="@filename"/>
+                            <xf:filename  ref="@filename" />
+                            <xf:mediatype ref="@mediatype"/>
+                            <xf:header ref="fr:attachment-form-version()">
+                                <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                                <xf:value value="."/>
+                            </xf:header>
+                            <xf:header ref="$binding[@fr:attachment-encrypted = 'true']">
+                                <xf:name>Orbeon-Decrypt</xf:name>
+                                <xf:value>true</xf:value>
+                            </xf:header>
+                        </xf:output>
 
-                    <xf:output
-                        xmlns:filemetadata="java:org.orbeon.oxf.xforms.control.controls.FileMetadata"
-                        value="filemetadata:humanReadableBytes(@size)"
-                        class="fr-attachment-size"/>
+                        <xf:output
+                            xmlns:filemetadata="java:org.orbeon.oxf.xforms.control.controls.FileMetadata"
+                            value="filemetadata:humanReadableBytes(@size)"
+                            class="fr-attachment-size"/>
 
-                    <xf:trigger ref="." appearance="minimal" class="fr-attachment-remove" xxf:title="{xxf:r('remove')}">
-                        <xf:label><xh:i class="fa fa-fw fa-times"/></xf:label>
-                        <xf:action event="DOMActivate">
-                            <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
-                                upload:deleteFileIfPossible(string(.))
+                        <xf:trigger ref="." appearance="minimal" class="fr-attachment-remove" xxf:title="{xxf:r('remove')}">
+                            <xf:label><xh:i class="fa fa-fw fa-times"/></xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
+                                    upload:deleteFileIfPossible(string(.))
+                                </xf:action>
+                                <xf:delete
+                                    if="$multiple"
+                                    ref="."/>
+                                <xf:setvalue
+                                    if="not($multiple)"
+                                    iterate="., @*"
+                                    ref="."/>
                             </xf:action>
-                            <xf:delete
-                                if="$multiple"
-                                ref="."/>
-                            <xf:setvalue
-                                if="not($multiple)"
-                                iterate="., @*"
-                                ref="."/>
-                        </xf:action>
-                    </xf:trigger>
+                        </xf:trigger>
 
-                </xh:div>
+                    </xh:div>
 
-            </fr:dnd-repeat>
+                </fr:dnd-repeat>
 
-            <xf:group
-                class="fr-attachment-empty"
-                ref="$binding[$view and (if ($multiple) then count(_[xxf:non-blank(string(.))]) = 0 else xxf:is-blank(string(.)))]">
-                <xf:output value="xxf:r('empty')"/>
-            </xf:group>
+                <xf:group
+                    class="fr-attachment-empty"
+                    ref="$binding[$view and (if ($multiple) then count(_[xxf:non-blank(string(.))]) = 0 else xxf:is-blank(string(.)))]">
+                    <xf:output value="xxf:r('empty')"/>
+                </xf:group>
 
-            <xh:div class="{if ($cant-take-upload) then 'xforms-hidden' else ''}">
-                <xf:output class="fr-attachment-drop" value="xxf:r('drag')"/>
-                <xf:upload
-                    id="xf-upload"
-                    class="fr-attachment-upload"
-                    ref="if ($readonly) then '' else instance()"
-                    xbl:attr="xxf:multiple=multiple"
-                    accept="{
-                        (
-                            xxf:custom-mip($binding, 'upload-mediatypes'), (: 1st from common constraint :)
-                            fr:component-param-value('accept')             (: 2nd because there might be a property always defined :)
-                        )[xxf:non-blank()][1]
-                    }"
-                    xxf:title="{xxf:label('fr-attachment')}">
+                <xh:div class="{if ($cant-take-upload) then 'xforms-hidden' else ''}">
+                    <xf:output class="fr-attachment-drop" value="xxf:r('drag')"/>
+                    <xf:upload
+                        id="xf-upload"
+                        class="fr-attachment-upload"
+                        ref="if ($readonly) then '' else instance()"
+                        xbl:attr="xxf:multiple=multiple"
+                        accept="{
+                            (
+                                xxf:custom-mip($binding, 'upload-mediatypes'), (: 1st from common constraint :)
+                                fr:component-param-value('accept')             (: 2nd because there might be a property always defined :)
+                            )[xxf:non-blank()][1]
+                        }"
+                        xxf:title="{xxf:label('fr-attachment')}">
 
-                    <xf:filename  ref="if ($readonly) then '' else @filename"/>
-                    <xf:mediatype ref="if ($readonly) then '' else @mediatype"/>
-                    <xxf:size     ref="if ($readonly) then '' else @size"/>
+                        <xf:filename  ref="if ($readonly) then '' else @filename"/>
+                        <xf:mediatype ref="if ($readonly) then '' else @mediatype"/>
+                        <xxf:size     ref="if ($readonly) then '' else @size"/>
 
-                    <!-- Propagate the value to the binding *before* propagating the event (for #3061) -->
-                    <xf:action event="xxforms-upload-done">
+                        <!-- Propagate the value to the binding *before* propagating the event (for #3061) -->
+                        <xf:action event="xxforms-upload-done">
 
-                        <xf:insert
-                            if="$multiple"
-                            context="$binding"
-                            ref="*"
-                            origin="
-                                (: Create an `_` element respecting the default namespace in the instance, if any :)
-                                xf:element(
-                                    resolve-QName('_', $binding),
-                                    (instance()/@*, instance()/string())
-                                )
-                            "/>
-
-                        <xf:action if="not($multiple)">
-                            <!-- TODO: move to function library for offline -->
-                            <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
-                                upload:deleteFileIfPossible(string($binding))
-                            </xf:action>
-                            <xf:setvalue
-                                ref="$binding"
-                                value="instance()"/>
                             <xf:insert
+                                if="$multiple"
                                 context="$binding"
-                                origin="instance()/@*"/>
+                                ref="*"
+                                origin="
+                                    (: Create an `_` element respecting the default namespace in the instance, if any :)
+                                    xf:element(
+                                        resolve-QName('_', $binding),
+                                        (instance()/@*, instance()/string())
+                                    )
+                                "/>
+
+                            <xf:action if="not($multiple)">
+                                <!-- TODO: move to function library for offline -->
+                                <xf:action type="xpath" xmlns:upload="java:org.orbeon.oxf.xforms.control.controls.XFormsUploadControl">
+                                    upload:deleteFileIfPossible(string($binding))
+                                </xf:action>
+                                <xf:setvalue
+                                    ref="$binding"
+                                    value="instance()"/>
+                                <xf:insert
+                                    context="$binding"
+                                    origin="instance()/@*"/>
+                            </xf:action>
+
                         </xf:action>
 
-                    </xf:action>
+                        <!-- Retarget of upload events -->
+                        <!-- NOTE: Duplicated logic in image-attachment.xbl -->
+                        <xf:dispatch
+                            event="xxforms-upload-start xxforms-upload-cancel"
+                            targetid="fr-attachment"
+                            name="{event('xxf:type')}"/>
 
-                    <!-- Retarget of upload events -->
-                    <!-- NOTE: Duplicated logic in image-attachment.xbl -->
-                    <xf:dispatch
-                        event="xxforms-upload-start xxforms-upload-cancel"
-                        targetid="fr-attachment"
-                        name="{event('xxf:type')}"/>
+                        <xf:dispatch
+                            event="xxforms-upload-done"
+                            propagate="stop"
+                            defaultAction="cancel"
 
-                    <xf:dispatch
-                        event="xxforms-upload-done"
-                        propagate="stop"
-                        defaultAction="cancel"
+                            targetid="fr-attachment"
+                            name="{event('xxf:type')}">
+                            <xf:property name="file"           value="event('file')"/>
+                            <xf:property name="filename"       value="event('filename')"/>
+                            <xf:property name="content-type"   value="event('content-type')"/>
+                            <xf:property name="content-length" value="event('content-length')"/>
+                        </xf:dispatch>
 
-                        targetid="fr-attachment"
-                        name="{event('xxf:type')}">
-                        <xf:property name="file"           value="event('file')"/>
-                        <xf:property name="filename"       value="event('filename')"/>
-                        <xf:property name="content-type"   value="event('content-type')"/>
-                        <xf:property name="content-length" value="event('content-length')"/>
-                    </xf:dispatch>
+                        <xf:dispatch
+                            event="xxforms-upload-error"
+                            propagate="stop"
+                            defaultAction="cancel"
 
-                    <xf:dispatch
-                        event="xxforms-upload-error"
-                        propagate="stop"
-                        defaultAction="cancel"
+                            targetid="fr-attachment"
+                            name="{event('xxf:type')}">
+                            <xf:property name="error-type" value="event('error-type')"/>
+                            <xf:property name="permitted"  value="event('permitted')"/>
+                            <xf:property name="actual"     value="event('actual')"/>
+                            <xf:property name="message"    value="event('message')"/>
+                        </xf:dispatch>
 
-                        targetid="fr-attachment"
-                        name="{event('xxf:type')}">
-                        <xf:property name="error-type" value="event('error-type')"/>
-                        <xf:property name="permitted"  value="event('permitted')"/>
-                        <xf:property name="actual"     value="event('actual')"/>
-                        <xf:property name="message"    value="event('message')"/>
-                    </xf:dispatch>
+                        <xf:action event="xxforms-upload-done xxforms-upload-error">
+                            <xf:setvalue
+                                iterate="instance(), instance()/@*"
+                                ref="."/>
+                        </xf:action>
 
-                    <xf:action event="xxforms-upload-done xxforms-upload-error">
-                        <xf:setvalue
-                            iterate="instance(), instance()/@*"
-                            ref="."/>
-                    </xf:action>
+                    </xf:upload>
 
-                </xf:upload>
-
-                <xh:label
-                    class="btn btn-default fr-attachment-select {if ($readonly) then ' disabled' else ''}"
-                    for="xf-upload≡xforms-input"
-                    role="button"
-                    tabindex="{if ($readonly) then '-1' else '0'}">
-                    <xf:output value="if ($multiple) then xxf:r('select-files') else xxf:r('select-file')"/>
-                </xh:label>
+                    <xh:label
+                        class="btn btn-default fr-attachment-select {if ($readonly) then ' disabled' else ''}"
+                        for="xf-upload≡xforms-input"
+                        role="button"
+                        tabindex="{if ($readonly) then '-1' else '0'}">
+                        <xf:output value="if ($multiple) then xxf:r('select-files') else xxf:r('select-file')"/>
+                    </xh:label>
+                </xh:div>
             </xh:div>
 
         </xbl:template>

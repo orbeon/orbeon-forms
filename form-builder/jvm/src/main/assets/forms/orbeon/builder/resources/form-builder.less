@@ -552,12 +552,22 @@ div.orbeon.orbeon-portlet-div {
         width: 875px;
         max-width: none;
 
-        // Override `white-space: pre-wrap` which we set by default following
-        // https://github.com/orbeon/orbeon-forms/issues/1618. That works for
-        // plain text, but here we want HTML content and we want regular white-space.
-        // We need a better solution!
-        .popover.xforms-help-popover .popover-content {
-            white-space: normal;
+        .popover.xforms-help-popover {
+            // Override `white-space: pre-wrap` which we set by default following
+            // https://github.com/orbeon/orbeon-forms/issues/1618. That works for
+            // plain text, but here we want HTML content and we want regular white-space.
+            // We need a better solution!
+            .popover-content {
+                white-space: normal;
+            }
+
+            // Make popover a bit narrower so it fits in the dialog
+            max-width: 350px;
+        }
+
+        .tab-content {
+            // Override Boostrap default so the help tooltips are not clipped
+            overflow: visible;
         }
 
         div[class ^= "fb-settings-mode-"] {

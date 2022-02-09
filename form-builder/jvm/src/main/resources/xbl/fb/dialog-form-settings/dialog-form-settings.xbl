@@ -590,30 +590,24 @@
                                     <fr:c x="1" y="1" w="6" h="1">
                                         <!-- Application name -->
                                         <!-- Use an input if app name is a wildcard -->
-                                        <xf:group ref=".[$app-chooser = 'input']">
-                                            <xf:input ref="app" id="fb-app-name-input" xxf:autocomplete="off">
-                                                <xf:label ref="$resources/application-name/label"/>
-                                                <xf:hint ref="$resources/application-name/hint"/>
-                                                <xf:help ref="$resources/application-name/help" mediatype="text/html"/>
-                                                <xf:alert ref="$resources/application-name/alert"/>
-                                            </xf:input>
-                                        </xf:group>
+                                        <xf:input ref="app[$app-chooser = 'input']" id="fb-app-name-input" xxf:autocomplete="off">
+                                            <xf:label ref="$resources/application-name/label"/>
+                                            <xf:hint ref="$resources/application-name/hint"/>
+                                            <xf:help ref="$resources/application-name/help" mediatype="text/html"/>
+                                            <xf:alert ref="$resources/application-name/alert"/>
+                                        </xf:input>
                                         <!-- Otherwise, if there are multiple choices, use a dropdown -->
-                                        <xf:group ref=".[$app-chooser = 'select1']">
-                                            <fr:dropdown-select1 ref="app">
-                                                <xf:label ref="$resources/application-name/label"/>
-                                                <xf:itemset ref="$allowed-apps-if-has-roles">
-                                                    <xf:label ref="."/>
-                                                    <xf:value ref="."/>
-                                                </xf:itemset>
-                                            </fr:dropdown-select1>
-                                        </xf:group>
+                                        <fr:dropdown-select1 ref="app[$app-chooser = 'select1']">
+                                            <xf:label ref="$resources/application-name/label"/>
+                                            <xf:itemset ref="$allowed-apps-if-has-roles">
+                                                <xf:label ref="."/>
+                                                <xf:value ref="."/>
+                                            </xf:itemset>
+                                        </fr:dropdown-select1>
                                         <!-- Otherwise, if there is just one choice, just show what the value will be -->
-                                        <xf:group ref=".[$app-chooser = 'output']">
-                                            <xf:output ref="app">
-                                                <xf:label ref="$resources/application-name/label"/>
-                                            </xf:output>
-                                        </xf:group>
+                                        <xf:output ref="app[$app-chooser = 'output']">
+                                            <xf:label ref="$resources/application-name/label"/>
+                                        </xf:output>
                                     </fr:c>
                                     <fr:c x="7" y="1" w="6" h="1">
                                         <!-- Form name -->

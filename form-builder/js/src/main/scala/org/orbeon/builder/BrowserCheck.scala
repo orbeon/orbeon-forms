@@ -18,7 +18,7 @@ import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.facades.Bowser
 import org.orbeon.xforms.rpc.RpcClient
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.concurrent.duration._
 import scala.scalajs.js.timers
 

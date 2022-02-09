@@ -29,7 +29,7 @@ import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 
 import scala.collection.{mutable => m}
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary

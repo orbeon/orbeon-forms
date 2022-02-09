@@ -13,7 +13,6 @@
   */
 package org.orbeon.fr
 
-import monix.execution.Scheduler.Implicits.global
 import org.orbeon.fr.DockerSupport._
 import org.orbeon.oxf.util.FutureUtils._
 import org.orbeon.xforms.facade.AjaxServerTrait
@@ -26,7 +25,7 @@ import org.scalatest.funspec.AsyncFunSpec
 import scala.async.Async._
 import scala.collection.compat._
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.annotation.JSImport
@@ -124,8 +123,8 @@ class OrbeonClientTest extends AsyncFunSpec {
     result
   }
 
-  implicit override def executionContext: ExecutionContext =
-    scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+  implicit override def executionContext: scala.concurrent.ExecutionContext =
+    org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
   def simpleServerRequest(
     urlToLoad     : String,

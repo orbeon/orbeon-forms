@@ -19,7 +19,6 @@ import org.orbeon.xforms._
 import org.scalajs.dom
 import org.scalajs.dom.html
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 

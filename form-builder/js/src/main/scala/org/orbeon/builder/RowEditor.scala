@@ -26,7 +26,8 @@ import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.document
 import org.scalajs.jquery.JQuery
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 
 object RowEditor {
 

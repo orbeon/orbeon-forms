@@ -20,7 +20,7 @@ import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
 import org.scalajs.dom.{Element, EventTarget, FocusEvent, FormData, html}
 
 import scala.concurrent.Future
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.scalajs.js
 import scala.scalajs.js.|
 import scala.util.control.NonFatal

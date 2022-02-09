@@ -22,9 +22,10 @@ import org.scalajs.dom.html.Element
 import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQueryEventObject
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
+
 
 private object ControlDnD {
 

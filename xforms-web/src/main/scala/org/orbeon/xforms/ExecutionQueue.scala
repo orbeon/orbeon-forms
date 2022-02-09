@@ -18,7 +18,7 @@ import enumeratum._
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.scalajs.js
 
 sealed trait ExecutionWait extends EnumEntry

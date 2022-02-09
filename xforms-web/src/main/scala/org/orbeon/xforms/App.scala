@@ -15,7 +15,7 @@ package org.orbeon.xforms
 
 import org.scalajs.dom
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.util.{Failure, Success}
 
 

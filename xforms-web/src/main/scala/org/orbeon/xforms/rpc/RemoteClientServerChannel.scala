@@ -24,7 +24,7 @@ import org.scalajs.dom.experimental.AbortController
 
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.scalajs.js
 import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}

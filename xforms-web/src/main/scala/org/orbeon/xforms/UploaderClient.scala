@@ -22,7 +22,7 @@ import org.scalajs.dom.experimental._
 import org.orbeon.oxf.util.CoreUtils._
 
 import scala.concurrent.{Future, Promise}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 

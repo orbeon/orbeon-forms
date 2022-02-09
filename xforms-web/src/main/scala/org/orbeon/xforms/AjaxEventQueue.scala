@@ -18,7 +18,7 @@ import cats.syntax.option._
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Future, Promise}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.scalajs.js.timers
 import scala.scalajs.js.timers.SetTimeoutHandle
 

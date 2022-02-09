@@ -25,6 +25,7 @@ val DefaultOrbeonFormsVersion     = "2021.1-SNAPSHOT"
 val DefaultOrbeonEdition          = "CE"
 
 // Scala libraries for Scala.js only
+val ScalaJsMacrotaskExecutor         = "1.0.0"
 val SaxonJsVersion                   = "10.0.0.64-SNAPSHOT"
 val XercesVersion                    = "2.11.0.11-SNAPSHOT"
 val SaxVersion                       = "2.0.2.8-SNAPSHOT"
@@ -395,6 +396,8 @@ lazy val commonScalaJvmSettings = Seq(
 )
 
 lazy val commonScalaJsSettings = Seq(
+
+  libraryDependencies += "org.scala-js" %%% "scala-js-macrotask-executor" % ScalaJsMacrotaskExecutor,
 
   packageJSDependencies / skip   := false,
   scalaJSLinkerConfig            ~= (_.withSourceMap(false).withESFeatures(_.withESVersion(ESVersion.ES5_1))),
@@ -1178,7 +1181,6 @@ lazy val orbeonWarJS = orbeonWar.js
       "org.scala-js"           %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery" % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%  "scala-async"    % ScalaAsyncVersion,
-      "io.monix"               %%% "monix"          % "3.4.0"
     ),
 
     Test / parallelExecution                := false,

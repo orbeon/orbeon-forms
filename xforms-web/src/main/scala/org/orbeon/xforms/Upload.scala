@@ -19,7 +19,7 @@ import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.concurrent.duration._
 import scala.scalajs.js.annotation.JSExport
 

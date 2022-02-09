@@ -25,9 +25,10 @@ import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
 
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js
+
 
 // Allows form authors to move the grid cell walls to resize cells
 object GridWallDnD {

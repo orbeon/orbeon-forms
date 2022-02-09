@@ -13,14 +13,14 @@
   */
 package org.orbeon.xbl
 
-import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
+import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants, EventNames}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.timers

@@ -489,7 +489,7 @@ object SimpleDataMigration {
         // However, this probably also means that we'll not delete extra elements nested within other leaves.
         val deleteOps =
           if (binds.nonEmpty)
-            parents / * filter (e => ! allBindNames(e.localname)) map { e =>
+            parents / * filter (e => e.namespaceURI == "" && ! allBindNames(e.localname)) map { e =>
               DataMigrationOp.Delete(e)
             }
           else

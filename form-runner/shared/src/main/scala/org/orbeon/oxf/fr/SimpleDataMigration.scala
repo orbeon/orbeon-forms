@@ -82,16 +82,28 @@ object SimpleDataMigration {
     enclosingModelAbsoluteId : String,
     templateInstanceRootElem : om.NodeInfo,
     dataToMigrateRootElem    : om.NodeInfo
-  ): Option[om.NodeInfo] = {
+  ): Option[om.NodeInfo] =
+    dataMaybeWithSimpleMigrationWithBehavior(
+      enclosingModelAbsoluteId,
+      templateInstanceRootElem,
+      dataToMigrateRootElem,
+      getConfiguredDataMigrationBehavior(inScopeContainingDocument.staticState).entryName
+    )
 
-    val doc = inScopeContainingDocument
+  //@XPathFunction
+  def dataMaybeWithSimpleMigrationWithBehavior(
+    enclosingModelAbsoluteId : String,
+    templateInstanceRootElem : om.NodeInfo,
+    dataToMigrateRootElem    : om.NodeInfo,
+    dataMigrationBehavior    : String
+  ): Option[om.NodeInfo] = {
 
     val maybeMigrated =
       dataMaybeWithSimpleMigrationUseOps(
         enclosingModelAbsoluteId = enclosingModelAbsoluteId,
         templateInstanceRootElem = templateInstanceRootElem,
         dataToMigrateRootElem    = dataToMigrateRootElem,
-        dataMigrationBehavior    = getConfiguredDataMigrationBehavior(doc.staticState))(
+        dataMigrationBehavior    = DataMigrationBehavior.withName(dataMigrationBehavior))(
         formOps                  = new ContainingDocumentOps(inScopeContainingDocument, enclosingModelAbsoluteId)
       )
 

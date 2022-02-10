@@ -663,9 +663,20 @@
                 ),
                 (
                     xxf:call-xpl(
-                        'oxf:/forms/orbeon/builder/form/deannotate.xpl',
-                        'data',
-                        instance('fb-form-instance'),
+                        'oxf:/forms/orbeon/builder/form/add-migration.xpl',
+                        (
+                            'data',
+                            'bindings'
+                        ),
+                        (
+                            xxf:call-xpl(
+                                'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                                'data',
+                                instance('fb-form-instance'),
+                                'data'
+                            ),
+                            xxf:instance('fb-components-instance')
+                        ),
                         'data'
                     ),
                     xxf:instance('fb-components-instance'),

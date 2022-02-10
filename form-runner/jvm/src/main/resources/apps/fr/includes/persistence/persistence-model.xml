@@ -216,10 +216,11 @@
                                 xxf:get-request-parameter('data-format-version')
                             )/root()/*,
                         $simply-migrated :=
-                            simple-migration:dataMaybeWithSimpleMigration(
+                            simple-migration:dataMaybeWithSimpleMigrationWithBehavior(
                                 xxf:absolute-id('fr-form-model'),
                                 instance('fr-initial-instance'),
-                                $format-migrated
+                                $format-migrated,
+                                'holesonly'
                             )
                         return
                             if (exists($simply-migrated)) then
@@ -785,10 +786,11 @@
                             xxf:instance('fr-form-metadata')/root()
                         )/root()/*,
                     $simply-migrated :=
-                        simple-migration:dataMaybeWithSimpleMigration(
+                        simple-migration:dataMaybeWithSimpleMigrationWithBehavior(
                             xxf:absolute-id('fr-form-model'),
                             instance('fr-initial-instance'),
-                            $format-migrated
+                            $format-migrated,
+                            'holesonly'
                         )
                 return
                     if (exists($simply-migrated)) then

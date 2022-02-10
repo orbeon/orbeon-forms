@@ -99,6 +99,7 @@ class SimpleDataMigrationTest
             <!-- This needs to be the correct template. -->
             <st1image1/>
           </section-5>
+          <fr:metadata xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
       </form>
 
     val IncomingFormData: NodeInfo =
@@ -154,6 +155,7 @@ class SimpleDataMigrationTest
           <!-- Here this should contain `st1image1`, but it matches a different element template from
                the section template which as attributes. We need to pick the correct template. -->
           <section-5/>
+          <fr:metadata xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
       </form>
 
     val IncomingFormDataWithExtra: NodeInfo =
@@ -220,6 +222,7 @@ class SimpleDataMigrationTest
           <!-- Here this should contain `st1image1`, but it matches a different element template from
                the section template which as attributes. We need to pick the correct template. -->
           <section-5/>
+          <fr:metadata xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
       </form>
 
     val Expected = List(

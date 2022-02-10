@@ -104,20 +104,14 @@ class SimpleDataMigrationTest
       <form>
         <section-2>
             <s1input1/>
-            <extra1/>
         </section-2>
         <!-- The entire section must be removed -->
-        <extra2>
-          <extra2-iteration/>
-          <extra2-iteration/>
-        </extra2>
         <section-1>
             <section-1-iteration>
                 <s2field1/>
                 <grid-2>
                     <grid-2-iteration>
                         <s2number/>
-                        <extra3/>
                     </grid-2-iteration>
                     <grid-2-iteration>
                         <s2number/>
@@ -132,11 +126,9 @@ class SimpleDataMigrationTest
                     </grid-2-iteration>
                     <grid-2-iteration>
                         <s2number/>
-                        <extra4/>
                     </grid-2-iteration>
                     <grid-2-iteration>
                         <s2number/>
-                        <extra4/>
                     </grid-2-iteration>
                 </grid-2>
             </section-1-iteration>
@@ -145,7 +137,6 @@ class SimpleDataMigrationTest
         <section-4>
             <st1field1/>
             <st1num1/>
-            <extra5/>
             <st1grid2>
                 <st1grid2-iteration>
                 </st1grid2-iteration>
@@ -154,10 +145,8 @@ class SimpleDataMigrationTest
         <section-3>
             <st1field1/>
             <st1num1/>
-            <extra5/>
             <st1grid2>
                 <st1grid2-iteration>
-                    <extra6/>
                 </st1grid2-iteration>
             </st1grid2>
         </section-3>

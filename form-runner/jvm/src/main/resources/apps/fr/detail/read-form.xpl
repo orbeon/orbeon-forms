@@ -24,7 +24,7 @@
 
     <!-- Parameters (app, form, form version, document, and mode) -->
     <p:param type="input" name="instance"/>
-    <!-- XHTML+FR+XForms for the from obtained from persistence layer -->
+    <!-- XHTML+FR+XForms for the form obtained from persistence layer -->
     <p:param type="output" name="data"/>
     <!-- Parameters, to which we added the form version -->
     <p:param type="output" name="instance"/>

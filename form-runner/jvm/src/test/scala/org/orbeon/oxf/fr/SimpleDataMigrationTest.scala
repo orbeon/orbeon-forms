@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fr
 
+import cats.syntax.option._
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.importexport.FormDefinitionOps
 import org.orbeon.oxf.http.StreamedContent
@@ -37,153 +38,231 @@ class SimpleDataMigrationTest
 
     val ExpectedFormData: NodeInfo =
       <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
-        <section-2>
-            <s1input1/>
-        </section-2>
-        <section-1>
-            <section-1-iteration>
-                <s2field1/>
-                <grid-2>
-                    <grid-2-iteration>
-                        <s2attachment filename="" mediatype="" size=""/>
-                        <s2number/>
-                    </grid-2-iteration>
-                    <grid-2-iteration>
-                        <s2attachment filename="" mediatype="" size=""/>
-                        <s2number/>
-                    </grid-2-iteration>
-                </grid-2>
-            </section-1-iteration>
-            <section-1-iteration>
-                <s2field1/>
-                <grid-2>
-                    <grid-2-iteration>
-                        <s2attachment filename="" mediatype="" size=""/>
-                        <s2number/>
-                    </grid-2-iteration>
-                    <grid-2-iteration>
-                        <s2attachment filename="" mediatype="" size=""/>
-                        <s2number/>
-                    </grid-2-iteration>
-                    <grid-2-iteration>
-                        <s2attachment filename="" mediatype="" size=""/>
-                        <s2number/>
-                    </grid-2-iteration>
-                </grid-2>
-            </section-1-iteration>
-        </section-1>
-        <section-4>
-            <st1field1/>
-            <st1image1 filename="" mediatype="" size=""/>
-            <st1num1/>
-            <st1grid2>
-                <st1grid2-iteration>
-                    <st1area1/>
-                    <st1currency1/>
-                </st1grid2-iteration>
-            </st1grid2>
-        </section-4>
-        <section-3>
-            <st1field1/>
-            <st1image1 filename="" mediatype="" size=""/>
-            <st1num1/>
-            <st1grid2>
-                <st1grid2-iteration>
-                    <st1area1/>
-                    <st1currency1/>
-                </st1grid2-iteration>
-            </st1grid2>
-        </section-3>
-        <section-5>
-          <!-- This needs to be the correct template. -->
-          <st1image1/>
-        </section-5>
-    </form>
+          <section-2>
+              <s1input1/>
+          </section-2>
+          <section-1>
+              <section-1-iteration>
+                  <s2field1/>
+                  <grid-2>
+                      <grid-2-iteration>
+                          <s2attachment filename="" mediatype="" size=""/>
+                          <s2number/>
+                      </grid-2-iteration>
+                      <grid-2-iteration>
+                          <s2attachment filename="" mediatype="" size=""/>
+                          <s2number/>
+                      </grid-2-iteration>
+                  </grid-2>
+              </section-1-iteration>
+              <section-1-iteration>
+                  <s2field1/>
+                  <grid-2>
+                      <grid-2-iteration>
+                          <s2attachment filename="" mediatype="" size=""/>
+                          <s2number/>
+                      </grid-2-iteration>
+                      <grid-2-iteration>
+                          <s2attachment filename="" mediatype="" size=""/>
+                          <s2number/>
+                      </grid-2-iteration>
+                      <grid-2-iteration>
+                          <s2attachment filename="" mediatype="" size=""/>
+                          <s2number/>
+                      </grid-2-iteration>
+                  </grid-2>
+              </section-1-iteration>
+          </section-1>
+          <section-4>
+              <st1field1/>
+              <st1image1 filename="" mediatype="" size=""/>
+              <st1num1/>
+              <st1grid2>
+                  <st1grid2-iteration>
+                      <st1area1/>
+                      <st1currency1/>
+                  </st1grid2-iteration>
+              </st1grid2>
+          </section-4>
+          <section-3>
+              <st1field1/>
+              <st1image1 filename="" mediatype="" size=""/>
+              <st1num1/>
+              <st1grid2>
+                  <st1grid2-iteration>
+                      <st1area1/>
+                      <st1currency1/>
+                  </st1grid2-iteration>
+              </st1grid2>
+          </section-3>
+          <section-5>
+            <!-- This needs to be the correct template. -->
+            <st1image1/>
+          </section-5>
+      </form>
 
     val IncomingFormData: NodeInfo =
       <form>
-        <section-2>
-            <s1input1/>
-        </section-2>
-        <!-- The entire section must be removed -->
-        <section-1>
-            <section-1-iteration>
-                <s2field1/>
-                <grid-2>
-                    <grid-2-iteration>
-                        <s2number/>
-                    </grid-2-iteration>
-                    <grid-2-iteration>
-                        <s2number/>
-                    </grid-2-iteration>
-                </grid-2>
-            </section-1-iteration>
-            <section-1-iteration>
-                <s2field1/>
-                <grid-2>
-                    <grid-2-iteration>
-                        <s2number/>
-                    </grid-2-iteration>
-                    <grid-2-iteration>
-                        <s2number/>
-                    </grid-2-iteration>
-                    <grid-2-iteration>
-                        <s2number/>
-                    </grid-2-iteration>
-                </grid-2>
-            </section-1-iteration>
-        </section-1>
-        <!-- Section templates are also missing fields -->
-        <section-4>
-            <st1field1/>
-            <st1num1/>
-            <st1grid2>
-                <st1grid2-iteration>
-                </st1grid2-iteration>
-            </st1grid2>
-        </section-4>
-        <section-3>
-            <st1field1/>
-            <st1num1/>
-            <st1grid2>
-                <st1grid2-iteration>
-                </st1grid2-iteration>
-            </st1grid2>
-        </section-3>
-        <!-- Here this should contain `st1image1`, but it matches a different element template from
-             the section template which as attributes. We need to pick the correct template. -->
-        <section-5/>
-    </form>
+          <section-2>
+              <s1input1/>
+          </section-2>
+          <!-- The entire section must be removed -->
+          <section-1>
+              <section-1-iteration>
+                  <s2field1/>
+                  <grid-2>
+                      <grid-2-iteration>
+                          <s2number/>
+                      </grid-2-iteration>
+                      <grid-2-iteration>
+                          <s2number/>
+                      </grid-2-iteration>
+                  </grid-2>
+              </section-1-iteration>
+              <section-1-iteration>
+                  <s2field1/>
+                  <grid-2>
+                      <grid-2-iteration>
+                          <s2number/>
+                      </grid-2-iteration>
+                      <grid-2-iteration>
+                          <s2number/>
+                      </grid-2-iteration>
+                      <grid-2-iteration>
+                          <s2number/>
+                      </grid-2-iteration>
+                  </grid-2>
+              </section-1-iteration>
+          </section-1>
+          <!-- Section templates are also missing fields -->
+          <section-4>
+              <st1field1/>
+              <st1num1/>
+              <st1grid2>
+                  <st1grid2-iteration>
+                  </st1grid2-iteration>
+              </st1grid2>
+          </section-4>
+          <section-3>
+              <st1field1/>
+              <st1num1/>
+              <st1grid2>
+                  <st1grid2-iteration>
+                  </st1grid2-iteration>
+              </st1grid2>
+          </section-3>
+          <!-- Here this should contain `st1image1`, but it matches a different element template from
+               the section template which as attributes. We need to pick the correct template. -->
+          <section-5/>
+      </form>
 
-    val contentToPost =
+    val IncomingFormDataWithExtra: NodeInfo =
+      <form>
+          <section-2>
+              <s1input1/>
+              <extra1/>
+          </section-2>
+          <!-- The entire section must be removed -->
+          <extra2>
+            <extra2-iteration/>
+            <extra2-iteration/>
+          </extra2>
+          <section-1>
+              <section-1-iteration>
+                  <s2field1/>
+                  <grid-2>
+                      <grid-2-iteration>
+                          <s2number/>
+                          <extra3/>
+                      </grid-2-iteration>
+                      <grid-2-iteration>
+                          <s2number/>
+                      </grid-2-iteration>
+                  </grid-2>
+              </section-1-iteration>
+              <section-1-iteration>
+                  <s2field1/>
+                  <grid-2>
+                      <grid-2-iteration>
+                          <s2number/>
+                      </grid-2-iteration>
+                      <grid-2-iteration>
+                          <s2number/>
+                          <extra4/>
+                      </grid-2-iteration>
+                      <grid-2-iteration>
+                          <s2number/>
+                          <extra4/>
+                      </grid-2-iteration>
+                  </grid-2>
+              </section-1-iteration>
+          </section-1>
+          <!-- Section templates are also missing fields -->
+          <section-4>
+              <st1field1/>
+              <st1num1/>
+              <extra5/>
+              <st1grid2>
+                  <st1grid2-iteration>
+                  </st1grid2-iteration>
+              </st1grid2>
+          </section-4>
+          <section-3>
+              <st1field1/>
+              <st1num1/>
+              <extra5/>
+              <st1grid2>
+                  <st1grid2-iteration>
+                      <extra6/>
+                  </st1grid2-iteration>
+              </st1grid2>
+          </section-3>
+          <!-- Here this should contain `st1image1`, but it matches a different element template from
+               the section template which as attributes. We need to pick the correct template. -->
+          <section-5/>
+      </form>
+
+    val Expected = List(
+      ("migration of elements in main form and section templates with holes", IncomingFormData,          ExpectedFormData.some),
+      ("migration disallowed when extra elements are present"               , IncomingFormDataWithExtra, None) // #5217
+    )
+
+    def contentToPost(data: NodeInfo) =
       StreamedContent.fromBytes(
-        TransformerUtils.tinyTreeToString(IncomingFormData).getBytes(ExternalContext.StandardCharacterEncoding),
+        TransformerUtils.tinyTreeToString(data).getBytes(ExternalContext.StandardCharacterEncoding),
         Some(ContentTypes.XmlContentType)
       )
 
-    val (processorService, docOpt, _) =
-      runFormRunner(
-        app        = "tests",
-        form       = "data-migration",
-        mode       = "new",
-        document   = "",
-        query      = List(FormRunnerPersistence.DataFormatVersionName -> DataFormatVersion.Edge.entryName),
-        initialize = true,
-        content    = Some(contentToPost)
-      )
+    for ((desc, incomingData, expectedDataOpt) <- Expected)
+      it(desc) {
 
-    val doc = docOpt.get
-
-    it("must pass migration of elements in main form and section templates") {
-      withTestExternalContext { _ =>
-        withFormRunnerDocument(processorService, doc) {
-          assertXMLDocumentsIgnoreNamespacesInScope(
-            left  = ExpectedFormData.root,
-            right = doc.findObjectByEffectiveId(Names.FormInstance).get.asInstanceOf[XFormsInstance].root
+        val (processorService, docOpt, _) =
+          runFormRunner(
+            app        = "tests",
+            form       = "data-migration",
+            mode       = "new",
+            document   = "",
+            query      = List(FormRunnerPersistence.DataFormatVersionName -> DataFormatVersion.Edge.entryName),
+            initialize = true,
+            content    = contentToPost(incomingData).some
           )
+
+        expectedDataOpt match {
+          case None =>
+            assert(docOpt.isEmpty)
+          case Some(expectedData) =>
+            assert(docOpt.nonEmpty)
+            val doc = docOpt.get
+            withTestExternalContext { _ =>
+              withFormRunnerDocument(processorService, doc) {
+                assertXMLDocumentsIgnoreNamespacesInScope(
+                  left  = expectedData.root,
+                  right = doc.findObjectByEffectiveId(Names.FormInstance).get.asInstanceOf[XFormsInstance].root
+                )
+              }
+            }
         }
       }
-    }
   }
 
   describe("Find form definition format") {

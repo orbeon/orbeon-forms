@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLReceiverHelper._
+import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.xforms.XFormsId
 

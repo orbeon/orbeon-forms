@@ -11,10 +11,10 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.fr
+package org.orbeon.oxf.fb
 
 import org.orbeon.datatypes.Direction
-import org.orbeon.fr.HtmlElementCell._
+import org.orbeon.builder.HtmlElementCell._
 import org.orbeon.oxf.fr.Cell
 import org.orbeon.xforms._
 import org.scalajs.dom

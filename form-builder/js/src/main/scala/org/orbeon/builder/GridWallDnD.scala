@@ -14,10 +14,10 @@
 package org.orbeon.builder
 
 import autowire._
+import org.orbeon.builder.HtmlElementCell._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.{Direction, Orientation}
 import org.orbeon.facades.{Dragula, DragulaOptions}
-import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.fr.{Cell, GridModel, WallPosition}
 import org.orbeon.xforms._

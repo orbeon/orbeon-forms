@@ -13,13 +13,16 @@
  */
 package org.orbeon.xbl
 
+import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, XFormsNames}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom.document
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic
+
+
 object WPaint {
 
   XBL.declareCompanion(
@@ -52,7 +55,7 @@ object WPaint {
       def readwrite() = ()
 
       private def backgroundImageChanged(): Unit = {
-        if (imageEl.attr("src") contains XFormsNames.DUMMY_IMAGE_URI) {
+        if (imageEl.attr("src") contains DUMMY_IMAGE_URI) {
             wpaintElA.addClass("xforms-hidden")
             if (wpaintElC != null) {
                 wpaintElC.detach()

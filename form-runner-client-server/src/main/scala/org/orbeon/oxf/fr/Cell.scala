@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.CoreUtils._
 
 import scala.util.Try
 
+
 case class Cell[Underlying](u: Option[Underlying], origin: Option[Cell[Underlying]], x: Int, y: Int, h: Int, w: Int)(maxGridWidth: Int) {
 
   require(x > 0 && y > 0 && h > 0 && w > 0,                 s"`$x`, `$y`, `$h`, `$w`")

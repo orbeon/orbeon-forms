@@ -11,7 +11,7 @@
   *
   * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   */
-package org.orbeon.fr
+package org.orbeon.builder
 
 import org.orbeon.oxf.fr.CellOps
 import org.orbeon.oxf.fr.ClientNames._

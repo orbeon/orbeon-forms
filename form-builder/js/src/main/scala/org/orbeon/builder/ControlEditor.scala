@@ -14,9 +14,9 @@
 package org.orbeon.builder
 
 import autowire._
+import org.orbeon.builder.HtmlElementCell._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
-import org.orbeon.fr.HtmlElementCell._
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.fr.Cell
 import org.orbeon.oxf.util.CoreUtils._

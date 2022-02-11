@@ -25,6 +25,7 @@ import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.timers
 
+
 object Number {
 
   XBL.declareCompanion(

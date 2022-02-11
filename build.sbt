@@ -564,8 +564,8 @@ lazy val formRunnerJVM = formRunner.jvm
     core      % "test->test;compile->compile",
     xformsJVM % "test->test;compile->compile",
     portletSupport,
-    formRunnerCommonJVM
-
+    formRunnerCommonJVM,
+    formRunnerClientServerJVM
   )
   .enablePlugins(SbtWeb)
   .settings(assetsSettings: _*)
@@ -603,6 +603,7 @@ lazy val formRunnerJS = formRunner.js
   .dependsOn(
     xformsRuntimeJS,
     formRunnerCommonJS,
+    formRunnerClientServerJS,
     formRunnerWeb % "test->compile"
   )
   .settings(commonScalaJsSettings)
@@ -683,6 +684,29 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
     )
   )
 
+lazy val formRunnerClientServer = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("form-runner-client-server"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-form-runner-client-server",
+  )
+
+lazy val formRunnerClientServerJVM = formRunnerClientServer.jvm
+  .dependsOn(
+    commonJVM,
+    xformsClientServerJVM
+  )
+
+lazy val formRunnerClientServerJS = formRunnerClientServer.js
+  .dependsOn(
+    commonJS,
+    xformsClientServerJS
+  )
+  .settings(commonScalaJsSettings)
+  .settings(
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
+  )
+
 lazy val formRunnerWeb = (project in file("form-runner-web"))
   .settings(commonSettings: _*)
   .settings(
@@ -692,7 +716,7 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
     commonJS,
     xformsWeb % "test->test;compile->compile",
     webFacades,
-    formRunnerCommonJS
+    formRunnerClientServerJS
   )
   .settings(commonScalaJsSettings)
   .enablePlugins(JSDependenciesPlugin)
@@ -749,14 +773,15 @@ lazy val formBuilderJS = formBuilder.js
     formRunnerWeb
   )
   .settings(commonScalaJsSettings)
+  .enablePlugins(JSDependenciesPlugin)
   .settings(
 
-    libraryDependencies            ++= Seq(
+    jsDependencies += "org.webjars" % "jquery" % "3.6.0" / "3.6.0/jquery.js",
+
+    libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
       "be.doeraene"  %%% "scalajs-jquery" % ScalaJsJQueryVersion
     ),
-
-    Test / test := {},
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
       (Compile / fastOptJS).value.data,
@@ -818,7 +843,7 @@ lazy val xformsJS = xforms.js
   .settings(commonScalaJsSettings)
   .settings(
 
-    libraryDependencies            ++= Seq(
+    libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom"      % ScalaJsDomVersion,
       "be.doeraene"  %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
       "com.beachape" %%% "enumeratum"       % EnumeratumVersion,
@@ -839,6 +864,33 @@ lazy val xformsJS = xforms.js
     )
   )
 
+lazy val xformsClientServer = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("xforms-client-server"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "orbeon-xforms-client-server",
+    libraryDependencies += "com.lihaoyi" %%% "autowire" % AutowireVersion,
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
+    ).map(_ % CirceVersion)
+  )
+
+lazy val xformsClientServerJVM = xformsClientServer.jvm
+  .dependsOn(
+    commonJVM
+  )
+
+lazy val xformsClientServerJS = xformsClientServer.js
+  .dependsOn(
+    commonJS
+  )
+  .settings(commonScalaJsSettings)
+  .settings(
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
+  )
+
 lazy val xformsCommon = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("xforms-common"))
   .settings(commonSettings: _*)
   .settings(
@@ -857,6 +909,7 @@ lazy val xformsCommonJVM = xformsCommon.jvm
   .dependsOn(
     commonJVM,
     domJVM,
+    xformsClientServerJVM,
     core,
     coreCrossPlatformJVM // implied
   )
@@ -865,6 +918,7 @@ lazy val xformsCommonJS = xformsCommon.js
   .dependsOn(
     commonJS,
     domJS,
+    xformsClientServerJS,
     coreCrossPlatformJS
   )
   .settings(commonScalaJsSettings)
@@ -979,7 +1033,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
   .enablePlugins(JSDependenciesPlugin)
   .dependsOn(
     commonJS % "test->test;compile->compile",
-    xformsCommonJS
+    xformsClientServerJS
   )
   .settings(
     Compile / unmanagedJars      := Nil,

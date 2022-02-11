@@ -98,9 +98,3 @@ case class DelayedEvent(
   browserTarget          : Option[String], // optional browser target for submit events
   isResponseResourceType : Boolean
 )
-
-sealed trait HeadElement
-object HeadElement {
-  case class Reference(src: String) extends HeadElement
-  case class Inline(text: String)   extends HeadElement
-}

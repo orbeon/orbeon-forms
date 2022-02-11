@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.submission.{SubmissionHeaders, SubmissionUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.XFormsError
+import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl

@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport,
 import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLReceiverHelper._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLReceiverSupport, XMLUtils}
+import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.Attributes

@@ -164,6 +164,12 @@
         name="oxf.fr.detail.lease.enabled.orbeon.builder"
         value="false"/>
 
+    <!-- https://github.com/orbeon/orbeon-forms/issues/5229 -->
+    <property
+        as="xs:string"
+        name="oxf.fr.detail.html-page-layout.orbeon.builder"
+        value="fixed"/>
+
     <!-- For the Form Builder UI -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-width.orbeon.builder"   value="'full'"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-width.orbeon.builder" value="'full'"/>

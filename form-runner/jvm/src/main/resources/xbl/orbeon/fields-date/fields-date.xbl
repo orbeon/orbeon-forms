@@ -94,11 +94,12 @@
             <xf:var name="binding" value="xxf:binding('fr-fields-date-binding')"/>
             <xf:var name="value" as="xs:string" value="$binding/string()">
                 <xf:action ev:event="xforms-value-changed xforms-enabled">
-                    <!-- Only set local values if the bound node is an xs:date -->
+                    <!-- Only set local values if the bound node is an `xs:date` -->
                     <xf:action if="$value castable as xs:date">
-                        <xf:setvalue ref="instance('i')/year" value="year-from-date($binding)"/>
-                        <xf:setvalue ref="instance('i')/month" value="month-from-date($binding)"/>
-                        <xf:setvalue ref="instance('i')/day" value="day-from-date($binding)"/>
+                        <!-- TODO: Instead of `xs:date($value)` we should be able to use `$binding`, but `$binding/string()` is empty -->
+                        <xf:setvalue ref="instance('i')/year"  value="year-from-date  (xs:date($value))"/>
+                        <xf:setvalue ref="instance('i')/month" value="month-from-date (xs:date($value))"/>
+                        <xf:setvalue ref="instance('i')/day"   value="day-from-date   (xs:date($value))"/>
                     </xf:action>
                     <xf:action if="not($value castable as xs:date) and xxf:is-blank($value)">
                         <xf:setvalue ref="instance('i')/year"/>

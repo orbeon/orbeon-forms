@@ -81,11 +81,15 @@
         .fr-repeat-column-right,
         &.fr-repeat-multiple-rows .fr-grid-head {
 
-            padding: @frGridCellPadding @frGridCellPadding;
+            // Don't use padding on grids, so empty grids don't take space
+            // Instead use a margin on the control inside the cell (see below)
+            padding: 0;
 
             // Exclude buttons, as we don't want them to take the whole width of the cell
-            &> .xforms-control:not(.xforms-trigger-appearance-full), &> .xbl-component, &> .xforms-group {
-                margin: @frGridCellPadding 0;
+            &> .xforms-control:not(.xforms-trigger-appearance-full),
+            &> .xbl-component,
+            &> .xforms-group {
+                margin: @frGridCellPadding @frGridCellPadding;
                 display: block;
             }
 

@@ -847,8 +847,8 @@
     </xsl:template>
 
     <xsl:template match="fr:alert" mode="within-action-2018.2">
-        <xsl:variable name="message" select="@message/string()" as="xs:string"/>
-        <xf:message><xsl:value-of select="$message"/></xf:message>
+        <xf:var name="message"><xsl:value-of select="@message"/></xf:var>
+        <xf:message value="xxf:evaluate-avt($message)"/>
     </xsl:template>
 
 </xsl:stylesheet>

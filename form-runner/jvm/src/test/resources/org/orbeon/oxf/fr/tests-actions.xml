@@ -539,10 +539,12 @@
                         for $i in 1 to 10 return xxf:set-request-attribute(concat('fr-action-continuation-is-last-iteration-', $i), ()),
                         for $i in 1 to 10 return xxf:set-request-attribute(concat('fr-iteration-context-', $i), ())
                    </xf:action>
-                   <xf:message>1</xf:message>
+                   <xf:var name="message">1</xf:var>
+                   <xf:message value="xxf:evaluate-avt($message)"/>
                    <xf:var name="cond1" value="true()"/>
                    <xf:action if="$cond1">
-                       <xf:message>2</xf:message>
+                       <xf:var name="message">2</xf:var>
+                       <xf:message value="xxf:evaluate-avt($message)"/>
                        <xf:dispatch name="fr-action-continuation-my-action-2-id" targetid="fr-form-model"/>
                    </xf:action>
                    <xf:action if="not($cond1)">
@@ -550,7 +552,8 @@
                    </xf:action>
                </xf:action>
                <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-2-id" context="instance('fr-form-instance')">
-                   <xf:message>3</xf:message>
+                   <xf:var name="message">3</xf:var>
+                   <xf:message value="xxf:evaluate-avt($message)"/>
                </xf:action>
 
             </xf:model>
@@ -613,7 +616,8 @@
                         for $i in 1 to 10 return xxf:set-request-attribute(concat('fr-action-continuation-is-last-iteration-', $i), ()),
                         for $i in 1 to 10 return xxf:set-request-attribute(concat('fr-iteration-context-', $i), ())
                     </xf:action>
-                    <xf:message>1</xf:message>
+                    <xf:var name="message">1</xf:var>
+                    <xf:message value="xxf:evaluate-avt($message)"/>
                     <xf:insert ref="xxf:instance('fr-service-request-instance')"
                                origin="xf:parse(xxf:instance('my-service-1-instance'))"/>
                     <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-2-id')</xf:action>
@@ -623,7 +627,8 @@
                 <xf:action observer="my-service-1-submission" event="xforms-submit-done"
                            context="xxf:instance('fr-service-response-instance')"
                            if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-2-id'">
-                    <xf:message>2</xf:message>
+                    <xf:var name="message">2</xf:var>
+                    <xf:message value="xxf:evaluate-avt($message)"/>
                     <xf:action if="empty((/*/record))">
                         <xf:dispatch name="fr-action-continuation-my-action-6-id" targetid="fr-form-model"/>
                     </xf:action>
@@ -633,7 +638,8 @@
                                 last())
                             </xf:action>
                             <xf:action type="xpath">xxf:set-request-attribute('fr-iteration-context-1', .)</xf:action>
-                            <xf:message>3</xf:message>
+                            <xf:var name="message">3</xf:var>
+                            <xf:message value="xxf:evaluate-avt($message)"/>
                             <xf:insert ref="xxf:instance('fr-service-request-instance')"
                                        origin="xf:parse(xxf:instance('my-service-2-instance'))"/>
                             <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-3-id')</xf:action>
@@ -645,10 +651,12 @@
                 <xf:action observer="my-service-2-submission" event="xforms-submit-done"
                            context="xxf:instance('fr-service-response-instance')"
                            if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-3-id'">
-                    <xf:message>4</xf:message>
+                    <xf:var name="message">4</xf:var>
+                    <xf:message value="xxf:evaluate-avt($message)"/>
                     <xf:var name="cond1" value="true()"/>
                     <xf:action if="$cond1">
-                        <xf:message>5</xf:message>
+                        <xf:var name="message">5</xf:var>
+                        <xf:message value="xxf:evaluate-avt($message)"/>
                         <xf:insert ref="xxf:instance('fr-service-request-instance')"
                                    origin="xf:parse(xxf:instance('my-service-3-instance'))"/>
                         <xf:var name="original-context" value="."/>
@@ -670,16 +678,19 @@
                 <xf:action observer="my-service-3-submission" event="xforms-submit-done"
                            context="xxf:instance('fr-service-response-instance')"
                            if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-4-id'">
-                    <xf:message>6</xf:message>
+                    <xf:var name="message">6</xf:var>
+                    <xf:message value="xxf:evaluate-avt($message)"/>
                     <xf:dispatch name="fr-action-continuation-my-action-5-id" targetid="fr-form-model"/>
                 </xf:action>
                 <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-5-id" context="xxf:instance('fr-service-response-instance')">
-                    <xf:message>7</xf:message>
+                    <xf:var name="message">7</xf:var>
+                    <xf:message value="xxf:evaluate-avt($message)"/>
                     <xf:dispatch if="xxf:get-request-attribute('fr-action-continuation-is-last-iteration-1') = true()"
                                  name="fr-action-continuation-my-action-6-id" targetid="fr-form-model"/>
                 </xf:action>
                 <xf:action observer="fr-form-model" event="fr-action-continuation-my-action-6-id" context="xxf:instance('fr-service-response-instance')">
-                    <xf:message>8</xf:message>
+                    <xf:var name="message">8</xf:var>
+                    <xf:message value="xxf:evaluate-avt($message)"/>
                     <xf:insert ref="xxf:instance('fr-service-request-instance')"
                                origin="xf:parse(xxf:instance('my-service-4-instance'))"/>
                     <xf:action type="xpath">xxf:set-request-attribute('fr-action-continuation-id', 'my-action-7-id')</xf:action>
@@ -689,7 +700,8 @@
                 <xf:action observer="my-service-4-submission" event="xforms-submit-done"
                            context="xxf:instance('fr-service-response-instance')"
                            if="xxf:get-request-attribute('fr-action-continuation-id') = 'my-action-7-id'">
-                    <xf:message>9</xf:message>
+                    <xf:var name="message">9</xf:var>
+                    <xf:message value="xxf:evaluate-avt($message)"/>
                 </xf:action>
                 <xf:action xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
                            event="xforms-submit-error"

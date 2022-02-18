@@ -23,9 +23,9 @@ public class AcmeFileScanProvider extends FileScanProvider {
 
     private static Logger logger = LoggerFactory.getLogger(AcmeFileScanProvider.class);
 
-    private class AcmeFileScan implements FileScan {
+    private static class AcmeFileScan implements FileScan {
 
-        private String fileName;
+        private final String fileName;
         private Map<String, String[]> headers;
 
         AcmeFileScan(String fileName, Map<String, String[]> headers) {

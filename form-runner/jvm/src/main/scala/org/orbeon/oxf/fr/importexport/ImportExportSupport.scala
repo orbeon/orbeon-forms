@@ -203,8 +203,9 @@ object ImportExportSupport {
   def countRepeatIterations(holders: Option[Seq[om.NodeInfo]]): Int =
     (holders.toList.flatten / *).size
 
+  // TODO: use `untitled-form` resource in closest language
   def buildFilename(title: String, lang: String, ext: String): String =
-    s"$title ($lang).$ext"
+    s"${title.trimAllToOpt.getOrElse("Untitled Form")} ($lang).$ext"
 
   def prepareFormRunnerDocContextOrThrow(
     form              : om.NodeInfo,

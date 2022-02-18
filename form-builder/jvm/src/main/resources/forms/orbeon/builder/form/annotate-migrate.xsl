@@ -410,4 +410,12 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- Migrate email definition to support multiple emails -->
+    <!--
+    <xsl:template
+        match="xf:instance[@id = 'fr-form-metadata']/metadata/email[
+        ]"
+        mode="within-model"/>
+    -->
+
 </xsl:stylesheet>

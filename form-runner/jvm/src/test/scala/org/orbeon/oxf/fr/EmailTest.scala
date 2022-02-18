@@ -18,8 +18,10 @@ import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
+
 import scala.collection.compat._
 
 
@@ -102,6 +104,66 @@ class EmailTest
           assert(expectedValues === actualValues)
           assert(expectedPath   === actualPaths)
         }
+    }
+  }
+
+  describe("Email metadata parsing") {
+
+    val MetadataCurrent = NodeConversions.elemToNodeInfo(
+      <email xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+        <templates>
+          <template name="default" xml:lang="en">
+            <subject>My subject {{$my-param}}</subject>
+            <body mediatype="text/html">My body: {{$my-param}}</body>
+          </template>
+          <template name="default" xml:lang="fr">
+            <subject>Mon sujet {{$my-param}}</subject>
+            <body mediatype="text/html">Mon message: {{$my-param}}</body>
+          </template>
+        </templates>
+        <parameters>
+          <fr:param type="ExpressionParam">
+              <fr:name>my-param</fr:name>
+              <fr:expr>42</fr:expr>
+          </fr:param>
+          <fr:param type="ExpressionParam">
+              <fr:name>my-param</fr:name>
+              <fr:expr>43</fr:expr>
+          </fr:param>
+        </parameters>
+      </email>
+    )
+
+    val MetadataLegacy2021 = NodeConversions.elemToNodeInfo(
+        <email xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+          <subject>
+              <template xml:lang="en">My subject {{$my-param}}</template>
+              <template xml:lang="fr">Mon sujet {{$my-param}}</template>
+              <fr:param type="ExpressionParam">
+                  <fr:name>my-param</fr:name>
+                  <fr:expr>42</fr:expr>
+              </fr:param>
+          </subject>
+          <body>
+              <template xml:lang="en" mediatype="text/html">My body: {{$my-param}}</template>
+              <template xml:lang="fr" mediatype="text/html">Mon message: {{$my-param}}</template>
+              <fr:param type="ExpressionParam">
+                  <fr:name>my-param</fr:name>
+                  <fr:expr>43</fr:expr>
+              </fr:param>
+          </body>
+      </email>
+    )
+
+    describe("parse both old and new format") {
+
+      assert(! FormRunnerEmail.isLegacy2021Metadata(MetadataCurrent   ))
+      assert(  FormRunnerEmail.isLegacy2021Metadata(MetadataLegacy2021))
+
+      assert(
+        FormRunnerEmail.parseMetadata(MetadataCurrent) ===
+        FormRunnerEmail.parseMetadata(MetadataLegacy2021)
+      )
     }
   }
 }

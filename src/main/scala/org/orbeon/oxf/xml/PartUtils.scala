@@ -21,14 +21,14 @@ import org.orbeon.oxf.processor.generator.URLGenerator
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver
 import org.orbeon.oxf.processor.{Processor, ProcessorImpl}
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{FileItemSupport, NetUtils}
 import org.xml.sax.InputSource
 
 object PartUtils {
 
   // Read a text or binary document and return it as a FileItem
   def handleStreamedPartContent(source: SAXSource)(logger: Logger): FileItem = {
-    val fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE, logger.logger)
+    val fileItem = FileItemSupport.prepareFileItem(NetUtils.REQUEST_SCOPE, logger.logger)
     TransformerUtils.sourceToSAX(source, new BinaryTextXMLReceiver(fileItem.getOutputStream))
     fileItem
   }

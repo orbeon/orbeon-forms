@@ -15,8 +15,8 @@ package org.orbeon.oxf.processor.pdf
 
 import java.io.{ByteArrayInputStream, InputStream}
 import java.net.URI
-
 import com.lowagie.text.Image
+
 import javax.imageio.ImageIO
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
@@ -25,7 +25,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.ImageSupport._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, IndentedLogger, NetUtils, URLRewriterUtils}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, FileItemSupport, IndentedLogger, NetUtils, URLRewriterUtils}
 import org.xhtmlrenderer.layout.SharedContext
 import org.xhtmlrenderer.pdf.ITextFSImage
 import org.xhtmlrenderer.resource.ImageResource
@@ -96,11 +96,11 @@ class CustomUserAgent(
     def createImageResource(originalUriString: String, resolvedUriString: String): ImageResource = {
 
       val localUri =
-        NetUtils.inputStreamToAnyURI(
+        FileItemSupport.inputStreamToAnyURI(
           resolveAndOpenStream(resolvedUriString),
           NetUtils.REQUEST_SCOPE,
           XHTMLToPDFProcessor.logger.logger
-        )
+        )._1
 
       indentedLogger.logDebug("pdf", "getting image resource", "url", originalUriString, "local", localUri)
 

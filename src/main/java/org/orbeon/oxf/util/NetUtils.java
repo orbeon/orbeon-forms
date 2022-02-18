@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+// TODO: refactor, use functions in `FileItemSupport`
 public class NetUtils {
 
     private static final Pattern PATTERN_NO_AMP;
@@ -620,7 +622,7 @@ public class NetUtils {
         return (externalContext != null) ? externalContext.getSession(create) : null;
     }
 
-    private static void deleteFile(final File file, final Logger logger) {
+    public static void deleteFile(final File file, final Logger logger) {
 
         final boolean success = file.delete();
 
@@ -698,10 +700,6 @@ public class NetUtils {
         }
     }
 
-    public static void debugLogRequestAsXML(final ExternalContext.Request request) {
-        System.out.println(IOSupport.domToPrettyStringJava(RequestGenerator.readWholeRequestAsOrbeonDom(request, null)));
-    }
-
     /**
      * Get a File object from either a URL or a path.
      */
@@ -740,14 +738,14 @@ public class NetUtils {
     /**
      * Get a File object for an oxf: or file: URL.
      */
-    public static File getFile(String configUrl, LocationData locationData, boolean makeDirectories) {
+    private static File getFile(String configUrl, LocationData locationData, boolean makeDirectories) {
         return getFile(null, getRealPath(configUrl, locationData), makeDirectories);
     }
 
     /**
      * Get a File object from a path.
      */
-    public static File getFile(String configDirectory, String configFile, boolean makeDirectories) {
+    private static File getFile(String configDirectory, String configFile, boolean makeDirectories) {
 
         final File file;
         if (configDirectory == null) {

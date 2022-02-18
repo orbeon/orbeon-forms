@@ -95,7 +95,7 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
         val outputStream = new ContentHandlerOutputStream(xmlReceiver, true)
         outputStream.setContentType(s"image/${config.format}")
 
-        val fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE, Logger.logger)
+        val fileItem = FileItemSupport.prepareFileItem(NetUtils.REQUEST_SCOPE, Logger.logger)
         try {
           readInputAsSAX(pc, "data", new BinaryTextXMLReceiver(fileItem.getOutputStream))
           convert(config, fileItem.asInstanceOf[DiskFileItem].getStoreLocation, outputStream)

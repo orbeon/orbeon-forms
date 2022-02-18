@@ -83,7 +83,7 @@ class UploaderProcessor extends ProcessorImpl {
                     def sessionUrlAndSizeFromFileItem = {
 
                       val newFile =
-                        NetUtils.renameAndExpireWithSession(
+                        FileItemSupport.renameAndExpireWithSession(
                           RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE))(
                           Loggers.logger.logger
                         )

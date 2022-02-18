@@ -6,10 +6,11 @@ import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.NetUtils._
+import org.orbeon.oxf.util.NetUtils.{APPLICATION_SCOPE, REQUEST_SCOPE, SESSION_SCOPE}
 import org.slf4j.Logger
 
-import java.io.InputStream
+import java.io.{File, IOException, InputStream}
+import java.net.URI
 
 
 object FileItemSupport {
@@ -42,6 +43,45 @@ object FileItemSupport {
     fileItem
   }
 
+  def renameAndExpireWithSession(existingFileURI: String)(implicit logger: Logger): File = {
+
+      // Assume the file will be deleted with the request so rename it first
+      val newPath = {
+        val newFile = File.createTempFile("xforms_upload_", null)
+        val r = newFile.getCanonicalPath
+        newFile.delete()
+        r
+      }
+
+      val oldFile = new File(new URI(existingFileURI))
+      val newFile = new File(newPath)
+      val success = oldFile.renameTo(newFile)
+      try
+        logger.debug(s"${if (success) "renamed" else "could not rename"} temporary file from `${oldFile.getCanonicalPath}` to `$newPath`")
+      catch {
+        case _: IOException => // NOP
+      }
+
+      // Mark deletion of the file on exit and on session termination
+      newFile.deleteOnExit()
+
+      CoreCrossPlatformSupport.externalContext.getSessionOpt(false) match {
+        case Some(session) =>
+          try
+            session.addListener((_: ExternalContext.Session) => NetUtils.deleteFile(newFile, logger))
+          catch {
+            case e: IllegalStateException =>
+              logger.info(s"unable to add session listener: ${e.getMessage}")
+              NetUtils.deleteFile(newFile, logger) // remove immediately
+              throw e
+          }
+        case None =>
+          logger.debug(s"no existing session found so cannot register temporary file deletion upon session destruction: `$newPath`")
+      }
+
+      newFile
+    }
+
   private object Private {
 
     lazy val fileItemFactory = new DiskFileItemFactory(0, NetUtils.getTemporaryDirectory)
@@ -63,7 +103,7 @@ object FileItemSupport {
       PipelineContext.get.addContextListener((_: Boolean) => deleteFileItem(fileItem, REQUEST_SCOPE, logger))
 
     def deleteFileOnSessionTermination(fileItem: FileItem, logger: Logger): Unit =
-      getExternalContext.getSessionOpt(false) match {
+      CoreCrossPlatformSupport.externalContext.getSessionOpt(false) match {
         case Some(session) =>
           try
             session.addListener((_: ExternalContext.Session) => deleteFileItem(fileItem, SESSION_SCOPE, logger))
@@ -80,7 +120,7 @@ object FileItemSupport {
       }
 
     def deleteFileOnApplicationDestroyed(fileItem: FileItem, logger: Logger): Unit =
-      getExternalContext.getWebAppContext.addListener(() => deleteFileItem(fileItem, APPLICATION_SCOPE, logger))
+      CoreCrossPlatformSupport.externalContext.getWebAppContext.addListener(() => deleteFileItem(fileItem, APPLICATION_SCOPE, logger))
 
     def deleteFileItem(fileItem: FileItem, scope: Int, logger: Logger): Unit = {
       fileItem.delete()

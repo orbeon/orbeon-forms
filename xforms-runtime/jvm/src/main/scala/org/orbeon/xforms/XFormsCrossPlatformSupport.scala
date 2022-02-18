@@ -207,14 +207,14 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     existingFileURI  : String)(implicit
     logger           : IndentedLogger
   ): URI =
-    NetUtils.renameAndExpireWithSession(existingFileURI, logger.logger.logger).toURI
+    FileItemSupport.renameAndExpireWithSession(existingFileURI)(logger.logger.logger).toURI
 
   def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
   ): Option[String] =
     useAndClose(inputStream) { is =>
-      NetUtils.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.logger.logger).some
+      FileItemSupport.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.logger.logger)._1.some
     }
 
   def inputStreamToSessionUri(
@@ -222,7 +222,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): Option[String] =
     useAndClose(inputStream) { is =>
-      NetUtils.inputStreamToAnyURI(is, NetUtils.SESSION_SCOPE, logger.logger.logger).some
+      FileItemSupport.inputStreamToAnyURI(is, NetUtils.SESSION_SCOPE, logger.logger.logger)._1.some
     }
 
   def getLastModifiedIfFast(absoluteURL: String): Long =

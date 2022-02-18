@@ -176,7 +176,7 @@ object ImageSupport {
     tryReadAllMetadata(existingUri) match {
       case Success(allMetadata) if mustTransform(allMetadata) =>
 
-        val fileItem = NetUtils.prepareFileItem(NetUtils.SESSION_SCOPE, logger.logger.logger)
+        val fileItem = FileItemSupport.prepareFileItem(NetUtils.SESSION_SCOPE, logger.logger.logger)
 
         useAndClose(fileItem.getOutputStream)(tryReadAndTransformToOutputStream(allMetadata, _)) map { _ =>
           (

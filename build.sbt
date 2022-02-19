@@ -67,6 +67,7 @@ val Log4j2Version                 = "2.17.1"
 val CommonsIoVersion              = "2.11.0"
 val FlyingSaucerVersion           = "9.1.22"
 val TinkVersion                   = "1.6.1"
+val ProtobufJavaVersionForTink    = "3.19.4"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.0"
 val AntVersion                    = "1.10.11"
@@ -125,6 +126,7 @@ val CoreLibraryDependencies = Seq(
     ExclusionRule(organization = "com.amazonaws"),
     ExclusionRule(organization = "com.fasterxml.jackson.core")
   ),
+  "com.google.protobuf"         % "protobuf-java"                   % ProtobufJavaVersionForTink,
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.9.0"           % Test,

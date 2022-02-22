@@ -262,7 +262,8 @@
                         xxf:property(string-join(('oxf.fr.detail.lease.enabled', $app, $form), '.')) and
                         frf:isLeaseSupported($app, $form) and
                         not(fr:is-readonly-mode())        and
-                        not($is-background)
+                        not($is-background)               and
+                        not(fr:is-browser-environment())
                     "/>
                 <xf:setvalue ref="$lease-enabled-elem" value="$lease-enabled"/>
                 <xf:action if="$lease-enabled">

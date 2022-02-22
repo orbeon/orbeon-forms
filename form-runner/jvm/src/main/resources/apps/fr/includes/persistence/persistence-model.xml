@@ -1005,7 +1005,7 @@
                 let $nodes :=
                     if (event('xxf:type')      = 'xforms-insert')         then
                         event('inserted-nodes')
-                    if (event('xxf:type')      = 'xforms-delete')         then
+                    else if (event('xxf:type') = 'xforms-delete')         then
                         event('deleted-nodes')
                     else if (event('xxf:type') = 'xxforms-replace')       then
                         event('current-node')

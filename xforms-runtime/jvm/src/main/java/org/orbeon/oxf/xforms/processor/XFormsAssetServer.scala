@@ -277,7 +277,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
     val isCSS = ext == "css"
 
     // Two clients could request the same CSS URL with a different value of the `Orbeon-Client` header, causing
-    // the production of different content based on the URL rewriter used as a consquence.
+    // the production of different content based on the URL rewriter used as a consequence.
     if (isCSS)
       response.addHeader("Vary", Headers.OrbeonClient)
 

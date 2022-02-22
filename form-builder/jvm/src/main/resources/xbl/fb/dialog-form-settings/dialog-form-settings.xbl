@@ -455,6 +455,11 @@
                     constraint="matches(., '^[A-Za-z0-9\-_]+$')"
                     xxf:whitespace="trim"
                     readonly="false()"/>
+
+                <xf:bind
+                    ref="title | description"
+                    xxf:whitespace="trim"/>
+
                 <xf:bind
                     ref="app"
                     constraint="not($has-roles and not($allowed-apps-if-has-roles = ('*', .)))"/>

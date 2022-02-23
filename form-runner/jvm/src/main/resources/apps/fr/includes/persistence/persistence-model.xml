@@ -1013,10 +1013,12 @@
                         event('node')
                     else
                         (),
+                    (: in theory, `insert`/`delete` can affect more than one node but this doesn't happen in the wizard :)
                     $att := $nodes[..//@fr:section-status is .]
                 return
                     empty($att)
             )">
+
             <!-- Mark status as dirty if data changes -->
             <xf:setvalue ref="$persistence-instance/data-status"          value="'dirty'"/>
             <!-- Reset override, see: https://github.com/orbeon/orbeon-forms/issues/1325  -->

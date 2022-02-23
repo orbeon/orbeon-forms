@@ -43,10 +43,10 @@ trait FormRunnerEmail {
   //
   //@XPathFunction
   def searchHoldersForClassTopLevelOnly(
-                                         body: NodeInfo,
-                                         data: NodeInfo,
-                                         classNames: String
-                                       ): SequenceIterator =
+    body: NodeInfo,
+    data: NodeInfo,
+    classNames: String
+  ): SequenceIterator =
     frc.searchControlsTopLevelOnly(
       data = Option(data),
       predicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
@@ -72,11 +72,11 @@ trait FormRunnerEmail {
   //
   //@XPathFunction
   def searchHoldersForClassUseSectionTemplates(
-                                                head: NodeInfo,
-                                                body: NodeInfo,
-                                                data: NodeInfo,
-                                                classNames: String
-                                              ): SequenceIterator =
+    head: NodeInfo,
+    body: NodeInfo,
+    data: NodeInfo,
+    classNames: String
+  ): SequenceIterator =
     frc.searchControlsUnderSectionTemplates(
       head = head,
       data = Option(data),

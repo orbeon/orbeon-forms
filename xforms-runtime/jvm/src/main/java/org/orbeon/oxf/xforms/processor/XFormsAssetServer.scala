@@ -278,6 +278,8 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
     // Two clients could request the same CSS URL with a different value of the `Orbeon-Client` header, causing
     // the production of different content based on the URL rewriter used as a consequence.
+    // However, we can't see a use case where a cache would actually see that, as the `Orbeon-Client` header is not
+    // sent by the browser!
     if (isCSS)
       response.addHeader("Vary", Headers.OrbeonClient)
 

@@ -2715,7 +2715,22 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
 
             var handled = false;
-            if (controlTarget != null && ($(controlTarget).is('.xforms-trigger, .xforms-submit'))) {
+            if (originalTarget != null && $(originalTarget).is('.xforms-help')) {
+                // Help image
+                // We test on `originalTarget` being on the help icon first, so in case the help icon is inside a
+                // trigger, we don't "mistake" the click on the help for a click on the trigger, rendering the help
+                // inaccessible through a click.
+                if (ORBEON.util.Properties.helpHandler.get()) {
+                    // We are sending the xforms-help event to the server and the server will tell us what do to
+                    var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, null, "xforms-help");
+                    ORBEON.xforms.AjaxClient.fireEvent(event);
+                } else {
+                    // If the servers tells us there are no event handlers for xforms-help in the page,
+                    // we can avoid a round trip and show the help right away
+                    ORBEON.xforms.Controls.showHelp(controlTarget);
+                }
+                handled = true;
+            } else if (controlTarget != null && ($(controlTarget).is('.xforms-trigger, .xforms-submit'))) {
                 // Click on trigger
                 event.preventDefault();
                 if (! $(controlTarget).is('.xforms-readonly')) {
@@ -2745,18 +2760,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // Click on remove icon in upload control
                 var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, "", "xxforms-value");
                 ORBEON.xforms.AjaxClient.fireEvent(event);
-                handled = true;
-            } else if (originalTarget != null && $(originalTarget).is('.xforms-help')) {
-                // Help image
-                if (ORBEON.util.Properties.helpHandler.get()) {
-                    // We are sending the xforms-help event to the server and the server will tell us what do to
-                    var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, null, "xforms-help");
-                    ORBEON.xforms.AjaxClient.fireEvent(event);
-                } else {
-                    // If the servers tells us there are no event handlers for xforms-help in the page,
-                    // we can avoid a round trip and show the help right away
-                    ORBEON.xforms.Controls.showHelp(controlTarget);
-                }
                 handled = true;
             }
 

@@ -40,7 +40,7 @@ private class SAXEntityResolver(uriPrefix: String) extends EntityResolver {
 
       var _systemId = systemId
 
-      if ((_systemId ne null) && ! _systemId.isEmpty) {
+      if ((_systemId ne null) && _systemId.nonEmpty) {
         if ((uriPrefix ne null) && (_systemId.indexOf(':') <= 0)) {
           _systemId = uriPrefix + _systemId
         }
@@ -110,7 +110,7 @@ class SAXReader(xmlReader: XMLReader) {
 
   private def createDefaultEntityResolver(systemId: String): EntityResolver = {
     var prefix: String = null
-    if ((systemId ne null) && ! systemId.isEmpty) {
+    if ((systemId ne null) && systemId.nonEmpty) {
       val idx = systemId.lastIndexOf('/')
       if (idx > 0) {
         prefix = systemId.substring(0, idx + 1)

@@ -16,5 +16,5 @@ package org.orbeon.oxf.xforms.submission
 trait Submission {
   def getType: String
   def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Boolean
-  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[SubmissionResult]
+  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[ConnectResult]
 }

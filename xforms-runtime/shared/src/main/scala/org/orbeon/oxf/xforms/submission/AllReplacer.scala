@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import cats.Eval
 import cats.syntax.option._
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
@@ -65,7 +64,7 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
   // NOP
   def deserialize(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
 
-  def replace(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Option[Eval[Unit]] = {
+  def replace(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): ReplaceResult = {
 
     // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
     // Remember that we got a submission producing output
@@ -77,14 +76,14 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
 
     AllReplacer.forwardResultToResponse(cxr, replaceAllResponse)
 
-    // Success: "the event xforms-submit-done may be dispatched with appropriate context information"
+    // Success: "the event `xforms-submit-done` may be dispatched with appropriate context information"
     // Error: "either the document is replaced with an implementation-specific indication of an error or submission
-    // processing concludes after dispatching xforms-submit-error with appropriate context information, including an
-    // error-type of resource-error"
-    if (!p.isDeferredSubmissionSecondPass) {
+    // processing concludes after dispatching `xforms-submit-error` with appropriate context information, including an
+    // `error-type` of `resource-error`"
+    if (! p.isDeferredSubmissionSecondPass) {
       if (StatusCode.isSuccessCode(cxr.statusCode))
-        submission.sendSubmitDone(cxr).some
-      else {
+        ReplaceResult.SendDone(cxr)
+      else
         // Here we dispatch xforms-submit-error upon getting a non-success error code, even though the response has
         // already been written out. This gives the form author a chance to do something in cases the response is
         // buffered, for example do a sendError().
@@ -98,13 +97,12 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
             connectionResult = cxr.some
           )
         )
-      }
     } else {
       // Two reasons:
       //
       // 1. We don't want to modify the document state
       // 2. This can be called outside of the document lock, see XFormsServer.
-      None
+      ReplaceResult.None
     }
   }
 }

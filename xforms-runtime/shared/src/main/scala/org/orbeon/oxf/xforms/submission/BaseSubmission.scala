@@ -63,8 +63,8 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
   protected def submitEval(
     p    : SubmissionParameters,
     p2   : SecondPassParameters,
-    eval : Eval[SubmissionResult]
-  ): Option[SubmissionResult] =
+    eval : Eval[ConnectResult]
+  ): Option[ConnectResult] =
     if (p2.isAsynchronous) {
       // Tell XFCD that we have one more async submission
       containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(eval)

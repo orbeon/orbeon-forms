@@ -41,7 +41,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     p : SubmissionParameters,
     p2: SecondPassParameters,
     sp: SerializationParameters
-  ): Option[SubmissionResult] = {
+  ): Option[ConnectResult] = {
 
     sp.messageBody match {
       case None =>
@@ -100,6 +100,6 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
     // Deserialize here so it can run in parallel
     replacer.deserialize(connectionResult, p, p2)
 
-    SubmissionResult(submission.getEffectiveId, Success((replacer, connectionResult))).some
+    ConnectResult(submission.getEffectiveId, Success((replacer, connectionResult))).some
   }
 }

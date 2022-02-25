@@ -40,7 +40,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
     p  : SubmissionParameters,
     p2 : SecondPassParameters,
     sp : SerializationParameters
-  ): Option[SubmissionResult] = {
+  ): Option[ConnectResult] = {
 
     val absoluteResolvedURL = new URI(getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, p.urlNorewrite, p.urlType))
 
@@ -123,12 +123,12 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
         // Update status
         deserialized = true
 
-        SubmissionResult(submissionEffectiveId, Success((replacer, connectionResult)))
+        ConnectResult(submissionEffectiveId, Success((replacer, connectionResult)))
       } catch {
         case NonFatal(throwable) =>
           // Exceptions are handled further down
           connectionResultOpt foreach (_.close())
-          SubmissionResult(submissionEffectiveId, Failure(throwable))
+          ConnectResult(submissionEffectiveId, Failure(throwable))
       } finally {
         if (p2.isAsynchronous && timingLogger.debugEnabled) {
           timingLogger.setDebugResults(

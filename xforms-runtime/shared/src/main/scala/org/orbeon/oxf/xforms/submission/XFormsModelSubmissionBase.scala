@@ -47,29 +47,29 @@ abstract class XFormsModelSubmissionBase
 
   def model: XFormsModel
 
-  protected def sendSubmitError(throwable: Throwable, submissionResult: SubmissionResult): Unit =
+  protected def sendSubmitError(t: Throwable, connectResult: ConnectResult): Unit =
     sendSubmitErrorWithDefault(
-      throwable,
-      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, submissionResult.result.toOption map (_._2))
+      t,
+      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, connectResult.result.toOption map (_._2))
     )
 
-  protected def sendSubmitError(throwable: Throwable, resolvedActionOrResource: String): Unit =
+  protected def sendSubmitError(t: Throwable, resolvedActionOrResource: String): Unit =
     sendSubmitErrorWithDefault(
-      throwable,
+      t,
       new XFormsSubmitErrorEvent(thisSubmission, Option(resolvedActionOrResource), ErrorType.XXFormsInternalError, 0)
     )
 
-  private def sendSubmitErrorWithDefault(throwable: Throwable, default: => XFormsSubmitErrorEvent): Unit = {
+  private def sendSubmitErrorWithDefault(t: Throwable, default: => XFormsSubmitErrorEvent): Unit = {
 
     // After a submission, the context might have changed
     model.resetAndEvaluateVariables()
 
     // Try to get error event from exception and if not possible create default event
     val submitErrorEvent =
-      throwable.narrowTo[XFormsSubmissionException] flatMap (_.submitErrorEventOpt) getOrElse default
+      t.narrowTo[XFormsSubmissionException] flatMap (_.submitErrorEventOpt) getOrElse default
 
     // Dispatch event
-    submitErrorEvent.logMessage(throwable)
+    submitErrorEvent.logMessage(t)
     Dispatch.dispatchEvent(submitErrorEvent)
   }
 

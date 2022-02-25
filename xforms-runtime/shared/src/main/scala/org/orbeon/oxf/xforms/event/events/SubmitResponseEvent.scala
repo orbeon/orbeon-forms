@@ -83,6 +83,7 @@ private object SubmitResponseEvent {
   }
 
   def body(e: SubmitResponseEvent): Option[AnyRef] = {
+
     implicit val logger = e.indentedLogger
 
     def readOrReturn(cxr: ConnectionResult): Option[String Either DocumentNodeInfoType] =
@@ -122,9 +123,9 @@ private object SubmitResponseEvent {
       // Read the whole stream to a temp URI so we can read it more than once if needed. This allows trying reading
       // as XML then as text.
       val tempURIOpt =
-        try {
+        try
           XFormsCrossPlatformSupport.inputStreamToRequestUri(cxr.content.inputStream)
-        } catch {
+        catch {
           warn("error while reading response body")
         }
 

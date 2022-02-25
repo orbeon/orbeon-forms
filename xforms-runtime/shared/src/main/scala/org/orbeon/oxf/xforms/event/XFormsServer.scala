@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{SubmissionResult, XFormsModelSubmission}
+import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmission}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
@@ -79,7 +79,7 @@ object XFormsServer {
     // - https://github.com/orbeon/orbeon-forms/issues/2071
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
-    val lockResult: Try[Try[Option[Eval[SubmissionResult]]]] =
+    val lockResult: Try[Try[Option[Eval[ConnectResult]]]] =
       withLock(requestParameters, if (isAjaxRequest) 0L else XFormsGlobalProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 

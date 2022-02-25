@@ -15,8 +15,6 @@ package org.orbeon.oxf.xforms.submission
 
 import java.net.URI
 
-import cats.Eval
-import cats.syntax.option._
 import org.orbeon.io.FileUtils
 import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -32,26 +30,26 @@ class BinaryReplacer(
   private var contentUrlOpt: Option[String] = None
 
   def deserialize(
-    connectionResult : ConnectionResult,
-    p                : SubmissionParameters,
-    p2               : SecondPassParameters
+    cxr: ConnectionResult,
+    p  : SubmissionParameters,
+    p2 : SecondPassParameters
   ): Unit =
     contentUrlOpt = XFormsCrossPlatformSupport.inputStreamToSessionUri(
-      connectionResult.content.inputStream)(
+      cxr.content.inputStream)(
       submission.getDetailsLogger(p, p2)
     )
 
   def replace(
-    connectionResult : ConnectionResult,
-    p                : SubmissionParameters,
-    p2               : SecondPassParameters
-  ): Option[Eval[Unit]] = {
+    cxr: ConnectionResult,
+    p  : SubmissionParameters,
+    p2 : SecondPassParameters
+  ): ReplaceResult = {
 
     def filenameFromValue  : Option[String] = None // MAYBE: `xxf:filenamevalue`
     def filenameFromHeader : Option[String] = None // MAYBE: `Content-Disposition`'s `filename`.
 
     def mediatypeFromValue : Option[String] = None // MAYBE: `xxf:mediatypevalue`
-    def mediatypeFromHeader: Option[String] = connectionResult.content.contentType
+    def mediatypeFromHeader: Option[String] = cxr.content.contentType
 
     val filenameOpt  = filenameFromValue  orElse filenameFromHeader
     val mediatypeOpt = mediatypeFromValue orElse mediatypeFromHeader
@@ -65,7 +63,7 @@ class BinaryReplacer(
       TextReplacer.replaceText(
         submission         = submission,
         containingDocument = containingDocument,
-        connectionResult   = connectionResult,
+        connectionResult   = cxr,
         p                  = p,
         value              = macValue
       )
@@ -75,6 +73,6 @@ class BinaryReplacer(
     // MAYBE `xxf:mediatyperef` (also with other replacers!)
     // MAYBE `xxf:sizeref`      (also with other replacers!)
 
-    submission.sendSubmitDone(connectionResult).some
+    ReplaceResult.SendDone(cxr)
   }
 }

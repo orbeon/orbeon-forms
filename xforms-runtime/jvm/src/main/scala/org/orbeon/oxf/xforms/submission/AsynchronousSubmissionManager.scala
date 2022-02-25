@@ -59,7 +59,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
         allowDuplicates   = false  // no need for duplicates
       )
 
-  def addAsynchronousSubmission(eval: Eval[SubmissionResult]): Unit = {
+  def addAsynchronousSubmission(eval: Eval[ConnectResult]): Unit = {
     val asynchronousSubmissionsOpt =
       findAsynchronousSubmissions(
         create = true,
@@ -135,7 +135,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
             val submission =
               containingDocument.getObjectByEffectiveId(result.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
 
-            submission.doSubmitReplace(result)
+            submission.processAsyncSubmissionResponse(result)
 
             processedCount += 1
           }
@@ -172,7 +172,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
             val submission =
               containingDocument.getObjectByEffectiveId(result.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
 
-            submission.doSubmitReplace(result)
+            submission.processAsyncSubmissionResponse(result)
 
             processedCount += 1
 
@@ -226,24 +226,24 @@ private object AsynchronousSubmissionManager {
 
   class AsynchronousSubmissions extends Externalizable {
 
-    private val completionService = new ExecutorCompletionService[SubmissionResult](getExecutorService)
+    private val completionService = new ExecutorCompletionService[ConnectResult](getExecutorService)
 
     private var _pendingCount = 0
     def pendingCount = _pendingCount
 
-    def submit(task: Eval[SubmissionResult]): Future[SubmissionResult] = {
+    def submit(task: Eval[ConnectResult]): Future[ConnectResult] = {
       val future = completionService.submit(() => task.value)
       _pendingCount += 1
       future
     }
 
-    def poll(): Option[Future[SubmissionResult]] =
+    def poll(): Option[Future[ConnectResult]] =
       Option(completionService.poll()) map { f =>
         _pendingCount -= 1
         f
       }
 
-    def take(): Future[SubmissionResult] = {
+    def take(): Future[ConnectResult] = {
       val f = completionService.take()
       _pendingCount -= 1
       f

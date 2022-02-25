@@ -50,14 +50,14 @@ object XFormsModelSubmission {
   /**
    * Run the given submission `Eval`. This must be for a `replace="all"` submission.
    */
-  def runDeferredSubmission(eval: Eval[SubmissionResult], response: ExternalContext.Response): Unit =
+  def runDeferredSubmission(eval: Eval[ConnectResult], response: ExternalContext.Response): Unit =
     eval.value.result match {
       case Success((replacer, connectionResult)) =>
         try {
           replacer match {
             case _: AllReplacer      => AllReplacer.forwardResultToResponse(connectionResult, response)
             case _: RedirectReplacer => RedirectReplacer.updateResponse(connectionResult, response)
-            case _: NoneReplacer     => // NOP
+            case _: NoneReplacer     => ()
             case r                   => throw new IllegalArgumentException(r.getClass.getName)
           }
         } finally {
@@ -88,7 +88,7 @@ object XFormsModelSubmission {
 
   private def isLogDetails = XFormsGlobalProperties.getDebugLogging.contains("submission-details")
 
-  // Only allow xxforms-submit from client
+  // Only allow `xxforms-submit` from client
   private val ALLOWED_EXTERNAL_EVENTS = new util.HashSet[String]
   ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_SUBMIT)
 }
@@ -134,11 +134,11 @@ class XFormsModelSubmission(
     // Variables declared here as they are used in a catch/finally block
     var p: SubmissionParameters = null
     var resolvedActionOrResource: String = null
-    var submitDoneOrErrorEvalOpt: Option[Eval[Unit]] = None
+    var replaceResultOpt: Option[(ReplaceResult, Option[ConnectionResult])] = None
     try {
       try {
         // Big bag of initial runtime parameters
-        p = SubmissionParameters(event.name)(thisSubmission)
+        p = SubmissionParameters(event.name.some)(thisSubmission)
         if (indentedLogger.debugEnabled) {
           val message =
             if (p.isDeferredSubmissionFirstPass)
@@ -227,7 +227,7 @@ class XFormsModelSubmission(
         /* ***** Submission second pass ************************************************************************* */
 
         // Compute parameters only needed during second pass
-        val p2 = SecondPassParameters(thisSubmission, p)
+        val p2 = SecondPassParameters(p)(thisSubmission)
         resolvedActionOrResource = p2.actionOrResource // in case of exception
 
         /* ***** Serialization ********************************************************************************** */
@@ -290,7 +290,7 @@ class XFormsModelSubmission(
           /* ***** Submission connection ************************************************************************** */
 
           // Result information
-          val submissionResultOpt =
+          val connectResultOpt =
             submissions find (_.isMatch(p, p2, sp)) flatMap { submission =>
               withDebug("connecting", List("type" -> submission.getType)) {
                 submission.connect(p, p2, sp)
@@ -300,28 +300,37 @@ class XFormsModelSubmission(
           /* ***** Submission result processing ******************************************************************* */
 
           // `None` in case the submission is running asynchronously, AND when ???
-          submissionResultOpt foreach { submissionResult =>
-            submitDoneOrErrorEvalOpt =
-              handleSubmissionResult(p, p2, submissionResult, initializeXPathContext = true) // true because function context might have changed
-          }
+          replaceResultOpt =
+            connectResultOpt map { connectResult =>
+              handleConnectResult(
+                p                      = p,
+                p2                     = p2,
+                connectResult          = connectResult,
+                initializeXPathContext = true // function context might have changed
+              )
+            }
         }
       } catch {
         case NonFatal(throwable) =>
           /* ***** Handle errors ********************************************************************************** */
           val pVal = p
           val resolvedActionOrResourceVal = resolvedActionOrResource
-          submitDoneOrErrorEvalOpt = Some(Eval.later {
-            // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
-            if (pVal != null && pVal.isDeferredSubmissionSecondPass && containingDocument.isLocalSubmissionForward)
-              throw new XFormsSubmissionException(
-                thisSubmission,
-                "Error while processing xf:submission", "processing submission",
-                throwable,
-                null
-              )
-            else
-              sendSubmitError(throwable, resolvedActionOrResourceVal) // any exception will cause an error event to be dispatched
-          })
+          replaceResultOpt =
+            (
+              if (pVal != null && pVal.isDeferredSubmissionSecondPass && containingDocument.isLocalSubmissionForward)
+                ReplaceResult.Throw( // no purpose to dispatch an event so we just propagate the exception
+                  new XFormsSubmissionException(
+                    thisSubmission,
+                    "Error while processing xf:submission",
+                    "processing submission",
+                    throwable,
+                    null
+                  )
+                )
+              else
+                ReplaceResult.SendError(throwable, Right(resolvedActionOrResourceVal)),
+              None
+            ).some
       }
     } finally {
       // Log total time spent in submission
@@ -329,43 +338,55 @@ class XFormsModelSubmission(
         indentedLogger.endHandleOperation()
     }
     // Execute post-submission code if any
-    // This typically dispatches xforms-submit-done/xforms-submit-error, or may throw another exception
-    submitDoneOrErrorEvalOpt foreach { submitDoneOrErrorEval =>
-      // We do this outside the above catch block so that if a problem occurs during dispatching xforms-submit-done
-      // or xforms-submit-error we don't dispatch xforms-submit-error (which would be illegal).
-      // This will also close the connection result if needed.
-      submitDoneOrErrorEval.value
-    }
+    // We do this outside the above catch block so that if a problem occurs during dispatching `xforms-submit-done`
+    // or `xforms-submit-error` we don't dispatch `xforms-submit-error` (which would be illegal).
+    // This will also close the connection result if needed.
+    replaceResultOpt foreach (processReplaceResultAndCloseConnection _).tupled
   }
 
-  /*
-   * Process the response of an asynchronous submission.
-   */
+  private def processReplaceResultAndCloseConnection(
+    replaceResult       : ReplaceResult,
+    connectionResultOpt : Option[ConnectionResult]
+  ): Unit =
+    try {
+      replaceResult match {
+        case ReplaceResult.None                               => ()
+        case ReplaceResult.SendDone (cxr)                     => sendSubmitDone(cxr)
+        case ReplaceResult.SendError(t, Left(connectResult))  => sendSubmitError(t, connectResult)
+        case ReplaceResult.SendError(t, Right(submissionUri)) => sendSubmitError(t, submissionUri)
+        case ReplaceResult.Throw    (t)                       => throw t
+      }
+    } finally {
+      // https://github.com/orbeon/orbeon-forms/issues/5224
+      connectionResultOpt foreach (_.close())
+    }
+
   private[submission]
-  def doSubmitReplace(submissionResult: SubmissionResult): Unit = {
+  def processAsyncSubmissionResponse(submissionResult: ConnectResult): Unit = {
 
-    require(submissionResult ne null)
+    val p  = SubmissionParameters(None)(thisSubmission)
+    val p2 = SecondPassParameters(p)(thisSubmission)
 
-    val p = SubmissionParameters(null)(thisSubmission)
-    val p2 = SecondPassParameters(thisSubmission, p)
-
-    handleSubmissionResult(p, p2, submissionResult, initializeXPathContext = false) foreach { submitDoneEval=>
-      // Do this outside the `handleSubmissionResult` catch block so that if a problem occurs during dispatching
-      // `xforms-submit-done` we don't dispatch `xforms-submit-error` (which would be illegal).
-      submitDoneEval.value
-    }
+    (processReplaceResultAndCloseConnection _).tupled(
+      handleConnectResult(
+        p                      = p,
+        p2                     = p2,
+        connectResult          = submissionResult,
+        initializeXPathContext = false
+      )
+    )
   }
 
-  private def handleSubmissionResult(
-    p                      : SubmissionParameters,
-    p2                     : SecondPassParameters,
-    submissionResult       : SubmissionResult,
-    initializeXPathContext : Boolean
-  ): Option[Eval[Unit]] = {
+  private def handleConnectResult(
+    p                     : SubmissionParameters,
+    p2                    : SecondPassParameters,
+    connectResult         : ConnectResult,
+    initializeXPathContext: Boolean
+  ): (ReplaceResult, Option[ConnectionResult]) = {
 
     require(p ne null)
     require(p2 ne null)
-    require(submissionResult ne null)
+    require(connectResult ne null)
 
     try {
       val indentedLogger = getIndentedLogger
@@ -377,29 +398,25 @@ class XFormsModelSubmission(
           else
               p
 
-        submissionResult.result match {
+        connectResult.result match {
           case Success((replacer, connectionResult)) =>
-            try {
-              replacer.replace(connectionResult, updatedP, p2)
-            } finally {
-              connectionResult.close()
-            }
+            val r = replacer.replace(connectionResult, updatedP, p2) // the *only* call to `replace()`
+            r -> connectionResult.some
           case Failure(throwable) =>
-            Eval.later(sendSubmitError(throwable, submissionResult)).some
+            ReplaceResult.SendError(throwable, Left(connectResult)) -> None
         }
       }(indentedLogger)
     } catch {
       case NonFatal(throwable) =>
-        Eval.later(sendSubmitError(throwable, submissionResult)).some
+        ReplaceResult.SendError(throwable, Left(connectResult)) -> None
     }
   }
 
-  def sendSubmitDone(connectionResult: ConnectionResult): Eval[Unit] =
-    Eval.later {
-      // After a submission, the context might have changed
-      model.resetAndEvaluateVariables()
-      Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, connectionResult))
-    }
+  def sendSubmitDone(connectionResult: ConnectionResult): Unit = {
+    // After a submission, the context might have changed
+    model.resetAndEvaluateVariables()
+    Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, connectionResult))
+  }
 
   def getReplacer(connectionResult: ConnectionResult, p: SubmissionParameters): Replacer = {
     // NOTE: This can be called from other threads so it must NOT modify the XFCD or submission

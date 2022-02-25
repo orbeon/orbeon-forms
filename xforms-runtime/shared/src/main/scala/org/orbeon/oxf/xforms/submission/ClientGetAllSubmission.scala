@@ -28,7 +28,7 @@ class ClientGetAllSubmission(submission: XFormsModelSubmission)
   def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Boolean =
     p.isHandlingClientGetAll
 
-  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[SubmissionResult] = {
+  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[ConnectResult] = {
     XFormsLoadAction.resolveStoreLoadValue(
       containingDocument           = containingDocument,
       currentElem                  = Option(submission.staticSubmission.element),

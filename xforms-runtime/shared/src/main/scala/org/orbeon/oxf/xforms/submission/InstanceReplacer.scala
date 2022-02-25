@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import cats.Eval
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.{Document, Node}
@@ -51,12 +50,12 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
   }
 
   def deserialize(
-    connectionResult : ConnectionResult,
-    p                : SubmissionParameters,
-    p2               : SecondPassParameters
+    cxr: ConnectionResult,
+    p  : SubmissionParameters,
+    p2 : SecondPassParameters
   ): Unit = {
     // Deserialize here so it can run in parallel
-    val contentType = connectionResult.mediatypeOrDefault(ContentTypes.XmlContentType)
+    val contentType = cxr.mediatypeOrDefault(ContentTypes.XmlContentType)
     val isJSON = ContentTypes.isJSONContentType(contentType)
     if (ContentTypes.isXMLContentType(contentType) || isJSON) {
       implicit val detailsLogger = submission.getDetailsLogger(p, p2)
@@ -65,7 +64,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           isReadonly       = p2.isReadonly,
           isHandleXInclude = p2.isHandleXInclude,
           isJSON           = isJSON,
-          connectionResult = connectionResult
+          connectionResult = cxr
         )
       )
     } else {
@@ -77,7 +76,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         submitErrorEvent = new XFormsSubmitErrorEvent(
           submission,
           ErrorType.ResourceError,
-          connectionResult.some
+          cxr.some
         )
       )
     }
@@ -141,13 +140,10 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
   }
 
   def replace(
-    connectionResult : ConnectionResult,
-    p                : SubmissionParameters,
-    p2               : SecondPassParameters
-  ): Option[Eval[Unit]] = {
-
-    // Set new instance document to replace the one submitted
-
+    cxr: ConnectionResult,
+    p  : SubmissionParameters,
+    p2 : SecondPassParameters
+  ): ReplaceResult =
     submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt) match {
       case None =>
 
@@ -167,7 +163,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           submitErrorEvent = new XFormsSubmitErrorEvent(
             target           = submission,
             errorType        = ErrorType.TargetError,
-            connectionResult = connectionResult.some
+            connectionResult = cxr.some
           )
         )
       case Some(replaceInstanceNoTargetref) =>
@@ -193,7 +189,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             submitErrorEvent = new XFormsSubmitErrorEvent(
               submission,
               ErrorType.TargetError,
-              connectionResult.some
+              cxr.some
             )
           )
         }
@@ -207,7 +203,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             submitErrorEvent = new XFormsSubmitErrorEvent(
               submission,
               ErrorType.TargetError,
-              connectionResult.some
+              cxr.some
             )
           )
         }
@@ -223,7 +219,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
             submitErrorEvent = new XFormsSubmitErrorEvent(
               submission,
               ErrorType.TargetError,
-              connectionResult.some
+              cxr.some
             )
           )
         }
@@ -311,7 +307,6 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
           // - doDelete() does as well
           // Does this mean that we should check that the node is still where it should be?
         }
-        submission.sendSubmitDone(connectionResult).some
+        ReplaceResult.SendDone(cxr)
     }
-  }
 }

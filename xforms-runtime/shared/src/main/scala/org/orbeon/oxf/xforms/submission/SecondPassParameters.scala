@@ -37,7 +37,7 @@ object SecondPassParameters {
   private val Application      = "application"
   private val CacheableMethods = Set(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT): Set[HttpMethod]
 
-  def apply(dynamicSubmission: XFormsModelSubmission, p: SubmissionParameters): SecondPassParameters = {
+  def apply(p: SubmissionParameters)(dynamicSubmission: XFormsModelSubmission): SecondPassParameters = {
 
     val staticSubmission = dynamicSubmission.staticSubmission
 

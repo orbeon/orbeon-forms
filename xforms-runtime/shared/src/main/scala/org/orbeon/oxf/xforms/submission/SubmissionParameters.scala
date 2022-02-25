@@ -69,7 +69,7 @@ object SubmissionParameters {
     p.copy(refContext = createRefContext(dynamicSubmission))
 
   def apply(
-    eventNameOrNull   : String)(implicit
+    eventNameOpt      : Option[String])(implicit
     dynamicSubmission : XFormsModelSubmission
   ): SubmissionParameters = {
 
@@ -227,18 +227,19 @@ object SubmissionParameters {
         staticSubmission.avtXxfTargetOpt.isEmpty                                    && // can't optimize if there is a target
         staticSubmission.element.jElements(XFORMS_HEADER_QNAME).size == 0               // can't optimize if there are headers specified
 
+    // 2022-02-25: TODO: Check comments below.
     // TODO: use static for headers
     // In "Ajax portlet" mode, there is no deferred submission process
     // Also don't allow deferred submissions when the incoming method is a GET. This is an indirect way of
     // allowing things like using the XForms engine to generate a PDF with an HTTP GET.
     // NOTE: Method can be `null` e.g. in a portlet render request.
-    val incomingMethod = XFormsCrossPlatformSupport.externalContext.getRequest.getMethod
+    val incomingMethod: HttpMethod = XFormsCrossPlatformSupport.externalContext.getRequest.getMethod
 
     val isAllowDeferredSubmission      = incomingMethod != HttpMethod.GET
     val isPossibleDeferredSubmission   = resolvedReplace == ReplaceType.All && ! isHandlingClientGetAll && ! containingDocument.initializing
     val isDeferredSubmission           = isAllowDeferredSubmission && isPossibleDeferredSubmission
-    val isDeferredSubmissionFirstPass  = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT == eventNameOrNull
-    val isDeferredSubmissionSecondPass = isDeferredSubmission && ! isDeferredSubmissionFirstPass // XXFORMS_SUBMIT
+    val isDeferredSubmissionFirstPass  = isDeferredSubmission && eventNameOpt.contains(XFormsEvents.XFORMS_SUBMIT)
+    val isDeferredSubmissionSecondPass = isDeferredSubmission && ! isDeferredSubmissionFirstPass // must be `XXFORMS_SUBMIT`
 
     SubmissionParameters(
       refContext                     = refContext,

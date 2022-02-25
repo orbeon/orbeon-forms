@@ -15,9 +15,13 @@ package org.orbeon.oxf.xforms.submission
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
+import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.util.XPathCache.XPathContext
 import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.saxon.om
+
+import scala.util.Try
+
 
 sealed trait ReplaceType extends EnumEntry with Lowercase
 
@@ -38,3 +42,16 @@ case class RefContext(
   submissionElementContextItem : om.Item,
   xpathContext                 : XPathContext
 )
+
+case class ConnectResult(
+  submissionEffectiveId : String,
+  result                : Try[(Replacer, ConnectionResult)]
+)
+
+sealed trait ReplaceResult
+object ReplaceResult {
+  case object None                                                  extends ReplaceResult
+  case class  SendDone (cxr: ConnectionResult)                      extends ReplaceResult
+  case class  SendError(t: Throwable, connectResult: Either[ConnectResult, String]) extends ReplaceResult
+  case class  Throw    (t: Throwable)                               extends ReplaceResult
+}

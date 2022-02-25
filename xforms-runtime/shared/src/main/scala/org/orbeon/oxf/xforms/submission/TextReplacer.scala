@@ -33,11 +33,11 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
   private var responseBodyOpt: Option[String] = None
 
   def deserialize(
-    connectionResult : ConnectionResult,
-    p                : SubmissionParameters,
-    p2               : SecondPassParameters
+    cxr: ConnectionResult,
+    p  : SubmissionParameters,
+    p2 : SecondPassParameters
   ): Unit =
-    SubmissionUtils.readTextContent(connectionResult.content) match {
+    SubmissionUtils.readTextContent(cxr.content) match {
       case s @ Some(_) =>
         this.responseBodyOpt = s
       case None =>
@@ -52,7 +52,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
         // nothing in the document is replaced and submission processing concludes after dispatching
         // xforms-submit-error with appropriate context information, including an error-type of resource-error."
         val message =
-          connectionResult.mediatype match {
+          cxr.mediatype match {
             case Some(mediatype) => s"""Mediatype is neither text nor XML for replace="text": $mediatype"""
             case None            => s"""No mediatype received for replace="text""""
           }
@@ -64,18 +64,18 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
           submitErrorEvent = new XFormsSubmitErrorEvent(
             submission,
             ErrorType.ResourceError,
-            connectionResult.some
+            cxr.some
           )
         )
     }
 
   def replace(
-    connectionResult : ConnectionResult,
-    p                : SubmissionParameters,
-    p2               : SecondPassParameters
-  ): Option[Eval[Unit]] = {
-    responseBodyOpt foreach (TextReplacer.replaceText(submission, containingDocument, connectionResult, p, _))
-    submission.sendSubmitDone(connectionResult).some
+    cxr: ConnectionResult,
+    p  : SubmissionParameters,
+    p2 : SecondPassParameters
+  ): ReplaceResult = {
+    responseBodyOpt foreach (TextReplacer.replaceText(submission, containingDocument, cxr, p, _))
+    ReplaceResult.SendDone(cxr)
   }
 }
 

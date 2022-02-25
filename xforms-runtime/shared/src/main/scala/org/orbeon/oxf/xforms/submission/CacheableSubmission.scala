@@ -46,7 +46,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
   def isMatch(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Boolean =
     p.replaceType == ReplaceType.Instance && p2.isCache
 
-  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[SubmissionResult] = {
+  def connect(p: SubmissionParameters, p2: SecondPassParameters, sp: SerializationParameters): Option[ConnectResult] = {
     // Get the instance from shared instance cache
     // This can only happen is method="get" and replace="instance" and xxf:cache="true"
 
@@ -79,7 +79,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
       case Some(cachedDocumentInfo) =>
         // Here we cheat a bit: instead of calling generically `deserialize()`, we directly set the instance document
         replacer.setCachedResult(cachedDocumentInfo, instanceCaching)
-        SubmissionResult(submissionEffectiveId, Success((replacer, connectionResult))).some
+        ConnectResult(submissionEffectiveId, Success((replacer, connectionResult))).some
       case None =>
         // NOTE: technically, somebody else could put an instance in cache between now and the `Eval` execution
         if (detailsLogger.debugEnabled)
@@ -101,7 +101,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
                   // Update status
                   loadingAttempted = true
                   // Call regular submission
-                  var submissionResultOpt: Option[SubmissionResult] = None
+                  var submissionResultOpt: Option[ConnectResult] = None
                   try {
                     // Run regular submission but force:
                     // - synchronous execution
@@ -148,14 +148,14 @@ class CacheableSubmission(submission: XFormsModelSubmission)
             // Here we cheat a bit: instead of calling generically `deserialize()`, we directly set the `DocumentInfo`
             replacer.setCachedResult(newDocumentInfo, instanceCaching)
 
-            SubmissionResult(submissionEffectiveId, Success((replacer, connectionResult)))
+            ConnectResult(submissionEffectiveId, Success((replacer, connectionResult)))
           } catch {
             case throwableWrapper: CacheableSubmission.ThrowableWrapper =>
               // The ThrowableWrapper was thrown within the inner load() method above
-              SubmissionResult(submissionEffectiveId, Failure(throwableWrapper.throwable))
+              ConnectResult(submissionEffectiveId, Failure(throwableWrapper.throwable))
             case NonFatal(throwable) =>
               // Any other throwable
-              SubmissionResult(submissionEffectiveId, Failure(throwable))
+              ConnectResult(submissionEffectiveId, Failure(throwable))
           } finally
             if (p2.isAsynchronous && timingLogger.debugEnabled) {
 

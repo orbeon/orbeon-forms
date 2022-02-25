@@ -13,23 +13,19 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import cats.Eval
-import cats.syntax.option._
 import org.orbeon.oxf.util.ConnectionResult
 
-/**
-  * Handle replace="none".
-  */
+
 class NoneReplacer(submission: XFormsModelSubmission) extends Replacer {
 
   // NOP
-  def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
+  def deserialize(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
 
   // Just notify that processing is terminated by dispatching xforms-submit-done
   def replace(
-    connectionResult: ConnectionResult,
-    p: SubmissionParameters,
-    p2: SecondPassParameters
-  ): Option[Eval[Unit]] =
-    submission.sendSubmitDone(connectionResult).some
+    cxr: ConnectionResult,
+    p  : SubmissionParameters,
+    p2 : SecondPassParameters
+  ): ReplaceResult =
+    ReplaceResult.SendDone(cxr)
 }

@@ -13,11 +13,11 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import cats.Eval
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.util.ConnectionResult
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.xforms.XFormsCrossPlatformSupport
+
 
 object RedirectReplacer {
 
@@ -31,11 +31,11 @@ class RedirectReplacer(containingDocument: XFormsContainingDocument)
   extends Replacer {
 
   // NOP
-  def deserialize(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
+  def deserialize(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Unit = ()
 
-  def replace(connectionResult: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): Option[Eval[Unit]] = {
+  def replace(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): ReplaceResult = {
     containingDocument.setGotSubmissionRedirect()
-    RedirectReplacer.updateResponse(connectionResult, XFormsCrossPlatformSupport.externalContext.getResponse)
-    None
+    RedirectReplacer.updateResponse(cxr, XFormsCrossPlatformSupport.externalContext.getResponse)
+    ReplaceResult.None
   }
 }

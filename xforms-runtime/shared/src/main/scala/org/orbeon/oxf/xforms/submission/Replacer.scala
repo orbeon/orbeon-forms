@@ -13,21 +13,21 @@
   */
 package org.orbeon.oxf.xforms.submission
 
-import cats.Eval
 import org.orbeon.oxf.util.ConnectionResult
+
 
 trait Replacer {
 
   def deserialize(
-    connectionResult : ConnectionResult,
-    p                : SubmissionParameters,
-    p2               : SecondPassParameters)
+    cxr: ConnectionResult,
+    p  : SubmissionParameters,
+    p2 : SecondPassParameters)
   : Unit
 
   // NOTE: This is allowed to throw exceptions, including `XFormsSubmissionException`.
   def replace(
-    connectionResult : ConnectionResult,
-    p                : SubmissionParameters,
-    p2               : SecondPassParameters
-  ): Option[Eval[Unit]]
+    cxr: ConnectionResult,
+    p  : SubmissionParameters,
+    p2 : SecondPassParameters
+  ): ReplaceResult
 }

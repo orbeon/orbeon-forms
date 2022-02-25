@@ -123,6 +123,11 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     // What we'd like to say is "get the value from a section component coming from library `acme`'s
     // section `my-address". But since control names are unique in the library, we don't need to
     // specify the section name. So we only need to specify the library name.
+    //
+    // However we could still find multiple *instances* of a given control:
+    //
+    // - in repeats
+    // - and/or when multiple instances of a same section template are present in the form
 
     val libraryUri = s"${Controls.SectionTemplateUriPrefix}$libraryName/library"
 

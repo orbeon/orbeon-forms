@@ -45,7 +45,9 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
   def this(target: XFormsEventTarget, errorType: ErrorType, connectionResult: Option[ConnectionResult]) = {
     this(
       target     = target,
-      properties = Map("error-type" -> Some(errorType.entryName))
+      properties = Map(
+        "error-type" -> Some(errorType.entryName)
+      )
     )
     _errorType = errorType
     _connectionResult = connectionResult

@@ -413,9 +413,15 @@
     <!-- Migrate email definition to support multiple emails -->
     <!--
     <xsl:template
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
         match="xf:instance[@id = 'fr-form-metadata']/metadata/email[
+            frf:isLegacy2021Metadata(.)
         ]"
-        mode="within-model"/>
-    -->
+        mode="within-model">
+        <xsl:copy>
+            <xsl:value-of select=""/>
+        </xsl:copy>
+    </xsl:template>
+     -->
 
 </xsl:stylesheet>

@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr
 
 import cats.syntax.option._
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.PathUtils._
@@ -23,9 +22,12 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupport}
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.saxon.function.ProcessTemplateSupport
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
 import org.orbeon.xforms.XFormsNames
+
+import scala.collection.compat.immutable.LazyList
 
 
 trait FormRunnerEmail {
@@ -133,7 +135,15 @@ trait FormRunnerEmail {
 
     sealed trait Param
     case class ControlValueParam(name: String, controlName: String) extends Param
-    case class ExpressionParam  (name: String, expression: String) extends Param
+    case class ExpressionParam  (name: String, expression : String) extends Param
+
+    // `name` is common to all params
+    implicit class ParamOps(private val p: Param) {
+      def name: String = p match {
+        case ControlValueParam(name, _) => name
+        case ExpressionParam  (name, _) => name
+      }
+    }
 
     object Legacy2021 {
       case class Metadata(subject: Part, body: Part)
@@ -144,7 +154,56 @@ trait FormRunnerEmail {
 
   object Conversion {
 
-    def convertLegacy2021Metadata(metadata: Metadata.Legacy2021.Metadata): Metadata.Metadata = {
+    def convertLegacy2021Metadata(metadata: Metadata.Legacy2021.Metadata): Metadata.Metadata =
+      convertFormat(renameParams(metadata, paramsToRename(metadata)))
+
+    private case class ParamToRename(originalName: String, newSubjectName: String, newBodyName: String)
+    private def paramsToRename(metadata: Metadata.Legacy2021.Metadata): List[ParamToRename] = {
+      var allParamNames: List[String] = (metadata.subject.params ++ metadata.body.params).map(_.name)
+      val conflictingNames = allParamNames.filter(name => allParamNames.count(_ == name) > 1).distinct
+      conflictingNames.map { originalName =>
+        def newName() =
+          LazyList.from(1).map(originalName + "-" + _).collectFirst {
+            case candidateName if !allParamNames.contains(candidateName) => candidateName
+          }.get.kestrel(newName => allParamNames = newName :: allParamNames)
+        ParamToRename(originalName, newName(), newName())
+      }
+    }
+
+    private def renameParams(
+      metadata       : Metadata.Legacy2021.Metadata,
+      paramsToRename : List[ParamToRename]
+    ): Metadata.Legacy2021.Metadata =
+      paramsToRename.foldLeft(metadata) { (metadata, paramToRename) =>
+        def renamePart(
+          part         : Metadata.Legacy2021.Part,
+          originalName : String,
+          newName      : String
+        ): Metadata.Legacy2021.Part =
+          Metadata.Legacy2021.Part(
+            templates = part.templates.map { template =>
+              template.copy(text = {
+                val replacement = List(originalName -> ("{$" + newName + "}"))
+                ProcessTemplateSupport.processTemplateWithNames(template.text, replacement)
+              })
+            },
+            params    = part.params.map { param =>
+              if (param.name == originalName)
+                param match {
+                  case p @ Metadata.ControlValueParam(_, _) => p.copy(name = newName)
+                  case p @ Metadata.ExpressionParam  (_, _) => p.copy(name = newName)
+                }
+              else
+                param
+            }
+          )
+        Metadata.Legacy2021.Metadata(
+          subject = renamePart(metadata.subject, paramToRename.originalName, paramToRename.newSubjectName),
+          body    = renamePart(metadata.body   , paramToRename.originalName, paramToRename.newBodyName),
+        )
+      }
+
+    private def convertFormat(metadata: Metadata.Legacy2021.Metadata): Metadata.Metadata = {
       val langs = metadata.subject.templates.map(_.lang)
       Metadata.Metadata(
         templates = langs.map { lang =>
@@ -164,7 +223,6 @@ trait FormRunnerEmail {
         params = metadata.subject.params ++ metadata.body.params
       )
     }
-
   }
 
   object Parsing {

@@ -113,21 +113,21 @@ class EmailTest
       <email xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
         <templates>
           <template name="default" xml:lang="en">
-            <subject>My subject {{$my-param}}</subject>
-            <body mediatype="text/html">My body: {{$my-param}}</body>
+            <subject>My subject {{$my-param-1}}</subject>
+            <body mediatype="text/html">My body: {{$my-param-2}}</body>
           </template>
           <template name="default" xml:lang="fr">
-            <subject>Mon sujet {{$my-param}}</subject>
-            <body mediatype="text/html">Mon message: {{$my-param}}</body>
+            <subject>Mon sujet {{$my-param-1}}</subject>
+            <body mediatype="text/html">Mon message: {{$my-param-2}}</body>
           </template>
         </templates>
         <parameters>
           <fr:param type="ExpressionParam">
-              <fr:name>my-param</fr:name>
+              <fr:name>my-param-1</fr:name>
               <fr:expr>42</fr:expr>
           </fr:param>
           <fr:param type="ExpressionParam">
-              <fr:name>my-param</fr:name>
+              <fr:name>my-param-2</fr:name>
               <fr:expr>43</fr:expr>
           </fr:param>
         </parameters>
@@ -135,23 +135,23 @@ class EmailTest
     )
 
     val MetadataLegacy2021 = NodeConversions.elemToNodeInfo(
-        <email xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-          <subject>
-              <template xml:lang="en">My subject {{$my-param}}</template>
-              <template xml:lang="fr">Mon sujet {{$my-param}}</template>
-              <fr:param type="ExpressionParam">
-                  <fr:name>my-param</fr:name>
-                  <fr:expr>42</fr:expr>
-              </fr:param>
-          </subject>
-          <body>
-              <template xml:lang="en" mediatype="text/html">My body: {{$my-param}}</template>
-              <template xml:lang="fr" mediatype="text/html">Mon message: {{$my-param}}</template>
-              <fr:param type="ExpressionParam">
-                  <fr:name>my-param</fr:name>
-                  <fr:expr>43</fr:expr>
-              </fr:param>
-          </body>
+      <email xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+        <subject>
+            <template xml:lang="en">My subject {{$my-param}}</template>
+            <template xml:lang="fr">Mon sujet {{$my-param}}</template>
+            <fr:param type="ExpressionParam">
+                <fr:name>my-param</fr:name>
+                <fr:expr>42</fr:expr>
+            </fr:param>
+        </subject>
+        <body>
+            <template xml:lang="en" mediatype="text/html">My body: {{$my-param}}</template>
+            <template xml:lang="fr" mediatype="text/html">Mon message: {{$my-param}}</template>
+            <fr:param type="ExpressionParam">
+                <fr:name>my-param</fr:name>
+                <fr:expr>43</fr:expr>
+            </fr:param>
+        </body>
       </email>
     )
 

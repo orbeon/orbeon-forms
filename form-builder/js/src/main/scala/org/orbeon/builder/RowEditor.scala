@@ -94,19 +94,28 @@ object RowEditor {
 
       // Position row editor
       pointerRowTopBottomIndexOpt.foreach(pointerRowTopBottom => {
-        rowEditorContainer.show()
-        rowEditorContainer.children().hide()
 
         val rowTop    = pointerRowTopBottom._1.top
         val rowBottom = pointerRowTopBottom._1.bottom
         val rowHeight = rowBottom - rowTop
         val rowIndex  = pointerRowTopBottom._2
 
+        rowEditorContainer.show()
+      Offset.offset(
+          el     = rowEditorContainer,
+          offset = Offset(
+            left = containerLeft,
+            top  = rowTop
+          )
+        )
+
+        rowEditorContainer.children().hide()
+
         def positionElWithClass(selector: String, topOffset: JQuery => Double): Unit = {
           val elem = rowEditorContainer.children(selector)
           elem.show()
           Offset.offset(
-            el = elem,
+            el     = elem,
             offset = Offset(
               left = containerLeft,
               top  = topOffset(elem) - Position.scrollTop()

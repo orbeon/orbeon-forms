@@ -13,11 +13,14 @@
  */
 package org.orbeon.oxf.fr
 
+import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
@@ -110,7 +113,7 @@ class EmailTest
   describe("Email metadata parsing") {
 
     val MetadataCurrent = NodeConversions.elemToNodeInfo(
-      <email xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+      <email>
         <templates>
           <template name="default" xml:lang="en">
             <subject>My subject {{$my-param-1}}</subject>
@@ -122,13 +125,13 @@ class EmailTest
           </template>
         </templates>
         <parameters>
-          <fr:param type="ExpressionParam">
+          <fr:param type="ExpressionParam" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
               <fr:name>my-param-1</fr:name>
               <fr:expr>42</fr:expr>
           </fr:param>
-          <fr:param type="ExpressionParam">
+          <fr:param type="ControlValueParam" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
               <fr:name>my-param-2</fr:name>
-              <fr:expr>43</fr:expr>
+              <fr:controlName>43</fr:controlName>
           </fr:param>
         </parameters>
       </email>
@@ -147,9 +150,9 @@ class EmailTest
         <body>
             <template xml:lang="en" mediatype="text/html">My body: {{$my-param}}</template>
             <template xml:lang="fr" mediatype="text/html">Mon message: {{$my-param}}</template>
-            <fr:param type="ExpressionParam">
+            <fr:param type="ControlValueParam">
                 <fr:name>my-param</fr:name>
-                <fr:expr>43</fr:expr>
+                <fr:controlName>43</fr:controlName>
             </fr:param>
         </body>
       </email>
@@ -157,13 +160,30 @@ class EmailTest
 
     describe("parse both old and new format") {
 
-      assert(! FormRunnerEmail.isLegacy2021Metadata(MetadataCurrent   ))
-      assert(  FormRunnerEmail.isLegacy2021Metadata(MetadataLegacy2021))
+      assert(! FormRunnerEmail.isLegacy2021EmailMetadata(MetadataCurrent   ))
+      assert(  FormRunnerEmail.isLegacy2021EmailMetadata(MetadataLegacy2021))
 
+      println(FormRunnerEmail.parseEmailMetadata(MetadataLegacy2021))
       assert(
-        FormRunnerEmail.parseMetadata(MetadataCurrent) ===
-        FormRunnerEmail.parseMetadata(MetadataLegacy2021)
+        FormRunnerEmail.parseEmailMetadata(MetadataCurrent) ===
+        FormRunnerEmail.parseEmailMetadata(MetadataLegacy2021)
       )
     }
+
+    describe("serialize metadata") {
+
+      def prettyPrint(nodeInfo: NodeInfo): String =
+        TransformerUtils.tinyTreeToOrbeonDom(nodeInfo).getRootElement.serializeToString(XMLWriter.PrettyFormat)
+
+      val originalMetadata            = MetadataCurrent.pipe(prettyPrint)
+      val parsedAndSerializedMetadata = MetadataCurrent
+        .pipe(FormRunnerEmail.parseEmailMetadata)
+        .pipe(FormRunnerEmail.serializeEmailMetadata)
+        .pipe(NodeConversions.elemToNodeInfo)
+        .pipe(prettyPrint)
+
+      assert(parsedAndSerializedMetadata === originalMetadata)
+    }
+
   }
 }

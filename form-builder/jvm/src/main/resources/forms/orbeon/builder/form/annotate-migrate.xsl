@@ -419,7 +419,7 @@
         ]"
         mode="within-model">
         <xsl:copy>
-            <xsl:value-of select=""/>
+           XXX
         </xsl:copy>
     </xsl:template>
      -->

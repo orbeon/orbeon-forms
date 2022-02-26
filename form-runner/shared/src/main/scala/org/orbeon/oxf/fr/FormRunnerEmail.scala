@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Orbeon, Inc.
+ * Copyright (C) 2022 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import cats.syntax.option._
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{ContentTypes, CoreCrossPlatformSupport}
@@ -28,7 +28,7 @@ import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
 import org.orbeon.xforms.XFormsNames
 
 import scala.collection.compat.immutable.LazyList
-
+import scala.xml.Elem
 
 trait FormRunnerEmail {
 
@@ -116,16 +116,19 @@ trait FormRunnerEmail {
     }
   }
 
-  def isLegacy2021Metadata(emailMetadata: NodeInfo): Boolean =
+  def isLegacy2021EmailMetadata(emailMetadata: NodeInfo): Boolean =
     List("subject", "body").forall(emailMetadata.child(_).nonEmpty)
 
-  def parseMetadata(emailMetadata: NodeInfo): Metadata.Metadata =
-    if (isLegacy2021Metadata(emailMetadata)) {
+  def parseEmailMetadata(emailMetadata: NodeInfo): Metadata.Metadata =
+    if (isLegacy2021EmailMetadata(emailMetadata)) {
       val legacy2021Metadata = Parsing.parseLegacy2021Metadata(emailMetadata)
       Conversion.convertLegacy2021Metadata(legacy2021Metadata)
     } else {
       Parsing.parseCurrentMetadata(emailMetadata)
     }
+
+  def serializeEmailMetadata(metadata: Metadata.Metadata): Elem =
+    Serializing.serializeMetadata(metadata)
 
   object Metadata {
 
@@ -273,6 +276,43 @@ trait FormRunnerEmail {
       }
     }
 
+  }
+
+  object Serializing {
+
+    def serializeMetadata(metadata: Metadata.Metadata): Elem =
+      <email>{
+        List(
+          serializeTemplates(metadata.templates),
+          serializeParams   (metadata.params)
+        )
+      }</email>
+
+    def serializeParam(param: Metadata.Param): Elem =
+      param match {
+        case Metadata.ControlValueParam(_, controlName) =>
+          <fr:param type="ControlValueParam" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+              <fr:name       >{ param.name  }</fr:name>
+              <fr:controlName>{ controlName }</fr:controlName>
+          </fr:param>
+        case Metadata.ExpressionParam(_, expression) =>
+          <fr:param type="ExpressionParam" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+              <fr:name>{ param.name  }</fr:name>
+              <fr:expr>{ expression  }</fr:expr>
+          </fr:param>
+      }
+
+    def serializeParams(params: List[Metadata.Param]): Elem =
+      <parameters>{ params.map(serializeParam) }</parameters>
+
+    def serializeTemplate(template: Metadata.Template): Elem =
+      <template name={template.name} xml:lang={template.lang.orNull}>
+        <subject mediatype={template.subject.isHTML.option("text/html").orNull}>{ template.subject.text }</subject>
+        <body    mediatype={template.body   .isHTML.option("text/html").orNull}>{ template.body.text    }</body>
+      </template>
+
+    def serializeTemplates(templates: List[Metadata.Template]): Elem =
+      <templates>{ templates.map(serializeTemplate) }</templates>
   }
 }
 

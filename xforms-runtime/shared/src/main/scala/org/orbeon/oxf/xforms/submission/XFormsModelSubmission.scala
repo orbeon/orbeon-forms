@@ -505,14 +505,9 @@ class XFormsModelSubmission(
   }
 
   def findReplaceInstanceNoTargetref(refInstance: Option[XFormsInstance]): Option[XFormsInstance] =
-    if (staticSubmission.xxfReplaceInstanceIdOrNull != null)
-      container.findInstance(staticSubmission.xxfReplaceInstanceIdOrNull)
-    else if (staticSubmission.replaceInstanceIdOrNull != null)
-      model.findInstance(staticSubmission.replaceInstanceIdOrNull)
-    else if (refInstance.isEmpty)
-      model.defaultInstanceOpt
-    else
-      refInstance
+    staticSubmission.xxfReplaceInstanceIdOpt.map(container.findInstance)
+      .orElse(staticSubmission.replaceInstanceIdOpt.map(model.findInstance))
+      .getOrElse(refInstance.orElse(model.defaultInstanceOpt))
 
   def evaluateTargetRef(
     xpathContext                 : XPathCache.XPathContext,
@@ -530,7 +525,7 @@ class XFormsModelSubmission(
         // evaluation context for this attribute is the in-scope evaluation context for the submission element, except
         // the context node is modified to be the document element of the instance identified by the instance attribute
         // if it is specified."
-        val hasInstanceAttribute = staticSubmission.xxfReplaceInstanceIdOrNull != null || staticSubmission.replaceInstanceIdOrNull != null
+        val hasInstanceAttribute = staticSubmission.xxfReplaceInstanceIdOpt.isDefined || staticSubmission.replaceInstanceIdOpt.isDefined
         val targetRefContextItem =
           if (hasInstanceAttribute)
             defaultReplaceInstance.rootElement

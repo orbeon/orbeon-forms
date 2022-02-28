@@ -77,8 +77,8 @@ class Submission(
   val avtStandalone              = element.attributeValueOpt("standalone")
 
   val avtReplaceOpt              = element.attributeValueOpt("replace")
-  val replaceInstanceIdOrNull    = element.attributeValue("instance")
-  val xxfReplaceInstanceIdOrNull = element.attributeValue(XXFORMS_INSTANCE_QNAME)
+  val replaceInstanceIdOpt       = element.attributeValueOpt("instance")
+  val xxfReplaceInstanceIdOpt    = element.attributeValueOpt(XXFORMS_INSTANCE_QNAME)
 
   val avtSeparatorOpt            = element.attributeValueOpt("separator")
 

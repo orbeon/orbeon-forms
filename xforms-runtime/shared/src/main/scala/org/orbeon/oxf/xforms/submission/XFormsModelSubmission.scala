@@ -52,16 +52,16 @@ object XFormsModelSubmission {
    */
   def runDeferredSubmission(eval: Eval[ConnectResult], response: ExternalContext.Response): Unit =
     eval.value.result match {
-      case Success((replacer, connectionResult)) =>
+      case Success((replacer, cxr)) =>
         try {
           replacer match {
-            case _: AllReplacer      => AllReplacer.forwardResultToResponse(connectionResult, response)
-            case _: RedirectReplacer => RedirectReplacer.updateResponse(connectionResult, response)
+            case _: AllReplacer      => AllReplacer.forwardResultToResponse(cxr, response)
+            case _: RedirectReplacer => RedirectReplacer.updateResponse(cxr, response)
             case _: NoneReplacer     => ()
             case r                   => throw new IllegalArgumentException(r.getClass.getName)
           }
         } finally {
-          connectionResult.close()
+          cxr.close()
         }
       case Failure(throwable) =>
         // Propagate throwable, which might have come from a separate thread
@@ -176,9 +176,9 @@ class XFormsModelSubmission(
             "checking pending uploads",
             null,
             new XFormsSubmitErrorEvent(
-              thisSubmission,
-              ErrorType.XXFormsPendingUploads,
-              None
+              target    = thisSubmission,
+              errorType = ErrorType.XXFormsPendingUploads,
+              cxrOpt    = None
             )
           )
 
@@ -345,20 +345,20 @@ class XFormsModelSubmission(
   }
 
   private def processReplaceResultAndCloseConnection(
-    replaceResult       : ReplaceResult,
-    connectionResultOpt : Option[ConnectionResult]
+    replaceResult : ReplaceResult,
+    cxrOpt        : Option[ConnectionResult]
   ): Unit =
     try {
       replaceResult match {
-        case ReplaceResult.None                               => ()
-        case ReplaceResult.SendDone (cxr)                     => sendSubmitDone(cxr)
-        case ReplaceResult.SendError(t, Left(connectResult))  => sendSubmitError(t, connectResult)
-        case ReplaceResult.SendError(t, Right(submissionUri)) => sendSubmitError(t, submissionUri)
-        case ReplaceResult.Throw    (t)                       => throw t
+        case ReplaceResult.None                                 => ()
+        case ReplaceResult.SendDone (cxr)                       => sendSubmitDone(cxr)
+        case ReplaceResult.SendError(t, Left(cxrOpt))           => sendSubmitError(t, cxrOpt)
+        case ReplaceResult.SendError(t, Right(submissionUri))   => sendSubmitError(t, submissionUri)
+        case ReplaceResult.Throw    (t)                         => throw t
       }
     } finally {
       // https://github.com/orbeon/orbeon-forms/issues/5224
-      connectionResultOpt foreach (_.close())
+      cxrOpt foreach (_.close())
     }
 
   private[submission]
@@ -399,34 +399,32 @@ class XFormsModelSubmission(
               p
 
         connectResult.result match {
-          case Success((replacer, connectionResult)) =>
-            val r = replacer.replace(connectionResult, updatedP, p2) // the *only* call to `replace()`
-            r -> connectionResult.some
-          case Failure(throwable) =>
-            ReplaceResult.SendError(throwable, Left(connectResult)) -> None
+          case Success((replacer, cxr)) => (replacer.replace(cxr, updatedP, p2),             cxr.some)
+          case Failure(throwable)       => (ReplaceResult.SendError(throwable, Left(None)),  None)
         }
       }(indentedLogger)
     } catch {
       case NonFatal(throwable) =>
-        ReplaceResult.SendError(throwable, Left(connectResult)) -> None
+        val cxrOpt = connectResult.result.toOption.map(_._2)
+        (ReplaceResult.SendError(throwable, Left(cxrOpt)), cxrOpt)
     }
   }
 
-  def sendSubmitDone(connectionResult: ConnectionResult): Unit = {
+  def sendSubmitDone(cxr: ConnectionResult): Unit = {
     // After a submission, the context might have changed
     model.resetAndEvaluateVariables()
-    Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, connectionResult))
+    Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, cxr))
   }
 
-  def getReplacer(connectionResult: ConnectionResult, p: SubmissionParameters): Replacer = {
+  def getReplacer(cxr: ConnectionResult, p: SubmissionParameters): Replacer = {
     // NOTE: This can be called from other threads so it must NOT modify the XFCD or submission
     // Handle response
-    if (connectionResult.dontHandleResponse) {
+    if (cxr.dontHandleResponse) {
       // Always return a replacer even if it does nothing, this way we don't have to deal with null
       new NoneReplacer(thisSubmission)
-    } else if (StatusCode.isSuccessCode(connectionResult.statusCode)) {
+    } else if (StatusCode.isSuccessCode(cxr.statusCode)) {
       // Successful response
-      if (connectionResult.hasContent) {
+      if (cxr.hasContent) {
         // There is a body
         // Get replacer
         if (p.replaceType == ReplaceType.All)
@@ -446,9 +444,9 @@ class XFormsModelSubmission(
             "processing instance replacement",
             null,
             new XFormsSubmitErrorEvent(
-              thisSubmission,
-              ErrorType.XXFormsInternalError,
-              connectionResult.some
+              target    = thisSubmission,
+              errorType = ErrorType.XXFormsInternalError,
+              cxrOpt    = cxr.some
             )
           )
       } else {
@@ -468,7 +466,7 @@ class XFormsModelSubmission(
         // xforms-submit-done"
         new NoneReplacer(thisSubmission)
       }
-    } else if (StatusCode.isRedirectCode(connectionResult.statusCode)) {
+    } else if (StatusCode.isRedirectCode(cxr.statusCode)) {
       // Got a redirect
       // Currently we don't know how to handle a redirect for replace != "all"
       if (p.replaceType != ReplaceType.All)
@@ -478,27 +476,27 @@ class XFormsModelSubmission(
           "processing submission response",
           null,
           new XFormsSubmitErrorEvent(
-            thisSubmission,
-            ErrorType.ResourceError,
-            connectionResult.some
+            target    = thisSubmission,
+            errorType = ErrorType.ResourceError,
+            cxrOpt    = cxr.some
           )
         )
       new RedirectReplacer(containingDocument)
     } else {
       // Error code received
-      if (p.replaceType == ReplaceType.All && connectionResult.hasContent) {
+      if (p.replaceType == ReplaceType.All && cxr.hasContent) {
         // For `replace="all"`, if we received content, which might be an error page, we still want to serve it
         new AllReplacer(thisSubmission, containingDocument)
       } else
         throw new XFormsSubmissionException(
           thisSubmission,
-          "xf:submission for submission id: " + getId + ", error code received when submitting instance: " + connectionResult.statusCode,
+          "xf:submission for submission id: " + getId + ", error code received when submitting instance: " + cxr.statusCode,
           "processing submission response",
           null,
           new XFormsSubmitErrorEvent(
-            thisSubmission,
-            ErrorType.ResourceError,
-            connectionResult.some
+            target    = thisSubmission,
+            errorType = ErrorType.ResourceError,
+            cxrOpt    = cxr.some
           )
         )
     }
@@ -513,7 +511,7 @@ class XFormsModelSubmission(
     xpathContext                 : XPathCache.XPathContext,
     defaultReplaceInstance       : XFormsInstance,
     submissionElementContextItem : om.Item
-  ): om.NodeInfo = {
+  ): Option[om.NodeInfo] = {
     val destinationObject =
       if (staticSubmission.targetrefOpt.isEmpty) {
         // There is no explicit @targetref, so the target is implicitly the root element of either the instance
@@ -543,8 +541,8 @@ class XFormsModelSubmission(
       }
     // TODO: Also detect readonly node/ancestor situation
     destinationObject match {
-      case node: om.NodeInfo if node.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE => node
-      case _ => null
+      case node: om.NodeInfo if node.getNodeKind == org.w3c.dom.Node.ELEMENT_NODE => node.some
+      case _ => None
     }
   }
 

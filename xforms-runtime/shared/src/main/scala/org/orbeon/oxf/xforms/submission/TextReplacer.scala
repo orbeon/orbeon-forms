@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.submission
 
-import cats.Eval
 import cats.syntax.option._
 import org.orbeon.oxf.util.{ConnectionResult, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -62,9 +61,9 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
           message          = message,
           description      = "reading response body",
           submitErrorEvent = new XFormsSubmitErrorEvent(
-            submission,
-            ErrorType.ResourceError,
-            cxr.some
+            target    = submission,
+            errorType = ErrorType.ResourceError,
+            cxrOpt    = cxr.some
           )
         )
     }
@@ -73,10 +72,9 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
     cxr: ConnectionResult,
     p  : SubmissionParameters,
     p2 : SecondPassParameters
-  ): ReplaceResult = {
-    responseBodyOpt foreach (TextReplacer.replaceText(submission, containingDocument, cxr, p, _))
-    ReplaceResult.SendDone(cxr)
-  }
+  ): ReplaceResult =
+    responseBodyOpt flatMap (TextReplacer.replaceText(submission, containingDocument, cxr, p, _)) getOrElse
+      ReplaceResult.SendDone(cxr)
 }
 
 
@@ -88,71 +86,87 @@ object TextReplacer {
     connectionResult   : ConnectionResult,
     p                  : SubmissionParameters,
     value              : String
-  ): Unit = {
+  ): Option[ReplaceResult.SendError] = {
+
     // XForms 1.1: "If the processing of the `targetref` attribute fails, then submission processing ends after
     // dispatching the event `xforms-submit-error` with an `error-type` of `target-error`."
-    def throwSubmissionException(message: String) =
-      throw new XFormsSubmissionException(
+    def newSubmissionException(message: String) =
+      new XFormsSubmissionException(
         submission       = submission,
         message          = message,
         description      = "processing `targetref` attribute",
         submitErrorEvent = new XFormsSubmitErrorEvent(
-          target           = submission,
-          errorType        = ErrorType.TargetError,
-          connectionResult = connectionResult.some
+          target    = submission,
+          errorType = ErrorType.TargetError,
+          cxrOpt    = connectionResult.some
         )
       )
 
-    // Find target location
-    val destinationNodeInfo =
-      submission.staticSubmission.targetrefOpt match {
-        case Some(targetRef) =>
-          // Evaluate destination node
-          XPathCache.evaluateSingleWithContext(
-            xpathContext = p.refContext.xpathContext,
-            contextItem  = p.refContext.refNodeInfo,
-            xpathString  = targetRef,
-            reporter     = containingDocument.getRequestStats.addXPathStat
-          ) match {
-            case n: om.NodeInfo => n
-            case _              => throwSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`.""")
+    def handleSetValue(destinationNodeInfo: om.NodeInfo) = {
+      // NOTE: Here we decided to use the actions logger, by compatibility with `xf:setvalue`. Anything we would
+      // like to log in "submission" mode?
+      def handleSetValueSuccess(oldValue: String): Unit =
+        DataModel.logAndNotifyValueChange(
+          source             = "submission",
+          nodeInfo           = destinationNodeInfo,
+          oldValue           = oldValue,
+          newValue           = value,
+          isCalculate        = false,
+          collector          = Dispatch.dispatchEvent)(
+          containingDocument = containingDocument,
+          logger             = containingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
+        )
+
+      def handleSetValueError(reason: Reason) =
+        throw newSubmissionException(
+          reason match {
+            case DisallowedNodeReason =>
+              s"""`targetref` attribute doesn't point to an element without children or to an attribute for `replace="${p.replaceType}"`."""
+            case ReadonlyNodeReason   =>
+              s"""`targetref` attribute points to a readonly node for `replace="${p.replaceType}"`."""
           }
-        case None =>
-          // Use default destination
-          submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt).getOrElse(throw new IllegalArgumentException).rootElement
+        )
+
+      try {
+        DataModel.setValueIfChanged(
+          nodeInfo  = destinationNodeInfo,
+          newValue  = value,
+          onSuccess = handleSetValueSuccess,
+          onError   = handleSetValueError
+        )
+        None
+      } catch {
+        case t: XFormsSubmissionException =>
+          ReplaceResult.SendError(
+            t,
+            Left(connectionResult.some)
+          ).some
       }
+    }
 
-    def handleSetValueSuccess(oldValue: String): Unit =
-      DataModel.logAndNotifyValueChange(
-        source             = "submission",
-        nodeInfo           = destinationNodeInfo,
-        oldValue           = oldValue,
-        newValue           = value,
-        isCalculate        = false,
-        collector          = Dispatch.dispatchEvent)(
-        containingDocument = containingDocument,
-        logger             = containingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
-      )
-
-    def handleSetValueError(reason: Reason) =
-      throwSubmissionException(
-        reason match {
-          case DisallowedNodeReason =>
-            s"""`targetref` attribute doesn't point to an element without children or to an attribute for `replace="${p.replaceType}"`."""
-          case ReadonlyNodeReason   =>
-            s"""`targetref` attribute points to a readonly node for `replace="${p.replaceType}"`."""
+    // Find target location
+    submission.staticSubmission.targetrefOpt match {
+      case Some(targetRef) =>
+        XPathCache.evaluateSingleWithContext(
+          xpathContext = p.refContext.xpathContext,
+          contextItem  = p.refContext.refNodeInfo,
+          xpathString  = targetRef,
+          reporter     = containingDocument.getRequestStats.addXPathStat
+        ) match {
+          case destinationNodeInfo: om.NodeInfo =>
+            handleSetValue(destinationNodeInfo)
+          case _ =>
+            ReplaceResult.SendError(
+              newSubmissionException(s"""`targetref` attribute doesn't point to a node for `replace="${p.replaceType}"`."""),
+              Left(connectionResult.some)
+            ).some
         }
-      )
-
-    // Set value into the instance
-    // NOTE: Here we decided to use the actions logger, by compatibility with xf:setvalue. Anything we would like
-    // to log in "submission" mode?
-    DataModel.setValueIfChanged(
-      nodeInfo  = destinationNodeInfo,
-      newValue  = value,
-      onSuccess = handleSetValueSuccess,
-      onError   = handleSetValueError
-    )
+      case None =>
+        // Use default destination
+        handleSetValue(
+          submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt)
+            .getOrElse(throw new IllegalArgumentException).rootElement
+        )
+    }
   }
-
 }

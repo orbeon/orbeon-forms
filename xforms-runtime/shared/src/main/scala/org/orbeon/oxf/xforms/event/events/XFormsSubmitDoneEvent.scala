@@ -22,9 +22,9 @@ class XFormsSubmitDoneEvent(target: XFormsEventTarget, properties: PropertyGette
     extends XFormsEvent(XFORMS_SUBMIT_DONE, target, properties, bubbles = true, cancelable = false)
     with SubmitResponseEvent {
 
-  def this(target: XFormsEventTarget, connectionResult: ConnectionResult) = {
+  def this(target: XFormsEventTarget, cxr: ConnectionResult) = {
     this(target, EmptyGetter)
-    _connectionResult = Option(connectionResult)
+    _connectionResult = Option(cxr)
   }
 
   private var _connectionResult: Option[ConnectionResult] = None

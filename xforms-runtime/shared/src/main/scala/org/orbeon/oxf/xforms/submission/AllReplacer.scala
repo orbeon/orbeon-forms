@@ -67,8 +67,8 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
   def replace(cxr: ConnectionResult, p: SubmissionParameters, p2: SecondPassParameters): ReplaceResult = {
 
     // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
-    // Remember that we got a submission producing output
 
+    // Remember that we got a submission producing output
     containingDocument.setGotSubmissionReplaceAll()
 
     val replaceAllResponse =
@@ -84,18 +84,21 @@ class AllReplacer(submission: XFormsModelSubmission, containingDocument: XFormsC
       if (StatusCode.isSuccessCode(cxr.statusCode))
         ReplaceResult.SendDone(cxr)
       else
-        // Here we dispatch xforms-submit-error upon getting a non-success error code, even though the response has
+        // Here we dispatch `xforms-submit-error` upon getting a non-success error code, even though the response has
         // already been written out. This gives the form author a chance to do something in cases the response is
-        // buffered, for example do a sendError().
-        throw new XFormsSubmissionException(
-          submission       = submission,
-          message          = s"xf:submission for submission id `${submission.getId}`, error code received when submitting instance: `${cxr.statusCode}`",
-          description      = "processing submission response",
-          submitErrorEvent = new XFormsSubmitErrorEvent(
-            target           = submission,
-            errorType        = ErrorType.ResourceError,
-            connectionResult = cxr.some
-          )
+        // buffered, for example do a `sendError()`.
+        ReplaceResult.SendError(
+          new XFormsSubmissionException(
+            submission       = submission,
+            message          = s"xf:submission for submission id `${submission.getId}`, error code received when submitting instance: `${cxr.statusCode}`",
+            description      = "processing submission response",
+            submitErrorEvent = new XFormsSubmitErrorEvent(
+              target    = submission,
+              errorType = ErrorType.ResourceError,
+              cxrOpt    = cxr.some
+            )
+          ),
+          Left(cxr.some)
         )
     } else {
       // Two reasons:

@@ -50,8 +50,8 @@ case class ConnectResult(
 
 sealed trait ReplaceResult
 object ReplaceResult {
-  case object None                                                  extends ReplaceResult
-  case class  SendDone (cxr: ConnectionResult)                      extends ReplaceResult
-  case class  SendError(t: Throwable, connectResult: Either[ConnectResult, String]) extends ReplaceResult
-  case class  Throw    (t: Throwable)                               extends ReplaceResult
+  case object None                                                                   extends ReplaceResult
+  case class  SendDone (cxr: ConnectionResult)                                       extends ReplaceResult
+  case class  SendError(t: Throwable, cxr: Either[Option[ConnectionResult], String]) extends ReplaceResult
+  case class  Throw    (t: Throwable)                                                extends ReplaceResult
 }

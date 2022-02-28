@@ -469,10 +469,6 @@ trait ContainerResolver {
         Some(sourceEffectiveId)
     }
 
-  // For Java callers
-  def getInstanceForNode(nodeInfo: om.NodeInfo): XFormsInstance =
-    instanceForNodeOpt(nodeInfo).orNull
-
   // Recursively find the instance containing the specified node
   def instanceForNodeOpt(nodeInfo: om.NodeInfo): Option[XFormsInstance] =
     isRelevant flatOption {

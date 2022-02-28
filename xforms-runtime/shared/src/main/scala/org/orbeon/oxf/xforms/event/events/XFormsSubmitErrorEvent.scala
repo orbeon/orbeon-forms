@@ -20,15 +20,12 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
 
+
 class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XFORMS_SUBMIT_ERROR, target, properties, bubbles = true, cancelable = false)
     with SubmitResponseEvent {
 
-  def this(target: XFormsEventTarget) = {
-    this(target, Map("error-type" -> Some(ErrorType.XXFormsInternalError.entryName)))
-    _errorType = ErrorType.XXFormsInternalError
-  }
-
+  // 1 caller
   // Event can be dispatched before the resource URI is resolved so the resource URI is optional
   def this(target: XFormsEventTarget, resourceURI: Option[String], errorType: ErrorType, statusCode: Int) = {
     this(
@@ -42,7 +39,8 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
     _errorType = errorType
   }
 
-  def this(target: XFormsEventTarget, errorType: ErrorType, connectionResult: Option[ConnectionResult]) = {
+  // 20 callers
+  def this(target: XFormsEventTarget, errorType: ErrorType, cxrOpt: Option[ConnectionResult]) = {
     this(
       target     = target,
       properties = Map(
@@ -50,7 +48,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
       )
     )
     _errorType = errorType
-    _connectionResult = connectionResult
+    _connectionResult = cxrOpt
   }
 
   private var _errorType: ErrorType = _

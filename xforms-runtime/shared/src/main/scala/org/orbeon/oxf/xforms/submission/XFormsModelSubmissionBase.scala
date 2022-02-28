@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, StaticXPath, XPath}
+import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, StaticXPath, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.Relevant
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
@@ -47,10 +47,10 @@ abstract class XFormsModelSubmissionBase
 
   def model: XFormsModel
 
-  protected def sendSubmitError(t: Throwable, connectResult: ConnectResult): Unit =
+  protected def sendSubmitError(t: Throwable, cxrOpt: Option[ConnectionResult]): Unit =
     sendSubmitErrorWithDefault(
       t,
-      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, connectResult.result.toOption map (_._2))
+      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, cxrOpt)
     )
 
   protected def sendSubmitError(t: Throwable, resolvedActionOrResource: String): Unit =

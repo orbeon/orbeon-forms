@@ -85,9 +85,9 @@ object SubmissionParameters {
         message          = s"Empty single-node binding on xf:submission for submission id: `${dynamicSubmission.getId}`",
         description      = "getting submission single-node binding",
         submitErrorEvent = new XFormsSubmitErrorEvent(
-          dynamicSubmission,
-          ErrorType.NoData,
-          None
+          target    = dynamicSubmission,
+          errorType = ErrorType.NoData,
+          cxrOpt    = None
         )
       )
 
@@ -97,9 +97,9 @@ object SubmissionParameters {
         message          = "xf:submission: single-node binding must refer to a document node or an element.",
         description      = "getting submission single-node binding",
         submitErrorEvent = new XFormsSubmitErrorEvent(
-          dynamicSubmission,
-          ErrorType.NoData,
-          None
+          target    = dynamicSubmission,
+          errorType = ErrorType.NoData,
+          cxrOpt    = None
         )
       )
 
@@ -280,9 +280,9 @@ object SubmissionParameters {
           message          = s"Invalid method name: `$methodName`",
           description      = "getting submission method",
           submitErrorEvent = new XFormsSubmitErrorEvent(
-            dynamicSubmission,
-            ErrorType.XXFormsMethodError,
-            None
+            target    = dynamicSubmission,
+            errorType = ErrorType.XXFormsMethodError,
+            cxrOpt    = None
           )
         )
     }

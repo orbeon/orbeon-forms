@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
-import org.orbeon.oxf.xforms.model.InstanceCaching
+import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import scala.util.control.NonFatal
@@ -175,49 +175,52 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     }
   }
 
-  private def checkInstanceToUpdate(indentedLogger: IndentedLogger, p: SubmissionParameters) = {
+  private def checkInstanceToUpdate(indentedLogger: IndentedLogger, p: SubmissionParameters): XFormsInstance = {
 
-    val destinationNodeInfo =
+    val destinationNodeInfoOpt =
       submission.evaluateTargetRef(
         p.refContext.xpathContext,
         submission.findReplaceInstanceNoTargetref(p.refContext.refInstanceOpt).orNull,
         p.refContext.submissionElementContextItem
       )
 
-    if (destinationNodeInfo == null)
-      // Throw target-error
-      // XForms 1.1: "If the processing of the targetref attribute fails,
-      // then submission processing ends after dispatching the event
-      // xforms-submit-error with an error-type of target-error."
-      throw new XFormsSubmissionException(
-        submission,
-        "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
-        null,
-        new XFormsSubmitErrorEvent(
+    destinationNodeInfoOpt match {
+      case Some(destinationNodeInfo) =>
+        submission.containingDocument.instanceForNodeOpt(destinationNodeInfo) match {
+          case Some(updatedInstance) if updatedInstance.rootElement.isSameNodeInfo(destinationNodeInfo) =>
+            if (indentedLogger.debugEnabled)
+              indentedLogger.logDebug("", "using instance from application shared instance cache", "instance", updatedInstance.getEffectiveId)
+            updatedInstance
+          case _ =>
+            // Only support replacing the root element of an instance
+            // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
+            throw new XFormsSubmissionException(
+              submission,
+              "targetref attribute must point to an instance root element when using cached/shared instance replacement.",
+              "processing targetref attribute",
+              null,
+              new XFormsSubmitErrorEvent(
+                submission, ErrorType.TargetError,
+                None
+              )
+            )
+        }
+      case None =>
+        // Throw target-error
+        // XForms 1.1: "If the processing of the targetref attribute fails,
+        // then submission processing ends after dispatching the event
+        // xforms-submit-error with an error-type of target-error."
+        throw new XFormsSubmissionException(
           submission,
-          ErrorType.TargetError,
-          None
+          "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
+          null,
+          new XFormsSubmitErrorEvent(
+            submission,
+            ErrorType.TargetError,
+            None
+          )
         )
-      )
-
-    val updatedInstance = submission.containingDocument.getInstanceForNode(destinationNodeInfo)
-    if (updatedInstance == null || !updatedInstance.rootElement.isSameNodeInfo(destinationNodeInfo)) {
-      // Only support replacing the root element of an instance
-      // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
-      throw new XFormsSubmissionException(
-        submission,
-        "targetref attribute must point to an instance root element when using cached/shared instance replacement.",
-        "processing targetref attribute",
-        null,
-        new XFormsSubmitErrorEvent(
-          submission, ErrorType.TargetError,
-          None
-        )
-      )
     }
-    if (indentedLogger.debugEnabled)
-      indentedLogger.logDebug("", "using instance from application shared instance cache", "instance", updatedInstance.getEffectiveId)
-    updatedInstance
   }
 
   // NOTE: This is really weird: the ConnectionResult returned must essentially say that it has some content.

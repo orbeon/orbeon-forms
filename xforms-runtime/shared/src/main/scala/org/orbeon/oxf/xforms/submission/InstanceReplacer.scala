@@ -156,157 +156,168 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
         // Another option would be to dispatch, at runtime, an xxforms-binding-error event. xforms-submit-error is
         // consistent with targetref, so might be better.
 
-        throw new XFormsSubmissionException(
-          submission       = submission,
-          message          = """`instance` attribute doesn't point to an existing instance for `replace="instance"`.""",
-          description      = "processing `instance` attribute",
-          submitErrorEvent = new XFormsSubmitErrorEvent(
-            target           = submission,
-            errorType        = ErrorType.TargetError,
-            connectionResult = cxr.some
-          )
+        ReplaceResult.SendError(
+          new XFormsSubmissionException(
+            submission       = submission,
+            message          = """`instance` attribute doesn't point to an existing instance for `replace="instance"`.""",
+            description      = "processing `instance` attribute",
+            submitErrorEvent = new XFormsSubmitErrorEvent(
+              target    = submission,
+              errorType = ErrorType.TargetError,
+              cxrOpt    = cxr.some
+            )
+          ),
+          Left(cxr.some)
         )
+
       case Some(replaceInstanceNoTargetref) =>
 
-        val destinationNodeInfo =
+        val destinationNodeInfoOpt =
           submission.evaluateTargetRef(
             p.refContext.xpathContext,
             replaceInstanceNoTargetref,
             p.refContext.submissionElementContextItem
           )
 
-        if (destinationNodeInfo eq null) {
-
-          // Throw target-error
-
-          // XForms 1.1: "If the processing of the targetref attribute fails,
-          // then submission processing ends after dispatching the event
-          // xforms-submit-error with an error-type of target-error."
-          throw new XFormsSubmissionException(
-            submission       = submission,
-            message          = """targetref attribute doesn't point to an element for `replace="instance"`.""",
-            description      = "processing targetref attribute",
-            submitErrorEvent = new XFormsSubmitErrorEvent(
-              submission,
-              ErrorType.TargetError,
-              cxr.some
+        destinationNodeInfoOpt match {
+          case None =>
+            // XForms 1.1: "If the processing of the `targetref` attribute fails,
+            // then submission processing ends after dispatching the event
+            // `xforms-submit-error` with an `error-type` of `target-error`."
+            ReplaceResult.SendError(
+              new XFormsSubmissionException(
+                submission       = submission,
+                message          = """targetref attribute doesn't point to an element for `replace="instance"`.""",
+                description      = "processing targetref attribute",
+                submitErrorEvent = new XFormsSubmitErrorEvent(
+                  target    = submission,
+                  errorType = ErrorType.TargetError,
+                  cxrOpt    = cxr.some
+                )
+              ),
+              Left(cxr.some)
             )
-          )
-        }
+          case Some(destinationNodeInfo) =>
+            // This is the instance which is effectively going to be updated
+            containingDocument.instanceForNodeOpt(destinationNodeInfo) match {
+              case None =>
+                ReplaceResult.SendError(
+                  new XFormsSubmissionException(
+                    submission       = submission,
+                    message          = """targetref attribute doesn't point to an element in an existing instance for `replace="instance"`.""",
+                    description      = "processing targetref attribute",
+                    submitErrorEvent = new XFormsSubmitErrorEvent(
+                      target    = submission,
+                      errorType = ErrorType.TargetError,
+                      cxrOpt    = cxr.some
+                    )
+                  ),
+                  Left(cxr.some)
+                )
+              case Some(instanceToUpdate) =>
+                // Whether the destination node is the root element of an instance
+                val isDestinationRootElement = instanceToUpdate.rootElement.isSameNodeInfo(destinationNodeInfo)
+                if (p2.isReadonly && ! isDestinationRootElement) {
+                  // Only support replacing the root element of an instance when using a shared instance
+                  ReplaceResult.SendError(
+                    new XFormsSubmissionException(
+                      submission       = submission,
+                      message          = "targetref attribute must point to instance root element when using read-only instance replacement.",
+                      description      = "processing targetref attribute",
+                      submitErrorEvent = new XFormsSubmitErrorEvent(
+                        target    = submission,
+                        errorType = ErrorType.TargetError,
+                        cxrOpt    = cxr.some
+                      )
+                    ),
+                    Left(cxr.some)
+                  )
+                } else {
+                  implicit val detailsLogger  = submission.getDetailsLogger(p, p2)
 
-        // This is the instance which is effectively going to be updated
-        val instanceToUpdate = containingDocument.instanceForNodeOpt(destinationNodeInfo) getOrElse {
-          throw new XFormsSubmissionException(
-            submission       = submission,
-            message          = """targetref attribute doesn't point to an element in an existing instance for `replace="instance"`.""",
-            description      = "processing targetref attribute",
-            submitErrorEvent = new XFormsSubmitErrorEvent(
-              submission,
-              ErrorType.TargetError,
-              cxr.some
-            )
-          )
-        }
+                  // Obtain root element to insert
+                  if (detailsLogger.debugEnabled)
+                    detailsLogger.logDebug(
+                      "",
+                      if (p2.isReadonly)
+                        "replacing instance with read-only instance"
+                      else
+                        "replacing instance with mutable instance",
+                      "instance",
+                      instanceToUpdate.getEffectiveId
+                    )
 
-        // Whether the destination node is the root element of an instance
-        val isDestinationRootElement = instanceToUpdate.rootElement.isSameNodeInfo(destinationNodeInfo)
-        if (p2.isReadonly && ! isDestinationRootElement) {
-          // Only support replacing the root element of an instance when using a shared instance
-          throw new XFormsSubmissionException(
-            submission       = submission,
-            message          = "targetref attribute must point to instance root element when using read-only instance replacement.",
-            description      = "processing targetref attribute",
-            submitErrorEvent = new XFormsSubmitErrorEvent(
-              submission,
-              ErrorType.TargetError,
-              cxr.some
-            )
-          )
-        }
+                  // Perform insert/delete. This will dispatch xforms-insert/xforms-delete events.
+                  // "the replacement is performed by an XForms action that performs some
+                  // combination of node insertion and deletion operations that are
+                  // performed by the insert action (10.3 The insert Element) and the
+                  // delete action"
 
-        implicit val detailsLogger  = submission.getDetailsLogger(p, p2)
+                  // NOTE: As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
+                  // performing RRRR directly.
+                  val newDocumentInfo =
+                    wrappedDocumentInfo getOrElse
+                      XFormsInstance.createDocumentInfo(
+                        _resultingDocumentOpt.get,
+                        instanceToUpdate.instance.exposeXPathTypes
+                      )
 
-        // Obtain root element to insert
-        if (detailsLogger.debugEnabled)
-          detailsLogger.logDebug(
-            "",
-            if (p2.isReadonly)
-              "replacing instance with read-only instance"
-            else
-              "replacing instance with mutable instance",
-            "instance",
-            instanceToUpdate.getEffectiveId
-          )
+                  val applyDefaults = p2.applyDefaults
+                  if (isDestinationRootElement) {
+                    // Optimized insertion for instance root element replacement
+                    if (applyDefaults)
+                      newDocumentInfo match {
+                        case node: VirtualNodeType =>
+                          InstanceDataOps.setRequireDefaultValueRecursively(node.getUnderlyingNode.asInstanceOf[Node])
+                        case _ => ()
+                      }
 
-        // Perform insert/delete. This will dispatch xforms-insert/xforms-delete events.
-        // "the replacement is performed by an XForms action that performs some
-        // combination of node insertion and deletion operations that are
-        // performed by the insert action (10.3 The insert Element) and the
-        // delete action"
+                    instanceToUpdate.replace(
+                      newDocumentInfo = newDocumentInfo,
+                      dispatch        = true,
+                      instanceCaching = instanceCaching,
+                      isReadonly      = p2.isReadonly,
+                      applyDefaults   = applyDefaults
+                    )
+                  } else {
+                    // Generic insertion
+                    instanceToUpdate.markModified()
 
-        // NOTE: As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
-        // performing RRRR directly.
-        val newDocumentInfo =
-          wrappedDocumentInfo getOrElse
-            XFormsInstance.createDocumentInfo(
-              _resultingDocumentOpt.get,
-              instanceToUpdate.instance.exposeXPathTypes
-            )
+                    // Perform the insertion
 
-        val applyDefaults = p2.applyDefaults
-        if (isDestinationRootElement) {
-          // Optimized insertion for instance root element replacement
-          if (applyDefaults)
-            newDocumentInfo match {
-              case node: VirtualNodeType =>
-                InstanceDataOps.setRequireDefaultValueRecursively(node.getUnderlyingNode.asInstanceOf[Node])
-              case _ =>
+                    // Insert before the target node, so that the position of the inserted node
+                    // wrt its parent does not change after the target node is removed
+                    // This will also mark a structural change
+                    // FIXME: Replace logic should use `doReplace` and `xxforms-replace` event
+                    XFormsInsertAction.doInsert(
+                      containingDocumentOpt             = containingDocument.some,
+                      insertPosition                    = InsertPosition.Before,
+                      insertLocation                    = Left(NonEmptyList(destinationNodeInfo, Nil) -> 1),
+                      originItemsOpt                    = List(DataModel.firstChildElement(newDocumentInfo)).some,
+                      doClone                           = false,
+                      doDispatch                        = true,
+                      requireDefaultValues              = applyDefaults,
+                      searchForInstance                 = true,
+                      removeInstanceDataFromClonedNodes = true,
+                      structuralDependencies            = true
+                    )
+
+                    // Perform the deletion of the selected node
+                    XFormsDeleteAction.doDeleteOne(
+                      containingDocument = containingDocument,
+                      nodeInfo           = destinationNodeInfo,
+                      doDispatch         = true
+                    )
+
+                    // Update model instance
+                    // NOTE: The inserted node NodeWrapper.index might be out of date at this point because:
+                    // - doInsert() dispatches an event which might itself change the instance
+                    // - doDelete() does as well
+                    // Does this mean that we should check that the node is still where it should be?
+                  }
+                  ReplaceResult.SendDone(cxr)
+                }
             }
-
-          instanceToUpdate.replace(
-            newDocumentInfo = newDocumentInfo,
-            dispatch        = true,
-            instanceCaching = instanceCaching,
-            isReadonly      = p2.isReadonly,
-            applyDefaults   = applyDefaults
-          )
-        } else {
-          // Generic insertion
-          instanceToUpdate.markModified()
-          val newDocumentRootElement: om.Item = DataModel.firstChildElement(newDocumentInfo)
-
-          // Perform the insertion
-
-          // Insert before the target node, so that the position of the inserted node
-          // wrt its parent does not change after the target node is removed
-          // This will also mark a structural change
-          // FIXME: Replace logic should use `doReplace` and `xxforms-replace` event
-          XFormsInsertAction.doInsert(
-            containingDocumentOpt             = containingDocument.some,
-            insertPosition                    = InsertPosition.Before,
-            insertLocation                    = Left(NonEmptyList(destinationNodeInfo, Nil) -> 1),
-            originItemsOpt                    = List(newDocumentRootElement).some,
-            doClone                           = false,
-            doDispatch                        = true,
-            requireDefaultValues              = applyDefaults,
-            searchForInstance                 = true,
-            removeInstanceDataFromClonedNodes = true,
-            structuralDependencies            = true
-          )
-
-          // Perform the deletion of the selected node
-          XFormsDeleteAction.doDeleteOne(
-            containingDocument = containingDocument,
-            nodeInfo           = destinationNodeInfo,
-            doDispatch         = true
-          )
-
-          // Update model instance
-          // NOTE: The inserted node NodeWrapper.index might be out of date at this point because:
-          // - doInsert() dispatches an event which might itself change the instance
-          // - doDelete() does as well
-          // Does this mean that we should check that the node is still where it should be?
         }
-        ReplaceResult.SendDone(cxr)
     }
 }

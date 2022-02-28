@@ -2216,4 +2216,191 @@ az4K</document>
         </output>
     </test>
 
+    <test description="Instance replacement: replace text error conditions" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+
+                        <xf:instance id="result-instance">
+                            <_>
+                                <result/>
+                            </_>
+                        </xf:instance>
+
+                        <xf:send
+                            event="xforms-model-construct-done"
+                            submission="replace-instance-empty"/>
+                        <xf:submission
+                            id="replace-instance-empty"
+                            method="get"
+                            serialization="none"
+                            resource="oxf:/org/orbeon/oxf/xforms/data/sample-instance.xml"
+                            replace="text"
+                            targetref="instance('this-instance-does-not-exist')/result"/>
+
+                        <xf:send
+                            event="xforms-model-construct-done"
+                            submission="replace-instance-atomic"/>
+                        <xf:submission
+                            id="replace-instance-atomic"
+                            method="get"
+                            serialization="none"
+                            resource="oxf:/org/orbeon/oxf/xforms/data/sample-instance.xml"
+                            replace="text"
+                            targetref="42"/>
+
+                        <xf:send
+                            event="xforms-model-construct-done"
+                            submission="replace-instance-complex"/>
+                        <xf:submission
+                            id="replace-instance-complex"
+                            method="get"
+                            serialization="none"
+                            resource="oxf:/org/orbeon/oxf/xforms/data/sample-instance.xml"
+                            replace="text"
+                            targetref="instance('result-instance')"/>
+
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events">
+                            <events/>
+                        </xf:instance>
+                        <xf:insert
+                            event="xforms-submit-done xforms-submit-error"
+                            context="instance('events')"
+                            ref="*"
+                            origin="
+                                xf:element(
+                                    'event',
+                                    (
+                                        xf:attribute('type', event('xxf:type')),
+                                        xf:attribute('target', event('xxf:targetid')),
+                                        for $c in event('error-type')
+                                        return xf:attribute('inserted-nodes', $c)
+                                    )
+                                )"/>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-submit-error" target="replace-instance-empty" inserted-nodes="target-error"/>
+                                    <event type="xforms-submit-error" target="replace-instance-atomic" inserted-nodes="target-error"/>
+                                    <event type="xforms-submit-error" target="replace-instance-complex" inserted-nodes="target-error"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Instance replacement: replace text to default instance" name="oxf:pipeline" only="true">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+
+                        <xf:instance id="result-instance-default">
+                            <_/>
+                        </xf:instance>
+
+                        <xf:instance id="result-instance-explicit">
+                            <_/>
+                        </xf:instance>
+
+                        <xf:send
+                            event="xforms-model-construct-done"
+                            submission="replace-instance-default"/>
+                        <xf:submission
+                            id="replace-instance-default"
+                            method="get"
+                            serialization="none"
+                            resource="oxf:/org/orbeon/oxf/xforms/data/sample-instance.xml"
+                            replace="text"/>
+
+                        <xf:send
+                            event="xforms-model-construct-done"
+                            submission="replace-instance-explicit"/>
+                        <xf:submission
+                            id="replace-instance-explicit"
+                            method="get"
+                            serialization="none"
+                            resource="oxf:/org/orbeon/oxf/xforms/data/sample-instance.xml"
+                            replace="text"
+                            targetref="instance('result-instance-explicit')"/>
+
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events">
+                            <events/>
+                        </xf:instance>
+                        <xf:insert
+                            event="xforms-submit-done xforms-submit-error"
+                            context="instance('events')"
+                            ref="*"
+                            origin="
+                            xf:element(
+                                'event',
+                                (
+                                    xf:attribute('type', event('xxf:type')),
+                                    xf:attribute('target', event('xxf:targetid')),
+                                    for $c in event('error-type')
+                                    return xf:attribute('inserted-nodes', $c)
+                                )
+                            )"/>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="result-instance-default" model-id="model">
+                                <_>&lt;book&gt; &lt;title lang="en"&gt;Pale
+                                    Blue Dot&lt;/title&gt; &lt;author&gt;Carl Sagan&lt;/author&gt; &lt;/book&gt;
+                                </_>
+                            </instance>
+                            <instance id="result-instance-explicit" model-id="model">
+                                <_>&lt;book&gt; &lt;title lang="en"&gt;Pale
+                                    Blue Dot&lt;/title&gt; &lt;author&gt;Carl Sagan&lt;/author&gt; &lt;/book&gt;
+                                </_>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-submit-done" target="replace-instance-default"/>
+                                    <event type="xforms-submit-done" target="replace-instance-explicit"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

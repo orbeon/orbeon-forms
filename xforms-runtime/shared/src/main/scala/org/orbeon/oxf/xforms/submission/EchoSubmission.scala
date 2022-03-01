@@ -95,7 +95,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
         title           = None
       )
     )
-    val replacer = submission.getReplacer(connectionResult, p)
+    val replacer = submission.getReplacer(connectionResult, p)(submission.getIndentedLogger)
 
     // Deserialize here so it can run in parallel
     replacer.deserialize(connectionResult, p, p2)

@@ -135,7 +135,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
             val submission =
               containingDocument.getObjectByEffectiveId(result.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
 
-            submission.processAsyncSubmissionResponse(result)
+            submission.processAsyncSubmissionResponse(result)(submission.getIndentedLogger)
 
             processedCount += 1
           }
@@ -172,7 +172,7 @@ class AsynchronousSubmissionManager(val containingDocument: XFormsContainingDocu
             val submission =
               containingDocument.getObjectByEffectiveId(result.submissionEffectiveId).asInstanceOf[XFormsModelSubmission]
 
-            submission.processAsyncSubmissionResponse(result)
+            submission.processAsyncSubmissionResponse(result)(submission.getIndentedLogger)
 
             processedCount += 1
 

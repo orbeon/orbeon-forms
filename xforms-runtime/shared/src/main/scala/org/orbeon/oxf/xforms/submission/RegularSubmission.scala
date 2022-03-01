@@ -116,7 +116,7 @@ class RegularSubmission(submission: XFormsModelSubmission) extends BaseSubmissio
         connected = true
 
         // TODO: This refers to Submission.
-        val replacer = submission.getReplacer(connectionResult, p)
+        val replacer = submission.getReplacer(connectionResult, p)(submission.getIndentedLogger)
 
         // Deserialize here so it can run in parallel
         replacer.deserialize(connectionResult, p, p2)

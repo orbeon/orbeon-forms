@@ -71,7 +71,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
     // Pass a pseudo connection result which contains information used by getReplacer()
     // We know that we will get an InstanceReplacer
     val connectionResult = createPseudoConnectionResult(absoluteResolvedURLString)
-    val replacer = submission.getReplacer(connectionResult, p).asInstanceOf[InstanceReplacer]
+    val replacer = submission.getReplacer(connectionResult, p)(detailsLogger).asInstanceOf[InstanceReplacer]
 
     // As an optimization, try from cache first
     // The purpose of this is to avoid starting a new thread in asynchronous mode if the instance is already in cache

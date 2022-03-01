@@ -47,16 +47,13 @@ abstract class XFormsModelSubmissionBase
 
   def model: XFormsModel
 
-  protected def sendSubmitError(t: Throwable, cxrOpt: Option[ConnectionResult]): Unit =
+  protected def sendSubmitError(t: Throwable, ctx: Either[Option[ConnectionResult], Option[String]]): Unit =
     sendSubmitErrorWithDefault(
       t,
-      new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, cxrOpt)
-    )
-
-  protected def sendSubmitError(t: Throwable, resolvedActionOrResource: String): Unit =
-    sendSubmitErrorWithDefault(
-      t,
-      new XFormsSubmitErrorEvent(thisSubmission, Option(resolvedActionOrResource), ErrorType.XXFormsInternalError, 0)
+      ctx match {
+        case Left(v)  => new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, v)
+        case Right(v) => new XFormsSubmitErrorEvent(thisSubmission, v, ErrorType.XXFormsInternalError, 0)
+      }
     )
 
   private def sendSubmitErrorWithDefault(t: Throwable, default: => XFormsSubmitErrorEvent): Unit = {

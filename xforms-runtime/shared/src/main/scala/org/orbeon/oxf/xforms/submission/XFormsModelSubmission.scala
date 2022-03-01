@@ -130,177 +130,180 @@ class XFormsModelSubmission(
     }
 
   private def doSubmit(event: XFormsEvent): Unit = {
-    val indentedLogger = getIndentedLogger
-    // Variables declared here as they are used in a catch/finally block
-    var p: SubmissionParameters = null
-    var resolvedActionOrResource: String = null
-    var replaceResultOpt: Option[(ReplaceResult, Option[ConnectionResult])] = None
-    try {
-      try {
-        // Big bag of initial runtime parameters
-        p = SubmissionParameters(event.name.some)(thisSubmission)
-        if (indentedLogger.debugEnabled) {
-          val message =
-            if (p.isDeferredSubmissionFirstPass)
-              "submission first pass"
-            else if (p.isDeferredSubmissionSecondPass)
-              "submission second pass"
-            else
-              "submission"
-          indentedLogger.startHandleOperation("", message, "id", getEffectiveId)
-        }
-        // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
-        // issue a warning
-        val twoPassParams = containingDocument.findTwoPassSubmitEvent
-        if (p.isDeferredSubmission && twoPassParams.isDefined) {
-          indentedLogger.logWarning(
-            "",
-            "another submission requiring a second pass already exists",
-            "existing submission",
-            twoPassParams.get.targetEffectiveId,
-            "new submission",
-            getEffectiveId
-          )
+
+    implicit val indentedLogger: IndentedLogger = getIndentedLogger
+
+    // Create the big bag of initial runtime parameters, which can throw
+    val p =
+      try
+        SubmissionParameters(event.name.some)(thisSubmission)
+      catch {
+        case t: Throwable =>
+          sendSubmitError(t, Right(None))
           return
-        }
+      }
 
-        /* ***** Check for pending uploads ********************************************************************** */
+    var resolvedActionOrResourceOpt: Option[String] = None
 
-        // We can do this first, because the check just depends on the controls, instance to submit, and pending
-        // submissions if any. This does not depend on the actual state of the instance.
-        if (p.serialize && p.xxfUploads &&
-          SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refContext.refInstanceOpt))
-          throw new XFormsSubmissionException(
-            thisSubmission,
-            "xf:submission: instance to submit has at least one pending upload.",
-            "checking pending uploads",
-            null,
-            new XFormsSubmitErrorEvent(
-              target    = thisSubmission,
-              errorType = ErrorType.XXFormsPendingUploads,
-              cxrOpt    = None
+    val replaceResultOpt: Option[(ReplaceResult, Option[ConnectionResult])] =
+      withDebug(
+        if (p.isDeferredSubmissionFirstPass)
+          "submission first pass"
+        else if (p.isDeferredSubmissionSecondPass)
+          "submission second pass"
+        else
+          "submission",
+        List("id" -> getEffectiveId)
+      ) {
+        try {
+          // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
+          // issue a warning
+          val twoPassParams = containingDocument.findTwoPassSubmitEvent
+          if (p.isDeferredSubmission && twoPassParams.isDefined) {
+            warn(
+              "another submission requiring a second pass already exists",
+              List(
+                "existing submission" -> twoPassParams.get.targetEffectiveId,
+                "new submission"      -> getEffectiveId
+              )
             )
-          )
+            return
+          }
 
-        /* ***** Update data model ****************************************************************************** */
+          /* ***** Check for pending uploads ********************************************************************** */
 
-        val relevanceHandling = p.relevanceHandling
-
-        // "The data model is updated"
-        p.refContext.refInstanceOpt foreach { refInstance =>
-          val modelForInstance = refInstance.model
-          // NOTE: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
-          // Here, we rebuild/recalculate instead the model containing the submission's single-node binding.
-          // This can be different than the model containing the submission if using e.g. xxf:instance().
-          // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
-          // the instance is not serialized and if no instance data is otherwise used for the submission,
-          // this seems however unneeded so we optimize out.
-
-          // Rebuild impacts validation, relevance and calculated values (set by recalculate)
-          if (p.validate || relevanceHandling != RelevanceHandling.Keep || p.xxfCalculate)
-            modelForInstance.doRebuild()
-
-          // Recalculate impacts relevance and calculated values
-          if (relevanceHandling != RelevanceHandling.Keep || p.xxfCalculate)
-            modelForInstance.doRecalculateRevalidate()
-        }
-
-        /* ***** Handle deferred submission ********************************************************************* */
-
-        // Deferred submission: end of the first pass
-        if (p.isDeferredSubmissionFirstPass) {
-          // Create (but abandon) document to submit here because in case of error, an Ajax response will still be produced
-          if (p.serialize)
-            createDocumentToSubmit(
-              p.refContext.refNodeInfo,
-              p.refContext.refInstanceOpt,
-              p.validate,
-              relevanceHandling,
-              p.xxfAnnotate,
-              p.xxfRelevantAttOpt)(
-              indentedLogger
-            )
-          containingDocument.addTwoPassSubmitEvent(TwoPassSubmissionParameters(getEffectiveId, p))
-          return
-        }
-
-        /* ***** Submission second pass ************************************************************************* */
-
-        // Compute parameters only needed during second pass
-        val p2 = SecondPassParameters(p)(thisSubmission)
-        resolvedActionOrResource = p2.actionOrResource // in case of exception
-
-        /* ***** Serialization ********************************************************************************** */
-
-        getRequestedSerialization(p.serializationOpt, p.xformsMethod, p.httpMethod) match {
-          case None =>
+          // We can do this first, because the check just depends on the controls, instance to submit, and pending
+          // submissions if any. This does not depend on the actual state of the instance.
+          if (p.serialize && p.xxfUploads &&
+            SubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refContext.refInstanceOpt))
             throw new XFormsSubmissionException(
               thisSubmission,
-              "xf:submission: invalid submission method requested: " + p.xformsMethod,
-              "serializing instance",
+              "xf:submission: instance to submit has at least one pending upload.",
+              "checking pending uploads",
               null,
-              null
+              new XFormsSubmitErrorEvent(
+                target    = thisSubmission,
+                errorType = ErrorType.XXFormsPendingUploads,
+                cxrOpt    = None
+              )
             )
-          case Some(requestedSerialization) =>
-            val documentToSubmit =
-              if (p.serialize) {
-                // Check if a submission requires file upload information
 
-                // Annotate before re-rooting/pruning
-                if (requestedSerialization.startsWith("multipart/") && p.refContext.refInstanceOpt.isDefined)
-                  SubmissionUtils.annotateBoundRelevantUploadControls(containingDocument, p.refContext.refInstanceOpt.get)
+          /* ***** Update data model ****************************************************************************** */
 
-                // Create document to submit
-                createDocumentToSubmit(
-                  p.refContext.refNodeInfo,
-                  p.refContext.refInstanceOpt,
-                  p.validate,
-                  relevanceHandling,
-                  p.xxfAnnotate,
-                  p.xxfRelevantAttOpt)(
-                  indentedLogger
-                )
+          val relevanceHandling = p.relevanceHandling
+
+          // "The data model is updated"
+          p.refContext.refInstanceOpt foreach { refInstance =>
+            val modelForInstance = refInstance.model
+            // NOTE: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
+            // Here, we rebuild/recalculate instead the model containing the submission's single-node binding.
+            // This can be different than the model containing the submission if using e.g. xxf:instance().
+            // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
+            // the instance is not serialized and if no instance data is otherwise used for the submission,
+            // this seems however unneeded so we optimize out.
+
+            // Rebuild impacts validation, relevance and calculated values (set by recalculate)
+            if (p.validate || relevanceHandling != RelevanceHandling.Keep || p.xxfCalculate)
+              modelForInstance.doRebuild()
+
+            // Recalculate impacts relevance and calculated values
+            if (relevanceHandling != RelevanceHandling.Keep || p.xxfCalculate)
+              modelForInstance.doRecalculateRevalidate()
+          }
+
+          /* ***** Handle deferred submission ********************************************************************* */
+
+          // Deferred submission: end of the first pass
+          if (p.isDeferredSubmissionFirstPass) {
+            // Create (but abandon) document to submit here because in case of error, an Ajax response will still be produced
+            if (p.serialize)
+              createDocumentToSubmit(
+                p.refContext.refNodeInfo,
+                p.refContext.refInstanceOpt,
+                p.validate,
+                relevanceHandling,
+                p.xxfAnnotate,
+                p.xxfRelevantAttOpt
+              )
+            containingDocument.addTwoPassSubmitEvent(TwoPassSubmissionParameters(getEffectiveId, p))
+            return
+          }
+
+          /* ***** Submission second pass ************************************************************************* */
+
+          // Compute parameters only needed during second pass
+          val p2 = SecondPassParameters(p)(thisSubmission)
+          resolvedActionOrResourceOpt = p2.actionOrResource.some // in case of exception
+
+          /* ***** Serialization ********************************************************************************** */
+
+          getRequestedSerialization(p.serializationOpt, p.xformsMethod, p.httpMethod) match {
+            case None =>
+              throw new XFormsSubmissionException(
+                thisSubmission,
+                "xf:submission: invalid submission method requested: " + p.xformsMethod,
+                "serializing instance",
+                null,
+                null
+              )
+            case Some(requestedSerialization) =>
+              val documentToSubmit =
+                if (p.serialize) {
+                  // Check if a submission requires file upload information
+
+                  // Annotate before re-rooting/pruning
+                  if (requestedSerialization.startsWith("multipart/") && p.refContext.refInstanceOpt.isDefined)
+                    SubmissionUtils.annotateBoundRelevantUploadControls(containingDocument, p.refContext.refInstanceOpt.get)
+
+                  // Create document to submit
+                  createDocumentToSubmit(
+                    p.refContext.refNodeInfo,
+                    p.refContext.refInstanceOpt,
+                    p.validate,
+                    relevanceHandling,
+                    p.xxfAnnotate,
+                    p.xxfRelevantAttOpt
+                  )
+                } else {
+                  // Don't recreate document
+                  null
+                }
+
+            val overriddenSerializedData =
+              if (! p.isDeferredSubmissionSecondPass && p.serialize) {
+                // Fire `xforms-submit-serialize`
+                // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
+                // is changed from the initial value of empty string, then the content of the submission-body
+                // property string is used as the submission serialization. Otherwise, the submission serialization
+                // consists of a serialization of the selected instance data according to the rules stated at 11.9
+                // Submission Options."
+                val serializeEvent =
+                  new XFormsSubmitSerializeEvent(thisSubmission, p.refContext.refNodeInfo, requestedSerialization)
+
+                Dispatch.dispatchEvent(serializeEvent)
+
+                // TODO: rest of submission should happen upon default action of event
+                serializeEvent.submissionBodyAsString
               } else {
-                // Don't recreate document
                 null
               }
 
-          val overriddenSerializedData =
-            if (! p.isDeferredSubmissionSecondPass && p.serialize) {
-              // Fire `xforms-submit-serialize`
-              // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
-              // is changed from the initial value of empty string, then the content of the submission-body
-              // property string is used as the submission serialization. Otherwise, the submission serialization
-              // consists of a serialization of the selected instance data according to the rules stated at 11.9
-              // Submission Options."
-              val serializeEvent =
-                new XFormsSubmitSerializeEvent(thisSubmission, p.refContext.refNodeInfo, requestedSerialization)
+            // Serialize
+            val sp = SerializationParameters(thisSubmission, p, p2, requestedSerialization, documentToSubmit, overriddenSerializedData)
 
-              Dispatch.dispatchEvent(serializeEvent)
+            /* ***** Submission connection ************************************************************************** */
 
-              // TODO: rest of submission should happen upon default action of event
-              serializeEvent.submissionBodyAsString
-            } else {
-              null
-            }
+            // Result information
+            val connectResultOpt =
+              submissions find (_.isMatch(p, p2, sp)) flatMap { submission =>
+                withDebug("connecting", List("type" -> submission.getType)) {
+                  submission.connect(p, p2, sp)
+                }
+              }
 
-          // Serialize
-          val sp = SerializationParameters(thisSubmission, p, p2, requestedSerialization, documentToSubmit, overriddenSerializedData)
+            /* ***** Submission result processing ******************************************************************* */
 
-          /* ***** Submission connection ************************************************************************** */
-
-          // Result information
-          val connectResultOpt =
-            submissions find (_.isMatch(p, p2, sp)) flatMap { submission =>
-              withDebug("connecting", List("type" -> submission.getType)) {
-                submission.connect(p, p2, sp)
-              }(indentedLogger)
-            }
-
-          /* ***** Submission result processing ******************************************************************* */
-
-          // `None` in case the submission is running asynchronously, AND when ???
-          replaceResultOpt =
+            // `None` in case the submission is running asynchronously, AND when ???
             connectResultOpt map { connectResult =>
               handleConnectResult(
                 p                      = p,
@@ -309,15 +312,12 @@ class XFormsModelSubmission(
                 initializeXPathContext = true // function context might have changed
               )
             }
-        }
-      } catch {
-        case NonFatal(throwable) =>
-          /* ***** Handle errors ********************************************************************************** */
-          val pVal = p
-          val resolvedActionOrResourceVal = resolvedActionOrResource
-          replaceResultOpt =
+          }
+        } catch {
+          case NonFatal(throwable) =>
+            /* ***** Handle errors ********************************************************************************** */
             (
-              if (pVal != null && pVal.isDeferredSubmissionSecondPass && containingDocument.isLocalSubmissionForward)
+              if (p.isDeferredSubmissionSecondPass && containingDocument.isLocalSubmissionForward)
                 ReplaceResult.Throw( // no purpose to dispatch an event so we just propagate the exception
                   new XFormsSubmissionException(
                     thisSubmission,
@@ -328,15 +328,12 @@ class XFormsModelSubmission(
                   )
                 )
               else
-                ReplaceResult.SendError(throwable, Right(resolvedActionOrResourceVal)),
+                ReplaceResult.SendError(throwable, Right(resolvedActionOrResourceOpt)),
               None
             ).some
-      }
-    } finally {
-      // Log total time spent in submission
-      if (p != null && indentedLogger.debugEnabled)
-        indentedLogger.endHandleOperation()
-    }
+        }
+      } // withDebug
+
     // Execute post-submission code if any
     // We do this outside the above catch block so that if a problem occurs during dispatching `xforms-submit-done`
     // or `xforms-submit-error` we don't dispatch `xforms-submit-error` (which would be illegal).
@@ -350,11 +347,10 @@ class XFormsModelSubmission(
   ): Unit =
     try {
       replaceResult match {
-        case ReplaceResult.None                                 => ()
-        case ReplaceResult.SendDone (cxr)                       => sendSubmitDone(cxr)
-        case ReplaceResult.SendError(t, Left(cxrOpt))           => sendSubmitError(t, cxrOpt)
-        case ReplaceResult.SendError(t, Right(submissionUri))   => sendSubmitError(t, submissionUri)
-        case ReplaceResult.Throw    (t)                         => throw t
+        case ReplaceResult.None              => ()
+        case ReplaceResult.SendDone (cxr)    => sendSubmitDone(cxr)
+        case ReplaceResult.SendError(t, ctx) => sendSubmitError(t, ctx)
+        case ReplaceResult.Throw    (t)      => throw t
       }
     } finally {
       // https://github.com/orbeon/orbeon-forms/issues/5224
@@ -362,7 +358,7 @@ class XFormsModelSubmission(
     }
 
   private[submission]
-  def processAsyncSubmissionResponse(submissionResult: ConnectResult): Unit = {
+  def processAsyncSubmissionResponse(submissionResult: ConnectResult)(implicit logger: IndentedLogger): Unit = {
 
     val p  = SubmissionParameters(None)(thisSubmission)
     val p2 = SecondPassParameters(p)(thisSubmission)
@@ -381,7 +377,8 @@ class XFormsModelSubmission(
     p                     : SubmissionParameters,
     p2                    : SecondPassParameters,
     connectResult         : ConnectResult,
-    initializeXPathContext: Boolean
+    initializeXPathContext: Boolean)(implicit
+    logger                : IndentedLogger
   ): (ReplaceResult, Option[ConnectionResult]) = {
 
     require(p ne null)
@@ -389,7 +386,6 @@ class XFormsModelSubmission(
     require(connectResult ne null)
 
     try {
-      val indentedLogger = getIndentedLogger
       withDebug("handling result") {
 
         val updatedP =
@@ -402,7 +398,7 @@ class XFormsModelSubmission(
           case Success((replacer, cxr)) => (replacer.replace(cxr, updatedP, p2),             cxr.some)
           case Failure(throwable)       => (ReplaceResult.SendError(throwable, Left(None)),  None)
         }
-      }(indentedLogger)
+      }
     } catch {
       case NonFatal(throwable) =>
         val cxrOpt = connectResult.result.toOption.map(_._2)
@@ -416,7 +412,7 @@ class XFormsModelSubmission(
     Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, cxr))
   }
 
-  def getReplacer(cxr: ConnectionResult, p: SubmissionParameters): Replacer = {
+  def getReplacer(cxr: ConnectionResult, p: SubmissionParameters)(implicit logger: IndentedLogger): Replacer = {
     // NOTE: This can be called from other threads so it must NOT modify the XFCD or submission
     // Handle response
     if (cxr.dontHandleResponse) {
@@ -454,12 +450,11 @@ class XFormsModelSubmission(
         if (p.replaceType == ReplaceType.Instance || p.replaceType == ReplaceType.Text) {
           // XForms 1.1 says it is fine not to have a body, but in most cases you will want to know that
           // no instance replacement took place
-          val indentedLogger = getIndentedLogger
-          indentedLogger.logWarning(
-            "",
+          warn(
             "instance or text replacement did not take place upon successful response because no body was provided.",
-            "submission id",
-            getEffectiveId
+            List(
+              "submission id" -> getEffectiveId
+            )
           )
         }
         // "For a success response not including a body, submission processing concludes after dispatching
@@ -546,7 +541,7 @@ class XFormsModelSubmission(
     }
   }
 
-  private def getIndentedLogger: IndentedLogger =
+  def getIndentedLogger: IndentedLogger =
     containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
 
   def getDetailsLogger(p: SubmissionParameters, p2: SecondPassParameters): IndentedLogger =

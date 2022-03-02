@@ -13,125 +13,55 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import cats.Eval
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils.decodeSimpleQuery
 import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, StaticXPath, XPath}
+import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, StaticXPath, XPath}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.Relevant
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
-import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
-import org.orbeon.oxf.xforms.event.{Dispatch, ListenersTrait, XFormsEventTarget}
-import org.orbeon.oxf.xforms.model.{BindNode, InstanceData, XFormsInstance, XFormsModel}
+import org.orbeon.oxf.xforms.model.{BindNode, InstanceData}
 import org.orbeon.oxf.xml.dom.Extensions
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.analysis.model.ValidationLevel
-import shapeless.syntax.typeable._
 
 import scala.collection.mutable
+import scala.util.{Failure, Success}
 
-abstract class XFormsModelSubmissionBase
-  extends ListenersTrait
-     with XFormsEventTarget {
 
-  thisSubmission: XFormsModelSubmission =>
-
-  import XFormsModelSubmissionBase._
-
-  def model: XFormsModel
-
-  protected def sendSubmitError(t: Throwable, ctx: Either[Option[ConnectionResult], Option[String]]): Unit =
-    sendSubmitErrorWithDefault(
-      t,
-      ctx match {
-        case Left(v)  => new XFormsSubmitErrorEvent(thisSubmission, ErrorType.XXFormsInternalError, v)
-        case Right(v) => new XFormsSubmitErrorEvent(thisSubmission, v, ErrorType.XXFormsInternalError, 0)
-      }
-    )
-
-  private def sendSubmitErrorWithDefault(t: Throwable, default: => XFormsSubmitErrorEvent): Unit = {
-
-    // After a submission, the context might have changed
-    model.resetAndEvaluateVariables()
-
-    // Try to get error event from exception and if not possible create default event
-    val submitErrorEvent =
-      t.narrowTo[XFormsSubmissionException] flatMap (_.submitErrorEventOpt) getOrElse default
-
-    // Dispatch event
-    submitErrorEvent.logMessage(t)
-    Dispatch.dispatchEvent(submitErrorEvent)
-  }
-
-  protected def createDocumentToSubmit(
-    currentNodeInfo   : om.NodeInfo,
-    currentInstance   : Option[XFormsInstance],
-    validate          : Boolean,
-    relevanceHandling : RelevanceHandling,
-    annotateWith      : Set[String],
-    relevantAttOpt    : Option[QName])(implicit
-    indentedLogger    : IndentedLogger
-  ): Document = {
-
-    // Revalidate instance
-    // NOTE: We need to do this before pruning so that bind/@type works correctly. XForms 1.1 seems to say that this
-    // must be done after pruning, but then it is not clear how XML Schema validation would work then.
-    // Also, if validate="false" or if serialization="none", then we do not revalidate. Now whether this optimization
-    // is acceptable depends on whether validate="false" only means "don't check the instance's validity" or also
-    // don't even recalculate. If the latter, then this also means that type annotations won't be updated, which
-    // can impact serializations that use type information, for example multipart. But in that case, here we decide
-    // the optimization is worth it anyway.
-    if (validate)
-      currentInstance foreach (_.model.doRecalculateRevalidate())
-
-    // Get selected nodes (re-root and handle relevance)
-    val documentToSubmit =
-      prepareXML(
-        xfcd              = containingDocument,
-        ref               = currentNodeInfo,
-        relevanceHandling = relevanceHandling,
-        namespaceContext  = staticSubmission.namespaceMapping.mapping,
-        annotateWith      = annotateWith,
-        relevantAttOpt    = relevantAttOpt
-      )
-
-    // Check that there are no validation errors
-    // NOTE: If the instance is read-only, it can't have MIPs at the moment, and can't fail validation/requiredness,
-    // so we don't go through the process at all.
-    val instanceSatisfiesValidRequired =
-      currentInstance.exists(_.readonly) ||
-      ! validate                         ||
-      isSatisfiesValidity(documentToSubmit, relevanceHandling)
-
-    if (! instanceSatisfiesValidRequired) {
-      debug(
-        "instance document or subset thereof cannot be submitted",
-        List("document" -> StaticXPath.tinyTreeToString(currentNodeInfo))
-      )
-      throw new XFormsSubmissionException(
-        submission       = thisSubmission,
-        message          = "xf:submission: instance to submit does not satisfy valid and/or required model item properties.",
-        description      = "checking instance validity",
-        submitErrorEvent = new XFormsSubmitErrorEvent(thisSubmission, ErrorType.ValidationError, None)
-      )
-    }
-
-    documentToSubmit
-  }
-
-}
-
-object XFormsModelSubmissionBase {
+object XFormsModelSubmissionSupport {
 
   import Private._
   import RelevanceHandling._
+
+  // Run the given submission `Eval`. This must be for a `replace="all"` submission.
+  def runDeferredSubmission(eval: Eval[ConnectResult], response: ExternalContext.Response): Unit =
+    eval.value.result match {
+      case Success((replacer, cxr)) =>
+        try {
+          replacer match {
+            case _: AllReplacer      => AllReplacer.forwardResultToResponse(cxr, response)
+            case _: RedirectReplacer => RedirectReplacer.updateResponse(cxr, response)
+            case _: NoneReplacer     => ()
+            case r                   => throw new IllegalArgumentException(r.getClass.getName)
+          }
+        } finally {
+          cxr.close()
+        }
+      case Failure(throwable) =>
+        // Propagate throwable, which might have come from a separate thread
+        throw new OXFException(throwable)
+    }
 
   // Prepare XML for submission
   //

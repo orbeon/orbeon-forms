@@ -90,7 +90,7 @@ class SubmissionRelevanceTest extends AnyFunSpec with XMLSupport {
 
         val doc = newDoc
 
-        XFormsModelSubmissionBase.processRelevant(
+        XFormsModelSubmissionSupport.processRelevant(
           doc                           = doc,
           relevanceHandling             = relevanceHandling,
           relevantAttOpt                = Some(XFRelevantQName),

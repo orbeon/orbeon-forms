@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.junit.Test
 import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionSupport
 import org.orbeon.oxf.xml.dom.Converter._
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -88,7 +88,7 @@ class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
       }
 
       def copyAndAnnotate(tokens: Set[String]) =
-        XFormsModelSubmissionBase.prepareXML(
+        XFormsModelSubmissionSupport.prepareXML(
           xfcd              = document,
           ref               = instance("fr-form-instance").get.root,
           relevanceHandling = RelevanceHandling.Keep,

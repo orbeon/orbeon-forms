@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmission}
+import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmission, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
@@ -298,7 +298,7 @@ object XFormsServer {
         // - Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         //   hit the document.
         // - No need to output a null document here, `xmlReceiver` is absent anyway.
-        XFormsModelSubmission.runDeferredSubmission(replaceAllEval, responseForReplaceAll)
+        XFormsModelSubmissionSupport.runDeferredSubmission(replaceAllEval, responseForReplaceAll)
       case Success(Success(None)) =>
       case Success(Failure(t))    => throw t
     }

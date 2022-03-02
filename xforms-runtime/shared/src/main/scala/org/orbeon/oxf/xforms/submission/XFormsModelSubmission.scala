@@ -91,7 +91,7 @@ class XFormsModelSubmission(
     )
 
   def getId               : String            = staticSubmission.staticId
-  def getPrefixedId       : String            = XFormsId.getPrefixedId(getEffectiveId)
+  def getPrefixedId       : String            = staticSubmission.prefixedId
   def scope               : Scope             = staticSubmission.scope
   def getEffectiveId      : String            = XFormsId.getRelatedEffectiveId(model.getEffectiveId, getId)
   def getLocationData     : LocationData      = staticSubmission.locationData
@@ -121,12 +121,6 @@ class XFormsModelSubmission(
         initializeXPathContext = false
       )
     )
-  }
-
-  def sendSubmitDone(cxr: ConnectionResult): Unit = {
-    // After a submission, the context might have changed
-    model.resetAndEvaluateVariables()
-    Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, cxr))
   }
 
   def getReplacer(cxr: ConnectionResult, p: SubmissionParameters)(implicit logger: IndentedLogger): Replacer = {
@@ -501,6 +495,11 @@ class XFormsModelSubmission(
         // https://github.com/orbeon/orbeon-forms/issues/5224
         cxrOpt foreach (_.close())
       }
+
+    def sendSubmitDone(cxr: ConnectionResult): Unit = {
+      model.resetAndEvaluateVariables() // after a submission, the context might have changed
+      Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(thisSubmission, cxr))
+    }
 
     def sendSubmitError(t: Throwable, ctx: Either[Option[ConnectionResult], Option[String]]): Unit =
       sendSubmitErrorWithDefault(

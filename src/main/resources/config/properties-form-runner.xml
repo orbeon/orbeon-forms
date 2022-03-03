@@ -225,7 +225,7 @@
 
     <property as="xs:boolean" name="oxf.fr.detail.initial-focus.*.*"                            value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.focus.includes.*.*"                           value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.focus.excludes.*.*"                           value="xf:trigger"/>
+    <property as="xs:string"  name="oxf.fr.detail.focus.excludes.*.*"                           value="xf:trigger xf:output"/>
 
     <!-- Supports: blank, -1 (unlimited), or positive `Long` value (there should be a `xs:integer?` type) -->
     <property as="xs:string"  name="oxf.fr.detail.attachment.max-size.*.*"                      value=""/>

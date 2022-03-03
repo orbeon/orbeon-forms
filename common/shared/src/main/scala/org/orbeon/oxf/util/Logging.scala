@@ -68,9 +68,6 @@ trait Logging {
     if (logger.debugEnabled)
       body
 
-  // Whether debug logging is enabled
-  def debugEnabled(implicit logger: IndentedLogger): Boolean = logger.debugEnabled
-
   // Call from a result block to set result parameters
   def debugResults(parameters: => Seq[(String, String)])(implicit logger: IndentedLogger): Unit =
     if (logger.debugEnabled)

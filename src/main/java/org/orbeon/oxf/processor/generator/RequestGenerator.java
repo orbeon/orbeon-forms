@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.generator;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.datatypes.LocationData;
@@ -25,27 +24,20 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.http.Headers;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.XPLConstants;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom.Extensions;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
+
 
 /**
  * The Request generator works like this:
@@ -275,33 +267,10 @@ public class RequestGenerator extends ProcessorImpl {
         }
     }
 
-    public static String urlForFileItemCreateIfNeeded(FileItem fileItem, int scope) {
-        // Only a reference to the file is output (xs:anyURI)
-        final DiskFileItem diskFileItem = (DiskFileItem) fileItem;
-        final String resultUri;
-
-        try {
-            if (! fileItem.isInMemory()) {
-                // File must exist on disk since isInMemory() returns false
-                final File file = diskFileItem.getStoreLocation();
-                if (! file.exists())
-                    file.createNewFile(); // https://github.com/orbeon/orbeon-forms/issues/4466
-                resultUri = file.toURI().toString();
-            } else {
-                // File does not exist on disk, must convert
-                // NOTE: Conversion occurs every time this method is called. Not optimal.
-                resultUri = NetUtils.inputStreamToAnyURI(fileItem.getInputStream(), scope, logger);
-            }
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
-
-        return resultUri;
-    }
-
     public static String writeURLFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, ContentHandler contentHandler) throws SAXException {
 
-        final String uriExpiringWithRequest = urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE);
+        final String uriExpiringWithRequest =
+                FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request$.MODULE$, logger);
 
         // If the content is meant to expire with the session, and we haven't yet renamed the file, then do this here.
         final String uriExpiringWithScope;

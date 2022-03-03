@@ -18,7 +18,6 @@ import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput}
-import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.{Loggers, XFormsGlobalProperties}
@@ -26,6 +25,7 @@ import org.orbeon.oxf.xforms.upload.UploaderServer
 import org.orbeon.oxf.xml.{EncodeDecode, XMLReceiver}
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.slf4j.Logger
 
 
 class UploaderProcessor extends ProcessorImpl {
@@ -52,6 +52,8 @@ class UploaderProcessor extends ProcessorImpl {
                 xmlReceiver
               )
 
+          implicit def logger: Logger = Loggers.logger.logger
+
           UploaderServer.processUpload(XFormsCrossPlatformSupport.externalContext.getRequest) match {
             case (nameValuesFileScan, None) =>
 
@@ -72,7 +74,7 @@ class UploaderProcessor extends ProcessorImpl {
                     def sessionUrlAndSizeFromFileScan =
                       fileScanAcceptResultOpt.flatMap(_.content) map { is =>
                         useAndClose(is) { _ =>
-                          FileItemSupport.inputStreamToAnyURI(is, NetUtils.SESSION_SCOPE, Loggers.logger.logger)
+                          FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)
                         }
                       }
 
@@ -84,8 +86,7 @@ class UploaderProcessor extends ProcessorImpl {
 
                       val newFile =
                         FileItemSupport.renameAndExpireWithSession(
-                          RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE))(
-                          Loggers.logger.logger
+                          FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request)
                         )
 
                       (newFile.toURI.toString, newFile.length())

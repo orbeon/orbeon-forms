@@ -19,7 +19,6 @@ import org.orbeon.datatypes.Mediatype
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.ImageMetadata.AllMetadata
@@ -176,11 +175,11 @@ object ImageSupport {
     tryReadAllMetadata(existingUri) match {
       case Success(allMetadata) if mustTransform(allMetadata) =>
 
-        val fileItem = FileItemSupport.prepareFileItem(NetUtils.SESSION_SCOPE, logger.logger.logger)
+        val fileItem = FileItemSupport.prepareFileItem(ExpirationScope.Session)(logger.logger.logger)
 
         useAndClose(fileItem.getOutputStream)(tryReadAndTransformToOutputStream(allMetadata, _)) map { _ =>
           (
-            new URI(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.SESSION_SCOPE)),
+            new URI(FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Session)(logger.logger.logger)),
             fileItem.getSize
           ).some
         }

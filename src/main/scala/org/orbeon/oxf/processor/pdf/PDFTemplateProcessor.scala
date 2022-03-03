@@ -13,11 +13,6 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import java.io.{ByteArrayOutputStream, OutputStream}
-import java.net.URI
-import java.net.URLDecoder.{decode => decodeURL}
-import java.util.{List => JList}
-
 import com.lowagie.text.pdf._
 import com.lowagie.text.{Image, Rectangle}
 import org.log4s
@@ -42,8 +37,13 @@ import org.orbeon.saxon.om.{Item, NodeInfo, ValueRepresentation}
 import org.orbeon.saxon.value.{FloatValue, Int64Value}
 import org.orbeon.xml.NamespaceMapping
 
+import java.io.{ByteArrayOutputStream, OutputStream}
+import java.net.URI
+import java.net.URLDecoder.{decode => decodeURL}
+import java.util.{List => JList}
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 /**
  * The PDF Template processor reads a PDF template and performs textual annotations on it.
@@ -352,7 +352,8 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
             )
 
           ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
-            val tempURLString = FileItemSupport.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, PDFTemplateProcessor.Logger.logger)._1            // NOTE: iText's Image.getInstance() closes the local URL's InputStream
+            // NOTE: iText's Image.getInstance() closes the local URL's InputStream
+            val tempURLString = FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Request)(PDFTemplateProcessor.Logger.logger)._1
             Image.getInstance(URLFactory.createURL(tempURLString))
           }
       }

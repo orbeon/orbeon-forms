@@ -13,22 +13,20 @@
   */
 package org.orbeon.oxf.xforms.upload
 
-import java.util.ServiceLoader
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.apache.commons.fileupload.{FileItem, FileItemHeaders, FileItemHeadersSupport, UploadContext}
-import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
 import org.orbeon.datatypes.MaximumSize
+import org.orbeon.datatypes.MaximumSize.{LimitedSize, UnlimitedSize}
 import org.orbeon.exception.OrbeonFormatter
+import org.orbeon.io.IOUtils.runQuietly
 import org.orbeon.io.LimiterInputStream
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils.{collectByErasedType, _}
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils.runQuietly
 import org.orbeon.oxf.util.Multipart.UploadItem
+import org.orbeon.oxf.util.SLF4JLogging._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport._
@@ -38,16 +36,15 @@ import org.orbeon.oxf.xforms.upload.api.java.{FileScan2, FileScanProvider2, File
 import org.orbeon.oxf.xforms.upload.api.{FileScan, FileScanProvider, FileScanStatus}
 import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
-
-import java.net.URI
-import scala.jdk.CollectionConverters._
-import scala.collection.{mutable => m}
-import scala.util.{Failure, Success, Try}
-import scala.util.control.NonFatal
-import scala.collection.compat._
 import shapeless.syntax.typeable._
 
+import java.net.URI
+import java.util.ServiceLoader
+import scala.collection.{mutable => m}
+import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
+import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 
 object UploaderServer {
@@ -267,7 +264,7 @@ object UploaderServer {
             }
           } catch {
             case NonFatal(t) =>
-              Logger.info(s"error thrown by file scan provider while calling `abort()`: ${OrbeonFormatter.getThrowableMessage(t)}")
+              info(s"error thrown by file scan provider while calling `abort()`: ${OrbeonFormatter.getThrowableMessage(t)}")
           }
           None
         case UploadState.Started =>
@@ -294,7 +291,7 @@ object UploaderServer {
 
   private object Private {
 
-    val Logger = LoggerFactory.getLogger("org.orbeon.xforms.upload")
+    implicit val Logger = LoggerFactory.getLogger("org.orbeon.xforms.upload")
 
     val UploadProgressSessionKey = "orbeon.upload.progress."
 
@@ -309,8 +306,8 @@ object UploaderServer {
     }
 
     def convertFileItemHeaders(headers: FileItemHeaders) =
-      for (name <- headers.getHeaderNames.asScala.to(List))
-        yield name -> headers.getHeaders(name).asScala.to(List)
+      for (name <- headers.getHeaderNames.asScala.toList)
+        yield name -> headers.getHeaders(name).asScala.toList
 
     // The file will expire with the request
     // We now set the threshold of `DiskFileItem` to `-1` so that a file is already created in the first
@@ -318,7 +315,7 @@ object UploaderServer {
     // case is that of a zero-length file, which will probably not be created by `DiskFileItem` as nothing
     // is written.
     def fileFromFileItemCreateIfNeeded(fileItem: DiskFileItem): java.io.File =
-      new java.io.File(new URI(RequestGenerator.urlForFileItemCreateIfNeeded(fileItem, NetUtils.REQUEST_SCOPE)))
+      new java.io.File(new URI(FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request)))
 
     def withFileScanCall(block: => FileScanStatus): FileScanResult =
       Try(block) match {

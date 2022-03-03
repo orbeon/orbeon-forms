@@ -111,10 +111,11 @@ trait BindingMetadata extends Logging {
 
     _checkedPaths = newPaths
 
-    if (debugEnabled)
+    ifDebug {
       bindingOpt foreach { _ =>
         debug("found binding for", List("element" -> s"Q{$uri}$localname"))
       }
+    }
 
     bindingOpt
   }

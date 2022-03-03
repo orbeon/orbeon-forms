@@ -424,7 +424,7 @@ object Connection extends ConnectionTrait {
               content    = StreamedContent.fromStreamAndHeaders(urlConnection.getInputStream, headersWithContentType)
             )
 
-            if (debugEnabled) {
+            ifDebug {
               connectionResult.logResponseDetailsOnce(log4s.Debug)
               connectionResult.logResponseBody(log4s.Debug, logBody)
             }

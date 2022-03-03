@@ -13,25 +13,24 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import java.io.{ByteArrayInputStream, InputStream}
-import java.net.URI
 import com.lowagie.text.Image
-
-import javax.imageio.ImageIO
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.ImageSupport._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.ImageSupport._
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, FileItemSupport, IndentedLogger, NetUtils, URLRewriterUtils}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, NetUtils, URLRewriterUtils}
 import org.xhtmlrenderer.layout.SharedContext
 import org.xhtmlrenderer.pdf.ITextFSImage
 import org.xhtmlrenderer.resource.ImageResource
 import org.xhtmlrenderer.swing.NaiveUserAgent
 import org.xhtmlrenderer.util.{ImageUtil, XRLog}
 
+import java.io.{ByteArrayInputStream, InputStream}
+import java.net.URI
+import javax.imageio.ImageIO
 import scala.collection.mutable
 import scala.util.Try
 import scala.util.control.NonFatal
@@ -98,7 +97,7 @@ class CustomUserAgent(
       val localUri =
         FileItemSupport.inputStreamToAnyURI(
           resolveAndOpenStream(resolvedUriString),
-          NetUtils.REQUEST_SCOPE,
+          ExpirationScope.Request)(
           XHTMLToPDFProcessor.logger.logger
         )._1
 

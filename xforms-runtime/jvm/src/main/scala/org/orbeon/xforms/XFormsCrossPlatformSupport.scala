@@ -214,7 +214,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): Option[String] =
     useAndClose(inputStream) { is =>
-      FileItemSupport.inputStreamToAnyURI(is, NetUtils.REQUEST_SCOPE, logger.logger.logger)._1.some
+      FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Request)(logger.logger.logger)._1.some
     }
 
   def inputStreamToSessionUri(
@@ -222,7 +222,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): Option[String] =
     useAndClose(inputStream) { is =>
-      FileItemSupport.inputStreamToAnyURI(is, NetUtils.SESSION_SCOPE, logger.logger.logger)._1.some
+      FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)(logger.logger.logger)._1.some
     }
 
   def getLastModifiedIfFast(absoluteURL: String): Long =

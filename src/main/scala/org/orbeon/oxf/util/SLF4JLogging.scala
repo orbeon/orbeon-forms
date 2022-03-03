@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.util
 
+
 object SLF4JLogging {
 
   def withDebug[T](
@@ -23,11 +24,7 @@ object SLF4JLogging {
   ): T =
     try {
       if (logger.isDebugEnabled)
-        logger.debug(
-          s"start $message",
-          parameters collect {
-            case (k, v) if (k ne null) && (v ne null) => s"""$k: "$v""""
-          } mkString ("{", ", ", "}")
+        logger.debug(s"start $message", flattenParams(parameters)
         )
 
       body
@@ -35,4 +32,25 @@ object SLF4JLogging {
       if (logger.isDebugEnabled)
         logger.debug(s"end $message")
     }
+
+  def error(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: org.slf4j.Logger): Unit =
+    logger.error(message, flattenParams(parameters))
+
+  def warn(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: org.slf4j.Logger): Unit =
+    logger.warn(message, flattenParams(parameters))
+
+  def info(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: org.slf4j.Logger): Unit =
+    logger.info(message, flattenParams(parameters))
+
+  def debug(message: => String, parameters: => Seq[(String, String)] = Nil)(implicit logger: org.slf4j.Logger): Unit =
+    logger.debug(message, flattenParams(parameters))
+
+  def ifDebug[T](body: => T)(implicit logger: org.slf4j.Logger): Unit =
+    if (logger.isDebugEnabled)
+      body
+
+  private def flattenParams(tuples: Seq[(String, String)]): String =
+    tuples collect {
+      case (k, v) if (k ne null) && (v ne null) => s"""$k: "$v""""
+    } mkString ("{", ", ", "}")
 }

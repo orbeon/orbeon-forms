@@ -93,12 +93,6 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="fr:grid" mode="within-controls">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-    </xsl:template>
-
     <xsl:template match="fr:grid" mode="within-controls within-dialogs">
         <xsl:copy>
 

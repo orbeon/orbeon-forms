@@ -136,9 +136,9 @@ What's happening?
 Compiling Orbeon Forms
 ----------------------
 
-You usually don't have to compile Orbeon Forms yourself. But if you want to, see
-[Building Orbeon Forms](https://doc.orbeon.com/contributors/building-orbeon-forms).
-The source code is available on [github](https://github.com/orbeon/orbeon-forms/).
+You usually don't have to compile Orbeon Forms yourself. But if you want to, see [Building Orbeon Forms](https://doc.orbeon.com/contributors/building-orbeon-forms).
+
+The source code of Orbeon Forms CE is available on [github](https://github.com/orbeon/orbeon-forms/).
 
 Orbeon Forms is written mainly using the following languages and technologies:
 
@@ -154,76 +154,19 @@ Known bugs and requests for enhancements (RFEs)
 For a list of known issues and RFEs, check the [issue tracking system](https://github.com/orbeon/orbeon-forms/issues).
 
 
-License
--------
-
-The source code is distributed under the terms of the GNU Lesser General
-Public License (LGPL). The full text of the license is available at
-<http://www.gnu.org/copyleft/lesser.html>. LGPL is a business-friendly
-license that allows you to use Orbeon Forms for open source and
-commercial applications.
-
-Some examples are distributed under the terms of the Apache License,
-Version 2.0. The full text of the license is available at:
-<http://www.apache.org/licenses/LICENSE-2.0>.
-
-Please refer to file headers to identify which license governs the
-distribution of a particular file.
-
-This software is OSI Certified Open Source Software. OSI Certified is
-a certification mark of the Open Source Initiative.
-
-See the next section for more details about the licenses of included
-third-party software.
-
 
 Third-party software
 --------------------
 
-This product includes software developed by the [Apache Software Foundation](https://www.apache.org/):
+This product includes:
 
-- [Ant](https://ant.apache.org/)
-- [Commons](https://commons.apache.org/)
-- [HttpComponents](https://hc.apache.org/)
-- [Log4j](https://logging.apache.org/log4j/)
-- [Mime4j](https://james.apache.org/mime4j/)
-- [Xerces](https://xerces.apache.org/xerces-j/)
+- software developed by the [Apache Software Foundation](https://www.apache.org/)
+- other third-party software (see [build.sbt](https://github.com/orbeon/orbeon-forms/blob/master/build.sbt)) 
+- [Silk Icons](http://www.famfamfam.com/lab/icons/silk) (Creative Commons Attribution 2.5 License)
+- [PixelMixer icons](https://iconarchive.com/artist/pixelmixer.html)
+- schemas for XSLT 2.0 and XForms 1.1 (W3C Software License)
 
-In addition, this product includes the following software:
-
-- [Barcode4j](http://barcode4j.sourceforge.net/)
-- [Bootstrap](https://getbootstrap.com/)
-- [CodeMirror](https://codemirror.net/)
-- dom4j
-- [Ehcache](https://www.ehcache.org/)
-- [eXist](https://exist-db.org/)
-- [Flying Saucer](https://code.google.com/archive/p/flying-saucer/)
-- [OpenPDF](https://github.com/LibrePDF/OpenPDF)
-- Jaxen
-- [JCIFS](https://www.jcifs.org/)
-- [JTidy](http://jtidy.sourceforge.net/)
-- [JUnit](https://junit.org/)
-- [Saxon](http://saxon.sourceforge.net/)
-- [SAXPath](https://sourceforge.net/projects/saxpath)
-- [Scala](https://www.scala-lang.org/)
-- [ScalaTest](https://www.scalatest.org/)
-- Sun Multi-Schema XML Validator
-- TagSoup
-- [YUI Library](https://yuilibrary.com/)
-
-This product makes use of schemas for XSLT 2.0 and XForms 1.1 provided
-under W3C Software License. The schemas are available at the following
-locations:
-
-    jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/*.xsd
-
-This product makes use of the [Silk Icons](<http://www.famfamfam.com/lab/icons/silk/>), released
-under a Creative Commons Attribution 2.5 License.
-
-This product makes use of the [PixelMixer icons](https://iconarchive.com/artist/pixelmixer.html).
-
-Please consult the `third-party-licenses` directory for more information
-about individual licenses.
+Please consult the `third-party-licenses` directory for more information about individual licenses.
 
 Credits
 -------

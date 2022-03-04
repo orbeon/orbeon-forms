@@ -101,7 +101,7 @@ object RowEditor {
         val rowIndex  = pointerRowTopBottom._2
 
         rowEditorContainer.show()
-      Offset.offset(
+        Offset.offset(
           el     = rowEditorContainer,
           offset = Offset(
             left = containerLeft,

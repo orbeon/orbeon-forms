@@ -155,7 +155,7 @@ object Authorizer extends Logging {
             url             = newURL,
             credentials     = None,
             content         = content,
-            headers         = allHeaders.toMap,
+            headers         = allHeaders,
             loadState       = true,
             saveState       = true,
             logBody         = false)(

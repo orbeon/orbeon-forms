@@ -13,9 +13,8 @@
  */
 package org.orbeon.oxf.util
 
-import java.io.{ByteArrayInputStream, File}
+import org.apache.commons.fileupload.UploadContext
 import org.apache.commons.fileupload.disk.DiskFileItem
-import org.apache.commons.fileupload.{FileItem, UploadContext}
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.datatypes.MaximumSize.LimitedSize
 import org.orbeon.io.LimiterInputStream
@@ -33,6 +32,7 @@ import org.orbeon.xforms.Constants
 import org.scalactic.Equality
 import org.scalatest.funspec.AnyFunSpecLike
 
+import java.io.ByteArrayInputStream
 import scala.collection.{mutable => m}
 import scala.util.{Success, Try}
 
@@ -82,7 +82,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
       parseMultipartRequest(
         uploadContext,
         Some(
-          new UploadProgressMultipartLifecycle(Some(body.length.toLong), uploadContext.getInputStream, session) {
+          new UploadProgressMultipartLifecycle(Some(body.length.toLong), None, uploadContext.getInputStream, session) {
             def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] =
               Success(MaximumSize.unapply(maxSize.toString).get -> AllowedAnyMediatype)
           }

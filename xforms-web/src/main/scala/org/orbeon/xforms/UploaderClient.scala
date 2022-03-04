@@ -144,6 +144,7 @@ object UploaderClient {
           url         = Page.getForm(requestFormId).xformsServerUploadPath,
           requestBody = formData,
           contentType = None,
+          acceptLang  = Language.getLang().some, // this language can be used for messages returned by a file scanner
           formId      = requestFormId,
           abortSignal = controller.signal.some
         )

@@ -80,6 +80,7 @@ object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
         url         = requestForm.xformsServerPath,
         requestBody = requestBody,
         contentType = "application/xml".some,
+        acceptLang  = None,
         formId      = requestFormId,
         abortSignal = controller.signal.some
       ).onComplete { response =>

@@ -79,6 +79,7 @@ public class AcmeFileScanProvider2 extends FileScanProvider2 {
 
     @Override
     public FileScan2 startStream(String filename, Map<String, String[]> headers, String language, Map<String, Object> extension) {
+        logger.info("Starting scan for " + filename + " with language " + language);
         return new AcmeFileScan2(filename, headers, language, extension);
     }
 

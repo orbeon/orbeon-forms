@@ -76,7 +76,12 @@ object UploaderServer {
     Multipart.parseMultipartRequest(
       uploadContext  = trustedUploadContext,
       lifecycleOpt   = Some(
-        new UploadProgressMultipartLifecycle(request.contentLengthOpt, trustedUploadContext.getInputStream, session) {
+        new UploadProgressMultipartLifecycle(
+          requestContentLengthOpt  = request.contentLengthOpt,
+          requestAcceptLanguageOpt = request.getFirstHeader(Headers.AcceptLanguageLower),
+          outerLimiterInputStream  = trustedUploadContext.getInputStream,
+          session                  = session
+        ) {
           def getUploadConstraintsForControl(uuid: String, controlEffectiveId: String): Try[(MaximumSize, AllowedMediatypes)] =
             withDocumentAcquireLock(
               uuid    = uuid,
@@ -106,9 +111,10 @@ object UploaderServer {
 
   // Public for tests
   abstract class UploadProgressMultipartLifecycle(
-    requestContentLengthOpt : Option[Long],
-    outerLimiterInputStream : LimiterInputStream,
-    session                 : Session
+    requestContentLengthOpt  : Option[Long],
+    requestAcceptLanguageOpt : Option[String],
+    outerLimiterInputStream  : LimiterInputStream,
+    session                  : Session
   ) extends MultipartLifecycle {
 
     // Mutable state
@@ -219,7 +225,14 @@ object UploaderServer {
       fileScanProviderOpt foreach {
         case Left(fileScanProviderV2) =>
           fileScanOpt =
-            Try(fileScanProviderV2.startStream(fileItem.getName, FileScanProvider.convertHeadersToJava(headersOpt map convertFileItemHeaders getOrElse Nil), "???", Map.empty.asJava)) match {
+            Try(
+              fileScanProviderV2.startStream(
+                filename  = fileItem.getName,
+                headers   = FileScanProvider.convertHeadersToJava(headersOpt map convertFileItemHeaders getOrElse Nil),
+                language  = requestAcceptLanguageOpt.getOrElse("en"),
+                extension = Map.empty.asJava
+              )
+            ) match {
               case Success(fs) => Some(Left(fs))
               case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
             }
@@ -257,12 +270,12 @@ object UploaderServer {
             case Right(fileScan) => withFileScanCall(fileScan.complete(file))
           }
         case UploadState.Interrupted(_) =>
-          try {
+          try
             fileScanOpt foreach {
               case Left(fileScan2) => fileScan2.abort()
               case Right(fileScan) => fileScan.abort()
             }
-          } catch {
+          catch {
             case NonFatal(t) =>
               info(s"error thrown by file scan provider while calling `abort()`: ${OrbeonFormatter.getThrowableMessage(t)}")
           }
@@ -356,20 +369,20 @@ object UploaderServer {
       loadProvider[FileScanProvider2].map(Left.apply)
         .orElse(loadProvider[FileScanProvider].map(Right.apply))
 
-    // The Java API uses its ADT. Here we convert from that to our native Scala ADT.
+    // The Java API uses its own ADT. Here we convert from that to our native Scala ADT.
     def fileScanResultFromJavaApi(jfsr: JFileScanResult): FileScanResult =
       jfsr match {
         case r: JFileScanResult.FileScanAcceptResult =>
           FileScanAcceptResult(
-            message    = Option(r.message)  .flatMap(_.trimAllToOpt),
-            mediatype  = Option(r.mediatype).flatMap(_.trimAllToOpt),
-            filename   = Option(r.filename) .flatMap(_.trimAllToOpt),
-            content    = Option(r.content),
-            extension  = Option(r.extension).map(_.asScala.toMap)
+            message   = Option(r.message)  .flatMap(_.trimAllToOpt),
+            mediatype = Option(r.mediatype).flatMap(_.trimAllToOpt),
+            filename  = Option(r.filename) .flatMap(_.trimAllToOpt),
+            content   = Option(r.content),
+            extension = Option(r.extension).map(_.asScala.toMap)
           )
         case r: JFileScanResult.FileScanRejectResult =>
           FileScanRejectResult(
-            message = Option(r.message).flatMap(_.trimAllToOpt)
+            message   = Option(r.message).flatMap(_.trimAllToOpt)
           )
         case r: JFileScanResult.FileScanErrorResult  =>
           FileScanErrorResult(

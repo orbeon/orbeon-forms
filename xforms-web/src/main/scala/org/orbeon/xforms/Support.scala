@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.StringUtils._
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
@@ -21,6 +22,7 @@ import org.scalajs.dom.{Element, EventTarget, FocusEvent, FormData, html}
 
 import scala.concurrent.Future
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 import scala.scalajs.js
 import scala.scalajs.js.|
 import scala.util.control.NonFatal
@@ -67,9 +69,14 @@ object Support {
     url         : String,
     requestBody : String | FormData,
     contentType : Option[String],
+    acceptLang  : Option[String],
     formId      : String,
     abortSignal : Option[AbortSignal]
   ): Future[(Int, String, Option[dom.Document])] = {
+
+    val customHeaders = js.Dictionary[String]()
+    contentType.foreach(customHeaders(Headers.ContentType)    = _)
+    acceptLang .foreach(customHeaders(Headers.AcceptLanguage) = _)
 
     val fetchPromise =
       Fetch.fetch(
@@ -77,7 +84,7 @@ object Support {
         new RequestInit {
           method         = HttpMethod.POST
           body           = requestBody
-          headers        = contentType map (ct => js.defined(js.Dictionary("Content-Type" -> ct))) getOrElse js.undefined
+          headers        = if (customHeaders.nonEmpty) customHeaders else js.undefined
           referrer       = js.undefined
           referrerPolicy = js.undefined
           mode           = js.undefined

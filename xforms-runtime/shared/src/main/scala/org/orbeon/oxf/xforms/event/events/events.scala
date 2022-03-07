@@ -180,7 +180,7 @@ object XXFormsUploadErrorEvent {
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.FileScanReason(_, message)))) =>
         List(
           "error-type" -> Some("file-scan-error"),
-          "message"    -> Some(message)
+          "message"    -> message
         )
       case _ =>
         List("error-type" -> Some("upload-error"))

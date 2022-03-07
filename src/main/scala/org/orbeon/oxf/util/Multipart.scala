@@ -278,7 +278,7 @@ object Multipart {
                collect {
                  case root: SizeLimitExceededException                => Reason.SizeReason(root.getPermittedSize, root.getActualSize)
                  case DisallowedMediatypeException(permitted, actual) => Reason.MediatypeReason(permitted, actual)
-                 case FileScanException(fieldName, fileScanResult)    => Reason.FileScanReason(fieldName, fileScanResult.message.getOrElse("xxxxxxxx")) // xxx TODO message
+                 case FileScanException(fieldName, fileScanResult)    => Reason.FileScanReason(fieldName, fileScanResult.message)
                }
               )
             ))

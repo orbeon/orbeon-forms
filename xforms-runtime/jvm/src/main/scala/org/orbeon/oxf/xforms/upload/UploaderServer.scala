@@ -262,7 +262,7 @@ object UploaderServer {
       state match {
         case UploadState.Completed(fileItem) =>
 
-          val file = fileFromFileItemCreateIfNeeded(fileItem)
+          val file = FileItemSupport.fileFromFileItemCreateIfNeeded(fileItem)
 
           fileScanOpt map {
             case Left(fileScan2) => withFileScanCall2(fileScan2.complete(file))

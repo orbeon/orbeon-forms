@@ -113,7 +113,7 @@ object Multipart {
         pipelineContext.addContextListener((_: Boolean) => quietlyDeleteFileItems(nameValuesFileScan))
 
         val foldedValues =
-          nameValuesFileScan map { case (k, v, f) => (k,  v.fold(identity, identity)) }
+          nameValuesFileScan map { case (k, v, _) => (k,  v.fold(identity, identity)) }
 
         combineValues[String, AnyRef, Array](foldedValues).toMap.asJava
       case (nameValuesFileScan, Some(t)) =>
@@ -158,7 +158,7 @@ object Multipart {
       val result = m.ListBuffer[(String, UploadItem, Option[FileScanAcceptResult])]()
       try {
         // `getItemIterator` can throw a `SizeLimitExceededException` in particular
-        val itemIterator = asScalaIterator(servletFileUpload.getItemIterator(uploadContext))
+        val itemIterator = FileItemSupport.asScalaIterator(servletFileUpload.getItemIterator(uploadContext))
         for (fis <- itemIterator)
           result += processSingleStreamItem(servletFileUpload, fis, lifecycleOpt)
 
@@ -242,7 +242,7 @@ object Multipart {
                 fis.openStream,
               out = new OutputStream {
 
-                val fios = fileItem.getOutputStream
+                private val fios = fileItem.getOutputStream
 
                 // We know that this is not called by `copyStream`
                 def write(b: Int): Unit = throw new IllegalStateException
@@ -286,11 +286,5 @@ object Multipart {
         } // catch
       } // ! fis.isFormField
     } // processSingleStreamItem
-
-    def asScalaIterator(i: FileItemIterator): Iterator[FileItemStream] = new Iterator[FileItemStream] {
-      def hasNext: Boolean = i.hasNext
-      def next(): FileItemStream = i.next()
-      override def toString = "Iterator wrapping FileItemIterator" // super.toString is dangerous when running in a debugger
-    }
   }
 }

@@ -38,7 +38,6 @@ import org.orbeon.xforms.Constants
 import org.slf4j.LoggerFactory
 import shapeless.syntax.typeable._
 
-import java.net.URI
 import java.util.ServiceLoader
 import scala.collection.{mutable => m}
 import scala.jdk.CollectionConverters._
@@ -321,14 +320,6 @@ object UploaderServer {
     def convertFileItemHeaders(headers: FileItemHeaders) =
       for (name <- headers.getHeaderNames.asScala.toList)
         yield name -> headers.getHeaders(name).asScala.toList
-
-    // The file will expire with the request
-    // We now set the threshold of `DiskFileItem` to `-1` so that a file is already created in the first
-    // place, so this should never create a file but just use the one from the `DiskItem`. One unclear
-    // case is that of a zero-length file, which will probably not be created by `DiskFileItem` as nothing
-    // is written.
-    def fileFromFileItemCreateIfNeeded(fileItem: DiskFileItem): java.io.File =
-      new java.io.File(new URI(FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request)))
 
     def withFileScanCall(block: => FileScanStatus): FileScanResult =
       Try(block) match {

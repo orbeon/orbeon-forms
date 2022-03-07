@@ -1,6 +1,6 @@
 package org.orbeon.oxf.util
 
-import org.apache.commons.fileupload.FileItem
+import org.apache.commons.fileupload.{FileItem, FileItemIterator, FileItemStream}
 import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -112,6 +112,20 @@ object FileItemSupport {
       // NOTE: Conversion occurs every time this method is called. Not optimal.
       inputStreamToAnyURI(fileItem.getInputStream, scope)._1
     }
+  }
+
+  // The file will expire with the request
+  // We now set the threshold of `DiskFileItem` to `-1` so that a file is already created in the first
+  // place, so this should never create a file but just use the one from the `DiskItem`. One unclear
+  // case is that of a zero-length file, which will probably not be created by `DiskFileItem` as nothing
+  // is written.
+  def fileFromFileItemCreateIfNeeded(fileItem: DiskFileItem)(implicit logger: Logger): java.io.File =
+    new java.io.File(new URI(FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request)))
+
+  def asScalaIterator(i: FileItemIterator): Iterator[FileItemStream] = new Iterator[FileItemStream] {
+    def hasNext: Boolean = i.hasNext
+    def next(): FileItemStream = i.next()
+    override def toString = "Iterator wrapping FileItemIterator" // `super.toString` is dangerous when running in a debugger
   }
 
   private object Private {

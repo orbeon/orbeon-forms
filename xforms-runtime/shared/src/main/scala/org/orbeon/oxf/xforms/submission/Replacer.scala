@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.ConnectionResult
 
 trait Replacer {
 
+  // TODO: Refactor to return a value like `replace()` does.
   def deserialize(
     cxr: ConnectionResult,
     p  : SubmissionParameters,

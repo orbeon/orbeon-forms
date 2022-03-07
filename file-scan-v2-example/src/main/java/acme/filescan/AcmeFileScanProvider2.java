@@ -13,7 +13,7 @@ import java.util.Map;
  * if its name contains the string "virus". This obviously is not the right way to determine
  * whether a file contains a virus or not ;)
  */
-public class AcmeFileScanProvider2 extends FileScanProvider2 {
+public class AcmeFileScanProvider2 implements FileScanProvider2 {
 
     // A public no-arguments constructor is required by the `ServiceLoader` API
     public AcmeFileScanProvider2() {

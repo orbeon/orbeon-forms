@@ -3,7 +3,7 @@ package org.orbeon.oxf.xforms.upload.api.java
 import _root_.java.{util => ju}
 
 
-abstract class FileScanProvider2 {
+trait FileScanProvider2 {
 
   def init(): Unit
   def destroy(): Unit

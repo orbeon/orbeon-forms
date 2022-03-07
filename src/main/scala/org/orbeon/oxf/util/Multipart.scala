@@ -245,7 +245,7 @@ object Multipart {
                 val fios = fileItem.getOutputStream
 
                 // We know that this is not called by `copyStream`
-                def write(b: Int) = throw new IllegalStateException
+                def write(b: Int): Unit = throw new IllegalStateException
 
                 // We know that this is the only `write` method called by `copyStream`
                 override def write(b: Array[Byte], off: Int, len: Int): Unit =

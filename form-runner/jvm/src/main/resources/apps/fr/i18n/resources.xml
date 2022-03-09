@@ -3246,10 +3246,10 @@
                 <goto-content>Gehe zu Inhalt</goto-content>
             </labels>
             <formats>
-                <date>[D]. [Mn] [Y]</date>
+                <date>[D]. [MNn] [Y]</date>
                 <time>[H01]:[m01]:[s01]</time>
                 <dateTime>[D]. [Mn] [Y] [H01]:[m01]:[s01]</dateTime>
-                <save-datetime>[D]. [Mn] [Y] [H01]:[m01]:[s01]</save-datetime>
+                <save-datetime>[D]. [MNn] [Y] [H01]:[m01]:[s01]</save-datetime>
             </formats>
         </summary>
         <detail>

@@ -308,7 +308,7 @@ trait FormRunnerActionsCommon {
       pathQueryOrUrl
 
   private def tryNavigateTo(location: String, target: Option[String]): Try[Any] =
-    Try(load(prependCommonFormRunnerParameters(location,  forNavigate = true), target, progress = false))
+    Try(load(prependCommonFormRunnerParameters(location, forNavigate = true), target, progress = false))
 
   // Navigate to a URL specified in parameters or indirectly in properties
   // If no URL is specified, the action fails

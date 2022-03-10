@@ -27,6 +27,7 @@ object ContentTypes {
   val SoapContentType           = "application/soap+xml"
   val PdfContentType            = "application/pdf"
   val TiffContentType           = "image/tiff"
+  val ExcelContentType          = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   val OctetStreamContentType    = "application/octet-stream"
   val UnknownContentType        = "content/unknown"
 

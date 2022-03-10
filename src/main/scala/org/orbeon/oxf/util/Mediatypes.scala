@@ -74,6 +74,9 @@ object Mediatypes {
     } yield
       mapping.extension
 
+  def getExtensionForMediatypeOrThrow(mediatype: String): String =
+    findExtensionForMediatype(mediatype).getOrElse(throw new IllegalArgumentException("mediatype"))
+
   def fromHeadersOrFilename(
     header  : String => Option[String],
     filename: => Option[String]

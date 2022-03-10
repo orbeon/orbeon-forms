@@ -13,9 +13,12 @@
  */
 package org.orbeon.oxf.fr.process
 
+import enumeratum.EnumEntry.Hyphencase
+import enumeratum._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
+import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.NodeInfoFactory
@@ -23,25 +26,31 @@ import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import enumeratum.EnumEntry.Lowercase
-import enumeratum._
 
 import scala.language.postfixOps
 
+
 object FormRunnerRenderedFormat {
 
-  sealed trait RenderedFormat extends EnumEntry with Lowercase
+  sealed trait RenderedFormat extends EnumEntry with Hyphencase
 
   object RenderedFormat extends Enum[RenderedFormat] {
 
     val values = findValues
 
-    case object Pdf  extends RenderedFormat
-    case object Tiff extends RenderedFormat
+    case object Pdf                     extends RenderedFormat
+    case object Tiff                    extends RenderedFormat
+    case object ExcelWithNamedRanges    extends RenderedFormat
+    case object XmlFormStructureAndData extends RenderedFormat
   }
 
   val SupportedRenderFormatsMediatypes: Map[RenderedFormat, String] =
-    Map(RenderedFormat.Pdf -> "application/pdf", RenderedFormat.Tiff -> "image/tiff")
+    Map(
+      RenderedFormat.Pdf                     -> ContentTypes.PdfContentType,
+      RenderedFormat.Tiff                    -> ContentTypes.TiffContentType,
+      RenderedFormat.ExcelWithNamedRanges    -> ContentTypes.ExcelContentType,
+      RenderedFormat.XmlFormStructureAndData -> ContentTypes.XmlContentType
+    )
 
   case class PdfTemplate(path: String, nameOpt: Option[String], langOpt: Option[String]) {
     require(path ne null)
@@ -198,6 +207,7 @@ object FormRunnerRenderedFormat {
     }
   }
 
+  private[process] // for tests
   def createPdfOrTiffParams(
     frFormAttachmentsRootElemOpt : Option[NodeInfo],
     params                       : ActionParams,

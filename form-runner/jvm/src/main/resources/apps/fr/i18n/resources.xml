@@ -79,6 +79,7 @@
             <test-formulas>&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
             <test-offline>&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
             <excel-export>&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
+            <xml-export>&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publish</save-publish>
 

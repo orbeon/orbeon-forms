@@ -20,9 +20,9 @@ import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.http.{Headers, HttpMethod}
-import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{ContentTypes, Mediatypes}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.EscapeURI
@@ -142,7 +142,8 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         } toMap
       }
 
-      // The token can be `xml`, `metadata`, `pdf`, `tiff`, `pdf-url`, `tiff-url`
+      // The token can be `xml`, `metadata`, `pdf`, `tiff`, `pdf-url`, `tiff-url`,
+      // `excel-with-named-ranges`, `xml-form-structure-and-data`.
       val contentToken = evaluatedPropertiesAsMap("content").get.trimAllToEmpty
       val renderedFormatContentToken = RenderedFormat.withNameOption(contentToken)
 
@@ -193,7 +194,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
           (NonRelevantName   -> effectiveNonRelevant)
       }
 
-      // Create PDF and/or TIFF if needed
+      // Create rendered format if needed
       val selectedRenderFormatOpt =
         RenderedFormat.values find { format =>
           val formatString = format.entryName
@@ -260,40 +261,56 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
   def tryOpenRenderedFormat(params: ActionParams): Try[Any] =
     Try {
-      val FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
+      implicit val frParams: FormRunnerParams = FormRunnerParams()
 
       ensureDataCalculationsAreUpToDate()
 
-      val renderedFormatString = (
+      val renderedFormat = (
         paramByName(params, "format")
         flatMap   trimAllToOpt
         flatMap   RenderedFormat.withNameOption
         getOrElse RenderedFormat.Pdf
-      ).entryName
+      )
+
+      def extensionForRenderedFormat(renderedFormat: RenderedFormat): String =
+        Mediatypes.getExtensionForMediatypeOrThrow(FormRunnerRenderedFormat.SupportedRenderFormatsMediatypes(renderedFormat))
 
       // TODO: Use namespaces from appropriate scope.
       val fullFilename = {
-        val filenameProperty            = s"oxf.fr.detail.$renderedFormatString.filename"
-        val filenamePropertyValue       = formRunnerProperty(filenameProperty)(FormRunnerParams()).flatMap(trimAllToOpt)
+        val filenameProperty            = s"oxf.fr.detail.${renderedFormat.entryName}.filename"
+        val filenamePropertyValue       = formRunnerProperty(filenameProperty).flatMap(trimAllToOpt)
         val filenameFromProperty        = filenamePropertyValue.map(evaluateString(_, xpathContext)).flatMap(trimAllToOpt)
         val escapedFilenameFromProperty = filenameFromProperty.map(EscapeURI.escape(_, "-_.~").toString)
         val filename                    = escapedFilenameFromProperty.getOrElse(currentXFormsDocumentId)
-        s"$filename.$renderedFormatString"
+
+        s"$filename.${extensionForRenderedFormat(renderedFormat)}"
       }
 
-      val currentFormLang = FormRunner.currentLang
+      val path =
+        buildRenderedFormatPath(
+          params          = params,
+          renderedFormat  = renderedFormat,
+          fullFilename    = Some(fullFilename),
+          currentFormLang = FormRunner.currentLang
+        )
 
-      recombineQuery(
-        s"/fr/$app/$form/$renderedFormatString/$document",
-        ("fr-rendered-filename" -> fullFilename) :: createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
-      )
-    } flatMap
+      val formTargetOpt =
+        renderedFormat match {
+          case RenderedFormat.Pdf | RenderedFormat.Tiff                                     => Some("_blank")
+          case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData => None
+        }
+
+      (path, formTargetOpt)
+    } flatMap { case (path, formTargetOpt) =>
       tryChangeMode(
         replace            = XFORMS_SUBMIT_REPLACE_ALL,
         showProgress       = false,
-        formTargetOpt      = Some("_blank"),
+        formTargetOpt      = formTargetOpt,
         responseIsResource = true
+      )(
+        path               = path
       )
+    }
 
   def clearRenderedFormatsResources(): Try[Any] = Try {
 
@@ -349,8 +366,40 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     recombineQuery(path, newParams ::: params)
   }
 
+  private def buildRenderedFormatPath(
+    params          : ActionParams,
+    renderedFormat  : RenderedFormat,
+    fullFilename    : Option[String],
+    currentFormLang : String)(implicit
+    frParams        : FormRunnerParams
+  ): String = {
+
+    val FormRunnerParams(app, form, _, Some(document), _, _) = frParams
+
+    val urlParams =
+      fullFilename.toList.map("fr-rendered-filename" ->) :::
+        createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
+
+    renderedFormat match {
+      case RenderedFormat.Pdf | RenderedFormat.Tiff =>
+        recombineQuery(
+          s"/fr/${if (fullFilename.isDefined) "" else "service/"}$app/$form/${renderedFormat.entryName}/$document",
+          urlParams
+        )
+      case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData =>
+        recombineQuery(
+          s"/fr/service/$app/$form/export/$document?export-format=${renderedFormat.entryName}",
+          urlParams
+        )
+    }
+  }
+
   // Create if needed and return the element key name
-  private def tryCreatePdfOrTiffIfNeeded(params: ActionParams, format: RenderedFormat): Try[String] =
+  private def tryCreatePdfOrTiffIfNeeded(
+    params   : ActionParams,
+    format   : RenderedFormat)(implicit
+    frParams : FormRunnerParams
+  ): Try[String] =
     Try {
 
       val currentFormLang = FormRunner.currentLang
@@ -365,12 +414,12 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         case Some((_, key)) => key
         case None =>
 
-          implicit val frParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-
           val path =
-            recombineQuery(
-              s"/fr/service/$app/$form/${format.entryName}/$document",
-              createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
+            buildRenderedFormatPath(
+              params          = params,
+              renderedFormat  = format,
+              fullFilename    = None,
+              currentFormLang = currentFormLang
             )
 
           def processSuccessResponse() = {

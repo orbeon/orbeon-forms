@@ -179,6 +179,9 @@
     <property as="xs:string"  name="oxf.fr.detail.tiff.compression.quality.*.*"                 value="0.8"/>
     <property as="xs:string"  name="oxf.fr.detail.tiff.scale.*.*"                               value="3.0"/>
 
+    <property as="xs:string"  name="oxf.fr.detail.excel-with-named-ranges.filename.*.*"         value=""/>
+    <property as="xs:string"  name="oxf.fr.detail.xml-form-structure-and-data.filename.*.*"     value=""/>
+
     <property as="xs:string"  name="oxf.fr.detail.rendered-page-orientation.*.*"                value="portrait"/>
     <property as="xs:string"  name="oxf.fr.detail.rendered-page-size.*.*"                       value="letter"/>
 
@@ -400,6 +403,12 @@
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.tiff.*.*">
         open-rendered-format(format = "tiff")
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.excel-export.*.*">
+        open-rendered-format(format = "excel-with-named-ranges")
+    </property>
+    <property as="xs:string"  name="oxf.fr.detail.process.xml-export.*.*">
+        open-rendered-format(format = "xml-form-structure-and-data")
     </property>
 
     <!-- Legacy buttons and processes -->

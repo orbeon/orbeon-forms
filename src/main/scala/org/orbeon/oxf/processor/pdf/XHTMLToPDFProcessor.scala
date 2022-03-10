@@ -36,7 +36,7 @@ private object XHTMLToPDFProcessor {
 
   val logger = LoggerFactory.createLogger(classOf[XHTMLToPDFProcessor])
 
-  var DefaultContentType  = "application/pdf"
+  var DefaultContentType  = ContentTypes.PdfContentType
   val DefaultDotsPerPoint = 20f * 4f / 3f
   val DefaultDotsPerPixel = 14
 

@@ -59,7 +59,7 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
   addInputInfo(new ProcessorInputOutputInfo("data"))
   addInputInfo(new ProcessorInputOutputInfo("config"))
 
-  protected def getDefaultContentType = "image/tiff"
+  protected def getDefaultContentType = ContentTypes.TiffContentType
 
   override def createOutput(outputName: String): ProcessorOutput =
     new ProcessorOutputImpl(PDFToImageProcessor.this, outputName) {

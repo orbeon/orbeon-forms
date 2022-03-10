@@ -15,6 +15,7 @@ package org.orbeon.xforms.rpc
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
+import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.xforms.AjaxClient.{handleFailure, logAndShowError}
 import org.orbeon.xforms.facade.Properties
 import org.orbeon.xforms.{AjaxRequest, Page, Support}
@@ -25,6 +26,7 @@ import org.scalajs.dom.experimental.AbortController
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 import scala.scalajs.js
 import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}
@@ -79,7 +81,7 @@ object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
       Support.fetchText(
         url         = requestForm.xformsServerPath,
         requestBody = requestBody,
-        contentType = "application/xml".some,
+        contentType = ContentTypes.XmlContentType.some,
         acceptLang  = None,
         formId      = requestFormId,
         abortSignal = controller.signal.some

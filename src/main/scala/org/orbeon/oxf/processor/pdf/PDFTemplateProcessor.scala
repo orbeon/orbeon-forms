@@ -53,7 +53,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
   addInputInfo(new ProcessorInputOutputInfo("model", PDFTemplateModelNamespaceURI))
   addInputInfo(new ProcessorInputOutputInfo("data"))
 
-  protected def getDefaultContentType = "application/pdf"
+  protected def getDefaultContentType = ContentTypes.PdfContentType
 
   protected def readInput(
     pipelineContext : PipelineContext,

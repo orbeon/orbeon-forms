@@ -11,16 +11,15 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<p:config
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- Empty, or current form data -->
     <p:param type="input" name="instance"/>
-    <!-- XHTML+FR+XForms for the from obtained from persistence layer -->
+
+    <!-- XHTML+FR+XForms for the form obtained from persistence layer -->
     <p:param type="output" name="data"/>
     <!-- Request parameters (app, form, document, and mode) from URL -->
     <p:param type="output" name="instance"/>
@@ -31,7 +30,7 @@
         <p:output name="data" id="parameters"/>
     </p:processor>
 
-    <!-- If data is posted, store as request attribute -->
+    <!-- If data is `POST`ed, store as request attribute -->
     <p:choose href="#instance">
         <p:when test="not(/null/@xsi:nil='true')">
             <p:processor name="oxf:scope-serializer">

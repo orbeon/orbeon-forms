@@ -24,7 +24,9 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
 
+import java.net.URI
 import scala.util.{Failure, Success}
+
 
 class GridDataMigrationTest
   extends DocumentTestBase
@@ -33,8 +35,8 @@ class GridDataMigrationTest
      with FormBuilderSupport
      with XMLSupport {
 
-  lazy val form   : DocumentInfo = readURLAsImmutableXMLDocument("oxf:/org/orbeon/oxf/fb/form-to-migrate.xhtml")
-  lazy val toolbox: DocumentInfo = readURLAsImmutableXMLDocument("oxf:/org/orbeon/oxf/fb/form-to-migrate-library.xml")
+  lazy val form   : DocumentInfo = readURLAsImmutableXMLDocument(URI.create("oxf:/org/orbeon/oxf/fb/form-to-migrate.xhtml"))
+  lazy val toolbox: DocumentInfo = readURLAsImmutableXMLDocument(URI.create("oxf:/org/orbeon/oxf/fb/form-to-migrate-library.xml"))
 
   val Migration48Json =
     """

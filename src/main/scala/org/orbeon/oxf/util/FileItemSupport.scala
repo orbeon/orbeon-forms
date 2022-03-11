@@ -34,16 +34,9 @@ object FileItemSupport {
     inputStream : InputStream,
     scope       : ExpirationScope)(implicit
     logger      : Logger
-  ): (String, Long) = {
-
+  ): (URI, Long) = {
     val (fileItem, size) = prepareFileItemFromInputStream(inputStream, scope)
-
-    val storeLocation = fileItem.asInstanceOf[DiskFileItem].getStoreLocation
-
-    // Escape "+" because at least in one environment (JBoss 5.1.0 GA on OS X) not escaping the "+" in a file URL causes
-    // later incorrect conversion to space.
-    // 2022-02-18: Not sure if this is still relevant or needed.
-    (storeLocation.toURI.toString.replace("+", "%2B"), size)
+    (fileItem.asInstanceOf[DiskFileItem].getStoreLocation.toURI, size)
   }
 
   def prepareFileItem(scope: ExpirationScope)(implicit logger: Logger): FileItem = {
@@ -59,7 +52,7 @@ object FileItemSupport {
     fileItem
   }
 
-  def renameAndExpireWithSession(existingFileUri: String)(implicit logger: Logger): File = {
+  def renameAndExpireWithSession(existingFileUri: URI)(implicit logger: Logger): File = {
 
       // Assume the file will be deleted with the request so rename it first
       val newPath = {
@@ -69,7 +62,7 @@ object FileItemSupport {
         r
       }
 
-      val oldFile = new File(new URI(existingFileUri))
+      val oldFile = new File(existingFileUri)
       val newFile = new File(newPath)
       val success = oldFile.renameTo(newFile)
       try
@@ -98,7 +91,7 @@ object FileItemSupport {
       newFile
     }
 
-  def urlForFileItemCreateIfNeeded(fileItem: FileItem, scope: ExpirationScope)(implicit logger: Logger): String = {
+  def urlForFileItemCreateIfNeeded(fileItem: FileItem, scope: ExpirationScope)(implicit logger: Logger): URI = {
     // Only a reference to the file is output (xs:anyURI)
     val diskFileItem = fileItem.asInstanceOf[DiskFileItem]
     if (! fileItem.isInMemory) {
@@ -106,7 +99,7 @@ object FileItemSupport {
       val file = diskFileItem.getStoreLocation
       if (! file.exists)
         file.createNewFile() // https://github.com/orbeon/orbeon-forms/issues/4466
-      file.toURI.toString
+      file.toURI
     } else {
       // File does not exist on disk, must convert
       // NOTE: Conversion occurs every time this method is called. Not optimal.
@@ -120,7 +113,7 @@ object FileItemSupport {
   // case is that of a zero-length file, which will probably not be created by `DiskFileItem` as nothing
   // is written.
   def fileFromFileItemCreateIfNeeded(fileItem: DiskFileItem)(implicit logger: Logger): java.io.File =
-    new java.io.File(new URI(FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request)))
+    new java.io.File(FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request))
 
   def asScalaIterator(i: FileItemIterator): Iterator[FileItemStream] = new Iterator[FileItemStream] {
     def hasNext: Boolean = i.hasNext

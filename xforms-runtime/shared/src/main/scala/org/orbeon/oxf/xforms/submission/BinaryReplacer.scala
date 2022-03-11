@@ -27,7 +27,7 @@ class BinaryReplacer(
   containingDocument : XFormsContainingDocument
 ) extends Replacer {
 
-  private var contentUrlOpt: Option[String] = None
+  private var contentUrlOpt: Option[URI] = None
 
   def deserialize(
     cxr: ConnectionResult,
@@ -56,9 +56,9 @@ class BinaryReplacer(
 
     contentUrlOpt foreach { contentUrl =>
 
-      val sizeFromContentOpt = FileUtils.findFileUriPath(new URI(contentUrl)) map XFormsCrossPlatformSupport.tempFileSize
+      val sizeFromContentOpt = FileUtils.findFileUriPath(contentUrl) map XFormsCrossPlatformSupport.tempFileSize
 
-      val macValue = hmacURL(contentUrl, filenameOpt, mediatypeOpt, sizeFromContentOpt map (_.toString))
+      val macValue = hmacURL(contentUrl.toString, filenameOpt, mediatypeOpt, sizeFromContentOpt map (_.toString))
 
       TextReplacer.replaceText(
         submission         = submission,

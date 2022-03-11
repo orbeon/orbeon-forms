@@ -179,7 +179,7 @@ object ImageSupport {
 
         useAndClose(fileItem.getOutputStream)(tryReadAndTransformToOutputStream(allMetadata, _)) map { _ =>
           (
-            new URI(FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Session)(logger.logger.logger)),
+            FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Session)(logger.logger.logger),
             fileItem.getSize
           ).some
         }

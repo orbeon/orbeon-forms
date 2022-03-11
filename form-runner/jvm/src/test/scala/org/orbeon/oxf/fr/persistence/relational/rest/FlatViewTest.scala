@@ -17,9 +17,11 @@ import org.junit.Test
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
 import org.scalatestplus.junit.AssertionsForJUnit
 
+import java.net.URI
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.collection.compat._
+
 
 class FlatViewTest extends ResourceManagerTestBase with XMLSupport with AssertionsForJUnit {
 
@@ -65,7 +67,7 @@ class FlatViewTest extends ResourceManagerTestBase with XMLSupport with Assertio
     )
 
     for ((url, expected) <- expectedForDocuments)
-      assert(expected === FlatView.extractPathsCols(readURLAsImmutableXMLDocument(url)))
+      assert(expected === FlatView.extractPathsCols(readURLAsImmutableXMLDocument(URI.create(url))))
   }
 
   @Test def xmlToSQLIdTest(): Unit = {

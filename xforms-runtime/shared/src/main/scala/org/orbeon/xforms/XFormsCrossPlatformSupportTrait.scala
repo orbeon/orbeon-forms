@@ -154,25 +154,25 @@ trait XFormsCrossPlatformSupportTrait {
   ): String
 
   def renameAndExpireWithSession(
-    existingFileURI  : String)(implicit
+    existingFileURI  : URI)(implicit
     logger           : IndentedLogger
   ): URI
 
   def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
-  ): Option[String]
+  ): Option[URI]
 
   def inputStreamToSessionUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
-  ): Option[String]
+  ): Option[URI]
 
   def getLastModifiedIfFast(absoluteURL: String): Long
 
   // NOTE: Only referred to indirectly by Form Builder Summary page in order to load
   // external resources. This will not be called when offline!
-  def readTinyTreeFromUrl(urlString: String): DocumentNodeInfoType
+  def readTinyTreeFromUrl(url: URI): DocumentNodeInfoType
 
   def readTinyTree(
     configuration  : SaxonConfiguration,
@@ -201,7 +201,7 @@ trait XFormsCrossPlatformSupportTrait {
   def hmacString(text: String, encoding: String): String
   def digestBytes(bytes: Array[Byte], encoding: String): String
 
-  def openUrlStream(urlString: String): InputStream
+  def openUrlStream(url: URI): InputStream
 
   def writeMultipartFormData(document: dom.Document, os: OutputStream): String
 

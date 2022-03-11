@@ -89,7 +89,7 @@ class UploaderProcessor extends ProcessorImpl {
                           FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request)
                         )
 
-                      (newFile.toURI.toString, newFile.length())
+                      (newFile.toURI, newFile.length())
                     }
 
                     (name, filename, mediatype, sessionUrlAndSizeFromFileScan getOrElse sessionUrlAndSizeFromFileItem)
@@ -98,14 +98,14 @@ class UploaderProcessor extends ProcessorImpl {
               outputResponse(
                 <xxf:events xmlns:xxf="http://orbeon.org/oxf/xml/xforms">{
                   for {
-                    (fieldName, filename, mediatype, (sessionURL, size)) <- files
+                    (fieldName, filename, mediatype, (sessionUrl, size)) <- files
                     headers      = Map(Headers.ContentType -> mediatype)
                     mediatypeOpt = Mediatypes.fromHeadersOrFilename(n => headers.get(n).flatten, filename)
                   } yield
                     <xxf:event
                       name="xxforms-upload-done"
                       source-control-id={fieldName}
-                      file={sessionURL}
+                      file={sessionUrl.toString}
                       filename={filename.getOrElse("")}
                       content-type={mediatypeOpt map (_.toString) getOrElse ""}
                       content-length={size.toString}/>

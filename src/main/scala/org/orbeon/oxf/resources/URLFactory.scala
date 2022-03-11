@@ -30,6 +30,9 @@ import java.net._
  */
 object URLFactory {
 
+  def createURL(url: URI): URL =
+    createURL(null.asInstanceOf[URL], url.toString)
+
   def createURL(spec: String): URL =
     createURL(null.asInstanceOf[URL], spec)
 

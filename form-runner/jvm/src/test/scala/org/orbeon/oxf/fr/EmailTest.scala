@@ -25,6 +25,7 @@ import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
 
+import java.net.URI
 import scala.collection.compat._
 
 
@@ -33,7 +34,7 @@ class EmailTest
      with ResourceManagerSupport
      with AnyFunSpecLike {
 
-  val FormWithEmailControls = "oxf:/org/orbeon/oxf/fr/form-with-email-controls.xhtml"
+  val FormWithEmailControls = URI.create("oxf:/org/orbeon/oxf/fr/form-with-email-controls.xhtml")
 
   describe("Email address extraction from form definition") {
 

@@ -270,7 +270,7 @@ public class RequestGenerator extends ProcessorImpl {
     public static String writeURLFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, ContentHandler contentHandler) throws SAXException {
 
         final String uriExpiringWithRequest =
-                FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request$.MODULE$, logger);
+            FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request$.MODULE$, logger).toString();
 
         // If the content is meant to expire with the session, and we haven't yet renamed the file, then do this here.
         final String uriExpiringWithScope;

@@ -204,7 +204,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     )
 
   def renameAndExpireWithSession(
-    existingFileURI  : String)(implicit
+    existingFileURI  : URI)(implicit
     logger           : IndentedLogger
   ): URI =
     FileItemSupport.renameAndExpireWithSession(existingFileURI)(logger.logger.logger).toURI
@@ -212,7 +212,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
-  ): Option[String] =
+  ): Option[URI] =
     useAndClose(inputStream) { is =>
       FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Request)(logger.logger.logger)._1.some
     }
@@ -220,7 +220,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def inputStreamToSessionUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
-  ): Option[String] =
+  ): Option[URI] =
     useAndClose(inputStream) { is =>
       FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)(logger.logger.logger)._1.some
     }
@@ -229,8 +229,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     NetUtils.getLastModifiedIfFast(absoluteURL)
 
   // See comment in trait
-  def readTinyTreeFromUrl(urlString: String): DocumentNodeInfoType =
-    useAndClose(URLFactory.createURL(urlString).openStream()) { is =>
+  def readTinyTreeFromUrl(url: URI): DocumentNodeInfoType =
+    useAndClose(URLFactory.createURL(url).openStream()) { is =>
       readTinyTree(
         XPath.GlobalConfiguration,
         is,
@@ -274,8 +274,8 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def digestBytes(bytes: Array[Byte], encoding: String): String =
     SecureUtils.digestBytes(bytes, encoding)
 
-  def openUrlStream(urlString: String): InputStream =
-    URLFactory.createURL(urlString).openStream
+  def openUrlStream(url: URI): InputStream =
+    URLFactory.createURL(url).openStream
 
   /**
    * Implement support for XForms 1.1 section "11.9.7 Serialization as multipart/form-data".
@@ -301,7 +301,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
                 // Value is valid as per xs:anyURI
                 // Don't close the stream here, as it will get read later when the MultipartEntity
                 // we create here is written to an output stream
-                addPart(multipartEntity, XFormsCrossPlatformSupport.openUrlStream(value), element, value.some)
+                addPart(multipartEntity, XFormsCrossPlatformSupport.openUrlStream(new URI(value)), element, value.some)
               } else {
                 // Value is invalid as per xs:anyURI
                 // Just use the value as is (could also ignore it)

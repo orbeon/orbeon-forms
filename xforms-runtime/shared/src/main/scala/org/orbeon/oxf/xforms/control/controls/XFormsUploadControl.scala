@@ -157,7 +157,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
       // point to the persistence layer, in which case it will contain a path. When that's
       // the case, `deleteFileIfPossible()` will not attempt to delete the file.
       //
-      oldValueOpt foreach deleteFileIfPossible
+      oldValueOpt foreach XFormsCrossPlatformSupport.deleteFileIfPossible
 
       val valueToStore =
         normalizeAndCheckRawValue(rawNewValue) match {
@@ -310,7 +310,7 @@ object XFormsUploadControl {
    *
    * The URI has to be a URL. It is read entirely
    */
-  def anyURIToBase64Binary(value: String): String = {
+  def anyURIToBase64Binary(value: URI): String = {
 
     val sb = new StringBuilder
 
@@ -349,11 +349,11 @@ object XFormsUploadControl {
     val newValueUriString = newValueUri.toString
 
     if (Base64BinaryQNames(valueType)) {
-      val converted = anyURIToBase64Binary(newValueUriString)
+      val converted = anyURIToBase64Binary(newValueUri)
       deleteFileIfPossible(newValueUriString)
       converted
     } else {
-      val newFileURL = XFormsCrossPlatformSupport.renameAndExpireWithSession(newValueUriString).toString
+      val newFileURL = XFormsCrossPlatformSupport.renameAndExpireWithSession(newValueUri).toString
       hmacURL(newFileURL, filename, mediatype, size)
     }
   }

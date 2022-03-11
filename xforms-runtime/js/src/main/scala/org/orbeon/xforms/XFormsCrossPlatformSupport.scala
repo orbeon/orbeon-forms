@@ -162,7 +162,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     "data:" + mediatype.getOrElse("") + ";base64," + value
 
   def renameAndExpireWithSession(
-    existingFileURI  : String)(implicit
+    existingFileURI  : URI)(implicit
     logger           : IndentedLogger
   ): URI =
     throw new NotImplementedError("renameAndExpireWithSession")
@@ -170,20 +170,20 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
-  ): Option[String] =
+  ): Option[URI] =
     throw new NotImplementedError("inputStreamToRequestUri")
 
   def inputStreamToSessionUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
-  ): Option[String] =
+  ): Option[URI] =
     throw new NotImplementedError("inputStreamToSessionUri")
 
   // TODO: This is used by `XFormsOutputControl` when proxying resources.
   def getLastModifiedIfFast(absoluteURL: String): Long = 0
 
   // Must not be called, see comment in trait
-  def readTinyTreeFromUrl(urlString: String): DocumentNodeInfoType =
+  def readTinyTreeFromUrl(url: URI): DocumentNodeInfoType =
     throw new UnsupportedOperationException
 
 //  object ErrorHandler extends org.xml.sax.ErrorHandler {
@@ -278,7 +278,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def hmacString(text: String, encoding: String): String = throw new NotImplementedError("hmacString")
   def digestBytes(bytes: Array[Byte], encoding: String): String = throw new NotImplementedError("digestBytes")
 
-  def openUrlStream(urlString: String): InputStream = throw new NotImplementedError("openUrlStream")
+  def openUrlStream(url: URI): InputStream = throw new NotImplementedError("openUrlStream")
 
   def writeMultipartFormData(document: dom.Document, os: OutputStream): String = throw new NotImplementedError("writeMultipartFormData")
 

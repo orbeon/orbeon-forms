@@ -19,6 +19,8 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import java.net.URI
+
 
 trait FormRunnerResourcesOps {
 
@@ -61,12 +63,13 @@ trait FormRunnerResourcesOps {
   // Support for `<xf:instance id="" src=""/>`, only for Form Builder's Summary page
   private def resourcesInstanceDocFromUrlOpt(inDoc: NodeInfo): Option[NodeInfo] =
     frc.instanceElem(inDoc, FormResources) flatMap
-      (_.attValueOpt("src"))           map
-      readUrlAsImmutableXmlDocument    map
+      (_.attValueOpt("src"))               map
+      (new URI(_))                         map
+      readUrlAsImmutableXmlDocument        map
       (_.rootElement)
 
   // Also used by tests!
-  private def readUrlAsImmutableXmlDocument(url: String) =
+  private def readUrlAsImmutableXmlDocument(url: URI) =
     XFormsCrossPlatformSupport.readTinyTreeFromUrl(url)
 }
 

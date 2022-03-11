@@ -26,6 +26,7 @@
             <display-name lang="nl">Knop met link</display-name>
             <display-name lang="sv">Knapp med länk</display-name>
             <display-name lang="pt">Botão para endereço</display-name>
+            <toolbox show="false"/>
             <icon>
                 <icon-class>fa fa-fw fa-link</icon-class>
             </icon>

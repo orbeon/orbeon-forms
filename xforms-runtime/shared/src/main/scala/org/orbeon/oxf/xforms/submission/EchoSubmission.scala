@@ -62,7 +62,7 @@ class EchoSubmission(submission: XFormsModelSubmission) extends BaseSubmission(s
 
     // Just a scheme is not a valid URI, so add a scheme-specific part if needed
     val url =
-      new URI(
+      URI.create(
         p2.actionOrResource match {
           case "echo:" | "test:" => "echo:/"
           case other             => other

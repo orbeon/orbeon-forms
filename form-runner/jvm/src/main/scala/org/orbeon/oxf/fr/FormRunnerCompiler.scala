@@ -83,7 +83,7 @@ class FormRunnerCompiler extends ProcessorImpl {
 
             val entriesIt =
               urlOptIt.flatten map { uri =>
-                ManifestEntry(new URI(uri), ContentTypes.XmlContentType.some)
+                ManifestEntry(URI.create(uri), ContentTypes.XmlContentType.some)
               }
 
             entriesIt.toList
@@ -140,7 +140,7 @@ class FormRunnerCompiler extends ProcessorImpl {
                   toBasePath       = "/dummy", // TODO: `Option`?
                   forceAttachments = true
                 ) map { case FormRunner.AttachmentWithHolder(fromPath, _, holder) =>
-                  ManifestEntry(new URI(fromPath), holder.attValueOpt("mediatype").flatMap(_.trimAllToOpt))
+                  ManifestEntry(URI.create(fromPath), holder.attValueOpt("mediatype").flatMap(_.trimAllToOpt))
                 }
             }
 
@@ -186,7 +186,7 @@ class FormRunnerCompiler extends ProcessorImpl {
             def connect(path: String): ConnectionResult = {
 
               val resolvedUri =
-                new URI(
+                URI.create(
                   URLRewriterUtils.rewriteServiceURL(
                     ec.getRequest,
                     path,

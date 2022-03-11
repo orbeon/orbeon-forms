@@ -22,7 +22,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
@@ -117,11 +116,11 @@ public class ObjectReceiverTest extends ObjectReceiver {
     }
 
     @Test
-    public void uri() throws IOException, SAXException, URISyntaxException {
+    public void uri() throws IOException, SAXException {
         XMLReader reader = XMLReaderFactory.createXMLReader();
         reader.setContentHandler(this);
         reader.parse(new InputSource(new StringReader("<uri>http://example.com</uri>")));
-        assertEquals(new URI("http://example.com"), uri);
+        assertEquals(URI.create("http://example.com"), uri);
     }
 
     @Test

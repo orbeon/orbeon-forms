@@ -80,7 +80,7 @@ object InstanceCaching {
       timeToLive        = timeToLive,
       handleXInclude    = handleXInclude,
       pathOrAbsoluteURI = Connection.findInternalUrl(
-        normalizedUrl = new URI(sourceURI).normalize,
+        normalizedUrl = URI.create(sourceURI).normalize,
         filter        = isInternalPath)(
         ec            = XFormsCrossPlatformSupport.externalContext
       ) getOrElse sourceURI, // adjust for internal path so replication works

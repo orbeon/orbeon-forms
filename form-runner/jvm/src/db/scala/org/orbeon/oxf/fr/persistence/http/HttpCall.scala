@@ -149,7 +149,7 @@ private[persistence] object HttpCall {
       val headers = (timeoutHeader.toList ++ versionHeaders ++ stageHeader.toList).toMap
 
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
-        url              = new URI(documentURL),
+        url              = URI.create(documentURL),
         hasCredentials   = false,
         customHeaders    = headers,
         headersToForward = Connection.headersToForwardFromProperty,

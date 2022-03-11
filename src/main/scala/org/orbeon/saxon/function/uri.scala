@@ -28,7 +28,7 @@ trait UriFunction[T <: AtomicValue] extends FunctionSupport {
 
   override def evaluateItem(context: XPathContext): T = {
     implicit val ctx = context
-    evaluateUriPart(new URI(stringArgument(0)), booleanArgumentOpt(1))
+    evaluateUriPart(URI.create(stringArgument(0)), booleanArgumentOpt(1))
   }
 }
 
@@ -93,7 +93,7 @@ class UriFragment extends UriFunction[StringValue] {
 class UriParamNames extends FunctionSupport {
   override def iterate(context: XPathContext): SequenceIterator = {
     implicit val ctx = context
-    PathUtils.decodeSimpleQuery(new URI(stringArgument(0)).getRawQuery) map (_._1)
+    PathUtils.decodeSimpleQuery(URI.create(stringArgument(0)).getRawQuery) map (_._1)
   }
 }
 
@@ -102,6 +102,6 @@ class UriParamValues extends FunctionSupport {
   override def iterate(context: XPathContext): SequenceIterator = {
     implicit val ctx = context
     val paramName = stringArgument(1)
-    PathUtils.decodeSimpleQuery(new URI(stringArgument(0)).getRawQuery) collect { case (`paramName`, value) => value}
+    PathUtils.decodeSimpleQuery(URI.create(stringArgument(0)).getRawQuery) collect { case (`paramName`, value) => value}
   }
 }

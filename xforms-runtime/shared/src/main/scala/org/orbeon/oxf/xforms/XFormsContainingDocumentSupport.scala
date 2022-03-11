@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.net.{URI, URISyntaxException}
+import java.net.URI
 import java.util.concurrent.locks.Lock
 import cats.Eval
 import cats.syntax.option._
@@ -22,7 +22,6 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
-import org.orbeon.oxf.externalcontext.UrlRewriteMode.AbsolutePathOrRelative
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -611,10 +610,10 @@ trait ContainingDocumentRequest {
    * @return resolved URI
    */
   def resolveXMLBase(element: Element, uri: String): URI =
-    try {
+    try
       element.resolveXMLBase(Option(getRequestPath), uri)
-    } catch {
-      case e: URISyntaxException =>
+    catch {
+      case e: IllegalArgumentException =>
         throw new ValidationException(
           s"Error while resolving URI: `$uri`",
           e,

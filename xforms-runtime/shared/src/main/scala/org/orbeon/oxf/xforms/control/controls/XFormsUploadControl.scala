@@ -281,7 +281,7 @@ object XFormsUploadControl {
   // Remove the MAC from the URL
   def removeMAC(url: String): String = {
 
-    val uri = new URI(url)
+    val uri = URI.create(url)
 
     // NOTE: Use getRawQuery, as the query might encode & and =, and we should not decode them before decoding the query
     val query = Option(uri.getRawQuery) map PathUtils.decodeSimpleQuery getOrElse Nil
@@ -326,7 +326,7 @@ object XFormsUploadControl {
   }
 
   def normalizeAndCheckRawValue(rawNewValue: String): Option[URI] =
-    rawNewValue.trimAllToOpt map (new URI(_).normalize()) match {
+    rawNewValue.trimAllToOpt map (URI.create(_).normalize()) match {
       case someNewValueUri @ Some(newValueUri) if FileUtils.isTemporaryFileUri(newValueUri) =>
         someNewValueUri
       case Some(newValueUri) =>

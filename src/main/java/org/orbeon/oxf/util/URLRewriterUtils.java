@@ -23,7 +23,6 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -143,12 +142,7 @@ public class URLRewriterUtils {
             // Obtain just the path
             final String absolutePathNoContext;
             {
-                final URI absoluteURINoContextURI;
-                try {
-                    absoluteURINoContextURI = new URI(absoluteURINoContext);
-                } catch (URISyntaxException e) {
-                    throw new OXFException(e);
-                }
+                final URI absoluteURINoContextURI = URI.create(absoluteURINoContext);
                 absolutePathNoContext = absoluteURINoContextURI.getPath();
             }
 

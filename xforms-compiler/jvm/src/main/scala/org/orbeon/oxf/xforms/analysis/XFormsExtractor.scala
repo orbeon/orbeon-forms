@@ -13,7 +13,7 @@
   */
 package org.orbeon.oxf.xforms.analysis
 
-import java.net.{URI, URISyntaxException}
+import java.net.URI
 
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common.ValidationException
@@ -267,9 +267,9 @@ class XFormsExtractor(
         Option(attributes.getValue(XML_URI, "base")) match {
           case Some(xmlBaseAttribute) =>
             try {
-              parentElementDetails.xmlBase.resolve(new URI(xmlBaseAttribute)).normalize // normalize to remove "..", etc.
+              parentElementDetails.xmlBase.resolve(URI.create(xmlBaseAttribute)).normalize // normalize to remove "..", etc.
             } catch {
-              case e: URISyntaxException =>
+              case e: IllegalArgumentException =>
                 throw new ValidationException(
                   s"Error creating URI from: `$parentElementDetails` and `$xmlBaseAttribute`.",
                   e,

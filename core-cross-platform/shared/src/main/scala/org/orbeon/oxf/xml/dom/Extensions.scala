@@ -160,7 +160,7 @@ object Extensions {
 
       // Allow for null `Element` (why? and what about `baseURI` in this case?)
       if (e == null)
-        return new URI(uri)
+        return URI.create(uri)
 
       // Collect `xml:base` attributes
       val xmlBaseValuesLeafToRootIt =
@@ -172,7 +172,7 @@ object Extensions {
 
       urisRootToLeaf.foldLeft(null: URI) {
         case (r, s) =>
-          val currentXMLBaseURI = new URI(s)
+          val currentXMLBaseURI = URI.create(s)
           if (r eq null)
             currentXMLBaseURI
           else

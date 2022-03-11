@@ -5,7 +5,7 @@ import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils._
 
-import java.net.{URI, URISyntaxException}
+import java.net.URI
 
 
 object URLRewriterImpl {
@@ -49,9 +49,9 @@ object URLRewriterImpl {
 
       val baseURI =
         try
-          new URI(baseURIProperty.trimAllToEmpty)
+          URI.create(baseURIProperty.trimAllToEmpty)
         catch {
-          case t: URISyntaxException =>
+          case t: IllegalArgumentException =>
             throw new OXFException(s"Incorrect base URI property specified: `$baseURIProperty`", t)
         }
 

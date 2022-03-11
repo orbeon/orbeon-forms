@@ -376,7 +376,7 @@ trait FormRunnerPersistence {
         UrlRewriteMode.Absolute
       )
 
-    val url = new URI(rewrittenURLString)
+    val url = URI.create(rewrittenURLString)
 
     val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
       url              = url,
@@ -641,7 +641,7 @@ trait FormRunnerPersistence {
           Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*)
 
         val resolvedGetUri =
-          new URI(rewriteServiceUrl(beforeUrl))
+          URI.create(rewriteServiceUrl(beforeUrl))
 
         val allGetHeaders =
           Connection.buildConnectionHeadersCapitalizedIfNeeded(
@@ -673,7 +673,7 @@ trait FormRunnerPersistence {
             Nil
 
           val resolvedPutUri =
-            new URI(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
+            URI.create(rewriteServiceUrl(PathUtils.appendQueryString(toBaseURI + afterUrl, commonQueryString)))
 
           val allPutHeaders =
             Connection.buildConnectionHeadersCapitalizedIfNeeded(

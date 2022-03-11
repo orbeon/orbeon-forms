@@ -397,12 +397,7 @@ public class NetUtils {
     public static String resolveURI(String href, String base) {
         final String resolvedURIString;
         if (base != null) {
-            final URI baseURI;
-            try {
-                baseURI = new URI(MarkupUtils.encodeHRRI(base, true));
-            } catch (URISyntaxException e) {
-                throw new OXFException(e);
-            }
+            final URI baseURI = URI.create(MarkupUtils.encodeHRRI(base, true));
             resolvedURIString = baseURI.resolve(MarkupUtils.encodeHRRI(href, true)).normalize().toString();// normalize to remove "..", etc.
         } else {
             resolvedURIString = MarkupUtils.encodeHRRI(href, true);

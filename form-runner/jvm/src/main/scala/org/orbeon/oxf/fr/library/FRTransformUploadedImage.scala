@@ -69,7 +69,7 @@ class FRTransformUploadedImage extends FunctionSupport with RuntimeDependentFunc
         require(XFormsUploadControl.verifyMAC(uriString))
 
         ImageSupport.tryMaybeTransformImage(
-          new URI(uriString),
+          URI.create(uriString),
           maxWidthOpt,
           maxHeightOpt,
           mediatypeOpt,

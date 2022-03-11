@@ -323,7 +323,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
           Image.getInstance(os.toByteArray)
         case None =>
 
-          val url = new URI(hrefAttribute)
+          val url = URI.create(hrefAttribute)
 
           val externalContext = NetUtils.getExternalContext
 

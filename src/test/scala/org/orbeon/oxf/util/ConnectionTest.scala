@@ -66,7 +66,7 @@ class ConnectionTest
 
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-          url                      = new URI("/foo/bar"),
+          url                      = URI.create("/foo/bar"),
           method                   = HttpMethod.GET,
           hasCredentials           = false,
           mediatypeOpt             = None,
@@ -122,7 +122,7 @@ class ConnectionTest
 
       val headersCapitalized =
         Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-          url                      = new URI("/foo/bar"),
+          url                      = URI.create("/foo/bar"),
           method                   = method,
           hasCredentials           = false,
           mediatypeOpt             = bodyMediaType.some,
@@ -172,7 +172,7 @@ class ConnectionTest
       it(s"must ${if (expectedHeaderValue.isDefined) "" else "not " }include a `Content-Type` header when using the `${method.entryName}` method") {
         val headersCapitalized =
           Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-            url                      = new URI("/foo/bar"),
+            url                      = URI.create("/foo/bar"),
             method                   = method,
             hasCredentials           = false,
             mediatypeOpt             = contentType.some,
@@ -210,7 +210,7 @@ class ConnectionTest
       it(s"call to `$urlString` with `$httpMethod` must ${if (mustIncludeToken) "" else "not " }include an `Orbeon-Token` header") {
         val headersCapitalized =
           Connection.buildConnectionHeadersCapitalizedWithSOAPIfNeeded(
-            url                      = new URI(serviceAbsoluteUrl),
+            url                      = URI.create(serviceAbsoluteUrl),
             method                   = httpMethod,
             hasCredentials           = false,
             mediatypeOpt             = ContentTypes.XmlContentType.some,

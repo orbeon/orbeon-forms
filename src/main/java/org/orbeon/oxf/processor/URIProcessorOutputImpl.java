@@ -317,18 +317,14 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 // Compute absolute submission URL
-                final URI submissionURL;
-                try {
-                    submissionURL = new URI(
+                final URI submissionURL =
+                    URI.create(
                         URLRewriterUtils.rewriteServiceURL(
                             externalContext.getRequest(),
                             urlString,
                             UrlRewriteMode.Absolute$.MODULE$
                         )
                     );
-                } catch (URISyntaxException e) {
-                    throw new OXFException(e);
-                }
 
                 // Open connection
                 final IndentedLogger indentedLogger = new IndentedLogger(logger);

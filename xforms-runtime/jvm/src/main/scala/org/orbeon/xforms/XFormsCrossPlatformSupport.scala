@@ -23,7 +23,7 @@ import org.orbeon.dom.{Document, Element, VisitorSupport}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
-import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.resources.URLFactory
@@ -41,7 +41,7 @@ import org.orbeon.oxf.xml.dom.IOSupport
 import org.xml.sax.InputSource
 
 import java.io._
-import java.net.{URI, URISyntaxException}
+import java.net.URI
 import java.nio.charset.Charset
 import javax.xml.transform.dom.{DOMResult, DOMSource}
 import javax.xml.transform.sax.TransformerHandler
@@ -96,14 +96,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     URLRewriterImpl.rewriteURL(request, urlString, rewriteMode)
 
   private def uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument: XFormsContainingDocument, resolvedURI: URI): String =
-    if ((containingDocument.isPortletContainer || containingDocument.isEmbedded) && resolvedURI.getFragment != null) {
+    if ((containingDocument.isPortletContainer || containingDocument.isEmbedded) && resolvedURI.getFragment != null)
       // Page was loaded from a portlet or embedding API and there is a fragment, remove it
-      try new URI(resolvedURI.getScheme, resolvedURI.getRawAuthority, resolvedURI.getRawPath, resolvedURI.getRawQuery, null).toString
-      catch {
-        case e: URISyntaxException =>
-          throw new OXFException(e)
-      }
-    } else
+      new URI(resolvedURI.getScheme, resolvedURI.getRawAuthority, resolvedURI.getRawPath, resolvedURI.getRawQuery, null).toString
+    else
       resolvedURI.toString
 
   private val TagSoupHtmlSchema = new HTMLSchema
@@ -301,7 +297,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
                 // Value is valid as per xs:anyURI
                 // Don't close the stream here, as it will get read later when the MultipartEntity
                 // we create here is written to an output stream
-                addPart(multipartEntity, XFormsCrossPlatformSupport.openUrlStream(new URI(value)), element, value.some)
+                addPart(multipartEntity, XFormsCrossPlatformSupport.openUrlStream(URI.create(value)), element, value.some)
               } else {
                 // Value is invalid as per xs:anyURI
                 // Just use the value as is (could also ignore it)
@@ -395,7 +391,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     IOUtils.runQuietly {
       for {
         nonBlankUrlString <- urlString.trimAllToOpt
-        uri               = new URI(nonBlankUrlString)
+        uri               = URI.create(nonBlankUrlString)
         temporaryFilePath <- FileUtils.findTemporaryFilePath(uri)
       } locally {
         val file = new File(temporaryFilePath)

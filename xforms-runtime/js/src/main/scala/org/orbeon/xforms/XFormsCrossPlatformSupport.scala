@@ -135,7 +135,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     val cxr =
       Connection.connectNow(
         method          = GET,
-        url             = new URI(uri),
+        url             = URI.create(uri),
         credentials     = None,
         content         = None,
         headers         = Map.empty,

@@ -405,7 +405,7 @@ trait XFormsModelInstances {
 
     SubmissionUtils.readTinyTree(
       headersGetter       = containingDocument.headersGetter,
-      resolvedAbsoluteUrl = new URI(
+      resolvedAbsoluteUrl = URI.create(
         URLRewriterUtils.rewriteServiceURL(
           externalContext.getRequest,
           pathOrAbsoluteURI,
@@ -544,7 +544,7 @@ trait XFormsModelInstances {
           if (indentedLogger.debugEnabled)
             indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteURLString)
 
-          val absoluteResolvedUrl = new URI(absoluteURLString)
+          val absoluteResolvedUrl = URI.create(absoluteURLString)
 
           implicit val ec                      : ExternalContext               = XFormsCrossPlatformSupport.externalContext
           implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport

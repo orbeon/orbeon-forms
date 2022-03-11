@@ -158,7 +158,7 @@ object SerializationParameters {
 
             // NOTE: We support a relative path, in which case the path is resolved as a service URL
             val resolvedAbsoluteUrl =
-              new URI(
+              URI.create(
                 XFormsCrossPlatformSupport.resolveServiceURL(
                   submission.containingDocument,
                   submission.staticSubmission.element,

@@ -40,7 +40,7 @@ object Transforms {
 
       SubmissionUtils.readTinyTree(
         headersGetter       = _ => None, // Q: Do we need any header forwarding here?
-        resolvedAbsoluteUrl = new URI(
+        resolvedAbsoluteUrl = URI.create(
           URLRewriterUtils.rewriteServiceURL(
             externalContext.getRequest,
             s"/fr/service/custom/orbeon/builder/toolbox?application=${appForm.app}&form=${appForm.form}&orbeon-library-version=$orbeonLibraryVersion&app-library-version=$appLibraryVersion",
@@ -59,7 +59,7 @@ object Transforms {
   ): (DocumentInfo, Map[String, List[String]]) =
     SubmissionUtils.readTinyTree(
       headersGetter       = _ => None, // Q: Do we need any header forwarding here?
-      resolvedAbsoluteUrl = new URI(
+      resolvedAbsoluteUrl = URI.create(
         URLRewriterUtils.rewriteServiceURL(
           externalContext.getRequest,
           s"/fr/service/persistence/crud/${appForm.app}/${appForm.form}/data/$documentId/data.xml",

@@ -487,7 +487,7 @@ object Connection extends ConnectionTrait {
                   s
               }
 
-              val effectiveConnectionUrl = new URI(effectiveConnectionUrlString)
+              val effectiveConnectionUrl = URI.create(effectiveConnectionUrlString)
 
               val effectiveConnectionUriNoPassword =
                 new URI(

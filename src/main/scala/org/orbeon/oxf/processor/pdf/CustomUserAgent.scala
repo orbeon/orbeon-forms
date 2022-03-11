@@ -130,7 +130,7 @@ class CustomUserAgent(
     // a browser retrieving resources directly, not like a portlet. This is the case also if we are
     // called by the proxy portlet or if we are directly within a portlet.
 
-    val url = new URI(resolvedURI)
+    val url = URI.create(resolvedURI)
     val headers =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
         url              = url,

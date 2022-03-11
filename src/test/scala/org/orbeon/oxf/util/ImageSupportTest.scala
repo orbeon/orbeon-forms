@@ -19,8 +19,8 @@ class ImageSupportTest
   val Mediatype(jpegMediatype) = "image/jpeg"
   val Mediatype(pngMediatype)  = "image/png"
 
-  val jpgImg = new URI("oxf:/org/orbeon/oxf/util/hs-2010-13-a-web.jpg")
-  val pngImg = new URI("oxf:/org/orbeon/oxf/util/hs-2010-13-a-web.png")
+  val jpgImg = URI.create("oxf:/org/orbeon/oxf/util/hs-2010-13-a-web.jpg")
+  val pngImg = URI.create("oxf:/org/orbeon/oxf/util/hs-2010-13-a-web.png")
 
   describe("Image transformation") {
 

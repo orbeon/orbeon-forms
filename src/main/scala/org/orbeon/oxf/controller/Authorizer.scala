@@ -115,7 +115,7 @@ object Authorizer extends Logging {
     // NOTE: If the authorizer base URL is an absolute path, it is rewritten against the host
     def delegateAbsoluteBaseURIOpt =
       propertySet.getStringOrURIAsStringOpt(AuthorizerProperty) map
-        (p => new URI(URLRewriterUtils.rewriteServiceURL(request, p, UrlRewriteMode.AbsoluteNoContext)))
+        (p => URI.create(URLRewriterUtils.rewriteServiceURL(request, p, UrlRewriteMode.AbsoluteNoContext)))
 
     delegateAbsoluteBaseURIOpt match {
       case Some(baseDelegateURI) =>

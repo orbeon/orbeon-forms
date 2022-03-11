@@ -64,7 +64,7 @@ trait FormRunnerResourcesOps {
   private def resourcesInstanceDocFromUrlOpt(inDoc: NodeInfo): Option[NodeInfo] =
     frc.instanceElem(inDoc, FormResources)           flatMap
       (_.attValueOpt("src"))                         map
-      (new URI(_))                                   map
+      URI.create                                     map
       XFormsCrossPlatformSupport.readTinyTreeFromUrl map
       (_.rootElement)
 }

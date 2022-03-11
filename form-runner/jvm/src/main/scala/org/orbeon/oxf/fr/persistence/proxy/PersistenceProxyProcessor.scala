@@ -307,7 +307,7 @@ private object PersistenceProxyProcessor {
     implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
     val outgoingURL =
-      new URI(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri, UrlRewriteMode.Absolute))
+      URI.create(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri, UrlRewriteMode.Absolute))
 
     val persistenceHeaders =
       for ((name, value) <- headers)

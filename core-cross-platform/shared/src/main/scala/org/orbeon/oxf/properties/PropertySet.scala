@@ -135,9 +135,9 @@ object PropertySet {
 
     def convertURI(value: String, namespaces: Map[String, String]): URI =
       try {
-        new URI(value)
+        URI.create(value)
       } catch {
-        case e: URISyntaxException =>
+        case e: IllegalArgumentException =>
           throw new ValidationException(e, null)
       }
 

@@ -326,7 +326,7 @@ object XFormsAssetServer {
 
     // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with
     // an absolute URI.
-    val serviceAbsoluteUrl = new URI(
+    val serviceAbsoluteUrl = URI.create(
       URLRewriterUtils.rewriteServiceURL(
         XFormsCrossPlatformSupport.externalContext.getRequest,
         uri,

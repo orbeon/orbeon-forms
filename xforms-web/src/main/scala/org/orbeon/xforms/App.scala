@@ -13,13 +13,17 @@
  */
 package org.orbeon.xforms
 
+import org.log4s
 import org.scalajs.dom
-
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 import scala.util.{Failure, Success}
 
 
 trait App {
+
+  //  private val LogLevel = log4s.Debug // Debug|Info|Warn|Error
+  protected val LogLevel: log4s.LogLevel = log4s.Info // Trace|Debug|Info|Warn|Error
 
   def onOrbeonApiLoaded(): Unit
   def onPageContainsFormsMarkup(): Unit
@@ -76,8 +80,14 @@ trait App {
 
     def initialize(): Unit = {
 
-      // By default, set to `Error` instead of `Debug`, not to pollute the console when it isn't necessary
-      val rootLevel = Level.Info
+      val rootLevel =
+        LogLevel match {
+          case log4s.Trace => Level.Trace
+          case log4s.Debug => Level.Debug
+          case log4s.Info  => Level.Info
+          case log4s.Warn  => Level.Warn
+          case log4s.Error => Level.Error
+        }
 
       scribe.Logger.root.clearHandlers().clearModifiers().withHandler(
         minimumLevel = Some(rootLevel),

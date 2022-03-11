@@ -23,6 +23,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.net.URI
@@ -38,7 +39,7 @@ class EmailTest
 
   describe("Email address extraction from form definition") {
 
-    val formDoc = readURLAsImmutableXMLDocument(FormWithEmailControls)
+    val formDoc = readTinyTreeFromUrl(FormWithEmailControls)
 
     val head     = formDoc.rootElement / XHHeadTest head
     val model    = head / XFModelTest head

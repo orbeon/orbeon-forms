@@ -22,6 +22,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.net.URI
@@ -35,8 +36,8 @@ class GridDataMigrationTest
      with FormBuilderSupport
      with XMLSupport {
 
-  lazy val form   : DocumentInfo = readURLAsImmutableXMLDocument(URI.create("oxf:/org/orbeon/oxf/fb/form-to-migrate.xhtml"))
-  lazy val toolbox: DocumentInfo = readURLAsImmutableXMLDocument(URI.create("oxf:/org/orbeon/oxf/fb/form-to-migrate-library.xml"))
+  lazy val form   : DocumentInfo = readTinyTreeFromUrl(URI.create("oxf:/org/orbeon/oxf/fb/form-to-migrate.xhtml"))
+  lazy val toolbox: DocumentInfo = readTinyTreeFromUrl(URI.create("oxf:/org/orbeon/oxf/fb/form-to-migrate-library.xml"))
 
   val Migration48Json =
     """

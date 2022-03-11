@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.junit.Test
 import org.orbeon.oxf.test.{ResourceManagerTestBase, XMLSupport}
+import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatestplus.junit.AssertionsForJUnit
 
 import java.net.URI
@@ -67,7 +68,7 @@ class FlatViewTest extends ResourceManagerTestBase with XMLSupport with Assertio
     )
 
     for ((url, expected) <- expectedForDocuments)
-      assert(expected === FlatView.extractPathsCols(readURLAsImmutableXMLDocument(URI.create(url))))
+      assert(expected === FlatView.extractPathsCols(readTinyTreeFromUrl(URI.create(url))))
   }
 
   @Test def xmlToSQLIdTest(): Unit = {

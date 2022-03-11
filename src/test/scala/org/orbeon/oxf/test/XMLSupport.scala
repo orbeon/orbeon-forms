@@ -15,21 +15,13 @@ package org.orbeon.oxf.test
 
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.dom.{Document => JDocument, Element => JElement}
-import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils._
-import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xml.dom.{Comparator, IOSupport}
+import org.orbeon.oxf.xml.dom.Comparator
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.scalatestplus.junit.AssertionsForJUnit
 
-trait XMLSupport extends AssertionsForJUnit {
 
-  def readURLAsImmutableXMLDocument(url: String): DocumentInfo =
-    useAndClose(URLFactory.createURL(url).openStream()) { is =>
-      TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, null, false, false)
-    }
+trait XMLSupport extends AssertionsForJUnit {
 
   def assertXMLDocumentsIgnoreNamespacesInScope(left: DocumentInfo, right: DocumentInfo): Unit =
     assertXMLDocumentsIgnoreNamespacesInScope(tinyTreeToOrbeonDom(left), tinyTreeToOrbeonDom(right))

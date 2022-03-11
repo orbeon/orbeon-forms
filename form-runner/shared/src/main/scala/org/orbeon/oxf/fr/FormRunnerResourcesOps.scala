@@ -62,15 +62,11 @@ trait FormRunnerResourcesOps {
 
   // Support for `<xf:instance id="" src=""/>`, only for Form Builder's Summary page
   private def resourcesInstanceDocFromUrlOpt(inDoc: NodeInfo): Option[NodeInfo] =
-    frc.instanceElem(inDoc, FormResources) flatMap
-      (_.attValueOpt("src"))               map
-      (new URI(_))                         map
-      readUrlAsImmutableXmlDocument        map
+    frc.instanceElem(inDoc, FormResources)           flatMap
+      (_.attValueOpt("src"))                         map
+      (new URI(_))                                   map
+      XFormsCrossPlatformSupport.readTinyTreeFromUrl map
       (_.rootElement)
-
-  // Also used by tests!
-  private def readUrlAsImmutableXmlDocument(url: URI) =
-    XFormsCrossPlatformSupport.readTinyTreeFromUrl(url)
 }
 
 object FormRunnerResourcesOps extends FormRunnerResourcesOps

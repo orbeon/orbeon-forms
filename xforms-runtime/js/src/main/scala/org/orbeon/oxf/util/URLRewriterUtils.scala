@@ -4,12 +4,15 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.scalajs.dom
 import PathUtils._
 import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.util.StringUtils._
 
 import java.net.URI
 import java.{util => ju}
 
 
 object URLRewriterUtils {
+
+  private val FormBuilderEditPath = "/fr/orbeon/builder/edit/"
 
   // TODO: placeholder, does it matter for Scala.js?
   def isResourcesVersioned = false
@@ -34,10 +37,22 @@ object URLRewriterUtils {
         urlString
       } else {
         val base = URI.create(dom.window.location.href)
-        if (base.getScheme == "http" || base.getScheme == "https")
-          base.resolve("_/" + stringNoSlash).toString // mostly for when we load the offline template from Orbeon Forms for testing
-        else
-          base.resolve(uriNoSlash).toString           // regular offline case where resources are loaded from `file:`
+        if (base.getScheme == "http" || base.getScheme == "https") {
+          
+          val basePath = base.resolve(".").getPath
+
+          val newBasePath =
+            if (basePath.endsWith(FormBuilderEditPath))
+              basePath.substring(0, basePath.length - FormBuilderEditPath.length + 1)
+            else
+              basePath
+
+          newBasePath + "_/" + stringNoSlash
+
+        } else {
+          // Case where resources are loaded from `file:` from native app
+          base.resolve(uriNoSlash).toString
+        }
       }
     }
   }

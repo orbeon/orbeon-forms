@@ -22,6 +22,9 @@
     xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
     <xbl:script src="/xbl/orbeon/tinymce/js/tinymce/tinymce.min.js"/>
+    <xbl:script src="/xbl/orbeon/tinymce/js/tinymce/themes/silver/theme.min.js"/>
+    <xbl:script src="/xbl/orbeon/tinymce/js/tinymce/plugins/lists/plugin.min.js"/>
+    <xbl:script src="/xbl/orbeon/tinymce/js/tinymce/plugins/link/plugin.min.js"/>
     <xbl:binding
         id="fr-tinymce"
         element="fr|tinymce, xf|textarea[mediatype = 'text/html']"

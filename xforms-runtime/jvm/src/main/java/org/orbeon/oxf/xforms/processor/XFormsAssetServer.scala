@@ -13,15 +13,12 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import org.orbeon.io.IOUtils
-import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.io.IOUtils._
-import org.orbeon.io.CharsetNames
+import org.orbeon.io.{CharsetNames, IOUtils}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.GET
-import org.orbeon.oxf.http.{Headers, StatusCode}
+import org.orbeon.oxf.http.{Headers, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ResourceServer}
 import org.orbeon.oxf.util.PathUtils._
@@ -37,9 +34,9 @@ import java.io._
 import java.net.URI
 import scala.collection.compat._
 import scala.collection.immutable.ListSet
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 import scala.jdk.CollectionConverters._
-import scala.util.control.NonFatal
 
 
 /**
@@ -333,7 +330,7 @@ object XFormsAssetServer {
       URLRewriterUtils.rewriteServiceURL(
         XFormsCrossPlatformSupport.externalContext.getRequest,
         uri,
-        URLRewriter.REWRITE_MODE_ABSOLUTE
+        UrlRewriteMode.Absolute
       )
     )
 

@@ -3,7 +3,7 @@ package org.orbeon.oxf.fr.persistence.proxy
 import cats.syntax.option._
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerPersistence.findFormDefinitionFormatFromStringVersions
 import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
 import org.orbeon.oxf.fr._
@@ -44,7 +44,7 @@ object Transforms {
           URLRewriterUtils.rewriteServiceURL(
             externalContext.getRequest,
             s"/fr/service/custom/orbeon/builder/toolbox?application=${appForm.app}&form=${appForm.form}&orbeon-library-version=$orbeonLibraryVersion&app-library-version=$appLibraryVersion",
-            URLRewriter.REWRITE_MODE_ABSOLUTE
+            UrlRewriteMode.Absolute
           )
         ),
         handleXInclude = false
@@ -63,7 +63,7 @@ object Transforms {
         URLRewriterUtils.rewriteServiceURL(
           externalContext.getRequest,
           s"/fr/service/persistence/crud/${appForm.app}/${appForm.form}/data/$documentId/data.xml",
-          URLRewriter.REWRITE_MODE_ABSOLUTE
+          UrlRewriteMode.Absolute
         )
       ),
       handleXInclude = false

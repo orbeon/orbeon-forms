@@ -19,7 +19,7 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter, UrlRewriteMode}
 import org.orbeon.oxf.json.Converter
 import org.orbeon.oxf.util.{ContentTypes, IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.model.InstanceData
@@ -28,8 +28,6 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 import java.io.ByteArrayOutputStream
 import java.net.URI
-
-
 import scala.util.control.NonFatal
 
 
@@ -165,7 +163,7 @@ object SerializationParameters {
                   submission.containingDocument,
                   submission.staticSubmission.element,
                   documentToSubmit.getRootElement.getStringValue,
-                  URLRewriter.REWRITE_MODE_ABSOLUTE
+                  UrlRewriteMode.Absolute
                 )
               )
 

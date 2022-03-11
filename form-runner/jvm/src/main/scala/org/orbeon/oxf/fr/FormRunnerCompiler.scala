@@ -4,7 +4,7 @@ import cats.syntax.option._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.orbeon.io.{CharsetNames, IOUtils}
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.fr.Names.{FormInstance, FormResources, MetadataInstance}
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
@@ -14,8 +14,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput}
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Submission}
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
 import org.orbeon.oxf.xforms.processor.XFormsCompiler
@@ -190,7 +190,7 @@ class FormRunnerCompiler extends ProcessorImpl {
                   URLRewriterUtils.rewriteServiceURL(
                     ec.getRequest,
                     path,
-                    URLRewriter.REWRITE_MODE_ABSOLUTE
+                    UrlRewriteMode.Absolute
                   )
                 )
 

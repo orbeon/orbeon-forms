@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.{Element, QName}
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.{PathUtils, URLRewriterUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction
@@ -164,7 +164,7 @@ class XFormsOutputControl(
                       XFormsCrossPlatformSupport.externalContext.getRequest,
                       containingDocument.resolveXMLBase(element, trimmedInternalValue).toString,
                       URLRewriterUtils.getPathMatchers,
-                      URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT
+                      UrlRewriteMode.AbsolutePathNoContext
                     )
 
                   (
@@ -228,7 +228,7 @@ class XFormsOutputControl(
         // External value is not blank, rewrite as absolute path. Two cases:
         // - URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
         // - URL is default value:  /ops/images/xforms/foo.gif      => [/context][/version]/ops/images/xforms/foo.gif
-        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
+        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, UrlRewriteMode.AbsolutePath)
       } else
         // Empty value, return as is
         externalValue
@@ -242,7 +242,7 @@ class XFormsOutputControl(
   override def getNonRelevantEscapedExternalValue: String =
     if (mediatype exists (_.startsWith("image/")))
       // Return rewritten URL of dummy image URL
-      XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
+      XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, UrlRewriteMode.AbsolutePath)
     else
       super.getNonRelevantEscapedExternalValue
 

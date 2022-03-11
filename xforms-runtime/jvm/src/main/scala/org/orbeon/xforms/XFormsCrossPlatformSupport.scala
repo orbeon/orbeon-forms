@@ -24,7 +24,7 @@ import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.io.{CharsetNames, FileUtils, IOUtils}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl}
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.PathUtils.splitQuery
@@ -62,12 +62,12 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def attachmentFileExists(holderValue: String): Boolean =
     new File(URLFactory.createURL(splitQuery(holderValue)._1).getFile).exists()
 
-  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = {
+  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String = {
     val resolvedURI = containingDocument.resolveXMLBase(element, url)
     URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, resolvedURI.toString, rewriteMode)
   }
 
-  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String = {
+  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String = {
     val resolvedURI = containingDocument.resolveXMLBase(element, url)
     externalContext.getResponse.rewriteResourceURL(resolvedURI.toString, rewriteMode)
   }
@@ -92,7 +92,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     externalContext.getResponse.rewriteActionURL(resolvedURIStringNoPortletFragment, null, null)
   }
 
-  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String =
+  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: UrlRewriteMode): String =
     URLRewriterImpl.rewriteURL(request, urlString, rewriteMode)
 
   private def uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument: XFormsContainingDocument, resolvedURI: URI): String =

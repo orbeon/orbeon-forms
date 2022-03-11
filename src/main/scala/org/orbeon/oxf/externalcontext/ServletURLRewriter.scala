@@ -22,18 +22,18 @@ class ServletURLRewriter(private val request: ExternalContext.Request) extends U
   private lazy val pathMatchers = URLRewriterUtils.getPathMatchers
 
   def rewriteActionURL(urlString: String): String =
-    URLRewriterImpl.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+    URLRewriterImpl.rewriteURL(request, urlString, UrlRewriteMode.AbsolutePathOrRelative)
 
   def rewriteRenderURL(urlString: String): String =
-    URLRewriterImpl.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+    URLRewriterImpl.rewriteURL(request, urlString, UrlRewriteMode.AbsolutePathOrRelative)
 
   def rewriteActionURL(urlString: String, portletMode: String, windowState: String): String =
-    URLRewriterImpl.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+    URLRewriterImpl.rewriteURL(request, urlString, UrlRewriteMode.AbsolutePathOrRelative)
 
   def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String =
-    URLRewriterImpl.rewriteURL(request, urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+    URLRewriterImpl.rewriteURL(request, urlString, UrlRewriteMode.AbsolutePathOrRelative)
 
-  def rewriteResourceURL(urlString: String, rewriteMode: Int): String =
+  def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode): String =
     URLRewriterUtils.rewriteResourceURL(
       request,
       urlString,

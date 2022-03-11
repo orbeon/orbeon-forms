@@ -20,7 +20,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.io.IOUtils
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.util._
@@ -58,13 +58,13 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     throw new NotImplementedError("attachmentFileExists")
 
   // Form Runner: called with `input:instance`
-  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String =
+  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String =
     url match {
       case "input:instance" => url
       case _                => url
     }
 
-  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String =
+  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String =
     if (url.startsWith("data:"))
       url
     else
@@ -78,7 +78,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   ): String =
     throw new NotImplementedError("resolveRenderURL")
 
-  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String =
+  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: UrlRewriteMode): String =
     throw new NotImplementedError("rewriteURL")
 
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String =

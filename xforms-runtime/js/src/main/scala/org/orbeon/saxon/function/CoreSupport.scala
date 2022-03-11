@@ -1,6 +1,6 @@
 package org.orbeon.saxon.function
 
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.xml.SaxonUtils
@@ -32,8 +32,8 @@ object CoreSupport {
     CoreCrossPlatformSupport.externalContext.getResponse.rewriteResourceURL(
       uri,
       if (absolute)
-        URLRewriter.REWRITE_MODE_ABSOLUTE
+        UrlRewriteMode.Absolute
       else
-        URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
+        UrlRewriteMode.AbsolutePathOrRelative
     )
 }

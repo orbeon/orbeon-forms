@@ -22,7 +22,7 @@ class ResponseWrapper(var _response: ExternalContext.Response)
   def rewriteRenderURL(urlString: String): String = _response.rewriteRenderURL(urlString)
   def rewriteActionURL(urlString: String, portletMode: String, windowState: String): String = _response.rewriteActionURL(urlString, portletMode, windowState)
   def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String = _response.rewriteRenderURL(urlString, portletMode, windowState)
-  def rewriteResourceURL(urlString: String, rewriteMode: Int): String = _response.rewriteResourceURL(urlString, rewriteMode)
+  def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode): String = _response.rewriteResourceURL(urlString, rewriteMode)
 
   def sendError(len: Int): Unit =
     _response.sendError(len)

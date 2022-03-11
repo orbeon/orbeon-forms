@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.externalcontext
 
+import org.orbeon.io.CharsetNames
+import org.orbeon.oxf.util.{NetUtils, PathMatcher, PathUtils, StringConversions, URLRewriterUtils}
+
 import java.net.{URL, URLDecoder, URLEncoder}
 import java.util.concurrent.Callable
 import java.{util => ju}
 
-import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.externalcontext.URLRewriter._
-import org.orbeon.oxf.util.{NetUtils, PathMatcher, PathUtils, StringConversions, URLRewriterUtils}
 
 // This URL rewriter rewrites URLs using the WSRP encoding
 class WSRPURLRewriter(
@@ -65,7 +65,7 @@ class WSRPURLRewriter(
   def rewriteActionURL(urlString: String, portletMode: String, windowState: String) =
     rewritePortletURL(urlString, URLTypeBlockingAction, portletMode, windowState)
 
-  def rewriteResourceURL(urlString: String, rewriteMode: Int) =
+  def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode) =
     rewriteResourceURL(urlString) // the mode is ignored
 
   def getNamespacePrefix = PrefixTag
@@ -115,7 +115,7 @@ class WSRPURLRewriter(
           request,
           urlString,
           getPathMatchers,
-          REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT
+          UrlRewriteMode.AbsolutePathNoContext
         )
 
       // Then do the WSRP encoding
@@ -126,7 +126,7 @@ class WSRPURLRewriter(
         request,
         urlString,
         getPathMatchers,
-        REWRITE_MODE_ABSOLUTE_PATH
+        UrlRewriteMode.AbsolutePath
       )
   }
 }

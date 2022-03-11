@@ -3,8 +3,7 @@ package org.orbeon.oxf.rewrite
 import java.nio.Buffer
 import java.util
 import java.util.StringTokenizer
-
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.{URLRewriter, UrlRewriteMode}
 import org.orbeon.oxf.util.StringUtils
 import org.orbeon.oxf.xml.saxrewrite.State
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiver}
@@ -67,7 +66,7 @@ class RewriteState private[rewrite] (
         return null
       ret = this
       val newAtts = RewriteState.getAttributesFromDefaultNamespace(atts)
-      val newRes = response.rewriteResourceURL(res, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+      val newRes = response.rewriteResourceURL(res, UrlRewriteMode.AbsolutePathOrRelative)
       val idx = newAtts.getIndex("", resAtt)
       newAtts.setValue(idx, newRes)
       xmlReceiver.startElement(ns, lnam, qnam, newAtts)
@@ -91,23 +90,23 @@ class RewriteState private[rewrite] (
       ret = this
       val newAtts = RewriteState.getAttributesFromDefaultNamespace(atts)
       if (codebaseAttribute != null) {
-        val newAttribute = response.rewriteResourceURL(codebaseAttribute, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+        val newAttribute = response.rewriteResourceURL(codebaseAttribute, UrlRewriteMode.AbsolutePathOrRelative)
         val idx = newAtts.getIndex("", "codebase")
         newAtts.setValue(idx, newAttribute)
       } else {
         // We don't rewrite these attributes if there is a codebase
         if (classidAttribute != null) {
-          val newAttribute = response.rewriteResourceURL(classidAttribute, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+          val newAttribute = response.rewriteResourceURL(classidAttribute, UrlRewriteMode.AbsolutePathOrRelative)
           val idx = newAtts.getIndex("", "classid")
           newAtts.setValue(idx, newAttribute)
         }
         if (dataAttribute != null) {
-          val newAttribute = response.rewriteResourceURL(dataAttribute, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+          val newAttribute = response.rewriteResourceURL(dataAttribute, UrlRewriteMode.AbsolutePathOrRelative)
           val idx = newAtts.getIndex("", "data")
           newAtts.setValue(idx, newAttribute)
         }
         if (usemapAttribute != null) {
-          val newAttribute = response.rewriteResourceURL(usemapAttribute, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+          val newAttribute = response.rewriteResourceURL(usemapAttribute, UrlRewriteMode.AbsolutePathOrRelative)
           val idx = newAtts.getIndex("", "usemap")
           newAtts.setValue(idx, newAttribute)
         }
@@ -117,7 +116,7 @@ class RewriteState private[rewrite] (
           var first = true
           while (st.hasMoreTokens) {
             val currentArchive = StringUtils.trimAllToEmpty(st.nextToken)
-            val newArchive = response.rewriteResourceURL(currentArchive, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+            val newArchive = response.rewriteResourceURL(currentArchive, UrlRewriteMode.AbsolutePathOrRelative)
             if (! first)
               sb.append(' ')
             sb.append(newArchive)
@@ -147,7 +146,7 @@ class RewriteState private[rewrite] (
       ret = this
       val newAtts = RewriteState.getAttributesFromDefaultNamespace(atts)
       if (codebaseAttribute != null) {
-        val newAttribute = response.rewriteResourceURL(codebaseAttribute, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+        val newAttribute = response.rewriteResourceURL(codebaseAttribute, UrlRewriteMode.AbsolutePathOrRelative)
         val idx = newAtts.getIndex("", "codebase")
         newAtts.setValue(idx, newAttribute)
       } else {
@@ -157,7 +156,7 @@ class RewriteState private[rewrite] (
         var first = true
         while (st.hasMoreTokens) {
           val currentArchive = StringUtils.trimAllToEmpty(st.nextToken)
-          val newArchive = response.rewriteResourceURL(currentArchive, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+          val newArchive = response.rewriteResourceURL(currentArchive, UrlRewriteMode.AbsolutePathOrRelative)
           if (! first)
             sb.append(' ')
           sb.append(newArchive)
@@ -190,7 +189,7 @@ class RewriteState private[rewrite] (
         var first = true
         while (st.hasMoreTokens) {
           val currentArchive = StringUtils.trimAllToEmpty(st.nextToken)
-          val newArchive = response.rewriteResourceURL(currentArchive, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+          val newArchive = response.rewriteResourceURL(currentArchive, UrlRewriteMode.AbsolutePathOrRelative)
           if (! first)
             sb.append(' ')
           sb.append(newArchive)
@@ -235,7 +234,7 @@ class RewriteState private[rewrite] (
         else if ("action" == urlType)
           response.rewriteActionURL(href, portletMode, windowState)
         else if ("resource" == urlType)
-          response.rewriteResourceURL(href, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+          response.rewriteResourceURL(href, UrlRewriteMode.AbsolutePathOrRelative)
         else
           null
       val idx = newAtts.getIndex("", Rewrite.HREF_ATT)
@@ -394,7 +393,7 @@ class RewriteState private[rewrite] (
           else if ("render" == typ)
             response.rewriteRenderURL(url)
           else
-            response.rewriteResourceURL(url, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+            response.rewriteResourceURL(url, UrlRewriteMode.AbsolutePathOrRelative)
         val chs = newURL.toCharArray
         xmlReceiver.characters(chs, 0, chs.length)
       }

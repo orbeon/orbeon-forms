@@ -4,7 +4,7 @@ import java.{util => ju}
 import cats.Eval
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter, UrlRewriteMode}
 import org.orbeon.oxf.externalcontext.ExternalContext.Response
 import org.orbeon.oxf.http.{HttpMethod, SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
-import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmission, XFormsModelSubmissionSupport}
+import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
@@ -576,7 +576,7 @@ object XFormsServer {
 
           val actionUrl =
             if (twoPassSubmitEvent.isResponseResourceType)
-              response.rewriteResourceURL(XFORMS_SERVER_SUBMIT, URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT) // NOTE: mode ignored in portlet mode
+              response.rewriteResourceURL(XFORMS_SERVER_SUBMIT, UrlRewriteMode.AbsoluteNoContext) // NOTE: mode ignored in portlet mode
             else
               response.rewriteActionURL(XFORMS_SERVER_SUBMIT)
 

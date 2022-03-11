@@ -26,6 +26,7 @@ import org.orbeon.oxf.util._
 
 import scala.jdk.CollectionConverters._
 
+
 /*
  * Servlet-specific implementation of ExternalContext.
  */
@@ -276,7 +277,7 @@ class ServletExternalContext(
               URLRewriterUtils.rewriteServiceURL(
                 getRequest,
                 location,
-                URLRewriter.REWRITE_MODE_ABSOLUTE_PATH
+                UrlRewriteMode.AbsolutePath
               ),
               List(ExternalContext.EmbeddableParam -> "true")
             )
@@ -304,7 +305,7 @@ class ServletExternalContext(
     def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String =
       urlRewriter.rewriteRenderURL(urlString, portletMode, windowState)
 
-    def rewriteResourceURL(urlString: String, rewriteMode: Int): String =
+    def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode): String =
       urlRewriter.rewriteResourceURL(urlString, rewriteMode)
   }
 

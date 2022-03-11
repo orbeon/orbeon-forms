@@ -15,27 +15,27 @@ package org.orbeon.oxf.fr
 
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.PropertySet
-import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
+import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.Loggers
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.XFormsInstance
-import org.orbeon.xml.NamespaceMapping
+import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.xforms.Loggers
-import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.immutable
 import scala.util.Try
@@ -415,7 +415,7 @@ trait FormRunnerBaseOps {
       XFormsCrossPlatformSupport.rewriteURL(
         req,
         "/",
-        URLRewriter.REWRITE_MODE_ABSOLUTE
+        UrlRewriteMode.Absolute
       )
 
     (baseUrlFromProperty getOrElse baseUrlFromContext).appendSlash

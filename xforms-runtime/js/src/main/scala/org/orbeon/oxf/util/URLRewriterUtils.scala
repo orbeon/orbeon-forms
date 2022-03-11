@@ -1,10 +1,9 @@
 package org.orbeon.oxf.util
 
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.externalcontext.UrlRewriteMode
+import org.orbeon.oxf.util.PathUtils._
 import org.scalajs.dom
-import PathUtils._
-import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.util.StringUtils._
 
 import java.net.URI
 import java.{util => ju}
@@ -22,7 +21,7 @@ object URLRewriterUtils {
     request      : Request,
     urlString    : String,
     pathMatchers : ju.List[PathMatcher],
-    rewriteMode  : Int
+    rewriteMode  : UrlRewriteMode
   ): String = {
 
     // We want to rewrite for example `/xbl/etc.`
@@ -32,13 +31,13 @@ object URLRewriterUtils {
     if (uriNoSlash.getScheme ne null) {
       urlString
     } else {
-      if (rewriteMode == URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT) {
+      if (rewriteMode == UrlRewriteMode.AbsolutePathNoContext) {
         // Only used directly by `XFormsOutputControl`
         urlString
       } else {
         val base = URI.create(dom.window.location.href)
         if (base.getScheme == "http" || base.getScheme == "https") {
-          
+
           val basePath = base.resolve(".").getPath
 
           val newBasePath =
@@ -60,7 +59,7 @@ object URLRewriterUtils {
   def rewriteServiceURL(
     request     : Request,
     urlString   : String,
-    rewriteMode : Int
+    rewriteMode : UrlRewriteMode
   ): String =
     if (PathUtils.urlHasProtocol(urlString))
       urlString

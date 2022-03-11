@@ -18,7 +18,7 @@ import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.dom.io.DocumentSource
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.processor.XPLConstants
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
@@ -51,9 +51,9 @@ trait XFormsCrossPlatformSupportTrait {
 
   def attachmentFileExists(holderValue: String): Boolean
 
-  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String
+  def resolveServiceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String
 
-  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: Int): String
+  def resolveResourceURL(containingDocument: XFormsContainingDocument, element: dom.Element, url: String, rewriteMode: UrlRewriteMode): String
 
   def resolveRenderURL(
     containingDocument : XFormsContainingDocument,
@@ -62,7 +62,7 @@ trait XFormsCrossPlatformSupportTrait {
     skipRewrite        : Boolean
   ): String
 
-  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String
+  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: UrlRewriteMode): String
 
   def streamHTMLFragment(
     value        : String,

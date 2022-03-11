@@ -14,14 +14,11 @@
 
 package org.orbeon.oxf.xforms.processor
 
-import java.io._
-import java.util.regex.Matcher
-
 import org.orbeon.io.IOUtils._
 import org.orbeon.io.{CharsetNames, IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.TryUtils._
@@ -29,8 +26,11 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.AssetPath
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import java.io._
+import java.util.regex.Matcher
 import scala.util.Try
 import scala.util.control.NonFatal
+
 
 // NOTE: Should rename to XFormsAssetRewriter?
 object XFormsResourceRewriter extends Logging {
@@ -150,7 +150,7 @@ object XFormsResourceRewriter extends Logging {
     def tryRewriteURL(url: String) =
       Try {
         val resolvedURI = NetUtils.resolveURI(url, resourcePath)
-        val rewrittenURI = response.rewriteResourceURL(resolvedURI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+        val rewrittenURI = response.rewriteResourceURL(resolvedURI, UrlRewriteMode.AbsolutePathOrRelative)
         "url(" + rewrittenURI + ")"
       } recover {
         case NonFatal(_) =>

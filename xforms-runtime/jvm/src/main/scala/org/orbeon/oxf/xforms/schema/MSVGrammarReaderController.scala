@@ -13,22 +13,21 @@
  */
 package org.orbeon.oxf.xforms.schema
 
-import java.net.URL
-
 import org.orbeon.msv.grammar.Grammar
 import org.orbeon.msv.reader.GrammarReaderController
 import org.orbeon.oxf.cache.CacheKey
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.xforms.model.XFormsModelSchemaValidator
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.model.XFormsModelSchemaValidator
 import org.orbeon.oxf.xml.XMLParsing
 import org.orbeon.oxf.xml.dom.XmlLocationData
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.{InputSource, Locator}
 
+import java.net.URL
 import scala.util.control.NonFatal
 
 
@@ -51,7 +50,7 @@ class MSVGrammarReaderController(
         case Some(baseURL) =>
           URLFactory.createURL(baseURL, systemId)
         case None =>
-          URLFactory.createURL(XFormsCrossPlatformSupport.resolveServiceURL(containingDocument, null, systemId, URLRewriter.REWRITE_MODE_ABSOLUTE))
+          URLFactory.createURL(XFormsCrossPlatformSupport.resolveServiceURL(containingDocument, null, systemId, UrlRewriteMode.Absolute))
       }
 
     dependencies.addInclude(url)
@@ -93,7 +92,7 @@ class SchemaDependencies {
       catch {
         // If an include is missing it may just be the case that it isn't included anymore _and_ it has been
         // removed. So, we return `false` and then on a reparse we will find out the truth.
-        case NonFatal(e) => false
+        case NonFatal(_) => false
       }
 
     includes forall (isUnchanged _).tupled

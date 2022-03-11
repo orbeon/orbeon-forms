@@ -15,11 +15,10 @@ package org.orbeon.oxf.xforms.model
 
 import java.net.URI
 import java.{util => ju}
-
 import cats.syntax.option._
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
@@ -44,6 +43,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}
 
 import scala.util.control.NonFatal
+
 
 object XFormsModel {
   val LoggingCategory = "model"
@@ -409,7 +409,7 @@ trait XFormsModelInstances {
         URLRewriterUtils.rewriteServiceURL(
           externalContext.getRequest,
           pathOrAbsoluteURI,
-          URLRewriter.REWRITE_MODE_ABSOLUTE
+          UrlRewriteMode.Absolute
         )
       ),
       handleXInclude = handleXInclude
@@ -485,7 +485,7 @@ trait XFormsModelInstances {
       containingDocument,
       instance.element,
       instance.instanceSource.get,
-      URLRewriter.REWRITE_MODE_ABSOLUTE
+      UrlRewriteMode.Absolute
     )
 
   private def loadInitialExternalInstanceFromCacheIfNeeded(instance: Instance): Unit = {

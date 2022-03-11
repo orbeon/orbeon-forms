@@ -13,12 +13,8 @@
  */
 package org.orbeon.oxf.util
 
-import java.net.URI
-import java.{util => ju}
 import cats.Eval
 import cats.syntax.option._
-
-import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.log4s
@@ -26,7 +22,7 @@ import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.io.UriScheme
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.ExternalContext.SessionScope
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod._
 import org.orbeon.oxf.http._
@@ -38,9 +34,13 @@ import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 
-import scala.jdk.CollectionConverters._
+import java.net.URI
+import java.{util => ju}
+import javax.servlet.http.{Cookie, HttpServletRequest}
 import scala.collection.compat._
+import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 /**
  * Connection to a URL.
@@ -164,7 +164,7 @@ object Connection extends ConnectionTrait {
       URLRewriterUtils.rewriteServiceURL(
         ec.getRequest,
         "/",
-        URLRewriter.REWRITE_MODE_ABSOLUTE
+        UrlRewriteMode.Absolute
       )
 
     for {

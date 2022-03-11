@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.IndentedLogger
@@ -150,7 +150,7 @@ object XFormsLoadAction {
             containingDocument,
             currentElem.orNull,
             value,
-            URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE
+            UrlRewriteMode.AbsolutePathOrRelative
           )
         } else {
           // Load as render URL

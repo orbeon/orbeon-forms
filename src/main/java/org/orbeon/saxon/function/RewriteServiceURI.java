@@ -13,16 +13,15 @@
  */
 package org.orbeon.saxon.function;
 
-import org.orbeon.oxf.externalcontext.URLRewriter$;
+import org.orbeon.oxf.externalcontext.UrlRewriteMode;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.ExpressionVisitor;
-import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.scaxon.Implicits;
+
 
 public class RewriteServiceURI extends SystemFunction {
 
@@ -31,7 +30,7 @@ public class RewriteServiceURI extends SystemFunction {
      * (because the value of the expression depends on the runtime context)
      */
     @Override
-    public Expression preEvaluate(ExpressionVisitor visitor) throws XPathException {
+    public Expression preEvaluate(ExpressionVisitor visitor) {
         return this;
     }
 
@@ -52,11 +51,11 @@ public class RewriteServiceURI extends SystemFunction {
         return Implicits.stringToStringValue(rewrittenURI);
     }
 
-    public static String rewriteServiceURI(String uri, boolean absolute) {
+    private static String rewriteServiceURI(String uri, boolean absolute) {
         return URLRewriterUtils.rewriteServiceURL(
             NetUtils.getExternalContext().getRequest(),
             uri,
-            absolute ? URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE() : URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH()
+            absolute ? UrlRewriteMode.Absolute$.MODULE$ : UrlRewriteMode.AbsolutePath$.MODULE$
         );
     }
 }

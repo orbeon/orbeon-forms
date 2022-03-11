@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.submission
 
 import cats.Eval
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.util.{IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.XFormsGlobalProperties
 import org.orbeon.xforms.{UrlType, XFormsCrossPlatformSupport}
@@ -53,7 +53,7 @@ abstract class BaseSubmission(val submission: XFormsModelSubmission) extends Sub
       containingDocument,
       submission.staticSubmission.element,
       PathUtils.appendQueryString(resolvedActionOrResource, queryString),
-      if (isNorewrite) URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT else URLRewriter.REWRITE_MODE_ABSOLUTE
+      if (isNorewrite) UrlRewriteMode.AbsoluteNoContext else UrlRewriteMode.Absolute
     )
   }
 

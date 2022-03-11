@@ -13,11 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor
 
-import java.{lang => jl}
-
 import cats.syntax.option._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{BasicCredentials, URIReferences}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferencesState
@@ -31,6 +29,7 @@ import org.orbeon.oxf.xforms.state.{AnnotatedTemplate, XFormsStateManager, XForm
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import java.{lang => jl}
 import scala.util.control.NonFatal
 
 
@@ -284,7 +283,7 @@ private object XFormsProcessorBase {
             containingDocument,
             instance.element,
             instance.dependencyURL.get,
-            URLRewriter.REWRITE_MODE_ABSOLUTE
+            UrlRewriteMode.Absolute
           )
       } yield {
         if (logger.debugEnabled)

@@ -105,7 +105,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
   def rewriteRenderURL(urlString: String, portletMode: String, windowState: String) =
     rewriter.rewriteRenderURL(urlString, portletMode, windowState)
 
-  def rewriteResourceURL(urlString: String, rewriteMode: Int) =
+  def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode) =
     rewriter.rewriteResourceURL(urlString, rewriteMode)
 
   def sendError(sc: Int): Unit =

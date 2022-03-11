@@ -10,7 +10,7 @@ import java.net.{URI, URISyntaxException}
 
 object URLRewriterImpl {
 
-  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: Int): String =
+  def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: UrlRewriteMode): String =
     rewriteURL(
       scheme       = request.getScheme,
       host         = request.getServerName,
@@ -24,7 +24,7 @@ object URLRewriterImpl {
   def rewriteServiceURL(
     request         : ExternalContext.Request,
     urlString       : String,
-    rewriteMode     : Int,
+    rewriteMode     : UrlRewriteMode,
     baseURIProperty : String
   ): String = {
 
@@ -83,7 +83,7 @@ object URLRewriterImpl {
     contextPath  : String,
     requestPath  : String,
     rawUrlString : String,
-    rewriteMode  : Int
+    rewriteMode  : UrlRewriteMode
   ): String = {
 
     // Accept human-readable URI
@@ -97,13 +97,13 @@ object URLRewriterImpl {
 
         // Prepend absolute base if needed
         val _baseURLString =
-          if ((rewriteMode & URLRewriter.REWRITE_MODE_ABSOLUTE) != 0)
+          if (rewriteMode == UrlRewriteMode.Absolute || rewriteMode == UrlRewriteMode.AbsoluteNoContext)
             scheme + "://" + host + (if (port == 80 || port == -1) "" else ":" + port)
           else
             ""
 
         // Append context path if needed
-        if ((rewriteMode & URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT) == 0)
+        if (rewriteMode != UrlRewriteMode.AbsolutePathNoContext && rewriteMode != UrlRewriteMode.AbsoluteNoContext)
           _baseURLString + contextPath
         else
           _baseURLString
@@ -114,7 +114,7 @@ object URLRewriterImpl {
         // This is a special case that appears to be implemented
         // in Web browsers as a convenience. Users may use it.
         baseURLString + requestPath + urlString
-      } else if ((rewriteMode & URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE) != 0 && ! urlString.startsWith("/") && "" != urlString) {
+      } else if (rewriteMode == UrlRewriteMode.AbsolutePathOrRelative && ! urlString.startsWith("/") && "" != urlString) {
         // Don't change the URL if it is a relative path and we don't force absolute
         urlString
       } else {

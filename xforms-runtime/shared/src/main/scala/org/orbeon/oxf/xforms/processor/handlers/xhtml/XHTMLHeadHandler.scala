@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 
-import org.orbeon.oxf.externalcontext.URLRewriter._
+import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.processor.ScriptBuilder._
@@ -146,7 +146,7 @@ class XHTMLHeadHandler(
         List(
           buildJavaScriptInitialData(
             containingDocument   = containingDocument,
-            rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE),
+            rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
             controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
           )
         ) foreach

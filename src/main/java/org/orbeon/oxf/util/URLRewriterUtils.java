@@ -73,7 +73,7 @@ public class URLRewriterUtils {
      * @param rewriteMode       rewrite mode
      * @return                  rewritten URL
      */
-    public static String rewriteServiceURL(ExternalContext.Request request, String urlString, int rewriteMode) {
+    public static String rewriteServiceURL(ExternalContext.Request request, String urlString, UrlRewriteMode rewriteMode) {
         return URLRewriterImpl.rewriteServiceURL(request, urlString, rewriteMode, getServiceBaseURI());
     }
 
@@ -131,12 +131,12 @@ public class URLRewriterUtils {
      * @param rewriteMode       rewrite mode
      * @return                  rewritten URL
      */
-    public static String rewriteResourceURL(ExternalContext.Request request, String urlString, List<PathMatcher> pathMatchers, int rewriteMode) {
+    public static String rewriteResourceURL(ExternalContext.Request request, String urlString, List<PathMatcher> pathMatchers, UrlRewriteMode rewriteMode) {
         if (pathMatchers != null && pathMatchers.size() > 0) {
             // We need to match the URL against the matcher
 
             // 1. Rewrite to absolute path URI without context
-            final String absoluteURINoContext = URLRewriterImpl.rewriteURL(request, urlString, URLRewriter$.MODULE$.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT());
+            final String absoluteURINoContext = URLRewriterImpl.rewriteURL(request, urlString, UrlRewriteMode.AbsolutePathNoContext$.MODULE$);
             if (PathUtils.urlHasProtocol(absoluteURINoContext))
                 return absoluteURINoContext; // will be an absolute path
 

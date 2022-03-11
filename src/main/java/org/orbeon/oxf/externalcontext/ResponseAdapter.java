@@ -86,7 +86,7 @@ public class ResponseAdapter implements ExternalContext.Response {
         return null;
     }
 
-    public String rewriteResourceURL(String urlString, int rewriteMode) {
+    public String rewriteResourceURL(String urlString, UrlRewriteMode rewriteMode) {
         return null;
     }
 

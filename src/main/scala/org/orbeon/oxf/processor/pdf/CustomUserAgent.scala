@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor.pdf
 
 import com.lowagie.text.Image
 import org.orbeon.io.IOUtils
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.CoreUtils._
@@ -183,7 +183,7 @@ class CustomUserAgent(
       URLRewriterUtils.rewriteServiceURL(
         requestOpt.orNull,
         uri,
-        URLRewriter.REWRITE_MODE_ABSOLUTE_NO_CONTEXT
+        UrlRewriteMode.AbsoluteNoContext
       )
 
     indentedLogger.logDebug("pdf", "after resolving URL", "url", resolved)

@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.processor
 
 import java.io.{OutputStreamWriter, PrintWriter}
-
-import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseAdapter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseAdapter, UrlRewriteMode}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.processor.serializer.CachedSerializer
 import org.orbeon.oxf.util.{ContentHandlerOutputStream, ContentTypes}
 import org.orbeon.oxf.xml.XMLReceiver
+
 
 object PipelineResponse {
   /*
@@ -70,7 +70,7 @@ object PipelineResponse {
         override def setTitle(title: String): Unit =
           originalResponse.setTitle(title)
 
-        override def rewriteResourceURL(urlString: String, rewriteMode: Int) =
+        override def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode) =
           originalResponse.rewriteResourceURL(urlString, rewriteMode)
 
         override def rewriteRenderURL(urlString: String, portletMode: String, windowState: String) =

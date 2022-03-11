@@ -15,10 +15,8 @@ package org.orbeon.oxf.controller
 
 import java.lang.{Boolean => JBoolean}
 import java.net.URI
-
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.externalcontext.URLRewriter._
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
 import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException, StreamedContent}
@@ -29,6 +27,7 @@ import org.orbeon.oxf.util._
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 object Authorizer extends Logging {
 
@@ -116,7 +115,7 @@ object Authorizer extends Logging {
     // NOTE: If the authorizer base URL is an absolute path, it is rewritten against the host
     def delegateAbsoluteBaseURIOpt =
       propertySet.getStringOrURIAsStringOpt(AuthorizerProperty) map
-        (p => new URI(URLRewriterUtils.rewriteServiceURL(request, p, REWRITE_MODE_ABSOLUTE_NO_CONTEXT)))
+        (p => new URI(URLRewriterUtils.rewriteServiceURL(request, p, UrlRewriteMode.AbsoluteNoContext)))
 
     delegateAbsoluteBaseURIOpt match {
       case Some(baseDelegateURI) =>

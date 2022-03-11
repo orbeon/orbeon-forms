@@ -15,12 +15,10 @@ package org.orbeon.oxf.util
 
 import java.net.URI
 import java.{util => ju}
-
 import cats.syntax.option._
 import org.mockito.Mockito
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.externalcontext.URLRewriter.REWRITE_MODE_ABSOLUTE
-import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, WebAppContext}
+import org.orbeon.oxf.externalcontext.{ExternalContext, LocalRequest, RequestAdapter, UrlRewriteMode, WebAppContext}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.{Headers, HttpMethod, StreamedContent}
 import org.orbeon.oxf.test.{ResourceManagerSupport, ResourceManagerTestBase}
@@ -207,7 +205,7 @@ class ConnectionTest
     for {
       (urlString, mustIncludeToken) <- Expected
       httpMethod                    <- List(HttpMethod.GET, HttpMethod.POST)
-      serviceAbsoluteUrl            = URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, urlString, REWRITE_MODE_ABSOLUTE)
+      serviceAbsoluteUrl            = URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, urlString, UrlRewriteMode.Absolute)
     } locally {
       it(s"call to `$urlString` with `$httpMethod` must ${if (mustIncludeToken) "" else "not " }include an `Orbeon-Token` header") {
         val headersCapitalized =

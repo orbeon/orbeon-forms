@@ -161,7 +161,7 @@ object ExternalContext {
     def rewriteRenderURL(urlString: String): String
     def rewriteActionURL(urlString: String, portletMode: String, windowState: String): String
     def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String
-    def rewriteResourceURL(urlString: String, rewriteMode: Int): String
+    def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode): String
     def getNamespacePrefix: String
   }
 

@@ -13,23 +13,21 @@
  */
 package org.orbeon.oxf.externalcontext
 
-object URLRewriter {
-  // Works as a bitset
-  // 1: whether to produce an absolute URL (starting with "http" or "https")
-  // 2: whether to leave the URL as is if it is does not start with "/"
-  // 4: whether to prevent insertion of a context at the start of the path
-  val REWRITE_MODE_ABSOLUTE = 1
-  val REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE = 2
-  val REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT = 4
-  val REWRITE_MODE_ABSOLUTE_PATH = 0
-  val REWRITE_MODE_ABSOLUTE_NO_CONTEXT = REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT + REWRITE_MODE_ABSOLUTE
+
+sealed trait UrlRewriteMode
+object UrlRewriteMode {
+  case object Absolute               extends UrlRewriteMode
+  case object AbsolutePathOrRelative extends UrlRewriteMode
+  case object AbsolutePathNoContext  extends UrlRewriteMode
+  case object AbsolutePath           extends UrlRewriteMode
+  case object AbsoluteNoContext      extends UrlRewriteMode
 }
 
 trait URLRewriter {
-  def rewriteRenderURL(urlString: String): String
-  def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String
-  def rewriteActionURL(urlString: String): String
-  def rewriteActionURL(urlString: String, portletMode: String, windowState: String): String
-  def rewriteResourceURL(urlString: String, rewriteMode: Int): String
+  def rewriteRenderURL  (urlString: String): String
+  def rewriteRenderURL  (urlString: String, portletMode: String, windowState: String): String
+  def rewriteActionURL  (urlString: String): String
+  def rewriteActionURL  (urlString: String, portletMode: String, windowState: String): String
+  def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode): String
   def getNamespacePrefix: String
 }

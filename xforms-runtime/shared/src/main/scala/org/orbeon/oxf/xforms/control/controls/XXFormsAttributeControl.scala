@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
-import org.orbeon.oxf.externalcontext.URLRewriter._
+import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
@@ -74,12 +74,12 @@ class XXFormsAttributeControl(
     val externalValue = getExternalValue()
     attributeName match {
       case "src" =>
-        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, UrlRewriteMode.AbsolutePathOrRelative)
       case "href" if ! externalValue.startsWith("#") =>
         // NOTE: Keep value unchanged if it's just a fragment (see also XFormsLoadAction)
         attributeControl.urlType match {
           case "action"   => XFormsCrossPlatformSupport.resolveActionURL  (containingDocument, element, externalValue)
-          case "resource" => XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+          case "resource" => XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, externalValue, UrlRewriteMode.AbsolutePathOrRelative)
           case _          => XFormsCrossPlatformSupport.resolveRenderURL  (containingDocument, element, externalValue, false) // default is "render"
         }
       case _ => externalValue
@@ -99,7 +99,7 @@ class XXFormsAttributeControl(
     attributeName match {
       case "src" if forName == "img" =>
         // Return rewritten URL of dummy image URL
-        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, REWRITE_MODE_ABSOLUTE_PATH)
+        XFormsCrossPlatformSupport.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, UrlRewriteMode.AbsolutePath)
       case "src" if forName == "script" =>
         DUMMY_SCRIPT_URI
       case _ =>

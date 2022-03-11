@@ -328,18 +328,18 @@ class TestExternalContext(
     def isCommitted: Boolean = false
 
     def rewriteActionURL(urlString: String) =
-      rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+      rewriteResourceURL(urlString, UrlRewriteMode.AbsolutePathOrRelative)
 
     def rewriteRenderURL(urlString: String) =
-      rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+      rewriteResourceURL(urlString, UrlRewriteMode.AbsolutePathOrRelative)
 
     def rewriteActionURL(urlString: String, portletMode: String, windowState: String) =
-      rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+      rewriteResourceURL(urlString, UrlRewriteMode.AbsolutePathOrRelative)
 
     def rewriteRenderURL(urlString: String, portletMode: String, windowState: String) =
-      rewriteResourceURL(urlString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+      rewriteResourceURL(urlString, UrlRewriteMode.AbsolutePathOrRelative)
 
-    def rewriteResourceURL(urlString: String, rewriteMode: Int) =
+    def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode) =
       URLRewriterImpl.rewriteURL(getRequest, urlString, rewriteMode)
 
     def reset()                                                                      = ()

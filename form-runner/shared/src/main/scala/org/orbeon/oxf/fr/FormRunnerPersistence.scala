@@ -20,7 +20,7 @@ import enumeratum._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
@@ -373,7 +373,7 @@ trait FormRunnerPersistence {
       URLRewriterUtils.rewriteServiceURL(
         request,
         urlString,
-        URLRewriter.REWRITE_MODE_ABSOLUTE
+        UrlRewriteMode.Absolute
       )
 
     val url = new URI(rewrittenURLString)
@@ -624,7 +624,7 @@ trait FormRunnerPersistence {
           URLRewriterUtils.rewriteServiceURL(
             externalContext.getRequest,
             url,
-            URLRewriter.REWRITE_MODE_ABSOLUTE
+            UrlRewriteMode.Absolute
           )
 
         val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")

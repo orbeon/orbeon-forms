@@ -17,15 +17,14 @@ import org.apache.http.HttpStatus
 import org.orbeon.dom.QName
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
-import org.orbeon.oxf.externalcontext.URLRewriter._
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.HttpMethodsWithRequestBody
-import org.orbeon.oxf.http.{HttpMethod, _}
+import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -308,7 +307,7 @@ private object PersistenceProxyProcessor {
     implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
     val outgoingURL =
-      new URI(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri, REWRITE_MODE_ABSOLUTE))
+      new URI(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri, UrlRewriteMode.Absolute))
 
     val persistenceHeaders =
       for ((name, value) <- headers)

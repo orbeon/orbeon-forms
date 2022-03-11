@@ -13,15 +13,10 @@
   */
 package org.orbeon.oxf.portlet
 
-import java.io._
-import java.util.Locale
-import java.{util => ju}
-
-import javax.portlet._
 import org.orbeon.io.StringBuilderWriter
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
-import org.orbeon.oxf.externalcontext.{ExternalContext, ServletPortletRequest, WSRPURLRewriter, WebAppContext}
+import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.CollectionUtils._
@@ -30,7 +25,12 @@ import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 
+import java.io._
+import java.util.Locale
+import java.{util => ju}
+import javax.portlet._
 import scala.jdk.CollectionConverters._
+
 
 /*
  * Portlet-specific implementation of ExternalContext.
@@ -91,7 +91,7 @@ object Portlet2ExternalContext {
     def rewriteRenderURL(urlString: String, portletMode: String, windowState: String): String =
       urlRewriter.rewriteRenderURL(urlString, portletMode, windowState)
 
-    def rewriteResourceURL(urlString: String, rewriteMode: Int): String =
+    def rewriteResourceURL(urlString: String, rewriteMode: UrlRewriteMode): String =
       urlRewriter.rewriteResourceURL(urlString, rewriteMode)
 
     def getNamespacePrefix: String = urlRewriter.getNamespacePrefix

@@ -28,35 +28,54 @@
         marker           : null,
 
         init: function() {
-            var me = this;
+            // Delegate to a recursive worker function, as recursively calling `init` would have not no effect,
+            // as we override `init` so subsequent calls are ignored.
+            this.initWorker();
+        },
 
-            // Init object attributes
-            var mapDiv          = $(this.container).find('.fb-map-gmap-div' )[0];
-            me.addressOutputID  = $(this.container).find('.fb-map-address'  )[0].id;
-            me.longitudeInputID = $(this.container).find('.fb-map-longitude')[0].id;
-            me.latitudeInputID  = $(this.container).find('.fb-map-latitude' )[0].id;
+        initWorker: function() {
 
-            // By default load the map zoomed out, and we'll then update it if we have a lat/lng or address
-            var mapOptions = {
-                center: { lat: 0, lng: 0},
-                zoom: 1,
-                scaleControl: true,
-                zoomControl: true
-            };
+            if (
+                "google" in window &&
+                "maps" in google &&
+                "Map" in google.maps
+            ) {
 
-            // Create map with its controls
-            me.map = new google.maps.Map(mapDiv, mapOptions);
-            me.geoCoder = new google.maps.Geocoder();
+                // Init object attributes
+                var mapDiv          = $(this.container).find('.fb-map-gmap-div' )[0];
+                this.addressOutputID  = $(this.container).find('.fb-map-address'  )[0].id;
+                this.longitudeInputID = $(this.container).find('.fb-map-longitude')[0].id;
+                this.latitudeInputID  = $(this.container).find('.fb-map-latitude' )[0].id;
 
-            // Set location
-            var initialLatitude  = ORBEON.xforms.Document.getValue(me.latitudeInputID);
-            var initialLongitude = ORBEON.xforms.Document.getValue(me.longitudeInputID);
-            if (initialLatitude != "" && initialLongitude != "") {
-                var latLng = new google.maps.LatLng(Number(initialLatitude), Number(initialLongitude));
-                me.updateMarkerFromLatLng(latLng);
-                return latLng;
+                // By default load the map zoomed out, and we'll then update it if we have a lat/lng or address
+                var mapOptions = {
+                    center: { lat: 0, lng: 0},
+                    zoom: 1,
+                    scaleControl: true,
+                    zoomControl: true
+                };
+
+                // Create map with its controls
+                this.map = new google.maps.Map(mapDiv, mapOptions);
+                this.geoCoder = new google.maps.Geocoder();
+
+                // Set location
+                var initialLatitude  = ORBEON.xforms.Document.getValue(this.latitudeInputID);
+                var initialLongitude = ORBEON.xforms.Document.getValue(this.longitudeInputID);
+                if (initialLatitude != "" && initialLongitude != "") {
+                    var latLng = new google.maps.LatLng(Number(initialLatitude), Number(initialLongitude));
+                    this.updateMarkerFromLatLng(latLng);
+                    return latLng;
+                } else {
+                    this.updateMarkerFromAddress();
+                }
+
             } else {
-                me.updateMarkerFromAddress();
+
+                // The additional scripts loaded by the map API haven't been loaded yet, try again after a short delay
+                var shortDelay = ORBEON.util.Properties.internalShortDelay.get();
+                setTimeout(this.initWorker.bind(this), shortDelay);
+
             }
         },
 

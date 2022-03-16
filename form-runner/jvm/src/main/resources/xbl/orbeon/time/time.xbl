@@ -86,7 +86,7 @@
                     </xh:tr>
                 </fr:grid>
                 <xf:action
-                     id="fb-editor-time-action"
+                    id="fb-editor-time-action"
                     event="xforms-value-changed"
                     observer="field-width-control">
 

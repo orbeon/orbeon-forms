@@ -17,25 +17,135 @@ import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.xforms.facade.{Controls, Utils}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
-import org.scalajs.dom.html
-import org.scalajs.dom.raw.{Element, HTMLElement}
-import scalatags.JsDom
-
+import org.scalajs.dom.{html, raw}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+import scalatags.JsDom
+import scalatags.JsDom.all.{value, _}
+
 import scala.concurrent.duration._
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.timers
 import scala.scalajs.js.timers.SetTimeoutHandle
-import scalatags.JsDom.all.{value, _}
 
 
-// Progressively migrate contents of xforms.js here
+// Progressively migrate contents of xforms.js/AjaxServer.js here
 @JSExportTopLevel("OrbeonXFormsUi")
 object XFormsUI {
 
   @JSExport // 2020-04-27: 6 JavaScript usages from xforms.js
   var modalProgressPanelShown: Boolean = false
+
+  // 2022-03-16: AjaxServer.js
+  @JSExport
+  def firstChildWithLocalName(node: raw.Element, name: String): js.UndefOr[raw.Element] =
+    node.childNodes.collectFirst{
+      case n: raw.Element if n.localName == name => n
+    }.orUndefined
+
+  private def childrenWithLocalName(node: raw.Element, name: String): Iterator[raw.Element] =
+    node.childNodes.iterator collect {
+      case n: raw.Element if n.localName == name => n
+    }
+
+  private def appendRepeatSuffix(id: String, suffix: String): String =
+    if (suffix.isEmpty)
+      id
+    else
+      id + Constants.RepeatSeparator + suffix
+
+  private def attributeValueOrThrow(elem: raw.Element, name: String): String =
+    attributeValueOpt(elem, name).getOrElse(throw new IllegalArgumentException(name))
+
+  // Just in case, normalize following:
+  // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute#non-existing_attributes
+  private def attributeValueOpt(elem: raw.Element, name: String): Option[String] =
+    if (elem.hasAttribute(name))
+      Option(elem.getAttribute(name)) // `Some()` should be ok but just in case...
+    else
+      None
+
+  // 2022-03-16: AjaxServer.js
+  @JSExport
+  def findDialogsToShow(controlValuesElems: js.Array[raw.Element]): Iterator[String] =
+    for {
+      controlValuesElem <- controlValuesElems.iterator
+      dialogElem        <- childrenWithLocalName(controlValuesElem, "dialog")
+      visibleValue      <- attributeValueOpt(dialogElem, "visibility")
+      if visibleValue == "visible"
+      idValue           <- attributeValueOpt(dialogElem, "id")
+    } yield
+      idValue
+
+  // 2022-03-16: AjaxServer.js
+  @JSExport
+  def handleScriptElem(formID: String, scriptElem: raw.Element): Unit = {
+
+    val functionName  = attributeValueOrThrow(scriptElem, "name")
+    val targetId      = attributeValueOrThrow(scriptElem, "target-id")
+    val observerId    = attributeValueOrThrow(scriptElem, "observer-id")
+    val paramElements = childrenWithLocalName(scriptElem, "param")
+
+    val paramValues = paramElements map (_.textContent.asInstanceOf[js.Any])
+
+    ServerAPI.callUserScript(formID, functionName, targetId, observerId, paramValues.toList: _*)
+  }
+
+  // 2022-03-16: AjaxServer.js
+  @JSExport
+  def handleDeleteRepeatElements(controlValuesElems: js.Array[raw.Element]): Unit =
+    controlValuesElems.iterator foreach { controlValuesElem =>
+      childrenWithLocalName(controlValuesElem, "delete-repeat-elements") foreach { deleteElem =>
+
+        // Extract data from server response
+        val deleteId      = attributeValueOrThrow(deleteElem, "id")
+        val parentIndexes = attributeValueOrThrow(deleteElem, "parent-indexes")
+        val count         = attributeValueOrThrow(deleteElem, "count").toInt
+
+        // TODO: Server splits `deleteId`/`parentIndexes` and here we just put them back together!
+        // TODO: `deleteId` is namespaced by the server; yet here we prepend `repeat-end`
+        val repeatEnd =
+          dom.document.getElementById("repeat-end-" + appendRepeatSuffix(deleteId, parentIndexes))
+
+        // Find last element to delete
+        var lastNodeToDelete: raw.Node = repeatEnd.previousSibling
+
+        // Perform delete
+        for (_ <- 0 until count) {
+          var nestedRepeatLevel = 0
+          var wasDelimiter = false
+          while (! wasDelimiter) {
+            lastNodeToDelete match {
+              case lastElemToDelete: raw.Element =>
+
+                val classList = lastElemToDelete.classList
+
+                if (classList.contains("xforms-repeat-begin-end") && lastElemToDelete.id.startsWith("repeat-end-"))
+                  nestedRepeatLevel += 1 // entering nested repeat
+                else if (classList.contains("xforms-repeat-begin-end") && lastElemToDelete.id.startsWith("repeat-begin-"))
+                  nestedRepeatLevel -=1 // exiting nested repeat
+                else
+                  wasDelimiter = nestedRepeatLevel == 0 && classList.contains("xforms-repeat-delimiter")
+
+                // Since we are removing an element that can contain controls, remove the known server value
+                lastElemToDelete.getElementsByClassName("xforms-control") foreach
+                  (controlElem => ServerValueStore.remove(controlElem.id))
+
+                // We also need to check this on the "root", as the `getElementsByClassName()` function only returns
+                // sub-elements of the specified root and doesn't include the root in its search.
+                if (lastElemToDelete.classList.contains("xforms-control"))
+                  ServerValueStore.remove(lastElemToDelete.id)
+
+              case _ => ()
+            }
+            val previous = lastNodeToDelete.previousSibling
+            lastNodeToDelete.parentNode.removeChild(lastNodeToDelete)
+            lastNodeToDelete = previous
+          }
+        }
+      }
+    }
 
   @JSExport // 2020-04-27: 1 JavaScript usage
   def displayModalProgressPanel(): Unit =
@@ -104,13 +214,13 @@ object XFormsUI {
   //    See `XFormsSelect1Control.outputAjaxDiffUseClientValue()`.
   @JSExport
   def updateSelectItemset(documentElement: html.Element, itemsetTree: js.Array[ItemsetItem]): Unit =
-    ((documentElement.getElementsByTagName("select")(0): js.UndefOr[Element]): Any) match {
+    ((documentElement.getElementsByTagName("select")(0): js.UndefOr[raw.Element]): Any) match {
         case select: html.Select =>
 
           val selectedValues =
             select.options.filter(_.selected).map(_.value)
 
-          def generateItem(itemElement: ItemsetItem): JsDom.TypedTag[HTMLElement] = {
+          def generateItem(itemElement: ItemsetItem): JsDom.TypedTag[raw.HTMLElement] = {
 
             val classOpt = itemElement.attributes.toOption.flatMap(_.get("class"))
 
@@ -145,10 +255,10 @@ object XFormsUI {
 
   private object Private {
 
-    private def findLoaderElem: Option[Element] =
+    private def findLoaderElem: Option[raw.Element] =
       Option(dom.document.querySelector("body > .orbeon-loader"))
 
-    private def createLoaderElem: Element = {
+    private def createLoaderElem: raw.Element = {
       val newDiv = dom.document.createElement("div")
       newDiv.classList.add("orbeon-loader")
       dom.document.body.appendChild(newDiv)

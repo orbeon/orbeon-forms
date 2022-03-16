@@ -13,22 +13,11 @@
  */
 (function() {
 
-    // 2020-10-05: xforms.js comes first. It defindes `ORBEON.xforms` already.
+    // 2020-10-05: xforms.js comes first. It defines `ORBEON.xforms` already.
 
     ORBEON.xforms.AjaxServerResponse = {};
 
     var $ = ORBEON.jQuery;
-
-    function childrenWithLocalName(node, name) {
-        var result = [];
-        _.each(node.childNodes, function(child) {
-            // Not using child.localName, as it isn't supported by IE8
-            var childLocalName = _.last(child.nodeName.split(':'));
-            if (childLocalName == name)
-                result.push(child);
-        });
-        return result;
-    }
 
     /**
      * Process events in the DOM passed as parameter.
@@ -62,30 +51,12 @@
                         return ORBEON.util.Utils.getLocalName(childElement) == "control-values";
                     });
 
-                    function findDialogsToShow() {
-
-                        var result = [];
-
-                        _.each(controlValuesElements, function(controlValuesElement) {
-                            _.each(childrenWithLocalName(controlValuesElement, 'dialog'), function(elem) {
-
-                                var id      = ORBEON.util.Dom.getAttribute(elem, "id");
-                                var visible = ORBEON.util.Dom.getAttribute(elem, "visibility") == "visible";
-
-                                if (visible)
-                                    result.push(id);
-                            });
-                        });
-
-                        return result;
-                    }
-
                     function findRepeatInsertionPoint(repeatPrefixedId, parentIndexes) {
                         return document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatPrefixedId, parentIndexes));
                     }
 
                     if (ORBEON.util.Utils.isIOS() && ORBEON.util.Utils.getZoomLevel() != 1.0) {
-                        var dialogsToShowArray = findDialogsToShow();
+                        var dialogsToShowArray = ORBEON.xforms.XFormsUi.findDialogsToShow(controlValuesElements);
                         if (dialogsToShowArray.length > 0) {
                             responseDialogIdsToShowAsynchronously = dialogsToShowArray;
                             ORBEON.util.Utils.resetIOSZoom();
@@ -93,57 +64,7 @@
                     }
 
                     // First add and remove "lines" in repeats (as itemset changed below might be in a new line)
-                    _.each(controlValuesElements, function(controlValuesElement) {
-
-                        _.each(childrenWithLocalName(controlValuesElement, 'delete-repeat-elements'), function(deleteElementElement) {
-
-                            // Extract data from server response
-                            var deleteId      = ORBEON.util.Dom.getAttribute(deleteElementElement, "id");
-                            var parentIndexes = ORBEON.util.Dom.getAttribute(deleteElementElement, "parent-indexes");
-                            var count         = ORBEON.util.Dom.getAttribute(deleteElementElement, "count");
-
-                            // Find end of the repeat
-                            var repeatEnd = document.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(deleteId, parentIndexes));
-
-                            // Find last element to delete
-                            var lastElementToDelete = repeatEnd.previousSibling;
-
-                            // Perform delete
-                            for (var countIndex = 0; countIndex < count; countIndex++) {
-                                var nestedRepeatLevel = 0;
-                                while (true) {
-                                    var wasDelimiter = false;
-                                    if (lastElementToDelete.nodeType == ELEMENT_TYPE) {
-                                        if ($(lastElementToDelete).is('.xforms-repeat-begin-end') &&
-                                            lastElementToDelete.id.indexOf("repeat-end-") == 0) {
-                                            // Entering nested repeat
-                                            nestedRepeatLevel++;
-                                        } else if ($(lastElementToDelete).is('.xforms-repeat-begin-end') &&
-                                                   lastElementToDelete.id.indexOf("repeat-begin-") == 0) {
-                                            // Exiting nested repeat
-                                            nestedRepeatLevel--;
-                                        } else {
-                                            wasDelimiter = nestedRepeatLevel == 0 && $(lastElementToDelete).is('.xforms-repeat-delimiter');
-                                        }
-                                    }
-                                    var previous = lastElementToDelete.previousSibling;
-                                    // Since we are removing an element that can contain controls, remove the known server value
-                                    if (lastElementToDelete.nodeType == ELEMENT_TYPE) {
-                                        YAHOO.util.Dom.getElementsByClassName("xforms-control", null, lastElementToDelete, function(control) {
-                                            ORBEON.xforms.ServerValueStore.remove(control.id);
-                                        });
-                                        // We also need to check this on the "root", as the getElementsByClassName() function only returns sub-elements
-                                        // of the specified root and doesn't include the root in its search.
-                                        if ($(lastElementToDelete).is('.xforms-control'))
-                                            ORBEON.xforms.ServerValueStore.remove(lastElementToDelete.id);
-                                    }
-                                    lastElementToDelete.parentNode.removeChild(lastElementToDelete);
-                                    lastElementToDelete = previous;
-                                    if (wasDelimiter) break;
-                                }
-                            }
-                        });
-                    });
+                    ORBEON.xforms.XFormsUi.handleDeleteRepeatElements(controlValuesElements);
 
                     function handleControlDetails(controlValuesElements) {
 
@@ -845,10 +766,10 @@
 
                         function handleInnerHtml(elem) {
 
-                            var innerHTML    = ORBEON.util.Dom.getStringValue(childrenWithLocalName(elem, 'value')[0]);
-                            var initElem     = childrenWithLocalName(elem, 'init')[0];
+                            var innerHTML    = ORBEON.util.Dom.getStringValue(ORBEON.xforms.XFormsUi.firstChildWithLocalName(elem, 'value'));
+                            var initElem     = ORBEON.xforms.XFormsUi.firstChildWithLocalName(elem, 'init');
                             var initValue    = _.isUndefined(initElem) ? null : ORBEON.util.Dom.getStringValue(initElem);
-                            var destroyElem  = childrenWithLocalName(elem, 'destroy')[0];
+                            var destroyElem  = ORBEON.xforms.XFormsUi.firstChildWithLocalName(elem, 'destroy');
                             var destroyValue = _.isUndefined(destroyElem) ? null : ORBEON.util.Dom.getStringValue(destroyElem);
                             var controlId    = ORBEON.util.Dom.getAttribute(elem, "id");
 
@@ -1294,16 +1215,7 @@
 
                                 // Run JavaScript code
                                 case "script": {
-                                    var scriptElement = childNode;
-                                    var functionName = ORBEON.util.Dom.getAttribute(scriptElement, "name");
-                                    var targetId = ORBEON.util.Dom.getAttribute(scriptElement, "target-id");
-                                    var observerId = ORBEON.util.Dom.getAttribute(scriptElement, "observer-id");
-                                    var paramElements = childrenWithLocalName(scriptElement, "param");
-                                    var paramValues = _.map(paramElements, function(paramElement) {
-                                        return $(paramElement).text();
-                                    });
-                                    var args = [formID, functionName, targetId, observerId].concat(paramValues);
-                                    ORBEON.xforms.ServerApi.callUserScript.apply(ORBEON.xforms.ServerApi, args);
+                                    ORBEON.xforms.XFormsUi.handleScriptElem(formID, childNode);
                                     break;
                                 }
 
@@ -1346,7 +1258,7 @@
 
                     _.each(errorsElement.childNodes, function(errorElement) {
                         // <xxf:error exception="org.orbeon.saxon.trans.XPathException" file="gaga.xhtml" line="24" col="12">
-                        //     Invalid date "foo" (Year is less than four digits)
+                        //     Invalid date "foo" (Year is less than four digits)
                         // </xxf:error>
                         var exception = ORBEON.util.Dom.getAttribute(errorElement, "exception");
                         var file      = ORBEON.util.Dom.getAttribute(errorElement, "file");

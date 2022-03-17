@@ -15,10 +15,12 @@ package org.orbeon.xforms
 
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
-import org.orbeon.xforms.facade.{Controls, Utils}
+import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
+import org.orbeon.xforms.facade.{Controls, Utils, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.{html, raw}
+import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scalatags.JsDom
 import scalatags.JsDom.all._
@@ -35,37 +37,17 @@ import scala.scalajs.js.timers.SetTimeoutHandle
 @JSExportTopLevel("OrbeonXFormsUi")
 object XFormsUI {
 
+  import Private._
+
   @JSExport // 2020-04-27: 6 JavaScript usages from xforms.js
   var modalProgressPanelShown: Boolean = false
 
   // 2022-03-16: AjaxServer.js
   @JSExport
   def firstChildWithLocalName(node: raw.Element, name: String): js.UndefOr[raw.Element] =
-    node.childNodes.collectFirst{
+    node.childNodes.collectFirst {
       case n: raw.Element if n.localName == name => n
-    }.orUndefined
-
-  private def childrenWithLocalName(node: raw.Element, name: String): Iterator[raw.Element] =
-    node.childNodes.iterator collect {
-      case n: raw.Element if n.localName == name => n
-    }
-
-  private def appendRepeatSuffix(id: String, suffix: String): String =
-    if (suffix.isEmpty)
-      id
-    else
-      id + Constants.RepeatSeparator + suffix
-
-  private def attValueOrThrow(elem: raw.Element, name: String): String =
-    attValueOpt(elem, name).getOrElse(throw new IllegalArgumentException(name))
-
-  // Just in case, normalize following:
-  // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute#non-existing_attributes
-  private def attValueOpt(elem: raw.Element, name: String): Option[String] =
-    if (elem.hasAttribute(name))
-      Option(elem.getAttribute(name)) // `Some()` should be ok but just in case...
-    else
-      None
+    } .orUndefined
 
   // 2022-03-16: AjaxServer.js
   @JSExport
@@ -150,6 +132,154 @@ object XFormsUI {
 
   // 2022-03-16: AjaxServer.js
   @JSExport
+  def handleInit(elem: raw.Element, controlsWithUpdatedItemsets: js.Dictionary[Boolean]): Unit = {
+
+    val controlId       = attValueOrThrow(elem, "id")
+    val documentElement = dom.document.getElementById(controlId).asInstanceOf[html.Element]
+    val relevant        = attValueOpt(elem, "relevant")
+    val readonly        = attValueOpt(elem, "readonly")
+
+    val instance = XBL.instanceForControl(documentElement)
+
+    if (instance.isInstanceOf[js.Object]) {
+
+      val becomesRelevant    = relevant.contains("true")
+      val becomesNonRelevant = relevant.contains("false")
+
+      def callXFormsUpdateReadonlyIfNeeded(): Unit =
+        if (readonly.isDefined && instance.asInstanceOf[js.Dynamic].xformsUpdateReadonly.isInstanceOf[js.Function])
+          instance.xformsUpdateReadonly(readonly.contains("true"))
+
+      if (becomesRelevant) {
+        // NOTE: We don't need to call this right now, because  this is done via `instanceForControl`
+        // the first time. `init()` is guaranteed to be called only once. Obviously this is a little
+        // bit confusing.
+        // if (_.isFunction(instance.init))
+        //     instance.init();
+        callXFormsUpdateReadonlyIfNeeded()
+      } else if (becomesNonRelevant) {
+
+        // We ignore `readonly` when we become non-relevant
+
+        if (instance.asInstanceOf[js.Dynamic].destroy.isInstanceOf[js.Function])
+          instance.destroy()
+
+        // The class's `destroy()` should do that anyway as we inject our own `destroy()`, but ideally
+        // `destroy()` should only be called from there, and so the `null`ing of `xforms-xbl-object` should
+        // take place here as well.
+        $(documentElement).data("xforms-xbl-object", null)
+      } else {
+        // Stays relevant or non-relevant (but we should never be here if we are non-relevant)
+        callXFormsUpdateReadonlyIfNeeded()
+      }
+
+      childrenWithLocalName(elem, "value") foreach { childNode =>
+        handleValue(childNode, controlId, recreatedInput = false, controlsWithUpdatedItemsets)
+      }
+    }
+  }
+
+  // 2022-03-16: AjaxServer.js
+  @JSExport
+  def handleValues(controlElem: raw.Element, controlId: String, recreatedInput: Boolean, controlsWithUpdatedItemsets: js.Dictionary[Boolean]): Unit =
+    childrenWithLocalName(controlElem, "value") foreach
+      (handleValue(_, controlId, recreatedInput, controlsWithUpdatedItemsets))
+
+  def handleValue(elem: raw.Element, controlId: String, recreatedInput: Boolean, controlsWithUpdatedItemsets: js.Dictionary[Boolean]): Unit = {
+
+    val newControlValue  = elem.textContent
+    val documentElement  = dom.document.getElementById(controlId).asInstanceOf[html.Element]
+
+    def containsAnyOf(e: raw.Element, tokens: List[String]) = {
+      val classList = e.classList
+      tokens.exists(classList.contains)
+    }
+
+    if (containsAnyOf(documentElement, HandleValueIgnoredControls)) {
+      scribe.error(s"Got value from server for element with class: ${documentElement.getAttribute("class")}")
+    } else {
+
+      ServerValueStore.set(controlId, newControlValue)
+
+      val normalizedNewControlValue = newControlValue.normalizeSerializedHtml
+
+      if (containsAnyOf(documentElement, HandleValueOutputOnlyControls))
+        Controls.setCurrentValue(documentElement, normalizedNewControlValue, force = false)
+      else
+        Controls.getCurrentValue(documentElement) foreach { currentValue =>
+
+          val normalizedPreviousServerValueOpt = Option(ServerValueStore.get(controlId)).map(_.normalizeSerializedHtml)
+          val normalizedCurrentValue           = currentValue.normalizeSerializedHtml
+
+          val doUpdate =
+          // If this was an input that was recreated because of a type change, we always set its value
+            recreatedInput ||
+              // If this is a control for which we recreated the itemset, we want to set its value
+              controlsWithUpdatedItemsets.get(controlId).contains(true) ||
+              (
+                // Update only if the new value is different than the value already have in the HTML area
+                normalizedCurrentValue != normalizedNewControlValue
+                  // Update only if the value in the control is the same now as it was when we sent it to the server,
+                  // so not to override a change done by the user since the control value was last sent to the server
+                  && (
+                  normalizedPreviousServerValueOpt.isEmpty ||
+                    normalizedPreviousServerValueOpt.contains(normalizedCurrentValue) ||
+                    // For https://github.com/orbeon/orbeon-forms/issues/3130
+                    //
+                    // We would like to test for "becomes readonly", but test below is equivalent:
+                    //
+                    // - either the control was already readonly, so `currentValue != newControlValue` was `true`
+                    //   as server wouldn't send a value otherwise
+                    // - or it was readwrite and became readonly, in which case we test for this below
+                    documentElement.classList.contains("xforms-readonly")
+                  )
+                )
+
+          if (doUpdate) {
+            val promiseOrUndef = Controls.setCurrentValue(documentElement, normalizedNewControlValue, force = true)
+
+            // Store the server value as the client sees it, not as the server sees it. There can be a difference in the following cases:
+            //
+            // 1) For HTML editors, the HTML might change once we put it in the DOM.
+            // 2) For select/select1, if the server sends an out-of-range value, the actual value of the field won"t be the out
+            //    of range value but the empty string.
+            // 3) For boolean inputs, the server might tell us the new value is "" when the field becomes non-relevant, which is
+            //    equivalent to "false".
+            //
+            // It is important to store in the serverValue the actual value of the field, otherwise if the server later sends a new
+            // value for the field, since the current value is different from the server value, we will incorrectly think that the
+            // user modified the field, and won"t update the field with the value provided by the AjaxServer.
+
+            // `setCurrentValue()` may return a jQuery `Promise` and if it does we update the server value only once it is resolved.
+            // For details see https://github.com/orbeon/orbeon-forms/issues/2670.
+
+            def setServerValue(): Unit =
+              ServerValueStore.set(
+                controlId,
+                Controls.getCurrentValue(documentElement)
+              )
+
+            val promiseOrUndefDyn = promiseOrUndef.asInstanceOf[js.Dynamic]
+
+            if (promiseOrUndefDyn.isInstanceOf[js.Object] && promiseOrUndefDyn.done.isInstanceOf[js.Function])
+              promiseOrUndef.asInstanceOf[JQueryPromise].done(setServerValue _: js.Function)
+            else if (promiseOrUndefDyn.isInstanceOf[js.Object] && promiseOrUndefDyn.then.isInstanceOf[js.Function])
+              promiseOrUndef.asInstanceOf[js.Promise[Unit]].toFuture.foreach(_ => setServerValue())
+            else
+              setServerValue()
+          }
+        }
+
+      // Call custom listener if any
+      // 2022-03-17: This should be considered an obsolete API. And there are no references in the code or documentation
+      // or through Google that we can find.
+      if (js.typeOf(js.Dynamic.global.xformsValueChangedListener) != "undefined")
+        js.Dynamic.global.xformsValueChangedListener(controlId, normalizedNewControlValue)
+    }
+  }
+
+  // 2022-03-16: AjaxServer.js
+  @JSExport
   def handleErrorsElem(formID: String, ignoreErrors: Boolean, errorsElem: raw.Element): Unit = {
 
     val serverErrors =
@@ -197,11 +327,11 @@ object XFormsUI {
           Utils.resetIOSZoom()
             Some(
               timers.setTimeout(200.milliseconds) {
-                Private.showModalProgressPanelRaw()
+                showModalProgressPanelRaw()
               }
             )
         } else {
-          Private.showModalProgressPanelRaw()
+          showModalProgressPanelRaw()
           None
         }
 
@@ -222,15 +352,15 @@ object XFormsUI {
           )
 
         if (mustHideProgressDialog)
-          Private.hideModalProgressPanel(timerIdOpt, focusControlIdOpt)
+          hideModalProgressPanel(timerIdOpt, focusControlIdOpt)
       }
     }
 
   def showModalProgressPanelImmediate(): Unit =
-    Private.showModalProgressPanelRaw()
+    showModalProgressPanelRaw()
 
   def hideModalProgressPanelImmediate(): Unit =
-    Private.hideModalProgressPanelRaw()
+    hideModalProgressPanelRaw()
 
   @js.native trait ItemsetItem extends js.Object {
     def attributes: js.UndefOr[js.Dictionary[String]] = js.native
@@ -295,6 +425,31 @@ object XFormsUI {
       dom.document.body.appendChild(newDiv)
       newDiv
     }
+
+    val HandleValueIgnoredControls    = List("xforms-trigger", "xforms-submit", "xforms-upload")
+    val HandleValueOutputOnlyControls = List("xforms-output", "xforms-static", "xforms-label", "xforms-hint", "xforms-help")
+
+    def childrenWithLocalName(node: raw.Element, name: String): Iterator[raw.Element] =
+      node.childNodes.iterator collect {
+        case n: raw.Element if n.localName == name => n
+      }
+
+    def appendRepeatSuffix(id: String, suffix: String): String =
+      if (suffix.isEmpty)
+        id
+      else
+        id + Constants.RepeatSeparator + suffix
+
+    def attValueOrThrow(elem: raw.Element, name: String): String =
+      attValueOpt(elem, name).getOrElse(throw new IllegalArgumentException(name))
+
+    // Just in case, normalize following:
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute#non-existing_attributes
+    def attValueOpt(elem: raw.Element, name: String): Option[String] =
+      if (elem.hasAttribute(name))
+        Option(elem.getAttribute(name)) // `Some()` should be ok but just in case...
+      else
+        None
 
     def showModalProgressPanelRaw(): Unit = {
       val elem = findLoaderElem getOrElse createLoaderElem

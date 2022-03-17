@@ -86,7 +86,7 @@ object DocumentAPI extends js.Object {
     )
 
     // Directly change the value in the UI without waiting for an Ajax response
-    Controls.setCurrentValue(control, newStringValue)
+    Controls.setCurrentValue(control, newStringValue, force = false)
 
     // And also fire server event
     AjaxClient.fireEvent(

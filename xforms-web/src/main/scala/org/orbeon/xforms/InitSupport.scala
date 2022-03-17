@@ -380,7 +380,7 @@ object InitSupport {
               _     <- Option(XBL.instanceForControl(control))
               value <- valueOpt
             } locally {
-              Controls.setCurrentValue(control, value)
+              Controls.setCurrentValue(control, value, force = false)
             }
           } else if ($(control).is(".xforms-dialog.xforms-dialog-visible-true")) {
               // Initialized visible dialogs

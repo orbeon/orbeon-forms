@@ -170,151 +170,10 @@
                             }
                         }
 
-                        function handleValue(elem, controlId, recreatedInput) {
-                            var newControlValue  = ORBEON.util.Dom.getStringValue(elem);
-                            var documentElement  = document.getElementById(controlId);
-                            var jDocumentElement = $(documentElement);
-
-                            // Save new value sent by server (upload controls don't carry their value the same way as other controls)
-                            var previousServerValue = ORBEON.xforms.ServerValueStore.get(controlId);
-
-                            if (! jDocumentElement.is('.xforms-upload')) // Should not happen to match
-                                ORBEON.xforms.ServerValueStore.set(controlId, newControlValue);
-
-                            // Update value
-                            if (jDocumentElement.is('.xforms-trigger, .xforms-submit, .xforms-upload')) {
-                               // Should not happen
-                                ORBEON.util.Utils.logMessage("Got value from server for element with class: " + jDocumentElement.attr('class'));
-                            } else if (jDocumentElement.is('.xforms-output, .xforms-static, .xforms-label, .xforms-hint, .xforms-help')) {
-                                // Output-only control, just set the value
-                                ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
-                            } else {
-                                var currentValue = ORBEON.xforms.Controls.getCurrentValue(documentElement);
-                                if (currentValue != null) {
-                                    previousServerValue = previousServerValue == null ? null : ORBEON.common.MarkupUtils.normalizeSerializedHtml(previousServerValue);
-                                    currentValue    = ORBEON.common.MarkupUtils.normalizeSerializedHtml(currentValue);
-                                    newControlValue = ORBEON.common.MarkupUtils.normalizeSerializedHtml(newControlValue);
-
-                                    var doUpdate =
-                                        // If this was an input that was recreated because of a type change, we always set its value
-                                        recreatedInput ||
-                                        // If this is a control for which we recreated the itemset, we want to set its value
-                                        controlsWithUpdatedItemsets[controlId] ||
-                                        (
-                                            // Update only if the new value is different than the value already have in the HTML area
-                                            currentValue != newControlValue
-                                            // Update only if the value in the control is the same now as it was when we sent it to the server,
-                                            // so not to override a change done by the user since the control value was last sent to the server
-                                            && (
-                                                (previousServerValue == null || currentValue == previousServerValue) ||
-                                                // For https://github.com/orbeon/orbeon-forms/issues/3130
-                                                //
-                                                // We would like to test for "becomes readonly", but test below is equivalent:
-                                                //
-                                                // - either the control was already readonly, so `currentValue != newControlValue` was `true`
-                                                //   as server wouldn't send a value otherwise
-                                                // - or it was readwrite and became readonly, in which case we test for this below
-                                                jDocumentElement.is('.xforms-readonly')
-                                            )
-                                        );
-
-                                    if (doUpdate) {
-                                        var promiseOrUndef = ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, true);
-
-                                        // Store the server value as the client sees it, not as the server sees it. There can be a difference in the following cases:
-                                        //
-                                        // 1) For HTML editors, the HTML might change once we put it in the DOM.
-                                        // 2) For select/select1, if the server sends an out-of-range value, the actual value of the field won't be the out
-                                        //    of range value but the empty string.
-                                        // 3) For boolean inputs, the server might tell us the new value is "" when the field becomes non-relevant, which is
-                                        //    equivalent to "false".
-                                        //
-                                        // It is important to store in the serverValue the actual value of the field, otherwise if the server later sends a new
-                                        // value for the field, since the current value is different from the server value, we will incorrectly think that the
-                                        // user modified the field, and won't update the field with the value provided by the AjaxServer.
-
-                                        // `setCurrentValue()` may return a jQuery `Promise` and if it does we update the server value only once it is resolved.
-                                        // For details see https://github.com/orbeon/orbeon-forms/issues/2670.
-
-                                        function setServerValue() {
-                                            ORBEON.xforms.ServerValueStore.set(
-                                                controlId,
-                                                ORBEON.xforms.Controls.getCurrentValue(document.getElementById(controlId))
-                                            );
-                                        }
-
-                                        if (_.isObject(promiseOrUndef) && _.isFunction(promiseOrUndef.done))
-                                            promiseOrUndef.done(setServerValue);
-                                        else if (_.isObject(promiseOrUndef) && _.isFunction(promiseOrUndef.then))
-                                            promiseOrUndef.then(setServerValue);
-                                        else
-                                            setServerValue();
-                                    }
-                                }
-                            }
-
-                            // Call custom listener if any (temporary until we have a good API for custom components)
-                            if (typeof xformsValueChangedListener != "undefined") {
-                                xformsValueChangedListener(controlId, newControlValue);
-                            }
-                        }
-
                         function handleSwitchCase(elem) {
                             var id      = ORBEON.util.Dom.getAttribute(elem, "id");
                             var visible = ORBEON.util.Dom.getAttribute(elem, "visibility") == "visible";
                             ORBEON.xforms.Controls.toggleCase(id, visible);
-                        }
-
-                        function handleInit(elem) {
-                            var controlId        = ORBEON.util.Dom.getAttribute(elem, "id");
-                            var documentElement  = document.getElementById(controlId);
-                            var relevant         = ORBEON.util.Dom.getAttribute(elem, "relevant");
-                            var readonly         = ORBEON.util.Dom.getAttribute(elem, "readonly");
-
-                            var instance = ORBEON.xforms.XBL.instanceForControl(documentElement);
-
-                            if (_.isObject(instance)) {
-
-                                var becomesRelevant    = relevant == "true";
-                                var becomesNonRelevant = relevant == "false";
-
-                                function callXFormsUpdateReadonlyIfNeeded() {
-                                    if (readonly != null && _.isFunction(instance.xformsUpdateReadonly)) {
-                                        instance.xformsUpdateReadonly(readonly == "true");
-                                    }
-                                }
-
-                                if (becomesRelevant) {
-                                    // NOTE: We don't need to call this right now, because  this is done via `instanceForControl`
-                                    // the first time. `init()` is guaranteed to be called only once. Obviously this is a little
-                                    // bit confusing.
-                                    // if (_.isFunction(instance.init))
-                                    //     instance.init();
-                                    callXFormsUpdateReadonlyIfNeeded();
-                                } else if (becomesNonRelevant) {
-
-                                    // We ignore `readonly` when we become non-relevant
-
-                                    if (_.isFunction(instance.destroy))
-                                        instance.destroy();
-
-                                    // The class's `destroy()` should do that anyway as we inject our own `destroy()`, but ideally
-                                    // `destroy()` should only be called from there, and so the `null`ing of `xforms-xbl-object` should
-                                    // take place here as well.
-                                    $(documentElement).data("xforms-xbl-object", null);
-                                } else {
-                                    // Stays relevant or non-relevant (but we should never be here if we are non-relevant)
-                                    callXFormsUpdateReadonlyIfNeeded();
-                                }
-
-                                _.each(elem.childNodes, function(childNode) {
-                                    switch (ORBEON.util.Utils.getLocalName(childNode)) {
-                                        case 'value':
-                                            handleValue(childNode, controlId, false);
-                                            break;
-                                    }
-                                });
-                            }
                         }
 
                         function handleControl(elem) {
@@ -750,13 +609,7 @@
                             });
 
                             // Must handle `value` after `itemset`
-                            _.each(elem.childNodes, function(childNode) {
-                                switch (ORBEON.util.Utils.getLocalName(childNode)) {
-                                    case 'value':
-                                        handleValue(childNode, controlId, recreatedInput);
-                                        break;
-                                }
-                            });
+                            ORBEON.xforms.XFormsUi.handleValues(elem, controlId, recreatedInput, controlsWithUpdatedItemsets);
 
                             // Handle becoming non-relevant after everything so that XBL companion class instances
                             // are nulled and can be garbage-collected
@@ -929,7 +782,7 @@
                                         handleControl(childNode);
                                         break;
                                     case 'init':
-                                        handleInit(childNode);
+                                        ORBEON.xforms.XFormsUi.handleInit(childNode, controlsWithUpdatedItemsets);
                                         break;
                                     case 'inner-html':
                                         handleInnerHtml(childNode);

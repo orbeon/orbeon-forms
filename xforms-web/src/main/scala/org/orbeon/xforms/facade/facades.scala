@@ -118,12 +118,12 @@ object XBL extends js.Object {
 @JSGlobal("ORBEON.xforms.Controls")
 @js.native
 object Controls extends js.Object {
-  def setCurrentValue(control: html.Element, newControlValue: String): js.UndefOr[js.Promise[Unit] | JQueryPromise] = js.native
-  def getCurrentValue(elem: html.Element)                            : js.UndefOr[String]                           = js.native
-  def setFocus(controlId: String)                                    : Unit                                         = js.native
-  def removeFocus(controlId: String)                                 : Unit                                         = js.native
-  def getForm(control: dom.Element)                                  : js.UndefOr[html.Form]                        = js.native
-  val afterValueChange                                               : YUICustomEvent                               = js.native
+  def setCurrentValue(control: html.Element, newControlValue: String, force: Boolean): js.UndefOr[js.Promise[Unit] | JQueryPromise] = js.native
+  def getCurrentValue(elem: html.Element)                                            : js.UndefOr[String]                           = js.native
+  def setFocus(controlId: String)                                                    : Unit                                         = js.native
+  def removeFocus(controlId: String)                                                 : Unit                                         = js.native
+  def getForm(control: dom.Element)                                                  : js.UndefOr[html.Form]                        = js.native
+  val afterValueChange                                                               : YUICustomEvent                               = js.native
 }
 
 class ConnectCallbackArgument(val formId: String, val isUpload: js.UndefOr[Boolean]) extends js.Object

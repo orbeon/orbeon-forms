@@ -1250,32 +1250,7 @@
                     }
 
                 } else if (ORBEON.util.Utils.getLocalName(childNode) == "errors") {
-
-                    // NOTE: Similar code is in XFormsError.scala.
-                    // <xxf:errors>
-                    var errorsElement = childNode;
-                    var details = "<ul>";
-
-                    _.each(errorsElement.childNodes, function(errorElement) {
-                        // <xxf:error exception="org.orbeon.saxon.trans.XPathException" file="gaga.xhtml" line="24" col="12">
-                        //     Invalid date "foo" (Year is less than four digits)
-                        // </xxf:error>
-                        var exception = ORBEON.util.Dom.getAttribute(errorElement, "exception");
-                        var file      = ORBEON.util.Dom.getAttribute(errorElement, "file");
-                        var line      = ORBEON.util.Dom.getAttribute(errorElement, "line");
-                        var col       = ORBEON.util.Dom.getAttribute(errorElement, "col");
-                        var message   = ORBEON.util.Dom.getStringValue(errorElement);
-
-                        // Create HTML with message
-                        details += "<li>" + message;
-                        if (file) details += " in " + ORBEON.common.MarkupUtils.escapeXmlMinimal(file);
-                        if (line) details += " line " + ORBEON.common.MarkupUtils.escapeXmlMinimal(line);
-                        if (col) details += " column " + ORBEON.common.MarkupUtils.escapeXmlMinimal(col);
-                        if (exception) details += " (" + ORBEON.common.MarkupUtils.escapeXmlMinimal(exception) + ")";
-                        details += "</li>";
-                    });
-                    ORBEON.xforms.AjaxClient.showError("Non-fatal error", details, formID, ignoreErrors);
-                    details += "</ul>";
+                    ORBEON.xforms.XFormsUi.handleErrorsElem(formID, ignoreErrors, childNode);
                 }
             });
 

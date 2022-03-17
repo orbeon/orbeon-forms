@@ -870,7 +870,8 @@ lazy val xformsClientServer = (crossProject(JVMPlatform, JSPlatform).crossType(C
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-xforms-client-server",
-    libraryDependencies += "com.lihaoyi" %%% "autowire" % AutowireVersion,
+    libraryDependencies += "com.lihaoyi" %%% "autowire"  % AutowireVersion,
+    libraryDependencies += "com.lihaoyi" %%% "scalatags" % ScalatagsVersion,
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",

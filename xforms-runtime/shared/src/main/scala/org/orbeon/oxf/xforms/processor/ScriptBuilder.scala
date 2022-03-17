@@ -23,8 +23,8 @@ import org.orbeon.oxf.xforms.XFormsGlobalProperties._
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
-import org.orbeon.oxf.xforms.{ServerError, ShareableScript, XFormsContainingDocument}
-import org.orbeon.xforms.{EventNames, rpc}
+import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
+import org.orbeon.xforms.{EventNames, ServerError, rpc}
 
 import scala.collection.mutable
 
@@ -301,7 +301,7 @@ object ScriptBuilder {
         if (errorsToShow.nonEmpty) {
 
           val title   = "Non-fatal error"
-          val details = ServerError.errorsAsHTMLElem(errorsToShow).toString.escapeJavaScript
+          val details = ServerError.errorsAsHtmlString(errorsToShow).escapeJavaScript
           val formId  = containingDocument.getNamespacedFormId
 
           sb append s"""ORBEON.xforms.AjaxServer.showError("$title", "$details", "$formId");"""

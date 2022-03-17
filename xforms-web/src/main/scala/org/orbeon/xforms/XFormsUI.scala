@@ -13,6 +13,7 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.xforms.facade.{Controls, Utils}
 import org.scalajs.dom
@@ -20,7 +21,7 @@ import org.scalajs.dom.ext._
 import org.scalajs.dom.{html, raw}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scalatags.JsDom
-import scalatags.JsDom.all.{value, _}
+import scalatags.JsDom.all._
 
 import scala.concurrent.duration._
 import scala.scalajs.js
@@ -55,12 +56,12 @@ object XFormsUI {
     else
       id + Constants.RepeatSeparator + suffix
 
-  private def attributeValueOrThrow(elem: raw.Element, name: String): String =
-    attributeValueOpt(elem, name).getOrElse(throw new IllegalArgumentException(name))
+  private def attValueOrThrow(elem: raw.Element, name: String): String =
+    attValueOpt(elem, name).getOrElse(throw new IllegalArgumentException(name))
 
   // Just in case, normalize following:
   // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute#non-existing_attributes
-  private def attributeValueOpt(elem: raw.Element, name: String): Option[String] =
+  private def attValueOpt(elem: raw.Element, name: String): Option[String] =
     if (elem.hasAttribute(name))
       Option(elem.getAttribute(name)) // `Some()` should be ok but just in case...
     else
@@ -72,9 +73,9 @@ object XFormsUI {
     for {
       controlValuesElem <- controlValuesElems.iterator
       dialogElem        <- childrenWithLocalName(controlValuesElem, "dialog")
-      visibleValue      <- attributeValueOpt(dialogElem, "visibility")
+      visibleValue      <- attValueOpt(dialogElem, "visibility")
       if visibleValue == "visible"
-      idValue           <- attributeValueOpt(dialogElem, "id")
+      idValue           <- attValueOpt(dialogElem, "id")
     } yield
       idValue
 
@@ -82,9 +83,9 @@ object XFormsUI {
   @JSExport
   def handleScriptElem(formID: String, scriptElem: raw.Element): Unit = {
 
-    val functionName  = attributeValueOrThrow(scriptElem, "name")
-    val targetId      = attributeValueOrThrow(scriptElem, "target-id")
-    val observerId    = attributeValueOrThrow(scriptElem, "observer-id")
+    val functionName  = attValueOrThrow(scriptElem, "name")
+    val targetId      = attValueOrThrow(scriptElem, "target-id")
+    val observerId    = attValueOrThrow(scriptElem, "observer-id")
     val paramElements = childrenWithLocalName(scriptElem, "param")
 
     val paramValues = paramElements map (_.textContent.asInstanceOf[js.Any])
@@ -99,9 +100,9 @@ object XFormsUI {
       childrenWithLocalName(controlValuesElem, "delete-repeat-elements") foreach { deleteElem =>
 
         // Extract data from server response
-        val deleteId      = attributeValueOrThrow(deleteElem, "id")
-        val parentIndexes = attributeValueOrThrow(deleteElem, "parent-indexes")
-        val count         = attributeValueOrThrow(deleteElem, "count").toInt
+        val deleteId      = attValueOrThrow(deleteElem, "id")
+        val parentIndexes = attValueOrThrow(deleteElem, "parent-indexes")
+        val count         = attValueOrThrow(deleteElem, "count").toInt
 
         // TODO: Server splits `deleteId`/`parentIndexes` and here we just put them back together!
         // TODO: `deleteId` is namespaced by the server; yet here we prepend `repeat-end`
@@ -146,6 +147,36 @@ object XFormsUI {
         }
       }
     }
+
+  // 2022-03-16: AjaxServer.js
+  @JSExport
+  def handleErrorsElem(formID: String, ignoreErrors: Boolean, errorsElem: raw.Element): Unit = {
+
+    val serverErrors =
+      errorsElem.childNodes collect { case n: raw.Element => n } map { errorElem =>
+        // <xxf:error exception="org.orbeon.saxon.trans.XPathException" file="gaga.xhtml" line="24" col="12">
+        //     Invalid date "foo" (Year is less than four digits)
+        // </xxf:error>
+        ServerError(
+          message  = errorElem.textContent,
+          location = attValueOpt(errorElem, "file") map { file =>
+            BasicLocationData(
+              file = file,
+              line = attValueOpt(errorElem, "line").map(_.toInt).getOrElse(-1),
+              col  = attValueOpt(errorElem, "col" ).map(_.toInt).getOrElse(-1)
+            )
+          },
+          classOpt = attValueOpt(errorElem, "exception")
+        )
+      }
+
+    AjaxClient.showError(
+      titleString   = "Non-fatal error",
+      detailsString = ServerError.errorsAsHtmlString(serverErrors),
+      formId        = formID,
+      ignoreErrors  = ignoreErrors
+    )
+  }
 
   @JSExport // 2020-04-27: 1 JavaScript usage
   def displayModalProgressPanel(): Unit =

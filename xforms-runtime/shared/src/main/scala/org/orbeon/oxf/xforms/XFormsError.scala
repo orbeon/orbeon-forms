@@ -16,80 +16,15 @@ package org.orbeon.oxf.xforms
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.http.HttpStatusCode
-import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.trans.XPathException
-import org.orbeon.xforms.XFormsCrossPlatformSupport
-import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.{ServerError, XFormsCrossPlatformSupport, XFormsNames}
 
 import scala.collection.compat._
-import scala.xml.Elem
 
-
-// Represent a non-fatal server XForms error
-case class ServerError(
-  message  : String,
-  fileOpt  : Option[String],
-  lineOpt  : Option[Int],
-  colOpt   : Option[Int],
-  classOpt : Option[String]
-)
-
-object ServerError {
-
-  def apply(t: Throwable): ServerError = {
-    val root = XFormsCrossPlatformSupport.getRootThrowable(t)
-    ServerError(
-      root.getMessage,
-      OrbeonLocationException.getRootLocationData(t),
-      Some(root.getClass.getName)
-    )
-  }
-
-  def apply(message: String, location : Option[LocationData], classOpt : Option[String] = None): ServerError =
-    ServerError(
-      message.trimAllToEmpty,
-      location flatMap (l => Option(l.file)),
-      location map     (_.line) filter (_ >= 0),
-      location map     (_.col)  filter (_ >= 0),
-      classOpt
-    )
-
-  private val attributes  = List("file", "line", "column", "exception")
-  private val description = List("in",   "line", "column", "cause")
-
-  private def collectTuples(error: ServerError, names: List[String]) =
-    names zip
-      List(error.fileOpt, error.lineOpt, error.colOpt, error.classOpt) collect
-      { case (k, Some(v)) => k -> v.toString }
-
-  private def collectList(error: ServerError, names: List[String]) =
-    collectTuples(error, names) collect { case (k, v) => List(k, v) } flatten
-
-  def getDetailsAsList(error: ServerError): List[(String, String)] =
-    collectTuples(error, attributes)
-
-  // NOTE: A similar concatenation logic is in AjaxServer.js
-  def getDetailsAsUserMessage(error: ServerError): String =
-    error.message :: collectList(error, description) mkString " "
-
-  def errorsAsHTMLElem(errors: IterableOnce[ServerError]): Elem =
-    <ul>{
-      for (error <- errors)
-        yield <li>{ServerError.getDetailsAsUserMessage(error).escapeXmlMinimal}</li>
-    }</ul>
-
-  def errorsAsXHTMLElem(errors: IterableOnce[ServerError]): Elem =
-    <ul xmlns="http://www.w3.org/1999/xhtml">{
-      for (error <- errors)
-        yield <li>{ServerError.getDetailsAsUserMessage(error).escapeXmlMinimal}</li>
-    }</ul>
-}
 
 object XFormsError {
 
@@ -153,9 +88,19 @@ object XFormsError {
       causesContainFatalError) {
       throw new OXFException(t)
     } else {
+
+      def serverErrorFromThrowable(t: Throwable): ServerError = {
+        val root = XFormsCrossPlatformSupport.getRootThrowable(t)
+        ServerError(
+          root.getMessage,
+          OrbeonLocationException.getRootLocationData(t),
+          Some(root.getClass.getName)
+        )
+      }
+
       val containingDocument = container.getContainingDocument
       containingDocument.indentedLogger.logDebug("", message, t)
-      containingDocument.addServerError(ServerError(t))
+      containingDocument.addServerError(serverErrorFromThrowable(t))
     }
   }
 

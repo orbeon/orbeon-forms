@@ -22,7 +22,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 @JSExportTopLevel("OrbeonMarkupUtils") // AjaxServer.js/xforms.js, remove when possible
 object MarkupUtils {
 
-  @JSExport // AjaxServer.js/xforms.js, remove when possible
+  @JSExport // xforms.js, remove when possible
   def escapeXmlMinimal(s: String): String = s.escapeXmlMinimal
 
   @JSExport // AjaxServer.js, remove when possible

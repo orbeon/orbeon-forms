@@ -269,12 +269,6 @@ object XFormsUI {
               setServerValue()
           }
         }
-
-      // Call custom listener if any
-      // 2022-03-17: This should be considered an obsolete API. And there are no references in the code or documentation
-      // or through Google that we can find.
-      if (js.typeOf(js.Dynamic.global.xformsValueChangedListener) != "undefined")
-        js.Dynamic.global.xformsValueChangedListener(controlId, normalizedNewControlValue)
     }
   }
 

@@ -139,15 +139,13 @@ object XFormsUI {
     val relevant        = attValueOpt(elem, "relevant")
     val readonly        = attValueOpt(elem, "readonly")
 
-    val instance = XBL.instanceForControl(documentElement)
-
-    if (instance.isInstanceOf[js.Object]) {
+    Option(XBL.instanceForControl(documentElement)) foreach { instance =>
 
       val becomesRelevant    = relevant.contains("true")
       val becomesNonRelevant = relevant.contains("false")
 
       def callXFormsUpdateReadonlyIfNeeded(): Unit =
-        if (readonly.isDefined && instance.asInstanceOf[js.Dynamic].xformsUpdateReadonly.isInstanceOf[js.Function])
+        if (readonly.isDefined && isObjectWithMethod(instance, "xformsUpdateReadonly"))
           instance.xformsUpdateReadonly(readonly.contains("true"))
 
       if (becomesRelevant) {
@@ -161,7 +159,7 @@ object XFormsUI {
 
         // We ignore `readonly` when we become non-relevant
 
-        if (instance.asInstanceOf[js.Dynamic].destroy.isInstanceOf[js.Function])
+        if (isObjectWithMethod(instance, "destroy"))
           instance.destroy()
 
         // The class's `destroy()` should do that anyway as we inject our own `destroy()`, but ideally
@@ -261,9 +259,9 @@ object XFormsUI {
 
             val promiseOrUndefDyn = promiseOrUndef.asInstanceOf[js.Dynamic]
 
-            if (promiseOrUndefDyn.isInstanceOf[js.Object] && promiseOrUndefDyn.done.isInstanceOf[js.Function])
+            if (isObjectWithMethod(promiseOrUndefDyn, "done"))
               promiseOrUndef.asInstanceOf[JQueryPromise].done(setServerValue _: js.Function)
-            else if (promiseOrUndefDyn.isInstanceOf[js.Object] && promiseOrUndefDyn.then.isInstanceOf[js.Function])
+            else if (isObjectWithMethod(promiseOrUndefDyn, "then"))
               promiseOrUndef.asInstanceOf[js.Promise[Unit]].toFuture.foreach(_ => setServerValue())
             else
               setServerValue()
@@ -422,6 +420,10 @@ object XFormsUI {
 
     val HandleValueIgnoredControls    = List("xforms-trigger", "xforms-submit", "xforms-upload")
     val HandleValueOutputOnlyControls = List("xforms-output", "xforms-static", "xforms-label", "xforms-hint", "xforms-help")
+
+    def isObjectWithMethod(obj: js.Any, method: String): Boolean =
+      obj.isInstanceOf[js.Object] &&                                                 // `obj instanceof Object`
+        obj.asInstanceOf[js.Dynamic].selectDynamic(method).isInstanceOf[js.Function] // `obj[method] instanceof Function`
 
     def childrenWithLocalName(node: raw.Element, name: String): Iterator[raw.Element] =
       node.childNodes.iterator collect {

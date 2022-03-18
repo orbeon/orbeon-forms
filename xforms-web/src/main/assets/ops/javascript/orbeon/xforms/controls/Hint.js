@@ -15,7 +15,6 @@
 (function() {
 
     var $ = ORBEON.jQuery;
-    var Controls = ORBEON.xforms.Controls;
 
     /**
      * Show, update, init, or destroy the tooltip on mouseover on a hint region
@@ -36,7 +35,7 @@
 
         // Compute placement, and don't use 'over' since tooltips don't support it
         var placement  = (function() {
-            var p = Controls.getPlacement(Controls.getPosition(hintRegionEl));
+            var p = ORBEON.xforms.Placement.getPlacement(ORBEON.xforms.Placement.getPosition(hintRegionEl));
             return p == 'over' ? 'bottom' : p;
         })();
 

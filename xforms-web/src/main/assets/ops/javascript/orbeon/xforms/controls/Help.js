@@ -42,8 +42,8 @@
                                   formElContainer.is('*') ?
                                   formElContainer :
                                   controlEl; // [1]
-        var elPos               = Controls.getPosition(el);
-        var placement           = Controls.getPlacement(elPos);
+        var elPos               = ORBEON.xforms.Placement.getPosition(el);
+        var placement           = ORBEON.xforms.Placement.getPlacement(elPos);
         var popoverAlreadyShown = controlEl.next().is('.xforms-help-popover');
 
         // Hide other help popovers before (maybe) showing this one
@@ -55,7 +55,7 @@
             // For top placement, popover must be above the label
             if (placement == 'top') {
                 el = controlEl;
-                elPos = Controls.getPosition(el);
+                elPos = ORBEON.xforms.Placement.getPosition(el);
             }
 
             controlEl.popover({

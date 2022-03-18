@@ -17,6 +17,7 @@ import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
 
+
 case class Offset(left: Double, top: Double)
 
 object Offset {

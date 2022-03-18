@@ -586,10 +586,12 @@ object XPathCache extends XPathCacheTrait {
     locationData       : LocationData
   ): ObjectPool[PooledXPathExpression] = {
 
+    require(xpathConfiguration ne null)
+
     // TODO: pool should have at least one hard reference
     val factory =
       new XPathCachePoolableObjectFactory(
-        configurationOrDefault(xpathConfiguration),
+        xpathConfiguration,
         xpathString,
         namespaceMapping,
         variableNames,
@@ -615,10 +617,6 @@ object XPathCache extends XPathCacheTrait {
       pool,
       variables
     )
-
-  // Not sure if/when configuration can be null, but it shouldn't be
-  private def configurationOrDefault(configuration: Configuration) =
-    Option(configuration) getOrElse XPath.GlobalConfiguration
 
   private class XPathCachePoolableObjectFactory(
     xpathConfiguration : Configuration,

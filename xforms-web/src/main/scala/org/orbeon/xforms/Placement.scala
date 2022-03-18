@@ -8,7 +8,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel, JSGlobal}
 
 
-// TODO: Remove this once Hint.js and Help.js have been migrated too.
+// TODO: Remove this once Help.js have been migrated too.
 @JSExportTopLevel("OrbeonPlacement")
 object Placement {
 

@@ -56,7 +56,7 @@ object XFormsApp extends App {
     xformsDyn.AjaxClient             = js.Dynamic.global.OrbeonAjaxClient
     xformsDyn.Globals                = js.Dynamic.global.OrbeonGlobals
     xformsDyn.XFormsUi               = js.Dynamic.global.OrbeonXFormsUi
-    xformsDyn.Placement              = js.Dynamic.global.OrbeonPlacement
+    xformsDyn.Help                   = js.Dynamic.global.OrbeonHelp
     xformsDyn.InitSupport            = js.Dynamic.global.OrbeonInitSupport
     xformsDyn.RpcClient              = js.Dynamic.global.OrbeonRpcClient
     xformsDyn.AjaxFieldChangeTracker = js.Dynamic.global.OrbeonAjaxFieldChangeTracker
@@ -69,6 +69,7 @@ object XFormsApp extends App {
     org.orbeon.xbl.Date
 
     org.orbeon.xforms.ItemHint
+    org.orbeon.xforms.Help
   }
 
   def onPageContainsFormsMarkup(): Unit = {

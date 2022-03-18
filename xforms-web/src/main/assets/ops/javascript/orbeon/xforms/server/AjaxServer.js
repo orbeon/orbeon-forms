@@ -1077,7 +1077,7 @@
                                     var helpElement = childNode;
                                     var controlId = ORBEON.util.Dom.getAttribute(helpElement, "control-id");
                                     var control = document.getElementById(controlId);
-                                    ORBEON.xforms.Controls.showHelp(control);
+                                    ORBEON.xforms.Help.showHelp(control);
                                     break;
                                 }
                             }

@@ -23,16 +23,23 @@ object ItemHint {
     ".xforms-form .xforms-items .xforms-hint-region",
     (ev: JQueryEventObject) => {
 
-      val hintRegionEl                 = $(ev.target)
-      val hintHtml: js.UndefOr[String] = hintRegionEl.nextAll(".xforms-hint").html() // `UndefOr` to try to avoid occasional error with fastOptJS but doesn't seem to work
-      val tooltipData                  = hintRegionEl.data("tooltip")
-      val haveHint                     = hintHtml.exists(_.nonEmpty)
-      val tooltipInitialized           = ! js.isUndefined(tooltipData)
+      val hintRegionEl     = ev.target
+      val jHintRegionEl    = $(hintRegionEl)
+      val jHintRegionElDyn = jHintRegionEl.asInstanceOf[js.Dynamic]
+
+      // `UndefOr` to try to avoid occasional error with fastOptJS but that doesn't seem to work; `.html()` is meant to
+      // return a `String` but occasionally returns `undefined`, and that's probably the main problem. Should be ok
+      // with `fullOptJS`.
+      val hintHtml: js.UndefOr[String] = jHintRegionEl.nextAll(".xforms-hint").html()
+
+      val tooltipData        = jHintRegionEl.data("tooltip")
+      val haveHint           = hintHtml.exists(_.nonEmpty)
+      val tooltipInitialized = ! js.isUndefined(tooltipData)
 
       // Compute placement, and don"t use "over" since tooltips don"t support it
       val placement: js.Function = () => {
-        val p = Placement.getPlacement(Placement.getPosition(hintRegionEl))
-        if (p == "over") "bottom" else p
+        val p = Placement.getPlacement(Placement.getPositionDetails(jHintRegionEl))
+        if (p == Placement.Over) "bottom" else p.entryName
       }
 
       (haveHint, tooltipInitialized) match {
@@ -45,27 +52,27 @@ object ItemHint {
           //   has it already has shown the tooltip without using the updated placement.
           tooltipData.options.title = hintHtml
           tooltipData.options.placement = placement
-          hintRegionEl.asInstanceOf[js.Dynamic].tooltip("show")
+          jHintRegionElDyn.tooltip("show")
         case (true, false) =>
           // Avoid super-narrow tooltip in Form Builder [1]
           val containerEl = {
-            val parentFbHover = hintRegionEl.closest(".fb-hover");
-            if (parentFbHover.is("*")) parentFbHover.parent() else hintRegionEl
+            val parentFbHover = jHintRegionEl.closest(".fb-hover");
+            if (parentFbHover.is("*")) parentFbHover.parent() else jHintRegionEl
           }
 
           // Create tooltip and show right away
-          hintRegionEl.asInstanceOf[js.Dynamic].tooltip(js.Dynamic.literal(
+          jHintRegionElDyn.tooltip(js.Dynamic.literal(
             title     = hintHtml,
             html      = true,
             animation = false,
             placement = placement,
             container = containerEl
           ))
-          hintRegionEl.on("shown", shiftTooltipLeft(containerEl, hintRegionEl): js.Function1[JQueryEventObject, Unit])
-          hintRegionEl.asInstanceOf[js.Dynamic].tooltip("show")
+          jHintRegionEl.on("shown", shiftTooltipLeft(containerEl, jHintRegionEl): js.Function1[JQueryEventObject, Unit])
+          jHintRegionElDyn.tooltip("show")
         case (false, true) =>
           // We had a tooltip, but we don"t have anything for show anymore
-          hintRegionEl.asInstanceOf[js.Dynamic].tooltip("destroy")
+          jHintRegionElDyn.tooltip("destroy")
         case (false, false) =>
         // NOP if not initialized and we don"t have a tooltip
       }

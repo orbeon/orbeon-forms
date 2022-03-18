@@ -60,7 +60,6 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/javascript/orbeon/xforms/control/CalendarResources.js",          "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/control/Calendar.js",                   "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
-          { "full": "/ops/javascript/orbeon/xforms/controls/Help.js",                      "min": true  },
 
           { "full": "/ops/javascript/scalajs/orbeon-xforms.js",                            "min": false }
         ]
@@ -105,7 +104,6 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/javascript/orbeon/xforms/control/CalendarResources.js",          "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/control/Calendar.js",                   "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
-          { "full": "/ops/javascript/orbeon/xforms/controls/Help.js",                      "min": true  },
 
           { "full": "/apps/fr/resources/scalajs/orbeon-form-runner.js",                    "min": false }
         ]

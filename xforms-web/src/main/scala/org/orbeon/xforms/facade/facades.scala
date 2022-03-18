@@ -123,6 +123,8 @@ object Controls extends js.Object {
   def setFocus(controlId: String)                                                    : Unit                                         = js.native
   def removeFocus(controlId: String)                                                 : Unit                                         = js.native
   def getForm(control: dom.Element)                                                  : js.UndefOr[html.Form]                        = js.native
+  def getLabelMessage(elem: html.Element)                                            : String                                       = js.native
+  def getHelpMessage(elem: html.Element)                                             : String                                       = js.native
   val afterValueChange                                                               : YUICustomEvent                               = js.native
 }
 

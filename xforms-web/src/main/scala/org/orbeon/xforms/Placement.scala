@@ -5,29 +5,35 @@ import org.scalajs.dom
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel, JSGlobal}
 
 
-// TODO: Remove this once Help.js have been migrated too.
-@JSExportTopLevel("OrbeonPlacement")
+sealed trait Placement { val entryName: String }
+
 object Placement {
 
   val RequiredSpaceHorizontal = 420
   val RequiredSpaceVertical   = 300
 
-  trait TopLeftOffset extends js.Object {
-    val top, left: Double
-  }
+  case object Top    extends { val entryName = "top"    } with Placement
+  case object Right  extends { val entryName = "right"  } with Placement
+  case object Bottom extends { val entryName = "bottom" } with Placement
+  case object Left   extends { val entryName = "left"   } with Placement
+  case object Over   extends { val entryName = "over"   } with Placement
 
-  trait Margins extends js.Object {
-    val top, right, bottom, left: Double
-  }
+  case class Margins(
+    top    : Double,
+    right  : Double,
+    bottom : Double,
+    left   : Double
+  )
 
-  trait Placement extends js.Object {
-    val width, height, scrollTop: Double
-    val offset: TopLeftOffset
-    val margins: Margins
-  }
+  case class PositionDetails(
+    width     : Double,
+    height    : Double,
+    scrollTop : Double,
+    offset    : Offset,
+    margins   : Margins
+  )
 
   /**
    * For the element, returns an object with the following properties:
@@ -35,8 +41,7 @@ object Placement {
    *      offset: { top, left }                   // Position relative to the document
    *      margins: { top, right, bottom, left }   // In in a scrollable area (e.g. FB), space around that area
    */
-  @JSExport
-  def getPosition(el: JQuery): Placement = {
+  def getPositionDetails(el: JQuery): PositionDetails = {
 
     def getElPosition = {
       val o = Offset(el)
@@ -44,10 +49,10 @@ object Placement {
         el.outerWidth(),
         el.outerHeight(),
         $(dom.document).scrollTop(), // Will this work if we"re in a scrollable area?
-        new TopLeftOffset {
-          val top  = o.top
-          val left = o.left
-        },
+        Offset(
+          left = o.left,
+          top  = o.top
+        ),
       )
     }
 
@@ -93,46 +98,45 @@ object Placement {
           )
       }
 
-    new Placement {
-      val width     = widthV
-      val height    = heightV
-      val scrollTop = scrollTopV
-      val offset    = offsetV
-      val margins   =
-        new Margins {
-          val top    = topV
-          val right  = rightV
-          val bottom = bottomV
-          val left   = leftV
-        }
-    }
+    PositionDetails(
+      width     = widthV,
+      height    = heightV,
+      scrollTop = scrollTopV,
+      offset    = offsetV,
+      margins   =
+        Margins(
+          top    = topV,
+          right  = rightV,
+          bottom = bottomV,
+          left   = leftV
+        )
+    )
   }
 
   /**
    * Figure where we want to place the popover: right, left, top, bottom, or over
    */
-  @JSExport
-  def getPlacement(elPos: Placement): String = {
+  def getPlacement(pos: PositionDetails): Placement = {
 
-    val left   = elPos.offset.left
-    val right  = $(dom.window).width() - (elPos.offset.left + elPos.width)
-    val top    = elPos.offset.top - elPos.scrollTop
-    val bottom = $(dom.window).height() - (elPos.offset.top - elPos.scrollTop + elPos.height)
+    val left   = pos.offset.left
+    val right  = $(dom.window).width() - (pos.offset.left + pos.width)
+    val top    = pos.offset.top - pos.scrollTop
+    val bottom = $(dom.window).height() - (pos.offset.top - pos.scrollTop + pos.height)
 
     if (right >= RequiredSpaceHorizontal || left >= RequiredSpaceHorizontal) {
       // If space to the left and right are the same (e.g. title with wide page), display to the left, which
       // will be closer to the text of the title
       if (right > left)
-        "right"
+        Placement.Right
       else
-        "left"
+        Placement.Left
     } else if (top >= RequiredSpaceVertical || bottom >= RequiredSpaceVertical) {
       if (top >= bottom)
-        "top"
+        Placement.Top
       else
-        "bottom"
+        Placement.Bottom
     } else {
-      "over"
+      Placement.Over
     }
   }
 }

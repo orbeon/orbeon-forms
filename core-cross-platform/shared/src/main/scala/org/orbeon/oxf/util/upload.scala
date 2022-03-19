@@ -20,6 +20,6 @@ object UploadState {
 case class UploadProgress[FileItemType](
   fieldName        : String,
   expectedSize     : Option[Long],
-  var receivedSize : Long        = 0L,
+  var receivedSize : Long                      = 0L,
   var state        : UploadState[FileItemType] = UploadState.Started
 )

@@ -337,7 +337,7 @@ class SharedUtilsTest extends AnyFunSpec {
         assert(callCount == 3)
       }
 
-      it ("must not fail if `Failure` is last") {
+      it ("must not fail incorrectly if `Failure` is last") {
 
         val in = List("1", "2", "3", "W")
         var callCount = 0

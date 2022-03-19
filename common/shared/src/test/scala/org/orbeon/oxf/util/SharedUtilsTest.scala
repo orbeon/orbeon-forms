@@ -301,11 +301,11 @@ class SharedUtilsTest extends AnyFunSpec {
   describe("The `normalizeSerializedHTML` function") {
 
     val expected = Seq(
-      "\rtext with\r\na new line\r" -> "text with\na new line"
+      ("remove \\r", "\rtext with\r\na new line\r", "text with\na new line")
     )
 
-    for ((left, right) <- expected)
-      it(s"must escape with `$left`") {
+    for ((desc, left, right) <- expected)
+      it(desc) {
         assert(right === left.normalizeSerializedHtml)
       }
   }

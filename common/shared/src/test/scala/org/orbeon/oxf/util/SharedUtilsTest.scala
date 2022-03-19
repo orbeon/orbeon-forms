@@ -22,6 +22,8 @@ import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.mutable
 import scala.collection.compat._
+import scala.util.{Success, Try}
+
 
 class SharedUtilsTest extends AnyFunSpec {
 
@@ -306,5 +308,48 @@ class SharedUtilsTest extends AnyFunSpec {
       it(s"must escape with `$left`") {
         assert(right === left.normalizeSerializedHtml)
       }
+  }
+
+  describe("`TryUtils`") {
+
+    describe("The `sequenceLazily` function") {
+
+      it ("must return all elements") {
+
+        val in = List("1", "2", "3")
+
+        def f(s: String) = Try(s.toInt)
+
+        assert(Success(List(1, 2, 3)) == TryUtils.sequenceLazily(in)(f))
+      }
+
+      it ("must stop at the first `Failure`") {
+
+        val in = List("1", "2", "W", "4")
+        var callCount = 0
+
+        def f(s: String) = Try {
+          callCount += 1
+          s.toInt
+        }
+
+        assertThrows[NumberFormatException](TryUtils.sequenceLazily(in)(f).get)
+        assert(callCount == 3)
+      }
+
+      it ("must not fail if `Failure` is last") {
+
+        val in = List("1", "2", "3", "W")
+        var callCount = 0
+
+        def f(s: String) = Try {
+          callCount += 1
+          s.toInt
+        }
+
+        assertThrows[NumberFormatException](TryUtils.sequenceLazily(in)(f).get)
+        assert(callCount == 4)
+      }
+    }
   }
 }

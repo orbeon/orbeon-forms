@@ -52,12 +52,19 @@ object TryUtils {
   // - all subsequent elements are ignored in case of failure
   def sequenceLazily[T, U](iterable: Iterable[T])(f: T => Try[U]): Try[List[U]] = {
 
-    val tryIt = iterable.iterator.map(f)
+    val tryStream     = iterable.toStream.map(f)
+    val successStream = tryStream.takeWhile(_.isSuccess).map(_.get)
 
-    val success = tryIt.takeWhile(_.isSuccess).map(_.get).toList
-    if (success.size != iterable.size)
-      tryIt.next() map (dummy => List(dummy)) // so we don't use `asInstanceOf`
+    val successSize = successStream.size
+
+    assert(successSize <= iterable.size)
+
+    if (successSize < iterable.size)
+      tryStream(successSize) match {
+        case Failure(t) => Failure(t)
+        case Success(_) => throw new IllegalStateException
+      }
     else
-      Success(success)
+      Success(successStream.toList)
   }
 }

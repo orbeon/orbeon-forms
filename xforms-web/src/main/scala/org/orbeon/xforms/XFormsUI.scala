@@ -51,7 +51,7 @@ object XFormsUI {
 
   // 2022-03-16: AjaxServer.js
   @JSExport
-  def findDialogsToShow(controlValuesElems: js.Array[raw.Element]): Iterator[String] =
+  def findDialogsToShow(controlValuesElems: js.Array[raw.Element]): js.Array[String] = {
     for {
       controlValuesElem <- controlValuesElems.iterator
       dialogElem        <- childrenWithLocalName(controlValuesElem, "dialog")
@@ -60,6 +60,7 @@ object XFormsUI {
       idValue           <- attValueOpt(dialogElem, "id")
     } yield
       idValue
+  } .toJSArray
 
   // 2022-03-16: AjaxServer.js
   @JSExport
@@ -210,7 +211,7 @@ object XFormsUI {
           val normalizedCurrentValue           = currentValue.normalizeSerializedHtml
 
           val doUpdate =
-          // If this was an input that was recreated because of a type change, we always set its value
+            // If this was an input that was recreated because of a type change, we always set its value
             recreatedInput ||
               // If this is a control for which we recreated the itemset, we want to set its value
               controlsWithUpdatedItemsets.get(controlId).contains(true) ||

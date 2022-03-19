@@ -90,10 +90,8 @@ object Help {
     // Hide help when user presses the escape key
     def handleKeyUp(e: JQueryEventObject): js.Any = {
       val keyboardEvent = e.asInstanceOf[KeyboardEvent]
-      if (keyboardEvent.keyCode == 27) {
-        println("xxx esc")
+      if (keyboardEvent.keyCode == 27)
         hideAllHelpPopovers()
-      }
     }
 
     def hideAllHelpPopovers(): Unit =
@@ -201,20 +199,17 @@ object Help {
       // Adjust arrow height for right/left
       placement match {
         case Placement.Right | Placement.Left =>
-          println(s"xxx adjust arrow right/left")
           val controlTopDoc = elPos.offset.top + elPos.height / 2
           val controlTopPopover = controlTopDoc - newPopoverOffset.top
           val arrowTop = (controlTopPopover / popover.outerHeight()) * 100
           popover.children(".arrow").css("top", arrowTop + "%")
         case Placement.Top | Placement.Bottom =>
-          println(s"xxx adjust arrow top/bottom")
           popover.children(".arrow").css("left", "10%")
           // Smaller max-width to avoid popover having no padding on the right, especially for mobile
           val altMaxWidth = $(dom.window).width() - 2 * newPopoverOffset.left
           if (popover.width() > altMaxWidth)
             popover.css("max-width", altMaxWidth + "px")
         case _ =>
-          println(s"xxx no adjust arrow over")
       }
     }
 
@@ -230,12 +225,12 @@ object Help {
     // TODO: Move to common DOM utilities.
     def findCommonAncestor(elems: List[html.Element]): Option[html.Element] = {
 
-      def commonAncestorForPair(elem1: html.Element, elem2: html.Element): Option[html.Element] =
+      def findFirstCommonAncestorForPair(elem1: html.Element, elem2: html.Element): Option[html.Element] =
         ancestorOrSelfElem(elem1).toList.reverseIterator
           .zip(ancestorOrSelfElem(elem2).toList.reverseIterator)
           .takeWhile { case (e1, e2) => e1.isSameNode(e2) }
-          .map(_._1)
           .lastOption()
+          .map(_._1)
 
       @tailrec
       def recurse(elems: List[html.Element]): Option[html.Element] = {
@@ -245,7 +240,7 @@ object Help {
           case elem1 :: Nil =>
             Some(elem1)
           case elem1 :: elem2 :: rest =>
-            commonAncestorForPair(elem1, elem2) match {
+            findFirstCommonAncestorForPair(elem1, elem2) match {
               case Some(elem) => recurse(elem :: rest)
               case None       => None
             }

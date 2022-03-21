@@ -198,6 +198,9 @@ object XFormsUI {
       scribe.error(s"Got value from server for element with class: ${documentElement.getAttribute("class")}")
     } else {
 
+      // This must be done before `ServerValueStore.set()`~
+      val normalizedPreviousServerValueOpt = Option(ServerValueStore.get(controlId)).map(_.normalizeSerializedHtml)
+
       ServerValueStore.set(controlId, newControlValue)
 
       val normalizedNewControlValue = newControlValue.normalizeSerializedHtml
@@ -207,32 +210,31 @@ object XFormsUI {
       else
         Controls.getCurrentValue(documentElement) foreach { currentValue =>
 
-          val normalizedPreviousServerValueOpt = Option(ServerValueStore.get(controlId)).map(_.normalizeSerializedHtml)
-          val normalizedCurrentValue           = currentValue.normalizeSerializedHtml
+          val normalizedCurrentValue = currentValue.normalizeSerializedHtml
 
           val doUpdate =
             // If this was an input that was recreated because of a type change, we always set its value
             recreatedInput ||
-              // If this is a control for which we recreated the itemset, we want to set its value
-              controlsWithUpdatedItemsets.get(controlId).contains(true) ||
-              (
-                // Update only if the new value is different than the value already have in the HTML area
-                normalizedCurrentValue != normalizedNewControlValue
-                  // Update only if the value in the control is the same now as it was when we sent it to the server,
-                  // so not to override a change done by the user since the control value was last sent to the server
-                  && (
+            // If this is a control for which we recreated the itemset, we want to set its value
+            controlsWithUpdatedItemsets.get(controlId).contains(true) ||
+            (
+              // Update only if the new value is different than the value already have in the HTML area
+              normalizedCurrentValue != normalizedNewControlValue
+                // Update only if the value in the control is the same now as it was when we sent it to the server,
+                // so not to override a change done by the user since the control value was last sent to the server
+                && (
                   normalizedPreviousServerValueOpt.isEmpty ||
-                    normalizedPreviousServerValueOpt.contains(normalizedCurrentValue) ||
-                    // For https://github.com/orbeon/orbeon-forms/issues/3130
-                    //
-                    // We would like to test for "becomes readonly", but test below is equivalent:
-                    //
-                    // - either the control was already readonly, so `currentValue != newControlValue` was `true`
-                    //   as server wouldn't send a value otherwise
-                    // - or it was readwrite and became readonly, in which case we test for this below
-                    documentElement.classList.contains("xforms-readonly")
-                  )
+                  normalizedPreviousServerValueOpt.contains(normalizedCurrentValue) ||
+                  // For https://github.com/orbeon/orbeon-forms/issues/3130
+                  //
+                  // We would like to test for "becomes readonly", but test below is equivalent:
+                  //
+                  // - either the control was already readonly, so `currentValue != newControlValue` was `true`
+                  //   as server wouldn't send a value otherwise
+                  // - or it was readwrite and became readonly, in which case we test for this below
+                  documentElement.classList.contains("xforms-readonly")
                 )
+              )
 
           if (doUpdate) {
             val promiseOrUndef = Controls.setCurrentValue(documentElement, normalizedNewControlValue, force = true)

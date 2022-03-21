@@ -144,7 +144,6 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/control/CalendarResources.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Calendar.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/controls/Help.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/scalajs/orbeon-xforms-web.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.fr.min.js" class="xforms-baseline"/>

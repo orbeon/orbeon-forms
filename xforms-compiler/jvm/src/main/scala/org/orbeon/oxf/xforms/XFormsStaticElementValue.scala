@@ -124,7 +124,8 @@ object XFormsStaticElementValue {
 
     def addExpr(expr: String, isHtml: Boolean): Unit = {
       commitLiteralBuilderIfNeeded()
-      builder += (if (containsHtml && ! isHtml) s"""xxf:escape-xml-minimal($expr)""" else expr)
+      // NOTE: No need to wrap `$expr` as it's already an `xs:string?` expression and safe for embedding.
+      builder += (if (containsHtml && ! isHtml) s"""replace(replace(replace($expr, '&', '&amp;'), '<', '&lt;'), '>', '&gt;')""" else expr)
       containsExpr = true
     }
 

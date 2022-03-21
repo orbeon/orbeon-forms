@@ -214,8 +214,6 @@
                 p:has-class('fr-dialog')                         or
                 p:has-class('xforms-error-dialogs')              or
                 p:has-class('xforms-help-panel')                 or
-                p:has-class('popover-container-right')           or
-                p:has-class('popover-container-left')            or
                 p:has-class('xforms-template')]"
         mode="#all"/>
 

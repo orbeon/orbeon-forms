@@ -100,8 +100,9 @@
                  doesn't have access to the app/form name. Also, we don't pass the app/form and let the XSLT check the property
                  to support the property being changed at runtime. -->
             <xsl:variable
-                    name="markup-property"
-                    select="p:property(string-join(('oxf.xforms.xbl.fr.grid.markup', $app, $form), '.'))"/>
+                name="markup-property"
+                select="p:property(string-join(('oxf.xforms.xbl.fr.grid.markup', $app, $form), '.'))"/>
+
             <xsl:attribute name="markup" select="$markup-property"/>
 
             <!-- Set repeat appearance if available and needed -->

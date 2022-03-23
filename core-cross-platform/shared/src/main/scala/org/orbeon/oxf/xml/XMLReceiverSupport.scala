@@ -202,6 +202,7 @@ object XMLReceiverSupport extends XMLReceiverSupport {
   }
 
   // Used by handlers
+  // 2022-03-22: Only one use.
   def removeAttribute(attributes: Attributes, uri: String, localname: String): AttributesImpl = {
     val newAttributes = new AttributesImpl
     for (i <- 0 until attributes.getLength) {

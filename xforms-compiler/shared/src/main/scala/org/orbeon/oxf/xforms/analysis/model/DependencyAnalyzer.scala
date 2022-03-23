@@ -64,6 +64,7 @@ object DependencyAnalyzer {
     }
   }
 
+  // 2022-03-23: Unused.
   def findMissingVariableReferences(expr: Expression, validBindNames: scala.collection.Set[String]): Set[String] =
     (SaxonUtils.iterateExternalVariableReferences(expr) filterNot validBindNames).to(Set)
 

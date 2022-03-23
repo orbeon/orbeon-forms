@@ -99,7 +99,7 @@ object XFormsBaseHandler {
       reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, containingDocument.namespaceId(effectiveId))
 
     // Create "class" attribute if necessary
-    if (classes != null && classes.length > 0)
+    if (classes != null && classes.nonEmpty)
       reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes)
 
     // Copy attributes in the xhtml namespace to no namespace

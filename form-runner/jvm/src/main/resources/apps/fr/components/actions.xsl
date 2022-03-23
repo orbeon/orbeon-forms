@@ -238,8 +238,11 @@
             name="dataset-names-20182"
             select="$actions-20182//fr:dataset-write/@name/string()"/>
 
+        <xsl:variable
+            name="existing-dataset-instances"
+            select="$model/xf:instance/@id/substring-after(., 'fr-dataset-')"/>
 
-        <xsl:for-each select="distinct-values(($dataset-names, $dataset-names-20182))">
+        <xsl:for-each select="distinct-values(($dataset-names, $dataset-names-20182))[not(. = $existing-dataset-instances)]">
             <xf:instance id="fr-dataset-{.}"><dataset/></xf:instance>
         </xsl:for-each>
 

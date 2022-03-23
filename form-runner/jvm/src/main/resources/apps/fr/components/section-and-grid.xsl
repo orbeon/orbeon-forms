@@ -75,7 +75,13 @@
                 <xsl:copy-of select="@page-size"/>
             </xsl:if>
 
-            <xsl:apply-templates select="@* except @page-size" mode="#current"/>
+            <xsl:for-each select="@min | @max | @freeze | @remove-constraint">
+                <xsl:if test="exists(.)">
+                    <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(.)"/>
+                </xsl:if>
+            </xsl:for-each>
+
+            <xsl:apply-templates select="@* except (@page-size | @min | @max | @freeze | @remove-constraint)" mode="#current"/>
             <xsl:apply-templates select="node()" mode="#current">
                 <xsl:with-param name="section-level" select="$section-level + 1" tunnel="yes"/>
             </xsl:apply-templates>
@@ -124,7 +130,13 @@
                 </xsl:if>
             </xsl:if>
 
-            <xsl:apply-templates select="@* | node()" mode="#current"/>
+            <xsl:for-each select="@min | @max | @freeze | @remove-constraint">
+                <xsl:if test="exists(.)">
+                    <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(.)"/>
+                </xsl:if>
+            </xsl:for-each>
+
+            <xsl:apply-templates select="@* except (@min | @max | @freeze | @remove-constraint) | node()" mode="#current"/>
 
         </xsl:copy>
     </xsl:template>

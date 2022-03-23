@@ -10,3 +10,4 @@ object FormRunner
      with FormRunnerHome
      with FormRunnerPublish
      with FormRunnerEncodeDecode
+     with FormRunnerComponents

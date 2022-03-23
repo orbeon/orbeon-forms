@@ -137,23 +137,32 @@
                             value="xxf:readonly($repeat-context) or fr:is-readonly-mode()"/>
 
                         <!-- NOTE: `min="foo"` is taken as no minimum. Dubious but has been like this for a long time. -->
-                        <xf:var name="min"    as="xs:integer"  value="(xs:integer(fr:component-param-value('min')   [. castable as xs:integer])[. ge 0], 0)[1]"/>
-                        <xf:var name="freeze" as="xs:integer"  value="(xs:integer(fr:component-param-value('freeze')[. castable as xs:integer])[. ge 0], 0)[1]"/>
+                        <xsl:choose>
+                            <xsl:when test="$is-editable">
+                                <xf:var name="min"    as="xs:integer"  value="0"/>
+                                <xf:var name="freeze" as="xs:integer"  value="0"/>
+                                <xf:var name="max"    as="xs:integer?" value="()"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xf:var name="min"    as="xs:integer"  value="(xs:integer(fr:component-param-value('min')   [. castable as xs:integer])[. ge 0], 0)[1]"/>
+                                <xf:var name="freeze" as="xs:integer"  value="(xs:integer(fr:component-param-value('freeze')[. castable as xs:integer])[. ge 0], 0)[1]"/>
 
-                        <xf:var
-                            name="max"
-                            as="xs:integer?"
-                            value="
-                                let $s := fr:component-param-value('max'),
-                                    $i := xs:integer($s[. castable as xs:integer])
-                                return
-                                    if ($s = 'none') then
-                                        ()
-                                    else if (exists($s) and empty($i)) then
-                                        0
-                                    else
-                                        $i
-                        "/>
+                                <xf:var
+                                    name="max"
+                                    as="xs:integer?"
+                                    value="
+                                        let $s := fr:component-param-value('max'),
+                                            $i := xs:integer($s[. castable as xs:integer])
+                                        return
+                                            if ($s = 'none') then
+                                                ()
+                                            else if (exists($s) and empty($i)) then
+                                                0
+                                            else
+                                                $i
+                                "/>
+                            </xsl:otherwise>
+                        </xsl:choose>
 
                         <!-- Insert code duplicated, see https://github.com/orbeon/orbeon-forms/issues/3892 -->
                         <xf:action event="DOMActivate" observer="fr-grid-add fr-grid-add-bottom">

@@ -667,9 +667,10 @@ trait ControlOps extends ResourcesOps {
     def findLegacyActions: Seq[NodeInfo] =
       ctx.modelElem child FBActionTest filter (_.id.endsWith("-binding"))
 
-    // Replace formulas in binds
-    ctx.topLevelBindElem.toList descendantOrSelf * att XMLNames.FormulaTest foreach { att =>
+    def findRepeatedGridsAndSections: Seq[NodeInfo] =
+      ctx.bodyElem descendant FRContainerTest filter isRepeat
 
+    def renameAtt(att: NodeInfo, avt: Boolean) = {
       val xpathString = att.stringValue
 
       val compiledExpr =
@@ -678,7 +679,7 @@ trait ControlOps extends ResourcesOps {
           namespaceMapping = NamespaceMapping(att.parentUnsafe.namespaceMappings.toMap),
           locationData     = null,
           functionLibrary  = inScopeContainingDocument.partAnalysis.functionLibrary,
-          avt              = false
+          avt              = avt
         )
 
       val expr = compiledExpr.expression.getInternalExpression
@@ -686,6 +687,9 @@ trait ControlOps extends ResourcesOps {
       if (xpathString.contains(s"$$$oldName") && DependencyAnalyzer.containsVariableReference(expr, oldName))
         updateNode(xpathString.replace(s"$$$oldName", s"$$$newName"))(att)
     }
+
+    // Replace formulas in binds
+    ctx.topLevelBindElem.toList descendantOrSelf * att XMLNames.FormulaTest foreach (renameAtt(_, avt = false))
 
     // Replace references in templates, including email templates
     List(ctx.bodyElem, ctx.metadataRootElem) descendant FRParamTest filter
@@ -735,5 +739,14 @@ trait ControlOps extends ResourcesOps {
       VALUE_QNAME                            filter
       (_.stringValue == s"'$oldName'")       foreach
       updateNode(s"'$newName'")
+
+    // `fr:section`/`fr:grid` attributes
+    findRepeatedGridsAndSections foreach { container =>
+      ContainerAtts foreach { attName =>
+        container.att(attName).foreach(renameAtt(_, avt = true))
+      }
+    }
   }
+
+  private val ContainerAtts = List("min", "max", "freeze", "remove-constraint")
 }

@@ -194,8 +194,13 @@
                                                     <fr:repeater
                                                         id="{$repeater-id}"
                                                         ref="*"
-                                                        level="{$level}"
-                                                        xbl:attr="template origin min max remove-constraint apply-defaults appearance insert freeze readonly view-appearance">
+                                                        level="{$level}">
+
+                                                        <xsl:copy-of select="@template | @origin | @apply-defaults | @appearance | @insert | @readonly | @view-appearance"/>
+
+                                                        <xsl:if test="not($editable)">
+                                                            <xsl:copy-of select="@min | @max | @freeze | @remove-constraint"/>
+                                                        </xsl:if>
 
                                                         <!-- Paging is only available at runtime, not design-time -->
                                                         <xsl:if test="not($editable)">

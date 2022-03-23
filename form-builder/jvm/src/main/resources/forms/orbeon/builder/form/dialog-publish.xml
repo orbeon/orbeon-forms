@@ -51,7 +51,6 @@
             <xf:property name="callback-id"                value="'fb-publish-model'"/>
         </xf:dispatch>
 
-        <xf:setfocus control="fb-publish-selected-version"/>
     </xf:action>
 
     <!-- Switch to display initial / success / error cases -->
@@ -100,7 +99,7 @@
                 </xh:table>
 
 
-                <xf:group ref=".[$versioning-supported and $latest-version gt 0]">
+                <xf:group ref=".[$versioning-supported]">
                     <fr:grid>
                         <xh:tr>
                             <xh:td>
@@ -108,7 +107,7 @@
                                 <xf:select1 ref="instance()/selected-version" appearance="dropdown" id="fb-publish-selected-version">
                                     <xf:label value="$form-resources/dialog-publish/version"/>
                                     <xf:item>
-                                        <xf:label value="xxf:format-message($form-resources/dialog-publish/create-new-version-item, $latest-version + 1)"/>
+                                        <xf:label value="xxf:format-message($form-resources/dialog-publish/create-new-version-item, max((0, $latest-version)) + 1)"/>
                                         <xf:value>next</xf:value>
                                     </xf:item>
                                     <!-- All existing versions sorted from newest to oldest -->
@@ -150,7 +149,7 @@
                     <fr:grid>
                         <xh:tr>
                             <xh:td>
-                                <xf:textarea  ref="instance()/selected-comment">
+                                <xf:textarea  ref="instance()/selected-comment" id="fb-publish-comment">
                                     <xf:label value="$form-resources/dialog-publish/comment"/>
                                 </xf:textarea>
                             </xh:td>
@@ -286,9 +285,37 @@
     <xf:model id="fb-publish-model">
 
         <xf:action event="fr-versions-read fr-versions-empty">
+
             <xf:setvalue
                 ref="instance()/versioning-supported"
                 value="event('is-form-definition-versioning-supported')"/>
+
+            <xf:var
+                name="version-property"
+                value="xxf:property('oxf.fb.publish.version')"/>
+
+            <xf:setvalue
+                ref="instance()/version-selection-enabled"
+                value="
+                    instance()/versioning-supported = 'true' and
+                    event('latest-version') gt 0 and
+                    not($version-property = ('force-next', 'force-latest'))"/>
+
+            <xf:setvalue
+                ref="instance()/selected-version"
+                if="instance()/versioning-supported = 'true'"
+                value="
+                    if      (empty(event('latest-version')))                            then 'next'
+                    else if ($version-property = ('default-to-next'  , 'force-next'  )) then 'next'
+                    else if ($version-property = ('default-to-latest', 'force-latest')) then event('latest-version')
+                    else    ''"/>
+
+            <xf:setfocus control="{
+                    if (instance()/version-selection-enabled = 'true')
+                    then 'fb-publish-selected-version'
+                    else 'fb-publish-comment'
+                }"/>
+
         </xf:action>
 
         <xf:action event="fr-versions-read">
@@ -332,6 +359,7 @@
                 <form/>
 
                 <versioning-supported/>
+                <version-selection-enabled/>
                 <latest-version>-1</latest-version>
                 <versions/>
 
@@ -351,13 +379,17 @@
             ref="published-attachments | published-version | existing-version | latest-version"
             type="xs:integer"/>
 
-        <xf:bind ref="selected-version" required="$versioning-supported and $latest-version gt 0"/>
+        <xf:bind
+            ref="selected-version"
+            required="$versioning-supported"
+            readonly="not($version-selection-enabled)"/>
 
-        <xf:var name="app"                  value="instance()/app/string()"/>
-        <xf:var name="form"                 value="instance()/form/string()"/>
-        <xf:var name="versioning-supported" value="instance()/versioning-supported = 'true'"/>
-        <xf:var name="latest-version"       value="instance()/latest-version/data(.)"/>
-        <xf:var name="versions"             value="instance()/versions/version"/>
+        <xf:var name="app"                       value="instance()/app/string()"/>
+        <xf:var name="form"                      value="instance()/form/string()"/>
+        <xf:var name="versioning-supported"      value="instance()/versioning-supported = 'true'"/>
+        <xf:var name="version-selection-enabled" value="instance()/version-selection-enabled = 'true'"/>
+        <xf:var name="latest-version"            value="instance()/latest-version/data(.)"/>
+        <xf:var name="versions"                  value="instance()/versions/version"/>
 
         <xf:submission
             id="fb-read-form-definition"

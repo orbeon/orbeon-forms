@@ -94,6 +94,7 @@
     <property as="xs:boolean" name="oxf.fb.menu.actions"                                        value="true"/>
 
     <property as="xs:string"  name="oxf.fb.publish.buttons"                                     value="new summary"/>
+    <property as="xs:string"  name="oxf.fb.publish.version"                                     value="default-to-select"/>
 
     <property as="xs:boolean" name="oxf.fb.metadata.logo"                                       value="true"/>
     <property as="xs:integer" name="oxf.fb.section.close"                                       value="100"/>

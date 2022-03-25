@@ -81,6 +81,17 @@
         </xsl:copy>
     </xsl:template>
 
+    <xsl:template
+        match="fr:number[exists(@prefix | @suffix)]"
+        mode="within-controls">
+        <xsl:copy>
+            <xsl:for-each select="@prefix | @suffix">
+                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., true())"/>
+            </xsl:for-each>
+            <xsl:apply-templates select="@* except (@prefix | @suffix) | node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- Add a default xf:alert for those fields which don't have one. Only do this within grids and dialogs. -->
     <!-- Q: Do we really need this? -->
     <xsl:template

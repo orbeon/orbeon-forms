@@ -673,6 +673,9 @@ trait ControlOps extends ResourcesOps {
     def findParamExprs: Seq[NodeInfo] =
       ctx.bodyElem descendant FRParamTest child FRExprTest
 
+    def findNumbers: Seq[NodeInfo] =
+      ctx.bodyElem descendant FRNumberTest
+
     def renameNodeContent(elemOrAtt: NodeInfo, avt: Boolean): Unit = {
 
       val xpathString = elemOrAtt.stringValue
@@ -745,9 +748,9 @@ trait ControlOps extends ResourcesOps {
       updateNode(s"'$newName'")
 
     // `fr:section`/`fr:grid` attributes
-    findRepeatedGridsAndSections foreach { container =>
+    findRepeatedGridsAndSections foreach { containerElem =>
       ContainerAtts foreach { attName =>
-        container.att(attName).foreach(renameNodeContent(_, avt = true))
+        containerElem.att(attName).foreach(renameNodeContent(_, avt = true))
       }
     }
 
@@ -755,7 +758,15 @@ trait ControlOps extends ResourcesOps {
     findParamExprs foreach { exprElem =>
       renameNodeContent(exprElem, avt = false)
     }
+
+    // `fr:number/(@suffix | @prefix)`
+    findNumbers foreach { numberElem =>
+      NumberAtts foreach { attName =>
+        numberElem.att(attName).foreach(renameNodeContent(_, avt = true))
+      }
+    }
   }
 
   private val ContainerAtts = List("min", "max", "freeze", "remove-constraint")
+  private val NumberAtts    = List("prefix", "suffix")
 }

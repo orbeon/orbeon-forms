@@ -65,6 +65,8 @@ object XMLNames {
   val FRListenerTest           : Test      = FR -> "listener"
   val FRActionTest             : Test      = FR -> "action"
 
+  val FRNumberTest             : Test      = FR -> "number"
+
   val ControlsTest             : Test      = QName("controls")
   val ControlTest              : Test      = QName("control")
   val RepeatTest               : Test      = QName("repeat")

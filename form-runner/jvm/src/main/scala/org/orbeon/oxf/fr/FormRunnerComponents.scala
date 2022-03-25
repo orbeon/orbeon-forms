@@ -18,10 +18,10 @@ trait FormRunnerComponents {
   // In an XPath expression, replace non-local variable references.
   //
   //@XPathFunction
-  def replaceVarReferencesWithFunctionCalls(att: NodeInfo): String = {
+  def replaceVarReferencesWithFunctionCalls(elemOrAtt: NodeInfo, avt: Boolean): String = {
 
-    val xpathString = att.stringValue
-    val expr        = compileExpression(xpathString, att, FormRunnerFunctionLibrary, avt = true)(indentedLogger)
+    val xpathString = elemOrAtt.stringValue
+    val expr        = compileExpression(xpathString, elemOrAtt, FormRunnerFunctionLibrary, avt = avt)(indentedLogger)
 
     SaxonUtils.iterateExternalVariableReferences(expr).foldLeft(xpathString) { case (xp, name) =>
       xp.replace(s"$$$name", s"(fr:control-string-value('$name'))")

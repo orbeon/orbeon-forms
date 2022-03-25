@@ -126,7 +126,7 @@
                                                 if ($p/@type = 'ExpressionParam') then
                                                     concat(
                                                         'string((',
-                                                        $p/fr:expr,
+                                                        frf:replaceVarReferencesWithFunctionCalls($p/fr:expr, false()),
                                                         ')[1])'
                                                     )
                                                 else if ($p/@type = 'ControlValueParam') then

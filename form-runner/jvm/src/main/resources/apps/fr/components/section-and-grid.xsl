@@ -77,7 +77,7 @@
 
             <xsl:for-each select="@min | @max | @freeze | @remove-constraint">
                 <xsl:if test="exists(.)">
-                    <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(.)"/>
+                    <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., true())"/>
                 </xsl:if>
             </xsl:for-each>
 
@@ -132,7 +132,7 @@
 
             <xsl:for-each select="@min | @max | @freeze | @remove-constraint">
                 <xsl:if test="exists(.)">
-                    <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(.)"/>
+                    <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., true())"/>
                 </xsl:if>
             </xsl:for-each>
 

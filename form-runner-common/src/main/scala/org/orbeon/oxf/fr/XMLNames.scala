@@ -56,11 +56,11 @@ object XMLNames {
   val FRItemsetId              : Test      = FR -> "itemsetid"
   val FRItemsetMap             : Test      = FR -> "itemsetmap"
 
-  val FRItemsetMapTest         : Test     = FR -> "itemsetmap"
-  val FRParamTest              : Test     = FR -> "param"
-  val FRNameTest               : Test     = FR -> "name"
-  val FRControlNameTest        : Test     = FR -> "controlName"
-  val FRExprTest               : Test     = FR -> "expr"
+  val FRItemsetMapTest         : Test      = FR -> "itemsetmap"
+  val FRParamTest              : Test      = FR -> "param"
+  val FRNameTest               : Test      = FR -> "name"
+  val FRControlNameTest        : Test      = FR -> "controlName"
+  val FRExprTest               : Test      = FR -> "expr"
 
   val FRListenerTest           : Test      = FR -> "listener"
   val FRActionTest             : Test      = FR -> "action"

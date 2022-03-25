@@ -670,13 +670,17 @@ trait ControlOps extends ResourcesOps {
     def findRepeatedGridsAndSections: Seq[NodeInfo] =
       ctx.bodyElem descendant FRContainerTest filter isRepeat
 
-    def renameAtt(att: NodeInfo, avt: Boolean) = {
-      val xpathString = att.stringValue
+    def findParamExprs: Seq[NodeInfo] =
+      ctx.bodyElem descendant FRParamTest child FRExprTest
+
+    def renameNodeContent(elemOrAtt: NodeInfo, avt: Boolean): Unit = {
+
+      val xpathString = elemOrAtt.stringValue
 
       val compiledExpr =
         XPath.compileExpression(
           xpathString      = xpathString,
-          namespaceMapping = NamespaceMapping(att.parentUnsafe.namespaceMappings.toMap),
+          namespaceMapping = NamespaceMapping(elemOrAtt.parentUnsafe.namespaceMappings.toMap),
           locationData     = null,
           functionLibrary  = inScopeContainingDocument.partAnalysis.functionLibrary,
           avt              = avt
@@ -685,11 +689,11 @@ trait ControlOps extends ResourcesOps {
       val expr = compiledExpr.expression.getInternalExpression
 
       if (xpathString.contains(s"$$$oldName") && DependencyAnalyzer.containsVariableReference(expr, oldName))
-        updateNode(xpathString.replace(s"$$$oldName", s"$$$newName"))(att)
+        updateNode(xpathString.replace(s"$$$oldName", s"$$$newName"))(elemOrAtt)
     }
 
     // Replace formulas in binds
-    ctx.topLevelBindElem.toList descendantOrSelf * att XMLNames.FormulaTest foreach (renameAtt(_, avt = false))
+    ctx.topLevelBindElem.toList descendantOrSelf * att XMLNames.FormulaTest foreach (renameNodeContent(_, avt = false))
 
     // Replace references in templates, including email templates
     List(ctx.bodyElem, ctx.metadataRootElem) descendant FRParamTest filter
@@ -743,8 +747,13 @@ trait ControlOps extends ResourcesOps {
     // `fr:section`/`fr:grid` attributes
     findRepeatedGridsAndSections foreach { container =>
       ContainerAtts foreach { attName =>
-        container.att(attName).foreach(renameAtt(_, avt = true))
+        container.att(attName).foreach(renameNodeContent(_, avt = true))
       }
+    }
+
+    // `fr:param/fr:expr`
+    findParamExprs foreach { exprElem =>
+      renameNodeContent(exprElem, avt = false)
     }
   }
 

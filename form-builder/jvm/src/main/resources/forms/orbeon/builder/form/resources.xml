@@ -1107,10 +1107,10 @@
                 </item>
             </event-type>
             <event-condition>
-                <label>Run condition</label>
+                <label>Run the action in the following case</label>
                 <item id="always">Always</item>
                 <item id="new-only">In "new" mode only</item>
-                <item id="formula">When formula evaluates to true</item>
+                <item id="formula">When formula evaluates to "true"</item>
                 <formula>Formula</formula>
             </event-condition>
             <event-control>
@@ -2434,10 +2434,10 @@
                 </item>
             </event-type>
             <event-condition>
-                <label>Condition d'exécution</label>
+                <label>Exécute l'action dans le cas suivant</label>
                 <item id="always">Toujours</item>
                 <item id="new-only">Dans le mode "création" seulement</item>
-                <item id="formula">Quand la formule s'évalue à vrai</item>
+                <item id="formula">Quand la formule s'évalue à "vrai"</item>
                 <formula>Formule</formula>
             </event-condition>
             <event-control>
@@ -3771,10 +3771,10 @@
                 <!--</item>-->
             <!--</event-type>-->
             <event-condition>
-                <label todo="true">[Run condition]</label>
+                <label todo="true">[Run the action in the following case]</label>
                 <item todo="true" id="always">[Always]</item>
                 <item todo="true" id="new-only">[In "new" mode only]</item>
-                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <item todo="true" id="formula">[When formula evaluates to "true"]</item>
                 <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
@@ -5107,10 +5107,10 @@
                 <!--</item>-->
             <!--</event-type>-->
             <event-condition>
-                <label todo="true">[Run condition]</label>
+                <label todo="true">[Run the action in the following case]</label>
                 <item todo="true" id="always">[Always]</item>
                 <item todo="true" id="new-only">[In "new" mode only]</item>
-                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <item todo="true" id="formula">[When formula evaluates to "true"]</item>
                 <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
@@ -9101,7 +9101,7 @@
                 <label>Tila</label>
                 <item id="always">Aja aina</item>
                 <item id="new-only">Aja vain luonnin yhteydessä</item>
-                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <item todo="true" id="formula">[When formula evaluates to "true"]</item>
                 <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
@@ -10430,7 +10430,7 @@
                 <label>Condición</label>
                 <item id="always">Ejecutar Siempre</item>
                 <item id="new-only">Ejecutar solamente al Inicio</item>
-                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <item todo="true" id="formula">[When formula evaluates to "true"]</item>
                 <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
@@ -11739,7 +11739,7 @@
                 <label>Conditie</label>
                 <item id="always">Start altijd</item>
                 <item id="new-only">Start alleen bij aanmaken</item>
-                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <item todo="true" id="formula">[When formula evaluates to "true"]</item>
                 <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
@@ -13075,7 +13075,7 @@
                 <label>Condição</label>
                 <item id="always">Correr sempre</item>
                 <item id="new-only">Correr apenas em criação</item>
-                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <item todo="true" id="formula">[When formula evaluates to "true"]</item>
                 <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>
@@ -14412,7 +14412,7 @@
                 <label>Villkor</label>
                 <item id="always">Kör alltid</item>
                 <item id="new-only">Kör bara när nytt formulär fylls i</item>
-                <item todo="true" id="formula">[When formula evaluates to true]</item>
+                <item todo="true" id="formula">[When formula evaluates to "true"]</item>
                 <formula todo="true">[Formula]</formula>
             </event-condition>
             <event-control>

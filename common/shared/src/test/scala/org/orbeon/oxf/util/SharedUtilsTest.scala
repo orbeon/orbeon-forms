@@ -314,7 +314,7 @@ class SharedUtilsTest extends AnyFunSpec {
 
     describe("The `sequenceLazily` function") {
 
-      it ("must return all elements") {
+      it ("must return all elements if all are successful") {
 
         val in = List("1", "2", "3")
 
@@ -323,32 +323,25 @@ class SharedUtilsTest extends AnyFunSpec {
         assert(Success(List(1, 2, 3)) == TryUtils.sequenceLazily(in)(f))
       }
 
-      it ("must stop at the first `Failure`") {
+      val in = List("1", "2", "3", "4")
 
-        val in = List("1", "2", "W", "4")
-        var callCount = 0
+      for (i <- in.indices) {
+        val (l1, l2) = in.splitAt(i)
+        val listWithNaN = l1 ::: "NaN" :: l2.tail
 
-        def f(s: String) = Try {
-          callCount += 1
-          s.toInt
+        it (s"must stop at the first `Failure` for $listWithNaN") {
+
+          var callCount = 0
+
+          assertThrows[NumberFormatException] {
+            TryUtils.sequenceLazily(listWithNaN) { s =>
+              callCount += 1
+              Try(s.toInt)
+            } .get
+          }
+
+          assert(callCount == i + 1)
         }
-
-        assertThrows[NumberFormatException](TryUtils.sequenceLazily(in)(f).get)
-        assert(callCount == 3)
-      }
-
-      it ("must not fail incorrectly if `Failure` is last") {
-
-        val in = List("1", "2", "3", "W")
-        var callCount = 0
-
-        def f(s: String) = Try {
-          callCount += 1
-          s.toInt
-        }
-
-        assertThrows[NumberFormatException](TryUtils.sequenceLazily(in)(f).get)
-        assert(callCount == 4)
       }
     }
   }

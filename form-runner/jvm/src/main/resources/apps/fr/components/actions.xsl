@@ -240,10 +240,10 @@
 
         <xsl:variable
             name="existing-dataset-instances"
-            select="$model/xf:instance/@id/substring-after(., 'fr-dataset-')"/>
+            select="$model/xf:instance/@id[starts-with(., 'fr-dataset-')]/substring-after(., 'fr-dataset-')"/>
 
         <xsl:for-each select="distinct-values(($dataset-names, $dataset-names-20182))[not(. = $existing-dataset-instances)]">
-            <xf:instance id="fr-dataset-{.}"><dataset/></xf:instance>
+            <xf:instance id="fr-dataset-{.}"><_/></xf:instance>
         </xsl:for-each>
 
     </xsl:function>

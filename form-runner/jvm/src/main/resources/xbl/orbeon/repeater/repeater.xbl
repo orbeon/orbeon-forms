@@ -446,7 +446,7 @@
                                                 <xh:div id="fr-repeater-repeat-iteration">
                                                     <xsl:attribute name="class" select="@class, 'fr-repeater-repeat-iteration', '{$can-classes}'"/>
                                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                        <xsl:apply-templates select="* except fr:iteration-label3"/>
+                                                        <xsl:apply-templates select="* except fr:iteration-label"/>
                                                     </xf:group>
                                                 </xh:div>
                                             </xf:case>

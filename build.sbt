@@ -136,10 +136,16 @@ val CoreLibraryDependencies = Seq(
   "mysql"                       % "mysql-connector-java"            % "8.0.26"          % Test,
   "org.postgresql"              % "postgresql"                      % "42.2.24"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
-  "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
-  "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
+  "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion excludeAll (
+    ExclusionRule(organization = "org.bouncycastle"),
+    ExclusionRule(organization = "com.lowagie")
+  ),
+  "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion excludeAll (
+    ExclusionRule(organization = "org.bouncycastle"),
+    ExclusionRule(organization = "com.lowagie")
+  ),
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
-  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.69", // for `openpdf`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.70", // for `openpdf`, also pulls `bcprov` and `bcpkix`
   "com.drewnoakes"              % "metadata-extractor"              % "2.16.0",
   "net.coobird"                 % "thumbnailator"                   % ThumbnailatorVersion,
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",

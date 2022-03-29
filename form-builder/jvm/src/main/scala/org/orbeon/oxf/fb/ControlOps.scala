@@ -52,10 +52,18 @@ trait ControlOps extends ResourcesOps {
 
   self: GridOps => // funky dependency, to resolve at some point
 
-  private val MIPsToRewrite = ModelDefs.AllMIPs - ModelDefs.Type - ModelDefs.Required - ModelDefs.Whitespace
-  private val RewrittenMIPs = MIPsToRewrite map (mip => mip -> QName(mip.name, XMLNames.FBPrefix, XMLNames.FB)) toMap
+  private val MIPsToRewrite =
+    ModelDefs.AllMIPs - ModelDefs.Type - ModelDefs.Required - ModelDefs.Whitespace
 
-  private val FRResourceElemLocalNamesToQNames = List(FRTextQName, FRIterationLabelQName) map (v => v.localName -> v) toMap
+  private val RewrittenMIPs =
+    MIPsToRewrite
+      .map(mip => mip -> QName(mip.name, XMLNames.FBPrefix, XMLNames.FB))
+      .toMap
+
+  private val FRResourceElemLocalNamesToQNames =
+    List(FRTextQName, FRIterationLabelQName, FRAddIterationLabelQName)
+      .map(v => v.localName -> v)
+      .toMap
 
   private val PossibleResourcePointerNames: Set[String] =
     (LHHA.values map (_.entryName)).to(Set) ++

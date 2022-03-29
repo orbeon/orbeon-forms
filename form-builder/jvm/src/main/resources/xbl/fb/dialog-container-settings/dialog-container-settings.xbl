@@ -93,7 +93,7 @@
                 <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($i/control-name)/namespace::node()"/>
 
                 <!-- Read Label/Help if we are a section -->
-                <xf:action iterate="$i/(label, help, iteration-label)">
+                <xf:action iterate="$i/(label, help, iteration-label, add-iteration-label)">
 
                     <xf:delete ref="fr:param"/>
 
@@ -208,7 +208,7 @@
                             $i/apply-defaults = true(),
                             if ($i/initial-iterations = true()) then 'first' else ''
                         ),
-                        for $lh in $i/(label, help, iteration-label)[@supported = 'true'] return
+                        for $lh in $i/(label, help, iteration-label, add-iteration-label)[@supported = 'true'] return
                             fbf:setControlLabelHintHelpOrText(
                                 $i/control-name,
                                 local-name($lh),
@@ -365,6 +365,10 @@
                             <value/>
                             <!--<fr:param/>-->
                         </iteration-label>
+                        <add-iteration-label isHTML="" supported="">
+                            <value/>
+                            <!--<fr:param/>-->
+                        </add-iteration-label>
 
                         <prev-control-id/>
                         <next-control-id/>
@@ -500,7 +504,7 @@
                     readonly="xxf:is-blank()"/>
 
                 <xf:bind
-                    ref="label | help | iteration-label"
+                    ref="label | help | iteration-label | add-iteration-label"
                     readonly="not(@supported = 'true')"/>
 
                 <!-- We could do this but the issue is that things will look inconsistent when switching between repeated and
@@ -769,7 +773,7 @@
                             </xf:group>
                         </fr:tab>
 
-                        <fr:tab id="label-help-tab" ref="(label, help, iteration-label)[true() or @supported = 'true']">
+                        <fr:tab id="label-help-tab" ref="(label, help, iteration-label, add-iteration-label)[true() or @supported = 'true']">
                             <fr:label
                                 ref="
                                     $resources/dialog-control-settings/*[

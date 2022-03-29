@@ -207,7 +207,7 @@
                                                             <xsl:copy-of select="$root/@page-size"/>
                                                         </xsl:if>
 
-                                                        <xsl:apply-templates select="fr:iteration-label"/>
+                                                        <xsl:apply-templates select="fr:iteration-label | fr:add-iteration-label"/>
 
                                                         <!-- Forward iteration events -->
                                                         <xf:action

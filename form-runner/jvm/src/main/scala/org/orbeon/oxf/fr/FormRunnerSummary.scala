@@ -34,10 +34,12 @@ trait FormRunnerSummary {
 
   private val OffsetR = """([+-])(\d{2}):(\d{2})""".r
 
-  private def offsetToDuration(offset: String): String = {
-    val OffsetR(sign, hours, minutes) = offset
-    (if (sign == "+") "PT" else "-PT") + hours + 'H' + minutes + 'M'
-  }
+  private def offsetToDuration(offset: String): String =
+    offset match {
+      case "Z"                           => "PT0H0M"
+      case OffsetR(sign, hours, minutes) => (if (sign == "+") "PT" else "-PT") + hours + 'H' + minutes + 'M'
+      case other                         => throw new IllegalArgumentException(other)
+    }
 
   //@XPathFunction
   def defaultTimezoneToOffsetString: String =

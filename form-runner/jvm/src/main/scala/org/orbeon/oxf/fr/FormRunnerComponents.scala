@@ -17,10 +17,7 @@ trait FormRunnerComponents {
   def replaceVarReferencesWithFunctionCalls(elemOrAtt: NodeInfo, avt: Boolean): String =
     FormRunnerRename.replaceVarReferencesWithFunctionCalls(
       elemOrAtt.stringValue,
-      NamespaceMapping(elemOrAtt match {
-        case n if n.isAttribute => n.parentUnsafe.namespaceMappings.toMap
-        case n                  => n.namespaceMappings.toMap
-      }),
+      NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
       FormRunnerFunctionLibrary,
       avt,
       name => s"(fr:control-string-value('$name'))"

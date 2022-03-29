@@ -678,10 +678,7 @@ trait ControlOps extends ResourcesOps {
     def renameNodeContent(elemOrAtt: NodeInfo, avt: Boolean): Unit =
       FormRunnerRename.replaceSingleVarReference(
         xpathString        = elemOrAtt.stringValue,
-        namespaceMapping   = NamespaceMapping(elemOrAtt match {
-          case n if n.isAttribute => n.parentUnsafe.namespaceMappings.toMap
-          case n                  => n.namespaceMappings.toMap
-        }),
+        namespaceMapping   = NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
         functionLibrary    = inScopeContainingDocument.partAnalysis.functionLibrary,
         avt                = avt,
         oldName            = oldName,

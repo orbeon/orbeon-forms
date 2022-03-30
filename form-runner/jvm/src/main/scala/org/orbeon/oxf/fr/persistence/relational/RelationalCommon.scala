@@ -45,9 +45,12 @@ object RelationalCommon {
           .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
     }
 
-  def requestedFormVersion(req: SearchRequest): FormDefinitionVersion =
-    req.version match {
-      case SearchVersion.Unspecified  => Private.latest(req.appForm).map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
+  def requestedFormVersion(
+    appForm : AppForm,
+    version : SearchVersion
+  ): FormDefinitionVersion =
+    version match {
+      case SearchVersion.Unspecified  => Private.latest(appForm).map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
       case SearchVersion.All          => FormDefinitionVersion.Latest
       case SearchVersion.Specific(v)  => FormDefinitionVersion.Specific(v)
     }

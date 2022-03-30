@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.fr.{AppForm, FormRunner}
+import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.RelationalCommon.requestedFormVersion
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
+import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
@@ -41,13 +43,70 @@ trait SearchRequestParser {
     httpRequest.getRequestPath match {
       case SearchPath(provider, app, form) =>
 
-        val appForm         = AppForm(app, form)
-        val searchElement   = searchDocument.rootElement
-        val queryEls        = searchElement.child("query").toList
-        val draftsElOpt     = searchElement.child("drafts").headOption
-        val username        = httpRequest.credentials map     (_.userAndGroup.username)
-        val group           = httpRequest.credentials flatMap (_.userAndGroup.groupname)
-        val operationsElOpt = searchElement.child("operations").headOption
+        val appForm             = AppForm(app, form)
+        val searchElement       = searchDocument.rootElement
+        val queryEls            = searchElement.child("query").toList
+        val freeTextElOpt       = queryEls.find(! _.hasAtt("path"))
+        val structuredSearchEls = queryEls.filter(_.hasAtt("path"))
+        val draftsElOpt         = searchElement.child("drafts").headOption
+        val username            = httpRequest.credentials map     (_.userAndGroup.username)
+        val group               = httpRequest.credentials flatMap (_.userAndGroup.groupname)
+        val operationsElOpt     = searchElement.child("operations").headOption
+        val allFields           = httpRequest.getFirstParamAsString("all-fields").contains(true.toString)
+
+        val specificColumns =
+          structuredSearchEls
+            .map { c =>
+              val filterOpt = trimAllToOpt(c.stringValue)
+              Column(
+                // Filter `[1]` predicates (see https://github.com/orbeon/orbeon-forms/issues/2922)
+                path        = c.attValue("path").replace("[1]", ""),
+                filterType  = filterOpt match {
+                  case None => FilterType.None
+                  case Some(filter) =>
+
+                    def fromMatch: Option[FilterType] =
+                      c.attValueOpt("match") map {
+                        case "substring" => FilterType.Substring(filter)
+                        case "token"     => FilterType.Token(filter.splitTo[List]())
+                        case "exact"     => FilterType.Exact(filter)
+                        case other       => throw new IllegalArgumentException(other)
+                      }
+
+                    def fromControl: Option[FilterType] =
+                      c.attValueOpt("control") map {
+                        case "input" | "textarea" => FilterType.Substring(filter)
+                        case "select"             => FilterType.Token(filter.splitTo[List]())
+                        case _                    => FilterType.Exact(filter)
+                      }
+
+                    fromMatch     orElse
+                      fromControl getOrElse
+                      FilterType.Exact(filter)
+                }
+              )
+            }
+
+        val columns =
+          if (allFields) {
+
+            // Use specific columns to merge with explicit columns passed
+            val specificColumnsByPath =
+              specificColumns.map(c => c.path -> c).toMap
+
+            FormRunner.readPublishedForm(appForm, requestedFormVersion(appForm, version)).toList flatMap { formDoc =>
+              Index.findIndexedControls(
+                formDoc,
+                FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
+              ) map { indexedControl =>
+                Column(
+                  indexedControl.xpath,
+                  specificColumnsByPath.get(indexedControl.xpath).map(_.filterType).getOrElse(FilterType.None)
+                )
+              }
+            }
+          } else
+            specificColumns
 
         SearchRequest(
           provider       = Provider.withName(provider),
@@ -57,46 +116,8 @@ trait SearchRequestParser {
           group          = group,
           pageSize       = searchElement.firstChildOpt("page-size")  .get.stringValue.toInt,
           pageNumber     = searchElement.firstChildOpt("page-number").get.stringValue.toInt,
-          freeTextSearch =
-            queryEls
-              // Free text is in the first <query>
-              .headOption.map(_.stringValue)
-              // Empty means no search
-              .flatMap(trimAllToOpt),
-          columns        =
-            queryEls
-              // First is for free text search
-              .drop(1)
-              .map { c =>
-                val filterOpt = trimAllToOpt(c.stringValue)
-                Column(
-                  // Filter `[1]` predicates (see https://github.com/orbeon/orbeon-forms/issues/2922)
-                  path       = c.attValue("path").replace("[1]", ""),
-                  filterType  = filterOpt match {
-                    case None => FilterType.None
-                    case Some(filter) =>
-
-                      def fromMatch: Option[FilterType] =
-                        c.attValueOpt("match") map {
-                          case "substring" => FilterType.Substring(filter)
-                          case "token"     => FilterType.Token(filter.splitTo[List]())
-                          case "exact"     => FilterType.Exact(filter)
-                          case other       => throw new IllegalArgumentException(other)
-                        }
-
-                      def fromControl: Option[FilterType] =
-                        c.attValueOpt("control") map {
-                          case "input" | "textarea" => FilterType.Substring(filter)
-                          case "select"             => FilterType.Token(filter.splitTo[List]())
-                          case _                    => FilterType.Exact(filter)
-                        }
-
-                      fromMatch     orElse
-                        fromControl getOrElse
-                        FilterType.Exact(filter)
-                  }
-                )
-              },
+          freeTextSearch = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // blank means no search
+          columns        = columns,
           drafts         =
             username match {
               case None =>

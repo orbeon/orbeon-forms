@@ -73,7 +73,7 @@ trait SearchLogic extends SearchRequestParser {
 
   def doSearch(request: SearchRequest): (List[Document], Int) = {
 
-    val version          = requestedFormVersion(request)
+    val version          = requestedFormVersion(request.appForm, request.version)
     val user             = PermissionsAuthorization.currentUserFromSession
     val permissions      = computePermissions(request, user, version)
     val hasNoPermissions =

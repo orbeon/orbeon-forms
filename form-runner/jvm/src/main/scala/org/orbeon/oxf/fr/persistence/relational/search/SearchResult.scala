@@ -54,7 +54,7 @@ trait SearchResult extends SearchRequestParser {
                     .map(_.value)
                     // Return values as comma separated list, to be compatible with 2016.1 and earlier
                     .mkString(", ")
-                  <detail>{columnValue}</detail>
+                  <detail path={requestColumn.path}>{columnValue}</detail>
               }
             }</details>
 

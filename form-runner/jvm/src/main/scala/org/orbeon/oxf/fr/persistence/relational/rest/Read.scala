@@ -14,12 +14,9 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.apache.commons.io.input.ReaderInputStream
-
-import java.io.{ByteArrayInputStream, StringReader}
-import org.orbeon.io.IOUtils._
 import org.orbeon.io.CharsetNames
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.UserAndGroup
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunnerPersistence}
 import org.orbeon.oxf.fr.permission.Operation.Read
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization, PermissionsXML}
@@ -27,10 +24,12 @@ import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunnerPersistence}
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{ContentTypes, DateUtils, NetUtils}
 
+import java.io.{ByteArrayInputStream, StringReader}
 import java.sql.Timestamp
 
 
@@ -84,8 +83,8 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
       }
       useAndClose(connection.prepareStatement(sql)) { ps =>
         val position = Iterator.from(1)
-        ps.setString(position.next(), req.app)
-        ps.setString(position.next(), req.form)
+        ps.setString(position.next(), req.appForm.app)
+        ps.setString(position.next(), req.appForm.form)
         if (req.forForm) ps.setInt(position.next(), requestedFormVersion(req))
         if (req.forData) {
           ps.setString(position.next(), req.dataPart.get.documentId)
@@ -167,7 +166,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
           // Read form metadata after we're done with the connection to read the data,
           // so we don't use two simultaneous connections
           val formMetadataForDataRequestOpt = req.forData.option(RelationalUtils.readFormPermissions(
-            req.app, req.form, FormDefinitionVersion.Specific(fromDatabase.formVersion))
+            req.appForm, FormDefinitionVersion.Specific(fromDatabase.formVersion))
           )
 
           formMetadataForDataRequestOpt foreach { formMetadata =>

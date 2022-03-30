@@ -18,9 +18,10 @@ import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
 
+
 object draftsPart {
 
-  def apply(request: SearchRequest) =
+  def apply(request: SearchRequest): StatementPart =
     request.drafts match {
       case IncludeDrafts => StatementPart("", Nil)
       case ExcludeDrafts => StatementPart(" AND c.draft = 'N'", Nil)
@@ -44,8 +45,8 @@ object draftsPart {
                    |   ) = 0
                    |""".stripMargin,
               setters = List(
-                _.setString(_, request.app),
-                _.setString(_, request.form)
+                _.setString(_, request.appForm.app),
+                _.setString(_, request.appForm.form)
               )
             )
           case DraftsForDocumentId(documentId) =>
@@ -55,5 +56,4 @@ object draftsPart {
             )
       }
     }
-
 }

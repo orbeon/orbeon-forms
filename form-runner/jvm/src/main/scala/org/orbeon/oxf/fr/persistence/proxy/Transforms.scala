@@ -3,7 +3,7 @@ package org.orbeon.oxf.fr.persistence.proxy
 import cats.syntax.option._
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerPersistence.findFormDefinitionFormatFromStringVersions
 import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
 import org.orbeon.oxf.fr._
@@ -71,13 +71,10 @@ object Transforms {
 
   def migrateFormDefinition(
     dstVersion      : DataFormatVersion,
-    app             : String,
-    form            : String)(implicit
+    appForm         : AppForm)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): (InputStream, OutputStream) => Unit = {
-
-    val appForm = AppForm(app, form)
 
     // We are explicitly asked to downgrade a form definition format
     // The database may contain a form definition in any format

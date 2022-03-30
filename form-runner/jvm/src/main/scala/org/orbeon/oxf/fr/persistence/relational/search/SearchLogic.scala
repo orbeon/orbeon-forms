@@ -42,7 +42,7 @@ trait SearchLogic extends SearchRequestParser {
   ): SearchPermissions = {
 
     val searchOperations     = request.anyOfOperations.getOrElse(List(Read, Update, Delete))
-    val formPermissionsElOpt = RelationalUtils.readFormPermissions(request.app, request.form, version)
+    val formPermissionsElOpt = RelationalUtils.readFormPermissions(request.appForm, version)
     val formPermissions      = PermissionsXML.parse(formPermissionsElOpt.orNull)
 
     def hasPermissionCond(condition: Condition): Boolean =

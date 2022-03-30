@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index
 
-import java.sql.{Connection, PreparedStatement}
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerPersistence}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
@@ -27,14 +26,17 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xml.NamespaceMapping
 
+import java.sql.{Connection, PreparedStatement}
+
+
 trait Reindex extends FormDefinition {
 
   sealed trait WhatToReindex
 
   object WhatToReindex {
-    case object  AllData                                              extends WhatToReindex
-    case class   DataForDocumentId(documentId: String)                extends WhatToReindex
-    case class   DataForForm(app: String, form: String, version: Int) extends WhatToReindex
+    case object  AllData                                     extends WhatToReindex
+    case class   DataForDocumentId(documentId: String)       extends WhatToReindex
+    case class   DataForForm(appForm: AppForm, version: Int) extends WhatToReindex
   }
 
   import WhatToReindex._
@@ -62,15 +64,15 @@ trait Reindex extends FormDefinition {
           List("document_id = ?"),
           (ps: PreparedStatement) => ps.setString(1, id)
         )
-        case DataForForm(app, form, version) => (
+        case DataForForm(appForm, version) => (
           List(
             "app = ?",
             "form = ?",
             "form_version = ?"
           ),
           (ps: PreparedStatement) => {
-            ps.setString(1, app)
-            ps.setString(2, form)
+            ps.setString(1, appForm.app)
+            ps.setString(2, appForm.form)
             ps.setInt   (3, version)
           }
         )
@@ -216,14 +218,15 @@ trait Reindex extends FormDefinition {
               indexedControls
             case _ =>
               // Compute indexed controls reading the form definition
-              FormRunner.readPublishedForm(app, form, FormDefinitionVersion.Specific(formVersion))(RelationalUtils.Logger) match {
+              val appForm = AppForm(app, form)
+              FormRunner.readPublishedForm(appForm, FormDefinitionVersion.Specific(formVersion))(RelationalUtils.Logger) match {
                 case None =>
                   RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
                   Seq.empty
                 case Some(formDefinition) =>
                   findIndexedControls(
                     formDefinition,
-                    FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
+                    FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
                   )
               }
           }
@@ -285,7 +288,7 @@ trait Reindex extends FormDefinition {
             for ((node, pos) <- nodes.zipWithIndex) {
               val nodeValue = truncateValue(provider, node.getStringValue)
               // For indexing, we are not interested in empty values
-              if (!nodeValue.isEmpty) {
+              if (nodeValue.nonEmpty) {
                 val position = Iterator.from(1)
                 val insertIntoControlTextSql =
                   """INSERT INTO orbeon_i_control_text

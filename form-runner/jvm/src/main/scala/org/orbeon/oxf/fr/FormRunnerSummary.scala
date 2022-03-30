@@ -53,7 +53,7 @@ trait FormRunnerSummary {
   def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String): Seq[NodeInfo] =
     Index.findIndexedControls(
       formDoc,
-      FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
+      FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
     ) map
       (_.toXML)
 
@@ -68,7 +68,7 @@ trait FormRunnerSummary {
     workflowStage : String
   ): Unit = {
 
-    val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
+    val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
 
     putWithAttachments(
       liveData           = data.root,

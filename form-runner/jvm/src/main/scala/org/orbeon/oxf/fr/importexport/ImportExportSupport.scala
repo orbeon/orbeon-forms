@@ -445,7 +445,7 @@ object ImportExportSupport {
 
       (
         doc,
-        FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm.app, appForm.form),
+        FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
         DataMigrationBehavior.Disabled
       )
     }

@@ -13,15 +13,14 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import java.sql.Connection
-
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.io.IOUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
 
+import java.sql.Connection
 import scala.annotation.tailrec
 import scala.collection.mutable
 
@@ -44,8 +43,8 @@ private object FlatView {
   def createFlatView(req: Request, version: Int, connection: Connection): Unit = {
 
     val viewName = {
-      val app  = xmlToSQLId(req.app)
-      val form = xmlToSQLId(req.form)
+      val app  = xmlToSQLId(req.appForm.app)
+      val form = xmlToSQLId(req.appForm.form)
       TablePrefix + joinParts(List(app, form, version.toString), MaxNameLength - TablePrefix.length)
     }
 
@@ -75,8 +74,7 @@ private object FlatView {
       val query =
         Provider.flatViewCreateView(
           req.provider,
-          req.app,
-          req.form,
+          req.appForm,
           version.toString,
           viewName,
           cols map { case Col(col, name) => col + " " + name} mkString ", "

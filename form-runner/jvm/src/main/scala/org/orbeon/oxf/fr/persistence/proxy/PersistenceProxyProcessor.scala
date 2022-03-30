@@ -84,11 +84,11 @@ private object PersistenceProxyProcessor {
   def proxyRequest(request: Request, response: Response)(implicit externalContext: ExternalContext): Unit = {
     val incomingPath = request.getRequestPath
     incomingPath match {
-      case FormPath(path, app, form, _)                => proxyRequest               (request, response, app, form, FormOrData.Form, None          , path)
-      case DataPath(path, app, form, _, _, filename)   => proxyRequest               (request, response, app, form, FormOrData.Data, Some(filename), path)
-      case DataCollectionPath(path, app, form)         => proxyRequest               (request, response, app, form, FormOrData.Data, None          , path)
-      case SearchPath(path, app, form)                 => proxyRequest               (request, response, app, form, FormOrData.Data, None          , path)
-      case ReEncryptAppFormPath(path, app, form)       => proxyRequest               (request, response, app, form, FormOrData.Form, None          , path)
+      case FormPath(path, app, form, _)                => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None          , path)
+      case DataPath(path, app, form, _, _, filename)   => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename), path)
+      case DataCollectionPath(path, app, form)         => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None          , path)
+      case SearchPath(path, app, form)                 => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None          , path)
+      case ReEncryptAppFormPath(path, app, form)       => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None          , path)
       case PublishedFormsMetadataPath(path, app, form) => proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
       case ReindexPath                                 => proxyReindex               (request, response)
       case ReEncryptStatusPath                         => proxyReEncryptStatus       (request, response)
@@ -100,8 +100,7 @@ private object PersistenceProxyProcessor {
   def proxyRequest(
     request         : Request,
     response        : Response,
-    app             : String,
-    form            : String,
+    appForm         : AppForm,
     formOrData      : FormOrData,
     filename        : Option[String],
     path            : String)(implicit
@@ -109,10 +108,10 @@ private object PersistenceProxyProcessor {
   ): Unit = {
 
     // Throws if there is an incompatibility
-    checkDataFormatVersionIfNeeded(request, app, form, formOrData)
+    checkDataFormatVersionIfNeeded(request, appForm, formOrData)
 
     val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains("data.xml")
-    val isFormBuilder    = AppForm(app, form) == AppForm.FormBuilder
+    val isFormBuilder    = appForm == AppForm.FormBuilder
 
     val requestContent = HttpMethodsWithRequestBody(request.getMethod) option {
 
@@ -133,8 +132,7 @@ private object PersistenceProxyProcessor {
           FieldEncryption.encryptDataIfNecessary(
             request,
             requestInputStream,
-            app,
-            form,
+            appForm,
             isDataXmlRequest
           ).getOrElse(inputData)
       }
@@ -148,7 +146,7 @@ private object PersistenceProxyProcessor {
     }
 
     // Get persistence implementation target URL and configuration headers
-    val (persistenceBaseURL, headers) = getPersistenceURLHeaders(app, form, formOrData)
+    val (persistenceBaseURL, headers) = getPersistenceURLHeaders(appForm, formOrData)
 
     val serviceURI = PathUtils.appendQueryString(
       persistenceBaseURL.dropTrailingSlash + path,
@@ -159,8 +157,7 @@ private object PersistenceProxyProcessor {
       request.getFirstParamAsString(FormDefinitionFormatVersionName).map(DataFormatVersion.withName) map { dstVersion =>
         Transforms.migrateFormDefinition(
           dstVersion,
-          app,
-          form
+          appForm
         )
       }
 
@@ -206,8 +203,7 @@ private object PersistenceProxyProcessor {
 
   def checkDataFormatVersionIfNeeded(
     request    : Request,
-    app        : String,
-    form       : String,
+    appForm    : AppForm,
     formOrData : FormOrData
   ): Unit =
     if (formOrData == FormOrData.Data && GetOrPutMethods(request.getMethod))
@@ -215,7 +211,7 @@ private object PersistenceProxyProcessor {
       request.getFirstParamAsString(DataFormatVersionName) foreach { incomingVersion =>
 
         val providerVersion =
-          providerDataFormatVersionOrThrow(app, form)
+          providerDataFormatVersionOrThrow(appForm)
 
         require(
           AllowedDataFormatVersionParams(incomingVersion),
@@ -360,7 +356,7 @@ private object PersistenceProxyProcessor {
       (app, form) match {
         case (Some(appName), Some(formName)) =>
           // Get the specific provider for this app/form
-          findProvider(appName, formName, FormOrData.Form).toList
+          findProvider(AppForm(appName, formName), FormOrData.Form).toList
         case _ =>
           // Get providers independently from app/form
           // NOTE: Could also optimize case where only app is provided, but there are no callers as of 2013-10-21.

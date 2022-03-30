@@ -17,7 +17,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.EmbeddableParam
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.FormRunnerPersistence._
-import org.orbeon.oxf.fr.{DataStatus, FormRunnerBaseOps, FormRunnerParams, FormRunnerPersistence, GridDataMigration, Names}
+import org.orbeon.oxf.fr.{AppForm, DataStatus, FormRunnerBaseOps, FormRunnerParams, FormRunnerPersistence, GridDataMigration, Names}
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.util.PathUtils._
@@ -138,6 +138,7 @@ trait FormRunnerActionsCommon {
 
       ensureDataCalculationsAreUpToDate()
 
+      val appForm       = AppForm(app, form)
       val isDraft       = booleanParamByName(params, "draft", default = false)
       val pruneMetadata = booleanParamByName(params, "prune-metadata", default = false)
       val queryXVT      = paramByName(params, "query")
@@ -146,7 +147,7 @@ trait FormRunnerActionsCommon {
       // Notify that the data is about to be saved
       dispatch(name = "fr-data-save-prepare", targetId = FormModel)
 
-      val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
+      val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
 
       def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType =
         GridDataMigration.dataMaybeMigratedFromEdge(

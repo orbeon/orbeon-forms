@@ -13,17 +13,19 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
+import org.orbeon.oxf.fr.{AppForm, FormRunner}
 import org.orbeon.oxf.fr.permission.Operation
+import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
-import org.orbeon.oxf.fr.persistence.relational.{Provider, Version}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SimplePath._
+
 
 trait SearchRequestParser {
 
@@ -39,6 +41,7 @@ trait SearchRequestParser {
     httpRequest.getRequestPath match {
       case SearchPath(provider, app, form) =>
 
+        val appForm         = AppForm(app, form)
         val searchElement   = searchDocument.rootElement
         val queryEls        = searchElement.child("query").toList
         val draftsElOpt     = searchElement.child("drafts").headOption
@@ -48,8 +51,7 @@ trait SearchRequestParser {
 
         SearchRequest(
           provider       = Provider.withName(provider),
-          app            = app,
-          form           = form,
+          appForm        = appForm,
           version        = version,
           username       = username,
           group          = group,

@@ -13,10 +13,11 @@
   */
 package org.orbeon.oxf.fr.persistence.relational
 
+import org.orbeon.oxf.fr.AppForm
+
 
 trait RequestCommon {
   val provider : Provider
-  val app      : String
-  val form     : String
+  val appForm  : AppForm
   val version  : Version
 }

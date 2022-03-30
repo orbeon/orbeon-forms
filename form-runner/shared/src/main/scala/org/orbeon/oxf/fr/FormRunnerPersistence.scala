@@ -67,11 +67,11 @@ object FormOrData extends Enum[FormOrData] {
 object FormRunnerPersistenceJava {
   //@XPathFunction
   def providerDataFormatVersion(app: String, form: String): String =
-    FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form).entryName
+    FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form)).entryName
 
   //@XPathFunction
   def findProvider(app: String, form: String, formOrData: String): Option[String] =
-    FormRunnerPersistence.findProvider(app, form, FormOrData.withName(formOrData))
+    FormRunnerPersistence.findProvider(AppForm(app, form), FormOrData.withName(formOrData))
 }
 
 sealed abstract class DataFormatVersion(override val entryName: String) extends EnumEntry
@@ -143,20 +143,20 @@ object FormRunnerPersistence {
   val StandardProviderProperties          = Set("uri", "autosave", "active", "permissions")
   val AttachmentAttributeNames            = List("filename", "mediatype", "size")
 
-  def findProvider(app: String, form: String, formOrData: FormOrData): Option[String] = {
-    val providerProperty = PersistenceProviderPropertyPrefix :: app :: form :: formOrData.entryName :: Nil mkString "."
-    properties.getNonBlankString(providerProperty)
-  }
+  def findProvider(appForm: AppForm, formOrData: FormOrData): Option[String] =
+    properties.getNonBlankString(
+      PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: Nil mkString "."
+    )
 
   def providerPropertyAsURL(provider: String, property: String): String =
     properties.getStringOrURIAsString(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".")
 
-  def getPersistenceURLHeaders(app: String, form: String, formOrData: FormOrData): (String, Map[String, String]) = {
+  def getPersistenceURLHeaders(appForm: AppForm, formOrData: FormOrData): (String, Map[String, String]) = {
 
-    require(augmentString(app).nonEmpty) // Q: why `augmentString`?
-    require(augmentString(form).nonEmpty)
+    require(augmentString(appForm.app).nonEmpty) // Q: why `augmentString`?
+    require(augmentString(appForm.form).nonEmpty)
 
-    getPersistenceURLHeadersFromProvider(findProvider(app, form, formOrData).get)
+    getPersistenceURLHeadersFromProvider(findProvider(appForm, formOrData).get)
   }
 
   def getPersistenceURLHeadersFromProvider(provider: String): (String, Map[String, String]) = {
@@ -181,9 +181,9 @@ object FormRunnerPersistence {
     (uri, headers)
   }
 
-  def getPersistenceHeadersAsXML(app: String, form: String, formOrData: FormOrData): DocumentNodeInfoType = {
+  def getPersistenceHeadersAsXML(appForm: AppForm, formOrData: FormOrData): DocumentNodeInfoType = {
 
-    val (_, headers) = getPersistenceURLHeaders(app, form, formOrData)
+    val (_, headers) = getPersistenceURLHeaders(appForm, formOrData)
 
     // Build headers document
     val headersXML =
@@ -203,11 +203,11 @@ object FormRunnerPersistence {
     )
   }
 
-  def providerDataFormatVersionOrThrow(app: String, form: String): DataFormatVersion = {
+  def providerDataFormatVersionOrThrow(appForm: AppForm): DataFormatVersion = {
 
     val provider =
-      findProvider(app, form, FormOrData.Data) getOrElse
-        (throw new IllegalArgumentException(s"no provider property configuration found for `$app/$form`"))
+      findProvider(appForm, FormOrData.Data) getOrElse
+        (throw new IllegalArgumentException(s"no provider property configuration found for `${appForm.app}/${appForm.form}`"))
 
     val dataFormatVersionString =
       providerPropertyAsString(provider, DataFormatVersionName, PersistenceDefaultDataFormatVersion.entryName)
@@ -341,19 +341,19 @@ trait FormRunnerPersistence {
   // 2020-12-23: If the provider is not configured, return `false` (for offline FIXME).
   //@XPathFunction
   def isAutosaveSupported(app: String, form: String): Boolean =
-    findProvider(app, form, FormOrData.Data) exists (providerPropertyAsBoolean(_, "autosave", default = false))
+    findProvider(AppForm(app, form), FormOrData.Data) exists (providerPropertyAsBoolean(_, "autosave", default = false))
 
   //@XPathFunction
   def isOwnerGroupPermissionsSupported(app: String, form: String): Boolean =
-    providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "permissions", default = false)
+    providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "permissions", default = false)
 
   //@XPathFunction
   def isFormDefinitionVersioningSupported(app: String, form: String): Boolean =
-    providerPropertyAsBoolean(findProvider(app, form, FormOrData.Form).get, "versioning", default = false)
+    providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Form).get, "versioning", default = false)
 
   //@XPathFunction
   def isLeaseSupported(app: String, form: String): Boolean =
-    providerPropertyAsBoolean(findProvider(app, form, FormOrData.Data).get, "lease", default = false)
+    providerPropertyAsBoolean(findProvider(AppForm(app, form), FormOrData.Data).get, "lease", default = false)
 
   def isActiveProvider(provider: String): Boolean =
     providerPropertyAsBoolean(provider, "active", default = true)
@@ -433,12 +433,11 @@ trait FormRunnerPersistence {
 
   // Retrieves a form definition from the persistence layer
   def readPublishedForm(
-    appName         : String,
-    formName        : String,
+    appForm         : AppForm,
     version         : FormDefinitionVersion)(
     implicit logger : IndentedLogger
   ): Option[DocumentNodeInfoType] = {
-    val path = createFormDefinitionBasePath(appName, formName) + "form.xhtml"
+    val path = createFormDefinitionBasePath(appForm.app, appForm.form) + "form.xhtml"
     val customHeaders = version match {
       case FormDefinitionVersion.Latest            => Map.empty[String, List[String]]
       case FormDefinitionVersion.Specific(version) => Map(OrbeonFormDefinitionVersion -> List(version.toString))
@@ -448,15 +447,14 @@ trait FormRunnerPersistence {
 
   // Retrieves from the persistence layer the metadata for a form, return an `Option[<form>]`
   def readFormMetadataOpt(
-    appName  : String,
-    formName : String,
+    appForm  : AppForm,
     version  : FormDefinitionVersion)(implicit
     logger   : IndentedLogger
   ): Option[NodeInfo] = {
     val formsDoc = readDocument(
       createFormMetadataPathAndQuery(
-        app         = appName,
-        form        = formName,
+        app         = appForm.app,
+        form        = appForm.form,
         allVersions = version != FormDefinitionVersion.Latest,
         allForms    = true
       ),
@@ -475,12 +473,11 @@ trait FormRunnerPersistence {
   }
 
   def readDocumentFormVersion(
-    appName         : String,
-    formName        : String,
+    appForm         : AppForm,
     documentId      : String,
     isDraft         : Boolean
   ): Option[Int] = {
-    val path = createFormDataBasePath(appName, formName, isDraft, documentId) + "data.xml"
+    val path = createFormDataBasePath(appForm.app, appForm.form, isDraft, documentId) + "data.xml"
     val headers = readHeaders(path, Map.empty)
     headers.get(Version.OrbeonFormDefinitionVersion).map(_.head).map(_.toInt)
   }

@@ -329,6 +329,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-autocomplete.*"                 value="fr-autocomplete"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-databound-select1.*"            value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-checkbox-input.*"               value="select-value"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.fr-explanation.*"                  value="output-string"/>
 
      <!-- Internal processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                value='save'/>

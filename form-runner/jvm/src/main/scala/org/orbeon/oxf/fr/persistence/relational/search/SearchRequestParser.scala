@@ -52,7 +52,7 @@ trait SearchRequestParser {
         val username            = httpRequest.credentials map     (_.userAndGroup.username)
         val group               = httpRequest.credentials flatMap (_.userAndGroup.groupname)
         val operationsElOpt     = searchElement.child("operations").headOption
-        val allFields           = httpRequest.getFirstParamAsString("all-fields").contains(true.toString)
+        val allFields           = searchElement.attValueOpt("return-all-indexed-fields").contains(true.toString)
 
         val specificColumns =
           structuredSearchEls

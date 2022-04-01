@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pipeline.choose;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.orbeon.dom.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.*;

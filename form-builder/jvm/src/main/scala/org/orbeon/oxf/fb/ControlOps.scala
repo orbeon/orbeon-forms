@@ -20,17 +20,15 @@ import org.orbeon.oxf.fb.XMLNames._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerDocContext, FormRunnerTemplatesOps, Names}
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerRename, FormRunnerTemplatesOps, Names}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xforms.NodeInfoFactory._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs.MIP
-import org.orbeon.oxf.xforms.analysis.model.{DependencyAnalyzer, ModelDefs}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.NodeInfo
@@ -39,6 +37,7 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 
 import scala.annotation.tailrec
@@ -53,10 +52,18 @@ trait ControlOps extends ResourcesOps {
 
   self: GridOps => // funky dependency, to resolve at some point
 
-  private val MIPsToRewrite = ModelDefs.AllMIPs - ModelDefs.Type - ModelDefs.Required - ModelDefs.Whitespace
-  private val RewrittenMIPs = MIPsToRewrite map (mip => mip -> QName(mip.name, XMLNames.FBPrefix, XMLNames.FB)) toMap
+  private val MIPsToRewrite =
+    ModelDefs.AllMIPs - ModelDefs.Type - ModelDefs.Required - ModelDefs.Whitespace
 
-  private val FRResourceElemLocalNamesToQNames = List(FRTextQName, FRIterationLabelQName) map (v => v.localName -> v) toMap
+  private val RewrittenMIPs =
+    MIPsToRewrite
+      .map(mip => mip -> QName(mip.name, XMLNames.FBPrefix, XMLNames.FB))
+      .toMap
+
+  private val FRResourceElemLocalNamesToQNames =
+    List(FRTextQName, FRIterationLabelQName, FRAddIterationLabelQName)
+      .map(v => v.localName -> v)
+      .toMap
 
   private val PossibleResourcePointerNames: Set[String] =
     (LHHA.values map (_.entryName)).to(Set) ++
@@ -676,24 +683,17 @@ trait ControlOps extends ResourcesOps {
     def findNumbers: Seq[NodeInfo] =
       ctx.bodyElem descendant FRNumberTest
 
-    def renameNodeContent(elemOrAtt: NodeInfo, avt: Boolean): Unit = {
-
-      val xpathString = elemOrAtt.stringValue
-
-      val compiledExpr =
-        XPath.compileExpression(
-          xpathString      = xpathString,
-          namespaceMapping = NamespaceMapping(elemOrAtt.parentUnsafe.namespaceMappings.toMap),
-          locationData     = null,
-          functionLibrary  = inScopeContainingDocument.partAnalysis.functionLibrary,
-          avt              = avt
-        )
-
-      val expr = compiledExpr.expression.getInternalExpression
-
-      if (xpathString.contains(s"$$$oldName") && DependencyAnalyzer.containsVariableReference(expr, oldName))
-        updateNode(xpathString.replace(s"$$$oldName", s"$$$newName"))(elemOrAtt)
-    }
+    def renameNodeContent(elemOrAtt: NodeInfo, avt: Boolean): Unit =
+      FormRunnerRename.replaceSingleVarReference(
+        xpathString        = elemOrAtt.stringValue,
+        namespaceMapping   = NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
+        functionLibrary    = inScopeContainingDocument.partAnalysis.functionLibrary,
+        avt                = avt,
+        oldName            = oldName,
+        newName            = newName
+      ) foreach { newValue =>
+        updateNode(newValue)(elemOrAtt)
+      }
 
     // Replace formulas in binds
     ctx.topLevelBindElem.toList descendantOrSelf * att XMLNames.FormulaTest foreach (renameNodeContent(_, avt = false))

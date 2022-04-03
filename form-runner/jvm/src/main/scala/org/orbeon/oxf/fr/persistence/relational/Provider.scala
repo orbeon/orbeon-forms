@@ -13,18 +13,20 @@
  */
 package org.orbeon.oxf.fr.persistence.relational
 
-import java.sql.{Connection, ResultSet}
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
 import org.orbeon.dom.saxon.DocumentWrapper
-
-import javax.xml.transform.stream.StreamSource
 import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
-import org.orbeon.oxf.util.CoreUtils._
+
+import java.io.StringReader
+import java.sql.{Connection, ResultSet}
+import javax.xml.transform.stream.StreamSource
 
 import java.io.StringReader
 
@@ -238,7 +240,7 @@ object Provider extends Enum[Provider] {
       case _          => throw new UnsupportedOperationException
     }
 
-  def flatViewCreateView(provider: Provider, app: String, form: String, version: String, viewName: String, cols: String): String = {
+  def flatViewCreateView(provider: Provider, appForm: AppForm, version: String, viewName: String, cols: String): String = {
 
     def escapeSQL(s: String): String =
       s.replace("'", "''")
@@ -255,8 +257,8 @@ object Provider extends Enum[Provider] {
         |            SELECT   max(last_modified_time) last_modified_time,
         |                     app, form, form_version, document_id
         |              FROM   orbeon_form_data d
-        |             WHERE       app          = '${escapeSQL(app)}'
-        |                     AND form         = '${escapeSQL(form)}'
+        |             WHERE       app          = '${escapeSQL(appForm.app)}'
+        |                     AND form         = '${escapeSQL(appForm.form)}'
         |                     AND form_version = $version
         |                     AND draft        = 'N'
         |            GROUP BY app, form, form_version, document_id

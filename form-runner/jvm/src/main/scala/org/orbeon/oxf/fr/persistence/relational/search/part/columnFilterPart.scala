@@ -17,6 +17,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Statement._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{Column, FilterType, SearchRequest}
 
+
 object columnFilterPart {
 
   def apply(request: SearchRequest): StatementPart =

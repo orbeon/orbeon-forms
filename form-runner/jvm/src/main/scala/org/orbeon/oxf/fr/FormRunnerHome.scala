@@ -36,8 +36,7 @@ trait FormRunnerHome {
   private case class AvailableAndTime(available: Boolean, time: Long)
 
   private case class Form(
-    app     : String,
-    form    : String,
+    appForm : AppForm,
     version : String,
     local   : Option[AvailableAndTime],
     remote  : Option[AvailableAndTime],
@@ -74,8 +73,10 @@ trait FormRunnerHome {
       val remoteTime = form elemValueOpt "remote-last-modified-time"
 
       Form(
-        form elemValue Names.AppName,
-        form elemValue Names.FormName,
+        AppForm(
+          form elemValue Names.AppName,
+          form elemValue Names.FormName
+        ),
         form elemValue Names.FormVersion,
         localTime  map (v => AvailableAndTime((form elemValue "available")        != "false", DateUtilsUsingSaxon.parseISODateOrDateTime(v))),
         remoteTime map (v => AvailableAndTime((form elemValue "remote-available") != "false", DateUtilsUsingSaxon.parseISODateOrDateTime(v))),
@@ -187,7 +188,7 @@ trait FormRunnerHome {
   //@XPathFunction
   def canReEncrypt(selection: String, forms: SequenceIterator): Boolean =
     formsForSelection(selection, forms).forall { form =>
-      val provider = findProvider(form.app, form.form, FormOrData.Data).get
+      val provider = findProvider(form.appForm, FormOrData.Data).get
       providerPropertyAsBoolean(provider, property = "reencrypt", default = false)
     }
 

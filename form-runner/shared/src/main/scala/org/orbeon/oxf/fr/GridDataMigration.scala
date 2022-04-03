@@ -40,7 +40,7 @@ object GridDataMigration {
         appForm             = appForm,
         data                = data,
         metadataRootElemOpt = metadataOpt.map(_.rootElement),
-        srcVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
+        srcVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
         dstVersion          = dstDataFormatVersion,
         pruneMetadata       = false
       ) getOrElse
@@ -64,7 +64,7 @@ object GridDataMigration {
       data                = data,
       metadataRootElemOpt = metadataOpt.map(_.rootElement),
       srcVersion          = DataFormatVersion.Edge,
-      dstVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form),
+      dstVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form)),
       pruneMetadata       = false
     ) getOrElse
       data

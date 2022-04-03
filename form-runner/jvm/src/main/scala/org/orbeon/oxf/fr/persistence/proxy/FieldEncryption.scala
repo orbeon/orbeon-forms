@@ -7,6 +7,7 @@ import java.io.{InputStream, OutputStream}
 
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
+import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.util.IndentedLogger
 
 
@@ -15,8 +16,7 @@ object FieldEncryption {
   def encryptDataIfNecessary(
     request            : Request,
     requestInputStream : InputStream,
-    app                : String,
-    form               : String,
+    appForm            : AppForm,
     isForXmlData       : Boolean)( // vs. attachment data
     implicit logger    : IndentedLogger
   ): Option[(InputStream, Option[Long])] = None

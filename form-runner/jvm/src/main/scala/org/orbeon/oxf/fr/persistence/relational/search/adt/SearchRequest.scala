@@ -13,13 +13,14 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
+import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.Operation
-import org.orbeon.oxf.fr.persistence.relational.{Provider, RequestCommon, Version}
+import org.orbeon.oxf.fr.persistence.relational.Provider
+
 
 case class SearchRequest(
   provider        : Provider,
-  app             : String,
-  form            : String,
+  appForm         : AppForm,
   version         : SearchVersion,
   username        : Option[String],
   group           : Option[String],

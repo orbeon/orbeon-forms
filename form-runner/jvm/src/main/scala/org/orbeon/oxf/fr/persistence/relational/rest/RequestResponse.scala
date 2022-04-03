@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
+import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.persistence.relational.{Provider, _}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 
+
 case class DataPart(isDraft: Boolean, documentId: String, stage: Option[String])
 
 case class Request(
   provider      : Provider,
-  app           : String,
-  form          : String,
+  appForm       : AppForm,
   version       : Version,
   filename      : Option[String],
   dataPart      : Option[DataPart]
@@ -73,11 +74,11 @@ trait RequestResponse extends Common {
     requestPath match {
       case CrudFormPath(provider, app, form, filename) =>
         val file = if (filename == "form.xhtml") None else Some(filename)
-        Request(Provider.withName(provider), app, form, version, file, None)
+        Request(Provider.withName(provider), AppForm(app, form), version, file, None)
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
         val file = if (filename == "data.xml") None else Some(filename)
         val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
-        Request(Provider.withName(provider), app, form, version, file, Some(dataPart))
+        Request(Provider.withName(provider), AppForm(app, form), version, file, Some(dataPart))
     }
   }
 

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.collections.iterators.TransformIterator;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.iterators.TransformIterator;
 
 import java.util.HashMap;
 import java.util.Iterator;

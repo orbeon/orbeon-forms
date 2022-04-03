@@ -221,7 +221,19 @@ object SimplePath {
     def sibling(test: Test): Seq[NodeInfo] = precedingSibling(test) ++ followingSibling(test)
 
     def namespaces        = find(Axis.NAMESPACE, AnyTest)
-    def namespaceMappings = namespaces map (n => n.getLocalPart -> n.getStringValue)
+    def namespaceMappings = {
+
+      // 2022-03-28: We use the namespace axis to get namespaces, and this doesn't work on an attribute node,
+      // apparently. Unclear if this is by design or not, but the test below addresses that by looking at the
+      // parent element if needed.
+      val ns =
+        this match {
+          case n if n.isAttribute => n.parentUnsafe.namespaces
+          case n                  => n.namespaces
+        }
+
+      ns map (n => n.getLocalPart -> n.getStringValue)
+    }
 
     def prefixesForURI(uri: String) = prefixesForURIImpl(uri, this)
     def nonEmptyPrefixesForURI(uri: String) = prefixesForURI(uri) filter (_ != "")

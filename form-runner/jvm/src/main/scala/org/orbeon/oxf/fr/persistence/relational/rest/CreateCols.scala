@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import java.sql.{PreparedStatement, Timestamp}
 import org.orbeon.oxf.externalcontext.{Organization, UserAndGroup}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationSupport => _}
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
+
+import java.sql.{PreparedStatement, Timestamp}
 
 
 trait CreateCols extends RequestResponse with Common {
@@ -116,14 +117,14 @@ trait CreateCols extends RequestResponse with Common {
         name          = "app",
         value         = DynamicColValue(
           placeholder  = "?",
-          paramSetter  = param(_.setString, req.app)
+          paramSetter  = param(_.setString, req.appForm.app)
         )
       ),
       Col(
         name          = "form",
         value         = DynamicColValue(
           placeholder = "?",
-          paramSetter = param(_.setString, req.form)
+          paramSetter = param(_.setString, req.appForm.form)
         )
       ),
       Col(

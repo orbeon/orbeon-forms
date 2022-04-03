@@ -4,6 +4,7 @@ import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, DataMigrationOp}
 import org.orbeon.oxf.fr.XMLNames.FRNamespace
 import org.orbeon.oxf.fr._
@@ -209,7 +210,7 @@ object ImportExportSupport {
 
   def prepareFormRunnerDocContextOrThrow(
     form              : om.NodeInfo,
-    appFormVersionOpt : Option[(AppForm, Int)],
+    appFormVersionOpt : Option[AppFormVersion],
     formDataOpt       : Option[(om.DocumentInfo, DataFormatVersion, DataMigrationBehavior)]
   ): FormRunnerDocContext =
     prepareFormRunnerDocContext(form, appFormVersionOpt, formDataOpt)
@@ -217,7 +218,7 @@ object ImportExportSupport {
 
   def prepareFormRunnerDocContext(
     form              : om.NodeInfo,
-    appFormVersionOpt : Option[(AppForm, Int)],
+    appFormVersionOpt : Option[AppFormVersion],
     formDataOpt       : Option[(om.DocumentInfo, DataFormatVersion, DataMigrationBehavior)]
   ): List[DataMigrationOp] Either FormRunnerDocContext = {
 
@@ -444,7 +445,7 @@ object ImportExportSupport {
 
       (
         doc,
-        FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm.app, appForm.form),
+        FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
         DataMigrationBehavior.Disabled
       )
     }

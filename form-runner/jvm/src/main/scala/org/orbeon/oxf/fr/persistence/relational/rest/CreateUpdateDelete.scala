@@ -13,34 +13,35 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import java.io.{ByteArrayOutputStream, InputStream, Writer}
-import java.sql.{Array => _, _}
-import javax.xml.transform.OutputKeys
-import javax.xml.transform.sax.{SAXResult, SAXSource}
-import javax.xml.transform.stream.StreamResult
 import org.orbeon.io.IOUtils._
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.externalcontext.UserAndGroup
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerPersistence, Names}
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
-import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
+import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUser}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
-import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, Names}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.{PipelineContext, TransformerXMLReceiver}
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.{NetUtils, Whitespace, XPath}
-import org.orbeon.oxf.xml.{JXQName, _}
+import org.orbeon.oxf.xml._
 import org.orbeon.saxon.event.SaxonOutputKeys
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SAXEvents.{Atts, StartElement}
 import org.xml.sax.InputSource
+
+import java.io.{ByteArrayOutputStream, InputStream, Writer}
+import java.sql.{Array => _, _}
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.sax.{SAXResult, SAXSource}
+import javax.xml.transform.stream.StreamResult
 
 
 object RequestReader {
@@ -186,8 +187,8 @@ trait CreateUpdateDelete
     useAndClose(connection.prepareStatement(sql)) { ps =>
 
       val position = Iterator.from(1)
-      ps.setString(position.next(), req.app)
-      ps.setString(position.next(), req.form)
+      ps.setString(position.next(), req.appForm.app)
+      ps.setString(position.next(), req.appForm.form)
       if (! req.forData)     ps.setInt   (position.next(), requestedFormVersion(req))
 
       req.dataPart foreach (dataPart => ps.setString(position.next(), dataPart.documentId))
@@ -357,7 +358,7 @@ trait CreateUpdateDelete
 
     // Read outside of a `withConnection` block, so we don't use two simultaneous connections
     val formPermissions = {
-      val elOpt = req.forData.option(RelationalUtils.readFormPermissions(req.app, req.form, FormDefinitionVersion.Specific(versionToSet))).flatten
+      val elOpt = req.forData.option(RelationalUtils.readFormPermissions(req.appForm, FormDefinitionVersion.Specific(versionToSet))).flatten
       PermissionsXML.parse(elOpt.orNull)
     }
     debug("CRUD: form permissions", List("permissions" -> formPermissions.toString))
@@ -496,7 +497,7 @@ trait CreateUpdateDelete
         case None =>
           // Form definition: update index for this form version
           // Re. the asInstanceOf, when updating a form, we must have a specific version specified
-          Index.WhatToReindex.DataForForm(req.app, req.form, versionSet)
+          Index.WhatToReindex.DataForForm(req.appForm, versionSet)
       }
 
       withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
@@ -510,7 +511,7 @@ trait CreateUpdateDelete
         req.forForm                                       &&
         ! req.forAttachment                               &&
         ! delete                                          &&
-        req.form != Names.LibraryFormName
+        req.appForm.form != Names.LibraryFormName
       ) withDebug("CRUD: creating flat view") {
         FlatView.createFlatView(req, versionSet, connection)
       }

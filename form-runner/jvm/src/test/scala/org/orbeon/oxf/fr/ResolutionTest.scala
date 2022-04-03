@@ -30,155 +30,155 @@ import org.scalatestplus.junit.AssertionsForJUnit
 class ResolutionTest extends DocumentTestBase with AssertionsForJUnit {
 
   def source: dom.Document =
-      <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
-           xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-           xmlns:xf="http://www.w3.org/2002/xforms"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <xh:head>
-          <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
-            <xf:instance id="fr-form-instance">
-              <form>
-                <section>
-                  <section-iteration>
-                    <button/>
-                    <result>42</result>
-                    <grid>
-                      <grid-iteration>
-                        <number>1</number>
-                        <other>o1</other>
-                      </grid-iteration>
-                      <grid-iteration>
-                        <number>2</number>
-                        <other>o2</other>
-                      </grid-iteration>
-                      <grid-iteration>
-                        <number>3</number>
-                        <other>o3</other>
-                      </grid-iteration>
-                    </grid>
-                    <hidden-grid>
-                      <hidden-number>4</hidden-number>
-                      <hidden-other>o4</hidden-other>
-                    </hidden-grid>
-                    <hidden-grid>
-                      <hidden-number>5</hidden-number>
-                      <hidden-other>o5</hidden-other>
-                    </hidden-grid>
-                    <hidden-grid>
-                      <hidden-number>6</hidden-number>
-                      <hidden-other>o6</hidden-other>
-                    </hidden-grid>
-                  </section-iteration>
-                  <section-iteration>
-                    <button/>
-                    <result>43</result>
-                    <grid>
-                      <grid-iteration>
-                        <number>21</number>
-                        <other>o21</other>
-                      </grid-iteration>
-                      <grid-iteration>
-                        <number>22</number>
-                        <other>o22</other>
-                      </grid-iteration>
-                      <grid-iteration>
-                        <number>23</number>
-                        <other>o23</other>
-                      </grid-iteration>
-                    </grid>
-                    <hidden-grid>
-                      <hidden-number>24</hidden-number>
-                      <hidden-other>o24</hidden-other>
-                    </hidden-grid>
-                    <hidden-grid>
-                      <hidden-number>25</hidden-number>
-                      <hidden-other>o25</hidden-other>
-                    </hidden-grid>
-                    <hidden-grid>
-                      <hidden-number>26</hidden-number>
-                      <hidden-other>o26</hidden-other>
-                    </hidden-grid>
-                  </section-iteration>
-                </section>
-              </form>
-            </xf:instance>
-            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-              <xf:bind id="section-bind" name="section" ref="section">
-                <xf:bind id="section-iteration-bind" name="section-iteration" ref="section-iteration">
-                  <xf:bind id="button-bind" ref="button" name="button"/>
-                  <xf:bind id="result-bind" ref="result" name="result"/>
-                  <xf:bind id="grid-bind" ref="grid" name="grid">
-                    <xf:bind id="grid-iteration-bind" ref="grid-iteration" name="grid-iteration">
-                      <xf:bind id="number-bind" ref="number" name="number"/>
-                      <xf:bind id="other-bind" ref="other" name="other"/>
-                    </xf:bind>
+    <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+          <xf:instance id="fr-form-instance">
+            <form>
+              <section>
+                <section-iteration>
+                  <button/>
+                  <result>42</result>
+                  <grid>
+                    <grid-iteration>
+                      <number>1</number>
+                      <other>o1</other>
+                    </grid-iteration>
+                    <grid-iteration>
+                      <number>2</number>
+                      <other>o2</other>
+                    </grid-iteration>
+                    <grid-iteration>
+                      <number>3</number>
+                      <other>o3</other>
+                    </grid-iteration>
+                  </grid>
+                  <hidden-grid>
+                    <hidden-number>4</hidden-number>
+                    <hidden-other>o4</hidden-other>
+                  </hidden-grid>
+                  <hidden-grid>
+                    <hidden-number>5</hidden-number>
+                    <hidden-other>o5</hidden-other>
+                  </hidden-grid>
+                  <hidden-grid>
+                    <hidden-number>6</hidden-number>
+                    <hidden-other>o6</hidden-other>
+                  </hidden-grid>
+                </section-iteration>
+                <section-iteration>
+                  <button/>
+                  <result>43</result>
+                  <grid>
+                    <grid-iteration>
+                      <number>21</number>
+                      <other>o21</other>
+                    </grid-iteration>
+                    <grid-iteration>
+                      <number>22</number>
+                      <other>o22</other>
+                    </grid-iteration>
+                    <grid-iteration>
+                      <number>23</number>
+                      <other>o23</other>
+                    </grid-iteration>
+                  </grid>
+                  <hidden-grid>
+                    <hidden-number>24</hidden-number>
+                    <hidden-other>o24</hidden-other>
+                  </hidden-grid>
+                  <hidden-grid>
+                    <hidden-number>25</hidden-number>
+                    <hidden-other>o25</hidden-other>
+                  </hidden-grid>
+                  <hidden-grid>
+                    <hidden-number>26</hidden-number>
+                    <hidden-other>o26</hidden-other>
+                  </hidden-grid>
+                </section-iteration>
+              </section>
+            </form>
+          </xf:instance>
+          <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+            <xf:bind id="section-bind" name="section" ref="section">
+              <xf:bind id="section-iteration-bind" name="section-iteration" ref="section-iteration">
+                <xf:bind id="button-bind" ref="button" name="button"/>
+                <xf:bind id="result-bind" ref="result" name="result"/>
+                <xf:bind id="grid-bind" ref="grid" name="grid">
+                  <xf:bind id="grid-iteration-bind" ref="grid-iteration" name="grid-iteration">
+                    <xf:bind id="number-bind" ref="number" name="number"/>
+                    <xf:bind id="other-bind" ref="other" name="other"/>
                   </xf:bind>
-                  <xf:bind id="hidden-grid-bind" ref="hidden-grid" name="hidden-grid" relevant="false()">
-                    <xf:bind id="hidden-number-bind" ref="hidden-number" name="hidden-number"/>
-                    <xf:bind id="hidden-other-bind" ref="hidden-other" name="hidden-other"/>
-                  </xf:bind>
+                </xf:bind>
+                <xf:bind id="hidden-grid-bind" ref="hidden-grid" name="hidden-grid" relevant="false()">
+                  <xf:bind id="hidden-number-bind" ref="hidden-number" name="hidden-number"/>
+                  <xf:bind id="hidden-other-bind" ref="hidden-other" name="hidden-other"/>
                 </xf:bind>
               </xf:bind>
             </xf:bind>
-            <xf:instance id="fr-form-resources" xxf:readonly="false">
-              <resources>
-                <resource xml:lang="en"/>
-              </resources>
-            </xf:instance>
-            <xf:instance xxf:readonly="true" id="dummy-template">
-              <dummy/>
-            </xf:instance>
-          </xf:model>
-        </xh:head>
-        <xh:body>
-          <fr:view>
-            <fr:body>
-              <fr:section
-                id="section-control"
-                repeat="content"
-                bind="section-bind"
-                template="instance('dummy-template')">
-                <fr:grid>
-                  <xh:tr>
-                    <xh:td>
-                      <xf:trigger id="button-control" bind="button-bind"/>
-                    </xh:td>
-                    <xh:td>
-                      <xf:input id="result-control" bind="result-bind"/>
-                    </xh:td>
-                  </xh:tr>
-                </fr:grid>
-                <fr:grid
-                    id="grid-control"
-                    repeat="content"
-                    bind="grid-bind"
-                    template="instance('dummy-template')">
-                  <xh:tr>
-                    <xh:td>
-                      <xf:input id="number-control" bind="number-bind"/>
-                    </xh:td>
-                    <xh:td>
-                      <xf:input id="other-control" bind="other-bind"/>
-                    </xh:td>
-                  </xh:tr>
-                </fr:grid>
-                <fr:grid id="hidden-grid-control" bind="hidden-grid-bind">
-                  <xh:tr>
-                    <xh:td>
-                      <xf:input id="hidden-number-control" bind="hidden-number-bind"/>
-                    </xh:td>
-                    <xh:td>
-                      <xf:input id="hidden-other-control" bind="hidden-other-bind"/>
-                    </xh:td>
-                  </xh:tr>
-                </fr:grid>
-              </fr:section>
-            </fr:body>
-          </fr:view>
-        </xh:body>
-      </xh:html>.toDocument
+          </xf:bind>
+          <xf:instance id="fr-form-resources" xxf:readonly="false">
+            <resources>
+              <resource xml:lang="en"/>
+            </resources>
+          </xf:instance>
+          <xf:instance xxf:readonly="true" id="dummy-template">
+            <dummy/>
+          </xf:instance>
+        </xf:model>
+      </xh:head>
+      <xh:body>
+        <fr:view>
+          <fr:body>
+            <fr:section
+              id="section-control"
+              repeat="content"
+              bind="section-bind"
+              template="instance('dummy-template')">
+              <fr:grid>
+                <xh:tr>
+                  <xh:td>
+                    <xf:trigger id="button-control" bind="button-bind"/>
+                  </xh:td>
+                  <xh:td>
+                    <xf:input id="result-control" bind="result-bind"/>
+                  </xh:td>
+                </xh:tr>
+              </fr:grid>
+              <fr:grid
+                  id="grid-control"
+                  repeat="content"
+                  bind="grid-bind"
+                  template="instance('dummy-template')">
+                <xh:tr>
+                  <xh:td>
+                    <xf:input id="number-control" bind="number-bind"/>
+                  </xh:td>
+                  <xh:td>
+                    <xf:input id="other-control" bind="other-bind"/>
+                  </xh:td>
+                </xh:tr>
+              </fr:grid>
+              <fr:grid id="hidden-grid-control" bind="hidden-grid-bind">
+                <xh:tr>
+                  <xh:td>
+                    <xf:input id="hidden-number-control" bind="hidden-number-bind"/>
+                  </xh:td>
+                  <xh:td>
+                    <xf:input id="hidden-other-control" bind="hidden-other-bind"/>
+                  </xh:td>
+                </xh:tr>
+              </fr:grid>
+            </fr:section>
+          </fr:body>
+        </fr:view>
+      </xh:body>
+    </xh:html>.toDocument
 
   private def resolveAllNodeValues(actionSourceAbsoluteId: String, targetControlName: String, followIndexes: Boolean): List[String] =
     FormRunner.resolveTargetRelativeToActionSource(actionSourceAbsoluteId, targetControlName, followIndexes, "") match {

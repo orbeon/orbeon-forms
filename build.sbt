@@ -56,7 +56,7 @@ val AutowireVersion               = "0.3.3"
 val ScalatagsVersion              = "0.9.4"
 val SbinaryVersion                = "0.5.1"
 val Log4sVersion                  = "1.10.0"
-val ScalaCollectionCompatVersion  = "2.6.0"
+val ScalaCollectionCompatVersion  = "2.7.0"
 
 // Java libraries
 val SaxonJvmVersion               = "9.1.0.8.3"
@@ -93,16 +93,12 @@ val CoreLibraryDependencies = Seq(
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
   "org.apache.commons"          %  "commons-lang3"                  % "3.12.0",
   "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
-  "commons-beanutils"           %  "commons-beanutils"              % "1.9.4",
   "commons-codec"               %  "commons-codec"                  % "1.15",
-  "commons-collections"         %  "commons-collections"            % "3.2.2",
-  "commons-digester"            %  "commons-digester"               % "2.1",
-  "commons-cli"                 %  "commons-cli"                    % "1.4",
+  "org.apache.commons"          %  "commons-collections4"           % "4.4",
   "commons-discovery"           %  "commons-discovery"              % "0.5",
   "commons-fileupload"          %  "commons-fileupload"             % "1.4",
   "commons-io"                  %  "commons-io"                     % CommonsIoVersion,
   "commons-pool"                %  "commons-pool"                   % "1.6",
-  "commons-validator"           %  "commons-validator"              % "1.7",
   "org.apache.ant"              %  "ant"                            % AntVersion,
   "org.apache.ant"              %  "ant-jsch"                       % AntVersion,
   "javax.mail"                  % "javax.mail-api"                  % JavaMailVersion,
@@ -136,10 +132,16 @@ val CoreLibraryDependencies = Seq(
   "mysql"                       % "mysql-connector-java"            % "8.0.26"          % Test,
   "org.postgresql"              % "postgresql"                      % "42.2.24"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
-  "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion,
-  "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion,
+  "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion excludeAll (
+    ExclusionRule(organization = "org.bouncycastle"),
+    ExclusionRule(organization = "com.lowagie")
+  ),
+  "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion excludeAll (
+    ExclusionRule(organization = "org.bouncycastle"),
+    ExclusionRule(organization = "com.lowagie")
+  ),
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
-  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.69", // for `openpdf`, also pulls `bcprov` and `bcpkix`
+  "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.70", // for `openpdf`, also pulls `bcprov` and `bcpkix`
   "com.drewnoakes"              % "metadata-extractor"              % "2.16.0",
   "net.coobird"                 % "thumbnailator"                   % ThumbnailatorVersion,
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",

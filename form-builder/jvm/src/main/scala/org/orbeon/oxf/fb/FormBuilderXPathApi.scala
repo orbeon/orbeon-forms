@@ -200,7 +200,9 @@ object FormBuilderXPathApi {
     implicit val ctx = FormBuilderDocContext()
 
     val isOptionalLHHAT =
-      lhht == LHHA.Help.entryName || lhht == fr.XMLNames.FRIterationLabelQName.localName
+      lhht == LHHA.Help.entryName ||
+      lhht == fr.XMLNames.FRIterationLabelQName.localName ||
+      lhht == fr.XMLNames.FRAddIterationLabelQName.localName
 
     // Make sure an optional element is present while we set content or attributes
     if (isOptionalLHHAT)

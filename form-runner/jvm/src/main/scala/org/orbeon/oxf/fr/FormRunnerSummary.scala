@@ -34,10 +34,12 @@ trait FormRunnerSummary {
 
   private val OffsetR = """([+-])(\d{2}):(\d{2})""".r
 
-  private def offsetToDuration(offset: String): String = {
-    val OffsetR(sign, hours, minutes) = offset
-    (if (sign == "+") "PT" else "-PT") + hours + 'H' + minutes + 'M'
-  }
+  private def offsetToDuration(offset: String): String =
+    offset match {
+      case "Z"                           => "PT0H0M"
+      case OffsetR(sign, hours, minutes) => (if (sign == "+") "PT" else "-PT") + hours + 'H' + minutes + 'M'
+      case other                         => throw new IllegalArgumentException(other)
+    }
 
   //@XPathFunction
   def defaultTimezoneToOffsetString: String =
@@ -51,7 +53,7 @@ trait FormRunnerSummary {
   def findIndexedControlsAsXML(formDoc: DocumentInfo, app: String, form: String): Seq[NodeInfo] =
     Index.findIndexedControls(
       formDoc,
-      FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
+      FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
     ) map
       (_.toXML)
 
@@ -66,7 +68,7 @@ trait FormRunnerSummary {
     workflowStage : String
   ): Unit = {
 
-    val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(app, form)
+    val databaseDataFormatVersion = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form))
 
     putWithAttachments(
       liveData           = data.root,

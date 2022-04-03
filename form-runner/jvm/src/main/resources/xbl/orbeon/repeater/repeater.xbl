@@ -196,6 +196,24 @@
                             </xf:dispatch>
                         </xf:action>
 
+                        <xsl:variable name="add-iteration-label-content" as="element()">
+                            <xsl:choose>
+                                <xsl:when test="exists(fr:add-iteration-label)">
+                                    <xsl:for-each select="fr:add-iteration-label[1]">
+                                        <xf:label value="{@ref}" xxbl:scope="outer">
+                                            <xsl:copy-of select="@mediatype"/>
+                                        </xf:label>
+                                    </xsl:for-each>
+                                </xsl:when>
+                                <xsl:when test="$appearance = 'minimal' and not($readonly)">
+                                    <xf:label value="xxf:r('components.section.add-another.label', '|fr-fr-resources|')"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xf:label><xh:i class="fa fa-fw fa-plus-circle"/><xf:output value="xxf:r('components.section.add-another.label', '|fr-fr-resources|')"/></xf:label>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:variable>
+
                         <!-- Placeholder to add first iteration when empty (could have `and count($repeat-sequence) = 0`,
                              but seems fine to keep this permanently). See #1509. -->
                         <xsl:if test="$appearance = 'full' and not($readonly)">
@@ -205,7 +223,7 @@
                                     ref="if ($can-add) then $repeat-context else ''"
                                     id="fr-repeater-add"
                                     xxf:title="{{xxf:r('components.section.add-another.hint',  '|fr-fr-resources|')}}">
-                                    <xf:label><xh:i class="fa fa-fw fa-plus-circle"/><xf:output value="xxf:r('components.section.add-another.label', '|fr-fr-resources|')"/></xf:label>
+                                    <xsl:copy-of select="$add-iteration-label-content"/>
                                 </xf:trigger>
                             </xf:group>
                         </xsl:if>
@@ -406,7 +424,9 @@
                                             <xf:output
                                                 id="{$iteration-label-id}"
                                                 value="{@ref}"
-                                                xxbl:scope="outer"/>
+                                                xxbl:scope="outer">
+                                                <xsl:copy-of select="@mediatype"/>
+                                            </xf:output>
                                         </xsl:element>
                                     </xsl:for-each>
                                 </xsl:variable>
@@ -426,7 +446,7 @@
                                                 <xh:div id="fr-repeater-repeat-iteration">
                                                     <xsl:attribute name="class" select="@class, 'fr-repeater-repeat-iteration', '{$can-classes}'"/>
                                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                        <xsl:apply-templates select="* except fr:iteration-label3"/>
+                                                        <xsl:apply-templates select="* except fr:iteration-label"/>
                                                     </xf:group>
                                                 </xh:div>
                                             </xf:case>
@@ -449,12 +469,13 @@
 
                         <xsl:if test="$appearance = 'minimal' and not($readonly)">
                             <xf:group ref=".[not($view-mode)]" class="fr-repeater-bottom-buttons">
+
                                 <xf:trigger
                                     appearance="minimal"
                                     id="fr-repeater-add-bottom"
                                     ref="$repeat-context[$can-add]"
                                     xxf:title="{{xxf:r('components.section.add-another.hint',  '|fr-fr-resources|')}}">
-                                    <xf:label value="xxf:r('components.section.add-another.label', '|fr-fr-resources|')"/>
+                                    <xsl:copy-of select="$add-iteration-label-content"/>
                                 </xf:trigger>
 
                                 <xsl:if test="$remove-at-bottom">

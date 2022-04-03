@@ -36,6 +36,5 @@ object freeTextFilterPart {
             List(_.setString(_, param))
           }
         )
-
     }
 }

@@ -20,6 +20,7 @@ import org.orbeon.oxf.fr.persistence.relational.Statement.{Setter, StatementPart
 import org.orbeon.oxf.fr.persistence.relational.search.adt.{FilterType, SearchRequest}
 import org.orbeon.oxf.util.CoreUtils._
 
+
 object commonPart  {
 
   def apply(
@@ -49,8 +50,8 @@ object commonPart  {
             |""".stripMargin
       },
       setters = {
-        val appSetter        :        Setter  = _.setString(_, request.app)
-        val formSetter       :        Setter  = _.setString(_, request.form)
+        val appSetter        :        Setter  = _.setString(_, request.appForm.app)
+        val formSetter       :        Setter  = _.setString(_, request.appForm.form)
         val versionSetterOpt : Option[Setter] = version match {
           case FormDefinitionVersion.Specific(v) => Some(_.setInt(_, v))
           case FormDefinitionVersion.Latest      => None

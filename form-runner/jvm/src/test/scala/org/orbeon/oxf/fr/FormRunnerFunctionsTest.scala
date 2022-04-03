@@ -27,6 +27,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.jdk.CollectionConverters._
 
+
 class FormRunnerFunctionsTest
   extends DocumentTestBase
      with ResourceManagerSupport
@@ -43,7 +44,7 @@ class FormRunnerFunctionsTest
 
     for ((formOrData, expected) <- Expected)
       it(s"must get headers for ${formOrData.entryName}") {
-        val headersAsXml = getPersistenceHeadersAsXML("cities", "form1", formOrData)
+        val headersAsXml = getPersistenceHeadersAsXML(AppForm("cities", "form1"), formOrData)
         assert(TransformerUtils.tinyTreeToString(headersAsXml) === expected)
       }
   }

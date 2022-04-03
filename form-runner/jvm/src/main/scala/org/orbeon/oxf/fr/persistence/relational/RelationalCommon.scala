@@ -13,14 +13,13 @@
   */
 package org.orbeon.oxf.fr.persistence.relational
 
-import java.sql.Connection
-import org.orbeon.oxf.fr.persistence.relational.Version._
-import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
-import org.orbeon.io.IOUtils.useAndClose
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerPersistence}
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{SearchRequest, SearchVersion}
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
-import org.orbeon.scaxon.SimplePath.{NodeInfoOps, NodeInfoSeqOps}
+import org.orbeon.oxf.fr.persistence.relational.Version._
+import org.orbeon.oxf.fr.persistence.relational.search.adt.{SearchRequest, SearchVersion}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner}
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
+import org.orbeon.scaxon.SimplePath.NodeInfoOps
+
 
 object RelationalCommon {
 
@@ -38,27 +37,29 @@ object RelationalCommon {
   def requestedFormVersion(req: RequestCommon): Int =
 
     req.version match {
-      case Unspecified                 => Private.latest(req.app, req.form).getOrElse(1)
-      case Next                        => Private.latest(req.app, req.form).map(_ + 1).getOrElse(1)
+      case Unspecified                 => Private.latest(req.appForm).getOrElse(1)
+      case Next                        => Private.latest(req.appForm).map(_ + 1).getOrElse(1)
       case Specific(v)                 => v
       case ForDocument(docId, isDraft) =>
-        FormRunner.readDocumentFormVersion(req.app, req.form, docId, isDraft)
+        FormRunner.readDocumentFormVersion(req.appForm, docId, isDraft)
           .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
     }
 
-  def requestedFormVersion(req: SearchRequest): FormDefinitionVersion =
-
-    req.version match {
-      case SearchVersion.Unspecified  => Private.latest(req.app, req.form).map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
+  def requestedFormVersion(
+    appForm : AppForm,
+    version : SearchVersion
+  ): FormDefinitionVersion =
+    version match {
+      case SearchVersion.Unspecified  => Private.latest(appForm).map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
       case SearchVersion.All          => FormDefinitionVersion.Latest
       case SearchVersion.Specific(v)  => FormDefinitionVersion.Specific(v)
     }
 
   private object Private {
 
-    def latest(app: String, form: String): Option[Int] =
+    def latest(appForm: AppForm): Option[Int] =
       for {
-        metadata    <- FormRunner.readFormMetadataOpt(app, form, FormDefinitionVersion.Latest)
+        metadata    <- FormRunner.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
         formVersion <- metadata.child("form-version").headOption
       } yield
         formVersion.stringValue.toInt

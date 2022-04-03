@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunnerPersistence}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, NetUtils}
 import org.orbeon.saxon.om.NodeInfo
@@ -41,7 +41,7 @@ object Permissions {
     implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(Permissions.getClass))
 
     val authorizedOperations = {
-      val permissionsElOrNull = RelationalUtils.readFormPermissions(app, form, FormDefinitionVersion.Latest).orNull
+      val permissionsElOrNull = RelationalUtils.readFormPermissions(AppForm(app, form), FormDefinitionVersion.Latest).orNull
       val permissions         = PermissionsXML.parse(permissionsElOrNull)
       val currentUser         = PermissionsAuthorization.currentUserFromSession
       val checkWithDataUser   = CheckWithDataUser(

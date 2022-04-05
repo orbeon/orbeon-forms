@@ -44,17 +44,6 @@
             </xbl:handler>
         </xbl:handlers>
 
-        <xbl:implementation>
-            <xf:model>
-                <xf:instance id="_" xxf:readonly="true">
-                    <_>
-                        <readonly/>
-                    </_>
-                </xf:instance>
-                <xf:bind ref="readonly" readonly="true()"/>
-            </xf:model>
-        </xbl:implementation>
-
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -142,20 +131,26 @@
                                         </xsl:if>
 
                                         <!-- Actual section title -->
-                                        <xsl:variable
-                                            name="section-opened-closed-class"
-                                            select="
-                                                if ($collapsible)
-                                                then 'fr-section-{if ($open) then ''open'' else ''closed''}'
-                                                else ''"/>
-                                        <xf:trigger appearance="minimal" class="fr-section-label {$section-opened-closed-class}">
-                                            <xsl:if test="not($collapsible)">
-                                                <xsl:attribute name="ref">instance()/readonly</xsl:attribute>
-                                            </xsl:if>
-                                            <xf:label value="xxf:label('fr-section')"><xsl:copy-of select="$root/xf:label/@mediatype"/></xf:label>
-                                            <xf:help  value="xxf:help ('fr-section')"><xsl:copy-of select="$root/xf:help /@mediatype"/></xf:help>
-                                            <xf:hint  value="xxf:hint ('fr-section')"><xsl:copy-of select="$root/xf:hint /@mediatype"/></xf:hint>
-                                        </xf:trigger>
+                                        <xsl:choose>
+                                             <xsl:when test="$collapsible">
+                                                 <xf:trigger appearance="minimal" class="fr-section-label fr-section-{{if ($open) then 'open' else 'closed'}}">
+                                                     <xf:label value="xxf:label('fr-section')"><xsl:copy-of select="$root/xf:label/@mediatype"/></xf:label>
+                                                     <xf:help  value="xxf:help ('fr-section')"><xsl:copy-of select="$root/xf:help /@mediatype"/></xf:help>
+                                                     <xf:hint  value="xxf:hint ('fr-section')"><xsl:copy-of select="$root/xf:hint /@mediatype"/></xf:hint>
+                                                 </xf:trigger>
+                                             </xsl:when>
+                                             <xsl:otherwise>
+                                                 <!-- We can't use a trigger in all cases, making the trigger readonly if the section isn't collapsible,
+                                                      as readonly triggers are removed when in static-readonly (as a result, section titles wouldn't show
+                                                      on the review page if the section isn't collapsible) -->
+                                                 <xf:output appearance="minimal" class="fr-section-label" value="xxf:label('fr-section')">
+                                                     <xsl:copy-of select="$root/xf:label/@mediatype"/>
+                                                     <xf:help  value="xxf:help ('fr-section')"><xsl:copy-of select="$root/xf:help /@mediatype"/></xf:help>
+                                                     <xf:hint  value="xxf:hint ('fr-section')"><xsl:copy-of select="$root/xf:hint /@mediatype"/></xf:hint>
+                                                 </xf:output>
+                                             </xsl:otherwise>
+                                         </xsl:choose>
+
                                     </xf:group>
 
                                 </xsl:element>

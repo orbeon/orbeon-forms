@@ -216,6 +216,14 @@ object StringUtils {
       index >= 0 option s.substring(index + search.length)
     }
 
+    def substringBefore(search: String): String =
+      substringBeforeOpt(search).getOrElse("")
+
+    def substringBeforeOpt(search: String): Option[String] = {
+      val index = s.indexOf(search)
+      index >= 0 option s.substring(0, index)
+    }
+
     def trimSuffixIfPresent(suffix: String): String =
       if (s.endsWith(suffix))
         s.substring(0, s.length - suffix.length)

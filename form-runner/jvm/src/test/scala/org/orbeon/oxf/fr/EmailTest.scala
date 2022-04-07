@@ -27,7 +27,6 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.net.URI
-import scala.collection.compat._
 
 
 class EmailTest
@@ -35,7 +34,7 @@ class EmailTest
      with ResourceManagerSupport
      with AnyFunSpecLike {
 
-  val FormWithEmailControls = URI.create("oxf:/org/orbeon/oxf/fr/form-with-email-controls.xhtml")
+  private val FormWithEmailControls = URI.create("oxf:/org/orbeon/oxf/fr/form-with-email-controls.xhtml")
 
   describe("Email address extraction from form definition") {
 
@@ -57,7 +56,7 @@ class EmailTest
         searchResult map { case ControlBindPathHoldersResources(_, _, path, _, _) => path map (_.value) mkString "/" } distinct
 
       val values =
-        searchResult.flatMap(_.holders).flatten.map(_.getStringValue).to(List)
+        searchResult.flatMap(_.holders).flatten.map(_.getStringValue).toList
 
       (values, distinctPaths)
     }
@@ -118,10 +117,24 @@ class EmailTest
       <email>
         <templates>
           <template name="default" xml:lang="en">
+            <form-fields>
+              <recipient name="control-1"/>
+              <cc name="control-2"/>
+              <bcc name="control-3"/>
+              <sender name="control-4"/>
+              <attachment name="control-14"/>
+            </form-fields>
             <subject>My subject {{$my-param-1}}</subject>
             <body mediatype="text/html">My body: {{$my-param-2}}</body>
           </template>
           <template name="default" xml:lang="fr">
+            <form-fields>
+              <recipient name="control-1"/>
+              <cc name="control-2"/>
+              <bcc name="control-3"/>
+              <sender name="control-4"/>
+              <attachment name="control-14"/>
+            </form-fields>
             <subject>Mon sujet {{$my-param-1}}</subject>
             <body mediatype="text/html">Mon message: {{$my-param-2}}</body>
           </template>
@@ -160,15 +173,17 @@ class EmailTest
       </email>
     )
 
+    val formDoc  = readTinyTreeFromUrl(FormWithEmailControls)
+    val formBody = formDoc.rootElement / XHBodyTest head
+
     describe("parse both old and new format") {
 
       assert(! FormRunnerEmail.isLegacy2021EmailMetadata(MetadataCurrent   ))
       assert(  FormRunnerEmail.isLegacy2021EmailMetadata(MetadataLegacy2021))
 
-      println(FormRunnerEmail.parseEmailMetadata(MetadataLegacy2021))
       assert(
-        FormRunnerEmail.parseEmailMetadata(MetadataCurrent) ===
-        FormRunnerEmail.parseEmailMetadata(MetadataLegacy2021)
+        FormRunnerEmail.parseEmailMetadata(MetadataCurrent, null) ===
+        FormRunnerEmail.parseEmailMetadata(MetadataLegacy2021, formBody)
       )
     }
 
@@ -179,7 +194,7 @@ class EmailTest
 
       val originalMetadata            = MetadataCurrent.pipe(prettyPrint)
       val parsedAndSerializedMetadata = MetadataCurrent
-        .pipe(FormRunnerEmail.parseEmailMetadata)
+        .pipe(FormRunnerEmail.parseEmailMetadata(_, formBody))
         .pipe(FormRunnerEmail.serializeEmailMetadata)
         .pipe(NodeConversions.elemToNodeInfo)
         .pipe(prettyPrint)

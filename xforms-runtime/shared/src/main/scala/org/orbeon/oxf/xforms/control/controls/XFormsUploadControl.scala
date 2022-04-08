@@ -318,7 +318,7 @@ object XFormsUploadControl {
       XFormsCrossPlatformSupport.openUrlStream(value),
       new XMLReceiverAdapter {
         override def characters(ch: Array[Char], start: Int, length: Int): Unit =
-          sb.append(ch, start, length)
+          sb.appendAll(ch, start, length)
       }
     )
 

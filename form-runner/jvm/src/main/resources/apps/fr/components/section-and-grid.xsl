@@ -100,12 +100,17 @@
     <xsl:template match="fr:grid" mode="within-controls within-dialogs">
         <xsl:copy>
 
-            <!-- Annotate `<fr:grid>` element with the `markup` attribute, based on property using app/name, as XSLT inside XBL
-                 doesn't have access to the app/form name. Also, we don't pass the app/form and let the XSLT check the property
-                 to support the property being changed at runtime. -->
+            <!-- Annotate `<fr:grid>` element with the `markup` attribute, based on property using app/name/mode,
+                 as XSLT inside XBL doesn't have access to the app/form/mode. Instead, we could pass the app/form/mode
+                 and let the XSLT inside the XBL component check the property, if doing this, changing the property
+                 and reloading the form doesn't use the new value of the property. -->
             <xsl:variable
                 name="markup-property"
-                select="p:property(string-join(('oxf.xforms.xbl.fr.grid.markup', $app, $form), '.'))"/>
+                select="
+                    if ($mode = 'pdf')
+                    then 'html-table'
+                    else p:property(string-join(('oxf.xforms.xbl.fr.grid.markup', $app, $form), '.'))
+                "/>
 
             <xsl:attribute name="markup" select="$markup-property"/>
 

@@ -180,11 +180,88 @@ object XFormsUI {
 
   // 2022-03-16: AjaxServer.js
   @JSExport
-  def handleValues(controlElem: raw.Element, controlId: String, recreatedInput: Boolean, controlsWithUpdatedItemsets: js.Dictionary[Boolean]): Unit =
+  def handleValues(
+    controlElem                 : raw.Element,
+    controlId                   : String,
+    recreatedInput              : Boolean,
+    controlsWithUpdatedItemsets : js.Dictionary[Boolean]
+  ): Unit =
     childrenWithLocalName(controlElem, "value") foreach
       (handleValue(_, controlId, recreatedInput, controlsWithUpdatedItemsets))
 
-  def handleValue(elem: raw.Element, controlId: String, recreatedInput: Boolean, controlsWithUpdatedItemsets: js.Dictionary[Boolean]): Unit = {
+  // 2022-04-12: AjaxServer.js
+  @JSExport
+  def handleDialog(
+    controlElem : raw.Element,
+    formID      : String
+  ): Unit = {
+
+    val id        = controlElem.id
+    val visible   = controlElem.getAttribute("visibility") == "visible"
+    val neighbor  = controlElem.getAttribute("neighbor")
+
+    if (visible)
+      Controls.showDialog(id, neighbor)
+    else
+      Globals.dialogs.get(id) foreach { yuiDialog =>
+        // Remove timer to show the dialog asynchronously so it doesn't show later!
+        Page.getForm(formID).removeDialogTimerId(id)
+
+        Globals.maskDialogCloseEvents = true
+        yuiDialog.hide()
+        Globals.maskDialogCloseEvents = false
+        // Fixes cursor Firefox issue; more on this in dialog init code
+        yuiDialog.element.style.display = "none"
+      }
+  }
+
+  // 2022-04-12: AjaxServer.js
+  @JSExport
+  def handleAttribute(controlElem : raw.Element): Unit = {
+
+    val newAttributeValue = controlElem.textContent
+    val forAttribute      = controlElem.getAttribute("for")
+    val nameAttribute     = controlElem.getAttribute("name")
+    val htmlElement       = dom.document.getElementById(forAttribute)
+
+    if (htmlElement != null)
+      htmlElement.setAttribute(nameAttribute, newAttributeValue) // use case: xh:html/@lang but HTML fragment produced
+  }
+
+  // 2022-04-12: AjaxServer.js
+  @JSExport
+  def handleText(controlElem : raw.Element): Unit = {
+
+    val newTextValue = controlElem.textContent
+    val forAttribute = controlElem.getAttribute("for")
+    val htmlElement = dom.document.getElementById(forAttribute)
+
+    if (htmlElement != null && htmlElement.tagName.toLowerCase() == "title")
+      dom.document.title = newTextValue
+  }
+
+  // 2022-04-12: AjaxServer.js
+  @JSExport
+  def handleRepeatIteration(
+    controlElem : raw.Element,
+    formID      : String
+  ): Unit = {
+
+    val repeatId  = controlElem.getAttribute("id")
+    val iteration = controlElem.getAttribute("iteration")
+    val relevant  = controlElem.getAttribute("relevant")
+
+    // Remove or add `xforms-disabled` on elements after this delimiter
+    if (relevant != null)
+      Controls.setRepeatIterationRelevance(formID, repeatId, iteration, relevant == "true")
+  }
+
+  def handleValue(
+    elem                        : raw.Element,
+    controlId                   : String,
+    recreatedInput              : Boolean,
+    controlsWithUpdatedItemsets : js.Dictionary[Boolean]
+  ): Unit = {
 
     val newControlValue  = elem.textContent
     val documentElement  = dom.document.getElementById(controlId).asInstanceOf[html.Element]

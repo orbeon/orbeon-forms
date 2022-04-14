@@ -721,60 +721,6 @@
                             }
                         }
 
-                        function handleAttribute(elem) {
-                            var newAttributeValue = ORBEON.util.Dom.getStringValue(elem);
-                            var forAttribute = ORBEON.util.Dom.getAttribute(elem, "for");
-                            var nameAttribute = ORBEON.util.Dom.getAttribute(elem, "name");
-                            var htmlElement = document.getElementById(forAttribute);
-                            if (htmlElement != null) {// use case: xh:html/@lang but HTML fragment produced
-                                ORBEON.util.Dom.setAttribute(htmlElement, nameAttribute, newAttributeValue);
-                            }
-                        }
-
-                        function handleText(elem) {
-                            var newTextValue = ORBEON.util.Dom.getStringValue(elem);
-                            var forAttribute = ORBEON.util.Dom.getAttribute(elem, "for");
-                            var htmlElement = document.getElementById(forAttribute);
-
-                            if (htmlElement != null && htmlElement.tagName.toLowerCase() == "title") {
-                                // Set HTML title
-                                document.title = newTextValue;
-                            }
-                        }
-
-                        function handleRepeatIteration(elem) {
-                            // Extract data from server response
-                            var repeatId = ORBEON.util.Dom.getAttribute(elem, "id");
-                            var iteration = ORBEON.util.Dom.getAttribute(elem, "iteration");
-                            var relevant = ORBEON.util.Dom.getAttribute(elem, "relevant");
-                            // Remove or add xforms-disabled on elements after this delimiter
-                            if (relevant != null)
-                                ORBEON.xforms.Controls.setRepeatIterationRelevance(formID, repeatId, iteration, relevant == "true" ? true : false);
-                        }
-
-                        function handleDialog(elem) {
-                            var id        = ORBEON.util.Dom.getAttribute(elem, "id");
-                            var visible   = ORBEON.util.Dom.getAttribute(elem, "visibility") == "visible";
-                            var neighbor  = ORBEON.util.Dom.getAttribute(elem, "neighbor");
-                            var yuiDialog = ORBEON.xforms.Globals.dialogs[id];
-
-                            if (visible) {
-                                ORBEON.xforms.Controls.showDialog(id, neighbor);
-                            } else {
-                                // If the dialog hasn't been initialized yet, there is nothing we need to do to hide it
-                                if (_.isObject(yuiDialog)) {
-                                    // Remove timer to show the dialog asynchronously so it doesn't show later!
-                                    ORBEON.xforms.Page.getForm(formID).removeDialogTimerId(id);
-
-                                    ORBEON.xforms.Globals.maskDialogCloseEvents = true;
-                                    yuiDialog.hide();
-                                    ORBEON.xforms.Globals.maskDialogCloseEvents = false;
-                                    // Fixes cursor Firefox issue; more on this in dialog init code
-                                    yuiDialog.element.style.display = "none";
-                                }
-                            }
-                        }
-
                         _.each(controlValuesElements, function(controlValuesElement) {
                             _.each(controlValuesElement.childNodes, function(childNode) {
                                 switch (ORBEON.util.Utils.getLocalName(childNode)) {
@@ -788,16 +734,16 @@
                                         handleInnerHtml(childNode);
                                         break;
                                     case 'attribute':
-                                        handleAttribute(childNode);
+                                        ORBEON.xforms.XFormsUi.handleAttribute(childNode);
                                         break;
                                     case 'text':
-                                        handleText(childNode);
+                                        ORBEON.xforms.XFormsUi.handleText(childNode);
                                         break;
                                     case 'repeat-iteration':
-                                        handleRepeatIteration(childNode);
+                                        ORBEON.xforms.XFormsUi.handleRepeatIteration(childNode, formID);
                                         break;
                                     case 'dialog':
-                                        handleDialog(childNode);
+                                        ORBEON.xforms.XFormsUi.handleDialog(childNode, formID);
                                         break;
                                 }
 

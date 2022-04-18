@@ -542,7 +542,6 @@
             </xbl:template>
         </xbl:binding>
 
-
     </xsl:template>
 
 </xsl:stylesheet>

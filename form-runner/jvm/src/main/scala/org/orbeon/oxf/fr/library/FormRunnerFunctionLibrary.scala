@@ -20,6 +20,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames, _}
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.function.XFormsFunction
@@ -105,13 +106,15 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("control-string-value", classOf[FRControlStringValue], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(BOOLEAN, EXACTLY_ONE),
-      Arg(STRING, EXACTLY_ONE)
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
 
     Fun("control-typed-value", classOf[FRControlTypedValue], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE),
       Arg(BOOLEAN, EXACTLY_ONE),
-      Arg(STRING, EXACTLY_ONE)
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
 
     Fun("component-param-value", classOf[FRComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
@@ -284,10 +287,10 @@ private object FormRunnerFunctions {
       implicit val ctx = context
 
       FormRunner.resolveTargetRelativeToActionSourceOpt(
-        actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
-        targetControlName      = stringArgument(0),
-        followIndexes          = booleanArgumentOpt(1) getOrElse false,
-        libraryNameOpt         = stringArgumentOpt(2)
+        actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
+        targetControlName       = stringArgument(0),
+        followIndexes           = booleanArgumentOpt(1) getOrElse false,
+        libraryOrSectionNameOpt = stringArgumentOpt(2).flatMap(_.trimAllToOpt).map(Right.apply)
       ) map {
         _ map (_.getStringValue): SequenceIterator
       } getOrElse
@@ -303,10 +306,10 @@ private object FormRunnerFunctions {
 
       val resolvedItems =
         FormRunner.resolveTargetRelativeToActionSourceOpt(
-          actionSourceAbsoluteId = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
-          targetControlName      = stringArgument(0),
-          followIndexes          = booleanArgumentOpt(1) getOrElse false,
-          libraryNameOpt         = stringArgumentOpt(2)
+          actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
+          targetControlName       = stringArgument(0),
+          followIndexes           = booleanArgumentOpt(1) getOrElse false,
+          libraryOrSectionNameOpt = stringArgumentOpt(2).flatMap(_.trimAllToOpt).map(Right.apply)
         ) getOrElse
           Iterator.empty
 

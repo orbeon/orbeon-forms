@@ -33,6 +33,7 @@ import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.compat._
@@ -84,7 +85,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       actionSourceAbsoluteId,
       targetControlName,
       followIndexes,
-      libraryName.trimAllToOpt
+      libraryName.trimAllToOpt.map(Left.apply)
     ) map (new SequenceExtent(_)) orNull
 
   //@XPathFunction
@@ -102,6 +103,42 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
       actionSourceAbsoluteId,
       targetControlName
     ) map (new SequenceExtent(_)) orNull
+  }
+
+  def resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
+    container              : XBLContainer,
+    actionSourceAbsoluteId : String, // TODO: review if we need to resolve against this
+    targetControlName      : String,
+    followIndexes          : Boolean,
+    sectionName            : String
+  ): Option[Iterator[NodeInfo]] = {
+
+    def findAncestorSectionName(st: XFormsComponentControl) =
+      ErrorSummary.ancestorSectionsIt(st)
+        .find(_.staticControl.element.getQName == XMLNames.FRSectionQName)
+        .map(s => frc.controlNameFromId(s.staticControl.staticId))
+
+    val resolvedSectionsIt =
+      container.containingDocument.controls.getCurrentControlTree.getSectionTemplateControls.iterator collect {
+        case st if findAncestorSectionName(st).contains(sectionName) => st
+      }
+
+    val nestedIt =
+      resolvedSectionsIt map { section =>
+
+        val root = section.innerRootControl
+
+        resolveTargetRelativeToActionSourceFromControlsOpt(
+          container              = root.container,
+          actionSourceAbsoluteId = root.absoluteId,
+          targetControlName      = targetControlName,
+          followIndexes          = followIndexes
+        )
+      }
+
+    val it = nestedIt.flatten.flatten
+
+    it.nonEmpty option it
   }
 
   def resolveTargetRelativeToActionSourceFromControlsUseLibraryOpt(
@@ -238,23 +275,31 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     }
 
   def resolveTargetRelativeToActionSourceOpt(
-    actionSourceAbsoluteId : String,
-    targetControlName      : String,
-    followIndexes          : Boolean,
-    libraryNameOpt         : Option[String]
+    actionSourceAbsoluteId  : String,
+    targetControlName       : String,
+    followIndexes           : Boolean,
+    libraryOrSectionNameOpt : Option[Either[String, String]]
   ): Option[Iterator[Item]] = {
 
     val container = XFormsFunction.context.container
 
     {
-      libraryNameOpt match {
-        case Some(libraryName) =>
+      libraryOrSectionNameOpt match {
+        case Some(Left(libraryName)) =>
           resolveTargetRelativeToActionSourceFromControlsUseLibraryOpt(
             container,
             actionSourceAbsoluteId,
             targetControlName,
             followIndexes,
             libraryName
+          )
+        case Some(Right(sectionName)) =>
+          resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
+            container,
+            actionSourceAbsoluteId,
+            targetControlName,
+            followIndexes,
+            sectionName
           )
         case None =>
           resolveTargetRelativeToActionSourceFromControlsOpt(

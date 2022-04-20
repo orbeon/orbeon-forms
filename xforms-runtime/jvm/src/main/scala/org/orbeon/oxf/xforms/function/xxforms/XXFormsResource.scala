@@ -104,6 +104,12 @@ object XXFormsResource {
     pathMapNodeSet : PathMap.PathMapNodeSet
   ): PathMap.PathMapNodeSet = {
 
+    // `xxf:r()` function doesn't reevaluate if 3rd parameter is a `map`
+    if (arguments.size > 2) {
+      pathMap.setInvalidated(true)
+      return null
+    }
+
     // Only support dependencies if we can figure out the resource path statically
     // In theory, we could also support the case where we don't know the path, and assume that any change to the
     // resources would cause a miss. But I don't think we have a way to express this right now. Note that the case

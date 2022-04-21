@@ -115,6 +115,8 @@
             fr:add-iteration-label[exists(fr:param)]"
         mode="within-controls">
 
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
+
         <xsl:copy>
             <xsl:apply-templates select="@*" mode="#current"/>
 

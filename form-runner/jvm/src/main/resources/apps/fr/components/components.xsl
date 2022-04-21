@@ -894,7 +894,12 @@
     <xsl:template match="/xh:html/xh:head/xbl:xbl/xbl:binding[p:has-class('fr-section-component')]/xbl:template">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <xsl:apply-templates select="node()" mode="within-controls"/>
+            <xsl:apply-templates select="node()" mode="within-controls">
+                <xsl:with-param
+                    name="library-name"
+                    select="frf:findAppFromSectionTemplateUri(namespace-uri-for-prefix('component', ..))"
+                    tunnel="yes"/>
+            </xsl:apply-templates>
         </xsl:copy>
     </xsl:template>
 

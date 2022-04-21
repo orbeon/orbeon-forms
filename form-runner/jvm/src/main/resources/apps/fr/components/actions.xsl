@@ -729,7 +729,8 @@
         <xsl:copy>
             <xsl:copy-of select="@*"/>
 
-            <xsl:variable name="model-id" select="../@id/string()"/>
+            <xsl:variable name="model-id"     select="../@id/string()"/>
+            <xsl:variable name="library-name" select="ancestor::xbl:binding[1]/frf:findAppFromSectionTemplateUri(namespace-uri-for-prefix('component', .))"/>
 
             <!-- Main event handler to start the action -->
             <xsl:for-each select="xf:action[fr:has-known-action-event(.) or fr:has-action-call-event(.)][1]">
@@ -874,7 +875,17 @@
                                 <xsl:choose>
                                     <xsl:when test="p:has-class('fr-set-control-value-action')">
                                         <!-- Keep parameters but override implementation -->
-                                        <xsl:copy-of select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
+                                        <xsl:for-each select="(*:variable | *:var)[@name = 'control-name']">
+                                            <xf:var
+                                                name="{@name}"
+                                                value="{(@value | @select)[1]}"/>
+                                        </xsl:for-each>
+
+                                        <xsl:for-each select="(*:variable | *:var)[@name = 'control-value']">
+                                            <xf:var
+                                                name="{@name}"
+                                                value="{frf:replaceVarReferencesWithFunctionCalls((@value | @select)[1], (@value | @select)[1], false(), ())}"/>
+                                        </xsl:for-each>
 
                                         <!-- Set values (we choose to set all targets returned) -->
                                         <xf:setvalue
@@ -890,7 +901,11 @@
                                     </xsl:when>
                                     <xsl:when test="p:has-class('fr-itemset-action')">
                                         <!-- Keep parameters but override implementation -->
-                                        <xsl:copy-of select="(*:variable | *:var)[@name = 'control-name']"/>
+                                        <xsl:for-each select="(*:variable | *:var)[@name = 'control-name']">
+                                            <xf:var
+                                                name="{@name}"
+                                                value="{(@value | @select)[1]}"/>
+                                        </xsl:for-each>
 
                                         <xsl:variable
                                             name="resource-items-value"
@@ -915,7 +930,7 @@
                                             <xf:var
                                                 name="response-items"
                                                 context="xxf:instance('fr-service-response-instance')"
-                                                value="{$resource-items-value}"/>
+                                                value="frf:replaceVarReferencesWithFunctionCalls(({$resource-items-value}), ({$resource-items-value}), false(), '{$library-name}')"/>
 
                                             <xf:insert
                                                 context="$new-itemset-holder"
@@ -932,8 +947,17 @@
                                                 name="item-hint-xpath"
                                                 select="xs:string(.//(*:variable | *:var)[@name = ('item-hint')]/(@value | @select)[1])"/>
                                             <xf:action iterate="$response-items">
-                                                <xf:var name="item-label" value="{.//(*:variable | *:var)[@name = ('item-label')]/(@value | @select)[1]}"/>
-                                                <xf:var name="item-value" value="{.//(*:variable | *:var)[@name = ('item-value')]/(@value | @select)[1]}"/>
+
+                                                <xsl:variable
+                                                    name="item-label"
+                                                    select=".//(*:variable | *:var)[@name = ('item-label')]/(@value | @select)[1]"/>
+
+                                                <xsl:variable
+                                                    name="item-value"
+                                                    select=".//(*:variable | *:var)[@name = ('item-value')]/(@value | @select)[1]"/>
+
+                                                <xf:var name="item-label" value="frf:replaceVarReferencesWithFunctionCalls(({$item-label}), ({$item-label}), false(), '{$library-name}')"/>
+                                                <xf:var name="item-value" value="frf:replaceVarReferencesWithFunctionCalls(({$item-value}), ({$item-value}), false(), '{$library-name}')"/>
 
                                                 <xsl:choose>
                                                     <xsl:when test="$item-hint-xpath != ''">

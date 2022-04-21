@@ -36,11 +36,11 @@ object FormRunnerRename {
     val varRefsByLengthDesc =
       SaxonUtils.iterateExternalVariableReferences(expr).toList.sortBy(_.length).reverse
 
-    varRefsByLengthDesc.foldLeft(xpathString) { case (xp, name) =>
+    varRefsByLengthDesc.foldLeft(xpathString) { case (xpathString, oldName) =>
       replaceSingleVarReferenceUseRegex(
-        xp,
-        name,
-        s"(fr:control-string-value('$name'))"
+        xpathString,
+        oldName,
+        newName(oldName)
       )
     }
   }

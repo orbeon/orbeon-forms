@@ -40,7 +40,7 @@ private class ControlIndex {
   private val _controlTypes            = new ju.HashMap[QName, ju.LinkedHashMap[String, XFormsControl]]
   private val _sectionTemplateControls = new ju.LinkedHashMap[String, XFormsComponentControl]()
 
-  private def collectSectionControl(control: XFormsControl): Option[XFormsComponentControl] = control match {
+  private def collectSectionContentControl(control: XFormsControl): Option[XFormsComponentControl] = control match {
     case s: XFormsComponentControl
       if s.staticControl.element.getNamespaceURI.startsWith(Controls.SectionTemplateUriPrefix) => Some(s)
     case _                                                                                     => None
@@ -70,7 +70,7 @@ private class ControlIndex {
       }
       controlsMap.put(control.getEffectiveId, control)
     } else {
-      collectSectionControl(control) foreach { componentControl =>
+      collectSectionContentControl(control) foreach { componentControl =>
         _sectionTemplateControls.put(componentControl.getEffectiveId, componentControl)
       }
     }
@@ -92,7 +92,7 @@ private class ControlIndex {
       if (controlsMap ne null)
         controlsMap.remove(control.getEffectiveId)
     } else {
-      collectSectionControl(control) foreach { componentControl =>
+      collectSectionContentControl(control) foreach { componentControl =>
         _sectionTemplateControls.remove(componentControl.getEffectiveId)
       }
     }

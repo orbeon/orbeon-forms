@@ -228,14 +228,15 @@
         </output>
     </test>
 
-    <test description="For #2471: fr:control-string-value() with library argument" name="oxf:pipeline">
+    <test description="For #2471: frf:controlVariableValue()/fr:control-string-value() with library/section arguments" name="oxf:pipeline">
         <input name="config" href="../xforms/wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html
                 xmlns:xh="http://www.w3.org/1999/xhtml"
                 xmlns:xf="http://www.w3.org/2002/xforms"
                 xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-                xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
                 <xh:head>
                     <xf:model
                         id="fr-form-model"
@@ -251,9 +252,14 @@
                         <xf:bind id="my-field-a-bind" name="my-field-a" ref="my-field-a"/>
 
                         <xf:action event="xforms-ready">
-                            <xf:message value="concat('root: ', fr:control-string-value('my-field-a', false()))"/>
-                            <xf:message value="concat('root: ', fr:control-string-value('my-field-a', false(), 'a'))"/>
-                            <xf:message value="concat('root: ', fr:control-string-value('my-field-a', false(), 'b'))"/>
+                            <xf:message value="concat('root: ', frf:controlVariableValue('my-field-a', ()))"/>
+                            <xf:message value="concat('root: ', frf:controlVariableValue('my-field-a', 'a'))"/>
+                            <xf:message value="concat('root: ', frf:controlVariableValue('my-field-a', 'b'))"/>
+
+                            <xf:message value="concat('using section name: ', fr:control-string-value('my-field-a', false(), ()))"/>
+                            <xf:message value="concat('using section name: ', fr:control-string-value('my-field-a', false(), 'section-a'))"/>
+                            <xf:message value="concat('using section name: ', fr:control-string-value('my-field-a', false(), 'section-b'))"/>
+
                         </xf:action>
 
                     </xf:model>
@@ -270,9 +276,9 @@
                                     </xf:instance>
                                     <xf:bind id="my-field-a-bind" ref="my-field-a" name="my-field-a"/>
                                     <xf:action event="xforms-ready">
-                                        <xf:message value="concat('library a: ', fr:control-string-value('my-field-a', false()))"/>
-                                        <xf:message value="concat('library a: ', fr:control-string-value('my-field-a', false(), 'a'))"/>
-                                        <xf:message value="concat('library a: ', fr:control-string-value('my-field-a', false(), 'b'))"/>
+                                        <xf:message value="concat('library a: ', frf:controlVariableValue('my-field-a', ()))"/>
+                                        <xf:message value="concat('library a: ', frf:controlVariableValue('my-field-a', 'a'))"/>
+                                        <xf:message value="concat('library a: ', frf:controlVariableValue('my-field-a', 'b'))"/>
                                     </xf:action>
                                 </xf:model>
                             </xbl:implementation>
@@ -294,9 +300,9 @@
                                     </xf:instance>
                                     <xf:bind id="my-field-a-bind" ref="my-field-a" name="my-field-a"/>
                                     <xf:action event="xforms-ready">
-                                        <xf:message value="concat('library b: ', fr:control-string-value('my-field-a', false()))"/>
-                                        <xf:message value="concat('library b: ', fr:control-string-value('my-field-a', false(), 'b'))"/>
-                                        <xf:message value="concat('library b: ', fr:control-string-value('my-field-a', false(), 'a'))"/>
+                                        <xf:message value="concat('library b: ', frf:controlVariableValue('my-field-a', ()))"/>
+                                        <xf:message value="concat('library b: ', frf:controlVariableValue('my-field-a', 'b'))"/>
+                                        <xf:message value="concat('library b: ', frf:controlVariableValue('my-field-a', 'a'))"/>
                                     </xf:action>
                                 </xf:model>
                             </xbl:implementation>
@@ -305,11 +311,24 @@
                             </xbl:template>
                         </xbl:binding>
                     </xbl:xbl>
+                    <xbl:xbl
+                        xmlns:xbl="http://www.w3.org/ns/xbl"
+                        xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/b/library">
+                        <xbl:binding id="fr-section" element="fr|section">
+                            <xbl:template>
+                                <xbl:content/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
                 </xh:head>
                 <xh:body>
                     <xf:input id="my-field-a-control" bind="my-field-a-bind"/>
-                    <component:lib-section-a id="component-a" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/a/library"/>
-                    <component:lib-section-a id="component-b" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/b/library"/>
+                    <fr:section id="section-a-section">
+                        <component:lib-section-a id="component-a" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/a/library"/>
+                    </fr:section>
+                    <fr:section id="section-b-section">
+                        <component:lib-section-a id="component-b" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/b/library"/>
+                    </fr:section>
                 </xh:body>
             </xh:html>
         </input>
@@ -323,10 +342,10 @@
                         <xxf:control id="my-field-a-control">
                             <xxf:value>42</xxf:value>
                         </xxf:control>
-                        <xxf:control id="component-a≡my-field-a-control">
+                        <xxf:control id="section-a-section≡component-a≡my-field-a-control">
                             <xxf:value>43</xxf:value>
                         </xxf:control>
-                        <xxf:control id="component-b≡my-field-a-control">
+                        <xxf:control id="section-b-section≡component-b≡my-field-a-control">
                             <xxf:value>44</xxf:value>
                         </xxf:control>
                     </xxf:control-values>
@@ -339,6 +358,9 @@
                     <xxf:message level="modal">root: 42</xxf:message>
                     <xxf:message level="modal">root: 43</xxf:message>
                     <xxf:message level="modal">root: 44</xxf:message>
+                    <xxf:message level="modal">using section name: 42</xxf:message>
+                    <xxf:message level="modal">using section name: 43</xxf:message>
+                    <xxf:message level="modal">using section name: 44</xxf:message>
                 </xxf:action>
             </xxf:event-response>
         </output>

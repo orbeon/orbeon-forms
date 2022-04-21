@@ -105,6 +105,18 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     ) map (new SequenceExtent(_)) orNull
   }
 
+  //@XPathFunction
+  def controlVariableValue(
+    targetControlName : String,
+    libraryName       : String
+  ): SequenceIterator =
+    resolveTargetRelativeToActionSourceOpt(
+      actionSourceAbsoluteId  = XFormsId.effectiveIdToAbsoluteId(XFormsFunction.context.sourceEffectiveId),
+      targetControlName       = targetControlName,
+      followIndexes           = false,
+      libraryOrSectionNameOpt = libraryName.trimAllToOpt.map(Left.apply)
+    ).getOrElse(Iterator.empty): Iterator[om.Item]
+
   def resolveTargetRelativeToActionSourceFromControlsUseSectionNameOpt(
     container              : XBLContainer,
     actionSourceAbsoluteId : String, // TODO: review if we need to resolve against this

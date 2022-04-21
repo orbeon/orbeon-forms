@@ -14,6 +14,7 @@
 <xsl:stylesheet
     version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xh="http://www.w3.org/1999/xhtml"
@@ -29,7 +30,8 @@
          and we'd need some extra support. Other changes are probably not possible via parameters. -->
     <xsl:template match="fr:section" mode="within-controls">
 
-        <xsl:param name="section-level" tunnel="yes" select="1"/>
+        <xsl:param name="section-level"                tunnel="yes" select="1"/>
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
 
         <xsl:copy>
             <xsl:if test="empty(@collapse) and empty(@collapsible)">
@@ -76,7 +78,7 @@
             </xsl:if>
 
             <xsl:for-each select="@min | @max | @freeze | @remove-constraint">
-                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., true())"/>
+                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name)"/>
             </xsl:for-each>
 
             <xsl:apply-templates select="@* except (@page-size | @min | @max | @freeze | @remove-constraint)" mode="#current"/>
@@ -98,6 +100,7 @@
     </xsl:template>
 
     <xsl:template match="fr:grid" mode="within-controls within-dialogs">
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
 
             <!-- Annotate `<fr:grid>` element with the `markup` attribute, based on property using app/name/mode,
@@ -134,7 +137,7 @@
             </xsl:if>
 
             <xsl:for-each select="@min | @max | @freeze | @remove-constraint">
-                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., true())"/>
+                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name)"/>
             </xsl:for-each>
 
             <xsl:apply-templates select="@* except (@min | @max | @freeze | @remove-constraint) | node()" mode="#current"/>

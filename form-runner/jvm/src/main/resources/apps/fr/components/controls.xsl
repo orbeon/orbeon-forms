@@ -84,9 +84,10 @@
     <xsl:template
         match="fr:number[exists(@prefix | @suffix)]"
         mode="within-controls">
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
             <xsl:for-each select="@prefix | @suffix">
-                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., true())"/>
+                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name)"/>
             </xsl:for-each>
             <xsl:apply-templates select="@* except (@prefix | @suffix) | node()" mode="#current"/>
         </xsl:copy>
@@ -140,14 +141,19 @@
                                                 if ($p/@type = 'ExpressionParam') then
                                                     concat(
                                                         'string((',
-                                                        frf:replaceVarReferencesWithFunctionCalls($p/fr:expr, false()),
+                                                        frf:replaceVarReferencesWithFunctionCalls($p/fr:expr, $p/fr:expr, false(), $library-name),
                                                         ')[1])'
                                                     )
                                                 else if ($p/@type = 'ControlValueParam') then
                                                     concat(
-                                                        'for $a in fr:control-typed-value(''',
-                                                        $p/fr:controlName,
-                                                        ''', false()) return if (array:size($a) = 0) then () else array:get($a, 1)'
+                                                        'string((',
+                                                        frf:replaceVarReferencesWithFunctionCalls(
+                                                            $p/fr:controlName,
+                                                            concat('$', $p/fr:controlName),
+                                                            false(),
+                                                            $library-name
+                                                        ),
+                                                        ')[1])'
                                                     )
                                                 else if (
                                                     $p/@type = (

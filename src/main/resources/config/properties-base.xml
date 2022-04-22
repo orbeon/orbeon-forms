@@ -24,6 +24,7 @@
     <!-- Global properties -->
     <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/config/log4j.xml"/>
     <property as="xs:anyURI"  name="oxf.log4j2-config"                               value="oxf:/config/log4j2.xml"/>
+    <property as="xs:boolean" name="oxf.log4j.thread-context.http-headers"           value="false"/>
     <property as="xs:integer" name="oxf.cache.size"                                  value="1000"/>
     <property as="xs:integer" name="oxf.cache.xpath.size"                            value="5000"/>
     <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>

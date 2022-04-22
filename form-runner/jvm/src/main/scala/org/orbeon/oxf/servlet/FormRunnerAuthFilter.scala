@@ -14,11 +14,14 @@
 package org.orbeon.oxf.servlet
 
 import com.typesafe.scalalogging.Logger
-import javax.servlet._
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
+import org.apache.logging.log4j.ThreadContext
 import org.orbeon.oxf.fr.FormRunnerAuth
+import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
 
+import javax.servlet._
+import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
+import scala.collection.JavaConverters._
 import scala.collection.compat._
 
 class FormRunnerAuthFilter extends Filter {
@@ -46,6 +49,17 @@ class FormRunnerAuthFilter extends Filter {
     // Set `Content-Security-Policy` response header if configured
     settingsOpt flatMap (_.contentSecurityPolicy) foreach { value =>
       res.asInstanceOf[HttpServletResponse].setHeader("Content-Security-Policy", value)
+    }
+
+    val addHttpHeadersToThreadContext =
+      Properties.instance.getPropertySet.getBoolean("oxf.log4j.thread-context.http-headers", default = false)
+    if (addHttpHeadersToThreadContext) {
+      val httpReq = req.asInstanceOf[HttpServletRequest]
+      httpReq.getHeaderNames.asScala.foreach { name =>
+        val key   = "orbeon-incoming-http-header-" + name.toLowerCase
+        val value = httpReq.getHeader(name)
+        ThreadContext.put(key, value)
+      }
     }
 
     chain.doFilter(amendRequest(req.asInstanceOf[HttpServletRequest]), res)

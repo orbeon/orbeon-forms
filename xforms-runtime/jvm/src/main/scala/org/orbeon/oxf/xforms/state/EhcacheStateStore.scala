@@ -118,7 +118,7 @@ object EhcacheStateStore {
   }
 
   def getMaxSize     : Long = Caches.stateCache.getCacheConfiguration.getMaxEntriesLocalHeap
-  def getCurrentSize : Long = Caches.stateCache.getMemoryStoreSize
+  def getCurrentSize : Long = Caches.stateCache.getStatistics.getLocalHeapSize
 
   private object Private {
 

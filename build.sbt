@@ -92,7 +92,7 @@ val CoreLibraryDependencies = Seq(
   "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
   "org.apache.commons"          %  "commons-lang3"                  % "3.12.0",
-  "net.sf.ehcache"              %  "ehcache-core"                   % "2.6.11",
+  "net.sf.ehcache"              %  "ehcache"                        % "2.10.9.2",
   "commons-codec"               %  "commons-codec"                  % "1.15",
   "org.apache.commons"          %  "commons-collections4"           % "4.4",
   "commons-discovery"           %  "commons-discovery"              % "0.5",

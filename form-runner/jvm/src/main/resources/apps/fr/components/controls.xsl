@@ -32,7 +32,8 @@
     </xsl:function>
 
     <!-- For now only support `xf:select1[appearance ~= dropdown]` and `xf:select1[appearance ~= search]`. The databound
-         controls (`fr:databound-select1` and `fr:databound-select1`) don't currently have an `xf:select1` representation. -->
+         controls (`fr:databound-select1` and `fr:databound-select1-search`) don't currently have an `xf:select1`
+         representation. -->
     <xsl:variable
         name="controls-to-check-for-pdf-appearance"
         select="$controls-roots-for-pdf-appearance//(
@@ -90,6 +91,18 @@
                 <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name)"/>
             </xsl:for-each>
             <xsl:apply-templates select="@* except (@prefix | @suffix) | node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template
+        match="fr:databound-select1 | fr:databound-select1-search"
+        mode="within-controls">
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
+        <xsl:copy>
+            <xsl:for-each select="@resource">
+                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name)"/>
+            </xsl:for-each>
+            <xsl:apply-templates select="@* except (@resource) | node()" mode="#current"/>
         </xsl:copy>
     </xsl:template>
 

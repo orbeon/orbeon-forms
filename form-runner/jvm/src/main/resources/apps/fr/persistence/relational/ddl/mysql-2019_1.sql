@@ -110,4 +110,5 @@ CREATE        INDEX orbeon_from_data_attach_i1    ON orbeon_form_data_attach    
 CREATE        INDEX orbeon_from_data_attach_i2    ON orbeon_form_data_attach       (document_id);
 CREATE UNIQUE INDEX orbeon_i_current_i1           ON orbeon_i_current              (data_id, draft);
 CREATE        INDEX orbeon_i_current_i2           ON orbeon_i_current              (app, form, draft);
+CREATE        INDEX orbeon_i_current_i3           ON orbeon_i_current              (document_id, draft);
 CREATE        INDEX orbeon_i_control_text_i1      ON orbeon_i_control_text         (data_id);

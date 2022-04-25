@@ -167,12 +167,13 @@
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(scala-*.jar,parboiled*.jar,enumeratum*.jar,circe-*.jar,cats-*.jar,jawn-*.jar,sbinary*.jar,log4s*.jar,shapeless*.jar,autowire*.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(commons-fileupload-*.jar,commons-pool-*.jar,commons-io-*,commons-lang3-*.jar,commons-codec-*.jar,commons-collections4-*.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(saxon-*.jar,http*.jar,jcl-over-slf4j-*.jar,log4j-*.jar;)
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/ehcache-core-2.6.11.jar
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/ehcache-2.10.9.2.jar
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(jcifs-*.jar,tink-*.jar,gson-*.jar,protobuf-*.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(javax.activation-*.jar;)
 
 <!--            -ignorewarnings-->
             -dontwarn net.sf.ehcache.**
+            -dontwarn org.terracotta.**
             -dontwarn org.apache.http.auth.KerberosCredentials
             -dontwarn org.apache.http.impl.auth.**
             -dontwarn org.apache.http.impl.client.cache.memcached.**

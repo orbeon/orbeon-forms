@@ -85,8 +85,7 @@
             // Instead use a margin on the control inside the cell (see below)
             padding: 0;
 
-            // Exclude buttons, as we don't want them to take the whole width of the cell
-            &> .xforms-control:not(.xforms-trigger-appearance-full),
+            &> .xforms-control,
             &> .xbl-component,
             &> .xforms-group {
                 margin: @frGridCellPadding @frGridCellPadding;

@@ -679,7 +679,7 @@ trait FormRunnerPersistence {
               customHeaders    = customPutHeaders.toMap,
               headersToForward = Connection.headersToForwardFromProperty,
               cookiesToForward = Connection.cookiesToForwardFromProperty,
-              getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest)
+              getHeader        = inScopeContainingDocument.headersGetter
             )
 
           Connection.connectNow(

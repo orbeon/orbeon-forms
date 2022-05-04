@@ -944,24 +944,22 @@
                                             <!-- Should use a version of `XFormsItemUtils.evaluateItemset()`
                                                  See https://github.com/orbeon/orbeon-forms/issues/3125 -->
                                             <xsl:variable
-                                                name="item-hint-xpath"
-                                                select="xs:string(.//(*:variable | *:var)[@name = ('item-hint')]/(@value | @select)[1])"/>
+                                                name="item-label"
+                                                select=".//(*:variable | *:var)[@name = ('item-label')]/(@value | @select)[1]"/>
+                                            <xsl:variable
+                                                name="item-value"
+                                                select=".//(*:variable | *:var)[@name = ('item-value')]/(@value | @select)[1]"/>
+                                            <xsl:variable
+                                                name="item-hint"
+                                                select=".//(*:variable | *:var)[@name = ('item-hint')]/(@value | @select)[1]"/>
                                             <xf:action iterate="$response-items">
 
-                                                <xsl:variable
-                                                    name="item-label"
-                                                    select=".//(*:variable | *:var)[@name = ('item-label')]/(@value | @select)[1]"/>
-
-                                                <xsl:variable
-                                                    name="item-value"
-                                                    select=".//(*:variable | *:var)[@name = ('item-value')]/(@value | @select)[1]"/>
-
-                                                <xf:var name="item-label" value="frf:replaceVarReferencesWithFunctionCalls(({$item-label}), ({$item-label}), false(), '{$library-name}')"/>
-                                                <xf:var name="item-value" value="frf:replaceVarReferencesWithFunctionCalls(({$item-value}), ({$item-value}), false(), '{$library-name}')"/>
+                                                <xf:var name="item-label" value="{frf:replaceVarReferencesWithFunctionCalls($item-label, $item-label, false(), $library-name)}"/>
+                                                <xf:var name="item-value" value="{frf:replaceVarReferencesWithFunctionCalls($item-value, $item-value, false(), $library-name)}"/>
 
                                                 <xsl:choose>
-                                                    <xsl:when test="$item-hint-xpath != ''">
-                                                        <xf:var name="item-hint"    value="{$item-hint-xpath}"/>
+                                                    <xsl:when test="exists($item-hint) and $item-hint != ''">
+                                                        <xf:var name="item-hint"    value="{frf:replaceVarReferencesWithFunctionCalls($item-hint, $item-hint, false(), $library-name)}"/>
                                                         <xf:var name="element-hint" value="xf:element('hint', xs:string($item-hint))"/>
                                                     </xsl:when>
                                                     <xsl:otherwise>

@@ -82,14 +82,14 @@
                     <xf:label value="xxf:label('fr-checkbox-input-binding')"><xsl:copy-of select="$root/xf:label/@mediatype"/></xf:label>
                     <xf:value xbl:attr="xbl:text=selected-value">true</xf:value>
                 </xf:item>
-                <xf:setvalue
-                    event="xforms-select"
-                    ref="."
-                    xbl:attr="xbl:text=selected-value">true</xf:setvalue>
-                <xf:setvalue
-                    event="xforms-deselect"
-                    ref="."
-                    xbl:attr="xbl:text=deselected-value">false</xf:setvalue>
+                <xf:action event="xforms-select">
+                    <xf:dispatch name="xforms-select" targetid="fr-checkbox-input-binding"/>
+                    <xf:setvalue ref="." xbl:attr="xbl:text=selected-value">true</xf:setvalue>
+                </xf:action>
+                <xf:action event="xforms-deselect">
+                    <xf:dispatch name="xforms-deselect" targetid="fr-checkbox-input-binding"/>
+                    <xf:setvalue ref="." xbl:attr="xbl:text=deselected-value">false</xf:setvalue>
+                </xf:action>
             </xf:select>
         </xbl:template>
     </xbl:binding>

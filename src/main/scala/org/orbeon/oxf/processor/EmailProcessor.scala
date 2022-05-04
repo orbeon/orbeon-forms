@@ -13,15 +13,6 @@
  */
 package org.orbeon.oxf.processor
 
-import java.io._
-import java.util.{Properties => JProperties}
-
-import javax.activation.{DataHandler, DataSource}
-import javax.mail.Message.RecipientType
-import javax.mail._
-import javax.mail.internet._
-import javax.xml.transform.OutputKeys
-import javax.xml.transform.stream.StreamResult
 import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.{Document, Element}
@@ -37,7 +28,15 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.LocationSAXWriter
 
-import scala.jdk.CollectionConverters._
+import java.io._
+import java.util.{Properties => JProperties}
+import javax.activation.{DataHandler, DataSource}
+import javax.mail.Message.RecipientType
+import javax.mail._
+import javax.mail.internet._
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.stream.StreamResult
+
 
 /**
  * This processor allows sending emails. It supports multipart messages and inline as well as out-of-line attachments.
@@ -194,7 +193,7 @@ class EmailProcessor extends ProcessorImpl {
     addRecipients("bcc", Message.RecipientType.BCC)
 
     // Set headers if any
-    for (headerElement <- messageElement.jElements("header").asScala) {
+    for (headerElement <- messageElement.elements("header")) {
       val headerName  = headerElement.element("name").getTextTrim  // required
       val headerValue = headerElement.element("value").getTextTrim // required
 
@@ -291,17 +290,17 @@ class EmailProcessor extends ProcessorImpl {
             val needsRootElement   = mediatype == ContentTypes.XhtmlContentType
             val mayHaveRootElement = mediatype == ContentTypes.HtmlContentType
 
-            if (needsRootElement && partOrBodyElement.jElements.size != 1)
+            if (needsRootElement && partOrBodyElement.elements.size != 1)
               throw new ValidationException(
                 s"The `<body>` or `<part>` element must contain exactly one element for ${ContentTypes.XhtmlContentType}",
                 partOrBodyElement.getData.asInstanceOf[LocationData]
               )
 
-            val hasRootElement = needsRootElement || mayHaveRootElement && ! partOrBodyElement.jElements.isEmpty
+            val hasRootElement = needsRootElement || mayHaveRootElement && partOrBodyElement.elements.nonEmpty
 
             // Create Document and convert it into a String
-            val rootElement = if (hasRootElement) partOrBodyElement.jElements.get(0) else partOrBodyElement
-            val partDocument = dom.Document(rootElement.deepCopy.asInstanceOf[Element])
+            val rootElement = if (hasRootElement) partOrBodyElement.elements.head else partOrBodyElement
+            val partDocument = dom.Document(rootElement.deepCopy)
             Right(handleInlinePartContent(partDocument, mediatype, hasRootElement))
         }
 
@@ -344,7 +343,7 @@ class EmailProcessor extends ProcessorImpl {
       //part.setContentID(contentId);
     }
 
-    def handleInlinePartContent(document: Document, contentType: String, hasRootElement: Boolean) =
+    def handleInlinePartContent(document: Document, contentType: String, hasRootElement: Boolean): String =
       if (hasRootElement) {
         // Convert nested XHTML into an HTML String
         val writer = new StringBuilderWriter

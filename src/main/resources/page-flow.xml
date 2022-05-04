@@ -24,8 +24,8 @@
     <!-- ==== Pages ================================================================================================ -->
 
     <!-- Home application -->
-    <page path="/(welcome/?)?"><action><result page="home"/></action></page>
-    <page id="home" path="/home/" model="apps/home/page-flow.xml"/>
+    <page path="/(welcome/?|home/?)?"><action><result page="home"/></action></page>
+    <page id="home" path="/fr/" model="apps/fr/page-flow.xml"/>
 
     <!-- Other applications -->
     <page path="/([^/]+)/.*" model="apps/${1}/page-flow.xml" public-methods="#all"/>

@@ -151,7 +151,7 @@
     <!-- 1. Model initialization when we have a specific app and form -->
     <xf:action
         event="xforms-model-construct-done"
-        if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
+        if="not($mode = ('summary', 'home', 'landing')) and $app != '*' and $form != '*'">
 
         <!-- Handle loading of initial data for new/test/edit/view/pdf/email modes only -->
         <xf:action if="$mode = ('new', 'test', 'edit') or fr:is-readonly-mode()">
@@ -358,7 +358,7 @@
         type="xpath">frf:sendError(404)</xf:action>
 
     <!-- 3. Maybe show drafts dialog and check form permissions for detail modes -->
-    <xf:action event="xforms-ready" if="not($mode = ('summary', 'home'))">
+    <xf:action event="xforms-ready" if="not($mode = ('summary', 'home', 'landing'))">
 
         <xf:var name="show-drafts-dialog" value="instance('fr-persistence-instance')/found-document-message-to-show != ''"/>
         <xf:action if="not($show-drafts-dialog)">

@@ -647,7 +647,7 @@ trait FormRunnerPersistence {
             customHeaders    = customGetHeaders,
             headersToForward = Connection.headersToForwardFromProperty,
             cookiesToForward = Connection.cookiesToForwardFromProperty,
-            getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest)
+            getHeader        = inScopeContainingDocument.headersGetter
           )
 
         def connectGet: ConnectionResult =

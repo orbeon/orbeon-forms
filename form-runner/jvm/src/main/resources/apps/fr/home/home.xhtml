@@ -126,7 +126,7 @@
                 <xf:setvalue ref="selection"/>
 
                 <!-- Don't keep potentially large instances -->
-                <xf:insert ref="instance('fr-form')" origin="xf:element('dummy')"/>
+                <xf:insert ref="instance('fr-form')" origin="xf:element('_')"/>
             </xf:action>
 
             <xf:instance id="fr-form-instance">
@@ -504,9 +504,7 @@
                 replace="instance"
                 instance="fb-publish-response-instance"/>
 
-            <xf:instance id="fb-publish-response-instance">
-                <dummy/>
-            </xf:instance>
+            <xf:instance id="fb-publish-response-instance"><_/></xf:instance>
 
             <xf:submission
                 id="delete-submission"
@@ -524,7 +522,7 @@
             </xf:submission>
 
             <!-- Form definition -->
-            <xf:instance id="fr-form"><dummy/></xf:instance>
+            <xf:instance id="fr-form"><_/></xf:instance>
 
             <xf:submission
                 id="read-form"

@@ -92,7 +92,7 @@ class EmailProcessor extends ProcessorImpl {
 
       def ensureCredentials(encryption: String) =
         if (usernameOption.isEmpty)
-          throw new OXFException("Credentails are required when using " + encryption.toUpperCase)
+          throw new OXFException("Credentials are required when using " + encryption.toUpperCase)
 
       val defaultUpdatePort: String => Unit =
         properties.setProperty("mail.smtp.port", _)

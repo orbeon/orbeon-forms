@@ -55,13 +55,7 @@
                             p:property(string-join(($property-name, $app, $form), '.'))
                         )
                     return
-                        for $raw-email in
-                            tokenize(
-                                $holder,
-                                '(,|\s)\s*'
-                            )
-                        return
-                            normalize-space($raw-email)[. != '']
+                        normalize-space($holder)[. != '']
                 )
             "
         />

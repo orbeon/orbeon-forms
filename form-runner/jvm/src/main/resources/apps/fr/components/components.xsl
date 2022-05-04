@@ -55,9 +55,9 @@
 
     <xsl:variable name="fr-form-metadata" select="($fr-form-model/xf:instance[@id = 'fr-form-metadata']/*)[1]"/>
 
-    <xsl:variable name="is-detail"           select="not($mode = ('summary', 'home', ''))"          as="xs:boolean"/>
-    <xsl:variable name="is-summary"          select="$mode = 'summary'"                             as="xs:boolean"/>
-    <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'"         as="xs:boolean"/>
+    <xsl:variable name="is-detail"           select="not($mode = ('summary', 'home', 'landing', ''))" as="xs:boolean"/>
+    <xsl:variable name="is-summary"          select="$mode = 'summary'"                               as="xs:boolean"/>
+    <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'"           as="xs:boolean"/>
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
 

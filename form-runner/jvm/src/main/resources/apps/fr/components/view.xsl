@@ -960,7 +960,7 @@
 
         <xf:group
             model="fr-form-model"
-            ref=".[not($fr-mode = ('summary', 'home'))]"
+            ref=".[not($fr-mode = ('summary', 'home', 'landing'))]"
             class="fr-status-icons">
 
             <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert gt 0]">

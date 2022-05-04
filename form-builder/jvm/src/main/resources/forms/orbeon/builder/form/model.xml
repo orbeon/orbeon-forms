@@ -149,7 +149,7 @@
     </xf:action>
 
     <!-- Initialization entry point. Form data must be ready and the Form Runner language must have been set. -->
-    <xf:action ev:event="xforms-model-construct-done" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
+    <xf:action ev:event="xforms-model-construct-done" if="not($mode = ('summary', 'home', 'landing')) and $app != '*' and $form != '*'">
         <xf:dispatch name="fb-data-ready" targetid="fr-form-model"/>
     </xf:action>
 

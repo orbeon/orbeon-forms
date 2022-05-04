@@ -30,10 +30,8 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
 //      Arg(STRING, EXACTLY_ONE)
 //    )
 //
-//    // TODO: Split this out into separate trait
 //    Fun("get-portlet-mode", classOf[GetPortletMode], op = 0, min = 0, STRING, ALLOWS_ONE)
 //
-//    // TODO: Split this out into separate trait
 //    Fun("get-window-state", classOf[GetWindowState], op = 0, min = 0, STRING, ALLOWS_ONE)
 //
 
@@ -111,16 +109,29 @@ trait IndependentFunctions extends OrbeonFunctionLibrary {
     } yield
       leafOrg
 
-//    // TODO: Split this out into separate trait
-//    Fun("user-ancestor-organizations", classOf[AncestorOrganizations], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_MORE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
-//    // TODO: Split this out into separate trait
-//    Fun("is-user-in-role", classOf[IsUserInRole], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
-//      Arg(STRING, EXACTLY_ONE)
-//    )
-//
+  @XPathFunction
+  def userAncestorOrganizations(leafOrgParam: String): List[String] = {
+
+    // There should be only one match if the organizations are well-formed
+    val foundOrgs =
+      for {
+          credentials <- CoreCrossPlatformSupport.externalContext.getRequest.credentials.toList
+          org         <- credentials.organizations
+          if org.levels.lastOption contains leafOrgParam
+        } yield
+          org
+
+    foundOrgs.headOption match {
+      case Some(foundOrg) => foundOrg.levels.init.reverse
+      case None           => Nil
+    }
+  }
+
+  // TODO: Split this out into separate trait
+  @XPathFunction
+  def isUserInRole(username: String): Boolean =
+    CoreCrossPlatformSupport.externalContext.getRequest.isUserInRole(username)
+
 //    Fun("call-xpl", classOf[CallXPL], op = 0, min = 4, NODE_TYPE, ALLOWS_ZERO_OR_MORE,
 //      Arg(STRING, EXACTLY_ONE),
 //      Arg(STRING, ALLOWS_ZERO_OR_MORE),

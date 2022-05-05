@@ -164,7 +164,7 @@ trait FormRunnerActionsCommon {
         liveData          = frc.formInstance.root,
         migrate           = Some(maybeMigrateData),
         toBaseURI         = "", // local save
-        fromBasePaths     = List(frc.createFormDataBasePath(app, form, ! isDraft, document) -> 1), // data is never versioned so `1`
+        fromBasePaths     = List(frc.createFormDataBasePath(app, form, ! isDraft, document) -> formVersion),
         toBasePath        = frc.createFormDataBasePath(app, form,   isDraft, document),
         filename          = "data.xml",
         commonQueryString = s"valid=${frc.dataValid}&$DataFormatVersionName=${databaseDataFormatVersion.entryName}" + querySuffix,

@@ -217,24 +217,26 @@
                                     $control-metadata/fb:template/*
                                 )[1]"/>
 
-                        <!-- Don't use `node-name($view-template)` as we did before as we want a uniquely identifiable name. We
-                             remove the `appearance` attribute so we cannot use that. -->
+                        <!-- Don't use `node-name($view-template)` as we did before as we want a uniquely identifiable
+                             name. We remove the `appearance` attribute, so we cannot use that. See
+                             https://github.com/orbeon/orbeon-forms/issues/5026 -->
                         <xf:var
-                            name="direct-name"
+                            name="direct-qname"
+                            as="xs:QName"
                             value="fbf:directNameFromBinding($xbl-binding)"/>
 
                         <xf:var
-                            name="existing-params"
-                            value="(event('xbl')/*[name(.) = $direct-name])[1]"/>
+                            name="control-settings-elem"
+                            value="(event('xbl')/*[node-name(.) = $direct-qname])[1]"/>
 
                         <xf:insert
                             context="$inserted//xf:instance"
                             origin="
-                                if (exists($existing-params)) then
-                                    $existing-params
+                                if (exists($control-settings-elem)) then
+                                    $control-settings-elem
                                 else
                                     xf:element(
-                                        $direct-name,
+                                        $direct-qname,
                                         (: Also copy attributes that are always there on the view template :)
                                         $view-template/(@* except (@id, @appearance, @ref, @bind))
                                     )"/>
@@ -291,16 +293,29 @@
                 <!-- Remove attributes if their value is the same as the value of the attribute on the view template -->
                 <xf:action iterate="instance('dynamic')/*">
                     <xf:var
-                        name="xbl"
+                        name="p"
+                        value="position()"/>
+                    <xf:var
+                        name="control-settings-elem"
                         value="(.//xf:instance/*)[1]"/>
+                    <!--
+                        Search by position. Each element under `instance('dynamic')` has a corresponding element under
+                        `instance('control-details-metadata')` in order. We cannot search using the element name under
+                        the view template as we did previously because we use a uniquely identifiable direct name. See:
+
+                        - https://github.com/orbeon/orbeon-forms/issues/5026
+                        - https://github.com/orbeon/orbeon-forms/issues/5315
+                    -->
                     <xf:var
                         name="view-template"
                         value="
-                            instance('control-details-metadata')/
-                            fb:metadata/
-                            (fb:template | fb:templates/fb:view)/
-                            *[name() = $xbl/name()]"/>
-                    <xf:action iterate="$xbl/@*">
+                            (
+                                instance('control-details-metadata')/
+                                fb:metadata[$p]/
+                                (fb:template | fb:templates/fb:view)/
+                                *
+                            )[1]"/>
+                    <xf:action iterate="$control-settings-elem/@*">
                         <xf:var name="xbl-attribute" value="."/>
                         <xf:delete
                             if="

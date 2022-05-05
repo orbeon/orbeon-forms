@@ -17,7 +17,6 @@ import io.circe.parser
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
-import org.orbeon.dom.QName
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
@@ -38,6 +37,7 @@ import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.saxon.value.QNameValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
@@ -497,7 +497,7 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def directNameFromBinding(
     bindingElem: NodeInfo
-  ): String = {
+  ): QNameValue = {
 
     import org.orbeon.scaxon.SimplePath._
 
@@ -509,15 +509,13 @@ object FormBuilderXPathApi {
     val directNameOpt =
       selectors collectFirst BindingDescriptor.directBindingPF(bindingNs, None) flatMap (_.elementName)
 
-    // We wish we could just pass back a `QName` but we don't have the glue to do that. So we pass
-    // a qualified name, but this means we need to have a prefix which matches the in-scope namespaces.
     val updatedDirectNameOpt =
       for {
         directName <- directNameOpt
         uri        =  directName.namespace.uri
         newPrefix  <- bindingNs.mapping collectFirst { case (p, `uri`) => p }
       } yield
-        QName(directName.localName, newPrefix, uri).qualifiedName
+        new QNameValue(newPrefix, uri, directName.localName)
 
     updatedDirectNameOpt.orNull
   }

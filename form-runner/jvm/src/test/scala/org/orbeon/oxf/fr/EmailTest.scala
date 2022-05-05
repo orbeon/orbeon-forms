@@ -27,6 +27,7 @@ import org.orbeon.xforms.XFormsCrossPlatformSupport.readTinyTreeFromUrl
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.net.URI
+import javax.mail.internet.InternetAddress
 
 
 class EmailTest
@@ -35,6 +36,22 @@ class EmailTest
      with AnyFunSpecLike {
 
   private val FormWithEmailControls = URI.create("oxf:/org/orbeon/oxf/fr/form-with-email-controls.xhtml")
+
+  describe("Email addresses parsing") {
+
+    val Expected = List(
+      "John Smith <john@acme.com>, Alice <alice@example.org>"     -> List(Some("John Smith") -> "john@acme.com", Some("Alice") -> "alice@example.org"),
+      "\"John Smith\" <john@acme.com>, Alice <alice@example.org>" -> List(Some("John Smith") -> "john@acme.com", Some("Alice") -> "alice@example.org"),
+      "john@acme.com alice@example.org"                           -> List(None -> "john@acme.com", None -> "alice@example.org"),
+      "john@acme.com, alice@example.org"                          -> List(None -> "john@acme.com", None -> "alice@example.org")
+    )
+
+    for ((in, expected) <- Expected)
+      it(s"must pass for `$in`") {
+        val actual = InternetAddress.parse(in, false).map(addr => Option(addr.getPersonal) -> addr.getAddress).toList
+        assert(expected == actual)
+      }
+  }
 
   describe("Email address extraction from form definition") {
 

@@ -157,7 +157,7 @@ class EmailProcessor extends ProcessorImpl {
 
       addressElement.elementOpt("name") match {
         case Some(nameElement) => List(new InternetAddress(email, nameElement.getTextTrim))
-        case None => InternetAddress.parse(email).toList
+        case None              => InternetAddress.parse(email, false).toList // `strict = false` allows for space-separated simple emails
       }
     }
 
@@ -185,7 +185,7 @@ class EmailProcessor extends ProcessorImpl {
 
     // Set To
     propertySet.getNonBlankString(TestTo) match {
-      case Some(testTo) => message.addRecipient(Message.RecipientType.TO, new InternetAddress(testTo))
+      case Some(testTo) => message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(testTo, false).map(ia => ia: Address))
       case None         => addRecipients("to", Message.RecipientType.TO)
     }
 

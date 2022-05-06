@@ -102,8 +102,16 @@
             <xsl:for-each select="@resource">
                 <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name)"/>
             </xsl:for-each>
-            <xsl:apply-templates select="@* except (@resource) | node()" mode="#current"/>
+            <xsl:apply-templates select="@* except (@resource) | node() except (xf:itemset, xf:item, xf:choices)" mode="#current"/>
+            <xsl:apply-templates select="xf:itemset | xf:item | xf:choices" mode="within-databound-itemset"/>
         </xsl:copy>
+    </xsl:template>
+
+    <xsl:template
+        match="@ref"
+        mode="within-databound-itemset">
+        <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
+        <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., false(), $library-name)"/>
     </xsl:template>
 
     <!-- Add a default xf:alert for those fields which don't have one. Only do this within grids and dialogs. -->

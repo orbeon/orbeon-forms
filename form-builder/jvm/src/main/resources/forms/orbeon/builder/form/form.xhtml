@@ -555,7 +555,7 @@
                                     body-ref="$body">
 
                                     <!-- Update title/description -->
-                                    <xf:action ev:event="fb-update-metadata">
+                                    <xf:action event="fb-update-metadata">
                                         <xf:setvalue ref="bind('title-bind')"       value="event('title')"/>
                                         <xf:setvalue ref="bind('description-bind')" value="event('description')"/>
 
@@ -687,15 +687,19 @@
                                         <xf:delete
                                             bind="xbl-bind"/>
                                         <xf:insert
-                                            if="exists(event('xbl')/@*)"
+                                            if="exists(event('control-settings-elems')/@*)"
                                             context="bind('metadata-bind')"
                                             ref="*"
-                                            origin="xf:element('xbl', event('xbl')[exists(@*)])"/>
+                                            origin="
+                                                xf:element(
+                                                    'xbl',
+                                                    event('control-settings-elems')[exists(@*)]
+                                                )"/>
 
                                     </xf:action>
                                     <!-- Update app/form name if changed -->
                                     <xf:action
-                                            ev:event="fb-update-metadata"
+                                            event="fb-update-metadata"
                                             if="bind('application-name-bind') != event('app') or bind('form-name-bind') != event('form')">
 
                                         <!-- Copy data to main instance -->
@@ -709,7 +713,7 @@
                                     </xf:action>
                                     <!-- "Save as" -->
                                     <xf:action
-                                            ev:event="fb-update-metadata"
+                                            event="fb-update-metadata"
                                             if="event('mode') = 'save-as'">
                                         <!-- Create new document id -->
                                         <xf:setvalue

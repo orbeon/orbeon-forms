@@ -412,7 +412,7 @@
                 <xf:property name="html-page-layout"              value="bind('html-page-layout-bind')"/>
                 <xf:property name="analysis-calculate"            value="bind('analysis-calculate-bind')"/>
                 <xf:property name="email"                         value="bind('email-bind')"/>
-                <xf:property name="xbl"                           value="bind('xbl-bind')"/>
+                <xf:property name="control-settings-elems"        value="bind('xbl-bind')/*"/>
                 <xf:property name="component-bindings"            value="$component-bindings"/>
             </xf:dispatch>
 

@@ -381,7 +381,7 @@
                             )"/>
 
                     <xf:property
-                        name="xbl"
+                        name="control-settings-elems"
                         value="
                             for $subform in instance('dynamic')/*
                             return

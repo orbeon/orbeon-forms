@@ -13,12 +13,6 @@
  */
 package org.orbeon.oxf.http
 
-import java.io.IOException
-import java.net.{CookieStore => _, _}
-import java.security.KeyStore
-import javax.net.ssl.SSLContext
-import jcifs.ntlmssp.{Type1Message, Type2Message, Type3Message}
-import jcifs.util.Base64
 import org.apache.http.auth._
 import org.apache.http.client.methods._
 import org.apache.http.client.protocol.{ClientContext, RequestAcceptEncoding, ResponseContentEncoding}
@@ -28,19 +22,23 @@ import org.apache.http.conn.routing.{HttpRoute, HttpRoutePlanner}
 import org.apache.http.conn.scheme.{PlainSocketFactory, Scheme, SchemeRegistry}
 import org.apache.http.conn.ssl.SSLSocketFactory
 import org.apache.http.entity.{ContentType, InputStreamEntity}
-import org.apache.http.impl.auth.{BasicScheme, NTLMEngine, NTLMEngineException, NTLMScheme}
+import org.apache.http.impl.auth.{BasicScheme, NTLMScheme}
 import org.apache.http.impl.client.{BasicCredentialsProvider, DefaultHttpClient}
 import org.apache.http.impl.conn.PoolingClientConnectionManager
 import org.apache.http.params.{BasicHttpParams, HttpConnectionParams}
 import org.apache.http.protocol.{BasicHttpContext, ExecutionContext, HttpContext}
 import org.apache.http.util.EntityUtils
 import org.apache.http.{ProtocolException => _, _}
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.http.HttpMethod._
+import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.resources.URLFactory
 import org.slf4j.LoggerFactory
+
+import java.net.{CookieStore => _, _}
+import java.security.KeyStore
+import javax.net.ssl.SSLContext
 
 
 class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieStore] {
@@ -257,7 +255,7 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
 
     // It seems that credentials and state are not thread-safe, so create every time
     def newProxyAuthState = proxyCredentials map {
-      case c: NTCredentials               => new AuthState |!> (_.update(new NTLMScheme(JCIFSEngine), c))
+      case c: NTCredentials               => new AuthState |!> (_.update(new NTLMScheme, c))
       case c: UsernamePasswordCredentials => new AuthState |!> (_.update(new BasicScheme, c))
       case _                              => throw new IllegalStateException
     }
@@ -395,34 +393,11 @@ class ApacheHttpClient(settings: HttpClientSettings) extends HttpClient[CookieSt
           // If found, generate preemptively
           if (credentials ne null) {
             authState.update(
-              if (credentials.isInstanceOf[NTCredentials]) new NTLMScheme(JCIFSEngine) else new BasicScheme,
+              if (credentials.isInstanceOf[NTCredentials]) new NTLMScheme else new BasicScheme,
               credentials
             )
           }
         }
-      }
-    }
-
-    object JCIFSEngine extends NTLMEngine {
-
-      def generateType1Msg(domain: String, workstation: String): String = {
-        val t1m = new Type1Message(Type1Message.getDefaultFlags, domain, workstation)
-        Base64.encode(t1m.toByteArray)
-      }
-
-      def generateType3Msg(username: String, password: String, domain: String, workstation: String, challenge: String): String = {
-        val t2m =
-          try
-            new Type2Message(Base64.decode(challenge))
-          catch {
-            case ex: IOException =>
-              throw new NTLMEngineException("Invalid Type2 message", ex)
-          }
-
-        val t3m =
-          new Type3Message(t2m, password, domain, username, workstation, 0)
-
-        Base64.encode(t3m.toByteArray)
       }
     }
   }

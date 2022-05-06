@@ -117,7 +117,6 @@ val CoreLibraryDependencies = Seq(
   "org.apache.logging.log4j"    % "log4j-core"                      % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-1.2-api"                   % Log4j2Version, // for eXist JARs
   "com.jcraft"                  % "jsch"                            % "0.1.55",
-  "jcifs"                       % "jcifs"                           % "1.3.17",
   "com.google.crypto.tink"      % "tink"                            % TinkVersion excludeAll (
     ExclusionRule(organization = "com.amazonaws"),
     ExclusionRule(organization = "com.fasterxml.jackson.core")

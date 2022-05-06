@@ -168,7 +168,7 @@
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(commons-fileupload-*.jar,commons-pool-*.jar,commons-io-*,commons-lang3-*.jar,commons-codec-*.jar,commons-collections4-*.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(saxon-*.jar,http*.jar,jcl-over-slf4j-*.jar,log4j-*.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/ehcache-2.10.9.2.jar
-            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(jcifs-*.jar,tink-*.jar,gson-*.jar,protobuf-*.jar;)
+            -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(tink-*.jar,gson-*.jar,protobuf-*.jar;)
             -injars      orbeon-war/jvm/target/webapp/WEB-INF/lib/(javax.activation-*.jar;)
 
 <!--            -ignorewarnings-->
@@ -219,7 +219,6 @@
             <rule pattern="org.apache.**"                              result="org.orbeon.private.apache.@1"/>
             <rule pattern="com.google.**"                              result="org.orbeon.private.google.@1"/>
             <rule pattern="scala.**"                                   result="org.orbeon.private.scala.@1"/>
-            <rule pattern="jcifs.**"                                   result="org.orbeon.private.jcifs.@1"/>
             <rule pattern="spray.**"                                   result="org.orbeon.private.spray.@1"/>
             <rule pattern="enumeratum.**"                              result="org.orbeon.private.enumeratum.@1"/>
         </jarjar>

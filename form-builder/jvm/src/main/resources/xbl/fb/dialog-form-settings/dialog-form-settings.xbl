@@ -401,7 +401,7 @@
         <xbl:implementation>
             <xf:model id="model">
                 <xf:instance id="local">
-                    <instance>
+                    <_>
                         <lang/>
                         <app/>
                         <form/>
@@ -431,7 +431,7 @@
                         <data-migration/>
                         <analysis-calculate/>
                         <xbl/>
-                    </instance>
+                    </_>
                 </xf:instance>
 
                 <xf:var
@@ -512,11 +512,11 @@
                     required="false()"/>
 
                 <xf:instance id="dynamic" xxf:exclude-result-prefixes="#all">
-                    <forms/>
+                    <_/>
                 </xf:instance>
 
                 <xf:instance id="control-details-metadata">
-                    <empty/>
+                    <_/>
                 </xf:instance>
 
                 <xf:instance id="dynamic-template" xxf:readonly="true">
@@ -531,7 +531,7 @@
                 </xf:instance>
 
                 <xf:instance id="modified">
-                    <modified i="" dynamic=""/>
+                    <_ i="" dynamic=""/>
                 </xf:instance>
 
             </xf:model>

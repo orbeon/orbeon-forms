@@ -685,7 +685,7 @@ trait FormRunnerPersistence {
           Connection.connectNow(
             method          = PUT,
             url             = resolvedPutUri,
-            credentials     = username map (BasicCredentials(_, password, preemptiveAuth = false, domain = None)),
+            credentials     = username map (BasicCredentials(_, password, preemptiveAuth = true, domain = None)),
             content         = StreamedContent(is, ContentTypes.OctetStreamContentType.some, contentLength = None, title = None).some,
             headers         = allPutHeaders,
             loadState       = true,

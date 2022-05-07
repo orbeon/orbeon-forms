@@ -234,7 +234,7 @@ object MigrationOps20191 extends MigrationOps {
           after  = afterBindElem.toList,
           origin =
             elementInfo(
-              XFormsBindQName,
+              XFORMS_BIND_QNAME,
               attributeInfo("id",   frc.bindId(gridName)) ::
                 attributeInfo("ref",  gridName) ::
                 attributeInfo("name", gridName) ::

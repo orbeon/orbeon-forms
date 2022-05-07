@@ -80,26 +80,16 @@ object ImportExportSupport {
       controlQName == QName("date", XMLNames.FRNamespace)     ||
       controlQName == QName("time", XMLNames.FRNamespace)     ||
       controlQName == QName("datetime", XMLNames.FRNamespace) ||
-      isYesNoInput(controlElem)                               ||
-      isCheckboxInput(controlElem)
-  }
-
-  def isYesNoInput(controlElem: om.NodeInfo): Boolean = {
-    val controlQName = controlElem.resolveQName(controlElem.name)
-    controlQName == QName("yesno-input", XMLNames.FRNamespace)
-  }
-
-  def isCheckboxInput(controlElem: om.NodeInfo): Boolean = {
-    val controlQName = controlElem.resolveQName(controlElem.name)
-    controlQName == QName("checkbox-input", XMLNames.FRNamespace)
+      FormRunner.isYesNoInput(controlElem)                    ||
+      FormRunner.isCheckboxInput(controlElem)
   }
 
   def isSelectionControl(controlElem: om.NodeInfo): Boolean = {
     val localname = controlElem.localname
     FormRunner.isSingleSelectionControl(localname)     ||
       FormRunner.isMultipleSelectionControl(localname) ||
-      isYesNoInput(controlElem)                        ||
-      isCheckboxInput(controlElem)
+      FormRunner.isYesNoInput(controlElem)             ||
+      FormRunner.isCheckboxInput(controlElem)
   }
 
   def isMultipleSelectionControl(controlElem: om.NodeInfo): Boolean =
@@ -394,7 +384,7 @@ object ImportExportSupport {
     requestedLang               : String,
     frResourcesForRequestedLang : om.NodeInfo
   ): Seq[(String, String)] =
-    if (isYesNoInput(leafControl) || isCheckboxInput(leafControl)) {
+    if (FormRunner.isYesNoInput(leafControl) || FormRunner.isCheckboxInput(leafControl)) {
       // Special behavior
 
       val yesLabel = frResourcesForRequestedLang / "components" / "labels" / "yes"

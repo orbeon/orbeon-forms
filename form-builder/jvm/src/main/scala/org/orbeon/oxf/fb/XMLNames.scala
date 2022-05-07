@@ -58,18 +58,17 @@ object XMLNames {
 
   // NOTE: `fb:constraint` when annotated and `xf:constraint` when not (eg. coming from a section template)
   val NestedBindElemTest: Test =
-    FBConstraintTest   ||
-      XFConstraintTest ||
-      XFTypeTest       ||
-      XFRequiredTest
+    FBConstraintTest ||
+    XFConstraintTest ||
+    XFTypeTest       ||
+    XFRequiredTest
 
   val FormulaTest: Test =
-    FBConstraintTest           ||
-    FBDefaultTest              ||
-    FBRelevantTest             ||
-    FBCalculateTest            ||
-    FBReadonlyTest             ||
-    FBRequiredTest             ||
-    XFormsNames.REQUIRED_QNAME ||
-    XFormsNames.VALUE_QNAME
+    FBConstraintTest ||
+    FBDefaultTest    ||
+    FBRelevantTest   ||
+    FBCalculateTest  ||
+    FBReadonlyTest   ||
+    FBRequiredTest   ||
+    XFormsNames.REQUIRED_QNAME
 }

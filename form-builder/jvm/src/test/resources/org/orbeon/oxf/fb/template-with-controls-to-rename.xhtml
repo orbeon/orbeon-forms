@@ -1,18 +1,20 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
          xmlns:exf="http://www.exforms.org/exf/1-0"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
-         xmlns:sql="http://orbeon.org/oxf/xml/sql"
          xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xf="http://www.w3.org/2002/xforms">
     <xh:head>
         <xh:title>Untitled Form</xh:title>
         <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
@@ -52,6 +54,12 @@
                             <my-dropdown/>
                         </outputs-grid>
                     </outputs>
+                    <selection-controls>
+                        <selection-controls-grid>
+                            <static-dropdown/>
+                            <dynamic-drodpown itemset-empty="false"/>
+                        </selection-controls-grid>
+                    </selection-controls>
                 </form>
             </xf:instance>
 
@@ -113,6 +121,13 @@
                         <xf:bind id="my-dropdown-bind" ref="my-dropdown" name="my-dropdown"/>
                     </xf:bind>
                 </xf:bind>
+                <xf:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
+                    <xf:bind id="selection-controls-grid-bind" ref="selection-controls-grid"
+                             name="selection-controls-grid">
+                        <xf:bind id="static-dropdown-bind" ref="static-dropdown" name="static-dropdown"/>
+                        <xf:bind id="dynamic-drodpown-bind" ref="dynamic-drodpown" name="dynamic-drodpown"/>
+                    </xf:bind>
+                </xf:bind>
             </xf:bind>
 
             <!-- Metadata -->
@@ -125,6 +140,7 @@
                     <created-with-version>2019.1-SNAPSHOT PE</created-with-version>
                     <library-versions>
                         <orbeon>1</orbeon>
+                        <app>16</app>
                     </library-versions>
                     <email>
                         <subject>
@@ -162,6 +178,29 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
+                        <static-dropdown>
+                            <label>Static dropdown</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </static-dropdown>
+                        <dynamic-drodpown>
+                            <label>Dynamic dropdown</label>
+                            <hint/>
+                        </dynamic-drodpown>
                         <my-dropdown>
                             <label>My Dropdown</label>
                             <hint/>
@@ -232,6 +271,9 @@
                             <label>Outputs</label>
                             <help/>
                         </outputs>
+                        <selection-controls>
+                            <label>Selection controls</label>
+                        </selection-controls>
                         <inputs>
                             <label>Inputs</label>
                         </inputs>
@@ -304,29 +346,20 @@
                 </xf:action>
             </xf:action>
 
-            <fr:listener
-                version="2018.2"
+            <fr:listener version="2018.2" modes="new" events="enabled value-changed activated"
+                         controls="control-foo control-gaga"
+                         actions="my-action"/>
 
-                modes="new"
-                events="enabled value-changed activated"
-                controls="control-foo control-gaga"
-
-                actions="my-action"/>
-
-            <fr:listener
-                version="2018.2"
-
-                events="form-load-after-controls"
-
-                actions="my-action other-action"/>
+            <fr:listener version="2018.2" events="form-load-after-controls"
+                         actions="my-action other-action"/>
 
             <fr:action name="my-action" version="2018.2">
 
                 <fr:control-setvalue value="'before'" control="control-before"/>
 
                 <fr:service-call service="my-service-gaga">
-                    <fr:value     control="control1" ref="/request/control1"/>
-                    <fr:value     control="control2" ref="/request/control2"/>
+                    <fr:value control="control1" ref="/request/control1"/>
+                    <fr:value control="control2" ref="/request/control2"/>
                     <fr:url-param control="control3" name="param3"/>
                 </fr:service-call>
 
@@ -334,10 +367,10 @@
                 <fr:control-setvalue value="/response/bar" control="control-bar"/>
 
                 <fr:service-call service="my-service-toto">
-                    <fr:value     control="control4"     ref="/request/control4"/>
-                    <fr:url-param control="control5"     name="param5"/>
-                    <fr:sql-param control="control6"     index="2"/>
-                    <fr:value     value="current-date()" ref="/request/value7"/>
+                    <fr:value control="control4" ref="/request/control4"/>
+                    <fr:url-param control="control5" name="param5"/>
+                    <fr:sql-param control="control6" index="2"/>
+                    <fr:value value="current-date()" ref="/request/value7"/>
                 </fr:service-call>
 
                 <fr:control-setvalue value="'after'" control="control-after"/>
@@ -355,8 +388,8 @@
                     <fr:control-setitems items="item" label="@label" value="@value" control="my-dropdown" at="end"/>
 
                     <fr:control-setattachment control="my-attachment" at="end"/>
-                    <fr:control-setfilename   control="my-attachment" at="end" value="'My Image.png'"/>
-                    <fr:control-setmediatype  control="my-attachment" at="end" value="'image/png'"/>
+                    <fr:control-setfilename control="my-attachment" at="end" value="'My Image.png'"/>
+                    <fr:control-setmediatype control="my-attachment" at="end" value="'image/png'"/>
                 </fr:data-iterate>
 
                 <fr:repeat-remove-iteration repeat="my-grid" at="start"/>
@@ -540,15 +573,11 @@
                                 <xf:label ref="$form-resources/label-with-formula/label">
                                     <fr:param type="ExpressionParam">
                                         <fr:name>my-formula</fr:name>
-                                        <fr:expr>string-join((//foo, //bar), ' - ')</fr:expr>
-
-
+                                        <fr:expr>string-join(($foo, $bar), ' - ')</fr:expr>
                                     </fr:param>
                                 </xf:label>
                                 <xf:hint ref="$form-resources/label-with-formula/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
                             </xf:input>
                         </fr:c>
                     </fr:grid>
@@ -563,6 +592,7 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
+
                                 <xf:itemset ref="$form-resources/my-dropdown/item">
                                     <xf:label ref="label"/>
                                     <xf:value ref="value"/>
@@ -570,6 +600,40 @@
                             </xf:select1>
                         </fr:c>
                         <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="selection-controls-section" bind="selection-controls-bind">
+                    <xf:label ref="$form-resources/selection-controls/label"/>
+                    <fr:grid id="selection-controls-grid-grid" bind="selection-controls-grid-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:select1 id="static-dropdown-control" bind="static-dropdown-bind" appearance="dropdown">
+                                <xf:label ref="$form-resources/static-dropdown/label"/>
+                                <xf:hint ref="$form-resources/static-dropdown/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/static-dropdown/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <fr:databound-select1 xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                  id="dynamic-drodpown-control"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true&amp;my-param={$foo}"
+                                                  bind="dynamic-drodpown-bind">
+                                <xf:label ref="$form-resources/dynamic-drodpown/label"/>
+                                <xf:hint ref="$form-resources/dynamic-drodpown/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <xf:itemset ref="//*[name() = $foo]">
+                                    <xf:label ref="*[name() = $bar]"/>
+                                    <xf:value ref="*[name() = $foo]"/>
+                                    <xf:hint  ref="*[name() = $bar]"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
             </fr:body>

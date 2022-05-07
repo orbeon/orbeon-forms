@@ -508,10 +508,10 @@ class FormBuilderFunctionsTest
 
         val RenamedBinds: NodeInfo =
           <xf:bind
-          xmlns:xf="http://www.w3.org/2002/xforms"
-          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-          id="formulas-bind" ref="formulas" name="formulas">
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+            id="formulas-bind" ref="formulas" name="formulas">
             <xf:bind id="formulas-grid-bind" ref="formulas-grid" name="formulas-grid">
               <xf:bind id="calculated-bind" ref="calculated" name="calculated" fb:calculate="concat($qux, $baz, $toto, $gaga)"
                        fb:readonly="false()"/>
@@ -536,11 +536,11 @@ class FormBuilderFunctionsTest
             </xf:bind>
           </xf:bind>
 
-        val RenamedParams: NodeInfo =
+        val RenamedControlNameParams: NodeInfo =
           <xf:label
-          xmlns:xf="http://www.w3.org/2002/xforms"
-          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-          ref="$form-resources/label-with-control-ref/label">
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            ref="$form-resources/label-with-control-ref/label">
             <fr:param type="ControlValueParam">
               <fr:name>my-foo</fr:name>
               <fr:controlName>qux</fr:controlName>
@@ -548,6 +548,17 @@ class FormBuilderFunctionsTest
             <fr:param type="ControlValueParam">
               <fr:name>my-bar</fr:name>
               <fr:controlName>baz</fr:controlName>
+            </fr:param>
+          </xf:label>
+
+        val RenamedExprParams: NodeInfo =
+          <xf:label
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            ref="$form-resources/label-with-formula/label">
+            <fr:param type="ExpressionParam">
+              <fr:name>my-formula</fr:name>
+              <fr:expr>string-join(($qux, $baz), ' - ')</fr:expr>
             </fr:param>
           </xf:label>
 
@@ -587,10 +598,17 @@ class FormBuilderFunctionsTest
           )
         }
 
-        it("must rename references from LHHA") {
+        it("must rename control references from LHHA") {
           assertXMLElementsIgnoreNamespacesInScope(
-            left  = RenamedParams,
+            left  = RenamedControlNameParams,
             right = ctx.bodyElem descendant * filter (_.id == "label-with-control-ref-control") child LABEL_QNAME head
+          )
+        }
+
+        it("must rename expression references from LHHA") {
+          assertXMLElementsIgnoreNamespacesInScope(
+            left  = RenamedExprParams,
+            right = ctx.bodyElem descendant * filter (_.id == "label-with-formula-control") child LABEL_QNAME head
           )
         }
 
@@ -653,7 +671,7 @@ class FormBuilderFunctionsTest
 
         it("must rename references from actions") {
           assertXMLElementsIgnoreNamespacesInScope(
-            left = RenamedLegacyAction,
+            left  = RenamedLegacyAction,
             right = ctx.modelElem child FBActionTest head
           )
         }
@@ -744,15 +762,47 @@ class FormBuilderFunctionsTest
 
         it("must rename references from listeners") {
           assertXMLElementsIgnoreNamespacesInScope(
-            left = RenamedListener,
+            left  = RenamedListener,
             right = ctx.modelElem child FRListenerTest head
           )
         }
 
         it("must rename references from actions") {
           assertXMLElementsIgnoreNamespacesInScope(
-            left = RenamedAction,
+            left  = RenamedAction,
             right = ctx.modelElem child FRActionTest head
+          )
+        }
+      }
+    }
+
+    describe("Selection controls") {
+      withActionAndFBDoc(FormulasDoc) { implicit ctx =>
+
+        val RenamedDataboundSelect1: NodeInfo =
+          <fr:databound-select1
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            id="dynamic-drodpown-control"
+            resource="/fr/service/custom/orbeon/controls/countries?all=true&amp;my-param={$qux}"
+            bind="dynamic-drodpown-bind">
+            <xf:label ref="$form-resources/dynamic-drodpown/label"/>
+            <xf:hint ref="$form-resources/dynamic-drodpown/hint"/>
+            <xf:alert ref="$fr-resources/detail/labels/alert"/>
+            <xf:itemset ref="//*[name() = $qux]">
+              <xf:label ref="*[name() = $baz]"/>
+              <xf:value ref="*[name() = $qux]"/>
+              <xf:hint  ref="*[name() = $baz]"/>
+            </xf:itemset>
+          </fr:databound-select1>
+
+        FormBuilder.renameControlReferences("foo", "qux")
+        FormBuilder.renameControlReferences("bar", "baz")
+
+        it("must rename references from `resource` attribute") {
+          assertXMLElementsIgnoreNamespacesInScope(
+            left  = RenamedDataboundSelect1,
+            right = ctx.bodyElem descendant * filter (_.id == "dynamic-drodpown-control") head
           )
         }
       }

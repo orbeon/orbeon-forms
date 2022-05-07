@@ -82,8 +82,9 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- See also `fb.ControlOps` for the renaming part -->
     <xsl:template
-        match="fr:number[exists(@prefix | @suffix)]"
+        match="fr:number[exists(@prefix | @suffix)] | fr:currency[exists(@prefix | @suffix)]"
         mode="within-controls">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
@@ -94,6 +95,7 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- See also `fb.ControlOps` for the renaming part -->
     <xsl:template
         match="fr:databound-select1 | fr:databound-select1-search"
         mode="within-controls">
@@ -107,8 +109,9 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- See also `fb.ControlOps` for the renaming part -->
     <xsl:template
-        match="@ref"
+        match="@ref | @value | @label | @hint"
         mode="within-databound-itemset">
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., false(), $library-name)"/>

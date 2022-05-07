@@ -14,10 +14,10 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.dom.{Namespace, QName}
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.scaxon.SimplePath.Test
-import org.orbeon.xforms.Namespaces
+import org.orbeon.xforms.{Namespaces, XFormsNames}
+
 
 object XMLNames {
 
@@ -25,10 +25,13 @@ object XMLNames {
   val FR       = "http://orbeon.org/oxf/xml/form-runner"
 
   val XH  = XHTML_NAMESPACE_URI
-  val XF  = XFORMS_NAMESPACE_URI
-  val XXF = XXFORMS_NAMESPACE_URI
   val XS  = XSD_URI
+
+  val XF  = Namespaces.XF
+  val XXF = Namespaces.XXF
   val XBL = Namespaces.XBL
+
+  val FRNamespace              : Namespace = Namespace(FRPrefix, FR)
 
   val XHHeadTest               : Test      = XH -> "head"
   val XHBodyTest               : Test      = XH -> "body"
@@ -53,6 +56,17 @@ object XMLNames {
   val XFActionTest             : Test      = XF -> "action"
   val XFSendTest               : Test      = XF -> "send"
 
+  val XFItemsetTest            : Test      = XFormsNames.XFORMS_ITEMSET_QNAME
+  val XFItemTest               : Test      = XFormsNames.XFORMS_ITEM_QNAME
+  val XFChoicesTest            : Test      = XFormsNames.XFORMS_CHOICES_QNAME
+
+  val XFLabelTest              : Test      = XFormsNames.LABEL_QNAME
+  val XFHelpTest               : Test      = XFormsNames.HELP_QNAME
+  val XFHintTest               : Test      = XFormsNames.HINT_QNAME
+  val XFAlertTest              : Test      = XFormsNames.ALERT_QNAME
+
+  val XFValueTest              : Test      = XFormsNames.XFORMS_VALUE_QNAME
+
   val FRMetadata               : Test      = FR -> "metadata"
   val FRItemsetId              : Test      = FR -> "itemsetid"
   val FRItemsetMap             : Test      = FR -> "itemsetmap"
@@ -68,24 +82,34 @@ object XMLNames {
   val FRServiceCallTest        : Test      = FR -> "service-call"
 
   val FRNumberTest             : Test      = FR -> "number"
+  val FRCurrencyTest           : Test      = FR -> "currency"
 
   val ControlsTest             : Test      = QName("controls")
   val ControlTest              : Test      = QName("control")
   val RepeatTest               : Test      = QName("repeat")
+  val ValueTest                : Test      = QName("value")
+  val RefTest                  : Test      = QName("ref")
+  val ItemsTest                : Test      = QName("items")
+  val LabelTest                : Test      = QName("label")
+  val HintTest                 : Test      = QName("hint")
+  val ConditionTest            : Test      = QName("condition")
+  val ResourceTest             : Test      = QName("resource")
 
   val XMLLangQName             : QName     = XML_LANG_QNAME//both
 
   val FRRelevantQName          : QName     = QName("relevant", FRNamespace)
 
-  val FRContainerTest = FRSectionTest || FRGridTest
+  val FRContainerTest          : Test      = FRSectionTest || FRGridTest
 
-  val FRNamespace              : Namespace = Namespace(FRPrefix, FR)
-
-  val XFormsBindQName          : QName     = QName("bind",                XFORMS_NAMESPACE_SHORT)
   val FRItemsetIdQName         : QName     = QName("itemsetid",           FRNamespace)
   val FRDataFormatVersionQName : QName     = QName("data-format-version", FRNamespace)
   val FRTextQName              : QName     = QName("text",                FRNamespace)
   val FRIterationLabelQName    : QName     = QName("iteration-label",     FRNamespace)
   val FRAddIterationLabelQName : QName     = QName("add-iteration-label", FRNamespace)
   val FRSectionQName           : QName     = QName("section",             FRNamespace)
+
+  val FRYesNoInputQName             : QName = QName("yesno-input",              FRNamespace)
+  val FRCheckboxInputQName          : QName = QName("checkbox-input",           FRNamespace)
+  val FRDataboundSelect1QName       : QName = QName("databound-select1",        FRNamespace)
+  val FRDataboundSelect1SearchQName : QName = QName("databound-select1-search", FRNamespace)
 }

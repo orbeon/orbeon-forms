@@ -173,6 +173,20 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def isMultipleSelectionControl(localName: String): Boolean =
     localName == "select" || localName.endsWith("-select")
 
+  def isSelectionControl(controlElem: NodeInfo): Boolean = {
+    val localname = controlElem.localname
+    isSingleSelectionControl(localname)     ||
+      isMultipleSelectionControl(localname) ||
+      isYesNoInput(controlElem)             ||
+      isCheckboxInput(controlElem)
+  }
+
+  def isYesNoInput(controlElem: NodeInfo): Boolean =
+    controlElem.resolveQName(controlElem.name) == FRYesNoInputQName
+
+  def isCheckboxInput(controlElem: NodeInfo): Boolean =
+    controlElem.resolveQName(controlElem.name) == FRCheckboxInputQName
+
   def searchControlsInFormByClass(
     classes           : Set[String],
     dataFormatVersion : DataFormatVersion)(implicit

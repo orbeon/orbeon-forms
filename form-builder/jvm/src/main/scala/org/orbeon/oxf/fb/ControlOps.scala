@@ -669,19 +669,17 @@ trait ControlOps extends ResourcesOps {
   def findLegacyActions(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
     ctx.modelElem child FBActionTest filter (_.id.endsWith("-binding"))
 
-  def renameControlReferences(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit = {
+  // See also `controls.xsl` for the handling of `replaceVarReferencesWithFunctionCalls()`. Unfortunately there is
+  // duplication of logic here.
+  def renameControlReferences(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Int = {
 
-    def updateNode(newValue: String)(node: NodeInfo): Unit =
+    var countOfUpdatedValues = 0
+
+    def updateNode(newValue: String)(node: NodeInfo): Unit = {
+      if (node.stringValue != newValue)
+        countOfUpdatedValues += 1
       XFormsAPI.setvalue(node, newValue)
-
-    def findRepeatedGridsAndSections: Seq[NodeInfo] =
-      ctx.bodyElem descendant FRContainerTest filter isRepeat
-
-    def findParamExprs: Seq[NodeInfo] =
-      ctx.bodyElem descendant FRParamTest child FRExprTest
-
-    def findNumbers: Seq[NodeInfo] =
-      ctx.bodyElem descendant FRNumberTest
+    }
 
     def renameNodeContent(elemOrAtt: NodeInfo, avt: Boolean): Unit =
       FormRunnerRename.replaceSingleVarReference(
@@ -696,77 +694,119 @@ trait ControlOps extends ResourcesOps {
       }
 
     // Replace formulas in binds
-    ctx.topLevelBindElem.toList descendantOrSelf * att XMLNames.FormulaTest foreach (renameNodeContent(_, avt = false))
+    locally {
+      val bindElems = ctx.topLevelBindElem.toList descendantOrSelf *
 
-    // Replace references in templates, including email templates
-    List(ctx.bodyElem, ctx.metadataRootElem) descendant FRParamTest filter
-      (_.attValue(TYPE_QNAME) == "ControlValueParam")               child
-      FRControlNameTest                                             filter
-      (_.stringValue == oldName)                                    foreach
-      updateNode(newName)
+      bindElems att XMLNames.FormulaTest foreach (renameNodeContent(_, avt = false))
+
+      bindElems child NestedBindElemTest att ValueTest foreach (renameNodeContent(_, avt = false))
+    }
+
+    // Replace references in template parameters
+    locally {
+
+      // Below we use local name tests because within metadata, email templates now use non-namespaced elements for
+      // template parameters, while in other places we used namespaced elements.
+      val params = List(ctx.bodyElem, ctx.metadataRootElem) descendant "param"
+
+      params child "controlName"   filter
+        (_.stringValue == oldName) foreach
+        updateNode(newName)
+
+      params child "expr" foreach
+        (renameNodeContent(_, avt = false))
+    }
 
     // Update new actions
+    locally {
 
-    // `fr:action//(@control | @repeat)`
-    findNewActions descendant *   att
-      (ControlTest || RepeatTest) filter
-      (_.stringValue == oldName)  foreach
-      updateNode(newName)
+      val newActions = findNewActions
 
-    // `fr:listener/@controls`
-    ctx.modelElem child FRListenerTest att ControlsTest foreach { att =>
+      // `fr:action//(@control | @repeat)`
+      newActions descendant *       att
+        (ControlTest || RepeatTest) filter
+        (_.stringValue == oldName)  foreach
+        updateNode(newName)
 
-      val newTokens = att.stringValue.splitTo[List]() map {
-        case `oldName` => newName
-        case other     => other
+      // `fr:listener/@controls`
+      ctx.modelElem child FRListenerTest att ControlsTest foreach { att =>
+
+        val newTokens = att.stringValue.splitTo[List]() map {
+          case `oldName` => newName
+          case other     => other
+        }
+
+        updateNode(newTokens mkString " ")(att)
       }
 
-      updateNode(newTokens mkString " ")(att)
+      // Attributes that can contain (non-AVT) XPath expressions
+      newActions descendant * att
+        (ValueTest || RefTest || ItemsTest || LabelTest || HintTest || ConditionTest) foreach
+        (renameNodeContent(_, avt = false))
     }
 
     // Update legacy actions
-    val legacyActions = findLegacyActions
+    locally {
+      val legacyActions = findLegacyActions
 
-    findControlIdByName(oldName) foreach { oldControlId =>
+      findControlIdByName(oldName) foreach { oldControlId =>
 
-      val newControlId = newName + oldControlId.substringAfter(oldName)
+        val newControlId = newName + oldControlId.substringAfter(oldName)
 
-      // `<xf:action event="xforms-value-changed" ev:observer="foo-control" if="true()">`
-      legacyActions                     child
-        XFActionTest                    att
-        "observer"                      filter // when using a String we match on any namespace (for better or for worse)
-        (_.stringValue == oldControlId) foreach
-        updateNode(newControlId)
+        // `<xf:action event="xforms-value-changed" ev:observer="foo-control" if="true()">`
+        legacyActions                     child
+          XFActionTest                    att
+          "observer"                      filter // when using a String we match on any namespace (for better or for worse)
+          (_.stringValue == oldControlId) foreach
+          updateNode(newControlId)
+      }
+
+      // `<xf:var name="control-name" value="'foo'"/>`
+      legacyActions                            descendant
+        XFORMS_VAR_QNAME                       filter
+        (_.attValue("name") == "control-name") att
+        VALUE_QNAME                            filter
+        (_.stringValue == s"'$oldName'")       foreach
+        updateNode(s"'$newName'")
+
+      // `<xf:var name="response-items" value="//item"/>`
+      // `<xf:var name="item-label"     value="@label"/>`
+      // `<xf:var name="item-value"     value="@value"/>`
+      // `<xf:var name="item-hint"      value="@hint"/>`
+      legacyActions                                          descendant
+        XFORMS_VAR_QNAME                                     filter
+        (elem => ExpressionsVarNames(elem.attValue("name"))) flatMap
+        (_.att(VALUE_QNAME))                                 foreach
+        (renameNodeContent(_, avt = false))
     }
 
-    // `<xf:var name="control-name" value="'foo'"/>`
-    legacyActions                            descendant
-      XFORMS_VAR_QNAME                       filter
-      (_.attValue("name") == "control-name") att
-      VALUE_QNAME                            filter
-      (_.stringValue == s"'$oldName'")       foreach
-      updateNode(s"'$newName'")
-
-    // `fr:section`/`fr:grid` attributes
-    findRepeatedGridsAndSections foreach { containerElem =>
-      ContainerAtts foreach { attName =>
-        containerElem.att(attName).foreach(renameNodeContent(_, avt = true))
+    // Controls
+    locally {
+      RenameMappings foreach { case (test, filter, avtAtts, atts) =>
+        ctx.bodyElem descendant test filter filter foreach { elem =>
+          avtAtts foreach { avtAtt =>
+            elem.att(avtAtt).foreach(renameNodeContent(_, avt = true))
+          }
+          atts foreach { att =>
+            elem.att(att).foreach(renameNodeContent(_, avt = false))
+          }
+        }
       }
     }
 
-    // `fr:param/fr:expr`
-    findParamExprs foreach { exprElem =>
-      renameNodeContent(exprElem, avt = false)
-    }
-
-    // `fr:number/(@suffix | @prefix)`
-    findNumbers foreach { numberElem =>
-      NumberAtts foreach { attName =>
-        numberElem.att(attName).foreach(renameNodeContent(_, avt = true))
-      }
-    }
+    countOfUpdatedValues
   }
 
-  private val ContainerAtts = List("min", "max", "freeze", "remove-constraint")
-  private val NumberAtts    = List("prefix", "suffix")
+  private val ExpressionsVarNames = Set("control-value", "response-items", "item-label", "item-value", "item-hint")
+
+  private val RenameMappings: List[(Test, NodeInfo => Boolean, List[String], List[String])] = List(
+    // These should match what's in `controls.xsl`
+    (FRContainerTest                                                      , isRepeat,  List("min", "max", "freeze", "remove-constraint", "clear-constraint"), Nil),
+    (FRNumberTest || FRCurrencyTest                                       , _ => true, List("prefix", "suffix")                                             , Nil),
+    (FRDataboundSelect1QName || FRDataboundSelect1SearchQName             , _ => true, List("resource")                                                     , Nil),
+    // These are a little different from `controls.xsl` as in the XSLT we use a mode, `within-databound-itemset`, and
+    // then match on the attributes. So instead we have a different setup below, mostly not not 100% equivalent.
+    (XFItemsetTest || XFItemTest || XFChoicesTest                         , _ => true, Nil                                                                  , List("ref", "value", "label", "hint")),
+    (XFLabelTest || XFHelpTest || XFHintTest || XFAlertTest || XFValueTest, _ => true, Nil                                                                  , List("ref", "value")),
+  )
 }

@@ -14,11 +14,10 @@
 package org.orbeon.oxf.fr.datamigration
 
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
-import org.orbeon.oxf.fr.{DataFormatVersion, FormRunnerDocContext, InDocFormRunnerDocContext}
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
 import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport._
+import org.orbeon.oxf.fr.{DataFormatVersion, FormRunnerDocContext, InDocFormRunnerDocContext}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
@@ -29,6 +28,7 @@ import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.BasicNamespaceMapping
+import org.orbeon.xforms.XFormsNames.XFORMS_BIND_QNAME
 
 import scala.collection.compat._
 
@@ -87,8 +87,8 @@ object MigrationOps48 extends MigrationOps {
     jsonString : String
   ): MigrationSet48 = {
 
-    import io.circe.parser
     import io.circe.generic.auto._
+    import io.circe.parser
 
     case class PathAndName(path: String, `iteration-name`: String)
 
@@ -224,7 +224,7 @@ object MigrationOps48 extends MigrationOps {
           into = containerBindElem,
           origin =
             elementInfo(
-              XFormsBindQName,
+              XFORMS_BIND_QNAME,
               attributeInfo("id",   frc.bindId(iterationName)) ::
                 attributeInfo("ref",  iterationName)           ::
                 attributeInfo("name", iterationName)           ::

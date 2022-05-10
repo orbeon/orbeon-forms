@@ -221,7 +221,7 @@
                             as="element()?"/>
                     </xsl:if>
                     <!-- Scope AVT vars -->
-                    <xsl:if test="$is-editable or $is-repeat">
+                    <xsl:if test="exists($c/@class)">
                         <xsl:copy-of select="fr:scope-outer-avt-class($c/@class)"/>
                     </xsl:if>
 

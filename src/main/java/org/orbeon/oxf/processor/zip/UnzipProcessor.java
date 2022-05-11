@@ -17,14 +17,13 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.SAXUtils;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.DateUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -71,7 +70,7 @@ public class UnzipProcessor extends ProcessorImpl {
                         String fileTime = DateUtils.formatIsoDateTimeUtc(zipEntry.getTime());
 
                         InputStream entryInputStream = zipFile.getInputStream(zipEntry);
-                        String uri = NetUtils.inputStreamToAnyURI(entryInputStream, NetUtils.REQUEST_SCOPE, logger);
+                        String uri = FileItemSupport.inputStreamToAnyURI(entryInputStream, ExpirationScope.Request$.MODULE$)._1().toString();
                         // <file name="filename.ext">uri</file>
                         AttributesImpl fileAttributes = new AttributesImpl();
                         fileAttributes.addAttribute("", "name", "name", "CDATA", fileName);

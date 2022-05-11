@@ -7,6 +7,7 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.ExpirationScope.entryName
 import org.orbeon.oxf.util.StringUtils._
 
@@ -55,13 +56,18 @@ object FileItemSupport {
     scope       : ExpirationScope
   ): (URI, Long) = {
 
-    val (fileItem, size) = prepareFileItemFromInputStream(inputStream, scope)
+    val fileItem = prepareFileItem(scope)
+    var sizeAccumulator = 0L
 
-    Logger.debug(
-      s"FileItemSupport created ${entryName(scope)}-scoped `FileItem` (disk location: `${fileItem.debugFileLocation}`)"
-    )
+    copyStreamAndClose(inputStream, fileItem.getOutputStream, read => sizeAccumulator += read, doCloseOut = true)
 
-    (fileItem.asInstanceOf[DiskFileItem].getStoreLocation.toURI, size)
+    val file =
+      fileItem.fileLocationOpt.getOrElse(throw new IllegalStateException) |!>
+      (_.createNewFile())
+
+    Logger.debug(s"FileItemSupport created ${entryName(scope)}-scoped `FileItem` (disk location: `${file.getCanonicalPath}`)")
+
+    (file.toURI, sizeAccumulator)
   }
 
   def prepareFileItem(scope: ExpirationScope): FileItem = {
@@ -105,8 +111,7 @@ object FileItemSupport {
   def urlForFileItemCreateIfNeeded(fileItem: FileItem, scope: ExpirationScope): URI =
     fileItem.fileLocationOpt match {
       case Some(file) =>
-        if (! file.exists)
-          file.createNewFile() // https://github.com/orbeon/orbeon-forms/issues/4466
+        file.createNewFile() // https://github.com/orbeon/orbeon-forms/issues/4466
         file.toURI
       case None =>
         // File does not exist on disk, must convert
@@ -129,12 +134,12 @@ object FileItemSupport {
     try {
       logIfNeeded("about to delete")
       if (file.delete())
-        logIfNeeded("success deleting")
+        logIfNeeded("-> success deleting")
       else
-        logIfNeeded("failure deleting")
+        logIfNeeded("-> failure deleting")
     } catch {
       case NonFatal(t) =>
-        logIfNeeded("failure deleting", OrbeonFormatter.getThrowableMessage(t))
+        logIfNeeded("-> failure deleting", OrbeonFormatter.getThrowableMessage(t))
     }
   }
 
@@ -155,24 +160,6 @@ object FileItemSupport {
   private object Private {
 
     lazy val fileItemFactory = new DiskFileItemFactory(0, NetUtils.getTemporaryDirectory)
-
-    // 2022-05-10: Only used by `inputStreamToAnyURI`
-    def prepareFileItemFromInputStream(
-      inputStream : InputStream,
-      scope       : ExpirationScope
-    ): (FileItem, Long) = {
-
-      val fileItem = prepareFileItem(scope)
-      var sizeAccumulator = 0L
-
-      copyStreamAndClose(inputStream, fileItem.getOutputStream, read => sizeAccumulator += read, doCloseOut = true)
-
-      fileItem.fileLocationOpt foreach { storeLocation =>
-        storeLocation.createNewFile()
-      }
-
-      (fileItem, sizeAccumulator)
-    }
 
     def deleteFileOnRequestEnd(fileItem: FileItem): Unit =
       PipelineContext.get.addContextListener((_: Boolean) => deleteFileItem(fileItem, ExpirationScope.Request.some))

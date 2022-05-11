@@ -17,6 +17,7 @@ import java.awt.image._
 import java.io.{File, OutputStream}
 import javax.imageio.{IIOImage, ImageIO, ImageTypeSpecifier, ImageWriteParam}
 
+import cats.syntax.option._
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.icepdf.core.pobjects.{Page, Document => ICEDocument}
 import org.icepdf.core.util.GraphicsRenderingHints
@@ -96,12 +97,12 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
         val outputStream = new ContentHandlerOutputStream(xmlReceiver, true)
         outputStream.setContentType(s"image/${config.format}")
 
-        val fileItem = FileItemSupport.prepareFileItem(ExpirationScope.Request)(Logger.logger)
+        val fileItem = FileItemSupport.prepareFileItem(ExpirationScope.Request)
         try {
           readInputAsSAX(pc, "data", new BinaryTextXMLReceiver(fileItem.getOutputStream))
           convert(config, fileItem.asInstanceOf[DiskFileItem].getStoreLocation, outputStream)
         } finally {
-          fileItem.delete()
+          FileItemSupport.deleteFileItem(fileItem, ExpirationScope.Request.some)
         }
 
         outputStream.close()

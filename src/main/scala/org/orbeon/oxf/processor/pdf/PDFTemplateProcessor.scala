@@ -353,8 +353,8 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
           ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
             // NOTE: iText's Image.getInstance() closes the local URL's InputStream
-            val tempUrl = FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Request)(PDFTemplateProcessor.Logger.logger)._1
-            Image.getInstance(URLFactory.createURL(tempUrl.toString))
+            val tempUrl = FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Request)._1
+            Image.getInstance(URLFactory.createURL(tempUrl))
           }
       }
     }

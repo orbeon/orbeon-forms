@@ -97,15 +97,14 @@ class CustomUserAgent(
       val localUriString =
         FileItemSupport.inputStreamToAnyURI(
           resolveAndOpenStream(resolvedUriString),
-          ExpirationScope.Request)(
-          XHTMLToPDFProcessor.logger.logger
+          ExpirationScope.Request
         )._1.toString
 
       indentedLogger.logDebug("pdf", "getting image resource", "url", originalUriString, "local", localUriString)
 
       fromBase64(localUriString)  getOrElse
         fromImage(localUriString) map
-        maybeClone          getOrElse
+        maybeClone                getOrElse
         new ImageResource(originalUriString, null) // for some reason, we return a "null" image resource
     }
 

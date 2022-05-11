@@ -14,10 +14,12 @@
 package org.orbeon.oxf.xforms.processor
 
 import org.apache.commons.fileupload.FileUploadBase.{FileSizeLimitExceededException, SizeLimitExceededException}
+import org.apache.commons.fileupload.disk.DiskFileItem
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorOutput}
+import org.orbeon.oxf.util.FileItemSupport.FileItemOps
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.{Loggers, XFormsGlobalProperties}
@@ -61,12 +63,16 @@ class UploaderProcessor extends ProcessorImpl {
               // handle more than one here.
               val files =
                 nameValuesFileScan collect { // Q: Why do we test on fileItem.getName? We call the file scan API even is not blank, by the way!
-                  case (name, Right(fileItem), fileScanAcceptResultOpt) if fileItem.getName.nonAllBlank => // XXX TODO use fileScanAcceptResultOpt
+                  case (name, Right(fileItem: DiskFileItem), fileScanAcceptResultOpt) if fileItem.getName.nonAllBlank => // XXX TODO use fileScanAcceptResultOpt
+
+                    FileItemSupport.Logger.debug(
+                      s"UploaderServer got `FileItem` (disk location: `${fileItem.debugFileLocation}`)"
+                    )
 
                     // Get size before renaming below
                     val message   = fileScanAcceptResultOpt.flatMap(_.message)
-                    val mediatype = fileScanAcceptResultOpt.flatMap(_.mediatype) orElse fileItem.getContentType.trimAllToOpt
-                    val filename  = fileScanAcceptResultOpt.flatMap(_.filename ) orElse fileItem.getName.trimAllToOpt
+                    val mediatype = fileScanAcceptResultOpt.flatMap(_.mediatype) orElse fileItem.contentTypeOpt
+                    val filename  = fileScanAcceptResultOpt.flatMap(_.filename ) orElse fileItem.nameOpt
 
                     // Not used yet
                     //val extension = fileScanAcceptResultOpt.flatMap(_.extension)

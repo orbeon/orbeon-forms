@@ -15,7 +15,6 @@ package org.orbeon.oxf.util
 
 import java.io.OutputStream
 import java.{util => ju}
-
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
 import org.apache.commons.fileupload._
 import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
@@ -30,6 +29,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.FileItemSupport.FileItemOps
 import shapeless.syntax.typeable._
 
 import scala.collection.{mutable => m}
@@ -184,7 +184,8 @@ object Multipart {
     nameValues collect {
       case (_, Right(fileItem), _) => fileItem
     } foreach {
-      fileItem => runQuietly(fileItem.delete())
+      fileItem =>
+        FileItemSupport.deleteFileItem(fileItem, None)
     }
 
   private object Private {
@@ -261,7 +262,7 @@ object Multipart {
           } catch {
             // Clean-up `FileItem` right away in case of failure
             case NonFatal(t) =>
-              runQuietly(fileItem.delete())
+              FileItemSupport.deleteFileItem(fileItem, None)
               throw t
           }
 

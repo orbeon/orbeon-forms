@@ -203,14 +203,14 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     existingFileURI  : URI)(implicit
     logger           : IndentedLogger
   ): URI =
-    FileItemSupport.renameAndExpireWithSession(existingFileURI)(logger.logger.logger).toURI
+    FileItemSupport.renameAndExpireWithSession(existingFileURI).toURI
 
   def inputStreamToRequestUri(
     inputStream      : InputStream)(implicit
     logger           : IndentedLogger
   ): Option[URI] =
     useAndClose(inputStream) { is =>
-      FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Request)(logger.logger.logger)._1.some
+      FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Request)._1.some
     }
 
   def inputStreamToSessionUri(
@@ -218,7 +218,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     logger           : IndentedLogger
   ): Option[URI] =
     useAndClose(inputStream) { is =>
-      FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)(logger.logger.logger)._1.some
+      FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)._1.some
     }
 
   def getLastModifiedIfFast(absoluteURL: String): Long =
@@ -387,20 +387,16 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   def tempFileSize(filePath: String): Long =
     new File(filePath).length
 
+  // Used by `XFormsUploadControl` and `attachment.xbl`
   def deleteFileIfPossible(urlString: String): Unit =
     IOUtils.runQuietly {
       for {
         nonBlankUrlString <- urlString.trimAllToOpt
+        _                 = FileItemSupport.Logger.debug(s"considering deleting temporary file for attachment: `$nonBlankUrlString`")
         uri               = URI.create(nonBlankUrlString)
         temporaryFilePath <- FileUtils.findTemporaryFilePath(uri)
       } locally {
-        val file = new File(temporaryFilePath)
-        if (file.exists) {
-          if (file.delete())
-            Loggers.logger.debug(s"deleted temporary file upon upload: `${file.getCanonicalPath}`")
-          else
-            Loggers.logger.warn(s"could not delete temporary file upon upload: `${file.getCanonicalPath}`")
-        }
+        FileItemSupport.deleteFile(new File(temporaryFilePath), None)
       }
     }
 

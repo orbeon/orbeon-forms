@@ -142,7 +142,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     final ExternalContext.Request request = getRequest(pipelineContext);
 
                                     if (context.bodyFileItem == null) {
-                                        final FileItem fileItem = new DiskFileItemFactory(getMaxMemorySizeProperty(), NetUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
+                                        final FileItem fileItem = new DiskFileItemFactory(getMaxMemorySizeProperty(), NetUtils.getTemporaryDirectory()).createItem("dummy", null, false, null);
                                         pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
                                             public void contextDestroyed(boolean success) {
                                                 fileItem.delete();
@@ -270,7 +270,7 @@ public class RequestGenerator extends ProcessorImpl {
     public static String writeURLFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, ContentHandler contentHandler) throws SAXException {
 
         final String uriExpiringWithRequest =
-            FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request$.MODULE$, logger).toString();
+            FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Request$.MODULE$).toString();
 
         // If the content is meant to expire with the session, and we haven't yet renamed the file, then do this here.
         final String uriExpiringWithScope;

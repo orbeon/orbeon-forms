@@ -175,11 +175,11 @@ object ImageSupport {
     tryReadAllMetadata(existingUri) match {
       case Success(allMetadata) if mustTransform(allMetadata) =>
 
-        val fileItem = FileItemSupport.prepareFileItem(ExpirationScope.Session)(logger.logger.logger)
+        val fileItem = FileItemSupport.prepareFileItem(ExpirationScope.Session)
 
         useAndClose(fileItem.getOutputStream)(tryReadAndTransformToOutputStream(allMetadata, _)) map { _ =>
           (
-            FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Session)(logger.logger.logger),
+            FileItemSupport.urlForFileItemCreateIfNeeded(fileItem, ExpirationScope.Session),
             fileItem.getSize
           ).some
         }

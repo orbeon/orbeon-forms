@@ -148,22 +148,23 @@ object UploaderServer {
 
       val headersOpt =
         for {
-          headersSupport <- collectByErasedType[FileItemHeadersSupport](fileItem)
-          headers        <- Option(headersSupport.getHeaders)
+          support <- fileItem.cast[FileItemHeadersSupport]
+          headers <- Option(support.getHeaders)
         } yield
           headers
 
+      def findHeaderValue(name: String) =
+        for {
+          headers <- headersOpt
+          value   <- Option(headers.getHeader(name))
+        } yield
+          value
 
       // Handle max size
       locally {
         // This is `None` with Chrome and Firefox at least (2019-10-18: confirmed at least for Chrome)
-        val untrustedPartContentLengthOpt =
-          for {
-            headers             <- headersOpt
-            contentLengthString <- Option(headers.getHeader(Headers.ContentLength))
-            contentLengthLong   <- NumericUtils.parseLong(contentLengthString)
-          } yield
-            contentLengthLong
+        val untrustedPartContentLengthOpt: Option[Long] =
+          findHeaderValue(Headers.ContentLength) flatMap NumericUtils.parseLong
 
         val untrustedExpectedSizeOpt = untrustedPartContentLengthOpt orElse requestContentLengthOpt
 
@@ -191,8 +192,8 @@ object UploaderServer {
         // The assumption is that the content of the upload is typically much larger than
         // the overhead.
         (outerLimiterInputStream.maxBytes, maxUploadSizeForControl) match {
-          case (_,                   UnlimitedSize)         => outerLimiterInputStream.maxBytes = UnlimitedSize
-          case (UnlimitedSize, LimitedSize(_))              => throw new IllegalStateException
+          case (_,                    UnlimitedSize)        => outerLimiterInputStream.maxBytes = UnlimitedSize
+          case (UnlimitedSize,        LimitedSize(_))       => throw new IllegalStateException
           case (LimitedSize(current), LimitedSize(control)) => outerLimiterInputStream.maxBytes = LimitedSize(current + control)
         }
       }
@@ -202,15 +203,6 @@ object UploaderServer {
         allowedMediatypeRangesForControl match {
           case AllowedMediatypes.AllowedAnyMediatype =>
           case AllowedMediatypes.AllowedSomeMediatypes(allowedMediatypeRanges) =>
-
-            def findHeaderValue(name: String) =
-              for {
-                support <- fileItem.cast[FileItemHeadersSupport]
-                headers <- Option(support.getHeaders)
-                value   <- Option(headers.getHeader(name))
-              } yield
-                value
-
             Mediatypes.fromHeadersOrFilename(findHeaderValue, fileItem.getName.trimAllToOpt) match {
               case None =>
                 throw DisallowedMediatypeException(allowedMediatypeRanges, None)

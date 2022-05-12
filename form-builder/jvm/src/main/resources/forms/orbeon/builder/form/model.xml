@@ -401,6 +401,7 @@
                 <xf:property name="wizard-mode"                   value="bind('wizard-mode-bind')"/>
                 <xf:property name="wizard-subsections-nav"        value="bind('wizard-subsections-nav-bind')"/>
                 <xf:property name="wizard-subsections-toc"        value="bind('wizard-subsections-toc-bind')"/>
+                <xf:property name="wizard-separate-toc"           value="bind('wizard-separate-toc-bind')"/>
                 <xf:property name="labels"                        value="bind('labels-bind')"/>
                 <xf:property name="hints"                         value="bind('hints-bind')"/>
                 <xf:property name="data-migration"                value="bind('data-migration-bind')"/>
@@ -437,6 +438,7 @@
                 <xf:property name="wizard-mode"                   value="bind('wizard-mode-bind')"/>
                 <xf:property name="wizard-subsections-nav"        value="bind('wizard-subsections-nav-bind')"/>
                 <xf:property name="wizard-subsections-toc"        value="bind('wizard-subsections-toc-bind')"/>
+                <xf:property name="wizard-separate-toc"           value="bind('wizard-separate-toc-bind')"/>
                 <xf:property name="labels"                        value="bind('labels-bind')"/>
                 <xf:property name="hints"                         value="bind('hints-bind')"/>
                 <xf:property name="data-migration"                value="bind('data-migration-bind')"/>
@@ -470,6 +472,7 @@
                     <xf:bind id="wizard-mode-bind"                ref="wizard-mode"/>
                     <xf:bind id="wizard-subsections-nav-bind"     ref="wizard-subsections-nav"/>
                     <xf:bind id="wizard-subsections-toc-bind"     ref="wizard-subsections-toc"/>
+                    <xf:bind id="wizard-separate-toc-bind"        ref="wizard-separate-toc"/>
                     <xf:bind id="email-bind"                      ref="email"/>
                     <xf:bind id="data-migration-bind"             ref="data-migration"/>
                     <xf:bind id="rendered-page-orientation-bind"  ref="rendered-page-orientation"/>

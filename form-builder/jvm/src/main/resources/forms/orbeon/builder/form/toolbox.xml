@@ -56,6 +56,7 @@
                             <xf:property name="wizard-mode"                   value="bind('wizard-mode-bind')"/>
                             <xf:property name="wizard-subsections-nav"        value="bind('wizard-subsections-nav-bind')"/>
                             <xf:property name="wizard-subsections-toc"        value="bind('wizard-subsections-toc-bind')"/>
+                            <xf:property name="wizard-separate-toc"           value="bind('wizard-separate-toc-bind')"/>
                             <xf:property name="labels"                        value="bind('labels-bind')"/>
                             <xf:property name="hints"                         value="bind('hints-bind')"/>
                             <xf:property name="data-migration"                value="bind('data-migration-bind')"/>

@@ -608,6 +608,14 @@
                                             ref="*"
                                             origin="xf:element('wizard-subsections-toc', event('wizard-subsections-toc'))"/>
 
+                                         <xf:delete
+                                            bind="wizard-separate-toc-bind"/>
+                                        <xf:insert
+                                            if="event('wizard-separate-toc') = ('true', 'false')"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('wizard-separate-toc', event('wizard-separate-toc'))"/>
+
                                         <!-- Add/remove XForms properties as needed -->
                                         <xf:delete
                                             bind="attachment-max-size-bind"/>

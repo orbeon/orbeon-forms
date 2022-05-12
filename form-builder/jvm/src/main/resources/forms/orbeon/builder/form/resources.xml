@@ -383,6 +383,9 @@
                 <item id="2">Show subsections for all sections</item>
                 <item id="3">Don't show subsections</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label>Wizard Separate Table of Contents</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label>Maximum Attachment Size per File</label>
                 <hint>Can also be set on a per-control basis in Control Settings</hint>
@@ -1712,6 +1715,9 @@
                 <item id="2">Montrer les sous-sections pour toutes les sections</item>
                 <item id="3">Ne pas montrer les sous-sections</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label>Table de matières séparée pour le wizard</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label>Taille maximale des fichiers joints par contrôle</label>
                 <hint>Peut aussi être spécifié pour chaque contrôle via "Paramètres du contrôle"</hint>
@@ -3024,6 +3030,9 @@
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label todo="true">Wizard Separate Table of Contents</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -4364,6 +4373,9 @@
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label todo="true">Wizard Separate Table of Contents</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -5704,6 +5716,9 @@
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label todo="true">Wizard Separate Table of Contents</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -7036,6 +7051,9 @@
                 <item id="2">Alle Unterabschnitte zeigen</item>
                 <item id="3">Keine Unterabschnitte</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label todo="true">Wizard Separate Table of Contents</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label>Maximale Größe des Dateianhangs pro Steuerelement</label>
                 <hint>Kann auch pro Steuerelement konfiguriert werden (in den Steuerelement-Einstellungen)</hint>
@@ -8371,6 +8389,9 @@
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label todo="true">Wizard Separate Table of Contents</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -9703,6 +9724,9 @@
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label todo="true">Wizard Separate Table of Contents</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -11036,6 +11060,9 @@
                 <item id="2">Toon subsecties voor alle secties</item>
                 <item id="3">Toon geen subsecties</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label todo="true">Wizard Separate Table of Contents</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label>Maximum bijlagegrootte per control</label>
                 <hint>Kan ook per control worden ingesteld in de control-instellingen</hint>
@@ -12348,6 +12375,9 @@
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label todo="true">Wizard Separate Table of Contents</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -13687,6 +13717,9 @@
                 <item id="2">Show Subsections for All Sections</item>
                 <item id="3">Don't Show Subsections</item>
             </wizard-subsections-toc>
+            <wizard-separate-toc>
+                <label todo="true">Wizard Separate Table of Contents</label>
+            </wizard-separate-toc>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>

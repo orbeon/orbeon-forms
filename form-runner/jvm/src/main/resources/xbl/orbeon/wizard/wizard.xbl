@@ -1413,9 +1413,11 @@
                                 xxbl:scope="inner"/>
                         </xf:var>
 
+                        <!-- FIXME: `exists(@fr:section-status)` no longer works, while `exists(@*:section-status)` and
+                              `exists(@fr:section-status/string())` work! -->
                         <xf:var
                             name="top-level-section-visited"
-                            value="exists(@fr:section-status)"/>
+                            value="exists(@fr:section-status/string())"/>
 
                         <xf:var
                             name="top-level-section-tokens"

@@ -391,7 +391,7 @@
                                     ref="."/>
                                 <xf:setvalue
                                     if="not($multiple)"
-                                    iterate="., @*"
+                                    iterate="., @filename, @mediatype, @size"
                                     ref="."/>
                             </xf:action>
                         </xf:trigger>

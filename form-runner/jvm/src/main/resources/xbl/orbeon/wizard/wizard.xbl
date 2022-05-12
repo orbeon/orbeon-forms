@@ -147,18 +147,22 @@
                         <show-toc/>
                         <show-body/>
                         <readwrite/>
+
                         <validate/>
                         <separate-toc/>
+                        <section-status/>
                     </_>
                 </xf:instance>
 
                 <xf:var name="local" value="instance('local')"/>
 
-                <xf:bind ref="validate"                        xxf:default="Wizard:normalizeWizardMode(fr:component-param-value('validate'))"/>
-                <xf:bind ref="separate-toc"  type="xs:boolean" xxf:default="(fr:component-param-value('separate-toc'), 'false')[1]"/>
-                <xf:bind ref="current-index" type="xs:integer" xxf:default="1"/>
-                <xf:bind ref="show-toc"      type="xs:boolean" xxf:default="true()"/>
-                <xf:bind ref="show-body"     type="xs:boolean" xxf:default="not(../separate-toc/data(.))"/>
+                <xf:bind ref="validate"                         xxf:default="Wizard:normalizeWizardMode(fr:component-param-value('validate'))"/>
+                <xf:bind ref="separate-toc"   type="xs:boolean" xxf:default="(fr:component-param-value('separate-toc'),   'false')[1]"/>
+                <xf:bind ref="section-status" type="xs:boolean" xxf:default="../separate-toc/data(.) or fr:component-param-value('section-status') = 'true'"/>
+
+                <xf:bind ref="current-index"  type="xs:integer" xxf:default="1"/>
+                <xf:bind ref="show-toc"       type="xs:boolean" xxf:default="true()"/>
+                <xf:bind ref="show-body"      type="xs:boolean" xxf:default="not(../separate-toc/data(.))"/>
 
                 <xf:instance id="available-top-level-sections" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
                     <_/>
@@ -1508,7 +1512,7 @@
                                     <xh:span class="fr-toc-edit"><xf:output value="xxf:r('components.wizard.edit', '|fr-fr-resources|')"/></xh:span>
                                     <xsl:if test="$static-is-top-level-section">
                                         <!-- NOTE: Hide labels when not in `separate-toc` mode as they take a lot of space -->
-                                        <xh:span class="{{'xforms-hidden'[not(xxf:instance('local')/separate-toc/data(.))]}} label{{
+                                        <xh:span class="{{'xforms-hidden'[not(xxf:instance('local')/section-status/data(.))]}} label{{
                                             if ($top-level-section-tokens = 'invalid') then
                                                 ' label-important'
                                             else if ($top-level-section-tokens = 'incomplete') then

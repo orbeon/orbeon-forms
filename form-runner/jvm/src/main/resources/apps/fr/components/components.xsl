@@ -308,6 +308,20 @@
             )[1]"/>
 
     <xsl:variable
+        name="wizard-section-status"
+        as="xs:string"
+        select="
+            (
+                $fr-form-metadata/wizard-section-status[
+                    . = ('true', 'false')
+                ],
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.section-status', $app, $form), '.'))[
+                    . = ('true', 'false')
+                ],
+                'false'
+            )[1]"/>
+
+    <xsl:variable
         name="validation-mode"
         as="xs:string"
         select="

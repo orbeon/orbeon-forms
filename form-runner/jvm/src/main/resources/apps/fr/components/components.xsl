@@ -294,6 +294,20 @@
             )[1]"/>
 
     <xsl:variable
+        name="wizard-separate-toc"
+        as="xs:string"
+        select="
+            (
+                $fr-form-metadata/wizard-separate-toc[
+                    . = ('true', 'false')
+                ],
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.separate-toc', $app, $form), '.'))[
+                    . = ('true', 'false')
+                ],
+                'false'
+            )[1]"/>
+
+    <xsl:variable
         name="validation-mode"
         as="xs:string"
         select="
@@ -804,10 +818,9 @@
                  Builder for example can open a dialog upon load. Another possible fix would be to fix setfocus to
                  understand that if a modal dialog is currently visible, setting focus to a control outside that dialog
                  should not have any effect. See https://github.com/orbeon/orbeon-forms/issues/2010  -->
-            <xsl:if test="$enable-initial-focus">
+            <xsl:if test="$enable-initial-focus and $wizard-separate-toc = 'true'">
                 <xf:setfocus
                     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-                    if="not(Wizard:isWizardSeparateToc())"
                     event="xforms-ready"
                     control="fr-view-component"
                     includes="{{frf:xpathFormRunnerStringProperty('oxf.fr.detail.focus.includes')}}"

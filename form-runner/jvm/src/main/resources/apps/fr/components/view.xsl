@@ -385,6 +385,10 @@
                             <xsl:attribute name="subsections-toc" select="."/>
                         </xsl:for-each>
 
+                        <xsl:for-each select="$wizard-separate-toc[1]">
+                            <xsl:attribute name="separate-toc" select="."/>
+                        </xsl:for-each>
+
                         <!--
                             This is the `incremental|explicit` Form Runner validation mode, which is passed to the wizard but
                             is also used separately from the wizard. Here too the name should be clearer.

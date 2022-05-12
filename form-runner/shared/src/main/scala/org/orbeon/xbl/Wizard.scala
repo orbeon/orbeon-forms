@@ -46,10 +46,6 @@ object Wizard {
       case _              => "free"
     }
 
-  //@XPathFunction
-  def isWizardSeparateToc: Boolean =
-    formRunnerProperty("oxf.xforms.xbl.fr.wizard.separate-toc")(FormRunnerParams()) contains "true"
-
   def isWizardTocShown: Boolean =
     findWizardState map (_ elemValue "show-toc") contains "true"
 

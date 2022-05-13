@@ -202,7 +202,7 @@ object XFormsLoadAction {
           //
           val skipRewrite =
             if (! containingDocument.isPortletContainer) {
-              if (! containingDocument.isEmbedded)
+              if (! containingDocument.isEmbeddedFromHeaders)
                 false
               else
                 containingDocument.initializing

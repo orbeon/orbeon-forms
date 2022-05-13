@@ -159,7 +159,7 @@ private object FormRunnerFunctions {
     "is-draft"                    -> (() => FormRunnerParams().isDraft.getOrElse(false)),
     "is-design-time"              -> (() => FormRunner.isDesignTime(FormRunnerParams())),
     "is-readonly-mode"            -> (() => FormRunner.isReadonlyMode(FormRunnerParams())),
-    "is-embedded"                 -> (() => FormRunner.isEmbeddedFromHeaders),
+    "is-embedded"                 -> (() => FormRunner.isEmbedded),
     "is-background"               -> (() => FormRunner.isBackground(XFormsFunction.context, FormRunnerParams())),
     "is-noscript"                 -> (() => false),
     "is-form-data-valid"          -> (() => countValidationsByLevel(ErrorLevel) == 0),

@@ -371,8 +371,8 @@ trait FormRunnerBaseOps {
   def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
   def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ReadonlyModes(p.mode)
 
-  def isEmbeddedFromHeaders: Boolean =
-    inScopeContainingDocument.isEmbedded
+  def isEmbedded: Boolean =
+    inScopeContainingDocument.isEmbeddedFromHeaders || isEmbeddable
 
   // For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
   // probably, as they also need to send an XML response back.

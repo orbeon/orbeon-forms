@@ -143,11 +143,11 @@
 
     <!-- Buttons visible / enabled-->
     <property as="xs:string"  name="oxf.fr.detail.button.*.visible.*.*"                         value="fr:owns-lease-or-none-required()"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.review.visible.*.*"                    value="not(fr:is-browser-environment())"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.pdf.visible.*.*"                       value="not(fr:is-browser-environment())"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.tiff.visible.*.*"                      value="not(fr:is-browser-environment())"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.summary.visible.*.*"                   value="not(fr:is-browser-environment())"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.home.visible.*.*"                      value="not(fr:is-browser-environment())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.review.visible.*.*"                    value="not(fr:is-browser-environment()) and not(fr:is-embedded())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.pdf.visible.*.*"                       value="not(fr:is-browser-environment()) and not(fr:is-embedded())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.tiff.visible.*.*"                      value="not(fr:is-browser-environment()) and not(fr:is-embedded())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.summary.visible.*.*"                   value="not(fr:is-browser-environment()) and not(fr:is-embedded())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.home.visible.*.*"                      value="not(fr:is-browser-environment()) and not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.wizard-prev.visible.*.*"               >
         fr:owns-lease-or-none-required() and fr:is-wizard-body-shown()
     </property>

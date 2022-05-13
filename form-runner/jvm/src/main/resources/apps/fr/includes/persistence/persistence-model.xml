@@ -263,7 +263,8 @@
                         frf:isLeaseSupported($app, $form) and
                         not(fr:is-readonly-mode())        and
                         not($is-background)               and
-                        not(fr:is-browser-environment())
+                        not(fr:is-browser-environment())  and
+                        not(fr:is-embedded())
                     "/>
                 <xf:setvalue ref="$lease-enabled-elem" value="$lease-enabled"/>
                 <xf:action if="$lease-enabled">

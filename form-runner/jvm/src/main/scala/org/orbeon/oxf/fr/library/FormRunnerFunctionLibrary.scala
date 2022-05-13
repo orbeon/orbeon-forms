@@ -168,6 +168,7 @@ private object FormRunnerFunctions {
     "is-wizard-body-shown"        -> (() => Wizard.isWizardBodyShown),
     "is-wizard-first-page"        -> (() => Wizard.isWizardFirstPage),
     "is-wizard-last-page"         -> (() => Wizard.isWizardLastPage),
+    "is-wizard-separate-toc"      -> (() => Wizard.isWizardSeparateToc),
     "can-create"                  -> (() => FormRunner.canCreate),
     "can-read"                    -> (() => FormRunner.canRead),
     "can-update"                  -> (() => FormRunner.canUpdate),

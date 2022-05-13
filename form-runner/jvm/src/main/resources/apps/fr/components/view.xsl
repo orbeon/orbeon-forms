@@ -1066,7 +1066,7 @@
                                     if (xxf:is-blank($buttons-property-override) and $fr-mode = ('pdf', 'email')) then
                                         ()
                                     else if (xxf:is-blank($buttons-property-override) and $fr-mode = 'test') then
-                                        (('wizard-prev', 'wizard-next')[fr:is-wizard-body-shown()], 'validate')
+                                        (('wizard-toc', 'wizard-prev', 'wizard-next')[fr:is-wizard-body-shown()], 'validate')
                                     else
                                         xxf:split(xxf:property(string-join(($buttons-property, fr:app-name(), fr:form-name()), '.'))),
                                 $is-inner :=

@@ -58,6 +58,9 @@ object Wizard {
   def isWizardValidatedMode: Boolean =
     getWizardValidatedMode != "free"
 
+  def isWizardSeparateToc: Boolean =
+    findWizardState map (_ elemValue "separate-toc") contains "true"
+
   def wizardAvailableSections: Set[String] = {
 
     val resultOpt =

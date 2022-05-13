@@ -133,7 +133,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.service.background.enable-return-data.*.*"    value="false"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.*.*">
-        summary clear pdf save-final review
+        summary clear pdf wizard-toc wizard-prev wizard-next save-final review
     </property>
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-draft.*.*"             value="inline"/><!-- deprecated, use `save-progress` -->
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save-progress.*.*"          value="inline"/>
@@ -161,7 +161,7 @@
         not(fr:is-wizard-last-page())
     </property>
     <property as="xs:string"  name="oxf.fr.detail.button.wizard-toc.visible.*.*">
-        fr:owns-lease-or-none-required() and fr:is-wizard-body-shown()
+        fr:owns-lease-or-none-required() and fr:is-wizard-separate-toc() and fr:is-wizard-body-shown()
     </property>
 
     <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->

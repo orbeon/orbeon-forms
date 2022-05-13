@@ -60,25 +60,20 @@
                     ref="$i/attachment-mediatypes"
                     value="(event('attachment-mediatypes'), $unlikely-mediatype)[1]"/>
 
-                <xf:setvalue
-                    ref="$i/wizard"
-                    value="(event('wizard')[. = ('true', 'false')], 'default')[1]"/>
+                <xf:action iterate="'wizard', 'wizard-subsections-nav', 'wizard-separate-toc', 'wizard-section-status'">
+                    <xf:var name="name" value="."/>
+                    <xf:setvalue
+                        ref="$i/*[name() = $name]"
+                        value="(event($name)[. = ('true', 'false')], 'default')[1]"/>
+                </xf:action>
 
                 <xf:setvalue
                     ref="$i/wizard-mode"
                     value="(event('wizard-mode')[. = ('free', 'lax', 'strict')], 'default')[1]"/>
 
                 <xf:setvalue
-                    ref="$i/wizard-subsections-nav"
-                    value="(event('wizard-subsections-nav')[. = ('true', 'false')], 'default')[1]"/>
-
-                <xf:setvalue
                     ref="$i/wizard-subsections-toc"
                     value="(event('wizard-subsections-toc')[. = ('active', 'all', 'none')], 'default')[1]"/>
-
-                <xf:setvalue
-                    ref="$i/wizard-separate-toc"
-                    value="(event('wizard-separate-toc')[. = ('true', 'false')], 'default')[1]"/>
 
                 <xf:setvalue
                     ref="$i/labels"
@@ -349,6 +344,7 @@
                     <xf:property name="wizard-subsections-nav"        value="$i/wizard-subsections-nav/string()"/>
                     <xf:property name="wizard-subsections-toc"        value="$i/wizard-subsections-toc/string()"/>
                     <xf:property name="wizard-separate-toc"           value="$i/wizard-separate-toc/string()"/>
+                    <xf:property name="wizard-section-status"         value="$i/wizard-section-status/string()"/>
                     <xf:property name="mode"                          value="$i/mode/string()"/>
                     <xf:property name="data-migration"                value="$i/data-migration/string()"/>
                     <xf:property name="rendered-page-orientation"     value="$i/rendered-page-orientation/string()"/>
@@ -418,6 +414,7 @@
                         <wizard-subsections-nav/>
                         <wizard-subsections-toc/>
                         <wizard-separate-toc/>
+                        <wizard-section-status/>
                         <rendered-page-orientation/>
                         <rendered-page-size/>
                         <readonly-disable-calculate/>
@@ -938,6 +935,18 @@
                                             <xf:select1 ref="wizard-separate-toc" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/wizard-separate-toc/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/wizard-separate-toc/hint"/>
+                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="wizard-section-status" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/wizard-section-status/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/wizard-section-status/hint"/>
                                                 <xf:itemset ref="$resources/default-always-never/item">
                                                     <xf:label ref="."/>
                                                     <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>

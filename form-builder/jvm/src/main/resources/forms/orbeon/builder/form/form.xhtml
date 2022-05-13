@@ -575,13 +575,16 @@
                                             origin="xf:element('singleton', event('singleton'))"/>
 
                                         <!-- Add/remove wizard setting as needed -->
-                                        <xf:delete
-                                            bind="wizard-bind"/>
-                                        <xf:insert
-                                            if="event('wizard') = ('true', 'false')"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('wizard', event('wizard'))"/>
+                                        <xf:action iterate="'wizard', 'wizard-subsections-nav', 'wizard-separate-toc', 'wizard-section-status'">
+                                            <xf:var name="name" value="."/>
+                                            <xf:delete
+                                                ref="bind(concat($name, '-bind'))"/>
+                                            <xf:insert
+                                                if="event($name) = ('true', 'false')"
+                                                context="bind('metadata-bind')"
+                                                ref="*"
+                                                origin="xf:element($name, event($name))"/>
+                                        </xf:action>
 
                                         <!-- Add/remove wizard mode setting as needed -->
                                         <xf:delete
@@ -593,28 +596,12 @@
                                             origin="xf:element('wizard-mode', event('wizard-mode'))"/>
 
                                         <xf:delete
-                                            bind="wizard-subsections-nav-bind"/>
-                                        <xf:insert
-                                            if="event('wizard-subsections-nav') = ('true', 'false')"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('wizard-subsections-nav', event('wizard-subsections-nav'))"/>
-
-                                        <xf:delete
                                             bind="wizard-subsections-toc-bind"/>
                                         <xf:insert
                                             if="event('wizard-subsections-toc') = ('active', 'all', 'none')"
                                             context="bind('metadata-bind')"
                                             ref="*"
                                             origin="xf:element('wizard-subsections-toc', event('wizard-subsections-toc'))"/>
-
-                                         <xf:delete
-                                            bind="wizard-separate-toc-bind"/>
-                                        <xf:insert
-                                            if="event('wizard-separate-toc') = ('true', 'false')"
-                                            context="bind('metadata-bind')"
-                                            ref="*"
-                                            origin="xf:element('wizard-separate-toc', event('wizard-separate-toc'))"/>
 
                                         <!-- Add/remove XForms properties as needed -->
                                         <xf:delete

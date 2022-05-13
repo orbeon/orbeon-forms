@@ -1506,13 +1506,15 @@
 
                             <xf:trigger appearance="minimal">
                                 <xf:label>
-                                    <xf:output value="{$section-label-expr}">
-                                        <xsl:if test="$static-section-has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
-                                    </xf:output>
-                                    <xh:span class="fr-toc-edit"><xf:output value="xxf:r('components.wizard.edit', '|fr-fr-resources|')"/></xh:span>
+                                    <xh:span class="fr-toc-title">
+                                        <xf:output value="{$section-label-expr}">
+                                            <xsl:if test="$static-section-has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
+                                        </xf:output>
+                                    </xh:span>
+                                    <xh:span class="fr-toc-edit {{'xforms-hidden'[not(xxf:instance('local')/section-status/data(.))]}}"><xf:output value="xxf:r('components.wizard.edit', '|fr-fr-resources|')"/></xh:span>
                                     <xsl:if test="$static-is-top-level-section">
                                         <!-- NOTE: Hide labels when not in `separate-toc` mode as they take a lot of space -->
-                                        <xh:span class="{{'xforms-hidden'[not(xxf:instance('local')/section-status/data(.))]}} label{{
+                                        <xh:span class="fr-toc-status {{'xforms-hidden'[not(xxf:instance('local')/section-status/data(.))]}} label{{
                                             if ($top-level-section-tokens = 'invalid') then
                                                 ' label-important'
                                             else if ($top-level-section-tokens = 'incomplete') then

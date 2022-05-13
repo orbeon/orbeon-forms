@@ -386,6 +386,9 @@
             <wizard-separate-toc>
                 <label>Wizard Separate Table of Contents</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label>Always Show Wizard Section Status</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label>Maximum Attachment Size per File</label>
                 <hint>Can also be set on a per-control basis in Control Settings</hint>
@@ -1718,6 +1721,9 @@
             <wizard-separate-toc>
                 <label>Table de matières séparée pour le wizard</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label>Toujour montrer l'état des sections du wizard</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label>Taille maximale des fichiers joints par contrôle</label>
                 <hint>Peut aussi être spécifié pour chaque contrôle via "Paramètres du contrôle"</hint>
@@ -3033,6 +3039,9 @@
             <wizard-separate-toc>
                 <label todo="true">Wizard Separate Table of Contents</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label todo="true">Always Show Wizard Section Status</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -4376,6 +4385,9 @@
             <wizard-separate-toc>
                 <label todo="true">Wizard Separate Table of Contents</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label todo="true">Always Show Wizard Section Status</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -5719,6 +5731,9 @@
             <wizard-separate-toc>
                 <label todo="true">Wizard Separate Table of Contents</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label todo="true">Always Show Wizard Section Status</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -7054,6 +7069,9 @@
             <wizard-separate-toc>
                 <label todo="true">Wizard Separate Table of Contents</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label todo="true">Always Show Wizard Section Status</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label>Maximale Größe des Dateianhangs pro Steuerelement</label>
                 <hint>Kann auch pro Steuerelement konfiguriert werden (in den Steuerelement-Einstellungen)</hint>
@@ -8392,6 +8410,9 @@
             <wizard-separate-toc>
                 <label todo="true">Wizard Separate Table of Contents</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label todo="true">Always Show Wizard Section Status</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -9727,6 +9748,9 @@
             <wizard-separate-toc>
                 <label todo="true">Wizard Separate Table of Contents</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label todo="true">Always Show Wizard Section Status</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -11063,6 +11087,9 @@
             <wizard-separate-toc>
                 <label todo="true">Wizard Separate Table of Contents</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label todo="true">Always Show Wizard Section Status</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label>Maximum bijlagegrootte per control</label>
                 <hint>Kan ook per control worden ingesteld in de control-instellingen</hint>
@@ -12378,6 +12405,9 @@
             <wizard-separate-toc>
                 <label todo="true">Wizard Separate Table of Contents</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label todo="true">Always Show Wizard Section Status</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>
@@ -13720,6 +13750,9 @@
             <wizard-separate-toc>
                 <label todo="true">Wizard Separate Table of Contents</label>
             </wizard-separate-toc>
+            <wizard-section-status>
+                <label todo="true">Always Show Wizard Section Status</label>
+            </wizard-section-status>
             <attachment-max-size>
                 <label todo="true">[Maximum Attachment Size per File]</label>
                 <hint todo="true">[Can also be set on a per-control basis in Control Settings]</hint>

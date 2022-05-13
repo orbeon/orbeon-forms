@@ -73,13 +73,20 @@
                 display: flex;
                 align-items: center;
 
+                padding-left: 10px;  // narrower than default
+                padding-right: 10px; // narrower than default
+
                 .fr-toc-title {
                     order: 1;
                     flex-grow: 1;
+
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 .fr-toc-edit {
                     order: 3;
+
                     margin-left: 1em;
                     text-decoration: underline;
                     display: none;
@@ -87,9 +94,12 @@
 
                 .fr-toc-status {
                     order: 2;
+                    flex-grow: 0;
+                    flex-shrink: 0;
+
                     text-align: center;
                     width: 70px;
-                    margin-left: 1em;
+                    margin-left: 0.25em;
                 }
             }
 

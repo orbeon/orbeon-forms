@@ -62,7 +62,7 @@ trait FormRunnerPermissionsOps {
     PermissionsAuthorization.authorizedOperations(
       permissions,
       currentUser,
-      PermissionsAuthorization.CheckWithoutDataUser(optimistic = true)
+      PermissionsAuthorization.CheckWithoutDataUserPessimistic
     )
   }
 
@@ -138,24 +138,35 @@ trait FormRunnerPermissionsOps {
 
     allOperationsIfNoPermissionsDefined(permissionsElOrNull) { _ =>
       val rolesOperations       = Operations.serialize(authorizedOperationsBasedOnRoles(permissionsElOrNull, currentUser))
-      val ownerOperations       = ownerGroupMemberOperations(currentUser map     (_.userAndGroup.username), dataUsername,  "owner")
-      val groupMemberOperations = ownerGroupMemberOperations(currentUser flatMap (_.userAndGroup.groupname),    dataGroupname, "group-member")
+      val ownerOperations       = ownerGroupMemberOperations(currentUser map     (_.userAndGroup.username),  dataUsername,  "owner")
+      val groupMemberOperations = ownerGroupMemberOperations(currentUser flatMap (_.userAndGroup.groupname), dataGroupname, "group-member")
       (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
     }
   }
 
   /**
    * This is an "optimistic" version of allAuthorizedOperations, asking what operation you can do on data assuming
-   * you are the owner and a group member. It is used in the Form Runner home page to determine if it is even
-   * worth linking to the summary page for a given form.
+   * you are the owner and a group member. It is used in the Form Runner home page, through the form metadata API,
+   * to determine if it is even worth linking to the summary page for a given form.
+   *
+   * FIXME: We have similar, but better typed logic in `authorizedBasedOnRole()` (`SearchLogic.scala`), which we
+   *        could move to `PermissionsAuthorization`, and use from here and `SearchLogic.scala`
    */
   //@XPathFunction
   def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
-    val headers  = CoreCrossPlatformSupport.externalContext.getRequest.getHeaderValuesMap.asScala
-    val username = headers.get(Headers.OrbeonUsernameLower).toSeq.flatten.headOption
-    val group    = headers.get(Headers.OrbeonGroupLower   ).toSeq.flatten.headOption
 
-    allAuthorizedOperations(permissionsElement, username, group, None)
+    val headers       = CoreCrossPlatformSupport.externalContext.getRequest.getHeaderValuesMap.asScala
+    val authUsername  = headers.get(Headers.OrbeonUsernameLower).toSeq.flatten.headOption
+    val authGroupname = headers.get(Headers.OrbeonGroupLower   ).toSeq.flatten.headOption
+
+    val operationsWithoutAssumingOwnership = allAuthorizedOperations(permissionsElement, None, None, None)
+    def operationsAssumingOwnership        = allAuthorizedOperations(permissionsElement, authUsername, authGroupname, None)
+    val authUserCanCreate                  = Operations.allows(Operations.parse(operationsWithoutAssumingOwnership), Operation.Create)
+
+    // If the user can't create data, don't return permissions the user might have if that user was the owner; we
+    // assume that if the user can't create data, the user can never be the owner of any data
+    if (authUserCanCreate) operationsAssumingOwnership
+    else                   operationsWithoutAssumingOwnership
   }
 
   def orbeonRolesFromCurrentRequest: Set[String] =

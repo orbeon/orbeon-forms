@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.search
 
 import java.sql.Timestamp
 import org.orbeon.oxf.externalcontext.{Credentials, Organization, UserAndGroup}
-import org.orbeon.oxf.fr.FormDefinitionVersion
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner}
 import org.orbeon.oxf.fr.permission.Operation.{Delete, Read, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
@@ -55,9 +55,24 @@ trait SearchLogic extends SearchRequestParser {
           }
       }
 
-    def authorizedBasedOnRole(optimistic: Boolean) = {
-      val check                = PermissionsAuthorization.CheckWithoutDataUser(optimistic)
-      val authorizedOperations = PermissionsAuthorization.authorizedOperations(formPermissions, user, check)
+    def authorizedBasedOnRole(optimistic: Boolean): Boolean = {
+      val authorizedOperationsNotAssumingOwner = {
+        val notAssumingOwnerCheck = PermissionsAuthorization.CheckWithoutDataUserPessimistic
+        PermissionsAuthorization.authorizedOperations(formPermissions, user, notAssumingOwnerCheck)
+      }
+      val authorizedOperations = {
+        val checkAssumingOwner =
+          optimistic &&
+          request.username.isDefined &&
+          Operations.allows(authorizedOperationsNotAssumingOwner, Operation.Create)
+        if (checkAssumingOwner) {
+          val userAndGroup       = UserAndGroup(request.username.get, request.group)
+          val assumingOwnerCheck = PermissionsAuthorization.CheckWithDataUser(Some(userAndGroup), None)
+          PermissionsAuthorization.authorizedOperations(formPermissions, user, assumingOwnerCheck)
+        } else {
+          authorizedOperationsNotAssumingOwner
+        }
+      }
       Operations.allowsAny(authorizedOperations, searchOperations)
     }
 

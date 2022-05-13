@@ -50,7 +50,7 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
         val ops  = authorizedOperations(
           UndefinedPermissions,
           Some(user),
-          CheckWithoutDataUser(optimistic = false)
+          CheckWithoutDataUserPessimistic
         )
         assert(ops === SpecificOperations(Operations.All))
 
@@ -62,7 +62,7 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
         val ops = authorizedOperations(
           clerkPermissions,
           Some(juser.copy(roles = List(SimpleRole("clerk" )))),
-          CheckWithoutDataUser(optimistic = false)
+          CheckWithoutDataUserPessimistic
         )
         assert(ops === SpecificOperations(List(Read)))
       }
@@ -70,7 +70,7 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
         val ops = authorizedOperations(
           clerkPermissions,
           Some(juser.copy(roles = List(SimpleRole("other" )))),
-          CheckWithoutDataUser(optimistic = false)
+          CheckWithoutDataUserPessimistic
         )
         assert(ops === Operations.None)
       }

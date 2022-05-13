@@ -26,11 +26,9 @@ object PermissionsAuthorization {
   case class CheckWithDataUser(
     userAndGroup : Option[UserAndGroup],
     organization : Option[Organization]
-  )                                          extends PermissionsCheck
-  case class CheckWithoutDataUser(
-    optimistic   : Boolean
-  )                                          extends PermissionsCheck
-  case object CheckAssumingOrganizationMatch extends PermissionsCheck
+  )                                           extends PermissionsCheck
+  case object CheckWithoutDataUserPessimistic extends PermissionsCheck
+  case object CheckAssumingOrganizationMatch  extends PermissionsCheck
 
   def authorizedOperations(
     permissions : Permissions,
@@ -70,7 +68,7 @@ object PermissionsAuthorization {
       case SpecificOperations(operations) =>
         SpecificOperations(operations.filter { operation =>
           val checkBasedOnOperation = check match {
-            case CheckWithoutDataUser(_)
+            case CheckWithoutDataUserPessimistic
                  if operation == Operation.Create => checkWithCurrentUser
             case _                                => check
           }
@@ -81,7 +79,7 @@ object PermissionsAuthorization {
           AnyOperation
         else
           check match {
-            case CheckWithoutDataUser(_) =>
+            case CheckWithoutDataUserPessimistic =>
               if (allConditionsPass(checkWithCurrentUser))
                 SpecificOperations(List(Operation.Create))
               else
@@ -105,8 +103,8 @@ object PermissionsAuthorization {
               case (Some(currentUsername), Some(dataUsername)) if currentUsername == dataUsername => true
               case _ => false
             }
-          case CheckWithoutDataUser(optimistic) => optimistic
-          case CheckAssumingOrganizationMatch   => false
+          case CheckWithoutDataUserPessimistic => false
+          case CheckAssumingOrganizationMatch  => false
         }
       case Group =>
         check match {
@@ -115,8 +113,8 @@ object PermissionsAuthorization {
               case (Some(currentUsername), Some(dataGroupnameOpt)) if currentUsername == dataGroupnameOpt => true
               case _ => false
             }
-          case CheckWithoutDataUser(optimistic) => optimistic
-          case CheckAssumingOrganizationMatch   => false
+          case CheckWithoutDataUserPessimistic => false
+          case CheckAssumingOrganizationMatch  => false
         }
       case RolesAnyOf(permissionRoles) =>
         permissionRoles.exists(permissionRoleName =>
@@ -128,8 +126,8 @@ object PermissionsAuthorization {
                 check match {
                   case CheckWithDataUser(_, dataOrganizationOpt) =>
                     dataOrganizationOpt.exists(_.levels.contains(userOrganizationName))
-                  case CheckWithoutDataUser(optimistic) => optimistic
-                  case CheckAssumingOrganizationMatch   => true
+                  case CheckWithoutDataUserPessimistic => false
+                  case CheckAssumingOrganizationMatch  => true
                 }
               )
           }

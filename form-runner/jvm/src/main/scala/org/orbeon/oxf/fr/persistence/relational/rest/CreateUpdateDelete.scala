@@ -18,7 +18,7 @@ import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.externalcontext.UserAndGroup
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Update}
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUser}
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUserPessimistic}
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
@@ -408,7 +408,7 @@ trait CreateUpdateDelete
                     PermissionsAuthorization.authorizedOperations(
                       formPermissions,
                       PermissionsAuthorization.currentUserFromSession,
-                      CheckWithoutDataUser(optimistic = false)
+                      CheckWithoutDataUserPessimistic
                     )
                 val requiredOps   = if (delete) List(Delete) else List(Create)
                 Operations.allowsAny(authorizedOps, requiredOps)

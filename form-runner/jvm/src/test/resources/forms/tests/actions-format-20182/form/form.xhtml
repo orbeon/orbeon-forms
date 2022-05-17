@@ -109,7 +109,12 @@
                            method="get"
                            serialization="application/x-www-form-urlencoded"
                            replace="xxf:binary"
-                           mediatype="application/x-www-form-urlencoded"/>
+                           mediatype="application/x-www-form-urlencoded">
+                <xf:header>
+                    <xf:name>User-Agent</xf:name>
+                    <xf:value>OrbeonForms</xf:value>
+                </xf:header>
+            </xf:submission>
 
             <fr:listener version="2018.2" events="form-load-after-data" actions="populate-attachments"/>
 

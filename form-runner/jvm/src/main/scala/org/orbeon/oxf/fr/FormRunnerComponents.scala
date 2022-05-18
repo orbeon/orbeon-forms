@@ -26,6 +26,10 @@ trait FormRunnerComponents {
       NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
       FormRunnerFunctionLibrary,
       avt,
-      name => s"frf:controlVariableValue('$name', ${libraryName.trimAllToOpt.map("'" + _ + "'").getOrElse("()")})"
+      name =>
+        if (name == "fr-lang")
+          s"$$$name"
+        else
+          s"frf:controlVariableValue('$name', ${libraryName.trimAllToOpt.map("'" + _ + "'").getOrElse("()")})"
     )(indentedLogger)
 }

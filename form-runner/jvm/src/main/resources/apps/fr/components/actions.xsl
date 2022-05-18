@@ -930,7 +930,7 @@
                                             <xf:var
                                                 name="response-items"
                                                 context="xxf:instance('fr-service-response-instance')"
-                                                value="frf:replaceVarReferencesWithFunctionCalls(({$resource-items-value}), ({$resource-items-value}), false(), '{$library-name}')"/>
+                                                value="{frf:replaceVarReferencesWithFunctionCalls($resource-items-value, $resource-items-value, false(), $library-name)}"/>
 
                                             <xf:insert
                                                 context="$new-itemset-holder"

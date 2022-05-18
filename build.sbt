@@ -67,6 +67,7 @@ val Log4j2Version                 = "2.17.1"
 val CommonsIoVersion              = "2.11.0"
 val FlyingSaucerVersion           = "9.1.22"
 val TinkVersion                   = "1.6.1"
+val GsonVersion                   = "2.9.0"
 val ProtobufJavaVersionForTink    = "3.19.4"
 val JavaMailVersion               = "1.6.2"
 val JavaActivationVersion         = "1.2.0"
@@ -121,11 +122,11 @@ val CoreLibraryDependencies = Seq(
     ExclusionRule(organization = "com.amazonaws"),
     ExclusionRule(organization = "com.fasterxml.jackson.core")
   ),
+  "com.google.code.gson"        % "gson"                            % GsonVersion, // for Tink
   "com.google.protobuf"         % "protobuf-java"                   % ProtobufJavaVersionForTink,
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,
   "org.apache.commons"          % "commons-exec"                    % "1.3"             % Test,
   "org.apache.commons"          % "commons-dbcp2"                   % "2.9.0"           % Test,
-  "com.google.code.gson"        % "gson"                            % "2.9.0"           % Test,
   "com.google.guava"            % "guava"                           % "30.0-jre"        % Test,
   "org.mockito"                 % "mockito-all"                     % "1.10.19"         % Test,
   "mysql"                       % "mysql-connector-java"            % "8.0.26"          % Test,

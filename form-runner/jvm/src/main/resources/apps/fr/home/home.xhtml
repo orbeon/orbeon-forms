@@ -129,8 +129,8 @@
                 <xf:insert ref="instance('fr-form')" origin="xf:element('_')"/>
             </xf:action>
 
-            <xf:instance id="fr-form-instance">
-                <i>
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
+                <_>
                     <selection/>
 
                     <error/>
@@ -181,7 +181,7 @@
 
                     <form-definition-version/>
 
-                </i>
+                </_>
             </xf:instance>
 
             <xf:var name="selection"                value="xxf:split(selection)"/>
@@ -263,7 +263,7 @@
                         target="fr-form-model"
                         delay="2000"/>
             </xf:action>
-            <xf:instance id="fr-reindex-instance">
+            <xf:instance id="fr-reindex-instance" xxf:exclude-result-prefixes="#all">
                 <reindex>
                     <status>stopped</status>
                     <provider-token/>
@@ -275,7 +275,7 @@
             </xf:instance>
 
             <!-- Forms metadata -->
-            <xf:instance id="fr-metadata"><forms/></xf:instance>
+            <xf:instance id="fr-metadata" xxf:exclude-result-prefixes="#all"><forms/></xf:instance>
 
             <xf:var name="forms" value="instance('fr-metadata')/form"/>
 
@@ -283,8 +283,8 @@
                 ref="instance('fr-metadata')/form/(last-modified-time | remote-last-modified-time)"
                 type="xs:dateTime"/>
 
-            <xf:instance id="fr-metadata-local"><forms/></xf:instance>
-            <xf:instance id="fr-metadata-remote"><forms/></xf:instance>
+            <xf:instance id="fr-metadata-local" xxf:exclude-result-prefixes="#all"><forms/></xf:instance>
+            <xf:instance id="fr-metadata-remote" xxf:exclude-result-prefixes="#all"><forms/></xf:instance>
 
             <xf:submission
                 id="read-local-metadata"
@@ -504,7 +504,7 @@
                 replace="instance"
                 instance="fb-publish-response-instance"/>
 
-            <xf:instance id="fb-publish-response-instance"><_/></xf:instance>
+            <xf:instance id="fb-publish-response-instance" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
 
             <xf:submission
                 id="delete-submission"
@@ -522,7 +522,7 @@
             </xf:submission>
 
             <!-- Form definition -->
-            <xf:instance id="fr-form"><_/></xf:instance>
+            <xf:instance id="fr-form" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
 
             <xf:submission
                 id="read-form"
@@ -559,7 +559,7 @@
             </xf:action>
 
             <!-- Paging information -->
-            <xf:instance id="fr-paging-instance" xxf:expose-xpath-types="true">
+            <xf:instance id="fr-paging-instance" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
                 <paging xmlns="">
                     <total/>
                     <search-total/>

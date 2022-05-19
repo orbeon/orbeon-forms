@@ -18,7 +18,7 @@ object FormRunnerRename {
     namespaceMapping : NamespaceMapping,
     functionLibrary  : FunctionLibrary,
     avt              : Boolean,
-    newName          : String => String
+    replace          : String => String
   )(implicit
     logger           : IndentedLogger
   ): String = {
@@ -40,7 +40,7 @@ object FormRunnerRename {
       replaceSingleVarReferenceUseRegex(
         xpathString,
         oldName,
-        newName(oldName)
+        replace(oldName)
       )
     }
   }

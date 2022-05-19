@@ -41,6 +41,18 @@
             </xbl:handler>
         </xbl:handlers>
 
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="local" xxf:expose-xpath-types="true">
+                    <_>
+                        <from>0</from>
+                        <to>0</to>
+                    </_>
+                </xf:instance>
+                <xf:bind ref="from | to" type="xf:integer"/>
+            </xf:model>
+        </xbl:implementation>
+
         <!-- Keep a single global copy of the repeat menu. It is moved around as needed. -->
         <xxbl:global>
             <div class="dropdown fr-repeater-dropdown-menu" xmlns="http://www.w3.org/1999/xhtml">
@@ -84,6 +96,7 @@
                 <xsl:variable name="remove-constraint"  select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
                 <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
                 <xsl:variable name="level"              select="$root/@level"/>
+                <xsl:variable name="is-paging"          select="$root/@paging"/>
 
                 <!-- Allow  -->
                 <xsl:variable
@@ -102,13 +115,14 @@
                                 )
                         )[1]"/>
 
-                <xsl:variable name="appearance"         select="($root/@appearance, 'full')[1]"/>
-                <xsl:variable name="insert"             select="($root/@insert, if ($appearance = 'full') then 'index' else 'bottom')[1]"/>
-                <xsl:variable name="remove-at-bottom"   select="false()"/>
-                <xsl:variable name="use-paging"         select="$root/@view-appearance = 'wizard' and $root/@page-size = '1'"/>
+                <xsl:variable name="appearance"               select="($root/@appearance, 'full')[1]"/>
+                <xsl:variable name="insert"                   select="($root/@insert, if ($appearance = 'full') then 'index' else 'bottom')[1]"/>
+                <xsl:variable name="remove-at-bottom"         select="false()"/>
+                <xsl:variable name="use-wizard-repeat-paging" select="$root/@view-appearance = 'wizard' and $root/@page-size = '1'"/>
+                <xsl:variable name="use-pager"                select="not($root/@view-appearance = 'wizard') and $root/@page-size/xs:integer(.) gt 0"/>
 
                 <xsl:template match="/*">
-                    <xh:div xxf:control="true" class="{'fr-repeat-container', 'fr-repeater-paging'[$use-paging], @class}">
+                    <xh:div xxf:control="true" class="{'fr-repeat-container', 'fr-repeater-paging'[$use-wizard-repeat-paging], @class}">
 
                         <xf:var name="repeat-context">
                             <xxf:value value="." xxbl:scope="outer"/>
@@ -223,10 +237,36 @@
                                     xxf:title="{{xxf:r('components.section.add-another.hint',  '|fr-fr-resources|')}}">
                                     <xsl:copy-of select="$add-iteration-label-content"/>
                                 </xf:trigger>
+
+                                <xsl:if test="$use-pager">
+                                    <fr:pager
+                                        page-size="{$root/@page-size}"
+                                        total-value="count($repeat-sequence)"
+                                        from-ref="instance('local')/from"
+                                        to-ref="instance('local')/to"/>
+
+                                </xsl:if>
                             </xf:group>
                         </xsl:if>
 
-                        <xf:repeat ref="{$repeat-expression}" id="{$repeat-id}" xxbl:scope="outer">
+                       <xsl:if test="$use-pager">
+                            <xf:var name="fr-pager-from" xxbl:scope="outer">
+                                <xxf:value value="instance('local')/from/data(.)" xxbl:scope="inner"/>
+                            </xf:var>
+                            <xf:var name="fr-pager-to" xxbl:scope="outer">
+                                <xxf:value value="instance('local')/to/data(.)" xxbl:scope="inner"/>
+                            </xf:var>
+                        </xsl:if>
+
+                        <xf:repeat id="{$repeat-id}" xxbl:scope="outer">
+                            <xsl:choose>
+                                <xsl:when test="$use-pager">
+                                    <xsl:attribute name="ref" select="concat('(', $repeat-expression, ')[position() ge $fr-pager-from and position() le $fr-pager-to]')"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:attribute name="ref" select="$repeat-expression"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
                             <xf:group appearance="xxf:internal" xxbl:scope="inner" id="repeat-group">
 
                                 <!-- Run row operations, checking that they are allowed first -->
@@ -437,7 +477,7 @@
                                 </xf:var>
 
                                 <xsl:choose>
-                                    <xsl:when test="$use-paging">
+                                    <xsl:when test="$use-wizard-repeat-paging">
                                         <xf:switch caseref="xxf:repeat-position() = index('{$repeat-id}')" xxf:update="full" xxbl:scope="outer">
                                             <xf:case value="true()" xxbl:scope="inner">
                                                 <xsl:copy-of select="$iteration-label-content"/>

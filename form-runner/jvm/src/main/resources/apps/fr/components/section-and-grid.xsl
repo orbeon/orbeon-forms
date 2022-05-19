@@ -81,9 +81,14 @@
                 <xsl:attribute name="readonly">true</xsl:attribute>
             </xsl:if>
 
-            <xsl:if test="$use-view-appearance and $view-appearance = 'wizard' and not($is-readonly-mode)">
-                <xsl:copy-of select="@page-size"/>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="$use-view-appearance and $view-appearance = 'wizard' and not($is-readonly-mode) and @page-size = '1'">
+                    <xsl:copy-of select="@page-size"/>
+                </xsl:when>
+                <xsl:when test="not($use-view-appearance and $view-appearance = 'wizard')">
+                    <xsl:copy-of select="@page-size"/>
+                </xsl:when>
+            </xsl:choose>
 
             <xsl:for-each select="@min | @max | @freeze | @remove-constraint | @clear-constraint | @class">
                 <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCallsFromString(., ., true(), $library-name, ())"/>

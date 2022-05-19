@@ -84,7 +84,10 @@
 
         .fr-repeater-top-buttons {
 
-            display: block;
+            display: flex;
+            column-gap: 1em;
+            align-items: center;
+
             margin-bottom: 0;
             padding-bottom: 4px;
             border-bottom: 3px solid #ddd;
@@ -117,6 +120,14 @@
             width: 8px;
             height: 12px;
             margin: 4px auto;
+        }
+    }
+
+    .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+        .xbl-fr-repeater {
+            .xbl-fr-pager {
+                display: none;
+            }
         }
     }
 }

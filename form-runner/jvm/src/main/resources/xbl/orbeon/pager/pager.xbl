@@ -1,0 +1,150 @@
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xbl:binding
+        id="fr-pager"
+        element="fr|pager"
+        xxbl:mode="">
+
+        <xbl:resources>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="xxforms-visible" phase="target">
+
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model>
+
+                <xf:instance id="fr-paging-instance" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
+                    <_ xmlns="">
+                        <search-total/>
+                        <page-size>20</page-size>
+                        <page-number>1</page-number>
+                        <page-count/>
+                        <from>0</from>
+                        <to>0</to>
+                        <prev-trigger/>
+                        <next-trigger/>
+                    </_>
+                </xf:instance>
+
+                <xf:bind ref="instance('fr-paging-instance')">
+                    <xf:bind ref="* except (prev-trigger, next-trigger)" type="xs:integer"/>
+                    <xf:bind ref="page-size"    calculate="(fr:component-param-value('page-size'), 10)[. castable as xs:integer][1]"/>
+                    <xf:bind ref="page-count"   calculate="(../search-total + ../page-size - 1) idiv ../page-size"/>
+                    <xf:bind ref="from"         calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
+                    <xf:bind ref="to"           calculate="min((../page-number * ../page-size, ../search-total))"/>
+                    <xf:bind ref="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>
+                    <xf:bind ref="next-trigger" readonly="../search-total = 0 or xs:integer(../search-total) le xs:integer(../to)"/>
+                </xf:bind>
+
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template>
+            <div class="pagination" xmlns="http://www.w3.org/1999/xhtml">
+
+                <xf:group ref="()" xbl:attr="model context ref=total-value" appearance="xxf:internal" xxbl:scope="outer">
+                    <xf:var name="value" as="item()?" xxbl:scope="inner">
+                        <xxf:value value="string(.)" xxbl:scope="outer"/>
+                        <xf:setvalue
+                            event="xforms-enabled xforms-value-changed"
+                            ref="instance('fr-paging-instance')/search-total"
+                            value="$value"/>
+                    </xf:var>
+                </xf:group>
+
+                <xf:group ref="()" xbl:attr="model context ref=from-ref" appearance="xxf:internal" xxbl:scope="outer">
+                    <xf:group ref="instance('fr-paging-instance')/from" xxbl:scope="inner" appearance="xxf:internal">
+                        <xf:var name="ref" as="item()?">
+                            <xxf:value value="." xxbl:scope="outer"/>
+                        </xf:var>
+                        <xf:var name="value" as="xs:integer" value="data(.)">
+                            <xf:setvalue event="xforms-enabled xforms-value-changed" ref="$ref" value="$value"/>
+                        </xf:var>
+                    </xf:group>
+                </xf:group>
+
+                <xf:group ref="()" xbl:attr="model context ref=to-ref" appearance="xxf:internal" xxbl:scope="outer">
+                    <xf:group ref="instance('fr-paging-instance')/to" xxbl:scope="inner" appearance="xxf:internal">
+                        <xf:var name="ref" as="item()?">
+                            <xxf:value value="." xxbl:scope="outer"/>
+                        </xf:var>
+                        <xf:var name="value" as="xs:integer" value="data(.)">
+                            <xf:setvalue event="xforms-enabled xforms-value-changed" ref="$ref" value="$value"/>
+                        </xf:var>
+                    </xf:group>
+                </xf:group>
+
+                <ul>
+                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
+                        <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first">
+                            <xf:label><xh:i class="fa fa-fw fa-step-backward"/></xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="1"/>
+                                <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </li>
+                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
+                        <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev">
+                            <xf:label><xh:i class="fa fa-fw fa-chevron-left"/></xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:setvalue ref="instance('fr-paging-instance')/page-number" value=". - 1"/>
+                                <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </li>
+                    <!-- Some results -->
+                    <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
+                        <li role="presentation">
+                            <xf:output
+                                value="
+                                    concat(
+                                        string(max((instance('fr-paging-instance')/from, 0))),
+                                        ' ',
+                                        xxf:r('summary.paging.to', '|fr-fr-resources|'),
+                                        ' ',
+                                        string(max((instance('fr-paging-instance')/to, 0))),
+                                        ' ',
+                                        xxf:r('summary.paging.of', '|fr-fr-resources|'),
+                                        ' ',
+                                        instance('fr-paging-instance')/search-total
+                                    )"/>
+                        </li>
+                    </xf:group>
+                    <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
+                        <!-- No results -->
+                    </xf:group>
+                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
+                        <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next">
+                            <xf:label><xh:i class="fa fa-fw fa-chevron-right"/></xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:setvalue ref="instance('fr-paging-instance')/page-number" value=". + 1"/>
+                                <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </li>
+                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
+                        <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last">
+                            <xf:label><xh:i class="fa fa-fw fa-step-forward"/></xf:label>
+                            <xf:action event="DOMActivate">
+                                <xf:setvalue ref="instance('fr-paging-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
+                                <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </li>
+                </ul>
+            </div>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

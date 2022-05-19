@@ -800,11 +800,7 @@
                                         <xh:ul>
                                             <xh:li class="{{if ($prev-button-ref instance of xs:string) then 'disabled' else ''}}">
                                                 <xf:trigger id="fr-wizard-prev"  ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
-                                                    <!-- https://github.com/orbeon/orbeon-forms/issues/723
-                                                         https://github.com/orbeon/orbeon-forms/issues/1042 -->
-                                                    <xf:label>
-                                                        <xh:i class="fa fa-fw fa-chevron-left"/>&#x200b;
-                                                    </xf:label>
+                                                    <xf:label><xh:i class="fa fa-fw fa-chevron-left"/></xf:label>
                                                     <xf:action event="DOMActivate" type="xpath">
                                                         fr:run-process-by-name('oxf.fr.detail.process', 'wizard-prev')
                                                     </xf:action>
@@ -848,9 +844,7 @@
                                             </xh:li>
                                             <xh:li class="{{if ($next-button-ref instance of xs:string) then 'disabled' else ''}}">
                                                 <xf:trigger id="fr-wizard-next" ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
-                                                    <xf:label>
-                                                        <xh:i class="fa fa-fw fa-chevron-right"/>&#x200b;
-                                                    </xf:label>
+                                                    <xf:label><xh:i class="fa fa-fw fa-chevron-right"/></xf:label>
                                                     <xf:action event="DOMActivate" type="xpath">
                                                         fr:run-process-by-name('oxf.fr.detail.process', 'wizard-next')
                                                     </xf:action>

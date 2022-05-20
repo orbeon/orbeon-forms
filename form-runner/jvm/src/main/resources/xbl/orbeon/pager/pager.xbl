@@ -12,15 +12,6 @@
         element="fr|pager"
         xxbl:mode="">
 
-        <xbl:resources>
-        </xbl:resources>
-
-        <xbl:handlers>
-            <xbl:handler event="xxforms-visible" phase="target">
-
-            </xbl:handler>
-        </xbl:handlers>
-
         <xbl:implementation>
             <xf:model>
 
@@ -51,7 +42,7 @@
         </xbl:implementation>
 
         <xbl:template>
-            <div class="pagination" xmlns="http://www.w3.org/1999/xhtml">
+            <xh:div class="pagination">
 
                 <xf:group ref="()" xbl:attr="model context ref=total-value" appearance="xxf:internal" xxbl:scope="outer">
                     <xf:var name="value" as="item()?" xxbl:scope="inner">
@@ -85,8 +76,8 @@
                     </xf:group>
                 </xf:group>
 
-                <ul>
-                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
+                <xh:ul>
+                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first">
                             <xf:label><xh:i class="fa fa-fw fa-step-backward"/></xf:label>
                             <xf:action event="DOMActivate">
@@ -94,8 +85,8 @@
                                 <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
                             </xf:action>
                         </xf:trigger>
-                    </li>
-                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
+                    </xh:li>
+                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev">
                             <xf:label><xh:i class="fa fa-fw fa-chevron-left"/></xf:label>
                             <xf:action event="DOMActivate">
@@ -103,10 +94,10 @@
                                 <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
                             </xf:action>
                         </xf:trigger>
-                    </li>
+                    </xh:li>
                     <!-- Some results -->
                     <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
-                        <li role="presentation">
+                        <xh:li role="presentation">
                             <xf:output
                                 value="
                                     concat(
@@ -120,12 +111,12 @@
                                         ' ',
                                         instance('fr-paging-instance')/search-total
                                     )"/>
-                        </li>
+                        </xh:li>
                     </xf:group>
                     <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
                         <!-- No results -->
                     </xf:group>
-                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
+                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next">
                             <xf:label><xh:i class="fa fa-fw fa-chevron-right"/></xf:label>
                             <xf:action event="DOMActivate">
@@ -133,8 +124,8 @@
                                 <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
                             </xf:action>
                         </xf:trigger>
-                    </li>
-                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
+                    </xh:li>
+                    <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last">
                             <xf:label><xh:i class="fa fa-fw fa-step-forward"/></xf:label>
                             <xf:action event="DOMActivate">
@@ -142,9 +133,9 @@
                                 <xf:dispatch name="fr-pager-changed" targetid="fr-pager"/>
                             </xf:action>
                         </xf:trigger>
-                    </li>
-                </ul>
-            </div>
+                    </xh:li>
+                </xh:ul>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

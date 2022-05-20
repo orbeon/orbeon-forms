@@ -438,7 +438,11 @@
                         ' '
                     )"/>
             <xsl:apply-templates select="@* except @class"/>
-            <xf:group model="fr-form-model" id="fr-view" class="container{if ($fluid) then '-fluid' else ''} fr-view {{concat('fr-mode-', $fr-mode)}}" xxf:element="div">
+            <xf:group
+                model="fr-form-model"
+                id="fr-view"
+                class="container{if ($fluid) then '-fluid' else ''} fr-view {{concat('fr-mode-', $fr-mode)}}"
+                xxf:element="div">
                 <xsl:apply-templates select="if ($is-detail and not($is-form-builder)) then $default-page-template else node()"/>
                 <xsl:call-template name="fr-hidden-controls"/>
                 <xsl:call-template name="fr-dialogs"/>

@@ -264,18 +264,18 @@
                         delay="2000"/>
             </xf:action>
             <xf:instance id="fr-reindex-instance" xxf:exclude-result-prefixes="#all">
-                <reindex>
+                <_>
                     <status>stopped</status>
                     <provider-token/>
                     <provider-current/>
                     <provider-total/>
                     <document-current/>
                     <document-total/>
-                </reindex>
+                </_>
             </xf:instance>
 
             <!-- Forms metadata -->
-            <xf:instance id="fr-metadata" xxf:exclude-result-prefixes="#all"><forms/></xf:instance>
+            <xf:instance id="fr-metadata" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
 
             <xf:var name="forms" value="instance('fr-metadata')/form"/>
 
@@ -283,8 +283,8 @@
                 ref="instance('fr-metadata')/form/(last-modified-time | remote-last-modified-time)"
                 type="xs:dateTime"/>
 
-            <xf:instance id="fr-metadata-local" xxf:exclude-result-prefixes="#all"><forms/></xf:instance>
-            <xf:instance id="fr-metadata-remote" xxf:exclude-result-prefixes="#all"><forms/></xf:instance>
+            <xf:instance id="fr-metadata-local" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
+            <xf:instance id="fr-metadata-remote" xxf:exclude-result-prefixes="#all"><_/></xf:instance>
 
             <xf:submission
                 id="read-local-metadata"

@@ -3228,7 +3228,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
             // This is for JAWS to read the content of the dialog (otherwise it just reads the button)
             var dialogDiv = YAHOO.util.Dom.getElementsByClassName("xforms-dialog", "div", yuiDialog.element)[0];
-            dialogDiv.setAttribute("aria-live", "polite");
+            dialogDiv.setAttribute("aria-live",  "polite");
+            dialogDiv.setAttribute("aria-modal", "true");
+            dialogDiv.setAttribute("role",       "dialog");
+            var dialogHeadDiv = dialogDiv.querySelector(".xxforms-dialog-head");
+            if (dialogHeadDiv != null)
+                dialogDiv.setAttribute("aria-labelledby", dialogDiv.id + "_h");
 
             // If the dialog has a close "x" in the dialog toolbar, register a listener on the escape key that does the same as clicking on the "x"
             if (hasClose) {

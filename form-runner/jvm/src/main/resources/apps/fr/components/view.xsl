@@ -802,7 +802,7 @@
         </xsl:for-each>
 
         <!-- Error dialog -->
-        <fr:alert-dialog id="fr-error-dialog" close="true">
+        <fr:alert-dialog id="fr-error-dialog">
             <fr:label ref="$fr-resources/detail/messages/error-dialog-title"/>
             <fr:neutral-choice/>
         </fr:alert-dialog>

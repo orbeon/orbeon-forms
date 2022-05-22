@@ -36,7 +36,7 @@ val PerfolationVersion               = "1.2.8"
 val ScalaJsStubsVersion              = "1.1.0" // can be different from Scala.js version
 val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
 val ScalaJsTimeVersion               = "2.0.0"
-val ScalaJsLocalesVersion            = "1.1.3"
+val ScalaJsLocalesVersion            = "1.4.0"
 
 // Scala libraries for Scala JVM only
 val Parboiled1Version             = "1.3.1"

@@ -179,8 +179,6 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.us-phone.field-width"                 value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:integer" name="oxf.xforms.xbl.fr.error-summary.page-size"              value="20"/>
 
-    <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.max-characters"     value="60"/>
-    <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.tolerance"          value="20"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.start-year"             value="1970"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.dropdown-date.end-year">
         year-from-date(current-date())

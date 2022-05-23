@@ -162,7 +162,7 @@
             <!-- Standard Form Runner data instance -->
             <!-- TODO: Can we remove this? -->
             <xf:instance id="fr-form-instance">
-                <dummy/>
+                <_/>
             </xf:instance>
 
             <!-- Standard Form Runner resources instance -->
@@ -173,11 +173,11 @@
             </xf:instance>
 
             <!-- Instance to control the triggers' appearance -->
-            <xf:instance id="fr-summary-triggers-instance">
-                <triggers xmlns="">
+            <xf:instance id="fr-summary-triggers-instance" xxf:exclude-result-prefixes="#all">
+                <_ xmlns="">
                     <enabled/>
                     <disabled/>
-                </triggers>
+                </_>
             </xf:instance>
 
             <xf:bind ref="instance('fr-summary-triggers-instance')/disabled" readonly="true()"/>
@@ -215,13 +215,13 @@
             <!-- Instance to track search results and paging -->
             <!-- NOTE: As of 2011-11-28, `app` and `form` are not set by us. We leave them in for now because the
                  built-in eXist, Oracle and MySQL implementations rely on them in the Form Runner page flow. -->
-            <xf:instance id="fr-search-instance">
-                <search xmlns="">
+            <xf:instance id="fr-search-instance" xxf:exclude-result-prefixes="#all">
+                <_ xmlns="">
                     <query/>
                     <page-size>5</page-size>
                     <page-number>1</page-number>
                     <lang/>
-                </search>
+                </_>
             </xf:instance>
 
             <!-- Contains search labels -->
@@ -274,8 +274,8 @@
             </xf:bind>
 
             <!-- Paging information -->
-            <xf:instance id="fr-paging-instance">
-                <search xmlns="">
+            <xf:instance id="fr-paging-instance" xxf:exclude-result-prefixes="#all">
+                <_ xmlns="">
                     <search-total/>
                     <page-size/>
                     <page-number/>
@@ -284,7 +284,7 @@
                     <to>0</to>
                     <prev-trigger/>
                     <next-trigger/>
-                </search>
+                </_>
             </xf:instance>
 
             <!-- Calculations for page navigation -->
@@ -299,8 +299,8 @@
                 <xf:bind ref="next-trigger" readonly="../search-total = 0 or xs:integer(../search-total) le xs:integer(../to)"/>
             </xf:bind>
 
-            <xf:instance id="fr-selection-instance">
-                <selection xmlns=""/>
+            <xf:instance id="fr-selection-instance" xxf:exclude-result-prefixes="#all">
+                <_ xmlns=""/>
             </xf:instance>
 
             <!-- 1. Load form metadata -->
@@ -496,7 +496,7 @@
                 submission="fr-summary-search-submission"/>
 
             <!-- Duplicate -->
-            <xf:instance id="fr-duplicate" xmlns=""><document-id/></xf:instance>
+            <xf:instance id="fr-duplicate" xmlns="" xxf:exclude-result-prefixes="#all"><document-id/></xf:instance>
 
             <!-- Read form data for the duplicate button -->
             <!-- NOTE: It would be nice if this could be done entirely with a process. -->

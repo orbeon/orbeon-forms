@@ -26,7 +26,6 @@ pages = [
     "test-update-full"
     "test-upload-replace-instance"
     "test-xforms-controls"
-    "xbl/orbeon/accordion/accordion-unittest"
     "xbl/orbeon/autocomplete/autocomplete-unittest"
     "xbl/orbeon/button/button-unittest"
     "xbl/orbeon/currency/currency-unittest"

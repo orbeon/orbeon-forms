@@ -37,7 +37,7 @@ class JSDateUtilsTest extends AnyFunSpec {
       isoString                  <- isoStrings
     }
       it(s"must pass for `$isoString`") {
-        val actual   = isoDateToStringUsingLocalTimezone(isoString).map(_.getTime)
+        val actual   = parseIsoDateUsingLocalTimezone(isoString).map(_.getTime)
         val expected = expectedDate.map(_.getTime)
         assert(actual === expected)
       }
@@ -50,7 +50,7 @@ class JSDateUtilsTest extends AnyFunSpec {
       date                  <- dateOpt
     }
       it(s"must pass for `$expectedString`") {
-        assert(dateToISOStringUsingLocalTimezone(date) === expectedString)
+        assert(dateToIsoStringUsingLocalTimezone(date) === expectedString)
       }
   }
 
@@ -64,7 +64,7 @@ class JSDateUtilsTest extends AnyFunSpec {
       current.setSeconds(0)
       current.setMilliseconds(0)
 
-      assert(isoDateToStringUsingLocalTimezone(dateToISOStringUsingLocalTimezone(current)) map (_.getTime) contains current.getTime)
+      assert(parseIsoDateUsingLocalTimezone(dateToIsoStringUsingLocalTimezone(current)) map (_.getTime) contains current.getTime)
     }
   }
 }

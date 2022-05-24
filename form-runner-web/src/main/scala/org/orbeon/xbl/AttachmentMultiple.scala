@@ -77,7 +77,7 @@ object AttachmentMultiple {
       private def uploadControlElem = containerElem.querySelector(".xforms-upload").asInstanceOf[html.Element]
       private def uploadInputOpt    = Option(containerElem.querySelector(".xforms-upload-select").asInstanceOf[html.Input])
 
-      private  object EventSupport extends EventListenerSupport
+      private object EventSupport extends EventListenerSupport
 
       private def browserSupportsFileDrop: Boolean =
         ! Bowser.msie.contains(true)
@@ -102,7 +102,7 @@ object AttachmentMultiple {
           EventSupport.addListener(dropElem, name, fn)
 
         addListenerOnDropElem(
-          "drop",
+          EventNames.Drop,
           ev => {
             removeClass()
             if (ev.dataTransfer.types contains "Files") {
@@ -122,7 +122,7 @@ object AttachmentMultiple {
         )
 
         addListenerOnDropElem(
-          "dragover",
+          EventNames.DragOver,
           ev => {
             ev.preventDefault() // Necessary to indicate the drop target
             // "add an entry to L consisting of the string "Files""
@@ -134,7 +134,7 @@ object AttachmentMultiple {
         )
 
         addListenerOnDropElem(
-          "dragleave", // doesn't seem like `dragexit` is a thing anymore
+          EventNames.DragLeave, // doesn't seem like `dragexit` is a thing anymore
           ev => {
             scribe.debug(ev.`type`)
             if (ev.target eq dropElem) {
@@ -146,7 +146,7 @@ object AttachmentMultiple {
 
         EventSupport.addListener(
           selectLabel,
-          "keydown",
+          EventNames.KeyDown,
           (ev: dom.raw.KeyboardEvent) => {
             if (ev.key == "Enter" || ev.key == " ") {
               ev.preventDefault() // so that the page doesn't scroll

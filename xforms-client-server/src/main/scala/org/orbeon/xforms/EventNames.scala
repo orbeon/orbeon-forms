@@ -43,6 +43,13 @@ object EventNames {
   val FocusOut                 = "focusout"
   val DOMContentLoaded         = "DOMContentLoaded"
   val DOMActivate              = "DOMActivate"
+  val Input                    = "input"
+  val MouseOver                = "mouseover"
+  val MouseOut                 = "mouseout"
+  val Click                    = "click"
+  val Drop                     = "drop"
+  val DragOver                 = "dragover"
+  val DragLeave                = "dragleave"
 
   val KeyTextPropertyName      = "text"
   val KeyModifiersPropertyName = "modifiers"

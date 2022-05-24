@@ -244,14 +244,14 @@ object InitSupport {
         // for compatibility with older browsers that didn't support `focusin` and `focusout`, and since they are different events,
         // we're then unable stopping the propagation of those events
 
-        GlobalEventListenerSupport.addListener(dom.document, "focusin" ,  Events.focus)
-        GlobalEventListenerSupport.addListener(dom.document, "focusout",  Events.blur)
-        GlobalEventListenerSupport.addListener(dom.document, "keypress",  Events.keypress)
-        GlobalEventListenerSupport.addListener(dom.document, "keydown",   Events.keydown)
-        GlobalEventListenerSupport.addListener(dom.document, "input",     Events.input)
-        GlobalEventListenerSupport.addListener(dom.document, "mouseover", Events.mouseover)
-        GlobalEventListenerSupport.addListener(dom.document, "mouseout",  Events.mouseout)
-        GlobalEventListenerSupport.addListener(dom.document, "click",     Events.click)
+        GlobalEventListenerSupport.addJsListener(dom.document, EventNames.FocusIn ,  Events.focus)
+        GlobalEventListenerSupport.addJsListener(dom.document, EventNames.FocusOut,  Events.blur)
+        GlobalEventListenerSupport.addJsListener(dom.document, EventNames.KeyPress,  Events.keypress)
+        GlobalEventListenerSupport.addJsListener(dom.document, EventNames.KeyDown,   Events.keydown)
+        GlobalEventListenerSupport.addJsListener(dom.document, EventNames.Input,     Events.input)
+        GlobalEventListenerSupport.addJsListener(dom.document, EventNames.MouseOver, Events.mouseover)
+        GlobalEventListenerSupport.addJsListener(dom.document, EventNames.MouseOut,  Events.mouseout)
+        GlobalEventListenerSupport.addJsListener(dom.document, EventNames.Click,     Events.click)
 
         // We could do this on `pageshow` or `pagehide`
         // https://github.com/orbeon/orbeon-forms/issues/4552

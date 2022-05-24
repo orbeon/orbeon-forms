@@ -120,7 +120,7 @@ private class DateCompanion extends XBLCompanionWithState {
         opts.format = orbeonFormatToBootstrapFormat(format)
         weekStart.foreach(opts.weekStart = _)
         if (excludedDates.nonEmpty)
-          opts.datesDisabled = excludedDates.flatMap(JSDateUtils.isoDateToStringUsingLocalTimezone).toJSArray
+          opts.datesDisabled = excludedDates.flatMap(JSDateUtils.parseIsoDateUsingLocalTimezone).toJSArray
       }
 
       opts
@@ -160,7 +160,7 @@ private class DateCompanion extends XBLCompanionWithState {
       value.trimAllToOpt match {
         case Some(newValue) =>
 
-          JSDateUtils.isoDateToStringUsingLocalTimezone(newValue) match {
+          JSDateUtils.parseIsoDateUsingLocalTimezone(newValue) match {
             case Some(date) =>
               datePicker.setDate(date)
             case None       =>
@@ -213,7 +213,7 @@ private class DateCompanion extends XBLCompanionWithState {
           getInputFieldValue
         } else {
           Option(datePicker.getDate) match {
-            case Some(date) => JSDateUtils.dateToISOStringUsingLocalTimezone(date) // https://github.com/orbeon/orbeon-forms/issues/3907
+            case Some(date) => JSDateUtils.dateToIsoStringUsingLocalTimezone(date) // https://github.com/orbeon/orbeon-forms/issues/3907
             case None       => getInputFieldValue
           }
         }

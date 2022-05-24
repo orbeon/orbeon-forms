@@ -14,17 +14,9 @@
 package org.orbeon.xbl
 
 
-//
-// NOTE: This is in `xformsCommon` because it is used by:
-//
-// - `formRunnerJVM`
-// - `xformsWeb`
-//
-// But there might be a better place to put this, such as an
-// `formRunnerComponents` module.
-//
 case class DateExternalValue(
   value         : String,
   format        : String,
-  excludedDates : List[String]
+  excludedDates : List[String],
+  weekStart     : Option[Int]
 )

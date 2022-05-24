@@ -113,20 +113,38 @@ object Support {
     element     : Element,
     eventTarget : FocusEvent => EventTarget,
     targetClass : String
-  ): Unit = {
+  ): Unit =
     element.addEventListener(
-      "focusout",
-      (event: FocusEvent) => {
-        // 2020-12-22: Noted that `relatedTarget` can be `null` in plain XForms.
-        // Not sure why, but protecting against crash here with pattern match.
-        eventTarget(event) match {
-          case relatedTarget: dom.html.Element =>
-            if (relatedTarget.classList.contains(targetClass))
-              event.stopPropagation()
-          case _ =>
-        }
-      },
+      EventNames.FocusOut,
+      focusFunction(eventTarget, targetClass),
       useCapture = true
     )
-  }
+
+  def stopFocusOutPropagationUseEventListenerSupport(
+    element     : Element,
+    eventTarget : FocusEvent => EventTarget,
+    targetClass : String,
+    support     : EventListenerSupport
+  ): Unit =
+    support.addListener(
+      element,
+      EventNames.FocusOut,
+      focusFunction(eventTarget, targetClass),
+      useCapture = true
+    )
+
+  private def focusFunction(
+    eventTarget : FocusEvent => EventTarget,
+    targetClass : String
+  ): FocusEvent => Unit =
+    (event: FocusEvent) => {
+      // 2020-12-22: Noted that `relatedTarget` can be `null` in plain XForms.
+      // Not sure why, but protecting against crash here with pattern match.
+      eventTarget(event) match {
+        case relatedTarget: dom.html.Element =>
+          if (relatedTarget.classList.contains(targetClass))
+            event.stopPropagation()
+        case _ =>
+      }
+    }
 }

@@ -13,6 +13,7 @@
   */
 package org.orbeon.xbl
 
+import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.model.InstanceData
@@ -31,13 +32,15 @@ object DateSupportJava {
 
   //@XPathFunction
   def serializeExternalValueJava(
-    binding : om.Item,
-    format  : String
+    binding   : om.Item,
+    format    : String,
+    weekStart : String
   ): String =
     DateExternalValue(
       value         = binding.getStringValue,
       format        = format,
-      excludedDates = InstanceData.findCustomMip(binding, ExcludedDatesQName) map (_.splitTo[List]()) getOrElse Nil
+      excludedDates = InstanceData.findCustomMip(binding, ExcludedDatesQName) map (_.splitTo[List]()) getOrElse Nil,
+      weekStart     = weekStart.trimAllToOpt.flatMap(v => if (v == "sunday") 0.some else if (v == "monday") 1.some else None)
     ).asJson.noSpaces
 
   //@XPathFunction

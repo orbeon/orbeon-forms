@@ -77,10 +77,10 @@ object XFormsBaseHandler {
     }
   }
 
-  def handleAriaAttributes(required: Boolean, valid: Boolean, destAttributes: AttributesImpl): Unit = {
+  def handleAriaAttributes(required: Boolean, valid: Boolean, visited: Boolean, destAttributes: AttributesImpl): Unit = {
     if (required)
       destAttributes.addAttribute("", "aria-required", "aria-required", XMLReceiverHelper.CDATA, "true")
-    if (! valid)
+    if (! valid && visited)
       destAttributes.addAttribute("", "aria-invalid", "aria-invalid", XMLReceiverHelper.CDATA, "true")
   }
 

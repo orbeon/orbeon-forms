@@ -188,6 +188,7 @@
                             var progressReceived = ORBEON.util.Dom.getAttribute(elem, "progress-received");
                             var progressExpected = ORBEON.util.Dom.getAttribute(elem, "progress-expected");
                             var newSchemaType    = ORBEON.util.Dom.getAttribute(elem, "type");
+                            var newVisited       = ORBEON.util.Dom.getAttribute(elem, "visited");
 
                             var documentElement = document.getElementById(controlId);
 
@@ -443,12 +444,11 @@
                                         else
                                             firstInput.removeAttr("aria-required");
                                     }
-                                    if (newLevel != null) {
-                                        if (newLevel == "error")
-                                            firstInput.attr("aria-invalid", "true");
-                                        else
-                                            firstInput.removeAttr("aria-invalid");
-                                    }
+
+                                    var visited = newVisited != null ? newVisited          : documentElement.classList.contains("xforms-visited");
+                                    var invalid = newLevel   != null ? newLevel == "error" : documentElement.classList.contains("xforms-invalid");
+                                    if (invalid && visited) firstInput.attr      ("aria-invalid", "true");
+                                    else                    firstInput.removeAttr("aria-invalid");
                                 }
 
                                 if ($(documentElement).is('.xforms-upload')) {
@@ -592,7 +592,6 @@
                                 );
 
                             // Handle visited flag
-                            var newVisited = ORBEON.util.Dom.getAttribute(elem, "visited");
                             if (newVisited)
                                 ORBEON.xforms.Controls.updateVisited(documentElement, newVisited == 'true');
 

@@ -69,7 +69,7 @@ class XFormsTextareaHandler(
       if (isXFormsReadonlyButNotStaticReadonly(textareaControl))
         XFormsBaseHandlerXHTML.outputReadonlyAttribute(htmlTextareaAttributes)
 
-      XFormsBaseHandler.handleAriaAttributes(textareaControl.isRequired, textareaControl.isValid, htmlTextareaAttributes)
+      XFormsBaseHandler.handleAriaAttributes(textareaControl.isRequired, textareaControl.isValid, textareaControl.visited, htmlTextareaAttributes)
 
       // Add attribute even if the control is not concrete
       placeHolderInfo foreach { placeHolderInfo =>

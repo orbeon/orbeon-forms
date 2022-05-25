@@ -50,7 +50,7 @@ class XFormsSecretHandler(
       secretControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XFormsNames.XXFORMS_NAMESPACE_URI)
       if (isXFormsReadonlyButNotStaticReadonly(secretControl))
         XFormsBaseHandlerXHTML.outputReadonlyAttribute(reusableAttributes)
-      XFormsBaseHandler.handleAriaAttributes(secretControl.isRequired, secretControl.isValid, containerAttributes)
+      XFormsBaseHandler.handleAriaAttributes(secretControl.isRequired, secretControl.isValid, secretControl.visited, containerAttributes)
 
       // Output element
       contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes)

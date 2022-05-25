@@ -174,8 +174,7 @@ class XFormsInputHandler(
           } else {
             if (isXFormsReadonlyButNotStaticReadonly(inputControl))
               outputReadonlyAttribute(reusableAttributes)
-
-            handleAriaAttributes(inputControl.isRequired, inputControl.isValid, reusableAttributes)
+            handleAriaAttributes(inputControl.isRequired, inputControl.isValid, inputControl.visited, reusableAttributes)
 
             xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
             xmlReceiver.endElement(XHTML_NAMESPACE_URI, "input", inputQName)

@@ -398,7 +398,7 @@ class XFormsSelect1Handler(
         outputDisabledAttribute(containerAttributes)
 
       if (control ne null)
-        XFormsBaseHandler.handleAriaAttributes(control.isRequired, control.isValid, containerAttributes)
+        XFormsBaseHandler.handleAriaAttributes(control.isRequired, control.isValid, control.visited, containerAttributes)
 
       withElement(localName = "select", prefix = xhtmlPrefix, uri = XHTML, atts = containerAttributes) {
         itemsetOpt foreach { itemset =>

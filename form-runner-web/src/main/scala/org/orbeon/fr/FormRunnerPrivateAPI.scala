@@ -117,4 +117,7 @@ object FormRunnerPrivateAPI extends js.Object {
       url       = PathUtils.recombineQuery(location.pathname, newParams) + location.hash
     )
   }
+
+  def navigateToError(errorPosition: String, controlName: String, label: String, validationMessage: String, validationLevel: String): Unit =
+    FormRunnerAPI.errorSummary._dispatch(errorPosition.toInt, controlName, label, validationMessage, validationLevel)
 }

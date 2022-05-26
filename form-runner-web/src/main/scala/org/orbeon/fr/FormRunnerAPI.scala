@@ -15,6 +15,7 @@ package org.orbeon.fr
 
 import org.orbeon.oxf.fr.{ControlOps, Names}
 import org.orbeon.xforms._
+import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -44,7 +45,43 @@ object FormRunnerAPI extends FormRunnerEmbeddingAPI {
   ): Boolean =
     Page.getForm(Support.formElemOrDefaultForm(formElem).id).isFormDataSafe
 
-  val wizard: FormRunnerWizardAPI.type = FormRunnerWizardAPI
+  val wizard      : FormRunnerWizardAPI.type       = FormRunnerWizardAPI
+  val errorSummary: FormRunnerErrorSummaryAPI.type = FormRunnerErrorSummaryAPI
+}
+
+object FormRunnerErrorSummaryAPI extends js.Object {
+
+  private var listeners: List[js.Function1[ErrorSummaryNavigateToErrorEvent, Any]] = Nil
+
+  trait ErrorSummaryNavigateToErrorEvent extends js.Object {
+    val errorPosition    : Int
+    val controlName      : String
+    val label            : String
+    val validationMessage: String
+    val validationLevel  : String
+
+    // Later
+//    val sectionForTemplate: Option[String]
+//    val repetitions: List[Int]
+//    val ancestorSections: List[String]
+//    val wizardPageName: String
+  }
+
+  // Private
+  def _dispatch(_errorPosition: Int, _controlName: String, _label: String, _validationMessage: String, _validationLevel: String): Unit =
+    listeners foreach (_(new ErrorSummaryNavigateToErrorEvent {
+      val errorPosition    : Int    = _errorPosition
+      val controlName      : String = _controlName
+      val label            : String = _label
+      val validationMessage: String = _validationMessage
+      val validationLevel  : String = _validationLevel
+    }))
+
+  def addNavigateToErrorListener(fn: js.Function1[ErrorSummaryNavigateToErrorEvent, Any]): Unit =
+    listeners ::= fn
+
+  def removeNavigateToErrorListener(fn: js.Function1[ErrorSummaryNavigateToErrorEvent, Any]): Unit =
+    listeners = listeners filterNot (_ eq fn)
 }
 
 object FormRunnerWizardAPI extends js.Object {

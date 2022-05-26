@@ -772,7 +772,7 @@
                         <xxf:attribute for="my-date≡input" name="placeholder"/>
                         <xxf:control id="my-date≡xf-13" relevant="false"/>
                         <xxf:init id="my-date">
-                            <xxf:value>{"value":"2010-01-13","format":"[M]/[D]/[Y]","excludedDates":[]}</xxf:value>
+                            <xxf:value>{"value":"2010-01-13","format":"[M]/[D]/[Y]","excludedDates":[],"weekStart":null}</xxf:value>
                         </xxf:init>
                     </xxf:control-values>
                     <xxf:focus control-id="my-date"/>

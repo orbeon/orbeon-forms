@@ -134,6 +134,10 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
     )
+
+    Fun("form-runner-link", classOf[FRLinkBackToFormRunner], op = 0, min = 1, STRING, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
   }
 }
 
@@ -406,5 +410,21 @@ private object FormRunnerFunctions {
           Version.compare(metadataVersion, paramVersion).exists(_ >= 0)
       }
     }
+  }
+
+  class FRLinkBackToFormRunner extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(context: XPathContext): StringValue =
+      FormRunner.buildLinkBackToFormRunner(
+        stringArgument(0)(context) match {
+          case "edit"    => "LinkToEditPageParam"
+          case "view"    => "LinkToViewPageParam"
+          case "new"     => "LinkToNewPageParam"
+          case "summary" => "LinkToSummaryPageParam"
+          case "landing" => "LinkToLandingPageParam"
+          case "home"    => "LinkToHomePageParam"
+          case "pdf"     => "LinkToPdfParam"
+          case other     => throw new IllegalArgumentException(other)
+        }
+      )
   }
 }

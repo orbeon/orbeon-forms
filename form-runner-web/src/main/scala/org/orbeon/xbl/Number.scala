@@ -14,13 +14,14 @@
 package org.orbeon.xbl
 
 import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants, EventNames}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
-
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.timers
@@ -63,7 +64,7 @@ object Number {
         companion.visibleInputElemOpt = Some(visibleInputElem)
 
         // Switch the input type after cleaning up the value for edition
-        $(visibleInputElem).on(s"${EventNames.TouchStart}$ListenerSuffix ${EventNames.FocusIn}$ListenerSuffix", {
+        $(visibleInputElem).on(s"${DomEventNames.TouchStart}$ListenerSuffix ${DomEventNames.FocusIn}$ListenerSuffix", {
           (bound: html.Element, e: JQueryEventObject) => {
 
             scribe.debug(s"reacting to event ${e.`type`}")
@@ -80,7 +81,7 @@ object Number {
         }: js.ThisFunction)
 
         // Restore input type, send the value to the server, and updates value after server response
-        $(visibleInputElem).on(s"${EventNames.FocusOut}$ListenerSuffix", {
+        $(visibleInputElem).on(s"${DomEventNames.FocusOut}$ListenerSuffix", {
           (bound: html.Element, e: JQueryEventObject) => {
 
             scribe.debug(s"reacting to event ${e.`type`}")
@@ -110,7 +111,7 @@ object Number {
           }
         }: js.ThisFunction)
 
-        $(visibleInputElem).on(s"${EventNames.KeyPress}$ListenerSuffix", {
+        $(visibleInputElem).on(s"${DomEventNames.KeyPress}$ListenerSuffix", {
           (_: html.Element, e: JQueryEventObject) => {
 
             scribe.debug(s"reacting to event ${e.`type`}")
@@ -120,7 +121,7 @@ object Number {
               updateStateAndSendValueToServer()
               AjaxClient.fireEvent(
                 AjaxEvent(
-                  eventName = EventNames.DOMActivate,
+                  eventName = DomEventNames.DOMActivate,
                   targetId  = containerElem.id
                 )
               )

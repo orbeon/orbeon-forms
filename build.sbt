@@ -515,6 +515,23 @@ lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) 
 lazy val domJVM = dom.jvm.dependsOn(commonJVM)
 lazy val domJS  = dom.js.dependsOn(commonJS)
 
+lazy val webSupport = (project in file("web-support"))
+  .settings(commonSettings: _*)
+  .settings(commonScalaJsSettings)
+  .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(JSDependenciesPlugin)
+  .settings(
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
+  )
+  .settings(
+    name := "orbeon-web-support",
+
+    libraryDependencies ++= Seq(
+      "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
+    ),
+  )
+
 lazy val embedding = (project in file("embedding"))
   .dependsOn(core)
   .settings(commonSettings: _*)
@@ -1038,6 +1055,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
   .enablePlugins(JSDependenciesPlugin)
   .dependsOn(
     commonJS % "test->test;compile->compile",
+    webSupport,
     xformsClientServerJS
   )
   .settings(
@@ -1063,7 +1081,6 @@ lazy val xformsWeb = (project in file("xforms-web"))
     jsDependencies                      += "org.webjars" % "jquery" % "3.6.0" / "3.6.0/jquery.js",
     Test / jsDependencies               += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     Test / unmanagedResourceDirectories += baseDirectory.value / "src" / "main" / "assets",
-
 
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
@@ -1231,8 +1248,8 @@ lazy val orbeonWarJS = orbeonWar.js
   .settings(commonSettings: _*)
   .dependsOn(
     commonJS,
-    xformsWeb,
-    nodeFacades
+    nodeFacades,
+    webSupport
   )
   .settings(
 

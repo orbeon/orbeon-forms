@@ -16,6 +16,7 @@ package org.orbeon.xbl
 import cats.syntax.option._
 import org.orbeon.date.JSDateUtils
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.web.DomEventNames
 import org.orbeon.xbl.DatePickerFacade._
 import org.orbeon.xforms.Constants.XFormsIosClass
 import org.orbeon.xforms.facade.XBL
@@ -131,9 +132,9 @@ private class DateCompanion extends XBLCompanionWithState {
     // Register listeners
 
     // DOM listeners
-    EventSupport.addListener(containerElem.querySelector(".add-on"), EventNames.KeyDown,  onIconKeypress)
-    EventSupport.addListener(inputEl(0),                             EventNames.KeyPress, onInputKeypress)
-    EventSupport.addListener(inputEl(0),                             EventNames.Change,   onInputChangeUpdateDatePicker)
+    EventSupport.addListener(containerElem.querySelector(".add-on"), DomEventNames.KeyDown,  onIconKeypress)
+    EventSupport.addListener(inputEl(0),                             DomEventNames.KeyPress, onInputKeypress)
+    EventSupport.addListener(inputEl(0),                             DomEventNames.Change,   onInputChangeUpdateDatePicker)
 
     // Date picker listeners
     enableDatePickerChangeListener()
@@ -239,7 +240,7 @@ private class DateCompanion extends XBLCompanionWithState {
       onDateSelectedUpdateStateAndSendValueToServer()
       AjaxClient.fireEvent(
         AjaxEvent(
-          eventName = EventNames.DOMActivate,
+          eventName = DomEventNames.DOMActivate,
           targetId  = containerElem.id
         )
       )

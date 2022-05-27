@@ -15,6 +15,7 @@ package org.orbeon.xforms
 
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.web.DomEventNames
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
 import org.scalajs.dom.experimental.domparser.{DOMParser, SupportedType}
@@ -115,7 +116,7 @@ object Support {
     targetClass : String
   ): Unit =
     element.addEventListener(
-      EventNames.FocusOut,
+      DomEventNames.FocusOut,
       focusFunction(eventTarget, targetClass),
       useCapture = true
     )
@@ -128,7 +129,7 @@ object Support {
   ): Unit =
     support.addListener(
       element,
-      EventNames.FocusOut,
+      DomEventNames.FocusOut,
       focusFunction(eventTarget, targetClass),
       useCapture = true
     )

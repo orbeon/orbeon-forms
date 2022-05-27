@@ -14,6 +14,7 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.Bowser
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
 import org.orbeon.xforms._
 import org.scalajs.dom
@@ -102,7 +103,7 @@ object AttachmentMultiple {
           EventSupport.addListener(dropElem, name, fn)
 
         addListenerOnDropElem(
-          EventNames.Drop,
+          DomEventNames.Drop,
           ev => {
             removeClass()
             if (ev.dataTransfer.types contains "Files") {
@@ -122,7 +123,7 @@ object AttachmentMultiple {
         )
 
         addListenerOnDropElem(
-          EventNames.DragOver,
+          DomEventNames.DragOver,
           ev => {
             ev.preventDefault() // Necessary to indicate the drop target
             // "add an entry to L consisting of the string "Files""
@@ -134,7 +135,7 @@ object AttachmentMultiple {
         )
 
         addListenerOnDropElem(
-          EventNames.DragLeave, // doesn't seem like `dragexit` is a thing anymore
+          DomEventNames.DragLeave, // doesn't seem like `dragexit` is a thing anymore
           ev => {
             scribe.debug(ev.`type`)
             if (ev.target eq dropElem) {
@@ -146,7 +147,7 @@ object AttachmentMultiple {
 
         EventSupport.addListener(
           selectLabel,
-          EventNames.KeyDown,
+          DomEventNames.KeyDown,
           (ev: dom.raw.KeyboardEvent) => {
             if (ev.key == "Enter" || ev.key == " ") {
               ev.preventDefault() // so that the page doesn't scroll

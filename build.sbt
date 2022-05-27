@@ -411,15 +411,6 @@ lazy val commonScalaJsSettings = Seq(
 
   Compile / scalaJSUseMainModuleInitializer := true,
   Test    / scalaJSUseMainModuleInitializer := false,
-
-  scalacOptions ++= {
-    if (scalaJSVersion.startsWith("0.6."))
-      List(
-        "-P:scalajs:sjsDefinedByDefault"
-      )
-    else
-      Nil
-  }
 )
 
 lazy val assetsSettings = Seq(

@@ -59,7 +59,7 @@ private class DateCompanion extends XBLCompanionWithState {
     if (iOS) {
       // On iOS, use native date picker
       inputEl.attr("type", "date")
-      inputEl.on("change", () => onDateSelectedUpdateStateAndSendValueToServer())
+      EventSupport.addListener(inputEl(0), DomEventNames.Change, (_: dom.raw.Event) => onDateSelectedUpdateStateAndSendValueToServer())
     } else {
       createDatePicker(dateExternalValue = None)
     }
@@ -69,10 +69,13 @@ private class DateCompanion extends XBLCompanionWithState {
 
     scribe.debug("destroy")
 
-    Language.offLangChange(containerElem.id)
-    EventSupport.clearAllListeners()
-
-    datePicker.destroy()
+    if (iOS) {
+      EventSupport.clearAllListeners()
+    } else {
+      Language.offLangChange(containerElem.id)
+      EventSupport.clearAllListeners()
+      datePicker.destroy()
+    }
   }
 
   def xformsUpdateState(previousStateOpt: Option[State], newState: State): Unit = {

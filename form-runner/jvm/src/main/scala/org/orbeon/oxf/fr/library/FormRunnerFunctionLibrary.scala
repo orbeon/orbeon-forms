@@ -414,17 +414,6 @@ private object FormRunnerFunctions {
 
   class FRLinkBackToFormRunner extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): StringValue =
-      FormRunner.buildLinkBackToFormRunner(
-        stringArgument(0)(context) match {
-          case "edit"    => "LinkToEditPageParam"
-          case "view"    => "LinkToViewPageParam"
-          case "new"     => "LinkToNewPageParam"
-          case "summary" => "LinkToSummaryPageParam"
-          case "landing" => "LinkToLandingPageParam"
-          case "home"    => "LinkToHomePageParam"
-          case "pdf"     => "LinkToPdfParam"
-          case other     => throw new IllegalArgumentException(other)
-        }
-      )
+      FormRunner.buildLinkBackToFormRunnerUsePageName(stringArgument(0)(context))
   }
 }

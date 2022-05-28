@@ -82,6 +82,20 @@ trait FormRunnerEmail {
       case ControlBindPathHoldersResources(_, _, _, None, _) => Nil
     }
 
+  def buildLinkBackToFormRunnerUsePageName(pageName: String): String =
+    buildLinkBackToFormRunner(
+      pageName match {
+        case "edit"    => "LinkToEditPageParam"
+        case "view"    => "LinkToViewPageParam"
+        case "new"     => "LinkToNewPageParam"
+        case "summary" => "LinkToSummaryPageParam"
+        case "landing" => "LinkToLandingPageParam"
+        case "home"    => "LinkToHomePageParam"
+        case "pdf"     => "LinkToPdfParam"
+        case other     => throw new IllegalArgumentException(other)
+      }
+    )
+
   //@XPathFunction
   def buildLinkBackToFormRunner(linkType: String): String = {
 

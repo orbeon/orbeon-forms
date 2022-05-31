@@ -5,12 +5,17 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value._
 import org.orbeon.dom.QName
-import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams, Names}
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
+import org.orbeon.oxf.fr.{AppForm, FormRunnerParams, Names, XMLNames}
 import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
+import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
 
@@ -93,7 +98,7 @@ object FRComponentParamSupport {
 
   // https://github.com/orbeon/orbeon-forms/issues/4919
   def formAttachmentVersion(implicit p: FormRunnerParams): Int =
-    if (FormRunner.isDesignTime || p.mode == "test") {
+    if (frc.isDesignTime || p.mode == "test") {
       // The form definition is not published yet and we need to figure out the library form version
 
       val appsIt =
@@ -101,7 +106,7 @@ object FRComponentParamSupport {
           staticControl <- XFormsFunction.context.container.associatedControlOpt.flatMap(_.staticControlOpt).iterator
           ancestor      <- ElementAnalysis.ancestorsIterator(staticControl, includeSelf = false)
           if ancestor.isInstanceOf[ComponentControl]
-          app           <- FormRunner.findAppFromSectionTemplateUri(ancestor.element.getNamespaceURI)
+          app           <- frc.findAppFromSectionTemplateUri(ancestor.element.getNamespaceURI)
         } yield
           app
 
@@ -145,4 +150,22 @@ object FRComponentParamSupport {
       case None           => (None, None)
     }
   }
+
+  def ancestorSectionsIt(control: XFormsControl): Iterator[XFormsComponentControl] =
+    new AncestorOrSelfIterator(control.parent) collect {
+      case cc: XFormsComponentControl if cc.staticControl.element.getQName == XMLNames.FRSectionQName => cc
+    }
+
+  def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
+    inScopeContainingDocument.findControlByEffectiveId(XFormsId.absoluteIdToEffectiveId(absoluteControlId))
+      .flatMap(topLevelAncestorSectionName)
+
+  def ancestorSectionNames(control: XFormsControl): Iterator[String] =
+    ancestorSectionsIt(control).map(s => frc.controlNameFromId(s.staticControl.staticId))
+
+  def topLevelAncestorSectionName(control: XFormsControl): Option[String] =
+    ancestorSectionNames(control).lastOption()
+
+  def closestAncestorSectionName(control: XFormsControl): Option[String] =
+    ancestorSectionNames(control).nextOption()
 }

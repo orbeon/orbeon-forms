@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import cats.syntax.option._
 import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
@@ -33,7 +34,6 @@ import org.orbeon.saxon.value.SequenceExtent
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xbl.ErrorSummary
 import org.orbeon.xforms.XFormsId
 
 import scala.collection.compat._
@@ -125,14 +125,9 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
     sectionName            : String
   ): Option[Iterator[NodeInfo]] = {
 
-    def findAncestorSectionName(st: XFormsComponentControl) =
-      ErrorSummary.ancestorSectionsIt(st)
-        .find(_.staticControl.element.getQName == XMLNames.FRSectionQName)
-        .map(s => frc.controlNameFromId(s.staticControl.staticId))
-
     val resolvedSectionsIt =
       container.containingDocument.controls.getCurrentControlTree.getSectionTemplateControls.iterator collect {
-        case st if findAncestorSectionName(st).contains(sectionName) => st
+        case st if FRComponentParamSupport.closestAncestorSectionName(st).contains(sectionName) => st
       }
 
     val nestedIt =

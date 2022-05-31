@@ -15,15 +15,15 @@ package org.orbeon.xbl
 
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
+import org.orbeon.oxf.fr.library.FRComponentParamSupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.InstanceData
@@ -40,7 +40,7 @@ import scala.annotation.tailrec
 import scala.collection.Searching._
 import scala.collection.SeqLike
 import scala.collection.generic.IsSeqLike
-import scala.math.Ordering
+
 
 object ErrorSummary {
 
@@ -85,17 +85,12 @@ object ErrorSummary {
       val effectiveControlId = XFormsId.absoluteIdToEffectiveId(absoluteControlId)
       val controlOpt         = inScopeContainingDocument.findControlByEffectiveId(effectiveControlId)
       controlOpt.toIterable flatMap { control =>
-        val containingSections = ancestorSectionsIt(control)
-        containingSections.map(_.getId).flatMap(FormRunner.controlNameFromIdOpt)
+        val containingSections = FRComponentParamSupport.ancestorSectionsIt(control)
+        containingSections.map(_.getId).flatMap(frc.controlNameFromIdOpt)
       }
     }
     sectionsWithErrorsIt.toList
   }
-
-  def ancestorSectionsIt(control: XFormsControl): Iterator[XFormsComponentControl] =
-    new AncestorOrSelfIterator(control.parent) collect {
-      case section: XFormsComponentControl if section.localName == "section" => section
-    }
 
   def controlSearchIndexes(absoluteId: String): Iterator[Int] = {
 
@@ -362,14 +357,6 @@ object ErrorSummary {
     def findErrorsInstance =
       findErrorSummaryModel map (_.getInstance("fr-errors-instance"))
 
-    def findStateInstance =
-      findErrorSummaryModel map (_.getInstance("fr-state-instance"))
-
-    def topLevelSectionNameForControlId(absoluteControlId: String): Option[String] =
-      inScopeContainingDocument.findControlByEffectiveId(XFormsId.absoluteIdToEffectiveId(absoluteControlId)) flatMap { control =>
-        ancestorSectionsIt(control).lastOption() map (_.getId) flatMap FormRunner.controlNameFromIdOpt
-      }
-
     def createNewErrorElem(
       absoluteTargetId : String,
       controlPosition  : Int,
@@ -386,7 +373,7 @@ object ErrorSummary {
           attributeInfo(LevelAttName,         level.entryName),
           attributeInfo(AlertAttName,         alert),
           attributeInfo(LabelAttName,         labelOpt getOrElse ""),
-          attributeInfo(SectionNameAttName,   topLevelSectionNameForControlId(absoluteTargetId) getOrElse ""),
+          attributeInfo(SectionNameAttName,   FRComponentParamSupport.topLevelSectionNameForControlId(absoluteTargetId) getOrElse ""),
           attributeInfo(RequiredEmptyAttName, requiredEmpty.toString)
         )
       )

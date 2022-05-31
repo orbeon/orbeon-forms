@@ -373,10 +373,11 @@
                                                                     <xf:action type="javascript" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
                                                                         <xf:param name="elemId"            value="xxf:client-id(@id)"/>
                                                                         <xf:param name="errorPosition"     value="string(position())"/>
-                                                                        <xf:param name="controlName"       value="frf:controlNameFromId(substring-before(substring-after(@id, '|'), '|'))"/>
+                                                                        <xf:param name="controlName"       value="frf:controlNameFromId(xxf:client-id(@id))"/>
                                                                         <xf:param name="label"             value="string(@label)"/>
                                                                         <xf:param name="validationMessage" value="string(@alert)"/>
                                                                         <xf:param name="validationLevel"   value="string(@level)"/>
+                                                                        <xf:param name="sectionNames"      value="string-join(ErrorSummary:ancestorSectionNames(@id), ' ')"/>
                                                                         <xf:body>
                                                                             const elem = window.document.getElementById(elemId);
                                                                             if (elem) {
@@ -384,7 +385,15 @@
                                                                                 const y = elem.getBoundingClientRect().top + window.pageYOffset + offset;
                                                                                 window.scrollTo({top: y, behavior: 'smooth'});
                                                                             }
-                                                                            ORBEON.fr.private.API.navigateToError(errorPosition, controlName, label, validationMessage, validationLevel);
+                                                                            ORBEON.fr.private.API.navigateToError(
+                                                                                errorPosition,
+                                                                                elemId,
+                                                                                controlName,
+                                                                                label,
+                                                                                validationMessage,
+                                                                                validationLevel,
+                                                                                sectionNames
+                                                                            );
                                                                         </xf:body>
                                                                     </xf:action>
                                                                     <xf:setfocus control="{{@id}}"/>

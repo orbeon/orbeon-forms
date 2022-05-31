@@ -21,14 +21,16 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
 import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeInfoConversions._
@@ -301,6 +303,15 @@ object ErrorSummary {
       )
     }
   }
+
+  //@XPathFunction
+  def ancestorSectionNames(controlAbsoluteId: String): SequenceIterator =
+    ancestorSectionNamesUseDocument(controlAbsoluteId, inScopeContainingDocument)
+
+  def ancestorSectionNamesUseDocument(controlAbsoluteId: String, xfcd: XFormsContainingDocument): Iterator[String] =
+    xfcd.controls.getCurrentControlTree
+      .findControl(XFormsId.absoluteIdToEffectiveId(controlAbsoluteId)).iterator
+      .flatMap(FRComponentParamSupport.ancestorSectionNames)
 
   implicit object IntIteratorOrdering extends Ordering[Iterator[Int]] {
     def compare(x: Iterator[Int], y: Iterator[Int]): Int =

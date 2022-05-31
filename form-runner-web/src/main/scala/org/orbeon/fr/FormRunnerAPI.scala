@@ -55,10 +55,13 @@ object FormRunnerErrorSummaryAPI extends js.Object {
 
   trait ErrorSummaryNavigateToErrorEvent extends js.Object {
     val errorPosition    : Int
+    val elemId           : String
+    val repetitions      : js.Array[Int]
     val controlName      : String
     val label            : String
     val validationMessage: String
     val validationLevel  : String
+    val sectionNames     : js.Array[String]
 
     // Later
 //    val sectionForTemplate: Option[String]
@@ -68,13 +71,24 @@ object FormRunnerErrorSummaryAPI extends js.Object {
   }
 
   // Private
-  def _dispatch(_errorPosition: Int, _controlName: String, _label: String, _validationMessage: String, _validationLevel: String): Unit =
+  def _dispatch(
+    _errorPosition     : Int,
+    _elemId            : String,
+    _controlName       : String,
+    _label             : String,
+    _validationMessage : String,
+    _validationLevel   : String,
+    _sectionNames      : js.Array[String]
+  ): Unit =
     listeners foreach (_(new ErrorSummaryNavigateToErrorEvent {
-      val errorPosition    : Int    = _errorPosition
-      val controlName      : String = _controlName
-      val label            : String = _label
-      val validationMessage: String = _validationMessage
-      val validationLevel  : String = _validationLevel
+      val errorPosition    : Int              = _errorPosition
+      val elemId           : String           = _elemId
+      val repetitions      : js.Array[Int]    = XFormsId.getEffectiveIdSuffixParts(_elemId).toJSArray
+      val controlName      : String           = _controlName
+      val label            : String           = _label
+      val validationMessage: String           = _validationMessage
+      val validationLevel  : String           = _validationLevel
+      val sectionNames     : js.Array[String] = _sectionNames
     }))
 
   def addNavigateToErrorListener(fn: js.Function1[ErrorSummaryNavigateToErrorEvent, Any]): Unit =

@@ -378,12 +378,6 @@
                                                                         <xf:param name="validationLevel"    value="string(@level)"/>
                                                                         <xf:param name="sectionNames"       value="string-join(ErrorSummary:ancestorSectionNames(@id), ' ')"/>
                                                                         <xf:body>
-                                                                            const elem = window.document.getElementById(elementId);
-                                                                            if (elem) {
-                                                                                const offset = -100;
-                                                                                const y = elem.getBoundingClientRect().top + window.pageYOffset + offset;
-                                                                                window.scrollTo({top: y, behavior: 'smooth'});
-                                                                            }
                                                                             ORBEON.fr.private.API.navigateToError(
                                                                                 validationPosition,
                                                                                 elementId,

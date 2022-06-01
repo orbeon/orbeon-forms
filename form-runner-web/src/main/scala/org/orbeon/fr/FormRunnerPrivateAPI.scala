@@ -127,7 +127,17 @@ object FormRunnerPrivateAPI extends js.Object {
     validationMessage : String,
     validationLevel   : String,
     sectionNames      : String
-  ): Unit =
+  ): Unit = {
+
+    Option(dom.window.document.getElementById(elementId)) foreach { elem =>
+      dom.window.asInstanceOf[js.Dynamic].scrollTo( // `scrollTo(options)` not in facade yet
+        new js.Object {
+          val top      = elem.getBoundingClientRect().top + dom.window.pageYOffset + ErrorScrollOffset
+          val behavior = "smooth"
+        }
+      )
+    }
+
     FormRunnerAPI.errorSummary._dispatch(
       validationPosition.toInt,
       elementId,
@@ -137,4 +147,7 @@ object FormRunnerPrivateAPI extends js.Object {
       validationLevel,
       sectionNames.splitTo[js.Array]()
     )
+  }
+
+  private val ErrorScrollOffset = -100
 }

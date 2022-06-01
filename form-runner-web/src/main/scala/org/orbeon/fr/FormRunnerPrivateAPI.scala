@@ -120,19 +120,19 @@ object FormRunnerPrivateAPI extends js.Object {
   }
 
   def navigateToError(
-    errorPosition     : String,
-    elemId            : String,
+    validationPosition: String,
+    elementId         : String,
     controlName       : String,
-    label             : String,
+    controlLabel      : String,
     validationMessage : String,
     validationLevel   : String,
     sectionNames      : String
   ): Unit =
     FormRunnerAPI.errorSummary._dispatch(
-      errorPosition.toInt,
-      elemId,
+      validationPosition.toInt,
+      elementId,
       controlName,
-      label,
+      controlLabel,
       validationMessage,
       validationLevel,
       sectionNames.splitTo[js.Array]()

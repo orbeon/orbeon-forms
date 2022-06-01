@@ -67,6 +67,7 @@ val HttpComponentsVersion         = "4.5.13"
 val Log4j2Version                 = "2.19.0"
 val CommonsIoVersion              = "2.11.0"
 val FlyingSaucerVersion           = "9.1.22"
+val OpenHtmlToPdfVersion          = "1.0.10" // tiz170: open html to pdf version
 val TinkVersion                   = "1.6.1"
 val GsonVersionForTink            = "2.9.0"
 val ProtobufJavaVersionForTink    = "3.19.6"
@@ -141,6 +142,11 @@ val CoreLibraryDependencies = Seq(
     ExclusionRule(organization = "org.bouncycastle"),
     ExclusionRule(organization = "com.lowagie")
   ),
+  // tizz170: open html to pdf dependencies
+  "com.openhtmltopdf"           % "openhtmltopdf-core"              % OpenHtmlToPdfVersion,
+  "com.openhtmltopdf"           % "openhtmltopdf-pdfbox"            % OpenHtmlToPdfVersion,
+  "com.openhtmltopdf"           % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,
+  // end
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
   "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.70", // for `openpdf`, also pulls `bcprov` and `bcpkix`
   "com.drewnoakes"              % "metadata-extractor"              % "2.18.0",

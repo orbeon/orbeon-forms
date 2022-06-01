@@ -273,6 +273,8 @@
     <property as="xs:string"  name="oxf.fr.pdf.font.path.ID"                                    value=""/>
     <property as="xs:string"  name="oxf.fr.pdf.font.family.ID"                                  value=""/>
     -->
+    <property as="xs:string"  name="oxf.fr.pdf.font.resource.roboto"                            value="/forms/resources/Roboto-Medium.ttf"/>
+    <property as="xs:string"  name="oxf.fr.pdf.font.family.roboto"                              value="Roboto"/>
     <property as="xs:string" name="oxf.fr.pdf.template.font.paths"                              value=""/>
 
     <!-- Automatic PDF JPEG compression level for image attachments that needs reencoding -->

@@ -13,9 +13,12 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import java.io.OutputStream
-
 import com.lowagie.text.pdf.BaseFont
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder.PdfAConformance
+
+import java.io.{File, OutputStream}
+import com.openhtmltopdf.pdfboxout.{PdfBoxFastOutputDevice, PdfBoxRenderer, PdfBoxSlowOutputDevice, PdfBoxUserAgent, PdfRendererBuilder}
+import com.openhtmltopdf.swing.NaiveUserAgent
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -40,15 +43,19 @@ private object XHTMLToPDFProcessor {
   val DefaultDotsPerPoint = 20f * 4f / 3f
   val DefaultDotsPerPixel = 14
 
-  def embedFontsConfiguredInProperties(renderer: ITextRenderer): Unit = {
+  // tiz170 TODO: update the method to set properties for OHTP
+  def embedFontsConfiguredInProperties(renderer: ITextRenderer, pdfRendererBuilder: PdfRendererBuilder): Unit = {
 
+    // tiz170: get global properties
     val props = Properties.instance.getPropertySet
 
     for {
+      // tiz170: concatenate two lists into one list
       propName  <- props.propertiesStartsWith("oxf.fr.pdf.font.path") ++ props.propertiesStartsWith("oxf.fr.pdf.font.resource")
+      // tiz170: path is Option type which means it's either a String or None
       path      <- props.getNonBlankString(propName)
       _ :: _ :: _ :: _ :: pathOrResource :: name :: Nil = propName.splitTo[List](".")
-    } locally {
+    } {
       try {
 
         val familyOpt = props.getNonBlankString(s"oxf.fr.pdf.font.family.$name")
@@ -60,7 +67,11 @@ private object XHTMLToPDFProcessor {
             case _          => throw new IllegalStateException
           }
 
-        renderer.getFontResolver.addFont(absolutePath, familyOpt.orNull, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, null)
+        // tiz170: add font
+        //        renderer.getFontResolver.addFont(absolutePath, familyOpt.orNull, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, null)
+        // tiz170 TODO: add OHTP version of add font
+        // the corresponding function is useFont
+        pdfRendererBuilder.useFont(new File(absolutePath), familyOpt.orNull)
       } catch {
         case NonFatal(_) =>
           logger.warn(s"Failed to load font by path: `$path` specified with property `$propName`")
@@ -78,57 +89,87 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
   protected def getDefaultContentType: String = XHTMLToPDFProcessor.DefaultContentType
 
   protected def readInput(
-     pipelineContext : PipelineContext,
-     input           : ProcessorInput,
-     config          : HttpSerializerBase.Config,
-     outputStream    : OutputStream
-  ): Unit = {
+                           pipelineContext : PipelineContext,
+                           input           : ProcessorInput,
+                           config          : HttpSerializerBase.Config,
+                           outputStream    : OutputStream
+                         ): Unit = {
 
     implicit val externalContext         : ExternalContext               = NetUtils.getExternalContext
     implicit val indentedLogger          : IndentedLogger                = new IndentedLogger(XHTMLToPDFProcessor.logger)
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
     val requestOpt  = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
+    // tiz170: this is where it initiates fly saucer ITextRenderer
     val renderer    = new ITextRenderer(DefaultDotsPerPoint, DefaultDotsPerPixel)
+    // tiz170 TODO: initialize OHTP correspondence
+    // the correspondence is PdfRendererBuilder
+    val pdfRendererBuilder = new PdfRendererBuilder()
+    pdfRendererBuilder.useFastMode();
+    //    pdfRendererBuilder.useSlowMode();
+    //    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
+    //    pdfRendererBuilder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_A)
 
     try {
-      embedFontsConfiguredInProperties(renderer)
+      embedFontsConfiguredInProperties(renderer, pdfRendererBuilder)
 
+      //      // NOTE: Default compression level is 0.75:
+      //      // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
+      //      val jpegCompressionLevel =
+      //        Properties.instance.getPropertySet.getNonBlankString("oxf.fr.pdf.jpeg.compression") flatMap
+      //          (s => Try(java.lang.Float.parseFloat(s)).toOption) filter
+      //          (f => f >= 0f && f <= 1.0f) getOrElse
+      //          0.9f
 
-      // NOTE: Default compression level is 0.75:
-      // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
-      val jpegCompressionLevel =
-        Properties.instance.getPropertySet.getNonBlankString("oxf.fr.pdf.jpeg.compression") flatMap
-          (s => Try(java.lang.Float.parseFloat(s)).toOption) filter
-          (f => f >= 0f && f <= 1.0f) getOrElse
-          0.9f
+      //       tiz170: set callback mechanism for Flying Saucer to interact with a user agent
+      //      renderer.getSharedContext.setUserAgentCallback(
+      //        new CustomUserAgent(
+      //          jpegCompressionLevel,
+      //          pipelineContext,
+      //          renderer.getSharedContext
+      //        )
+      //      )
 
-      renderer.getSharedContext.setUserAgentCallback(
-        new CustomUserAgent(
-          jpegCompressionLevel,
-          pipelineContext,
-          renderer.getSharedContext
-        )
-      )
-      // renderer.getSharedContext().setDPI(150);
+      ////       tiz170: this is where data is passed into flying-saucer
+      //      renderer.setDocument(
+      //        readInputAsDOM(pipelineContext, input),
+      //        requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
+      //      )
+      //      renderer.layout()
 
-      renderer.setDocument(
-        readInputAsDOM(pipelineContext, input),
-        requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
-      )
-
-      renderer.layout()
-
+      // tiz170: this is custom IO util
       IOUtils.useAndClose(outputStream) { os =>
+        // tiz170 TODO: OHTP version of setting document
+        pdfRendererBuilder.toStream(os)
+        pdfRendererBuilder.withW3cDocument(
+          readInputAsDOM(pipelineContext, input),
+          requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
+        )
+        //        pdfRendererBuilder.useUriResolver(new CustomFSUriResolver())
+        val pdfBoxRenderer = pdfRendererBuilder.buildPdfRenderer()
+        //         tiz170 TODO: set callback mechanism for OHTP to interact with a user agent
+        val userAgent = new CustomUserAgentOHTP(pdfBoxRenderer.getOutputDevice(), pipelineContext)
+        userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
+        pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
+        pdfBoxRenderer.layout()
+
         // Page count might be zero!
         // Q: Log if no pages?
-        val hasPages = Option(renderer.getRootBox.getLayer.getPages) exists (_.size > 0)
-        if (hasPages)
-          renderer.createPDF(os)
+        // tiz170 TODO: PdfRendererBuilder has a buildPdfRenderer method which returns a PdfBoxRenderer.
+        // PdfBoxRenderer is OHTP version of ITextRenderer in flying saucer
+        //        val hasPages = Option(renderer.getRootBox.getLayer.getPages) exists (_.size > 0)
+        val hasPages = Option(pdfBoxRenderer.getRootBox.getLayer.getPages) exists (_.size > 0)
+        if (hasPages) {
+          // tiz170: this is where pdf is created using flyer saucer
+          //          renderer.createPDF(os)
+          // tiz170 TODO: add OHTP correspondence of creating PDF
+          pdfBoxRenderer.createPDF()
+        }
       }
+
     } finally {
       // Free resources associated with the rendering context
-      renderer.getSharedContext.reset()
+      //      renderer.getSharedContext.reset()
     }
   }
 }

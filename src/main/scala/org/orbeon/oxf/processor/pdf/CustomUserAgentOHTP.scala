@@ -1,21 +1,21 @@
 package org.orbeon.oxf.processor.pdf
 
 import com.openhtmltopdf.pdfboxout.{PdfBoxOutputDevice, PdfBoxUserAgent}
-import com.openhtmltopdf.resource.ImageResource
-import com.openhtmltopdf.swing.NaiveUserAgent
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.TryUtils.TryOps
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, URLRewriterUtils}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, IndentedLogger, URLRewriterUtils}
 
 import java.io.InputStream
 import java.net.URI
 
-class CustomUserAgentOHTP(outputDevice: PdfBoxOutputDevice, pipelineContext          : PipelineContext)(implicit
-                                                                                                        externalContext          : ExternalContext,
-                                                                                                        indentedLogger           : IndentedLogger,
-                                                                                                        coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+class CustomUserAgentOHTP(
+  outputDevice: PdfBoxOutputDevice,
+  pipelineContext : PipelineContext)(implicit
+  externalContext : ExternalContext,
+  indentedLogger : IndentedLogger,
+  coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
 ) extends PdfBoxUserAgent(outputDevice) {
   import Private._
   //  override def getImageResource(originalUriString: String): ImageResource = {

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Orbeon, Inc.
+ * Copyright (C) 2022 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,4 +11,6 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-.orbeon .fb-map-gmap-div img { max-width: none }
+.orbeon .xbl-acme-map                      { aspect-ratio: 3 / 2 }
+.orbeon .xbl-acme-map .acme-map-google     { height: 100% }
+.orbeon .xbl-acme-map .acme-map-google img { max-width: none }

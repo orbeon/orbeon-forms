@@ -1,0 +1,69 @@
+<!--
+  Copyright (C) 2022 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:acme="http://www.acme.com/xbl">
+
+    <xbl:script src="/xbl/acme/map/map.js"/>
+    <xbl:binding id="acme-map" element="acme|map" xxbl:mode="lhha binding value external-value focus javascript-lifecycle">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">Map</display-name>
+            <display-name lang="es">Mapa</display-name>
+            <display-name lang="fi">Kartta</display-name>
+            <display-name lang="fr">Carte</display-name>
+            <display-name lang="ru">Карта</display-name>
+            <display-name lang="de">Karte</display-name>
+            <display-name lang="it">Mappa</display-name>
+            <display-name lang="sv">Karta</display-name>
+            <display-name lang="nl">Kaart</display-name>
+            <display-name lang="pt">Mapa</display-name>
+            <icon>
+                <icon-class>fa fa-fw fa-globe</icon-class>
+            </icon>
+            <templates>
+                <view>
+                    <acme:map>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </acme:map>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/acme/map/map.css"/>
+        </xbl:resources>
+
+        <xbl:template>
+            <xf:group appearance="xxf:internal">
+
+                <!-- Div in which Google Maps does its rendering -->
+                <xh:div class="acme-map-google"/>
+
+                <!-- Load script depending on configuration properties -->
+                <xh:script src="https://maps.googleapis.com/maps/api/js?key={xxf:property('oxf.xforms.xbl.acme.map.key')}"
+                           type="text/javascript" />
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

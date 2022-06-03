@@ -13,9 +13,7 @@
   -->
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:acme="http://www.acme.com/xbl">
@@ -54,15 +52,9 @@
         </xbl:resources>
 
         <xbl:template>
-            <xf:group appearance="xxf:internal">
-
-                <!-- Div in which Google Maps does its rendering -->
-                <xh:div class="acme-map-google"/>
-
-                <!-- Load script depending on configuration properties -->
-                <xh:script src="https://maps.googleapis.com/maps/api/js?key={xxf:property('oxf.xforms.xbl.acme.map.key')}"
-                           type="text/javascript" />
-            </xf:group>
+            <!-- Div in which Google Maps does its rendering -->
+<!--            <xf:output value="xxf:property('oxf.xforms.xbl.acme.map.key')"/>-->
+            <xh:div class="acme-map-google" data-google-maps-key="{xxf:property('oxf.xforms.xbl.acme.map.key')}"/>
         </xbl:template>
     </xbl:binding>
 

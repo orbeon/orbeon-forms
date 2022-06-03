@@ -48,14 +48,14 @@ ORBEON.xforms.XBL.declareCompanion("acme|map", {
             })();
         });
 
-        var initPromiseResolutionFunc = null;
+        let initPromiseResolutionFunc = null;
         this._initPromise = new Promise((resolutionFunc) => {
             initPromiseResolutionFunc = resolutionFunc;
         });
 
         jsLoadedPromise.then(() => {
-            var mapElement = this.container.querySelector('.acme-map-google');
-            var mapOptions = {
+            const mapElement = this.container.querySelector('.acme-map-google');
+            const mapOptions = {
                 center: { lat: 0, lng: 0},
                 zoom: 1,
                 scaleControl: true,
@@ -68,15 +68,14 @@ ORBEON.xforms.XBL.declareCompanion("acme|map", {
     },
 
     xformsUpdateValue: function(address) {
-        var companion = this;
         return this._initPromise.then(() => {
-            companion._address = address;
-            companion._geoCoder.geocode(
+            this._address = address;
+            this._geoCoder.geocode(
                 { 'address': address },
                 (results, status) => {
                     if (status == google.maps.GeocoderStatus.OK) {
-                        var latLng = results[0].geometry.location;
-                        companion._updateMarkerFromLatLng(latLng);
+                        const latLng = results[0].geometry.location;
+                        this._updateMarkerFromLatLng(latLng);
                     }
                 }
             );

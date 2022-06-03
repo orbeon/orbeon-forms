@@ -69,7 +69,7 @@ ORBEON.xforms.XBL.declareCompanion("acme|map", {
 
     xformsUpdateValue: function(address) {
         var companion = this;
-        this._initPromise.then(() => {
+        return this._initPromise.then(() => {
             companion._address = address;
             companion._geoCoder.geocode(
                 { 'address': address },

@@ -57,6 +57,7 @@
 
     <xsl:variable name="is-detail"           select="not($mode = ('summary', 'home', 'landing', ''))" as="xs:boolean"/>
     <xsl:variable name="is-summary"          select="$mode = 'summary'"                               as="xs:boolean"/>
+    <xsl:variable name="is-landing"          select="$mode = 'landing'"                               as="xs:boolean"/>
     <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'"           as="xs:boolean"/>
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
@@ -174,7 +175,7 @@
         as="xs:string"
         select="
             let $updates :=
-                for $update in ('fr', 'fb'[$is-form-builder and $is-detail])
+                for $update in ('fr', 'fb'[$is-form-builder and $is-detail], 'landing'[$is-landing])
                 return p:property(concat('oxf.xforms.assets.baseline.updates.', $update))
             return string-join($updates, ' ')
         "/>

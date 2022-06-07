@@ -53,7 +53,6 @@
 
         <xbl:template>
             <!-- Div in which Google Maps does its rendering -->
-<!--            <xf:output value="xxf:property('oxf.xforms.xbl.acme.map.key')"/>-->
             <xh:div class="acme-map-google" data-google-maps-key="{xxf:property('oxf.xforms.xbl.acme.map.key')}"/>
         </xbl:template>
     </xbl:binding>

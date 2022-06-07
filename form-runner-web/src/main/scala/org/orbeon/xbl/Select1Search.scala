@@ -16,6 +16,7 @@ package org.orbeon.xbl
 import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
 import org.orbeon.jquery._
+import org.orbeon.web.DomSupport
 import org.orbeon.xforms.facade.{Controls, Properties, XBL, XBLCompanion}
 import org.orbeon.xforms._
 import org.scalajs.dom
@@ -93,6 +94,12 @@ private class Select1SearchCompanion extends XBLCompanion {
         val isDatabound = containerElem.classList.contains("xbl-fr-databound-select1-search")
         if (isDatabound)
           jSelect.on("change", onChange _)
+
+        // Update `aria-labelledby`
+        val comboboxElement = containerElem.querySelector(".select2-selection")
+        val labelElement    = containerElem.querySelector(".xforms-label").asInstanceOf[html.Element]
+        val labelId         = DomSupport.generateIdIfNeeded(labelElement)
+        comboboxElement.setAttribute("aria-labelledby", labelId)
       }
 
       initOrUpdatePlaceholder()

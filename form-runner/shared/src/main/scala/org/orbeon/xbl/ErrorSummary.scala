@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.event.XFormsEvent.xxfName
 import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}

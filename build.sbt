@@ -507,6 +507,7 @@ lazy val domJVM = dom.jvm.dependsOn(commonJVM)
 lazy val domJS  = dom.js.dependsOn(commonJS)
 
 lazy val webSupport = (project in file("web-support"))
+  .dependsOn(commonJS)
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings)
   .enablePlugins(ScalaJSPlugin)

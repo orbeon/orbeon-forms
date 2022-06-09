@@ -76,15 +76,15 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
   protected def getDefaultContentType: String = XHTMLToPDFProcessor.DefaultContentType
 
-  protected def readInput(pipelineContext : PipelineContext,
-                          input           : ProcessorInput,
-                          config          : HttpSerializerBase.Config,
-                          outputStream    : OutputStream): Unit = {
-    implicit val externalContext         : ExternalContext               = NetUtils.getExternalContext
-    implicit val indentedLogger          : IndentedLogger                = new IndentedLogger(XHTMLToPDFProcessor.logger)
+  protected def readInput(pipelineContext: PipelineContext,
+                          input: ProcessorInput,
+                          config: HttpSerializerBase.Config,
+                          outputStream: OutputStream): Unit = {
+    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
+    implicit val indentedLogger: IndentedLogger = new IndentedLogger(XHTMLToPDFProcessor.logger)
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
-    val requestOpt  = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
+    val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
     val pdfRendererBuilder = new PdfRendererBuilder()
     pdfRendererBuilder.useFastMode();
     //    pdfRendererBuilder.useSlowMode();
@@ -102,17 +102,22 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
         )
         val pdfBoxRenderer = pdfRendererBuilder.buildPdfRenderer()
 
-        // set user agent callback
-        val userAgent = new CustomUserAgentOHTP(pdfBoxRenderer.getOutputDevice(), pipelineContext)
-        userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
-        pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
-        pdfBoxRenderer.layout()
+        try {
+          // set user agent callback
+          val userAgent = new CustomUserAgentOHTP(pdfBoxRenderer.getOutputDevice(), pipelineContext)
+          userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
+          pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
+          pdfBoxRenderer.layout()
 
-        // Page count might be zero!
-        // Q: Log if no pages?
-        val hasPages = Option(pdfBoxRenderer.getRootBox.getLayer.getPages) exists (_.size > 0)
-        if (hasPages) {
-          pdfBoxRenderer.createPDF()
+          // Page count might be zero!
+          // Q: Log if no pages?
+          val hasPages = Option(pdfBoxRenderer.getRootBox.getLayer.getPages) exists (_.size > 0)
+          if (hasPages) {
+            pdfBoxRenderer.createPDF()
+          }
+        } finally {
+          // Free resources associated with the rendering context
+          pdfBoxRenderer.close()
         }
       }
     }

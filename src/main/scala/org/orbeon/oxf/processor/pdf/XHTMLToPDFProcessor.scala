@@ -76,32 +76,32 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
   protected def getDefaultContentType: String = XHTMLToPDFProcessor.DefaultContentType
 
-  protected def readInput(pipelineContext : PipelineContext,
-                          input           : ProcessorInput,
-                          config          : HttpSerializerBase.Config,
-                          outputStream    : OutputStream): Unit = {
-    implicit val externalContext         : ExternalContext               = NetUtils.getExternalContext
-    implicit val indentedLogger          : IndentedLogger                = new IndentedLogger(XHTMLToPDFProcessor.logger)
+  protected def readInput(pipelineContext: PipelineContext,
+                          input: ProcessorInput,
+                          config: HttpSerializerBase.Config,
+                          outputStream: OutputStream): Unit = {
+    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
+    implicit val indentedLogger: IndentedLogger = new IndentedLogger(XHTMLToPDFProcessor.logger)
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
-    val requestOpt  = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
+    val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
     val pdfRendererBuilder = new PdfRendererBuilder()
     pdfRendererBuilder.useFastMode();
     //    pdfRendererBuilder.useSlowMode();
     //    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
     //    pdfRendererBuilder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_A)
 
-    try {
-      embedFontsConfiguredInProperties(pdfRendererBuilder)
+    embedFontsConfiguredInProperties(pdfRendererBuilder)
 
-      IOUtils.useAndClose(outputStream) { os =>
-        pdfRendererBuilder.toStream(os)
-        pdfRendererBuilder.withW3cDocument(
-          readInputAsDOM(pipelineContext, input),
-          requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
-        )
-        val pdfBoxRenderer = pdfRendererBuilder.buildPdfRenderer()
+    IOUtils.useAndClose(outputStream) { os =>
+      pdfRendererBuilder.toStream(os)
+      pdfRendererBuilder.withW3cDocument(
+        readInputAsDOM(pipelineContext, input),
+        requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
+      )
+      val pdfBoxRenderer = pdfRendererBuilder.buildPdfRenderer()
 
+      try {
         // set user agent callback
         val userAgent = new CustomUserAgentOHTP(pdfBoxRenderer.getOutputDevice(), pipelineContext)
         userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
@@ -114,6 +114,9 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
         if (hasPages) {
           pdfBoxRenderer.createPDF()
         }
+      } finally {
+        // Free resources associated with the rendering context
+        pdfBoxRenderer.close()
       }
     }
   }

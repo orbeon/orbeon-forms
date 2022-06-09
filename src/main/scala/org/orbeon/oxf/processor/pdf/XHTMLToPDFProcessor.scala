@@ -91,34 +91,32 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
     //    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
     //    pdfRendererBuilder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_A)
 
-    try {
-      embedFontsConfiguredInProperties(pdfRendererBuilder)
+    embedFontsConfiguredInProperties(pdfRendererBuilder)
 
-      IOUtils.useAndClose(outputStream) { os =>
-        pdfRendererBuilder.toStream(os)
-        pdfRendererBuilder.withW3cDocument(
-          readInputAsDOM(pipelineContext, input),
-          requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
-        )
-        val pdfBoxRenderer = pdfRendererBuilder.buildPdfRenderer()
+    IOUtils.useAndClose(outputStream) { os =>
+      pdfRendererBuilder.toStream(os)
+      pdfRendererBuilder.withW3cDocument(
+        readInputAsDOM(pipelineContext, input),
+        requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
+      )
+      val pdfBoxRenderer = pdfRendererBuilder.buildPdfRenderer()
 
-        try {
-          // set user agent callback
-          val userAgent = new CustomUserAgentOHTP(pdfBoxRenderer.getOutputDevice(), pipelineContext)
-          userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
-          pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
-          pdfBoxRenderer.layout()
+      try {
+        // set user agent callback
+        val userAgent = new CustomUserAgentOHTP(pdfBoxRenderer.getOutputDevice(), pipelineContext)
+        userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
+        pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
+        pdfBoxRenderer.layout()
 
-          // Page count might be zero!
-          // Q: Log if no pages?
-          val hasPages = Option(pdfBoxRenderer.getRootBox.getLayer.getPages) exists (_.size > 0)
-          if (hasPages) {
-            pdfBoxRenderer.createPDF()
-          }
-        } finally {
-          // Free resources associated with the rendering context
-          pdfBoxRenderer.close()
+        // Page count might be zero!
+        // Q: Log if no pages?
+        val hasPages = Option(pdfBoxRenderer.getRootBox.getLayer.getPages) exists (_.size > 0)
+        if (hasPages) {
+          pdfBoxRenderer.createPDF()
         }
+      } finally {
+        // Free resources associated with the rendering context
+        pdfBoxRenderer.close()
       }
     }
   }

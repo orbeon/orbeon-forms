@@ -248,5 +248,4 @@ abstract class XFormsControlLifecyleHandler(
         case _                          => false
       }
   }
-
 }

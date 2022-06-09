@@ -228,11 +228,9 @@ class XFormsInputHandler(
     }
   }
 
-  // Do as if this was in a component, noscript has to handle that
   private def getFirstInputEffectiveIdWithNs(effectiveId: String): Option[String] =
     ! isBoolean option XFormsInputHandler.firstInputEffectiveIdWithNs(effectiveId)(containingDocument)
 
-  // Do as if this was in a component, noscript has to handle that
   private def getSecondInputEffectiveId(effectiveId: String): Option[String] =
     isDateTime option containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-2"))
 

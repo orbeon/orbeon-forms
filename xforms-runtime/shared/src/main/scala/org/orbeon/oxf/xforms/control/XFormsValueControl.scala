@@ -331,13 +331,11 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       hasNestedContent option outputNestedContent
     )
 
-    outputAriaByAtts(previousValue, previousControl, ch)
+    outputAjaxAriaByAtts(previousControl, ch)
   }
 
   // This logic applies only when a control comes into existence. At that point, we must tell the client, when
-  //
- final def outputAriaByAtts(
-    previousValue   : Option[String],
+ final def outputAjaxAriaByAtts(
     previousControl : Option[XFormsValueControl],
     ch              : XMLReceiverHelper
   ): Unit =

@@ -139,7 +139,7 @@ class XFormsValueComponentControl(
   }
 
   // TODO
-  override def findAriaByControlEffectiveIdWithNs = None
+  override def findAriaByControlEffectiveIdWithNs: Option[String] = None
 
   override def outputAjaxDiffUseClientValue(
     previousValue   : Option[String],
@@ -154,7 +154,7 @@ class XFormsValueComponentControl(
       None
     )
 
-    outputAriaByAtts(previousValue, previousControl, ch)
+    outputAjaxAriaByAtts(previousControl, ch)
   }
 }
 

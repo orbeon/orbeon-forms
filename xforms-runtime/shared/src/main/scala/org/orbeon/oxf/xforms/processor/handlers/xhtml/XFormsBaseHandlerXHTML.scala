@@ -17,7 +17,6 @@ import cats.syntax.option._
 import java.{lang => jl}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -240,13 +239,11 @@ abstract class XFormsBaseHandlerXHTML (
     isExternal               : Boolean
   ): Unit = {
 
-    require(targetControlEffectiveId ne null)
-    require(forEffectiveIdWithNs     ne null)
+    val isInternalAppearance = lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)
 
-    val isInternal           = lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)
-    val staticLHHAAttributes = lhhaAnalysis.element.attributesAsSax
+    if (! isInternalAppearance) {
 
-    if (! isInternal) {
+      val staticLHHAAttributes = lhhaAnalysis.element.attributesAsSax
 
       // If no attributes were found, there is no such label / help / hint / alert
 
@@ -426,9 +423,6 @@ object XFormsBaseHandlerXHTML {
     elementName              : String,
     addIds                   : Boolean
   ): Unit = {
-
-    require(lhha ne null)
-    require(! addIds || targetControlEffectiveId.isDefined)
 
     // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
     val newAttribute =

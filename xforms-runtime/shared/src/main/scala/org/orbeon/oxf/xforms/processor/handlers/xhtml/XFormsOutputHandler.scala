@@ -301,5 +301,5 @@ class XFormsOutputDownloadHandler(
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = null
+  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = None
 }

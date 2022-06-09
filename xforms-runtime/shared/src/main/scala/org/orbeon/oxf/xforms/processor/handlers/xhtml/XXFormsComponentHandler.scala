@@ -89,9 +89,9 @@ class XXFormsComponentHandler(
         isExternal               = false
       )
 
-  protected override def handleAlert() = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Alert)) super.handleAlert()
-  protected override def handleHint()  = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Hint))  super.handleHint()
-  protected override def handleHelp()  = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Help))  super.handleHelp()
+  protected override def handleAlert(): Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Alert)) super.handleAlert()
+  protected override def handleHint() : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Hint))  super.handleHint()
+  protected override def handleHelp() : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Help))  super.handleHelp()
 
   // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
   // NOTE: Used by `handleLabel()` if there is a local LHHA, and by `findTargetControlForEffectiveId`.

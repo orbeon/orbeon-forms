@@ -31,6 +31,7 @@ import org.orbeon.xforms.Constants.{ComponentSeparator, ComponentSeparatorString
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
+import shapeless.syntax.typeable._
 
 /**
  * Handle xf:select and xf:select1.
@@ -314,11 +315,8 @@ class XFormsSelect1Handler(
   // Incremental mode is the default
   override def isDefaultIncremental = true
 
-  private def getAppearanceTrait =
-    elementAnalysis match {
-      case t: SelectAppearanceTrait => t
-      case _                        => null
-    }
+  private def findAppearanceTrait =
+    elementAnalysis.narrowTo[SelectAppearanceTrait]
 
   def handleControlStart(): Unit = {
 
@@ -359,7 +357,6 @@ class XFormsSelect1Handler(
     val containingDocument   = xformsHandlerContext.containingDocument
     val containerAttributes  = getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, !isFull)
     val xhtmlPrefix          = xformsHandlerContext.findXHTMLPrefix
-    val appearanceTrait      = getAppearanceTrait
     val isStaticReadonly     = XFormsBaseHandler.isStaticReadonly(control)
 
     val allowFullStaticReadonly =
@@ -384,7 +381,7 @@ class XFormsSelect1Handler(
       // Q: Can remove now?
       containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId)
 
-      if ((appearanceTrait ne null) && appearanceTrait.isCompact)
+      if (findAppearanceTrait.exists(_.isCompact))
         containerAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple")
 
       // Handle accessibility attributes
@@ -486,10 +483,8 @@ class XFormsSelect1Handler(
 
     implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
-    val appearanceTrait = getAppearanceTrait
-
     val containerAttributes =
-      getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, !(appearanceTrait != null && appearanceTrait.isFull))
+      getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, ! findAppearanceTrait.exists(_.isFull))
 
     // CSS classes:
     // - `xforms-items` for styling
@@ -591,22 +586,16 @@ class XFormsSelect1Handler(
     mustSelect
   }
 
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = {
-    // For full appearance we don't put a `@for` attribute so that selecting the main label doesn't select the item
-    val appearanceTrait = getAppearanceTrait
-    if ((appearanceTrait ne null) && appearanceTrait.isFull)
+  // For full appearance we don't put a `@for` attribute so that selecting the main label doesn't select the item
+  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] =
+    if (findAppearanceTrait.exists(_.isFull))
       None
     else
       super.getForEffectiveIdWithNs(effectiveId)
-  }
 
-  override def handleLabel(): Unit = {
-
-    val appearanceTrait = getAppearanceTrait
-    val isFull = (appearanceTrait ne null) && appearanceTrait.isFull
-
-    if (isFull) {
-      // For radio and checkboxes, produce span with an id
+  // For full appearance produce `span` with an `id`
+  override def handleLabel(): Unit =
+    if (findAppearanceTrait.exists(_.isFull))
       handleLabelHintHelpAlert(
         lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
         targetControlEffectiveId = getEffectiveId,
@@ -616,7 +605,6 @@ class XFormsSelect1Handler(
         controlOrNull            = currentControl,
         isExternal               = true         // pretend we're "external", so the element gets an id
       )
-    } else
+    else
       super.handleLabel()
-  }
 }

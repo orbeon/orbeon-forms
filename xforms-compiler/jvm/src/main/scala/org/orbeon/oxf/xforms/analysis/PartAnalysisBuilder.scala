@@ -553,16 +553,6 @@ object PartAnalysisBuilder {
       )
 
     elementAnalysisOpt match {
-      case Some(componentControl: ComponentControl) =>
-
-        val abstractBinding =
-          partAnalysisCtx.metadata.findAbstractBindingByPrefixedId(componentControl.prefixedId) getOrElse
-            (throw new IllegalStateException)
-
-        componentControl.commonBinding = abstractBinding.commonBinding
-
-        index(componentControl)
-        componentControl
       case Some(elementAnalysis) =>
         index(elementAnalysis)
         elementAnalysis

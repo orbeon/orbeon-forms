@@ -19,7 +19,8 @@ class ComponentControl(
   namespaceMapping   : NamespaceMapping,
   scope              : Scope,
   containerScope     : Scope,
-  val isTopLevelPart : Boolean
+  val isTopLevelPart : Boolean,
+  val commonBinding  : CommonBinding,
 ) extends ContainerControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope)
      with WithChildrenTrait
      with OptionalSingleNode { // binding could be mandatory, optional, or prohibited
@@ -28,7 +29,6 @@ class ComponentControl(
     ! isTopLevelPart &&
       element.attributeValueOpt(XFormsNames.XXFORMS_UPDATE_QNAME).contains(XFormsNames.XFORMS_FULL_UPDATE)
 
-  var commonBinding: CommonBinding = null // TODO: pass via constructor
   var rootElem: Element = element // default, can be updated by `xxf:dynamic`
 
   private var _concreteBindingOpt: Option[ConcreteBinding] = None //part.getBinding(prefixedId)

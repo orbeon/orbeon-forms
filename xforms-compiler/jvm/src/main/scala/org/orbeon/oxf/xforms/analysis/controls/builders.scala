@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.analysis.model.ModelDefs.{Constraint, QNameToXPathM
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.{TypeMIP, XPathMIP}
 import org.orbeon.oxf.xforms.analysis.model.{Instance, InstanceMetadata, ModelVariable, StaticBind}
 import org.orbeon.oxf.xforms.itemset.{Item, ItemContainer, Itemset, LHHAValue}
+import org.orbeon.oxf.xforms.xbl.CommonBinding
 import org.orbeon.oxf.xml.dom.Extensions.{DomElemOps, VisitorListener}
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
 import org.orbeon.saxon.expr.StringLiteral
@@ -662,14 +663,15 @@ object ComponentControlBuilder {
     namespaceMapping : NamespaceMapping,
     scope            : Scope,
     containerScope   : Scope,
+    commonBinding    : CommonBinding,
     modeValue        : Boolean,
     modeLHHA         : Boolean
   ): ComponentControl =
     (modeValue, modeLHHA) match {
-      case (false, false) => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart)
-      case (false, true)  => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart) with                          StaticLHHASupport
-      case (true,  false) => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart) with ValueComponentTrait
-      case (true,  true)  => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart) with ValueComponentTrait with StaticLHHASupport
+      case (false, false) => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding)
+      case (false, true)  => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with                          StaticLHHASupport
+      case (true,  false) => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with ValueComponentTrait
+      case (true,  true)  => new ComponentControl(index, element, parent, preceding, staticId, prefixedId, namespaceMapping, scope, containerScope, partAnalysisCtx.isTopLevelPart, commonBinding) with ValueComponentTrait with StaticLHHASupport
     }
 }
 

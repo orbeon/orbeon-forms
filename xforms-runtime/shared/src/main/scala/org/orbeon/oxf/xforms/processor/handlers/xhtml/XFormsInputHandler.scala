@@ -17,7 +17,7 @@ import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
+import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport}
@@ -234,16 +234,17 @@ class XFormsInputHandler(
   private def getSecondInputEffectiveId(effectiveId: String): Option[String] =
     isDateTime option containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-2"))
 
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] =
+  // xxx XFormsSelect1Handler.getItemId won't be namespaced!
+  override def getForEffectiveIdWithNs: Option[String] =
     isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, 0) orElse getFirstInputEffectiveIdWithNs(getEffectiveId)
 
-  protected override def handleLabel(): Unit =
+  protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
     if (! (placeHolderInfo exists (_.isLabelPlaceholder)))
-      super.handleLabel()
+      super.handleLabel(lhhaAnalysis)
 
-  protected override def handleHint(): Unit =
+  protected override def handleHint(lhhaAnalysis: LHHAAnalysis): Unit =
     if (placeHolderInfo forall (_.isLabelPlaceholder))
-      super.handleHint()
+      super.handleHint(lhhaAnalysis)
 }
 
 object XFormsInputHandler {

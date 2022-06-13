@@ -14,9 +14,8 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
-
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.{LHHASupport, XFormsSingleNodeControl}
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport}
@@ -42,9 +41,7 @@ abstract class XFormsGroupHandler(
     forwarding = true
   ) with HandlerSupport {
 
-  protected def getLabelClasses(xformsControl: XFormsSingleNodeControl): jl.StringBuilder = {
-
-    require(LHHASupport.hasLabel(containingDocument, getPrefixedId))
+  protected def getLabelClasses(xformsControl: XFormsSingleNodeControl, lhhaAnalysis: LHHAAnalysis): jl.StringBuilder = {
 
     val labelClasses = new jl.StringBuilder("xforms-label")
 
@@ -53,10 +50,7 @@ abstract class XFormsGroupHandler(
       labelClasses.append(" xforms-disabled")
 
     // Copy over existing label classes if any
-    val labelClassAttribute =
-      handlerContext.getPartAnalysis.getLHH(getPrefixedId, LHHA.Label).element.attributeValue(XFormsNames.CLASS_QNAME)
-
-    if (labelClassAttribute ne null) {
+    lhhaAnalysis.element.attributeValueOpt(XFormsNames.CLASS_QNAME) foreach { labelClassAttribute =>
       labelClasses.append(' ')
       labelClasses.append(labelClassAttribute)
     }

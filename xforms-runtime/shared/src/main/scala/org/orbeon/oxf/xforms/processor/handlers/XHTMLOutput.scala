@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, ComponentControl, OutputControl}
+import org.orbeon.oxf.xforms.analysis.controls.{AppearanceTrait, ComponentControl, GroupControl, LHHA, LHHAAnalysis, OutputControl, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.{LHHASupport, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.xhtml._
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Namespaces._
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.Attributes
+import shapeless.syntax.typeable.typeableOps
 
 
 object XHTMLOutput {
@@ -89,9 +90,8 @@ object XHTMLOutput {
     case (ns @ XXF,  ln @ "text", qn, atts, hc) => new XXFormsTextHandler(ns, ln, qn, atts, hc)
   }
 
-  private def isFieldSet(hc: HandlerContext, atts: Attributes, c: ElementAnalysis): Boolean =
-    XFormsControl.appearances(c).contains(XXFORMS_FIELDSET_APPEARANCE_QNAME) ||
-      LHHASupport.hasLabel(hc.containingDocument, hc.getPrefixedId(atts))
+  private def isFieldSet(c: GroupControl): Boolean =
+    c.appearances(XXFORMS_FIELDSET_APPEARANCE_QNAME) || c.hasLocal(LHHA.Label)
 
   // The efficiency of this depends on how pattern-matching is implemented in Scala.
   // Dotty has an optimized pattern matcher, which implies that Scala 2 doesn't, but we need to
@@ -105,7 +105,7 @@ object XHTMLOutput {
     case (ns @ XF,  ln @ "output"          , qn, atts, c                  , hc)                                                      => new XFormsOutputDefaultHandler  (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "group"           , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)  => new TransparentHandler          (ns, ln, qn, atts,    hc)
     case (ns @ XF,  ln @ "group"           , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME) => new XFormsGroupSeparatorHandler (ns, ln, qn, atts, c, hc)
-    case (ns @ XF,  ln @ "group"           , qn, atts, c                  , hc) if isFieldSet(hc, atts, c)                           => new XFormsGroupFieldsetHandler  (ns, ln, qn, atts, c, hc)
+    case (ns @ XF,  ln @ "group"           , qn, atts, c: GroupControl    , hc) if isFieldSet(c)                                     => new XFormsGroupFieldsetHandler  (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "group"           , qn, atts, c                  , hc)                                                      => new XFormsGroupDefaultHandler   (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "switch"          , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME) => new XFormsGroupSeparatorHandler (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "switch"          , qn, atts, c                  , hc)                                                      => new XFormsGroupDefaultHandler   (ns, ln, qn, atts, c, hc)
@@ -126,10 +126,10 @@ object XHTMLOutput {
     case (ns @ XF,  ln @ "select1"         , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)  => new NullHandler                 (ns, ln, qn, atts,    hc)
     case (ns @ XF,  ln @ "select"          , qn, atts, c                  , hc)                                                      => new XFormsSelectHandler         (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "select1"         , qn, atts, c                  , hc)                                                      => new XFormsSelect1Handler        (ns, ln, qn, atts, c, hc)
-    case (ns @ XF,  ln @ "label"           , qn, atts, c                  , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
-    case (ns @ XF,  ln @ "help"            , qn, atts, c                  , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
-    case (ns @ XF,  ln @ "hint"            , qn, atts, c                  , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
-    case (ns @ XF,  ln @ "alert"           , qn, atts, c                  , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
+    case (ns @ XF,  ln @ "label"           , qn, atts, c: LHHAAnalysis    , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
+    case (ns @ XF,  ln @ "help"            , qn, atts, c: LHHAAnalysis    , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
+    case (ns @ XF,  ln @ "hint"            , qn, atts, c: LHHAAnalysis    , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
+    case (ns @ XF,  ln @ "alert"           , qn, atts, c: LHHAAnalysis    , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
     case (ns @ XXF, ln @ "dynamic"         , qn, atts, _                  , hc)                                                      => new XXFormsDynamicHandler       (ns, ln, qn, atts,    hc)
   }
 

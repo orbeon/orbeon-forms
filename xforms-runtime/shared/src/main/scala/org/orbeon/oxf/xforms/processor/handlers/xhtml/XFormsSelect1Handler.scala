@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, SelectAppearanceTrait, SelectionControlTrait}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, SelectAppearanceTrait, SelectionControlTrait}
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.itemset._
@@ -157,7 +157,7 @@ object XFormsSelect1Handler {
         reusableAttributes,
         XMLReceiverSupport.EmptyAttributes,
         itemClasses,
-        null
+        None
       )
 
     // Add item attributes to span
@@ -176,11 +176,11 @@ object XFormsSelect1Handler {
         outputLabelForStart(
           handlerContext           = xformsHandlerContextForItem,
           attributes               = reusableAttributes,
-          targetControlEffectiveId = None,
+          labelEffectiveIdOpt      = None,
           forEffectiveIdWithNs     = None,
           lhha                     = LHHA.Label,
           elementName              = labelName,
-          addIds                   = false
+          isExternal               = false
         )
       }
 
@@ -241,13 +241,13 @@ object XFormsSelect1Handler {
           outputLabelFor(
             handlerContext           = xformsHandlerContextForItem,
             attributes               = reusableAttributes,
-            targetControlEffectiveId = None,
+            labelEffectiveIdOpt      = None,
             forEffectiveIdWithNs     = None,
             lhha                     = LHHA.Help,
             elementName              = "span",
             labelValue               = help.label,
             mustOutputHTMLFragment   = help.isHTML,
-            addIds                   = false
+            isExternal               = false
           )
         }
 
@@ -258,12 +258,12 @@ object XFormsSelect1Handler {
           outputLabelFor(
             handlerContext           = xformsHandlerContextForItem,
             attributes               = reusableAttributes,
-            targetControlEffectiveId = None,
+            labelEffectiveIdOpt      = None,
             forEffectiveIdWithNs     = None,
             lhha                     = LHHA.Hint, elementName = "span",
             labelValue               = hint.label,
             mustOutputHTMLFragment   = hint.isHTML,
-            addIds                   = false
+            isExternal               = false
           )
         }
       }
@@ -425,7 +425,7 @@ class XFormsSelect1Handler(
                     // See https://github.com/orbeon/orbeon-forms/issues/4843
 
                     val itemClasses = XFormsSelect1Handler.getItemClasses(item, null)
-                    val optGroupAttributes = getIdClassXHTMLAttributes(XMLReceiverSupport.EmptyAttributes, itemClasses, null)
+                    val optGroupAttributes = getIdClassXHTMLAttributes(XMLReceiverSupport.EmptyAttributes, itemClasses, None)
 
                     optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, item.label.label)
 
@@ -559,7 +559,7 @@ class XFormsSelect1Handler(
   ): Boolean = {
 
     val itemClasses      = XFormsSelect1Handler.getItemClasses(item, null)
-    val optionAttributes = getIdClassXHTMLAttributes(XMLReceiverSupport.EmptyAttributes, itemClasses, null)
+    val optionAttributes = getIdClassXHTMLAttributes(XMLReceiverSupport.EmptyAttributes, itemClasses, None)
 
     // Add item attributes to `<option>`
     XFormsSelect1Handler.addItemAttributes(item, optionAttributes)
@@ -587,24 +587,23 @@ class XFormsSelect1Handler(
   }
 
   // For full appearance we don't put a `@for` attribute so that selecting the main label doesn't select the item
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] =
+  override def getForEffectiveIdWithNs: Option[String] =
     if (findAppearanceTrait.exists(_.isFull))
       None
     else
-      super.getForEffectiveIdWithNs(effectiveId)
+      super.getForEffectiveIdWithNs
 
   // For full appearance produce `span` with an `id`
-  override def handleLabel(): Unit =
+  override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
     if (findAppearanceTrait.exists(_.isFull))
       handleLabelHintHelpAlert(
-        lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
-        targetControlEffectiveId = getEffectiveId,
-        forEffectiveIdWithNs     = None,
-        lhha                     = LHHA.Label,
-        requestedElementNameOpt  = "span".some, // make element name a `span`, as a label would need a `for`
-        controlOrNull            = currentControl,
-        isExternal               = true         // pretend we're "external", so the element gets an id
+        lhhaAnalysis            = lhhaAnalysis,
+        elemEffectiveIdOpt      = getEffectiveId.some,
+        forEffectiveIdWithNs    = None,
+        requestedElementNameOpt = "span".some, // make element name a `span`, as a label would need a `for`
+        controlOrNull           = currentControl,
+        isExternal              = false
       )
     else
-      super.handleLabel()
+      super.handleLabel(lhhaAnalysis)
 }

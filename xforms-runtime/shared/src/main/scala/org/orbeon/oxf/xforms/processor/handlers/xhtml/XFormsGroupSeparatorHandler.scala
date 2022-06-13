@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
-
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor}
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
@@ -69,10 +69,10 @@ class XFormsGroupSeparatorHandler(
 
       appendControlUserClasses(attributes, currentControl)
 
-      handleMIPClasses(getPrefixedId, currentControl)
       // NOTE: Could also use `getInitialClasses(uri, localname, attributes, control)`, but then we get the
       // `xforms-group-appearance-xxforms-separator` class. Is that desirable?
       // As of August 2009, actually only need the marker class as well as `xforms-disabled` if the group is non-relevant
+      handleMIPClasses(elementAnalysis, currentControl)
 
       classes.toString
     }
@@ -122,8 +122,8 @@ class XFormsGroupSeparatorHandler(
   }
 
   // Don't output any LHHA
-  override def handleLabel(): Unit = ()
-  override def handleHint() : Unit = ()
-  override def handleAlert(): Unit = ()
-  override def handleHelp() : Unit = ()
+  override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = ()
+  override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = ()
+  override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = ()
+  override def handleHelp(lhhaAnalysis: LHHAAnalysis) : Unit = ()
 }

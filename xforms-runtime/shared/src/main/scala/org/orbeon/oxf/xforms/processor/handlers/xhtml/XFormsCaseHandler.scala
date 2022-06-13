@@ -14,8 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
-
-import org.orbeon.oxf.xforms.analysis.controls.SwitchControl
+import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, SwitchControl}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -191,8 +190,8 @@ class XFormsCaseHandler(
   }
 
   // Don't output any LHHA
-  override def handleLabel(): Unit = ()
-  override def handleHint() : Unit = ()
-  override def handleHelp() : Unit = ()
-  override def handleAlert(): Unit = ()
+  override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = ()
+  override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = ()
+  override def handleHelp(lhhaAnalysis: LHHAAnalysis) : Unit = ()
+  override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = ()
 }

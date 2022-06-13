@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
+
 import java.{lang => jl}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.LHHA.Label
-import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA, StaticLHHASupport}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaControlRef, LhhaPlacementType}
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml._
@@ -48,10 +48,10 @@ class XXFormsComponentHandler(
   private lazy val staticControl =
     handlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId).asInstanceOf[ComponentControl]
 
-  override def getContainingElementName =
+  override def getContainingElementName: String =
     staticControl.commonBinding.containerElementName
 
-  protected override def getContainingElementQName =
+  protected override def getContainingElementQName: String =
     XMLUtils.buildQName(handlerContext.findXHTMLPrefix, staticControl.commonBinding.containerElementName)
 
   protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {
@@ -77,57 +77,48 @@ class XXFormsComponentHandler(
   protected override def handleControlEnd(): Unit =
     handlerContext.popComponentContext()
 
-  protected override def handleLabel() =
+  protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
     if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Label)) // also implied: label is local (from `XFormsControlLifecyleHandler`)
       handleLabelHintHelpAlert(
-        lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
-        targetControlEffectiveId = getEffectiveId,
-        forEffectiveIdWithNs     = getForEffectiveIdWithNs(getEffectiveId),
-        lhha                     = LHHA.Label,
-        requestedElementNameOpt  = (staticControl.commonBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControl)) option "span",
-        controlOrNull            = currentControl,
-        isExternal               = false
+        lhhaAnalysis            = lhhaAnalysis,
+        elemEffectiveIdOpt      = None,
+        forEffectiveIdWithNs    = getForEffectiveIdWithNs,
+        requestedElementNameOpt = (staticControl.commonBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControl)) option "span",
+        controlOrNull           = currentControl,
+        isExternal              = false
       )
 
-  protected override def handleAlert(): Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Alert)) super.handleAlert()
-  protected override def handleHint() : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Hint))  super.handleHint()
-  protected override def handleHelp() : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Help))  super.handleHelp()
+  protected override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Alert)) super.handleAlert(lhhaAnalysis)
+  protected override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Hint))  super.handleHint(lhhaAnalysis)
+  protected override def handleHelp(lhhaAnalysis: LHHAAnalysis) : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Help))  super.handleHelp(lhhaAnalysis)
 
   // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
-  // NOTE: Used by `handleLabel()` if there is a local LHHA, and by `findTargetControlForEffectiveId`.
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = {
+  // NOTE: Used by `handleLabel()` above only if there is a local LHHA, and by `findTargetControlForEffectiveId`.
+  override def getForEffectiveIdWithNs: Option[String] = {
 
     def findFromTarget(
-      effectiveTargetControlOrPrefixedId : Either[StaticLHHASupport, String],
-      currentControlSuffix               : String
+      lhhaPlacementType   : LhhaPlacementType,
+      currentControlSuffix: String
     ): Option[String] =
-      effectiveTargetControlOrPrefixedId match {
-        case Left(effectiveTargetControl) =>
-
-          // Push/pop component context so that handler resolution works
-          handlerContext.pushComponentContext(getPrefixedId)
-          try
-            XFormsLHHAHandler.findTargetControlForEffectiveIdWithNs(
-              handlerContext,
-              effectiveTargetControl,
-              effectiveTargetControl.prefixedId + currentControlSuffix
-            )
-          finally
-            handlerContext.popComponentContext()
-
-        case Right(targetPrefixedId) =>
+      lhhaPlacementType match {
+        case LhhaPlacementType.Local(directTargetControl, LhhaControlRef.Control(targetControl)) if targetControl ne directTargetControl =>
+          XFormsLHHAHandler.findTargetControlForEffectiveIdWithNs(
+            handlerContext,
+            targetControl
+          )
+        case LhhaPlacementType.Local(_, LhhaControlRef.PrefixedId(targetPrefixedId)) =>
           containingDocument.namespaceId(targetPrefixedId + currentControlSuffix).some
+        case _ =>
+          None
       }
 
     import shapeless._
     import syntax.typeable._
 
     for {
-      staticLhhaSupport                  <- elementAnalysis.narrowTo[StaticLHHASupport]
-      staticLabel                        <- staticLhhaSupport.lhh(Label)
-      effectiveTargetControlOrPrefixedId <- staticLabel.effectiveTargetControlOrPrefixedIdOpt
-      currentControlSuffix               = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
-      result                             <- findFromTarget(effectiveTargetControlOrPrefixedId, currentControlSuffix)
+      staticLabel          <- getStaticLHHA(LHHA.Label)
+      currentControlSuffix = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
+      result               <- findFromTarget(staticLabel.lhhaPlacementType, currentControlSuffix)
     } yield
       result
   }

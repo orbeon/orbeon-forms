@@ -72,23 +72,16 @@ trait PartGlobalOps {
     case viewTrait: ViewTrait => viewTrait.index
   }
 
-  def appendClasses(sb: java.lang.StringBuilder, prefixedId: String): Unit =
-    findControlAnalysis(prefixedId) foreach { controlAnalysis =>
-      val controlClasses = controlAnalysis.classes
-      if (controlClasses.nonAllBlank) {
-        if (sb.length > 0)
-          sb.append(' ')
-        sb.append(controlClasses)
-      }
+  def appendClasses(sb: java.lang.StringBuilder, controlAnalysis: ElementAnalysis): Unit = {
+    val controlClasses = controlAnalysis.classes
+    if (controlClasses.nonAllBlank) {
+      if (sb.length > 0)
+        sb.append(' ')
+      sb.append(controlClasses)
     }
+  }
 
   // LHHA
-  def getLHH(prefixedId: String, lhha: LHHA): LHHAAnalysis =
-    (collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) flatMap (_.lhh(lhha))).orNull
-
-  def getAlerts(prefixedId: String): List[LHHAAnalysis] =
-    collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)).toList flatMap (_.alerts)
-
   def hasLHHA(prefixedId: String, lhha: LHHA): Boolean =
     collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) exists (_.hasLHHA(lhha))
 }

@@ -1,6 +1,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
@@ -38,9 +39,9 @@ abstract class XFormsTriggerHandler(
   override def isMustOutputControl(control: XFormsControl): Boolean =
     ! XFormsBaseHandler.isStaticReadonly(control)
 
-  override def handleLabel(): Unit = () // label is handled differently
-  override def handleHint() : Unit = () // hint is handled differently
-  override def handleAlert(): Unit = () // triggers don't need an alert (in theory, they could have one)
+  override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = () // label is handled differently
+  override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = () // hint is handled differently
+  override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = () // triggers don't need an alert (in theory, they could have one)
 
   override def getEmptyNestedControlAttributesMaybeWithId(effectiveId: String, control: XFormsControl, addId: Boolean): AttributesImpl = {
 

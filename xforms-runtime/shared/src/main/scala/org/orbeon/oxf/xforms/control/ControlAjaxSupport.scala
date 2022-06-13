@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaPlacementType}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
@@ -79,8 +79,10 @@ trait ControlAjaxSupport {
       staticLhhaSupport <- staticControl.cast[StaticLHHASupport].toList // NOTE: `narrowTo` fails
       lhha              <- ajaxLhhaSupport
       // https://github.com/orbeon/orbeon-forms/issues/3836
-      // Q: Could we just check `isLocal` instead of `isForRepeat`?
-      if staticLhhaSupport.hasLHHANotForRepeat(lhha) || staticLhhaSupport.hasLHHAPlaceholder(lhha)
+      // Also: we can have multiple `staticLhhaSupport` for `LHHA.Alert`, but only one `lhhaProperty`! Some `LHHA`s
+      // could be nested, some external, but in the end we only get one value. For now (2022-06-09) the constraint
+      // remains that we should either have all local alerts, or all separate.
+      if staticLhhaSupport.hasLocal(lhha) || staticLhhaSupport.hasLHHAPlaceholder(lhha)
       value1            = previousControlOpt.map(_.lhhaProperty(lhha).value()).orNull
       lhha2             = self.lhhaProperty(lhha)
       value2            = lhha2.value()
@@ -204,26 +206,26 @@ object ControlAjaxSupport {
 
   // Output an `xxf:attribute` element for the given name and value extractor if the value has changed
   def outputAttributeElement(
-    previousControlOpt : Option[XFormsControl],
-    currentControl     : XFormsControl,
-    effectiveId        : String,
-    name               : String,
-    value              : XFormsControl => String)(
-    ch                 : XMLReceiverHelper,
-    containingDocument : XFormsContainingDocument
+    previousControlOpt: Option[XFormsControl],
+    currentControl    : XFormsControl,
+    effectiveId       : String,
+    attName           : String,
+    attValue          : XFormsControl => Option[String])(
+    ch                : XMLReceiverHelper,
+    containingDocument: XFormsContainingDocument
   ): Unit = {
 
-    val value1 = previousControlOpt   map value
-    val value2 = Some(currentControl) map value
+    val value1Opt = previousControlOpt flatMap attValue
+    val value2    = attValue(currentControl).getOrElse("")
 
-    if (value1 != value2) {
-      val attributeValue = value2 getOrElse ""
+    if (! value1Opt.contains(value2)) {
+
       val attributesImpl = new AttributesImpl
 
       addAttribute(attributesImpl, "for",  containingDocument.namespaceId(effectiveId))
-      addAttribute(attributesImpl, "name", name)
+      addAttribute(attributesImpl, "name", attName)
       ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "attribute", attributesImpl)
-      ch.text(attributeValue)
+      ch.text(value2)
       ch.endElement()
     }
   }
@@ -238,6 +240,22 @@ object ControlAjaxSupport {
     LHHA.Help  -> AriaDetails
   )
 
+  def iterateAriaByAtts(
+    staticControl      : ElementAnalysis,
+    control            : XFormsControl)(
+    containingDocument : XFormsContainingDocument
+  ): Iterator[(String, String)] = {
+
+    def cond(lhha: LHHA)(lhhaAnalysis: LHHAAnalysis): Boolean =
+      lhhaAnalysis.isForRepeat || lhha != LHHA.Label
+
+    for {
+      (lhha, attName) <- ControlAjaxSupport.LhhaWithAriaAttName.iterator
+      attValue        <- ControlAjaxSupport.findAriaByWithNs(staticControl, control, lhha, cond(lhha))(containingDocument)
+    } yield
+      attName -> attValue
+  }
+
   def findAriaByWithNs(
     staticControl      : ElementAnalysis,
     control            : XFormsControl,
@@ -249,18 +267,34 @@ object ControlAjaxSupport {
     import shapeless._
     import syntax.typeable._
 
+    // We want the same id that is placed on the `<label>` or `<span>` element in the markup, so follow the logic
+    // present in `XFormsLHHAHandler`.
+    // TODO: We don't want this duplication of logic!
+
     for {
       staticLhhaSupport <- staticControl.narrowTo[StaticLHHASupport]
       staticLhha        <- staticLhhaSupport.lhhBy(lhha) orElse staticLhhaSupport.lhh(lhha)
       if condition(staticLhha)
     } yield
-      if (staticLhha.isLocal) {
-        XFormsBaseHandler.getLHHACIdWithNs(containingDocument, control.effectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
-      } else {
-        val suffix    = XFormsId.getEffectiveIdSuffixParts(control.effectiveId)
-        val newSuffix = suffix.take(suffix.size - staticLhha.forRepeatNesting)
+      staticLhha.lhhaPlacementType match {
+        case LhhaPlacementType.Local(directTargetControl, _) =>
+          val lhhaRepeatIndices = XFormsId.getEffectiveIdSuffixParts(control.effectiveId)
+          XFormsBaseHandler.getLHHACIdWithNs(
+            containingDocument,
+            XFormsId.buildEffectiveId(directTargetControl.prefixedId, lhhaRepeatIndices),
+            XFormsBaseHandlerXHTML.LHHACodes(lhha)
+          )
+        case LhhaPlacementType.External(_, _, forRepeatNestingOpt) =>
 
-        containingDocument.namespaceId(XFormsId.buildEffectiveId(staticLhha.prefixedId, newSuffix))
+          val controlRepeatIndices = XFormsId.getEffectiveIdSuffixParts(control.effectiveId)
+
+          val lhhaRepeatIndices =
+            forRepeatNestingOpt match {
+              case Some(forRepeatNesting) => controlRepeatIndices.take(controlRepeatIndices.size - forRepeatNesting)
+              case None                   => controlRepeatIndices
+            }
+
+          containingDocument.namespaceId(XFormsId.buildEffectiveId(staticLhha.prefixedId, lhhaRepeatIndices))
       }
   }
 }

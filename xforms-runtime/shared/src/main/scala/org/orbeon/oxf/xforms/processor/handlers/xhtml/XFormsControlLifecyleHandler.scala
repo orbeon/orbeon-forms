@@ -78,11 +78,10 @@ abstract class XFormsControlLifecyleHandler(
             uri,
             localname,
             attributes,
-            getPrefixedId,
             getEffectiveId,
             elementAnalysis,
             currentControl,
-            Option(getStaticLHHA(getPrefixedId, LHHA.Label))
+            lhhaIfLocal(LHHA.Label)
           )
         )
 
@@ -90,10 +89,10 @@ abstract class XFormsControlLifecyleHandler(
       for (current <- beforeAfterTokens._1)
         current match {
           case "control" => handleControlStart()
-          case "label"   => if (hasLocalLabel) handleLabel()
-          case "alert"   => if (hasLocalAlert) handleAlert()
-          case "hint"    => if (hasLocalHint)  handleHint()
-          case "help"    => if (hasLocalHelp)  handleHelp()
+          case "label"   => lhhaIfLocal(LHHA.Label).foreach(handleLabel)
+          case "alert"   => lhhaIfLocal(LHHA.Alert).foreach(handleAlert)
+          case "hint"    => lhhaIfLocal(LHHA.Hint).foreach(handleHint)
+          case "help"    => lhhaIfLocal(LHHA.Help).foreach(handleHelp)
         }
     }
 
@@ -104,10 +103,10 @@ abstract class XFormsControlLifecyleHandler(
       for (current <- beforeAfterTokens._2)
         current match {
           case "control" => handleControlEnd()
-          case "label"   => if (hasLocalLabel) handleLabel()
-          case "alert"   => if (hasLocalAlert) handleAlert()
-          case "hint"    => if (hasLocalHint)  handleHint()
-          case "help"    => if (hasLocalHelp)  handleHelp()
+          case "label"   => lhhaIfLocal(LHHA.Label).foreach(handleLabel)
+          case "alert"   => lhhaIfLocal(LHHA.Alert).foreach(handleAlert)
+          case "hint"    => lhhaIfLocal(LHHA.Hint).foreach(handleHint)
+          case "help"    => lhhaIfLocal(LHHA.Help).foreach(handleHelp)
         }
 
       // Close control element, usually `<span>`
@@ -123,52 +122,47 @@ abstract class XFormsControlLifecyleHandler(
   protected def isMustOutputControl(control: XFormsControl) = true
   protected def isMustOutputContainerElement                = true
 
-  // TODO: Those should take the static LHHA
-  protected def handleLabel(): Unit =
+  protected def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
     handleLabelHintHelpAlert(
-      lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Label),
-      targetControlEffectiveId = getEffectiveId,
-      forEffectiveIdWithNs     = getForEffectiveIdWithNs(getEffectiveId),
-      lhha                     = LHHA.Label,
-      requestedElementNameOpt  = XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
-      controlOrNull            = currentControl,
-      isExternal               = false
+      lhhaAnalysis            = lhhaAnalysis,
+      elemEffectiveIdOpt      = None,
+      forEffectiveIdWithNs    = getForEffectiveIdWithNs,
+      requestedElementNameOpt = XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
+      controlOrNull           = currentControl,
+      isExternal              = false
     )
 
-  protected def handleAlert(): Unit =
+  protected def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyAlert)
       handleLabelHintHelpAlert(
-        lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Alert),
-        targetControlEffectiveId = getEffectiveId,
-        forEffectiveIdWithNs     = getForEffectiveIdWithNs(getEffectiveId),
-        lhha                     = LHHA.Alert,
-        requestedElementNameOpt  = None,
-        controlOrNull            = currentControl,
-        isExternal               = false
+        lhhaAnalysis            = lhhaAnalysis,
+        elemEffectiveIdOpt      = None,
+        forEffectiveIdWithNs    = None,
+        requestedElementNameOpt = None,
+        controlOrNull           = currentControl,
+        isExternal              = false
       )
 
-  protected def handleHint(): Unit =
+  protected def handleHint(lhhaAnalysis: LHHAAnalysis): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyHint)
       handleLabelHintHelpAlert(
-        lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Hint),
-        targetControlEffectiveId = getEffectiveId,
-        forEffectiveIdWithNs     = getForEffectiveIdWithNs(getEffectiveId),
-        lhha                     = LHHA.Hint,
-        requestedElementNameOpt  = None,
-        controlOrNull            = currentControl,
-        isExternal               = false
+        lhhaAnalysis            = lhhaAnalysis,
+        elemEffectiveIdOpt      = getEffectiveId.some,
+        forEffectiveIdWithNs    = None,
+        requestedElementNameOpt = None,
+        controlOrNull           = currentControl,
+        isExternal              = false
       )
 
-  protected def handleHelp(): Unit =
+  protected def handleHelp(lhhaAnalysis: LHHAAnalysis): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControl))
       handleLabelHintHelpAlert(
-        lhhaAnalysis             = getStaticLHHA(getPrefixedId, LHHA.Help),
-        targetControlEffectiveId = getEffectiveId,
-        forEffectiveIdWithNs     = getForEffectiveIdWithNs(getEffectiveId),
-        lhha                     = LHHA.Help,
-        requestedElementNameOpt  = None,
-        controlOrNull            = currentControl,
-        isExternal               = false
+        lhhaAnalysis            = lhhaAnalysis,
+        elemEffectiveIdOpt      = getEffectiveId.some,
+        forEffectiveIdWithNs    = None,
+        requestedElementNameOpt = None,
+        controlOrNull           = currentControl,
+        isExternal              = false
       )
 
   // Must be overridden by subclasses
@@ -193,38 +187,36 @@ abstract class XFormsControlLifecyleHandler(
     containerAttributes
   }
 
-  // Return the effective id of the element to which label/@for, etc. must point to.
-  // Default: point to `foo$bar$$c.1-2-3`
-  def getForEffectiveIdWithNs(effectiveId: String): Option[String] =
+  // Return the effective id of the element to which `label/@for`, etc. must point to.
+  // Default: point to `foo≡bar≡≡c⊙1-2-3`
+  def getForEffectiveIdWithNs: Option[String] =
     XFormsBaseHandler.getLHHACIdWithNs(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.ControlCode).some
 
   // See https://github.com/orbeon/orbeon-forms/issues/4046
   final lazy val currentControl: XFormsControl =
     containingDocument.getControlByEffectiveId(getEffectiveId) ensuring (_ ne null)
 
+  // TODO: Remove some duplication with `handleAriaByAtts`. Here we do the same thing but just with
+  //   `LHHA.Label` and don't have a condition.
   final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =
     for {
-      attValue      <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl, LHHA.Label, condition = _ => true)(containingDocument)
-      attName       = ControlAjaxSupport.AriaLabelledby
+      (lhha, attName) <- ControlAjaxSupport.LhhaWithAriaAttName.headOption
+      attValue        <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl, lhha, condition = _ => true)(containingDocument)
     } locally {
       atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
     }
 
   final protected def handleAriaByAtts(atts: AttributesImpl): Unit =
     for {
-      (lhha, attName) <- ControlAjaxSupport.LhhaWithAriaAttName
-      attValue        <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl, lhha, condition = _.isForRepeat)(containingDocument)
+      (attName, attValue) <- ControlAjaxSupport.iterateAriaByAtts(elementAnalysis, currentControl)(containingDocument)
     } locally {
       atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
     }
 
-  final protected def getStaticLHHA(controlPrefixedId: String, lhha: LHHA): LHHAAnalysis = {
-    val globalOps = handlerContext.getPartAnalysis
-    if (lhha == LHHA.Alert)
-      globalOps.getAlerts(controlPrefixedId).head
-    else // for alerts, take the first one, but does this make sense?
-      globalOps.getLHH(controlPrefixedId, lhha)
-  }
+  final protected def getStaticLHHA(lhha: LHHA): Option[LHHAAnalysis] =
+    elementAnalysis.narrowTo[StaticLHHASupport].flatMap { lhhaSupport =>
+      lhhaSupport.firstLhha(lhha)
+    }
 
   private object Private {
 
@@ -233,15 +225,7 @@ abstract class XFormsControlLifecyleHandler(
       (_.beforeAfterTokensOpt)                    getOrElse
       handlerContext.documentOrder
 
-    def hasLocalLabel: Boolean = hasLocalLHHA(LHHA.Label)
-    def hasLocalHint : Boolean = hasLocalLHHA(LHHA.Hint)
-    def hasLocalHelp : Boolean = hasLocalLHHA(LHHA.Help)
-    def hasLocalAlert: Boolean = hasLocalLHHA(LHHA.Alert)
-
-    def hasLocalLHHA(lhhaType: LHHA): Boolean =
-      handlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId) match {
-        case support: StaticLHHASupport => support.hasLocal(lhhaType)
-        case _                          => false
-      }
+    def lhhaIfLocal(lhhaType: LHHA): Option[LHHAAnalysis] =
+      getStaticLHHA(lhhaType).filter(_.isLocal)
   }
 }

@@ -39,14 +39,17 @@ trait StaticLHHASupport extends ElementAnalysis {
   def lhhBy(lhhaType: LHHA): Option[LHHAAnalysis] = _lhhBy.get(lhhaType)
   def alerts               : List[LHHAAnalysis]   = _alerts
 
+  def firstLhha(lhhaType: LHHA): Option[LHHAAnalysis] =
+    if (lhhaType == LHHA.Alert)
+      alerts.headOption
+    else // for alerts, take the first one, but does this make sense?
+      lhh(lhhaType)
+
   def hasLHHA(lhhaType: LHHA): Boolean =
     if (lhhaType == LHHA.Alert) alerts.nonEmpty else lhh(lhhaType).nonEmpty
 
   def hasLocal(lhhaType: LHHA): Boolean =
     lhhaAsList(lhhaType) exists (_.isLocal)
-
-  def hasLHHANotForRepeat(lhhaType: LHHA): Boolean =
-    lhhaAsList(lhhaType) exists (! _.isForRepeat)
 
   def lhhaValueAnalyses(lhhaType: LHHA): List[XPathAnalysis] =
     lhhaAsList(lhhaType) flatMap (_.valueAnalysis)

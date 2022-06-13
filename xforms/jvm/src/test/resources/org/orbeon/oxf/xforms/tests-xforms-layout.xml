@@ -33,10 +33,10 @@
                 <xh:head>
                     <xf:model id="main-model">
                         <xf:instance id="tests">
-                            <instance>
+                            <_>
                                 <default>Hello!</default>
                                 <boolean>true</boolean>
-                            </instance>
+                            </_>
                         </xf:instance>
                         <xf:bind ref="default" type="xs:NCName" required="true()"/>
                         <xf:bind ref="boolean" type="xs:boolean" required="true()"/>
@@ -80,10 +80,10 @@
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-input⊙1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-input≡xforms-input-1⊙1">My label</xh:label>
-                    <xh:input id="my-new-input≡xforms-input-1⊙1" type="text" name="my-new-input≡xforms-input-1⊙1" value="Hello!" class="xforms-input-input xforms-type-NCName" aria-required="true"/>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:input id="my-new-input≡xforms-input-1⊙1" type="text" name="my-new-input≡xforms-input-1⊙1" value="Hello!" class="xforms-input-input xforms-type-NCName" aria-describedby="my-new-input≡≡t⊙1" aria-details="my-new-input≡≡p⊙1" aria-required="true"/>
+                    <xh:button class="xforms-help" id="my-new-input≡≡p⊙1">My help</xh:button>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                    <xh:span class="xforms-hint" id="my-new-input≡≡t⊙1">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-boolean-input⊙1" class="xforms-control xforms-input xforms-required xforms-filled xforms-type-boolean xforms-repeat-selected-item-1 xforms-update-full">
@@ -91,26 +91,26 @@
                     <xh:span class="xforms-selected">
                         <xh:input id="my-new-boolean-input≡≡e0⊙1" type="checkbox" name="my-new-boolean-input⊙1" value="true" checked="checked"/>
                     </xh:span>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:button class="xforms-help" id="my-new-boolean-input≡≡p⊙1">My help</xh:button>
                     <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                    <xh:span class="xforms-hint" id="my-new-boolean-input≡≡t⊙1">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="my-new-input-2≡≡l⊙1" for="my-new-input-2≡xforms-input-1⊙1">My label</xh:label>
+                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="xf-11⊙1" for="my-new-input-2≡xforms-input-1⊙1">My label</xh:label>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="my-new-input-2≡≡t⊙1">My hint</xh:span>
+                <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="xf-12⊙1">My hint</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-input-2⊙1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
-                    <xh:input id="my-new-input-2≡xforms-input-1⊙1" type="text" name="my-new-input-2≡xforms-input-1⊙1" value="Hello!" class="xforms-input-input xforms-type-NCName" aria-required="true"/>
+                    <xh:input id="my-new-input-2≡xforms-input-1⊙1" type="text" name="my-new-input-2≡xforms-input-1⊙1" value="Hello!" class="xforms-input-input xforms-type-NCName" aria-describedby="xf-12⊙1" aria-details="xf-13⊙1" aria-required="true"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:button class="xforms-help xforms-repeat-selected-item-1 xforms-update-full" id="my-new-input-2≡≡p⊙1">My help</xh:button>
+                <xh:button class="xforms-help xforms-repeat-selected-item-1 xforms-update-full" id="xf-13⊙1">My help</xh:button>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:span class="xforms-active xforms-invalid xforms-alert xforms-repeat-selected-item-1 xforms-update-full" id="my-new-input-2≡≡a⊙1">My alert</xh:span>
+                <xh:span class="xforms-active xforms-invalid xforms-alert xforms-repeat-selected-item-1 xforms-update-full" id="xf-14⊙1">My alert</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="my-new-boolean-input-2≡≡l⊙1" for="my-new-boolean-input-2≡≡e0⊙1">My label</xh:label>
+                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="xf-15⊙1" for="my-new-boolean-input-2≡≡e0⊙1">My label</xh:label>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="my-new-boolean-input-2≡≡t⊙1">My hint</xh:span>
+                <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="xf-16⊙1">My hint</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-boolean-input-2⊙1" class="xforms-control xforms-input xforms-required xforms-filled xforms-type-boolean xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span class="xforms-selected">
@@ -118,9 +118,9 @@
                     </xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:button class="xforms-help xforms-repeat-selected-item-1 xforms-update-full" id="my-new-boolean-input-2≡≡p⊙1">My help</xh:button>
+                <xh:button class="xforms-help xforms-repeat-selected-item-1 xforms-update-full" id="xf-17⊙1">My help</xh:button>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:span class="xforms-alert xforms-repeat-selected-item-1 xforms-update-full" id="my-new-boolean-input-2≡≡a⊙1"/>
+                <xh:span class="xforms-alert xforms-repeat-selected-item-1 xforms-update-full" id="xf-18⊙1"/>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
@@ -134,7 +134,7 @@
                 <xh:head>
                     <xf:model id="main-model" xxf:encrypt-item-values="false">
                         <xf:instance id="tests">
-                            <instance>apple</instance>
+                            <_>apple</_>
                         </xf:instance>
                         <xf:bind ref="." type="xs:NCName" required="true()"/>
                     </xf:model>
@@ -166,13 +166,13 @@
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-select1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-select1≡≡c⊙1">My label</xh:label>
-                    <xh:select id="my-new-select1≡≡c⊙1" name="my-new-select1⊙1" aria-required="true">
+                        <xh:select id="my-new-select1≡≡c⊙1" name="my-new-select1⊙1" aria-describedby="my-new-select1≡≡t⊙1" aria-details="my-new-select1≡≡p⊙1" aria-required="true">
                         <xh:option value="apple" selected="selected">Apple</xh:option>
                         <xh:option value="orange">Orange</xh:option>
                     </xh:select>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:button class="xforms-help" id="my-new-select1≡≡p⊙1">My help</xh:button>
                     <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                    <xh:span class="xforms-hint" id="my-new-select1≡≡t⊙1">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
@@ -187,7 +187,7 @@
                 <xh:head>
                     <xf:model id="main-model">
                         <xf:instance id="tests">
-                            <instance>Hello!</instance>
+                            <_>Hello!</_>
                         </xf:instance>
                         <xf:bind ref="." type="xs:NCName" required="true()"/>
                     </xf:model>
@@ -217,10 +217,10 @@
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-output⊙1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-output≡≡c⊙1">My label</xh:label>
-                    <xh:output id="my-new-output≡≡c⊙1" class="xforms-field" tabindex="0" aria-readonly="true" role="textbox">Hello!</xh:output>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:output id="my-new-output≡≡c⊙1" class="xforms-field" aria-describedby="my-new-output≡≡t⊙1" aria-details="my-new-output≡≡p⊙1" tabindex="0" aria-readonly="true" role="textbox">Hello!</xh:output>
+                    <xh:button class="xforms-help" id="my-new-output≡≡p⊙1">My help</xh:button>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                    <xh:span class="xforms-hint" id="my-new-output≡≡t⊙1">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-output-no-label⊙1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
@@ -246,7 +246,7 @@
                 <xh:head>
                     <xf:model id="main-model">
                         <xf:instance id="tests">
-                            <instance>Hello!</instance>
+                            <_>Hello!</_>
                         </xf:instance>
                         <xf:bind ref="." type="xs:NCName" required="true()"/>
                     </xf:model>
@@ -338,7 +338,7 @@
                 <xh:head>
                     <xf:model id="main-model">
                         <xf:instance id="tests">
-                            <instance>Hello!</instance>
+                            <_>Hello!</_>
                         </xf:instance>
                         <xf:bind ref="." type="xs:NCName" required="true()"/>
                     </xf:model>
@@ -381,22 +381,22 @@
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:button id="my-new-trigger≡≡c⊙1" title="My hint" type="button" class="btn">My label</xh:button>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:button class="xforms-help" id="my-new-trigger≡≡p⊙1">My help</xh:button>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-minimal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:button id="my-new-minimal-trigger≡≡c⊙1" title="My hint" class="btn-link">My label</xh:button>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:button class="xforms-help" id="my-new-minimal-trigger≡≡p⊙1">My help</xh:button>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-modal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:button id="my-new-modal-trigger≡≡c⊙1" title="My hint" type="button" class="btn">My label</xh:button>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:button class="xforms-help" id="my-new-modal-trigger≡≡p⊙1">My help</xh:button>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-modal-minimal-trigger⊙1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:button id="my-new-modal-minimal-trigger≡≡c⊙1" title="My hint" class="btn-link">My label</xh:button>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:button class="xforms-help" id="my-new-modal-minimal-trigger≡≡p⊙1">My help</xh:button>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
@@ -411,7 +411,7 @@
                 <xh:head>
                     <xf:model id="main-model">
                         <xf:instance id="tests">
-                            <instance>Hello!</instance>
+                            <_>Hello!</_>
                         </xf:instance>
                         <xf:bind ref="." type="xs:NCName" required="true()"/>
                     </xf:model>
@@ -438,9 +438,9 @@
                     <xh:div id="my-new-range≡≡c⊙1" class="xforms-range-background">
                         <xh:div class="xforms-range-thumb"/>
                     </xh:div>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:button class="xforms-help" id="my-new-range≡≡p⊙1">My help</xh:button>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                    <xh:span class="xforms-hint" id="my-new-range≡≡t⊙1">My hint</xh:span>
                 </xh:div>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:div id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
@@ -455,7 +455,7 @@
                 <xh:head>
                     <xf:model id="main-model" xxf:encrypt-item-values="false">
                         <xf:instance id="tests">
-                            <instance>apple</instance>
+                            <_>apple</_>
                         </xf:instance>
                         <xf:bind ref="." type="xs:NCName" required="true()"/>
                     </xf:model>
@@ -501,24 +501,24 @@
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-select⊙1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-select≡≡c⊙1">My label</xh:label>
-                    <xh:select id="my-new-select≡≡c⊙1" name="my-new-select⊙1" multiple="multiple" aria-required="true">
+                <xh:select id="my-new-select≡≡c⊙1" name="my-new-select⊙1" multiple="multiple" aria-describedby="my-new-select≡≡t⊙1" aria-details="my-new-select≡≡p⊙1" aria-required="true">
                         <xh:option value="apple" selected="selected">Apple</xh:option>
                         <xh:option value="orange">Orange</xh:option>
                     </xh:select>
-                    <xh:button class="xforms-help">My help</xh:button>
+                <xh:button class="xforms-help" id="my-new-select≡≡p⊙1">My help</xh:button>
                     <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                <xh:span class="xforms-hint" id="my-new-select≡≡t⊙1">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-compact-select⊙1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-compact-select≡≡c⊙1">My label</xh:label>
-                    <xh:select id="my-new-compact-select≡≡c⊙1" name="my-new-compact-select⊙1" multiple="multiple" aria-required="true">
+                <xh:select id="my-new-compact-select≡≡c⊙1" name="my-new-compact-select⊙1" multiple="multiple" aria-describedby="my-new-compact-select≡≡t⊙1" aria-details="my-new-compact-select≡≡p⊙1" aria-required="true">
                         <xh:option value="apple" selected="selected">Apple</xh:option>
                         <xh:option value="orange">Orange</xh:option>
                     </xh:select>
-                    <xh:button class="xforms-help">My help</xh:button>
+                <xh:button class="xforms-help" id="my-new-compact-select≡≡p⊙1">My help</xh:button>
                     <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                <xh:span class="xforms-hint" id="my-new-compact-select≡≡t⊙1">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
@@ -533,10 +533,10 @@
                 <xh:head>
                     <xf:model id="main-model">
                         <xf:instance id="tests">
-                            <instance>
+                            <_>
                                 <default xsi:type="xs:anyURI"/>
                                 <file xsi:type="xs:anyURI" filename="help.png" mediatype="image/png" size="123456">oxf:/ops/images/xforms/help.png</file>
-                            </instance>
+                            </_>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -577,7 +577,7 @@
                 <xh:span id="my-new-upload⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-upload≡xforms-input⊙1">My label</xh:label>
                     <xh:span id="my-new-upload≡≡c⊙1">
-                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload≡xforms-input⊙1" name="my-new-upload⊙1" unselectable="on"/>
+                    <xh:input class="xforms-upload-select" type="file" id="my-new-upload≡xforms-input⊙1" name="my-new-upload⊙1" unselectable="on" aria-describedby="my-new-upload≡≡t⊙1" aria-details="my-new-upload≡≡p⊙1"/>
                         <xh:span class="xforms-upload-info">
                             <xh:span class="xforms-upload-filename"/>
                             <xh:span class="xforms-upload-mediatype"/>
@@ -585,18 +585,18 @@
                             <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
                         </xh:span>
                     </xh:span>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:button class="xforms-help" id="my-new-upload≡≡p⊙1">My help</xh:button>
                     <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                    <xh:span class="xforms-hint" id="my-new-upload≡≡t⊙1">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="my-new-upload-2≡≡l⊙1" for="my-new-upload-2≡xforms-input⊙1">My label</xh:label>
+                <xh:label class="xforms-label xforms-repeat-selected-item-1 xforms-update-full" id="xf-5⊙1" for="my-new-upload-2≡xforms-input⊙1">My label</xh:label>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="my-new-upload-2≡≡t⊙1">My hint</xh:span>
+                <xh:span class="xforms-hint xforms-repeat-selected-item-1 xforms-update-full" id="xf-6⊙1">My hint</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-upload-2⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span id="my-new-upload-2≡≡c⊙1">
-                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-2≡xforms-input⊙1" name="my-new-upload-2⊙1" unselectable="on"/>
+                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-2≡xforms-input⊙1" name="my-new-upload-2⊙1" unselectable="on" aria-describedby="xf-6⊙1" aria-details="xf-7⊙1"/>
                         <xh:span class="xforms-upload-info">
                             <xh:span class="xforms-upload-filename"/>
                             <xh:span class="xforms-upload-mediatype"/>
@@ -606,14 +606,14 @@
                     </xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:button class="xforms-help xforms-repeat-selected-item-1 xforms-update-full" id="my-new-upload-2≡≡p⊙1">My help</xh:button>
+                <xh:button class="xforms-help xforms-repeat-selected-item-1 xforms-update-full" id="xf-7⊙1">My help</xh:button>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:span class="xforms-alert xforms-repeat-selected-item-1 xforms-update-full" id="my-new-upload-2≡≡a⊙1"/>
+                <xh:span class="xforms-alert xforms-repeat-selected-item-1 xforms-update-full" id="xf-8⊙1"/>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-upload-file⊙1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-file xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:label class="xforms-label" for="my-new-upload-file≡xforms-input⊙1">My label</xh:label>
                     <xh:span id="my-new-upload-file≡≡c⊙1">
-                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-file≡xforms-input⊙1" name="my-new-upload-file⊙1" unselectable="on"/>
+                    <xh:input class="xforms-upload-select" type="file" id="my-new-upload-file≡xforms-input⊙1" name="my-new-upload-file⊙1" unselectable="on" aria-describedby="my-new-upload-file≡≡t⊙1" aria-details="my-new-upload-file≡≡p⊙1"/>
                         <xh:span class="xforms-upload-info">
                             <xh:span class="xforms-upload-filename">help.png</xh:span>
                             <xh:span class="xforms-upload-mediatype">image/png</xh:span>
@@ -621,9 +621,9 @@
                             <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
                         </xh:span>
                     </xh:span>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:button class="xforms-help" id="my-new-upload-file≡≡p⊙1">My help</xh:button>
                     <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                    <xh:span class="xforms-hint" id="my-new-upload-file≡≡t⊙1">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
@@ -639,9 +639,9 @@
                 <xh:head>
                     <xf:model>
                         <xf:instance id="instance">
-                            <instance>
+                            <_>
                                 <name/>
-                            </instance>
+                            </_>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -696,9 +696,9 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance>
+                            <_>
                                 <name/>
-                            </instance>
+                            </_>
                         </xf:instance>
                         <!-- Set even length -->
                         <xf:setvalue ev:event="xforms-ready" ref="name">XML</xf:setvalue>
@@ -731,9 +731,9 @@
                     <dynamic-state>
                         <instances>
                             <instance id="instance" model-id="model">
-                                <instance>
+                                <_>
                                     <name>XML</name>
-                                </instance>
+                                </_>
                             </instance>
                         </instances>
                     </dynamic-state>
@@ -769,9 +769,9 @@
                 <xh:head>
                     <xf:model id="main-model">
                         <xf:instance id="tests">
-                            <instance>
+                            <_>
                                 <default>Hello!</default>
-                            </instance>
+                            </_>
                         </xf:instance>
                         <xf:bind ref="default" type="xs:NCName" required="true()" readonly="true()"/>
                     </xf:model>
@@ -790,10 +790,10 @@
             <controls xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:span id="my-new-textarea" class="xforms-control xforms-textarea xforms-invalid xforms-readonly xforms-required xforms-filled xforms-type-NCName">
                     <xh:label class="xforms-label" for="my-new-textarea≡≡c">My label</xh:label>
-                    <xh:textarea id="my-new-textarea≡≡c" name="my-new-textarea" readonly="readonly" aria-required="true">Hello!</xh:textarea>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:textarea id="my-new-textarea≡≡c" name="my-new-textarea" aria-describedby="my-new-textarea≡≡t" aria-details="my-new-textarea≡≡p" readonly="readonly" aria-required="true">Hello!</xh:textarea>
+                    <xh:button class="xforms-help" id="my-new-textarea≡≡p">My help</xh:button>
                     <xh:span class="xforms-active xforms-alert">My alert</xh:span>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                    <xh:span class="xforms-hint" id="my-new-textarea≡≡t">My hint</xh:span>
                 </xh:span>
             </controls>
         </output>
@@ -806,7 +806,7 @@
                 <xh:head>
                     <xf:model id="model" xxf:encrypt-item-values="false">
                         <xf:instance id="selection">
-                            <value/>
+                            <_/>
                         </xf:instance>
 
                         <xf:instance id="itemset-1">
@@ -861,10 +861,10 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance>
+                            <_>
                                 <image>/ops/images/xforms/help.png</image>
                                 <show>true</show>
-                            </instance>
+                            </_>
                         </xf:instance>
                         <xf:bind ref="image" relevant="../show = 'true'"/>
                         <xf:setvalue ev:event="xforms-ready" ref="show">false</xf:setvalue>
@@ -949,9 +949,9 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance" model-id="model">
-                            <instance>
+                            <_>
                                 <image>/ops/images/xforms/help.png</image>
-                            </instance>
+                            </_>
                         </xf:instance>
                         <xf:bind id="bind1" ref="image" relevant="../show = 'true'"/>
                         <xf:setvalue ev:event="xforms-ready" ref="image">    </xf:setvalue>
@@ -1086,7 +1086,7 @@
                 <xh:head>
                     <xf:model id="main-model" xxf:encrypt-item-values="false">
                         <xf:instance id="tests">
-                            <instance>apple</instance>
+                            <_>apple</_>
                         </xf:instance>
                         <xf:bind ref="." type="xs:NCName" required="true()"/>
                     </xf:model>
@@ -1160,9 +1160,9 @@
                             </xh:label>
                         </xh:span>
                     </xh:span>
-                    <xh:button class="xforms-help">My help</xh:button>
+                    <xh:button class="xforms-help" id="my-new-select1≡≡p⊙1">My help</xh:button>
                     <xh:span class="xforms-alert"/>
-                    <xh:span class="xforms-hint">My hint</xh:span>
+                    <xh:span class="xforms-hint" id="my-new-select1≡≡t⊙1">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
@@ -1177,11 +1177,11 @@
                 <xh:head>
                     <xf:model id="main-model" xxf:encrypt-item-values="false">
                         <xf:instance id="tests">
-                            <instance>
+                            <_>
                                 <default/>
                                 <relevant/>
                                 <readonly/>
-                            </instance>
+                            </_>
                         </xf:instance>
                         <xf:bind ref="relevant" relevant="false()"/>
                         <xf:bind ref="readonly" readonly="true()"/>
@@ -1363,7 +1363,7 @@
                <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance/>
+                            <_/>
                         </xf:instance>
                     </xf:model>
                </xh:head>
@@ -1381,8 +1381,8 @@
                     <xh:label class="xforms-mediatype-text-html xforms-label" for="xf-1≡xforms-input-1">Foo
                         <xh:br/>Bar
                     </xh:label>
-                    <xh:input id="xf-1≡xforms-input-1" type="text" name="xf-1≡xforms-input-1" value="" class="xforms-input-input"/>
-                    <xh:button class="xforms-help">Foo&lt;div&gt;&lt;/div&gt;Bar</xh:button>
+                    <xh:input id="xf-1≡xforms-input-1" type="text" name="xf-1≡xforms-input-1" value="" class="xforms-input-input" aria-details="xf-1≡≡p"/>
+                    <xh:button class="xforms-help" id="xf-1≡≡p">Foo&lt;div&gt;&lt;/div&gt;Bar</xh:button>
                 </xh:span>
             </controls>
         </output>
@@ -1396,7 +1396,7 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance>&lt;div xmlns:x="x">&lt;p x:y="foo">Hello!&lt;/p>&lt;/div></instance>
+                            <_>&lt;div xmlns:x="x">&lt;p x:y="foo">Hello!&lt;/p>&lt;/div></_>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -1426,7 +1426,7 @@
                 <xh:head>
                     <xf:model xxf:encrypt-item-values="false">
                         <xf:instance xmlns="">
-                            <Testcase>
+                            <_>
                                 <myvalue/>
                                 <myvalue2>one</myvalue2>
                                 <myvalue3> </myvalue3>
@@ -1434,7 +1434,7 @@
                                 <myvalue5>
                                 one
                                 </myvalue5>
-                            </Testcase>
+                            </_>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -1670,14 +1670,14 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <lists>
+                            <_>
                                 <list>
                                 </list>
                                 <list>
                                     <item name="a"/>
                                     <item name="b"/>
                                 </list>
-                            </lists>
+                            </_>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -1745,7 +1745,7 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance/>
+                            <_/>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -1788,11 +1788,11 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <instance>
+                            <_>
                                 <default/>
                                 <relevant/>
                                 <readonly/>
-                            </instance>
+                            </_>
                         </xf:instance>
                         <xf:bind ref="relevant" relevant="false()"/>
                         <xf:bind ref="readonly" readonly="true()"/>
@@ -1853,12 +1853,12 @@
                 <xh:head>
                     <xf:model>
                         <xf:instance>
-                            <value>
+                            <_>
                                 <span xmlns="">
                                     <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
                                     <span>Pellentesque gravida scelerisque leo, vel <a href="http://orbeon.com/" target="_blank">viverra</a> lacus dignissim nec.</span>
                                 </span>
-                            </value>
+                            </_>
                         </xf:instance>
                         <xf:bind ref="." type="xs:date" readonly="true()"/>
                     </xf:model>
@@ -1897,7 +1897,7 @@
                 <xh:head>
                     <xf:model>
                         <xf:instance>
-                            <value xmlns=""/>
+                            <_ xmlns=""/>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -2030,11 +2030,11 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="selection">
-                            <selection>
+                            <_>
                                 <blank/>
                                 <apple>apple</apple>
                                 <other>other</other>
-                            </selection>
+                            </_>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -2128,10 +2128,10 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="items">
-                            <items>
+                            <_>
                                 <item/>
                                 <item/>
-                            </items>
+                            </_>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -2230,10 +2230,10 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="items">
-                            <items>
+                            <_>
                                 <item/>
                                 <item/>
-                            </items>
+                            </_>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -2292,10 +2292,10 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="items">
-                            <items>
+                            <_>
                                 <item/>
                                 <item/>
-                            </items>
+                            </_>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -2339,7 +2339,7 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="items">
-                            <value label="This is a &lt;b&gt;bold&lt;/b&gt; value"/>
+                            <_ label="This is a &lt;b&gt;bold&lt;/b&gt; value"/>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -2396,7 +2396,7 @@
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="items">
-                            <value/>
+                            <_/>
                         </xf:instance>
                     </xf:model>
                 </xh:head>
@@ -2421,7 +2421,7 @@
                 <xh:head>
                     <xf:model>
                         <xf:instance>
-                            <rows>
+                            <_>
                                 <row>
                                     <input>input 1</input>
                                     <textarea>textarea 1</textarea>
@@ -2432,7 +2432,7 @@
                                     <textarea>textarea 2</textarea>
                                     <gaga>gaga 2</gaga>
                                 </row>
-                            </rows>
+                            </_>
                         </xf:instance>
                         <xf:bind ref="row/input" required="true()"/>
                     </xf:model>

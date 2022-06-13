@@ -22,6 +22,7 @@ import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 
+
 class LHHAAnalysis(
   index                         : Int,
   element                       : Element,
@@ -54,20 +55,20 @@ class LHHAAnalysis(
 
   def lhhaType: LHHA = LHHA.withNameOption(localName) getOrElse LHHA.Label // FIXME: Because `SelectionControlTrait` calls this for `value`!
 
-  val forStaticIdOpt: Option[String] = element.attributeValueOpt(FOR_QNAME)
-  val isLocal       : Boolean        = forStaticIdOpt.isEmpty
-  val defaultToHTML : Boolean        = LHHAAnalysis.isHTML(element) // IIUC: starting point for nested `<xf:output>`.
+  val defaultToHTML: Boolean = LHHAAnalysis.isHTML(element) // IIUC: starting point for nested `<xf:output>`.
 
   // Updated in `attachToControl()`
-  var _isForRepeat                          : Boolean                                 = false
-  var _forRepeatNesting                     : Int                                     = 0
-  var _directTargetControlOpt               : Option[StaticLHHASupport]               = None
-  var _effectiveTargetControlOrPrefixedIdOpt: Option[StaticLHHASupport Either String] = None
+  var lhhaPlacementType: LhhaPlacementType = _
 
-  def isForRepeat                          : Boolean           = _isForRepeat
-  def forRepeatNesting                     : Int               = _forRepeatNesting
-  def directTargetControl                  : StaticLHHASupport = _directTargetControlOpt getOrElse (throw new IllegalStateException)
-  def effectiveTargetControlOrPrefixedIdOpt: Option[Either[StaticLHHASupport, String]] = _effectiveTargetControlOrPrefixedIdOpt
+  def isLocal: Boolean = lhhaPlacementType match {
+    case LhhaPlacementType.Local(_, _) => true
+    case _ => false
+  }
+
+  def isForRepeat: Boolean = lhhaPlacementType match {
+    case LhhaPlacementType.External(_, _, Some(_)) => true
+    case _ => false
+  }
 
   // Allow the client telling us that an external LHHA has the focus, for instance in the case of an `<xf:help>`
   // rendered as a `<button>` in the headings of a repeated grid.

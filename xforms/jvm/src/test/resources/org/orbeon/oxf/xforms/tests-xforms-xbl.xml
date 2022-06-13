@@ -3332,7 +3332,7 @@
                         <xxf:control id="my-foo≡gaga-label">
                             <xxf:value>My label</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-foo≡gaga" label="My label">
+                        <xxf:control id="my-foo≡gaga">
                             <xxf:value>42</xxf:value>
                         </xxf:control>
                     </xxf:control-values>
@@ -3371,7 +3371,7 @@
                 </xh:head>
                 <xh:body>
                     <fr:foo id="my-foo" ref="foo1">
-                        <xf:label id="gaga-label" for="gaga" ref="@label"/>
+                        <xf:label id="gaga-label" for="gaga"/>
                         <xf:input ref="." id="gaga"/>
                     </fr:foo>
                 </xh:body>
@@ -3387,7 +3387,7 @@
                         <xxf:control id="my-foo≡gaga-label">
                             <xxf:value>My label</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-foo≡gaga" label="My label">
+                        <xxf:control id="my-foo≡gaga">
                             <xxf:value>42</xxf:value>
                         </xxf:control>
                     </xxf:control-values>
@@ -3437,7 +3437,7 @@
                         <xxf:control id="gaga-label">
                             <xxf:value>My label</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-foo≡gaga" label="My label">
+                        <xxf:control id="my-foo≡gaga">
                             <xxf:value>42</xxf:value>
                         </xxf:control>
                     </xxf:control-values>

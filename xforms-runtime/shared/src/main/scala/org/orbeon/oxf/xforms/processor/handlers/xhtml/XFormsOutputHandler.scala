@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{LHHA, StaticLHHASupport}
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.isStaticReadonly
@@ -65,14 +66,14 @@ class XFormsOutputDefaultHandler(
     forwarding = false
   ) with XFormsOutputHandler {
 
+  private val hasLabel =
+    getStaticLHHA(LHHA.Label).isDefined
+
   protected def handleControlStart(): Unit = {
 
     implicit val xmlReceiver: XMLReceiver = handlerContext.controller.output
 
     val outputControl = currentControl.asInstanceOf[XFormsOutputControl]
-
-    val hasLabel =
-      elementAnalysis.asInstanceOf[StaticLHHASupport].hasLHHA(LHHA.Label)
 
     val isMinimal =
       XFormsControl.appearances(elementAnalysis)(XFORMS_MINIMAL_APPEARANCE_QNAME)
@@ -82,7 +83,8 @@ class XFormsOutputDefaultHandler(
 
     // Handle accessibility attributes on control element
     XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
-    handleAriaByAtts(containerAttributes)
+    if (hasLabel)
+      handleAriaByAtts(containerAttributes)
     // See https://github.com/orbeon/orbeon-forms/issues/3583
     if (hasLabel && ! isStaticReadonly(outputControl)) {
       containerAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0")
@@ -90,15 +92,35 @@ class XFormsOutputDefaultHandler(
       containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, "textbox")
     }
 
-    val elementName = if (getStaticLHHA(getPrefixedId, LHHA.Label) ne null) "output" else "span"
-
-    withElement(elementName, prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
+    withElement(if (hasLabel) "output" else "span", prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       val mediatypeValue = attributes.getValue("mediatype")
       val textValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
       if ((textValue ne null) && textValue.nonEmpty)
         xmlReceiver.characters(textValue.toCharArray, 0, textValue.length)
     }
   }
+
+  protected override def handleHint(lhhaAnalysis: LHHAAnalysis): Unit =
+    if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyHint)
+      handleLabelHintHelpAlert(
+        lhhaAnalysis            = lhhaAnalysis,
+        elemEffectiveIdOpt      = hasLabel option getEffectiveId, // change from default
+        forEffectiveIdWithNs    = None,
+        requestedElementNameOpt = None,
+        controlOrNull           = currentControl,
+        isExternal              = false
+      )
+
+  protected override def handleHelp(lhhaAnalysis: LHHAAnalysis): Unit =
+    if (! XFormsBaseHandler.isStaticReadonly(currentControl))
+      handleLabelHintHelpAlert(
+        lhhaAnalysis            = lhhaAnalysis,
+        elemEffectiveIdOpt      = hasLabel option getEffectiveId, // change from default
+        forEffectiveIdWithNs    = None,
+        requestedElementNameOpt = None,
+        controlOrNull           = currentControl,
+        isExternal              = false
+      )
 }
 
 // xf:output[@mediatype = 'text/html']
@@ -140,7 +162,7 @@ class XFormsOutputHTMLHandler(
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = None
+  override def getForEffectiveIdWithNs: Option[String] = None
 
   override def getContainingElementName: String = "div"
 }
@@ -186,7 +208,7 @@ class XFormsOutputImageHandler(
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = None
+  override def getForEffectiveIdWithNs: Option[String] = None
 }
 
 // xf:output[@appearance = 'xxf:text']
@@ -218,8 +240,8 @@ class XFormsOutputTextHandler(
       xmlReceiver.characters(externalValue.toCharArray, 0, externalValue.length)
   }
 
-  // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = null
+  // Don't use `for` as we are not pointing to an HTML control
+  override def getForEffectiveIdWithNs: Option[String] = None
 }
 
 // xf:output[@appearance = 'xxf:download']
@@ -242,7 +264,7 @@ class XFormsOutputDownloadHandler(
 ) with XFormsOutputHandler {
 
   // NOP because the label is output as the text within <a>
-  protected override def handleLabel(): Unit = ()
+  protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = ()
 
   protected def handleControlStart(): Unit = {
 
@@ -301,5 +323,5 @@ class XFormsOutputDownloadHandler(
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] = None
+  override def getForEffectiveIdWithNs: Option[String] = None
 }

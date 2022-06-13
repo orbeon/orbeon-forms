@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import cats.syntax.option._
 import java.{util => ju}
 
 import org.orbeon.oxf.common.OXFException
@@ -34,6 +35,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xml.NamespaceMapping
 import org.xml.sax.helpers.AttributesImpl
+
 
 // Trait for for all controls that hold a value
 trait XFormsValueControl extends XFormsSingleNodeControl {
@@ -334,26 +336,24 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     outputAjaxAriaByAtts(previousControl, ch)
   }
 
-  // This logic applies only when a control comes into existence. At that point, we must tell the client, when
- final def outputAjaxAriaByAtts(
+  // This logic applies only when a control comes into existence
+  final def outputAjaxAriaByAtts(
     previousControl : Option[XFormsValueControl],
     ch              : XMLReceiverHelper
   ): Unit =
-    if (previousControl.isEmpty && ! isStaticReadonly) {
+    if (previousControl.isEmpty && ! isStaticReadonly)
       for {
-        (lhha, attName)          <- ControlAjaxSupport.LhhaWithAriaAttName
-        value                    <- ControlAjaxSupport.findAriaByWithNs(staticControlOpt.get, this, lhha, condition = _.isForRepeat)(containingDocument)
-        ariaByControlEffectiveId <- findAriaByControlEffectiveIdWithNs
+        ariaByControlEffectiveId <- findAriaByControlEffectiveIdWithNs.iterator
+        (attName, attValue)      <- ControlAjaxSupport.iterateAriaByAtts(staticControlOpt.get, this)(containingDocument)
       } locally {
         ControlAjaxSupport.outputAttributeElement(
-          previousControl,
-          this,
-          ariaByControlEffectiveId,
-          attName,
-          _ => value
+          previousControlOpt = None,
+          currentControl     = this,
+          effectiveId        = ariaByControlEffectiveId,
+          attName            = attName,
+          attValue           = _ => attValue.some
         )(ch, containingDocument)
       }
-    }
 
   // Can be overridden by subclasses
   // This is the effective id of the element which may have an `aria-labelledby`, etc. attribute. So an `<input>`, `<textarea>`,

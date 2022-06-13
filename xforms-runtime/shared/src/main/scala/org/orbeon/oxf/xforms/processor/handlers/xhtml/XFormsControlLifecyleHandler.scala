@@ -86,10 +86,6 @@ abstract class XFormsControlLifecyleHandler(
           )
         )
 
-      // 2012-12-17: Removed nested `<a name="effective-id">` because the enclosing `<span`> for the control has the
-      // same id and will be handled first by the browser as per HTML 5. This means the named anchor is actually
-      // redundant.
-
       // Process everything up to and including the control
       for (current <- beforeAfterTokens._1)
         current match {

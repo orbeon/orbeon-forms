@@ -483,7 +483,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </textarea-counter>
                         <output>
                             <label>Text Output</label>
-                            <hint/>
+                            <hint>Standard text output with a label</hint>
                         </output>
                         <secret>
                             <label>Password Field</label>
@@ -759,7 +759,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </textarea-counter>
                         <output>
                             <label>Sortie texte</label>
-                            <hint/>
+                            <hint>Sortie texte standard avec libellé</hint>
                         </output>
                         <secret>
                             <label>Mot de passe</label>
@@ -821,6 +821,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <fr:c y="3" x="1" w="6">
                             <xf:output bind="output-bind" id="output-control">
                                 <xf:label ref="$form-resources/output/label"/>
+                                <xf:hint ref="$form-resources/output/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:output>
                         </fr:c>
                         <fr:c y="3" x="7" w="6">

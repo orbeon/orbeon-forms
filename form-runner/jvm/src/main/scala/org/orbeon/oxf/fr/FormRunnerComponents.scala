@@ -1,8 +1,11 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary
+import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.saxon.functions.FunctionLibraryList
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xml.NamespaceMapping
@@ -24,7 +27,9 @@ trait FormRunnerComponents {
     FormRunnerRename.replaceVarReferencesWithFunctionCalls(
       xpathString,
       NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
-      FormRunnerFunctionLibrary,
+      new FunctionLibraryList                         |!>
+        (_.addFunctionLibrary(XFormsFunctionLibrary)) |!>
+        (_.addFunctionLibrary(FormRunnerFunctionLibrary)),
       avt,
       name =>
         if (name == "fr-lang")

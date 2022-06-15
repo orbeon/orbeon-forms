@@ -35,7 +35,7 @@ val ScribeVersion                    = "2.8.6"
 val PerfolationVersion               = "1.2.8"
 val ScalaJsStubsVersion              = "1.1.0" // can be different from Scala.js version
 val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
-val ScalaJsTimeVersion               = "2.0.0"
+val ScalaJsTimeVersion               = "2.4.0"
 val ScalaJsLocalesVersion            = "1.1.3"
 
 // Scala libraries for Scala JVM only
@@ -681,7 +681,7 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-      "io.github.cquiroz"      %%% "scala-java-time" % "2.3.0"
+      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -739,7 +739,7 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-      "io.github.cquiroz"      %%% "scala-java-time" % "2.3.0"
+      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -857,11 +857,11 @@ lazy val xformsJS = xforms.js
   .settings(
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom"      % ScalaJsDomVersion,
-      "be.doeraene"  %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
-      "com.beachape" %%% "enumeratum"       % EnumeratumVersion,
-      "com.beachape" %%% "enumeratum-circe" % EnumeratumCirceVersion,
-      "io.github.cquiroz" %%% "scala-java-time" % "2.3.0"
+      "org.scala-js"      %%% "scalajs-dom"      % ScalaJsDomVersion,
+      "be.doeraene"       %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
+      "com.beachape"      %%% "enumeratum"       % EnumeratumVersion,
+      "com.beachape"      %%% "enumeratum-circe" % EnumeratumCirceVersion,
+      "io.github.cquiroz" %%% "scala-java-time " % ScalaJsTimeVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -1040,6 +1040,7 @@ lazy val xformsRuntimeJS = xformsRuntime.js
     )
   )
 
+
 lazy val xformsWeb = (project in file("xforms-web"))
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings)
@@ -1067,7 +1068,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "be.doeraene"            %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
       "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,
       "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,
-      "io.github.cquiroz"      %%% "scala-java-time"  % "2.3.0"
+      "io.github.cquiroz"      %%% "scala-java-time"  % ScalaJsTimeVersion
     ),
 
     jsDependencies                      += "org.webjars" % "jquery" % "3.6.0" / "3.6.0/jquery.js",

@@ -3371,7 +3371,7 @@
                 </xh:head>
                 <xh:body>
                     <fr:foo id="my-foo" ref="foo1">
-                        <xf:label id="gaga-label" for="gaga"/>
+                        <xf:label id="gaga-label" for="gaga" ref="@label"/>
                         <xf:input ref="." id="gaga"/>
                     </fr:foo>
                 </xh:body>

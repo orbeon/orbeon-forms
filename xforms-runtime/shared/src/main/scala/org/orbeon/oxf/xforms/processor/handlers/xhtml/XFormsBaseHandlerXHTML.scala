@@ -484,4 +484,11 @@ object XFormsBaseHandlerXHTML {
 
   def outputReadonlyAttribute(newAttributes: AttributesImpl): Unit =
     newAttributes.addAttribute("", "readonly", "readonly", XMLReceiverHelper.CDATA, "readonly")
+
+  def withFormattingPrefix[T](body: String => T)(implicit context: HandlerContext): T = {
+    val formattingPrefix = context.findFormattingPrefixDeclare
+    val result = body(formattingPrefix)
+    context.findFormattingPrefixUndeclare(formattingPrefix)
+    result
+  }
 }

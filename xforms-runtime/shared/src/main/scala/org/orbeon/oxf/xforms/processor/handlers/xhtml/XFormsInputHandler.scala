@@ -20,15 +20,17 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
+import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
-import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport}
 import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.Attributes
+
 
 /**
  * Handle xf:input.
@@ -52,7 +54,7 @@ class XFormsInputHandler(
     handlerContext,
     repeating  = false,
     forwarding = false
-  ) with HandlerSupport {
+  ) {
 
   private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
     PlaceHolderInfo.placeHolderValueOpt(elementAnalysis, currentControl)

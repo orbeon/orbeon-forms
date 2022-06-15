@@ -15,9 +15,6 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.controls.InputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl._
@@ -27,9 +24,8 @@ import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsInputHandler
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl
-
-import scala.jdk.CollectionConverters._
 
 /**
  * xf:input control
@@ -104,9 +100,6 @@ class XFormsInputControl(
     // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
     // the encrypted value of "true". So we do not encrypt values.
 
-    // Whether the day precedes the month in dates
-    def dayMonth = containingDocument.getDateFormatInput.startsWith("[D")
-
     Option(
       getBuiltinTypeName match {
         case "boolean"       => normalizeBooleanString(externalValue)
@@ -122,27 +115,9 @@ class XFormsInputControl(
   // Convenience method for handler: return the value of the first input field.
   def getFirstValueUseFormat: String = {
     val result =
-      if (isRelevant) {
-        getBuiltinTypeName match {
-          case "date" | "time" => formatSubValue(getFirstValueType, getValue)
-          case "dateTime"      => formatSubValue(getFirstValueType, getDateTimeDatePart(getValue, 'T'))
-          case _               => externalValueOpt
-        }
-      } else
-        None
-
-    result getOrElse ""
-  }
-
-  // Convenience method for handler: return the value of the second input field.
-  def getSecondValueUseFormat: String = {
-    val result =
-      if (isRelevant) {
-        getBuiltinTypeName match {
-          case "dateTime"      => formatSubValue(getSecondValueType, getDateTimeTimePart(getValue, 'T'))
-          case _               => None
-        }
-      } else
+      if (isRelevant)
+        externalValueOpt
+      else
         None
 
     result getOrElse ""
@@ -151,43 +126,7 @@ class XFormsInputControl(
   override def getFormattedValue: Option[String] =
     getValueUseFormat(format) orElse Option(getExternalValue)
 
-  private def formatSubValue(valueType: String, value: String): Option[String] =
-    boundItemOpt match {
-      case None =>
-        // No need to format
-        null
-      case Some(boundItem) =>
-
-        // Format
-        val xpathExpression =
-          "if ($v castable as xs:" +
-          valueType +
-          ") then format-" +
-          valueType +
-          "(xs:" +
-          valueType +
-          "($v), '" +
-          containingDocument.getTypeInputFormat(valueType) +
-          "', 'en', (), ()) else $v"
-
-        val variables = Map[String, ValueRepresentationType]("v" -> stringToStringValue(value))
-
-        evaluateAsString(
-          xpathString        = xpathExpression,
-          contextItems       = List(boundItem),
-          contextPosition    = 1,
-          namespaceMapping   = XFormsValueControl.FormatNamespaceMapping,
-          variableToValueMap = variables.asJava
-        )
-    }
-
-  def getFirstValueType: String = {
-    val typeName = getBuiltinTypeName
-    if (typeName == "dateTime") "date" else typeName
-  }
-
-  def getSecondValueType: String =
-    if (getBuiltinTypeName == "dateTime") "time" else null
+  def getFirstValueType: String = getBuiltinTypeName
 
   override def compareExternalUseExternalValue(
     previousExternalValue : Option[String],
@@ -233,20 +172,4 @@ object XFormsInputControl {
 
   // Anything but "true" is "false"
   private def normalizeBooleanString(s: String) = (s == "true").toString
-
-  private def getDateTimeDatePart(value: String, separator: Char) = {
-    val separatorIndex = value.indexOf(separator)
-    if (separatorIndex == -1)
-      value
-    else
-      value.substring(0, separatorIndex).trimAllToEmpty
-  }
-
-  private def getDateTimeTimePart(value: String, separator: Char) = {
-    val separatorIndex = value.indexOf(separator)
-    if (separatorIndex == -1)
-      ""
-    else
-      value.substring(separatorIndex + 1).trimAllToEmpty
-  }
 }

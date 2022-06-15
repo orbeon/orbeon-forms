@@ -5,6 +5,8 @@ import org.orbeon.sbt.OrbeonWebappPlugin
 import org.scalajs.linker.interface.ESVersion
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
+import scala.jdk.CollectionConverters.asScalaIteratorConverter
+
 // For our GitHub packages
 resolvers += Resolver.githubPackages("orbeon")
 ThisBuild / githubOwner := "orbeon"
@@ -428,7 +430,12 @@ lazy val assetsSettings = Seq(
   // Minify all JavaScript files which are not minified/debug and which don't already have a minified version
   // NOTE: The default `excludeFilter in uglify` explicitly excludes files under `resourceDirectory in Assets`.
   uglify / includeFilter                   := (uglify / includeFilter).value && FileHasNoMinifiedVersionFilter && -FileIsMinifiedVersionFilter,
-  uglify / excludeFilter                   := (uglify / excludeFilter).value || HiddenFileFilter || "*-debug.js", // || ((baseDirectory).value / "src" ** "codemirror-*" / "bin"),
+  // 2022-06-15: Tried to write the filter using `Glob`, etc. but can't seem to be able to convert that to a
+  // `FileFilter`. So doing this "by hand".
+  uglify / excludeFilter                   := (uglify / excludeFilter).value || HiddenFileFilter || "*-debug.js" || new SimpleFileFilter(f =>
+    // Found out that: 1. `endsWith` is not type-safe 2. `Path.iterator` returns `Path`s :(
+    f.toPath.iterator().asScala.map(_.toString).toList.endsWith("acme" :: "map" :: "map.js" :: Nil)
+  ),
   uglifyCompressOptions                    := Seq("warnings=false"),
 
   // By default sbt-web places resources under META-INF/resources/webjars. We don't support this yet so we fix it back.

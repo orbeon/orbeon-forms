@@ -18,7 +18,7 @@ import cats.syntax.option._
 import java.{lang => jl}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaControlRef, LhhaPlacementType}
-import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA, LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml._
@@ -44,6 +44,8 @@ class XXFormsComponentHandler(
     repeating  = false,
     forwarding = false
   ) {
+
+  import XXFormsComponentHandler._
 
   private lazy val staticControl =
     handlerContext.getPartAnalysis.getControlAnalysis(getPrefixedId).asInstanceOf[ComponentControl]
@@ -92,39 +94,39 @@ class XXFormsComponentHandler(
   protected override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Hint))  super.handleHint(lhhaAnalysis)
   protected override def handleHelp(lhhaAnalysis: LHHAAnalysis) : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Help))  super.handleHelp(lhhaAnalysis)
 
-  // If there is a label-for, use that, otherwise don't use @for as we are not pointing to an HTML form control
+  // If there is a `label-for`, use that, otherwise don't use `@for` as we are not pointing to an HTML form control
   // NOTE: Used by `handleLabel()` above only if there is a local LHHA, and by `findTargetControlForEffectiveId`.
-  override def getForEffectiveIdWithNs: Option[String] = {
-
-    def findFromTarget(
-      lhhaPlacementType   : LhhaPlacementType,
-      currentControlSuffix: String
-    ): Option[String] =
-      lhhaPlacementType match {
-        case LhhaPlacementType.Local(directTargetControl, LhhaControlRef.Control(targetControl)) if targetControl ne directTargetControl =>
-          XFormsLHHAHandler.findTargetControlForEffectiveIdWithNs(
-            handlerContext,
-            targetControl
-          )
-        case LhhaPlacementType.Local(_, LhhaControlRef.PrefixedId(targetPrefixedId)) =>
-          containingDocument.namespaceId(targetPrefixedId + currentControlSuffix).some
-        case _ =>
-          None
-      }
-
-    import shapeless._
-    import syntax.typeable._
-
+  override def getForEffectiveIdWithNs: Option[String] =
     for {
       staticLabel          <- getStaticLHHA(LHHA.Label)
       currentControlSuffix = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
-      result               <- findFromTarget(staticLabel.lhhaPlacementType, currentControlSuffix)
+      if mustFindLabelForEffectiveId(staticLabel.lhhaPlacementType)
+      result               <- findLabelForEffectiveIdWithNs(staticLabel.lhhaPlacementType.lhhaControlRef, currentControlSuffix, handlerContext)
     } yield
       result
-  }
 }
 
 object XXFormsComponentHandler {
+
+  def mustFindLabelForEffectiveId(lhhaPlacementType: LhhaPlacementType): Boolean =
+    lhhaPlacementType match {
+      case LhhaPlacementType.Local(directTargetControl, LhhaControlRef.Control(targetControl))
+        if targetControl ne directTargetControl                     => true
+      case LhhaPlacementType.Local(_, LhhaControlRef.PrefixedId(_)) => true
+      case _                                                        => false
+    }
+
+  def findLabelForEffectiveIdWithNs(
+    lhhaControlRef      : LhhaControlRef,
+    currentControlSuffix: String,
+    handlerContext      : HandlerContext
+  ): Option[String] =
+    lhhaControlRef match {
+      case LhhaControlRef.Control(targetControl) =>
+        XFormsLHHAHandler.findTargetControlForEffectiveIdWithNs(handlerContext, targetControl)
+      case LhhaControlRef.PrefixedId(targetPrefixedId) =>
+        handlerContext.containingDocument.namespaceId(targetPrefixedId + currentControlSuffix).some
+    }
 
   def processShadowTree[Ctx](controller: ElementHandlerController[Ctx], templateTree: SAXStore): Unit = {
     // Tell the controller we are providing a new body

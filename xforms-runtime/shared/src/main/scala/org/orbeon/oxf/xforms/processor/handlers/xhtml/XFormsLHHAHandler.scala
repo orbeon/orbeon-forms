@@ -111,18 +111,9 @@ class XFormsLHHAHandler(
 
         if (! mustOmitStaticReadonlyHint(effectiveTargetControlOpt)) {
 
-          val labelForEffectiveIdWithNsOpt: Option[String] =
-            elementAnalysis.lhhaType == LHHA.Label flatOption {
-              lhhaControlRef match {
-                case LhhaControlRef.Control(targetControl) =>
-                  findTargetControlForEffectiveIdWithNs(
-                    handlerContext,
-                    targetControl
-                  )
-                case LhhaControlRef.PrefixedId(targetPrefixedId) =>
-                  containingDocument.namespaceId(targetPrefixedId + XFormsId.getEffectiveIdSuffix(lhhaEffectiveId)).some
-              }
-            }
+          val labelForEffectiveIdWithNsOpt =
+            elementAnalysis.lhhaType == LHHA.Label flatOption
+              XXFormsComponentHandler.findLabelForEffectiveIdWithNs(lhhaControlRef, XFormsId.getEffectiveIdSuffix(lhhaEffectiveId), handlerContext)
 
           handleLabelHintHelpAlert(
             lhhaAnalysis            = elementAnalysis,
@@ -138,9 +129,6 @@ class XFormsLHHAHandler(
         // Q: Can this happen? Do we match on local LHHA?
         // 2020-11-13: This seems to happen.
         // 2022-06-08: still happens! `currentControl eq null`
-        val currentControl =
-          containingDocument.getControlByEffectiveId(lhhaEffectiveId)
-        println(s"xxxx CHECK THIS handler called for `isLocal` for ${if (currentControl eq null) "null" else currentControl.prefixedId}; prefixedId = `${elementAnalysis.prefixedId}`")
     }
   }
 }

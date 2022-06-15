@@ -29,9 +29,10 @@ trait StaticLHHASupport extends ElementAnalysis {
       case _          => _lhh     += lhhaAnalysis.lhhaType -> lhhaAnalysis
     }
 
+  // We called this "By" in reference to `aria-labelledy`/`aria-describedby`
   def attachLHHABy(lhhaAnalysis: LHHAAnalysis): Unit =
     lhhaAnalysis.lhhaType match {
-      case LHHA.Alert => _alertsBy :+= lhhaAnalysis
+      case LHHA.Alert => _alertsBy :+= lhhaAnalysis // 2022-06-14: unused
       case _          => _lhhBy     += lhhaAnalysis.lhhaType -> lhhaAnalysis
     }
 

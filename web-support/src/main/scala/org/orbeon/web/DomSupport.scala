@@ -71,9 +71,9 @@ object DomSupport {
     recurse(elems)
   }
 
-  def generateIdIfNeeded(element: html.Element): String = {
+  def generateIdIfNeeded(element: dom.Element): String = {
     if (element.id == "") {
-      def id(suffix: Int)       = s"orbeon-gen-$suffix"
+      def id(suffix: Int)       = s"xf-client-$suffix"
       def isUnused(suffix: Int) = document.getElementById(id(suffix)) == null
       val suffix                = Iterator.from(lastUsedSuffix + 1).find(isUnused).get
       element.id                = id(suffix)

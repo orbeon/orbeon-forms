@@ -20,7 +20,7 @@ import org.orbeon.web.DomSupport
 import org.orbeon.xforms.facade.{Controls, Properties, XBL, XBLCompanion}
 import org.orbeon.xforms._
 import org.scalajs.dom
-import org.scalajs.dom.{MutationObserver, MutationObserverInit, html}
+import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.collection.mutable
@@ -41,6 +41,7 @@ private class Select1SearchCompanion extends XBLCompanion {
   private val select2SuccessCallbacks      : mutable.Queue[Success] = new mutable.Queue[Select2.Success]
   private var onXFormsSelect1ValueChangeJs : Option[js.Function]    = None
   private var mutationObservers            : List[MutationObserver] = Nil
+  private var inputElementOpt              : Option[dom.Element]    = None
 
   override def init(): Unit = {
     for {
@@ -79,7 +80,8 @@ private class Select1SearchCompanion extends XBLCompanion {
           }
         }
 
-        object options extends Select2.Options {
+        // Init Select2
+        jSelect.select2(new Select2.Options {
           allowClear     = true
           ajax           = if (servicePerformsSearch) new Select2Ajax(select2SuccessCallbacks, containerElem) else null
           width          = "100%" // For Select2 width to update as the viewport width changes
@@ -88,16 +90,17 @@ private class Select1SearchCompanion extends XBLCompanion {
               val id   = "0"
               val text = elementWithData.attr(DataPlaceholder).get
             }
-        }
+        })
 
-        jSelect.select2(options)
+        // Register event listeners
         val isDatabound = containerElem.classList.contains("xbl-fr-databound-select1-search")
-        if (isDatabound)
-          jSelect.on("change", onChange _)
+        if (isDatabound) jSelect.on("change", (onChange _))
+        jSelect.on("select2:open", (onOpen _))
+        jSelect.data("select2").on("results:focus", (onResultsFocus _))
 
-        // Update `aria-labelledby`
+        // Update `aria-labelledby`, so the screen reader can read the field's label when it gets the focus
         val comboboxElement = containerElem.querySelector(".select2-selection")
-        val labelElement    = containerElem.querySelector(".xforms-label").asInstanceOf[html.Element]
+        val labelElement    = containerElem.querySelector(".xforms-label")
         val labelId         = DomSupport.generateIdIfNeeded(labelElement)
         comboboxElement.setAttribute("aria-labelledby", labelId)
       }
@@ -159,6 +162,23 @@ private class Select1SearchCompanion extends XBLCompanion {
     val newValue = event.newValue.asInstanceOf[String]
     if (containerElem.querySelector(".xforms-select1") == control)
       $(containerElem).find("select").trigger("change")
+  }
+
+  private def onOpen(event: JQueryEventObject): Unit = {
+    val dropdownElement = document.querySelector(".select2-dropdown")
+    val inputElement    = dropdownElement.querySelector("input")
+    val listboxElement  = dropdownElement.querySelector("[role=listbox]")
+    inputElement.setAttribute("aria-owns"     , listboxElement.id)
+    inputElement.setAttribute("aria-expanded" , "true")
+    inputElement.setAttribute("aria-haspopup" , "listbox")
+    inputElement.setAttribute("role"          , "combobox")
+    inputElementOpt = Some(inputElement)
+  }
+
+  private def onResultsFocus(event: JQueryEventObject): Unit = {
+    val focusedElement   = event.asInstanceOf[js.Dynamic].element.asInstanceOf[JQuery].get(0).asInstanceOf[html.Element]
+    val focusedElementId = DomSupport.generateIdIfNeeded(focusedElement)
+    inputElementOpt.foreach(_.setAttribute("aria-activedescendant", focusedElementId))
   }
 
   private def onChange(event: JQueryEventObject): Unit = {

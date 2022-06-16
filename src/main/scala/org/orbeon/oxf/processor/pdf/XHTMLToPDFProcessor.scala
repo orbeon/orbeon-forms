@@ -26,6 +26,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 
+import scala.util.Try
 import scala.util.control.NonFatal
 
 // XHTML to PDF converter using the Open HTML To PDF library.
@@ -93,6 +94,14 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
     embedFontsConfiguredInProperties(pdfRendererBuilder)
 
+    // NOTE: Default compression level is 0.75:
+    // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
+    val jpegCompressionLevel =
+    Properties.instance.getPropertySet.getNonBlankString("oxf.fr.pdf.jpeg.compression") flatMap
+      (s => Try(java.lang.Float.parseFloat(s)).toOption) filter
+      (f => f >= 0f && f <= 1.0f) getOrElse
+      0.9f
+
     IOUtils.useAndClose(outputStream) { os =>
       pdfRendererBuilder.toStream(os)
       pdfRendererBuilder.withW3cDocument(
@@ -103,7 +112,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
       try {
         // set user agent callback
-        val userAgent = new CustomUserAgentOHTP(pdfBoxRenderer.getOutputDevice(), pipelineContext)
+        val userAgent = new CustomUserAgentOHTP(jpegCompressionLevel, pdfBoxRenderer.getOutputDevice(), pipelineContext,  pdfBoxRenderer.getSharedContext)
         userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
         pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
         pdfBoxRenderer.layout()

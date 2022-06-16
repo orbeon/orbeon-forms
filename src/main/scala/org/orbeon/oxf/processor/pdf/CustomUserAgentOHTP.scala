@@ -1,34 +1,118 @@
 package org.orbeon.oxf.processor.pdf
 
-import com.openhtmltopdf.pdfboxout.{PdfBoxOutputDevice, PdfBoxUserAgent}
+import com.openhtmltopdf.layout.SharedContext
+import com.openhtmltopdf.pdfboxout.{PdfBoxImage, PdfBoxOutputDevice, PdfBoxUserAgent}
+import com.openhtmltopdf.resource.ImageResource
+import com.openhtmltopdf.util.{LogMessageId, XRLog}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.util.ImageSupport.{compressJpegImage, findImageOrientation, findTransformation, transformImage}
 import org.orbeon.oxf.util.TryUtils.TryOps
 import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, IndentedLogger, URLRewriterUtils}
 
-import java.io.InputStream
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, IOException, InputStream}
 import java.net.URI
+import java.util.Locale
+import java.util.logging.Level
+import javax.imageio.ImageIO
 
 class CustomUserAgentOHTP(
-  outputDevice: PdfBoxOutputDevice,
-  pipelineContext : PipelineContext)(implicit
-  externalContext : ExternalContext,
-  indentedLogger : IndentedLogger,
-  coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+  jpegCompressionLevel      : Float,
+  outputDevice              : PdfBoxOutputDevice,
+  pipelineContext           : PipelineContext,
+  sharedContext             : SharedContext)(implicit
+  externalContext           : ExternalContext,
+  indentedLogger            : IndentedLogger,
+  coreCrossPlatformSupport  : CoreCrossPlatformSupportTrait
 ) extends PdfBoxUserAgent(outputDevice) {
   import Private._
-  //  override def getImageResource(originalUriString: String): ImageResource = {
-  //    val resolvedUriString = resolveURI(originalUriString)
-  //    val localUriString =
-  //      FileItemSupport.inputStreamToAnyURI(
-  //        openStream(resolvedUriString),
-  //        ExpirationScope.Request)(
-  //        XHTMLToPDFProcessor.logger.logger
-  //      )._1.toString
-  //
-  //    super.getImageResource(localUriString)
-  //  }
+
+  override def getImageResource(uriStr: String): ImageResource = {
+    @throws[IOException]
+    def readStream(is: InputStream) = {
+      val out = new ByteArrayOutputStream(is.available)
+      val buf = new Array[Byte](10240)
+      var i = 0
+
+      while ( {i = is.read(buf); i != -1} ) {
+        out.write(buf, 0, i)
+      }
+      out.close()
+      out.toByteArray
+    }
+
+    def scaleToOutputResolution(image: PdfBoxImage): Unit = {
+      val factor = sharedContext.getDotsPerPixel
+      if (factor != 1.0f) image.scale((image.getWidth * factor).toInt, (image.getHeight * factor).toInt)
+    }
+
+    val uriResolved = resolveURI(uriStr)
+    if (uriResolved == null) {
+      XRLog.log(Level.INFO, LogMessageId.LogMessageId2Param.LOAD_URI_RESOLVER_REJECTED_LOADING_AT_URI, "image", uriStr)
+      return new ImageResource(uriStr, null)
+    }
+    var resource = _imageCache.get(uriResolved)
+    if (resource != null && resource.getImage.isInstanceOf[PdfBoxImage]) { // Make copy of PdfBoxImage so we don't stuff up the cache.
+      val original = resource.getImage.asInstanceOf[PdfBoxImage]
+      val copy = new PdfBoxImage(original.getBytes, original.getUri, original.getWidth, original.getHeight, original.getXObject)
+      return new ImageResource(resource.getImageUri, copy)
+    }
+
+    val is = openStream(uriResolved)
+
+    if (is != null) try {
+      if (uriStr.toLowerCase(Locale.US).endsWith(".pdf")) {
+        // TODO: Implement PDF AS IMAGE
+        // PdfReader reader = _outputDevice.getReader(uri);
+        // PDFAsImage image = new PDFAsImage(uri);
+        // Rectangle rect = reader.getPageSizeWithRotation(1);
+        // image.setInitialWidth(rect.getWidth() *
+        // _outputDevice.getDotsPerPoint());
+        // image.setInitialHeight(rect.getHeight() *
+        // resource = new ImageResource(uriStr, image);
+      }
+      else {
+        val sourceStreamBytes = readStream(is)
+        val imgBytes =
+          findImageOrientation(new ByteArrayInputStream(sourceStreamBytes)) match {
+            case Some(orientation) if orientation >= 2 && orientation <= 8 =>
+
+              val sourceImage = ImageIO.read(new ByteArrayInputStream(sourceStreamBytes))
+
+              val rotatedImage =
+                transformImage(
+                  sourceImage,
+                  findTransformation(orientation, sourceImage.getWidth, sourceImage.getHeight)
+                    .getOrElse(throw new IllegalStateException)
+                )
+
+              // https://github.com/orbeon/orbeon-forms/issues/4593
+              compressJpegImage(rotatedImage, jpegCompressionLevel)
+            case _ =>
+              sourceStreamBytes
+          }
+        val fsImage = new PdfBoxImage(imgBytes, uriStr)
+        scaleToOutputResolution(fsImage)
+        outputDevice.realizeImage(fsImage)
+        resource = new ImageResource(uriResolved, fsImage)
+      }
+      _imageCache.put(uriResolved, resource)
+    } catch {
+      case e: Exception =>
+        XRLog.log(Level.WARNING, LogMessageId.LogMessageId1Param.EXCEPTION_CANT_READ_IMAGE_FILE_FOR_URI, uriStr, e)
+    } finally try is.close()
+    catch {
+      case e: IOException =>
+
+      // ignore
+    }
+
+    if (resource != null) resource = new ImageResource(resource.getImageUri, resource.getImage)
+    else resource = new ImageResource(uriStr, null)
+
+    resource
+  }
 
   override def resolveURI(uri: String): String = {
 

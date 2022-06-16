@@ -45,6 +45,7 @@ val Parboiled1Version             = "1.3.1"
 val ScalaLoggingVersion           = "3.9.4"
 
 // Shared Scala libraries
+val CatsVersion                   = "2.7.0"
 val ScalaTestVersion              = "3.2.12"
 val CirceVersion                  = "0.14.2"
 val EnumeratumVersion             = "1.7.0"
@@ -85,6 +86,8 @@ val LiferayPortalKernelVersion    = "57.1.0"
 
 val CoreLibraryDependencies = Seq(
   "org.orbeon"                  % "saxon"                           % SaxonJvmVersion, // Java library!
+  "org.typelevel"               %% "cats-kernel"                    % CatsVersion,
+  "org.typelevel"               %% "cats-core"                      % CatsVersion,
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
   "com.chuusai"                 %% "shapeless"                      % ShapelessVersion,

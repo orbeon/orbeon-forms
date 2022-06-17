@@ -101,8 +101,10 @@ private class Select1SearchCompanion extends XBLCompanion {
         // Update `aria-labelledby`, so the screen reader can read the field's label when it gets the focus
         val comboboxElement = containerElem.querySelector(".select2-selection")
         val labelElement    = containerElem.querySelector(".xforms-label")
-        val labelId         = DomSupport.generateIdIfNeeded(labelElement)
-        comboboxElement.setAttribute("aria-labelledby", labelId)
+        if (labelElement != null) { // Field might not have a label, which happens in Form Builder
+          val labelId       = DomSupport.generateIdIfNeeded(labelElement)
+          comboboxElement.setAttribute("aria-labelledby", labelId)
+        }
       }
 
       initOrUpdatePlaceholder()

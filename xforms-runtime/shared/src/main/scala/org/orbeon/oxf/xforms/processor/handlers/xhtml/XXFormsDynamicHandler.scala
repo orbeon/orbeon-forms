@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
+import cats.syntax.option._
 import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl
 import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
@@ -55,7 +56,7 @@ class XXFormsDynamicHandler(
     this.elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName)
 
     val classes = "xxforms-dynamic-control"
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getIdClassXHTMLAttributes(attributes, classes, effectiveId))
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getIdClassXHTMLAttributes(attributes, classes, effectiveId.some))
     handlerContext.pushComponentContext(prefixedId)
 
     containingDocument.getControlByEffectiveId(effectiveId) match {

@@ -188,6 +188,7 @@
                             var progressReceived = ORBEON.util.Dom.getAttribute(elem, "progress-received");
                             var progressExpected = ORBEON.util.Dom.getAttribute(elem, "progress-expected");
                             var newSchemaType    = ORBEON.util.Dom.getAttribute(elem, "type");
+                            var newVisited       = ORBEON.util.Dom.getAttribute(elem, "visited");
 
                             var documentElement = document.getElementById(controlId);
 
@@ -251,9 +252,6 @@
 
                                     // For each supported type, declares the recognized schema types and the class used in the DOM
                                     var INPUT_TYPES = [
-                                        { type: "date",     schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}date", "{http://www.w3.org/2002/xforms}date" ], className: "xforms-type-date" },
-                                        { type: "time",     schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}time", "{http://www.w3.org/2002/xforms}time" ], className: "xforms-type-time" },
-                                        { type: "dateTime", schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}dateTime", "{http://www.w3.org/2002/xforms}dateTime" ], className: "xforms-type-dateTime" },
                                         { type: "boolean",  schemaTypes: [ "{http://www.w3.org/2001/XMLSchema}boolean", "{http://www.w3.org/2002/xforms}boolean" ], className: "xforms-type-boolean" },
                                         { type: "string",   schemaTypes: null, className: "xforms-type-string" }
                                     ];
@@ -320,29 +318,6 @@
                                             insertIntoDocument([newStringInput]);
                                             YAHOO.util.Dom.addClass(documentElement, "xforms-type-string");
                                             if (inputLabelElement != null) inputLabelElement.htmlFor = newStringInput.id;
-                                        } else if (newType.type == "date" && ! isMinimal) {
-                                            var newDateInput = createInput("xforms-type-date", 1);
-                                            insertIntoDocument([newDateInput]);
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-date");
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newDateInput.id;
-                                        } else if (newType.type == "date" && isMinimal) {
-                                            // Create image element
-                                            var image = document.createElement("img");
-                                            image.setAttribute("src", ORBEON.xforms.Page.getForm(formID).calendarImagePath);
-                                            image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
-                                            insertIntoDocument([image]);
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-date");
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = documentElement.id;
-                                        } else if (newType.type == "time") {
-                                            var newTimeInput = createInput("xforms-type-time", 1);
-                                            insertIntoDocument([newTimeInput]);
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-time");
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newTimeInput.id;
-                                        } else if (newType.type == "dateTime") {
-                                            var newDateTimeInput = createInput("xforms-type-date", 1);
-                                            insertIntoDocument([newDateTimeInput, createInput("xforms-type-time", 2)]);
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-type-dateTime");
-                                            if (inputLabelElement != null) inputLabelElement.htmlFor = newDateTimeInput.id;
                                         } else if (newType.type == "boolean") {
 
                                             // Make copy of the template
@@ -443,12 +418,11 @@
                                         else
                                             firstInput.removeAttr("aria-required");
                                     }
-                                    if (newLevel != null) {
-                                        if (newLevel == "error")
-                                            firstInput.attr("aria-invalid", "true");
-                                        else
-                                            firstInput.removeAttr("aria-invalid");
-                                    }
+
+                                    var visited = newVisited != null ? newVisited          : documentElement.classList.contains("xforms-visited");
+                                    var invalid = newLevel   != null ? newLevel == "error" : documentElement.classList.contains("xforms-invalid");
+                                    if (invalid && visited) firstInput.attr      ("aria-invalid", "true");
+                                    else                    firstInput.removeAttr("aria-invalid");
                                 }
 
                                 if ($(documentElement).is('.xforms-upload')) {
@@ -592,7 +566,6 @@
                                 );
 
                             // Handle visited flag
-                            var newVisited = ORBEON.util.Dom.getAttribute(elem, "visited");
                             if (newVisited)
                                 ORBEON.xforms.Controls.updateVisited(documentElement, newVisited == 'true');
 

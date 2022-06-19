@@ -431,13 +431,11 @@ object XFormsStaticStateDeserializer {
                 } yield {
                   val componentControl =
                     (commonBinding.modeValue, commonBinding.modeLHHA) match {
-                      case (false, false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true)
-                      case (false, true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with                          StaticLHHASupport
-                      case (true,  false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with ValueComponentTrait
-                      case (true,  true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true) with ValueComponentTrait with StaticLHHASupport
+                      case (false, false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding)
+                      case (false, true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with                          StaticLHHASupport
+                      case (true,  false) => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with ValueComponentTrait
+                      case (true,  true)  => new ComponentControl(index, element, controlStack.headOption, None, staticId, prefixedId, namespaceMapping, scope, containerScope, true, commonBinding) with ValueComponentTrait with StaticLHHASupport
                     }
-
-                  componentControl.commonBinding = commonBinding
 
                   // We don't serialize the attributes separately as we have them on the bound element, so we
                   // copy them again here.

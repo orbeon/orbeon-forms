@@ -1,7 +1,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.jquery.Offset
-import org.orbeon.oxf.util.CollectionUtils.IteratorWrapper
+import org.orbeon.web.DomSupport
 import org.orbeon.xforms.Placement.PositionDetails
 import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom
@@ -9,7 +9,6 @@ import org.scalajs.dom.html
 import org.scalajs.dom.raw.KeyboardEvent
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
-import scala.annotation.tailrec
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
@@ -213,43 +212,10 @@ object Help {
       }
     }
 
-    def ancestorOrSelfElem(elem: html.Element): Iterator[html.Element] =
-      Iterator.iterate(elem)(_.parentElement).takeWhile(_ ne null)
-
     def jCommonAncestor(jElems: JQuery): Option[html.Element] =
       if (jElems.length >= 2)
-        findCommonAncestor(jElems.toArray().toList.collect { case e: html.Element => e })
+        DomSupport.findCommonAncestor(jElems.toArray().toList.collect { case e: html.Element => e })
       else
         None
-
-    // TODO: Move to common DOM utilities.
-    def findCommonAncestor(elems: List[html.Element]): Option[html.Element] = {
-
-      def findFirstCommonAncestorForPair(elem1: html.Element, elem2: html.Element): Option[html.Element] =
-        ancestorOrSelfElem(elem1).toList.reverseIterator
-          .zip(ancestorOrSelfElem(elem2).toList.reverseIterator)
-          .takeWhile { case (e1, e2) => e1.isSameNode(e2) }
-          .lastOption()
-          .map(_._1)
-
-      @tailrec
-      def recurse(elems: List[html.Element]): Option[html.Element] = {
-        elems match {
-          case Nil =>
-            None
-          case elem1 :: Nil =>
-            Some(elem1)
-          case elem1 :: elem2 :: rest =>
-            findFirstCommonAncestorForPair(elem1, elem2) match {
-              case Some(elem) => recurse(elem :: rest)
-              case None       => None
-            }
-          case _ =>
-            None
-        }
-      }
-
-      recurse(elems)
-    }
   }
 }

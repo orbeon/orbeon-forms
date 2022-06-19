@@ -13,6 +13,7 @@
  */
 package org.orbeon.xbl
 
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
@@ -69,7 +70,7 @@ object WPaint {
             wpaintElC = $("""<div class="fr-wpaint-container-c" tabindex="-1"/>""")
             wpaintElB.append(wpaintElC)
             // When looses focus, send drawing to the server right away (incremental)
-            wpaintElC.on("focusout", sendAnnotationToServer _)
+            wpaintElC.on(DomEventNames.FocusOut, sendAnnotationToServer _)
             wpaintElC.css("width",  imageEl.width() )
             wpaintElC.css("height", imageEl.height())
             val annotation = annotationEl.attr("src").get

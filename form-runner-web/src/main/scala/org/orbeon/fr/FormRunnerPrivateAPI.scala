@@ -14,6 +14,7 @@
 package org.orbeon.fr
 
 import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.{$, Page}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URLSearchParams
@@ -117,4 +118,23 @@ object FormRunnerPrivateAPI extends js.Object {
       url       = PathUtils.recombineQuery(location.pathname, newParams) + location.hash
     )
   }
+
+  def navigateToError(
+    validationPosition: String,
+    elementId         : String,
+    controlName       : String,
+    controlLabel      : String,
+    validationMessage : String,
+    validationLevel   : String,
+    sectionNames      : String
+  ): Unit =
+    FormRunnerAPI.errorSummary._dispatch(
+      validationPosition.toInt,
+      elementId,
+      controlName,
+      controlLabel,
+      validationMessage,
+      validationLevel,
+      sectionNames.splitTo[js.Array]()
+    )
 }

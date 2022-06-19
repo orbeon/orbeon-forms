@@ -25,7 +25,6 @@ class XFormsAssetsTest extends AnyFunSpec{
       {
         "css": [
           { "full": "/ops/yui/container/assets/skins/sam/container.css",                   "min": false },
-          { "full": "/ops/yui/calendar/assets/skins/sam/calendar.css",                     "min": false },
           { "full": "/apps/fr/style/bootstrap/css/bootstrap.css",                          "min": true  },
           { "full": "/apps/fr/style/form-runner-bootstrap-override.css",                   "min": false },
           { "full": "/apps/fr/style/font-awesome/css/font-awesome.css",                    "min": true  },
@@ -50,15 +49,12 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
           { "full": "/ops/yui/container/container.js",                                     "min": true  },
           { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
-          { "full": "/ops/yui/calendar/calendar.js",                                       "min": true  },
           { "full": "/ops/yui/slider/slider.js",                                           "min": true  },
 
           { "full": "/ops/javascript/underscore/underscore.js",                            "min": true  },
 
           { "full": "/ops/javascript/xforms.js",                                           "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
-          { "full": "/ops/javascript/orbeon/xforms/control/CalendarResources.js",          "min": true  },
-          { "full": "/ops/javascript/orbeon/xforms/control/Calendar.js",                   "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
 
           { "full": "/ops/javascript/scalajs/orbeon-xforms.js",                            "min": false }
@@ -94,15 +90,12 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
           { "full": "/ops/yui/container/container.js",                                     "min": true  },
           { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
-          { "full": "/ops/yui/calendar/calendar.js",                                       "min": true  },
           { "full": "/ops/yui/slider/slider.js",                                           "min": true  },
 
           { "full": "/ops/javascript/underscore/underscore.js",                            "min": true  },
 
           { "full": "/ops/javascript/xforms.js",                                           "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
-          { "full": "/ops/javascript/orbeon/xforms/control/CalendarResources.js",          "min": true  },
-          { "full": "/ops/javascript/orbeon/xforms/control/Calendar.js",                   "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
 
           { "full": "/apps/fr/resources/scalajs/orbeon-form-runner.js",                    "min": false }

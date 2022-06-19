@@ -145,6 +145,7 @@ object ControlAnalysisFactory {
           namespaceMapping,
           scope,
           containerScope,
+          abstractBinding.commonBinding,
           abstractBinding.modeValue,
           abstractBinding.modeLHHA
         ).some

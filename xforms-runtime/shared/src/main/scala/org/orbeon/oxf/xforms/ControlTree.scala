@@ -172,7 +172,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
   def dispatchRefreshEvents(controlsEffectiveIds: List[String], isInitial: Boolean): Unit = {
     withDebug("dispatching refresh events") {
 
-      def dispatchRefreshEvents(control: XFormsControl): Unit =
+      def doDispatchRefreshEvents(control: XFormsControl): Unit =
         if (XFormsControl.controlSupportsRefreshEvents(control)) {
           val oldRelevantState = control.wasRelevantCommit()
           val newRelevantState = control.isRelevant
@@ -194,7 +194,7 @@ class ControlTree(private implicit val indentedLogger: IndentedLogger) extends C
         }
 
       for (controlEffectiveId <- controlsEffectiveIds)
-        findControl(controlEffectiveId) foreach dispatchRefreshEvents
+        findControl(controlEffectiveId) foreach doDispatchRefreshEvents
     }
   }
 

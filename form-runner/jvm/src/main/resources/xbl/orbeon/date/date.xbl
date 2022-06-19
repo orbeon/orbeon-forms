@@ -45,7 +45,8 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
         xxbl:serialize-external-value="
             DateSupport:serializeExternalValueJava(
                 xxf:binding('fr-date'),
-                xxf:property('oxf.xforms.format.input.date')
+                xxf:property('oxf.xforms.format.input.date'),
+                fr:component-param-value('week-start-day')
             )"
 
         xxbl:deserialize-external-value="DateSupport:deserializeExternalValueJava(.)"

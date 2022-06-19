@@ -370,15 +370,30 @@
                                                                     </span>
                                                                 </xf:label>
 								                                <xf:action ev:event="DOMActivate">
-                                                                    <xf:action type="javascript">
-                                                                        <xf:param name="elemId" value="xxf:client-id(@id)"/>
+                                                                    <xf:action type="javascript" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+                                                                        <xf:param name="elementId"          value="xxf:client-id(@id)"/>
+                                                                        <xf:param name="validationPosition" value="string(position())"/>
+                                                                        <xf:param name="controlName"        value="frf:controlNameFromId(xxf:client-id(@id))"/>
+                                                                        <xf:param name="controlLabel"       value="string(@label)"/>
+                                                                        <xf:param name="validationMessage"  value="string(@alert)"/>
+                                                                        <xf:param name="validationLevel"    value="string(@level)"/>
+                                                                        <xf:param name="sectionNames"       value="string-join(ErrorSummary:ancestorSectionNames(@id), ' ')"/>
                                                                         <xf:body>
-                                                                            const elem = window.document.getElementById(elemId);
+                                                                            const elem = window.document.getElementById(elementId);
                                                                             if (elem) {
                                                                                 const offset = -100;
                                                                                 const y = elem.getBoundingClientRect().top + window.pageYOffset + offset;
                                                                                 window.scrollTo({top: y, behavior: 'smooth'});
                                                                             }
+                                                                            ORBEON.fr.private.API.navigateToError(
+                                                                                validationPosition,
+                                                                                elementId,
+                                                                                controlName,
+                                                                                controlLabel,
+                                                                                validationMessage,
+                                                                                validationLevel,
+                                                                                sectionNames
+                                                                            );
                                                                         </xf:body>
                                                                     </xf:action>
                                                                     <xf:setfocus control="{{@id}}"/>

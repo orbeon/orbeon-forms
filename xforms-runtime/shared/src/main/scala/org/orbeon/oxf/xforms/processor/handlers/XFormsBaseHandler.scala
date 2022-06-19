@@ -42,8 +42,8 @@ abstract class XFormsBaseHandler protected (
   def isNonRelevant(control: XFormsControl): Boolean =
     (control eq null) || ! control.isRelevant
 
-  protected def getIdClassXHTMLAttributes(elementAttributes: Attributes, classes: String, effectiveId: String): AttributesImpl =
-    XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, elementAttributes, classes, effectiveId)
+  protected def getIdClassXHTMLAttributes(elementAttributes: Attributes, classes: String, effectiveIdOpt: Option[String]): AttributesImpl =
+    XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, elementAttributes, classes, effectiveIdOpt)
 }
 
 object XFormsBaseHandler {
@@ -77,10 +77,10 @@ object XFormsBaseHandler {
     }
   }
 
-  def handleAriaAttributes(required: Boolean, valid: Boolean, destAttributes: AttributesImpl): Unit = {
+  def handleAriaAttributes(required: Boolean, valid: Boolean, visited: Boolean, destAttributes: AttributesImpl): Unit = {
     if (required)
       destAttributes.addAttribute("", "aria-required", "aria-required", XMLReceiverHelper.CDATA, "true")
-    if (! valid)
+    if (! valid && visited)
       destAttributes.addAttribute("", "aria-invalid", "aria-invalid", XMLReceiverHelper.CDATA, "true")
   }
 
@@ -89,14 +89,15 @@ object XFormsBaseHandler {
     reusableAttributes : AttributesImpl,
     elementAttributes  : Attributes,
     classes            : String,
-    effectiveId        : String
+    effectiveIdOpt     : Option[String]
   ): AttributesImpl = {
 
     reusableAttributes.clear()
 
     // Copy "id"
-    if (effectiveId ne null)
+    effectiveIdOpt foreach { effectiveId =>
       reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, containingDocument.namespaceId(effectiveId))
+    }
 
     // Create "class" attribute if necessary
     if (classes != null && classes.nonEmpty)
@@ -116,7 +117,7 @@ object XFormsBaseHandler {
   def isStaticReadonly(control: XFormsControl): Boolean =
     control != null && control.isStaticReadonly
 
-  // E.g. foo$bar.1-2-3 -> foo$bar$$alert.1-2-3
+  // E.g. `foo≡bar⊙2` -> `foo≡bar≡≡a⊙2`
   def getLHHACIdWithNs(
     containingDocument : XFormsContainingDocument,
     controlEffectiveId : String,

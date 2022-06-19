@@ -19,16 +19,11 @@
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
+    <!-- 2022-05-23: Used only by `autocomplete.xbl` (legacy) -->
     <xsl:function name="xxbl:parameter">
         <xsl:param name="context"  as="element()"/>
         <xsl:param name="property" as="xs:string"/>
         <xsl:copy-of select="xxbl:parameter-impl($context, $property, false())"/>
-    </xsl:function>
-
-    <xsl:function name="xxbl:server-parameter">
-        <xsl:param name="context"  as="element()"/>
-        <xsl:param name="property" as="xs:string"/>
-        <xsl:copy-of select="xxbl:parameter-impl($context, $property, true())"/>
     </xsl:function>
 
     <xsl:function name="xxbl:parameter-impl">

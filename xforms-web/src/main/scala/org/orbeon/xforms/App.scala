@@ -14,6 +14,7 @@
 package org.orbeon.xforms
 
 import org.log4s
+import org.orbeon.web.DomSupport
 import org.scalajs.dom
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
@@ -37,7 +38,7 @@ trait App {
     scribe.debug("running initializations after Orbeon API is available")
     onOrbeonApiLoaded()
 
-    InitSupport.atLeastDomInteractiveF(dom.document) flatMap (_ => InitSupport.liferayF) onComplete {
+    DomSupport.atLeastDomInteractiveF(dom.document) flatMap (_ => InitSupport.liferayF) onComplete {
       case Success(_) =>
         scribe.debug("running initializations after form markup is available")
         onPageContainsFormsMarkup()

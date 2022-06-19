@@ -106,7 +106,6 @@
         <output name="data">
             <xh:head xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:link href="/ops/yui/container/assets/skins/sam/container.css" class="xforms-baseline"/>
-                <xh:link href="/ops/yui/calendar/assets/skins/sam/calendar.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/bootstrap/css/bootstrap.min.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/form-runner-bootstrap-override.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/font-awesome/css/font-awesome.min.css" class="xforms-baseline"/>
@@ -136,13 +135,10 @@
                 <xh:script src="/ops/yui/dragdrop/dragdrop.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/container/container.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/examples/container/assets/containerariaplugin.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/calendar/calendar.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/slider/slider.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/underscore/underscore.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/xforms.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/control/CalendarResources.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/javascript/orbeon/xforms/control/Calendar.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/scalajs/orbeon-xforms-web.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/js/bootstrap-datepicker.min.js" class="xforms-baseline"/>
@@ -708,24 +704,24 @@
                         </xxf:control>
                         <xxf:control id="my-summary≡xf-83⊙1">
                             <xxf:case id="my-summary≡xf-84⊙1" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-94⊙1" visibility="hidden"/>
+                            <xxf:case id="my-summary≡xf-100⊙1" visibility="hidden"/>
                         </xxf:control>
                         <xxf:control id="my-summary≡xf-85⊙1" label="&lt;span class=&quot;fr-error-label&quot;&gt;Note&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot;&gt;Invalid note&lt;/span&gt;"/>
-                        <xxf:control id="my-summary≡xf-95⊙1" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-96⊙1" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-101⊙1" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-102⊙1" relevant="false"/>
                         <xxf:control class="fr-level-error fr-error-single" id="my-summary≡xf-78⊙2"/>
                         <xxf:control id="my-summary≡xf-82⊙2">
                             <xxf:value>2</xxf:value>
                         </xxf:control>
                         <xxf:control id="my-summary≡xf-83⊙2">
                             <xxf:case id="my-summary≡xf-84⊙2" visibility="visible"/>
-                            <xxf:case id="my-summary≡xf-94⊙2" visibility="hidden"/>
+                            <xxf:case id="my-summary≡xf-100⊙2" visibility="hidden"/>
                         </xxf:control>
                         <xxf:control id="my-summary≡xf-85⊙2" label="&lt;span class=&quot;fr-error-label&quot;&gt;Last name&lt;/span&gt;&lt;span class=&quot;fr-error-alert fr-error-alert-error&quot;&gt;Invalid last name&lt;/span&gt;"/>
-                        <xxf:control id="my-summary≡xf-95⊙2" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-96⊙2" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-97" class="fr-show-more-errors" relevant="false"/>
-                        <xxf:control id="my-summary≡xf-100" class="fr-show-less-errors" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-101⊙2" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-102⊙2" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-103" class="fr-show-more-errors" relevant="false"/>
+                        <xxf:control id="my-summary≡xf-106" class="fr-show-less-errors" relevant="false"/>
                         <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" level="error" empty="true"/>
                         <xxf:control id="note-control⊙1" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>
                         <xxf:control id="note-control⊙2" label="Note" alert="Invalid note" required="true" level="error" empty="true"/>
@@ -772,7 +768,7 @@
                         <xxf:attribute for="my-date≡input" name="placeholder"/>
                         <xxf:control id="my-date≡xf-13" relevant="false"/>
                         <xxf:init id="my-date">
-                            <xxf:value>{"value":"2010-01-13","format":"[M]/[D]/[Y]","excludedDates":[]}</xxf:value>
+                            <xxf:value>{"value":"2010-01-13","format":"[M]/[D]/[Y]","excludedDates":[],"weekStart":null}</xxf:value>
                         </xxf:init>
                     </xxf:control-values>
                     <xxf:focus control-id="my-date"/>

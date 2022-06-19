@@ -864,6 +864,10 @@
                         name="response-actions"
                         select=".//xf:action[p:classes() = $response-action-classes]"/>
 
+                    <!-- Rebuild, for the `frf:resolveTargetRelativeToActionSource()` to return nodes in the current
+                         `fr-form-instance`, if that instance was just replaced by a submission loading the
+                         auto-saved or manually-saved document. -->
+                    <xf:rebuild/>
                     <!-- https://github.com/orbeon/orbeon-forms/issues/4178 -->
                     <xf:recalculate model="{$model-id}" xxf:deferred="true"/>
 

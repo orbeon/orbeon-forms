@@ -5,6 +5,8 @@ import org.orbeon.sbt.OrbeonWebappPlugin
 import org.scalajs.linker.interface.ESVersion
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
+import scala.jdk.CollectionConverters.asScalaIteratorConverter
+
 // For our GitHub packages
 resolvers += Resolver.githubPackages("orbeon")
 ThisBuild / githubOwner := "orbeon"
@@ -35,16 +37,17 @@ val ScribeVersion                    = "2.8.6"
 val PerfolationVersion               = "1.2.8"
 val ScalaJsStubsVersion              = "1.1.0" // can be different from Scala.js version
 val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
-val ScalaJsTimeVersion               = "2.0.0"
-val ScalaJsLocalesVersion            = "1.4.0"
+val ScalaJsTimeVersion               = "2.4.0"
+val ScalaJsLocalesVersion            = "1.1.3"
 
 // Scala libraries for Scala JVM only
 val Parboiled1Version             = "1.3.1"
 val ScalaLoggingVersion           = "3.9.4"
 
 // Shared Scala libraries
+val CatsVersion                   = "2.7.0"
 val ScalaTestVersion              = "3.2.12"
-val CirceVersion                  = "0.14.1"
+val CirceVersion                  = "0.14.2"
 val EnumeratumVersion             = "1.7.0"
 val EnumeratumCirceVersion        = "1.7.0"
 val ShapelessVersion              = "2.3.7"
@@ -63,7 +66,7 @@ val SaxonJvmVersion               = "9.1.0.8.3"
 val JUnitInterfaceVersion         = "0.13.3"
 val Slf4jVersion                  = "1.7.36"
 val HttpComponentsVersion         = "4.5.13"
-val Log4j2Version                 = "2.17.1"
+val Log4j2Version                 = "2.17.2"
 val CommonsIoVersion              = "2.11.0"
 val FlyingSaucerVersion           = "9.1.22"
 val TinkVersion                   = "1.6.1"
@@ -78,11 +81,13 @@ val ThumbnailatorVersion          = "0.4.16"
 val ServletApiVersion             = "4.0.1"
 val PortletApiVersion             = "3.0.1"
 val LiferayPortalServiceVersion   = "6.2.5"
-val LiferayPortalKernelVersion    = "36.0.0"
+val LiferayPortalKernelVersion    = "57.1.0"
 
 
 val CoreLibraryDependencies = Seq(
   "org.orbeon"                  % "saxon"                           % SaxonJvmVersion, // Java library!
+  "org.typelevel"               %% "cats-kernel"                    % CatsVersion,
+  "org.typelevel"               %% "cats-core"                      % CatsVersion,
   "com.beachape"                %% "enumeratum"                     % EnumeratumVersion,
   "com.beachape"                %% "enumeratum-circe"               % EnumeratumCirceVersion,
   "com.chuusai"                 %% "shapeless"                      % ShapelessVersion,
@@ -171,7 +176,7 @@ val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version fr
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
 
-lazy val scala212 = "2.12.15"
+lazy val scala212 = "2.12.16"
 lazy val scala213 = "2.13.8"
 lazy val supportedScalaVersions = List(scala212, scala213)
 
@@ -411,15 +416,6 @@ lazy val commonScalaJsSettings = Seq(
 
   Compile / scalaJSUseMainModuleInitializer := true,
   Test    / scalaJSUseMainModuleInitializer := false,
-
-  scalacOptions ++= {
-    if (scalaJSVersion.startsWith("0.6."))
-      List(
-        "-P:scalajs:sjsDefinedByDefault"
-      )
-    else
-      Nil
-  }
 )
 
 lazy val assetsSettings = Seq(
@@ -437,7 +433,12 @@ lazy val assetsSettings = Seq(
   // Minify all JavaScript files which are not minified/debug and which don't already have a minified version
   // NOTE: The default `excludeFilter in uglify` explicitly excludes files under `resourceDirectory in Assets`.
   uglify / includeFilter                   := (uglify / includeFilter).value && FileHasNoMinifiedVersionFilter && -FileIsMinifiedVersionFilter,
-  uglify / excludeFilter                   := (uglify / excludeFilter).value || HiddenFileFilter || "*-debug.js", // || ((baseDirectory).value / "src" ** "codemirror-*" / "bin"),
+  // 2022-06-15: Tried to write the filter using `Glob`, etc. but can't seem to be able to convert that to a
+  // `FileFilter`. So doing this "by hand".
+  uglify / excludeFilter                   := (uglify / excludeFilter).value || HiddenFileFilter || "*-debug.js" || new SimpleFileFilter(f =>
+    // Found out that: 1. `endsWith` is not type-safe 2. `Path.iterator` returns `Path`s :(
+    f.toPath.iterator().asScala.map(_.toString).toList.endsWith("acme" :: "map" :: "map.js" :: Nil)
+  ),
   uglifyCompressOptions                    := Seq("warnings=false"),
 
   // By default sbt-web places resources under META-INF/resources/webjars. We don't support this yet so we fix it back.
@@ -514,6 +515,24 @@ lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) 
 
 lazy val domJVM = dom.jvm.dependsOn(commonJVM)
 lazy val domJS  = dom.js.dependsOn(commonJS)
+
+lazy val webSupport = (project in file("web-support"))
+  .dependsOn(commonJS)
+  .settings(commonSettings: _*)
+  .settings(commonScalaJsSettings)
+  .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(JSDependenciesPlugin)
+  .settings(
+    Compile / unmanagedJars      := Nil,
+    Compile / unmanagedClasspath := Nil
+  )
+  .settings(
+    name := "orbeon-web-support",
+
+    libraryDependencies ++= Seq(
+      "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
+    ),
+  )
 
 lazy val embedding = (project in file("embedding"))
   .dependsOn(core)
@@ -672,7 +691,7 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-      "io.github.cquiroz"      %%% "scala-java-time" % "2.3.0"
+      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -730,7 +749,7 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-      "io.github.cquiroz"      %%% "scala-java-time" % "2.3.0"
+      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -848,11 +867,11 @@ lazy val xformsJS = xforms.js
   .settings(
 
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom"      % ScalaJsDomVersion,
-      "be.doeraene"  %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
-      "com.beachape" %%% "enumeratum"       % EnumeratumVersion,
-      "com.beachape" %%% "enumeratum-circe" % EnumeratumCirceVersion,
-      "io.github.cquiroz" %%% "scala-java-time" % "2.3.0"
+      "org.scala-js"      %%% "scalajs-dom"      % ScalaJsDomVersion,
+      "be.doeraene"       %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
+      "com.beachape"      %%% "enumeratum"       % EnumeratumVersion,
+      "com.beachape"      %%% "enumeratum-circe" % EnumeratumCirceVersion,
+      "io.github.cquiroz" %%% "scala-java-time " % ScalaJsTimeVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -1031,6 +1050,7 @@ lazy val xformsRuntimeJS = xformsRuntime.js
     )
   )
 
+
 lazy val xformsWeb = (project in file("xforms-web"))
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings)
@@ -1038,6 +1058,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
   .enablePlugins(JSDependenciesPlugin)
   .dependsOn(
     commonJS % "test->test;compile->compile",
+    webSupport,
     xformsClientServerJS
   )
   .settings(
@@ -1057,13 +1078,12 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "be.doeraene"            %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
       "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,
       "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,
-      "io.github.cquiroz"      %%% "scala-java-time"  % "2.3.0"
+      "io.github.cquiroz"      %%% "scala-java-time"  % ScalaJsTimeVersion
     ),
 
     jsDependencies                      += "org.webjars" % "jquery" % "3.6.0" / "3.6.0/jquery.js",
     Test / jsDependencies               += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     Test / unmanagedResourceDirectories += baseDirectory.value / "src" / "main" / "assets",
-
 
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
@@ -1231,8 +1251,8 @@ lazy val orbeonWarJS = orbeonWar.js
   .settings(commonSettings: _*)
   .dependsOn(
     commonJS,
-    xformsWeb,
-    nodeFacades
+    nodeFacades,
+    webSupport
   )
   .settings(
 

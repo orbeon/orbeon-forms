@@ -14,21 +14,22 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
-import java.{lang => jl}
-
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms.analysis.controls.UploadControl
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.outputDisabledAttribute
-import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport, XFormsBaseHandler}
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames._
 import org.xml.sax._
+
+import java.{lang => jl}
 
 
 /**
@@ -51,7 +52,7 @@ class XFormsUploadHandler(
     handlerContext,
     repeating  = false,
     forwarding = false
-  ) with HandlerSupport {
+  ) {
 
   protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = {
     val uploadControl = control.asInstanceOf[XFormsUploadControl]
@@ -77,7 +78,7 @@ class XFormsUploadHandler(
         reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "file")
         // Generate an id, because JS event handlers are not attached to elements that don't have an id, and
         // this causes issues with IE where we register handlers directly on controls
-        reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, getForEffectiveIdWithNs(getEffectiveId).getOrElse(throw new IllegalStateException))
+        reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, getForEffectiveIdWithNs.getOrElse(throw new IllegalStateException))
         reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId)
         // IE causes issues when the user types in or pastes in an incorrect file name. Some sites use this to
         // disable pasting in the file. See http://tinyurl.com/6dcd6a
@@ -137,6 +138,6 @@ class XFormsUploadHandler(
     }
   }
 
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] =
+  override def getForEffectiveIdWithNs: Option[String] =
     containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input")).some
 }

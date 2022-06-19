@@ -48,7 +48,7 @@ object AjaxClient {
   val ajaxResponseReceived  = new CallbackList[AjaxResponseDetails]()
   val ajaxResponseProcessed = new CallbackList[AjaxResponseDetails]()
 
-  // Used by `OrbeonClientTest`
+  // For `OrbeonClientTest`
   // This uses a JavaScript `Promise` as the API is used across Scala.js compilation contexts and Scala
   // classes cannot go through that boundary.
   @JSExport

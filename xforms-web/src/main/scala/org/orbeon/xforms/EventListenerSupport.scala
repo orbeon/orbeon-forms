@@ -20,18 +20,18 @@ import scala.scalajs.js
 
 trait EventListenerSupport {
 
-  private var listeners: List[(dom.raw.EventTarget, String, js.Function1[_, _])] = Nil
+  private var listeners: List[(dom.raw.EventTarget, String, js.Function1[_, _], Boolean)] = Nil
 
-  def addListener[E <: dom.raw.Event](target: dom.raw.EventTarget, name: String, fn: E => Unit): Unit =
-    addListener(target, name, fn: js.Function1[E, Unit])
+  def addListener[E <: dom.raw.Event](target: dom.raw.EventTarget, name: String, fn: E => Unit, useCapture  : Boolean = false): Unit =
+    addJsListener(target, name, fn: js.Function1[E, Unit], useCapture)
 
-  def addListener[E <: dom.raw.Event](target: dom.raw.EventTarget, name: String, jsFn: js.Function1[E, Unit]): Unit = {
-    target.addEventListener(name, jsFn)
-    listeners ::= (target, name, jsFn)
+  def addJsListener[E <: dom.raw.Event](target: dom.raw.EventTarget, name: String, jsFn: js.Function1[E, Unit], useCapture  : Boolean = false): Unit = {
+    target.addEventListener(name, jsFn, useCapture)
+    listeners ::= (target, name, jsFn, useCapture)
   }
 
   def clearAllListeners(): Unit = {
-    listeners foreach { case (target, name, jsFn) => target.removeEventListener(name, jsFn) }
+    listeners foreach { case (target, name, jsFn, useCapture) => target.removeEventListener(name, jsFn, useCapture) }
     listeners = Nil
   }
 }

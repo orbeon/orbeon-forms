@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.{ContainerControl, LHHA}
+import org.orbeon.oxf.xforms.analysis.controls.{ContainerControl, LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xml._
@@ -58,19 +58,15 @@ class XFormsGroupDefaultHandler(
 
   protected def handleControlStart(): Unit = ()
 
-  override protected def handleLabel(): Unit = {
+  override protected def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = {
 
     // TODO: check why we output our own label here
-
-    val staticLabelOpt = Option(getStaticLHHA(getPrefixedId, LHHA.Label))
 
     val groupControl = currentControl.asInstanceOf[XFormsSingleNodeControl]
     val effectiveId = getEffectiveId
 
-    val classes = getLabelClasses(groupControl)
-
-    // For LHH we know this statically
-    val isHtmlLabel = staticLabelOpt.exists(_.containsHTML)
+    val classes     = getLabelClasses(groupControl, lhhaAnalysis)
+    val isHtmlLabel = lhhaAnalysis.containsHTML
 
     if (isHtmlLabel) {
       if (classes.length() > 0)
@@ -84,13 +80,13 @@ class XFormsGroupDefaultHandler(
     XFormsBaseHandlerXHTML.outputLabelFor(
       handlerContext           = handlerContext,
       attributes               = reusableAttributes,
-      targetControlEffectiveId = effectiveId.some,
+      labelEffectiveIdOpt      = None,
       forEffectiveIdWithNs     = containingDocument.namespaceId(effectiveId).some,
       lhha                     = LHHA.Label,
       elementName              = handlerContext.labelElementName,
       labelValue               = getLabelValue(groupControl),
       mustOutputHTMLFragment   = isHtmlLabel,
-      addIds                   = false
+      isExternal               = false
     )
   }
 }

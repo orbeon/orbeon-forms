@@ -15,20 +15,22 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.xforms.XFormsNames._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
-import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, HandlerSupport}
+import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.Constants.ComponentSeparator
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.Attributes
+
 
 /**
  * Handle xf:input.
@@ -52,7 +54,7 @@ class XFormsInputHandler(
     handlerContext,
     repeating  = false,
     forwarding = false
-  ) with HandlerSupport {
+  ) {
 
   private lazy val placeHolderInfo: Option[PlaceHolderInfo] =
     PlaceHolderInfo.placeHolderValueOpt(elementAnalysis, currentControl)
@@ -60,8 +62,6 @@ class XFormsInputHandler(
   private def controlHas(predicate: XFormsInputControl => Boolean) =
     predicate(currentControl.asInstanceOf[XFormsInputControl])
 
-  private def isDateTime    = controlHas(c => c.getBuiltinTypeName == "dateTime")
-  private def isDateMinimal = controlHas(c => c.getBuiltinTypeName == "date" && c.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME))
   private def isBoolean     = controlHas(c => c.getBuiltinTypeName == "boolean")
 
   override protected def handleControlStart(): Unit = {
@@ -121,21 +121,15 @@ class XFormsInputHandler(
           val inputIdName = getFirstInputEffectiveIdWithNs(getEffectiveId).getOrElse(throw new IllegalStateException)
           reusableAttributes.clear()
           reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
-          if (! isDateMinimal)
-            reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "text")
+          reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "text")
           // Use effective id for name of first field
           reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, inputIdName)
           val inputClasses = new java.lang.StringBuilder("xforms-input-input")
           if (isRelevantControl) {
             // Output value only for concrete control
             val formattedValue = inputControl.getFirstValueUseFormat
-            if (!isDateMinimal) {
-              // Regular case, value goes to input control
-              reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, Option(formattedValue) getOrElse "")
-            } else {
-              // "Minimal date", value goes to @alt attribute on image
-              reusableAttributes.addAttribute("", "alt", "alt", XMLReceiverHelper.CDATA, Option(formattedValue) getOrElse "")
-            }
+            // Regular case, value goes to input control
+            reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, Option(formattedValue) getOrElse "")
             val firstType = inputControl.getFirstValueType
             if (firstType ne null) {
               inputClasses.append(" xforms-type-")
@@ -143,10 +137,10 @@ class XFormsInputHandler(
             }
             // Q: Not sure why we duplicate the appearances here. As of 2011-10-27, removing this
             // makes the minimal date picker fail on the client. We should be able to remove this.
-            elementAnalysis match {
-              case a: AppearanceTrait => a.encodeAndAppendAppearances(inputClasses)
-              case _ =>
-            }
+//            elementAnalysis match {
+//              case a: AppearanceTrait => a.encodeAndAppendAppearances(inputClasses)
+//              case _ =>
+//            }
           } else {
             reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, "")
           }
@@ -165,53 +159,10 @@ class XFormsInputHandler(
           handleAccessibilityAttributes(attributes, reusableAttributes)
           handleAriaByAtts(reusableAttributes)
 
-          if (isDateMinimal) {
-            val imgQName = XMLUtils.buildQName(xhtmlPrefix, "img")
-            reusableAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, CALENDAR_IMAGE_URI)
-            reusableAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, "")
-            xmlReceiver.startElement(XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes)
-            xmlReceiver.endElement(XHTML_NAMESPACE_URI, "img", imgQName)
-          } else {
-            if (isXFormsReadonlyButNotStaticReadonly(inputControl))
-              outputReadonlyAttribute(reusableAttributes)
-
-            handleAriaAttributes(inputControl.isRequired, inputControl.isValid, reusableAttributes)
-
-            xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
-            xmlReceiver.endElement(XHTML_NAMESPACE_URI, "input", inputQName)
-          }
-        }
-        // Add second field for dateTime's time part
-        // NOTE: In the future, we probably want to do this as an XBL component
-        if (isDateTime) {
-          val inputIdName = getSecondInputEffectiveId(getEffectiveId).getOrElse(throw new IllegalStateException)
-          reusableAttributes.clear()
-          reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
-          reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "text")
-          reusableAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, CALENDAR_IMAGE_URI)
-          reusableAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, "")
-          reusableAttributes.addAttribute("", "alt", "alt", XMLReceiverHelper.CDATA, "")
-          reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, inputIdName)
-          val inputClasses = new StringBuilder("xforms-input-input")
-          if (isRelevantControl) {
-            // Output value only for concrete control
-            val inputValue = inputControl.getSecondValueUseFormat
-            reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, inputValue)
-            val secondType = inputControl.getSecondValueType
-            if (secondType ne null) {
-              inputClasses.append(" xforms-type-")
-              inputClasses.append(secondType)
-            }
-          } else {
-            reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, "")
-          }
-          reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
           if (isXFormsReadonlyButNotStaticReadonly(inputControl))
             outputReadonlyAttribute(reusableAttributes)
+          handleAriaAttributes(inputControl.isRequired, inputControl.isValid, inputControl.visited, reusableAttributes)
 
-          // TODO: set @size and @maxlength
-
-          handleAccessibilityAttributes(attributes, reusableAttributes)
           xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
           xmlReceiver.endElement(XHTML_NAMESPACE_URI, "input", inputQName)
         }
@@ -229,24 +180,20 @@ class XFormsInputHandler(
     }
   }
 
-  // Do as if this was in a component, noscript has to handle that
   private def getFirstInputEffectiveIdWithNs(effectiveId: String): Option[String] =
     ! isBoolean option XFormsInputHandler.firstInputEffectiveIdWithNs(effectiveId)(containingDocument)
 
-  // Do as if this was in a component, noscript has to handle that
-  private def getSecondInputEffectiveId(effectiveId: String): Option[String] =
-    isDateTime option containingDocument.namespaceId(XFormsId.appendToEffectiveId(effectiveId, ComponentSeparator + "xforms-input-2"))
-
-  override def getForEffectiveIdWithNs(effectiveId: String): Option[String] =
+  // xxx XFormsSelect1Handler.getItemId won't be namespaced!
+  override def getForEffectiveIdWithNs: Option[String] =
     isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, 0) orElse getFirstInputEffectiveIdWithNs(getEffectiveId)
 
-  protected override def handleLabel(): Unit =
+  protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
     if (! (placeHolderInfo exists (_.isLabelPlaceholder)))
-      super.handleLabel()
+      super.handleLabel(lhhaAnalysis)
 
-  protected override def handleHint(): Unit =
+  protected override def handleHint(lhhaAnalysis: LHHAAnalysis): Unit =
     if (placeHolderInfo forall (_.isLabelPlaceholder))
-      super.handleHint()
+      super.handleHint(lhhaAnalysis)
 }
 
 object XFormsInputHandler {

@@ -1,8 +1,6 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.LHHA
-import org.orbeon.oxf.xforms.control.LHHASupport
+import org.orbeon.oxf.xforms.analysis.controls.{GroupControl, LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
@@ -14,7 +12,7 @@ class XFormsGroupFieldsetHandler(
   localname      : String,
   qName          : String,
   attributes     : Attributes,
-  matched        : ElementAnalysis,
+  elementAnalysis: GroupControl,
   handlerContext : HandlerContext
 ) extends
   XFormsGroupHandler(
@@ -22,7 +20,7 @@ class XFormsGroupFieldsetHandler(
     localname,
     qName,
     attributes,
-    matched,
+    elementAnalysis,
     handlerContext
   ) {
 
@@ -36,11 +34,10 @@ class XFormsGroupFieldsetHandler(
 
     // Output an `xh:legend` element if and only if there is an `xf:label` element. This help with
     // styling in particular.
-    val hasLabel = LHHASupport.hasLabel(containingDocument, getPrefixedId)
-    if (hasLabel) {
+    elementAnalysis.firstLhha(LHHA.Label) foreach { lhhaAnalysis =>
       // Handle label classes
       reusableAttributes.clear()
-      reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, getLabelClasses(groupControl).toString)
+      reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, getLabelClasses(groupControl, lhhaAnalysis).toString)
       reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, XFormsBaseHandler.getLHHACIdWithNs(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(LHHA.Label)))
 
       // Output `xh:legend` with label content
@@ -53,5 +50,5 @@ class XFormsGroupFieldsetHandler(
     }
   }
 
-  override def handleLabel(): Unit = () // NOP because we handle the label in a custom way
+  override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = () // NOP because we handle the label in a custom way
 }

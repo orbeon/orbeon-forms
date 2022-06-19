@@ -22,7 +22,7 @@ import scala.util.Try
 object JSDateUtils {
 
   // Parse as a local date (see https://stackoverflow.com/a/33909265/5295)
-  def isoDateToStringUsingLocalTimezone(dateString: String): Option[js.Date] = {
+  def parseIsoDateUsingLocalTimezone(dateString: String): Option[js.Date] = {
 
     // Use `substring` to trim potential timezone
     val beforeChrist = dateString.startsWith("-")
@@ -44,11 +44,11 @@ object JSDateUtils {
       // We want return `None` for "2021-11-31", as November has 30 days, but instead of failing,
       // `new Date(2021, 10, 31)` returns December 1. To detect this case, we can convert the parsed
       // date back to a string and check that string is the same our input.
-      dateToISOStringUsingLocalTimezone(parsedDate) == dateTrimmed
+      dateToIsoStringUsingLocalTimezone(parsedDate) == dateTrimmed
     )
   }
 
-  def dateToISOStringUsingLocalTimezone(date: js.Date): String = {
+  def dateToIsoStringUsingLocalTimezone(date: js.Date): String = {
 
     def pad2(n: Double): String =
       if (n < 10)

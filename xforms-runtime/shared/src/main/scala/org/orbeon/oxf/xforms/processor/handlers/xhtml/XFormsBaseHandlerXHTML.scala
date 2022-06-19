@@ -14,10 +14,11 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
+
 import java.{lang => jl}
 import org.orbeon.datatypes.LocationData
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.xforms.analysis.model.ValidationLevel
@@ -71,7 +72,7 @@ abstract class XFormsBaseHandlerXHTML (
 
   // Output MIP classes
   // TODO: Move this to to control itself, like writeMIPsAsAttributes
-  final def handleMIPClasses(controlPrefixedId: String, control: XFormsControl)(implicit sb: jl.StringBuilder): Unit = {
+  final def handleMIPClasses(controlAnalysis: ElementAnalysis, control: XFormsControl)(implicit sb: jl.StringBuilder): Unit = {
 
     // `xforms-disabled` class
     // NOTE: We used to not output this class if the control existed and didn't have a binding. That looked either
@@ -83,7 +84,7 @@ abstract class XFormsBaseHandlerXHTML (
       appendWithSpace("xforms-disabled")
 
     // MIP classes for a concrete control
-    if (isRelevant && handlerContext.getPartAnalysis.hasBinding(controlPrefixedId)) {
+    if (isRelevant && controlAnalysis.hasBinding) {
 
       if (control.visited)
         appendWithSpace("xforms-visited")
@@ -231,22 +232,17 @@ abstract class XFormsBaseHandlerXHTML (
     }
 
   final protected def handleLabelHintHelpAlert(
-    lhhaAnalysis             : LHHAAnalysis,
-    targetControlEffectiveId : String,
-    forEffectiveIdWithNs     : Option[String],
-    lhha                     : LHHA,
-    requestedElementNameOpt  : Option[String],
-    controlOrNull            : XFormsControl,
-    isExternal               : Boolean
-  ): Unit = {
+    lhhaAnalysis           : LHHAAnalysis,
+    elemEffectiveIdOpt     : Option[String],
+    forEffectiveIdWithNs   : Option[String],
+    requestedElementNameOpt: Option[String],
+    controlOrNull          : XFormsControl,
+    isExternal             : Boolean // if `true` adds contraint classes, `id` on labels, and don't add LHHA suffix to ids
+  ): Unit =
+    if (! lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)) {
 
-    require(targetControlEffectiveId ne null)
-    require(forEffectiveIdWithNs     ne null)
-
-    val isInternal           = lhhaAnalysis.appearances(XFormsNames.XXFORMS_INTERNAL_APPEARANCE_QNAME)
-    val staticLHHAAttributes = lhhaAnalysis.element.attributesAsSax
-
-    if (! isInternal) {
+      val lhha = lhhaAnalysis.lhhaType
+      val staticLHHAAttributes = lhhaAnalysis.element.attributesAsSax
 
       // If no attributes were found, there is no such label / help / hint / alert
 
@@ -281,9 +277,8 @@ abstract class XFormsBaseHandlerXHTML (
 
       // For now only place these on label and hint as that's the ones known statically
       // AND useful for Form Builder.
-      if ((lhha == LHHA.Label || lhha == LHHA.Hint) && mustOutputHTMLFragment) {
+      if ((lhha == LHHA.Label || lhha == LHHA.Hint) && mustOutputHTMLFragment)
         appendWithSpace("xforms-mediatype-text-html")
-      }
 
       // Mark alert as active if needed
       if (lhha == LHHA.Alert)
@@ -321,28 +316,26 @@ abstract class XFormsBaseHandlerXHTML (
       val attributes = {
         // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
         val elementAttributes = if (staticLHHAAttributes ne null) staticLHHAAttributes else new AttributesImpl
-        getIdClassXHTMLAttributes(elementAttributes, classes.toString, null)
+        getIdClassXHTMLAttributes(elementAttributes, classes.toString, None)
       }
 
       XFormsBaseHandlerXHTML.outputLabelFor(
         handlerContext           = handlerContext,
         attributes               = attributes,
-        targetControlEffectiveId = targetControlEffectiveId.some,
+        labelEffectiveIdOpt      = elemEffectiveIdOpt,
         forEffectiveIdWithNs     = forEffectiveIdWithNs,
         lhha                     = lhha,
         elementName              = elementName,
         labelValue               = labelHintHelpAlertValue,
         mustOutputHTMLFragment   = mustOutputHTMLFragment,
-        addIds                   = isExternal
+        isExternal               = isExternal
       )
     }
-  }
 
   final protected def getContainerAttributes(
     uri             : String,
     localname       : String,
     attributes      : Attributes,
-    prefixedId      : String,
     effectiveId     : String,
     elementAnalysis : ElementAnalysis,
     xformsControl   : XFormsControl,
@@ -355,16 +348,16 @@ abstract class XFormsBaseHandlerXHTML (
       getInitialClasses(uri, localname, attributes, elementAnalysis, xformsControl, isDefaultIncremental, staticLabel)
 
     // All MIP-related classes
-    handleMIPClasses(prefixedId, xformsControl)
+    handleMIPClasses(elementAnalysis, xformsControl)
 
     // Static classes
-    handlerContext.getPartAnalysis.appendClasses(classes, prefixedId)
+    handlerContext.getPartAnalysis.appendClasses(classes, elementAnalysis)
 
     // Dynamic classes added by the control
     addCustomClasses(classes, xformsControl)
 
     // Get attributes
-    val newAttributes = getIdClassXHTMLAttributes(attributes, classes.toString, effectiveId)
+    val newAttributes = getIdClassXHTMLAttributes(attributes, classes.toString, effectiveId.some)
 
     // Add extension attributes in no namespace if possible
     if (xformsControl ne null)
@@ -402,46 +395,45 @@ object XFormsBaseHandlerXHTML {
     }
 
   def outputLabelFor(
-    handlerContext           : HandlerContext,
-    attributes               : Attributes,
-    targetControlEffectiveId : Option[String],
-    forEffectiveIdWithNs     : Option[String],
-    lhha                     : LHHA,
-    elementName              : String,
-    labelValue               : String,
-    mustOutputHTMLFragment   : Boolean,
-    addIds                   : Boolean
+    handlerContext        : HandlerContext,
+    attributes            : Attributes,
+    labelEffectiveIdOpt   : Option[String],
+    forEffectiveIdWithNs  : Option[String],
+    lhha                  : LHHA,
+    elementName           : String,
+    labelValue            : String,
+    mustOutputHTMLFragment: Boolean,
+    isExternal            : Boolean
   ): Unit = {
-    outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveIdWithNs, lhha, elementName, addIds)
+    outputLabelForStart(handlerContext, attributes, labelEffectiveIdOpt, forEffectiveIdWithNs, lhha, elementName, isExternal)
     outputLabelTextIfNotEmpty(labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)(handlerContext.controller.output)
     outputLabelForEnd(handlerContext, elementName)
   }
 
   def outputLabelForStart(
-    handlerContext           : HandlerContext,
-    attributes               : Attributes,
-    targetControlEffectiveId : Option[String],
-    forEffectiveIdWithNs     : Option[String],
-    lhha                     : LHHA,
-    elementName              : String,
-    addIds                   : Boolean
+    handlerContext      : HandlerContext,
+    attributes          : Attributes,
+    labelEffectiveIdOpt : Option[String],
+    forEffectiveIdWithNs: Option[String],
+    lhha                : LHHA,
+    elementName         : String,
+    isExternal          : Boolean
   ): Unit = {
-
-    require(lhha ne null)
-    require(! addIds || targetControlEffectiveId.isDefined)
 
     // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
     val newAttribute =
-      targetControlEffectiveId match {
-        case Some(targetControlEffectiveId) if addIds =>
+      labelEffectiveIdOpt match {
+        case Some(labelEffectiveId) =>
           // Add or replace existing id attribute
-          // NOTE: addIds == true for external LHHA
           XMLReceiverSupport.addOrReplaceAttribute(
             attributes,
             "",
             "",
             "id",
-            XFormsBaseHandler.getLHHACIdWithNs(handlerContext.containingDocument, targetControlEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
+            if (isExternal)
+              handlerContext.containingDocument.namespaceId(labelEffectiveId)
+            else
+              XFormsBaseHandler.getLHHACIdWithNs(handlerContext.containingDocument, labelEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
           )
         case _ =>
           // Remove existing id attribute if any
@@ -492,4 +484,11 @@ object XFormsBaseHandlerXHTML {
 
   def outputReadonlyAttribute(newAttributes: AttributesImpl): Unit =
     newAttributes.addAttribute("", "readonly", "readonly", XMLReceiverHelper.CDATA, "readonly")
+
+  def withFormattingPrefix[T](body: String => T)(implicit context: HandlerContext): T = {
+    val formattingPrefix = context.findFormattingPrefixDeclare
+    val result = body(formattingPrefix)
+    context.findFormattingPrefixUndeclare(formattingPrefix)
+    result
+  }
 }

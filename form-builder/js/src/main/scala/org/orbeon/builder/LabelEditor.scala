@@ -17,6 +17,7 @@ import autowire._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.jquery.Offset
 import org.orbeon.oxf.util.CoreUtils.asUnit
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.RpcClient
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, EventNames}
@@ -47,7 +48,7 @@ object LabelEditor {
           val targetEl         = $(dom.document.getElementById(eventTargetId))
           val inSectionEditor  = targetEl.closest(".fb-section-grid-editor").is("*")
 
-          if (eventName == EventNames.DOMActivate && inSectionEditor)
+          if (eventName == DomEventNames.DOMActivate && inSectionEditor)
             addProperties(js.Dictionary(
               "section-id" -> SectionGridEditor.currentSectionGridOpt.get.el.attr("id").get
             ))

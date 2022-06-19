@@ -19,8 +19,9 @@ import org.orbeon.facades.{Bowser, Mousetrap}
 import org.orbeon.liferay._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants._
-import org.orbeon.xforms.EventNames.{DOMContentLoaded, KeyModifiersPropertyName, KeyTextPropertyName}
+import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
 import org.orbeon.xforms.StateHandling.StateResult
 import org.orbeon.xforms.facade._
 import org.orbeon.xforms.rpc.Initializations
@@ -78,34 +79,6 @@ object InitSupport {
         scheduleOrbeonLoadedEventIfNeeded()
       }
     }
-  }
-
-  def atLeastDomInteractiveF(doc: html.Document): Future[Unit] = {
-
-    scribe.debug(s"document state is `${doc.readyState}`")
-
-    val promise = Promise[Unit]()
-
-    if (doc.readyState == EventNames.InteractiveReadyState || doc.readyState == EventNames.CompleteReadyState) {
-
-      // Because yes, the document is interactive, but JavaScript placed after us might not have run yet.
-      // Although if we do everything in an async way, that should be changed.
-      // TODO: Review once full order of JavaScript is determined in `App` doc.
-      js.timers.setTimeout(0) {
-        promise.success(())
-      }
-    } else {
-
-      lazy val contentLoaded: js.Function1[dom.Event, _] = (_: dom.Event) => {
-        scribe.debug(s"$DOMContentLoaded handler called")
-        doc.removeEventListener(DOMContentLoaded, contentLoaded)
-        promise.success(())
-      }
-
-      doc.addEventListener(DOMContentLoaded, contentLoaded)
-    }
-
-    promise.future
   }
 
   def liferayF: Future[Unit] = {
@@ -244,14 +217,14 @@ object InitSupport {
         // for compatibility with older browsers that didn't support `focusin` and `focusout`, and since they are different events,
         // we're then unable stopping the propagation of those events
 
-        GlobalEventListenerSupport.addListener(dom.document, "focusin" ,  Events.focus)
-        GlobalEventListenerSupport.addListener(dom.document, "focusout",  Events.blur)
-        GlobalEventListenerSupport.addListener(dom.document, "keypress",  Events.keypress)
-        GlobalEventListenerSupport.addListener(dom.document, "keydown",   Events.keydown)
-        GlobalEventListenerSupport.addListener(dom.document, "input",     Events.input)
-        GlobalEventListenerSupport.addListener(dom.document, "mouseover", Events.mouseover)
-        GlobalEventListenerSupport.addListener(dom.document, "mouseout",  Events.mouseout)
-        GlobalEventListenerSupport.addListener(dom.document, "click",     Events.click)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusIn ,  Events.focus)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusOut,  Events.blur)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyPress,  Events.keypress)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyDown,   Events.keydown)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Input,     Events.input)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOver, Events.mouseover)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOut,  Events.mouseout)
+        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     Events.click)
 
         // We could do this on `pageshow` or `pagehide`
         // https://github.com/orbeon/orbeon-forms/issues/4552

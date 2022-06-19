@@ -22,28 +22,6 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.|
 
-// For `OrbeonClientTest`
-@js.native
-trait DocumentTrait extends js.Object {
-
-  def getValue(
-    controlIdOrElem : String | html.Element,
-    formElem        : js.UndefOr[html.Element] = js.undefined
-  ): js.UndefOr[String] = js.native
-
-  // Set the value of an XForms control
-  def setValue(
-    controlIdOrElem : String | html.Element,
-    newValue        : String | Double | Boolean,
-    formElem        : js.UndefOr[html.Element] = js.undefined
-  ): Unit = js.native
-
-  def focus(
-    controlIdOrElem : String | html.Element,
-    formElem        : js.UndefOr[html.Element] = js.undefined
-  ): Unit = js.native
-
-}
 
 @js.native
 trait InitTrait extends js.Object {
@@ -57,15 +35,9 @@ trait InitTrait extends js.Object {
 @JSGlobal("ORBEON.xforms.Init")
 object Init extends InitTrait
 
-// For `OrbeonClientTest`
-@js.native
-trait AjaxServerTrait extends js.Object {
-  def allEventsProcessedP(): js.Promise[Unit] = js.native
-}
-
 @js.native
 @JSGlobal("ORBEON.xforms.AjaxServerResponse")
-object AjaxServer extends AjaxServerTrait {
+object AjaxServer extends js.Object {
   def handleResponseDom(
     responseXML  : dom.Document,
     formId       : String,

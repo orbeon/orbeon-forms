@@ -275,12 +275,9 @@ object XFormsUI {
       scribe.error(s"Got value from server for element with class: ${documentElement.getAttribute("class")}")
     } else {
 
-      // This must be done before `ServerValueStore.set()`~
       val normalizedPreviousServerValueOpt = Option(ServerValueStore.get(controlId)).map(_.normalizeSerializedHtml)
-
+      val normalizedNewControlValue        = newControlValue.normalizeSerializedHtml
       ServerValueStore.set(controlId, newControlValue)
-
-      val normalizedNewControlValue = newControlValue.normalizeSerializedHtml
 
       if (containsAnyOf(documentElement, HandleValueOutputOnlyControls))
         Controls.setCurrentValue(documentElement, normalizedNewControlValue, force = false)

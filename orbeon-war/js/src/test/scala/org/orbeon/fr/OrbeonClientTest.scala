@@ -15,8 +15,9 @@ package org.orbeon.fr
 
 import org.orbeon.fr.DockerSupport._
 import org.orbeon.oxf.util.FutureUtils._
-import org.orbeon.xforms.facade.AjaxServerTrait
-import org.orbeon.xforms.{InitSupport, facade}
+import org.orbeon.web
+import org.scalajs.dom.html
+
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
 import org.scalajs.dom.raw.Window
@@ -41,6 +42,27 @@ object NodeFetch extends js.Function2[RequestInfo, RequestInit, js.Promise[Respo
   def apply(arg1: RequestInfo, arg2: RequestInit): js.Promise[Response] = js.native
 }
 
+@js.native
+trait DocumentTrait extends js.Object {
+
+  def getValue(
+    controlIdOrElem : String | html.Element,
+    formElem        : js.UndefOr[html.Element] = js.undefined
+  ): js.UndefOr[String] = js.native
+
+  // Set the value of an XForms control
+  def setValue(
+    controlIdOrElem : String | html.Element,
+    newValue        : String | Double | Boolean,
+    formElem        : js.UndefOr[html.Element] = js.undefined
+  ): Unit = js.native
+}
+
+@js.native
+trait AjaxServerTrait extends js.Object {
+  def allEventsProcessedP(): js.Promise[Unit] = js.native
+}
+
 class OrbeonClientTest extends AsyncFunSpec {
 
   val Server1ExternalPort = 8888
@@ -59,7 +81,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
   val CookieTimeout       = 60.seconds
 
-  case class OrbeonWindow(window: Window, documentAPI: facade.DocumentTrait, ajaxServer: AjaxServerTrait)
+  case class OrbeonWindow(window: Window, documentAPI: DocumentTrait, ajaxServer: AjaxServerTrait)
 
   object OrbeonWindow {
     def apply(window: Window): OrbeonWindow = {
@@ -68,7 +90,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
       OrbeonWindow(
         window       = window,
-        documentAPI  = ORBEON.xforms.Document.asInstanceOf[facade.DocumentTrait],
+        documentAPI  = ORBEON.xforms.Document.asInstanceOf[DocumentTrait],
         ajaxServer   = ORBEON.xforms.AjaxClient.asInstanceOf[AjaxServerTrait]
       )
     }
@@ -181,7 +203,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
     for {
       jsdom <- JSDOM.fromURL(urlToLoad, options).toFuture
-      _     <- InitSupport.atLeastDomInteractiveF(jsdom.window.document)
+      _     <- web.DomSupport.atLeastDomInteractiveF(jsdom.window.document)
       if jsdom.window.document.querySelector(".orbeon") ne null // this will throw if not satisfied
     } yield
       jsdom.window

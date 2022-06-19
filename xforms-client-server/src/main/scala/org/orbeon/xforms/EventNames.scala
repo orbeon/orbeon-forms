@@ -34,23 +34,15 @@ object EventNames {
 
   val XFormsFocus              = "xforms-focus"
 
-  val Change                   = "change"
-  val KeyPress                 = "keypress"
-  val KeyDown                  = "keydown"
-  val KeyUp                    = "keyup"
-  val TouchStart               = "touchstart"
-  val FocusIn                  = "focusin"
-  val FocusOut                 = "focusout"
-  val DOMContentLoaded         = "DOMContentLoaded"
-  val DOMActivate              = "DOMActivate"
-
   val KeyTextPropertyName      = "text"
   val KeyModifiersPropertyName = "modifiers"
 
-  val InteractiveReadyState    = "interactive"
-  val CompleteReadyState       = "complete"
+  val KeyPress                 = "keypress"
+  val KeyDown                  = "keydown"
+  val KeyUp                    = "keyup"
+
+  val KeyboardEvents: Set[String] = Set(KeyPress, KeyDown, KeyUp)
 
   val EventsWithoutTargetId: Set[String] = Set(XXFormsAllEventsRequired, XXFormsServerEvents, XXFormsSessionHeartbeat)
   val EventsWithoutSequence: Set[String] = Set(XXFormsUploadProgress, XXFormsSessionHeartbeat)
-  val KeyboardEvents       : Set[String] = Set(KeyPress, KeyDown, KeyUp)
 }

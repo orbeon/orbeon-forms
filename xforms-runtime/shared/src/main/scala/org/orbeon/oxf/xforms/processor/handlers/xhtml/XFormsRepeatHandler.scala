@@ -14,11 +14,10 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import java.{lang => jl}
-
 import cats.syntax.option._
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, RepeatControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.appendWithSpace
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor, XFormsBaseHandler}
@@ -223,8 +222,8 @@ class XFormsRepeatHandler(
   }
 
   // Don't output any LHHA
-  override def handleLabel(): Unit = ()
-  override def handleHint() : Unit = ()
-  override def handleAlert(): Unit = ()
-  override def handleHelp() : Unit = ()
+  override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = ()
+  override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = ()
+  override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = ()
+  override def handleHelp(lhhaAnalysis: LHHAAnalysis) : Unit = ()
 }

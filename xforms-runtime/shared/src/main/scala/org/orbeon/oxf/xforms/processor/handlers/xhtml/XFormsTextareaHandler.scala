@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsTextareaControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
@@ -69,7 +70,7 @@ class XFormsTextareaHandler(
       if (isXFormsReadonlyButNotStaticReadonly(textareaControl))
         XFormsBaseHandlerXHTML.outputReadonlyAttribute(htmlTextareaAttributes)
 
-      XFormsBaseHandler.handleAriaAttributes(textareaControl.isRequired, textareaControl.isValid, htmlTextareaAttributes)
+      XFormsBaseHandler.handleAriaAttributes(textareaControl.isRequired, textareaControl.isValid, textareaControl.visited, htmlTextareaAttributes)
 
       // Add attribute even if the control is not concrete
       placeHolderInfo foreach { placeHolderInfo =>
@@ -100,11 +101,11 @@ class XFormsTextareaHandler(
     }
   }
 
-  protected override def handleLabel(): Unit =
+  protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
     if (! (placeHolderInfo exists (_.isLabelPlaceholder)))
-      super.handleLabel()
+      super.handleLabel(lhhaAnalysis)
 
-  protected override def handleHint(): Unit =
+  protected override def handleHint(lhhaAnalysis: LHHAAnalysis): Unit =
     if (! (placeHolderInfo exists (! _.isLabelPlaceholder)))
-      super.handleHint()
+      super.handleHint(lhhaAnalysis)
 }

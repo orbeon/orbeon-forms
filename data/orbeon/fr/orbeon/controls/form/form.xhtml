@@ -155,6 +155,7 @@
                     <title xml:lang="fr">Contrôles de formulaire</title>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
                     <updated-with-version>2020.1</updated-with-version>
+                    <updated-with-version>2022.1</updated-with-version>
                     <library-versions>
                         <orbeon>1</orbeon>
                     </library-versions>
@@ -413,7 +414,7 @@
                         </textarea-counter>
                         <output>
                             <label>Text Output</label>
-                            <hint/>
+                            <hint>Standard text output with a label</hint>
                         </output>
                         <secret>
                             <label>Password Field</label>
@@ -670,7 +671,7 @@
                         </textarea-counter>
                         <output>
                             <label>Sortie texte</label>
-                            <hint/>
+                            <hint>Sortie texte standard avec libellé</hint>
                         </output>
                         <secret>
                             <label>Mot de passe</label>
@@ -930,6 +931,8 @@
                         <fr:c y="3" x="1" w="6">
                             <xf:output bind="output-bind" id="output-control">
                                 <xf:label ref="$form-resources/output/label"/>
+                                <xf:hint ref="$form-resources/output/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:output>
                         </fr:c>
                         <fr:c y="3" x="7" w="6">

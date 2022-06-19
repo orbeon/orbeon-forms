@@ -81,11 +81,11 @@ trait ControlExtensionAttributesSupport {
       if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
     } locally {
       ControlAjaxSupport.outputAttributeElement(
-        previousControlOpt,
-        this,
-        effectiveId,
-        name.localName,
-        _.extensionAttributeValue(name).orNull
+        previousControlOpt = previousControlOpt,
+        currentControl     = this,
+        effectiveId        = effectiveId,
+        attName            = name.localName,
+        attValue           = _.extensionAttributeValue(name)
       )(ch, containingDocument)
     }
 }

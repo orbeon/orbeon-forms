@@ -68,7 +68,7 @@ class XFormsLHHAHandler(
         // In this case, we handle our own value and don't ask it to the (repeated) controls, since there might be
         // zero, one, or several of them. We also currently don't handle constraint classes.
 
-        // This duplicates code in `XFormsControlLifecyleHandler` as this handler doesn't derive from it.
+        // This duplicates code in `XFormsControlLifecycleHandler` as this handler doesn't derive from it.
         val currentControl =
           containingDocument.getControlByEffectiveId(lhhaEffectiveId) ensuring (_ ne null)
 
@@ -155,7 +155,7 @@ object XFormsLHHAHandler {
       handlerContext.pushComponentContext(targetControl.scope.scopeId)
     try
       handlerContext.controller.findHandlerFromElem(targetControl.element) match {
-        case Some(handler: XFormsControlLifecyleHandler) => handler.getForEffectiveIdWithNs
+        case Some(handler: XFormsControlLifecycleHandler) => handler.getForEffectiveIdWithNs
         case _                                           => None
       }
     finally

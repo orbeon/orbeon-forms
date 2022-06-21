@@ -37,7 +37,7 @@ class XFormsRepeatHandler(
   elementAnalysis : ElementAnalysis,
   handlerContext  : HandlerContext
 ) extends
-  XFormsControlLifecyleHandler(
+  XFormsControlLifecycleHandler(
     uri,
     localname,
     qName,
@@ -186,7 +186,7 @@ class XFormsRepeatHandler(
 
       handlerContext.controller.findFirstHandlerOrElem match {
 
-        case Some(Left(handler: XFormsControlLifecyleHandler)) =>
+        case Some(Left(handler: XFormsControlLifecycleHandler)) =>
 
           outputBeginEndDelimiters(
             localName = handler.getContainingElementName,

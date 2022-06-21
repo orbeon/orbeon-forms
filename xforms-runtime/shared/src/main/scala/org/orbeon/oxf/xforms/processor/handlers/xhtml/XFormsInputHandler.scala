@@ -45,7 +45,7 @@ class XFormsInputHandler(
   elementAnalysis : ElementAnalysis,
   handlerContext  : HandlerContext
 ) extends
-  XFormsControlLifecyleHandler(
+  XFormsControlLifecycleHandler(
     uri,
     localname,
     qName,

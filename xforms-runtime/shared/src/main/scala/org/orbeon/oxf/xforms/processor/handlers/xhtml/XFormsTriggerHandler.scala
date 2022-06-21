@@ -18,7 +18,7 @@ abstract class XFormsTriggerHandler(
   matched        : ElementAnalysis,
   handlerContext : HandlerContext
 ) extends
-  XFormsControlLifecyleHandler(
+  XFormsControlLifecycleHandler(
     uri,
     localname,
     qName,

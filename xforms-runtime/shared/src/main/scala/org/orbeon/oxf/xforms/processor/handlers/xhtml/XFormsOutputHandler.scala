@@ -33,7 +33,7 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 
-trait XFormsOutputHandler extends XFormsControlLifecyleHandler {
+trait XFormsOutputHandler extends XFormsControlLifecycleHandler {
 
   protected def getContainerAttributes(
     effectiveId   : String,
@@ -57,7 +57,7 @@ class XFormsOutputDefaultHandler(
   elementAnalysis : ElementAnalysis,
   handlerContext  : HandlerContext
 ) extends
-  XFormsControlLifecyleHandler(
+  XFormsControlLifecycleHandler(
     uri,
     localname,
     qName,
@@ -133,7 +133,7 @@ class XFormsOutputHTMLHandler(
   localAtts      : Attributes,
   matched        : ElementAnalysis,
   handlerContext : HandlerContext
-) extends XFormsControlLifecyleHandler(
+) extends XFormsControlLifecycleHandler(
   uri,
   localname,
   qName,
@@ -177,7 +177,7 @@ class XFormsOutputImageHandler(
   localAtts      : Attributes,
   matched        : ElementAnalysis,
   handlerContext : HandlerContext
-) extends XFormsControlLifecyleHandler(
+) extends XFormsControlLifecycleHandler(
   uri,
   localname,
   qName,
@@ -221,7 +221,7 @@ class XFormsOutputTextHandler(
   localAtts      : Attributes,
   matched        : ElementAnalysis,
   handlerContext : HandlerContext
-) extends XFormsControlLifecyleHandler(
+) extends XFormsControlLifecycleHandler(
   uri,
   localname,
   qName,
@@ -254,7 +254,7 @@ class XFormsOutputDownloadHandler(
   localAtts      : Attributes,
   matched        : ElementAnalysis,
   handlerContext : HandlerContext
-) extends XFormsControlLifecyleHandler(
+) extends XFormsControlLifecycleHandler(
   uri,
   localname,
   qName,

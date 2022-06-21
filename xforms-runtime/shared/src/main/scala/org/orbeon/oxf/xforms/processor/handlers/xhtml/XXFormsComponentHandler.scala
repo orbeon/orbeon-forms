@@ -34,7 +34,7 @@ class XXFormsComponentHandler(
   elementAnalysis : ElementAnalysis,
   handlerContext  : HandlerContext
 ) extends
-  XFormsControlLifecyleHandler(
+  XFormsControlLifecycleHandler(
     uri,
     localname,
     qName,
@@ -80,7 +80,7 @@ class XXFormsComponentHandler(
     handlerContext.popComponentContext()
 
   protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
-    if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Label)) // also implied: label is local (from `XFormsControlLifecyleHandler`)
+    if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Label)) // also implied: label is local (from `XFormsControlLifecycleHandler`)
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
         elemEffectiveIdOpt      = None,

@@ -37,7 +37,7 @@ class XFormsCaseHandler(
   elementAnalysis : ElementAnalysis,
   handlerContext  : HandlerContext
 ) extends
-  XFormsControlLifecyleHandler(
+  XFormsControlLifecycleHandler(
     uri,
     localname,
     qName,

@@ -301,7 +301,7 @@ class XFormsSelect1Handler(
   elementAnalysis : ElementAnalysis,
   handlerContext  : HandlerContext
 ) extends
-  XFormsControlLifecyleHandler(
+  XFormsControlLifecycleHandler(
     uri            = uri,
     localname      = localname,
     qName          = qName,

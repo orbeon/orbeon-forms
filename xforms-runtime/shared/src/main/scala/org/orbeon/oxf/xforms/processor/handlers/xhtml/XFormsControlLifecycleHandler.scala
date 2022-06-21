@@ -37,7 +37,7 @@ import shapeless.syntax.typeable._
   * Outputting the control is split into two parts: `handleControlStart()` and `handleControlEnd()`. In most cases, only
   * `handleControlStart()` is used, but container controls will use `handleControlEnd()`.
   */
-abstract class XFormsControlLifecyleHandler(
+abstract class XFormsControlLifecycleHandler(
   uri                 : String,
   localname           : String,
   qName               : String,

@@ -21,7 +21,7 @@ class XFormsRangeHandler(
   matched        : ElementAnalysis,
   handlerContext : HandlerContext
 ) extends
-  XFormsControlLifecyleHandler(
+  XFormsControlLifecycleHandler(
     uri,
     localname,
     qName,

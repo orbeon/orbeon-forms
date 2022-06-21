@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import cats.syntax.option._
 import java.{util => ju}
 
 import org.orbeon.oxf.common.OXFException
@@ -332,34 +331,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
       previousControl,
       hasNestedContent option outputNestedContent
     )
-
-    outputAjaxAriaByAtts(previousControl, ch)
   }
-
-  // This logic applies only when a control comes into existence
-  // 2022-06-17: It's unclear if this can happen ever! I don't see it being called in the scenarios I have tried. In
-  // addition, `previousControl` can only be `None`, I infer, in the case of new repeat iterations. However, in that
-  // case, this seems to apply only to `XFormsRepeatIterationControl` for new iterations, and that is not an
-  // `XFormsValueControl`! We need to double-check, but there is a chance that we can remove this method completely.
-  final def outputAjaxAriaByAtts(
-    previousControl : Option[XFormsValueControl],
-    ch              : XMLReceiverHelper
-  ): Unit =
-    if (previousControl.isEmpty && ! isStaticReadonly) {
-      warn(s"calling `outputAjaxAriaByAtts()` for effectiveId = `$effectiveId`")
-      for {
-        ariaByControlEffectiveId <- findAriaByControlEffectiveIdWithNs.iterator
-        (attName, attValue)      <- ControlAjaxSupport.iterateAriaByAtts(staticControlOpt.get, this)(containingDocument)
-      } locally {
-        ControlAjaxSupport.outputAttributeElement(
-          previousControlOpt = None,
-          currentControl     = this,
-          effectiveId        = ariaByControlEffectiveId,
-          attName            = attName,
-          attValue           = _ => attValue.some
-        )(ch, containingDocument)
-      }
-    }
 
   // Can be overridden by subclasses
   // This is the effective id of the element which may have an `aria-labelledby`, etc. attribute. So an `<input>`, `<textarea>`,

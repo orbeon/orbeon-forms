@@ -266,11 +266,11 @@ class ControlsComparator(
         case c: XFormsValueControl =>
           // See https://github.com/orbeon/orbeon-forms/issues/2442
           val clientValueOpt   = valueChangeControlIdsAndValues.get(c.effectiveId)
-          val controlValue1Opt = control1Opt.asInstanceOf[Option[XFormsValueControl]]
-          if (! c.compareExternalMaybeClientValue(clientValueOpt, controlValue1Opt))
+          val valueControl1Opt = control1Opt.asInstanceOf[Option[XFormsValueControl]]
+          if (! c.compareExternalMaybeClientValue(clientValueOpt, valueControl1Opt))
             c.outputAjaxDiffMaybeClientValue(
               clientValueOpt,
-              controlValue1Opt
+              valueControl1Opt
             )
         case c =>
           if (! c.compareExternalMaybeClientValue(None, control1Opt))

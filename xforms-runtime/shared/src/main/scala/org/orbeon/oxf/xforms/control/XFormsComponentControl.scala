@@ -146,16 +146,13 @@ class XFormsValueComponentControl(
     previousControl : Option[XFormsValueControl],
     content         : Option[XMLReceiverHelper => Unit])(implicit
     ch              : XMLReceiverHelper
-  ): Unit = {
+  ): Unit =
     // NOTE: Don't output any nested content. The value is handled separately, see:
     // https://github.com/orbeon/orbeon-forms/issues/3909
     super.outputAjaxDiff(
       previousControl,
       None
     )
-
-    outputAjaxAriaByAtts(previousControl, ch)
-  }
 }
 
 // A component control with or without a value

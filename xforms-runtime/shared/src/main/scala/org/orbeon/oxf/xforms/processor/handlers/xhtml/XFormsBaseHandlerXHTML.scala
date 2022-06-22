@@ -234,7 +234,7 @@ abstract class XFormsBaseHandlerXHTML (
   final protected def handleLabelHintHelpAlert(
     lhhaAnalysis           : LHHAAnalysis,
     elemEffectiveIdOpt     : Option[String],
-    forEffectiveIdWithNs   : Option[String],
+    forEffectiveIdWithNsOpt: Option[String],
     requestedElementNameOpt: Option[String],
     controlOrNull          : XFormsControl,
     isExternal             : Boolean // if `true` adds contraint classes, `id` on labels, and don't add LHHA suffix to ids
@@ -323,7 +323,7 @@ abstract class XFormsBaseHandlerXHTML (
         handlerContext           = handlerContext,
         attributes               = attributes,
         labelEffectiveIdOpt      = elemEffectiveIdOpt,
-        forEffectiveIdWithNs     = forEffectiveIdWithNs,
+        forEffectiveIdWithNs     = forEffectiveIdWithNsOpt,
         lhha                     = lhha,
         elementName              = elementName,
         labelValue               = labelHintHelpAlertValue,

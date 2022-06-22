@@ -127,7 +127,7 @@ abstract class XFormsControlLifecycleHandler(
     handleLabelHintHelpAlert(
       lhhaAnalysis            = lhhaAnalysis,
       elemEffectiveIdOpt      = None,
-      forEffectiveIdWithNs    = getForEffectiveIdWithNs,
+      forEffectiveIdWithNsOpt = getForEffectiveIdWithNs,
       requestedElementNameOpt = XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
       controlOrNull           = currentControl,
       isExternal              = false
@@ -138,7 +138,7 @@ abstract class XFormsControlLifecycleHandler(
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
         elemEffectiveIdOpt      = None,
-        forEffectiveIdWithNs    = None,
+        forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,
         isExternal              = false
@@ -149,7 +149,7 @@ abstract class XFormsControlLifecycleHandler(
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
         elemEffectiveIdOpt      = getEffectiveId.some,
-        forEffectiveIdWithNs    = None,
+        forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,
         isExternal              = false
@@ -160,7 +160,7 @@ abstract class XFormsControlLifecycleHandler(
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
         elemEffectiveIdOpt      = getEffectiveId.some,
-        forEffectiveIdWithNs    = None,
+        forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,
         isExternal              = false

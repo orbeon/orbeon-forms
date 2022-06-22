@@ -118,7 +118,7 @@ class XFormsLHHAHandler(
           handleLabelHintHelpAlert(
             lhhaAnalysis            = elementAnalysis,
             elemEffectiveIdOpt      = lhhaEffectiveId.some,
-            forEffectiveIdWithNs    = labelForEffectiveIdWithNsOpt,
+            forEffectiveIdWithNsOpt = labelForEffectiveIdWithNsOpt,
             requestedElementNameOpt = None,
             controlOrNull           = effectiveTargetControlOpt.orNull, // to get the value; Q: When can this be `null`?
             isExternal              = true

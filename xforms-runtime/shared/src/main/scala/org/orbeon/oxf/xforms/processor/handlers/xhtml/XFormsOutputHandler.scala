@@ -107,7 +107,7 @@ class XFormsOutputDefaultHandler(
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
         elemEffectiveIdOpt      = hasLabel option getEffectiveId, // change from default
-        forEffectiveIdWithNs    = None,
+        forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,
         isExternal              = false
@@ -118,7 +118,7 @@ class XFormsOutputDefaultHandler(
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
         elemEffectiveIdOpt      = hasLabel option getEffectiveId, // change from default
-        forEffectiveIdWithNs    = None,
+        forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,
         isExternal              = false

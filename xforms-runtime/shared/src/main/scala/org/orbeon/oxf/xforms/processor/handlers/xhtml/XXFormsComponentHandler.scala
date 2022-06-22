@@ -84,7 +84,7 @@ class XXFormsComponentHandler(
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
         elemEffectiveIdOpt      = None,
-        forEffectiveIdWithNs    = getForEffectiveIdWithNs,
+        forEffectiveIdWithNsOpt = getForEffectiveIdWithNs,
         requestedElementNameOpt = (staticControl.commonBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControl)) option "span",
         controlOrNull           = currentControl,
         isExternal              = false

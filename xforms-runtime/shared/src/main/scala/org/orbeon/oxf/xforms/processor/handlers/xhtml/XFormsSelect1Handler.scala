@@ -599,7 +599,7 @@ class XFormsSelect1Handler(
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
         elemEffectiveIdOpt      = getEffectiveId.some,
-        forEffectiveIdWithNs    = None,
+        forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = "span".some, // make element name a `span`, as a label would need a `for`
         controlOrNull           = currentControl,
         isExternal              = false

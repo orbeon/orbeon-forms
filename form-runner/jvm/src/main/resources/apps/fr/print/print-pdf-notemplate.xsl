@@ -70,6 +70,12 @@
                     size: <xsl:value-of select="string-join(($page-size, $page-orientation), ' ')"/>;
                 }
             </style>
+            <bookmarks>
+                <xsl:for-each select="//xh:h2">
+                    <xsl:variable name="button" select=".//xh:button[@class = 'btn-link']"/>
+                    <bookmark name="{$button}" href="#{$button/@id}"/>
+                </xsl:for-each>
+            </bookmarks>
         </head>
     </xsl:template>
 

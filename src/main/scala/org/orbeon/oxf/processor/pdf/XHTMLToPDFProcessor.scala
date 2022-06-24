@@ -88,9 +88,10 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
     val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
     val pdfRendererBuilder = new PdfRendererBuilder()
     pdfRendererBuilder.useFastMode();
+
     //    pdfRendererBuilder.useSlowMode();
-    //    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
-    //    pdfRendererBuilder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_A)
+    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
+    pdfRendererBuilder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_U)
 
     embedFontsConfiguredInProperties(pdfRendererBuilder)
 

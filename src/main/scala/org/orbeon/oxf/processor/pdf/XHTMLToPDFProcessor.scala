@@ -25,7 +25,11 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
+import org.w3c.dom.Document
 
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.{OutputKeys, TransformerException, TransformerFactory}
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -105,15 +109,19 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
     IOUtils.useAndClose(outputStream) { os =>
       pdfRendererBuilder.toStream(os)
+      val document = readInputAsDOM(pipelineContext, input)
+
+      val documentString = getStringFromDocument(document)
+
       pdfRendererBuilder.withW3cDocument(
-        readInputAsDOM(pipelineContext, input),
+        document,
         requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
       )
       val pdfBoxRenderer = pdfRendererBuilder.buildPdfRenderer()
 
       try {
         // set user agent callback
-        val userAgent = new CustomUserAgentOHTP(jpegCompressionLevel, pdfBoxRenderer.getOutputDevice(), pipelineContext,  pdfBoxRenderer.getSharedContext)
+        val userAgent = new CustomUserAgentOHTP(jpegCompressionLevel, pdfBoxRenderer.getOutputDevice(), pipelineContext, pdfBoxRenderer.getSharedContext)
         userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
         pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
         pdfBoxRenderer.layout()
@@ -129,5 +137,16 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
         pdfBoxRenderer.close()
       }
     }
+  }
+
+  import java.io.StringWriter
+  def getStringFromDocument(doc: Document): String = {
+    val domSource = new DOMSource(doc)
+    val writer = new StringWriter
+    val result = new StreamResult(writer)
+    val tf = TransformerFactory.newInstance
+    val transformer = tf.newTransformer
+    transformer.transform(domSource, result)
+    writer.toString
   }
 }

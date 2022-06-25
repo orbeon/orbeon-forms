@@ -269,16 +269,12 @@
     <property as="xs:string"  name="oxf.fr.detail.attachment.mediatypes.*.*"                    value="*/*"/>
 
     <!-- PDF fonts -->
-    <!-- Optional PDF font embedding. Specifying a family name is optional.
-    <property as="xs:string"  name="oxf.fr.pdf.font.path.ID"                                    value=""/>
-    <property as="xs:string"  name="oxf.fr.pdf.font.family.ID"                                  value=""/>
-    -->
-    <property as="xs:string"  name="oxf.fr.pdf.font.resource.roboto"                            value="/forms/resources/Roboto-Medium.ttf"/>
-    <property as="xs:string"  name="oxf.fr.pdf.font.family.roboto"                              value="Roboto"/>
-    <property as="xs:string" name="oxf.fr.pdf.template.font.paths"                              value=""/>
+    <property as="xs:string"  name="oxf.fr.pdf.font.family.opensans"                            value="Helvetica Neue"/>
+    <property as="xs:string"  name="oxf.fr.pdf.font.resource.opensans"                          value="/apps/fr/print/OpenSans-Regular.ttf"/>
+    <property as="xs:string"  name="oxf.fr.pdf.template.font.paths"                             value=""/>
 
     <!-- Automatic PDF JPEG compression level for image attachments that needs reencoding -->
-    <property as="xs:string" name="oxf.fr.pdf.jpeg.compression"                                 value="0.9"/>
+    <property as="xs:string"  name="oxf.fr.pdf.jpeg.compression"                                value="0.9"/>
 
     <!-- Email configuration -->
     <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                 value=""/>

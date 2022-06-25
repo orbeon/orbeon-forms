@@ -19,7 +19,8 @@
     xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+    xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -71,13 +72,28 @@
                 }
             </style>
             <bookmarks>
-                <xsl:for-each select="//xh:h2">
-                    <xsl:variable name="button" select=".//xh:button[@class = 'btn-link']"/>
-                    <bookmark name="{$button}" href="#{$button/@id}"/>
-                </xsl:for-each>
+                <xsl:copy-of select="fr:bookmarks(/*)"/>
             </bookmarks>
         </head>
     </xsl:template>
+
+    <!-- Produce nested `<bookmark>` elements for Open HTML to PDF, based on `h1`, `h2`… -->
+    <xsl:function name="fr:bookmarks">
+        <xsl:param name="element"/>
+        <xsl:variable name="header" select="$element/xh:*[matches(local-name(), 'h[0-9]')]"/>
+
+        <xsl:choose>
+            <xsl:when test="exists($header)">
+                <xsl:variable name="button" select="$header//xh:button[@class = 'btn-link']"/>
+                <bookmark name="{$button}" href="#{$button/@id}">
+                    <xsl:copy-of select="$element/*/fr:bookmarks(.)"/>
+                </bookmark>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="$element/*/fr:bookmarks(.)"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
 
     <!-- https://github.com/orbeon/orbeon-forms/issues/3096 -->
     <xsl:template

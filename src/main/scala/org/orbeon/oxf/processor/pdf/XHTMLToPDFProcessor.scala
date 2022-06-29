@@ -93,9 +93,9 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
     val pdfRendererBuilder = new PdfRendererBuilder()
     pdfRendererBuilder.useFastMode();
 
-    //    pdfRendererBuilder.useSlowMode();
-    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
-    pdfRendererBuilder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_U)
+//    pdfRendererBuilder.useSlowMode();
+//    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
+//    pdfRendererBuilder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_U)
 
     embedFontsConfiguredInProperties(pdfRendererBuilder)
 
@@ -111,6 +111,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
       pdfRendererBuilder.toStream(os)
       val document = readInputAsDOM(pipelineContext, input)
 
+      // used for debbugging. will remove later
       val documentString = getStringFromDocument(document)
 
       pdfRendererBuilder.withW3cDocument(
@@ -139,6 +140,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
     }
   }
 
+  // used for debbugging. will remove later
   import java.io.StringWriter
   def getStringFromDocument(doc: Document): String = {
     val domSource = new DOMSource(doc)

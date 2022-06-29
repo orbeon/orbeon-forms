@@ -66,8 +66,7 @@ val Slf4jVersion                  = "2.0.5"
 val HttpComponentsVersion         = "4.5.13"
 val Log4j2Version                 = "2.19.0"
 val CommonsIoVersion              = "2.11.0"
-val FlyingSaucerVersion           = "9.1.22"
-val OpenHtmlToPdfVersion          = "1.0.10" // tiz170: open html to pdf version
+val OpenHtmlToPdfVersion          = "1.0.10"
 val TinkVersion                   = "1.6.1"
 val GsonVersionForTink            = "2.9.0"
 val ProtobufJavaVersionForTink    = "3.19.6"
@@ -134,19 +133,9 @@ val CoreLibraryDependencies = Seq(
   "mysql"                       % "mysql-connector-java"            % "8.0.26"          % Test,
   "org.postgresql"              % "postgresql"                      % "42.2.24"         % Test,
   "org.seleniumhq.selenium"     % "selenium-java"                   % "3.141.59"        % Test,
-  "org.xhtmlrenderer"           % "flying-saucer-core"              % FlyingSaucerVersion excludeAll (
-    ExclusionRule(organization = "org.bouncycastle"),
-    ExclusionRule(organization = "com.lowagie")
-  ),
-  "org.xhtmlrenderer"           % "flying-saucer-pdf"               % FlyingSaucerVersion excludeAll (
-    ExclusionRule(organization = "org.bouncycastle"),
-    ExclusionRule(organization = "com.lowagie")
-  ),
-  // tizz170: open html to pdf dependencies
   "com.openhtmltopdf"           % "openhtmltopdf-core"              % OpenHtmlToPdfVersion,
   "com.openhtmltopdf"           % "openhtmltopdf-pdfbox"            % OpenHtmlToPdfVersion,
   "com.openhtmltopdf"           % "openhtmltopdf-java2d"            % OpenHtmlToPdfVersion,
-  // end
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
   "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.70", // for `openpdf`, also pulls `bcprov` and `bcpkix`
   "com.drewnoakes"              % "metadata-extractor"              % "2.18.0",

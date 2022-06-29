@@ -1,65 +1,80 @@
-/**
- * Copyright (C) 2020 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
 package org.orbeon.oxf.processor.pdf
 
-import com.lowagie.text.Image
+import com.openhtmltopdf.layout.SharedContext
+import com.openhtmltopdf.pdfboxout.{PdfBoxImage, PdfBoxOutputDevice, PdfBoxUserAgent}
+import com.openhtmltopdf.resource.ImageResource
+import com.openhtmltopdf.util.{LogMessageId, XRLog}
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.ImageSupport._
-import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, NetUtils, URLRewriterUtils}
-import org.xhtmlrenderer.layout.SharedContext
-import org.xhtmlrenderer.pdf.ITextFSImage
-import org.xhtmlrenderer.resource.ImageResource
-import org.xhtmlrenderer.swing.NaiveUserAgent
-import org.xhtmlrenderer.util.{ImageUtil, XRLog}
+import org.orbeon.oxf.util.ImageSupport.{compressJpegImage, findImageOrientation, findTransformation, transformImage}
+import org.orbeon.oxf.util.TryUtils.TryOps
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, IndentedLogger, URLRewriterUtils}
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, IOException, InputStream}
 import java.net.URI
+import java.util.Locale
+import java.util.logging.Level
 import javax.imageio.ImageIO
-import scala.collection.mutable
-import scala.util.Try
-import scala.util.control.NonFatal
-
 
 class CustomUserAgent(
-  jpegCompressionLevel     : Float,
-  pipelineContext          : PipelineContext,
-  sharedContext            : SharedContext)(implicit
-  externalContext          : ExternalContext,
-  indentedLogger           : IndentedLogger,
-  coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
-) extends NaiveUserAgent {
-
+  jpegCompressionLevel      : Float,
+  outputDevice              : PdfBoxOutputDevice,
+  pipelineContext           : PipelineContext,
+  sharedContext             : SharedContext)(implicit
+  externalContext           : ExternalContext,
+  indentedLogger            : IndentedLogger,
+  coreCrossPlatformSupport  : CoreCrossPlatformSupportTrait
+) extends PdfBoxUserAgent(outputDevice) {
   import Private._
 
-  override def getImageResource(originalUriString: String): ImageResource = {
+  override def getImageResource(uriStr: String): ImageResource = {
+    @throws[IOException]
+    def readStream(is: InputStream) = {
+      val out = new ByteArrayOutputStream(is.available)
+      val buf = new Array[Byte](10240)
+      var i = 0
 
-    def fromBase64(uriString: String): Option[Try[ImageResource]] =
-      ImageUtil.isEmbeddedBase64Image(uriString) option
-        Try(loadEmbeddedBase64ImageResource(uriString)) // always return an `ImageResource``
+      while ( {i = is.read(buf); i != -1} ) {
+        out.write(buf, 0, i)
+      }
+      out.close()
+      out.toByteArray
+    }
 
-    def fromImage(uriString: String): Try[ImageResource] =
-      Try {
-        IOUtils.useAndClose(resolveAndOpenStream(uriString)) { is =>
+    def scaleToOutputResolution(image: PdfBoxImage): Unit = {
+      val factor = sharedContext.getDotsPerPixel
+      if (factor != 1.0f) image.scale((image.getWidth * factor).toInt, (image.getHeight * factor).toInt)
+    }
 
-          val sourceStreamBytes = NetUtils.inputStreamToByteArray(is)
+    val uriResolved = resolveURI(uriStr)
+    if (uriResolved == null) {
+      XRLog.log(Level.INFO, LogMessageId.LogMessageId2Param.LOAD_URI_RESOLVER_REJECTED_LOADING_AT_URI, "image", uriStr)
+      return new ImageResource(uriStr, null)
+    }
+    var resource = _imageCache.get(uriResolved)
+    if (resource != null && resource.getImage.isInstanceOf[PdfBoxImage]) { // Make copy of PdfBoxImage so we don't stuff up the cache.
+      val original = resource.getImage.asInstanceOf[PdfBoxImage]
+      val copy = new PdfBoxImage(original.getBytes, original.getUri, original.getWidth, original.getHeight, original.getXObject)
+      return new ImageResource(resource.getImageUri, copy)
+    }
 
-          val imageBytes =
+    try {
+      IOUtils.useAndClose(openStream(uriResolved)) { is =>
+        if (uriStr.toLowerCase(Locale.US).endsWith(".pdf")) {
+          // TODO: Implement PDF AS IMAGE
+          // PdfReader reader = _outputDevice.getReader(uri);
+          // PDFAsImage image = new PDFAsImage(uri);
+          // Rectangle rect = reader.getPageSizeWithRotation(1);
+          // image.setInitialWidth(rect.getWidth() *
+          // _outputDevice.getDotsPerPoint());
+          // image.setInitialHeight(rect.getHeight() *
+          // resource = new ImageResource(uriStr, image);
+        }
+        else {
+          val sourceStreamBytes = readStream(is)
+          val imgBytes =
             findImageOrientation(new ByteArrayInputStream(sourceStreamBytes)) match {
               case Some(orientation) if orientation >= 2 && orientation <= 8 =>
 
@@ -77,42 +92,47 @@ class CustomUserAgent(
               case _ =>
                 sourceStreamBytes
             }
-
-          new ImageResource(
-            uriString,
-            new ITextFSImage(Image.getInstance(imageBytes) |!> scaleToOutputResolution)
-          )
+          val fsImage = new PdfBoxImage(imgBytes, uriStr)
+          scaleToOutputResolution(fsImage)
+          outputDevice.realizeImage(fsImage)
+          resource = new ImageResource(uriResolved, fsImage)
         }
+        _imageCache.put(uriResolved, resource)
+
       }
-
-    // Not sure why this cloning is needed (was from original code)
-    def maybeClone(resource: ImageResource): ImageResource =
-      resource.getImage match {
-        case iTextFsImage: ITextFSImage => new ImageResource(resource.getImageUri, iTextFsImage.clone().asInstanceOf[ITextFSImage])
-        case _                          => resource
-      }
-
-    def createImageResource(originalUriString: String, resolvedUriString: String): ImageResource = {
-
-      val localUriString =
-        FileItemSupport.inputStreamToAnyURI(
-          resolveAndOpenStream(resolvedUriString),
-          ExpirationScope.Request
-        )._1.toString
-
-      indentedLogger.logDebug("pdf", "getting image resource", "url", originalUriString, "local", localUriString)
-
-      fromBase64(localUriString)  getOrElse
-        fromImage(localUriString) map
-        maybeClone                getOrElse
-        new ImageResource(originalUriString, null) // for some reason, we return a "null" image resource
+    } catch {
+      case e: Exception =>
+        XRLog.log(Level.WARNING, LogMessageId.LogMessageId1Param.EXCEPTION_CANT_READ_IMAGE_FILE_FOR_URI, uriStr, e)
     }
 
-    val resolvedUriString = resolveURI(originalUriString)
-    localImageCache.getOrElseUpdate(
-      resolvedUriString,
-      createImageResource(originalUriString, resolvedUriString)
-    )
+    if (resource != null) resource = new ImageResource(resource.getImageUri, resource.getImage)
+    else resource = new ImageResource(uriStr, null)
+
+    resource
+  }
+
+  override def resolveURI(uri: String): String = {
+
+    // All resources we care about here are resource URLs. The PDF pipeline makes sure that the servlet
+    // URL rewriter processes the XHTML output to rewrite resource URLs to absolute paths, including
+    // the servlet context and version number if needed. In addition, CSS resources must either use
+    // relative paths when pointing to other CSS files or images, or go through the XForms CSS rewriter,
+    // which also generates absolute paths.
+    // So all we need to do here is rewrite the resulting path to an absolute URL.
+    // NOTE: We used to call rewriteResourceURL() here as the PDF pipeline did not do URL rewriting.
+    // However this caused issues, for example resources like background images referred by CSS files
+    // could be rewritten twice: once by the XForms resource rewriter, and a second time here.
+    indentedLogger.logDebug("pdf", "before resolving URL", "url", uri)
+
+    val resolved =
+      URLRewriterUtils.rewriteServiceURL(
+        requestOpt.orNull,
+        uri,
+        UrlRewriteMode.AbsoluteNoContext
+      )
+
+    indentedLogger.logDebug("pdf", "after resolving URL", "url", resolved)
+    resolved
   }
 
   // Called by:
@@ -120,7 +140,7 @@ class CustomUserAgent(
   // - getImageResource below
   // - getBinaryResource (not sure when called)
   // - getXMLResource (not sure when called)
-  override protected def resolveAndOpenStream(uri: String): InputStream = {
+  override protected def openStream(uri: String): InputStream = {
 
     val resolvedURI = resolveURI(uri)
 
@@ -159,62 +179,8 @@ class CustomUserAgent(
     } get
   }
 
-  // Called for:
-  //
-  // - CSS URLs
-  // - image URLs
-  // - link clicked / form submission (not relevant for our usage)
-  // - resolveAndOpenStream below
-  override def resolveURI(uri: String): String = {
-
-    // All resources we care about here are resource URLs. The PDF pipeline makes sure that the servlet
-    // URL rewriter processes the XHTML output to rewrite resource URLs to absolute paths, including
-    // the servlet context and version number if needed. In addition, CSS resources must either use
-    // relative paths when pointing to other CSS files or images, or go through the XForms CSS rewriter,
-    // which also generates absolute paths.
-    // So all we need to do here is rewrite the resulting path to an absolute URL.
-    // NOTE: We used to call rewriteResourceURL() here as the PDF pipeline did not do URL rewriting.
-    // However this caused issues, for example resources like background images referred by CSS files
-    // could be rewritten twice: once by the XForms resource rewriter, and a second time here.
-    indentedLogger.logDebug("pdf", "before resolving URL", "url", uri)
-
-    val resolved =
-      URLRewriterUtils.rewriteServiceURL(
-        requestOpt.orNull,
-        uri,
-        UrlRewriteMode.AbsoluteNoContext
-      )
-
-    indentedLogger.logDebug("pdf", "after resolving URL", "url", resolved)
-    resolved
-  }
-
   private object Private {
 
     val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
-
-    // See https://github.com/orbeon/orbeon-forms/issues/1996
-    // Use our own local cache (`NaiveUserAgent` has one too) so that we can cache against the absolute URL
-    // yet pass a local URL to `super.getImageResource()`. This doesn't live beyond the production of this
-    // PDF as the user agent instance is created each time.
-    val localImageCache: mutable.Map[String, ImageResource] = mutable.HashMap()
-
-    def loadEmbeddedBase64ImageResource(uri: String): ImageResource =
-      try {
-        val buffer = ImageUtil.getEmbeddedBase64Image(uri)
-        val image = Image.getInstance(buffer)
-        scaleToOutputResolution(image)
-        new ImageResource(null, new ITextFSImage(image))
-      } catch {
-        case NonFatal(t) =>
-          XRLog.exception(s"Can't read XHTML embedded image.", t)
-          new ImageResource(null, null)
-      }
-
-    def scaleToOutputResolution(image: com.lowagie.text.Image): Unit = {
-      val factor = sharedContext.getDotsPerPixel
-      if (factor != 1.0f)
-        image.scaleAbsolute(image.getPlainWidth * factor, image.getPlainHeight * factor)
-    }
   }
 }

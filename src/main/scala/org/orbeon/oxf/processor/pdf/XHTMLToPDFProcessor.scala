@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.pdf
 
 import java.io.{File, OutputStream}
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
+import com.openhtmltopdf.util.XRLog
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -88,6 +89,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
     val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
     val pdfRendererBuilder = new PdfRendererBuilder()
+    XRLog.listRegisteredLoggers.forEach((logger) => XRLog.setLoggingEnabled(false)) // disbale logging
     pdfRendererBuilder.useFastMode();
 
 //    pdfRendererBuilder.useSlowMode();

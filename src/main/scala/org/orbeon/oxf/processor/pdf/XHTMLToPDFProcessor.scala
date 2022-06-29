@@ -43,13 +43,10 @@ private object XHTMLToPDFProcessor {
   val DefaultDotsPerPixel = 14
 
   def embedFontsConfiguredInProperties(pdfRendererBuilder: PdfRendererBuilder): Unit = {
-    // tiz170: get global properties
     val props = Properties.instance.getPropertySet
 
     for {
-      // tiz170: concatenate two lists into one list
       propName  <- props.propertiesStartsWith("oxf.fr.pdf.font.path") ++ props.propertiesStartsWith("oxf.fr.pdf.font.resource")
-      // tiz170: path is Option type which means it's either a String or None
       path      <- props.getNonBlankString(propName)
       _ :: _ :: _ :: _ :: pathOrResource :: name :: Nil = propName.splitTo[List](".")
     } {
@@ -122,7 +119,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
       try {
         // set user agent callback
-        val userAgent = new CustomUserAgentOHTP(jpegCompressionLevel, pdfBoxRenderer.getOutputDevice(), pipelineContext, pdfBoxRenderer.getSharedContext)
+        val userAgent = new CustomUserAgent(jpegCompressionLevel, pdfBoxRenderer.getOutputDevice(), pipelineContext, pdfBoxRenderer.getSharedContext)
         userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
         pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
         pdfBoxRenderer.layout()

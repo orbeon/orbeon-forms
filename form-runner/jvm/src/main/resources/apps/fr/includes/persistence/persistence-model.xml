@@ -800,6 +800,11 @@
                     else
                         $format-migrated
                 "/>
+
+        <xf:message level="xxf:log-debug">Rebuild/recalculate after loading doc</xf:message>
+        <xf:rebuild     model="fr-form-model"/>
+        <xf:recalculate model="fr-form-model"/>
+
     </xf:action>
 
     <xf:action

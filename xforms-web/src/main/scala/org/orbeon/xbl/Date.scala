@@ -57,9 +57,19 @@ private class DateCompanion extends XBLCompanionWithState {
     updateReadonly(isReadonly)
 
     if (iOS) {
+
       // On iOS, use native date picker
       inputEl.attr("type", "date")
       EventSupport.addListener(inputEl(0), DomEventNames.Change, (_: dom.raw.Event) => onDateSelectedUpdateStateAndSendValueToServer())
+
+      // Get around iOS bug where a touch shows the date picker even when the input is marked as readonly
+      EventSupport.addListener(inputEl(0), DomEventNames.TouchStart, (event: dom.raw.Event) => {
+        val targetInput = event.target.asInstanceOf[dom.html.Input]
+        val isReadonly  = targetInput.readOnly
+        if (isReadonly)
+          event.preventDefault()
+      })
+
     } else {
       createDatePicker(dateExternalValue = None)
     }

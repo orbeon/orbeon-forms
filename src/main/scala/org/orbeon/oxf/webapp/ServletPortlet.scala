@@ -20,9 +20,11 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.externalcontext.{WebAppContext, WebAppExternalContext}
 import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
-import org.orbeon.oxf.util.CollectionUtils._
 
 import scala.util.control.NonFatal
+
+import scala.collection.compat._
+
 
 // Servlet/portlet helper for processor definitions and services
 trait ServletPortlet {

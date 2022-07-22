@@ -13,15 +13,16 @@
  */
 package org.orbeon.saxon.function
 
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, DependsOnContextItemIfSingleArgumentMissing}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{BooleanValue, StringValue, Value}
-import org.orbeon.saxon.{Configuration, MapFunctions}
+import org.orbeon.saxon.MapFunctions
 import org.orbeon.scaxon.Implicits._
+
+import scala.collection.compat._
 
 
 class IsBlank extends DefaultFunctionSupport with DependsOnContextItemIfSingleArgumentMissing {

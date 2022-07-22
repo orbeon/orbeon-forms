@@ -24,7 +24,6 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.CollectionUtils.{collectByErasedType, _}
 import org.orbeon.oxf.util.Multipart.UploadItem
 import org.orbeon.oxf.util.SLF4JLogging._
 import org.orbeon.oxf.util.StringUtils._
@@ -44,6 +43,8 @@ import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
+
+import scala.collection.compat._
 
 
 object UploaderServer {

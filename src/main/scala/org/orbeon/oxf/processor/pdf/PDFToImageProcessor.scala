@@ -29,11 +29,11 @@ import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.pdf.fop.JAIMonochromeBitmapConverter
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.XMLReceiver
 
+import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
 

@@ -18,6 +18,8 @@ import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
+import scala.collection.compat._
+
 
 object FRComponentParamSupport {
 

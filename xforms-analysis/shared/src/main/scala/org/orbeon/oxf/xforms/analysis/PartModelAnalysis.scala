@@ -17,7 +17,9 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.analysis.model.{Instance, Model}
 import org.orbeon.xforms.xbl.Scope
 
+import scala.collection.compat._
 import scala.collection.mutable
+
 
 // Part analysis: models and instances information
 trait PartModelAnalysis extends TransientState {

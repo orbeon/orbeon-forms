@@ -17,7 +17,6 @@ import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.library.FRComponentParamSupport
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.xforms.NodeInfoFactory._
@@ -39,6 +38,7 @@ import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.analysis.model.ValidationLevel
 
 import scala.annotation.tailrec
+import scala.collection.compat._
 import scala.collection.Searching._
 import scala.collection.SeqLike
 import scala.collection.generic.IsSeqLike

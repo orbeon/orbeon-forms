@@ -21,7 +21,6 @@ import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.dom.saxon.OrbeonDOMObjectModel
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StaticXPath.{CompiledExpression, GlobalDocumentNumberAllocator}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
@@ -41,6 +40,9 @@ import org.xml.sax.{InputSource, XMLReader}
 
 import scala.util.Try
 import scala.util.control.NonFatal
+
+import scala.collection.compat._
+
 
 object XPath extends XPathTrait {
 

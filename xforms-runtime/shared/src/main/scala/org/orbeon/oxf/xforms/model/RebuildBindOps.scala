@@ -13,11 +13,11 @@
   */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.saxon.om
 
-import scala.jdk.CollectionConverters._
+import scala.collection.compat._
 import scala.collection.{mutable => m}
+
 
 trait RebuildBindOps {
 

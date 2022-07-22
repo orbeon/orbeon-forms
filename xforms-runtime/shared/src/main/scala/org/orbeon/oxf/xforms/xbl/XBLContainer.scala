@@ -34,6 +34,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xml.NamespaceMapping
 import shapeless.syntax.typeable.typeableOps
 
+import scala.collection.compat._
 import scala.collection.{immutable, mutable}
 
 /**

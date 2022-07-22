@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.model.RuntimeBind
 import org.orbeon.oxf.xml.DependsOnContextItem
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
+
+import scala.collection.compat._
 
 
 class Bind extends XFormsFunction with DependsOnContextItem {

@@ -35,6 +35,7 @@ import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import shapeless.syntax.typeable._
 
+import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
 

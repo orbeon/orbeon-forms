@@ -4,7 +4,6 @@ import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{MessageFormatter, MessageFormatCache, XPathCache}
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
@@ -28,6 +27,8 @@ import org.orbeon.saxon.om.{SequenceTool, StandardNames}
 import org.orbeon.saxon.value.{AtomicValue, QNameValue, StringValue}
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
+
+import scala.collection.compat._
 
 import scala.jdk.CollectionConverters._
 

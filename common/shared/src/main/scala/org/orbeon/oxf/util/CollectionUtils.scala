@@ -39,11 +39,10 @@ object CollectionUtils {
 
   // Extensions on Iterator[T]
   implicit class IteratorWrapper[T](private val i: Iterator[T]) extends AnyVal {
-    def nextOption(): Option[T] = i.hasNext option i.next()
     def lastOption(): Option[T] = {
-      var n = nextOption()
+      var n = i.nextOption()
       while (n.isDefined) {
-        val nextN = nextOption()
+        val nextN = i.nextOption()
         if (nextN.isEmpty)
           return n
         n = nextN

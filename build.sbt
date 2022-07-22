@@ -871,7 +871,7 @@ lazy val xformsJS = xforms.js
       "be.doeraene"       %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
       "com.beachape"      %%% "enumeratum"       % EnumeratumVersion,
       "com.beachape"      %%% "enumeratum-circe" % EnumeratumCirceVersion,
-      "io.github.cquiroz" %%% "scala-java-time " % ScalaJsTimeVersion
+      "io.github.cquiroz" %%% "scala-java-time"  % ScalaJsTimeVersion
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(

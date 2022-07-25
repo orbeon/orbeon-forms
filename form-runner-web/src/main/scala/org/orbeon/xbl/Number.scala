@@ -201,8 +201,8 @@ object Number {
 
           stateOpt foreach { state =>
             val newValue =
-                if (hasFocus) state.editValue
-                else          state.displayValue
+              if (hasFocus) state.editValue
+              else          state.displayValue
             writeValue(visibleInputElem, state.decimalSeparator, newValue)
           }
         }

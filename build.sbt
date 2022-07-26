@@ -33,8 +33,6 @@ val XercesVersion                    = "2.11.0.11-SNAPSHOT"
 val SaxVersion                       = "2.0.2.8-SNAPSHOT"
 val ScalaJsDomVersion                = "1.2.0"
 val ScalaJsJQueryVersion             = "0.9.6"
-val ScribeVersion                    = "2.8.6"
-val PerfolationVersion               = "1.2.8"
 val ScalaJsStubsVersion              = "1.1.0" // can be different from Scala.js version
 val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
 val ScalaJsTimeVersion               = "2.4.0"
@@ -460,7 +458,7 @@ lazy val assetsSettings = Seq(
   }
 )
 
-// This project contains utilities with no dependencies. It is mostly cross-JS/JVM platforms, with
+// This project contains utilities with few dependencies. It is mostly cross-JS/JVM platforms, with
 // a few exceptions that are JS- or JVM-only. `common` is not a good name. On the other hand,
 // `utils` is also very general. Can we find something more telling?
 lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Full) in file("common"))
@@ -824,8 +822,6 @@ lazy val xforms = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
     name := "orbeon-xforms",
 
     libraryDependencies += "com.lihaoyi" %%% "autowire"    % AutowireVersion,
-    libraryDependencies += "com.outr"    %%% "scribe"      % ScribeVersion,
-    libraryDependencies += "com.outr"    %%% "perfolation" % PerfolationVersion, // to avoid dependency on `scala-java-locales`
 
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
@@ -1049,7 +1045,6 @@ lazy val xformsRuntimeJS = xformsRuntime.js
     )
   )
 
-
 lazy val xformsWeb = (project in file("xforms-web"))
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings)
@@ -1071,8 +1066,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "com.lihaoyi"            %%% "autowire"         % AutowireVersion,
       "com.lihaoyi"            %%% "scalatags"        % ScalatagsVersion,
       "org.scala-lang.modules" %%% "scala-xml"        % ScalaXmlVersion,
-      "com.outr"               %%% "scribe"           % ScribeVersion,
-      "com.outr"               %%% "perfolation"      % PerfolationVersion, // to avoid dependency on `scala-java-locales`
+      "org.log4s"              %%% "log4s"            % Log4sVersion,
       "org.scala-js"           %%% "scalajs-dom"      % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
       "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,

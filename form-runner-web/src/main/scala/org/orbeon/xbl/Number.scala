@@ -13,7 +13,9 @@
   */
 package org.orbeon.xbl
 
+import org.log4s.Logger
 import org.orbeon.oxf.util.CoreUtils.PipeOps
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, Constants}
@@ -28,6 +30,8 @@ import scala.scalajs.js.timers
 
 
 object Number {
+
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Number")
 
   XBL.declareCompanion(
     "fr|number",
@@ -58,7 +62,7 @@ object Number {
 
       override def init(): Unit = {
 
-        scribe.debug("init")
+        logger.debug("init")
 
         val visibleInputElem = $(containerElem).find(".xbl-fr-number-visible-input")(0).asInstanceOf[html.Input]
         companion.visibleInputElemOpt = Some(visibleInputElem)
@@ -67,7 +71,7 @@ object Number {
         $(visibleInputElem).on(s"${DomEventNames.TouchStart}$ListenerSuffix ${DomEventNames.FocusIn}$ListenerSuffix", {
           (bound: html.Element, e: JQueryEventObject) => {
 
-            scribe.debug(s"reacting to event ${e.`type`}")
+            logger.debug(s"reacting to event ${e.`type`}")
 
             // Don't set value if not needed, so not to unnecessarily disturb the cursor position
             stateOpt foreach { state =>
@@ -84,7 +88,7 @@ object Number {
         $(visibleInputElem).on(s"${DomEventNames.FocusOut}$ListenerSuffix", {
           (bound: html.Element, e: JQueryEventObject) => {
 
-            scribe.debug(s"reacting to event ${e.`type`}")
+            logger.debug(s"reacting to event ${e.`type`}")
 
             updateStateAndSendValueToServer()
             setInputTypeIfNeeded("text")
@@ -114,7 +118,7 @@ object Number {
         $(visibleInputElem).on(s"${DomEventNames.KeyPress}$ListenerSuffix", {
           (_: html.Element, e: JQueryEventObject) => {
 
-            scribe.debug(s"reacting to event ${e.`type`}")
+            logger.debug(s"reacting to event ${e.`type`}")
 
             if (Set(10, 13)(e.which)) {
               e.preventDefault()
@@ -132,7 +136,7 @@ object Number {
 
       override def destroy(): Unit = {
 
-        scribe.debug("destroy")
+        logger.debug("destroy")
 
         visibleInputElemOpt foreach { visibleInputElem =>
           $(visibleInputElem).off()
@@ -141,7 +145,7 @@ object Number {
       }
 
       override def xformsUpdateReadonly(readonly: Boolean): Unit = {
-        scribe.debug(s"xformsUpdateReadonly: $readonly")
+        logger.debug(s"xformsUpdateReadonly: $readonly")
         updateReadonly(readonly)
       }
 
@@ -149,7 +153,7 @@ object Number {
 
         val NumberExternalValue(displayValue, editValue, decimalSeparator) = newState
 
-        scribe.debug(s"updateWithServerValues: `$displayValue`, `$editValue`, `$decimalSeparator`")
+        logger.debug(s"updateWithServerValues: `$displayValue`, `$editValue`, `$decimalSeparator`")
 
         updateVisibleValue()
 
@@ -159,7 +163,7 @@ object Number {
       }
 
       override def xformsFocus(): Unit = {
-        scribe.debug(s"xformsFocus")
+        logger.debug(s"xformsFocus")
         companion.visibleInputElemOpt foreach (_.focus())
       }
 

@@ -14,6 +14,8 @@
 package org.orbeon.xbl
 
 import io.circe.{Decoder, Encoder, parser}
+import org.log4s.Logger
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.DocumentAPI
 import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.jquery.JQueryPromise
@@ -22,8 +24,13 @@ import scala.scalajs.js
 import scala.scalajs.js.|
 import scala.util.{Failure, Success, Try}
 
+object XBLCompanionWithState {
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.XBLCompanionWithState")
+}
+
 abstract class XBLCompanionWithState extends XBLCompanion {
 
+  import XBLCompanionWithState._
   import io.circe.syntax._
 
   type State
@@ -46,10 +53,10 @@ abstract class XBLCompanionWithState extends XBLCompanion {
         val previousStateOpt = stateOpt
         stateOpt = Some(newState)
 
-        scribe.debug(s"previousStateOpt = `$previousStateOpt`, newState = `$newState`")
+        logger.debug(s"previousStateOpt = `$previousStateOpt`, newState = `$newState`")
         xformsUpdateState(previousStateOpt, newState)
       case Failure(t) =>
-        scribe.debug(s"error decoding value: ${t.getMessage}")
+        logger.debug(s"error decoding value: ${t.getMessage}")
     }
     js.undefined
   }
@@ -59,12 +66,12 @@ abstract class XBLCompanionWithState extends XBLCompanion {
     val mustUpdateStateAndSendValue =
       ! (stateOpt exists (state => valueFromState(state) == valueFromState(newState)))
 
-    scribe.debug(s"mustSendValue = `$mustUpdateStateAndSendValue`, stateOpt = `$stateOpt`, newState = `$newState`")
+    logger.debug(s"mustSendValue = `$mustUpdateStateAndSendValue`, stateOpt = `$stateOpt`, newState = `$newState`")
 
     if (mustUpdateStateAndSendValue) {
       stateOpt = Some(newState)
       val encodedState = encode(newState)
-      scribe.debug(s"encodedState = `$encodedState`")
+      logger.debug(s"encodedState = `$encodedState`")
       DocumentAPI.setValue(containerElem, encodedState)
     }
 

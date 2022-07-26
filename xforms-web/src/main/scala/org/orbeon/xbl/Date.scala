@@ -14,7 +14,9 @@
 package org.orbeon.xbl
 
 import cats.syntax.option._
+import org.log4s.Logger
 import org.orbeon.date.JSDateUtils
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
 import org.orbeon.xbl.DatePickerFacade._
@@ -29,6 +31,7 @@ import scala.scalajs.js.JSConverters._
 
 
 object Date {
+  val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Date")
   XBL.declareCompanion("fr|date", new DateCompanion)
 }
 
@@ -36,6 +39,7 @@ private class DateCompanion extends XBLCompanionWithState {
 
   companion =>
 
+  import Date._
   import io.circe.generic.auto._
   import io.circe.{Decoder, Encoder}
 
@@ -50,7 +54,7 @@ private class DateCompanion extends XBLCompanionWithState {
 
   override def init(): Unit = {
 
-    scribe.debug("init")
+    logger.debug("init")
 
     // Add `readonly` attribute on the input if the control is readonly
     val isReadonly = containerElem.classList.contains("xforms-readonly")
@@ -77,7 +81,7 @@ private class DateCompanion extends XBLCompanionWithState {
 
   override def destroy(): Unit = {
 
-    scribe.debug("destroy")
+    logger.debug("destroy")
 
     if (iOS) {
       EventSupport.clearAllListeners()
@@ -92,7 +96,7 @@ private class DateCompanion extends XBLCompanionWithState {
 
     val DateExternalValue(newValue, newFormat, newExcludedDates, newWeekStart) = newState
 
-    scribe.debug(s"updateWithServerValues: `$newValue`, `$newFormat`, `$newExcludedDates`, `$newWeekStart`")
+    logger.debug(s"updateWithServerValues: `$newValue`, `$newFormat`, `$newExcludedDates`, `$newWeekStart`")
 
     if (iOS) {
       if (! (previousStateOpt map (_.value) contains newValue))
@@ -117,7 +121,7 @@ private class DateCompanion extends XBLCompanionWithState {
 
   private def createDatePicker(dateExternalValue: Option[DateExternalValue]): Unit = {
 
-    scribe.debug(s"createDatePicker: `$dateExternalValue`")
+    logger.debug(s"createDatePicker: `$dateExternalValue`")
 
     val options =  {
       val opts = new DatePickerOptions

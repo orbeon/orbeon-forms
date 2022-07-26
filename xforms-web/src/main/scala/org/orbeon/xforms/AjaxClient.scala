@@ -15,9 +15,11 @@ package org.orbeon.xforms
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
+import org.log4s.Logger
 import org.orbeon.liferay.LiferaySupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Events, Properties}
 import org.scalajs.dom
@@ -38,6 +40,8 @@ import scala.scalajs.js.timers
 
 @JSExportTopLevel("OrbeonAjaxClient")
 object AjaxClient {
+
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.AjaxClient")
 
   import Private._
 
@@ -309,7 +313,7 @@ object AjaxClient {
 
     def callbackF[T](cb: CallbackList[T], forCurrentEventQueue: Boolean, debugName: String): Future[T] = {
 
-      scribe.debug(s"creating callback future for `$debugName`")
+      logger.debug(s"creating callback future for `$debugName`")
 
       val result = Promise[T]()
 
@@ -319,11 +323,11 @@ object AjaxClient {
       lazy val callback: T => Unit =
         (v: T) => {
           if (skipNext) {
-            scribe.debug(s"skipping callback future until next for `$debugName`")
+            logger.debug(s"skipping callback future until next for `$debugName`")
             skipNext = false
           } else {
             cb.remove(callback)
-            scribe.debug(s"completing callback future for `$debugName`")
+            logger.debug(s"completing callback future for `$debugName`")
             result.success(v)
           }
         }
@@ -354,9 +358,9 @@ object AjaxClient {
           StateHandling.updateSequence(formId, requestSequence + 1)
         }
 
-        scribe.debug("before `handleResponseDom`")
+        logger.debug("before `handleResponseDom`")
         AjaxServer.handleResponseDom(responseXML, formId, ignoreErrors)
-        scribe.debug("after `handleResponseDom`")
+        logger.debug("after `handleResponseDom`")
 
         // Reset changes, as changes are included in this batch of events
         AjaxFieldChangeTracker.afterResponseProcessed()

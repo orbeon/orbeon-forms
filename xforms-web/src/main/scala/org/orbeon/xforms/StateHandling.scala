@@ -17,6 +17,8 @@ import enumeratum._
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
+import org.log4s.Logger
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom
 import org.scalajs.dom.HashChangeEvent
@@ -27,6 +29,8 @@ import scala.scalajs.js.Dictionary
 import scala.scalajs.js.annotation.JSExport
 
 object StateHandling {
+
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.StateHandling")
 
   import Private._
 
@@ -68,7 +72,7 @@ object StateHandling {
     findClientState(formId) match {
       case None =>
 
-        scribe.debug("no state found, setting initial state")
+        logger.debug("no state found, setting initial state")
 
         val uuid = initialUuid
         setInitialState(uuid)
@@ -76,7 +80,7 @@ object StateHandling {
 
       case Some(_) if BrowserUtils.getNavigationType == BrowserUtils.NavigationType.Reload =>
 
-        scribe.debug("state found upon reload, setting initial state")
+        logger.debug("state found upon reload, setting initial state")
 
         val uuid = initialUuid
         setInitialState(uuid)
@@ -84,14 +88,14 @@ object StateHandling {
 
       case Some(_) if Properties.revisitHandling.get() == "reload" =>
 
-        scribe.debug("state found with `revisitHandling` set to `reload`, reloading page")
+        logger.debug("state found with `revisitHandling` set to `reload`, reloading page")
 
         clearClientState(formId)
         StateResult.Reload
 
       case Some(state) =>
 
-        scribe.debug("state found, assuming back/forward/navigate, requesting all events")
+        logger.debug("state found, assuming back/forward/navigate, requesting all events")
 
         StateResult.Restore(state.uuid)
     }
@@ -119,10 +123,10 @@ object StateHandling {
     findRawState flatMap (_.get(formId)) flatMap { serialized =>
       decode[ClientState](serialized) match {
         case Left(_)  =>
-          scribe.debug(s"error parsing state for form `$formId` and value `$serialized`")
+          logger.debug(s"error parsing state for form `$formId` and value `$serialized`")
           None
         case Right(state) =>
-          scribe.trace(s"found state for form `$formId` and value `$state`")
+          logger.trace(s"found state for form `$formId` and value `$state`")
           Some(state)
       }
     }
@@ -132,7 +136,7 @@ object StateHandling {
     val dict       = findRawState getOrElse js.Dictionary[String]()
     val serialized = clientState.asJson.noSpaces
 
-    scribe.debug(s"updating client state for form `$formId` with value `$serialized`")
+    logger.debug(s"updating client state for form `$formId` with value `$serialized`")
 
     dict(formId) = serialized
     Private.replaceState(dict)

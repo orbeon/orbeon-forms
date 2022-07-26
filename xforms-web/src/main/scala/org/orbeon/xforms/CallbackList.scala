@@ -13,11 +13,17 @@
  */
 package org.orbeon.xforms
 
+import org.log4s.Logger
+import org.orbeon.oxf.util.LoggerFactory
+
 import scala.collection.mutable
 import scala.util.control.NonFatal
 
 
-// Minimal implementation of a callback list
+object CallbackList {
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.CallbackList")
+}
+
 class CallbackList[T] {
 
   private val fns = mutable.Queue[T => Unit]()
@@ -34,7 +40,7 @@ class CallbackList[T] {
         fn(v)
       } catch {
         case NonFatal(t) =>
-          scribe.debug(t)
+          CallbackList.logger.debug(t)("throwable caught while running `fire()`")
       }
     }
 }

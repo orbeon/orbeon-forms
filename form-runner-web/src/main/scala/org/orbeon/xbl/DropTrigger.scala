@@ -1,5 +1,7 @@
 package org.orbeon.xbl
 
+import org.log4s.Logger
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
 import org.scalajs.dom.html
@@ -10,6 +12,8 @@ import scala.scalajs.js
 
 object DropTrigger {
 
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.DropTrigger")
+
   val ListenerSuffix   = ".drop-trigger"
   val ListenerSelector = "button[data-orbeon-value], a[data-orbeon-value]"
 
@@ -18,12 +22,12 @@ object DropTrigger {
 
       override def init(): Unit = {
 
-        scribe.debug("init")
+        logger.debug("init")
 
         $(containerElem).on(s"click.$ListenerSuffix", ListenerSelector, {
           (bound: html.Element, e: JQueryEventObject) => {
 
-            scribe.debug(s"reacting to event ${e.`type`}")
+            logger.debug(s"reacting to event ${e.`type`}")
 
             AjaxClient.fireEvent(
               AjaxEvent(
@@ -42,7 +46,7 @@ object DropTrigger {
       }
 
       override def destroy(): Unit = {
-        scribe.debug("destroy")
+        logger.debug("destroy")
         $(containerElem).off(s"click.$ListenerSuffix", ListenerSelector)
       }
     }

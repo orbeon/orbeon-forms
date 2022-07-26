@@ -13,8 +13,10 @@
  */
 package org.orbeon.xforms
 
+import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
 import org.orbeon.xforms.facade.{Controls, Utils, XBL}
 import org.scalajs.dom
@@ -37,6 +39,8 @@ import scala.scalajs.js.timers.SetTimeoutHandle
 // Progressively migrate contents of xforms.js/AjaxServer.js here
 @JSExportTopLevel("OrbeonXFormsUi")
 object XFormsUI {
+
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.XFormsUI")
 
   import Private._
 
@@ -291,7 +295,7 @@ object XFormsUI {
     }
 
     if (containsAnyOf(documentElement, HandleValueIgnoredControls)) {
-      scribe.error(s"Got value from server for element with class: ${documentElement.getAttribute("class")}")
+      logger.error(s"Got value from server for element with class: ${documentElement.getAttribute("class")}")
     } else {
 
       val normalizedPreviousServerValueOpt = Option(ServerValueStore.get(controlId)).map(_.normalizeSerializedHtml)
@@ -491,7 +495,7 @@ object XFormsUI {
           // This should not happen but if it does we'd like to know about it without entirely stopping the
           // update process so we give the user a chance to recover the form. This should be generalized
           // once we have migrated `AjaxServer.js` entirely to Scala.
-          scribe.error(s"`<select>` element not found when attempting to update itemset")
+          logger.error(s"`<select>` element not found when attempting to update itemset")
       }
 
   private object Private {

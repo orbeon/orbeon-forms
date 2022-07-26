@@ -13,22 +13,26 @@
   */
 package org.orbeon.xforms
 
+import org.log4s.Logger
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.controls.Upload._
 import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
-
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 import scala.concurrent.duration._
 import scala.scalajs.js.annotation.JSExport
 
 object Upload {
 
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.AjaxClient")
+
   private val ListenerSuffix = ".orbeon.upload"
   private val ClickEvent     = s"click$ListenerSuffix"
 
-  scribe.debug("init object")
+  logger.debug("init object")
 
   Page.registerControlConstructor(() => new Upload, (e: html.Element) => e.classList.contains("xforms-upload"))
 }
@@ -47,7 +51,7 @@ class Upload {
 
     self._container = container
 
-    scribe.debug("init class")
+    logger.debug("init class")
 
     if (findDescendantElem(UploadProgressClass).isEmpty) {
 
@@ -78,7 +82,7 @@ class Upload {
   // background as soon as possible.
   @JSExport
   def change(): Unit = {
-    scribe.debug("change -> queueing")
+    logger.debug("change -> queueing")
     val files = getInput.files
     for (i <- 0 until files.length) {
       UploaderClient.uploadEventQueue.add(
@@ -98,11 +102,11 @@ class Upload {
     state match {
       case "interrupted"                     =>
         UploaderClient.cancel(doAbort = true, XXFormsUploadError)
-        scribe.debug("cancel")
+        logger.debug("cancel")
       case _ =>
         findProgressBar foreach { bar =>
           val pct = 100 * received / expected max 10
-          scribe.debug(s"update progress $pct%")
+          logger.debug(s"update progress $pct%")
           bar.style.width = s"$pct%"
         }
     }
@@ -110,7 +114,7 @@ class Upload {
   // Called by UploadServer when the upload for this control is finished.
   def uploadDone(): Unit = {
 
-    scribe.debug("done")
+    logger.debug("done")
 
     // After the file is uploaded, in general at the next Ajax response, we get the file name
     // NOTE: Not (always?) the case, see: https://github.com/orbeon/orbeon-forms/issues/2318
@@ -127,7 +131,7 @@ class Upload {
   @JSExport
   def setState(state: String): Unit = {
 
-    scribe.debug(s"setState $state")
+    logger.debug(s"setState $state")
 
     require(States(state), throw new IllegalArgumentException(s"Invalid state: `$state`"))
 
@@ -145,7 +149,7 @@ class Upload {
 
   // Clears the upload field by recreating it.
   def clear(): Unit = {
-    scribe.debug("clear")
+    logger.debug("clear")
     getInput.value = "" // this should now work from IE11 up
   }
 
@@ -159,7 +163,7 @@ class Upload {
 
   // When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
   private def cancelButtonActivated(event: JQueryEventObject): Unit = {
-    scribe.debug("cancel button activated")
+    logger.debug("cancel button activated")
     event.preventDefault()
     UploaderClient.cancel(doAbort = true, XXFormsUploadCancel)
   }

@@ -15,9 +15,11 @@ package org.orbeon.xforms
 
 import io.circe.generic.auto._
 import io.circe.parser.decode
+import org.log4s.Logger
 import org.orbeon.facades.{Bowser, Mousetrap}
 import org.orbeon.liferay._
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants._
@@ -31,6 +33,7 @@ import org.scalajs.dom.html
 
 import scala.collection.{mutable => m}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
@@ -40,6 +43,8 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 @JSExportTopLevel("OrbeonInitSupport")
 object InitSupport {
+
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.InitSupport")
 
   import Private._
 
@@ -65,24 +70,24 @@ object InitSupport {
         case Right(i) => i
       }
 
-    scribe.debug(s"initialization data is ready for form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
+    logger.debug(s"initialization data is ready for form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
 
     pageContainsFormsMarkupF foreach { _ =>
 
-      scribe.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
+      logger.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
 
       initializeForm(initializations)
       initializeHeartBeatIfNeeded()
 
       if (Page.countInitializedForms == allFormElems.size) {
-        scribe.info(s"all forms are loaded; total time for client-side web app initialization: ${System.currentTimeMillis() - initTimestampBeforeMs} ms")
+        logger.info(s"all forms are loaded; total time for client-side web app initialization: ${System.currentTimeMillis() - initTimestampBeforeMs} ms")
         scheduleOrbeonLoadedEventIfNeeded()
       }
     }
   }
 
   def liferayF: Future[Unit] = {
-    scribe.debug("checking for Liferay object")
+    logger.debug("checking for Liferay object")
     dom.window.Liferay.toOption match {
       case None          => Future.unit
       case Some(liferay) => liferay.allPortletsReadyF
@@ -109,7 +114,7 @@ object InitSupport {
   def initializeJavaScriptControlsFromSerialized(initData: String): Unit =
     decode[List[rpc.Control]](initData) match {
       case Left(e)  =>
-        scribe.error(s"error decoding serialized controls for `initializeJavaScriptControlsFromSerialized`: ${e.getMessage}")
+        logger.error(s"error decoding serialized controls for `initializeJavaScriptControlsFromSerialized`: ${e.getMessage}")
       case Right(controls) =>
         initializeJavaScriptControls(controls)
     }
@@ -118,7 +123,7 @@ object InitSupport {
   def destroyJavaScriptControlsFromSerialized(initData: String): Unit =
     decode[List[rpc.Control]](initData) match {
       case Left(e)  =>
-        scribe.error(s"error decoding serialized controls for `destroyJavaScriptControlsFromSerialized`: ${e.getMessage}")
+        logger.error(s"error decoding serialized controls for `destroyJavaScriptControlsFromSerialized`: ${e.getMessage}")
       case Right(controls) =>
         destroyJavaScriptControls(controls)
     }
@@ -270,7 +275,7 @@ object InitSupport {
           val heartBeatDelay      = Properties.sessionHeartbeatDelay.get()
           val heartBeatCheckDelay = heartBeatDelay / 10
           if (heartBeatCheckDelay > 0) {
-            scribe.debug(s"setting heartbeat check every $heartBeatCheckDelay ms")
+            logger.debug(s"setting heartbeat check every $heartBeatCheckDelay ms")
             js.timers.setInterval(heartBeatCheckDelay) {
               AjaxClient.sendHeartBeatIfNeeded(heartBeatDelay)
             }
@@ -287,7 +292,7 @@ object InitSupport {
         // method could hang with IE. That is likely no longer a relevant comment but it might still be
         // better to fire the event asynchronously, although we could maybe use a `0` delay.
         js.timers.setTimeout(Properties.internalShortDelay.get()) {
-          scribe.debug("dispatching `orbeonLoadedEvent`")
+          logger.debug("dispatching `orbeonLoadedEvent`")
           Events.orbeonLoadedEvent.fire()
         }
         orbeonLoadedEventScheduled = true

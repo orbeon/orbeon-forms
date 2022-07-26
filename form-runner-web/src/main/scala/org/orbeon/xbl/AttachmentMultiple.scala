@@ -13,7 +13,9 @@
   */
 package org.orbeon.xbl
 
+import org.log4s.Logger
 import org.orbeon.facades.Bowser
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
 import org.orbeon.xforms._
@@ -25,6 +27,8 @@ import scala.concurrent.duration._
 
 // Companion for `fr:dnd-repeat`
 object AttachmentMultiple {
+
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.AttachmentMultiple")
 
   XBL.declareCompanion(
     "fr|attachment",
@@ -43,7 +47,7 @@ object AttachmentMultiple {
 
       override def init(): Unit = {
 
-        scribe.debug("init")
+        logger.debug("init")
 
         val isStaticReadonly = uploadInputOpt.isEmpty
 
@@ -56,13 +60,13 @@ object AttachmentMultiple {
         if (! isStaticReadonly && ! companion.isMarkedReadonly && browserSupportsFileDrop) {
           registerAllListeners()
         } else if (! browserSupportsFileDrop) {
-          scribe.debug("disabling drag and drop of files for unsupported browser")
+          logger.debug("disabling drag and drop of files for unsupported browser")
           dropElem.classList.add("xforms-hidden")
         }
       }
 
       override def destroy(): Unit = {
-        scribe.debug("destroy")
+        logger.debug("destroy")
         EventSupport.clearAllListeners()
       }
 
@@ -107,7 +111,7 @@ object AttachmentMultiple {
           ev => {
             removeClass()
             if (ev.dataTransfer.types contains "Files") {
-              scribe.debug(s"${ev.`type`} with files")
+              logger.debug(s"${ev.`type`} with files")
               ev.preventDefault()
 
               val files = ev.dataTransfer.files
@@ -128,7 +132,7 @@ object AttachmentMultiple {
             ev.preventDefault() // Necessary to indicate the drop target
             // "add an entry to L consisting of the string "Files""
             if (ev.dataTransfer.types contains "Files") {
-              scribe.debug(s"${ev.`type`} with files")
+              logger.debug(s"${ev.`type`} with files")
               addClass()
             }
           }
@@ -137,7 +141,7 @@ object AttachmentMultiple {
         addListenerOnDropElem(
           DomEventNames.DragLeave, // doesn't seem like `dragexit` is a thing anymore
           ev => {
-            scribe.debug(ev.`type`)
+            logger.debug(ev.`type`)
             if (ev.target eq dropElem) {
               ev.preventDefault()
               removeClass()

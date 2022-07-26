@@ -13,6 +13,7 @@
  */
 package org.orbeon.xforms
 
+import org.log4s.log4sjs.Log4sConfig.setLoggerThreshold
 import org.orbeon.xforms.InitSupport.setupGlobalClassesIfNeeded
 import org.orbeon.xforms.rpc.{ClientServerChannel, RemoteClientServerChannel}
 import org.scalajs.dom
@@ -63,6 +64,9 @@ object XFormsApp extends App {
 
     // Public API
     xformsDyn.Document               = DocumentAPI
+
+    // Configure logging
+//    setLoggerThreshold("org.orbeon.oxf.xforms", LogLevel)
 
     // Register XBL components
     org.orbeon.xforms.Upload

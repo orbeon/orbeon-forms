@@ -15,6 +15,8 @@ package org.orbeon.xforms
 
 import cats.syntax.option._
 import io.circe.generic.auto._
+import org.log4s.Logger
+import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.facade.Controls
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEventWithoutTarget}
@@ -27,6 +29,8 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 object AjaxEvent {
+
+  private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.AjaxEvent")
 
   // This defines the order of parameters to the constructor of `AjaxServerEvent`. This must
   // be kept in this order for legacy JavaScript callers.
@@ -155,7 +159,7 @@ class AjaxEvent(args: js.Any*) extends js.Object {
   val ignoreErrors: Boolean = checkArg[Boolean]("ignoreErrors", DefaultIgnoreErrors) // used by `AjaxServer`
   val showProgress: Boolean = checkArg[Boolean]("showProgress", DefaultShowProgress) // used by `AjaxServer`
 
-  scribe.debug(toString)
+  logger.debug(toString)
 
   def toWireAjaxEvent: WireAjaxEvent =
     targetIdOpt match {

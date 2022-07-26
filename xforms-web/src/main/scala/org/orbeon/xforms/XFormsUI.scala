@@ -25,11 +25,12 @@ import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scalatags.JsDom
 import scalatags.JsDom.all._
 
+import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration._
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.scalajs.js.timers
+import scala.scalajs.js.{timers, |}
 import scala.scalajs.js.timers.SetTimeoutHandle
 
 
@@ -256,6 +257,24 @@ object XFormsUI {
       Controls.setRepeatIterationRelevance(formID, repeatId, iteration, relevant == "true")
   }
 
+  def maybeFutureToScalaFuture(promiseOrUndef: js.UndefOr[js.Promise[Unit] | JQueryPromise]): Future[Unit] = {
+
+    val promiseOrUndefDyn = promiseOrUndef.asInstanceOf[js.Dynamic]
+
+    if (isObjectWithMethod(promiseOrUndefDyn, "done")) {
+      // JQuery future or similar
+      val promise = Promise[Unit]()
+      promiseOrUndef.asInstanceOf[JQueryPromise].done((() => promise.success(())): js.Function)
+      promise.future
+    } else if (isObjectWithMethod(promiseOrUndefDyn, "then")) {
+      // JavaScript future
+      promiseOrUndef.asInstanceOf[js.Promise[Unit]].toFuture
+    } else {
+      // Not a future
+      Future(())
+    }
+  }
+
   def handleValue(
     elem                        : raw.Element,
     controlId                   : String,
@@ -328,20 +347,12 @@ object XFormsUI {
             // `setCurrentValue()` may return a jQuery `Promise` and if it does we update the server value only once it is resolved.
             // For details see https://github.com/orbeon/orbeon-forms/issues/2670.
 
-            def setServerValue(): Unit =
+            maybeFutureToScalaFuture(promiseOrUndef) foreach { _ =>
               ServerValueStore.set(
                 controlId,
                 Controls.getCurrentValue(documentElement)
               )
-
-            val promiseOrUndefDyn = promiseOrUndef.asInstanceOf[js.Dynamic]
-
-            if (isObjectWithMethod(promiseOrUndefDyn, "done"))
-              promiseOrUndef.asInstanceOf[JQueryPromise].done(setServerValue _: js.Function)
-            else if (isObjectWithMethod(promiseOrUndefDyn, "then"))
-              promiseOrUndef.asInstanceOf[js.Promise[Unit]].toFuture.foreach(_ => setServerValue())
-            else
-              setServerValue()
+            }
           }
         }
     }

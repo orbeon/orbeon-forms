@@ -985,7 +985,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             } else if (ORBEON.xforms.XBL.isComponent(control)) {
                 var instance = ORBEON.xforms.XBL.instanceForControl(control);
                 if (_.isObject(instance) && _.isFunction(instance.xformsUpdateValue)) {
-                    // Return `undefined` or a jQuery `Promise` once the value is actually set
+                    // Return `undefined` or a JavaScript or jQuery `Promise` once the value is actually set
                     result = instance.xformsUpdateValue(newControlValue);
                 }
             } else if (typeof(control.value) == "string") {

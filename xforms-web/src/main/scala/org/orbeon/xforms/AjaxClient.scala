@@ -28,6 +28,8 @@ import org.scalajs.jquery.JQueryEventObject
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
+import scala.collection.mutable
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -243,18 +245,18 @@ object AjaxClient {
 
     // Because we catch errors in JavaScript right now in AjaxServer.js, and in JavaScript any object can be thrown,
     // we receive an `AnyRef` here.
-    val message = e match {
+    val messageOrNull = e match {
       case t: Throwable => t.getMessage
-      case r => r.toString
+      case r            => r.toString
     }
 
     // Q: We used to log the JavaScript exception to the console here. In which cases can we do that? How does it help?
-    dom.console.log(ErrorMessageTitle, message)
+    dom.console.log(ErrorMessageTitle, messageOrNull)
 
-    val sb = new StringBuilder(ErrorMessageTitle)
+    val sb = new mutable.StringBuilder(ErrorMessageTitle)
 
     // We used to log `fileName` and `lineNumber` as well, but those are strictly Firefox features
-    Option(message) foreach { m =>
+    Option(messageOrNull) foreach { m =>
       sb append "<ul><li>Message: "
       sb append m
       sb append "</li></ul>"

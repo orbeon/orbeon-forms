@@ -2,13 +2,14 @@ package org.orbeon.oxf.util
 
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.appender.ConsoleAppender
-import org.apache.logging.log4j.core.config.{AbstractConfiguration, ConfigurationSource, Configurator}
+import org.apache.logging.log4j.core.config.{AbstractConfiguration, ConfigurationSource, Configurator, Reconfigurable}
 import org.apache.logging.log4j.core.layout.PatternLayout
 import org.apache.logging.log4j.{Level, LogManager}
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.resources.handler.OXFHandler
 import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.LoggerFactory.logger
 import org.orbeon.oxf.xml.{ParserConfiguration, XMLParsing}
@@ -170,9 +171,18 @@ object Log4jSupport {
     )
 
     def createLog4j1XmlConfig(cxt: LoggerContext, is: InputStream, url: URL): AbstractConfiguration =
-      new org.apache.log4j.xml.XmlConfiguration(cxt, new ConfigurationSource(is, url), 0)
+      new org.apache.log4j.xml.XmlConfiguration(cxt, new ConfigurationSource(is, url), 0) {
+        override def initializeWatchers(reconfigurable: Reconfigurable, configSource: ConfigurationSource, monitorIntervalSeconds: Int): Unit =
+          if (url.getProtocol != OXFHandler.Protocol) // https://github.com/orbeon/orbeon-forms/issues/5370
+            super.initializeWatchers(reconfigurable, configSource, monitorIntervalSeconds)
+      }
 
     def createLog4j2XmlConfig(cxt: LoggerContext, is: InputStream, url: URL): AbstractConfiguration =
-      new org.apache.logging.log4j.core.config.xml.XmlConfiguration(cxt, new ConfigurationSource(is, url))
+      new org.apache.logging.log4j.core.config.xml.XmlConfiguration(cxt, new ConfigurationSource(is, url)) {
+        // https://github.com/orbeon/orbeon-forms/issues/5370
+        override def initializeWatchers(reconfigurable: Reconfigurable, configSource: ConfigurationSource, monitorIntervalSeconds: Int): Unit =
+          if (url.getProtocol != OXFHandler.Protocol) // https://github.com/orbeon/orbeon-forms/issues/5370
+            super.initializeWatchers(reconfigurable, configSource, monitorIntervalSeconds)
+      }
   }
 }

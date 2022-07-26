@@ -145,7 +145,7 @@ object Number {
         updateReadonly(readonly)
       }
 
-      override def xformsUpdateState(previousStateOpt: Option[NumberExternalValue], newState: NumberExternalValue): Unit = {
+      def xformsUpdateState(previousStateOpt: Option[NumberExternalValue], newState: NumberExternalValue): Unit = {
 
         val NumberExternalValue(displayValue, editValue, decimalSeparator) = newState
 

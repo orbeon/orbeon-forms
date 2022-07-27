@@ -470,6 +470,11 @@
 <!--                        </xh:div>-->
                         <fr:status-icons/>
                         <fr:user-nav/>
+                        <xh:div>
+                            <xh:a href="/fr/">
+                                <xh:i class="fa fa-fw fa-th"/>
+                            </xh:a>
+                        </xh:div>
                     </xsl:variable>
 
                     <xsl:apply-templates select="$default-objects"/>

@@ -1,0 +1,60 @@
+<!--
+  Copyright (C) 2016 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding
+        id="fr-bootstrap-select1-binding"
+        element="fr|bootstrap5-select1, xf|select1[appearance ~= bootstrap5]"
+        xxbl:mode="lhha binding value selection"
+        xxbl:container="span">
+
+        <xbl:template>
+            <!-- Hidden select to hold itemset -->
+            <xf:var name="binding" value="xxf:binding('fr-bootstrap-select1-binding')"/>
+
+            <xf:select ref="$binding" appearance="xxf:internal" id="hidden-select">
+                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+            </xf:select>
+            <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
+
+                <xh:div class="dropdown">
+                    <xh:a id="menu-button" href="#" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        <xf:output value="$items[value/string() = $binding]/label/string()"/>
+                    </xh:a>
+                    <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="menu-button">
+                        <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
+                             repeat nodeset recalculations -->
+                        <xf:repeat ref="$items/value/string()">
+                            <xf:var name="value" value="."/>
+                            <xf:var name="label" value="$items[value = $value]/label/string()"/>
+
+                            <xh:li role="presentation" class="dropdown-item{if ($value = $binding) then ' disabled' else ()}">
+                                <xf:trigger appearance="minimal" role="menuitem">
+                                    <xf:label value="$label"/>
+                                    <xf:setvalue event="DOMActivate" ref="$binding" value="$value"/>
+                                </xf:trigger>
+                            </xh:li>
+                        </xf:repeat>
+                    </xh:ul>
+                </xh:div>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

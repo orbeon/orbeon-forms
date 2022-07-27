@@ -192,6 +192,7 @@
         fr:box-select
         fr:character-counter
         fr:bootstrap-select1
+        fr:bootstrap5-select1
         fr:boolean-input
         fr:yesno-input
         fr:tree-select1

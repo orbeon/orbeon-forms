@@ -487,9 +487,8 @@ object XFormsUI {
             }
           }
 
-          // IE 11 doesn't support `replaceChildren()`
-          select.innerHTML = ""
-          itemsetTree.toList.map(generateItem).map(_.render).foreach(select.appendChild)
+          // `replaceChildren()` is ok now that IE 11 support is no longer needed
+          select.replaceChildren(itemsetTree.toList.map(generateItem).map(_.render): _*)
 
         case _ =>
           // This should not happen but if it does we'd like to know about it without entirely stopping the

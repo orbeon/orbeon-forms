@@ -182,7 +182,7 @@
             -dontwarn com.google.crypto.tink.**
             -dontwarn com.google.protobuf.**
             -dontwarn org.apache.logging.log4j.core.**
-            -dontwarn org.apache.logging.log4j.util.Activator
+            -dontwarn org.apache.logging.log4j.util.**
             -dontwarn org.slf4j.ext.**
             -dontwarn org.orbeon.apache.xerces.**
             -dontwarn org.orbeon.oxf.xml.xerces.**

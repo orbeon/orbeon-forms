@@ -327,8 +327,11 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title>Form Runner Admin</title>
+        </admin>
         <home>
-            <title>Form Runner Home</title>
+            <title>Form Runner Forms</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Make Unavailable</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Make Available</publish>
@@ -848,6 +851,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title>Administration Form Runner</title>
+        </admin>
         <home>
             <title>Accueil Form Runner</title>
             <buttons>
@@ -1355,6 +1361,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title>Inicio Form Runner</title>
             <buttons>
@@ -1860,6 +1869,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title todo="true">[Form Runner Home]</title>
             <buttons>
@@ -2364,6 +2376,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title todo="true">[Form Runner Home]</title>
             <buttons>
@@ -2881,6 +2896,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title>Form Runner Home</title>
             <buttons>
@@ -3398,6 +3416,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title>Form Runner Home</title>
             <buttons>
@@ -3915,6 +3936,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title>Form Runner Koti</title>
             <buttons>
@@ -4432,6 +4456,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title>Start av formulärmotorn</title>
             <buttons>
@@ -4948,6 +4975,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title>Form Runner Home</title>
             <buttons>
@@ -5464,6 +5494,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title>Form Runner</title>
             <buttons>
@@ -5968,6 +6001,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title>Blanketbehandler start</title>
             <buttons>
@@ -6484,6 +6520,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Admin]</title>
+        </admin>
         <home>
             <title>Form Runner Home</title>
             <buttons>

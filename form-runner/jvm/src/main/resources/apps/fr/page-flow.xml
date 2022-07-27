@@ -178,7 +178,7 @@
     <!-- NOTE: Put those here as some URLs starting with /fr/service or /fr/page can erroneously match on those -->
 
     <!-- Home page -->
-    <page path="/fr/?" model="home/home.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
+    <page path="/fr/(admin|home)?" model="home/home.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
         <setvalue ref="/*/app">*</setvalue>
         <setvalue ref="/*/form">*</setvalue>
         <setvalue ref="/*/mode">home</setvalue>

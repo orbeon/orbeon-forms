@@ -27,12 +27,16 @@
          xml:lang="{xxf:instance('fr-fr-language-instance')}">
 
     <xh:head>
-        <xh:title><xf:output ref="$fr-resources/home/title"/></xh:title>
+        <xh:title><xf:output ref="if ($is-admin) then $fr-resources/admin/title else $fr-resources/home/title"/></xh:title>
         <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-home.css" type="text/css" media="all"/>
         <!-- This page needs access to Form Builder permission -->
         <xi:include href="oxf:/apps/fr/includes/permissions-model.xml" xxi:omit-xml-base="true"/>
         <!-- FR Home page XForms model -->
         <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
+
+            <xf:var
+                name="is-admin"
+                value="xxf:get-request-path() = '/fr/admin'"/>
 
             <xf:var
                 name="tz"
@@ -47,9 +51,13 @@
                     name="has-any-matching-roles"
                     value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
 
+                <xf:action if="$is-admin and not($has-any-matching-roles)" type="xpath">
+                    frf:sendError(503)
+                </xf:action>
+
                 <xf:var
                     name="initialize-remotes"
-                    value="fr:is-pe() and $has-any-matching-roles"/>
+                    value="fr:is-pe() and $is-admin and $has-any-matching-roles"/>
 
                 <xf:action if="$initialize-remotes">
                     <xf:var
@@ -290,7 +298,7 @@
                 id="read-local-metadata"
                 method="get"
                 serialization="none"
-                resource="/fr/service/persistence/form?all-versions=true"
+                resource="/fr/service/persistence/form?all-versions={$is-admin}"
                 replace="instance"
                 targetref="instance('fr-metadata-local')">
 
@@ -340,7 +348,7 @@
 
                 <xf:setvalue
                     ref="instance()/any-has-admin-permission"
-                    value="xxf:exists(instance('fr-metadata')/form, $has-admin)"/>
+                    value="$is-admin and xxf:exists(instance('fr-metadata')/form, $has-admin)"/>
 
                 <!-- Because `any-has-admin-permission` is used in an `xf:bind/@ref` -->
                 <xf:rebuild xxf:deferred="true"/>
@@ -576,6 +584,10 @@
         <xf:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources"/>
         <xf:var name="fr-lang"      model="fr-resources-model" value="$fr-lang"/>
 
+        <xf:var
+            name="show-permissions"
+            value="$is-admin and $any-has-admin-permission"/>
+
         <fr:view fluid="true">
             <fr:navbar/>
             <fr:row>
@@ -585,7 +597,11 @@
                 </xf:group>
                 <xf:group ref=".[exists($forms)]">
 
-                    <xf:group ref=".[$any-has-admin-permission]" class="btn-toolbar" xmlns="http://www.w3.org/1999/xhtml" xxf:element="div">
+                    <xf:group
+                        ref=".[$show-permissions]"
+                        class="btn-toolbar"
+                        xmlns="http://www.w3.org/1999/xhtml"
+                        xxf:element="div">
                         <div class="btn-group">
 
                             <button id="select-button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -937,22 +953,22 @@
                             <xh:thead>
 								<xf:group ref=".[$remote-successful]">
 									<xh:tr>
-										<xf:group ref=".[$any-has-admin-permission]">
+										<xf:group ref=".[$show-permissions]">
 											<xh:th/>
 										</xf:group>
-										<xh:th colspan="{if ($any-has-admin-permission) then 2 else 1}"><xf:output value="$fr-resources/home/titles/local"/></xh:th>
-										<xh:th colspan="{if ($any-has-admin-permission) then 2 else 1}"><xf:output value="$fr-resources/home/titles/remote"/></xh:th>
+										<xh:th colspan="{if ($show-permissions) then 2 else 1}"><xf:output value="$fr-resources/home/titles/local"/></xh:th>
+										<xh:th colspan="{if ($show-permissions) then 2 else 1}"><xf:output value="$fr-resources/home/titles/remote"/></xh:th>
 										<xh:th colspan="3"><xf:output value="$fr-resources/home/titles/form-identification"/></xh:th>
 									</xh:tr>
 								</xf:group>
 								<xh:tr>
-                                    <xf:group ref=".[$any-has-admin-permission]">
+                                    <xf:group ref=".[$show-permissions]">
                                         <xh:th/>
                                         <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
                                     </xf:group>
                                     <xh:th><xf:output value="$fr-resources/home/titles/last-modified"/></xh:th>
                                     <xf:group ref=".[$remote-successful]">
-                                        <xf:group ref=".[$any-has-admin-permission]">
+                                        <xf:group ref=".[$show-permissions]">
                                             <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
                                         </xf:group>
                                         <xh:th><xf:output value="$fr-resources/home/titles/last-modified"/></xh:th>
@@ -1007,7 +1023,7 @@
                                                 ()"/>
 
                                     <xh:tr>
-                                        <xf:group ref=".[$any-has-admin-permission]">
+                                        <xf:group ref=".[$show-permissions]">
                                             <xh:td class="fr-home-select">
                                                 <xf:select
                                                     appearance="full"
@@ -1066,7 +1082,7 @@
                                                             else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
                                         </xh:td>
                                         <xf:group ref=".[$remote-successful]">
-                                            <xf:group ref=".[$any-has-admin-permission]">
+                                            <xf:group ref=".[$show-permissions]">
                                                 <xh:td class="fr-home-status">
                                                     <xf:output
                                                         ref=".[$ops = 'admin' and ($remote-available or $remote-unavailable)]"
@@ -1136,7 +1152,8 @@
                     </xf:group>
                 </xf:group>
             </fr:row>
-            <xf:group ref=".[$any-has-admin-permission]">
+
+            <xf:group ref=".[$show-permissions]">
                 <fr:row>
                     <xh:div class="fr-orbeon-version">
                         <xf:output
@@ -1145,6 +1162,7 @@
                     </xh:div>
                 </fr:row>
             </xf:group>
+
         </fr:view>
 
         <!-- Confirmation dialogs -->

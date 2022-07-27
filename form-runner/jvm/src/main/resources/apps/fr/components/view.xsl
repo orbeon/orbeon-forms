@@ -75,11 +75,9 @@
             <fr:messages/>
         </fr:row>
         <fr:row>
-            <fr:buttons-bar/>
-        </fr:row>
-        <fr:row>
             <fr:version/>
         </fr:row>
+        <fr:buttons-bar/>
     </xsl:variable>
 
     <xsl:template match="fr:row">
@@ -498,6 +496,49 @@
         </xf:group>
     </xsl:template>
 
+    <xsl:template match="fr:navbar5" name="fr-navbar5">
+        <xf:group
+            xxf:element="nav"
+            model="fr-form-model"
+            ref=".[not(xxf:property(string-join(('oxf.fr.detail.hide-header', fr:app-name(), fr:form-name()), '.')))]"
+            class="navbar navbar-expand-lg navbar-dark bg-dark position-sticky">
+            <xh:div class="container-fluid">
+                <xsl:variable name="default-objects" as="element()+">
+                    <fr:goto-content/>
+                    <!-- These are typically to the left -->
+                    <fr:logo/>
+                    <fr:title/>
+                    <xh:button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                      <xh:span class="navbar-toggler-icon"></xh:span>
+                    </xh:button>
+                    <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <xh:ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <!-- These are typically to the right -->
+                            <xh:li class="nav-item px-3">
+                                <fr:language-selector appearance="bootstrap5"/>
+                            </xh:li>
+                            <xh:li>
+                            <fr:status-icons/>
+                            </xh:li>
+                            <xh:li class="nav-item">
+                            <fr:user-nav/>
+                            </xh:li>
+                            <xh:li class="nav-item">
+                            <xh:div>
+                                <xh:a href="/fr/">
+                                    <xh:i class="fa fa-fw fa-th"/>
+                                </xh:a>
+                            </xh:div>
+                            </xh:li>
+                        </xh:ul>
+                    </xh:div>
+                </xsl:variable>
+
+                <xsl:apply-templates select="$default-objects"/>
+            </xh:div>
+        </xf:group>
+    </xsl:template>
+
     <xsl:template match="fr:hidden-controls" name="fr-hidden-controls">
         <xh:span class="xforms-hidden">
 
@@ -631,14 +672,14 @@
 
     <xsl:template match="fr:logo">
         <xsl:if test="not($hide-logo) and exists($default-logo-uri)">
-            <xh:div>
+            <xh:div class="navbar-brand">
                 <xh:img src="{$default-logo-uri}" alt=""/>
             </xh:div>
         </xsl:if>
     </xsl:template>
 
     <xsl:template match="fr:language-selector">
-        <xf:group xxf:element="div" model="fr-form-model" class="fr-language-choice">
+        <xf:group xxf:element="div" model="fr-form-model" class="fr-language-choice nav-item">
             <!-- Put default language first, then other languages -->
             <xf:var
                 name="available-languages"
@@ -662,6 +703,9 @@
                         )
                     ]">
                 <xf:select1 ref="$fr-selector-lang" appearance="bootstrap" id="fr-language-selector-select">
+                    <xsl:if test="@appearance">
+                        <xsl:attribute name="appearance" select="@appearance"/>
+                    </xsl:if>
                     <xf:itemset ref="$available-languages">
                         <xf:label ref="(xxf:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
                         <xf:value ref="context()"/>
@@ -984,7 +1028,7 @@
         <xf:group
             model="fr-form-model"
             ref=".[not($fr-mode = ('summary', 'home', 'landing'))]"
-            class="fr-status-icons">
+            class="fr-status-icons nav-item">
 
             <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert gt 0]">
                 <!-- Form has error or warning messages -->

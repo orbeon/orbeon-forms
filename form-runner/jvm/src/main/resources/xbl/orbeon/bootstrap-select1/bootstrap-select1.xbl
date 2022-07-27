@@ -35,14 +35,11 @@
             </xf:select>
             <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
 
-            <!-- NOTE: We shouldn't have .nav > .dropdown here, as it's a navbar feature, but .dropdown-toggle must be
-                 directly nested per the Bootstrap styles. Would need to be changed to make the Bootstrap dropdown usable
-                 outside of the navbar. -->
-            <xh:ul class="nav">
-                <xh:li class="dropdown">
-                    <xh:a id="menu-button" href="#" class="dropdown-toggle" data-toggle="dropdown">
+<!--            <xh:ul class="nav">-->
+                <xh:div class="dropdown">
+                    <xh:a id="menu-button" href="#" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
                         <xf:output value="$items[value/string() = $binding]/label/string()"/>
-                        <xh:b class="{if (exists($items)) then 'caret' else ''}"/>
+<!--                        <xh:b class="{if (exists($items)) then 'caret' else ''}"/>-->
                     </xh:a>
                     <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="menu-button">
                         <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
@@ -51,7 +48,7 @@
                             <xf:var name="value" value="."/>
                             <xf:var name="label" value="$items[value = $value]/label/string()"/>
 
-                            <xh:li role="presentation" class="{if ($value = $binding) then 'disabled' else ()}">
+                            <xh:li role="presentation" class="dropdown-item{if ($value = $binding) then ' disabled' else ()}">
                                 <xf:trigger appearance="minimal" role="menuitem">
                                     <xf:label value="$label"/>
                                     <xf:setvalue event="DOMActivate" ref="$binding" value="$value"/>
@@ -59,8 +56,8 @@
                             </xh:li>
                         </xf:repeat>
                     </xh:ul>
-                </xh:li>
-            </xh:ul>
+                </xh:div>
+<!--            </xh:ul>-->
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -322,6 +322,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Form Runner Home</title>
             <buttons>

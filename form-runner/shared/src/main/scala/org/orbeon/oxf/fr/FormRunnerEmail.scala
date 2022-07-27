@@ -118,8 +118,8 @@ trait FormRunnerEmail {
       case "LinkToViewPageParam"    => build("view", documentOpt)
       case "LinkToNewPageParam"     => build("new", None)
       case "LinkToSummaryPageParam" => build("summary", None)
-      case "LinkToLandingPageParam" => s"$baseUrlNoSlash/fr/landing"
-      case "LinkToHomePageParam"    => s"$baseUrlNoSlash/fr/"
+      case "LinkToLandingPageParam" => s"$baseUrlNoSlash/fr/landing" // xxx
+      case "LinkToHomePageParam"    => s"$baseUrlNoSlash/fr/" // xxx
       case "LinkToPdfParam"         => build("pdf", documentOpt)
       case _                        => throw new IllegalArgumentException(linkType)
     }

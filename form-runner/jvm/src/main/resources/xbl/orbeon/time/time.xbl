@@ -21,7 +21,7 @@
 
     <xbl:binding
         id="fr-time"
-        element="fr|time"
+        element="fr|time, xf|input:xxf-type('xs:time')"
         xxbl:label-for="fr-time-input"
         xxbl:mode="lhha binding value">
 

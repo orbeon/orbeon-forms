@@ -326,7 +326,6 @@ trait ProcessInterpreter extends Logging {
       functionContext = xpathFunctionContext
     )
 
-  // TODO
   def evaluate(expr: String, item: Item = xpathContext): collection.Seq[Any] =
     eval(
       item            = item,
@@ -335,7 +334,6 @@ trait ProcessInterpreter extends Logging {
       functionContext = xpathFunctionContext
     )
 
-  // TODO
   def evaluateValueTemplate(valueTemplate: String): String =
     if (! XMLUtils.maybeAVT(valueTemplate))
       valueTemplate

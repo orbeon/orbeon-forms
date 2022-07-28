@@ -70,7 +70,7 @@ class XHTMLBodyHandler(
     // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
     //        formattingPrefix = handlerContext().findFormattingPrefixDeclare();
 
-    val isEmbeddedClient = containingDocument.isEmbeddedFromHeaders
+    val isEmbeddedClient = containingDocument.embeddingTypeFromHeaders.isDefined
     val requestPath      = containingDocument.getRequestPath
 
     val xformsSubmissionPath =

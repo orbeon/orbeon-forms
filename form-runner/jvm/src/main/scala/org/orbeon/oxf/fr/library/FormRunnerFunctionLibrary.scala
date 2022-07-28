@@ -138,6 +138,10 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     Fun("form-runner-link", classOf[FRLinkBackToFormRunner], op = 0, min = 1, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE)
     )
+
+    Fun("is-embedded", classOf[FRIsEmbedded], op = 0, min = 0, BOOLEAN, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE)
+    )
   }
 }
 
@@ -163,7 +167,6 @@ private object FormRunnerFunctions {
     "is-draft"                    -> (() => FormRunnerParams().isDraft.getOrElse(false)),
     "is-design-time"              -> (() => FormRunner.isDesignTime(FormRunnerParams())),
     "is-readonly-mode"            -> (() => FormRunner.isReadonlyMode(FormRunnerParams())),
-    "is-embedded"                 -> (() => FormRunner.isEmbedded),
     "is-background"               -> (() => FormRunner.isBackground(XFormsFunction.context, FormRunnerParams())),
     "is-noscript"                 -> (() => false),
     "is-form-data-valid"          -> (() => countValidationsByLevel(ErrorLevel) == 0),
@@ -415,5 +418,10 @@ private object FormRunnerFunctions {
   class FRLinkBackToFormRunner extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): StringValue =
       FormRunner.buildLinkBackToFormRunnerUsePageName(stringArgument(0)(context))
+  }
+
+  class FRIsEmbedded extends FunctionSupport with RuntimeDependentFunction {
+    override def evaluateItem(context: XPathContext): BooleanValue =
+      FormRunner.isEmbedded(stringArgumentOpt(0)(context))
   }
 }

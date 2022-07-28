@@ -44,7 +44,7 @@ class PortletEmbeddingContext(
   def setSessionAttribute   (name: String, value: AnyRef): Unit           = session.setAttribute(name, value)
   def removeSessionAttribute(name: String)               : Unit           = session.removeAttribute(name)
 
-  val client: String = Headers.PortletClient
+  val client: String = Headers.PortletEmbeddingClient
 }
 
 class PortletEmbeddingContextWithResponse(

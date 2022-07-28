@@ -39,7 +39,7 @@ class ServletEmbeddingContext(
   def setSessionAttribute(name: String, value: AnyRef) = session.setAttribute(name, value)
   def removeSessionAttribute(name: String)             = session.removeAttribute(name)
 
-  val client = Headers.EmbeddedClient
+  val client = Headers.JavaApiEmbeddingClient
 }
 
 class ServletEmbeddingContextWithResponse(

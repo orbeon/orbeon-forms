@@ -371,8 +371,16 @@ trait FormRunnerBaseOps {
   def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
   def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ReadonlyModes(p.mode)
 
-  def isEmbedded: Boolean =
-    inScopeContainingDocument.isEmbeddedFromHeaders || isEmbeddable
+  // https://github.com/orbeon/orbeon-forms/issues/5323
+  // https://github.com/orbeon/orbeon-forms/issues/5325
+  // https://github.com/orbeon/orbeon-forms/issues/5390
+  def isEmbedded(embeddingType: Option[String]): Boolean =
+    embeddingType match {
+      case Some(Headers.GeneralEmbeddedClient)        => false // don't support `embedded` as its meaning is unclear
+      case Some(v) if Headers.EmbeddedClientValues(v) => inScopeContainingDocument.embeddingTypeFromHeaders.contains(v)
+      case Some(_)                                    => false
+      case None                                       => inScopeContainingDocument.embeddingTypeFromHeaders.isDefined || isEmbeddable
+    }
 
   // For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
   // probably, as they also need to send an XML response back.

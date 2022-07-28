@@ -37,17 +37,17 @@ import scala.collection.{Seq, immutable}
 
 
 case class RequestInformation(
-  deploymentType        : DeploymentType,
-  requestMethod         : HttpMethod,
-  requestContextPath    : String,
-  requestPath           : String,
-  requestHeaders        : Map[String, List[String]],
-  requestParameters     : Map[String, List[String]],
-  containerType         : String,
-  containerNamespace    : String,
-  versionedPathMatchers : List[PathMatcher],
-  isEmbedded            : Boolean,
-  forceInlineResources  : Boolean
+  deploymentType       : DeploymentType,
+  requestMethod        : HttpMethod,
+  requestContextPath   : String,
+  requestPath          : String,
+  requestHeaders       : Map[String, List[String]],
+  requestParameters    : Map[String, List[String]],
+  containerType        : String,
+  containerNamespace   : String,
+  versionedPathMatchers: List[PathMatcher],
+  embeddingType        : Option[String],
+  forceInlineResources : Boolean
 )
 
 /**

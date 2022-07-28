@@ -472,7 +472,7 @@ object XFormsServer {
             containingDocument.findTwoPassSubmitEvent foreach { twoPassSubmitEvent =>
               outputSubmissionInfo(
                 twoPassSubmitEvent,
-                containingDocument.isPortletContainer || containingDocument.isEmbeddedFromHeaders,
+                containingDocument.isPortletContainer || containingDocument.embeddingTypeFromHeaders.isDefined,
                 XFormsCrossPlatformSupport.externalContext.getResponse // would be better to pass this to `outputAjaxResponse`
               )
             }

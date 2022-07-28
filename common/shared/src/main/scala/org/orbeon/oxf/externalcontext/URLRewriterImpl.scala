@@ -22,10 +22,10 @@ object URLRewriterImpl {
     )
 
   def rewriteServiceURL(
-    request         : ExternalContext.Request,
-    urlString       : String,
-    rewriteMode     : UrlRewriteMode,
-    baseURIProperty : String
+    request                  : ExternalContext.Request,
+    urlString                : String,
+    rewriteMode              : UrlRewriteMode,
+    baseURIPropertyMaybeBlank: String,
   ): String = {
 
     // NOTE: We used to assert here that the mode required an absolute URL, but as of 2016-03-17 one caller
@@ -34,45 +34,46 @@ object URLRewriterImpl {
     // Case where a protocol is specified: the URL is left untouched
     if (PathUtils.urlHasProtocol(urlString)) {
       urlString
-    } else if (baseURIProperty.isAllBlank) {
-      // Property not specified, use request to build base URI
-      rewriteURL(
-        request.getScheme,
-        request.getServerName,
-        request.getServerPort,
-        request.getClientContextPath(urlString),
-        request.getRequestPath, urlString,
-        rewriteMode
-      )
     } else {
-      // Property specified
+      baseURIPropertyMaybeBlank.trimAllToOpt match {
+        case None =>
+          rewriteURL(
+            request.getScheme,
+            request.getServerName,
+            request.getServerPort,
+            request.getClientContextPath(urlString),
+            request.getRequestPath, urlString,
+            rewriteMode
+          )
+        case Some(baseURIProperty) =>
 
-      val baseURI =
-        try
-          URI.create(baseURIProperty.trimAllToEmpty)
-        catch {
-          case t: IllegalArgumentException =>
-            throw new OXFException(s"Incorrect base URI property specified: `$baseURIProperty`", t)
-        }
+          val baseURI =
+            try
+              URI.create(baseURIProperty)
+            catch {
+              case t: IllegalArgumentException =>
+                throw new OXFException(s"Incorrect base URI property specified: `$baseURIProperty`", t)
+            }
 
-      // NOTE: Force absolute URL to be returned in this case anyway
-      rewriteURL(
-        if (baseURI.getScheme != null)
-          baseURI.getScheme
-        else
-          request.getScheme,
-        if (baseURI.getHost != null)
-          baseURI.getHost
-        else request.getServerName,
-        if (baseURI.getHost != null)
-          baseURI.getPort
-        else
-          request.getServerPort,
-        baseURI.getPath,
-        "",
-        urlString,
-        rewriteMode
-      )
+          // NOTE: Force absolute URL to be returned in this case anyway
+          rewriteURL(
+            if (baseURI.getScheme != null)
+              baseURI.getScheme
+            else
+              request.getScheme,
+            if (baseURI.getHost != null)
+              baseURI.getHost
+            else request.getServerName,
+            if (baseURI.getHost != null)
+              baseURI.getPort
+            else
+              request.getServerPort,
+            baseURI.getPath,
+            "",
+            urlString,
+            rewriteMode
+          )
+      }
     }
   }
 

@@ -95,10 +95,6 @@ class XHTMLBodyHandler(
       sb.toString
     }
 
-    // Create `xh:form` element
-    // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters
-    val doMultipartPOST = containingDocument.staticOps.hasControlByName("upload") || isEmbeddedClient
-
     openElement(
       localName = "form",
       prefix    = htmlPrefix,
@@ -108,7 +104,8 @@ class XHTMLBodyHandler(
         ("class"    -> formElemClasses)                        ::
         ("method"   -> "POST")                                 ::
         ("onsubmit" -> "return false")                         ::
-        (doMultipartPOST list ("enctype" -> "multipart/form-data"))
+        ("enctype"  -> "multipart/form-data")                  ::
+        Nil
     )
 
     // Only for 2-pass submission

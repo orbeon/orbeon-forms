@@ -75,7 +75,6 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
   def findControlAnalysis(prefixedId: String) = findInParts(_.getControlAnalysis(prefixedId))
   def getControlAnalysis(prefixedId: String)  = findControlAnalysis(prefixedId).orNull
 
-  def hasControlByName(controlName: String) = existsInParts(_.hasControlByName(controlName))
   def controlsByName(controlName: String) = collectInParts(_.controlsByName(controlName))
 
   def repeats = collectInPartsReverse(_.repeats)

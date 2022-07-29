@@ -397,7 +397,6 @@
                                 <optional>
                                     <attribute name="action"/>
                                 </optional>
-                                <attribute name="method"/>
                                 <optional>
                                     <attribute name="show-progress">
                                         <choice>

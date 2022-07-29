@@ -588,7 +588,7 @@ object XFormsServer {
         localName = "submission",
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
-        atts      = ("method" -> HttpMethod.POST.entryName) :: showProgressAtt ::: targetAtt ::: actionAtt
+        atts      = showProgressAtt ::: targetAtt ::: actionAtt
       )
     }
 

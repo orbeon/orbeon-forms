@@ -840,7 +840,6 @@
                                 case "submission": {
                                     var submissionElement = childNode;
                                     var showProgress = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
-                                    var replace      = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
                                     var target       = ORBEON.util.Dom.getAttribute(submissionElement, "target");
                                     var action       = ORBEON.util.Dom.getAttribute(submissionElement, "action");
 

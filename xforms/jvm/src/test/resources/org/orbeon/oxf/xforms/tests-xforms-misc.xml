@@ -696,7 +696,7 @@
         <output name="response">
             <xh:html>
                 <xh:body class="yui-skin-sam">
-                    <xh:form id="xforms-form" class="xforms-form xforms-initially-hidden xforms-label-appearance-full xforms-hint-appearance-full xforms-disable-hint-as-tooltip xforms-help-appearance-dialog" method="POST" onsubmit="return false">
+                    <xh:form id="xforms-form" class="xforms-form xforms-initially-hidden xforms-label-appearance-full xforms-hint-appearance-full xforms-disable-hint-as-tooltip xforms-help-appearance-dialog" method="POST" onsubmit="return false" enctype="multipart/form-data">
                         <xh:input type="hidden" name="$uuid" value="4A00AF98-7464-2F85-9AF6-291447DCC6F8"/>
                         <xh:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
                         <xh:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>

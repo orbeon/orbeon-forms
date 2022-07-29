@@ -193,7 +193,6 @@ object InitSupport {
           ns                            = formId.substring(0, formId.indexOf(Constants.FormClass)),
           xformsServerPath              = initializations.xformsServerPath,
           xformsServerUploadPath        = initializations.xformsServerUploadPath,
-          calendarImagePath             = initializations.calendarImagePath,
           repeatTreeChildToParent       = repeatTreeChildToParent,
           repeatTreeParentToAllChildren = repeatTreeParentToAllChildren,
           repeatIndexes                 = processRepeatIndexes(initializations.repeatIndexes),

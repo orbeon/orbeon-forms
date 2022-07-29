@@ -184,10 +184,6 @@ object ScriptBuilder {
 
     val currentTime = System.currentTimeMillis
 
-    // NOTE: `calendarImage` is to handle the minimal date picker. Because the client must re-generate markup
-    // when the control becomes relevant or changes type, it needs the image URL, and that URL must be
-    // rewritten for use in portlets. This should ideally be handled by a template and/or the server should
-    // provide the markup directly when needed.
 
     val jsonString =
       rpc.Initializations(
@@ -197,7 +193,6 @@ object ScriptBuilder {
         repeatIndexes          = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
         xformsServerPath       = rewriteResource("/xforms-server"),
         xformsServerUploadPath = rewriteResource("/xforms-server/upload"),
-        calendarImagePath      = rewriteResource("/ops/images/xforms/calendar.png"),
         controls  =
           for {
             (id, valueOpt) <- controlsToInitialize

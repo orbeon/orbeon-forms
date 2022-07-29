@@ -29,7 +29,6 @@ case class Initializations(
   repeatIndexes          : String,
   xformsServerPath       : String,
   xformsServerUploadPath : String,
-  calendarImagePath      : String,
   controls               : List[Control],
   listeners              : List[KeyListener],
   pollEvent              : Option[PollEvent],

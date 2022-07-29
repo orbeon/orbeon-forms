@@ -28,7 +28,6 @@ class Form(
   val ns                            : String,
   val xformsServerPath              : String,
   val xformsServerUploadPath        : String,
-  val calendarImagePath             : String,
   var repeatTreeChildToParent       : js.Dictionary[String],           // for JavaScript access
   var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]], // for JavaScript access
   val repeatIndexes                 : js.Dictionary[String],           // for JavaScript access

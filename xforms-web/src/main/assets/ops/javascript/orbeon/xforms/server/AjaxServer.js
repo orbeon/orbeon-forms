@@ -910,8 +910,6 @@
                                     else
                                         requestForm.target = target;
 
-                                    debugger;
-
                                     if (urlType == "action")
                                         requestForm.action = form.xformsServerSubmitActionPath;
                                     else

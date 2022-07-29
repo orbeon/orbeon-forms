@@ -477,7 +477,6 @@ object XFormsServer {
               )
             }
 
-            // Non-`javascript:` loads only
             containingDocument.getNonJavaScriptLoadsToRun foreach { load =>
               outputLoad(containingDocument, load)
             }

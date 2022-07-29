@@ -96,7 +96,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     URLRewriterImpl.rewriteURL(request, urlString, rewriteMode)
 
   private def uriToStringRemoveFragmentForPortletAndEmbedded(containingDocument: XFormsContainingDocument, resolvedURI: URI): String =
-    if ((containingDocument.isPortletContainer || containingDocument.embeddingTypeFromHeaders.isDefined) && resolvedURI.getFragment != null)
+    if ((containingDocument.isPortletContainer || containingDocument.isEmbeddedFromHeaderOrUrlParam) && resolvedURI.getFragment != null)
       // Page was loaded from a portlet or embedding API and there is a fragment, remove it
       new URI(resolvedURI.getScheme, resolvedURI.getRawAuthority, resolvedURI.getRawPath, resolvedURI.getRawQuery, null).toString
     else

@@ -576,6 +576,12 @@ trait ContainingDocumentRequest {
 
   def isPortletContainer       = _requestInformation.containerType == "portlet"
   def embeddingTypeFromHeaders = _requestInformation.embeddingType
+
+  def isEmbeddedFromUrlParam: Boolean =
+    _requestInformation.requestParameters.get(ExternalContext.EmbeddableParam) map (_.head) contains true.toString
+
+  def isEmbeddedFromHeaderOrUrlParam: Boolean = embeddingTypeFromHeaders.isDefined || isEmbeddedFromUrlParam
+
   def isServeInlineResources   = staticState.isInlineResources || _requestInformation.forceInlineResources
 
   // Was `protected[xforms]` but we need to call from offline. Find better solution.
@@ -753,7 +759,7 @@ trait ContainingDocumentClientState {
 
   def setInitialClientScript(): Unit = {
 
-    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
+    implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
 
     val response = externalContext.getResponse
 
@@ -762,12 +768,13 @@ trait ContainingDocumentClientState {
       ScriptBuilder.findConfigurationProperties(
         this,
         URLRewriterUtils.isResourcesVersioned,
-        XFormsStateManager.getHeartbeatDelay(this, XFormsCrossPlatformSupport.externalContext)
+        XFormsStateManager.getHeartbeatDelay(this, externalContext)
       ).toList :::
       List(
         ScriptBuilder.buildJavaScriptInitialData(
           containingDocument   = this,
           rewriteResource      = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
+          rewriteAction        = response.rewriteActionURL,
           controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
         )
       )

@@ -147,6 +147,7 @@ class XHTMLHeadHandler(
           buildJavaScriptInitialData(
             containingDocument   = containingDocument,
             rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
+            rewriteAction        = externalContext.getResponse.rewriteActionURL,
             controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
           )
         ) foreach

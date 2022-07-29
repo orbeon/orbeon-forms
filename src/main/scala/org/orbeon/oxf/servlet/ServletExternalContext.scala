@@ -315,8 +315,9 @@ class ServletExternalContext(
   def getRequest: ExternalContext.Request = requestImpl
 
   // 2022-07-28: With `embeddedClientValueFromHeaders`, should we check that we have specifically the `portlet` token
-  // to enable `WSRPURLRewriter` encoding? We should review this. See also:
-  // https://github.com/orbeon/orbeon-forms/issues/5323
+  // to enable `WSRPURLRewriter` encoding? Also check uses of `isEmbedded`, which also causes  the `EmbeddableParam` to
+  // be passed during a redirect. We should review this.
+  // See also: https://github.com/orbeon/orbeon-forms/issues/5323
   private def isEmbedded: Boolean =
     Headers.isEmbeddedFromHeaders(requestImpl.headerValuesMap)
 

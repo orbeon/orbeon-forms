@@ -379,16 +379,13 @@ trait FormRunnerBaseOps {
       case Some(Headers.GeneralEmbeddedClient)        => false // don't support `embedded` as its meaning is unclear
       case Some(v) if Headers.EmbeddedClientValues(v) => inScopeContainingDocument.embeddingTypeFromHeaders.contains(v)
       case Some(_)                                    => false
-      case None                                       => inScopeContainingDocument.embeddingTypeFromHeaders.isDefined || isEmbeddable
+      case None                                       => inScopeContainingDocument.isEmbeddedFromHeaderOrUrlParam
     }
 
   // For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
   // probably, as they also need to send an XML response back.
   def isBackground(implicit xfc: XFormsFunction.Context, p: FormRunnerParams): Boolean =
     xfc.containingDocument.getRequestPath.startsWith("/fr/service/") && (p.mode == "new" || p.mode == "edit")
-
-  def isEmbeddable: Boolean =
-    inScopeContainingDocument.getRequestParameters.get(ExternalContext.EmbeddableParam) map (_.head) contains "true"
 
   // Display a success message
   // TODO: support `dialog` appearance, for symmetry with `error-message`

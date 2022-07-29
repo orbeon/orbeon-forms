@@ -4,9 +4,8 @@ import java.{util => ju}
 import cats.Eval
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriter, UrlRewriteMode}
-import org.orbeon.oxf.externalcontext.ExternalContext.Response
-import org.orbeon.oxf.http.{HttpMethod, SessionExpiredException, StatusCode}
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.http.{SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
@@ -24,7 +23,7 @@ import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
 import org.orbeon.xforms.{DelayedEvent, EventNames, Load, Message, XFormsCrossPlatformSupport}
-import org.orbeon.xforms.XFormsNames.{XFORMS_SERVER_SUBMIT, XXFORMS_NAMESPACE_URI, XXFORMS_SHORT_PREFIX}
+import org.orbeon.xforms.XFormsNames.{XXFORMS_NAMESPACE_URI, XXFORMS_SHORT_PREFIX}
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEventWithoutTarget}
 
 import scala.util.{Failure, Success, Try}
@@ -470,11 +469,7 @@ object XFormsServer {
             }
 
             containingDocument.findTwoPassSubmitEvent foreach { twoPassSubmitEvent =>
-              outputSubmissionInfo(
-                twoPassSubmitEvent,
-                containingDocument.isPortletContainer || containingDocument.embeddingTypeFromHeaders.isDefined,
-                XFormsCrossPlatformSupport.externalContext.getResponse // would be better to pass this to `outputAjaxResponse`
-              )
+              outputSubmissionInfo(twoPassSubmitEvent)
             }
 
             containingDocument.getNonJavaScriptLoadsToRun foreach { load =>
@@ -558,9 +553,7 @@ object XFormsServer {
       }
 
     def outputSubmissionInfo(
-      twoPassSubmitEvent : DelayedEvent,
-      isPortletContainer : Boolean,
-      response           : Response)(implicit
+      twoPassSubmitEvent : DelayedEvent)(implicit
       receiver           : XMLReceiver
     ): Unit = {
 
@@ -570,24 +563,19 @@ object XFormsServer {
       val targetAtt =
          twoPassSubmitEvent.browserTarget.toList map ("target" -> _)
 
-      val actionAtt =
-        isPortletContainer list {
+      val urlTypeAtt =
+        "url-type" -> (
+          if (twoPassSubmitEvent.isResponseResourceType)
+            "resource"
+          else
+            "action"
+        )
 
-          val actionUrl =
-            if (twoPassSubmitEvent.isResponseResourceType)
-              response.rewriteResourceURL(XFORMS_SERVER_SUBMIT, UrlRewriteMode.AbsoluteNoContext) // NOTE: mode ignored in portlet mode
-            else
-              response.rewriteActionURL(XFORMS_SERVER_SUBMIT)
-
-          "action" -> actionUrl
-        }
-
-      // Signal that we want a POST to the XForms server
       element(
         localName = "submission",
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
-        atts      = showProgressAtt ::: targetAtt ::: actionAtt
+        atts      = showProgressAtt ::: targetAtt ::: urlTypeAtt :: Nil
       )
     }
 

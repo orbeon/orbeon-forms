@@ -275,9 +275,9 @@ trait FormRunnerActionsCommon {
     }
 
   private val StateParams = List[(String, (() => String, String => Boolean))](
-    frc.LanguageParam    -> (() => frc.currentLang,                         _ => false ),
-    EmbeddableParam      -> (() => frc.isEmbeddable.toString,               _ == "true"),
-    frc.FormVersionParam -> (() => FormRunnerParams().formVersion.toString, _ => false )
+    frc.LanguageParam    -> (() => frc.currentLang,                                           _ => false ),
+    EmbeddableParam      -> (() => inScopeContainingDocument.isEmbeddedFromUrlParam.toString, _ == true.toString),
+    frc.FormVersionParam -> (() => FormRunnerParams().formVersion.toString,                   _ => false )
   )
 
   protected val StateParamNames = StateParams map (_._1) toSet

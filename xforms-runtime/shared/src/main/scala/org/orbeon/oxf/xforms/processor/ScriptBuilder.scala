@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
-import org.orbeon.xforms.{EventNames, ServerError, rpc}
+import org.orbeon.xforms.{DeploymentType, EventNames, ServerError, XFormsNames, rpc}
 
 import scala.collection.mutable
 
@@ -179,20 +179,28 @@ object ScriptBuilder {
   def buildJavaScriptInitialData(
     containingDocument   : XFormsContainingDocument,
     rewriteResource      : String => String,
+    rewriteAction        : String => String,
     controlsToInitialize : List[(String, Option[String])]
   ): String = {
 
     val currentTime = System.currentTimeMillis
 
+    val xformsSubmissionPath =
+      if (containingDocument.getDeploymentType != DeploymentType.Standalone || containingDocument.isPortletContainer || containingDocument.isEmbeddedFromHeaderOrUrlParam)
+        XFormsNames.XFORMS_SERVER_SUBMIT
+      else
+        containingDocument.getRequestPath
 
     val jsonString =
       rpc.Initializations(
-        uuid                   = containingDocument.uuid,
-        namespacedFormId       = containingDocument.getNamespacedFormId,
-        repeatTree             = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
-        repeatIndexes          = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
-        xformsServerPath       = rewriteResource("/xforms-server"),
-        xformsServerUploadPath = rewriteResource("/xforms-server/upload"),
+        uuid                           = containingDocument.uuid,
+        namespacedFormId               = containingDocument.getNamespacedFormId,
+        repeatTree                     = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
+        repeatIndexes                  = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
+        xformsServerPath               = rewriteResource("/xforms-server"),
+        xformsServerSubmitActionPath   = rewriteAction(xformsSubmissionPath),
+        xformsServerSubmitResourcePath = rewriteResource(xformsSubmissionPath),
+        xformsServerUploadPath         = rewriteResource("/xforms-server/upload"),
         controls  =
           for {
             (id, valueOpt) <- controlsToInitialize

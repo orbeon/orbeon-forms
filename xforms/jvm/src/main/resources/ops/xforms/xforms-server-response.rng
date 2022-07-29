@@ -394,9 +394,12 @@
                         </optional>
                         <optional>
                             <element name="xxf:submission">
-                                <optional>
-                                    <attribute name="action"/>
-                                </optional>
+                                <attribute name="url-type">
+                                    <choice>
+                                        <value>action</value>
+                                        <value>resource</value>
+                                    </choice>
+                                </attribute>
                                 <optional>
                                     <attribute name="show-progress">
                                         <choice>

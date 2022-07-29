@@ -23,16 +23,18 @@ case class PollEvent(delay: Long)
 case class UserScript(functionName: String, targetId: String, observerId: String, paramValues: List[String])
 
 case class Initializations(
-  uuid                   : String,
-  namespacedFormId       : String,
-  repeatTree             : String,
-  repeatIndexes          : String,
-  xformsServerPath       : String,
-  xformsServerUploadPath : String,
-  controls               : List[Control],
-  listeners              : List[KeyListener],
-  pollEvent              : Option[PollEvent],
-  userScripts            : List[UserScript]
+  uuid                          : String,
+  namespacedFormId              : String,
+  repeatTree                    : String,
+  repeatIndexes                 : String,
+  xformsServerPath              : String,
+  xformsServerSubmitActionPath  : String,
+  xformsServerSubmitResourcePath: String,
+  xformsServerUploadPath        : String,
+  controls                      : List[Control],
+  listeners                     : List[KeyListener],
+  pollEvent                     : Option[PollEvent],
+  userScripts                   : List[UserScript]
 )
 
 sealed trait WireAjaxEvent {

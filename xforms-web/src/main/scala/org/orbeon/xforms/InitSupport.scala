@@ -187,16 +187,18 @@ object InitSupport {
       Page.registerForm(
         formId,
         new Form(
-          uuid                          = uuid,
-          elem                          = formElem,
-          uuidInput                     = uuidInput,
-          ns                            = formId.substring(0, formId.indexOf(Constants.FormClass)),
-          xformsServerPath              = initializations.xformsServerPath,
-          xformsServerUploadPath        = initializations.xformsServerUploadPath,
-          repeatTreeChildToParent       = repeatTreeChildToParent,
-          repeatTreeParentToAllChildren = repeatTreeParentToAllChildren,
-          repeatIndexes                 = processRepeatIndexes(initializations.repeatIndexes),
-          xblInstances                  = js.Array()
+          uuid                           = uuid,
+          elem                           = formElem,
+          uuidInput                      = uuidInput,
+          ns                             = formId.substring(0, formId.indexOf(Constants.FormClass)),
+          xformsServerPath               = initializations.xformsServerPath,
+          xformsServerSubmitActionPath   = initializations.xformsServerSubmitActionPath,
+          xformsServerSubmitResourcePath = initializations.xformsServerSubmitResourcePath,
+          xformsServerUploadPath         = initializations.xformsServerUploadPath,
+          repeatTreeChildToParent        = repeatTreeChildToParent,
+          repeatTreeParentToAllChildren  = repeatTreeParentToAllChildren,
+          repeatIndexes                  = processRepeatIndexes(initializations.repeatIndexes),
+          xblInstances                   = js.Array()
         )
       )
 

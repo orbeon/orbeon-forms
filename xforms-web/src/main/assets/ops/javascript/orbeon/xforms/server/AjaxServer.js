@@ -839,13 +839,13 @@
                                 // Submit form
                                 case "submission": {
                                     var submissionElement = childNode;
+                                    var urlType      = ORBEON.util.Dom.getAttribute(submissionElement, "url-type");
                                     var showProgress = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
                                     var target       = ORBEON.util.Dom.getAttribute(submissionElement, "target");
-                                    var action       = ORBEON.util.Dom.getAttribute(submissionElement, "action");
 
-                                    // Increment and send sequence number
-                                    var requestForm = document.getElementById(formID);
-                                    // Go to another page
+                                    var form = ORBEON.xforms.Page.getForm(formID);
+                                    var requestForm = form.elem;
+
                                     if (showProgress != "false") {
                                         // Display loading indicator unless the server tells us not to display it
                                         newDynamicStateTriggersReplace = true;
@@ -910,13 +910,12 @@
                                     else
                                         requestForm.target = target;
 
-                                    if (action == null) {
-                                        // Reset as this may have been changed before by asyncAjaxRequest
-                                        requestForm.removeAttribute("action");
-                                    } else {
-                                        // Set the requested target
-                                        requestForm.action = action;
-                                    }
+                                    debugger;
+
+                                    if (urlType == "action")
+                                        requestForm.action = form.xformsServerSubmitActionPath;
+                                    else
+                                        requestForm.action = form.xformsServerSubmitResourcePath;
 
                                     try {
                                         requestForm.submit();

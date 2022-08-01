@@ -20,8 +20,9 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
 import org.orbeon.xforms.facade.{Controls, Utils, XBL}
 import org.scalajs.dom
+import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.ext._
-import org.scalajs.dom.{html, raw}
+import org.scalajs.dom.{html, raw, window}
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scalatags.JsDom
@@ -34,6 +35,7 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.scalajs.js.{timers, |}
 import scala.scalajs.js.timers.SetTimeoutHandle
+import scala.util.control.NonFatal
 
 
 // Progressively migrate contents of xforms.js/AjaxServer.js here
@@ -390,6 +392,94 @@ object XFormsUI {
       formId        = formID,
       ignoreErrors  = ignoreErrors
     )
+  }
+
+  @JSExport
+  def handleSubmission(
+    formID           : String,
+    submissionElement: raw.Element,
+    notifyReplace    : js.Function0[Unit]
+  ): Unit = {
+
+    val urlType         = submissionElement.getAttribute("url-type")
+    val showProgressOpt = Option(submissionElement.getAttribute("show-progress"))
+    val targetOpt       = Option(submissionElement.getAttribute("target"))
+
+    val form = Page.getForm(formID)
+    val formElem = form.elem
+
+    // When the target is an iframe, we add a `?t=id` to work around a Chrome bug happening  when doing a POST to the
+    // same page that was just loaded, gut that the POST returns a PDF. See:
+    //
+    // https://code.google.com/p/chromium/issues/detail?id=330687
+    // https://github.com/orbeon/orbeon-forms/issues/1480
+    //
+    def updatedPath(path: String) =
+      if (path.contains("xforms-server-submit")) {
+
+        val isTargetAnIframe =
+          targetOpt.exists(target => dom.document.getElementById(target).tagName.equalsIgnoreCase("iframe"))
+
+        if (isTargetAnIframe) {
+          val url = new URL(path, dom.document.location.href)
+          url.searchParams.delete("t")
+          url.searchParams.append("t", java.util.UUID.randomUUID().toString)
+          url.href
+        } else {
+          path
+        }
+      } else {
+        path
+      }
+
+    val newTargetOpt =
+      targetOpt flatMap {
+        case target if ! js.isUndefined(window.asInstanceOf[js.Dynamic].selectDynamic(target)) =>
+          // Pointing to a frame, so this won't open a new new window
+          Some(target)
+        case target =>
+          // See if we're able to open a new window
+          val targetButNotBlank =
+            if (target == "_blank")
+              Math.random().toString.substring(2) // use target name that we can reuse, in case opening the window works
+            else
+              target
+          // Don't use "noopener" as we do need to use that window to test on it!
+          val newWindow = window.open("about:blank", targetButNotBlank)
+          if (! js.isUndefined(newWindow) && (newWindow ne null)) // unclear if can be `undefined` or `null` or both!
+            Some(targetButNotBlank)
+          else
+            None
+      }
+
+    // Set or reset `target` attribute
+    newTargetOpt match {
+      case None            => formElem.removeAttribute("target")
+      case Some(newTarget) => formElem.target = newTarget
+    }
+
+    formElem.action = updatedPath(
+      if (urlType == "action")
+        form.xformsServerSubmitActionPath
+      else
+        form.xformsServerSubmitResourcePath
+    )
+
+    // Notify the caller (to handle the loading indicator)
+    if (! showProgressOpt.contains("false"))
+      notifyReplace()
+
+    try {
+      formElem.submit()
+    } catch {
+      case NonFatal(t) =>
+        // NOP: This is to prevent the error "Unspecified error" in IE. This can
+        // happen when navigating away is cancelled by the user pressing cancel
+        // on a dialog displayed on unload.
+        // 2022-08-01: We no longer support IE, so if indeed this only happened with
+        // IE we could remove this code. Adding logging to see if this ever happens.
+        logger.warn(s"`requestForm.submit()` caused an error: ${t.getMessage}")
+    }
   }
 
   @JSExport // 2020-04-27: 1 JavaScript usage

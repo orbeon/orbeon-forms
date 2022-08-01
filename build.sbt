@@ -35,6 +35,7 @@ val ScalaJsDomVersion                = "1.2.0"
 val ScalaJsJQueryVersion             = "0.9.6"
 val ScalaJsStubsVersion              = "1.1.0" // can be different from Scala.js version
 val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
+val ScalaJsFakeSecureRandomVersion   = "1.0.0" // switch to `scalajs-java-securerandom` when we upgrade to JSDOM 20+
 val ScalaJsTimeVersion               = "2.4.0"
 val ScalaJsLocalesVersion            = "1.4.1"
 
@@ -404,6 +405,7 @@ lazy val commonScalaJvmSettings = Seq(
 lazy val commonScalaJsSettings = Seq(
 
   libraryDependencies += "org.scala-js" %%% "scala-js-macrotask-executor" % ScalaJsMacrotaskExecutor,
+  libraryDependencies += "org.scala-js" %%% "scalajs-fake-insecure-java-securerandom" % ScalaJsFakeSecureRandomVersion,
 
   packageJSDependencies / skip   := false,
   scalaJSLinkerConfig            ~= (_.withSourceMap(false).withESFeatures(_.withESVersion(ESVersion.ES5_1))),

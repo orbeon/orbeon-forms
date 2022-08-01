@@ -838,87 +838,9 @@
 
                                 // Submit form
                                 case "submission": {
-                                    var submissionElement = childNode;
-                                    var urlType      = ORBEON.util.Dom.getAttribute(submissionElement, "url-type");
-                                    var showProgress = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
-                                    var target       = ORBEON.util.Dom.getAttribute(submissionElement, "target");
-
-                                    var form = ORBEON.xforms.Page.getForm(formID);
-                                    var requestForm = form.elem;
-
-                                    if (showProgress != "false") {
-                                        // Display loading indicator unless the server tells us not to display it
+                                    ORBEON.xforms.XFormsUi.handleSubmission(formID, childNode, function() {
                                         newDynamicStateTriggersReplace = true;
-                                    }
-
-                                    /**
-                                     * When the target is an iframe, we add a ?t=id to work around a Chrome bug happening
-                                     * when doing a POST to the same page that was just loaded, gut that the POST returns
-                                     * a PDF. See:
-                                     *
-                                     *     https://code.google.com/p/chromium/issues/detail?id=330687
-                                     *     https://github.com/orbeon/orbeon-forms/issues/1480
-                                     */
-                                    var updatePath = function(path) {
-                                        if (path.indexOf("xforms-server-submit") == -1) {
-                                            var isTargetAnIframe = _.isString(target) && $('#' + target).prop('tagName') == 'IFRAME';
-                                            if (isTargetAnIframe) {
-                                                var a = $('<a>');
-                                                a.prop('href', path);
-                                                var param = "t=" + _.uniqueId();
-                                                var search = a.prop('search');
-                                                var newSearch = (search == '' || search == '?') ? '?' + param : search + '&' + param;
-                                                a.prop('search', newSearch);
-                                                return a.prop('href');
-                                            } else {
-                                                return path;
-                                            }
-                                        } else {
-                                            return path;
-                                        }
-                                    }
-
-                                    // Do we set a target on the form to open the page in another frame?
-                                    var noTarget = (function() {
-                                        if (target == null) {
-                                            // Obviously, we won't try to set a target if the server didn't us one
-                                            return true;
-                                        } else if (! _.isUndefined(window.frames[target])) {
-                                            // Pointing to a frame, so this won't open a new new window
-                                            return false;
-                                        } else {
-                                            // See if we're able to open a new window
-                                            if (target == "_blank")
-                                                // Use target name that we can reuse, in case opening the window works
-                                                target = Math.random().toString().substring(2);
-                                            // Don't use "noopener" as we do need to use that window to test on it!
-                                            var newWindow = window.open("about:blank", target);
-                                            if (newWindow && newWindow.close) {
-                                                return false;
-                                            } else {
-                                                return true;
-                                            }
-                                        }
-                                    })();
-
-                                    // Set or reset `target` attribute
-                                    if (noTarget)
-                                        requestForm.removeAttribute("target");
-                                    else
-                                        requestForm.target = target;
-
-                                    if (urlType == "action")
-                                        requestForm.action = updatePath(form.xformsServerSubmitActionPath);
-                                    else
-                                        requestForm.action = updatePath(form.xformsServerSubmitResourcePath);
-
-                                    try {
-                                        requestForm.submit();
-                                    } catch (e) {
-                                        // NOP: This is to prevent the error "Unspecified error" in IE. This can
-                                        // happen when navigating away is cancelled by the user pressing cancel
-                                        // on a dialog displayed on unload.
-                                    }
+                                    });
                                     break;
                                 }
 

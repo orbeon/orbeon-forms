@@ -852,15 +852,6 @@
                                     }
 
                                     /**
-                                     * Set the action to the URL of the current page.
-                                     *
-                                     * We can't (or don't know how to) set the URL to the URL to which we did a submission
-                                     * replace="all", so the best we can do it to set it to the current URL.
-                                     *
-                                     * We don't do it when the server generated a <form action="…"> that contains
-                                     * xforms-server-submit, which can happen in cases (e.g. running in a portal) where for
-                                     * some reason submitting to the URL of the page wouldn't work.
-                                     *
                                      * When the target is an iframe, we add a ?t=id to work around a Chrome bug happening
                                      * when doing a POST to the same page that was just loaded, gut that the POST returns
                                      * a PDF. See:
@@ -868,17 +859,23 @@
                                      *     https://code.google.com/p/chromium/issues/detail?id=330687
                                      *     https://github.com/orbeon/orbeon-forms/issues/1480
                                      */
-                                    if (requestForm.action.indexOf("xforms-server-submit") == -1) {
-                                        var isTargetAnIframe = _.isString(target) && $('#' + target).prop('tagName') == 'IFRAME';
-                                        var a = $('<a>');
-                                        a.prop('href', window.location.href);
-                                        if (isTargetAnIframe) {
-                                            var param = "t=" + _.uniqueId();
-                                            var search = a.prop('search');
-                                            var newSearch = (search == '' || search == '?') ? '?' + param : search + '&' + param;
-                                            a.prop('search', newSearch);
+                                    var updatePath = function(path) {
+                                        if (path.indexOf("xforms-server-submit") == -1) {
+                                            var isTargetAnIframe = _.isString(target) && $('#' + target).prop('tagName') == 'IFRAME';
+                                            if (isTargetAnIframe) {
+                                                var a = $('<a>');
+                                                a.prop('href', path);
+                                                var param = "t=" + _.uniqueId();
+                                                var search = a.prop('search');
+                                                var newSearch = (search == '' || search == '?') ? '?' + param : search + '&' + param;
+                                                a.prop('search', newSearch);
+                                                return a.prop('href');
+                                            } else {
+                                                return path;
+                                            }
+                                        } else {
+                                            return path;
                                         }
-                                        requestForm.action = a.prop('href');
                                     }
 
                                     // Do we set a target on the form to open the page in another frame?
@@ -911,9 +908,9 @@
                                         requestForm.target = target;
 
                                     if (urlType == "action")
-                                        requestForm.action = form.xformsServerSubmitActionPath;
+                                        requestForm.action = updatePath(form.xformsServerSubmitActionPath);
                                     else
-                                        requestForm.action = form.xformsServerSubmitResourcePath;
+                                        requestForm.action = updatePath(form.xformsServerSubmitResourcePath);
 
                                     try {
                                         requestForm.submit();

@@ -797,11 +797,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        getCurrentValueEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         getCurrentValue: function (control) {
             var event = {control: control};
-            ORBEON.xforms.Controls.getCurrentValueEvent.fire(event);
-
             var jControl = $(control);
 
             if (! _.isUndefined(event.result)) {

@@ -418,7 +418,7 @@ object XFormsUI {
       if (path.contains("xforms-server-submit")) {
 
         val isTargetAnIframe =
-          targetOpt.exists(target => dom.document.getElementById(target).tagName.equalsIgnoreCase("iframe"))
+          targetOpt.flatMap(target => Option(dom.document.getElementById(target))).exists(_.tagName.equalsIgnoreCase("iframe"))
 
         if (isTargetAnIframe) {
           val url = new URL(path, dom.document.location.href)

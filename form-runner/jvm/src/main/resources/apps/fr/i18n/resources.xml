@@ -6108,49 +6108,49 @@
             </formats>
         </common>
         <buttons>
-            <create>&lt;i class="fa fa-fw fa-plus"/&lt; Utwórz</create>
-            <view>&lt;i class="fa fa-fw fa-eye"/&lt; Podgląd</view>
-            <approve>&lt;i class="icon-ok-circle"/&lt; Akceptuj</approve>
-            <reject>&lt;i class="icon-ban-circle"/&lt; Odrzuć</reject>
+            <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Utwórz</create>
+            <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Podgląd</view>
+            <approve>&lt;i class="icon-ok-circle"&gt;&lt;/i&gt; Akceptuj</approve>
+            <reject>&lt;i class="icon-ban-circle"&gt;&lt;/i&gt; Odrzuć</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&lt; Home</home>
-            <review>&lt;i class="fa fa-fw fa-eye"/&lt; Przeglądaj</review>
-            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"/&lt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&lt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&lt; Usuń</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&lt; Importuj</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&lt; Nowy</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&lt; Duplikuj</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Przeglądaj</review>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Usuń</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importuj</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nowy</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplikuj</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&lt; Zapisz</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&lt; Złóż</save-final>
-            <save-draft todo="true">&lt;i class="icon-inbox"/&lt; Zapisz szkic</save-draft>
-            <save-progress todo="true">&lt;i class="icon-inbox"/&lt; Zapisz szkic</save-progress>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&lt; Edytuj</edit>
-            <send>&lt;i class="icon-arrow-right"/&lt; Wyślij</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&lt; Email</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&lt; Zweryfikuj</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Zapisz</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Złóż</save-final>
+            <save-draft todo="true">&lt;i class="icon-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-draft>
+            <save-progress todo="true">&lt;i class="icon-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-progress>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Edytuj</edit>
+            <send>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Wyślij</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Zweryfikuj</validate>
             <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="icon-arrow-right"/&lt; Złóż</submit>
-            <workflow-review>&lt;i class="icon-arrow-right"/&lt; Przeglądaj</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&lt; Edytuj</workflow-edit>
-            <workflow-send>&lt;i class="icon-arrow-right"/&lt; Wyślij</workflow-send>
+            <submit>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Złóż</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Przeglądaj</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Edytuj</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Wyślij</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&lt; Podsumowanie</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&lt; Zamknij</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&lt; Wyczyść</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Podsumowanie</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Zamknij</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Wyczyść</clear>
             <cancel>Anuluj</cancel>
             <save-locally>Zapisz lokalnie</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/></collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/></expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Odśwież"/></refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&lt; Następna sekcja</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&lt; Poprzednia sekcja</wizard-prev>
-            <wizard-toc>&lt;i class="fa fa-fw fa-list"/&lt; Zawartość</wizard-toc>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Następna sekcja</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Poprzednia sekcja</wizard-prev>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Zawartość</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Wyczyść i zamknij</submit-dialog-clear>
@@ -6162,16 +6162,16 @@
             <validation-dialog-review>Przeglądaj</validation-dialog-review>
             <validation-dialog-continue>Kontynuuj</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&lt; Testuj</test>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testuj</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&lt; Publikuj</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&lt; Zapisz i publikuj</save-publish>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publikuj</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Zapisz i publikuj</save-publish>
 
-            <yes>&lt;i class="fa fa-fw fa-check"/&lt; Tak</yes>
-            <no>&lt;i class="fa fa-fw fa-times"/&lt; Nie</no>
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Tak</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Nie</no>
             <ok>OK</ok>
             <previous>Poprzedni</previous>
             <next>Następny</next>

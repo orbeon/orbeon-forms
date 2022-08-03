@@ -32,8 +32,25 @@
     <!-- Call up persistence layer to obtain XHTML+XForms -->
     <!-- NOTE: We used to use oxf:url-generator, then switched to oxf:xforms-submission for more header support. We use
          oxf:url-generator again as it is much faster and is enough now that the persistence proxy is in place. -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="#instance" transform="oxf:unsafe-xslt">
+
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/scheme</include>
+                <include>/request/server-name</include>
+                <include>/request/server-port</include>
+                <include>/request/is-secure</include>
+                <include>/request/context-path</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#instance"/>
+        <!-- https://github.com/orbeon/orbeon-forms/issues/5395 -->
+        <p:input name="request" href="#request"/>
+        <p:input name="config">
             <config xsl:version="2.0">
 
                 <xsl:variable name="params" select="/*"/>
@@ -92,6 +109,11 @@
 
             </config>
         </p:input>
+        <p:output name="data" id="url-generator-config"/>
+    </p:processor>
+
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" href="#url-generator-config"/>
         <p:output name="data" id="document"/>
     </p:processor>
 

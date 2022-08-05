@@ -459,10 +459,12 @@ object XFormsUI {
     }
 
     formElem.action = updatedPath(
-      if (urlType == "action")
-        form.xformsServerSubmitActionPath
-      else
-        form.xformsServerSubmitResourcePath
+      (
+        if (urlType == "action")
+          form.xformsServerSubmitActionPath
+        else
+          form.xformsServerSubmitResourcePath
+      ).getOrElse(dom.window.location.toString)
     )
 
     // Notify the caller (to handle the loading indicator)

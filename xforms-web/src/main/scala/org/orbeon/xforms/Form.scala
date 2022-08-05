@@ -27,8 +27,8 @@ class Form(
   val uuidInput                     : html.Input,
   val ns                            : String,
   val xformsServerPath              : String,
-  val xformsServerSubmitActionPath  : String,
-  val xformsServerSubmitResourcePath: String,
+  val xformsServerSubmitActionPath  : Option[String],
+  val xformsServerSubmitResourcePath: Option[String],
   val xformsServerUploadPath        : String,
   var repeatTreeChildToParent       : js.Dictionary[String],           // for JavaScript access
   var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]], // for JavaScript access

@@ -185,11 +185,11 @@ object ScriptBuilder {
 
     val currentTime = System.currentTimeMillis
 
-    val xformsSubmissionPath =
+    val xformsSubmissionPathOpt =
       if (containingDocument.getDeploymentType != DeploymentType.Standalone || containingDocument.isPortletContainer || containingDocument.isEmbeddedFromHeaderOrUrlParam)
-        XFormsNames.XFORMS_SERVER_SUBMIT
+        Some(XFormsNames.XFORMS_SERVER_SUBMIT)
       else
-        containingDocument.getRequestPath
+        None
 
     val jsonString =
       rpc.Initializations(
@@ -198,8 +198,8 @@ object ScriptBuilder {
         repeatTree                     = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
         repeatIndexes                  = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
         xformsServerPath               = rewriteResource("/xforms-server"),
-        xformsServerSubmitActionPath   = rewriteAction(xformsSubmissionPath),
-        xformsServerSubmitResourcePath = rewriteResource(xformsSubmissionPath),
+        xformsServerSubmitActionPath   = xformsSubmissionPathOpt.map(rewriteAction),
+        xformsServerSubmitResourcePath = xformsSubmissionPathOpt.map(rewriteResource),
         xformsServerUploadPath         = rewriteResource("/xforms-server/upload"),
         controls  =
           for {

@@ -44,6 +44,7 @@ object Operation extends Enum[Operation] {
   case object Read   extends Operation
   case object Update extends Operation
   case object Delete extends Operation
+  case object List   extends Operation
 }
 
 object Operations {
@@ -53,7 +54,8 @@ object Operations {
     Operation.Create,
     Operation.Read,
     Operation.Update,
-    Operation.Delete
+    Operation.Delete,
+    Operation.List
   )
 
   def parseFromHeaders(headers: Map[String, List[String]]): Option[Operations] =

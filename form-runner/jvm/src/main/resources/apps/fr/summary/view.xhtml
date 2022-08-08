@@ -357,6 +357,12 @@
                     name="operations-from-role"
                     value="frf:authorizedOperationsBasedOnRolesXPath($source-form-metadata/permissions)"/>
 
+                <!-- Check if the user doesn't have the permission to 'list'
+                     https://github.com/orbeon/orbeon-forms/issues/5397 -->
+                <xf:action
+                    if="not('list' = $operations-from-role)"
+                    type="xpath">frf:sendError(403)</xf:action>
+
                 <!-- Remember global operations -->
                 <xf:setvalue
                     ref="xxf:instance('fr-authorized-operations')"

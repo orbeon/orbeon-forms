@@ -31,9 +31,24 @@ trait FormRunnerPermissionsOps {
   /**
    * Given a permission element, e.g. <permission operations="read update delete">, returns the tokenized value of
    * the operations attribute.
+   *
+   * See backward compatibility handling: https://github.com/orbeon/orbeon-forms/issues/5397
    */
-  def permissionOperations(permissionElement: NodeInfo): List[String] =
-    permissionElement attTokens "operations" toList
+  def permissionOperationsHandleList(permissionElement: NodeInfo): List[String] = {
+
+    val tokens            = permissionElement.attTokens("operations")
+    val hasMinusListToken = tokens(Operation.MinusListToken) // https://github.com/orbeon/orbeon-forms/issues/5397
+
+    val updatedTokens =
+      if (! hasMinusListToken && tokens(Operation.Read.entryName))
+        tokens + Operation.List.entryName
+      else if (hasMinusListToken)
+        tokens.filter(_ != Operation.MinusListToken)
+      else
+        tokens
+
+    updatedTokens.to
+  }
 
   //@XPathFunction
   def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo): List[String] =
@@ -131,7 +146,7 @@ trait FormRunnerPermissionsOps {
           if currentUsernameOrGroupname == dataUsernameOrGroupname =>
             val allPermissions                   = permissionsElOrNull.child("permission").toList
             val permissionsForOwnerOrGroupMember = allPermissions.filter(p => p / * forall (_.localname == condition))
-            permissionsForOwnerOrGroupMember.flatMap(permissionOperations)
+            permissionsForOwnerOrGroupMember.flatMap(permissionOperationsHandleList)
         case _ => Nil
       }
     }

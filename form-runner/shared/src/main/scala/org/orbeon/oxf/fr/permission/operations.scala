@@ -45,6 +45,8 @@ object Operation extends Enum[Operation] {
   case object Update extends Operation
   case object Delete extends Operation
   case object List   extends Operation
+
+  val MinusListToken: String = s"-${List.entryName}"
 }
 
 object Operations {

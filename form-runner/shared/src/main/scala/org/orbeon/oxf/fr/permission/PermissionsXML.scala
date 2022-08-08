@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.permission
 
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.oxf.util.StringUtils._
@@ -54,7 +54,7 @@ object PermissionsXML {
     }
 
   private def parsePermission(permissionEl: NodeInfo): Permission = {
-    val operations = Operations.parse(FormRunner.permissionOperations(permissionEl))
+    val operations = Operations.parse(frc.permissionOperationsHandleList(permissionEl))
     val conditions =
       permissionEl.child(*).toList.map(
         conditionEl =>

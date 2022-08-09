@@ -24,9 +24,12 @@ import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerTemplatesOps, InDocFormRunnerDocContext, Names, SchemaOps}
+import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.permission.PermissionsXML
+import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
@@ -39,6 +42,7 @@ import org.orbeon.saxon.function.Property
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.QNameValue
 import org.orbeon.scaxon.Implicits._
+import org.orbeon.scaxon.NodeConversions
 import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.{XFormsId, XFormsNames}
@@ -647,6 +651,77 @@ object FormBuilderXPathApi {
       case None =>
         Nil
     }
+
+  //@XPathFunction
+  def convertPermissionsFromUiToFormDefinitionFormat(permissionsEl: NodeInfo): NodeInfo = {
+
+    val anyonePermissionElem    = (permissionsEl / "permission").head
+    val anyoneOperations        = anyonePermissionElem elemValue "operations"
+    val anyoneOperationsTokens  = anyoneOperations.splitTo[Set]()
+
+    def makePermissionElem(operationsTokens: Set[String], elemOpt: Option[NodeInfo]): NodeInfo =
+      elementInfo(
+        "permission",
+        attributeInfo("operations", operationsTokens.mkString(" ")) :: elemOpt.toList
+      )
+
+    val anyonePermissionOpt =
+      anyoneOperationsTokens.nonEmpty option
+        makePermissionElem(anyoneOperationsTokens, None)
+
+    def findPermissionsFor(condition: String): Option[NodeInfo] = {
+
+      val permissionElemOpt  = (permissionsEl / "permission").find(_.attValue("for") == condition)
+
+      permissionElemOpt flatMap { permissionElem =>
+
+        val operations = permissionElem elemValue "operations"
+        val operationsTokens = operations.splitTo[Set]()
+
+        operationsTokens.nonEmpty option
+          makePermissionElem(operationsTokens, Some(elementInfo(condition)))
+      }
+    }
+
+    val ownerPermissionOpt        = findPermissionsFor("owner")
+    val groupMembersPermissionOpt = findPermissionsFor("group-member")
+
+    val rolePermissionElems = (permissionsEl / "permission").filter(_.child("role").nonEmpty).toList
+
+    val rolesWithOperations =
+      for {
+        operation <- rolePermissionElems.flatMap(_.elemValue("operations").splitTo[List]()).distinct
+        sortedDistinctRoles =
+          rolePermissionElems
+            .filter(_.elemValue("operations").splitTo[Set]().contains(operation))
+            .map(_.elemValue("role").replace(" ", "%20"))
+            .distinct
+            .sorted
+      } yield
+        sortedDistinctRoles.mkString(" ") -> operation
+
+    // Consolidate multiple operations for the same roles
+    val rolesPermissionElems =
+      for ((rolesString, operations) <- CollectionUtils.combineValues(rolesWithOperations))
+        yield
+          makePermissionElem(
+            operations.toSet,
+            Some(
+              elementInfo(
+                "user-role",
+                attributeInfo("any-of", rolesString)
+              )
+            )
+          )
+
+    val allPermissionElems =
+      anyonePermissionOpt.toList       :::
+      ownerPermissionOpt.toList        :::
+      groupMembersPermissionOpt.toList :::
+      rolesPermissionElems
+
+    elementInfo("permissions", allPermissionElems)
+  }
 
   //@XPathFunction
   def buildFormBuilderControlNamespacedIdOrEmpty(staticId: String): String =

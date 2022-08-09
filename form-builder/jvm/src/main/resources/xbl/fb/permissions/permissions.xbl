@@ -102,7 +102,7 @@
                     <xf:insert context="$ui/permissions" ref="*" origin="instance('permission-template')"/>
                     <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'owner')"/>
                     <xf:insert context="$ui/permissions" ref="*" origin="instance('permission-template')"/>
-                    <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'group-members')"/>
+                    <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'group-member')"/>
                     <xf:action iterate="$ui/always-show-roles/role">
                         <xf:var name="role" value="."/>
                         <xf:insert context="$ui/permissions" ref="*" origin="instance('permission-with-role-template')"/>
@@ -117,8 +117,8 @@
                                      value="$metadata/permissions/permission[empty(*)]/@operations"/>
                         <xf:setvalue ref="$ui/permissions/permission[@for = 'owner']/operations"
                                      value="$metadata/permissions/permission[exists(owner)]/@operations"/>
-                        <xf:setvalue ref="$ui/permissions/permission[@for = 'group-members']/operations"
                                      value="$metadata/permissions/permission[exists(group-member)]/@operations"/>
+                        <xf:setvalue ref="$ui/permissions/permission[@for = 'group-member']/operations"
 
                         <!-- Add permissions attached to a role -->
                         <xf:var name="roles" value="distinct-values($metadata/permissions/permission/user-role/@any-of/xxf:split())"/>
@@ -154,42 +154,11 @@
                     <!-- Reset permissions element -->
                     <xf:delete ref="$metadata/permissions"/>
                     <xf:action if="$ui/has-permissions = 'true'">
-                        <xf:insert context="$metadata" ref="*" origin="xf:element('permissions')"/>
 
-                        <!-- In UI replace space in role by %20 -->
-                        <xf:setvalue iterate="$ui/permissions/permission/role" ref="." value="replace(xxf:trim(.), ' ', '%20')"/>
-
-                        <!-- Add "anyone" permission -->
-                        <xf:var name="anyone-operations" value="$ui/permissions/permission[1]/operations"/>
-                        <xf:insert if="$anyone-operations != ''" context="$metadata/permissions" origin="xf:element('permission', xf:attribute('operations', $anyone-operations))"/>
-
-                        <!-- Add owner permission -->
-                        <xf:var name="owner-operations" value="$ui/permissions/permission[@for = 'owner']/operations"/>
-                        <xf:insert if="$owner-operations != ''" context="$metadata/permissions" origin="xf:element('permission', (xf:attribute('operations', $owner-operations), xf:element('owner')))"/>
-                        <!-- Add group members permission -->
-                        <xf:var name="group-members-operations" value="$ui/permissions/permission[@for = 'group-members']/operations"/>
-                        <xf:insert if="$group-members-operations != ''" context="$metadata/permissions" origin="xf:element('permission', (xf:attribute('operations', $group-members-operations), xf:element('group-member')))"/>
-
-                        <!-- For each role-based permission, get the roles that can access it, and store in metadata as a separate permission element -->
-                        <xf:var name="role-permissions" value="$ui/permissions/permission[exists(role)]"/>
-                        <xf:action iterate="distinct-values($role-permissions/operations/xxf:split())">
-                            <xf:var name="operation" value="."/>
-                            <xf:var name="roles" value="string-join(saxon:sort($role-permissions[xxf:split(operations) = $operation]/role), ' ')"/>
-                            <xf:insert context="$metadata/permissions" ref="*" origin="xf:element('permission', (
-                                xf:attribute('operations', $operation),
-                                xf:element('user-role', xf:attribute('any-of', $roles))))"/>
-                        </xf:action>
-
-                        <!-- Optional code to consolidate multiple permission for the same roles -->
-                        <xf:var name="any-ofs" value="distinct-values($metadata/permissions/permission/user-role/@any-of)"/>
-                        <xf:var name="operations" value="for $ao in $any-ofs return string-join($metadata/permissions/permission[user-role/@any-of = $ao]/@operations, ' ')"/>
-                        <xf:delete ref="$metadata/permissions/permission[user-role]"/>
-                        <xf:action iterate="1 to count($any-ofs)">
-                            <xf:var name="i" value="position()"/>
-                            <xf:insert context="$metadata/permissions" ref="*" origin="xf:element('permission', (
-                                xf:attribute('operations', saxon:item-at($operations, $i)),
-                                xf:element('user-role', xf:attribute('any-of', saxon:item-at($any-ofs, $i)))))"/>
-                        </xf:action>
+                        <xf:insert
+                            context="$metadata"
+                            ref="*"
+                            origin="fbf:convertPermissionsFromUiToFormDefinitionFormat($ui/permissions)"/>
 
                         <!-- Log metadata permissions -->
                         <xf:action type="javascript" if="event('xxf:type') = 'fr-test'">
@@ -239,8 +208,8 @@
                                             $resources/dialog-permissions/(
                                                 if (context()/@for = 'owner') then
                                                     owner
-                                                else if (context()/@for = 'group-members') then
-                                                    group-members
+                                                else if (context()/@for = 'group-member') then
+                                                    group-member
                                                 else
                                                     anyone)">
                                         <xf:label value="$resources/dialog-permissions/role"/>

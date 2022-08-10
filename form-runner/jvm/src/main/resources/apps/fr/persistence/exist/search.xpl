@@ -229,7 +229,7 @@
                 <xsl:variable name="permissions" select="doc('input:form-metadata')/forms/form/permissions"/>
                 <xsl:template match="document">
                     <xsl:copy>
-                        <xsl:attribute name="operations" select="string-join(search:authorizedOperations($permissions, metadata), ' ')"/>
+                        <xsl:attribute name="operations" select="search:authorizedOperations($permissions, metadata)"/>
                         <xsl:apply-templates select="(@* | node()) except metadata"/>
                     </xsl:copy>
                 </xsl:template>

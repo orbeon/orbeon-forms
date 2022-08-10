@@ -27,6 +27,8 @@ object SearchOps {
 
   private val SearchOperations = List(Read, Update, Delete)
 
+  // Used by eXist only
+  //@XPathFunction
   def xpathAuthorizedIfOrganizationMatch(formPermissionsElOrNull: NodeInfo): List[String] =
     authorizedIfOrganizationMatch(
       permissions = PermissionsXML.parse(formPermissionsElOrNull),
@@ -47,10 +49,12 @@ object SearchOps {
     usefulUserParametrizedRoles.map(_.organizationName)
   }
 
+  // Used by eXist only
+  //@XPathFunction
   def authorizedOperations(
     formPermissionsElOrNull : NodeInfo,
     metadataOrNullEl        : NodeInfo
-  ): List[String] = {
+  ): String = {
 
     val checkWithData = {
 
@@ -82,6 +86,6 @@ object SearchOps {
         check       = checkWithData
       )
 
-    Operations.serialize(operations)
+    Operations.serialize(operations).mkString(" ")
   }
 }

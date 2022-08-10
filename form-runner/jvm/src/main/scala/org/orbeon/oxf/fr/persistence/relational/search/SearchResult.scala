@@ -41,7 +41,7 @@ trait SearchResult extends SearchRequestParser {
             workflow-stage      ={doc.metadata.workflowStage.map(xml.Text(_))}
             name                ={doc.metadata.documentId}
             draft               ={doc.metadata.draft.toString}
-            operations          ={doc.operations.mkString(" ")}>{
+            operations          ={doc.operations}>{
 
             <details>{
               request.columns.map { requestColumn =>

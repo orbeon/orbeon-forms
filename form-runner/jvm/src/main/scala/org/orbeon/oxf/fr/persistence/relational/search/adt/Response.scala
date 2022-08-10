@@ -36,7 +36,7 @@ case class DocumentValue(
 
 case class Document(
   metadata         : DocumentMetaData,
-  operations       : List[String],
+  operations       : String,
   values           : List[DocumentValue]
 )
 

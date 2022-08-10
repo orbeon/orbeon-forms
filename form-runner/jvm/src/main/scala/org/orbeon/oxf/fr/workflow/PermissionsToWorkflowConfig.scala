@@ -26,12 +26,12 @@ object PermissionsToWorkflowConfig {
                 else
                   permission.conditions
                     .flatMap {
-                      case Owner => List(WorkflowRoleAvailabilityRule(IsComparison, OwnerWorkflowRole))
-                      case Group => List(WorkflowRoleAvailabilityRule(IsComparison, GroupMemberWorkflowRole))
+                      case Owner             => List(WorkflowRoleAvailabilityRule(IsComparison, OwnerWorkflowRole))
+                      case Group             => List(WorkflowRoleAvailabilityRule(IsComparison, GroupMemberWorkflowRole))
                       case RolesAnyOf(roles) => roles.map(AuthenticationRoleAvailabilityRule(IsComparison, _))
                     }.map(ToUsersAvailability(_))
               val operations = permission.operations match {
-                case AnyOperation => PermissionOperations.All
+                case AnyOperation                   => PermissionOperations.All
                 case SpecificOperations(operations) => operations
               }
               actors.map(_ -> operations)

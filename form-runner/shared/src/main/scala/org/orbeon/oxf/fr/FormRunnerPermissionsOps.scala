@@ -96,7 +96,7 @@ trait FormRunnerPermissionsOps {
       )
 
     def unauthorizedMode =
-      ! frc.AllModes(mode)
+      ! frc.AllDetailModes(mode)
 
     ! (
       unauthorizedCreation ||

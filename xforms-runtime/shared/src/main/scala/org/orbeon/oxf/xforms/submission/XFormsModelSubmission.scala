@@ -147,7 +147,7 @@ class XFormsModelSubmission(
         else
           throw new XFormsSubmissionException(
             thisSubmission,
-            "xf:submission: invalid replace attribute: " + p.replaceType,
+            s"xf:submission: invalid replace attribute: `${p.replaceType}`",
             "processing instance replacement",
             null,
             new XFormsSubmitErrorEvent(
@@ -178,7 +178,8 @@ class XFormsModelSubmission(
       if (p.replaceType != ReplaceType.All)
         throw new XFormsSubmissionException(
           thisSubmission,
-          "xf:submission for submission id: " + getId + ", redirect code received with replace=\"" + p.replaceType + "\"",
+          // Scala 2.13: just use `"` and `\"` (use of `"""` due to a bug in Scala 2.12!)
+          s"""xf:submission for submission id: `$getId`, redirect code received with replace="${p.replaceType.entryName}"""",
           "processing submission response",
           null,
           new XFormsSubmitErrorEvent(
@@ -196,7 +197,7 @@ class XFormsModelSubmission(
       } else
         throw new XFormsSubmissionException(
           thisSubmission,
-          "xf:submission for submission id: " + getId + ", error code received when submitting instance: " + cxr.statusCode,
+          s"xf:submission for submission id: `$getId`, error code received when submitting instance: ${cxr.statusCode}",
           "processing submission response",
           null,
           new XFormsSubmitErrorEvent(
@@ -380,7 +381,7 @@ class XFormsModelSubmission(
               case None =>
                 throw new XFormsSubmissionException(
                   thisSubmission,
-                  "xf:submission: invalid submission method requested: " + p.xformsMethod,
+                  s"xf:submission: invalid submission method requested: `${p.xformsMethod}`",
                   "serializing instance",
                   null,
                   null

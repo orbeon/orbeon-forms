@@ -1,16 +1,3 @@
-/**
- * Copyright (C) 2016 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
 package org.orbeon.oxf.fr.permission
 
 import enumeratum.EnumEntry.Lowercase
@@ -18,6 +5,8 @@ import enumeratum._
 import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.StringUtils._
+
+import scala.collection.immutable
 
 
 sealed trait                                                        Operations
@@ -28,7 +17,7 @@ case class  SpecificOperations(operations: List[Operation]) extends Operations {
     def compare(x: Operation, y: Operation): Int = x.entryName.compare(y.entryName)
   }
 
-  override def equals(otherAny: Any) = otherAny match {
+  override def equals(otherAny: Any): Boolean = otherAny match {
     case otherOperations: SpecificOperations => operations.sorted == otherOperations.operations.sorted
     case _                                   => false
   }
@@ -38,27 +27,21 @@ sealed trait Operation extends EnumEntry with Lowercase
 
 object Operation extends Enum[Operation] {
 
-  val values = findValues
+  val values: immutable.IndexedSeq[Operation] = findValues
 
   case object Create extends Operation
   case object Read   extends Operation
   case object Update extends Operation
   case object Delete extends Operation
   case object List   extends Operation
-
-  val MinusListToken: String = s"-${List.entryName}"
 }
 
 object Operations {
 
-  def None = SpecificOperations(Nil)
-  def All  = List(
-    Operation.Create,
-    Operation.Read,
-    Operation.Update,
-    Operation.Delete,
-    Operation.List
-  )
+  private val MinusListToken: String = s"-${Operation.List.entryName}"
+
+  val None: Operations = SpecificOperations(Nil)
+  val All: List[Operation] = Operation.values.toList
 
   def parseFromHeaders(headers: Map[String, List[String]]): Option[Operations] =
     Headers.firstItemIgnoreCase(headers, FormRunnerPersistence.OrbeonOperations)
@@ -68,20 +51,48 @@ object Operations {
     stringOperations match {
       case List("*") =>
         AnyOperation
-      case _   =>
-        val operations = stringOperations.map { operationName =>
-          val operationOpt = All.find(_.entryName == operationName)
-          operationOpt.getOrElse(throw new IllegalArgumentException(s"Unknown operation `$operationName`"))
-        }
-        SpecificOperations(operations)
+      case _ =>
+        SpecificOperations(stringOperations.map(Operation.withName))
     }
 
-  def serialize(operations: Operations): List[String] =
+  def normalizeOperations(operations: String): Set[String] = {
+
+    val tokens = operations.tokenizeToSet
+    val hasMinusListToken = tokens(MinusListToken) // https://github.com/orbeon/orbeon-forms/issues/5397
+
+    if (! hasMinusListToken && tokens(Operation.Read.entryName))
+      tokens + Operation.List.entryName
+    else if (hasMinusListToken)
+      tokens.filter(_ != MinusListToken)
+    else
+      tokens
+  }
+
+  def denormalizeOperations(operationsTokens: Set[Operation]): Set[String] = {
+
+    // The UI format now no longer includes `read` if there is a `list` or `update`
+    // `list` => `read` and `update` => `read`
+    val withRead =
+      if (operationsTokens(Operation.List) || operationsTokens(Operation.Update))
+        operationsTokens + Operation.Read
+      else
+        operationsTokens
+
+    // See https://github.com/orbeon/orbeon-forms/issues/5397
+    if (withRead(Operation.Read) && ! withRead(Operation.List))
+      withRead.map(_.entryName) + MinusListToken // `-list` indicates permission is explicitly removed
+    else
+      (withRead - Operation.List).map(_.entryName)
+  }
+
+  def serialize(operations: Operations, normalized: Boolean = true): List[String] =
     operations match {
       case AnyOperation =>
         List("*")
-      case SpecificOperations(specificOperations) =>
-        specificOperations.map(_.entryName)
+      case SpecificOperations(operations) if normalized =>
+        operations.map(_.entryName)
+      case SpecificOperations(operations) =>
+        denormalizeOperations(operations.toSet).toList
      }
 
   def combine(left: Operations, right: Operations): Operations =

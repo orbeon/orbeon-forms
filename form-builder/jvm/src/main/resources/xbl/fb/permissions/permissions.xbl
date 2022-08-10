@@ -38,7 +38,7 @@
                     <ui valid="true">
                         <apply-trigger/>
                         <has-permissions/>
-                        <readonly-checked>create read update delete</readonly-checked>
+                        <readonly-checked>create read update delete list</readonly-checked>
                         <permissions/>
                         <always-show-roles/>
                     </ui>
@@ -50,16 +50,50 @@
                     <xf:bind ref="apply-trigger" readonly="instance()/@valid = 'false'"/>
                     <xf:bind ref="readonly-checked" readonly="true()"/>
                     <xf:bind ref="permissions" id="permissions-bind">
-                        <!-- If a permission is assigned to anyone, remove it from other "rows", as it would be redundant -->
+                        <!-- "Anyone" permission -->
+                        <xf:bind ref="permission[1]" id="anyone-permission-bind" name="anyone-permission"/>
+                        <!-- All rows: `update` => `read` and `list` => `read` -->
+                        <xf:bind
+                            ref="permission/operations"
+                            readonly="false()"
+                            calculate="
+                                let $tokens := xxf:split()
+                                return
+                                    string-join(
+                                        $tokens[
+                                            not(
+                                                . = 'read' and (
+                                                    $tokens = 'update' or
+                                                    $tokens = 'list'
+                                                )
+                                            )
+                                        ],
+                                        ' '
+                                    )"/>
+                        <!-- "Other" rows: "Anyone" permission => this row's permission -->
                         <xf:bind
                             ref="permission[position() > 1]/operations"
                             readonly="false()"
-                            calculate="string-join(xxf:split()[not (. = xxf:split(instance('ui')/permissions/permission[1]/operations))], ' ')"/>
+                            calculate="
+                                let $anyone-operations-tokens := xxf:split($anyone-permission/operations)
+                                return
+                                    string-join(
+                                        xxf:split()[
+                                            not(
+                                                . = $anyone-operations-tokens or
+                                                . = 'read' and (
+                                                    $anyone-operations-tokens = 'update' or (: implies `read` :)
+                                                    $anyone-operations-tokens = 'list'      (: implies `read` :)
+                                                )
+                                            )
+                                        ],
+                                        ' '
+                                    )"/>
                         <xf:bind ref="permission" id="permission-bind">
-                            <xf:bind ref="role" constraint="xxf:non-blank()" required="true()"/>
-                            <!-- If operations contains 'update', automatically add 'read' -->
-                            <xf:bind ref="operations" readonly="false()" calculate="if (xxf:split() = 'update')
-                                then string-join(distinct-values((xxf:split(), 'read')), ' ') else ."/>
+                            <xf:bind
+                                ref="role"
+                                constraint="xxf:non-blank()"
+                                required="true()"/>
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
@@ -86,7 +120,9 @@
                 <!-- On dialog open, copy permissions from metadata into our UI representation -->
                 <xf:action event="xxforms-dialog-open" observer="dialog">
 
-                    <xf:var name="has-permissions" value="exists($metadata/permissions)"/>
+                    <!-- https://github.com/orbeon/orbeon-forms/issues/5397 -->
+                    <xf:var name="metadata-permissions"    value="fbf:normalizePermissionsHandleList($metadata/permissions)"/>
+                    <xf:var name="has-permissions"         value="exists($metadata-permissions)"/>
                     <xf:setvalue ref="$ui/has-permissions" value="if ($has-permissions) then 'true' else ''"/>
 
                     <!-- Get and store roles we always show first -->
@@ -114,20 +150,20 @@
 
                         <!-- Add permission for anyone, owner, and group -->
                         <xf:setvalue ref="$ui/permissions/permission[1]/operations"
-                                     value="$metadata/permissions/permission[empty(*)]/@operations"/>
+                                     value="$metadata-permissions/permission[empty(*)]/@operations"/>
                         <xf:setvalue ref="$ui/permissions/permission[@for = 'owner']/operations"
-                                     value="$metadata/permissions/permission[exists(owner)]/@operations"/>
-                                     value="$metadata/permissions/permission[exists(group-member)]/@operations"/>
+                                     value="$metadata-permissions/permission[exists(owner)]/@operations"/>
                         <xf:setvalue ref="$ui/permissions/permission[@for = 'group-member']/operations"
+                                     value="$metadata-permissions/permission[exists(group-member)]/@operations"/>
 
                         <!-- Add permissions attached to a role -->
-                        <xf:var name="roles" value="distinct-values($metadata/permissions/permission/user-role/@any-of/xxf:split())"/>
+                        <xf:var name="roles" value="distinct-values($metadata-permissions/permission/user-role/@any-of/xxf:split())"/>
                         <xf:action iterate="$roles">
                             <!-- Current role -->
                             <xf:var name="role" value="."/>
                             <xf:var name="ui-role" value="replace($role, '%20', ' ')"/>
                             <!-- Permissions for the current role -->
-                            <xf:var name="permissions" value="$metadata/permissions/permission[xxf:split(user-role/@any-of) = $role]"/>
+                            <xf:var name="permissions" value="$metadata-permissions/permission[xxf:split(user-role/@any-of) = $role]"/>
                             <!-- If necessary, insert new permission in UI, and populate it -->
                             <xf:var name="operations" value="string-join($permissions/@operations, ' ')"/>
                             <xf:var name="existing-permission" value="$ui/permissions/permission[role = $ui-role]"/>
@@ -162,9 +198,11 @@
 
                         <!-- Log metadata permissions -->
                         <xf:action type="javascript" if="event('xxf:type') = 'fr-test'">
-                            <xf:param name="xml" value="xxf:serialize($metadata/permissions, 'xml')"/>
+                            <xf:param name="uiXml"   value="xxf:serialize($ui/permissions,       'xml')"/>
+                            <xf:param name="formXml" value="xxf:serialize($metadata/permissions, 'xml')"/>
                             <xf:body>
-                                console.log(ORBEON.jQuery.parseXML(unescape(xml)));
+                                console.log(ORBEON.jQuery.parseXML(unescape(uiXml)));
+                                console.log(ORBEON.jQuery.parseXML(unescape(formXml)));
                             </xf:body>
                         </xf:action>
                     </xf:action>
@@ -189,19 +227,19 @@
                     </xf:select>
                     <xf:group ref=".[$ui/has-permissions = 'true']">
                         <!-- Edit roles -->
-                        <xf:var name="anyone-operations" value="xxf:split($ui/permissions/permission[1]/operations)"/>
+                        <xf:var name="anyone-operations" value="xxf:split(bind('anyone-permission-bind')/operations)"/>
                         <fr:grid
                             repeat="content"
                             bind="permissions-bind"
                             template="instance('permission-with-role-template')"
                             freeze="{3 + count($ui/always-show-roles/role)}"
+                            columns="24"
                             class="fb-permissions-grid">
 
-                            <xh:tr>
                                 <xf:var name="is-anyone"      value="empty(role) and empty(@for)"/>
                                 <xf:var name="is-owner-group" value="exists(@for)"/>
                                 <!-- Role name or "anyone" -->
-                                <xh:td class="fb-role" colspan="4">
+                                <fr:c class="fb-role" x="1" w="9">
                                     <xf:output
                                         ref=".[$is-anyone or $is-owner-group]"
                                         value="
@@ -219,10 +257,10 @@
                                         <xf:output ref="role[$is-always-show-roles]"/>
                                         <xf:input  ref="role[not($is-always-show-roles)]" incremental="true" class="fb-role-name"/>
                                     </xf:group>
-                                </xh:td>
+                                </fr:c>
                                 <!-- Checkboxes for operations -->
                                 <!-- NOTE: Put `id` on controls as `grid.xbl` needs this -->
-                                <xh:td colspan="2">
+                                <fr:c x="10" w="3">
                                     <xf:select
                                         id="fb-permissions-create-checkbox"
                                         ref="
@@ -240,13 +278,23 @@
                                             <xf:value>create</xf:value>
                                         </xf:item>
                                     </xf:select>
-                                </xh:td>
-                                <xh:td colspan="2">
+                                </fr:c>
+                                <fr:c x="13" w="3">
                                     <!-- If this role has the 'update' permission, make the 'read' checkbox read-only -->
                                     <xf:select
                                         id="fb-permissions-read-checkbox"
                                         ref="
-                                            if ((not($is-anyone) and $anyone-operations = 'read') or (xxf:split(operations) = 'update')) then
+                                            if (
+                                                (
+                                                    not($is-anyone) and (
+                                                        $anyone-operations = 'read'   or
+                                                        $anyone-operations = 'update' or (: implies `read` :)
+                                                        $anyone-operations = 'list'      (: implies `read` :)
+                                                    )
+                                                ) or
+                                                xxf:split(operations) = 'update' or
+                                                xxf:split(operations) = 'list'
+                                            ) then
                                                 $ui/readonly-checked
                                             else
                                                 operations"
@@ -258,8 +306,8 @@
                                             <xf:value>read</xf:value>
                                         </xf:item>
                                     </xf:select>
-                                </xh:td>
-                                <xh:td colspan="2">
+                                </fr:c>
+                                <fr:c x="16" w="3">
                                     <xf:select
                                         id="fb-permissions-update-checkbox"
                                         ref="
@@ -275,8 +323,8 @@
                                             <xf:value>update</xf:value>
                                         </xf:item>
                                     </xf:select>
-                                </xh:td>
-                                <xh:td colspan="2">
+                                </fr:c>
+                                <fr:c x="19" w="3">
                                     <xf:select
                                         id="fb-permissions-delete-checkbox"
                                         ref="
@@ -292,8 +340,26 @@
                                             <xf:value>delete</xf:value>
                                         </xf:item>
                                     </xf:select>
-                                </xh:td>
-                            </xh:tr>
+                                </fr:c>
+                                <fr:c x="22" w="3">
+                                    <xf:select
+                                        id="fb-permissions-list-checkbox"
+                                        ref="
+                                            if ($is-owner-group) then
+                                                ()
+                                            else if (not($is-anyone) and $anyone-operations = 'list') then
+                                                $ui/readonly-checked
+                                            else
+                                                operations"
+                                        appearance="full"
+                                        class="fb-list-permission">
+                                        <xf:label ref="$resources/dialog-permissions/list"/>
+                                        <xf:item>
+                                            <xf:label ref="$resources/dialog-permissions/list"/>
+                                            <xf:value>list</xf:value>
+                                        </xf:item>
+                                    </xf:select>
+                                </fr:c>
                         </fr:grid>
                     </xf:group>
 

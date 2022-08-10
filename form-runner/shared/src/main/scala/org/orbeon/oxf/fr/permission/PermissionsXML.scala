@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.fr.permission
 
-import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.xml.Elem
 
+
 object PermissionsXML {
 
-  def serialize(permissions: Permissions): Option[Elem] =
+  def serialize(permissions: Permissions, normalized: Boolean): Option[Elem] =
     permissions match {
       case UndefinedPermissions =>
         None
@@ -30,7 +30,7 @@ object PermissionsXML {
         Some(
           <permissions>
             {permissionsList map (p =>
-            <permission operations={Operations.serialize(p.operations).mkString(" ")}>
+            <permission operations={Operations.serialize(p.operations, normalized).mkString(" ")}>
               {p.conditions map {
               case Owner => <owner/>
               case Group => <group-member/>
@@ -53,8 +53,20 @@ object PermissionsXML {
         DefinedPermissions(permissionsEl.child("permission").toList.map(parsePermission))
     }
 
+  /**
+   * Given a permission element, e.g.:
+   *
+   *   <permission operations="read update delete">
+   *
+   * return the tokenized value of the `operations` attribute.
+   *
+   * See backward compatibility handling: https://github.com/orbeon/orbeon-forms/issues/5397
+   */
+  def permissionOperationsHandleList(permissionElement: NodeInfo): List[String] =
+    Operations.normalizeOperations(permissionElement.attValue("operations")).to
+
   private def parsePermission(permissionEl: NodeInfo): Permission = {
-    val operations = Operations.parse(frc.permissionOperationsHandleList(permissionEl))
+    val operations = Operations.parse(permissionOperationsHandleList(permissionEl))
     val conditions =
       permissionEl.child(*).toList.map(
         conditionEl =>

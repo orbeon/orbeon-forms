@@ -1237,6 +1237,7 @@
             <read>Read</read>
             <update>Update</update>
             <delete>Delete</delete>
+            <list>List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow and Permissions</label>
@@ -2573,6 +2574,7 @@
             <read>Lire</read>
             <update>Mettre à jour</update>
             <delete>Supprimer</delete>
+            <list>Lister</list>
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow et Permissions</label>
@@ -3919,6 +3921,7 @@
             <read>Read</read>
             <update>Update</update>
             <delete>Delete</delete>
+            <list>List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -5264,6 +5267,7 @@
             <read>Просматривать</read>
             <update>редактировать</update>
             <delete>Удалять</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -6602,6 +6606,7 @@
             <read>Leggi</read>
             <update>Aggiorna</update>
             <delete>Cancella</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -7941,6 +7946,7 @@
             <read>Lesen</read>
             <update>Update</update>
             <delete>Löschen</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -9282,6 +9288,7 @@
             <read>Lue</read>
             <update>Päivitä</update>
             <delete>Poista</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -10620,6 +10627,7 @@
             <read>Acceder</read>
             <update>Modificar</update>
             <delete>Eliminar</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -11938,6 +11946,7 @@
             <read>Lezen</read>
             <update>Updaten</update>
             <delete>Verwijderen</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow en bevoegdheden</label>
@@ -13283,6 +13292,7 @@
             <read>Ler</read>
             <update>Actualizar</update>
             <delete>Apagar</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -14629,6 +14639,7 @@
             <read>Läsa</read>
             <update>Ändra</update>
             <delete>Ta bort</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>

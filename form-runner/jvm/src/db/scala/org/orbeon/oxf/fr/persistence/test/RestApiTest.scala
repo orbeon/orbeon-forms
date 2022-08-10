@@ -190,7 +190,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
               <application-name>{provider.entryName}</application-name>
               <form-name>{FormName}</form-name>
               <title xml:lang="en">{title.getOrElse("")}</title>
-              { PermissionsXML.serialize(permissions).getOrElse("") }
+              { PermissionsXML.serialize(permissions, normalized = false).getOrElse("") }
             </metadata>
           </xf:instance>
         </xf:model>

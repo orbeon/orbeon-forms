@@ -25,7 +25,7 @@ import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr._
-import org.orbeon.oxf.fr.permission.PermissionsXML
+import org.orbeon.oxf.fr.permission.{Operation, Operations, PermissionsXML}
 import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -653,59 +653,70 @@ object FormBuilderXPathApi {
     }
 
   //@XPathFunction
+  def normalizePermissionsHandleList(permissionsElOrNull: NodeInfo): NodeInfo =
+    PermissionsXML.serialize(PermissionsXML.parse(permissionsElOrNull), normalized = true)
+      .map(NodeConversions.elemToNodeInfo).orNull
+
+  private val PermissionElemName = "permission"
+  private val OperationsElemName = "operations"
+  private val RoleElemName       = "role"
+
+  private val OperationsAttName  = OperationsElemName
+
+  //@XPathFunction
   def convertPermissionsFromUiToFormDefinitionFormat(permissionsEl: NodeInfo): NodeInfo = {
 
-    val anyonePermissionElem    = (permissionsEl / "permission").head
-    val anyoneOperations        = anyonePermissionElem elemValue "operations"
-    val anyoneOperationsTokens  = anyoneOperations.splitTo[Set]()
+    val anyonePermissionElem    = (permissionsEl / PermissionElemName).head
+    val anyoneOperations        = anyonePermissionElem.elemValue(OperationsElemName)
+    val anyoneOperationsTokens  = anyoneOperations.splitTo[Set]().map(Operation.withName)
 
     def makePermissionElem(operationsTokens: Set[String], elemOpt: Option[NodeInfo]): NodeInfo =
       elementInfo(
-        "permission",
-        attributeInfo("operations", operationsTokens.mkString(" ")) :: elemOpt.toList
+        PermissionElemName,
+        attributeInfo(OperationsAttName, operationsTokens.mkString(" ")) :: elemOpt.toList
       )
 
     val anyonePermissionOpt =
       anyoneOperationsTokens.nonEmpty option
-        makePermissionElem(anyoneOperationsTokens, None)
+        makePermissionElem(Operations.denormalizeOperations(anyoneOperationsTokens), None)
 
     def findPermissionsFor(condition: String): Option[NodeInfo] = {
 
-      val permissionElemOpt  = (permissionsEl / "permission").find(_.attValue("for") == condition)
+      val permissionElemOpt  = (permissionsEl / PermissionElemName).find(_.attValue("for") == condition)
 
       permissionElemOpt flatMap { permissionElem =>
 
-        val operations = permissionElem elemValue "operations"
-        val operationsTokens = operations.splitTo[Set]()
+        val operations       = permissionElem.elemValue(OperationsElemName)
+        val operationsTokens = operations.splitTo[Set]().map(Operation.withName)
 
         operationsTokens.nonEmpty option
-          makePermissionElem(operationsTokens, Some(elementInfo(condition)))
+          makePermissionElem(Operations.denormalizeOperations(operationsTokens), Some(elementInfo(condition)))
       }
     }
 
     val ownerPermissionOpt        = findPermissionsFor("owner")
     val groupMembersPermissionOpt = findPermissionsFor("group-member")
 
-    val rolePermissionElems = (permissionsEl / "permission").filter(_.child("role").nonEmpty).toList
+    val rolePermissionElems = (permissionsEl / PermissionElemName).filter(_.child(RoleElemName).nonEmpty).toList
 
     val rolesWithOperations =
       for {
-        operation <- rolePermissionElems.flatMap(_.elemValue("operations").splitTo[List]()).distinct
+        operation <- rolePermissionElems.flatMap(_.elemValue(OperationsElemName).splitTo[List]()).distinct
         sortedDistinctRoles =
           rolePermissionElems
-            .filter(_.elemValue("operations").splitTo[Set]().contains(operation))
-            .map(_.elemValue("role").replace(" ", "%20"))
+            .filter(_.elemValue(OperationsElemName).splitTo[Set]().contains(operation))
+            .map(_.elemValue(RoleElemName).replace(" ", "%20"))
             .distinct
             .sorted
       } yield
-        sortedDistinctRoles.mkString(" ") -> operation
+        sortedDistinctRoles.mkString(" ") -> Operation.withName(operation)
 
     // Consolidate multiple operations for the same roles
     val rolesPermissionElems =
       for ((rolesString, operations) <- CollectionUtils.combineValues(rolesWithOperations))
         yield
           makePermissionElem(
-            operations.toSet,
+            Operations.denormalizeOperations(operations.toSet),
             Some(
               elementInfo(
                 "user-role",

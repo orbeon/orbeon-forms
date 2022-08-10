@@ -488,7 +488,7 @@
             xxf:element="nav"
             model="fr-form-model"
             ref=".[not(xxf:property(string-join(('oxf.fr.detail.hide-header', fr:app-name(), fr:form-name()), '.')))]"
-            class="navbar navbar-expand-lg navbar-dark bg-dark position-sticky">
+            class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
             <xh:div class="container-fluid">
                 <xsl:variable name="default-objects" as="element()+">
                     <fr:goto-content/>
@@ -499,21 +499,21 @@
                       <xh:span class="navbar-toggler-icon"></xh:span>
                     </xh:button>
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <xh:ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <xh:ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                             <!-- These are typically to the right -->
-                            <xh:li class="nav-item">
+                            <xh:li class="nav-item px-3">
                             <fr:language-selector/>
                             </xh:li>
-                            <xh:li>
-            <!--                        <xh:div>-->
-            <!--                            xxx: <xf:output value="fr:workflow-stage-value()"/>-->
-            <!--                        </xh:div>-->
-                            <fr:status-icons/>
-                            </xh:li>
-                            <xh:li class="nav-item">
+<!--                            <xh:li class="nav-item px-3">-->
+<!--            &lt;!&ndash;                        <xh:div>&ndash;&gt;-->
+<!--            &lt;!&ndash;                            xxx: <xf:output value="fr:workflow-stage-value()"/>&ndash;&gt;-->
+<!--            &lt;!&ndash;                        </xh:div>&ndash;&gt;-->
+<!--                            <fr:status-icons/>-->
+<!--                            </xh:li>-->
+                            <xh:li class="nav-item px-3">
                             <fr:user-nav/>
                             </xh:li>
-                            <xh:li class="nav-item">
+                            <xh:li class="nav-item px-3">
                             <xh:div>
                                 <xh:a href="/fr/">
                                     <xh:i class="fa fa-fw fa-th"/>
@@ -633,7 +633,7 @@
 
     <xsl:template match="fr:title" name="fr-title">
         <!-- Q: Why do we need @ref here? -->
-        <xh:h1><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
+        <xh:h5 class="text-white-50"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h5>
     </xsl:template>
 
     <!-- Description in chosen language or first one if not found -->

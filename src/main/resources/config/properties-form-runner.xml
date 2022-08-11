@@ -411,6 +411,11 @@
         open-rendered-format(format = "xml-form-structure-and-data")
     </property>
 
+    <!-- https://github.com/orbeon/orbeon-forms/issues/5403 -->
+    <property as="xs:string"  name="oxf.fr.detail.process.lease-view.*.*">
+        navigate(uri = "/fr/{fr:app-name()}/{fr:form-name()}/view/{fr:document-id()}")
+    </property>
+
     <!-- Legacy buttons and processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.save.*.*"                             value='save-final'/>
     <property as="xs:string"  name="oxf.fr.detail.process.submit.*.*">

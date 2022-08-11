@@ -48,7 +48,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
   private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
-  val AllOperations       = SpecificOperations(List(Create, Read, Update, Delete))
+  val AllOperations       = SpecificOperations(List(Create, Read, Update, Delete, Operation.List))
   val CanCreate           = SpecificOperations(List(Create))
   val CanRead             = SpecificOperations(List(Read))
   val CanUpdate           = SpecificOperations(List(Update))
@@ -382,7 +382,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
                 <form-version>1</form-version>
                 <title xml:lang="en"/>
                 <permissions>
-                    <permission operations="read create"/>
+                    <permission operations="read create -list"/>
                 </permissions>
             </form>
         </forms>.toDocument

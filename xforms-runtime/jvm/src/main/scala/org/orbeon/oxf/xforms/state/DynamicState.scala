@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
+import org.orbeon.oxf.xml.SBinaryDefaultFormats._
 import org.orbeon.oxf.xml.SAXStoreBinaryFormat._
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.xforms.{DelayedEvent, XFormsId}

@@ -1,8 +1,8 @@
 package org.orbeon.oxf.xml
 
-import sbinary.DefaultProtocol._
+import org.orbeon.oxf.xml.SBinaryDefaultFormats._
 import sbinary.Operations.{fromByteArray, read, toByteArray, write}
-import sbinary.{Format, Input, Output}
+import sbinary._
 
 import scala.jdk.CollectionConverters._
 

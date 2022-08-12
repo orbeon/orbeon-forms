@@ -663,6 +663,8 @@ object FormBuilderXPathApi {
 
   private val OperationsAttName  = OperationsElemName
 
+  // NOTE: This function works directly on the XML. Another way would be to produce the `Permissions` ADTs, and
+  // then just call `PermissionsXML.serialize()`.
   //@XPathFunction
   def convertPermissionsFromUiToFormDefinitionFormat(permissionsEl: NodeInfo): NodeInfo = {
 

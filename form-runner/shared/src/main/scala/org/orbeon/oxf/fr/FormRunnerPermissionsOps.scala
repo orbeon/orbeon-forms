@@ -33,9 +33,9 @@ trait FormRunnerPermissionsOps {
     appForm           : AppForm
   ): Permissions =
     permissionsElemOpt match {
-      case Some(permissionsElem) =>
+      case some @ Some(_) =>
         // If the element is defined, even if nothing else is present, properties will *not* be used
-        PermissionsXML.parse(Some(permissionsElem))
+        PermissionsXML.parse(some)
       case None =>
         // Try app/form properties
         frc.formRunnerProperty("oxf.fr.permissions", appForm) match {

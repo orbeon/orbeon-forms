@@ -28,7 +28,7 @@ import scala.jdk.CollectionConverters._
 
 trait FormRunnerPermissionsOps {
 
-  def findPermissionsFromElemOrProperties(
+  def permissionsFromElemOrProperties(
     permissionsElemOpt: Option[NodeInfo],
     appForm           : AppForm
   ): Permissions =
@@ -46,7 +46,15 @@ trait FormRunnerPermissionsOps {
 
   //@XPathFunction
   def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo, app: String, form: String): List[String] =
-    Operations.serialize(authorizedOperationsBasedOnRoles(Option(permissionsElOrNull), AppForm(app, form)), normalized = true)
+    Operations.serialize(
+      authorizedOperationsBasedOnRolesUseAdt(
+        permissionsFromElemOrProperties(
+          Option(permissionsElOrNull),
+          AppForm(app, form)
+        )
+      ),
+      normalized = true
+    )
 
   //@XPathFunction
   def isUserAuthorizedBasedOnOperationsAndModeXPath(operations: String, mode: String, isSubmit: Boolean): Boolean =
@@ -62,16 +70,12 @@ trait FormRunnerPermissionsOps {
    * can be tested with allAuthorizedOperations().
    * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
    */
-  def authorizedOperationsBasedOnRoles(
-    permissionsElemOpt: Option[NodeInfo],
-    appForm           : AppForm,
-    currentUser       : Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
+  def authorizedOperationsBasedOnRolesUseAdt(
+    permissions: Permissions,
+    currentUser: Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
   ): Operations =
     PermissionsAuthorization.authorizedOperations(
-      findPermissionsFromElemOrProperties(
-        permissionsElemOpt,
-        appForm
-      ),
+      permissions,
       currentUser,
       PermissionsAuthorization.CheckWithoutDataUserPessimistic
     )
@@ -116,16 +120,14 @@ trait FormRunnerPermissionsOps {
     )
   }
 
-  // Used by persistence layers (relational, eXist) and `allAuthorizedOperationsAssumingOwnerGroupMember`
-  // 2022-08-11: I only see the direct use by `allAuthorizedOperationsAssumingOwnerGroupMember`
+  // 2022-08-11: Only used by `allAuthorizedOperationsAssumingOwnerGroupMember`.
   def allAuthorizedOperations(
-    permissionsElOrNull : NodeInfo,
-    dataUsername        : Option[String],
-    dataGroupname       : Option[String],
-    dataOrganization    : Option[Organization],
-    appForm             : AppForm,
-    currentUser         : Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
-  ): List[String] = {
+    permissions     : Permissions,
+    dataUsername    : Option[String],
+    dataGroupname   : Option[String],
+    dataOrganization: Option[Organization], // 2022-08-12: unused and always passed `None`. A TODO?
+    currentUser     : Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
+  ): Operations = {
 
     // For both username and groupname, we don't want nulls, or if specified empty string
     require(dataUsername  ne null)
@@ -134,25 +136,30 @@ trait FormRunnerPermissionsOps {
     require(! dataGroupname.contains(""))
 
     def ownerGroupMemberOperations(
-      maybeCurrentUsernameOrGroupname : Option[String],
-      maybeDataUsernameOrGroupname    : Option[String],
-      condition                       : String
-    ): List[String] = {
+      definedPermissions             : DefinedPermissions,
+      maybeCurrentUsernameOrGroupname: Option[String],
+      maybeDataUsernameOrGroupname   : Option[String],
+      condition                      : Condition
+    ): List[Operations] = {
       (maybeCurrentUsernameOrGroupname, maybeDataUsernameOrGroupname) match {
         case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
           if currentUsernameOrGroupname == dataUsernameOrGroupname =>
-            val allPermissions                   = permissionsElOrNull.child("permission").toList
-            val permissionsForOwnerOrGroupMember = allPermissions.filter(p => p / * forall (_.localname == condition))
-            permissionsForOwnerOrGroupMember.flatMap(PermissionsXML.permissionOperationsHandleList)
-        case _ => Nil
+          definedPermissions.permissionsList.filter(_.conditions.contains(condition)).map(_.operations)
+        case _ =>
+          Nil
       }
     }
 
-    allOperationsIfNoPermissionsDefined(Option(permissionsElOrNull), appForm) { _ =>
-      val rolesOperations       = Operations.serialize(authorizedOperationsBasedOnRoles(Option(permissionsElOrNull), appForm, currentUser))
-      val ownerOperations       = ownerGroupMemberOperations(currentUser map     (_.userAndGroup.username),  dataUsername,  "owner")
-      val groupMemberOperations = ownerGroupMemberOperations(currentUser flatMap (_.userAndGroup.groupname), dataGroupname, "group-member")
-      (rolesOperations ++ ownerOperations ++ groupMemberOperations).distinct
+    permissions match {
+      case UndefinedPermissions =>
+        AnyOperation
+      case defined @ DefinedPermissions(_) =>
+
+        val rolesOperations       = authorizedOperationsBasedOnRolesUseAdt(defined, currentUser)
+        val ownerOperations       = ownerGroupMemberOperations(defined, currentUser map     (_.userAndGroup.username),  dataUsername,  Owner)
+        val groupMemberOperations = ownerGroupMemberOperations(defined, currentUser flatMap (_.userAndGroup.groupname), dataGroupname, Group)
+
+        Operations.combine(rolesOperations :: ownerOperations ::: groupMemberOperations)
     }
   }
 
@@ -163,22 +170,30 @@ trait FormRunnerPermissionsOps {
    *
    * FIXME: We have similar, but better typed logic in `authorizedBasedOnRole()` (`SearchLogic.scala`), which we
    *        could move to `PermissionsAuthorization`, and use from here and `SearchLogic.scala`
+   *
+   * 2022-08-12: This is now better typed. I don't know if the comment above still applies.
    */
   //@XPathFunction
-  def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo, app: String, form: String): Seq[String] = {
+  def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElOrNull: NodeInfo, app: String, form: String): Seq[String] = {
 
     val headers       = CoreCrossPlatformSupport.externalContext.getRequest.getHeaderValuesMap.asScala
     val authUsername  = headers.get(Headers.OrbeonUsernameLower).toSeq.flatten.headOption
     val authGroupname = headers.get(Headers.OrbeonGroupLower   ).toSeq.flatten.headOption
 
-    val operationsWithoutAssumingOwnership = allAuthorizedOperations(permissionsElement, None, None, None, AppForm(app, form))
-    def operationsAssumingOwnership        = allAuthorizedOperations(permissionsElement, authUsername, authGroupname, None, AppForm(app, form))
-    val authUserCanCreate                  = Operations.allows(Operations.parse(operationsWithoutAssumingOwnership), Operation.Create)
+    val permissions = permissionsFromElemOrProperties(Option(permissionsElOrNull), AppForm(app, form))
+
+    val operationsWithoutAssumingOwnership = allAuthorizedOperations(permissions, None,         None,          None)
+    def operationsAssumingOwnership        = allAuthorizedOperations(permissions, authUsername, authGroupname, None)
+    val authUserCanCreate                  = Operations.allows(operationsWithoutAssumingOwnership, Operation.Create)
 
     // If the user can't create data, don't return permissions the user might have if that user was the owner; we
-    // assume that if the user can't create data, the user can never be the owner of any data
-    if (authUserCanCreate) operationsAssumingOwnership
-    else                   operationsWithoutAssumingOwnership
+    // assume that if the user can't create data, the user can never be the owner of any data.
+    Operations.serialize(
+      if (authUserCanCreate)
+        operationsAssumingOwnership
+      else
+        operationsWithoutAssumingOwnership
+    )
   }
 
   def orbeonRolesFromCurrentRequest: Set[String] =
@@ -200,17 +215,6 @@ trait FormRunnerPermissionsOps {
       )
     }
   }
-
-  private def allOperationsIfNoPermissionsDefined(
-    permissionsElemOpt : Option[NodeInfo],
-    appForm            : AppForm)(
-    computePermissions : List[Permission] => List[String]
-  ): List[String] =
-    findPermissionsFromElemOrProperties(permissionsElemOpt, appForm) match {
-      // No permissions defined for this form, authorize any operation
-      case UndefinedPermissions => List("*")
-      case DefinedPermissions(permissions) => computePermissions(permissions)
-    }
 }
 
 object FormRunnerPermissionsOps extends FormRunnerPermissionsOps

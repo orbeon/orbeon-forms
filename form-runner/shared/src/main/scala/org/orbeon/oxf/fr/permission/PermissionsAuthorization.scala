@@ -37,8 +37,7 @@ object PermissionsAuthorization {
   ): Operations =
     permissions match {
       case DefinedPermissions(permissionsList) =>
-        val operationsList = permissionsList.map(authorizedOperations(_, currentUser, check))
-        Operations.combine(operationsList)
+        Operations.combine(permissionsList.map(authorizedOperations(_, currentUser, check)))
       case UndefinedPermissions =>
         SpecificOperations(Operations.All)
     }

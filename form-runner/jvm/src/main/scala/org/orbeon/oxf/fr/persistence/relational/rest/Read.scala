@@ -171,7 +171,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
           formPermissionsForDataRequestOptOpt foreach { formPermissionsElemOpt =>
             val authorizedOperations = PermissionsAuthorization.authorizedOperations(
-              FormRunner.findPermissionsFromElemOrProperties(
+              FormRunner.permissionsFromElemOrProperties(
                 formPermissionsElemOpt,
                 req.appForm
               ),

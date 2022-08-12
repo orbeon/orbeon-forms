@@ -63,11 +63,9 @@ object PermissionsXML {
    *
    * See backward compatibility handling: https://github.com/orbeon/orbeon-forms/issues/5397
    */
-  def permissionOperationsHandleList(permissionElement: NodeInfo): List[String] =
-    Operations.normalizeOperations(permissionElement.attValue("operations")).to
-
   private def parsePermission(permissionEl: NodeInfo): Permission = {
-    val operations = Operations.parse(permissionOperationsHandleList(permissionEl))
+    val operations =
+      Operations.parse(Operations.normalizeOperations(permissionEl.attValue("operations")).toList)
     val conditions =
       permissionEl.child(*).toList.map(
         conditionEl =>

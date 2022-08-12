@@ -358,7 +358,7 @@ trait CreateUpdateDelete
 
     // Read outside of a `withConnection` block, so we don't use two simultaneous connections
     val formPermissions =
-      FormRunner.findPermissionsFromElemOrProperties(
+      FormRunner.permissionsFromElemOrProperties(
         req.forData.option(RelationalUtils.readFormPermissions(req.appForm, FormDefinitionVersion.Specific(versionToSet))).flatten,
         req.appForm
       )

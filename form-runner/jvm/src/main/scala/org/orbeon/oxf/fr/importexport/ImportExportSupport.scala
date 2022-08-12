@@ -417,11 +417,14 @@ object ImportExportSupport {
 
       val (doc, headers) = Transforms.readFormData(appForm, documentId)
 
-      val permissionsElOpt = {
+      val permissions = {
 
         val ctx = new InDocFormRunnerDocContext(form.rootElement)
 
-        ctx.metadataRootElem.firstChildOpt(Names.Permissions)
+        FormRunnerPermissionsOps.permissionsFromElemOrProperties(
+          ctx.metadataRootElem.firstChildOpt(Names.Permissions),
+          appForm
+        )
       }
 
       // Follow what's done in `persistence-model.xml` for the `edit` mode:
@@ -431,7 +434,7 @@ object ImportExportSupport {
       //
       val operations =
         Operations.parseFromHeaders(headers)
-          .getOrElse(frc.authorizedOperationsBasedOnRoles(permissionsElOpt, appForm))
+          .getOrElse(frc.authorizedOperationsBasedOnRolesUseAdt(permissions))
 
       debug(s"operations obtained: `$operations`")
 

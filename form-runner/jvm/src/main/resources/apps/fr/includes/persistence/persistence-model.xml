@@ -71,7 +71,9 @@
             (
                 $mode != 'new' or
                 frf:allAuthorizedOperationsAssumingOwnerGroupMember(
-                    xxf:instance('fr-form-metadata')/permissions
+                    xxf:instance('fr-form-metadata')/permissions,
+                    $app,
+                    $form
                 ) = ('*', 'update')
             )                                                                   and
             $mode = ('new', 'edit')                                             and
@@ -375,9 +377,9 @@
                 if (exists($from-persistence)) then
                    xxf:split($from-persistence)
                 else if ($mode = 'new') then
-                   frf:allAuthorizedOperationsAssumingOwnerGroupMember(xxf:instance('fr-form-metadata')/permissions)
+                   frf:allAuthorizedOperationsAssumingOwnerGroupMember(xxf:instance('fr-form-metadata')/permissions, $app, $form)
                 else
-                   frf:authorizedOperationsBasedOnRolesXPath          (xxf:instance('fr-form-metadata')/permissions)
+                   frf:authorizedOperationsBasedOnRolesXPath          (xxf:instance('fr-form-metadata')/permissions, $app, $form)
             "/>
 
         <xf:setvalue

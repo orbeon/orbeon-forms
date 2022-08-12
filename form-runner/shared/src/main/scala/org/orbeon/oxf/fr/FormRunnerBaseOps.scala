@@ -43,19 +43,15 @@ import scala.util.Try
 
 // The standard Form Runner parameters
 case class FormRunnerParams(
-  app         : String,
-  form        : String,
+  app         : String, // curiously we allow this to be `"*"`
+  form        : String, // curiously we allow this to be `"*"`
   formVersion : Int,
   document    : Option[String],
   isDraft     : Option[Boolean],
   mode        : String
 ) {
-
-  def appForm: AppForm =
-    AppForm(app, form)
-
   def appFormVersion: FormRunnerParams.AppFormVersion =
-    (appForm, formVersion)
+    (AppForm(app, form), formVersion)
 }
 
 object FormRunnerParams {
@@ -83,6 +79,9 @@ case class AppForm(app: String, form: String) {
 
 object AppForm {
   val FormBuilder: AppForm = AppForm("orbeon", "builder")
+
+  def isSpecificAppForm(app: String, form: String): Boolean =
+    app != "*" && app.nonEmpty && form != "*" && form.nonEmpty
 }
 
 trait FormRunnerBaseOps {
@@ -229,10 +228,13 @@ trait FormRunnerBaseOps {
     }
 
   def buildPropertyName(name: String)(implicit p: FormRunnerParams): String =
-    if (frc.hasAppForm(p.app, p.form))
-      name :: p.app :: p.form :: Nil mkString "."
+    if (AppForm.isSpecificAppForm(p.app, p.form))
+      buildPropertyName(name, AppForm(p.app, p.form))
     else
       name
+
+  def buildPropertyName(name: String, appForm: AppForm): String =
+    name :: appForm.app :: appForm.form :: Nil mkString "."
 
   //@XPathFunction
   def xpathFormRunnerStringProperty(name: String): Option[String] =
@@ -241,6 +243,9 @@ trait FormRunnerBaseOps {
   // Return a property using the form's app/name, None if the property is not defined
   def formRunnerProperty(name: String)(implicit p: FormRunnerParams): Option[String] =
     properties.getObjectOpt(buildPropertyName(name)) map (_.toString)
+
+  def formRunnerProperty(name: String, appForm: AppForm): Option[String] =
+    properties.getObjectOpt(buildPropertyName(name, appForm)) map (_.toString)
 
   def formRunnerPropertyWithNs(name: String)(implicit p: FormRunnerParams): Option[(String, NamespaceMapping)] =
     properties.getPropertyOpt(buildPropertyName(name)) map { p => (p.value.toString, p.namespaceMapping) }

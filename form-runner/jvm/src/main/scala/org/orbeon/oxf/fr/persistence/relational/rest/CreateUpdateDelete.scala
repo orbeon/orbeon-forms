@@ -357,10 +357,11 @@ trait CreateUpdateDelete
     val versionToSet = existing.flatMap(_.formVersion).getOrElse(requestedFormVersion(req))
 
     // Read outside of a `withConnection` block, so we don't use two simultaneous connections
-    val formPermissions = {
-      val elOpt = req.forData.option(RelationalUtils.readFormPermissions(req.appForm, FormDefinitionVersion.Specific(versionToSet))).flatten
-      PermissionsXML.parse(elOpt.orNull)
-    }
+    val formPermissions =
+      FormRunner.findPermissionsFromElemOrProperties(
+        req.forData.option(RelationalUtils.readFormPermissions(req.appForm, FormDefinitionVersion.Specific(versionToSet))).flatten,
+        req.appForm
+      )
     debug("CRUD: form permissions", List("permissions" -> formPermissions.toString))
 
     // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:

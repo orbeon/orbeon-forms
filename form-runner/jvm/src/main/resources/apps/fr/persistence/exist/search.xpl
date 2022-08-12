@@ -52,7 +52,7 @@
         <p:input name="config">
             <auth-info xsl:version="2.0">
                 <xsl:variable name="permissions"                select="/forms/form/permissions"/>
-                <xsl:variable name="operations-from-role"       select="frf:authorizedOperationsBasedOnRolesXPath($permissions)"/>
+                <xsl:variable name="operations-from-role"       select="frf:authorizedOperationsBasedOnRolesXPath($permissions, /forms/form/application-name, /forms/form/form-name)"/>
                 <xsl:variable name="search-operations"          select="('*', 'read', 'update', 'delete')"/>
                 <xsl:variable name="search-permissions"         select="$permissions/permission[p:split(@operations) = $search-operations]"/>
                 <authorized-based-on-role  ><xsl:value-of select="$operations-from-role = $search-operations"/></authorized-based-on-role>

@@ -41,8 +41,8 @@ object Permissions {
     implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(Permissions.getClass))
 
     val authorizedOperations = {
-      val permissionsElOrNull = RelationalUtils.readFormPermissions(AppForm(app, form), FormDefinitionVersion.Latest).orNull
-      val permissions         = PermissionsXML.parse(permissionsElOrNull)
+      val permissionsElemOpt  = RelationalUtils.readFormPermissions(AppForm(app, form), FormDefinitionVersion.Latest)
+      val permissions         = PermissionsXML.parse(permissionsElemOpt)
       val currentUser         = PermissionsAuthorization.currentUserFromSession
       val checkWithDataUser   = CheckWithDataUser(
         userAndGroup = UserAndGroup.fromStrings(

@@ -178,7 +178,7 @@ class PermissionsUiTest extends DocumentTestBase
       it(s"must pass $desc") {
 
         val computedFdEl   = FormBuilderXPathApi.convertPermissionsFromUiToFormDefinitionFormat(uiEl)
-        val computedAdt    = PermissionsXML.parse(computedFdEl)
+        val computedAdt    = PermissionsXML.parse(Some(computedFdEl))
         val serializedFdEl = PermissionsXML.serialize(computedAdt, normalized = false)
 
 //        println(s"computedFdEl:\n${StaticXPath.tinyTreeToString(computedFdEl)}")

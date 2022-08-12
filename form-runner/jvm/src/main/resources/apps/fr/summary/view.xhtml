@@ -355,7 +355,7 @@
                 <!-- Are we authorized to see all the data based because of our role? -->
                 <xf:var
                     name="operations-from-role"
-                    value="frf:authorizedOperationsBasedOnRolesXPath($source-form-metadata/permissions)"/>
+                    value="frf:authorizedOperationsBasedOnRolesXPath($source-form-metadata/permissions, $app, $form)"/>
 
                 <!-- Check if the user doesn't have the permission to 'list'
                      https://github.com/orbeon/orbeon-forms/issues/5397 -->

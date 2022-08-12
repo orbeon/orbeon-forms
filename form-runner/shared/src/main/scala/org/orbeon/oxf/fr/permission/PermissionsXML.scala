@@ -22,6 +22,7 @@ import scala.xml.Elem
 
 object PermissionsXML {
 
+  // xxx TODO: sort things in predictable order
   def serialize(permissions: Permissions, normalized: Boolean): Option[Elem] =
     permissions match {
       case UndefinedPermissions =>
@@ -45,8 +46,8 @@ object PermissionsXML {
         )
     }
 
-  def parse(permissionsElOrNull: NodeInfo): Permissions =
-    Option(permissionsElOrNull) match {
+  def parse(permissionsElemOpt: Option[NodeInfo]): Permissions =
+    permissionsElemOpt match {
       case None =>
         UndefinedPermissions
       case Some(permissionsEl) =>
@@ -78,7 +79,7 @@ object PermissionsXML {
               val rawRoles      = anyOfAttValue.splitTo[List](" ")
               val roles         = rawRoles.map(_.replace("%20", " "))
               RolesAnyOf(roles)
-            case _ => throw new RuntimeException("")
+            case _ => throw new IllegalArgumentException
           }
       )
     Permission(conditions, operations)

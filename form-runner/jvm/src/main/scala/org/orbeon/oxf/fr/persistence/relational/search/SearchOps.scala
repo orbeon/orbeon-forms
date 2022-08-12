@@ -31,7 +31,7 @@ object SearchOps {
   //@XPathFunction
   def xpathAuthorizedIfOrganizationMatch(formPermissionsElOrNull: NodeInfo): List[String] =
     authorizedIfOrganizationMatch(
-      permissions = PermissionsXML.parse(formPermissionsElOrNull),
+      permissions = PermissionsXML.parse(Option(formPermissionsElOrNull)),
       currentUser = PermissionsAuthorization.currentUserFromSession
     )
 
@@ -81,7 +81,7 @@ object SearchOps {
 
     val operations =
       PermissionsAuthorization.authorizedOperations(
-        permissions = PermissionsXML.parse(formPermissionsElOrNull),
+        permissions = PermissionsXML.parse(Option(formPermissionsElOrNull)),
         currentUser = PermissionsAuthorization.currentUserFromSession,
         check       = checkWithData
       )

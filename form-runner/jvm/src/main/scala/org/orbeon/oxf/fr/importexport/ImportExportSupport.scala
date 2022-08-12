@@ -431,7 +431,7 @@ object ImportExportSupport {
       //
       val operations =
         Operations.parseFromHeaders(headers)
-          .getOrElse(frc.authorizedOperationsBasedOnRoles(permissionsElOpt.orNull))
+          .getOrElse(frc.authorizedOperationsBasedOnRoles(permissionsElOpt, appForm))
 
       debug(s"operations obtained: `$operations`")
 

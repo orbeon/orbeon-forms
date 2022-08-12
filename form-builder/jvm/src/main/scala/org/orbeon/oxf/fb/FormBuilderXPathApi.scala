@@ -654,7 +654,7 @@ object FormBuilderXPathApi {
 
   //@XPathFunction
   def normalizePermissionsHandleList(permissionsElOrNull: NodeInfo): NodeInfo =
-    PermissionsXML.serialize(PermissionsXML.parse(permissionsElOrNull), normalized = true)
+    PermissionsXML.serialize(PermissionsXML.parse(Option(permissionsElOrNull)), normalized = true)
       .map(NodeConversions.elemToNodeInfo).orNull
 
   private val PermissionElemName = "permission"

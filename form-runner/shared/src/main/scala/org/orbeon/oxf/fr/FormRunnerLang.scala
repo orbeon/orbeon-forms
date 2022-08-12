@@ -36,8 +36,7 @@ trait FormRunnerLang {
   import FormRunnerLangPrivate._
 
   // The client passes "*" or blank to indicate that there is no current app/form name
-  def hasAppForm(app: String, form: String) = app != "*" && app.nonEmpty && form != "*" && form.nonEmpty
-  def getAppForm(app: String, form: String) = hasAppForm(app, form) option AppForm(app, form)
+  def getAppForm(app: String, form: String) = AppForm.isSpecificAppForm(app, form) option AppForm(app, form)
 
   def currentLang          = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("lang").stringValue
   def currentFRLang        = topLevelModel(ResourcesModel).get.unsafeGetVariableAsNodeInfo("fr-lang").stringValue

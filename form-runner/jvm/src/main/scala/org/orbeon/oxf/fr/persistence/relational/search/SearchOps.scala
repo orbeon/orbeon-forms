@@ -86,6 +86,6 @@ object SearchOps {
         check       = checkWithData
       )
 
-    Operations.serialize(operations).mkString(" ")
+    Operations.serialize(operations, normalized = true).mkString(" ")
   }
 }

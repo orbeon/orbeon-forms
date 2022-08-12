@@ -387,14 +387,14 @@
             value="string-join($ops, ' ')"/>
 
         <xf:message level="xxf:log-debug">
-            AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): <xf:output value="string-join($ops, ' ')"/>
+            AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): <xf:output value="instance('fr-authorized-operations')"/>
         </xf:message>
 
         <!-- Send an "Unauthorized" error if the user is unauthorized -->
         <xf:action
             if="not(
                 frf:isUserAuthorizedBasedOnOperationsAndModeXPath(
-                    string-join($ops, ' '),
+                    $ops,
                     $mode,
                     $is-submit
                 )

@@ -68,7 +68,7 @@ object Operations {
       tokens
   }
 
-  def denormalizeOperations(operationsTokens: Set[Operation]): Set[String] = {
+  def denormalizeOperations(operationsTokens: Set[Operation]): List[String] = {
 
     // The UI format now no longer includes `read` if there is a `list` or `update`
     // `list` => `read` and `update` => `read`
@@ -80,19 +80,24 @@ object Operations {
 
     // See https://github.com/orbeon/orbeon-forms/issues/5397
     if (withRead(Operation.Read) && ! withRead(Operation.List))
-      withRead.map(_.entryName) + MinusListToken // `-list` indicates permission is explicitly removed
+      inDefinitionOrder(withRead).map(_.entryName) :+ MinusListToken // `-list` indicates permission is explicitly removed
     else
-      (withRead - Operation.List).map(_.entryName)
+      inDefinitionOrder(withRead - Operation.List).map(_.entryName)
   }
 
-  def serialize(operations: Operations, normalized: Boolean = true): List[String] =
+  def inDefinitionOrder(operations: Iterable[Operation]): List[Operation] = {
+    val operationsSet = operations.toSet
+    Operations.All.filter(operationsSet)
+  }
+
+  def serialize(operations: Operations, normalized: Boolean): List[String] =
     operations match {
       case AnyOperation =>
         List("*")
       case SpecificOperations(operations) if normalized =>
-        operations.map(_.entryName)
+        inDefinitionOrder(operations).map(_.entryName)
       case SpecificOperations(operations) =>
-        denormalizeOperations(operations.toSet).toList
+        denormalizeOperations(operations.toSet)
      }
 
   def combine(left: Operations, right: Operations): Operations =

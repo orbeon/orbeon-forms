@@ -132,13 +132,13 @@ class PermissionsUiTest extends DocumentTestBase
 
     val fdMixedPermissionsEl: om.NodeInfo =
       <permissions>
-        <permission operations="update delete read -list">
+        <permission operations="read update delete -list">
           <owner/>
         </permission>
         <permission operations="read -list">
           <group-member/>
         </permission>
-        <permission operations="create update read">
+        <permission operations="create read update">
           <user-role any-of="orbeon-admin orbeon-user"/>
         </permission>
         <permission operations="delete">

@@ -182,7 +182,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
               throw HttpStatusCodeException(StatusCode.Forbidden)
             httpResponse.setHeader(
               FormRunnerPersistence.OrbeonOperations,
-              Operations.serialize(authorizedOperations).mkString(" ")
+              Operations.serialize(authorizedOperations, normalized = true).mkString(" ")
             )
           }
         }

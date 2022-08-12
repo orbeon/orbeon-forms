@@ -214,7 +214,7 @@ trait SearchLogic extends SearchRequestParser {
             val organization              = metadata.organizationId.map(id => organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
             val check                     = CheckWithDataUser(metadata.createdBy, organization)
             val operations                = PermissionsAuthorization.authorizedOperations(permissions.formPermissions, user, check)
-            Document(metadata, Operations.serialize(operations).mkString(" "), values)
+            Document(metadata, Operations.serialize(operations, normalized = true).mkString(" "), values)
           }
         (documents, searchCount)
       }

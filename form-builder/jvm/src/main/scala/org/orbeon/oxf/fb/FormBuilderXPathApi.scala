@@ -672,7 +672,7 @@ object FormBuilderXPathApi {
     val anyoneOperations        = anyonePermissionElem.elemValue(OperationsElemName)
     val anyoneOperationsTokens  = anyoneOperations.splitTo[Set]().map(Operation.withName)
 
-    def makePermissionElem(operationsTokens: Set[String], elemOpt: Option[NodeInfo]): NodeInfo =
+    def makePermissionElem(operationsTokens: List[String], elemOpt: Option[NodeInfo]): NodeInfo =
       elementInfo(
         PermissionElemName,
         attributeInfo(OperationsAttName, operationsTokens.mkString(" ")) :: elemOpt.toList

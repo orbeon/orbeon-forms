@@ -69,7 +69,7 @@ object Permissions {
     def httpResponse = NetUtils.getExternalContext.getResponse
     httpResponse.setHeader(
       FormRunnerPersistence.OrbeonOperations,
-      Operations.serialize(authorizedOperations).mkString(" ")
+      Operations.serialize(authorizedOperations, normalized = true).mkString(" ")
     )
   }
 }

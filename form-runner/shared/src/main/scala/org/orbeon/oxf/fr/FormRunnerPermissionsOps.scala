@@ -57,12 +57,8 @@ trait FormRunnerPermissionsOps {
     )
 
   //@XPathFunction
-  def isUserAuthorizedBasedOnOperationsAndModeXPath(operations: String, mode: String, isSubmit: Boolean): Boolean =
-    isUserAuthorizedBasedOnOperationsAndMode(
-      Operations.parse(operations.splitTo[List]()),
-      mode,
-      isSubmit
-    )
+  def isUserAuthorizedBasedOnOperationsAndModeXPath(operations: java.util.List[String], mode: String, isSubmit: Boolean): Boolean =
+    isUserAuthorizedBasedOnOperationsAndMode(Operations.parse(operations.asScala.toList), mode, isSubmit)
 
   /**
    * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform,
@@ -192,7 +188,8 @@ trait FormRunnerPermissionsOps {
       if (authUserCanCreate)
         operationsAssumingOwnership
       else
-        operationsWithoutAssumingOwnership
+        operationsWithoutAssumingOwnership,
+      normalized = true
     )
   }
 

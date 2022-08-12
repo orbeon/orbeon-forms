@@ -2,10 +2,10 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
-import org.orbeon.oxf.util.StaticXPath
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.funspec.AnyFunSpecLike
+
 
 class PermissionsUiTest extends DocumentTestBase
   with ResourceManagerSupport
@@ -37,7 +37,7 @@ class PermissionsUiTest extends DocumentTestBase
         List(
           Permission(
             Nil,
-            SpecificOperations(List(Operation.Read))
+            SpecificOperations(Set(Operation.Read))
           )
         )
       )
@@ -65,7 +65,7 @@ class PermissionsUiTest extends DocumentTestBase
         List(
           Permission(
             Nil,
-            SpecificOperations(List(Operation.Read, Operation.List))
+            SpecificOperations(Set(Operation.Read, Operation.List))
           )
         )
       )
@@ -100,11 +100,11 @@ class PermissionsUiTest extends DocumentTestBase
         List(
           Permission(
             Nil,
-            SpecificOperations(List(Operation.Read))
+            SpecificOperations(Set(Operation.Read))
           ),
           Permission(
             List(RolesAnyOf(List("admin"))),
-            SpecificOperations(List(Operation.Read, Operation.List))
+            SpecificOperations(Set(Operation.Read, Operation.List))
           )
         )
       )
@@ -151,19 +151,19 @@ class PermissionsUiTest extends DocumentTestBase
         List(
           Permission(
             List(Owner),
-            SpecificOperations(List(Operation.Update, Operation.Delete, Operation.Read))
+            SpecificOperations(Set(Operation.Update, Operation.Delete, Operation.Read))
           ),
           Permission(
             List(Group),
-            SpecificOperations(List(Operation.Read))
+            SpecificOperations(Set(Operation.Read))
           ),
           Permission(
             List(RolesAnyOf(List("orbeon-admin", "orbeon-user"))),
-            SpecificOperations(List(Operation.Create, Operation.Update, Operation.Read, Operation.List))
+            SpecificOperations(Set(Operation.Create, Operation.Update, Operation.Read, Operation.List))
           ),
           Permission(
             List(RolesAnyOf(List("orbeon-admin"))),
-            SpecificOperations(List(Operation.Delete)))
+            SpecificOperations(Set(Operation.Delete)))
         )
       )
 

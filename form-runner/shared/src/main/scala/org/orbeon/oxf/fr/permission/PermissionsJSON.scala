@@ -44,7 +44,7 @@ object PermissionsJSON {
           }
 
         def jsonToOperations(jsonArray: Json): SpecificOperations =
-          SpecificOperations(jsonArray.asArray.getOrElse(error()).map(_.asString.getOrElse(error())).toSet.toList.map(Operation.withName))
+          SpecificOperations(jsonArray.asArray.getOrElse(error()).map(_.asString.getOrElse(error())).toSet.map(Operation.withName))
 
         parse(trimmedJsonString).toTry flatMap { json =>
           Try {

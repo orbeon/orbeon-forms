@@ -9,16 +9,16 @@ import org.orbeon.oxf.util.StringUtils._
 import scala.collection.immutable
 
 
-sealed trait                                                        Operations
-case object AnyOperation                                    extends Operations
-case class  SpecificOperations(operations: List[Operation]) extends Operations {
+sealed trait                                                       Operations
+case object AnyOperation                                   extends Operations
+case class  SpecificOperations(operations: Set[Operation]) extends Operations {
 
   implicit object OperationsOrdering extends Ordering[Operation] {
     def compare(x: Operation, y: Operation): Int = x.entryName.compare(y.entryName)
   }
 
   override def equals(otherAny: Any): Boolean = otherAny match {
-    case otherOperations: SpecificOperations => operations.sorted == otherOperations.operations.sorted
+    case otherOperations: SpecificOperations => operations == otherOperations.operations
     case _                                   => false
   }
 }
@@ -40,8 +40,9 @@ object Operations {
 
   private val MinusListToken: String = s"-${Operation.List.entryName}"
 
-  val None: Operations = SpecificOperations(Nil)
-  val All: List[Operation] = Operation.values.toList
+  val None   : Operations      = SpecificOperations(Set.empty)
+  val AllList: List[Operation] = Operation.values.toList
+  val AllSet : Set[Operation]  = AllList.toSet
 
   def parseFromHeaders(headers: Map[String, List[String]]): Option[Operations] =
     Headers.firstItemIgnoreCase(headers, FormRunnerPersistence.OrbeonOperations)
@@ -52,7 +53,7 @@ object Operations {
       case List("*") =>
         AnyOperation
       case _ =>
-        SpecificOperations(stringOperations.map(Operation.withName))
+        SpecificOperations(stringOperations.toSet.map(Operation.withName))
     }
 
   def normalizeOperations(operations: String): Set[String] = {
@@ -87,7 +88,7 @@ object Operations {
 
   def inDefinitionOrder(operations: Iterable[Operation]): List[Operation] = {
     val operationsSet = operations.toSet
-    Operations.All.filter(operationsSet)
+    Operations.AllList.filter(operationsSet)
   }
 
   def serialize(operations: Operations, normalized: Boolean): List[String] =
@@ -97,13 +98,13 @@ object Operations {
       case SpecificOperations(operations) if normalized =>
         inDefinitionOrder(operations).map(_.entryName)
       case SpecificOperations(operations) =>
-        denormalizeOperations(operations.toSet)
+        denormalizeOperations(operations)
      }
 
   def combine(left: Operations, right: Operations): Operations =
     (left, right) match {
       case (SpecificOperations(leftOps), SpecificOperations(rightOps)) =>
-        SpecificOperations((leftOps ++ rightOps).distinct)
+        SpecificOperations(leftOps ++ rightOps)
       case _ =>
         AnyOperation
     }
@@ -114,9 +115,9 @@ object Operations {
   def allows(granted: Operations, requested: Operation): Boolean =
     granted match {
       case AnyOperation                          => true
-      case SpecificOperations(grantedOperations) => grantedOperations.contains(requested)
+      case SpecificOperations(grantedOperations) => grantedOperations(requested)
     }
 
-  def allowsAny(granted: Operations, mightHave: List[Operation]): Boolean =   mightHave.exists(  allows(granted, _))
-  def allowsAll(granted: Operations, mustHave : List[Operation]): Boolean = ! mustHave .exists(! allows(granted, _))
+  def allowsAny(granted: Operations, mightHave: Set[Operation]): Boolean = mightHave.exists(allows(granted, _))
+  def allowsAll(granted: Operations, mustHave : Set[Operation]): Boolean = mustHave .forall(allows(granted, _))
 }

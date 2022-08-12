@@ -404,15 +404,14 @@ trait CreateUpdateDelete
                   if (delete)
                     // For deletes, if there is no data to delete, it unclear we think a 404 is clearer than a 403, so
                     // let this check pass, and some code later will return a 404
-                    SpecificOperations(List(Delete))
+                    SpecificOperations(Set(Delete))
                   else
                     PermissionsAuthorization.authorizedOperations(
                       formPermissions,
                       PermissionsAuthorization.currentUserFromSession,
                       CheckWithoutDataUserPessimistic
                     )
-                val requiredOps   = if (delete) List(Delete) else List(Create)
-                Operations.allowsAny(authorizedOps, requiredOps)
+                Operations.allowsAny(authorizedOps, Set(if (delete) Delete else Create))
             }
           } else {
             // Operations on deployed forms are always authorized

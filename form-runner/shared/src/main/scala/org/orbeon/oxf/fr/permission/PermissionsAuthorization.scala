@@ -39,7 +39,7 @@ object PermissionsAuthorization {
       case DefinedPermissions(permissionsList) =>
         Operations.combine(permissionsList.map(authorizedOperations(_, currentUser, check)))
       case UndefinedPermissions =>
-        SpecificOperations(Operations.All)
+        SpecificOperations(Operations.AllSet)
     }
 
   private def authorizedOperations(
@@ -80,7 +80,7 @@ object PermissionsAuthorization {
           check match {
             case CheckWithoutDataUserPessimistic =>
               if (allConditionsPass(checkWithCurrentUser))
-                SpecificOperations(List(Operation.Create))
+                SpecificOperations(Set(Operation.Create))
               else
                 Operations.None
             case _ =>

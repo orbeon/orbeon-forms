@@ -25,7 +25,7 @@ import scala.collection.compat._
 
 object SearchOps {
 
-  private val SearchOperations = List(Read, Update, Delete)
+  val SearchOperations: Set[Operation] = Set(Read, Update, Delete)
 
   // Used by eXist only
   //@XPathFunction

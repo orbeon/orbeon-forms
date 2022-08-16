@@ -37,8 +37,7 @@
     <xsl:template name="head">
         <xsl:apply-templates select="@*"/>
         <!-- Handle head elements except scripts -->
-        <!-- See https://github.com/orbeon/orbeon-forms/issues/2311 -->
-        <xsl:apply-templates select="xh:meta | xh:link | xh:style | comment()[starts-with(., '[if')]"/>
+        <xsl:apply-templates select="xh:meta | xh:link | xh:style"/>
         <!-- Title -->
         <xh:title>
             <xsl:apply-templates select="xh:title/@*"/>

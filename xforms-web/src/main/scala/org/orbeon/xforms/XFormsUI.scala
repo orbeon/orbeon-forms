@@ -46,6 +46,28 @@ object XFormsUI {
 
   import Private._
 
+  // Update `xforms-selected`/`xforms-deselected` classes on the parent `<span>` element
+  @JSExport
+  def setRadioCheckboxClasses(target: html.Element): Unit = {
+    val checkboxInputs = target.getElementsByTagName("input")
+    for {
+      _checkboxInput <- checkboxInputs
+      checkboxInput  = _checkboxInput.asInstanceOf[html.Input]
+    } locally {
+      var parentSpan = checkboxInput.parentNode.asInstanceOf[html.Element] // boolean checkboxes are directly inside a span
+      if (parentSpan.tagName.equalsIgnoreCase("label"))
+        parentSpan = parentSpan.parentNode.asInstanceOf[html.Element]      // while xf:select checkboxes have a label in between
+
+      if (checkboxInput.checked) {
+        parentSpan.classList.add("xforms-selected")
+        parentSpan.classList.remove("xforms-deselected")
+      } else {
+        parentSpan.classList.add("xforms-deselected")
+        parentSpan.classList.remove("xforms-selected")
+      }
+    }
+  }
+
   @JSExport // 2020-04-27: 6 JavaScript usages from xforms.js
   var modalProgressPanelShown: Boolean = false
 

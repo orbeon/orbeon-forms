@@ -953,7 +953,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 }
 
                 // Update classes on control
-                ORBEON.xforms.Controls._setRadioCheckboxClasses(control);
+                ORBEON.xforms.XFormsUi.setRadioCheckboxClasses(control);
             } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-compact, .xforms-select1-appearance-minimal, .xforms-input-appearance-compact, .xforms-input-appearance-minimal')) {
                 // Handle lists and comboboxes
                 var selectedValues = jControl.is('.xforms-select-appearance-compact') ? newControlValue.split(" ") : new Array(newControlValue);
@@ -994,23 +994,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             ORBEON.xforms.Controls.afterValueChange.fire(customEvent);
 
             return result;
-        },
-
-        _setRadioCheckboxClasses: function (target) {
-            // Update xforms-selected/xforms-deselected classes on the parent <span> element
-            var checkboxInputs = target.getElementsByTagName("input");
-            for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
-                var checkboxInput = checkboxInputs[checkboxInputIndex];
-                var parentSpan = checkboxInput.parentNode;                                              // Boolean checkboxes are directly inside a span
-                if (parentSpan.tagName.toLowerCase() == 'label') parentSpan = parentSpan.parentNode;    // While xf:select checkboxes have a label in between
-                if (checkboxInput.checked) {
-                    YAHOO.util.Dom.addClass(parentSpan, "xforms-selected");
-                    YAHOO.util.Dom.removeClass(parentSpan, "xforms-deselected");
-                } else {
-                    YAHOO.util.Dom.addClass(parentSpan, "xforms-deselected");
-                    YAHOO.util.Dom.removeClass(parentSpan, "xforms-selected");
-                }
-            }
         },
 
         // Mapping between className (parameter of this method and added after "xforms-") and id of elements
@@ -2241,7 +2224,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // Click on checkbox or radio button
 
                 // Update classes right away to give user visual feedback
-                ORBEON.xforms.Controls._setRadioCheckboxClasses(controlTarget);
+                ORBEON.xforms.XFormsUi.setRadioCheckboxClasses(controlTarget);
                 var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, ORBEON.xforms.Controls.getCurrentValue(controlTarget), "xxforms-value");
                 ORBEON.xforms.AjaxClient.fireEvent(event);
                 handled = true;

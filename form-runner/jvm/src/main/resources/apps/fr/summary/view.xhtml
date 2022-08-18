@@ -869,7 +869,7 @@
                                             <xh:th/>
                                         </xf:group>
                                         <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
-                                            <xh:th>
+                                            <xh:th class="{if (@control = ('number', 'currency')) then 'fr-align-right' else ''}">
                                                 <!-- Output showing as the header of the column -->
                                                 <xf:output
                                                     mediatype="text/html"
@@ -1050,7 +1050,7 @@
                                                     <xf:var name="detail-position" value="."/>
                                                     <!-- Set context to current detail -->
                                                     <xf:group context="$document/details/detail[$detail-position]" appearance="xxf:internal">
-                                                        <xh:td class="fr-summary-td">
+                                                        <xh:td class="fr-summary-td {'fr-align-right'[instance('fr-search-instance')/query[$detail-position + 1]/@control = ('number', 'currency')]}">
                                                             <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                             <xf:var
                                                                 name="detail"

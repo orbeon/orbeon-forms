@@ -30,31 +30,34 @@
 
     <xsl:template match="xh:head">
         <xsl:copy>
-            <xsl:apply-templates select="@*"/>
-            <!-- Handle head elements except scripts -->
-            <xsl:apply-templates select="xh:meta | xh:link | xh:style"/>
-            <!-- Title -->
-            <xh:title>
-                <xsl:apply-templates select="xh:title/@*"/>
-                <xsl:choose>
-                    <xsl:when test="xh:title != ''">
-                        <xsl:value-of select="xh:title"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="(/xh:html/xh:body/xh:h1)[1]"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xh:title>
-            <xsl:if test="$version">
-                <!-- Orbeon Forms version -->
-                <xh:meta name="generator" content="{$version}"/>
-            </xsl:if>
-            <!-- Handle head scripts if present -->
-            <xsl:apply-templates select="xh:script"/>
+            <xsl:call-template name="head"/>
         </xsl:copy>
     </xsl:template>
 
-    <!-- Add the `.orbeon` CSS clss on the body -->
+    <xsl:template name="head">
+        <xsl:apply-templates select="@*"/>
+        <!-- Handle head elements except scripts -->
+        <xsl:apply-templates select="xh:meta | xh:link | xh:style"/>
+        <!-- Title -->
+        <xh:title>
+            <xsl:apply-templates select="xh:title/@*"/>
+            <xsl:choose>
+                <xsl:when test="xh:title != ''">
+                    <xsl:value-of select="xh:title"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="(/xh:html/xh:body/xh:h1)[1]"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xh:title>
+        <xsl:if test="$version">
+            <!-- Orbeon Forms version -->
+            <xh:meta name="generator" content="{$version}"/>
+        </xsl:if>
+        <!-- Handle head scripts if present -->
+        <xsl:apply-templates select="xh:script"/>
+    </xsl:template>
+
     <xsl:template match="xh:body">
         <xsl:copy>
             <xsl:apply-templates select="@* except @class"/>

@@ -96,8 +96,8 @@ object DocumentAPI extends js.Object {
       Controls.getCurrentValue(control) foreach { newValue =>
         AjaxClient.fireEvent(
           AjaxEvent(
-            eventName = EventNames.XXFormsValue,
-            targetId = control.id,
+            eventName  = EventNames.XXFormsValue,
+            targetId   = control.id,
             properties = Map("value" -> newValue)
           )
         )

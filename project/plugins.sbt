@@ -14,4 +14,4 @@ libraryDependencies += "org.scala-js" %% "scalajs-env-jsdom-nodejs" % "1.1.0" //
 
 // Apparently needed for sbt-web
 resolvers += Resolver.typesafeRepo("releases")
-resolvers += Resolver.sonatypeRepo("releases")
+resolvers ++= Resolver.sonatypeOssRepos("releases")

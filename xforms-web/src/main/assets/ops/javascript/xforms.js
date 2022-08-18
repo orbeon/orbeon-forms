@@ -2225,7 +2225,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
                 // Update classes right away to give user visual feedback
                 ORBEON.xforms.XFormsUi.setRadioCheckboxClasses(controlTarget);
+                ORBEON.xforms.XFormsUi.handleShiftSelection(event, controlTarget);
                 var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, ORBEON.xforms.Controls.getCurrentValue(controlTarget), "xxforms-value");
+
                 ORBEON.xforms.AjaxClient.fireEvent(event);
                 handled = true;
             } else if (controlTarget != null && $(controlTarget).is('.xforms-upload') && $(originalTarget).is('.xforms-upload-remove')) {

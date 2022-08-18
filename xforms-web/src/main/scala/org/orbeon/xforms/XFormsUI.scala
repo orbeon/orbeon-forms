@@ -22,19 +22,21 @@ import org.orbeon.xforms.facade.{Controls, Utils, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.ext._
-import org.scalajs.dom.{html, raw, window}
+import org.scalajs.dom.html.Input
+import org.scalajs.dom.{MouseEvent, html, raw, window}
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scalatags.JsDom
 import scalatags.JsDom.all._
 
-import scala.concurrent.{Future, Promise}
+import scala.collection.immutable
 import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.scalajs.js.{timers, |}
 import scala.scalajs.js.timers.SetTimeoutHandle
+import scala.scalajs.js.{timers, |}
 import scala.util.control.NonFatal
 
 
@@ -46,14 +48,80 @@ object XFormsUI {
 
   import Private._
 
+  // Algorithm for a single repeated checkbox click:
+  //
+  // - always remember the last clicked checkbox, whether with shift or not or checked or not
+  // - if an unchecked box is clicked with shift, ensure all the checkboxes in the range are unchecked
+  // - if a checked box is clicked with shift, ensure all the checkboxes in the range are checked
+  //
+  // This matches what GMail does AFAICT.
+  @JSExport
+  def handleShiftSelection(clickEvent: MouseEvent, target: html.Element): Unit =
+    if (target.classList.contains("xforms-select-appearance-full")) {
+      // Only for "checkbox" controls
+      val checkboxInputs = target.getElementsByTagName("input")
+      if (XFormsId.hasEffectiveIdSuffix(target.id) && checkboxInputs.length == 1) {
+        // Click on a single repeated checkbox
+
+        val checkboxElem = checkboxInputs.head.asInstanceOf[html.Input]
+
+        if (clickEvent.getModifierState("Shift")) {
+          // Just got shift-selected
+
+          val newCheckboxChecked = checkboxElem.checked
+
+          def findControlIdsToUpdate(lastTarget: html.Element): Option[immutable.IndexedSeq[String]] = {
+
+            val lastTargetPrefixedId = XFormsId.getPrefixedId(lastTarget.id)
+            if (lastTargetPrefixedId == XFormsId.getPrefixedId(target.id)) {
+              // Same static control
+              val lastParts = XFormsId.getEffectiveIdSuffixParts(lastTarget.id).toList
+              val parts     = XFormsId.getEffectiveIdSuffixParts(target.id).toList
+
+              if (lastParts.init == parts.init && (lastParts.last - parts.last).abs >= 2) {
+                // Same repeat levels except the last must have a distance of at least 2
+
+                val indexes =
+                  if (lastParts.last > parts.last)
+                    parts.last + 1 until lastParts.last
+                  else
+                    lastParts.last + 1 until parts.last
+
+                Some(indexes map (index => XFormsId.buildEffectiveId(lastTargetPrefixedId, lastParts.init :+ index)))
+              } else {
+                None
+              }
+            } else {
+              None
+            }
+          }
+
+          for {
+            (lastTarget, lastCheckboxElem) <- lastCheckboxChecked
+            controlIds                     <- findControlIdsToUpdate(lastTarget)
+            controlId                      <- if (lastCheckboxElem.checked != newCheckboxChecked) controlIds :+ lastTarget.id else controlIds
+            controlElem                    <- Option(dom.document.getElementById(controlId))
+            checkboxValue                  <- if (newCheckboxChecked) nestedInputElems(controlElem).headOption.map(_.value) else Some("")
+          } locally {
+            DocumentAPI.setValue(controlId, checkboxValue)
+          }
+        }
+
+        // Update selection no matter what
+        lastCheckboxChecked = Some(target -> checkboxElem)
+
+      } else {
+        // TODO: support within a single select1?
+        lastCheckboxChecked = None
+      }
+    } else {
+      lastCheckboxChecked = None
+    }
+
   // Update `xforms-selected`/`xforms-deselected` classes on the parent `<span>` element
   @JSExport
   def setRadioCheckboxClasses(target: html.Element): Unit = {
-    val checkboxInputs = target.getElementsByTagName("input")
-    for {
-      _checkboxInput <- checkboxInputs
-      checkboxInput  = _checkboxInput.asInstanceOf[html.Input]
-    } locally {
+    for (checkboxInput  <-nestedInputElems(target)) {
       var parentSpan = checkboxInput.parentNode.asInstanceOf[html.Element] // boolean checkboxes are directly inside a span
       if (parentSpan.tagName.equalsIgnoreCase("label"))
         parentSpan = parentSpan.parentNode.asInstanceOf[html.Element]      // while xf:select checkboxes have a label in between
@@ -612,6 +680,13 @@ object XFormsUI {
       }
 
   private object Private {
+
+    // Global information about the last checkbox to check
+    // Q: Should this be by form?
+    var lastCheckboxChecked: Option[(html.Element, html.Input)] = None
+
+    def nestedInputElems(target: dom.Element): Seq[Input] =
+      target.getElementsByTagName("input").map(_.asInstanceOf[html.Input])
 
     private def findLoaderElem: Option[raw.Element] =
       Option(dom.document.querySelector("body > .orbeon-loader"))

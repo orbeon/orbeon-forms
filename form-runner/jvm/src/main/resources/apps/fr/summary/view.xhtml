@@ -847,33 +847,6 @@
 
                             <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
-                                 <xh:colgroup>
-                                    <xh:col class="fr-summary-repeat-selection-checkbox"/>
-                                    <xh:col class="{$labels-class}"/>
-                                    <xf:group ref="''[$show-created]">
-                                        <xh:col/>
-                                    </xf:group>
-                                    <xf:group ref="''[$show-last-modified]">
-                                        <xh:col/>
-                                    </xf:group>
-                                     <xf:group ref="''[$show-created-by]">
-                                        <xh:col/>
-                                    </xf:group>
-                                     <xf:group ref="''[$show-last-modified-by]">
-                                        <xh:col/>
-                                    </xf:group>
-                                    <xf:group ref="''[$show-workflow-stage]">
-                                        <xh:col/>
-                                    </xf:group>
-                                    <!-- Empty column if no summary fields looks nicer -->
-                                    <xf:group ref="''[empty($detail-positions)]">
-                                        <xh:col/>
-                                    </xf:group>
-                                    <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                    <xf:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']">
-                                        <xh:col/>
-                                    </xf:repeat>
-                                </xh:colgroup>
                                 <xh:thead>
                                     <xh:tr>
                                         <xh:th class="fr-summary-repeat-selection-checkbox"/>

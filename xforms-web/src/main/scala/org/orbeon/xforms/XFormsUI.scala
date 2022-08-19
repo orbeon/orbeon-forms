@@ -72,25 +72,19 @@ object XFormsUI {
 
           def findControlIdsToUpdate(lastTarget: html.Element): Option[immutable.IndexedSeq[String]] = {
 
-            val lastTargetPrefixedId = XFormsId.getPrefixedId(lastTarget.id)
-            if (lastTargetPrefixedId == XFormsId.getPrefixedId(target.id)) {
-              // Same static control
-              val lastParts = XFormsId.getEffectiveIdSuffixParts(lastTarget.id).toList
-              val parts     = XFormsId.getEffectiveIdSuffixParts(target.id).toList
+            val leftId  = XFormsId.fromEffectiveId(lastTarget.id)
+            val rightId = XFormsId.fromEffectiveId(target.id)
 
-              if (lastParts.init == parts.init && (lastParts.last - parts.last).abs >= 2) {
-                // Same repeat levels except the last must have a distance of at least 2
+            if (leftId.isRepeatNeighbor(rightId) && (leftId.iterations.last - rightId.iterations.last).abs >= 2) {
+              // Same repeat levels except the last must have a distance of at least 2
 
-                val indexes =
-                  if (lastParts.last > parts.last)
-                    parts.last + 1 until lastParts.last
-                  else
-                    lastParts.last + 1 until parts.last
+              val indexes =
+                if (leftId.iterations.last > rightId.iterations.last)
+                  rightId.iterations.last + 1 until leftId.iterations.last
+                else
+                  leftId.iterations.last + 1 until rightId.iterations.last
 
-                Some(indexes map (index => XFormsId.buildEffectiveId(lastTargetPrefixedId, lastParts.init :+ index)))
-              } else {
-                None
-              }
+              Some(indexes map (index => leftId.copy(iterations = leftId.iterations.init :+ index).toEffectiveId))
             } else {
               None
             }

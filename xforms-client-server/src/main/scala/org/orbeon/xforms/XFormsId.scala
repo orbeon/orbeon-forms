@@ -20,10 +20,21 @@ import scala.collection.compat._
 
 // Structured representation of an id
 case class XFormsId(staticId: String, containers: List[String], iterations: List[Int]) {
-  def toEffectiveId: String = {
+
+  def toEffectiveId: String =
     (containers :+ staticId).mkString(Constants.ComponentSeparatorString) +
       (if (iterations.isEmpty) "" else Constants.RepeatSeparatorString + iterations.mkString(Constants.RepeatIndexSeparatorString))
-  }
+
+  def isSamePrefixedId(other: XFormsId): Boolean =
+    staticId == other.staticId && containers == other.containers
+
+  def isRepeated: Boolean =
+    iterations.nonEmpty
+
+  def isRepeatNeighbor(other: XFormsId): Boolean =
+    isRepeated && other.isRepeated &&
+    isSamePrefixedId(other)        &&
+    iterations.init == other.iterations.init
 }
 
 // Utilities for handling XForms ids. For historical reasons, we manipulate id parts as strings in most cases. This

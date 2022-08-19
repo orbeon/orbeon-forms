@@ -382,7 +382,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
                 <form-version>1</form-version>
                 <title xml:lang="en"/>
                 <permissions>
-                    <permission operations="read create -list"/>
+                    <permission operations="create read -list"/>
                 </permissions>
             </form>
         </forms>.toDocument

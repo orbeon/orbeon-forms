@@ -110,7 +110,7 @@ object XFormsUI {
   // Update `xforms-selected`/`xforms-deselected` classes on the parent `<span>` element
   @JSExport
   def setRadioCheckboxClasses(target: html.Element): Unit = {
-    for (checkboxInput  <-nestedInputElems(target)) {
+    for (checkboxInput <- nestedInputElems(target)) {
       var parentSpan = checkboxInput.parentNode.asInstanceOf[html.Element] // boolean checkboxes are directly inside a span
       if (parentSpan.tagName.equalsIgnoreCase("label"))
         parentSpan = parentSpan.parentNode.asInstanceOf[html.Element]      // while xf:select checkboxes have a label in between

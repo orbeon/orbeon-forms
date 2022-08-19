@@ -499,21 +499,21 @@
                       <xh:span class="navbar-toggler-icon"></xh:span>
                     </xh:button>
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <xh:ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <xh:ul class="navbar-nav ms-auto mt-2 mt-lg-0">
                             <!-- These are typically to the right -->
                             <xh:li class="nav-item px-3">
                             <fr:language-selector/>
                             </xh:li>
 <!--                            <xh:li class="nav-item px-3">-->
-<!--            &lt;!&ndash;                        <xh:div>&ndash;&gt;-->
-<!--            &lt;!&ndash;                            xxx: <xf:output value="fr:workflow-stage-value()"/>&ndash;&gt;-->
-<!--            &lt;!&ndash;                        </xh:div>&ndash;&gt;-->
+<!--                                <xh:div>-->
+<!--                                    xxx: <xf:output value="fr:workflow-stage-value()"/>-->
+<!--                                </xh:div>-->
 <!--                            <fr:status-icons/>-->
 <!--                            </xh:li>-->
-                            <xh:li class="nav-item px-3">
+                            <xh:li class="nav-item px-3 d-flex align-items-center">
                             <fr:user-nav/>
                             </xh:li>
-                            <xh:li class="nav-item px-3">
+                            <xh:li class="nav-item px-3 d-flex align-items-center">
                             <xh:div>
                                 <xh:a href="/fr/">
                                     <xh:i class="fa fa-fw fa-th"/>
@@ -633,7 +633,7 @@
 
     <xsl:template match="fr:title" name="fr-title">
         <!-- Q: Why do we need @ref here? -->
-        <xh:h5 class="text-white-50"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h5>
+        <xh:h1 class="text-white-50 fs-3 mb-0"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
     </xsl:template>
 
     <!-- Description in chosen language or first one if not found -->
@@ -723,7 +723,7 @@
                 xxf:property('oxf.fr.authentication.user-menu.enable') and
                 not(fr:is-embedded())
             ]">
-            <xh:ul class="nav pull-right">
+            <xh:ul class="nav">
                 <xh:li class="dropdown">
                     <xh:a id="menu-button" href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <xh:i class="fa fa-user"/>
@@ -1203,7 +1203,7 @@
                         "/>
 
                         <!-- Because @appearance is static, use a CSS class instead for primary/inverse. This requires
-                             changes to form-runner-bootstrap-override.less, which is not the best solution. Ideally,
+                             changes to dropdown.less, which is not the best solution. Ideally,
                              we could find a dynamic way to set that class on the nested <button> so that standard
                              Bootstrap rules apply. -->
                         <fr:process-button

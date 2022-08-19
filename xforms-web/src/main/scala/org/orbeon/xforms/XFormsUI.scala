@@ -70,30 +70,25 @@ object XFormsUI {
 
           val newCheckboxChecked = checkboxElem.checked
 
-          def findControlIdsToUpdate(lastTarget: html.Element): Option[immutable.IndexedSeq[String]] = {
-
-            val leftId  = XFormsId.fromEffectiveId(lastTarget.id)
-            val rightId = XFormsId.fromEffectiveId(target.id)
-
-            if (leftId.isRepeatNeighbor(rightId) && (leftId.iterations.last - rightId.iterations.last).abs >= 2) {
-              // Same repeat levels except the last must have a distance of at least 2
+          def findControlIdsToUpdate(leftId: XFormsId, rightId: XFormsId): Option[immutable.IndexedSeq[String]] =
+            if (leftId.isRepeatNeighbor(rightId) && leftId.iterations.last != rightId.iterations.last) {
 
               val indexes =
                 if (leftId.iterations.last > rightId.iterations.last)
-                  rightId.iterations.last + 1 until leftId.iterations.last
+                  rightId.iterations.last + 1 to leftId.iterations.last
                 else
-                  leftId.iterations.last + 1 until rightId.iterations.last
+                  leftId.iterations.last until rightId.iterations.last
 
               Some(indexes map (index => leftId.copy(iterations = leftId.iterations.init :+ index).toEffectiveId))
             } else {
               None
             }
-          }
 
           for {
             (lastTarget, lastCheckboxElem) <- lastCheckboxChecked
-            controlIds                     <- findControlIdsToUpdate(lastTarget)
-            controlId                      <- if (lastCheckboxElem.checked != newCheckboxChecked) controlIds :+ lastTarget.id else controlIds
+            targetId = XFormsId.fromEffectiveId(target.id)
+            controlIds                     <- findControlIdsToUpdate(XFormsId.fromEffectiveId(lastTarget.id), targetId)
+            controlId                      <- controlIds
             controlElem                    <- Option(dom.document.getElementById(controlId))
             checkboxValue                  <- if (newCheckboxChecked) nestedInputElems(controlElem).headOption.map(_.value) else Some("")
           } locally {

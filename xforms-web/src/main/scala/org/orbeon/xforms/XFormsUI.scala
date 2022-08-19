@@ -28,6 +28,7 @@ import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scalatags.JsDom
 import scalatags.JsDom.all._
+import shapeless.syntax.typeable._
 
 import scala.collection.immutable
 import scala.concurrent.duration._
@@ -56,11 +57,11 @@ object XFormsUI {
   //
   // This matches what GMail does AFAICT.
   @JSExport
-  def handleShiftSelection(clickEvent: MouseEvent, target: html.Element): Unit =
-    if (target.classList.contains("xforms-select-appearance-full")) {
+  def handleShiftSelection(clickEvent: MouseEvent, controlElem: html.Element): Unit =
+    if (controlElem.classList.contains("xforms-select-appearance-full")) {
       // Only for "checkbox" controls
-      val checkboxInputs = target.getElementsByTagName("input")
-      if (XFormsId.hasEffectiveIdSuffix(target.id) && checkboxInputs.length == 1) {
+      val checkboxInputs = controlElem.getElementsByTagName("input")
+      if (XFormsId.hasEffectiveIdSuffix(controlElem.id) && checkboxInputs.length == 1) {
         // Click on a single repeated checkbox
 
         val checkboxElem = checkboxInputs.head.asInstanceOf[html.Input]
@@ -85,22 +86,44 @@ object XFormsUI {
             }
 
           for {
-            (lastTarget, lastCheckboxElem) <- lastCheckboxChecked
-            targetId = XFormsId.fromEffectiveId(target.id)
-            controlIds                     <- findControlIdsToUpdate(XFormsId.fromEffectiveId(lastTarget.id), targetId)
-            controlId                      <- controlIds
-            controlElem                    <- Option(dom.document.getElementById(controlId))
-            checkboxValue                  <- if (newCheckboxChecked) nestedInputElems(controlElem).headOption.map(_.value) else Some("")
+            (lastControlElem, _) <- lastCheckboxChecked
+            targetId = XFormsId.fromEffectiveId(controlElem.id)
+            controlIds           <- findControlIdsToUpdate(XFormsId.fromEffectiveId(lastControlElem.id), targetId)
+            controlId            <- controlIds
+            controlElem          <- Option(dom.document.getElementById(controlId))
+            checkboxValue        <- if (newCheckboxChecked) nestedInputElems(controlElem).headOption.map(_.value) else Some("")
           } locally {
             DocumentAPI.setValue(controlId, checkboxValue)
           }
         }
 
         // Update selection no matter what
-        lastCheckboxChecked = Some(target -> checkboxElem)
+        lastCheckboxChecked = Some(controlElem -> checkboxElem)
 
+      } else if (checkboxInputs.length > 1) {
+        // Within a single group of checkboxes
+
+        // LATER: could support click on `<span>` inside `<label>`
+        clickEvent.target.narrowTo[html.Input] foreach { currentCheckboxElem =>
+          if (clickEvent.getModifierState("Shift"))
+            for {
+              (lastControlElem, lastCheckboxElem) <- lastCheckboxChecked
+              if lastControlElem.id == controlElem.id
+              allCheckboxes                       = checkboxInputs.toList.map(_.asInstanceOf[html.Input])
+              lastIndex                           = allCheckboxes.indexWhere(_.value == lastCheckboxElem.value)
+              if lastIndex >= 0
+              currentIndex                        = allCheckboxes.indexWhere(_.value == currentCheckboxElem.value)
+              if currentIndex >= 0 && currentIndex != lastIndex
+              curentIndex                         <- if (currentIndex < lastIndex) currentIndex + 1 to lastIndex else lastIndex until currentIndex
+              checkboxToUpdate                    = allCheckboxes(curentIndex)
+            } locally {
+              checkboxToUpdate.checked = currentCheckboxElem.checked
+            }
+
+          // Update selection no matter what
+          lastCheckboxChecked = Some(controlElem -> currentCheckboxElem)
+        }
       } else {
-        // TODO: support within a single select1?
         lastCheckboxChecked = None
       }
     } else {

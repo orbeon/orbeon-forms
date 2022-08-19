@@ -376,7 +376,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       val expectedBody =
         <forms>
-            <form operations="read create">
+            <form operations="create read">
                 <application-name>{provider.entryName}</application-name>
                 <form-name>my-form</form-name>
                 <form-version>1</form-version>

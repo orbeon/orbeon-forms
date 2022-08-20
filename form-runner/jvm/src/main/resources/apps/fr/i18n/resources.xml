@@ -188,6 +188,12 @@
                 <error-count>Error in Your Form</error-count>
                 <errors-count>Errors in Your Form</errors-count>
             </titles>
+            <buttons>
+                <select-all>Select all</select-all>
+                <deselect-all>Deselect all</deselect-all>
+                <select-saved>Select saved only</select-saved>
+                <select-drafts>Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Search</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Search Forms</search-forms>
@@ -702,6 +708,12 @@
                 <error-count>erreur de saisie dans votre formulaire</error-count>
                 <errors-count>erreurs de saisie dans votre formulaire</errors-count>
             </titles>
+            <buttons>
+                <select-all>Tout sélectionner</select-all>
+                <deselect-all>Tout désélectionner</deselect-all>
+                <select-saved>Sélectionner documents sauvegardés seulement</select-saved>
+                <select-drafts>Sélectionner brouillons seulement</select-drafts>
+            </buttons>
             <search>
                 <search>Recherche</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Rechercher</search-forms>
@@ -1208,6 +1220,12 @@
                 <error-count>Errores en su formulario</error-count>
                 <errors-count>Errores en su formulario</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Buscar</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulario</search-forms>
@@ -1693,7 +1711,6 @@
             </formats>
         </print>
         <summary>
-
             <titles>
                 <summary-title>Oppsummering</summary-title>
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
@@ -1710,6 +1727,12 @@
                 <error-count>ugyldig eller manglende svar i skjema</error-count>
                 <errors-count>ugyldige eller manglende svar i skjema</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Søk</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søk etter skjema</search-forms>
@@ -2209,6 +2232,12 @@
                 <error-count>Есть ошибка</error-count>
                 <errors-count>Есть ошибки</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Поиск</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Поиск формы</search-forms>
@@ -2713,6 +2742,12 @@
                 <error-count>Errore nel modulo</error-count>
                 <errors-count>Errori nel modulo</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Cerca</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Cerca moduli</search-forms>
@@ -3224,6 +3259,12 @@
                 <error-count>Fehler im Formular</error-count>
                 <errors-count>Fehler im Formular</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Suchen</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formular suchen</search-forms>
@@ -3735,6 +3776,12 @@
                 <error-count>Virhe lomakkeessasi</error-count>
                 <errors-count>Virheitä lomakkeessasi</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Etsi</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Etsi lomakkeita</search-forms>
@@ -4246,6 +4293,12 @@
                 <error-count>Fel i formuläret</error-count>
                 <errors-count>Fel i formuläret</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Sök</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Sök formulär</search-forms>
@@ -4757,6 +4810,12 @@
                 <error-count>Fout in uw form</error-count>
                 <errors-count>Fouten in uw form</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Zoeken</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Forms zoeken</search-forms>
@@ -5267,6 +5326,12 @@
                 <error-count>Erro no seu formulário</error-count>
                 <errors-count>Erros no seu formulário</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Procurar</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Procurar formulários</search-forms>
@@ -5771,6 +5836,12 @@
                 <error-count>ugyldigt eller manglende svar i blanket</error-count>
                 <errors-count>ugyldige eller manglende svar i blanket</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Søg</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søg efter blanket</search-forms>
@@ -6275,6 +6346,12 @@
                 <error-count>Błąd w Twoim formularzu</error-count>
                 <errors-count>Błędy/-ów w Twoim formularzu</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Szukaj</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"/&lt; Wyszukaj formularze</search-forms>

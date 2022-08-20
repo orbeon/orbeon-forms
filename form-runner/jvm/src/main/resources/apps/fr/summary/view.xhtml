@@ -580,6 +580,7 @@
                                 )"/>
 
                         <xh:div class="fr-summary-search-top">
+
                             <xf:select1
                                 appearance="minimal"
                                 ref="$parameters/form-version[count($versions) gt 1]"
@@ -604,6 +605,76 @@
 
                                 </xf:action>
                             </xf:select1>
+
+                            <xh:div class="btn-group fr-summary-selection">
+                                <xh:button id="select-button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <xf:output value="$fr-resources/summary/titles/selected"/>
+                                    <xh:span class="badge badge-info" title="Documents Selected">
+                                        <xf:output value="count(xxf:split(instance('fr-selection-instance')))"/>
+                                    </xh:span>
+                                    <xh:span class="caret"/>
+                                </xh:button>
+                                <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="select-button">
+                                    <xh:li role="presentation">
+                                        <xf:trigger appearance="minimal" role="menuitem">
+                                            <xf:label ref="$fr-resources/summary/buttons/select-all"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                ref="instance('fr-selection-instance')"
+                                                propagate="stop"
+                                                value="
+                                                    string-join(
+                                                        for $d in instance('fr-search-results-instance')/document
+                                                        return
+                                                            concat(if ($d/@draft = 'true') then 'draft' else 'data', '/', $d/@name)                          ,
+                                                        ' '
+                                                    )"/>
+                                        </xf:trigger>
+                                    </xh:li>
+                                    <xh:li role="presentation">
+                                        <xf:trigger appearance="minimal" role="menuitem">
+                                            <xf:label ref="$fr-resources/summary/buttons/deselect-all"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                propagate="stop"
+                                                ref="instance('fr-selection-instance')"/>
+                                        </xf:trigger>
+                                    </xh:li>
+                                    <xh:li role="presentation" class="divider"/>
+                                    <xh:li role="presentation">
+                                        <xf:trigger appearance="minimal" role="menuitem">
+                                            <xf:label ref="$fr-resources/summary/buttons/select-saved"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                propagate="stop"
+                                                ref="instance('fr-selection-instance')"
+                                                value="
+                                                    string-join(
+                                                        for $d in instance('fr-search-results-instance')/document[not(@draft = 'true')]
+                                                        return
+                                                            concat('data/', $d/@name),
+                                                        ' '
+                                                    )"/>
+                                        </xf:trigger>
+                                    </xh:li>
+                                    <xh:li role="presentation">
+                                        <xf:trigger appearance="minimal" role="menuitem">
+                                            <xf:label ref="$fr-resources/summary/buttons/select-drafts"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                propagate="stop"
+                                                ref="instance('fr-selection-instance')"
+                                                value="
+                                                    string-join(
+                                                        for $d in instance('fr-search-results-instance')/document[@draft = 'true']
+                                                        return
+                                                            concat('draft/', $d/@name),
+                                                        ' '
+                                                    )"/>
+                                        </xf:trigger>
+                                    </xh:li>
+                                </xh:ul>
+                            </xh:div>
 
                             <xf:input
                                 id="fr-search-free-input"

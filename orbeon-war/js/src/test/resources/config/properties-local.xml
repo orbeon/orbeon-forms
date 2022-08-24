@@ -14,7 +14,7 @@
         value="http://localhost:8080/orbeon"/>
 
     <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug">
-        z
+        document
         model
         submission
         control

@@ -49,7 +49,7 @@
                             <xf:var name="label" value="$items[value = $value]/label/string()"/>
 
                             <xh:li role="presentation" class="dropdown-item{if ($value = $binding) then ' disabled' else ()}">
-                                <xf:trigger appearance="minimal" role="menuitem">
+                                <xf:trigger appearance="minimal" role="menuitem" class="dropdown-item">
                                     <xf:label value="$label"/>
                                     <xf:setvalue event="DOMActivate" ref="$binding" value="$value"/>
                                 </xf:trigger>

@@ -499,7 +499,7 @@
                       <xh:span class="navbar-toggler-icon"></xh:span>
                     </xh:button>
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <xh:ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+                        <xh:ul class="navbar-nav ms-auto mt-2 mt-lg-0 flex-row">
                             <!-- These are typically to the right -->
                             <xh:li class="nav-item px-3">
                             <fr:language-selector/>
@@ -1203,7 +1203,7 @@
                         "/>
 
                         <!-- Because @appearance is static, use a CSS class instead for primary/inverse. This requires
-                             changes to dropdown.less, which is not the best solution. Ideally,
+                             changes to form-runner-bootstrap-override.less, which is not the best solution. Ideally,
                              we could find a dynamic way to set that class on the nested <button> so that standard
                              Bootstrap rules apply. -->
                         <fr:process-button

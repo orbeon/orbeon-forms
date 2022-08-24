@@ -621,7 +621,7 @@ object XFormsUI {
         // We remove the modal progress panel before handling DOM response, as script actions may dispatch
         // events and we don't want them to be filtered. If there are server events, we don't remove the
         // panel until they have been processed, i.e. the request sending the server events returns.
-        val mustHideProgressDialog =
+        val mustHideModalPanel =
           ! (
             // `exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])`
             details.responseXML.getElementsByTagNameNS(Namespaces.XXF, "submission").iterator ++
@@ -629,7 +629,7 @@ object XFormsUI {
               (e => ! e.hasAttribute("target") && e.getAttribute("show-progress") != "false")
           )
 
-        if (mustHideProgressDialog)
+        if (mustHideModalPanel)
           hideModalProgressPanel(timerIdOpt, focusControlIdOpt)
       }
     }

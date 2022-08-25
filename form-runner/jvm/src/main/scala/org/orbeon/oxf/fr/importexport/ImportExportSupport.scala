@@ -254,7 +254,7 @@ object ImportExportSupport {
               data                = formData,
               metadataRootElemOpt = metadataRootElem.some,
               srcVersion          = inputDataFormat,
-              dstVersion          = DataFormatVersion.Edge,
+              dstVersion          = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataRootElem.some),
               pruneMetadata       = false
             )
 

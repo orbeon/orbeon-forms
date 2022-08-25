@@ -37,7 +37,7 @@ class SimpleDataMigrationTest
   ignore("Simple data migration") {
 
     val ExpectedFormData: NodeInfo =
-      <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
+      <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.8.0">
           <section-2>
               <s1input1/>
           </section-2>

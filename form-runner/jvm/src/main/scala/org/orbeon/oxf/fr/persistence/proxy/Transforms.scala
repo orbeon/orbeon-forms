@@ -4,7 +4,6 @@ import cats.syntax.option._
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
-import org.orbeon.oxf.fr.FormRunnerPersistence.findFormDefinitionFormatFromStringVersions
 import org.orbeon.oxf.fr.XMLNames.{XBLBindingTest, XBLXBLTest}
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
@@ -115,15 +114,8 @@ object Transforms {
       // Orbeon Forms which places ids everywhere.
 
       // 2. Migrate inline instance data
-
-      // If we don't find a version in the form definition, it means it was last updated with a version older than 2018.2
-      // TODO: We should discriminate between 4.8.0 and 4.0.0 ideally. Currently we don't have a user use case but it would
-      //   be good for correctness.
       val srcVersionFromMetadataOrGuess =
-        findFormDefinitionFormatFromStringVersions(
-          (frDocCtx.metadataRootElem / "updated-with-version" ++ frDocCtx.metadataRootElem / "created-with-version") map
-            (_.stringValue)
-        ) getOrElse DataFormatVersion.V480
+        FormRunnerPersistence.getOrGuessFormDataFormatVersion(frDocCtx.metadataRootElemOpt)
 
       val dataRootElem =
         frDocCtx.dataRootElem.asInstanceOf[NodeWrapper]

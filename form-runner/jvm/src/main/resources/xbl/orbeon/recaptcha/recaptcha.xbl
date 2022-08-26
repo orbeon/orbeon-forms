@@ -68,9 +68,8 @@
                                 <xf:body>YAHOO.xbl.fr.Recaptcha.instance(this).render(publicKey, theme);</xf:body>
                             </xf:action>
                             <!-- Copy value of private key to local model -->
-                            <!-- NOTE: We don't use xxbl:parameter() as we don't want the private key to get to the client -->
                             <xf:var name="private-key">
-                                <xxf:value value="{if (fr:private-key/@ref) then fr:private-key/@ref else 'xxf:property(''oxf.xforms.xbl.fr.recaptcha.private-key'')'}" xxbl:scope="outer"/>
+                                <xxf:value value="{if (fr:private-key/@ref) then fr:private-key/@ref else 'fr:component-param-value(''private-key'')'}" xxbl:scope="outer"/>
                             </xf:var>
                             <xf:setvalue ref="secret" value="$private-key"/>
                         </xf:action>

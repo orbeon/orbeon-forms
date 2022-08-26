@@ -303,8 +303,8 @@ object AjaxClient {
 
     def canSendEvents: Boolean = ! EventQueue.ajaxRequestInProgress
 
-    val shortDelay                                  : FiniteDuration          = Properties.internalShortDelay.get().toInt.millis
-    val incrementalDelay                            : FiniteDuration          = Properties.delayBeforeIncrementalRequest.get().millis
+    def shortDelay       : FiniteDuration = Properties.internalShortDelay.get().toInt.millis
+    def incrementalDelay : FiniteDuration = Properties.delayBeforeIncrementalRequest.get().millis
 
     var ajaxRequestInProgress : Boolean = false              // actual Ajax request has started and not yet successfully completed including response processing
   }

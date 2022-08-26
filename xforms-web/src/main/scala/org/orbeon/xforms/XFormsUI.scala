@@ -87,7 +87,7 @@ object XFormsUI {
 
           for {
             (lastControlElem, _) <- lastCheckboxChecked
-            targetId = XFormsId.fromEffectiveId(controlElem.id)
+            targetId             = XFormsId.fromEffectiveId(controlElem.id)
             controlIds           <- findControlIdsToUpdate(XFormsId.fromEffectiveId(lastControlElem.id), targetId)
             controlId            <- controlIds
             controlElem          <- Option(dom.document.getElementById(controlId))

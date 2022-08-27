@@ -191,8 +191,8 @@
             <buttons>
                 <select-all>Select all</select-all>
                 <deselect-all>Deselect all</deselect-all>
-                <select-saved>Select saved only</select-saved>
-                <select-drafts>Select drafts only</select-drafts>
+                <select-saved>Select explicitly saved only</select-saved>
+                <select-drafts>Select autosaved only</select-drafts>
             </buttons>
             <search>
                 <search>Search</search>
@@ -206,11 +206,11 @@
             </paging>
             <messages>
                 <no-form-found>No form data was found.</no-form-found>
-                <delete-confirmation>Are you sure you want to delete one or more forms? Note that when deleting a saved document, the corresponding drafts are deleted as well.</delete-confirmation>
+                <delete-confirmation>Are you sure you want to delete one or more forms? Note that when deleting a saved document, the corresponding autosaved documents are deleted as well.</delete-confirmation>
                 <version>Form Version {0,number,integer}</version>
             </messages>
             <labels>
-                <draft>Draft</draft>
+                <draft>Autosaved</draft>
                 <read-only>Read-Only</read-only>
                 <language-choice>Choose Language</language-choice>
                 <form-choice>Choose a Form</form-choice>
@@ -265,14 +265,14 @@
                 <lost-attachments>Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.</lost-attachments>
             </messages>
             <draft-singleton>
-                <found-draft>Found draft</found-draft>
-                <found-drafts>Found drafts</found-drafts>
-                <found-draft-for-document>After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?</found-draft-for-document>
-                <found-draft-for-never-saved>A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?</found-draft-for-never-saved>
-                <found-drafts-for-never-saved>Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?</found-drafts-for-never-saved>
-                <open-saved>Open saved document</open-saved>
-                <open-draft>Open auto-saved draft</open-draft>
-                <view-drafts>View auto-saved drafts</view-drafts>
+                <found-draft>Found autosaved document</found-draft>
+                <found-drafts>Found autosaved documents</found-drafts>
+                <found-draft-for-document>After this document was saved, a document was autosaved which might contain additional work. Do you want to open the saved document, or the autosaved document?</found-draft-for-document>
+                <found-draft-for-never-saved>An autosaved document for this form is available. Would you like to start from scratch or to open the autosaved document?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Several autosaved documents for this form are available. Would you like to start from scratch or to see the autosaved documents (and then possibly edit one of them)?</found-drafts-for-never-saved>
+                <open-saved>Open explicitly saved document</open-saved>
+                <open-draft>Open autosaved document</open-draft>
+                <view-drafts>View autosaved documents</view-drafts>
                 <start-new>Start from scratch</start-new>
                 <multiple-docs-title>Existing form data found</multiple-docs-title>
                 <multiple-docs-explanation>You cannot create new data for this form definition, however you might be able to edit existing form data.</multiple-docs-explanation>
@@ -711,8 +711,8 @@
             <buttons>
                 <select-all>Tout sélectionner</select-all>
                 <deselect-all>Tout désélectionner</deselect-all>
-                <select-saved>Sélectionner documents sauvegardés seulement</select-saved>
-                <select-drafts>Sélectionner brouillons seulement</select-drafts>
+                <select-saved>Sélectionner documents enregistrés explicitement seulement</select-saved>
+                <select-drafts>Sélectionner documents enregistrés automatiquement seulement</select-drafts>
             </buttons>
             <search>
                 <search>Recherche</search>
@@ -726,11 +726,11 @@
             </paging>
             <messages>
                 <no-form-found>Aucun formulaire trouvé.</no-form-found>
-                <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires? Notez que lors de la suppression d'un document enregistré, les brouillons correspondants sont également supprimés.</delete-confirmation>
+                <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires? Notez que lors de la suppression d'un document explicitement enregistré, les documents enregistrés automatiquement correspondants sont également supprimés.</delete-confirmation>
                 <version>Version de formulaire {0,number,integer}</version>
             </messages>
             <labels>
-                <draft>Brouillons</draft>
+                <draft>Sauv. aut.</draft>
                 <read-only>Lecture seule</read-only>
                 <language-choice>Choix de la langue</language-choice>
                 <form-choice>Choisisez un formulaire</form-choice>
@@ -773,7 +773,7 @@
                     1#contient '{0,choice,0#une erreur|1#un avertissement|2#un message d''''information|3#un message}'|
                     1&lt;contient {1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}'}. Vous pouvez choisir de {1,choice,1#le|1&lt;les} passer en revue ou de {1,choice,1#l''ignorer|1&lt;les ignorer} et de poursuivre l''opération.</validation-dialog-message>
                 <buttons-message/>
-                <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été sauvegardées.</saved-locally-open>
+                <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été enregistrées.</saved-locally-open>
                 <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
                 <upload-start>Téléchargement vers le serveur commencé</upload-start>
                 <upload-cancel>Téléchargement vers le serveur annulé par l'utilisateur</upload-cancel>
@@ -785,14 +785,14 @@
                 <lost-attachments>Des fichiers joints ont été perdus suite à un problème sur le serveur. Veuillez vérifier tous vos fichiers joints et les annexer à nouveau si nécessaire.</lost-attachments>
             </messages>
             <draft-singleton>
-                <found-draft>Un brouillon est disponible</found-draft>
-                <found-drafts>Plusieurs brouillons sont disponibles</found-drafts>
-                <found-draft-for-document>Après que ce document ait été enregistré, un brouillon a été auto-enregistré, et il se peut que ce dernier contenne des informations supplémentaires. Voulez-vous ouvrir le document enregistré, ou le brouillon auto-enregistré?</found-draft-for-document>
-                <found-draft-for-never-saved>Un brouillon pour ce formulaire a éte auto-enregistré. Voulez-vous commencer à partir de zéro ou d'ouvrir le brouillon auto-enregistré?</found-draft-for-never-saved>
-                <found-drafts-for-never-saved>Plusieurs brouillons pour ce formulaire ont été enregistrés. Voulez-vous commencer à partir de zéro ou voir ces brouillons auto-enregistrés (pour ensuite peut-être modifier l'un d'entre eux)?</found-drafts-for-never-saved>
-                <open-saved>Ouvrir le document enregistré</open-saved>
-                <open-draft>Ouvrir le brouillon auto-enregistrés</open-draft>
-                <view-drafts>Voir les brouillons automatiquement enregistrés</view-drafts>
+                <found-draft>Un document enregistré automatiquement est disponible</found-draft>
+                <found-drafts>Plusieurs documents enregistrés automatiquement sont disponibles</found-drafts>
+                <found-draft-for-document>Après que ce document ait été enregistré, un document enregistré automatiquement a été enregistré, et il se peut que ce dernier contienne des informations supplémentaires. Voulez-vous ouvrir le document enregistré, ou le document enregistré automatiquement?</found-draft-for-document>
+                <found-draft-for-never-saved>Un document enregistré automatiquement pour ce formulaire a éte enregistré. Voulez-vous commencer à partir de zéro ou ouvrir le document enregistré automatiquement?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Plusieurs documents enregistrés automatiquement pour ce formulaire ont été enregistrés. Voulez-vous commencer à partir de zéro ou voir ces documents enregistrés automatiquement (pour ensuite peut-être modifier l'un d'entre eux)?</found-drafts-for-never-saved>
+                <open-saved>Ouvrir le document enregistré explicitement</open-saved>
+                <open-draft>Ouvrir le document enregistré automatiquement</open-draft>
+                <view-drafts>Voir les documents enregistrés automatiquement</view-drafts>
                 <start-new>Recommencer à zéro</start-new>
                 <multiple-docs-title>Données de formulaire existantes</multiple-docs-title>
                 <multiple-docs-explanation>Vous ne pouvez pas créer de nouvelles données _ _, mais vous pourriez être en mesure de modifier les données de formulaire existantes.</multiple-docs-explanation>
@@ -827,11 +827,11 @@
             </lease>
         </detail>
         <save-locally>
-            <dialog-title>Sauvegarder Localement</dialog-title>
+            <dialog-title>Enregistrer Localement</dialog-title>
             <dialog-body>
                 <div>
                     <p>
-                        Cliquez sur le bouton Enregistrer ci-dessous pour sauvegarder les données de votre formulaire
+                        Cliquez sur le bouton Enregistrer ci-dessous pour enregistrer les données de votre formulaire
                         dans un fichier HTML.
                     </p>
                     <p>
@@ -1003,10 +1003,10 @@
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#a été validé|1&lt;ont été validés} et {0,choice,1#sera importé|1&lt;seront importés}.
             </valid-records-message>
             <invalid-document-message>
-                Le document téléchargé contient des erreurs de validation. Veuillez utiliser le bouton "Revoir les données" pour revoir et corriger les erreurs avant de sauvegarder.
+                Le document téléchargé contient des erreurs de validation. Veuillez utiliser le bouton "Revoir les données" pour revoir et corriger les erreurs avant d'enregistrer.
             </invalid-document-message>
             <valid-document-message>
-                Les données du document téléchargé sont valides. Veuillez utiliser le bouton "Revoir les données" pour revoir les données du formulaire avant de sauvegarder.
+                Les données du document téléchargé sont valides. Veuillez utiliser le bouton "Revoir les données" pour revoir les données du formulaire avant d'enregistrer.
             </valid-document-message>
             <import-complete-message>
 		        L'importation de {0,number,integer} {0,choice,1#document|1&lt;documents} est terminée. {1,number,integer} {1,choice,1#document invalide a été ignoré|1&lt;documents invalides ont été ignorés}
@@ -1223,7 +1223,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>
@@ -1730,7 +1730,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>
@@ -1803,12 +1803,12 @@
              <draft-singleton>
                 <found-draft todo="true">[Found draft]</found-draft>
                 <found-drafts todo="true">[Found drafts]</found-drafts>
-                <found-draft-for-document todo="true">[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
-                <found-draft-for-never-saved todo="true">[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
-                <found-drafts-for-never-saved todo="true">[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
+                <found-draft-for-document todo="true">[After this document was saved, a draft was autosaved, and it might contain additional work. Do you want to open the saved document, or the autosaved draft?]</found-draft-for-document>
+                <found-draft-for-never-saved todo="true">[A draft for this form was autosaved. Would you like to start from scratch or to open the autosaved draft?]</found-draft-for-never-saved>
+                <found-drafts-for-never-saved todo="true">[Several drafts for this form were autosaved. Would you like to start from scratch or to see the autosaved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
                 <open-saved todo="true">[Open saved document]</open-saved>
-                <open-draft todo="true">[Open auto-saved draft]</open-draft>
-                <view-drafts todo="true">[View auto-saved drafts]</view-drafts>
+                <open-draft todo="true">[Open autosaved draft]</open-draft>
+                <view-drafts todo="true">[View autosaved drafts]</view-drafts>
                 <start-new todo="true">[Start from scratch]</start-new>
                 <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
                 <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
@@ -2235,7 +2235,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>
@@ -2308,12 +2308,12 @@
              <draft-singleton>
                 <found-draft todo="true">[Found draft]</found-draft>
                 <found-drafts todo="true">[Found drafts]</found-drafts>
-                <found-draft-for-document todo="true">[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
-                <found-draft-for-never-saved todo="true">[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
-                <found-drafts-for-never-saved todo="true">[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
+                <found-draft-for-document todo="true">[After this document was saved, a draft was autosaved, and it might contain additional work. Do you want to open the saved document, or the autosaved draft?]</found-draft-for-document>
+                <found-draft-for-never-saved todo="true">[A draft for this form was autosaved. Would you like to start from scratch or to open the autosaved draft?]</found-draft-for-never-saved>
+                <found-drafts-for-never-saved todo="true">[Several drafts for this form were autosaved. Would you like to start from scratch or to see the autosaved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
                 <open-saved todo="true">[Open saved document]</open-saved>
-                <open-draft todo="true">[Open auto-saved draft]</open-draft>
-                <view-drafts todo="true">[View auto-saved drafts]</view-drafts>
+                <open-draft todo="true">[Open autosaved draft]</open-draft>
+                <view-drafts todo="true">[View autosaved drafts]</view-drafts>
                 <start-new todo="true">[Start from scratch]</start-new>
                 <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
                 <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
@@ -2745,7 +2745,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>
@@ -3262,7 +3262,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>
@@ -3779,7 +3779,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>
@@ -4296,7 +4296,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>
@@ -4813,7 +4813,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>
@@ -5329,7 +5329,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>
@@ -5839,7 +5839,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>
@@ -6349,7 +6349,7 @@
             <buttons>
                 <select-all todo="true">Select all</select-all>
                 <deselect-all todo="true">Deselect all</deselect-all>
-                <select-saved todo="true">Select saved only</select-saved>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
                 <select-drafts todo="true">Select drafts only</select-drafts>
             </buttons>
             <search>

@@ -69,11 +69,34 @@
 
                     <xf:action ev:event="DOMActivate">
                         <!-- Ask confirmation -->
+                        <xf:var name="service-name" value="$instance/name/string()"/>
+                        <xf:var
+                            name="impacted-actions"
+                            value="
+                                count(
+                                    $model/fb:action[
+                                        ends-with(@id, '-binding')
+                                    ]//xf:send/@submission[
+                                        . = concat($service-name, '-submission')
+                                    ]
+                                )
+                                +
+                                count(
+                                    $model/fr:action//fr:service-call/@service[
+                                        . = $service-name
+                                    ]
+                                )"/>
                         <xxf:show dialog="fb-confirmation-dialog">
-                            <xf:property name="fr:message"
-                                             value="concat($form-resources/messages/delete-service, ' ''',
-                                                         $instance/name,
-                                                         '''?')"/>
+                            <xf:property
+                                name="fr:message"
+                                value="
+                                    xxf:format-message(
+                                        $form-resources/messages/delete-service,
+                                        (
+                                            $service-name,    (: service name              :)
+                                            $impacted-actions (: count of impacted actions :)
+                                        )
+                                    )"/>
                             <xf:property name="fr:confirmation-target" value="'fb-database-service-delete'"/>
                         </xxf:show>
                     </xf:action>

@@ -499,7 +499,7 @@
                       <xh:span class="navbar-toggler-icon"></xh:span>
                     </xh:button>
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <xh:ul class="navbar-nav ms-auto mt-2 mt-lg-0 flex-row">
+                        <xh:ul class="navbar-nav ms-auto mt-2 mt-lg-0 flex-row pull-right">
                             <!-- These are typically to the right -->
                             <xh:li class="nav-item px-3">
                             <fr:language-selector/>

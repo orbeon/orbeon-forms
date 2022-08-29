@@ -69,23 +69,8 @@
 
                     <xf:action ev:event="DOMActivate">
                         <!-- Ask confirmation -->
-                        <xf:var name="service-name" value="$instance/name/string()"/>
-                        <xf:var
-                            name="impacted-actions"
-                            value="
-                                count(
-                                    $model/fb:action[
-                                        ends-with(@id, '-binding')
-                                    ]//xf:send/@submission[
-                                        . = concat($service-name, '-submission')
-                                    ]
-                                )
-                                +
-                                count(
-                                    $model/fr:action//fr:service-call/@service[
-                                        . = $service-name
-                                    ]
-                                )"/>
+                        <xf:var name="service-name"     value="$instance/name/string()"/>
+                        <xf:var name="impacted-actions" value="fbf:countImpactedActions($model, $service-name)" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
                         <xxf:show dialog="fb-confirmation-dialog">
                             <xf:property
                                 name="fr:message"

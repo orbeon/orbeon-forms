@@ -51,6 +51,7 @@ object XMLNames {
   val XFBindTest               : Test      = XF -> "bind"
   val XFGroupTest              : Test      = XF -> "group"
   val XFActionTest             : Test      = XF -> "action"
+  val XFSendTest               : Test      = XF -> "send"
 
   val FRMetadata               : Test      = FR -> "metadata"
   val FRItemsetId              : Test      = FR -> "itemsetid"
@@ -64,6 +65,7 @@ object XMLNames {
 
   val FRListenerTest           : Test      = FR -> "listener"
   val FRActionTest             : Test      = FR -> "action"
+  val FRServiceCallTest        : Test      = FR -> "service-call"
 
   val FRNumberTest             : Test      = FR -> "number"
 

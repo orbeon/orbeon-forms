@@ -24,6 +24,7 @@ import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner.findControlByName
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
+import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFSendTest}
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.permission.{Operation, Operations, PermissionsXML}
 import org.orbeon.oxf.util.CollectionUtils
@@ -555,6 +556,20 @@ object FormBuilderXPathApi {
   def countAllNonContainers(inDoc: NodeInfo): Int = FormRunner.getAllControlsWithIds(new InDocFormRunnerDocContext(inDoc)) count (! FormRunner.IsContainer(_))
   def countAllContainers   (inDoc: NodeInfo): Int = getAllContainerControls(inDoc).size
   def countAllControls     (inDoc: NodeInfo): Int = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
+
+  //@XPathFunction
+  def countImpactedActions(inDoc: NodeInfo, serviceName: String): Int = {
+
+    implicit val ctx = FormBuilderDocContext(inDoc)
+
+    val newServiceCalls =
+      findNewActions descendant FRServiceCallTest filter (_.attValue("service") == serviceName)
+
+    val legacyServiceCalls =
+      findLegacyActions descendant XFSendTest filter (_.attValue("submission") == s"$serviceName-submission")
+
+    legacyServiceCalls.size + newServiceCalls.size
+  }
 
   // Find the control's bound item if any (resolved from the top-level form model `fr-form-model`)
   //@XPathFunction

@@ -663,16 +663,16 @@ trait ControlOps extends ResourcesOps {
     XFormsId(staticId, containerIds.toList, 1 to repeatDepth map (_ => 1) toList).toEffectiveId
   }
 
+  def findNewActions(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
+    ctx.modelElem child FRActionTest
+
+  def findLegacyActions(implicit ctx: FormBuilderDocContext): Seq[NodeInfo] =
+    ctx.modelElem child FBActionTest filter (_.id.endsWith("-binding"))
+
   def renameControlReferences(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Unit = {
 
     def updateNode(newValue: String)(node: NodeInfo): Unit =
       XFormsAPI.setvalue(node, newValue)
-
-    def findNewActions: Seq[NodeInfo] =
-      ctx.modelElem child FRActionTest
-
-    def findLegacyActions: Seq[NodeInfo] =
-      ctx.modelElem child FBActionTest filter (_.id.endsWith("-binding"))
 
     def findRepeatedGridsAndSections: Seq[NodeInfo] =
       ctx.bodyElem descendant FRContainerTest filter isRepeat

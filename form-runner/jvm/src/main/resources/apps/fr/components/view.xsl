@@ -725,7 +725,7 @@
             ]">
             <xh:ul class="nav">
                 <xh:li class="dropdown">
-                    <xh:a id="menu-button" href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <xh:a id="menu-button" href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
                         <xh:i class="fa fa-user"/>
                     </xh:a>
                     <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="menu-button">
@@ -788,7 +788,7 @@
                                 else 'xforms-hidden'
                             "/>
                         <xh:li role="presentation" class="{{$login-class}}">
-                            <xh:a role="menuitem" href="{{$login-url}}">
+                            <xh:a role="menuitem" href="{{$login-url}}" class="btn">
                                 <xf:output value="
                                     xxf:r(
                                         'authentication.menu.login',

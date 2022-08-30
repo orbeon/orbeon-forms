@@ -17,17 +17,18 @@ import javax.portlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.wsrp.WSRPSupport
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
 import scala.util.matching.Regex
 import scala.collection.compat._
+
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -244,7 +245,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     val path = {
 
       def pathParameterOpt =
-        Option(request.getRenderParameters.getValue(WSRPURLRewriter.PathParameterName))
+        Option(request.getRenderParameters.getValue(WSRPSupport.PathParameterName))
 
       def defaultPath =
         if (getPreference(request, Page) == "home")

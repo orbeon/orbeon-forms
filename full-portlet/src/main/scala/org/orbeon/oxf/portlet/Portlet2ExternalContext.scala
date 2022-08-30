@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.wsrp.WSRPSupport
 
 import java.io._
 import java.util.Locale
@@ -208,7 +209,7 @@ class Portlet2ExternalContext(
       val rawResult =
         portletRequest match {
           case rr: ResourceRequest => PathUtils.splitQuery(rr.getResourceID)._1
-          case _                   => portletRequest.getParameter(WSRPURLRewriter.PathParameterName)
+          case _                   => portletRequest.getParameter(WSRPSupport.PathParameterName)
         }
 
       rawResult.trimAllToEmpty.prependSlash
@@ -263,7 +264,7 @@ class Portlet2ExternalContext(
             // Filter out `PathParameterName`, make values `Array[AnyRef]` (not great), and make immutable `Map`.
             val filteredParams =
               portletRequest.getParameterMap.asScala collect {
-                case pair @ (k, v) if k != WSRPURLRewriter.PathParameterName => (k, v.toArray[AnyRef])
+                case pair @ (k, v) if k != WSRPSupport.PathParameterName => (k, v.toArray[AnyRef])
               }
             filteredParams.asJava
         }

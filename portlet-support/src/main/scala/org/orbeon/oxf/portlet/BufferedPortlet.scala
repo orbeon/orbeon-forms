@@ -18,15 +18,16 @@ import java.{util => ju}
 import javax.portlet._
 import org.apache.commons.io.IOUtils
 import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
 import org.orbeon.oxf.fr.embedding.{APISupport, EmbeddingContext, EmbeddingContextWithResponse}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.wsrp.WSRPSupport.PathParameterName
 
 import scala.jdk.CollectionConverters._
 import scala.util.Try
+
 
 class PortletEmbeddingContext(
   context            : PortletContext,

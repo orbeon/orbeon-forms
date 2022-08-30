@@ -14,10 +14,10 @@
 package org.orbeon.oxf.portlet.liferay
 
 import java.{util => ju}
-
 import javax.portlet._
-import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.wsrp.WSRPSupport
+
 
 // Liferay-specific portlet support
 object LiferayURL {
@@ -73,7 +73,7 @@ object LiferayURL {
       url.toString
     }
 
-    WSRPURLRewriter.decodeURL(
+    WSRPSupport.decodeURL(
       encodedURL,
       createResourceURL,
       createPortletURL(response.createActionURL, _, _, _),

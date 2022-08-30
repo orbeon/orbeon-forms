@@ -19,7 +19,6 @@ import org.apache.commons.io.IOUtils
 import org.apache.http.client.CookieStore
 import org.apache.http.impl.client.BasicCookieStore
 import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.embedding.servlet.ServletEmbeddingContextWithResponse
 import org.orbeon.oxf.http.Headers._
@@ -29,6 +28,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.{ContentTypes, PathUtils}
+import org.orbeon.wsrp.WSRPSupport
 import org.slf4j.LoggerFactory
 
 import scala.jdk.CollectionConverters._
@@ -242,7 +242,7 @@ object APISupport {
           if (encodeForXML) decodedURL.escapeXmlMinimal else decodedURL
         }
 
-        decodeWSRPContent(
+        WSRPSupport.decodeWSRPContent(
           contentAsString,
           ctx.namespace,
           decodeURL,
@@ -419,49 +419,6 @@ object APISupport {
         headers     = requestDetails.headersMapWithContentType + (Headers.OrbeonClient -> List(ctx.client)),
         content     = requestDetails.content
       )
-
-    // Parse a string containing WSRP encodings and encode the URLs and namespaces
-    def decodeWSRPContent(content: String, ns: String, decodeURL: String => String, writer: Writer): Unit = {
-
-      val stringLength = content.length
-      var currentIndex = 0
-      var index        = 0
-
-      import org.orbeon.oxf.externalcontext.WSRPURLRewriter.{decodeURL => _, _}
-
-      while ({index = content.indexOf(BaseTag, currentIndex); index} != -1) {
-
-        // Write up to the current mark
-        writer.write(content, currentIndex, index - currentIndex)
-
-        // Check if escaping is requested
-        if (index + BaseTagLength * 2 <= stringLength &&
-            content.substring(index + BaseTagLength, index + BaseTagLength * 2) == BaseTag) {
-          // Write escaped tag, update index and keep looking
-          writer.write(BaseTag)
-          currentIndex = index + BaseTagLength * 2
-        } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '?') {
-          // URL encoding
-          // Find the matching end mark
-          val endIndex = content.indexOf(EndTag, index)
-          if (endIndex == -1)
-            throw new OXFException("Missing end tag for WSRP encoded URL.")
-          val encodedURL = content.substring(index + StartTagLength, endIndex)
-          currentIndex = endIndex + EndTagLength
-
-          writer.write(decodeURL(encodedURL))
-        } else if (index < stringLength - BaseTagLength && content.charAt(index + BaseTagLength) == '_') {
-          // Namespace encoding
-          writer.write(ns)
-          currentIndex = index + PrefixTagLength
-        } else
-          throw new OXFException("Invalid WSRP rewrite tagging.")
-      }
-
-      // Write remainder of string
-      if (currentIndex < stringLength)
-        writer.write(content, currentIndex, content.length - currentIndex)
-    }
 
     def getOrCreateCookieStore(implicit ctx: EmbeddingContext): CookieStore =
       ctx.getSessionAttribute(RemoteSessionIdKey) map (_.asInstanceOf[CookieStore]) getOrElse {

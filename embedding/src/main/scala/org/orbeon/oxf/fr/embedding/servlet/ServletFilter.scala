@@ -16,14 +16,15 @@ package org.orbeon.oxf.fr.embedding.servlet
 import java.io.Writer
 import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.fr.embedding.APISupport.FormDynamicResourcesRegex
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.wsrp.WSRPSupport
 
 import scala.util.Try
+
 
 class ServletEmbeddingContext(
   val namespace  : String,
@@ -71,7 +72,7 @@ class ServletEmbeddingContextWithResponse(
       req.getContextPath + orbeonPrefix + '/' + (if (namespaceResource(resourceId)) namespace else APISupport.NamespacePrefix) + resourceId
 
     def path(navigationParameters: ju.Map[String, Array[String]]) =
-      navigationParameters.asScala.getOrElse(WSRPURLRewriter.PathParameterName, Array()).headOption.getOrElse(throw new IllegalStateException)
+      navigationParameters.asScala.getOrElse(WSRPSupport.PathParameterName, Array()).headOption.getOrElse(throw new IllegalStateException)
 
     def createActionURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
       req.getContextPath + orbeonPrefix + '/' + path(navigationParameters).dropStartingSlash
@@ -79,7 +80,7 @@ class ServletEmbeddingContextWithResponse(
     def createRenderURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
       path(navigationParameters)
 
-    WSRPURLRewriter.decodeURL(encoded, createResourceURL, createActionURL, createRenderURL)
+    WSRPSupport.decodeURL(encoded, createResourceURL, createActionURL, createRenderURL)
   }
 }
 

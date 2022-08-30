@@ -57,35 +57,6 @@ public class StringConversions {
         }
     }
 
-    /**
-     * Convert a String array into an Object array.
-     */
-    public static Object[] stringArrayToObjectArray(String[] values) {
-
-        if (values == null)
-            return null;
-
-        final Object[] result = new Object[values.length];
-        int size = 0;
-        for (final Object currentValue: values) {
-            result[size++] = currentValue;
-        }
-        return result;
-    }
-
-    public static Map<String, Object[]> stringArrayMapToObjectArrayMap(Map<String, String[]> in) {
-        if (in == null)
-            return null;
-
-        final Map<String, Object[]> result = new LinkedHashMap<String, Object[]>(); // keep map in order
-        for (Map.Entry<String, String[]> entry : in.entrySet()) {
-            final Object[] values = stringArrayToObjectArray(entry.getValue());
-            if (values != null && values.length > 0)
-                result.put(entry.getKey(), values);
-        }
-        return result;
-    }
-
     public static String getFirstValueFromStringArray(String[] values) {
         return (values != null && values.length > 0) ? values[0] : null;
     }

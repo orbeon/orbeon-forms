@@ -23,7 +23,6 @@ import org.orbeon.oxf.fr.embedding.{APISupport, EmbeddingContext, EmbeddingConte
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.portlet.liferay.LiferayURL
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 
 import scala.jdk.CollectionConverters._
@@ -122,7 +121,7 @@ trait BufferedPortlet {
         val (path, queryOpt) = splitQuery(location)
         val parameters = queryOpt match {
           case Some(query) =>
-            val m = NetUtils.decodeQueryString(query)
+            val m = decodeQueryString(query)
             m.put(PathParameter, Array(path))
             ju.Collections.unmodifiableMap[String, Array[String]](m)
           case None =>

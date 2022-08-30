@@ -14,11 +14,12 @@
 package org.orbeon.oxf.externalcontext
 
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.util.{NetUtils, PathMatcher, PathUtils, StringConversions, URLRewriterUtils}
+import org.orbeon.oxf.util.{PathMatcher, PathUtils, StringConversions, URLRewriterUtils}
 
 import java.net.{URL, URLDecoder, URLEncoder}
 import java.util.concurrent.Callable
 import java.{util => ju}
+import scala.jdk.CollectionConverters._
 
 
 // This URL rewriter rewrites URLs using the WSRP encoding
@@ -85,7 +86,7 @@ class WSRPURLRewriter(
     val baseURL = new URL("http", "example.org", request.getRequestPath)
     val u = new URL(baseURL, urlString)
     // Decode query string
-    val parameters = NetUtils.decodeQueryStringPortlet(u.getQuery)
+    val parameters = PathUtils.decodeQueryStringPortlet(u.getQuery)
     // Add special path parameter
     val path =
       if (urlString.startsWith("?"))
@@ -99,7 +100,7 @@ class WSRPURLRewriter(
     parameters.put(PathParameterName, Array(path))
 
     // Encode as "navigational state"
-    val navigationalState = NetUtils.encodeQueryString2(parameters)
+    val navigationalState = PathUtils.encodeQueryString(parameters.asScala)
 
     // Encode the URL a la WSRP
     encodeURL(urlType, navigationalState, portletMode, windowState, u.getRef, secure = false)
@@ -230,7 +231,7 @@ object WSRPURLRewriter {
     def removeAmpIfNeeded(s: String) =
       if (s.startsWith("amp;")) s.substring("amp;".length) else s
 
-    val wsrpParameters = NetUtils.decodeQueryStringPortlet(encodedURL)
+    val wsrpParameters = PathUtils.decodeQueryStringPortlet(encodedURL)
 
     val urlType = {
       val urlType = getFirstValueFromStringArray(wsrpParameters.get(URLTypeParam))
@@ -247,7 +248,7 @@ object WSRPURLRewriter {
     val navigationParameters = {
       val navigationalStateValue = getFirstValueFromStringArray(wsrpParameters.get(NavigationalStateParam))
       if (navigationalStateValue ne null)
-        NetUtils.decodeQueryStringPortlet(URLDecoder.decode(removeAmpIfNeeded(navigationalStateValue), CharsetNames.Utf8))
+        PathUtils.decodeQueryStringPortlet(URLDecoder.decode(removeAmpIfNeeded(navigationalStateValue), CharsetNames.Utf8))
       else
         ju.Collections.emptyMap[String, Array[String]]
     }
@@ -255,7 +256,7 @@ object WSRPURLRewriter {
     if (urlType == URLTypeResourceString) {
       val resourcePath = navigationParameters.get(PathParameterName)(0)
       navigationParameters.remove(PathParameterName)
-      val resourceQuery = NetUtils.encodeQueryString2(navigationParameters)
+      val resourceQuery = PathUtils.encodeQueryString(navigationParameters.asScala)
       val resourceId = PathUtils.appendQueryString(resourcePath, resourceQuery)
 
       createResourceURL(resourceId)

@@ -41,8 +41,6 @@ import java.util.regex.Pattern;
 // TODO: refactor, use functions in `FileItemSupport`
 public class NetUtils {
 
-    private static final Pattern PATTERN_NO_AMP;
-
     private static final int COPY_BUFFER_SIZE = 8192;
     private static final String STANDARD_PARAMETER_ENCODING = CharsetNames.Utf8();
 
@@ -51,11 +49,6 @@ public class NetUtils {
     public static final int REQUEST_SCOPE = 0;
     public static final int SESSION_SCOPE = 1;
     public static final int APPLICATION_SCOPE = 2;
-
-    static {
-        final String token = "[^=&]";
-        PATTERN_NO_AMP = Pattern.compile( "(" + token + "+)=(" + token + "*)(?:&|(?<!&)\\z)" );
-    }
 
     public static File getTemporaryDirectory() {
         return new File(System.getProperty("java.io.tmpdir")).getAbsoluteFile();
@@ -234,135 +227,6 @@ public class NetUtils {
         final char[] buffer = new char[COPY_BUFFER_SIZE / 2];
         while ((count = reader.read(buffer)) > 0)
             writer.write(buffer, 0, count);
-    }
-
-    /**
-     * @param queryString a query string of the form n1=v1&n2=v2&... to decode.  May be null.
-     *
-     * @return a Map of String[] indexed by name, an empty Map if the query string was null
-     */
-    // TODO: Move to PathUtils.
-    public static Map<String, String[]> decodeQueryString(final CharSequence queryString) {
-
-        final Map<String, String[]> result = new LinkedHashMap<>();
-        if (queryString != null) {
-            final Matcher matcher = PATTERN_NO_AMP.matcher(queryString);
-            int matcherEnd = 0;
-            while (matcher.find()) {
-                matcherEnd = matcher.end();
-                try {
-                    final String name = URLDecoder.decode(matcher.group(1), NetUtils.STANDARD_PARAMETER_ENCODING);
-                    final String value = URLDecoder.decode(matcher.group(2), NetUtils.STANDARD_PARAMETER_ENCODING);
-
-                    StringConversions.addValueToStringArrayMap(result, name, value);
-                } catch (UnsupportedEncodingException e) {
-                    // Should not happen as we are using a required encoding
-                    throw new OXFException(e);
-                }
-            }
-            if (queryString.length() != matcherEnd) {
-                // There was garbage at the end of the query.
-                throw new OXFException("Malformed URL: " + queryString);
-            }
-        }
-        return result;
-    }
-
-    private static final Pattern PATTERN_AMP;
-
-    static {
-        final String token = "[^=&]+";
-        PATTERN_AMP = Pattern.compile( "(" + token + ")=(" + token + ")?(?:&amp;|&|(?<!&amp;|&)\\z)" );
-    }
-
-    // This is a modified copy of decodeQueryString() above. Not sure why we need 2 versions! Try to avoid duplication!
-    // TODO: Move to PathUtils.
-    public static Map<String, String[]> decodeQueryStringPortlet(final CharSequence queryString) {
-
-        final Map<String, String[]> result = new LinkedHashMap<>();
-        if (queryString != null) {
-            final Matcher matcher = PATTERN_AMP.matcher(queryString);
-            int matcherEnd = 0;
-            while (matcher.find()) {
-                matcherEnd = matcher.end();
-                try {
-                    String name = URLDecoder.decode(matcher.group(1), STANDARD_PARAMETER_ENCODING);
-                    String group2 = matcher.group(2);
-
-                    final String value = group2 != null ? URLDecoder.decode(group2, STANDARD_PARAMETER_ENCODING) : "";
-
-                    // Handle the case where the source contains &amp;amp; because of double escaping which does occur in
-                    // full Ajax updates!
-                    if (name.startsWith("amp;"))
-                        name = name.substring("amp;".length());
-
-                    // NOTE: Replace spaces with '+'. This is an artifact of the fact that URLEncoder/URLDecoder
-                    // are not fully reversible.
-                    StringConversions.addValueToStringArrayMap(result, name, value.replace(' ', '+'));
-                } catch (UnsupportedEncodingException e) {
-                    // Should not happen as we are using a required encoding
-                    throw new OXFException(e);
-                }
-            }
-            if (queryString.length() != matcherEnd) {
-                // There was garbage at the end of the query.
-                throw new OXFException("Malformed URL: " + queryString);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Encode a query string. The input Map contains names indexing Object[].
-     */
-    // TODO: Move to PathUtils.
-    public static String encodeQueryString(Map<String, Object[]> parameters) {
-        final StringBuilder sb = new StringBuilder(100);
-        boolean first = true;
-        try {
-            for (final Map.Entry<String, Object[]> entry : parameters.entrySet()) {
-                for (final Object currentValue : entry.getValue()) {
-                    if (currentValue instanceof String) {
-                        if (!first)
-                            sb.append('&');
-
-                        sb.append(URLEncoder.encode(entry.getKey(), NetUtils.STANDARD_PARAMETER_ENCODING));
-                        sb.append('=');
-                        sb.append(URLEncoder.encode((String) currentValue, NetUtils.STANDARD_PARAMETER_ENCODING));
-
-                        first = false;
-                    }
-                }
-            }
-        } catch (UnsupportedEncodingException e) {
-            // Should not happen as we are using a required encoding
-            throw new OXFException(e);
-        }
-        return sb.toString();
-    }
-
-    // TODO: Move to PathUtils.
-    public static String encodeQueryString2(Map<String, String[]> parameters) {
-        final StringBuilder sb = new StringBuilder(100);
-        boolean first = true;
-        try {
-            for (final Map.Entry<String, String[]> entry : parameters.entrySet()) {
-                for (final Object currentValue : entry.getValue()) {
-                    if (!first)
-                        sb.append('&');
-
-                    sb.append(URLEncoder.encode(entry.getKey(), NetUtils.STANDARD_PARAMETER_ENCODING));
-                    sb.append('=');
-                    sb.append(URLEncoder.encode((String) currentValue, NetUtils.STANDARD_PARAMETER_ENCODING));
-
-                    first = false;
-                }
-            }
-        } catch (UnsupportedEncodingException e) {
-            // Should not happen as we are using a required encoding
-            throw new OXFException(e);
-        }
-        return sb.toString();
     }
 
     /**

@@ -150,7 +150,7 @@ private object PersistenceProxyProcessor {
 
     val serviceURI = PathUtils.appendQueryString(
       persistenceBaseURL.dropTrailingSlash + path,
-      NetUtils.encodeQueryString(request.getParameterMap)
+      PathUtils.encodeQueryString(request.getParameterMap.asScala)
     )
 
     def maybeMigrateFormDefinition: Option[(InputStream, OutputStream) => Unit] =
@@ -364,7 +364,7 @@ private object PersistenceProxyProcessor {
       }
     }
 
-    val parameters = NetUtils.encodeQueryString(request.getParameterMap)
+    val parameters = PathUtils.encodeQueryString(request.getParameterMap.asScala)
 
     val allFormElements =
       for {

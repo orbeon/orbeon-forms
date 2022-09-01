@@ -113,10 +113,10 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
             // This is the case where the above doesn't hold, for example upon browser back. It should be a much rarer case, and we bear
             // the cost of getting the state from cache.
             def fromInitialStateOpt =
-                XFormsStateManager.getStateFromParamsOrStore(
-                  RequestParameters(uuid, None, None, None),
-                  isInitialState = true
-                ).dynamicState flatMap (_.initialClientScript)
+              XFormsStateManager.getStateFromParamsOrStore(
+                RequestParameters(uuid, None, None, None),
+                isInitialState = true
+              ).dynamicState flatMap (_.initialClientScript)
 
             response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
 

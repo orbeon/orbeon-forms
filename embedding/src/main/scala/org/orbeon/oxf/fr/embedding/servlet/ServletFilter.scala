@@ -71,13 +71,13 @@ class ServletEmbeddingContextWithResponse(
     def createResourceURL(resourceId: String) =
       req.getContextPath + orbeonPrefix + '/' + (if (namespaceResource(resourceId)) namespace else APISupport.NamespacePrefix) + resourceId
 
-    def path(navigationParameters: ju.Map[String, Array[String]]) =
-      navigationParameters.asScala.getOrElse(WSRPSupport.PathParameterName, Array()).headOption.getOrElse(throw new IllegalStateException)
+    def path(navigationParameters: Map[String, Array[String]]) =
+      navigationParameters.getOrElse(WSRPSupport.PathParameterName, Array()).headOption.getOrElse(throw new IllegalStateException)
 
-    def createActionURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
+    def createActionURL(portletMode: Option[String], windowState: Option[String], navigationParameters: Map[String, Array[String]]) =
       req.getContextPath + orbeonPrefix + '/' + path(navigationParameters).dropStartingSlash
 
-    def createRenderURL(portletMode: Option[String], windowState: Option[String], navigationParameters: ju.Map[String, Array[String]]) =
+    def createRenderURL(portletMode: Option[String], windowState: Option[String], navigationParameters: Map[String, Array[String]]) =
       path(navigationParameters)
 
     WSRPSupport.decodeURL(encoded, createResourceURL, createActionURL, createRenderURL)

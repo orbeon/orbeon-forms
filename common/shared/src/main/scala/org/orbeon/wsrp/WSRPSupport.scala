@@ -1,14 +1,10 @@
 package org.orbeon.wsrp
 
-import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.PathUtils.UrlEncoderDecoder
 import org.orbeon.oxf.util.PathUtils
+import org.orbeon.oxf.util.PathUtils.UrlEncoderDecoder
 
 import java.io.Writer
-import java.net.URLDecoder
-import java.{util => ju}
-import scala.jdk.CollectionConverters._
 
 
 object WSRPSupport {
@@ -89,8 +85,6 @@ object WSRPSupport {
 
   /**
    * Encode an URL into a WSRP pattern including the string "wsrp_rewrite".
-   *
-   * This does not call the portlet API. Used by Portlet2URLRewriter.
    */
   def encodeURL(
     urlType          : Int,
@@ -140,7 +134,7 @@ object WSRPSupport {
   }
 
   type CreateResourceURL = String => String
-  type CreatePortletURL = (Option[String], Option[String], ju.Map[String, Array[String]]) => String
+  type CreatePortletURL = (Option[String], Option[String], Map[String, Array[String]]) => String
 
   def decodeURL(
     encodedURL       : String,
@@ -150,45 +144,42 @@ object WSRPSupport {
     ed               : UrlEncoderDecoder
   ): String = {
 
-
     def removeAmpIfNeeded(s: String) =
       if (s.startsWith("amp;")) s.substring("amp;".length) else s
 
+    def getFirst(m: Map[String, Array[String]], key: String) =
+      m.get(key).flatMap(_.headOption)
+
     val wsrpParameters = PathUtils.decodeQueryStringPortlet(encodedURL)
 
-    val urlType = {
-      val urlType = getFirstValueFromStringArray(wsrpParameters.get(URLTypeParam))
+    val urlType =
+      getFirst(wsrpParameters, URLTypeParam) match {
+        case None =>
+          throw new IllegalArgumentException(s"Missing URL type for WSRP encoded URL `$encodedURL`")
+        case Some(urlType) if ! URLTypes.values.exists(_ == urlType) =>
+          throw new IllegalArgumentException(s"Invalid URL type $urlType for WSRP encoded URL `$encodedURL`")
+        case Some(urlType) =>
+          urlType
+      }
 
-      if (urlType eq null)
-        throw new IllegalArgumentException(s"Missing URL type for WSRP encoded URL $encodedURL")
-
-      if (!URLTypes.values.toSet(urlType))
-        throw new IllegalArgumentException(s"Invalid URL type $urlType for WSRP encoded URL $encodedURL")
-
-      urlType
-    }
-
-    val navigationParameters = {
-      val navigationalStateValue = getFirstValueFromStringArray(wsrpParameters.get(NavigationalStateParam))
-      if (navigationalStateValue ne null)
-        PathUtils.decodeQueryStringPortlet(URLDecoder.decode(removeAmpIfNeeded(navigationalStateValue), CharsetNames.Utf8))
-      else
-        ju.Collections.emptyMap[String, Array[String]]
-    }
+    val navigationParameters =
+      getFirst(wsrpParameters, NavigationalStateParam) match {
+        case Some(navigationalStateValue) => PathUtils.decodeQueryString(ed.decode(removeAmpIfNeeded(navigationalStateValue)))
+        case None                         => Map.empty[String, Array[String]]
+      }
 
     if (urlType == URLTypeResourceString) {
-      val resourcePath = navigationParameters.get(PathParameterName)(0)
-      navigationParameters.remove(PathParameterName)
-      val resourceQuery = PathUtils.encodeQueryString(navigationParameters.asScala)
+      val resourcePath  = getFirst(navigationParameters, PathParameterName).getOrElse(throw new IllegalArgumentException(s"missing $PathParameterName"))
+      val resourceQuery = PathUtils.encodeQueryString(navigationParameters - PathParameterName)
       val resourceId    = PathUtils.appendQueryString(resourcePath, resourceQuery)
 
       createResourceURL(resourceId)
     } else {
       val portletMode =
-        Option(getFirstValueFromStringArray(wsrpParameters.get(ModeParam))) map removeAmpIfNeeded
+        getFirst(wsrpParameters, ModeParam) map removeAmpIfNeeded
 
       val windowState =
-        Option(getFirstValueFromStringArray(wsrpParameters.get(WindowStateParam))) map removeAmpIfNeeded
+        getFirst(wsrpParameters, WindowStateParam) map removeAmpIfNeeded
 
       if (urlType == URLTypeBlockingActionString)
         createActionURL(portletMode, windowState, navigationParameters)
@@ -196,10 +187,4 @@ object WSRPSupport {
         createRenderURL(portletMode, windowState, navigationParameters)
     }
   }
-
-  def getFirstValueFromStringArray(values: Array[String]): String =
-    if (values != null && values.length > 0)
-      values(0)
-    else
-      null
 }

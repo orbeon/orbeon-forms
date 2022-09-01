@@ -122,9 +122,7 @@ trait BufferedPortlet {
         val (path, queryOpt) = splitQuery(location)
         val parameters = queryOpt match {
           case Some(query) =>
-            val m = decodeQueryString(query)
-            m.put(PathParameter, Array(path))
-            ju.Collections.unmodifiableMap[String, Array[String]](m)
+            (decodeQueryString(query) + (PathParameter -> Array(path))).asJava
           case None =>
             ju.Collections.singletonMap(PathParameter, Array(path))
         }

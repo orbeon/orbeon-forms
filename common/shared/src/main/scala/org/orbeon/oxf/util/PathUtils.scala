@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.StringUtils._
 
 import java.util.regex.Pattern
@@ -142,16 +143,6 @@ object PathUtils {
     urlString.substring(0, colonIndex)
   }
 
-  private val PatternNoAmp = {
-    val token = "[^=&]"
-    Pattern.compile("(" + token + "+)=(" + token + "*)(?:&|(?<!&)\\z)")
-  }
-
-  private val PatternAmp = {
-    val token = "[^=&]+"
-    Pattern.compile("(" + token + ")=(" + token + ")?(?:&amp;|&|(?<!&amp;|&)\\z)")
-  }
-
   def encodeQueryString[T](parameters: Iterable[(String, Array[T])])(implicit ed: UrlEncoderDecoder): String = {
     val sb    = new jl.StringBuilder(100)
     var first = true
@@ -170,51 +161,25 @@ object PathUtils {
     sb.toString
   }
 
-  /**
-   * @param queryString a query string of the form n1=v1&n2=v2&... to decode.  May be null.
-   * @return a Map of String[] indexed by name, an empty Map if the query string was null
-   */
-  def decodeQueryString(queryString: CharSequence)(implicit ed: UrlEncoderDecoder): util.Map[String, Array[String]] = {
-    val result = new util.LinkedHashMap[String, Array[String]]
-    if (queryString != null) {
-      val matcher    = PatternNoAmp.matcher(queryString)
-      var matcherEnd = 0
-      while (matcher.find()) {
-        matcherEnd = matcher.end
-        val name  = ed.decode(matcher.group(1))
-        val value = ed.decode(matcher.group(2))
-        addValueToStringArrayMap(result, name, value)
-      }
-      if (queryString.length != matcherEnd) // There was garbage at the end of the query.
-        throw new IllegalArgumentException(queryString.toString)
-    }
-    result
-  }
+  def decodeQueryString(queryString: CharSequence)(implicit ed: UrlEncoderDecoder): Map[String, Array[String]] =
+    combineValues[String, String, Array](PathUtils.decodeSimpleQuery(queryString.toString)).toMap
 
-  // This is a modified copy of decodeQueryString() above. Not sure why we need 2 versions! Try to avoid duplication!
-  def decodeQueryStringPortlet(queryString: CharSequence)(implicit ed: UrlEncoderDecoder): util.Map[String, Array[String]] = {
-    val result = new util.LinkedHashMap[String, Array[String]]
-    if (queryString != null) {
-      val matcher    = PatternAmp.matcher(queryString)
-      var matcherEnd = 0
-      while (matcher.find()) {
-        matcherEnd = matcher.end
-        var name   = ed.decode(matcher.group(1))
-        val group2 = matcher.group(2)
-        val value  = if (group2 != null) ed.decode(group2) else ""
-        // Handle the case where the source contains &amp;amp; because of double escaping which does occur in
-        // full Ajax updates!
-        if (name.startsWith("amp;"))
-          name = name.substring("amp;".length)
-        // NOTE: Replace spaces with '+'. This is an artifact of the fact that URLEncoder/URLDecoder
-        // are not fully reversible.
-        addValueToStringArrayMap(result, name, value.replace(' ', '+'))
+  // 2022-09-01: It's unclear how or why this works. The original code was splitting on `&amp;` instead of just a
+  // plain `&`. Further, there could be double escaping of `&`, see below. We try to reproduce this, but we need to
+  // clarify the scenarios.
+  def decodeQueryStringPortlet(queryString: CharSequence)(implicit ed: UrlEncoderDecoder): Map[String, Array[String]] =
+    combineValues[String, String, Array](
+      PathUtils.decodeSimpleQuery(queryString.toString.replace("&amp;", "&")) map { case (k, v) =>
+        (
+          // Source can contains `&amp;amp;` because of double escaping in full Ajax updates.
+          // 2022-08-31: Keeping this logic, but it's unclear why this is done or whether it's safe.
+          if (k.startsWith("amp;")) k.substring("amp;".length) else k,
+          // Replace spaces with '+' due to `URLEncoder`/`URLDecoder` not bing fully reversible.
+          // 2022-08-31: Keeping this logic, but it's unclear.
+          v.replace(' ', '+')
+        )
       }
-      if (queryString.length != matcherEnd) // There was garbage at the end of the query.
-        throw new IllegalArgumentException(queryString.toString)
-    }
-    result
-  }
+    ).toMap
 
   def addValueToStringArrayMap(map: util.Map[String, Array[String]], name: String, value: String): Unit =
     map.put(name, map.get(name) :+ value)

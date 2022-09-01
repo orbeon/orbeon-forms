@@ -17,8 +17,6 @@ import org.orbeon.oxf.portlet.liferay.LiferayURL
 import org.orbeon.oxf.util.PathUtils
 import org.scalatest.funspec.AnyFunSpec
 
-import scala.jdk.CollectionConverters._
-
 
 class WSRP2UtilsTest extends AnyFunSpec {
 
@@ -38,7 +36,7 @@ class WSRP2UtilsTest extends AnyFunSpec {
         )
     )
 
-    def decode(s: String) = PathUtils.decodeQueryStringPortlet(s).asScala.mapValues(_.toList)
+    def decode(s: String) = PathUtils.decodeQueryStringPortlet(s).mapValues(_.toList)
 
     it ("must satisfy expectations") {
       for ((query, extracted) <- expected) {

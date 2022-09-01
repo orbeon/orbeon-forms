@@ -83,7 +83,7 @@ class WSRPURLRewriter(
     val baseURL = new URL("http", "example.org", request.getRequestPath)
     val u = new URL(baseURL, urlString)
     // Decode query string
-    val parameters = PathUtils.decodeQueryStringPortlet(u.getQuery)
+    val parameters = Option(u.getQuery).map(PathUtils.decodeQueryStringPortlet).getOrElse(Map.empty)
     // Add special path parameter
     val path =
       if (urlString.startsWith("?"))
@@ -94,10 +94,8 @@ class WSRPURLRewriter(
         // Regular case, use parsed path
         URLRewriterUtils.getRewritingContext("wsrp", "") + u.getPath
 
-    parameters.put(PathParameterName, Array(path))
-
     // Encode as "navigational state"
-    val navigationalState = PathUtils.encodeQueryString(parameters.asScala)
+    val navigationalState = PathUtils.encodeQueryString(parameters + (PathParameterName -> Array(path)))
 
     // Encode the URL a la WSRP
     encodeURL(urlType, navigationalState, portletMode, windowState, u.getRef, secure = false)

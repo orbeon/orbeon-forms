@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr.embedding.servlet
 
 import java.io.Writer
-import java.{util => ju}
 import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
@@ -24,7 +23,6 @@ import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 
-import scala.jdk.CollectionConverters._
 import scala.util.Try
 
 class ServletEmbeddingContext(

@@ -25,12 +25,16 @@ class WSRP2UtilsTest extends AnyFunSpec {
 
     val expected = Seq(
       """filename=data.html&orbeon.path=/fr/service/import-export/serve&uuid=""" ->
-        Map("filename"    -> Seq("data.html"),
+        Map(
+          "filename"    -> Seq("data.html"),
           "orbeon.path" -> Seq("/fr/service/import-export/serve"),
-          "uuid"        -> Seq("")),
+          "uuid"        -> Seq("")
+        ),
       """p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=""" ->
-        Map("p1" -> Seq("v11", "v12", ""),
-          "p2" -> Seq("v21", "", "v23"))
+        Map(
+          "p1" -> Seq("v11", "v12", ""),
+          "p2" -> Seq("v21", "", "v23")
+        )
     )
 
     def decode(s: String) = NetUtils.decodeQueryStringPortlet(s).asScala.mapValues(_.toList)

@@ -174,7 +174,7 @@
         as="xs:string"
         select="
             let $updates :=
-                for $update in ('fr', 'fb'[$is-form-builder and $is-detail])
+                for $update in ('fr', 'fb'[$is-form-builder and $is-detail], 'summary'[$is-summary])
                 return p:property(concat('oxf.xforms.assets.baseline.updates.', $update))
             return string-join($updates, ' ')
         "/>

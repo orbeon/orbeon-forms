@@ -110,7 +110,7 @@ object XFormsContainingDocumentBuilder {
           requestContextPath    = request.getClientContextPath("/"),
           requestPath           = Option(request.getAttributesMap.get(RendererBaseUriAttributeName).asInstanceOf[String]) getOrElse request.getRequestPath,
           requestHeaders        = requestHeaders,
-          requestParameters     = request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap,
+          requestParameters     = request.parameters mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap,
           containerType         = containerType,
           containerNamespace    = StringUtils.defaultIfEmpty(request.getContainerNamespace, ""),
           versionedPathMatchers = versionedPathMatchers.asScala.toList,

@@ -284,7 +284,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
     // Namespace to use, must be `None` if empty
     def namespaceOpt: Option[String] = {
-      def nsFromParameters = Option(externalContext.getRequest.getParameterMap.get(NamespaceParameter)) map (_(0).asInstanceOf[String])
+      def nsFromParameters = externalContext.getRequest.getFirstParamAsString(Constants.NamespaceParameter)
       def nsFromContainer  = Some(response.getNamespacePrefix)
 
       nsFromParameters orElse nsFromContainer filter (_.nonEmpty)

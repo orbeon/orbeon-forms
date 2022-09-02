@@ -150,7 +150,7 @@ object ExternalContext {
 
     // TODO: return immutable.Map[String, List[AnyRef]] -> what about AnyRef?
     def parameters: collection.Map[String, Array[AnyRef]]   = getParameterMap.asScala
-    def getFirstParamAsString(name: String): Option[String] = Option(getParameterMap.get(name)) flatMap (_ collectFirst { case s: String => s })
+    def getFirstParamAsString(name: String): Option[String] = parameters.get(name) flatMap (_ collectFirst { case s: String => s })
     def getFirstHeader(name: String): Option[String]        = Option(getHeaderValuesMap.get(name)) flatMap (_.headOption)
     def sessionOpt: Option[Session]                         = Option(getSession(create = false))
     lazy val contentLengthOpt: Option[Long]                 = Headers.firstNonNegativeLongHeaderIgnoreCase(getHeaderValuesMap.asScala, Headers.ContentLength)

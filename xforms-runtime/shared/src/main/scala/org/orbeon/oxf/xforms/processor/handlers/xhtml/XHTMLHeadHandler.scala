@@ -133,13 +133,6 @@ class XHTMLHeadHandler(
 
         // Scripts known dynamically
 
-        findConfigurationProperties(
-          containingDocument = containingDocument,
-          versionedResources = isVersionedResources,
-          heartbeatDelay     = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.externalContext)
-        ) foreach
-          writeContent
-
         findOtherScriptInvocations(containingDocument) foreach
           writeContent
 
@@ -148,7 +141,9 @@ class XHTMLHeadHandler(
             containingDocument   = containingDocument,
             rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
             rewriteAction        = externalContext.getResponse.rewriteActionURL,
-            controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
+            controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
+            versionedResources   = isVersionedResources,
+            heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.externalContext)
           )
         ) foreach
           writeContent

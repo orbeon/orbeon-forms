@@ -765,17 +765,14 @@ trait ContainingDocumentClientState {
 
     val scripts =
       ScriptBuilder.findOtherScriptInvocations(this).toList :::
-      ScriptBuilder.findConfigurationProperties(
-        this,
-        URLRewriterUtils.isResourcesVersioned,
-        XFormsStateManager.getHeartbeatDelay(this, externalContext)
-      ).toList :::
       List(
         ScriptBuilder.buildJavaScriptInitialData(
           containingDocument   = this,
           rewriteResource      = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
           rewriteAction        = response.rewriteActionURL,
-          controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
+          controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
+          versionedResources   = URLRewriterUtils.isResourcesVersioned,
+          heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(this, externalContext)
         )
       )
 

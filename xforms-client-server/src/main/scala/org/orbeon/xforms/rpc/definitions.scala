@@ -34,7 +34,8 @@ case class Initializations(
   controls                      : List[Control],
   listeners                     : List[KeyListener],
   pollEvent                     : Option[PollEvent],
-  userScripts                   : List[UserScript]
+  userScripts                   : List[UserScript],
+  properties                    : Option[String] // later, structure this
 )
 
 sealed trait WireAjaxEvent {

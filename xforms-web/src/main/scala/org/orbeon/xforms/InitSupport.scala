@@ -41,6 +41,7 @@ import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
+
 @JSExportTopLevel("OrbeonInitSupport")
 object InitSupport {
 
@@ -152,6 +153,11 @@ object InitSupport {
 
       val formId   = initializations.namespacedFormId
       val formElem = dom.document.getElementById(formId).asInstanceOf[html.Form] // TODO: Error instead of plain cast?
+
+      // TODO: No longer handle properties as global JSON value
+      initializations.properties.map(js.JSON.parse(_, (_, value) => value)) foreach { props =>
+        dom.window.asInstanceOf[js.Dynamic].opsXFormsProperties = props
+      }
 
       // Q: Do this later?
       $(formElem).removeClass(Constants.InitiallyHiddenClass)

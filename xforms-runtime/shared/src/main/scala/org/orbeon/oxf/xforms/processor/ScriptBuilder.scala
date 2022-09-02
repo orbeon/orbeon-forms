@@ -13,6 +13,8 @@
   */
 package org.orbeon.oxf.xforms.processor
 
+import java.{lang => jl}
+
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
@@ -88,7 +90,7 @@ object ScriptBuilder {
     controlsToInitialize.result
   }
 
-  def findConfigurationProperties(
+  private def findConfigurationProperties(
     containingDocument : XFormsContainingDocument,
     versionedResources : Boolean,
     heartbeatDelay     : Long
@@ -147,9 +149,9 @@ object ScriptBuilder {
 
     clientProperties.nonEmpty option {
 
-      val sb = new StringBuilder
+      val sb = new jl.StringBuilder
 
-      sb append "var opsXFormsProperties = {"
+      sb append "{"
 
       for (((propertyName, propertyValue), index) <- clientProperties.toList.zipWithIndex) {
 
@@ -170,7 +172,7 @@ object ScriptBuilder {
         }
       }
 
-      sb append "};"
+      sb append "}"
 
       sb.toString
     }
@@ -180,7 +182,9 @@ object ScriptBuilder {
     containingDocument   : XFormsContainingDocument,
     rewriteResource      : String => String,
     rewriteAction        : String => String,
-    controlsToInitialize : List[(String, Option[String])]
+    controlsToInitialize : List[(String, Option[String])],
+    versionedResources   : Boolean,
+    heartbeatDelay       : Long
   ): String = {
 
     val currentTime = System.currentTimeMillis
@@ -229,7 +233,8 @@ object ScriptBuilder {
                 targetId     = containingDocument.namespaceId(script.targetEffectiveId),
                 observerId   = containingDocument.namespaceId(script.observerEffectiveId),
                 paramValues  = script.paramValues
-              )
+              ),
+        properties = findConfigurationProperties(containingDocument, versionedResources, heartbeatDelay)
       ).asJson.noSpaces
 
     s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData(${quoteString(jsonString)})}).call(this);"""

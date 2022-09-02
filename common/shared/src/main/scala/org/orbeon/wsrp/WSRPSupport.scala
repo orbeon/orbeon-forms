@@ -69,7 +69,7 @@ object WSRPSupport {
         // Find the matching end mark
         val endIndex = content.indexOf(EndTag, index)
         if (endIndex == -1)
-          throw new OXFException("Missing end tag for WSRP encoded URL.")
+          throw new IllegalArgumentException("Missing end tag for WSRP encoded URL.")
         val encodedURL = content.substring(index + StartTagLength, endIndex)
         currentIndex = endIndex + EndTagLength
 
@@ -79,7 +79,7 @@ object WSRPSupport {
         writer.write(ns)
         currentIndex = index + PrefixTagLength
       } else
-        throw new OXFException("Invalid WSRP rewrite tagging.")
+        throw new IllegalArgumentException("Invalid WSRP rewrite tagging.")
     }
 
     // Write remainder of string

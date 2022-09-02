@@ -137,8 +137,8 @@ class XHTMLHeadHandler(
         findOtherScriptInvocations(containingDocument) foreach
           writeContent
 
-        val p1 =
-          ScriptBuilder.quoteString(
+        writeContent(
+          ScriptBuilder.buildInitializationCall(
             buildJsonInitializationData(
               containingDocument   = containingDocument,
               rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
@@ -146,10 +146,11 @@ class XHTMLHeadHandler(
               controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
               versionedResources   = isVersionedResources,
               heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.externalContext)
-            )
+            ),
+            None,
+            None
           )
-
-        writeContent(s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData($p1)}).call(this);""")
+        )
       }
     }
   }

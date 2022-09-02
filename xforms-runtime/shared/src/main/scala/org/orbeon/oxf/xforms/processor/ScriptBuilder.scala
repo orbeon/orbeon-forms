@@ -260,6 +260,18 @@ object ScriptBuilder {
     ).asJson.noSpaces
   }
 
+  def buildInitializationCall(jsonInitialization: String, contextPathOpt: Option[String], namespaceOpt: Option[String]): String = {
+    val p1 = ScriptBuilder.quoteString(jsonInitialization)
+    namespaceOpt match {
+      case Some(namespace) =>
+        val p2 = contextPathOpt.map(ScriptBuilder.quoteString).getOrElse("undefined")
+        val p3 = ScriptBuilder.quoteString(namespace)
+        s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData($p1,$p2,$p3)}).call(this);"""
+      case None =>
+        s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData($p1)}).call(this);"""
+    }
+  }
+
   private def findOtherScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
 
     val javascriptLoads =

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
-import org.orbeon.xforms.{DeploymentType, EventNames, Message, ServerError, XFormsNames, rpc}
+import org.orbeon.xforms.{Constants, DeploymentType, EventNames, Message, ServerError, XFormsNames, rpc}
 
 import scala.collection.mutable
 
@@ -191,7 +191,7 @@ object ScriptBuilder {
 
     val xformsSubmissionPathOpt =
       if (containingDocument.getDeploymentType != DeploymentType.Standalone || containingDocument.isPortletContainer || containingDocument.isEmbeddedFromHeaderOrUrlParam)
-        Some(XFormsNames.XFORMS_SERVER_SUBMIT)
+        Some(Constants.XFormsServerSubmit)
       else
         None
 

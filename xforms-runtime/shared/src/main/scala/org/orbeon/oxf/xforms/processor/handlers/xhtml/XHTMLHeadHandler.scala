@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.xbl.XBLAssetsSupport
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.HeadElement
+import org.orbeon.xforms.{Constants, HeadElement}
 import org.xml.sax.Attributes
 
 
@@ -113,7 +113,7 @@ class XHTMLHeadHandler(
           localName = "script",
           prefix    = xhtmlPrefix,
           uri       = XHTML_NAMESPACE_URI,
-          atts      = ("src" -> (XFormsAssetPaths.FormDynamicResourcesPath + containingDocument.uuid + ".js") :: StandaloneScriptBaseAtts)
+          atts      = ("src" -> (Constants.FormDynamicResourcesPath + containingDocument.uuid + ".js") :: StandaloneScriptBaseAtts)
         )
 
       } else {

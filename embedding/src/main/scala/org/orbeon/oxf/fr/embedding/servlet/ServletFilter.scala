@@ -16,12 +16,12 @@ package org.orbeon.oxf.fr.embedding.servlet
 import java.io.Writer
 import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import org.orbeon.oxf.fr.embedding.APISupport.FormDynamicResourcesRegex
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.wsrp.WSRPSupport
+import org.orbeon.xforms.Constants
 
 import scala.util.Try
 
@@ -62,14 +62,14 @@ class ServletEmbeddingContextWithResponse(
 
     def namespaceResource(path: String) =
       path match {
-        case "/xforms-server"              => true
-        case path if path.endsWith(".css") => true
-        case FormDynamicResourcesRegex(_)  => true
-        case _                             => false
+        case "/xforms-server"                       => true
+        case path if path.endsWith(".css")          => true
+        case Constants.FormDynamicResourcesRegex(_) => true
+        case _                                      => false
       }
 
     def createResourceURL(resourceId: String) =
-      req.getContextPath + orbeonPrefix + '/' + (if (namespaceResource(resourceId)) namespace else APISupport.NamespacePrefix) + resourceId
+      req.getContextPath + orbeonPrefix + '/' + (if (namespaceResource(resourceId)) namespace else Constants.NamespacePrefix) + resourceId
 
     def path(navigationParameters: Map[String, Array[String]]) =
       navigationParameters.getOrElse(WSRPSupport.PathParameterName, Array()).headOption.getOrElse(throw new IllegalStateException)

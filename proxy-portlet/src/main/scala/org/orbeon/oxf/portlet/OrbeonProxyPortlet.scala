@@ -23,6 +23,7 @@ import org.orbeon.oxf.portlet.liferay.{LiferayAPI, LiferaySupport}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.wsrp.WSRPSupport
+import org.orbeon.xforms.Constants
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
@@ -263,7 +264,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         if (getBooleanPreference(request, ReadOnly) && mode == FormRunnerMode.Edit.entryName) FormRunnerMode.View.entryName else mode
 
       pathParameterOpt getOrElse defaultPath match {
-        case path @ APISupport.XFormsServerSubmit =>
+        case path @ Constants.XFormsServerSubmit =>
           path
         // Incoming path is Form Runner path without document id
         case FormRunnerPathRegex(appName, formName, mode, _, query) =>

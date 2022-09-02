@@ -44,4 +44,14 @@ object Constants {
   // NOTE: We could use a short SVG image but it's not guaranteed to be 1x1 IIUC.
   //     data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E
   val DUMMY_IMAGE_URI  = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" // smallest GIF 1x1 transparent image
+
+  val NamespacePrefix           = "o"
+  val XFormServerPrefix         = "/xforms-server/"
+  val XFormsServerSubmit        = "/xforms-server-submit"
+  val FormDynamicResourcesPath  = XFormServerPrefix + "form/dynamic/"
+  val FormDynamicResourcesRegex = s"$FormDynamicResourcesPath(.+).js".r
+
+  val NamespaceParameter   = "ns"
+  val ContextPathParameter = "context-path"
+  val UpdatesParameter     = "updates"
 }

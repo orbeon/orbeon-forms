@@ -19,6 +19,7 @@ import enumeratum._
 import org.orbeon.oxf.http.{Headers, HttpClient, StreamedContent}
 import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.xforms.Constants
 
 import scala.collection.immutable
 import scala.util.Try
@@ -75,7 +76,7 @@ private case class EmbeddingSettings(
   resourcesRegex : String,
   httpClient     : HttpClient[org.apache.http.client.CookieStore]
 ) {
-  val OrbeonSubmitPathRegex       : Regex = s"${Regex.quote(orbeonPrefix)}/(?:[^/]+/)?${APISupport.XFormsServerSubmit.dropStartingSlash}".r
+  val OrbeonSubmitPathRegex       : Regex = s"${Regex.quote(orbeonPrefix)}/(?:[^/]+/)?${Constants.XFormsServerSubmit.dropStartingSlash}".r
   val OrbeonResourcePathRegex     : Regex = s"${Regex.quote(orbeonPrefix)}/([^/]+)(/.+)".r
   val FormRunnerResourcePathRegex : Regex = resourcesRegex.r
 }

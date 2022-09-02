@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquire
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xforms.xbl.BindingLoader
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
 
 import java.io._
 import java.net.URI
@@ -36,7 +36,6 @@ import scala.collection.compat._
 import scala.collection.immutable.ListSet
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
-import scala.jdk.CollectionConverters._
 
 
 /**
@@ -70,8 +69,8 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
         val updatesPropOpt =
           for {
-            paramValue <- externalContext.getRequest.getFirstParamAsString(UpdatesParameter)
-            propName   = List(XFormsAssetsBuilder.AssetsBaselineProperty, UpdatesParameter, paramValue).mkString(".")
+            paramValue <- externalContext.getRequest.getFirstParamAsString(Constants.UpdatesParameter)
+            propName   = List(XFormsAssetsBuilder.AssetsBaselineProperty, Constants.UpdatesParameter, paramValue).mkString(".")
             prop       <- CoreCrossPlatformSupport.properties.getPropertyOpt(propName)
           } yield
             prop
@@ -89,7 +88,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
         AssetsAggregator.aggregate(resources ++ xblResources, redirect, None, isCSS)
 
-      case FormDynamicResourcesRegex(uuid) =>
+      case Constants.FormDynamicResourcesRegex(uuid) =>
 
         // This is the typical expected scenario: loading the dynamic data occurs just after loading the page and before there have been
         // any changes to the document, so the document should be in cache and have a sequence number of "1".
@@ -132,7 +131,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
                 val p1 = ScriptBuilder.quoteString(content)
 
-                externalContext.getRequest.getFirstParamAsString(NamespaceParameter) match {
+                externalContext.getRequest.getFirstParamAsString(Constants.NamespaceParameter) match {
                   case Some(ns) =>
                     val p2 = externalContext.getRequest.getFirstParamAsString(Constants.ContextPathParameter).map(ScriptBuilder.quoteString).getOrElse("undefined")
                     val p3 = ScriptBuilder.quoteString(ns)
@@ -310,8 +309,6 @@ object XFormsAssetServer {
   import XFormsAssetPaths._
 
   val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
-  val NamespaceParameter         = "ns"
-  val UpdatesParameter           = "updates"
 
   implicit def indentedLogger: IndentedLogger = Loggers.getIndentedLogger("resources")
 

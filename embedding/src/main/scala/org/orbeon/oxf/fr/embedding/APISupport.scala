@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.{ContentTypes, PathUtils}
+import org.orbeon.xforms.Constants
 import org.orbeon.wsrp.WSRPSupport
 import org.slf4j.LoggerFactory
 
@@ -41,8 +42,6 @@ object APISupport {
   import Private._
 
   val Logger = LoggerFactory.getLogger(List("org", "orbeon", "embedding") mkString ".") // so JARJAR doesn't touch this!
-
-  val XFormsServerSubmit = "/xforms-server-submit"
 
   def proxyPage(
     baseURL      : String,
@@ -120,7 +119,7 @@ object APISupport {
       implicit val ctx = new ServletEmbeddingContextWithResponse(
         req,
         Right(res),
-        APISupport.NamespacePrefix + "0",
+        Constants.NamespacePrefix + "0",
         settings.orbeonPrefix,
         settings.httpClient
       )
@@ -136,8 +135,8 @@ object APISupport {
       val (contentOrRedirect, httpResponse) =
         APISupport.callService(RequestDetails(
           content = Some(contentFromRequest),
-          url     = settings.formRunnerURL.dropTrailingSlash + XFormsServerSubmit,
-          path    = XFormsServerSubmit,
+          url     = settings.formRunnerURL.dropTrailingSlash + Constants.XFormsServerSubmit,
+          path    = Constants.XFormsServerSubmit,
           headers = proxyCapitalizeAndCombineHeaders(APISupport.requestHeaders(req).toList, request = true).toList,
           params  = Nil
         ))
@@ -218,15 +217,10 @@ object APISupport {
   def mustRewriteForMediatype(mediatype: String): Boolean =
     ContentTypes.isTextOrJSONContentType(mediatype) || ContentTypes.isXMLMediatype(mediatype)
 
-  // TODO: Duplicated from `XFormsAssetServer`
-  val XFormServerPrefix          = "/xforms-server/"
-  val FormDynamicResourcesPath   = XFormServerPrefix + "form/dynamic/"
-  val FormDynamicResourcesRegex  = s"$FormDynamicResourcesPath(.+).js".r
-
   def mustRewriteForPath(path: String): Boolean =
     path match {
-      case FormDynamicResourcesRegex(_) => true
-      case _                            => false
+      case Constants.FormDynamicResourcesRegex(_) => true
+      case _                                      => false
     }
 
   def writeResponseBody(doRewrite: String => Boolean)(content: Content)(implicit ctx: EmbeddingContextWithResponse): Unit =
@@ -286,7 +280,7 @@ object APISupport {
 
     req.setAttribute(LastNamespaceIndexKey, newValue)
 
-    NamespacePrefix + newValue
+    Constants.NamespacePrefix + newValue
   }
 
   val DefaultFormRunnerResourcePath =
@@ -392,8 +386,6 @@ object APISupport {
       case FormRunnerResourcePath(resourcePath) => resourcePath
     }
   }
-
-  val NamespacePrefix = "o"
 
   private object Private {
 

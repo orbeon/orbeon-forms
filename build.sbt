@@ -534,7 +534,10 @@ lazy val webSupport = (project in file("web-support"))
   )
 
 lazy val embedding = (project in file("embedding"))
-  .dependsOn(core)
+  .dependsOn(
+    core,
+    xformsClientServerJVM
+  )
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-embedding",

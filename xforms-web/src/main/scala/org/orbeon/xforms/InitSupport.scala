@@ -267,7 +267,22 @@ object InitSupport {
       }
 
       // Run other code sent by server
-      // TODO: `showMessages`, `showDialog`, `setFocus`, `showError` must be part of `Initializations`.
+      if (initializations.messagesToRun.nonEmpty)
+        MessageDialog.showMessages(initializations.messagesToRun.toJSArray)
+
+      initializations.dialogsToShow foreach { case rpc.Dialog(id, neighborId) =>
+        Controls.showDialog(id, neighborId.orNull)
+      }
+
+      // Do this after dialogs as focus might be within a dialog
+      initializations.focusElementId foreach { focusElementId =>
+        Controls.setFocus(focusElementId)
+      }
+
+      initializations.errorsToShow foreach { case rpc.Error(title, details, formId) =>
+        AjaxClient.showError(title, details, formId, ignoreErrors = false)
+      }
+
       // TODO: Handle `javascript:` loads as well.
       // TODO: `xformsPageLoadedServer` must be per form too! Currently, it is global.
       if (hasOtherScripts)

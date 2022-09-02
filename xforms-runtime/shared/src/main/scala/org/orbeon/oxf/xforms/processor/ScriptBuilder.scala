@@ -14,19 +14,19 @@
 package org.orbeon.oxf.xforms.processor
 
 import java.{lang => jl}
-
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.XFormsGlobalProperties._
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
-import org.orbeon.xforms.{DeploymentType, EventNames, ServerError, XFormsNames, rpc}
+import org.orbeon.xforms.{DeploymentType, EventNames, Message, ServerError, XFormsNames, rpc}
 
 import scala.collection.mutable
 
@@ -38,7 +38,7 @@ object ScriptBuilder {
   val RESOURCES_VERSION_NUMBER_PROPERTY = "oxf.resources.version-number"
   val RESOURCES_VERSIONED_DEFAULT       = false
 
-  private def quoteString(s: String) =
+  def quoteString(s: String) =
     s""""${s.escapeJavaScript}""""
 
   def escapeJavaScriptInsideScript (js: String): String = {
@@ -178,7 +178,7 @@ object ScriptBuilder {
     }
   }
 
-  def buildJavaScriptInitialData(
+  def buildJsonInitializationData(
     containingDocument   : XFormsContainingDocument,
     rewriteResource      : String => String,
     rewriteAction        : String => String,
@@ -195,127 +195,88 @@ object ScriptBuilder {
       else
         None
 
-    val jsonString =
-      rpc.Initializations(
-        uuid                           = containingDocument.uuid,
-        namespacedFormId               = containingDocument.getNamespacedFormId,
-        repeatTree                     = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
-        repeatIndexes                  = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
-        xformsServerPath               = rewriteResource("/xforms-server"),
-        xformsServerSubmitActionPath   = xformsSubmissionPathOpt.map(rewriteAction),
-        xformsServerSubmitResourcePath = xformsSubmissionPathOpt.map(rewriteResource),
-        xformsServerUploadPath         = rewriteResource("/xforms-server/upload"),
-        controls  =
+    rpc.Initializations(
+      uuid                           = containingDocument.uuid,
+      namespacedFormId               = containingDocument.getNamespacedFormId,
+      repeatTree                     = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
+      repeatIndexes                  = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
+      xformsServerPath               = rewriteResource("/xforms-server"),
+      xformsServerSubmitActionPath   = xformsSubmissionPathOpt.map(rewriteAction),
+      xformsServerSubmitResourcePath = xformsSubmissionPathOpt.map(rewriteResource),
+      xformsServerUploadPath         = rewriteResource("/xforms-server/upload"),
+      controls  =
+        for {
+          (id, valueOpt) <- controlsToInitialize
+        } yield
+          rpc.Control(containingDocument.namespaceId(id), valueOpt),
+      listeners =
+        (
           for {
-            (id, valueOpt) <- controlsToInitialize
+            handler  <- containingDocument.staticOps.keyboardHandlers
+            observer <- handler.observersPrefixedIds
+            keyText  <- handler.keyText
           } yield
-            rpc.Control(containingDocument.namespaceId(id), valueOpt),
-        listeners =
-          (
-            for {
-              handler  <- containingDocument.staticOps.keyboardHandlers
-              observer <- handler.observersPrefixedIds
-              keyText  <- handler.keyText
-            } yield
-              rpc.KeyListener(handler.eventNames filter EventNames.KeyboardEvents, observer, keyText, handler.keyModifiers)
-            ).distinct,
-        pollEvent =
-          for {
-            delayedEvent <- containingDocument.findEarliestPendingDelayedEvent
-            time         <- delayedEvent.time
-          } yield
+            rpc.KeyListener(handler.eventNames filter EventNames.KeyboardEvents, observer, keyText, handler.keyModifiers)
+        ).distinct,
+      pollEvent =
+        for {
+          delayedEvent <- containingDocument.findEarliestPendingDelayedEvent
+          time         <- delayedEvent.time
+        } yield
           rpc.PollEvent(time - currentTime),
-        userScripts =
-          for (script <- containingDocument.getScriptsToRun.toList collect { case Right(s) => s })
-            yield
-              rpc.UserScript(
-                functionName = script.script.shared.clientName,
-                targetId     = containingDocument.namespaceId(script.targetEffectiveId),
-                observerId   = containingDocument.namespaceId(script.observerEffectiveId),
-                paramValues  = script.paramValues
-              ),
-        properties = findConfigurationProperties(containingDocument, versionedResources, heartbeatDelay)
-      ).asJson.noSpaces
-
-    s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData(${quoteString(jsonString)})}).call(this);"""
+      userScripts =
+        for (script <- containingDocument.getScriptsToRun.toList collect { case Right(s) => s })
+        yield
+          rpc.UserScript(
+            functionName = script.script.shared.clientName,
+            targetId     = containingDocument.namespaceId(script.targetEffectiveId),
+            observerId   = containingDocument.namespaceId(script.observerEffectiveId),
+            paramValues  = script.paramValues
+          ),
+      properties =
+        findConfigurationProperties(containingDocument, versionedResources, heartbeatDelay),
+      messagesToRun =
+        (containingDocument.getMessagesToRun collect { case Message(text, "modal") => text }).toList,
+      dialogsToShow =
+        (
+          for {
+            dialogControl <- containingDocument.controls.getCurrentControlTree.getDialogControls
+            if dialogControl.isDialogVisible
+          } yield
+            rpc.Dialog(
+              id         = containingDocument.namespaceId(dialogControl.getEffectiveId),
+              neighborId = dialogControl.neighborControlId.map(containingDocument.namespaceId)
+            )
+        ).toList,
+      focusElementId =
+        containingDocument.controls.getFocusedControl.map(c => containingDocument.namespaceId(c.getEffectiveId)),
+      errorsToShow =
+        containingDocument.getServerErrors.nonEmpty option
+          rpc.Error(
+            title   = "Non-fatal error",
+            details = ServerError.errorsAsHtmlString(containingDocument.getServerErrors),
+            formId  = containingDocument.getNamespacedFormId
+          )
+    ).asJson.noSpaces
   }
 
-  def findOtherScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
-
-    val errorsToShow      = containingDocument.getServerErrors
-    val focusElementIdOpt = containingDocument.controls.getFocusedControl map (_.getEffectiveId)
-    val messagesToRun     = containingDocument.getMessagesToRun filter (_.level == "modal")
-
-    val dialogsToOpen =
-      for {
-        dialogControl <- containingDocument.controls.getCurrentControlTree.getDialogControls
-        if dialogControl.isDialogVisible
-      } yield
-        dialogControl
+  private def findOtherScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
 
     val javascriptLoads =
-      containingDocument.getScriptsToRun collect { case Left(l) => l }
+      containingDocument.getScriptsToRun collect { case Left(l) => l.resource.substringAfter("javascript:") }
 
-    val mustRunAnyScripts =
-      errorsToShow.nonEmpty       ||
-      focusElementIdOpt.isDefined ||
-      messagesToRun.nonEmpty      ||
-      dialogsToOpen.nonEmpty      ||
-      javascriptLoads.nonEmpty
+    javascriptLoads.nonEmpty option {
 
-    mustRunAnyScripts option {
-
-      val sb = new StringBuilder
-
-      if (mustRunAnyScripts) {
+      val sb = new jl.StringBuilder
 
         sb append "\nfunction xformsPageLoadedServer() { "
 
         // NOTE: The order of script actions vs. `javascript:` loads should be preserved. It is not currently.
 
-        // javascript: loads
-        for (load <- javascriptLoads) {
-          val body = load.resource.substring("javascript:".size).escapeJavaScript
-          sb append s"""(function(){$body})();"""
-        }
-
-        // TODO: `showMessages`, `showDialog`, `setFocus`, `showError` must be part of `Initializations`.
-
-        // Initial modal xf:message to run if present
-        if (messagesToRun.nonEmpty) {
-          val quotedMessages = messagesToRun map (m => s""""${m.message.escapeJavaScript}"""")
-          quotedMessages.addString(sb, "ORBEON.xforms.Message.showMessages([", ",", "]);")
-        }
-
-        // Initial dialogs to open
-        for (dialogControl <- dialogsToOpen) {
-          val id       = containingDocument.namespaceId(dialogControl.getEffectiveId)
-          val neighbor = (
-            dialogControl.neighborControlId
-            map (n => s""""${containingDocument.namespaceId(n)}"""")
-            getOrElse "null"
-          )
-
-          sb append s"""ORBEON.xforms.Controls.showDialog("$id", $neighbor);"""
-        }
-
-        // Initial setfocus if present
-        // Seems reasonable to do this after dialogs as focus might be within a dialog
-        focusElementIdOpt foreach { id =>
-          sb append s"""ORBEON.xforms.Controls.setFocus("${containingDocument.namespaceId(id)}");"""
-        }
-
-        // Initial errors
-        if (errorsToShow.nonEmpty) {
-
-          val title   = "Non-fatal error"
-          val details = ServerError.errorsAsHtmlString(errorsToShow).escapeJavaScript
-          val formId  = containingDocument.getNamespacedFormId
-
-          sb append s"""ORBEON.xforms.AjaxServer.showError("$title", "$details", "$formId");"""
-        }
-
-        sb append " }"
+      // javascript: loads
+      for (load <- javascriptLoads) {
+        val body = load.escapeJavaScript
+        sb append s"""(function(){$body})();"""
       }
 
       sb.toString

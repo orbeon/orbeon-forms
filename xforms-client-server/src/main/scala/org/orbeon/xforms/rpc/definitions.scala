@@ -21,6 +21,8 @@ case class Control(id: String, valueOpt: Option[String])
 case class KeyListener(eventName: Set[String], observer: String, keyText: String, modifiers: Set[Modifier])
 case class PollEvent(delay: Long)
 case class UserScript(functionName: String, targetId: String, observerId: String, paramValues: List[String])
+case class Dialog(id: String, neighborId: Option[String])
+case class Error(title: String, details: String, formId: String)
 
 case class Initializations(
   uuid                          : String,
@@ -35,7 +37,11 @@ case class Initializations(
   listeners                     : List[KeyListener],
   pollEvent                     : Option[PollEvent],
   userScripts                   : List[UserScript],
-  properties                    : Option[String] // later, structure this
+  properties                    : Option[String], // later, structure this
+  messagesToRun                 : List[String],
+  dialogsToShow                 : List[Dialog],
+  focusElementId                : Option[String],
+  errorsToShow                  : Option[Error]
 )
 
 sealed trait WireAjaxEvent {

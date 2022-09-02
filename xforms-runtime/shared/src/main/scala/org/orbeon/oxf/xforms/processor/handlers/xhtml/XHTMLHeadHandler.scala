@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.processor.ScriptBuilder._
 import org.orbeon.oxf.xforms.XFormsAssetPaths
+import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XHTMLOutput}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLAssetsSupport
@@ -136,17 +137,19 @@ class XHTMLHeadHandler(
         findOtherScriptInvocations(containingDocument) foreach
           writeContent
 
-        List(
-          buildJavaScriptInitialData(
-            containingDocument   = containingDocument,
-            rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
-            rewriteAction        = externalContext.getResponse.rewriteActionURL,
-            controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
-            versionedResources   = isVersionedResources,
-            heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.externalContext)
+        val p1 =
+          ScriptBuilder.quoteString(
+            buildJsonInitializationData(
+              containingDocument   = containingDocument,
+              rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
+              rewriteAction        = externalContext.getResponse.rewriteActionURL,
+              controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
+              versionedResources   = isVersionedResources,
+              heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.externalContext)
+            )
           )
-        ) foreach
-          writeContent
+
+        writeContent(s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData($p1)}).call(this);""")
       }
     }
   }

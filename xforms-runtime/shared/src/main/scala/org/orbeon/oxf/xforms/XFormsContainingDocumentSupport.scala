@@ -752,10 +752,10 @@ trait ContainingDocumentClientState {
 
   self: XFormsContainingDocument =>
 
-  private var _initialClientScript: Option[String] = None
+  private var _jsonInitializationData: Option[String] = None
 
   def initialClientScript: Option[String] =
-    _initialClientScript
+    _jsonInitializationData
 
   def setInitialClientScript(): Unit = {
 
@@ -763,24 +763,19 @@ trait ContainingDocumentClientState {
 
     val response = externalContext.getResponse
 
-    val scripts =
-      ScriptBuilder.findOtherScriptInvocations(this).toList :::
-      List(
-        ScriptBuilder.buildJavaScriptInitialData(
-          containingDocument   = this,
-          rewriteResource      = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
-          rewriteAction        = response.rewriteActionURL,
-          controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
-          versionedResources   = URLRewriterUtils.isResourcesVersioned,
-          heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(this, externalContext)
-        )
-      )
-
-    _initialClientScript = Some(scripts.fold("")(_ + _))
+    _jsonInitializationData =
+      ScriptBuilder.buildJsonInitializationData(
+        containingDocument   = this,
+        rewriteResource      = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
+        rewriteAction        = response.rewriteActionURL,
+        controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
+        versionedResources   = URLRewriterUtils.isResourcesVersioned,
+        heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(this, externalContext)
+      ).some
   }
 
   def clearInitialClientScript(): Unit =
-    _initialClientScript = None
+    _jsonInitializationData = None
 }
 
 trait ContainingDocumentCacheable extends Cacheable {

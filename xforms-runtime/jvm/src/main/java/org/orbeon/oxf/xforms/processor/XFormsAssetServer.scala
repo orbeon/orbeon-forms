@@ -129,7 +129,17 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
             IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
               fromCurrentStateOpt orElse fromInitialStateOpt foreach { content =>
-                writer.write(content)
+
+                val p1 = ScriptBuilder.quoteString(content)
+
+                externalContext.getRequest.getFirstParamAsString(NamespaceParameter) match {
+                  case Some(ns) =>
+                    val p2 = externalContext.getRequest.getFirstParamAsString(Constants.ContextPathParameter).map(ScriptBuilder.quoteString).getOrElse("undefined")
+                    val p3 = ScriptBuilder.quoteString(ns)
+                    writer.write(s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData($p1,$p2,$p3)}).call(this);""")
+                  case None =>
+                    writer.write(s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData($p1)}).call(this);""")
+                }
               }
             }
         }

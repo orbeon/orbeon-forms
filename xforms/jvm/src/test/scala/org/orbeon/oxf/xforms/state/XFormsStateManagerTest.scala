@@ -298,7 +298,7 @@ class XFormsStateManagerTest
     }
 
     def stripSequenceNumber(serializedState: String) =
-      DynamicState(serializedState).copy(sequence = 1, initialClientScript = None).encodeToString(XFormsGlobalProperties.isGZIPState, isForceEncryption = false)
+      DynamicState(serializedState).copy(sequence = 1, initializationData = None).encodeToString(XFormsGlobalProperties.isGZIPState, isForceEncryption = false)
 
     def getSequenceNumber(serializedState: String) =
       DynamicState(serializedState).sequence

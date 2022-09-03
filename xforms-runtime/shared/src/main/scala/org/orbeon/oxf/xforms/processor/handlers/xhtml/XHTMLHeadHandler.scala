@@ -133,10 +133,14 @@ class XHTMLHeadHandler(
         }
 
         // Scripts known dynamically
-
-        findOtherScriptInvocations(containingDocument) foreach
-          writeContent
-
+        ScriptBuilder.findOtherScriptInvocations(containingDocument) foreach { initializationScripts =>
+          writeContent(
+            ScriptBuilder.buildXFormsPageLoadedServer(
+              body         = initializationScripts,
+              namespaceOpt = None
+            )
+          )
+        }
         writeContent(
           ScriptBuilder.buildInitializationCall(
             buildJsonInitializationData(

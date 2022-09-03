@@ -752,18 +752,20 @@ trait ContainingDocumentClientState {
 
   self: XFormsContainingDocument =>
 
-  private var _jsonInitializationData: Option[String] = None
+  private var _initializationData : Option[(Option[String], String)] = None
 
-  def initialClientScript: Option[String] =
-    _jsonInitializationData
+  def getInitializationData: Option[(Option[String], String)] = _initializationData
 
-  def setInitialClientScript(): Unit = {
+  def setInitializationData(): Unit = {
 
     implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
 
     val response = externalContext.getResponse
 
-    _jsonInitializationData =
+    val initializationScripts =
+      ScriptBuilder.findOtherScriptInvocations(this)
+
+    val jsonInitializationData =
       ScriptBuilder.buildJsonInitializationData(
         containingDocument   = this,
         rewriteResource      = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
@@ -771,11 +773,13 @@ trait ContainingDocumentClientState {
         controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
         versionedResources   = URLRewriterUtils.isResourcesVersioned,
         heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(this, externalContext)
-      ).some
+      )
+
+    _initializationData = (initializationScripts, jsonInitializationData).some
   }
 
   def clearInitialClientScript(): Unit =
-    _jsonInitializationData = None
+    _initializationData = None
 }
 
 trait ContainingDocumentCacheable extends Cacheable {

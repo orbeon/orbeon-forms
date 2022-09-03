@@ -228,7 +228,7 @@ class XFormsContainingDocument(
 
     // Do this before clearing the client state
     if (! staticState.isInlineResources)
-      setInitialClientScript()
+      setInitializationData()
 
     clearClientState() // client state can contain e.g. focus information, etc. set during initialization
 

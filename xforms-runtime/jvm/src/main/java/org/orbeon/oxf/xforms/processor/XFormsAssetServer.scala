@@ -96,7 +96,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           withDocumentAcquireLock(
             uuid,
             XFormsGlobalProperties.uploadXFormsAccessTimeout // same timeout as upload for now (throws if the timeout expires)
-          )(_.initialClientScript)
+          )(d => d.getInitializationData)
 
         fromCurrentStateOptTry match {
           case Failure(e: SessionExpiredException) => // from downstream `acquireDocumentLock`
@@ -115,7 +115,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
               XFormsStateManager.getStateFromParamsOrStore(
                 RequestParameters(uuid, None, None, None),
                 isInitialState = true
-              ).dynamicState flatMap (_.initialClientScript)
+              ).dynamicState flatMap (_.initializationData)
 
             response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
 
@@ -127,11 +127,24 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
             )
 
             IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
-              fromCurrentStateOpt orElse fromInitialStateOpt foreach { content =>
-                ScriptBuilder.buildInitializationCall(
-                  jsonInitialization = content,
-                  contextPathOpt     = externalContext.getRequest.getFirstParamAsString(Constants.ContextPathParameter),
-                  namespaceOpt       = externalContext.getRequest.getFirstParamAsString(Constants.NamespaceParameter)
+
+              val namespaceOpt = externalContext.getRequest.getFirstParamAsString(Constants.NamespaceParameter)
+
+              fromCurrentStateOpt orElse fromInitialStateOpt foreach { case (initializationScriptsOpt, jsonInitializationData) =>
+                initializationScriptsOpt foreach { initializationScripts =>
+                  writer.write(
+                    ScriptBuilder.buildXFormsPageLoadedServer(
+                      body         = initializationScripts,
+                      namespaceOpt = namespaceOpt
+                    )
+                  )
+                }
+                writer.write(
+                  ScriptBuilder.buildInitializationCall(
+                    jsonInitialization = jsonInitializationData,
+                    contextPathOpt     = externalContext.getRequest.getFirstParamAsString(Constants.ContextPathParameter),
+                    namespaceOpt       = namespaceOpt
+                  )
                 )
               }
             }

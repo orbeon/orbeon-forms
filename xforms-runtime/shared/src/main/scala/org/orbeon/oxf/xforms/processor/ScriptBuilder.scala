@@ -272,25 +272,19 @@ object ScriptBuilder {
     }
   }
 
-  private def findOtherScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
+  def buildXFormsPageLoadedServer(body: String, namespaceOpt: Option[String]): String =
+    "\nfunction xformsPageLoadedServer(){" + body + "}"
+
+  def findOtherScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
 
     val javascriptLoads =
       containingDocument.getScriptsToRun collect { case Left(l) => l.resource.substringAfter("javascript:") }
 
     javascriptLoads.nonEmpty option {
-
       val sb = new jl.StringBuilder
-
-        sb append "\nfunction xformsPageLoadedServer() { "
-
-        // NOTE: The order of script actions vs. `javascript:` loads should be preserved. It is not currently.
-
-      // javascript: loads
-      for (load <- javascriptLoads) {
-        val body = load.escapeJavaScript
-        sb append s"""(function(){$body})();"""
-      }
-
+      // NOTE: The order of script actions vs. `javascript:` loads should be preserved. It is not currently.
+      for (load <- javascriptLoads)
+        sb.append(s"""(function(){${load.escapeJavaScript}})();""")
       sb.toString
     }
   }

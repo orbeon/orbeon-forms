@@ -645,7 +645,7 @@ lazy val formRunnerJS = formRunner.js
       "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
     ),
 
-    jsDependencies                      += "org.webjars" % "jquery" % "3.6.0" / "3.6.0/jquery.js",
+    jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "3.6.0/jquery.js",
     Test / jsDependencies               += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     Test / unmanagedResourceDirectories += (xformsWeb / baseDirectory).value / "src" / "main" / "assets",
 
@@ -798,7 +798,7 @@ lazy val formBuilderJS = formBuilder.js
   .enablePlugins(JSDependenciesPlugin)
   .settings(
 
-    jsDependencies += "org.webjars" % "jquery" % "3.6.0" / "3.6.0/jquery.js",
+    jsDependencies += "org.webjars" % "jquery" % "3.6.1" / "3.6.0/jquery.js",
 
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom"    % ScalaJsDomVersion,
@@ -1076,7 +1076,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "io.github.cquiroz"      %%% "scala-java-time"  % ScalaJsTimeVersion
     ),
 
-    jsDependencies                      += "org.webjars" % "jquery" % "3.6.0" / "3.6.0/jquery.js",
+    jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "3.6.0/jquery.js",
     Test / jsDependencies               += ProvidedJS / "ops/javascript/orbeon/util/jquery-orbeon.js" dependsOn "jquery.js",
     Test / unmanagedResourceDirectories += baseDirectory.value / "src" / "main" / "assets",
 

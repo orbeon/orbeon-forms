@@ -51,7 +51,7 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
           { "full": "/ops/yui/slider/slider.js",                                           "min": true  },
 
-          { "full": "/ops/javascript/underscore/underscore.js",                            "min": true  },
+          { "full": "/ops/javascript/underscore/underscore.min.js",                        "min": false },
 
           { "full": "/ops/javascript/xforms.js",                                           "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
@@ -92,7 +92,7 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
           { "full": "/ops/yui/slider/slider.js",                                           "min": true  },
 
-          { "full": "/ops/javascript/underscore/underscore.js",                            "min": true  },
+          { "full": "/ops/javascript/underscore/underscore.min.js",                        "min": false },
 
           { "full": "/ops/javascript/xforms.js",                                           "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },

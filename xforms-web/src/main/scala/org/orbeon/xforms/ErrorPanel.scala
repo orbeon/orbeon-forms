@@ -14,13 +14,14 @@
 package org.orbeon.xforms
 
 import org.orbeon.jquery._
+import org.orbeon.xforms
 import org.orbeon.xforms.facade.Utils
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
-import scala.collection.compat._
 
+import scala.collection.compat._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{newInstance, global => g}
 
@@ -93,9 +94,9 @@ object ErrorPanel {
     }
   }
 
-  def showError(formId: String, detailsOrNull: String): Unit = {
-    val formErrorPanel = Page.getForm(formId).errorPanel.asInstanceOf[js.Dynamic]
+  def showError(currentForm: xforms.Form, detailsOrNull: String): Unit = {
 
+    val formErrorPanel  = currentForm.errorPanel.asInstanceOf[js.Dynamic]
     val jErrorPanelElem = $(formErrorPanel.element)
 
     jErrorPanelElem.css("display: block")

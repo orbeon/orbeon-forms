@@ -269,8 +269,8 @@ object AjaxClient {
     showError(ErrorMessageTitle, sb.toString, formId, ignoreErrors)
   }
 
+  // TODO: After cp to 2021.1, `formId` -> `currentForm`
   // Display the error panel and shows the specified detailed message in the detail section of the panel.
-  @JSExport
   def showError(titleString: String, detailsString: String, formId: String, ignoreErrors: Boolean): Unit = {
     Events.errorEvent.fire(
       new js.Object {
@@ -279,7 +279,7 @@ object AjaxClient {
       }
     )
     if (! ignoreErrors && Properties.showErrorDialog.get())
-      ErrorPanel.showError(formId, detailsString)
+      ErrorPanel.showError(Page.getForm(formId), detailsString)
   }
 
   // Sending a heartbeat event if no event has been sent to server in the last time interval
@@ -448,7 +448,7 @@ object AjaxClient {
         eventsForOldestEventForm(coalescedEvents)
     }
 
-    def processEvents(currentForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
+    def processEvents(currentHtmlForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
 
       val eventsAsList = events.toList
 
@@ -489,7 +489,8 @@ object AjaxClient {
         }
       }
 
-      val currentFormId = currentForm.id
+      val currentFormId = currentHtmlForm.id
+      val currentForm   = Page.getForm(currentFormId)
 
       val foundEventOtherThanHeartBeat = events exists (_.eventName != EventNames.XXFormsSessionHeartbeat)
       val showProgress                 = events exists (_.showProgress)
@@ -499,7 +500,7 @@ object AjaxClient {
       // way by the server, skipping the "normal" processing which includes checking if there are
       // any discardable events waiting to be executed.
       if (foundEventOtherThanHeartBeat)
-        Page.getForm(currentFormId).clearDiscardableTimerIds()
+        currentForm.clearDiscardableTimerIds()
 
       // Don't ignore errors if *any* of the events tell us not to ignore errors.
       // (Corollary: We only ignore errors if *all* of the events tell us to ignore errors.)
@@ -518,7 +519,7 @@ object AjaxClient {
       val sequenceNumberOpt = mustIncludeSequence option StateHandling.getSequence(currentFormId).toInt
 
       XFormsApp.clientServerChannel.sendEvents(
-        requestFormId     = currentFormId,
+        requestFormId     = currentForm,
         eventsToSend      = eventsToSend,
         sequenceNumberOpt = sequenceNumberOpt,
         showProgress      = showProgress,

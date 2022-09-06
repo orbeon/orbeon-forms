@@ -14,6 +14,7 @@
 package org.orbeon.xforms
 
 import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
 import org.scalajs.dom
@@ -66,12 +67,13 @@ object Support {
   def getLocalName(e: dom.Element): String =
     if (e.tagName.contains(":")) e.tagName.substringAfter(":") else e.tagName
 
+  // TODO: Rename as we are returning a `dom.Document`?
   def fetchText(
     url         : String,
     requestBody : String | FormData,
     contentType : Option[String],
     acceptLang  : Option[String],
-    formId      : String,
+    transform   : (String, String) => String,
     abortSignal : Option[AbortSignal]
   ): Future[(Int, String, Option[dom.Document])] = {
 
@@ -102,11 +104,12 @@ object Support {
     for {
       response <- fetchPromise.toFuture
       text     <- response.text().toFuture
+      newText = transform(text, ContentTypes.XmlContentType)
     } yield
       (
         response.status,
-        text,
-        Support.parseStringAsXml(text)
+        newText,
+        Support.parseStringAsXml(newText)
       )
   }
 

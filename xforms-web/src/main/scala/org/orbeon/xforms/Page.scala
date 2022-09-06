@@ -51,23 +51,12 @@ object Page {
   // for one caller of this API. Short namespaces are removed as of Orbeon Forms 2019.2 so the potential
   // for conflict is lowered.
   @JSExport
-  def namespaceIdIfNeeded(formId: String, id: String): String = {
-    val ns = getForm(formId).ns
-    if (id.startsWith(ns))
-      id
-    else
-      ns + id
-  }
+  def namespaceIdIfNeeded(formId: String, id: String): String =
+    getForm(formId).namespaceIdIfNeeded(id)
 
-  // See comment for `namespaceIdIfNeeded`
   @JSExport
-  def deNamespaceIdIfNeeded(formId: String, id: String): String = {
-    val ns = getForm(formId).ns
-    if (id.startsWith(ns))
-      id.substringAfter(ns)
-    else
-      id
-  }
+  def deNamespaceIdIfNeeded(formId: String, id: String): String =
+    getForm(formId).deNamespaceIdIfNeeded(id)
 
   @JSExport
   def getUploadControl(container: html.Element): Upload = {

@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.xforms.facade.XBLCompanion
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -21,11 +22,13 @@ import scala.scalajs.js
 import scala.scalajs.js.timers
 import scala.scalajs.js.timers.SetTimeoutHandle
 
+
 class Form(
   val uuid                          : String,
   val elem                          : html.Form,
   val uuidInput                     : html.Input,
   val ns                            : String,
+  val contextAndNamespaceOpt        : Option[(String, String)],
   val xformsServerPath              : String,
   val xformsServerSubmitActionPath  : Option[String],
   val xformsServerSubmitResourcePath: Option[String],
@@ -38,6 +41,9 @@ class Form(
 
   private var discardableTimerIds: List[SetTimeoutHandle] = Nil
   private var dialogTimerIds: Map[String, Int] = Map.empty
+
+  val namespacedFormId: String = ns + Constants.FormClass
+  val transform: (String, String) => String = InitSupport.getResponseTransform(contextAndNamespaceOpt)
 
   lazy val errorPanel: js.Object =
     ErrorPanel.initializeErrorPanel(elem) getOrElse
@@ -61,4 +67,16 @@ class Form(
     dialogTimerIds.get(dialogId) foreach dom.window.clearTimeout
     dialogTimerIds -= dialogId
   }
+
+  def namespaceIdIfNeeded(id: String): String =
+    if (id.startsWith(ns))
+      id
+    else
+      ns + id
+
+  def deNamespaceIdIfNeeded(id: String): String =
+    if (id.startsWith(ns))
+      id.substringAfter(ns)
+    else
+      id
 }

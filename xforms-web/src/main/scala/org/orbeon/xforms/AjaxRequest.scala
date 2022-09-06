@@ -14,9 +14,9 @@
 package org.orbeon.xforms
 
 import java.{lang => jl}
-
 import cats.data.NonEmptyList
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.xforms
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget}
 import shapeless.syntax.typeable._
 
@@ -27,9 +27,9 @@ object AjaxRequest {
 
   // NOTE: Later we can switch this to an automatically-generated protocol
   def buildXmlRequest(
-    currentFormId     : String,
-    eventsToSend      : NonEmptyList[WireAjaxEvent],
-    sequenceNumberOpt : Option[Int]
+    currentForm      : xforms.Form,
+    eventsToSend     : NonEmptyList[WireAjaxEvent],
+    sequenceNumberOpt: Option[Int]
   ): String = {
 
     val requestDocumentString = new jl.StringBuilder
@@ -49,7 +49,7 @@ object AjaxRequest {
     // Add form UUID
     indent(1)
     requestDocumentString.append("<xxf:uuid>")
-    requestDocumentString.append(StateHandling.getFormUuid(currentFormId))
+    requestDocumentString.append(currentForm.uuid)
     requestDocumentString.append("</xxf:uuid>")
     newLine()
 
@@ -76,7 +76,7 @@ object AjaxRequest {
       requestDocumentString.append(s""" name="${event.eventName}"""")
 
       event.narrowTo[WireAjaxEventWithTarget] foreach { e =>
-        requestDocumentString.append(s""" source-control-id="${Page.deNamespaceIdIfNeeded(currentFormId, e.targetId)}"""")
+        requestDocumentString.append(s""" source-control-id="${currentForm.deNamespaceIdIfNeeded(e.targetId)}"""")
       }
 
       requestDocumentString.append(">")

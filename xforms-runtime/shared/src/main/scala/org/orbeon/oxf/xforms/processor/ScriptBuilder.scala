@@ -272,8 +272,11 @@ object ScriptBuilder {
     }
   }
 
+  def namespaceBuildXFormsPageLoadedServer(namespaceOpt: Option[String]): String =
+    s"xformsPageLoadedServer${namespaceOpt.getOrElse("")}"
+
   def buildXFormsPageLoadedServer(body: String, namespaceOpt: Option[String]): String =
-    "\nfunction xformsPageLoadedServer(){" + body + "}"
+    s"\nfunction ${namespaceBuildXFormsPageLoadedServer(namespaceOpt)}(){$body}"
 
   def findOtherScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
 

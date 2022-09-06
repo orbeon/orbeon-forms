@@ -145,7 +145,7 @@ object UploaderClient {
           requestBody = formData,
           contentType = None,
           acceptLang  = Language.getLang().some, // this language can be used for messages returned by a file scanner
-          formId      = requestFormId,
+          transform   = (content, _) => content,
           abortSignal = controller.signal.some
         )
 

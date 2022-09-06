@@ -13,7 +13,7 @@
  */
 package org.orbeon.xforms
 
-import org.log4s.log4sjs.Log4sConfig.setLoggerThreshold
+import org.orbeon.xforms
 import org.orbeon.xforms.InitSupport.setupGlobalClassesIfNeeded
 import org.orbeon.xforms.rpc.{ClientServerChannel, RemoteClientServerChannel}
 import org.scalajs.dom
@@ -25,13 +25,13 @@ import scala.scalajs.js.Dynamic.{global => g}
 // Scala.js starting point for XForms
 object XFormsApp extends App {
 
-  private var _clientServerChannel: ClientServerChannel[dom.Document] = _
-  def clientServerChannel: ClientServerChannel[dom.Document] = _clientServerChannel
+  private var _clientServerChannel: ClientServerChannel[xforms.Form, dom.Document] = _
+  def clientServerChannel: ClientServerChannel[xforms.Form, dom.Document] = _clientServerChannel
 
   def onOrbeonApiLoaded(): Unit =
     onOrbeonApiLoaded(RemoteClientServerChannel)
 
-  def onOrbeonApiLoaded(clientServerChannel: ClientServerChannel[dom.Document]): Unit = {
+  def onOrbeonApiLoaded(clientServerChannel: ClientServerChannel[xforms.Form, dom.Document]): Unit = {
 
     _clientServerChannel = clientServerChannel
 

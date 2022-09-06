@@ -16,32 +16,32 @@ package org.orbeon.xforms.rpc
 import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.oxf.util.ContentTypes
-import org.orbeon.xforms.AjaxClient.{handleFailure, logAndShowError}
+import org.orbeon.xforms
+import org.orbeon.xforms.AjaxClient.handleFailure
 import org.orbeon.xforms.facade.Properties
 import org.orbeon.xforms.{AjaxRequest, Page, Support}
 import org.scalajs.dom
 import org.scalajs.dom.FormData
 import org.scalajs.dom.experimental.AbortController
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
-import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
-
 import scala.scalajs.js
 import scala.scalajs.js.{timers, |}
 import scala.util.{Failure, Success}
 
 
-object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
+object RemoteClientServerChannel extends ClientServerChannel[xforms.Form, dom.Document] {
 
   import Private._
 
   def sendEvents(
-    requestFormId     : String,
-    eventsToSend      : NonEmptyList[WireAjaxEvent],
-    sequenceNumberOpt : Option[Int],
-    showProgress      : Boolean,
-    ignoreErrors      : Boolean
+    requestForm      : xforms.Form,
+    eventsToSend     : NonEmptyList[WireAjaxEvent],
+    sequenceNumberOpt: Option[Int],
+    showProgress     : Boolean,
+    ignoreErrors     : Boolean
   ): Future[dom.Document] = {
 
     requestTryCount = 0
@@ -49,8 +49,8 @@ object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
     Page.loadingIndicator().requestStarted(showProgress)
 
     asyncAjaxRequestWithRetry(
-      requestFormId,
-      AjaxRequest.buildXmlRequest(requestFormId, eventsToSend, sequenceNumberOpt),
+      requestForm,
+      AjaxRequest.buildXmlRequest(requestForm, eventsToSend, sequenceNumberOpt),
       showProgress,
       ignoreErrors
     )
@@ -61,13 +61,12 @@ object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
     var requestTryCount: Int = 0 // attempts to run the current Ajax request done so far
 
     def asyncAjaxRequestWithRetry(
-      requestFormId : String,
-      requestBody   : String | FormData,
-      showProgress  : Boolean,
-      ignoreErrors  : Boolean
+      requestForm : xforms.Form,
+      requestBody : String | FormData,
+      showProgress: Boolean,
+      ignoreErrors: Boolean
     ): Future[dom.Document] = {
 
-      val requestForm = Page.getForm(requestFormId)
       requestTryCount += 1
 
       // Timeout support using `AbortController`
@@ -83,7 +82,7 @@ object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
         requestBody = requestBody,
         contentType = ContentTypes.XmlContentType.some,
         acceptLang  = None,
-        formId      = requestFormId,
+        transform   = requestForm.transform,
         abortSignal = controller.signal.some
       ).onComplete { response =>
 
@@ -97,14 +96,14 @@ object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
             case Success((503, _, _)) =>
               // The server returns an explicit 503 when the Ajax server is still busy
               retryRequestAfterDelay(() =>
-                asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
+                asyncAjaxRequestWithRetry(requestForm, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
                   promise.complete
               )
             case Success((_, responseText, responseXmlOpt)) =>
               // Retry if we DON'T have an explicit error doc or a login
-              if (! handleFailure(responseXmlOpt.toRight(responseText), requestFormId, ignoreErrors))
+              if (! handleFailure(responseXmlOpt.toRight(responseText), requestForm.namespacedFormId, ignoreErrors))
                 retryRequestAfterDelay(() =>
-                  asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
+                  asyncAjaxRequestWithRetry(requestForm, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
                     promise.complete
                 )
               else {
@@ -114,7 +113,7 @@ object RemoteClientServerChannel extends ClientServerChannel[dom.Document] {
               }
             case Failure(t) =>
               retryRequestAfterDelay(() =>
-                asyncAjaxRequestWithRetry(requestFormId, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
+                asyncAjaxRequestWithRetry(requestForm, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
                   promise.complete
               )
           }

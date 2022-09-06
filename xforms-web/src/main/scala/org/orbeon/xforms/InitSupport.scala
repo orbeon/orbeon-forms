@@ -19,9 +19,12 @@ import org.log4s.Logger
 import org.orbeon.facades.{Bowser, Mousetrap}
 import org.orbeon.liferay._
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
+import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, PathUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
+import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants._
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
 import org.orbeon.xforms.StateHandling.StateResult
@@ -34,6 +37,7 @@ import org.scalajs.dom.html
 import scala.collection.{mutable => m}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
+import java.io.StringWriter
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
@@ -54,10 +58,50 @@ object InitSupport {
 
   private var initTimestampBeforeMs: Long = -1
 
-  // TODO: `xformsPageLoadedServer`
+  def getResponseTransform(contextAndNamespaceOpt: Option[(String, String)])(content: String, contentType: String): String = {
+
+    // See also `ServletEmbeddingContextWithResponse.decodeURL()`
+    def decodeURL(context: String, namespace: String)(encoded: String): String = {
+
+      def createResourceURL(resourceId: String) = {
+
+        val (path, query) = PathUtils.splitQueryDecodeParams(resourceId)
+
+        val basePath = context.dropTrailingSlash + '/' + path
+
+        if (path.endsWith(".css"))
+          PathUtils.recombineQuery(basePath, query ::: ("ns" -> namespace) :: Nil)
+        else
+          PathUtils.recombineQuery(basePath, query)
+      }
+
+      def path(navigationParameters: Map[String, Array[String]]) =
+        navigationParameters.getOrElse(WSRPSupport.PathParameterName, Array()).headOption.getOrElse(throw new IllegalStateException)
+
+      def createActionOrRenderURL(portletMode: Option[String], windowState: Option[String], navigationParameters: Map[String, Array[String]]) =
+        context.dropTrailingSlash + '/' + path(navigationParameters).dropStartingSlash
+
+      val decodedUrl =
+        WSRPSupport.decodeURL(encoded, createResourceURL, createActionOrRenderURL, createActionOrRenderURL)
+
+      // TODO: Check this logic, which is done in `APISupport` and which we reproduce here, but without being 100%
+      //  certain of why it's necessary.
+      if (contentType == ContentTypes.XmlContentType) decodedUrl.escapeXmlMinimal else decodedUrl
+    }
+
+    contextAndNamespaceOpt match {
+      case Some((context, namespace)) =>
+        val writer = new StringWriter
+        WSRPSupport.decodeWSRPContent(content, namespace, decodeURL(context, namespace), writer)
+        writer.toString
+      case None =>
+        content
+    }
+  }
+
   // Called by form-specific dynamic initialization
   @JSExport
-  def initializeFormWithInitData(initializationsString: String): Unit = {
+  def initializeFormWithInitData(initializeFormWithInitData: String, contextPathOrUndef: js.UndefOr[String], namespaceOrUndef: js.UndefOr[String]): Unit = {
 
     initTimestampBeforeMs = System.currentTimeMillis()
 
@@ -65,8 +109,13 @@ object InitSupport {
     // TODO: pass `opsXFormsProperties` directly
     Properties.init()
 
+    val contextAndNamespaceOpt = namespaceOrUndef.toOption.map(contextPathOrUndef.getOrElse("") -> _)
+
+    val updatedInitializeFormWithInitData =
+      getResponseTransform(contextAndNamespaceOpt)(initializeFormWithInitData, ContentTypes.JsonContentType)
+
     val initializations =
-      decode[rpc.Initializations](initializationsString) match {
+      decode[rpc.Initializations](updatedInitializeFormWithInitData) match {
         case Left(e)  => throw e
         case Right(i) => i
       }
@@ -77,7 +126,7 @@ object InitSupport {
 
       logger.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
 
-      initializeForm(initializations)
+      initializeForm(initializations, contextAndNamespaceOpt)
       initializeHeartBeatIfNeeded()
 
       if (Page.countInitializedForms == allFormElems.size) {
@@ -149,7 +198,7 @@ object InitSupport {
     private var heartBeatInitialized       = false
     private var orbeonLoadedEventScheduled = false
 
-    def initializeForm(initializations: Initializations): Unit = {
+    def initializeForm(initializations: Initializations, contextAndNamespaceOpt: Option[(String, String)]): Unit = {
 
       val formId   = initializations.namespacedFormId
       val formElem = dom.document.getElementById(formId).asInstanceOf[html.Form] // TODO: Error instead of plain cast?
@@ -196,7 +245,8 @@ object InitSupport {
           uuid                           = uuid,
           elem                           = formElem,
           uuidInput                      = uuidInput,
-          ns                             = formId.substring(0, formId.indexOf(Constants.FormClass)),
+          ns                             = formId.substring(0, formId.indexOf(Constants.FormClass)), // namespaceOpt.getOrElse("")
+          contextAndNamespaceOpt         = contextAndNamespaceOpt,
           xformsServerPath               = initializations.xformsServerPath,
           xformsServerSubmitActionPath   = initializations.xformsServerSubmitActionPath,
           xformsServerSubmitResourcePath = initializations.xformsServerSubmitResourcePath,
@@ -209,7 +259,7 @@ object InitSupport {
       )
 
       // TODO: We set those here, but we could set them just before submission instead.
-      uuidInput.value        = uuid
+      uuidInput.value = uuid
 
       initializeJavaScriptControls(initializations.controls)
       initializeKeyListeners(initializations.listeners, formElem)
@@ -259,7 +309,15 @@ object InitSupport {
 
       // Putting this here due to possible Scala.js bug reporting a "applyDynamic does not support passing a vararg parameter"
       // 2020-11-26: Using Scala.js 1.0 way of detecting the global variable.
-      val hasOtherScripts = js.typeOf(g.xformsPageLoadedServer) != "undefined"
+
+      // TODO: move to shared place
+      def namespaceBuildXFormsPageLoadedServer(namespaceOpt: Option[String]): String =
+        s"xformsPageLoadedServer${namespaceOpt.getOrElse("")}"
+
+      val xformsPageLoadedServerName = namespaceBuildXFormsPageLoadedServer(contextAndNamespaceOpt.map(_._2))
+
+      val hasOtherScripts =
+        js.typeOf(js.special.fileLevelThis.asInstanceOf[js.Dynamic].selectDynamic(xformsPageLoadedServerName)) != "undefined"
 
       // Run user scripts
       initializations.userScripts foreach { case rpc.UserScript(functionName, targetId, observerId, paramsValues) =>
@@ -283,10 +341,8 @@ object InitSupport {
         AjaxClient.showError(title, details, formId, ignoreErrors = false)
       }
 
-      // TODO: Handle `javascript:` loads as well.
-      // TODO: `xformsPageLoadedServer` must be per form too! Currently, it is global.
       if (hasOtherScripts)
-        g.xformsPageLoadedServer()
+        js.special.fileLevelThis.asInstanceOf[js.Dynamic].applyDynamic(xformsPageLoadedServerName)()
     }
 
     // The heartbeat is per servlet session and we only need one. But see https://github.com/orbeon/orbeon-forms/issues/2014.

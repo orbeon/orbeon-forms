@@ -61,12 +61,13 @@ object Headers {
   val CreatedLower            = Created.toLowerCase
   val TimeoutLower            = Timeout.toLowerCase
 
-  val GeneralEmbeddedClient   = "embedded"
-  val PortletEmbeddingClient  = "portlet"
-  val JavaApiEmbeddingClient  = "java-api"
-  val AppEmbeddingClient      = "app" // tentative naming
+  val GeneralEmbeddedClient         = "embedded"
+  val PortletEmbeddingClient        = "portlet"
+  val JavaApiEmbeddingClient        = "java-api"
+  val JavaScriptApiEmbeddingClient  = "javascript-api"
+  val AppEmbeddingClient            = "app" // tentative naming
 
-  val EmbeddedClientValues    = Set(GeneralEmbeddedClient, PortletEmbeddingClient, JavaApiEmbeddingClient, AppEmbeddingClient)
+  val EmbeddedClientValues = Set(GeneralEmbeddedClient, PortletEmbeddingClient, JavaApiEmbeddingClient, JavaScriptApiEmbeddingClient, AppEmbeddingClient)
 
   // These headers are connection headers and must never be forwarded (content-length is handled separately below)
   //

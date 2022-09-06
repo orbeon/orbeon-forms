@@ -102,10 +102,6 @@ object StateHandling {
   }
 
   @JSExport
-  def getFormUuid(formId: String): String =
-    getClientStateOrThrow(formId).uuid
-
-  @JSExport
   def getSequence(formId: String): String =
     getClientStateOrThrow(formId).sequence.toString
 

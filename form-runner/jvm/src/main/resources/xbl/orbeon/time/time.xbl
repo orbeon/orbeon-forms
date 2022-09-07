@@ -121,6 +121,7 @@
                         <resource xml:lang="fr"><format>hms</format></resource>
                         <resource xml:lang="de"><format>hms</format></resource> <!-- German also using "h" for hours -->
                         <resource xml:lang="hu"><format>ópm</format></resource>
+                        <resource xml:lang="da"><format>tms</format></resource>
                     </_>
                 </xf:instance>
             </xf:model>

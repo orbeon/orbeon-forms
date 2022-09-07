@@ -111,7 +111,7 @@ object RemoteClientServerChannel extends ClientServerChannel[xforms.Form, dom.Do
                 // This was handled by showing a dialog or login
                 promise.failure(new Throwable) // TODO: It would be good to return another error type.
               }
-            case Failure(t) =>
+            case Failure(_) =>
               retryRequestAfterDelay(() =>
                 asyncAjaxRequestWithRetry(requestForm, requestBody, showProgress, ignoreErrors = ignoreErrors) onComplete
                   promise.complete

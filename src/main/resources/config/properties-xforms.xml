@@ -118,8 +118,6 @@
     <property as="xs:string"  name="oxf.xforms.additional-avt-element-namespaces"           value=""/>
     <!-- Space-separated list of attribute names that contain references to id's -->
     <property as="xs:string"  name="oxf.xforms.additional-ref-id-attribute-names"           value=""/>
-    <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
     <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                     value="0"/>
 

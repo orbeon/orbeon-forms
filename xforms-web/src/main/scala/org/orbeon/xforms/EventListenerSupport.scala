@@ -14,7 +14,7 @@
 package org.orbeon.xforms
 
 import org.scalajs.dom
-import org.scalajs.jquery.{JQueryEventObject, jQuery}
+import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 

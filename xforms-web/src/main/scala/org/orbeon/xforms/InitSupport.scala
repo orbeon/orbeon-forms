@@ -41,7 +41,6 @@ import java.io.StringWriter
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
-import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
@@ -122,8 +121,6 @@ object InitSupport {
 
     pageContainsFormsMarkupF foreach { _ =>
 
-      logger.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
-
       initializeForm(initializations, contextAndNamespaceOpt)
       initializeHeartBeatIfNeeded(initializations.configuration)
 
@@ -197,6 +194,7 @@ object InitSupport {
 
     def initializeForm(initializations: Initializations, contextAndNamespaceOpt: Option[(String, String)]): Option[Form] = {
 
+      logger.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
       val formId   = initializations.namespacedFormId
       val formElem = dom.document.getElementById(formId).asInstanceOf[html.Form] // TODO: Error instead of plain cast?
 
@@ -462,9 +460,10 @@ object InitSupport {
         // NOTE: 2019-01-07: We don't handle dialogs yet.
         //if (dom.document.getElementById(observer).classList.contains("xforms-dialog"))
 
+        // TODO: destruction
         val mousetrap =
           if (observer == Constants.DocumentId)
-            Mousetrap
+            Mousetrap // TODO: should observe on embedding element?
           else
             Mousetrap(dom.document.getElementById(observer).asInstanceOf[html.Element])
 

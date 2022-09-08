@@ -30,10 +30,10 @@ class Form(
   val uuidInput                     : html.Input,
   val ns                            : String,
   val contextAndNamespaceOpt        : Option[(String, String)],
-  val xformsServerPath              : String,
-  val xformsServerSubmitActionPath  : Option[String],
-  val xformsServerSubmitResourcePath: Option[String],
-  val xformsServerUploadPath        : String,
+  val xformsServerPath              : String,                          // could move to configuration
+  val xformsServerSubmitActionPath  : Option[String],                  // could move to configuration
+  val xformsServerSubmitResourcePath: Option[String],                  // could move to configuration
+  val xformsServerUploadPath        : String,                          // could move to configuration
   var repeatTreeChildToParent       : js.Dictionary[String],           // for JavaScript access
   var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]], // for JavaScript access
   val repeatIndexes                 : js.Dictionary[String],           // for JavaScript access

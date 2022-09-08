@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, PathUtils}
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
 import org.orbeon.wsrp.WSRPSupport
+import org.orbeon.xforms
 import org.orbeon.xforms.Constants._
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
 import org.orbeon.xforms.StateHandling.StateResult

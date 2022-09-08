@@ -207,6 +207,10 @@
         http://orbeon.org/oxf/xml/form-runner
     </property>
 
+    <property as="xs:string"  name="oxf.xforms.xbl.mapping.xforms">
+        http://www.w3.org/2002/xforms
+    </property>
+
     <property as="xs:string"  name="oxf.xforms.xbl.fr.spell-checker.service">
         https://www.google.com/tbproxy/spell?lang=en&amp;hl=en
     </property>

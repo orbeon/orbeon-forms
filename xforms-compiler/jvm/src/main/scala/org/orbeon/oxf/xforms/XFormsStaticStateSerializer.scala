@@ -606,7 +606,6 @@ object XFormsStaticStateSerializer {
           }
         case c: WithExpressionOrConstantTrait => // includes `NestedNameOrValueControl` and `xf:message` action
           b += "expressionOrConstant" -> c.expressionOrConstant.asJson
-//          // xf:range (skip!)
 //        case _: UploadControl          =>
 //        case _: SwitchControl          =>
 //        case _: GroupControl           =>

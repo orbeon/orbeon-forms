@@ -119,7 +119,6 @@ object XHTMLOutput {
     case (ns @ XF,  ln @ "repeat-iteration", qn, atts, _                  , hc)                                                      => new TransparentHandler          (ns, ln, qn, atts,    hc)
     case (ns @ XF,  ln @ "secret"          , qn, atts, c                  , hc)                                                      => new XFormsSecretHandler         (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "upload"          , qn, atts, c                  , hc)                                                      => new XFormsUploadHandler         (ns, ln, qn, atts, c, hc)
-    case (ns @ XF,  ln @ "range"           , qn, atts, c                  , hc)                                                      => new XFormsRangeHandler          (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "textarea"        , qn, atts, c                  , hc)                                                      => new XFormsTextareaHandler       (ns, ln, qn, atts, c, hc)
     case (ns @ XXF, ln @ "dialog"          , qn, atts, c                  , hc)                                                      => new XXFormsDialogHandler        (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "select"          , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)  => new NullHandler                 (ns, ln, qn, atts,    hc)

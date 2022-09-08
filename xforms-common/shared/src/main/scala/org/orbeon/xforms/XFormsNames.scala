@@ -92,7 +92,6 @@ object XFormsNames {
   val XFORMS_OUTPUT_QNAME           = xformsQName("output")
   val XFORMS_UPLOAD_QNAME           = xformsQName("upload")
   val UPLOAD_NAME                   = XFORMS_UPLOAD_QNAME.localName
-  val XFORMS_RANGE_QNAME            = xformsQName("range")
   val XFORMS_SELECT_QNAME           = xformsQName("select")
   val XFORMS_SELECT1_QNAME          = xformsQName("select1")
 

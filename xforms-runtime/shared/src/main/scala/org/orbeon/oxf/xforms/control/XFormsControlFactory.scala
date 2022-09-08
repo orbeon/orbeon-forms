@@ -46,7 +46,6 @@ object XFormsControlFactory {
     XFORMS_TEXTAREA_QNAME,
     XFORMS_OUTPUT_QNAME,
     XFORMS_UPLOAD_QNAME,
-    XFORMS_RANGE_QNAME,
     XFORMS_SELECT_QNAME,
     XFORMS_SELECT1_QNAME,
     // Extension controls
@@ -73,7 +72,6 @@ object XFormsControlFactory {
     XFORMS_GROUP_QNAME            -> (new XFormsGroupControl(_, _, _, _)),
     XFORMS_INPUT_QNAME            -> (new XFormsInputControl(_, _, _, _)),
     XFORMS_OUTPUT_QNAME           -> (new XFormsOutputControl(_, _, _, _)),
-    XFORMS_RANGE_QNAME            -> (new XFormsRangeControl(_, _, _, _)),
     XFORMS_REPEAT_QNAME           -> (new XFormsRepeatControl(_, _, _, _)),
     XFORMS_REPEAT_ITERATION_QNAME -> (new XFormsRepeatIterationControl(_, _, _, _)),
     XFORMS_SECRET_QNAME           -> (new XFormsSecretControl(_, _, _, _)),

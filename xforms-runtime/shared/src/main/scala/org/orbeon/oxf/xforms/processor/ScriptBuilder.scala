@@ -78,7 +78,7 @@ object ScriptBuilder {
           controlsToInitialize += c.getEffectiveId -> None
       case c =>
         // Legacy JavaScript initialization
-        // As of 2016-08-04: `xxf:dialog`, `xf:select1[appearance = compact]`, `xf:range`
+        // As of 2016-08-04: `xxf:dialog`, `xf:select1[appearance = compact]`
         if (c.hasJavaScriptInitialization && ! c.isStaticReadonly)
           controlsToInitialize += c.getEffectiveId -> None
     }

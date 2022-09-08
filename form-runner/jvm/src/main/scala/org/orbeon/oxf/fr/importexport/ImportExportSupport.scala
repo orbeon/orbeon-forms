@@ -62,7 +62,6 @@ object ImportExportSupport {
     XFORMS_SECRET_QNAME,
     XFORMS_TEXTAREA_QNAME,
     XFORMS_OUTPUT_QNAME,
-    XFORMS_RANGE_QNAME,
     XFORMS_SELECT_QNAME,
     XFORMS_SELECT1_QNAME,
     QName("number",   FRNamespace),

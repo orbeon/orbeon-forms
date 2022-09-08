@@ -404,50 +404,6 @@
         </output>
     </test>
 
-    <test description="Layout for xf:range" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xh:head>
-                    <xf:model id="main-model">
-                        <xf:instance id="tests">
-                            <_>Hello!</_>
-                        </xf:instance>
-                        <xf:bind ref="." type="xs:NCName" required="true()"/>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <xf:repeat id="my-repeat" ref=".">
-                        <xf:range id="my-new-range" ref=".">
-                            <xf:label>My label</xf:label>
-                            <xf:hint>My hint</xf:hint>
-                            <xf:help>My help</xf:help>
-                            <xf:alert>My alert</xf:alert>
-                        </xf:range>
-                    </xf:repeat>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="response">
-            <controls>
-                <xh:div id="repeat-begin-my-repeat" class="xforms-repeat-begin-end xforms-update-full"/>
-                <xh:div class="xforms-repeat-delimiter"/>
-                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:div id="my-new-range⊙1" class="xforms-control xforms-range xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
-                    <xh:label class="xforms-label" for="my-new-range≡≡c⊙1">My label</xh:label>
-                    <xh:div id="my-new-range≡≡c⊙1" class="xforms-range-background">
-                        <xh:div class="xforms-range-thumb"/>
-                    </xh:div>
-                    <xh:button class="xforms-help" id="my-new-range≡≡p⊙1">My help</xh:button>
-                    <xh:span class="xforms-active xforms-alert">My alert</xh:span>
-                    <xh:span class="xforms-hint" id="my-new-range≡≡t⊙1">My hint</xh:span>
-                </xh:div>
-                <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
-                <xh:div id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
-            </controls>
-        </output>
-    </test>
-
     <test description="Layout for xf:select[not(@appearance) or @appearance = 'compact']" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">

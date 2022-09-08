@@ -69,7 +69,6 @@ object ControlAnalysisFactory {
     XFORMS_SECRET_QNAME           -> (new SecretControl(_, _, _, _, _, _, _, _, _)),
     XFORMS_TEXTAREA_QNAME         -> (new TextareaControl(_, _, _, _, _, _, _, _, _)),
     XFORMS_UPLOAD_QNAME           -> (new UploadControl(_, _, _, _, _, _, _, _, _)),
-    XFORMS_RANGE_QNAME            -> (new InputValueControl(_, _, _, _, _, _, _, _, _)),
     // Core controls
     XFORMS_TRIGGER_QNAME          -> (new TriggerControl(_, _, _, _, _, _, _, _, _)),
     XFORMS_SUBMIT_QNAME           -> (new TriggerControl(_, _, _, _, _, _, _, _, _)),

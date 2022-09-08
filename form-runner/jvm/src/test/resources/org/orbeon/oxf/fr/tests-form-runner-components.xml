@@ -75,8 +75,6 @@
                                 </xf:model>
                             </xh:head>
                             <xh:body>
-                                <!-- Built-in non-baseline control must be added -->
-                                <xf:range ref="."/>
                                 <!-- XBL non-baseline control must be added -->
                                 <fr:currency ref="."/>
                                 <!-- XBL baseline control must not be added as it's already in the baseline -->

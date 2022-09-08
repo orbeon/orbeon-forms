@@ -679,9 +679,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         return ORBEON.util.Dom.getStringValue(output[0]);
                     }
                 }
-            } else if (jControl.is('.xforms-range')) {
-                var value = ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;
-                return value.toString();
             } else if (ORBEON.xforms.XBL.isComponent(control)) {
                 var instance = ORBEON.xforms.XBL.instanceForControl(control);
                 if (_.isObject(instance) && _.isFunction(instance.xformsGetValue))
@@ -2120,15 +2117,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        sliderValueChange: function (offset) {
-            // Notify server that value changed
-            var rangeControl = document.getElementById(this.id).parentNode;
-
-            var value = offset / 200;
-            var event = new ORBEON.xforms.AjaxEvent(null, rangeControl.id, String(value), "xxforms-value");
-            ORBEON.xforms.AjaxClient.fireEvent(event);
-        },
-
         /**
          * Event listener on dialogs called by YUI when the dialog is closed. If the dialog was closed by the user (not
          * because the server told use to close the dialog), then we want to notify the server that this happened.
@@ -2424,22 +2412,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
     };
 
     ORBEON.xforms.Init = {
-
-        // Should move to XBL component, see: https://github.com/orbeon/orbeon-forms/issues/2658.
-        _range: function (range) {
-            range.tabIndex = 0;
-            ORBEON.xforms.ServerValueStore.set(range.id, "0");
-
-            // In both cases the background <div> element must already have an id
-            var backgroundDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-background", "div", range)[0];
-
-            var thumbDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-thumb", "div", range)[0];
-            thumbDiv.id = ORBEON.util.Utils.appendToEffectiveId(range.id, XF_LHHAI_SEPARATOR + "thumb");
-
-            var slider = YAHOO.widget.Slider.getHorizSlider(backgroundDiv.id, thumbDiv.id, 0, 200);
-            slider.subscribe("change", ORBEON.xforms.Events.sliderValueChange);
-            ORBEON.xforms.Globals.sliderYui[range.id] = slider;
-        },
 
         /**
          * For all the controls except list, we figure out the initial value of the control when

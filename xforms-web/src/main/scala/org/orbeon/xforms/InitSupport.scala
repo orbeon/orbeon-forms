@@ -434,9 +434,6 @@ object InitSupport {
           } else if (classList.contains("xforms-select1-appearance-compact") || classList.contains("xforms-select-appearance-compact")) {
               // Legacy JavaScript initialization
               Init._compactSelect(control)
-          } else if (classList.contains("xforms-range")) {
-              // Legacy JavaScript initialization
-              Init._range(control)
           }
         }
       }

@@ -2411,22 +2411,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             };
         },
 
-        // 2016-03-20: Called from xbl.xsl
-        // 2022-09-07: Only used by the legacy autocomplete.xbl
-        callValueChanged: function (prefix, component, target, property) {
-            var partial = YAHOO.xbl;
-            if (partial == null) return;
-            partial = partial[prefix];
-            if (partial == null) return;
-            partial = partial[component];
-            if (partial == null) return;
-            partial = partial.instance(target);
-            if (partial == null) return;
-            var method = partial["parameter" + property + "Changed"];
-            if (method == null) return;
-            method.call(partial);
-        },
-
         componentInitialized: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT)
     };
 

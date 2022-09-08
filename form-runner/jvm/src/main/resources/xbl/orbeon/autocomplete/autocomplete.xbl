@@ -135,7 +135,7 @@
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
-                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
+
                 <xsl:template match="/*">
                     <!-- Outer group -->
                     <xf:group id="component-inner-group" class="fr-autocomplete-container">
@@ -346,7 +346,22 @@
 
                         <!-- Configuration -->
                         <xf:output id="itemset" class="fr-autocomplete-dynamic-itemset xforms-hidden" value="$dynamic-itemset"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'max-results-displayed')"/>
+                        <xsl:choose>
+                            <xsl:when test="exists(fr:max-results-displayed)">
+                                <xf:var name="max-results-displayed">
+                                    <xxf:value
+                                        xxbl:attr="fr:max-results-displayed/(@model | @context | @ref | @bind | @value)"
+                                        value="."
+                                        xxbl:scope="outer"/>
+                                </xf:var>
+                                <xf:input ref="$max-results-displayed" class="xbl-fr-autocomplete-max-results-displayed xforms-hidden"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xf:output
+                                    class="xbl-fr-autocomplete-max-results-displayed xforms-hidden"
+                                    value="xxf:component-param-value('max-results-displayed')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
 
                         <!-- Dropdown with value shown by autocomplete -->
                         <xf:select1 id="select1" ref="$binding" class="fr-autocomplete-select1 xforms-hidden" appearance="minimal" xxf:encrypt-item-values="false">

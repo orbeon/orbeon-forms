@@ -17,7 +17,7 @@ import org.log4s.Logger
 import org.orbeon.facades.Bowser
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
-import org.orbeon.xforms.facade.{Properties, XBL, XBLCompanion}
+import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
 import org.orbeon.xforms._
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -118,7 +118,7 @@ object AttachmentMultiple {
               for (i <- 0 until files.length) {
                 UploaderClient.uploadEventQueue.add(
                   event    = UploadEvent(Page.getUploadControl(uploadControlElem), files(i)),
-                  wait     = Properties.delayBeforeIncrementalRequest.get().millis,
+                  wait     = Page.getFormFromElemOrThrow(companion.containerElem).configuration.delayBeforeIncrementalRequest.millis,
                   waitType = ExecutionWait.MinWait
                 )
               }

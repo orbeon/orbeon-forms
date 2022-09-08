@@ -105,10 +105,6 @@ object InitSupport {
 
     initTimestampBeforeMs = System.currentTimeMillis()
 
-    // Only now are properties available
-    // TODO: pass `opsXFormsProperties` directly
-    Properties.init()
-
     val contextAndNamespaceOpt = namespaceOrUndef.toOption.map(contextPathOrUndef.getOrElse("") -> _)
 
     val updatedInitializeFormWithInitData =
@@ -122,16 +118,18 @@ object InitSupport {
 
     logger.debug(s"initialization data is ready for form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
 
+    AjaxClient.initialize(initializations.configuration)
+
     pageContainsFormsMarkupF foreach { _ =>
 
       logger.debug(s"initializing form `${initializations.namespacedFormId}`/`${initializations.uuid}`")
 
       initializeForm(initializations, contextAndNamespaceOpt)
-      initializeHeartBeatIfNeeded()
+      initializeHeartBeatIfNeeded(initializations.configuration)
 
       if (Page.countInitializedForms == allFormElems.size) {
         logger.info(s"all forms are loaded; total time for client-side web app initialization: ${System.currentTimeMillis() - initTimestampBeforeMs} ms")
-        scheduleOrbeonLoadedEventIfNeeded()
+        scheduleOrbeonLoadedEventIfNeeded(initializations.configuration)
       }
     }
   }
@@ -198,21 +196,16 @@ object InitSupport {
     private var heartBeatInitialized       = false
     private var orbeonLoadedEventScheduled = false
 
-    def initializeForm(initializations: Initializations, contextAndNamespaceOpt: Option[(String, String)]): Unit = {
+    def initializeForm(initializations: Initializations, contextAndNamespaceOpt: Option[(String, String)]): Option[Form] = {
 
       val formId   = initializations.namespacedFormId
       val formElem = dom.document.getElementById(formId).asInstanceOf[html.Form] // TODO: Error instead of plain cast?
-
-      // TODO: No longer handle properties as global JSON value
-      initializations.properties.map(js.JSON.parse(_, (_, value) => value)) foreach { props =>
-        dom.window.asInstanceOf[js.Dynamic].opsXFormsProperties = props
-      }
 
       // Q: Do this later?
       $(formElem).removeClass(Constants.InitiallyHiddenClass)
 
       val uuid =
-        StateHandling.initializeState(formId, initializations.uuid) match {
+        StateHandling.initializeState(formId, initializations.uuid, initializations.configuration.revisitHandling) match {
           case StateResult.Uuid(uuid) =>
             uuid
           case StateResult.Restore(uuid) =>
@@ -225,7 +218,7 @@ object InitSupport {
             uuid
           case StateResult.Reload =>
             dom.window.location.reload(flag = true)
-            return
+            return None
         }
 
       val uuidInput = getTwoPassSubmissionField(formElem, UuidFieldName)
@@ -239,8 +232,7 @@ object InitSupport {
       // proxying be able to change the path itself? If so, wouldn't other things break anyway? So for now
       // server values it is.
 
-      Page.registerForm(
-        formId,
+      val newForm =
         new Form(
           uuid                           = uuid,
           elem                           = formElem,
@@ -254,8 +246,13 @@ object InitSupport {
           repeatTreeChildToParent        = repeatTreeChildToParent,
           repeatTreeParentToAllChildren  = repeatTreeParentToAllChildren,
           repeatIndexes                  = processRepeatIndexes(initializations.repeatIndexes),
-          xblInstances                   = js.Array()
+          xblInstances                   = js.Array(),
+          configuration                  = initializations.configuration
         )
+
+      Page.registerForm(
+        formId,
+        newForm
       )
 
       // TODO: We set those here, but we could set them just before submission instead.
@@ -343,14 +340,16 @@ object InitSupport {
 
       if (hasOtherScripts)
         js.special.fileLevelThis.asInstanceOf[js.Dynamic].applyDynamic(xformsPageLoadedServerName)()
+
+      Some(newForm)
     }
 
     // The heartbeat is per servlet session and we only need one. But see https://github.com/orbeon/orbeon-forms/issues/2014.
-    def initializeHeartBeatIfNeeded(): Unit =
+    def initializeHeartBeatIfNeeded(configuration: rpc.ConfigurationProperties): Unit =
       if (! heartBeatInitialized) {
-        if (Properties.sessionHeartbeat.get()) {
+        if (configuration.sessionHeartbeat) {
           // Say session is 60 minutes: heartbeat must come after 48 minutes and we check every 4.8 minutes
-          val heartBeatDelay      = Properties.sessionHeartbeatDelay.get()
+          val heartBeatDelay      = configuration.sessionHeartbeatDelay
           val heartBeatCheckDelay = heartBeatDelay / 10
           if (heartBeatCheckDelay > 0) {
             logger.debug(s"setting heartbeat check every $heartBeatCheckDelay ms")
@@ -362,14 +361,14 @@ object InitSupport {
         heartBeatInitialized = true
       }
 
-    def scheduleOrbeonLoadedEventIfNeeded(): Unit =
+    def scheduleOrbeonLoadedEventIfNeeded(configuration: rpc.ConfigurationProperties): Unit =
       if (! orbeonLoadedEventScheduled) {
         // See https://doc.orbeon.com/xforms/core/client-side-javascript-api#custom-events
         // See https://github.com/orbeon/orbeon-forms/issues/3729
         // 2019-01-10: There was an old comment about how the call to `this.subscribers.length` in the `fire()`
         // method could hang with IE. That is likely no longer a relevant comment but it might still be
         // better to fire the event asynchronously, although we could maybe use a `0` delay.
-        js.timers.setTimeout(Properties.internalShortDelay.get()) {
+        js.timers.setTimeout(configuration.internalShortDelay) {
           logger.debug("dispatching `orbeonLoadedEvent`")
           Events.orbeonLoadedEvent.fire()
         }

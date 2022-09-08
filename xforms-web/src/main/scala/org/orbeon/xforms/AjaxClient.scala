@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
-import org.orbeon.xforms.facade.{AjaxServer, Events, Properties}
+import org.orbeon.xforms.facade.{AjaxServer, Events}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
@@ -44,6 +44,11 @@ object AjaxClient {
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.AjaxClient")
 
   import Private._
+
+  def initialize(configuration: rpc.ConfigurationProperties): Unit = {
+    EventQueue.shortDelay       = configuration.internalShortDelay.millis
+    EventQueue.incrementalDelay = configuration.delayBeforeIncrementalRequest.millis
+  }
 
   class AjaxResponseDetails(
     val responseXML : dom.Document,
@@ -114,8 +119,8 @@ object AjaxClient {
 
     object LoginRegexpMatcher {
       def unapply(s: String): Boolean = {
-        val loginRegexp = Properties.loginPageDetectionRegexp.get()
-        loginRegexp.nonEmpty && new js.RegExp(loginRegexp).test(s)
+        val loginRegexp = Page.getForm(formId).configuration.loginPageDetectionRegexp
+        loginRegexp.exists(re => new js.RegExp(re).test(s))
       }
     }
 
@@ -278,13 +283,13 @@ object AjaxClient {
         val details: String = detailsString
       }
     )
-    if (! ignoreErrors && Properties.showErrorDialog.get())
+    if (! ignoreErrors && Page.getForm(formId).configuration.showErrorDialog)
       ErrorPanel.showError(Page.getForm(formId), detailsString)
   }
 
   // Sending a heartbeat event if no event has been sent to server in the last time interval
   // determined by the `session-heartbeat-delay` property.
-  def sendHeartBeatIfNeeded(heartBeatDelay: Int): Unit =
+  def sendHeartBeatIfNeeded(heartBeatDelay: Long): Unit =
     if ((System.currentTimeMillis() - EventQueue.newestEventTime) >= heartBeatDelay)
       AjaxClient.fireEvent(
         AjaxEvent(
@@ -303,8 +308,8 @@ object AjaxClient {
 
     def canSendEvents: Boolean = ! EventQueue.ajaxRequestInProgress
 
-    def shortDelay       : FiniteDuration = Properties.internalShortDelay.get().toInt.millis
-    def incrementalDelay : FiniteDuration = Properties.delayBeforeIncrementalRequest.get().millis
+    var shortDelay       : FiniteDuration = _
+    var incrementalDelay : FiniteDuration = _
 
     var ajaxRequestInProgress : Boolean = false              // actual Ajax request has started and not yet successfully completed including response processing
   }

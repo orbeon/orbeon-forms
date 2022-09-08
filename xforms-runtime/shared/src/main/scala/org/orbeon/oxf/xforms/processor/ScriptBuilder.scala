@@ -26,17 +26,13 @@ import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsCo
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
 import org.orbeon.xforms._
+import org.orbeon.xforms.rpc.ConfigurationProperties
 
 import java.{lang => jl}
 import scala.collection.mutable
 
 
 object ScriptBuilder {
-
-  // TODO: Constants duplicated from URLRewriterUtils
-  val RESOURCES_VERSIONED_PROPERTY      = "oxf.resources.versioned"
-  val RESOURCES_VERSION_NUMBER_PROPERTY = "oxf.resources.version-number"
-  val RESOURCES_VERSIONED_DEFAULT       = false
 
   def quoteString(s: String) =
     s""""${s.escapeJavaScript}""""
@@ -94,88 +90,40 @@ object ScriptBuilder {
     containingDocument : XFormsContainingDocument,
     versionedResources : Boolean,
     heartbeatDelay     : Long
-  ): Option[String] = {
+  ): ConfigurationProperties = {
 
-    // Gather all static properties that need to be sent to the client
-    val staticProperties = containingDocument.staticState.clientNonDefaultProperties
+    val staticState = containingDocument.staticState
 
-    val dynamicProperties = {
+    // Help events are dynamic because they depend on whether the xforms-help event is used
+    // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
+    def helpHandler =
+      containingDocument.staticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false)
 
-      def dynamicProperty[T](p: Boolean, name: String, value: T): Option[(String, T)] =
-        p option (name -> value)
+    // Application version is not an XForms property but we want to expose it on the client
+    def resourcesVersionOpt =
+      versionedResources flatOption CoreCrossPlatformSupport.getApplicationResourceVersion
 
-      // Heartbeat delay is dynamic because it depends on session duration
-      def heartbeatOpt =
-        Some(SessionHeartbeatDelayProperty -> heartbeatDelay)
-
-      // Help events are dynamic because they depend on whether the xforms-help event is used
-      // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
-      def helpOpt = dynamicProperty(
-        containingDocument.staticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
-        HelpHandlerProperty,
-        true
-      )
-
-      // Whether resources are versioned
-      def resourcesVersionedOpt = dynamicProperty(
-        versionedResources != RESOURCES_VERSIONED_DEFAULT,
-        RESOURCES_VERSIONED_PROPERTY,
-        versionedResources
-      )
-
-      // Application version is not an XForms property but we want to expose it on the client
-      def resourcesVersionOpt =
-        CoreCrossPlatformSupport.getApplicationResourceVersion flatMap
-        (
-          dynamicProperty(
-            versionedResources,
-            RESOURCES_VERSION_NUMBER_PROPERTY,
-            _
-          )
-        )
-
-      // Gather all dynamic properties that are defined
-      List(heartbeatOpt, helpOpt, resourcesVersionedOpt, resourcesVersionOpt).flatten
-    }
-
-    val globalProperties = List(
-      DelayBeforeAjaxTimeoutProperty -> getAjaxTimeout,
-      RetryDelayIncrement            -> getRetryDelayIncrement,
-      RetryMaxDelay                  -> getRetryMaxDelay
+    ConfigurationProperties(
+      sessionHeartbeat                 = staticState.staticBooleanProperty(SessionHeartbeatProperty),                     // static
+      sessionHeartbeatDelay            = heartbeatDelay,                                                                  // dynamic
+      revisitHandling                  = staticState.staticStringProperty(RevisitHandlingProperty),                       // static
+      delayBeforeIncrementalRequest    = staticState.staticIntProperty(DelayBeforeIncrementalRequestProperty),            // static
+      delayBeforeAjaxTimeout           = getAjaxTimeout,                                                                  // global
+      internalShortDelay               = staticState.staticIntProperty(InternalShortDelayProperty),                       // static
+      delayBeforeDisplayLoading        = staticState.staticIntProperty(DelayBeforeDisplayLoadingProperty),                // static
+      delayBeforeUploadProgressRefresh = staticState.staticIntProperty(DelayBeforeUploadProgressRefreshProperty),         // static
+      helpHandler                      = helpHandler,                                                                     // dynamic
+      resourcesVersioned               = versionedResources,                                                              // dynamic
+      resourcesVersionNumber           = resourcesVersionOpt,                                                             // dynamic
+      helpTooltip                      = staticState.staticBooleanProperty(HelpTooltipProperty),                          // static
+      showErrorDialog                  = staticState.staticBooleanProperty(ShowErrorDialogProperty),                      // static
+      loginPageDetectionRegexp         = staticState.staticStringProperty(LoginPageDetectionRegexpProperty).trimAllToOpt, // static
+      retryDelayIncrement              = getRetryDelayIncrement,                                                          // global
+      retryMaxDelay                    = getRetryMaxDelay,                                                                // global
+      useAria                          = staticState.staticBooleanProperty(UseAriaProperty),                              // static
+      dateFormatInput                  = staticState.staticStringProperty(DateFormatInputProperty),                       // static
+      timeFormatInput                  = staticState.staticStringProperty(TimeFormatInputProperty),                       // static
     )
-
-    // combine all static and dynamic properties
-    val clientProperties = staticProperties ++ dynamicProperties ++ globalProperties
-
-    clientProperties.nonEmpty option {
-
-      val sb = new jl.StringBuilder
-
-      sb append "{"
-
-      for (((propertyName, propertyValue), index) <- clientProperties.toList.zipWithIndex) {
-
-        if (index != 0)
-          sb append ','
-
-        sb append '"'
-        sb append propertyName
-        sb append "\":"
-
-        propertyValue match {
-          case s: String =>
-            sb append '"'
-            sb append s
-            sb append '"'
-          case _ =>
-            sb append propertyValue.toString
-        }
-      }
-
-      sb append "}"
-
-      sb.toString
-    }
   }
 
   def buildJsonInitializationData(
@@ -233,8 +181,6 @@ object ScriptBuilder {
             observerId   = containingDocument.namespaceId(script.observerEffectiveId),
             paramValues  = script.paramValues
           ),
-      properties =
-        findConfigurationProperties(containingDocument, versionedResources, heartbeatDelay),
       messagesToRun =
         (containingDocument.getMessagesToRun collect { case Message(text, "modal") => text }).toList,
       dialogsToShow =
@@ -256,7 +202,9 @@ object ScriptBuilder {
             title   = "Non-fatal error",
             details = ServerError.errorsAsHtmlString(containingDocument.getServerErrors),
             formId  = containingDocument.getNamespacedFormId
-          )
+          ),
+      configuration =
+        findConfigurationProperties(containingDocument, versionedResources, heartbeatDelay),
     ).asJson.noSpaces
   }
 

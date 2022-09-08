@@ -300,40 +300,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        Property: function() {
-            var Property = function(name, defaultValue) {
-                this.name = name;
-                this.defaultValue = defaultValue;
-            };
-
-            Property.prototype.get = function() {
-                return _.isUndefined(opsXFormsProperties) || _.isUndefined(opsXFormsProperties[this.name])
-                    ? this.defaultValue : opsXFormsProperties[this.name];
-            };
-
-            return Property;
-        }(),
-
-        Properties: {
-            init: function() {
-                this.sessionHeartbeat                 = new ORBEON.util.Property("session-heartbeat", true);
-                this.sessionHeartbeatDelay            = new ORBEON.util.Property("session-heartbeat-delay", 12 * 60 * 60 * 800); // 80 % of 12 hours in ms
-                this.revisitHandling                  = new ORBEON.util.Property("revisit-handling", "restore");
-                this.delayBeforeIncrementalRequest    = new ORBEON.util.Property("delay-before-incremental-request", 500);
-                this.delayBeforeAjaxTimeout           = new ORBEON.util.Property("delay-before-ajax-timeout", 30000);
-                this.internalShortDelay               = new ORBEON.util.Property("internal-short-delay", 100);
-                this.delayBeforeDisplayLoading        = new ORBEON.util.Property("delay-before-display-loading", 0);
-                this.delayBeforeUploadProgressRefresh = new ORBEON.util.Property("delay-before-upload-progress-refresh", 2000);
-                this.helpHandler                      = new ORBEON.util.Property("help-handler", false);
-                this.helpTooltip                      = new ORBEON.util.Property("help-tooltip", false);
-                this.showErrorDialog                  = new ORBEON.util.Property("show-error-dialog", true);
-                this.loginPageDetectionRegexp         = new ORBEON.util.Property("login-page-detection-regexp", "");
-                this.retryDelayIncrement              = new ORBEON.util.Property("retry.delay-increment", 5000);
-                this.retryMaxDelay                    = new ORBEON.util.Property("retry.max-delay", 30000);
-                this.useARIA                          = new ORBEON.util.Property("use-aria", false);
-            }
-        },
-
         /**
          * Utility methods that don't in any other category
          */
@@ -2137,7 +2103,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 }
 
                 // Help tooltip
-                if (ORBEON.util.Properties.helpTooltip.get() && $(target).is('.xforms-help')) {
+                if (ORBEON.xforms.Page.getForm(ORBEON.xforms.Controls.getForm(target).id).helpTooltip() && $(target).is('.xforms-help')) {
                     // Get control
                     var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help");
                     if (control) {
@@ -2192,7 +2158,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // We test on `originalTarget` being on the help icon first, so in case the help icon is inside a
                 // trigger, we don't "mistake" the click on the help for a click on the trigger, rendering the help
                 // inaccessible through a click.
-                if (ORBEON.util.Properties.helpHandler.get()) {
+                if (ORBEON.xforms.Page.getForm(ORBEON.xforms.Controls.getForm(controlTarget).id).helpHandler()) {
                     // We are sending the xforms-help event to the server and the server will tell us what do to
                     var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, null, "xforms-help");
                     ORBEON.xforms.AjaxClient.fireEvent(event);
@@ -2707,7 +2673,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     fixedcenter: false,
                     constraintoviewport: true,
                     underlay: "none",
-                    usearia: ORBEON.util.Properties.useARIA.get(),
+                    usearia: ORBEON.xforms.Page.getForm(ORBEON.xforms.Controls.getForm(dialog).id).useARIA(),
                     role: "" // See bug 315634 http://goo.gl/54vzd
                 });
                 // Close the dialog when users click on document
@@ -2722,7 +2688,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     fixedcenter: false,
                     constraintoviewport: true,
                     underlay: "none", // Similarly, setting the underlay to "shadow" conflicts with the CSS used to limit the width and height of the dialog on IE6
-                    usearia: ORBEON.util.Properties.useARIA.get(),
+                    usearia: ORBEON.xforms.Page.getForm(ORBEON.xforms.Controls.getForm(dialog).id).useARIA(),
                     role: "" // See bug 315634 http://goo.gl/54vzd
                 });
             }

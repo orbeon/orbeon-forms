@@ -14,8 +14,8 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.TinyMce._
-import org.orbeon.xforms.facade.{Events, Properties, XBL, XBLCompanion}
-import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
+import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI, Page}
 import org.scalajs.dom
 import org.scalajs.dom.raw
 import org.scalajs.jquery.JQueryEventObject
@@ -63,7 +63,7 @@ object TinyMCE {
         val xformsValue = DocumentAPI.getValue(serverValueOutputId).get
         onInit(() => {
           // Send value to the server on blur
-          myEditor.on("blur", (_) => clientToServer())
+          myEditor.on("blur", _ => clientToServer())
           // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
           $(containerElem).find("a[accesskey]").detach()
           myEditor.setContent(xformsValue)
@@ -84,7 +84,7 @@ object TinyMCE {
           if ($(tinyMceDiv).is(":visible")) {
             myEditor.render()
           } else {
-            val shortDelay = Properties.internalShortDelay.get()
+            val shortDelay = Page.getFormFromElemOrThrow(containerElem).configuration.internalShortDelay
             js.timers.setTimeout(shortDelay)(renderIfVisible())
           }
         }

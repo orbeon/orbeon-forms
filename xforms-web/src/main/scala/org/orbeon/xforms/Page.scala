@@ -13,10 +13,12 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.xforms
+import org.orbeon.xforms.facade.Controls
 import org.scalajs.dom.html
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+
 
 @JSExportTopLevel("OrbeonPage")
 object Page {
@@ -46,6 +48,9 @@ object Page {
   @JSExport
   def getForm(namespacedFormId: String): Form =
     formsByNamespacedFormId.getOrElse(namespacedFormId, throw new IllegalArgumentException(s"form `$namespacedFormId` not found"))
+
+  def getFormFromElemOrThrow(elem: html.Element): xforms.Form =
+    getForm(Controls.getForm(elem).getOrElse(throw new IllegalStateException).id)
 
   // Handle the case where the id is already prefixed. As of 2019-01-09 this can be a problem only
   // for one caller of this API. Short namespaces are removed as of Orbeon Forms 2019.2 so the potential

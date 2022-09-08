@@ -15,18 +15,20 @@ package org.orbeon.xforms
 
 import cats.data.NonEmptyList
 import cats.syntax.option._
-import org.orbeon.xforms.facade.{AjaxServer, Properties}
+import org.orbeon.xforms.facade.AjaxServer
 import org.scalajs.dom
 import org.scalajs.dom.experimental._
-
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.xforms
 
 import scala.concurrent.{Future, Promise}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 case class UploadEvent(upload: Upload, file: dom.raw.File)
+
 
 // - Converted from JavaScript/CoffeeScript so as of 2017-03-09 is still fairly JavaScript-like.
 // - Other enhancements are listed here: https://github.com/orbeon/orbeon-forms/issues/3150
@@ -57,9 +59,9 @@ object UploaderClient {
   // the status of the upload. Initially, it is called by `UploadServer` when it sends the file. Then, it is called
   // by the upload control, when it receives a progress update, as we only want to ask for an updated progress after
   // we get an answer from the server.
-  def askForProgressUpdate(): Unit =
+  def askForProgressUpdate(currentForm: xforms.Form): Unit =
     // Keep asking for progress update at regular interval until there is no upload in progress
-    js.timers.setTimeout(Properties.delayBeforeUploadProgressRefresh.get()) {
+    js.timers.setTimeout(currentForm.configuration.delayBeforeUploadProgressRefresh) {
       currentEventOpt foreach { processingEvent =>
         AjaxClient.fireEvent(
           AjaxEvent(
@@ -68,7 +70,7 @@ object UploaderClient {
             showProgress = false
           )
         )
-        askForProgressUpdate()
+        askForProgressUpdate(currentForm)
       }
     }
 
@@ -120,6 +122,7 @@ object UploaderClient {
       val formData = extractFormData(currentEvent)
 
       val requestFormId = currentEvent.upload.getAncestorForm.id
+      val currentForm   = Page.getForm(requestFormId)
 
       currentEventOpt = currentEvent.some
       remainingEvents = events.tail
@@ -141,7 +144,7 @@ object UploaderClient {
 
       val responseF =
         Support.fetchText(
-          url         = Page.getForm(requestFormId).xformsServerUploadPath,
+          url         = currentForm.xformsServerUploadPath,
           requestBody = formData,
           contentType = None,
           acceptLang  = Language.getLang().some, // this language can be used for messages returned by a file scanner
@@ -149,7 +152,7 @@ object UploaderClient {
           abortSignal = controller.signal.some
         )
 
-      askForProgressUpdate()
+      askForProgressUpdate(currentForm)
 
       responseF.onComplete {
         case Success((_, _, Some(responseXml))) if Support.getLocalName(responseXml.documentElement) == "event-response" =>

@@ -37,11 +37,11 @@ case class Initializations(
   listeners                     : List[KeyListener],
   pollEvent                     : Option[PollEvent],
   userScripts                   : List[UserScript],
-  properties                    : Option[String], // later, structure this
   messagesToRun                 : List[String],
   dialogsToShow                 : List[Dialog],
   focusElementId                : Option[String],
-  errorsToShow                  : Option[Error]
+  errorsToShow                  : Option[Error],
+  configuration                 : ConfigurationProperties,
 )
 
 sealed trait WireAjaxEvent {
@@ -62,3 +62,25 @@ case class WireAjaxEventWithoutTarget(
   eventName  : String,
   properties : Map[String, String]
 ) extends WireAjaxEvent
+
+case class ConfigurationProperties(
+  sessionHeartbeat                : Boolean,
+  sessionHeartbeatDelay           : Long,
+  revisitHandling                 : String,
+  delayBeforeIncrementalRequest   : Int,
+  delayBeforeAjaxTimeout          : Long,
+  internalShortDelay              : Int,
+  delayBeforeDisplayLoading       : Int,
+  delayBeforeUploadProgressRefresh: Int,
+  helpHandler                     : Boolean,
+  helpTooltip                     : Boolean,
+  showErrorDialog                 : Boolean,
+  loginPageDetectionRegexp        : Option[String],
+  retryDelayIncrement             : Int,
+  retryMaxDelay                   : Int,
+  useAria                         : Boolean,
+  resourcesVersioned              : Boolean,
+  resourcesVersionNumber          : Option[String],
+  dateFormatInput                 : String,
+  timeFormatInput                 : String,
+)

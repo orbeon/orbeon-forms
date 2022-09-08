@@ -1033,7 +1033,6 @@ object XFormsStaticStateImpl {
       def staticStringProperty (name: String) : String           = staticProperties.staticStringProperty (name)
       def staticBooleanProperty(name: String) : Boolean          = staticProperties.staticBooleanProperty(name)
       def staticIntProperty    (name: String) : Int              = staticProperties.staticIntProperty    (name)
-      def clientNonDefaultProperties          : Map[String, Any] = staticProperties.clientNonDefaultProperties
       def allowedExternalEvents               : Set[String]      = staticProperties.allowedExternalEvents
 
       def uploadMaxSizeAggregateExpression        : Option[StaticXPath.CompiledExpression]      = dynamicProperties.uploadMaxSizeAggregateExpression

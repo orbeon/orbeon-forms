@@ -2,7 +2,7 @@ package org.orbeon.oxf.xforms
 
 import org.orbeon.datatypes.MaximumSize
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.XFormsProperties.{SupportedDocumentProperties, UploadMaxSizeAggregateProperty, UploadMaxSizeProperty}
+import org.orbeon.oxf.xforms.XFormsProperties.{UploadMaxSizeAggregateProperty, UploadMaxSizeProperty}
 import org.orbeon.oxf.xforms.{XFormsProperties => P}
 
 
@@ -40,12 +40,4 @@ abstract class XFormsStaticStateStaticPropertiesImpl(
   def staticStringProperty (name: String): String  = staticPropertyOrDefault(name: String).toString
   def staticBooleanProperty(name: String): Boolean = staticPropertyOrDefault(name: String).asInstanceOf[Boolean]
   def staticIntProperty    (name: String): Int     = staticPropertyOrDefault(name: String).asInstanceOf[Int]
-
-  // 2020-09-10: Used by `ScriptBuilder` only.
-  def clientNonDefaultProperties: Map[String, Any] =
-    for {
-      (propertyName, _) <- nonDefaultProperties
-      if SupportedDocumentProperties(propertyName).propagateToClient
-    } yield
-      propertyName -> staticProperty(propertyName)
 }

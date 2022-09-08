@@ -15,6 +15,7 @@ package org.orbeon.xforms
 
 import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.xforms.facade.XBLCompanion
+import org.orbeon.xforms.rpc.ConfigurationProperties
 import org.scalajs.dom
 import org.scalajs.dom.html
 
@@ -36,7 +37,8 @@ class Form(
   var repeatTreeChildToParent       : js.Dictionary[String],           // for JavaScript access
   var repeatTreeParentToAllChildren : js.Dictionary[js.Array[String]], // for JavaScript access
   val repeatIndexes                 : js.Dictionary[String],           // for JavaScript access
-  val xblInstances                  : js.Array[XBLCompanion]
+  val xblInstances                  : js.Array[XBLCompanion],
+  val configuration                 : ConfigurationProperties
 ) extends js.Object { // so that properties/methods can be accessed from JavaScript
 
   private var discardableTimerIds: List[SetTimeoutHandle] = Nil
@@ -79,4 +81,9 @@ class Form(
       id.substringAfter(ns)
     else
       id
+
+  // 2022-09-07: Keep `()` for JavaScript callers
+  def helpHandler(): Boolean = configuration.helpHandler
+  def helpTooltip(): Boolean = configuration.helpTooltip
+  def useARIA    (): Boolean = configuration.useAria
 }

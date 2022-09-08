@@ -24,7 +24,6 @@ object Globals {
   var maskDialogCloseEvents       : Boolean                   = _ // avoid catching a dialog close event received from the server, so we don't sent it back to the server
   var currentFocusControlId       : String                    = _ // id of the control that got the focus last
   var currentFocusControlElement  : js.Object                 = _ // element for the control that got the focus last
-  var tooltipLibraryInitialized   : Boolean                   = _
 
   var activeControl               : js.Object                 = _ // the currently active control, used to disable hint
   var dialogs                     : js.Dictionary[js.Dynamic] = _ // map for dialogs: id -> YUI dialog object
@@ -42,7 +41,6 @@ object Globals {
     maskDialogCloseEvents      = false
     currentFocusControlId      = null
     currentFocusControlElement = null
-    tooltipLibraryInitialized  = false
 
     activeControl              = null
     dialogs                    = js.Dictionary.empty

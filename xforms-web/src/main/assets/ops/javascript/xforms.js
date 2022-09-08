@@ -2177,7 +2177,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         orbeonLoadedEvent           : new YAHOO.util.CustomEvent("orbeonLoaded", window, false, YAHOO.util.CustomEvent.LIST, true),
         errorEvent                  : new YAHOO.util.CustomEvent("errorEvent"),
-        yuiCalendarCreated          : new YAHOO.util.CustomEvent("yuiCalendarCreated"),
         componentChangedLayoutEvent : new YAHOO.util.CustomEvent("componentChangedLayout")
     };
 

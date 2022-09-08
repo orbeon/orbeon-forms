@@ -13,6 +13,7 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.xforms
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom
 import org.scalajs.dom.raw.UIEvent
@@ -30,8 +31,8 @@ object AjaxFieldChangeTracker {
 
   import Private._
 
-  def initialize(): Unit =
-    GlobalEventListenerSupport.addListener(
+  def initialize(form: xforms.Form): Unit =
+    form.eventSupport.addListener(
       dom.document,
       "input",
       onInput _

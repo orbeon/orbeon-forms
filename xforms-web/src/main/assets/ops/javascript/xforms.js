@@ -2251,42 +2251,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        /**
-         * Called upon resizing.
-         */
-        _resize: function () {
-            // Move hidden tooltips to the top-left of the document to avoid having a useless scrollbar show up in
-            // case they are outside of the viewport.
-            var collections = [ORBEON.xforms.Globals.hintTooltipForControl, ORBEON.xforms.Globals.helpTooltipForControl, ORBEON.xforms.Globals.alertTooltipForControl];
-            for (var i = 0; i < 3; i++) {
-                var collection = collections[i];
-                for (var control in collection) {
-                    var tooltip = collection[control];
-                    if (tooltip != null) {
-                        if (YAHOO.lang.isObject(tooltip.element) && tooltip.element.style.visibility == "hidden") {
-                            tooltip.element.style.top = 0;
-                            tooltip.element.style.left = 0;
-                        }
-                    }
-                }
-            }
-        },
-
-        /**
-         * Called upon scrolling or resizing.
-         */
-        scrollOrResize: function () {
-            ORBEON.xforms.Events._resize();
-            // Adjust position of dialogs with "constraintoviewport" since YUI doesn't do it automatically
-            // NOTE: comment this one out for now, as that causes issues like unreachable buttons for large dialogs, and funny scrolling
-            //        for (var yuiDialogId in ORBEON.xforms.Globals.dialogs) {
-            //            var yuiDialog = ORBEON.xforms.Globals.dialogs[yuiDialogId];
-            //            if (yuiDialog.cfg.getProperty("visible") && yuiDialog.cfg.getProperty("constraintoviewport")) {
-            //                yuiDialog.cfg.setProperty("xy", yuiDialog.cfg.getProperty("xy"));
-            //            }
-            //        }
-        },
-
         sliderValueChange: function (offset) {
             // Notify server that value changed
             var rangeControl = document.getElementById(this.id).parentNode;

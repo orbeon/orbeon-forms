@@ -120,7 +120,6 @@ object Events extends js.Object {
   val mouseover                   : js.Function1[UIEvent, Unit]    = js.native
   val mouseout                    : js.Function1[UIEvent, Unit]    = js.native
   val click                       : js.Function1[UIEvent, Unit]    = js.native
-  val scrollOrResize              : js.Function                    = js.native
 
   def _findParentXFormsControl(t: dom.EventTarget): dom.Element = js.native // can return `null`
 }

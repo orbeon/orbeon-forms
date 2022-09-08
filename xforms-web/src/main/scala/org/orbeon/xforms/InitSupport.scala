@@ -192,7 +192,6 @@ object InitSupport {
 
     val pageContainsFormsMarkupPromise = Promise[Unit]()
 
-    private var topLevelListenerRegistered = false
     private var heartBeatInitialized       = false
     private var orbeonLoadedEventScheduled = false
 
@@ -263,46 +262,7 @@ object InitSupport {
 
       dispatchInitialServerEvents(initializations.pollEvent, formId)
 
-      // Register events that bubble on document for all browsers
-      // TODO: Move away from YUI even listeners.
-      if (! topLevelListenerRegistered) {
-
-        // We are using jQuery for `change` because the Select2 component, used for the dropdowns with search, dispatches that jQuery
-        // event, and if just using the DOM API our code handling `change` in `xforms.js` isn't being notified, and the value isn't
-        // updated on the server
-        $(dom.document).on           ("change",  Events.change)
-
-        // We are not using jQuery for `focusin` and `focusout` as jQuery registers its own listeners on `focus` and `blur`, maybe
-        // for compatibility with older browsers that didn't support `focusin` and `focusout`, and since they are different events,
-        // we're then unable stopping the propagation of those events
-
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusIn ,  Events.focus)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.FocusOut,  Events.blur)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyPress,  Events.keypress)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.KeyDown,   Events.keydown)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Input,     Events.input)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOver, Events.mouseover)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.MouseOut,  Events.mouseout)
-        GlobalEventListenerSupport.addJsListener(dom.document, DomEventNames.Click,     Events.click)
-
-        // We could do this on `pageshow` or `pagehide`
-        // https://github.com/orbeon/orbeon-forms/issues/4552
-        GlobalEventListenerSupport.addListener(dom.window,
-          "pagehide",
-          (ev: dom.raw.PageTransitionEvent) => {
-            if (ev.persisted)
-              Page.loadingIndicator().hideIfAlreadyVisible()
-          }
-        )
-
-        AjaxFieldChangeTracker.initialize()
-
-        // TODO: Get rid of this. What code uses it?
-        g.YAHOO.widget.Overlay.windowScrollEvent.subscribe(Events.scrollOrResize)
-        g.YAHOO.widget.Overlay.windowResizeEvent.subscribe(Events.scrollOrResize)
-
-        topLevelListenerRegistered = true
-      }
+      initializeFormEventListeners(newForm)
 
       // Putting this here due to possible Scala.js bug reporting a "applyDynamic does not support passing a vararg parameter"
       // 2020-11-26: Using Scala.js 1.0 way of detecting the global variable.
@@ -424,6 +384,37 @@ object InitSupport {
 
     def processRepeatIndexes(repeatIndexesString: String): Dictionary[String] =
       parseRepeatIndexes(repeatIndexesString).toMap.toJSDictionary
+
+    def initializeFormEventListeners(currentForm: xforms.Form): Unit = {
+      // We are using jQuery for `change` because the Select2 component, used for the dropdowns with search, dispatches that jQuery
+      // event, and if just using the DOM API our code handling `change` in `xforms.js` isn't being notified, and the value isn't
+      // updated on the server
+      currentForm.eventSupport.addJQueryListener(dom.document, DomEventNames.Change, Events.change)
+
+      // We are not using jQuery for `focusin` and `focusout` as jQuery registers its own listeners on `focus` and `blur`, maybe
+      // for compatibility with older browsers that didn't support `focusin` and `focusout`, and since they are different events,
+      // we're then unable stopping the propagation of those events
+      currentForm.eventSupport.addJsListener(dom.document, DomEventNames.FocusIn, Events.focus)
+      currentForm.eventSupport.addJsListener(dom.document, DomEventNames.FocusOut, Events.blur)
+      currentForm.eventSupport.addJsListener(dom.document, DomEventNames.KeyPress, Events.keypress)
+      currentForm.eventSupport.addJsListener(dom.document, DomEventNames.KeyDown, Events.keydown)
+      currentForm.eventSupport.addJsListener(dom.document, DomEventNames.Input, Events.input)
+      currentForm.eventSupport.addJsListener(dom.document, DomEventNames.MouseOver, Events.mouseover)
+      currentForm.eventSupport.addJsListener(dom.document, DomEventNames.MouseOut, Events.mouseout)
+      currentForm.eventSupport.addJsListener(dom.document, DomEventNames.Click, Events.click)
+
+      // We could do this on `pageshow` or `pagehide`
+      // https://github.com/orbeon/orbeon-forms/issues/4552
+      currentForm.eventSupport.addListener(dom.window,
+        DomEventNames.PageHide,
+        (ev: dom.raw.PageTransitionEvent) => {
+          if (ev.persisted)
+            Page.loadingIndicator().hideIfAlreadyVisible()
+        }
+      )
+
+      AjaxFieldChangeTracker.initialize(currentForm)
+    }
 
     def initializeJavaScriptControls(controls: List[rpc.Control]): Unit =
       controls foreach { case rpc.Control(id, valueOpt) =>

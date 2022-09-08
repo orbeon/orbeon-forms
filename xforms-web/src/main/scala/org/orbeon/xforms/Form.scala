@@ -47,6 +47,14 @@ class Form(
   val namespacedFormId: String = ns + Constants.FormClass
   val transform: (String, String) => String = InitSupport.getResponseTransform(contextAndNamespaceOpt)
 
+  val eventSupport: EventListenerSupport = new EventListenerSupport {}
+
+  def destroy(): Unit = {
+    eventSupport.clearAllListeners()
+    xblInstances.foreach(_.destroy())
+    xblInstances.clear()
+  }
+
   lazy val errorPanel: js.Object =
     ErrorPanel.initializeErrorPanel(elem) getOrElse
       (throw new IllegalStateException(s"missing error panel element for form `${elem.id}`"))

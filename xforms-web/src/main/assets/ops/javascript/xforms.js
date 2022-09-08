@@ -547,26 +547,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             },
 
             /**
-             * Check whether a region is completely visible (i.e. is fully inside the viewport).
-             * Note: this function is different than the function with the same name in YUI.
-             */
-            fitsInViewport: function(element) {
-
-                // Viewport coordinates
-                var viewportFirstTop = YAHOO.util.Dom.getDocumentScrollTop();
-                var viewportFirstLeft = YAHOO.util.Dom.getDocumentScrollLeft();
-                var viewportSecondTop = viewportFirstTop + YAHOO.util.Dom.getViewportHeight();
-                var viewportSecondLeft = viewportFirstLeft + YAHOO.util.Dom.getViewportWidth();
-                var viewportRegion = new YAHOO.util.Region(viewportFirstTop, viewportSecondLeft, viewportSecondTop, viewportFirstLeft);
-
-                // Element coordinates
-                var elementRegion = YAHOO.util.Dom.getRegion(element);
-
-                return viewportRegion.top <= elementRegion.top && viewportRegion.left <= elementRegion.left
-                    && elementRegion.bottom <= viewportRegion.bottom && elementRegion.right <= viewportRegion.right;
-            },
-
-            /**
              * Applies a function to all the elements of an array, and discards the value returned by the function, if any.
              */
             apply: function(array, fn, obj, overrideContext) {
@@ -614,118 +594,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     }
                 }
             }
-        },
-
-        /**
-         * Utility function to make testing with YUI Test easier.
-         */
-        Test: {
-            /**
-             * Tests that rely on instances having a certain value should start by callng this utility function
-             */
-            executeWithInitialInstance: function(testCase, testFunction) {
-                ORBEON.testing.executeCausingAjaxRequest(testCase, function() {
-                    ORBEON.xforms.Document.dispatchEvent("main-model", "restore-instance");
-                }, function() {
-                    testFunction.call(testCase);
-                });
-            },
-
-            /**
-             * Runs a first function as part of a YUI test case, waits for all Ajax requests (if any) that might ensue
-             * to terminate, then run a second function.
-             *
-             * This doesn't use the ajaxResponseProcessedEvent, because we want this to work in cases where we have zero
-             * or more than one Ajax requests.
-             */
-            executeCausingAjaxRequest: function(testCase, causingAjaxRequestFunction, afterAjaxResponseFunction) {
-
-                function checkAjaxReceived() {
-                    if (ORBEON.xforms.AjaxClient.hasEventsToProcess()) {
-                        // Wait another 100 ms
-                        setTimeout(checkAjaxReceived, 100);
-                    } else {
-                        // We done with Ajax requests, continue with the test
-                        testCase.resume(function() {
-                            afterAjaxResponseFunction.call(testCase);
-                        });
-                    }
-                }
-
-                causingAjaxRequestFunction.call(testCase);
-                setTimeout(checkAjaxReceived, 100);
-                testCase.wait(20000);
-            },
-
-            /**
-             * Similar to executeCausingAjaxRequest
-             */
-            executeSequenceCausingAjaxRequest: function(testCase, tests) {
-                if (tests.length > 0) {
-                    var testTuple = tests.shift();
-                    ORBEON.util.Test.executeCausingAjaxRequest(testCase, function() {
-                        testTuple[0].call(testCase);
-                    }, function() {
-                        if (testTuple[1]) testTuple[1].call(testCase);
-                        ORBEON.util.Test.executeSequenceCausingAjaxRequest(testCase, tests);
-                    });
-                }
-            },
-
-            /**
-             * Take a sequence a function, and returns a function(testCase, next). If a function in the sequence
-             * invokes and XHR, then the following function will only run when that XHR finished.
-             */
-            runMayCauseXHR: function(/* testCase, continuations...*/) {
-                var testCase = arguments[0];
-                var continuations = Array.prototype.slice.call(arguments, 1);
-                if (continuations.length > 0) {
-                    var continuation = continuations.shift();
-                    ORBEON.util.Test.executeCausingAjaxRequest(testCase, function() {
-                        continuation.call(testCase);
-                    }, function() {
-                        ORBEON.util.Test.runMayCauseXHR.apply(null, [testCase].concat(continuations));
-                    });
-                }
-            },
-
-            /**
-             * Function to be call in every test to start the test when the page is loaded.
-             *
-             * You can pass one optional argument: the name of a test function (say 'testSomething'). If this argument is present, then
-             * only this specific test will be run. This is useful when debugging test, replacing the call to Test.onOrbeonLoadedRunTest()
-             * by a call to Test.onOrbeonLoadedRunTest('testSomething') to only run testSomething().
-             */
-            onOrbeonLoadedRunTest: function(onlyFunctionName) {
-                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-                    if (parent && parent.TestManager) {
-                        parent.TestManager.load();
-                    } else {
-                        if (! _.isUndefined(onlyFunctionName)) {
-                            _.each(YAHOO.tool.TestRunner.masterSuite.items, function(testCase) {
-                                _.each(_.functions(testCase), function(functionName) {
-                                    if (functionName.indexOf('test') == 0 && functionName != onlyFunctionName)
-                                        delete testCase[functionName];
-                                })
-                            });
-                        }
-                        new YAHOO.tool.TestLogger();
-                        YAHOO.tool.TestRunner.run();
-                    }
-                });
-            },
-
-            /**
-             * Simulate the user clicking on a button.
-             *
-             * @param id    Button id.
-             * @return {void}
-             */
-            click: function(id) {
-                var element = ORBEON.util.Dom.get(id);
-                var button = element.tagName.toLowerCase() == "button" ? element : ORBEON.util.Dom.getElementByTagName(element, "button");
-                button.click();
-            }
         }
     };
 })();
@@ -740,17 +608,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
     ORBEON.xforms.Controls = {
 
         // Returns MIP for a given control
-        isRelevant: function (control) {
-            return ! $(control).is('.xforms-disabled');
-        },
         isReadonly: function (control) {
             return $(control).is('.xforms-readonly');
-        },
-        isRequired: function (control) {
-            return $(control).is('.xforms-required');
-        },
-        isValid: function (control) {
-            return ! $(control).is('.xforms-invalid');
         },
 
         getForm: function (control) {
@@ -2554,6 +2413,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         },
 
         // 2016-03-20: Called from xbl.xsl
+        // 2022-09-07: Only used by the legacy autocomplete.xbl
         callValueChanged: function (prefix, component, target, property) {
             var partial = YAHOO.xbl;
             if (partial == null) return;

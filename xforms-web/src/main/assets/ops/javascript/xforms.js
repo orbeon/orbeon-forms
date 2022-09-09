@@ -614,7 +614,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         getForm: function (control) {
             // If the control is not an HTML form control look for an ancestor which is a form
-            if (typeof control.form == "undefined") {
+            if (_.isUndefined(control.form) || control.form == null) {
                 return $(control).closest('form')[0];
             } else {
                 // We have directly a form control

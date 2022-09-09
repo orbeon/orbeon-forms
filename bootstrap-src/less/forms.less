@@ -119,17 +119,12 @@ input[type="color"],
 .uneditable-input {
   background-color: @inputBackground;
   border: 1px solid @inputBorder;
-  //.box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
   transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-  //.transition(~"border linear .2s, box-shadow linear .2s");
 
-  // Focus state
   &:focus {
     border-color: #80bdff;
-    //border-color: rgba(82,168,236,.8); // #80bdff
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-    //.box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6)"); //
   }
 }
 

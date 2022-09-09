@@ -21,9 +21,11 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
+import org.orbeon.xforms.Namespaces.XXF
 import org.orbeon.xforms.{Constants, XFormsNames}
 
 import java.{lang => jl}
+import scala.collection.compat._
 import scala.collection.mutable.ListBuffer
 
 
@@ -79,6 +81,11 @@ object XFormsStaticElementValue {
   ): (Either[XPathExpressionString, String], Boolean) = {
 
     val outerIsHTML = LHHAAnalysis.isHTML(outerElem)
+
+    // https://github.com/orbeon/orbeon-forms/issues/5428
+    val xxfPrefix =
+      outerElem.prefixesForNamespaceUri(XXF).nextOption()
+        .getOrElse(throw new IllegalArgumentException(s"missing mapping for `$XXF`"))
 
     // Compute `containsHTML` in a separate pass
     val containsHtml = {
@@ -168,7 +175,7 @@ object XFormsStaticElementValue {
                   literalBuilder.append("=\"")
 
                   if (XMLUtils.maybeAVT(currentAttributeValue)) {
-                    addExpr(s"""xxf:evaluate-avt('${currentAttributeValue.replace("'", "''")}')""", isHtml = true)
+                    addExpr(s"""$xxfPrefix:evaluate-avt('${currentAttributeValue.replace("'", "''")}')""", isHtml = true)
                   } else if (currentAttributeName == "id") {
                     // This is an id, prefix if needed, but also add suffix
                     // https://github.com/orbeon/orbeon-forms/issues/4782
@@ -180,7 +187,7 @@ object XFormsStaticElementValue {
                     // https://github.com/orbeon/orbeon-forms/issues/4782
                     if (isWithinRepeat) {
                       literalBuilder.append(Constants.RepeatSeparatorString)
-                      addExpr(s"""string-join(for $$p in xxf:repeat-positions() return string($$p), '${Constants.RepeatIndexSeparatorString}')""", isHtml = true)
+                      addExpr(s"""string-join(for $$p in $xxfPrefix:repeat-positions() return string($$p), '${Constants.RepeatIndexSeparatorString}')""", isHtml = true)
                     }
                   } else {
                     literalBuilder.append(currentAttributeValue.escapeXmlForAttribute)

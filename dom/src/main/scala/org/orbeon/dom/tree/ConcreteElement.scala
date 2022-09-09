@@ -737,6 +737,9 @@ class ConcreteElement(var qname: QName)
           None
     }
 
+  def prefixesForNamespaceUri(uri: String): Iterator[String] =
+    new Element.ancestorOrSelfElementIt(this) flatMap (_.declaredNamespacesIterator) collect { case ns if ns.uri == uri => ns.prefix }
+
   def add(element: Element)    : Unit    = addNode(element)
   def remove(element: Element) : Boolean = removeNode(element)
 

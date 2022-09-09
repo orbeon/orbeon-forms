@@ -1,3 +1,4 @@
+<?xml version="1.1" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -1638,4 +1639,41 @@
         </output>
     </test>
 
+    <test description="#5428: &quot;Prefix `xxf` has not been declared&quot; with AVT and non-default namespace mapping" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <!-- Note the namespace undeclaration below with `xmlns:xxf=""`. We use this to be sure that there is no `xxf`
+             prefix in scope. This requires us to enable XML 1.1 parsing at the top of this file. -->
+        <input name="document">
+            <xh:html
+                xmlns:xxf=""
+                xmlns:xforms="http://www.w3.org/2002/xforms"
+                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xforms:model id="main-model"/>
+                </xh:head>
+                <xh:body>
+                    <xh:div>
+                        <xxforms:var name="icon" value="'https://placekitten.com/g/100/100'"/>
+                        <xforms:trigger appearance="minimal" id="my-trigger">
+                            <xforms:label>
+                                <xh:img src="{$icon}" alt="press" />
+                            </xforms:label>
+                        </xforms:trigger>
+                    </xh:div>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+               <xxf:dynamic-state>
+                   <dynamic-state/>
+               </xxf:dynamic-state>
+               <xxf:action>
+                   <xxf:control-values>
+                       <xxf:control id="my-trigger" label="&lt;img alt=&quot;press&quot; src=&quot;https://placekitten.com/g/100/100&quot;&gt; "/>
+                   </xxf:control-values>
+               </xxf:action>
+           </xxf:event-response>
+        </output>
+    </test>
 </group>

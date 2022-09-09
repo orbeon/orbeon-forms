@@ -12,20 +12,39 @@
 
 @import (reference) "../../../../../../../../bootstrap-src/less/variables";
 @import (reference) "../../../../../../../../bootstrap-src/less/mixins";
+@import (reference)  "../../../apps/fr/style/form-runner-common";
 
 .xbl-fr-tinymce {
     .xforms-readonly {
+        .xbl-fr-tinymce-div {
+            background-color: darken(@inputBackground, 5%);
+            cursor: not-allowed;
+        }
+        // 2022-09-08: These don't work anymore in `inline` mode as the TOC is placed under `<body>`.
         .tox-editor-header {
             display: none;              // Hide the toolbar when readonly
         }
     }
     .xbl-fr-tinymce-div {
         min-width: 1px;                 // So we can use jQuery's :visible selector
-    }
-    .mce-container {
-        .box-shadow(none);
+        min-height: @textareaHeight;
+        box-sizing: border-box;
+        padding: 4px 6px;
+
+        border: 1px solid @inputBorder;
+        box-shadow: none;   
+
+        border-radius: @inputBorderRadius;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+
+        &:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
     }
 
+    // 2022-09-08: These don't work anymore in `inline` mode as the TOC is placed under `<body>`.
     .tox .tox-tbtn {
         height: 25px;                   // Make icons smaller
         margin: 3px 0 3px 0;            // Default margin isn't the same on top and bottom
@@ -36,5 +55,24 @@
 
     .tox-tinymce {
         border-radius: 4px;             // Slightly rounded border, like we do for other controls
+    }
+}
+
+body {
+    .tox-tinymce-inline {
+        .tox-tbtn {
+            height: 25px;                   // Make icons smaller
+            margin: 3px 0 3px 0;            // Default margin isn't the same on top and bottom
+        }
+
+        .tox-toolbar__primary {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+
+        .tox-editor-header {
+            border: none;
+        }
     }
 }

@@ -47,13 +47,14 @@ object ControlLabelHintTextEditor {
     def clickOrFocus(event: dom.Event): Unit = {
       val target = $(event.target)
       val eventOnEditor        = target.closest(".fb-label-editor").is("*")
-      val eventOnMceFloatPanel = target.closest(".tox-dialog" ).is("*")
+      val eventOnMceDialog     = target.closest(".tox-dialog" ).is("*")
+      val eventOnMceToolbar    = target.closest(".tox-tinymce" ).is("*")
       val eventOnControlLabel  =
           // Click on label or element inside label
           (target.is(LabelHintSelector) || target.parents(LabelHintSelector).is("*")) &&
           // Only interested in labels in the "editor" portion of FB
           target.parents(".fb-main").is("*")
-      if (! (eventOnEditor || eventOnMceFloatPanel || eventOnControlLabel))
+      if (! (eventOnEditor || eventOnMceDialog || eventOnMceToolbar || eventOnControlLabel))
         resourceEditorEndEdit()
     }
 
@@ -235,7 +236,7 @@ object ControlLabelHintTextEditor {
 
       def makeSpaceForMCE(): Unit = {
         // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
-        val mceHeight = $(tinyMceObject.editorContainer).height()
+        val mceHeight = tinymceAnchor.height()
         resourceEditorCurrentLabelHint.height(mceHeight)
       }
 
@@ -269,22 +270,15 @@ object ControlLabelHintTextEditor {
 
         tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, tinyMceConfig, GlobalTinyMce.EditorManager)
         tinyMceObject.render()
-        afterTinyMCEInitialized(() => {
-          // We don't need the anchor anymore; just used to tell TinyMCE where to go in the DOM
-          tinymceAnchor.detach()
+
+        afterTinyMCEInitialized(() =>
           $(tinyMceObject.getWin()).on("resize", makeSpaceForMCE _)
-        })
+        )
       })
 
       // Set width of TinyMCE to the width of the container
-      // - If not yet initialized, set width on anchor, which is copied by TinyMCE to table
-      // - If already initialized, set width directly on table created by TinyMCE
-      // (Hacky, but didn't find a better way to do it)
-      def setTinyMCEWidth(): Unit = {
-        if (tinyMceObject ne null) {
-          $(tinyMceObject.container).width(container.outerWidth())
-        }
-      }
+      def setTinyMCEWidth(): Unit =
+        $(tinymceAnchor).width(container.outerWidth())
 
       def getValue: String =
         if (labelOrHintOrText == "text") {
@@ -314,7 +308,8 @@ object ControlLabelHintTextEditor {
       def startEdit(): Unit = {
         textfield.hide()
         checkbox.hide()
-        if (tinyMceObject ne null) tinyMceObject.hide()
+        if (tinyMceObject ne null)
+          tinyMceObject.hide()
         if (labelOrHintOrText == "text") {
           initTinyMCE()
           afterTinyMCEInitialized(() => {

@@ -21,6 +21,7 @@ import org.scalajs.dom.html
 import org.scalajs.dom.raw
 import org.scalajs.jquery.{JQueryEventObject, JQueryPromise}
 
+
 import scala.scalajs.js
 import scala.scalajs.js.{Promise, UndefOr, |}
 
@@ -57,7 +58,6 @@ object TinyMCE {
         tinyMceConfig.content_css = GlobalTinyMce.baseURL + "/../../content.css"
 
         val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
-        val tabindex = tinyMceDiv.getAttribute("tabindex")
         myEditor = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
 
         val isReadonly = containerElem.classList.contains("xforms-readonly")
@@ -69,12 +69,6 @@ object TinyMCE {
           myEditor.on("blur", _ => clientToServer())
           // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
           $(containerElem).find("a[accesskey]").detach()
-          val iframe = $(containerElem).find("iframe")
-          // On click inside the iframe, propagate the click outside, so code listening on click on an ancestor gets called
-          iframe.contents().on("click", (_: JQueryEventObject) => containerElem.click())
-          $(iframe.get(0).asInstanceOf[raw.HTMLIFrameElement].contentWindow).on("focus", onFocus _)
-          // Copy the tabindex on the iframe
-          if (tabindex != null && tabindex != "") iframe.attr("tabindex", tabindex)
           tinymceInitialized = true
           Events.componentChangedLayoutEvent.fire()
         })

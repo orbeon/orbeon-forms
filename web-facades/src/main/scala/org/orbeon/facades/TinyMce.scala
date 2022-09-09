@@ -47,9 +47,6 @@ object TinyMce {
     config        : TinyMceConfig,
     editorManager : TinyMceEditorManager
   ) extends js.Object {
-    val initialized: js.UndefOr[Boolean] = js.native
-    val editorContainer: dom.Element = js.native
-    val container: dom.Element = js.native
     def on(name: String, callback: js.Function1[TinyMceEditor, Unit]): Unit = js.native
     def render(): Unit = js.native
     def getWin(): dom.Window = js.native
@@ -63,18 +60,13 @@ object TinyMce {
     def setMode(mode: String): Unit = js.native
   }
 
-  @js.native
-  trait TinyMceEvent extends js.Object {
-    def add(f: js.Function1[TinyMceEditor, Unit]): Unit
-  }
-
   trait TinyMceConfig extends js.Object {
-    var mode                     : js.UndefOr[String]  = js.undefined
+    var inline                   : js.UndefOr[Boolean]  = js.undefined
     var language                 : js.UndefOr[String]  = js.undefined
     var statusbar                : js.UndefOr[Boolean] = js.undefined
     var menubar                  : js.UndefOr[Boolean] = js.undefined
     var toolbar                  : js.UndefOr[String]  = js.undefined
-    var gecko_spellcheck         : js.UndefOr[Boolean] = js.undefined
+    var browser_spellcheck       : js.UndefOr[Boolean] = js.undefined
     var doctype                  : js.UndefOr[String]  = js.undefined
     var encoding                 : js.UndefOr[String]  = js.undefined
     var entity_encoding          : js.UndefOr[String]  = js.undefined
@@ -82,7 +74,6 @@ object TinyMce {
     var verify_html              : js.UndefOr[Boolean] = js.undefined
     var visual_table_class       : js.UndefOr[String]  = js.undefined
     var skin                     : js.UndefOr[Boolean] = js.undefined
-    var content_style            : js.UndefOr[String]  = js.undefined
     var content_css              : js.UndefOr[String]  = js.undefined
     var plugins                  : js.UndefOr[String]  = js.undefined
     var autoresize_min_height    : js.UndefOr[Double]  = js.undefined
@@ -92,13 +83,13 @@ object TinyMce {
   }
 
   object TinyMceDefaultConfig extends TinyMceConfig {
-    mode               = "exact"
+    inline             = true
     language           = "en"
     statusbar          = false
     menubar            = false
     plugins            = "lists link"
     toolbar            = "bold italic | bullist numlist outdent indent | link"
-    gecko_spellcheck   = true
+    browser_spellcheck = true
     doctype            = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
     encoding           = "xml"
     entity_encoding    = "raw"

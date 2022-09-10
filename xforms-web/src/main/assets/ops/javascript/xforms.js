@@ -612,6 +612,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             return $(control).is('.xforms-readonly');
         },
 
+        // 2022-09-10: 3 usages left from JavaScript, other usages in Scala
         getForm: function (control) {
             // If the control is not an HTML form control look for an ancestor which is a form
             if (_.isUndefined(control.form) || control.form == null) {
@@ -1962,7 +1963,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 }
 
                 // Help tooltip
-                if (ORBEON.xforms.Page.getForm(ORBEON.xforms.Controls.getForm(target).id).helpTooltip() && $(target).is('.xforms-help')) {
+                if (ORBEON.xforms.Page.getFormFromElemOrThrow(target).helpTooltip() && $(target).is('.xforms-help')) {
                     // Get control
                     var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help");
                     if (control) {
@@ -2017,7 +2018,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // We test on `originalTarget` being on the help icon first, so in case the help icon is inside a
                 // trigger, we don't "mistake" the click on the help for a click on the trigger, rendering the help
                 // inaccessible through a click.
-                if (ORBEON.xforms.Page.getForm(ORBEON.xforms.Controls.getForm(controlTarget).id).helpHandler()) {
+                if (ORBEON.xforms.Page.getFormFromElemOrThrow(controlTarget).helpHandler()) {
                     // We are sending the xforms-help event to the server and the server will tell us what do to
                     var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, null, "xforms-help");
                     ORBEON.xforms.AjaxClient.fireEvent(event);
@@ -2397,8 +2398,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         instance = new xblClass(container);
                         instance.xblClass = xblClass;
                         instance.container = container;
-                        var formId = ORBEON.xforms.Controls.getForm(instance.container).id;
-                        var form   = ORBEON.xforms.Page.getForm(formId);
+                        var form = ORBEON.xforms.Page.getFormFromElemOrThrow(instance.container);
                         form.xblInstances.push(instance);
                         if (hasInit) {
                             instance.initialized = false;
@@ -2480,7 +2480,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     fixedcenter: false,
                     constraintoviewport: true,
                     underlay: "none",
-                    usearia: ORBEON.xforms.Page.getForm(ORBEON.xforms.Controls.getForm(dialog).id).useARIA(),
+                    usearia: ORBEON.xforms.Page.getFormFromElemOrThrow(dialog).useARIA(),
                     role: "" // See bug 315634 http://goo.gl/54vzd
                 });
                 // Close the dialog when users click on document
@@ -2495,7 +2495,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     fixedcenter: false,
                     constraintoviewport: true,
                     underlay: "none", // Similarly, setting the underlay to "shadow" conflicts with the CSS used to limit the width and height of the dialog on IE6
-                    usearia: ORBEON.xforms.Page.getForm(ORBEON.xforms.Controls.getForm(dialog).id).useARIA(),
+                    usearia: ORBEON.xforms.Page.getFormFromElemOrThrow(dialog).useARIA(),
                     role: "" // See bug 315634 http://goo.gl/54vzd
                 });
             }

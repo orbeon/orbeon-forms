@@ -49,6 +49,7 @@ object Page {
   def getForm(namespacedFormId: String): Form =
     formsByNamespacedFormId.getOrElse(namespacedFormId, throw new IllegalArgumentException(s"form `$namespacedFormId` not found"))
 
+  @JSExport
   def getFormFromElemOrThrow(elem: html.Element): xforms.Form =
     getForm(Controls.getForm(elem).getOrElse(throw new IllegalStateException).id)
 

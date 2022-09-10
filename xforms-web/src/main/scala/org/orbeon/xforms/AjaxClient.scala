@@ -20,6 +20,7 @@ import org.orbeon.liferay.LiferaySupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
 import org.orbeon.xforms.facade.{AjaxServer, Events}
 import org.scalajs.dom
@@ -344,7 +345,7 @@ object AjaxClient {
 
     def handleResponse(
       responseXML        : dom.Document,
-      formId             : String,
+      currentForm        : xforms.Form,
       requestSequenceOpt : Option[Int],
       showProgress       : Boolean,
       ignoreErrors       : Boolean
@@ -360,15 +361,15 @@ object AjaxClient {
       callbackF(ajaxResponseReceived, forCurrentEventQueue = false, "handleResponseDom") foreach { details =>
 
         requestSequenceOpt foreach { requestSequence =>
-          StateHandling.updateSequence(formId, requestSequence + 1)
+          StateHandling.updateSequence(currentForm.namespacedFormId, requestSequence + 1)
         }
 
         logger.debug("before `handleResponseDom`")
-        AjaxServer.handleResponseDom(responseXML, formId, ignoreErrors)
+        AjaxServer.handleResponseDom(responseXML, currentForm.namespacedFormId, ignoreErrors)
         logger.debug("after `handleResponseDom`")
 
         // Reset changes, as changes are included in this batch of events
-        AjaxFieldChangeTracker.afterResponseProcessed()
+        currentForm.ajaxFieldChangeTracker.afterResponseProcessed()
         ServerValueStore.purgeExpired()
 
         // `require(EventQueue.ajaxRequestInProgress == false)`
@@ -383,7 +384,7 @@ object AjaxClient {
       }
 
       // And then we fire the callback, which triggers both direct callbacks and `Future`s
-      ajaxResponseReceived.fire(new AjaxResponseDetails(responseXML, formId))
+      ajaxResponseReceived.fire(new AjaxResponseDetails(responseXML, currentForm.namespacedFormId))
     }
 
     def findEventsToProcess(originalEvents: NonEmptyList[AjaxEvent]): Option[(html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent])] = {
@@ -455,9 +456,11 @@ object AjaxClient {
 
     def processEvents(currentHtmlForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
 
-      val eventsAsList = events.toList
+      val eventsAsList  = events.toList
+      val currentFormId = currentHtmlForm.id
+      val currentForm   = Page.getForm(currentFormId)
 
-      AjaxFieldChangeTracker.beforeRequestSent(eventsAsList)
+      currentForm.ajaxFieldChangeTracker.beforeRequestSent(eventsAsList)
 
       eventsAsList foreach { event =>
 
@@ -494,9 +497,6 @@ object AjaxClient {
         }
       }
 
-      val currentFormId = currentHtmlForm.id
-      val currentForm   = Page.getForm(currentFormId)
-
       val foundEventOtherThanHeartBeat = events exists (_.eventName != EventNames.XXFormsSessionHeartbeat)
       val showProgress                 = events exists (_.showProgress)
 
@@ -532,7 +532,7 @@ object AjaxClient {
       ) foreach { responseXml =>
         handleResponse(
           responseXml,
-          currentFormId,
+          currentForm,
           sequenceNumberOpt,
           showProgress,
           ignoreErrors

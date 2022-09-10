@@ -48,6 +48,7 @@ class Form(
   val transform: (String, String) => String = InitSupport.getResponseTransform(contextAndNamespaceOpt)
 
   val eventSupport: EventListenerSupport = new EventListenerSupport {}
+  val ajaxFieldChangeTracker: AjaxFieldChangeTracker = new AjaxFieldChangeTracker
 
   def destroy(): Unit = {
     eventSupport.clearAllListeners()

@@ -752,7 +752,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         ORBEON.util.Dom.setStringValue(output[0], newControlValue);
                     }
                 }
-            } else if ((_.isUndefined(force) || force == false) && ORBEON.xforms.AjaxFieldChangeTracker.hasChangedIdsRequest(control.id)) {
+            } else if ((_.isUndefined(force) || force == false) && ORBEON.xforms.AjaxFieldChangeTracker.hasChangedIdsRequest(control)) {
                 // User has modified the value of this control since we sent our request so don't try to update it
                 // 2017-03-29: Added `force` attribute to handle https://github.com/orbeon/orbeon-forms/issues/3130 as we
                 // weren't sure we wanted to fully disable the test on `changedIdsRequest`.

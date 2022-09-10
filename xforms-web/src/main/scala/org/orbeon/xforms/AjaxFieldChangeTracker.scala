@@ -13,6 +13,7 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom
 import org.scalajs.dom.html
@@ -32,7 +33,7 @@ object AjaxFieldChangeTracker {
   def initialize(): Unit =
     GlobalEventListenerSupport.addListener(
       dom.document,
-      "input",
+      DomEventNames.Input,
       // "The `input` event fires when the value of an `<input>`, `<select>`, or `<textarea>` element has
       // been changed. [...] The `input` event is fired every time the value of the element changes. This
       // is unlike the change event, which only fires when the value is committed, such as by pressing the

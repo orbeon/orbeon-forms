@@ -31,8 +31,8 @@ object AjaxFieldChangeTracker {
 
   import Private._
 
-  def initialize(form: xforms.Form): Unit =
-    form.eventSupport.addListener(
+  def initialize(): Unit =
+    GlobalEventListenerSupport.addListener(
       dom.document,
       "input",
       onInput _

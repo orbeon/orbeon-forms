@@ -390,7 +390,7 @@ object AjaxClient {
 
       // Ignore events for form that are no longer part of the document
       def eventsForFormsInDocument(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
-        NonEmptyList.fromList(events.filter(event => dom.document.body.contains(event.form))) // IE11 doesn't support `document.contains`
+        NonEmptyList.fromList(events.filter(event => dom.document.contains(event.form)))
 
       // Coalesce value events for a given `targetId`, but only between boundaries of other events. We used to do this, more
       // or less, between those boundaries, but also including `XXFormsUploadProgress`, and allowing interleaving of `targetId`

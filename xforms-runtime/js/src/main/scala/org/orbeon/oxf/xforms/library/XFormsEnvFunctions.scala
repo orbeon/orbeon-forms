@@ -17,7 +17,7 @@ import cats.syntax.option._
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
 import org.orbeon.oxf.xforms.function.XFormsFunction.relevantControl

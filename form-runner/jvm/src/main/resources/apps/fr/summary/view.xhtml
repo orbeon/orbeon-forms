@@ -1262,8 +1262,7 @@
             </fr:row>
 
             <fr:buttons>
-                <div class="pagination pagination-left">
-                    <ul>
+                <ul class="pagination pagination-left">
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
                             <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first">
                                 <!-- https://github.com/orbeon/orbeon-forms/issues/1042 -->
@@ -1329,7 +1328,6 @@
                             </xf:trigger>
                         </li>
                     </ul>
-                </div>
 
                 <xf:group model="fr-form-model" class="fr-buttons">
 

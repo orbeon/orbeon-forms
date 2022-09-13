@@ -48,9 +48,10 @@ private class DateCompanion extends XBLCompanionWithState {
   val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
   val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
 
-  def inputEl    : JQuery     = $(containerElem).find("input").first()
-  def iOS        : Boolean    = dom.document.body.classList.contains(XFormsIosClass)
-  var datePicker : DatePicker = _
+  def inputJQueryEl : JQuery         = $(containerElem).find("input").first()
+  def inputHtmlEl   : dom.html.Input = inputJQueryEl(0).asInstanceOf[dom.html.Input]
+  def iOS           : Boolean        = dom.document.body.classList.contains(XFormsIosClass)
+  var datePicker    : DatePicker     = _
 
   override def init(): Unit = {
 
@@ -63,16 +64,12 @@ private class DateCompanion extends XBLCompanionWithState {
     if (iOS) {
 
       // On iOS, use native date picker
-      inputEl.attr("type", "date")
-      EventSupport.addListener(inputEl(0), DomEventNames.Change, (_: dom.raw.Event) => onDateSelectedUpdateStateAndSendValueToServer())
+      inputJQueryEl.attr("type", "date")
+      EventSupport.addListener(inputHtmlEl, DomEventNames.Change, (_: dom.raw.Event) => onDateSelectedUpdateStateAndSendValueToServer())
 
-      // Get around iOS bug where a touch shows the date picker even when the input is marked as readonly
-      EventSupport.addListener(inputEl(0), DomEventNames.TouchStart, (event: dom.raw.Event) => {
-        val targetInput = event.target.asInstanceOf[dom.html.Input]
-        val isReadonly  = targetInput.readOnly
-        if (isReadonly)
-          event.preventDefault()
-      })
+      // Also set `disabled` on iOS (see #5376)
+      if (inputHtmlEl.readOnly)
+        inputHtmlEl.disabled = true
 
     } else {
       createDatePicker(dateExternalValue = None)
@@ -100,7 +97,7 @@ private class DateCompanion extends XBLCompanionWithState {
 
     if (iOS) {
       if (! (previousStateOpt map (_.value) contains newValue))
-        inputEl.prop("value", newValue)
+        inputJQueryEl.prop("value", newValue)
     } else {
       if (! previousStateOpt.contains(newState)) {
         destroy()
@@ -144,19 +141,19 @@ private class DateCompanion extends XBLCompanionWithState {
       opts
     }
 
-    datePicker = inputEl.parent().datepicker(options)
+    datePicker = inputJQueryEl.parent().datepicker(options)
 
     // Register listeners
 
     // DOM listeners
     EventSupport.addListener(containerElem.querySelector(".add-on"), DomEventNames.KeyDown,  onIconKeypress)
-    EventSupport.addListener(inputEl(0),                             DomEventNames.KeyPress, onInputKeypress)
-    EventSupport.addListener(inputEl(0),                             DomEventNames.Change,   onInputChangeUpdateDatePicker)
+    EventSupport.addListener(inputJQueryEl(0),                             DomEventNames.KeyPress, onInputKeypress)
+    EventSupport.addListener(inputJQueryEl(0),                             DomEventNames.Change,   onInputChangeUpdateDatePicker)
 
     // Date picker listeners
     enableDatePickerChangeListener()
-    datePicker.onHide(              ()                     => { inputEl.focus() }) // Set focus back on field when done with the picker
-    datePicker.onShow(              ()                     => { inputEl.focus() }) // For date picker to be usable with the keyboard
+    datePicker.onHide(              ()                     => { inputJQueryEl.focus() }) // Set focus back on field when done with the picker
+    datePicker.onShow(              ()                     => { inputJQueryEl.focus() }) // For date picker to be usable with the keyboard
 
     // Global language listener
     Language.onLangChange(
@@ -193,7 +190,7 @@ private class DateCompanion extends XBLCompanionWithState {
               // I think we need a better date picker.
               disableDatePickerChangeListener()
               datePicker.clearDates()
-              inputEl.prop("value", newValue)
+              inputJQueryEl.prop("value", newValue)
               enableDatePickerChangeListener()
           }
         case None           =>
@@ -206,7 +203,7 @@ private class DateCompanion extends XBLCompanionWithState {
     updateReadonly(readonly)
 
   override def xformsFocus(): Unit =
-    inputEl.focus()
+    inputJQueryEl.focus()
 
   private object EventSupport extends EventListenerSupport
 
@@ -217,10 +214,14 @@ private class DateCompanion extends XBLCompanionWithState {
     datePicker.offChangeDate()
 
   private def getInputFieldValue: String =
-    inputEl.prop("value").asInstanceOf[String]
+    inputJQueryEl.prop("value").asInstanceOf[String]
 
-  private def updateReadonly(readonly: Boolean): Unit =
-    inputEl.prop("readonly", readonly)
+  private def updateReadonly(readonly: Boolean): Unit = {
+    inputHtmlEl.readOnly = readonly
+    if (iOS)
+      // Also set `disabled` on iOS (see #5376)
+      inputHtmlEl.disabled = readonly
+  }
 
   // Send the new value to the server when it changes
   private def onDateSelectedUpdateStateAndSendValueToServer(): Unit =

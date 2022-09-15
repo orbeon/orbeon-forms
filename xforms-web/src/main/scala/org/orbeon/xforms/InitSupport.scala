@@ -69,7 +69,7 @@ object InitSupport {
         val basePath = context.dropTrailingSlash + '/' + path
 
         if (path.endsWith(".css"))
-          PathUtils.recombineQuery(basePath, query ::: ("ns" -> namespace) :: Nil)
+          PathUtils.recombineQuery(basePath, query ::: (Constants.EmbeddingNamespaceParameter -> namespace) :: Nil)
         else
           PathUtils.recombineQuery(basePath, query)
       }

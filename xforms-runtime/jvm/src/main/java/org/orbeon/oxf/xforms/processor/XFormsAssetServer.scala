@@ -128,7 +128,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
             IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
 
-              val namespaceOpt = externalContext.getRequest.getFirstParamAsString(Constants.NamespaceParameter)
+              val namespaceOpt = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)
 
               fromCurrentStateOpt orElse fromInitialStateOpt foreach { case (initializationScriptsOpt, jsonInitializationData) =>
                 initializationScriptsOpt foreach { initializationScripts =>
@@ -142,7 +142,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
                 writer.write(
                   ScriptBuilder.buildInitializationCall(
                     jsonInitialization = jsonInitializationData,
-                    contextPathOpt     = externalContext.getRequest.getFirstParamAsString(Constants.ContextPathParameter),
+                    contextPathOpt     = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingContextParameter),
                     namespaceOpt       = namespaceOpt
                   )
                 )
@@ -300,7 +300,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
     // Namespace to use, must be `None` if empty
     def namespaceOpt: Option[String] = {
-      def nsFromParameters = externalContext.getRequest.getFirstParamAsString(Constants.NamespaceParameter)
+      def nsFromParameters = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)
       def nsFromContainer  = Some(response.getNamespacePrefix)
 
       nsFromParameters orElse nsFromContainer filter (_.nonEmpty)

@@ -17,8 +17,9 @@ import org.orbeon.facades.TinyMce._
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI, Page}
 import org.scalajs.dom
-import org.scalajs.jquery.JQueryEventObject
 import org.scalajs.dom.html
+import org.scalajs.dom.raw
+import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 

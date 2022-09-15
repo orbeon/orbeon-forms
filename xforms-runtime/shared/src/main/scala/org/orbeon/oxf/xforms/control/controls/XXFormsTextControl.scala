@@ -64,7 +64,7 @@ class XXFormsTextControl(
       isDefaultValue       = false
     )
 
-    atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, this.getEffectiveId)
+    atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, containingDocument.namespaceId(this.getEffectiveId))
 
     outputValueElement(
       attributesImpl = atts,

@@ -78,23 +78,10 @@ object SubmissionParameters {
     implicit val containingDocument = dynamicSubmission.containingDocument
     implicit val refContext         = createRefContext(dynamicSubmission)
 
-    // Check that we have a current node and that it is pointing to a document or an element
     if (refContext.refNodeInfo eq null)
       throw new XFormsSubmissionException(
         submission       = dynamicSubmission,
         message          = s"Empty single-node binding on xf:submission for submission id: `${dynamicSubmission.getId}`",
-        description      = "getting submission single-node binding",
-        submitErrorEvent = new XFormsSubmitErrorEvent(
-          target    = dynamicSubmission,
-          errorType = ErrorType.NoData,
-          cxrOpt    = None
-        )
-      )
-
-    if (! refContext.refNodeInfo.isDocument && ! refContext.refNodeInfo.isElement)
-      throw new XFormsSubmissionException(
-        submission       = dynamicSubmission,
-        message          = "xf:submission: single-node binding must refer to a document node or an element.",
         description      = "getting submission single-node binding",
         submitErrorEvent = new XFormsSubmitErrorEvent(
           target    = dynamicSubmission,
@@ -133,6 +120,20 @@ object SubmissionParameters {
     val resolvedMediatypeOpt = staticSubmission.avtMediatypeOpt flatMap stringAvtTrimmedOpt
 
     val serializationOpt = staticSubmission.avtSerializationOpt flatMap stringAvtTrimmedOpt
+
+    // For a binary serialization, we allow pointing to an attribute (and other nodes); otherwise we must point to a
+    // document or element.
+    if (! (serializationOpt.contains(ContentTypes.OctetStreamContentType) || refContext.refNodeInfo.isDocument || refContext.refNodeInfo.isElement))
+      throw new XFormsSubmissionException(
+        submission       = dynamicSubmission,
+        message          = "xf:submission: single-node binding must refer to a document node or an element.",
+        description      = "getting submission single-node binding",
+        submitErrorEvent = new XFormsSubmitErrorEvent(
+          target    = dynamicSubmission,
+          errorType = ErrorType.NoData,
+          cxrOpt    = None
+        )
+      )
 
     val serialize = serializationOpt match {
       case Some(serialization) => serialization != "none"

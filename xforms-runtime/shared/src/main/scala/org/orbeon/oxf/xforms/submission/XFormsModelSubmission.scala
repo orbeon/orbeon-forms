@@ -23,7 +23,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionSupport.{getRequestedSerialization, isSatisfiesValidity, prepareXML}
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionSupport.{isSatisfiesValidity, prepareXML, requestedSerialization}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
 import org.orbeon.saxon.om
@@ -31,6 +31,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{RelevanceHandling, XFormsId}
 import shapeless.syntax.typeable._
 
+import java.net.URI
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
@@ -330,8 +331,6 @@ class XFormsModelSubmission(
 
             /* ***** Update data model ****************************************************************************** */
 
-            val relevanceHandling = p.relevanceHandling
-
             // "The data model is updated"
             p.refContext.refInstanceOpt foreach { refInstance =>
               val modelForInstance = refInstance.model
@@ -343,11 +342,11 @@ class XFormsModelSubmission(
               // this seems however unneeded so we optimize out.
 
               // Rebuild impacts validation, relevance and calculated values (set by recalculate)
-              if (p.validate || relevanceHandling != RelevanceHandling.Keep || p.xxfCalculate)
+              if (p.validate || p.relevanceHandling != RelevanceHandling.Keep || p.xxfCalculate)
                 modelForInstance.doRebuild()
 
               // Recalculate impacts relevance and calculated values
-              if (relevanceHandling != RelevanceHandling.Keep || p.xxfCalculate)
+              if (p.relevanceHandling != RelevanceHandling.Keep || p.xxfCalculate)
                 modelForInstance.doRecalculateRevalidate()
             }
 
@@ -357,14 +356,7 @@ class XFormsModelSubmission(
             if (p.isDeferredSubmissionFirstPass) {
               // Create (but abandon) document to submit here because in case of error, an Ajax response will still be produced
               if (p.serialize)
-                createDocumentToSubmit(
-                  p.refContext.refNodeInfo,
-                  p.refContext.refInstanceOpt,
-                  p.validate,
-                  relevanceHandling,
-                  p.xxfAnnotate,
-                  p.xxfRelevantAttOpt
-                )
+                createUriOrDocumentToSubmit(p)
               containingDocument.addTwoPassSubmitEvent(TwoPassSubmissionParameters(getEffectiveId, p))
               return
             }
@@ -377,7 +369,7 @@ class XFormsModelSubmission(
 
             /* ***** Serialization ********************************************************************************** */
 
-            getRequestedSerialization(p.serializationOpt, p.xformsMethod, p.httpMethod) match {
+            requestedSerialization(p.serializationOpt, p.xformsMethod, p.httpMethod) match {
               case None =>
                 throw new XFormsSubmissionException(
                   thisSubmission,
@@ -387,7 +379,7 @@ class XFormsModelSubmission(
                   null
                 )
               case Some(requestedSerialization) =>
-                val documentToSubmit =
+                val uriOrDocumentToSubmitOpt =
                   if (p.serialize) {
                     // Check if a submission requires file upload information
 
@@ -395,18 +387,10 @@ class XFormsModelSubmission(
                     if (requestedSerialization.startsWith("multipart/") && p.refContext.refInstanceOpt.isDefined)
                       SubmissionUtils.annotateBoundRelevantUploadControls(containingDocument, p.refContext.refInstanceOpt.get)
 
-                    // Create document to submit
-                    createDocumentToSubmit(
-                      p.refContext.refNodeInfo,
-                      p.refContext.refInstanceOpt,
-                      p.validate,
-                      relevanceHandling,
-                      p.xxfAnnotate,
-                      p.xxfRelevantAttOpt
-                    )
+                    createUriOrDocumentToSubmit(p).some
                   } else {
                     // Don't recreate document
-                    null
+                    None
                   }
 
               val overriddenSerializedData =
@@ -429,7 +413,7 @@ class XFormsModelSubmission(
                 }
 
               // Serialize
-              val sp = SerializationParameters(thisSubmission, p, p2, requestedSerialization, documentToSubmit, overriddenSerializedData)
+              val sp = SerializationParameters(thisSubmission, p, p2, requestedSerialization, uriOrDocumentToSubmitOpt, overriddenSerializedData)
 
               /* ***** Submission connection ************************************************************************** */
 
@@ -524,6 +508,26 @@ class XFormsModelSubmission(
       submitErrorEvent.logMessage(t)
       Dispatch.dispatchEvent(submitErrorEvent)
     }
+
+    def createUriOrDocumentToSubmit(
+      p: SubmissionParameters)(implicit
+      indentedLogger    : IndentedLogger
+    ): URI Either Document =
+      if (requestedSerialization(p.serializationOpt, p.xformsMethod, p.httpMethod).contains(ContentTypes.OctetStreamContentType))
+        Left(
+          URI.create(p.refContext.refNodeInfo.getStringValue) // xxx TODO: if error, is it wrapped?
+        )
+      else
+        Right(
+          createDocumentToSubmit(
+            p.refContext.refNodeInfo,
+            p.refContext.refInstanceOpt,
+            p.validate,
+            p.relevanceHandling,
+            p.xxfAnnotate,
+            p.xxfRelevantAttOpt
+          )
+        )
 
     def createDocumentToSubmit(
       currentNodeInfo   : om.NodeInfo,

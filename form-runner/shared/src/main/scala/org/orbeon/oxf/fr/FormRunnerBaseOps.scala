@@ -50,8 +50,11 @@ case class FormRunnerParams(
   isDraft     : Option[Boolean],
   mode        : String
 ) {
+  def appForm: AppForm =
+    AppForm(app, form)
+
   def appFormVersion: FormRunnerParams.AppFormVersion =
-    (AppForm(app, form), formVersion)
+    (appForm, formVersion)
 }
 
 object FormRunnerParams {

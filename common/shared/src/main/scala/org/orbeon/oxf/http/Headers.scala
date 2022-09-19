@@ -31,6 +31,7 @@ object Headers {
 
   val ContentType             = "Content-Type"
   val ContentDisposition      = "Content-Disposition"
+  val ContentId               = "Content-ID"
   val ContentLength           = "Content-Length"
   val LastModified            = "Last-Modified"
   val Authorization           = "Authorization"
@@ -182,6 +183,7 @@ object Headers {
     "Cache-Control",
     "Connection",
     "Content-Disposition",
+    "Content-ID",
     "Content-Encoding",
     "Content-Language",
     "Content-Length",

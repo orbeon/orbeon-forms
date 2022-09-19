@@ -75,6 +75,8 @@ object XMLNames {
 
   val XMLLangQName             : QName     = XML_LANG_QNAME//both
 
+  val FRRelevantQName          : QName     = QName("relevant", FRNamespace)
+
   val FRContainerTest = FRSectionTest || FRGridTest
 
   val FRNamespace              : Namespace = Namespace(FRPrefix, FR)

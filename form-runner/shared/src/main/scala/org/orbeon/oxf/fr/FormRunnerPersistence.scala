@@ -600,6 +600,56 @@ trait FormRunnerPersistence {
     }
   }
 
+  def getAttachment(
+    fromBasePaths           : Iterable[(String, Int)],
+    beforeUrl               : String)(implicit
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): ConnectionResult = {
+
+    def rewriteServiceUrl(url: String) =
+      URLRewriterUtils.rewriteServiceURL(
+        externalContext.getRequest,
+        url,
+        UrlRewriteMode.Absolute
+      )
+
+    val attachmentVersionOpt =
+      fromBasePaths collectFirst { case (path, version) if beforeUrl.startsWith(path) => version }
+
+    // We used to use an XForms submission here which handled reading as well as writing. But that
+    // didn't allow for passing HTTP headers when reading, and we need this for versioning headers.
+    // So we now do all the work "natively", which is better anyway.
+    // https://github.com/orbeon/orbeon-forms/issues/4919
+
+    val customGetHeaders =
+      Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*)
+
+    val resolvedGetUri =
+      URI.create(rewriteServiceUrl(beforeUrl))
+
+    val allGetHeaders =
+      Connection.buildConnectionHeadersCapitalizedIfNeeded(
+        url              = resolvedGetUri,
+        hasCredentials   = false,
+        customHeaders    = customGetHeaders,
+        headersToForward = Connection.headersToForwardFromProperty,
+        cookiesToForward = Connection.cookiesToForwardFromProperty,
+        getHeader        = inScopeContainingDocument.headersGetter
+      )
+
+    Connection.connectNow(
+      method      = GET,
+      url         = resolvedGetUri,
+      credentials = None,
+      content     = None,
+      headers     = allGetHeaders,
+      loadState   = true,
+      saveState   = true,
+      logBody     = false
+    )
+  }
+
   def putWithAttachments(
     liveData          : DocumentNodeInfoType,
     migrate           : Option[DocumentNodeInfoType => DocumentNodeInfoType], // 2021-11-22: only from `trySaveAttachmentsAndData`
@@ -646,42 +696,6 @@ trait FormRunnerPersistence {
 
         val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
 
-        val attachmentVersionOpt =
-          fromBasePaths collectFirst { case (path, version) if beforeUrl.startsWith(path) => version }
-
-        // We used to use an XForms submission here which handled reading as well as writing. But that
-        // didn't allow for passing HTTP headers when reading, and we need this for versioning headers.
-        // So we now do all the work "natively", which is better anyway.
-        // https://github.com/orbeon/orbeon-forms/issues/4919
-
-        val customGetHeaders =
-          Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*)
-
-        val resolvedGetUri =
-          URI.create(rewriteServiceUrl(beforeUrl))
-
-        val allGetHeaders =
-          Connection.buildConnectionHeadersCapitalizedIfNeeded(
-            url              = resolvedGetUri,
-            hasCredentials   = false,
-            customHeaders    = customGetHeaders,
-            headersToForward = Connection.headersToForwardFromProperty,
-            cookiesToForward = Connection.cookiesToForwardFromProperty,
-            getHeader        = inScopeContainingDocument.headersGetter
-          )
-
-        def connectGet: ConnectionResult =
-          Connection.connectNow(
-            method          = GET,
-            url             = resolvedGetUri,
-            credentials     = None,
-            content         = None,
-            headers         = allGetHeaders,
-            loadState       = true,
-            saveState       = true,
-            logBody         = false
-          )
-
         def connectPut(is: InputStream): ConnectionResult = {
 
           val customPutHeaders =
@@ -721,7 +735,7 @@ trait FormRunnerPersistence {
         }
 
         for {
-          successGetCxr     <- ConnectionResult.trySuccessConnection(connectGet)
+          successGetCxr     <- ConnectionResult.trySuccessConnection(getAttachment(fromBasePaths, beforeUrl))
           putCxr            <- ConnectionResult.tryBody(successGetCxr, closeOnSuccess = true)(connectPut)
           successPutCxr     <- ConnectionResult.trySuccessConnection(putCxr)
           isEncryptedAtRest <- ConnectionResult.tryBody(successPutCxr, closeOnSuccess = true)(_ => getOrbeonDidEncryptHeader(successPutCxr))

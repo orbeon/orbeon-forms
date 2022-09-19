@@ -29,7 +29,6 @@ import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.FileItemSupport.FileItemOps
 import shapeless.syntax.typeable._
 
 import scala.collection.{mutable => m}

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.http
 
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.util.{DateUtils, NumericUtils}
+import org.orbeon.oxf.util.NumericUtils
 
 import java.net.URLEncoder
 
@@ -67,7 +67,13 @@ object Headers {
   val JavaScriptApiEmbeddingClient  = "javascript-api"
   val AppEmbeddingClient            = "app" // tentative naming
 
-  val EmbeddedClientValues = Set(GeneralEmbeddedClient, PortletEmbeddingClient, JavaApiEmbeddingClient, JavaScriptApiEmbeddingClient, AppEmbeddingClient)
+  val EmbeddedClientValues = Set(
+    GeneralEmbeddedClient,
+    PortletEmbeddingClient,
+    JavaApiEmbeddingClient,
+    JavaScriptApiEmbeddingClient,
+    AppEmbeddingClient
+  )
 
   // These headers are connection headers and must never be forwarded (content-length is handled separately below)
   //

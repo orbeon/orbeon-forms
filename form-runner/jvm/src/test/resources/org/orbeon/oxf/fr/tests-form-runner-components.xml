@@ -920,7 +920,7 @@
                         <xxf:control id="my-autocomplete≡itemset" class="fr-autocomplete-dynamic-itemset xforms-hidden">
                             <xxf:value>true</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-autocomplete≡xf-71" class="xbl-fr-autocomplete-max-results-displayed xforms-hidden">
+                        <xxf:control id="my-autocomplete≡xf-70" class="xbl-fr-autocomplete-max-results-displayed xforms-hidden">
                             <xxf:value>10</xxf:value>
                         </xxf:control>
                         <xxf:control id="my-autocomplete≡select1" class="fr-autocomplete-select1 xforms-hidden">

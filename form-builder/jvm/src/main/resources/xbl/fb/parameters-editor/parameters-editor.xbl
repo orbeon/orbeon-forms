@@ -43,24 +43,24 @@
                 <xf:var name="i" value="instance('i')"/>
 
                 <xf:bind
-                    ref="fr:param/fr:name"
+                    ref="*:param/*:name"
                     required="true()"
                     constraint="matches(., '^[A-Za-z0-9\-_]+$') and not(. = preceding::fr:name)"
                     xxf:whitespace="trim"/>
 
                 <xf:bind
-                    ref="fr:param/fr:expr"
+                    ref="*:param/*:expr"
                     required="true()"
                     type="xxf:XPath2"
                     xxf:whitespace="trim"/>
 
                 <xf:bind
-                    ref="fr:param/fr:controlName"
+                    ref="*:param/*:controlName"
                     required="true()"/>
 
-                <xf:instance id="values-template" xxf:exclude-result-prefixes="#all" xxf:readonly="true">
+                <xf:instance id="values-template" xxf:exclude-result-prefixes="#all">
                     <_>
-                        <!-- Make sure there are no whitespace next nodes inbetween as we don't handle that yet. -->
+                        <!-- Make sure there are no whitespace in between nodes, as we don't handle that yet -->
                         <fr:param type="ExpressionParam"       ><fr:name/><fr:expr/></fr:param>
                         <fr:param type="ControlValueParam"     ><fr:name/><fr:controlName/></fr:param>
                         <fr:param type="AllControlValuesParam" ><fr:name/></fr:param>
@@ -73,9 +73,29 @@
                     </_>
                 </xf:instance>
 
+                <!-- Change param templates to remove the `fr:` prefix if user set `form-runner-namespace="false"` -->
+                <xf:insert
+                    event="xforms-model-construct-done"
+                    if="xxf:component-param-value('form-runner-namespace') = 'false'"
+                    ref="instance('values-template')"
+                    origin="
+                        xf:element(
+                            '_',
+                            for $param in instance('values-template')/*
+                            return xf:element(
+                                $param/local-name(),
+                                (
+                                    $param/@*,
+                                    for $child in $param/*
+                                    return xf:element($child/local-name())
+                                )
+                            )
+                        )
+                    "/>
+
                 <xf:var
                     name="readonly-template"
-                    value="instance('values-template')/*[@type = 'ControlValueParam']"/>
+                    value="instance('values-template')/*:param[@type = 'ControlValueParam']"/>
 
                 <!-- List of controls computed once, as this is an expensive operation for large forms -->
                 <xf:instance id="controls-label-value-itemset">
@@ -87,7 +107,7 @@
                     event="xforms-enabled xforms-readwrite"
                     observer="control-selector"
                     if="
-                        exists(fr:param) and
+                        exists(*:param) and
                         empty(instance('controls-label-value-itemset')/item)
                     ">
                     <xf:insert
@@ -111,7 +131,7 @@
                 <fr:dnd-repeat
                     ref="
                         let $params :=
-                            $i/fr:param
+                            $i/*:param
                         return
                             if (exists($params)) then
                                 $params
@@ -119,7 +139,7 @@
                                 $readonly-template">
 
                     <xf:var name="current-param"    value="."/>
-                    <xf:var name="param-count"      value="count($i/fr:param)"/>
+                    <xf:var name="param-count"      value="count($i/*:param)"/>
                     <xf:var name="can-remove-param" value="$param-count gt 0"/>
 
                     <xh:div
@@ -129,7 +149,7 @@
                              'xforms-dnd-moves'[$param-count gt 1]
                         }">
 
-                        <xf:input ref="$current-param/fr:name" class="fb-param-name">
+                        <xf:input ref="$current-param/*:name" class="fb-param-name">
                             <xf:label appearance="minimal" ref="$resources/components/parameters-editor/name/label"/>
                             <xf:alert ref="$resources/components/parameters-editor/name/alert"/>
                         </xf:input>
@@ -174,7 +194,7 @@
                                                 'LinkToPdfParam'
                                             else
                                                 (),
-                                            $template := instance('values-template')/fr:param[@type = $type]
+                                            $template := instance('values-template')/*:param[@type = $type]
                                         return
                                             if (exists($type)) then
                                                 (
@@ -182,8 +202,8 @@
                                                     if ($type = $current-param/@type) then
                                                         $current-param/*             (: keep the currently-selected value as is :)
                                                     else (
-                                                        $current-param/fr:name,      (: always keep the parameter name          :)
-                                                        $template/(* except fr:name) (: but use the other elements if any       :)
+                                                        $current-param/*:name,      (: always keep the parameter name          :)
+                                                        $template/(* except *:name) (: but use the other elements if any       :)
                                                     )
                                                )
                                            else
@@ -193,13 +213,13 @@
 
                         <xf:switch caseref="$current-param/@type" class="fb-param-details">
                             <xf:case value="'ExpressionParam'">
-                                <xf:input ref="$current-param/fr:expr">
+                                <xf:input ref="$current-param/*:expr">
                                     <xf:label appearance="minimal" ref="$resources/components/parameters-editor/xpath/label"/>
                                     <xf:alert ref="$resources/components/parameters-editor/xpath/alert"/>
                                 </xf:input>
                             </xf:case>
                             <xf:case value="'ControlValueParam'">
-                                <fr:dropdown-select1-search ref="$current-param/fr:controlName" id="control-selector" style="width: 100%">
+                                <fr:dropdown-select1-search ref="$current-param/*:controlName" id="control-selector" style="width: 100%">
                                     <xf:label appearance="minimal" ref="$resources/components/parameters-editor/control/label"/>
                                     <xf:alert ref="$resources/components/parameters-editor/control/alert"/>
                                     <xf:itemset ref="instance('controls-label-value-itemset')/item">

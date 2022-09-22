@@ -45,10 +45,10 @@ public class PriorityResourceManagerImpl implements ResourceManager {
                 final int position;
                 final String localPropertyName;
                 if (dotIndex == -1) {
-                    position = new Integer(substring);
+                    position = Integer.valueOf(substring);
                     localPropertyName = null;
                 } else {
-                    position = new Integer(substring.substring(0, dotIndex));
+                    position = Integer.valueOf(substring.substring(0, dotIndex));
                     localPropertyName = substring.substring(dotIndex + 1);
                 }
 

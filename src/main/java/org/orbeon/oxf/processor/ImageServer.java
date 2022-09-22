@@ -146,7 +146,7 @@ public class ImageServer extends ProcessorImpl {
                     }
 
                     String qualityString = XPathUtils.selectStringValueNormalize(imageConfigDocument, "/image/quality");
-                    result.quality = (qualityString == null) ? null : new Float(qualityString);
+                    result.quality = (qualityString == null) ? null : Float.parseFloat(qualityString);
 
                     String useCacheString = XPathUtils.selectStringValueNormalize(imageConfigDocument, "/image/use-cache");
                     result.useCache = (useCacheString == null) ? null : Boolean.valueOf(useCacheString);

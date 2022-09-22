@@ -80,7 +80,7 @@ public class FieldsMatcher extends MatcherBundle {
                     new Object[]{
                         selector.idConst.namespaceURI,
                         selector.idConst.localName,
-                        new Integer(i+1)} );
+                        Integer.valueOf(i+1)} );
                 return;
             }
 

@@ -385,39 +385,39 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     private static final Map sqlTypesToDefaultXMLTypes = new HashMap();
     static {
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.CHAR), "{http://www.w3.org/2001/XMLSchema}string");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.VARCHAR), "{http://www.w3.org/2001/XMLSchema}string");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.LONGVARCHAR), "{http://www.w3.org/2001/XMLSchema}string");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.NUMERIC), "{http://www.w3.org/2001/XMLSchema}decimal");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.DECIMAL), "{http://www.w3.org/2001/XMLSchema}decimal");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.BIT), "{http://www.w3.org/2001/XMLSchema}boolean");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.BOOLEAN), "{http://www.w3.org/2001/XMLSchema}boolean");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.TINYINT), "{http://www.w3.org/2001/XMLSchema}byte");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.SMALLINT), "{http://www.w3.org/2001/XMLSchema}short");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.INTEGER), "{http://www.w3.org/2001/XMLSchema}int");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.BIGINT), "{http://www.w3.org/2001/XMLSchema}long");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.REAL), "{http://www.w3.org/2001/XMLSchema}float");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.FLOAT), "{http://www.w3.org/2001/XMLSchema}double");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.DOUBLE), "{http://www.w3.org/2001/XMLSchema}double");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.BINARY), "{http://www.w3.org/2001/XMLSchema}base64Binary");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.VARBINARY), "{http://www.w3.org/2001/XMLSchema}base64Binary");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.LONGVARBINARY), "{http://www.w3.org/2001/XMLSchema}base64Binary");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.DATE), "{http://www.w3.org/2001/XMLSchema}date");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.TIME), "{http://www.w3.org/2001/XMLSchema}time");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.TIMESTAMP), "{http://www.w3.org/2001/XMLSchema}dateTime");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.CLOB), "{http://www.w3.org/2001/XMLSchema}string");
-        sqlTypesToDefaultXMLTypes.put(new Integer(Types.BLOB), "{http://www.w3.org/2001/XMLSchema}base64Binary");
-//        sqlTypesToDefaultXMLTypes.put(new Integer(Types.ARRAY), "{http://www.w3.org/2001/XMLSchema}");
-//        sqlTypesToDefaultXMLTypes.put(new Integer(Types.DISTINCT), "{http://www.w3.org/2001/XMLSchema}");
-//        sqlTypesToDefaultXMLTypes.put(new Integer(Types.STRUCT), "{http://www.w3.org/2001/XMLSchema}");
-//        sqlTypesToDefaultXMLTypes.put(new Integer(Types.REF), "{http://www.w3.org/2001/XMLSchema}");
-//        sqlTypesToDefaultXMLTypes.put(new Integer(Types.DATALINK), "{http://www.w3.org/2001/XMLSchema}");
-//        sqlTypesToDefaultXMLTypes.put(new Integer(Types.JAVA_OBJECT), "{http://www.w3.org/2001/XMLSchema}");`
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.CHAR), "{http://www.w3.org/2001/XMLSchema}string");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.VARCHAR), "{http://www.w3.org/2001/XMLSchema}string");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.LONGVARCHAR), "{http://www.w3.org/2001/XMLSchema}string");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.NUMERIC), "{http://www.w3.org/2001/XMLSchema}decimal");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.DECIMAL), "{http://www.w3.org/2001/XMLSchema}decimal");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.BIT), "{http://www.w3.org/2001/XMLSchema}boolean");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.BOOLEAN), "{http://www.w3.org/2001/XMLSchema}boolean");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.TINYINT), "{http://www.w3.org/2001/XMLSchema}byte");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.SMALLINT), "{http://www.w3.org/2001/XMLSchema}short");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.INTEGER), "{http://www.w3.org/2001/XMLSchema}int");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.BIGINT), "{http://www.w3.org/2001/XMLSchema}long");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.REAL), "{http://www.w3.org/2001/XMLSchema}float");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.FLOAT), "{http://www.w3.org/2001/XMLSchema}double");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.DOUBLE), "{http://www.w3.org/2001/XMLSchema}double");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.BINARY), "{http://www.w3.org/2001/XMLSchema}base64Binary");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.VARBINARY), "{http://www.w3.org/2001/XMLSchema}base64Binary");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.LONGVARBINARY), "{http://www.w3.org/2001/XMLSchema}base64Binary");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.DATE), "{http://www.w3.org/2001/XMLSchema}date");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.TIME), "{http://www.w3.org/2001/XMLSchema}time");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.TIMESTAMP), "{http://www.w3.org/2001/XMLSchema}dateTime");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.CLOB), "{http://www.w3.org/2001/XMLSchema}string");
+        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.BLOB), "{http://www.w3.org/2001/XMLSchema}base64Binary");
+//        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.ARRAY), "{http://www.w3.org/2001/XMLSchema}");
+//        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.DISTINCT), "{http://www.w3.org/2001/XMLSchema}");
+//        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.STRUCT), "{http://www.w3.org/2001/XMLSchema}");
+//        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.REF), "{http://www.w3.org/2001/XMLSchema}");
+//        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.DATALINK), "{http://www.w3.org/2001/XMLSchema}");
+//        sqlTypesToDefaultXMLTypes.put(Integer.valueOf(Types.JAVA_OBJECT), "{http://www.w3.org/2001/XMLSchema}");`
     }
 
 //    private static final Map xmlTypesToDefaultSQLTypes = new HashMap();
 //    static {
-//        xmlTypesToDefaultSQLTypes.put("{http://www.w3.org/2001/XMLSchema}string", new Integer(Types.CHAR));
+//        xmlTypesToDefaultSQLTypes.put("{http://www.w3.org/2001/XMLSchema}string", Integer.valueOf(Types.CHAR));
 //
 //    }
 
@@ -427,7 +427,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
     public static Object getColumnValue(ResultSet resultSet, Locator locator, int columnIndex, String xmlTypeName) throws SQLException {
         try {
             final int columnType = resultSet.getMetaData().getColumnType(columnIndex);
-            final String defaultXMLType = (String) sqlTypesToDefaultXMLTypes.get(new Integer(columnType));
+            final String defaultXMLType = (String) sqlTypesToDefaultXMLTypes.get(Integer.valueOf(columnType));
             if (xmlTypeName != null && !xmlTypeName.equals(defaultXMLType))
                 throw new ValidationException("Illegal XML type for SQL type: " + xmlTypeName + ", " + resultSet.getMetaData().getColumnTypeName(columnIndex), XmlLocationData.apply(locator));
 
@@ -512,7 +512,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
     }
 
     public static String getDefaultXMLTypeFromSQLType(int type) {
-        return (String) sqlTypesToDefaultXMLTypes.get(new Integer(type));
+        return (String) sqlTypesToDefaultXMLTypes.get(Integer.valueOf(type));
     }
 
     public static String getXMLTypeFromAttributeString(Locator locator, PropertySet propertySet, String typeAttribute, Map prefixesMap) {

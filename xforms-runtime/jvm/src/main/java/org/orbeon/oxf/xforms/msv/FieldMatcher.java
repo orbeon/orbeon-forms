@@ -145,6 +145,6 @@ public class FieldMatcher extends PathMatcher {
             new Object[]{
                 parent.selector.idConst.namespaceURI,
                 parent.selector.idConst.localName,
-                new Integer(i+1)} );
+                Integer.valueOf(i+1)} );
     }
 }

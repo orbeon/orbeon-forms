@@ -184,9 +184,9 @@ public class ObjectReceiverTest extends ObjectReceiver {
         assertNotNull(foo.repeatableInt);
         assertEquals(2, foo.repeatableInt.size());
         Integer integer = foo.repeatableInt.get(0);
-        assertEquals(integer, new Integer(10));
+        assertEquals(integer, Integer.valueOf(10));
         integer = foo.repeatableInt.get(1);
-        assertEquals(integer, new Integer(-3));
+        assertEquals(integer, Integer.valueOf(-3));
     }
 
     @Test

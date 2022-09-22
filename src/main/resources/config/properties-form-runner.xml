@@ -170,19 +170,50 @@
     <property as="xs:string"  name="oxf.fr.detail.captcha.visible.*.*"                          value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.location.*.*"                         value="form-bottom"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.pdf.filename.*.*"                             value=""/>
+    <property as="xs:string" name="oxf.fr.detail.pdf.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.pdf'
+        )
+    </property>
+
     <property as="xs:boolean" name="oxf.fr.detail.pdf.barcode.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.disable-if-invalid.*.*"                   value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.hyperlinks.*.*"                           value="true"/>
     <property as="xs:integer" name="oxf.fr.detail.pdf.long-content-threshold.*.*"               value="512"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.tiff.filename.*.*"                            value=""/>
+    <property as="xs:string" name="oxf.fr.detail.tiff.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.tiff'
+        )
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.tiff.compression.type.*.*"                    value="LZW"/>
     <property as="xs:string"  name="oxf.fr.detail.tiff.compression.quality.*.*"                 value="0.8"/>
     <property as="xs:string"  name="oxf.fr.detail.tiff.scale.*.*"                               value="3.0"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.excel-with-named-ranges.filename.*.*"         value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.xml-form-structure-and-data.filename.*.*"     value=""/>
+    <property as="xs:string" name="oxf.fr.detail.excel-with-named-ranges.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.xlsx'
+        )
+    </property>
+
+    <property as="xs:string" name="oxf.fr.detail.xml-form-structure-and-data.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.xml'
+        )
+    </property>
 
     <property as="xs:string"  name="oxf.fr.detail.rendered-page-orientation.*.*"                value="portrait"/>
     <property as="xs:string"  name="oxf.fr.detail.rendered-page-size.*.*"                       value="letter"/>

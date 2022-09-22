@@ -4,36 +4,95 @@
 //   background-color: blue !important;
 // }
 
+// dropdown menu
+.dropdown-menu .btn-link {
+  font-size: 14px;
+  padding: 6px 12px;
+  margin-bottom: 0;
+
+  display: inline-block;
+  text-decoration: none !important;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+  color: black !important;
+  background-color: white;
+}
+
+.dropdown-menu .btn-link:hover,
+.btn-link:focus {
+  color: #333;
+  text-decoration: none;
+  background-color: #e9ecef;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+  color: unset !important;
+  text-decoration: unset !important;
+  background-color: #e9ecef !important;
+}
+
+.dropdown-item:hover .btn-link {
+  background-color: #e9ecef;
+}
+
+.disabled .btn-link {
+  color: lightgray !important;
+}
+
+.fr-summary-selection .dropdown-toggle {
+  background-color: #f8f9fa;
+  color: #000;
+}
+
+.fr-summary-selection .badge {
+  background-color: #0d6efd;
+}
+
+// button link: show search options
+.fr-summary-search-show-button .btn-link {
+  border: 1px solid transparent;
+  background-color: #F3F3F3;
+  color: #0d6efd !important;
+  text-decoration: underline !important;
+}
+
+// home button
 .xforms-trigger-appearance-full .btn {
   color: #000;
   background-color: #f8f9fa;
   border-color: #f8f9fa;
 }
 
-.xforms-trigger-appearance-full .btn:hover, .btn:focus, .btn:active, .btn.active, .open>.dropdown-toggle.btn {
-  background-color: #e6e6e6 !important;
+.xforms-trigger-appearance-full {
+  .btn:hover, .btn:focus, .btn:active, .btn.active, .open>.dropdown-toggle.btn {
+    background-color: #e6e6e6 !important;
+    border-color: #0a58ca !important;
+  }
 }
 
-//.fr-home-button .btn {
-//  color: #000;
-//  background-color: #f8f9fa;
-//  border-color: #f8f9fa;
-//}
-//.fr-home-button .btn:hover, .btn:focus, .btn:active, .btn.active, .open>.dropdown-toggle.btn {
-//  background-color: #e6e6e6 !important;
-//}
-
-.xforms-trigger-appearance-xxforms-primary .btn {
-  color: #fff;
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-  //.buttonBackground(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
-}
-
-.xforms-trigger-appearance-xxforms-primary .btn:hover, .btn:focus, .btn:active, .btn.active, .open>.dropdown-toggle.btn {
+// new button
+.fr-new-button .btn {
   color: #fff !important;
-  background-color: #0b5ed7 !important;
-  border-color: #0a58ca !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+.fr-new-button {
+  .btn:hover, .btn:focus, .btn:active, .btn.active, .open>.dropdown-toggle.btn {
+    color: #fff !important;
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+  }
 }
 
 .orbeon {

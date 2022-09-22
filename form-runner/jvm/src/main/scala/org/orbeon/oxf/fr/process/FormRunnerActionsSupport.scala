@@ -131,9 +131,12 @@ object FormRunnerActionsSupport {
     // Replace attachment paths/URLs in the (copied) data now. We don't need the URLs again since they have been
     // captured by `FormRunner.collectAttachments()`. We need to update the data before serializing attachments as
     // we want to serialize the XML before the attachments in the multipart body.
-    attachmentsWithHolder foreach { case FormRunner.AttachmentWithHolder(_, _, holder) =>
-      setvalue(holder, s"cid:${createCidForNode(holder)}")
-    }
+    // We dont do this replacement if the attachments are not sent, both because it's not helpful and for backward
+    // compatibility.
+    if (parts.exists(_ == ContentToken.Attachments))
+      attachmentsWithHolder foreach { case FormRunner.AttachmentWithHolder(_, _, holder) =>
+        setvalue(holder, s"cid:${createCidForNode(holder)}")
+      }
 
     def processXml(builder: MultipartEntityBuilder, xml: dom.Document): Unit = {
 

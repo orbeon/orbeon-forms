@@ -1096,7 +1096,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 var inputs = control.getElementsByTagName("input");
                 for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
                     var input = inputs[inputIndex];
-                    ORBEON.xforms.Controls.setDisabledOnFormElement(input, isReadonly);
+                    ORBEON.xforms.Controls.setReadonlyOnFormElement(input, isReadonly);
                 }
                 if (control.tagName.toLowerCase() == "input")
                     ORBEON.xforms.Controls.setDisabledOnFormElement(control, isReadonly);
@@ -2004,6 +2004,15 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (event.button != 0 && event.button != 1) return;
             var originalTarget = YAHOO.util.Event.getTarget(event);
             var controlTarget = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
+
+            // Prevent readonly checkboxes or radios from changing state on click
+            var readonlyWithCheckboxesOrRadio =
+                ":is(.xforms-input, .xforms-select, .xforms-select1).xforms-type-boolean.xforms-readonly";
+            if (controlTarget != null && controlTarget.matches(readonlyWithCheckboxesOrRadio)) {
+                event.preventDefault();
+                return;
+            }
+
             // Listeners might be interested in click events even if they don't target an XForms control
             ORBEON.xforms.Events.clickEvent.fire({target: originalTarget, control: controlTarget});
             if (YAHOO.lang.isObject(originalTarget) && YAHOO.lang.isBoolean(originalTarget.disabled) && originalTarget.disabled) {

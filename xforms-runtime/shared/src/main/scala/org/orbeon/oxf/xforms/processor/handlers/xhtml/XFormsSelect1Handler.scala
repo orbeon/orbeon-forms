@@ -209,7 +209,7 @@ object XFormsSelect1Handler {
             XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
         }
         if (baseHandler.isXFormsReadonlyButNotStaticReadonly(control))
-          outputDisabledAttribute(reusableAttributes)
+          outputReadonlyAttribute(reusableAttributes)
 
         element(localName = elementName, prefix = xhtmlPrefix, uri = XHTML, atts = reusableAttributes)
       }

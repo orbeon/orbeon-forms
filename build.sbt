@@ -116,7 +116,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.httpcomponents"   % "httpcore"                        % "4.4.14",
   "org.slf4j"                   % "jcl-over-slf4j"                  % Slf4jVersion,
   "org.slf4j"                   % "slf4j-api"                       % Slf4jVersion,
-  "org.apache.logging.log4j"    % "log4j-slf4j-impl"                % Log4j2Version, // move to `log4j-slf4j18-impl` for SLF4J 1.8.x releases or newer; seems like 1.8 is dead and replaced by 2.0; but that's still alpha as of 2021-12
+  "org.apache.logging.log4j"    % "log4j-slf4j2-impl"               % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-api"                       % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-core"                      % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-1.2-api"                   % Log4j2Version, // for eXist JARs

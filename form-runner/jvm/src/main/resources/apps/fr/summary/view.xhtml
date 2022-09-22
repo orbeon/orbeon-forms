@@ -586,7 +586,7 @@
                             </xf:select1>
 
                             <xh:div class="btn-group fr-summary-selection">
-                                <xh:button id="select-button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <xh:button id="select-button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                     <xf:output value="$fr-resources/summary/titles/selected"/>
                                     <xh:span class="badge badge-info" title="Documents Selected">
                                         <xf:output value="count(xxf:split(instance('fr-selection-instance')))"/>
@@ -594,7 +594,7 @@
                                     <xh:span class="caret"/>
                                 </xh:button>
                                 <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="select-button">
-                                    <xh:li role="presentation">
+                                    <xh:li class="dropdown-item" role="presentation">
                                         <xf:trigger appearance="minimal" role="menuitem">
                                             <xf:label ref="$fr-resources/summary/buttons/select-all"/>
                                             <xf:setvalue
@@ -610,7 +610,7 @@
                                                     )"/>
                                         </xf:trigger>
                                     </xh:li>
-                                    <xh:li role="presentation">
+                                    <xh:li class="dropdown-item" role="presentation">
                                         <xf:trigger appearance="minimal" role="menuitem">
                                             <xf:label ref="$fr-resources/summary/buttons/deselect-all"/>
                                             <xf:setvalue
@@ -619,8 +619,8 @@
                                                 ref="instance('fr-selection-instance')"/>
                                         </xf:trigger>
                                     </xh:li>
-                                    <xh:li role="presentation" class="divider"/>
-                                    <xh:li role="presentation">
+                                    <xh:li class="dropdown-item divider" role="presentation"/>
+                                    <xh:li class="dropdown-item" role="presentation">
                                         <xf:trigger appearance="minimal" role="menuitem">
                                             <xf:label ref="$fr-resources/summary/buttons/select-saved"/>
                                             <xf:setvalue
@@ -636,7 +636,7 @@
                                                     )"/>
                                         </xf:trigger>
                                     </xh:li>
-                                    <xh:li role="presentation">
+                                    <xh:li class="dropdown-item" role="presentation">
                                         <xf:trigger appearance="minimal" role="menuitem">
                                             <xf:label ref="$fr-resources/summary/buttons/select-drafts"/>
                                             <xf:setvalue

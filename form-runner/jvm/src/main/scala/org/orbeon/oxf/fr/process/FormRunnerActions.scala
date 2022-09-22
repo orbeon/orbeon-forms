@@ -21,7 +21,6 @@ import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.http.{Headers, HttpMethod}
-import org.orbeon.oxf.util.Mediatypes
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
@@ -331,25 +330,16 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         getOrElse RenderedFormat.Pdf
       )
 
-      def extensionForRenderedFormat(renderedFormat: RenderedFormat): String =
-        Mediatypes.getExtensionForMediatypeOrThrow(RenderedFormat.SupportedRenderFormatsMediatypes(renderedFormat))
-
-      // TODO: Use namespaces from appropriate scope.
-      val fullFilename = {
-        val filenameProperty            = s"oxf.fr.detail.${renderedFormat.entryName}.filename"
-        val filenamePropertyValue       = formRunnerProperty(filenameProperty).flatMap(trimAllToOpt)
-        val filenameFromProperty        = filenamePropertyValue.map(evaluateString(_, xpathContext)).flatMap(trimAllToOpt)
-        val escapedFilenameFromProperty = filenameFromProperty.map(EscapeURI.escape(_, "-_.~").toString)
-        val filename                    = escapedFilenameFromProperty.getOrElse(currentXFormsDocumentId)
-
-        s"$filename.${extensionForRenderedFormat(renderedFormat)}"
-      }
+      // Q: Noticing we use `EscapeURI`, while `buildContentDispositionHeader` uses `URLEncoder.encode`. Any good
+      // reason for this?
+      val filename =
+        EscapeURI.escape(FormRunnerActionsSupport.filenameForRenderedFormat(renderedFormat), "-_.~").toString
 
       val path =
         buildRenderedFormatPath(
           params          = params,
           renderedFormat  = renderedFormat,
-          fullFilename    = Some(fullFilename),
+          fullFilename    = Some(filename),
           currentFormLang = frc.currentLang
         )
 

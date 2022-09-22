@@ -24,22 +24,22 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
-import org.orbeon.oxf.fr.FormRunner.FormVersionParam
+import org.orbeon.oxf.fr.FormRunner.{FormVersionParam, formRunnerProperty}
 import org.orbeon.oxf.fr.FormRunnerPersistence._
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.process.RenderedFormat.SupportedRenderFormatsMediatypes
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, Names, XMLNames}
+import org.orbeon.oxf.fr.process.SimpleProcess.{currentXFormsDocumentId, evaluateString, xpathContext}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.PathUtils.{recombineQuery, splitQueryDecodeParams}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, SecureUtils, StaticXPath, URLRewriterUtils}
+import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, PathUtils, SecureUtils, StaticXPath, URLRewriterUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI.{inScopeContainingDocument, setvalue}
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
-import org.orbeon.xforms.XFormsCrossPlatformSupport.externalContext
 import org.orbeon.xforms.{RelevanceHandling, XFormsCrossPlatformSupport}
 
 import java.io.{ByteArrayInputStream, InputStream}
@@ -62,6 +62,22 @@ object FormRunnerActionsSupport {
       case name @ Names.WorkflowStage   => name -> processParams.workflowStage
     }
 
+  def extensionForRenderedFormat(renderedFormat: RenderedFormat): String =
+    Mediatypes.getExtensionForMediatypeOrThrow(RenderedFormat.SupportedRenderFormatsMediatypes(renderedFormat))
+
+  def filenameForRenderedFormat(renderedFormat: RenderedFormat)(implicit p: FormRunnerParams): String = {
+    // TODO: Use namespaces from appropriate scope.
+    val filenameProperty      = s"oxf.fr.detail.${renderedFormat.entryName}.filename"
+    val filenamePropertyValue = formRunnerProperty(filenameProperty).flatMap(trimAllToOpt)
+    val filenameFromProperty  = filenamePropertyValue.map(evaluateString(_, xpathContext)).flatMap(trimAllToOpt)
+    val filename              = filenameFromProperty.getOrElse(currentXFormsDocumentId)
+
+    PathUtils.findExtension(filename) match {
+      case Some(_) => filename
+      case None    => s"$filename.${extensionForRenderedFormat(renderedFormat)}"
+    }
+  }
+
   def updateUriWithParams(processParams: ProcessParams, uri: String, requestedParamNames: List[String]): String = {
 
     val (path, params) = splitQueryDecodeParams(uri)
@@ -82,6 +98,7 @@ object FormRunnerActionsSupport {
     relevanceHandling         : RelevanceHandling,
     annotateWith              : Set[String],
     headersGetter             : String => Option[List[String]])(implicit
+    formRunnerParams          : FormRunnerParams,
     logger                    : IndentedLogger
   ): (URI, String) = {
 
@@ -229,7 +246,7 @@ object FormRunnerActionsSupport {
               SecureUtils.hmacString(format.entryName, "hex"),
               format.entryName,
               SupportedRenderFormatsMediatypes.get(format),
-              Some(s"file.${Mediatypes.findExtensionForMediatype(SupportedRenderFormatsMediatypes(format)).getOrElse(throw new IllegalStateException)}") // TODO: should use configured filename expression
+              Some(FormRunnerActionsSupport.filenameForRenderedFormat(format))
             )
         }
     }

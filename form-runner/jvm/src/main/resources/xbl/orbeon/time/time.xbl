@@ -21,7 +21,7 @@
 
     <xbl:binding
         id="fr-time"
-        element="fr|time"
+        element="fr|time, xf|input:xxf-type('xs:time')"
         xxbl:label-for="fr-time-input"
         xxbl:mode="lhha binding value">
 
@@ -121,6 +121,7 @@
                         <resource xml:lang="fr"><format>hms</format></resource>
                         <resource xml:lang="de"><format>hms</format></resource> <!-- German also using "h" for hours -->
                         <resource xml:lang="hu"><format>ópm</format></resource>
+                        <resource xml:lang="da"><format>tms</format></resource>
                     </_>
                 </xf:instance>
             </xf:model>
@@ -143,7 +144,7 @@
             <xf:var
                 name="placeholder"
                 value="
-                    let $format      := xxf:property('oxf.xforms.format.input.time'),
+                    let $format      := property('xxf:format.input.time'),
                         $cleaned     := translate(lower-case($format), '[]', ''),
                         $duplicate   := replace(replace(replace(replace(replace(replace($cleaned,
                                         'h'      , 'hh'  ),

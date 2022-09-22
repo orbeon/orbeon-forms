@@ -189,6 +189,12 @@
                 <error-count>Error in Your Form</error-count>
                 <errors-count>Errors in Your Form</errors-count>
             </titles>
+            <buttons>
+                <select-all>Select all</select-all>
+                <deselect-all>Deselect all</deselect-all>
+                <select-saved>Select explicitly saved only</select-saved>
+                <select-drafts>Select autosaved only</select-drafts>
+            </buttons>
             <search>
                 <search>Search</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Search Forms</search-forms>
@@ -201,11 +207,11 @@
             </paging>
             <messages>
                 <no-form-found>No form data was found.</no-form-found>
-                <delete-confirmation>Are you sure you want to delete one or more forms? Note that when deleting a saved document, the corresponding drafts are deleted as well.</delete-confirmation>
+                <delete-confirmation>Are you sure you want to delete one or more forms? Note that when deleting a saved document, the corresponding autosaved documents are deleted as well.</delete-confirmation>
                 <version>Form Version {0,number,integer}</version>
             </messages>
             <labels>
-                <draft>Draft</draft>
+                <draft>Autosaved</draft>
                 <read-only>Read-Only</read-only>
                 <language-choice>Choose Language</language-choice>
                 <form-choice>Choose a Form</form-choice>
@@ -260,14 +266,14 @@
                 <lost-attachments>Some file attachments were lost due to a server issue. Please check all your attachments and upload them again if needed.</lost-attachments>
             </messages>
             <draft-singleton>
-                <found-draft>Found draft</found-draft>
-                <found-drafts>Found drafts</found-drafts>
-                <found-draft-for-document>After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?</found-draft-for-document>
-                <found-draft-for-never-saved>A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?</found-draft-for-never-saved>
-                <found-drafts-for-never-saved>Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?</found-drafts-for-never-saved>
-                <open-saved>Open saved document</open-saved>
-                <open-draft>Open auto-saved draft</open-draft>
-                <view-drafts>View auto-saved drafts</view-drafts>
+                <found-draft>Found autosaved document</found-draft>
+                <found-drafts>Found autosaved documents</found-drafts>
+                <found-draft-for-document>After this document was saved, a document was autosaved which might contain additional work. Do you want to open the saved document, or the autosaved document?</found-draft-for-document>
+                <found-draft-for-never-saved>An autosaved document for this form is available. Would you like to start from scratch or to open the autosaved document?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Several autosaved documents for this form are available. Would you like to start from scratch or to see the autosaved documents (and then possibly edit one of them)?</found-drafts-for-never-saved>
+                <open-saved>Open explicitly saved document</open-saved>
+                <open-draft>Open autosaved document</open-draft>
+                <view-drafts>View autosaved documents</view-drafts>
                 <start-new>Start from scratch</start-new>
                 <multiple-docs-title>Existing form data found</multiple-docs-title>
                 <multiple-docs-explanation>You cannot create new data for this form definition, however you might be able to edit existing form data.</multiple-docs-explanation>
@@ -707,6 +713,12 @@
                 <error-count>erreur de saisie dans votre formulaire</error-count>
                 <errors-count>erreurs de saisie dans votre formulaire</errors-count>
             </titles>
+            <buttons>
+                <select-all>Tout sélectionner</select-all>
+                <deselect-all>Tout désélectionner</deselect-all>
+                <select-saved>Sélectionner documents enregistrés explicitement seulement</select-saved>
+                <select-drafts>Sélectionner documents enregistrés automatiquement seulement</select-drafts>
+            </buttons>
             <search>
                 <search>Recherche</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Rechercher</search-forms>
@@ -719,11 +731,11 @@
             </paging>
             <messages>
                 <no-form-found>Aucun formulaire trouvé.</no-form-found>
-                <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires? Notez que lors de la suppression d'un document enregistré, les brouillons correspondants sont également supprimés.</delete-confirmation>
+                <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires? Notez que lors de la suppression d'un document explicitement enregistré, les documents enregistrés automatiquement correspondants sont également supprimés.</delete-confirmation>
                 <version>Version de formulaire {0,number,integer}</version>
             </messages>
             <labels>
-                <draft>Brouillons</draft>
+                <draft>Sauv. aut.</draft>
                 <read-only>Lecture seule</read-only>
                 <language-choice>Choix de la langue</language-choice>
                 <form-choice>Choisisez un formulaire</form-choice>
@@ -766,7 +778,7 @@
                     1#contient '{0,choice,0#une erreur|1#un avertissement|2#un message d''''information|3#un message}'|
                     1&lt;contient {1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}'}. Vous pouvez choisir de {1,choice,1#le|1&lt;les} passer en revue ou de {1,choice,1#l''ignorer|1&lt;les ignorer} et de poursuivre l''opération.</validation-dialog-message>
                 <buttons-message/>
-                <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été sauvegardées.</saved-locally-open>
+                <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été enregistrées.</saved-locally-open>
                 <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
                 <upload-start>Téléchargement vers le serveur commencé</upload-start>
                 <upload-cancel>Téléchargement vers le serveur annulé par l'utilisateur</upload-cancel>
@@ -778,14 +790,14 @@
                 <lost-attachments>Des fichiers joints ont été perdus suite à un problème sur le serveur. Veuillez vérifier tous vos fichiers joints et les annexer à nouveau si nécessaire.</lost-attachments>
             </messages>
             <draft-singleton>
-                <found-draft>Un brouillon est disponible</found-draft>
-                <found-drafts>Plusieurs brouillons sont disponibles</found-drafts>
-                <found-draft-for-document>Après que ce document ait été enregistré, un brouillon a été auto-enregistré, et il se peut que ce dernier contenne des informations supplémentaires. Voulez-vous ouvrir le document enregistré, ou le brouillon auto-enregistré?</found-draft-for-document>
-                <found-draft-for-never-saved>Un brouillon pour ce formulaire a éte auto-enregistré. Voulez-vous commencer à partir de zéro ou d'ouvrir le brouillon auto-enregistré?</found-draft-for-never-saved>
-                <found-drafts-for-never-saved>Plusieurs brouillons pour ce formulaire ont été enregistrés. Voulez-vous commencer à partir de zéro ou voir ces brouillons auto-enregistrés (pour ensuite peut-être modifier l'un d'entre eux)?</found-drafts-for-never-saved>
-                <open-saved>Ouvrir le document enregistré</open-saved>
-                <open-draft>Ouvrir le brouillon auto-enregistrés</open-draft>
-                <view-drafts>Voir les brouillons automatiquement enregistrés</view-drafts>
+                <found-draft>Un document enregistré automatiquement est disponible</found-draft>
+                <found-drafts>Plusieurs documents enregistrés automatiquement sont disponibles</found-drafts>
+                <found-draft-for-document>Après que ce document ait été enregistré, un document enregistré automatiquement a été enregistré, et il se peut que ce dernier contienne des informations supplémentaires. Voulez-vous ouvrir le document enregistré, ou le document enregistré automatiquement?</found-draft-for-document>
+                <found-draft-for-never-saved>Un document enregistré automatiquement pour ce formulaire a éte enregistré. Voulez-vous commencer à partir de zéro ou ouvrir le document enregistré automatiquement?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Plusieurs documents enregistrés automatiquement pour ce formulaire ont été enregistrés. Voulez-vous commencer à partir de zéro ou voir ces documents enregistrés automatiquement (pour ensuite peut-être modifier l'un d'entre eux)?</found-drafts-for-never-saved>
+                <open-saved>Ouvrir le document enregistré explicitement</open-saved>
+                <open-draft>Ouvrir le document enregistré automatiquement</open-draft>
+                <view-drafts>Voir les documents enregistrés automatiquement</view-drafts>
                 <start-new>Recommencer à zéro</start-new>
                 <multiple-docs-title>Données de formulaire existantes</multiple-docs-title>
                 <multiple-docs-explanation>Vous ne pouvez pas créer de nouvelles données _ _, mais vous pourriez être en mesure de modifier les données de formulaire existantes.</multiple-docs-explanation>
@@ -820,11 +832,11 @@
             </lease>
         </detail>
         <save-locally>
-            <dialog-title>Sauvegarder Localement</dialog-title>
+            <dialog-title>Enregistrer Localement</dialog-title>
             <dialog-body>
                 <div>
                     <p>
-                        Cliquez sur le bouton Enregistrer ci-dessous pour sauvegarder les données de votre formulaire
+                        Cliquez sur le bouton Enregistrer ci-dessous pour enregistrer les données de votre formulaire
                         dans un fichier HTML.
                     </p>
                     <p>
@@ -996,10 +1008,10 @@
                 {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#a été validé|1&lt;ont été validés} et {0,choice,1#sera importé|1&lt;seront importés}.
             </valid-records-message>
             <invalid-document-message>
-                Le document téléchargé contient des erreurs de validation. Veuillez utiliser le bouton "Revoir les données" pour revoir et corriger les erreurs avant de sauvegarder.
+                Le document téléchargé contient des erreurs de validation. Veuillez utiliser le bouton "Revoir les données" pour revoir et corriger les erreurs avant d'enregistrer.
             </invalid-document-message>
             <valid-document-message>
-                Les données du document téléchargé sont valides. Veuillez utiliser le bouton "Revoir les données" pour revoir les données du formulaire avant de sauvegarder.
+                Les données du document téléchargé sont valides. Veuillez utiliser le bouton "Revoir les données" pour revoir les données du formulaire avant d'enregistrer.
             </valid-document-message>
             <import-complete-message>
 		        L'importation de {0,number,integer} {0,choice,1#document|1&lt;documents} est terminée. {1,number,integer} {1,choice,1#document invalide a été ignoré|1&lt;documents invalides ont été ignorés}
@@ -1214,6 +1226,12 @@
                 <error-count>Errores en su formulario</error-count>
                 <errors-count>Errores en su formulario</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Buscar</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulario</search-forms>
@@ -1700,7 +1718,6 @@
             </formats>
         </print>
         <summary>
-
             <titles>
                 <summary-title>Oppsummering</summary-title>
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
@@ -1717,6 +1734,12 @@
                 <error-count>ugyldig eller manglende svar i skjema</error-count>
                 <errors-count>ugyldige eller manglende svar i skjema</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Søk</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søk etter skjema</search-forms>
@@ -1787,12 +1810,12 @@
              <draft-singleton>
                 <found-draft todo="true">[Found draft]</found-draft>
                 <found-drafts todo="true">[Found drafts]</found-drafts>
-                <found-draft-for-document todo="true">[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
-                <found-draft-for-never-saved todo="true">[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
-                <found-drafts-for-never-saved todo="true">[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
+                <found-draft-for-document todo="true">[After this document was saved, a draft was autosaved, and it might contain additional work. Do you want to open the saved document, or the autosaved draft?]</found-draft-for-document>
+                <found-draft-for-never-saved todo="true">[A draft for this form was autosaved. Would you like to start from scratch or to open the autosaved draft?]</found-draft-for-never-saved>
+                <found-drafts-for-never-saved todo="true">[Several drafts for this form were autosaved. Would you like to start from scratch or to see the autosaved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
                 <open-saved todo="true">[Open saved document]</open-saved>
-                <open-draft todo="true">[Open auto-saved draft]</open-draft>
-                <view-drafts todo="true">[View auto-saved drafts]</view-drafts>
+                <open-draft todo="true">[Open autosaved draft]</open-draft>
+                <view-drafts todo="true">[View autosaved drafts]</view-drafts>
                 <start-new todo="true">[Start from scratch]</start-new>
                 <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
                 <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
@@ -2217,6 +2240,12 @@
                 <error-count>Есть ошибка</error-count>
                 <errors-count>Есть ошибки</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Поиск</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Поиск формы</search-forms>
@@ -2287,12 +2316,12 @@
              <draft-singleton>
                 <found-draft todo="true">[Found draft]</found-draft>
                 <found-drafts todo="true">[Found drafts]</found-drafts>
-                <found-draft-for-document todo="true">[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
-                <found-draft-for-never-saved todo="true">[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
-                <found-drafts-for-never-saved todo="true">[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
+                <found-draft-for-document todo="true">[After this document was saved, a draft was autosaved, and it might contain additional work. Do you want to open the saved document, or the autosaved draft?]</found-draft-for-document>
+                <found-draft-for-never-saved todo="true">[A draft for this form was autosaved. Would you like to start from scratch or to open the autosaved draft?]</found-draft-for-never-saved>
+                <found-drafts-for-never-saved todo="true">[Several drafts for this form were autosaved. Would you like to start from scratch or to see the autosaved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
                 <open-saved todo="true">[Open saved document]</open-saved>
-                <open-draft todo="true">[Open auto-saved draft]</open-draft>
-                <view-drafts todo="true">[View auto-saved drafts]</view-drafts>
+                <open-draft todo="true">[Open autosaved draft]</open-draft>
+                <view-drafts todo="true">[View autosaved drafts]</view-drafts>
                 <start-new todo="true">[Start from scratch]</start-new>
                 <multiple-docs-title todo="true">[Existing form data found]</multiple-docs-title>
                 <multiple-docs-explanation todo="true">[You cannot create new data for this form definition, however you might be able to edit existing form data.]</multiple-docs-explanation>
@@ -2722,6 +2751,12 @@
                 <error-count>Errore nel modulo</error-count>
                 <errors-count>Errori nel modulo</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Cerca</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Cerca moduli</search-forms>
@@ -3234,6 +3269,12 @@
                 <error-count>Fehler im Formular</error-count>
                 <errors-count>Fehler im Formular</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Suchen</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formular suchen</search-forms>
@@ -3746,6 +3787,12 @@
                 <error-count>Virhe lomakkeessasi</error-count>
                 <errors-count>Virheitä lomakkeessasi</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Etsi</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Etsi lomakkeita</search-forms>
@@ -4258,6 +4305,12 @@
                 <error-count>Fel i formuläret</error-count>
                 <errors-count>Fel i formuläret</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Sök</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Sök formulär</search-forms>
@@ -4770,6 +4823,12 @@
                 <error-count>Fout in uw form</error-count>
                 <errors-count>Fouten in uw form</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Zoeken</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Forms zoeken</search-forms>
@@ -5281,6 +5340,12 @@
                 <error-count>Erro no seu formulário</error-count>
                 <errors-count>Erros no seu formulário</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Procurar</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Procurar formulários</search-forms>
@@ -5786,6 +5851,12 @@
                 <error-count>ugyldigt eller manglende svar i blanket</error-count>
                 <errors-count>ugyldige eller manglende svar i blanket</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Søg</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søg efter blanket</search-forms>
@@ -6123,50 +6194,50 @@
             </formats>
         </common>
         <buttons>
-            <create>&lt;i class="fa fa-fw fa-plus"/&lt; Utwórz</create>
-            <view>&lt;i class="fa fa-fw fa-eye"/&lt; Podgląd</view>
-            <approve>&lt;i class="icon-ok-circle"/&lt; Akceptuj</approve>
-            <reject>&lt;i class="icon-ban-circle"/&lt; Odrzuć</reject>
+            <create>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Utwórz</create>
+            <view>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Podgląd</view>
+            <approve>&lt;i class="icon-ok-circle"&gt;&lt;/i&gt; Akceptuj</approve>
+            <reject>&lt;i class="icon-ban-circle"&gt;&lt;/i&gt; Odrzuć</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"/&lt; Home</home>
-            <landing>&lt;i class="fa fa-fw fa-home"/&lt; Home</landing>
-            <review>&lt;i class="fa fa-fw fa-eye"/&lt; Przeglądaj</review>
-            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"/&lt; PDF</pdf>
-            <tiff>&lt;i class="fa fa-fw fa-image"/&lt; TIFF</tiff>
-            <delete>&lt;i class="fa fa-fw fa-remove"/&lt; Usuń</delete>
-            <import>&lt;i class="fa fa-fw fa-upload"/&lt; Importuj</import>
-            <new>&lt;i class="fa fa-fw fa-plus"/&lt; Nowy</new>
-            <duplicate>&lt;i class="fa fa-fw fa-copy"/&lt; Duplikuj</duplicate>
+            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
+            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</landing>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Przeglądaj</review>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Usuń</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importuj</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nowy</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplikuj</duplicate>
 
             <!-- Standard process buttons -->
-            <save>&lt;i class="fa fa-fw fa-hdd-o"/&lt; Zapisz</save>
-            <save-final>&lt;i class="fa fa-fw fa-hdd-o"/&lt; Złóż</save-final>
-            <save-draft todo="true">&lt;i class="icon-inbox"/&lt; Zapisz szkic</save-draft>
-            <save-progress todo="true">&lt;i class="icon-inbox"/&lt; Zapisz szkic</save-progress>
-            <edit>&lt;i class="fa fa-fw fa-arrow-left"/&lt; Edytuj</edit>
-            <send>&lt;i class="icon-arrow-right"/&lt; Wyślij</send>
-            <email>&lt;i class="fa fa-fw fa-envelope"/&lt; Email</email>
-            <validate>&lt;i class="fa fa-fw fa-check"/&lt; Zweryfikuj</validate>
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Zapisz</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Złóż</save-final>
+            <save-draft todo="true">&lt;i class="icon-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-draft>
+            <save-progress todo="true">&lt;i class="icon-inbox"&gt;&lt;/i&gt; Zapisz szkic</save-progress>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Edytuj</edit>
+            <send>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Wyślij</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Zweryfikuj</validate>
             <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
 
             <!-- Legacy buttons -->
-            <submit>&lt;i class="icon-arrow-right"/&lt; Złóż</submit>
-            <workflow-review>&lt;i class="icon-arrow-right"/&lt; Przeglądaj</workflow-review>
-            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"/&lt; Edytuj</workflow-edit>
-            <workflow-send>&lt;i class="icon-arrow-right"/&lt; Wyślij</workflow-send>
+            <submit>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Złóż</submit>
+            <workflow-review>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Przeglądaj</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Edytuj</workflow-edit>
+            <workflow-send>&lt;i class="icon-arrow-right"&gt;&lt;/i&gt; Wyślij</workflow-send>
 
             <!-- Other standard buttons -->
-            <summary>&lt;i class="fa fa-fw fa-list"/&lt; Podsumowanie</summary>
-            <close>&lt;i class="fa fa-fw fa-times"/&lt; Zamknij</close>
-            <clear>&lt;i class="fa fa-fw fa-remove"/&lt; Wyczyść</clear>
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Podsumowanie</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Zamknij</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Wyczyść</clear>
             <cancel>Anuluj</cancel>
             <save-locally>Zapisz lokalnie</save-locally>
             <collapse-all>&lt;i class="icon-resize-small"/></collapse-all>
             <expand-all>&lt;i class="icon-resize-full"/></expand-all>
             <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Odśwież"/></refresh>
-            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"/&lt; Następna sekcja</wizard-next>
-            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"/&lt; Poprzednia sekcja</wizard-prev>
-            <wizard-toc>&lt;i class="fa fa-fw fa-list"/&lt; Zawartość</wizard-toc>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Następna sekcja</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Poprzednia sekcja</wizard-prev>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Zawartość</wizard-toc>
 
             <!-- Submit dialog -->
             <submit-dialog-clear>Wyczyść i zamknij</submit-dialog-clear>
@@ -6178,16 +6249,16 @@
             <validation-dialog-review>Przeglądaj</validation-dialog-review>
             <validation-dialog-continue>Kontynuuj</validation-dialog-continue>
 
-            <test>&lt;i class="fa fa-fw fa-cog"/&lt; Testuj</test>
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testuj</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspect Formulas (Experimental)</test-formulas>
             <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline (Experimental)</test-offline>
             <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Excel Export</excel-export>
             <xml-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; XML Export</xml-export>
-            <publish>&lt;i class="fa fa-fw fa-globe"/&lt; Publikuj</publish>
-            <save-publish>&lt;i class="fa fa-fw fa-globe"/&lt; Zapisz i publikuj</save-publish>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publikuj</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Zapisz i publikuj</save-publish>
 
-            <yes>&lt;i class="fa fa-fw fa-check"/&lt; Tak</yes>
-            <no>&lt;i class="fa fa-fw fa-times"/&lt; Nie</no>
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Tak</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Nie</no>
             <ok>OK</ok>
             <previous>Poprzedni</previous>
             <next>Następny</next>
@@ -6291,6 +6362,12 @@
                 <error-count>Błąd w Twoim formularzu</error-count>
                 <errors-count>Błędy/-ów w Twoim formularzu</errors-count>
             </titles>
+            <buttons>
+                <select-all todo="true">Select all</select-all>
+                <deselect-all todo="true">Deselect all</deselect-all>
+                <select-saved todo="true">Select explicitly saved only</select-saved>
+                <select-drafts todo="true">Select drafts only</select-drafts>
+            </buttons>
             <search>
                 <search>Szukaj</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"/&lt; Wyszukaj formularze</search-forms>

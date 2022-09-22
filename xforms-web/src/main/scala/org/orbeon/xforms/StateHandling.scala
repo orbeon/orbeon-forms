@@ -19,7 +19,6 @@ import io.circe.parser._
 import io.circe.syntax._
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom
 import org.scalajs.dom.HashChangeEvent
 
@@ -27,6 +26,7 @@ import scala.collection.immutable
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
 import scala.scalajs.js.annotation.JSExport
+
 
 object StateHandling {
 
@@ -58,7 +58,7 @@ object StateHandling {
     case object Reload                extends StateResult
   }
 
-  def initializeState(formId: String, initialUuid: String): StateResult = {
+  def initializeState(formId: String, initialUuid: String, revisitHandling: String): StateResult = {
 
     def setInitialState(uuid: String): Unit =
       updateClientState(
@@ -86,7 +86,7 @@ object StateHandling {
         setInitialState(uuid)
         StateResult.Uuid(uuid)
 
-      case Some(_) if Properties.revisitHandling.get() == "reload" =>
+      case Some(_) if revisitHandling == "reload" =>
 
         logger.debug("state found with `revisitHandling` set to `reload`, reloading page")
 
@@ -100,10 +100,6 @@ object StateHandling {
         StateResult.Restore(state.uuid)
     }
   }
-
-  @JSExport
-  def getFormUuid(formId: String): String =
-    getClientStateOrThrow(formId).uuid
 
   @JSExport
   def getSequence(formId: String): String =

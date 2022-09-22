@@ -9,10 +9,6 @@ object XFormsGlobalProperties {
 
   val PropertyPrefix = "oxf.xforms."
 
-  val DelayBeforeAjaxTimeoutProperty = "delay-before-ajax-timeout"
-  val RetryDelayIncrement            = "retry.delay-increment"
-  val RetryMaxDelay                  = "retry.max-delay"
-
   private def propertySet =
     CoreCrossPlatformSupport.properties
 
@@ -30,9 +26,9 @@ object XFormsGlobalProperties {
   def isReplication             : Boolean = propertySet.getBoolean(PropertyPrefix + "replication",                        default = false)
   def getDebugLogXPathAnalysis  : Boolean = propertySet.getBoolean(PropertyPrefix + "debug.log-xpath-analysis",           default = false)
   def isRequestStats            : Boolean = propertySet.getBoolean(PropertyPrefix + "debug.log-request-stats",            default = false)
-  def getAjaxTimeout            : Long    = propertySet.getInteger(PropertyPrefix + DelayBeforeAjaxTimeoutProperty,       default = 30000).toLong
+  def getAjaxTimeout            : Long    = propertySet.getInteger(PropertyPrefix + "delay-before-ajax-timeout",          default = 30000).toLong
   def uploadXFormsAccessTimeout : Long    = propertySet.getInteger(PropertyPrefix + "upload.delay-before-xforms-timeout", default = 45000).toLong
-  def getRetryDelayIncrement    : Int     = propertySet.getInteger(PropertyPrefix + RetryDelayIncrement,                  default = 5000)
-  def getRetryMaxDelay          : Int     = propertySet.getInteger(PropertyPrefix + RetryMaxDelay,                        default = 30000)
+  def getRetryDelayIncrement    : Int     = propertySet.getInteger(PropertyPrefix + "retry.delay-increment",              default = 5000)
+  def getRetryMaxDelay          : Int     = propertySet.getInteger(PropertyPrefix + "retry.max-delay",                    default = 30000)
   def isKeepLocation            : Boolean = propertySet.getString (PropertyPrefix + "location-mode", "none") != "none"
 }

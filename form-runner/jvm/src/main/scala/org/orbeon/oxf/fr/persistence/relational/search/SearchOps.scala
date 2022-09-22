@@ -25,11 +25,13 @@ import scala.collection.compat._
 
 object SearchOps {
 
-  private val SearchOperations = List(Read, Update, Delete)
+  val SearchOperations: Set[Operation] = Set(Read, Update, Delete)
 
+  // Used by eXist only
+  //@XPathFunction
   def xpathAuthorizedIfOrganizationMatch(formPermissionsElOrNull: NodeInfo): List[String] =
     authorizedIfOrganizationMatch(
-      permissions = PermissionsXML.parse(formPermissionsElOrNull),
+      permissions = PermissionsXML.parse(Option(formPermissionsElOrNull)),
       currentUser = PermissionsAuthorization.currentUserFromSession
     )
 
@@ -47,10 +49,12 @@ object SearchOps {
     usefulUserParametrizedRoles.map(_.organizationName)
   }
 
+  // Used by eXist only
+  //@XPathFunction
   def authorizedOperations(
     formPermissionsElOrNull : NodeInfo,
     metadataOrNullEl        : NodeInfo
-  ): List[String] = {
+  ): String = {
 
     val checkWithData = {
 
@@ -77,11 +81,11 @@ object SearchOps {
 
     val operations =
       PermissionsAuthorization.authorizedOperations(
-        permissions = PermissionsXML.parse(formPermissionsElOrNull),
+        permissions = PermissionsXML.parse(Option(formPermissionsElOrNull)),
         currentUser = PermissionsAuthorization.currentUserFromSession,
         check       = checkWithData
       )
 
-    Operations.serialize(operations)
+    Operations.serialize(operations, normalized = true).mkString(" ")
   }
 }

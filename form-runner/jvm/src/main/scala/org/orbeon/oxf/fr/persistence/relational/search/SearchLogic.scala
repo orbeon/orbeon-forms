@@ -41,9 +41,9 @@ trait SearchLogic extends SearchRequestParser {
     version    : FormDefinitionVersion
   ): SearchPermissions = {
 
-    val searchOperations     = request.anyOfOperations.getOrElse(List(Read, Update, Delete))
+    val searchOperations     = request.anyOfOperations.getOrElse(SearchOps.SearchOperations)
     val formPermissionsElOpt = RelationalUtils.readFormPermissions(request.appForm, version)
-    val formPermissions      = PermissionsXML.parse(formPermissionsElOpt.orNull)
+    val formPermissions      = FormRunner.permissionsFromElemOrProperties(formPermissionsElOpt, request.appForm)
 
     def hasPermissionCond(condition: Condition): Boolean =
       formPermissions match {
@@ -214,7 +214,7 @@ trait SearchLogic extends SearchRequestParser {
             val organization              = metadata.organizationId.map(id => organizationsCache.getOrElseUpdate(id, readFromDatabase(id)))
             val check                     = CheckWithDataUser(metadata.createdBy, organization)
             val operations                = PermissionsAuthorization.authorizedOperations(permissions.formPermissions, user, check)
-            Document(metadata, Operations.serialize(operations), values)
+            Document(metadata, Operations.serialize(operations, normalized = true).mkString(" "), values)
           }
         (documents, searchCount)
       }

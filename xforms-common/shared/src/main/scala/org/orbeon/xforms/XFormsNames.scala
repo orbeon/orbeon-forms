@@ -358,10 +358,6 @@ object XFormsNames {
 
   val XXFORMS_MULTIPLE_QNAME = xxformsQName("multiple")
 
-  // TODO: Move.
-  val XFORMS_SERVER_SUBMIT = "/xforms-server-submit"
-
   // TODO: Move to handlers
   val DUMMY_SCRIPT_URI   = "data:text/javascript;base64,KGZ1bmN0aW9uKCl7fSgpKTsK"                       // empty self-calling function
-  val CALENDAR_IMAGE_URI = "/ops/images/xforms/calendar.png"
 }

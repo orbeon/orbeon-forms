@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fr.persistence.proxy
 
 import org.apache.http.HttpStatus
-import org.orbeon.dom.QName
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
@@ -72,8 +71,6 @@ private object PersistenceProxyProcessor {
 
   val RawDataFormatVersion           = "raw"
   val AllowedDataFormatVersionParams = Set() ++ (DataFormatVersion.values map (_.entryName)) + RawDataFormatVersion
-
-  val FRRelevantQName                = QName("relevant", XMLNames.FRNamespace)
 
   val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.HEAD, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
   val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
@@ -150,7 +147,7 @@ private object PersistenceProxyProcessor {
 
     val serviceURI = PathUtils.appendQueryString(
       persistenceBaseURL.dropTrailingSlash + path,
-      NetUtils.encodeQueryString(request.getParameterMap)
+      PathUtils.encodeQueryString(request.parameters)
     )
 
     def maybeMigrateFormDefinition: Option[(InputStream, OutputStream) => Unit] =
@@ -237,7 +234,7 @@ private object PersistenceProxyProcessor {
           new ElementFilterXMLReceiver(
             xmlReceiver = receiver,
             keep        = (_, _, _, atts) =>
-              atts.getValue(FRRelevantQName.namespace.uri, FRRelevantQName.localName) != "false"
+              atts.getValue(XMLNames.FRRelevantQName.namespace.uri, XMLNames.FRRelevantQName.localName) != "false"
           ),
           ParserConfiguration.Plain,
           handleLexical = true,
@@ -364,7 +361,7 @@ private object PersistenceProxyProcessor {
       }
     }
 
-    val parameters = NetUtils.encodeQueryString(request.getParameterMap)
+    val parameters = PathUtils.encodeQueryString(request.parameters)
 
     val allFormElements =
       for {

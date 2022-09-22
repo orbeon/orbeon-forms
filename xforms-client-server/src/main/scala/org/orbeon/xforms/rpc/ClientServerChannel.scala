@@ -17,13 +17,13 @@ import cats.data.NonEmptyList
 
 import scala.concurrent.Future
 
-trait ClientServerChannel[R] {
+trait ClientServerChannel[Form, Response] {
 
   def sendEvents(
-    requestFormId     : String,
+    requestFormId     : Form,
     eventsToSend      : NonEmptyList[WireAjaxEvent],
     sequenceNumberOpt : Option[Int],
     showProgress      : Boolean,
     ignoreErrors      : Boolean
-  ): Future[R]
+  ): Future[Response]
 }

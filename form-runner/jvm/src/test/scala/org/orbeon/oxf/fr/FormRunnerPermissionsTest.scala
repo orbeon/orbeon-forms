@@ -33,13 +33,13 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
   val jmanager = guest.copy(userAndGroup = guest.userAndGroup.copy(username = "jmanager"))
 
   val clerkPermissions = DefinedPermissions(List(
-    Permission(List(RolesAnyOf(List("clerk"))), SpecificOperations(List(Read)))
+    Permission(List(RolesAnyOf(List("clerk"))), SpecificOperations(Set(Read)))
   ))
   val clerkAndManagerPermissions = DefinedPermissions(List(
-    Permission(Nil                              , SpecificOperations(List(Create))),
-    Permission(List(Owner)                      , SpecificOperations(List(Read, Update))),
-    Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(List(Read))),
-    Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(List(Read, Update)))
+    Permission(Nil                              , SpecificOperations(Set(Create))),
+    Permission(List(Owner)                      , SpecificOperations(Set(Read, Update))),
+    Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(Set(Read))),
+    Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update)))
   ))
 
   describe("The `authorizedOperationsBasedOnRoles()` function") {
@@ -52,8 +52,7 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
           Some(user),
           CheckWithoutDataUserPessimistic
         )
-        assert(ops === SpecificOperations(Operations.All))
-
+        assert(ops === SpecificOperations(Operations.AllSet))
       }
     }
 
@@ -64,7 +63,7 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
           Some(juser.copy(roles = List(SimpleRole("clerk" )))),
           CheckWithoutDataUserPessimistic
         )
-        assert(ops === SpecificOperations(List(Read)))
+        assert(ops === SpecificOperations(Set(Read)))
       }
       it("prevents a user with another role from reading") {
         val ops = authorizedOperations(
@@ -79,8 +78,8 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
 
   describe("The `authorizedOperations()` function") {
 
-    val guestOperations = SpecificOperations(List(Create))
-    val fullOperations  = SpecificOperations(List(Create, Read, Update))
+    val guestOperations = SpecificOperations(Set(Create))
+    val fullOperations  = SpecificOperations(Set(Create, Read, Update))
 
     it("lets anonymous users only create") {
       val ops = authorizedOperations(

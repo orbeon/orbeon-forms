@@ -13,9 +13,13 @@
  */
 package org.orbeon.oxf.util
 
-import StringUtils._
+import org.orbeon.oxf.util.CollectionUtils.combineValues
+import org.orbeon.oxf.util.StringUtils._
 
+import java.util.regex.Pattern
+import java.{util, lang => jl}
 import scala.collection.compat.IterableOnce
+
 
 object PathUtils {
 
@@ -138,4 +142,45 @@ object PathUtils {
     }
     urlString.substring(0, colonIndex)
   }
+
+  def encodeQueryString[T](parameters: Iterable[(String, Array[T])])(implicit ed: UrlEncoderDecoder): String = {
+    val sb    = new jl.StringBuilder(100)
+    var first = true
+    for {
+      (key, values) <- parameters
+      currentValue  <- values
+      if currentValue.isInstanceOf[String]
+    } locally {
+      if (! first)
+        sb.append('&')
+      sb.append(ed.encode(key))
+      sb.append('=')
+      sb.append(ed.encode(currentValue.asInstanceOf[String]))
+      first = false
+    }
+    sb.toString
+  }
+
+  def decodeQueryString(queryString: CharSequence)(implicit ed: UrlEncoderDecoder): Map[String, Array[String]] =
+    combineValues[String, String, Array](PathUtils.decodeSimpleQuery(queryString.toString)).toMap
+
+  // 2022-09-01: It's unclear how or why this works. The original code was splitting on `&amp;` instead of just a
+  // plain `&`. Further, there could be double escaping of `&`, see below. We try to reproduce this, but we need to
+  // clarify the scenarios.
+  def decodeQueryStringPortlet(queryString: CharSequence)(implicit ed: UrlEncoderDecoder): Map[String, Array[String]] =
+    combineValues[String, String, Array](
+      PathUtils.decodeSimpleQuery(queryString.toString.replace("&amp;", "&")) map { case (k, v) =>
+        (
+          // Source can contains `&amp;amp;` because of double escaping in full Ajax updates.
+          // 2022-08-31: Keeping this logic, but it's unclear why this is done or whether it's safe.
+          if (k.startsWith("amp;")) k.substring("amp;".length) else k,
+          // Replace spaces with '+' due to `URLEncoder`/`URLDecoder` not bing fully reversible.
+          // 2022-08-31: Keeping this logic, but it's unclear.
+          v.replace(' ', '+')
+        )
+      }
+    ).toMap
+
+  def addValueToStringArrayMap(map: util.Map[String, Array[String]], name: String, value: String): Unit =
+    map.put(name, map.get(name) :+ value)
 }

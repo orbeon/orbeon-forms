@@ -98,6 +98,8 @@
     <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.logout"                 value="/fr/logout?source={xxf:get-request-path()}"/>
     <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.register"               value=""/>
 
+    <property as="xs:string"  name="oxf.fr.permissions.*.*"                                     value=""/>
+
     <property as="xs:integer" name="oxf.fr.summary.page-size.*.*"                               value="10"/>
     <property as="xs:string"  name="oxf.fr.summary.new.form-version.*.*"                        value="current"/>
     <property as="xs:boolean" name="oxf.fr.summary.show-created.*.*"                            value="true"/>
@@ -143,11 +145,11 @@
 
     <!-- Buttons visible / enabled-->
     <property as="xs:string"  name="oxf.fr.detail.button.*.visible.*.*"                         value="fr:owns-lease-or-none-required()"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.review.visible.*.*"                    value="not(fr:is-browser-environment()) and not(fr:is-embedded())"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.pdf.visible.*.*"                       value="not(fr:is-browser-environment()) and not(fr:is-embedded())"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.tiff.visible.*.*"                      value="not(fr:is-browser-environment()) and not(fr:is-embedded())"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.summary.visible.*.*"                   value="not(fr:is-browser-environment()) and not(fr:is-embedded())"/>
-    <property as="xs:string"  name="oxf.fr.detail.button.home.visible.*.*"                      value="not(fr:is-browser-environment()) and not(fr:is-embedded())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.review.visible.*.*"                    value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.summary.visible.*.*"                   value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.home.visible.*.*"                      value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.pdf.visible.*.*"                       value="not(fr:is-browser-environment())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.tiff.visible.*.*"                      value="not(fr:is-browser-environment())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.wizard-prev.visible.*.*"               >
         fr:owns-lease-or-none-required() and fr:is-wizard-body-shown()
     </property>
@@ -168,19 +170,50 @@
     <property as="xs:string"  name="oxf.fr.detail.captcha.visible.*.*"                          value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.location.*.*"                         value="form-bottom"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.pdf.filename.*.*"                             value=""/>
+    <property as="xs:string" name="oxf.fr.detail.pdf.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.pdf'
+        )
+    </property>
+
     <property as="xs:boolean" name="oxf.fr.detail.pdf.barcode.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.disable-if-invalid.*.*"                   value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.hyperlinks.*.*"                           value="true"/>
     <property as="xs:integer" name="oxf.fr.detail.pdf.long-content-threshold.*.*"               value="512"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.tiff.filename.*.*"                            value=""/>
+    <property as="xs:string" name="oxf.fr.detail.tiff.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.tiff'
+        )
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.tiff.compression.type.*.*"                    value="LZW"/>
     <property as="xs:string"  name="oxf.fr.detail.tiff.compression.quality.*.*"                 value="0.8"/>
     <property as="xs:string"  name="oxf.fr.detail.tiff.scale.*.*"                               value="3.0"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.excel-with-named-ranges.filename.*.*"         value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.xml-form-structure-and-data.filename.*.*"     value=""/>
+    <property as="xs:string" name="oxf.fr.detail.excel-with-named-ranges.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.xlsx'
+        )
+    </property>
+
+    <property as="xs:string" name="oxf.fr.detail.xml-form-structure-and-data.filename.*.*">
+        concat(
+            fr:form-title(),
+            ' - ',
+            substring(fr:document-id(), 1, 16),
+            '.xml'
+        )
+    </property>
 
     <property as="xs:string"  name="oxf.fr.detail.rendered-page-orientation.*.*"                value="portrait"/>
     <property as="xs:string"  name="oxf.fr.detail.rendered-page-size.*.*"                       value="letter"/>
@@ -409,6 +442,11 @@
     </property>
     <property as="xs:string"  name="oxf.fr.detail.process.xml-export.*.*">
         open-rendered-format(format = "xml-form-structure-and-data")
+    </property>
+
+    <!-- https://github.com/orbeon/orbeon-forms/issues/5403 -->
+    <property as="xs:string"  name="oxf.fr.detail.process.lease-view.*.*">
+        navigate(uri = "/fr/{fr:app-name()}/{fr:form-name()}/view/{fr:document-id()}")
     </property>
 
     <!-- Legacy buttons and processes -->

@@ -109,7 +109,7 @@ class XFormsRepeatIterationControl(
       val atts = new AttributesImpl
 
       // Use the effective id of the parent repeat
-      atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, parent.getEffectiveId)
+      atts.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, containingDocument.namespaceId(parent.getEffectiveId))
 
       // Relevance
       atts.addAttribute("", XFormsNames.RELEVANT_ATTRIBUTE_NAME, XFormsNames.RELEVANT_ATTRIBUTE_NAME, XMLReceiverHelper.CDATA, isRelevant.toString)

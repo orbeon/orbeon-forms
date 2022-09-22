@@ -281,7 +281,7 @@
                 <xf:group ref=".[not($view)]">
                     <!-- Don't show fields at all in static readonly mode -->
                     <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
-                    <xf:var name="month-first" value="starts-with(xxf:property('oxf.xforms.format.input.date'), '[M]')"/>
+                    <xf:var name="month-first" value="starts-with(property('xxf:format.input.date'), '[M]')"/>
                     <xf:var name="ref-1"       value="if ($month-first) then month else day  "/>
                     <xf:var name="ref-2"       value="if ($month-first) then day   else month"/>
                     <xf:var name="label-1"     value="xxf:r(concat('components.date-time.', if ($month-first) then 'month' else 'day'  ), '|fr-fr-resources|')"/>

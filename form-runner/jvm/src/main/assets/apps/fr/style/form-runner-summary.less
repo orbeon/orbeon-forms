@@ -30,10 +30,11 @@
 
         .fr-summary-search-top {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
         }
 
-        .fr-summary-form-version, .fr-summary-search-free-input, .fr-summary-search-search-button, .fr-summary-search-show-button {
+        .fr-summary-selection, .fr-summary-form-version, .fr-summary-search-free-input, .fr-summary-search-search-button, .fr-summary-search-show-button {
             margin-right: 10px;
         }
 
@@ -50,7 +51,8 @@
         }
 
         .fr-search-options {
-            display: block; // so that search buttons will always be underneath
+            display: flex;
+            flex-wrap: wrap;
 
             border: 1px solid #e1e1e8;
             border-radius: 4px;
@@ -66,11 +68,9 @@
 
             .fr-summary-search-item {
                 display: inline-block;
-                vertical-align: top;
-                margin-bottom: @spacing;
+                padding: @spacing;
+                box-sizing: border-box;
 
-                padding-right: @spacing / 2;
-                margin-right: @spacing / 2;
                 width: 215px;
 
                 .xforms-label {
@@ -85,6 +85,10 @@
                 .xbl-fr-time .input-append .xforms-input .xforms-type-time {
                     background-image: none;
                 }
+            }
+
+            .fr-summary-search-item.fr-summary-search-item-wide {
+                width: 430px;
             }
         }
     }
@@ -119,6 +123,10 @@
         }
 
         td, th {
+
+            &.fr-align-right {
+                text-align: right;
+            }
 
             .xforms-output .xforms-output-output {
                 white-space: nowrap;

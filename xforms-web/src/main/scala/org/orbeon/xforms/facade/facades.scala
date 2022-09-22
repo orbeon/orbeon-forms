@@ -25,7 +25,6 @@ import scala.scalajs.js.|
 
 @js.native
 trait InitTrait extends js.Object {
-  def initializeGlobals()                   : Unit = js.native
   def _range(control: html.Element)         : Unit = js.native
   def _compactSelect(control: html.Element) : Unit = js.native
   def _dialog(control: html.Element)        : Unit = js.native
@@ -121,9 +120,8 @@ object Events extends js.Object {
   val mouseover                   : js.Function1[UIEvent, Unit]    = js.native
   val mouseout                    : js.Function1[UIEvent, Unit]    = js.native
   val click                       : js.Function1[UIEvent, Unit]    = js.native
-  val scrollOrResize              : js.Function                    = js.native
 
-  def _findParentXFormsControl(t: dom.EventTarget): dom.Element = js.native // can return `null`
+  def _findParentXFormsControl(t: dom.EventTarget): html.Element = js.native // can return `null`
 }
 
 @JSGlobal("ORBEON.util.Property")
@@ -132,36 +130,9 @@ class Property[T] extends js.Object {
   def get(): T = js.native
 }
 
-@JSGlobal("ORBEON.util.Properties")
-@js.native
-object Properties extends js.Object {
-
-  def init()                           : Unit              = js.native
-
-  val delayBeforeIncrementalRequest    : Property[Int]     = js.native
-  val delayBeforeUploadProgressRefresh : Property[Int]     = js.native
-  val delayBeforeDisplayLoading        : Property[Int]     = js.native
-  val delayBeforeAjaxTimeout           : Property[Int]     = js.native
-  val retryDelayIncrement              : Property[Int]     = js.native
-  val retryMaxDelay                    : Property[Int]     = js.native
-  val internalShortDelay               : Property[Double]  = js.native
-  val revisitHandling                  : Property[String]  = js.native
-  val sessionHeartbeat                 : Property[Boolean] = js.native
-  val sessionHeartbeatDelay            : Property[Int]     = js.native
-
-  val loginPageDetectionRegexp         : Property[String]  = js.native
-  val showErrorDialog                  : Property[Boolean] = js.native
-}
-
-@js.native
-trait InitData extends js.Object {
-  val initializations : String = js.native
-}
-
 @JSGlobal("ORBEON.util.Utils")
 @js.native
 object Utils extends js.Object {
-  def appendToEffectiveId(effectiveId: String, ending: String)              : String           = js.native
   def getRepeatIndexes(effectiveId: String)                                 : js.Array[String] = js.native
   def findRepeatDelimiter(formId: String, repeatId: String, iteration: Int) : raw.Element      = js.native
   def overlayUseDisplayHidden(o: js.Object)                                 : Unit             = js.native

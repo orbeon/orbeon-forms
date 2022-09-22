@@ -146,7 +146,7 @@ class ConnectionTest
         )
 
       val parameters = wrapper.getParameterMap
-      assert("name1=value1a&name1=value1b&name1=value1c&name2=value2a&name2=value2b&name3=value3" === NetUtils.encodeQueryString(parameters))
+      assert("name1=value1a&name1=value1b&name1=value1c&name2=value2a&name2=value2b&name3=value3" === PathUtils.encodeQueryString(parameters.asScala))
     }
   }
 

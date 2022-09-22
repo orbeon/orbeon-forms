@@ -110,11 +110,11 @@ object XFormsContainingDocumentBuilder {
           requestContextPath    = request.getClientContextPath("/"),
           requestPath           = Option(request.getAttributesMap.get(RendererBaseUriAttributeName).asInstanceOf[String]) getOrElse request.getRequestPath,
           requestHeaders        = requestHeaders,
-          requestParameters     = request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap,
+          requestParameters     = request.parameters mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap,
           containerType         = containerType,
           containerNamespace    = StringUtils.defaultIfEmpty(request.getContainerNamespace, ""),
           versionedPathMatchers = versionedPathMatchers.asScala.toList,
-          isEmbedded            = Headers.isEmbeddedFromHeaders(requestHeaders),
+          embeddingType         = Headers.embeddedClientValueFromHeaders(requestHeaders),
           forceInlineResources  = isPortletContainerOrRemoteFromHeaders(containerType, requestHeaders)
         )
 
@@ -130,7 +130,7 @@ object XFormsContainingDocumentBuilder {
           containerType         = "servlet",
           containerNamespace    = "",
           versionedPathMatchers = Nil,
-          isEmbedded            = false,
+          embeddingType         = None,
           forceInlineResources  = false
         )
     }
@@ -185,7 +185,7 @@ object XFormsContainingDocumentBuilder {
               containerType         = containerType,
               containerNamespace    = dynamicState.containerNamespace.orNull,
               versionedPathMatchers = dynamicState.decodePathMatchers,
-              isEmbedded            = Headers.isEmbeddedFromHeaders(requestHeaders),
+              embeddingType         = Headers.embeddedClientValueFromHeaders(requestHeaders),
               forceInlineResources  = isPortletContainerOrRemoteFromHeaders(containerType, requestHeaders)
             )
           ) getOrElse
@@ -199,7 +199,7 @@ object XFormsContainingDocumentBuilder {
     }
 
   private def isPortletContainerOrRemoteFromHeaders(containerType: String, headers: Map[String, List[String]]) =
-    containerType == "portlet" || (Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletClient)
+    containerType == "portlet" || (Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) contains Headers.PortletEmbeddingClient)
 
   // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
   // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.

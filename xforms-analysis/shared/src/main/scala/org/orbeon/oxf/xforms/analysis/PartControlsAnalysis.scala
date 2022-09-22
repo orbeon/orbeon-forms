@@ -79,9 +79,6 @@ trait PartControlsAnalysis extends TransientState {
   def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl =
     _attributeControls.get(prefixedForAttribute) flatMap (_.get(attributeName)) orNull
 
-  def hasControlByName(controlName: String): Boolean =
-    controlTypes.get(controlName) exists (_.nonEmpty)
-
   def controlsByName(controlName: String): Iterable[ElementAnalysis] =
     controlTypes.get(controlName).toList flatMap (_.values)
 

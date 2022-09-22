@@ -288,7 +288,7 @@
 
             <!-- Calculations for page navigation -->
             <xf:bind ref="instance('fr-paging-instance')">
-                <xf:bind ref="search-total" calculate="(instance('fr-summary-instance')/@search-total, 0)[1]"/>
+                <xf:bind ref="search-total" calculate="(instance('fr-search-results-instance')/@search-total, 0)[1]"/>
                 <xf:bind ref="page-size"    calculate="instance('fr-search-instance')/page-size"/>
                 <xf:bind ref="page-number"  calculate="instance('fr-search-instance')/page-number"/>
                 <xf:bind ref="page-count"   calculate="(../search-total + ../page-size - 1) idiv ../page-size"/>
@@ -355,7 +355,13 @@
                 <!-- Are we authorized to see all the data based because of our role? -->
                 <xf:var
                     name="operations-from-role"
-                    value="frf:authorizedOperationsBasedOnRolesXPath($source-form-metadata/permissions)"/>
+                    value="frf:authorizedOperationsBasedOnRolesXPath($source-form-metadata/permissions, $app, $form)"/>
+
+                <!-- Check if the user doesn't have the permission to 'list'
+                     https://github.com/orbeon/orbeon-forms/issues/5397 -->
+                <xf:action
+                    if="not('list' = $operations-from-role)"
+                    type="xpath">frf:sendError(403)</xf:action>
 
                 <!-- Remember global operations -->
                 <xf:setvalue
@@ -444,7 +450,7 @@
             </xf:action>
 
             <!-- Summary data -->
-            <xf:instance id="fr-summary-instance">
+            <xf:instance id="fr-search-results-instance">
                 <documents xmlns="" search-total="0">
                     <!-- Content will be like this -->
                     <!--
@@ -467,7 +473,7 @@
                 method="post"
                 resource="/fr/service/persistence/search/{$app}/{$form}"
                 replace="instance"
-                instance="fr-summary-instance">
+                instance="fr-search-results-instance">
 
                 <xf:header>
                     <xf:name>Orbeon-Form-Definition-Version</xf:name>
@@ -554,7 +560,7 @@
                         <!-- Search also when dropdown value changes -->
                         <xf:dispatch
                             event="xforms-value-changed"
-                            target="search-select1"
+                            target="search-select1 search-open-select1"
                             name="fr-reset-search"
                             targetid="fr-form-model"/>
 
@@ -574,6 +580,7 @@
                                 )"/>
 
                         <xh:div class="fr-summary-search-top">
+
                             <xf:select1
                                 appearance="minimal"
                                 ref="$parameters/form-version[count($versions) gt 1]"
@@ -598,6 +605,76 @@
 
                                 </xf:action>
                             </xf:select1>
+
+                            <xh:div class="btn-group fr-summary-selection">
+                                <xh:button id="select-button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <xf:output value="$fr-resources/summary/titles/selected"/>
+                                    <xh:span class="badge badge-info" title="Documents Selected">
+                                        <xf:output value="count(xxf:split(instance('fr-selection-instance')))"/>
+                                    </xh:span>
+                                    <xh:span class="caret"/>
+                                </xh:button>
+                                <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="select-button">
+                                    <xh:li role="presentation">
+                                        <xf:trigger appearance="minimal" role="menuitem">
+                                            <xf:label ref="$fr-resources/summary/buttons/select-all"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                ref="instance('fr-selection-instance')"
+                                                propagate="stop"
+                                                value="
+                                                    string-join(
+                                                        for $d in instance('fr-search-results-instance')/document
+                                                        return
+                                                            concat(if ($d/@draft = 'true') then 'draft' else 'data', '/', $d/@name)                          ,
+                                                        ' '
+                                                    )"/>
+                                        </xf:trigger>
+                                    </xh:li>
+                                    <xh:li role="presentation">
+                                        <xf:trigger appearance="minimal" role="menuitem">
+                                            <xf:label ref="$fr-resources/summary/buttons/deselect-all"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                propagate="stop"
+                                                ref="instance('fr-selection-instance')"/>
+                                        </xf:trigger>
+                                    </xh:li>
+                                    <xh:li role="presentation" class="divider"/>
+                                    <xh:li role="presentation">
+                                        <xf:trigger appearance="minimal" role="menuitem">
+                                            <xf:label ref="$fr-resources/summary/buttons/select-saved"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                propagate="stop"
+                                                ref="instance('fr-selection-instance')"
+                                                value="
+                                                    string-join(
+                                                        for $d in instance('fr-search-results-instance')/document[not(@draft = 'true')]
+                                                        return
+                                                            concat('data/', $d/@name),
+                                                        ' '
+                                                    )"/>
+                                        </xf:trigger>
+                                    </xh:li>
+                                    <xh:li role="presentation">
+                                        <xf:trigger appearance="minimal" role="menuitem">
+                                            <xf:label ref="$fr-resources/summary/buttons/select-drafts"/>
+                                            <xf:setvalue
+                                                event="DOMActivate"
+                                                propagate="stop"
+                                                ref="instance('fr-selection-instance')"
+                                                value="
+                                                    string-join(
+                                                        for $d in instance('fr-search-results-instance')/document[@draft = 'true']
+                                                        return
+                                                            concat('draft/', $d/@name),
+                                                        ' '
+                                                    )"/>
+                                        </xf:trigger>
+                                    </xh:li>
+                                </xh:ul>
+                            </xh:div>
 
                             <xf:input
                                 id="fr-search-free-input"
@@ -715,7 +792,9 @@
                                     </xf:group>
                                     <!-- Structured search over query terms that have search-field set to 'true' -->
                                     <xf:repeat ref="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
-                                        <xf:var name="control-name" value="@name"/>
+                                        <xf:var name="control-name"    value="@name"/>
+                                        <xf:var name="control-path"    value="@path"/>
+                                        <xf:var name="control-control" value="@control"/>
                                         <xf:var
                                             name="resources"
                                             value="
@@ -725,10 +804,20 @@
                                                     ]/resources[
                                                         @lang = xxf:instance('fr-language-instance')
                                                     ]"/>
-
                                         <xf:var name="label" value="$resources/label"/>
 
-                                        <xf:group ref=".[not($has-fb-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]" class="fr-summary-search-item">
+                                        <xf:group
+                                            ref="
+                                                .[
+                                                    not(
+                                                        $has-fb-roles and (
+                                                            contains(@path, 'application-name') or
+                                                            contains(@path, 'form-name')
+                                                        )
+                                                    )
+                                                ]"
+                                            class="fr-summary-search-item {'fr-summary-search-item-wide'[$control-control = 'open-select1']}">
+
                                             <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
 
                                             <!-- input -->
@@ -756,17 +845,43 @@
                                                 <xf:label mediatype="text/html" value="$label"/>
                                             </xf:input>
                                             <!-- select1 -->
-                                            <xf:select1 ref=".[frf:isSingleSelectionControl(@control)]" id="search-select1">
+                                            <xf:select1 ref=".[not($control-control = 'open-select1') and frf:isSingleSelectionControl(@control)]" id="search-select1">
                                                 <xf:label mediatype="text/html" value="$label"/>
                                                 <xf:item>
                                                     <xf:label ref="$fr-resources/summary/labels/any"/>
                                                     <xf:value/>
                                                 </xf:item>
-                                                <xf:itemset model="fr-resources-model" ref="$resources/item">
+                                                <xf:itemset ref="$resources/item">
                                                     <xf:label ref="label"/>
                                                     <xf:value ref="value"/>
                                                 </xf:itemset>
                                             </xf:select1>
+                                            <!-- open select1 -->
+                                            <fr:open-select1 ref=".[$control-control = 'open-select1']" id="search-open-select1" appearance="minimal">
+                                                <xf:label mediatype="text/html" value="$label"/>
+                                                <!-- Static values -->
+                                                <xf:itemset ref="$resources/item">
+                                                    <xf:label ref="label"/>
+                                                    <xf:value ref="value"/>
+                                                </xf:itemset>
+                                                <!-- Also add distinct "other" values that are present on the page -->
+                                                <xf:itemset
+                                                    ref="
+                                                        let $static-values := $resources/item/value/string()
+                                                        return
+                                                            distinct-values(
+                                                                instance('fr-search-results-instance')/
+                                                                document/details/detail[
+                                                                    @path = $control-path and
+                                                                    xxf:non-blank()
+                                                                ]/string()
+                                                            )[
+                                                                not(. = $static-values)
+                                                            ]">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="."/>
+                                                </xf:itemset>
+                                            </fr:open-select1>
                                             <!-- select -->
                                             <fr:box-select ref=".[frf:isMultipleSelectionControl(@control)]" id="search-select">
                                                 <xf:label mediatype="text/html" value="$label"/>
@@ -774,7 +889,7 @@
                                                     <xf:label ref="$fr-resources/summary/labels/any"/>
                                                     <xf:value/>
                                                 </xf:item>
-                                                <xf:itemset model="fr-resources-model" ref="$resources/item">
+                                                <xf:itemset ref="$resources/item">
                                                     <xf:label ref="label"/>
                                                     <xf:value ref="value"/>
                                                 </xf:itemset>
@@ -786,7 +901,7 @@
                         </xf:switch>
                     </xf:group>
 
-                    <xf:group ref="instance('fr-summary-instance')" xxf:update="full">
+                    <xf:group ref="instance('fr-search-results-instance')" xxf:update="full">
 
                         <xf:var name="show-created"          value="xxf:property(string-join(('oxf.fr.summary.show-created'       ,   $app, $form), '.'))"/>
                         <xf:var name="show-last-modified"    value="xxf:property(string-join(('oxf.fr.summary.show-last-modified' ,   $app, $form), '.'))"/>
@@ -803,33 +918,6 @@
 
                             <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
-                                 <xh:colgroup>
-                                    <xh:col class="fr-summary-repeat-selection-checkbox"/>
-                                    <xh:col class="{$labels-class}"/>
-                                    <xf:group ref="''[$show-created]">
-                                        <xh:col/>
-                                    </xf:group>
-                                    <xf:group ref="''[$show-last-modified]">
-                                        <xh:col/>
-                                    </xf:group>
-                                     <xf:group ref="''[$show-created-by]">
-                                        <xh:col/>
-                                    </xf:group>
-                                     <xf:group ref="''[$show-last-modified-by]">
-                                        <xh:col/>
-                                    </xf:group>
-                                    <xf:group ref="''[$show-workflow-stage]">
-                                        <xh:col/>
-                                    </xf:group>
-                                    <!-- Empty column if no summary fields looks nicer -->
-                                    <xf:group ref="''[empty($detail-positions)]">
-                                        <xh:col/>
-                                    </xf:group>
-                                    <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                    <xf:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']">
-                                        <xh:col/>
-                                    </xf:repeat>
-                                </xh:colgroup>
                                 <xh:thead>
                                     <xh:tr>
                                         <xh:th class="fr-summary-repeat-selection-checkbox"/>
@@ -863,7 +951,7 @@
                                             <xh:th/>
                                         </xf:group>
                                         <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
-                                            <xh:th>
+                                            <xh:th class="{if (@control = ('number', 'currency')) then 'fr-align-right' else ''}">
                                                 <!-- Output showing as the header of the column -->
                                                 <xf:output
                                                     mediatype="text/html"
@@ -882,7 +970,7 @@
                                         <!-- 1-based position in the current page -->
                                         <xf:var name="position" value="position()"/>
                                         <!-- Set context to current document -->
-                                        <xf:group context="instance('fr-summary-instance')/document[$position]" appearance="xxf:internal">
+                                        <xf:group context="instance('fr-search-results-instance')/document[$position]" appearance="xxf:internal">
                                             <xf:var name="document" value="."/>
 
                                             <!-- Document name and href for edition -->
@@ -1044,7 +1132,7 @@
                                                     <xf:var name="detail-position" value="."/>
                                                     <!-- Set context to current detail -->
                                                     <xf:group context="$document/details/detail[$detail-position]" appearance="xxf:internal">
-                                                        <xh:td class="fr-summary-td">
+                                                        <xh:td class="fr-summary-td {'fr-align-right'[instance('fr-search-instance')/query[$detail-position + 1]/@control = ('number', 'currency')]}">
                                                             <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                             <xf:var
                                                                 name="detail"
@@ -1246,7 +1334,7 @@
 
                     <xf:var
                         name="documents-selected"
-                        value="instance('fr-summary-instance')/document[concat(if (@draft = 'true') then 'draft' else 'data', '/', @name) = xxf:split(instance('fr-selection-instance'))]"/>
+                        value="instance('fr-search-results-instance')/document[concat(if (@draft = 'true') then 'draft' else 'data', '/', @name) = xxf:split(instance('fr-selection-instance'))]"/>
 
                     <!-- Take into account the global operations but also the operations returned by the persistence
                          layer for each selected form. This can only add to permissions, for example if the user is the
@@ -1257,7 +1345,7 @@
                     <xf:var name="documents-can-view"      value="empty($documents-selected[not(distinct-values(($global-operations, xxf:split(@operations))) = ('*', 'read'))])"/>
                     <xf:var name="documents-can-delete"    value="empty($documents-selected[not(distinct-values(($global-operations, xxf:split(@operations))) = ('*', 'delete'))])"/>
 
-                    <xf:var name="doc-count"               value="count(instance('fr-summary-instance')/document)"/>
+                    <xf:var name="doc-count"               value="count(instance('fr-search-results-instance')/document)"/>
                     <xf:var name="is-singleton"            value="$source-form-metadata/singleton = 'true'"/>
                     <xf:var name="singleton-limit-reached" value="$is-singleton and $doc-count > 0"/>
                     <xf:var name="new-visible"             value="$global-operations = ('*', 'create') and not($singleton-limit-reached)"/>

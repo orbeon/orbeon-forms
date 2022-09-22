@@ -1,5 +1,5 @@
 addSbtPlugin     ("org.portable-scala"  % "sbt-scalajs-crossproject" % "1.2.0")
-addSbtPlugin     ("org.scala-js"        % "sbt-scalajs"              % "1.10.1")
+addSbtPlugin     ("org.scala-js"        % "sbt-scalajs"              % "1.11.0")
 addSbtPlugin     ("org.scala-js"        % "sbt-jsdependencies"       % "1.0.2")
 addSbtPlugin     ("com.eed3si9n"        % "sbt-buildinfo"            % "0.11.0")
 addSbtPlugin     ("com.typesafe.sbt"    % "sbt-less"                 % "1.1.2")
@@ -14,4 +14,4 @@ libraryDependencies += "org.scala-js" %% "scalajs-env-jsdom-nodejs" % "1.1.0" //
 
 // Apparently needed for sbt-web
 resolvers += Resolver.typesafeRepo("releases")
-resolvers += Resolver.sonatypeRepo("releases")
+resolvers ++= Resolver.sonatypeOssRepos("releases")

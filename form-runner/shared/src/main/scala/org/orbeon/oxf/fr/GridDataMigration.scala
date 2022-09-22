@@ -24,6 +24,7 @@ import org.orbeon.scaxon.SimplePath._
 
 object GridDataMigration {
 
+  // Used by `fr-get-document-submission` in `persistence-model.xml`
   //@XPathFunction
   def dataMaybeMigratedFromDatabaseFormat(
     app         : String,
@@ -33,7 +34,7 @@ object GridDataMigration {
   ): DocumentNodeInfoType = {
 
     val appForm              = AppForm(app, form)
-    val dstDataFormatVersion = DataFormatVersion.Edge
+    val dstDataFormatVersion = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt.map(_.rootElement))
 
     val migratedOrDuplicatedData =
       MigrationSupport.migrateDataWithFormMetadataMigrations(
@@ -51,7 +52,7 @@ object GridDataMigration {
     migratedOrDuplicatedData
   }
 
-  // NOTE: Exposed to some users.
+  // NOTE: Exposed to some external users.
   //@XPathFunction
   def dataMaybeMigratedToDatabaseFormat(
     app         : String,
@@ -63,13 +64,13 @@ object GridDataMigration {
       appForm             = AppForm(app, form),
       data                = data,
       metadataRootElemOpt = metadataOpt.map(_.rootElement),
-      srcVersion          = DataFormatVersion.Edge,
+      srcVersion          = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt.map(_.rootElement)),
       dstVersion          = FormRunnerPersistence.providerDataFormatVersionOrThrow(AppForm(app, form)),
       pruneMetadata       = false
     ) getOrElse
       data
 
-  // NOTE: Exposed to some users.
+  // NOTE: Exposed to some external users.
   //@XPathFunction
   def dataMaybeMigratedFromFormDefinition(
     data     : DocumentNodeInfoType,
@@ -86,6 +87,7 @@ object GridDataMigration {
       data
   }
 
+  // Used by background process in `persistence-model.xml`, `send`, and save to database.
   //@XPathFunction
   def dataMaybeMigratedFromEdge(
     app                     : String,
@@ -104,7 +106,7 @@ object GridDataMigration {
         appForm             = appForm,
         data                = data,
         metadataRootElemOpt = metadataOpt.map(_.rootElement),
-        srcVersion          = DataFormatVersion.Edge,
+        srcVersion          = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt.map(_.rootElement)),
         dstVersion          = dstDataFormatVersion,
         pruneMetadata       = pruneMetadata
       ) getOrElse
@@ -115,24 +117,25 @@ object GridDataMigration {
     migratedOrDuplicatedData
   }
 
+  // Used for data submitted data to page and load from service in `persistence-model.xml`
   //@XPathFunction
   def dataMigratedToEdge(
-    app                     : String,
-    form                    : String,
-    data                    : DocumentNodeInfoType,
-    metadataOpt             : Option[DocumentNodeInfoType],
-    dataFormatVersionString : String
+    app                       : String,
+    form                      : String,
+    data                      : DocumentNodeInfoType,
+    metadataOpt               : Option[DocumentNodeInfoType],
+    srcDataFormatVersionString: String
   ): DocumentWrapper = {
 
     val appForm              = AppForm(app, form)
-    val dstDataFormatVersion = DataFormatVersion.Edge
+    val dstDataFormatVersion = FormRunnerPersistence.getOrGuessFormDataFormatVersion(metadataOpt.map(_.rootElement))
 
     val migratedOrDuplicatedData =
       MigrationSupport.migrateDataWithFormMetadataMigrations(
         appForm             = appForm,
         data                = data,
         metadataRootElemOpt = metadataOpt.map(_.rootElement),
-        srcVersion          = dataFormatVersionString.trimAllToOpt    map
+        srcVersion          = srcDataFormatVersionString.trimAllToOpt map
                                 DataFormatVersion.withNameIncludeEdge getOrElse
                                 DataFormatVersion.V400,
         dstVersion          = dstDataFormatVersion,

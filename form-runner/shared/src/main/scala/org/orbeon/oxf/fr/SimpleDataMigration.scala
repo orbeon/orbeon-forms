@@ -13,7 +13,6 @@
   */
 package org.orbeon.oxf.fr
 
-import cats.syntax.option._
 import enumeratum.EnumEntry.Lowercase
 import org.log4s
 import org.orbeon.oxf.fr.FormRunnerCommon._
@@ -27,10 +26,13 @@ import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.model.{DataModel, XFormsModel}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticState}
 import org.orbeon.saxon.om
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
+
+import scala.reflect.ClassTag
 
 
 object SimpleDataMigration {
@@ -53,8 +55,46 @@ object SimpleDataMigration {
   sealed trait DataMigrationOp
 
   object DataMigrationOp {
-    case class Insert(parentElem: om.NodeInfo, after: Option[String], template: Option[om.NodeInfo]) extends DataMigrationOp
-    case class Delete(elem: om.NodeInfo)                                                             extends DataMigrationOp
+
+    type Ancestry = (String, List[String])
+
+    private def findClosestIterationElem(elem: om.NodeInfo, repeats: List[String]): Option[NodeInfo] =
+      elem.ancestor(*).sliding(2) collectFirst {
+        case Seq(pen, last) if repeats.headOption.contains(last.localname) => pen
+      }
+
+    sealed trait InsertOrDelete extends DataMigrationOp {
+      def ancestry: Ancestry
+      def findClosestRepeatIteration: Option[NodeInfo]
+    }
+
+    case class Insert(
+      parentElem: om.NodeInfo,
+      after     : Option[String],
+      template  : om.NodeInfo,
+      repeats   : List[String]
+    ) extends InsertOrDelete {
+      def ancestry: Ancestry = template.localname -> repeats
+      def findClosestRepeatIteration: Option[NodeInfo] =
+        if (repeats.isEmpty)
+          None
+        else
+          findClosestIterationElem(parentElem, repeats)
+    }
+
+    case class Delete(
+      elem   : om.NodeInfo,
+      repeats: List[String]
+    ) extends InsertOrDelete {
+      def ancestry: Ancestry = elem.localname -> repeats
+      def findClosestRepeatIteration: Option[NodeInfo] =
+        if (repeats.isEmpty)
+          None
+        else
+          findClosestIterationElem(elem, repeats)
+    }
+
+    case class Move(delete: Delete, insert: Insert) extends DataMigrationOp
   }
 
   trait FormOps {
@@ -140,25 +180,26 @@ object SimpleDataMigration {
             dataToMigrateRootElem    = dataToMigrateRootElemMutable
           )
 
-        lazy val deleteOps =
+        lazy val deleteAndMoveOps =
           ops collect {
-            case delete: DataMigrationOp.Delete => delete
+            case op: DataMigrationOp.Delete => op
+            case op: DataMigrationOp.Move   => op
           }
 
         val mustMigrate =
           ops.nonEmpty && (
             dataMigrationBehavior == DataMigrationBehavior.Enabled ||
-            dataMigrationBehavior == DataMigrationBehavior.HolesOnly && deleteOps.isEmpty
+            dataMigrationBehavior == DataMigrationBehavior.HolesOnly && deleteAndMoveOps.isEmpty
           )
 
         val mustRaiseError =
-          ops.nonEmpty && dataMigrationBehavior == DataMigrationBehavior.HolesOnly && deleteOps.nonEmpty
+          ops.nonEmpty && dataMigrationBehavior == DataMigrationBehavior.HolesOnly && deleteAndMoveOps.nonEmpty
 
         if (mustMigrate) {
           performMigrationOps(ops)
           Some(Right(dataToMigrateRootElemMutable))
         } else if (mustRaiseError) {
-          Left(deleteOps).some
+          Some(Left(deleteAndMoveOps))
         } else {
           None
         }
@@ -173,7 +214,7 @@ object SimpleDataMigration {
           )
 
         if (ops.nonEmpty)
-          Left(ops).some
+          Some(Left(ops))
         else
           None
     }
@@ -211,7 +252,6 @@ object SimpleDataMigration {
       scanBinds(ops)(binds, findOps)
     }
 
-    // The root bind has id `fr-form-binds` at the top-level as well as within section templates
     ops.findFormBindsRoot.toList flatMap { bind =>
       processLevel(
         parents = List(dataRootElem),
@@ -449,23 +489,30 @@ object SimpleDataMigration {
         parents          : List[om.NodeInfo],
         binds            : List[formOps.BindType], // use `List` to ensure eager evaluation
         templateRootElem : om.NodeInfo,
-        path             : List[String]
-      ): List[DataMigrationOp] = {
+        path             : List[String],
+        repeats          : List[String],
+      ): List[DataMigrationOp.InsertOrDelete] = {
 
         val allBindNames = binds.flatMap(formOps.bindNameOpt).toSet
 
-        def findOps(prevBindOpt: Option[formOps.BindType], bind: formOps.BindType, bindName: String): List[DataMigrationOp] = {
-
+        def findOps(
+          prevBindOpt: Option[formOps.BindType],
+          bind       : formOps.BindType,
+          bindName   : String
+        ): List[DataMigrationOp.InsertOrDelete] =
           parents flatMap { parent =>
             parent / bindName toList match {
               case Nil =>
-                List(
+                // 2022-08-24: Don't create an `Insert` operation if, for some reason (error?) we can't find the
+                // template. We were not making use of the `Insert` in that case anyway.
+                findElementTemplate(templateRootElem, bindName :: path).toList.map { template =>
                   DataMigrationOp.Insert(
                     parentElem = parent,
                     after      = prevBindOpt.flatMap(formOps.bindNameOpt),
-                    template   = findElementTemplate(templateRootElem, bindName :: path)
+                    template   = template,
+                    repeats    = repeats
                   )
-                )
+                }
               case nodes =>
 
                 // If we get a `Some(_)` it means that this bind is for a repeat iteration
@@ -477,11 +524,11 @@ object SimpleDataMigration {
                   parents          = nodes,
                   binds            = formOps.bindChildren(bind),
                   templateRootElem = newTemplateRootElem getOrElse templateRootElem,
-                  path             = if (newTemplateRootElem.isDefined) Nil else bindName :: path
+                  path             = if (newTemplateRootElem.isDefined) Nil else bindName :: path,
+                  repeats          = if (newTemplateRootElem.isDefined) bindName :: repeats else repeats,
                 )
             }
           }
-        }
 
         // https://github.com/orbeon/orbeon-forms/issues/5041
         // Only delete if there are no nested bind, for backward compatibility first. But is this wrong? If we don't do
@@ -490,33 +537,79 @@ object SimpleDataMigration {
         val deleteOps =
           if (binds.nonEmpty)
             parents / * filter (e => e.namespaceURI == "" && ! allBindNames(e.localname)) map { e =>
-              DataMigrationOp.Delete(e)
+              DataMigrationOp.Delete(
+                elem    = e,
+                repeats = repeats
+              )
             }
           else
             Nil
 
         deleteOps ++: scanBinds(formOps)(binds, findOps)
+      } // end `processLevel`
+
+      inferMoveOps(
+        formOps.findFormBindsRoot.toList flatMap { bind =>
+          processLevel(
+            parents          = List(dataToMigrateRootElem),
+            binds            = formOps.bindChildren(bind),
+            templateRootElem = templateInstanceRootElem,
+            path             = Nil,
+            repeats          = Nil
+          )
+        }
+      )
+    }
+
+    // From `Delete` and `Insert` operations, infer `Move` operations. Only handle moves of controls where both the
+    // source AND the destination are not repeated, or are within the same repeat iteration, as it's unclear what should
+    // happen in other cases.
+    def inferMoveOps(migrationOps: List[DataMigrationOp.InsertOrDelete]): List[DataMigrationOp] = {
+
+      import DataMigrationOp._
+
+      val moves = {
+
+        def collectAncestry[Op <: InsertOrDelete : ClassTag](ops: List[DataMigrationOp]): Map[Ancestry, List[Op]] =
+          (ops collect { case op: Op => (op.ancestry, op) })
+            .groupBy(_._1) collect { case (ancestry, ops) => ancestry -> ops.map(_._2) }
+
+        val deletesByAncestry: Map[Ancestry, List[Delete]] = collectAncestry[Delete](migrationOps)
+        val insertsByAncestry: Map[Ancestry, List[Insert]] = collectAncestry[Insert](migrationOps)
+
+        val commonAncestries: Set[Ancestry] =
+          deletesByAncestry.keySet.intersect(insertsByAncestry.keySet)
+
+        commonAncestries.toList flatMap { ancestry =>
+
+          def collectSingleOps[Op <: InsertOrDelete](ops: List[Op]): Map[Option[NodeInfo], Op] =
+            ops.groupBy(_.findClosestRepeatIteration) collect { case (nodeOpt, List(op)) => nodeOpt -> op }
+
+          val deletesByIteration: Map[Option[NodeInfo], Delete] = collectSingleOps(deletesByAncestry(ancestry))
+          val insertsByIteration: Map[Option[NodeInfo], Insert] = collectSingleOps(insertsByAncestry(ancestry))
+
+          for {
+            (nodeOpt, delete) <- deletesByIteration.toList
+            insert            <- insertsByIteration.get(nodeOpt)
+          } yield
+            Move(delete, insert)
+        }
       }
 
-      // The root bind has id `fr-form-binds` at the top-level as well as within section templates
-      formOps.findFormBindsRoot.toList flatMap { bind =>
-        processLevel(
-          parents          = List(dataToMigrateRootElem),
-          binds            = formOps.bindChildren(bind),
-          templateRootElem = templateInstanceRootElem,
-          path             = Nil
-        )
-      }
+      val remainingOps =
+        migrationOps filter (op => ! moves.exists(move => (op eq move.delete) || (op eq move.insert)))
+
+      remainingOps ::: moves
     }
 
     def performMigrationOps(migrationOps: List[DataMigrationOp]): Unit =
       migrationOps foreach {
-        case DataMigrationOp.Delete(elem) =>
+        case DataMigrationOp.Delete(elem, _) =>
 
           logger.debug(s"removing element `${elem.localname}` from `${elem.getParent.localname}`")
           delete(elem)
 
-        case DataMigrationOp.Insert(parentElem, after, Some(template)) =>
+        case DataMigrationOp.Insert(parentElem, after, template, _) =>
 
           logger.debug(s"inserting element `${template.localname}` into `${parentElem.localname}` after `$after`")
 
@@ -526,9 +619,20 @@ object SimpleDataMigration {
             origin = template.toList
           )
 
-        case DataMigrationOp.Insert(_, _, None) =>
+        case DataMigrationOp.Move(DataMigrationOp.Delete(elem, _), DataMigrationOp.Insert(parentElem, after, _, _)) =>
 
-          // Template for the element was not found. Error?
+          // TODO: Attributes on moved element should be compatible, somehow. For example, form author might have moved
+          //  a form control, and then changed its control type. Ideally, we'd know if the types are compatible.
+
+          logger.debug(s"moving element `${elem.localname}` into `${parentElem.localname}` after `$after`")
+
+          delete(elem)
+
+          insert(
+            into   = parentElem,
+            after  = after.toList flatMap (parentElem / _),
+            origin = elem
+          )
       }
   }
 }

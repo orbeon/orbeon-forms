@@ -17,13 +17,13 @@ import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.EventNames._
 import org.orbeon.xforms.controls.Upload._
-import org.orbeon.xforms.facade.Properties
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryEventObject
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import scala.concurrent.duration._
 import scala.scalajs.js.annotation.JSExport
+
 
 object Upload {
 
@@ -87,7 +87,7 @@ class Upload {
     for (i <- 0 until files.length) {
       UploaderClient.uploadEventQueue.add(
         event    = UploadEvent(self, files(i)),
-        wait     = Properties.delayBeforeIncrementalRequest.get().millis,
+        wait     = Page.getFormFromElemOrThrow(self.container).configuration.delayBeforeIncrementalRequest.millis,
         waitType = ExecutionWait.MinWait
       )
     }

@@ -865,23 +865,8 @@
                                 </fr:alert-dialog>
 
                                 <xf:action event="fb-request-delete-http-service" observer="dialog-http-services">
-
-                                    <xf:var
-                                        name="impacted-actions"
-                                        value="
-                                            count(
-                                                $model/fb:action[
-                                                    ends-with(@id, '-binding')
-                                                ]//xf:send/@submission[
-                                                    . = concat(event('service-name'), '-submission')
-                                                ]
-                                            )
-                                            +
-                                            count(
-                                                $model/fr:action//fr:service-call/@service[
-                                                    . = event('service-name')
-                                                ]
-                                            )"/>
+                                    <xf:var name="service-name"     value="event('service-name')"/>
+                                    <xf:var name="impacted-actions" value="fbf:countImpactedActions($model, $service-name)" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"/>
                                     <xf:dispatch name="fr-show" targetid="dialog-confirmation">
                                         <xf:property
                                             name="message"
@@ -889,8 +874,8 @@
                                                 xxf:format-message(
                                                     $form-resources/messages/delete-service,
                                                     (
-                                                        event('service-name'), (: service name              :)
-                                                        $impacted-actions      (: count of impacted actions :)
+                                                        $service-name,    (: service name              :)
+                                                        $impacted-actions (: count of impacted actions :)
                                                     )
                                                 )"/>
                                         <xf:property

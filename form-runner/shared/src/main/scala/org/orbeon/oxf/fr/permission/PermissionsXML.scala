@@ -13,16 +13,17 @@
  */
 package org.orbeon.oxf.fr.permission
 
-import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.xml.Elem
 
+
 object PermissionsXML {
 
-  def serialize(permissions: Permissions): Option[Elem] =
+  // xxx TODO: sort things in predictable order
+  def serialize(permissions: Permissions, normalized: Boolean): Option[Elem] =
     permissions match {
       case UndefinedPermissions =>
         None
@@ -30,7 +31,7 @@ object PermissionsXML {
         Some(
           <permissions>
             {permissionsList map (p =>
-            <permission operations={Operations.serialize(p.operations).mkString(" ")}>
+            <permission operations={Operations.serialize(p.operations, normalized).mkString(" ")}>
               {p.conditions map {
               case Owner => <owner/>
               case Group => <group-member/>
@@ -45,16 +46,26 @@ object PermissionsXML {
         )
     }
 
-  def parse(permissionsElOrNull: NodeInfo): Permissions =
-    Option(permissionsElOrNull) match {
+  def parse(permissionsElemOpt: Option[NodeInfo]): Permissions =
+    permissionsElemOpt match {
       case None =>
         UndefinedPermissions
       case Some(permissionsEl) =>
         DefinedPermissions(permissionsEl.child("permission").toList.map(parsePermission))
     }
 
+  /**
+   * Given a permission element, e.g.:
+   *
+   *   <permission operations="read update delete">
+   *
+   * return the tokenized value of the `operations` attribute.
+   *
+   * See backward compatibility handling: https://github.com/orbeon/orbeon-forms/issues/5397
+   */
   private def parsePermission(permissionEl: NodeInfo): Permission = {
-    val operations = Operations.parse(FormRunner.permissionOperations(permissionEl))
+    val operations =
+      Operations.parse(Operations.normalizeOperations(permissionEl.attValue("operations")).toList)
     val conditions =
       permissionEl.child(*).toList.map(
         conditionEl =>
@@ -66,7 +77,7 @@ object PermissionsXML {
               val rawRoles      = anyOfAttValue.splitTo[List](" ")
               val roles         = rawRoles.map(_.replace("%20", " "))
               RolesAnyOf(roles)
-            case _ => throw new RuntimeException("")
+            case _ => throw new IllegalArgumentException
           }
       )
     Permission(conditions, operations)

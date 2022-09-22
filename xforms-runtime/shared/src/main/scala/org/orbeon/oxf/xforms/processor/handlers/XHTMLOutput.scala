@@ -126,9 +126,9 @@ object XHTMLOutput {
     case (ns @ XF,  ln @ "select1"         , qn, atts, c: AppearanceTrait , hc) if c.appearances(XXFORMS_INTERNAL_APPEARANCE_QNAME)  => new NullHandler                 (ns, ln, qn, atts,    hc)
     case (ns @ XF,  ln @ "select"          , qn, atts, c                  , hc)                                                      => new XFormsSelectHandler         (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "select1"         , qn, atts, c                  , hc)                                                      => new XFormsSelect1Handler        (ns, ln, qn, atts, c, hc)
-    case (ns @ XF,  ln @ "label"           , qn, atts, c: LHHAAnalysis    , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
+    case (ns @ XF,  ln @ "label"           , qn, atts, c: LHHAAnalysis    , hc) if ! c.isPlaceholder                                 => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "help"            , qn, atts, c: LHHAAnalysis    , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
-    case (ns @ XF,  ln @ "hint"            , qn, atts, c: LHHAAnalysis    , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
+    case (ns @ XF,  ln @ "hint"            , qn, atts, c: LHHAAnalysis    , hc) if ! c.isPlaceholder                                 => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
     case (ns @ XF,  ln @ "alert"           , qn, atts, c: LHHAAnalysis    , hc)                                                      => new XFormsLHHAHandler           (ns, ln, qn, atts, c, hc)
     case (ns @ XXF, ln @ "dynamic"         , qn, atts, _                  , hc)                                                      => new XXFormsDynamicHandler       (ns, ln, qn, atts,    hc)
   }

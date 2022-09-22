@@ -45,7 +45,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
         xxbl:serialize-external-value="
             DateSupport:serializeExternalValueJava(
                 xxf:binding('fr-date'),
-                xxf:property('oxf.xforms.format.input.date'),
+                property('xxf:format.input.date'),
                 fr:component-param-value('week-start-day')
             )"
 
@@ -143,7 +143,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
                         <resource xml:lang="en"><format>MDY</format></resource>
                         <resource xml:lang="fr"><format>MJA</format></resource>
                         <resource xml:lang="de"><format>MTJ</format></resource>
-                        <resource xml:lang="pl"><format>YMD</format></resource>
+                        <resource xml:lang="pl"><format>MDR</format></resource>
                         <resource xml:lang="hu"><format>HNÉ</format></resource>
 						<resource xml:lang="da"><format>MDÅ</format></resource>
                     </_>
@@ -173,7 +173,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
                     <xf:var
                         name="placeholder"
                         value="
-                            let $format      := xxf:property('oxf.xforms.format.input.date'),
+                            let $format      := property('xxf:format.input.date'),
                                 $cleaned     := translate($format, '[01]', ''),
                                 $duplicate   := replace(replace(replace($cleaned,
                                                 'M', 'MM'),

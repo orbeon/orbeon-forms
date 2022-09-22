@@ -811,7 +811,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control class="input-prepend fr-field-width-natural" id="my-currency≡xf-11"/>
+                        <xxf:control class="xforms-help-popover-control input-prepend fr-field-width-natural" id="my-currency≡xf-11"/>
                         <xxf:control id="my-currency≡xf-13" class="add-on"/>
                         <xxf:control id="my-currency≡prefix">
                             <xxf:value>$</xxf:value>
@@ -920,7 +920,7 @@
                         <xxf:control id="my-autocomplete≡itemset" class="fr-autocomplete-dynamic-itemset xforms-hidden">
                             <xxf:value>true</xxf:value>
                         </xxf:control>
-                        <xxf:control id="my-autocomplete≡xf-71" class="xbl-fr-autocomplete-max-results-displayed xforms-hidden">
+                        <xxf:control id="my-autocomplete≡xf-70" class="xbl-fr-autocomplete-max-results-displayed xforms-hidden">
                             <xxf:value>10</xxf:value>
                         </xxf:control>
                         <xxf:control id="my-autocomplete≡select1" class="fr-autocomplete-select1 xforms-hidden">

@@ -29,7 +29,7 @@ case class SearchRequest(
   columns         : List[Column],
   drafts          : Drafts,
   freeTextSearch  : Option[String],
-  anyOfOperations : Option[List[Operation]]
+  anyOfOperations : Option[Set[Operation]]
 )
 
 sealed trait FilterType

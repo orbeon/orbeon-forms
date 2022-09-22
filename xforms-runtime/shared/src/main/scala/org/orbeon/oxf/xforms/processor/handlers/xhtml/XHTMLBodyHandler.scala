@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import java.{lang => jl}
 
 import org.orbeon.dom.QName
-import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLElementHandler._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler, XHTMLOutput}
@@ -24,8 +23,7 @@ import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XH}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.{Constants, DeploymentType}
+import org.orbeon.xforms.Constants
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -70,15 +68,6 @@ class XHTMLBodyHandler(
     // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
     //        formattingPrefix = handlerContext().findFormattingPrefixDeclare();
 
-    val isEmbeddedClient = containingDocument.isEmbeddedFromHeaders
-    val requestPath      = containingDocument.getRequestPath
-
-    val xformsSubmissionPath =
-      if (containingDocument.getDeploymentType != DeploymentType.Standalone || containingDocument.isPortletContainer || isEmbeddedClient)
-        XFORMS_SERVER_SUBMIT
-      else
-        requestPath // submission posts to URL of the current page and `xforms-xml-submission.xpl` intercepts that
-
     val formElemClasses = {
       val sb = new jl.StringBuilder("xforms-form xforms-initially-hidden")
 
@@ -106,10 +95,6 @@ class XHTMLBodyHandler(
       sb.toString
     }
 
-    // Create `xh:form` element
-    // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters
-    val doMultipartPOST = containingDocument.staticOps.hasControlByName("upload") || isEmbeddedClient
-
     openElement(
       localName = "form",
       prefix    = htmlPrefix,
@@ -117,10 +102,10 @@ class XHTMLBodyHandler(
       atts      =
         ("id"       -> containingDocument.getNamespacedFormId) ::
         ("class"    -> formElemClasses)                        ::
-        ("action"   -> xformsSubmissionPath)                   ::
         ("method"   -> "POST")                                 ::
         ("onsubmit" -> "return false")                         ::
-        (doMultipartPOST list ("enctype" -> "multipart/form-data"))
+        ("enctype"  -> "multipart/form-data")                  ::
+        Nil
     )
 
     // Only for 2-pass submission

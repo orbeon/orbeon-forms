@@ -28,6 +28,7 @@ trait Element extends Branch {
   def allInScopeNamespacesAsStrings: Map[String, String]
 
   def namespaceForPrefix(prefix: String): Option[String]
+  def prefixesForNamespaceUri(uri: String): Iterator[String]
 
   def regularNodeIterator: Iterator[Node]
 

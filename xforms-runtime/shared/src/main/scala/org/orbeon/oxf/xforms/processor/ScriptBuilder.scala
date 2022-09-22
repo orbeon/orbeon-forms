@@ -18,25 +18,23 @@ import io.circe.syntax._
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
-import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.oxf.xforms.XFormsGlobalProperties._
+import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl, XFormsValueComponentControl}
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.{ShareableScript, XFormsContainingDocument}
-import org.orbeon.xforms.{EventNames, ServerError, rpc}
+import org.orbeon.xforms._
+import org.orbeon.xforms.rpc.ConfigurationProperties
 
+import java.{lang => jl}
 import scala.collection.mutable
 
 
 object ScriptBuilder {
 
-  // TODO: Constants duplicated from URLRewriterUtils
-  val RESOURCES_VERSIONED_PROPERTY      = "oxf.resources.versioned"
-  val RESOURCES_VERSION_NUMBER_PROPERTY = "oxf.resources.version-number"
-  val RESOURCES_VERSIONED_DEFAULT       = false
-
-  private def quoteString(s: String) =
+  def quoteString(s: String) =
     s""""${s.escapeJavaScript}""""
 
   def escapeJavaScriptInsideScript (js: String): String = {
@@ -88,228 +86,156 @@ object ScriptBuilder {
     controlsToInitialize.result
   }
 
-  def findConfigurationProperties(
+  private def findConfigurationProperties(
     containingDocument : XFormsContainingDocument,
     versionedResources : Boolean,
     heartbeatDelay     : Long
-  ): Option[String] = {
+  ): ConfigurationProperties = {
 
-    // Gather all static properties that need to be sent to the client
-    val staticProperties = containingDocument.staticState.clientNonDefaultProperties
+    val staticState = containingDocument.staticState
 
-    val dynamicProperties = {
+    // Help events are dynamic because they depend on whether the xforms-help event is used
+    // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
+    def helpHandler =
+      containingDocument.staticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false)
 
-      def dynamicProperty[T](p: Boolean, name: String, value: T): Option[(String, T)] =
-        p option (name -> value)
+    // Application version is not an XForms property but we want to expose it on the client
+    def resourcesVersionOpt =
+      versionedResources flatOption CoreCrossPlatformSupport.getApplicationResourceVersion
 
-      // Heartbeat delay is dynamic because it depends on session duration
-      def heartbeatOpt =
-        Some(SessionHeartbeatDelayProperty -> heartbeatDelay)
-
-      // Help events are dynamic because they depend on whether the xforms-help event is used
-      // TODO: Better way to enable/disable xforms-help event support, maybe static analysis of event handlers?
-      def helpOpt = dynamicProperty(
-        containingDocument.staticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
-        HelpHandlerProperty,
-        true
-      )
-
-      // Whether resources are versioned
-      def resourcesVersionedOpt = dynamicProperty(
-        versionedResources != RESOURCES_VERSIONED_DEFAULT,
-        RESOURCES_VERSIONED_PROPERTY,
-        versionedResources
-      )
-
-      // Application version is not an XForms property but we want to expose it on the client
-      def resourcesVersionOpt =
-        CoreCrossPlatformSupport.getApplicationResourceVersion flatMap
-        (
-          dynamicProperty(
-            versionedResources,
-            RESOURCES_VERSION_NUMBER_PROPERTY,
-            _
-          )
-        )
-
-      // Gather all dynamic properties that are defined
-      List(heartbeatOpt, helpOpt, resourcesVersionedOpt, resourcesVersionOpt).flatten
-    }
-
-    val globalProperties = List(
-      DelayBeforeAjaxTimeoutProperty -> getAjaxTimeout,
-      RetryDelayIncrement            -> getRetryDelayIncrement,
-      RetryMaxDelay                  -> getRetryMaxDelay
+    ConfigurationProperties(
+      sessionHeartbeat                 = staticState.staticBooleanProperty(SessionHeartbeatProperty),                     // static
+      sessionHeartbeatDelay            = heartbeatDelay,                                                                  // dynamic
+      revisitHandling                  = staticState.staticStringProperty(RevisitHandlingProperty),                       // static
+      delayBeforeIncrementalRequest    = staticState.staticIntProperty(DelayBeforeIncrementalRequestProperty),            // static
+      delayBeforeAjaxTimeout           = getAjaxTimeout,                                                                  // global
+      internalShortDelay               = staticState.staticIntProperty(InternalShortDelayProperty),                       // static
+      delayBeforeDisplayLoading        = staticState.staticIntProperty(DelayBeforeDisplayLoadingProperty),                // static
+      delayBeforeUploadProgressRefresh = staticState.staticIntProperty(DelayBeforeUploadProgressRefreshProperty),         // static
+      helpHandler                      = helpHandler,                                                                     // dynamic
+      resourcesVersioned               = versionedResources,                                                              // dynamic
+      resourcesVersionNumber           = resourcesVersionOpt,                                                             // dynamic
+      helpTooltip                      = staticState.staticBooleanProperty(HelpTooltipProperty),                          // static
+      showErrorDialog                  = staticState.staticBooleanProperty(ShowErrorDialogProperty),                      // static
+      loginPageDetectionRegexp         = staticState.staticStringProperty(LoginPageDetectionRegexpProperty).trimAllToOpt, // static
+      retryDelayIncrement              = getRetryDelayIncrement,                                                          // global
+      retryMaxDelay                    = getRetryMaxDelay,                                                                // global
+      useAria                          = staticState.staticBooleanProperty(UseAriaProperty),                              // static
+      dateFormatInput                  = staticState.staticStringProperty(DateFormatInputProperty),                       // static
+      timeFormatInput                  = staticState.staticStringProperty(TimeFormatInputProperty),                       // static
     )
-
-    // combine all static and dynamic properties
-    val clientProperties = staticProperties ++ dynamicProperties ++ globalProperties
-
-    clientProperties.nonEmpty option {
-
-      val sb = new StringBuilder
-
-      sb append "var opsXFormsProperties = {"
-
-      for (((propertyName, propertyValue), index) <- clientProperties.toList.zipWithIndex) {
-
-        if (index != 0)
-          sb append ','
-
-        sb append '"'
-        sb append propertyName
-        sb append "\":"
-
-        propertyValue match {
-          case s: String =>
-            sb append '"'
-            sb append s
-            sb append '"'
-          case _ =>
-            sb append propertyValue.toString
-        }
-      }
-
-      sb append "};"
-
-      sb.toString
-    }
   }
 
-  def buildJavaScriptInitialData(
+  def buildJsonInitializationData(
     containingDocument   : XFormsContainingDocument,
     rewriteResource      : String => String,
-    controlsToInitialize : List[(String, Option[String])]
+    rewriteAction        : String => String,
+    controlsToInitialize : List[(String, Option[String])],
+    versionedResources   : Boolean,
+    heartbeatDelay       : Long
   ): String = {
 
     val currentTime = System.currentTimeMillis
 
-    // NOTE: `calendarImage` is to handle the minimal date picker. Because the client must re-generate markup
-    // when the control becomes relevant or changes type, it needs the image URL, and that URL must be
-    // rewritten for use in portlets. This should ideally be handled by a template and/or the server should
-    // provide the markup directly when needed.
+    val xformsSubmissionPathOpt =
+      if (containingDocument.getDeploymentType != DeploymentType.Standalone || containingDocument.isPortletContainer || containingDocument.isEmbeddedFromHeaderOrUrlParam)
+        Some(Constants.XFormsServerSubmit)
+      else
+        None
 
-    val jsonString =
-      rpc.Initializations(
-        uuid                   = containingDocument.uuid,
-        namespacedFormId       = containingDocument.getNamespacedFormId,
-        repeatTree             = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
-        repeatIndexes          = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
-        xformsServerPath       = rewriteResource("/xforms-server"),
-        xformsServerUploadPath = rewriteResource("/xforms-server/upload"),
-        calendarImagePath      = rewriteResource("/ops/images/xforms/calendar.png"),
-        controls  =
+    rpc.Initializations(
+      uuid                           = containingDocument.uuid,
+      namespacedFormId               = containingDocument.getNamespacedFormId,
+      repeatTree                     = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace),
+      repeatIndexes                  = XFormsRepeatControl.currentNamespacedIndexesString(containingDocument),
+      xformsServerPath               = rewriteResource("/xforms-server"),
+      xformsServerSubmitActionPath   = xformsSubmissionPathOpt.map(rewriteAction),
+      xformsServerSubmitResourcePath = xformsSubmissionPathOpt.map(rewriteResource),
+      xformsServerUploadPath         = rewriteResource("/xforms-server/upload"),
+      controls  =
+        for {
+          (id, valueOpt) <- controlsToInitialize
+        } yield
+          rpc.Control(containingDocument.namespaceId(id), valueOpt),
+      listeners =
+        (
           for {
-            (id, valueOpt) <- controlsToInitialize
+            handler  <- containingDocument.staticOps.keyboardHandlers
+            observer <- handler.observersPrefixedIds
+            keyText  <- handler.keyText
           } yield
-            rpc.Control(containingDocument.namespaceId(id), valueOpt),
-        listeners =
-          (
-            for {
-              handler  <- containingDocument.staticOps.keyboardHandlers
-              observer <- handler.observersPrefixedIds
-              keyText  <- handler.keyText
-            } yield
-              rpc.KeyListener(handler.eventNames filter EventNames.KeyboardEvents, observer, keyText, handler.keyModifiers)
-            ).distinct,
-        pollEvent =
-          for {
-            delayedEvent <- containingDocument.findEarliestPendingDelayedEvent
-            time         <- delayedEvent.time
-          } yield
+            rpc.KeyListener(handler.eventNames filter EventNames.KeyboardEvents, observer, keyText, handler.keyModifiers)
+        ).distinct,
+      pollEvent =
+        for {
+          delayedEvent <- containingDocument.findEarliestPendingDelayedEvent
+          time         <- delayedEvent.time
+        } yield
           rpc.PollEvent(time - currentTime),
-        userScripts =
-          for (script <- containingDocument.getScriptsToRun.toList collect { case Right(s) => s })
-            yield
-              rpc.UserScript(
-                functionName = script.script.shared.clientName,
-                targetId     = containingDocument.namespaceId(script.targetEffectiveId),
-                observerId   = containingDocument.namespaceId(script.observerEffectiveId),
-                paramValues  = script.paramValues
-              )
-      ).asJson.noSpaces
-
-    s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData(${quoteString(jsonString)})}).call(this);"""
+      userScripts =
+        for (script <- containingDocument.getScriptsToRun.toList collect { case Right(s) => s })
+        yield
+          rpc.UserScript(
+            functionName = script.script.shared.clientName,
+            targetId     = containingDocument.namespaceId(script.targetEffectiveId),
+            observerId   = containingDocument.namespaceId(script.observerEffectiveId),
+            paramValues  = script.paramValues
+          ),
+      messagesToRun =
+        (containingDocument.getMessagesToRun collect { case Message(text, "modal") => text }).toList,
+      dialogsToShow =
+        (
+          for {
+            dialogControl <- containingDocument.controls.getCurrentControlTree.getDialogControls
+            if dialogControl.isDialogVisible
+          } yield
+            rpc.Dialog(
+              id         = containingDocument.namespaceId(dialogControl.getEffectiveId),
+              neighborId = dialogControl.neighborControlId.map(containingDocument.namespaceId)
+            )
+        ).toList,
+      focusElementId =
+        containingDocument.controls.getFocusedControl.map(c => containingDocument.namespaceId(c.getEffectiveId)),
+      errorsToShow =
+        containingDocument.getServerErrors.nonEmpty option
+          rpc.Error(
+            title   = "Non-fatal error",
+            details = ServerError.errorsAsHtmlString(containingDocument.getServerErrors),
+            formId  = containingDocument.getNamespacedFormId
+          ),
+      configuration =
+        findConfigurationProperties(containingDocument, versionedResources, heartbeatDelay),
+    ).asJson.noSpaces
   }
+
+  def buildInitializationCall(jsonInitialization: String, contextPathOpt: Option[String], namespaceOpt: Option[String]): String = {
+    val p1 = ScriptBuilder.quoteString(jsonInitialization)
+    namespaceOpt match {
+      case Some(namespace) =>
+        val p2 = contextPathOpt.map(ScriptBuilder.quoteString).getOrElse("undefined")
+        val p3 = ScriptBuilder.quoteString(namespace)
+        s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData($p1,$p2,$p3)}).call(this);"""
+      case None =>
+        s"""(function(){ORBEON.xforms.InitSupport.initializeFormWithInitData($p1)}).call(this);"""
+    }
+  }
+
+  def namespaceBuildXFormsPageLoadedServer(namespaceOpt: Option[String]): String =
+    s"xformsPageLoadedServer${namespaceOpt.getOrElse("")}"
+
+  def buildXFormsPageLoadedServer(body: String, namespaceOpt: Option[String]): String =
+    s"\nfunction ${namespaceBuildXFormsPageLoadedServer(namespaceOpt)}(){$body}"
 
   def findOtherScriptInvocations(containingDocument: XFormsContainingDocument): Option[String] = {
 
-    val errorsToShow      = containingDocument.getServerErrors
-    val focusElementIdOpt = containingDocument.controls.getFocusedControl map (_.getEffectiveId)
-    val messagesToRun     = containingDocument.getMessagesToRun filter (_.level == "modal")
-
-    val dialogsToOpen =
-      for {
-        dialogControl <- containingDocument.controls.getCurrentControlTree.getDialogControls
-        if dialogControl.isDialogVisible
-      } yield
-        dialogControl
-
     val javascriptLoads =
-      containingDocument.getScriptsToRun collect { case Left(l) => l }
+      containingDocument.getScriptsToRun collect { case Left(l) => l.resource.substringAfter("javascript:") }
 
-    val mustRunAnyScripts =
-      errorsToShow.nonEmpty       ||
-      focusElementIdOpt.isDefined ||
-      messagesToRun.nonEmpty      ||
-      dialogsToOpen.nonEmpty      ||
-      javascriptLoads.nonEmpty
-
-    mustRunAnyScripts option {
-
-      val sb = new StringBuilder
-
-      if (mustRunAnyScripts) {
-
-        sb append "\nfunction xformsPageLoadedServer() { "
-
-        // NOTE: The order of script actions vs. `javascript:` loads should be preserved. It is not currently.
-
-        // javascript: loads
-        for (load <- javascriptLoads) {
-          val body = load.resource.substring("javascript:".size).escapeJavaScript
-          sb append s"""(function(){$body})();"""
-        }
-
-        // TODO: `showMessages`, `showDialog`, `setFocus`, `showError` must be part of `Initializations`.
-
-        // Initial modal xf:message to run if present
-        if (messagesToRun.nonEmpty) {
-          val quotedMessages = messagesToRun map (m => s""""${m.message.escapeJavaScript}"""")
-          quotedMessages.addString(sb, "ORBEON.xforms.Message.showMessages([", ",", "]);")
-        }
-
-        // Initial dialogs to open
-        for (dialogControl <- dialogsToOpen) {
-          val id       = containingDocument.namespaceId(dialogControl.getEffectiveId)
-          val neighbor = (
-            dialogControl.neighborControlId
-            map (n => s""""${containingDocument.namespaceId(n)}"""")
-            getOrElse "null"
-          )
-
-          sb append s"""ORBEON.xforms.Controls.showDialog("$id", $neighbor);"""
-        }
-
-        // Initial setfocus if present
-        // Seems reasonable to do this after dialogs as focus might be within a dialog
-        focusElementIdOpt foreach { id =>
-          sb append s"""ORBEON.xforms.Controls.setFocus("${containingDocument.namespaceId(id)}");"""
-        }
-
-        // Initial errors
-        if (errorsToShow.nonEmpty) {
-
-          val title   = "Non-fatal error"
-          val details = ServerError.errorsAsHtmlString(errorsToShow).escapeJavaScript
-          val formId  = containingDocument.getNamespacedFormId
-
-          sb append s"""ORBEON.xforms.AjaxServer.showError("$title", "$details", "$formId");"""
-        }
-
-        sb append " }"
-      }
-
+    javascriptLoads.nonEmpty option {
+      val sb = new jl.StringBuilder
+      // NOTE: The order of script actions vs. `javascript:` loads should be preserved. It is not currently.
+      for (load <- javascriptLoads)
+        sb.append(s"""(function(){${load.escapeJavaScript}})();""")
       sb.toString
     }
   }

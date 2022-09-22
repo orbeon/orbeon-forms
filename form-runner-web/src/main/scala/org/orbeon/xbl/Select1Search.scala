@@ -17,7 +17,7 @@ import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
 import org.orbeon.jquery._
 import org.orbeon.web.DomSupport
-import org.orbeon.xforms.facade.{Controls, Properties, XBL, XBLCompanion}
+import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
 import org.orbeon.xforms._
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
@@ -225,7 +225,7 @@ private class Select2Ajax(
   val containerElem           : html.Element
 ) extends Select2.Ajax {
 
-  val delay: Int = Properties.delayBeforeIncrementalRequest.get()
+  val delay: Int = Page.getFormFromElemOrThrow(containerElem).configuration.delayBeforeIncrementalRequest
 
   def transport(
     params  : Select2.Params,

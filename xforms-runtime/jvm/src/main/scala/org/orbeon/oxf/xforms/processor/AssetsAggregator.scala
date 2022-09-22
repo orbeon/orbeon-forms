@@ -24,7 +24,7 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -260,7 +260,7 @@ object AssetsAggregator extends Logging {
 
       // Extension and optional namespace parameter
       def extension = if (isCSS) ".css" else ".js"
-      def namespace = namespaceOpt map ("?ns=" + _) getOrElse ""
+      def namespace = namespaceOpt map (s"?${Constants.EmbeddingNamespaceParameter}=" + _) getOrElse ""
 
       // Output link to resource
       val path = "" :: "xforms-server" ::

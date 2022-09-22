@@ -1,0 +1,275 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Improved simple data migration (with moves)</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <s1>
+                        <s1g1/>
+                        <s1g2>
+                            <s1g1c1/>
+                        </s1g2>
+
+                    </s1>
+                    <s2>
+                        <s2g1>
+                            <s2g1c1/>
+                            <s1g1c2/>
+                        </s2g1>
+                    </s2>
+                    <s3>
+                        <s3g1>
+                            <s3g1-iteration>
+                                <s3g1c1/>
+                            </s3g1-iteration>
+                        </s3g1>
+                    </s3>
+                    <s4>
+                        <s4-iteration>
+                            <s4g1>
+                                <s4g1c2/>
+                            </s4g1>
+                            <s4g2>
+                                <s4g1c1/>
+                            </s4g2>
+                        </s4-iteration>
+                    </s4>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="s1-bind" name="s1" ref="s1">
+                    <xf:bind id="s1g1-bind" ref="s1g1" name="s1g1"/>
+                    <xf:bind id="s1g2-bind" ref="s1g2" name="s1g2">
+                        <xf:bind id="s1g1c1-bind" ref="s1g1c1" name="s1g1c1" xxf:whitespace="trim"/>
+                    </xf:bind>
+
+                </xf:bind>
+                <xf:bind id="s2-bind" ref="s2" name="s2">
+                    <xf:bind id="s2g1-bind" ref="s2g1" name="s2g1">
+                        <xf:bind id="s2g1c1-bind" name="s2g1c1" ref="s2g1c1" xxf:whitespace="trim"/>
+                        <xf:bind id="s1g1c2-bind" ref="s1g1c2" name="s1g1c2" xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="s3-bind" ref="s3" name="s3">
+                    <xf:bind id="s3g1-bind" ref="s3g1" name="s3g1">
+                        <xf:bind id="s3g1-iteration-bind" ref="s3g1-iteration" name="s3g1-iteration">
+                            <xf:bind id="s3g1c1-bind" ref="s3g1c1" name="s3g1c1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="s4-bind" ref="s4" name="s4">
+                    <xf:bind id="s4-iteration-bind" ref="s4-iteration" name="s4-iteration">
+                        <xf:bind id="s4g1-bind" ref="s4g1" name="s4g1">
+                            <xf:bind id="s4g1c2-bind" ref="s4g1c2" name="s4g1c2" xxf:whitespace="trim"/>
+                        </xf:bind>
+                        <xf:bind id="s4g2-bind" ref="s4g2" name="s4g2">
+                            <xf:bind id="s4g1c1-bind" ref="s4g1c1" name="s4g1c1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>issue</application-name>
+                    <form-name>5415v1</form-name>
+                    <title xml:lang="en">Improved simple data migration (with moves)</title>
+                    <description xml:lang="en"/>
+                    <created-with-version>2021.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2021.1-SNAPSHOT PE</updated-with-version>
+                    <library-versions>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+                    <data-migration>enabled</data-migration>
+                    <updated-with-version>2021.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="4.8.0">[{ "path": "s3/s3g1", "iteration-name": "s3g1-iteration" }]</migration>
+                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"s1"}],"newGridElem":{"value":"s1g1"},"afterElem":null,"content":[],"topLevel":true},{"containerPath":[{"value":"s1"}],"newGridElem":{"value":"s1g2"},"afterElem":{"value":"s1g1"},"content":[{"value":"s1g1c1"}],"topLevel":true},{"containerPath":[{"value":"s2"}],"newGridElem":{"value":"s2g1"},"afterElem":null,"content":[{"value":"s2g1c1"},{"value":"s1g1c2"}],"topLevel":true},{"containerPath":[{"value":"s4"},{"value":"s4-iteration"}],"newGridElem":{"value":"s4g1"},"afterElem":null,"content":[{"value":"s4g1c2"}],"topLevel":true},{"containerPath":[{"value":"s4"},{"value":"s4-iteration"}],"newGridElem":{"value":"s4g2"},"afterElem":{"value":"s4g1"},"content":[{"value":"s4g1c1"}],"topLevel":true}]}</migration>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <s4g1c1>
+                            <label>S4G1C1</label>
+                            <hint/>
+                        </s4g1c1>
+                        <s3g1c1>
+                            <label>S3G1C1</label>
+                            <hint/>
+                        </s3g1c1>
+                        <s1g1c1>
+                            <label>S1G1C1</label>
+                            <hint/>
+                        </s1g1c1>
+                        <s4g1c2>
+                            <label>S4G1C2</label>
+                            <hint/>
+                        </s4g1c2>
+                        <s2g1c1>
+                            <label>S2G1C1</label>
+                            <hint/>
+
+                        </s2g1c1>
+                        <s1g1c2>
+                            <label>S1G1C2</label>
+                            <hint/>
+                        </s1g1c2>
+                        <s1>
+                            <label>S1</label>
+                        </s1>
+                        <s2>
+                            <label>S2</label>
+                        </s2>
+                        <s3>
+                            <label>S3</label>
+                        </s3>
+                        <s4>
+                            <label>S4</label>
+                        </s4>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="s3g1-template">
+                <s3g1-iteration>
+                    <s3g1c1/>
+                </s3g1-iteration>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="s4-template">
+                <s4-iteration>
+                    <s4g1>
+                        <s4g1c2/>
+                    </s4g1>
+                    <s4g2>
+                        <s4g1c1/>
+                    </s4g2>
+                </s4-iteration>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="s1-section" bind="s1-bind">
+                    <xf:label ref="$form-resources/s1/label"/>
+                    <fr:grid id="s1g1-grid" bind="s1g1-bind">
+                        <fr:c y="1" x="1" w="6"/>
+                        <fr:c y="1" x="7" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="s1g2-grid" bind="s1g2-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="s1g1c1-control" bind="s1g1c1-bind">
+                                <xf:label ref="$form-resources/s1g1c1/label"/>
+                                <xf:hint ref="$form-resources/s1g1c1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="s2-section" bind="s2-bind">
+                    <xf:label ref="$form-resources/s2/label"/>
+                    <fr:grid id="s2g1-grid" bind="s2g1-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="s2g1c1-control" bind="s2g1c1-bind">
+                                    <xf:label ref="$form-resources/s2g1c1/label"/>
+                                    <xf:hint ref="$form-resources/s2g1c1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="s1g1c2-control" bind="s1g1c2-bind">
+                                <xf:label ref="$form-resources/s1g1c2/label"/>
+                                <xf:hint ref="$form-resources/s1g1c2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="s3-section" bind="s3-bind">
+                    <xf:label ref="$form-resources/s3/label"/>
+                    <fr:grid id="s3g1-grid" bind="s3g1-bind" repeat="content" min="1"
+                             template="instance('s3g1-template')"
+                             apply-defaults="true"
+                             fb:initial-iterations="first">
+                        <fr:c x="1" y="1" w="6"/>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="s3g1c1-control" bind="s3g1c1-bind">
+                                <xf:label ref="$form-resources/s3g1c1/label"/>
+                                <xf:hint ref="$form-resources/s3g1c1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="s4-section" bind="s4-bind" repeat="content" min="1"
+                            template="instance('s4-template')"
+                            apply-defaults="true"
+                            fb:initial-iterations="first">
+                    <xf:label ref="$form-resources/s4/label"/>
+                    <fr:grid id="s4g1-grid" bind="s4g1-bind">
+                        <fr:c x="1" y="1" w="6"/>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="s4g1c2-control" bind="s4g1c2-bind">
+                                <xf:label ref="$form-resources/s4g1c2/label"/>
+                                <xf:hint ref="$form-resources/s4g1c2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="s4g2-grid" bind="s4g2-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="s4g1c1-control" bind="s4g1c1-bind">
+                                <xf:label ref="$form-resources/s4g1c1/label"/>
+                                <xf:hint ref="$form-resources/s4g1c1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

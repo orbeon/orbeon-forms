@@ -64,8 +64,6 @@ trait XFormsStaticStateStaticProperties {
   def staticBooleanProperty(name: String) : Boolean
   def staticIntProperty    (name: String) : Int
 
-  def clientNonDefaultProperties          : Map[String, Any]
-
   // Probably obsolete
   def allowedExternalEvents               : Set[String]
 }

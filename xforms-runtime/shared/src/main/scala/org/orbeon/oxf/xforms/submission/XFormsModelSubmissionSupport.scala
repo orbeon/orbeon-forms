@@ -332,14 +332,7 @@ object XFormsModelSubmissionSupport {
     xformsMethod        : String,
     httpMethod          : HttpMethod
   ): Option[String] =
-      xformsSerialization flatMap  (_.trimAllToOpt) orElse defaultSerialization(xformsMethod, httpMethod)
-
-  def getRequestedSerialization(
-    xformsSerialization : Option[String],
-    xformsMethod        : String,
-    httpMethod          : HttpMethod
-  ): Option[String] =
-    requestedSerialization(xformsSerialization, xformsMethod, httpMethod)
+      xformsSerialization flatMap (_.trimAllToOpt) orElse defaultSerialization(xformsMethod, httpMethod)
 
   private object Private {
 

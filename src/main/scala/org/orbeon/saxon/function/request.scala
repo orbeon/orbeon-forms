@@ -41,7 +41,7 @@ class GetWindowState extends DefaultFunctionSupport with RuntimeDependentFunctio
 
 class GetRequestParameter extends RequestFunction {
   def fromRequest(request: Request, name: String)(implicit ctx: XPathContext): Option[List[String]] =
-    Option(request.getParameterMap.get(name)) map StringConversions.objectArrayToStringArray map (_.toList)
+    request.parameters.get(name) map StringConversions.objectArrayToStringArray map (_.toList)
 }
 
 class GetRequestHeader extends RequestFunction {

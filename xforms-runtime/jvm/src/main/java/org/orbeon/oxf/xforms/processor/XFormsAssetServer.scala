@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.withDocumentAcquire
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager, XFormsStaticStateCache}
 import org.orbeon.oxf.xforms.xbl.BindingLoader
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{Constants, XFormsCrossPlatformSupport}
 
 import java.io._
 import java.net.URI
@@ -36,7 +36,6 @@ import scala.collection.compat._
 import scala.collection.immutable.ListSet
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
-import scala.jdk.CollectionConverters._
 
 
 /**
@@ -70,8 +69,8 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
         val updatesPropOpt =
           for {
-            paramValue <- externalContext.getRequest.getFirstParamAsString(UpdatesParameter)
-            propName   = List(XFormsAssetsBuilder.AssetsBaselineProperty, UpdatesParameter, paramValue).mkString(".")
+            paramValue <- externalContext.getRequest.getFirstParamAsString(Constants.UpdatesParameter)
+            propName   = List(XFormsAssetsBuilder.AssetsBaselineProperty, Constants.UpdatesParameter, paramValue).mkString(".")
             prop       <- CoreCrossPlatformSupport.properties.getPropertyOpt(propName)
           } yield
             prop
@@ -89,7 +88,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
         AssetsAggregator.aggregate(resources ++ xblResources, redirect, None, isCSS)
 
-      case FormDynamicResourcesRegex(uuid) =>
+      case Constants.FormDynamicResourcesRegex(uuid) =>
 
         // This is the typical expected scenario: loading the dynamic data occurs just after loading the page and before there have been
         // any changes to the document, so the document should be in cache and have a sequence number of "1".
@@ -97,7 +96,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
           withDocumentAcquireLock(
             uuid,
             XFormsGlobalProperties.uploadXFormsAccessTimeout // same timeout as upload for now (throws if the timeout expires)
-          )(_.initialClientScript)
+          )(d => d.getInitializationData)
 
         fromCurrentStateOptTry match {
           case Failure(e: SessionExpiredException) => // from downstream `acquireDocumentLock`
@@ -113,10 +112,10 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
             // This is the case where the above doesn't hold, for example upon browser back. It should be a much rarer case, and we bear
             // the cost of getting the state from cache.
             def fromInitialStateOpt =
-                XFormsStateManager.getStateFromParamsOrStore(
-                  RequestParameters(uuid, None, None, None),
-                  isInitialState = true
-                ).dynamicState flatMap (_.initialClientScript)
+              XFormsStateManager.getStateFromParamsOrStore(
+                RequestParameters(uuid, None, None, None),
+                isInitialState = true
+              ).dynamicState flatMap (_.initializationData)
 
             response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
 
@@ -128,8 +127,25 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
             )
 
             IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
-              fromCurrentStateOpt orElse fromInitialStateOpt foreach { content =>
-                writer.write(content)
+
+              val namespaceOpt = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)
+
+              fromCurrentStateOpt orElse fromInitialStateOpt foreach { case (initializationScriptsOpt, jsonInitializationData) =>
+                initializationScriptsOpt foreach { initializationScripts =>
+                  writer.write(
+                    ScriptBuilder.buildXFormsPageLoadedServer(
+                      body         = initializationScripts,
+                      namespaceOpt = namespaceOpt
+                    )
+                  )
+                }
+                writer.write(
+                  ScriptBuilder.buildInitializationCall(
+                    jsonInitialization = jsonInitializationData,
+                    contextPathOpt     = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingContextParameter),
+                    namespaceOpt       = namespaceOpt
+                  )
+                )
               }
             }
         }
@@ -284,7 +300,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
     // Namespace to use, must be `None` if empty
     def namespaceOpt: Option[String] = {
-      def nsFromParameters = Option(externalContext.getRequest.getParameterMap.get(NamespaceParameter)) map (_(0).asInstanceOf[String])
+      def nsFromParameters = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)
       def nsFromContainer  = Some(response.getNamespacePrefix)
 
       nsFromParameters orElse nsFromContainer filter (_.nonEmpty)
@@ -300,8 +316,6 @@ object XFormsAssetServer {
   import XFormsAssetPaths._
 
   val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
-  val NamespaceParameter         = "ns"
-  val UpdatesParameter           = "updates"
 
   implicit def indentedLogger: IndentedLogger = Loggers.getIndentedLogger("resources")
 

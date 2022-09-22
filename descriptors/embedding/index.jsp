@@ -66,7 +66,12 @@
               "orbeon",
               "<%= selectedForm %>",
               "new"
-            );
+            )
+            .then(() => console.log("`embedForm()` successfully loaded the form"))
+            .catch((e) => {
+              console.log("`embedForm()` returned an error");
+              console.log(e);
+            });
           });
           <% } %>
         </script>

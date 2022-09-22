@@ -35,9 +35,14 @@ trait XMLSupport extends AssertionsForJUnit {
 
     // Produce a nicer message
     if (! result) {
-      assert(
-        left.getRootElement.serializeToString(XMLWriter.PrettyFormat) ===
-          right.getRootElement.serializeToString(XMLWriter.PrettyFormat)
+
+      fail(
+        s"""|Expected:
+            |${left.getRootElement.serializeToString(XMLWriter.PrettyFormat)}
+            |
+            |Actual:
+            |${right.getRootElement.serializeToString(XMLWriter.PrettyFormat)}
+            |""".stripMargin
       )
       assert(false)
     }
@@ -49,9 +54,13 @@ trait XMLSupport extends AssertionsForJUnit {
 
     // Produce a nicer message
     if (! result) {
-      assert(
-        left.serializeToString(XMLWriter.PrettyFormat) ===
-          right.serializeToString(XMLWriter.PrettyFormat)
+      fail(
+        s"""|Expected:
+            |${left.serializeToString(XMLWriter.PrettyFormat)}
+            |
+            |Actual:
+            |${right.serializeToString(XMLWriter.PrettyFormat)}
+            |""".stripMargin
       )
       assert(false)
     }

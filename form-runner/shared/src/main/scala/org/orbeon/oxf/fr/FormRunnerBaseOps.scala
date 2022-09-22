@@ -43,14 +43,13 @@ import scala.util.Try
 
 // The standard Form Runner parameters
 case class FormRunnerParams(
-  app         : String,
-  form        : String,
+  app         : String, // curiously we allow this to be `"*"`
+  form        : String, // curiously we allow this to be `"*"`
   formVersion : Int,
   document    : Option[String],
   isDraft     : Option[Boolean],
   mode        : String
 ) {
-
   def appForm: AppForm =
     AppForm(app, form)
 
@@ -83,6 +82,9 @@ case class AppForm(app: String, form: String) {
 
 object AppForm {
   val FormBuilder: AppForm = AppForm("orbeon", "builder")
+
+  def isSpecificAppForm(app: String, form: String): Boolean =
+    app != "*" && app.nonEmpty && form != "*" && form.nonEmpty
 }
 
 trait FormRunnerBaseOps {
@@ -229,10 +231,13 @@ trait FormRunnerBaseOps {
     }
 
   def buildPropertyName(name: String)(implicit p: FormRunnerParams): String =
-    if (frc.hasAppForm(p.app, p.form))
-      name :: p.app :: p.form :: Nil mkString "."
+    if (AppForm.isSpecificAppForm(p.app, p.form))
+      buildPropertyName(name, AppForm(p.app, p.form))
     else
       name
+
+  def buildPropertyName(name: String, appForm: AppForm): String =
+    name :: appForm.app :: appForm.form :: Nil mkString "."
 
   //@XPathFunction
   def xpathFormRunnerStringProperty(name: String): Option[String] =
@@ -241,6 +246,9 @@ trait FormRunnerBaseOps {
   // Return a property using the form's app/name, None if the property is not defined
   def formRunnerProperty(name: String)(implicit p: FormRunnerParams): Option[String] =
     properties.getObjectOpt(buildPropertyName(name)) map (_.toString)
+
+  def formRunnerProperty(name: String, appForm: AppForm): Option[String] =
+    properties.getObjectOpt(buildPropertyName(name, appForm)) map (_.toString)
 
   def formRunnerPropertyWithNs(name: String)(implicit p: FormRunnerParams): Option[(String, NamespaceMapping)] =
     properties.getPropertyOpt(buildPropertyName(name)) map { p => (p.value.toString, p.namespaceMapping) }
@@ -363,24 +371,29 @@ trait FormRunnerBaseOps {
   // NOTE: `tiff` and `test-pdf` are reduced to `pdf` at the XForms level, but not at the XSLT level. We don't
   // yet expose this to XSLT, but we might in the future, so check on those modes as well.
   // 2021-12-22: `schema` could be a readonly mode, but we consider this special as it is protected as a service.
-  val CreationModes = Set("new", "import", "validate")
-  val EditingModes  = Set("edit")
-  val ReadonlyModes = Set("view", "pdf", "email", "controls", "tiff", "test-pdf")
-  val AllModes      = CreationModes ++ EditingModes ++ FormRunnerCommon.frc.ReadonlyModes + "schema" + "test"
+  val CreationModes  = Set("new", "import", "validate")
+  val EditingModes   = Set("edit")
+  val ReadonlyModes  = Set("view", "pdf", "email", "controls", "tiff", "test-pdf")
+  val AllDetailModes = CreationModes ++ EditingModes ++ FormRunnerCommon.frc.ReadonlyModes + "schema" + "test"
 
   def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
   def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ReadonlyModes(p.mode)
 
-  def isEmbedded: Boolean =
-    inScopeContainingDocument.isEmbeddedFromHeaders || isEmbeddable
+  // https://github.com/orbeon/orbeon-forms/issues/5323
+  // https://github.com/orbeon/orbeon-forms/issues/5325
+  // https://github.com/orbeon/orbeon-forms/issues/5390
+  def isEmbedded(embeddingType: Option[String]): Boolean =
+    embeddingType match {
+      case Some(Headers.GeneralEmbeddedClient)        => false // don't support `embedded` as its meaning is unclear
+      case Some(v) if Headers.EmbeddedClientValues(v) => inScopeContainingDocument.embeddingTypeFromHeaders.contains(v)
+      case Some(_)                                    => false
+      case None                                       => inScopeContainingDocument.isEmbeddedFromHeaderOrUrlParam
+    }
 
   // For now restrict to `new` and `edit` modes. Make sure, if changing, to except `validate` and `import`,
   // probably, as they also need to send an XML response back.
   def isBackground(implicit xfc: XFormsFunction.Context, p: FormRunnerParams): Boolean =
     xfc.containingDocument.getRequestPath.startsWith("/fr/service/") && (p.mode == "new" || p.mode == "edit")
-
-  def isEmbeddable: Boolean =
-    inScopeContainingDocument.getRequestParameters.get(ExternalContext.EmbeddableParam) map (_.head) contains "true"
 
   // Display a success message
   // TODO: support `dialog` appearance, for symmetry with `error-message`

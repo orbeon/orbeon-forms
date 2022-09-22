@@ -14,6 +14,7 @@
 package org.orbeon.oxf.fr.process
 
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr._
@@ -21,8 +22,8 @@ import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ContentTypes, Mediatypes}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.saxon.functions.EscapeURI
@@ -31,6 +32,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.RelevanceHandling
 import org.orbeon.xforms.XFormsNames._
 
+import java.net.URI
 import scala.language.postfixOps
 import scala.util.Try
 
@@ -67,15 +69,15 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       val pdfTiffParams =
         for {
-          format    <- RenderedFormat.values.toList
-          (path, _) <- pdfOrTiffPathOpt(
+          format   <- RenderedFormat.values.toList
+          (uri, _) <- pdfOrTiffPathOpt(
               urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
               format               = format,
               pdfTemplateOpt       = findPdfTemplate(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, Some(currentFormLang)),
               defaultLang          = currentFormLang
             )
         } yield
-          format.entryName -> path
+          format.entryName -> uri.toString
 
       recombineQuery(
         s"/fr/service/$app/$form/email/$document",
@@ -90,6 +92,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       ensureDataCalculationsAreUpToDate()
 
       implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
+      val FormRunnerParams(currentApp, currentForm, currentFormVersion, currentDocumentOpt, isDraft, _) = formRunnerParams
 
       val propertyPrefixOpt = paramByNameOrDefault(params, "property")
 
@@ -104,10 +107,10 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       object SendProcessParams extends ProcessParams {
         def runningProcessId  : String  = self.runningProcessId.get
-        def app               : String  = formRunnerParams.app
-        def form              : String  = formRunnerParams.form
-        def formVersion       : Int     = formRunnerParams.formVersion
-        def document          : String  = formRunnerParams.document.get
+        def app               : String  = currentApp
+        def form              : String  = currentForm
+        def formVersion       : Int     = currentFormVersion
+        def document          : String  = currentDocumentOpt.get
         def valid             : Boolean = FormRunner.dataValid
         def language          : String  = FormRunner.currentLang
         def dataFormatVersion : String  = findParamValue(DataFormatVersionName) map evaluateValueTemplate get
@@ -138,48 +141,54 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
           case (n @ "method",  s @ Some(_)) => n -> (s map evaluateValueTemplate map (_.toLowerCase))
           case (n @ "headers", s @ Some(_)) => n -> (s map updateLineBreaks map evaluateValueTemplate)
           case (n,             s @ Some(_)) => n -> (s map evaluateValueTemplate)
-          case other                       => other
+          case other                        => other
         } toMap
       }
 
-      // The token can be `xml`, `metadata`, `pdf`, `tiff`, `pdf-url`, `tiff-url`,
-      // `excel-with-named-ranges`, `xml-form-structure-and-data`.
-      val contentToken = evaluatedPropertiesAsMap("content").get.trimAllToEmpty
-      val renderedFormatContentToken = RenderedFormat.withNameOption(contentToken)
+      val contentToSend =
+        ContentToSend.fromContentTokens(
+          ContentToken.fromString(evaluatedPropertiesAsMap("content").getOrElse(throw new IllegalArgumentException))
+        )
+
+      val distinctRenderedFormats = contentToSend match {
+        case ContentToSend.Single(ContentToken.Rendered(format, _)) => Set(format)
+        case ContentToSend.Multipart(parts)                         => parts collect { case ContentToken.Rendered(format, _) => format } toSet
+        case ContentToSend.NoContent | ContentToSend.Single(_)      => Set.empty[RenderedFormat]
+      }
 
       // Handle defaults which depend on other properties
       val evaluatedSendProperties = {
 
-        def findDefaultSerialization(method: String) = method match {
-          case "post" | "put" if renderedFormatContentToken.isDefined => "application/octet-stream"
-          case "post" | "put"                                         => ContentTypes.XmlContentType
-          case _                                                      => "none"
-        }
+        def getDefaultSerialization(method: String): String =
+          (method, contentToSend) match {
+            case ("post" | "put", sd: SerializationDefaults) => sd.defaultSerialization
+            case _                                           => "none"
+          }
 
-        def findDefaultContentType =
-          renderedFormatContentToken                                      flatMap
-            FormRunnerRenderedFormat.SupportedRenderFormatsMediatypes.get orElse
-            Some(ContentTypes.XmlContentType)
+        def findDefaultContentType(method: String): Option[String] =
+          (method, contentToSend) match {
+            case ("post" | "put", sd: SerializationDefaults) => Some(sd.defaultContentType)
+            case _                                           => None
+          }
 
-        def findDefaultPruneMetadata(dataFormatVersion: String) = dataFormatVersion match {
+        def findDefaultPruneMetadata(dataFormatVersion: String): String = dataFormatVersion match {
           case "edge" => "false"
           case _      => "true"
         }
 
         val effectiveSerialization =
           evaluatedPropertiesAsMap.get("serialization").flatten orElse
-            (evaluatedPropertiesAsMap.get("method").flatten map findDefaultSerialization)
+            (evaluatedPropertiesAsMap.get("method").flatten map getDefaultSerialization)
 
         val effectiveContentType =
           evaluatedPropertiesAsMap.get(Headers.ContentTypeLower).flatten orElse
-            findDefaultContentType
+            (evaluatedPropertiesAsMap.get("method").flatten flatMap findDefaultContentType)
 
         val effectivePruneMetadata =
           evaluatedPropertiesAsMap.get(PruneMetadataName).flatten orElse
             (evaluatedPropertiesAsMap.get(DataFormatVersionName).flatten map findDefaultPruneMetadata)
 
         // Allow `prune` to override `nonrelevant` for backward compatibility
-
         val effectiveNonRelevant =
           evaluatedPropertiesAsMap.get("prune").flatten collect {
             case "false" => RelevanceHandling.Keep.entryName.toLowerCase
@@ -195,15 +204,54 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       }
 
       // Create rendered format if needed
-      val selectedRenderFormatOpt =
-        RenderedFormat.values find { format =>
-          val formatString = format.entryName
-          Set(formatString, s"$formatString-url")(contentToken)
+      val renderedFormatTmpFileUris =
+        distinctRenderedFormats map { format =>
+          tryCreatePdfOrTiffIfNeeded(params, format).get._1 -> format
         }
 
-      val formatKeyOpt =
-        selectedRenderFormatOpt map
-          (tryCreatePdfOrTiffIfNeeded(params, _).get)
+      // Create multipart if needed
+      val multipartTmpFileUriOpt =
+        contentToSend match {
+          case ContentToSend.Multipart(parts) =>
+
+            def maybeMigrateData(originalData: DocumentNodeInfoType): DocumentNodeInfoType =
+              GridDataMigration.dataMaybeMigratedFromEdge(
+                app                     = currentApp,
+                form                    = currentForm,
+                data                    = originalData,
+                metadataOpt             = frc.metadataInstance.map(_.root),
+                dataFormatVersionString = FormRunnerPersistence.providerDataFormatVersionOrThrow(formRunnerParams.appForm).entryName,
+                pruneMetadata           = evaluatedSendProperties.get(PruneMetadataName).flatten.contains(true.toString),
+              )
+
+            val basePath =
+              frc.createFormDataBasePath(
+                app               = currentApp,
+                form              = currentForm,
+                isDraft           = false, // TODO: check: current idDraft?
+                documentIdOrEmpty = currentDocumentOpt.getOrElse("")
+              )
+
+            val relevanceHandling =
+              evaluatedSendProperties.get(NonRelevantName).flatten
+                .orElse(DefaultSendParameters.get(NonRelevantName))
+                .map(RelevanceHandling.withNameInsensitive)
+                .getOrElse(throw new IllegalStateException)
+
+            Some(
+              FormRunnerActionsSupport.buildMultipartEntity(
+                dataMaybeLiveMaybeMigrated = maybeMigrateData(frc.formInstance.root),
+                parts                      = parts,
+                renderedFormatTmpFileUris  = renderedFormatTmpFileUris,
+                fromBasePaths              = List(basePath -> currentFormVersion),
+                toBasePath                 = basePath,
+                relevanceHandling          = relevanceHandling,
+                annotateWith               = evaluatedSendProperties.get("annotate").flatten.map(_.splitTo[Set]()).getOrElse(Set.empty),
+                headersGetter              = inScopeContainingDocument.headersGetter
+              )
+            )
+          case _ => None
+        }
 
       // Set data-safe-override as we know we are not losing data upon navigation. This happens:
       // - with changing mode (tryChangeMode)
@@ -211,12 +259,22 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       if (evaluatedSendProperties.get("replace").flatten.contains(XFORMS_SUBMIT_REPLACE_ALL))
         setvalue(persistenceInstance.rootElement / "data-safe-override", "true")
 
-      val evaluatedSendPropertiesWithKey =
-        evaluatedSendProperties + ("binary-content-key" -> formatKeyOpt)
+      // If submitting binary (from the `xf:submission`'s point of view) find the URL
+      // For rendered formats, if there are multiple of them, we fall under the multipart case
+      def binaryContentUrlProperty =
+        "binary-content-url" -> multipartTmpFileUriOpt.map(_._1).orElse(renderedFormatTmpFileUris.headOption.map(_._1)).map(_.toString)
 
-      debug(s"`send` action sending submission", evaluatedSendPropertiesWithKey.iterator collect { case (k, Some(v)) => k -> v } toList)
+      // Add the `boundary` parameter to the mediatype if needed
+      def multipartContentTypePropertyOpt =
+        multipartTmpFileUriOpt map { case (_, boundary) =>
+          "mediatype" -> evaluatedSendProperties.get("mediatype").flatten.map(ct => s"$ct; boundary=$boundary")}
 
-      sendThrowOnError(s"fr-send-submission", evaluatedSendPropertiesWithKey)
+      val evaluatedSendPropertiesWithUpdates =
+        evaluatedSendProperties + binaryContentUrlProperty ++ multipartContentTypePropertyOpt
+
+      debug(s"`send` action sending submission", evaluatedSendPropertiesWithUpdates.iterator collect { case (k, Some(v)) => k -> v } toList)
+
+      sendThrowOnError(s"fr-send-submission", evaluatedSendPropertiesWithUpdates)
     }
 
   private def tryChangeMode(
@@ -272,26 +330,17 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         getOrElse RenderedFormat.Pdf
       )
 
-      def extensionForRenderedFormat(renderedFormat: RenderedFormat): String =
-        Mediatypes.getExtensionForMediatypeOrThrow(FormRunnerRenderedFormat.SupportedRenderFormatsMediatypes(renderedFormat))
-
-      // TODO: Use namespaces from appropriate scope.
-      val fullFilename = {
-        val filenameProperty            = s"oxf.fr.detail.${renderedFormat.entryName}.filename"
-        val filenamePropertyValue       = formRunnerProperty(filenameProperty).flatMap(trimAllToOpt)
-        val filenameFromProperty        = filenamePropertyValue.map(evaluateString(_, xpathContext)).flatMap(trimAllToOpt)
-        val escapedFilenameFromProperty = filenameFromProperty.map(EscapeURI.escape(_, "-_.~").toString)
-        val filename                    = escapedFilenameFromProperty.getOrElse(currentXFormsDocumentId)
-
-        s"$filename.${extensionForRenderedFormat(renderedFormat)}"
-      }
+      // Q: Noticing we use `EscapeURI`, while `buildContentDispositionHeader` uses `URLEncoder.encode`. Any good
+      // reason for this?
+      val filename =
+        EscapeURI.escape(FormRunnerActionsSupport.filenameForRenderedFormat(renderedFormat), "-_.~").toString
 
       val path =
         buildRenderedFormatPath(
           params          = params,
           renderedFormat  = renderedFormat,
-          fullFilename    = Some(fullFilename),
-          currentFormLang = FormRunner.currentLang
+          fullFilename    = Some(filename),
+          currentFormLang = frc.currentLang
         )
 
       val formTargetOpt =
@@ -346,9 +395,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     "headers",
     ShowProgressName,
     FormTargetName,
-    "prune", // for backward compatibility,
-    "response-is-resource",
-    "binary-content-key"
+    "prune" // for backward compatibility,
   ) ++ DefaultSendParameters.keys
 
   private def prependUserParamsForModeChange(pathQuery: String) = {
@@ -399,10 +446,10 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     params   : ActionParams,
     format   : RenderedFormat)(implicit
     frParams : FormRunnerParams
-  ): Try[String] =
+  ): Try[(URI, String)] =
     Try {
 
-      val currentFormLang = FormRunner.currentLang
+      val currentFormLang = frc.currentLang
       val pdfTemplateOpt  = findPdfTemplate(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, Some(currentFormLang))
 
       pdfOrTiffPathOpt(
@@ -411,18 +458,19 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         pdfTemplateOpt       = pdfTemplateOpt,
         defaultLang          = currentFormLang
       ) match {
-        case Some((_, key)) => key
+        case Some(pathToTmpFileWithKey) => pathToTmpFileWithKey
         case None =>
 
-          val path =
+          tryChangeMode(XFORMS_SUBMIT_REPLACE_INSTANCE)(
             buildRenderedFormatPath(
               params          = params,
               renderedFormat  = format,
               fullFilename    = None,
               currentFormLang = currentFormLang
             )
+          ).get
 
-          def processSuccessResponse() = {
+          locally {
 
             val response = topLevelInstance(FormModel, "fr-send-submission-response").get
 
@@ -442,11 +490,8 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
               )
             }
 
-            node.localname
+            URI.create(node.stringValue) -> node.localname
           }
-
-          tryChangeMode(XFORMS_SUBMIT_REPLACE_INSTANCE)(path).get
-          processSuccessResponse()
       }
     }
 }

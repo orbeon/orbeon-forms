@@ -19,13 +19,14 @@ import org.orbeon.oxf.util.URLRewriterUtils
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.processor.ScriptBuilder._
 import org.orbeon.oxf.xforms.XFormsAssetPaths
+import org.orbeon.oxf.xforms.processor.ScriptBuilder
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XHTMLOutput}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.xforms.xbl.XBLAssetsSupport
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.HeadElement
+import org.orbeon.xforms.{Constants, HeadElement}
 import org.xml.sax.Attributes
 
 
@@ -112,7 +113,7 @@ class XHTMLHeadHandler(
           localName = "script",
           prefix    = xhtmlPrefix,
           uri       = XHTML_NAMESPACE_URI,
-          atts      = ("src" -> (XFormsAssetPaths.FormDynamicResourcesPath + containingDocument.uuid + ".js") :: StandaloneScriptBaseAtts)
+          atts      = ("src" -> (Constants.FormDynamicResourcesPath + containingDocument.uuid + ".js") :: StandaloneScriptBaseAtts)
         )
 
       } else {
@@ -132,25 +133,28 @@ class XHTMLHeadHandler(
         }
 
         // Scripts known dynamically
-
-        findConfigurationProperties(
-          containingDocument = containingDocument,
-          versionedResources = isVersionedResources,
-          heartbeatDelay     = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.externalContext)
-        ) foreach
-          writeContent
-
-        findOtherScriptInvocations(containingDocument) foreach
-          writeContent
-
-        List(
-          buildJavaScriptInitialData(
-            containingDocument   = containingDocument,
-            rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
-            controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
+        ScriptBuilder.findOtherScriptInvocations(containingDocument) foreach { initializationScripts =>
+          writeContent(
+            ScriptBuilder.buildXFormsPageLoadedServer(
+              body         = initializationScripts,
+              namespaceOpt = None
+            )
           )
-        ) foreach
-          writeContent
+        }
+        writeContent(
+          ScriptBuilder.buildInitializationCall(
+            jsonInitialization = buildJsonInitializationData(
+              containingDocument   = containingDocument,
+              rewriteResource      = externalContext.getResponse.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
+              rewriteAction        = externalContext.getResponse.rewriteActionURL,
+              controlsToInitialize = containingDocument.controls.getCurrentControlTree.rootOpt map (gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
+              versionedResources   = isVersionedResources,
+              heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.externalContext)
+            ),
+            contextPathOpt = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingContextParameter),
+            namespaceOpt   = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)
+          )
+        )
       }
     }
   }

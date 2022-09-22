@@ -67,6 +67,13 @@ object MigrationSupport {
   def findLegacyUnrepeatedGrids(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
     findAllGrids(repeat = false) filter frc.isLegacyUnrepeatedGrid
 
+  def findAllMigrations(metadataRootElem: NodeInfo): List[(MigrationVersion, String)] =
+    for {
+      ops       <- AllMigrationOps
+      migration <- findMigrationForVersion(metadataRootElem, ops.version)
+    } yield
+      ops.version -> migration
+
   def findMigrationForVersion(metadataRootElem: NodeInfo, version: MigrationVersion): Option[String] =
     metadataRootElem                                        child
       "migration"                                           find

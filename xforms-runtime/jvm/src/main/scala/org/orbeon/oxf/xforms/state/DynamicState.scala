@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
+import org.orbeon.oxf.xml.SBinaryDefaultFormats._
 import org.orbeon.oxf.xml.SAXStoreBinaryFormat._
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.xforms.{DelayedEvent, XFormsId}
@@ -32,24 +33,24 @@ import scala.collection.immutable
 
 // Immutable representation of the dynamic state
 case class DynamicState(
-  uuid                : String,
-  sequence            : Long,
-  deploymentType      : Option[String],
-  requestMethod       : Option[HttpMethod],
-  requestContextPath  : Option[String],
-  requestPath         : Option[String],
-  requestHeaders      : List[(String, List[String])],
-  requestParameters   : List[(String, List[String])],
-  containerType       : Option[String],
-  containerNamespace  : Option[String],
-  pathMatchers        : Seq[Byte],
-  focusedControl      : Option[String],
-  pendingUploads      : Seq[Byte],
-  lastAjaxResponse    : Seq[Byte],
-  instances           : Seq[Byte],
-  controls            : Seq[Byte],
-  initialClientScript : Option[String],
-  delayedEvents       : Seq[Byte]
+  uuid              : String,
+  sequence          : Long,
+  deploymentType    : Option[String],
+  requestMethod     : Option[HttpMethod],
+  requestContextPath: Option[String],
+  requestPath       : Option[String],
+  requestHeaders    : List[(String, List[String])],
+  requestParameters : List[(String, List[String])],
+  containerType     : Option[String],
+  containerNamespace: Option[String],
+  pathMatchers      : Seq[Byte],
+  focusedControl    : Option[String],
+  pendingUploads    : Seq[Byte],
+  lastAjaxResponse  : Seq[Byte],
+  instances         : Seq[Byte],
+  controls          : Seq[Byte],
+  initializationData: Option[(Option[String], String)],
+  delayedEvents     : Seq[Byte]
 ) {
   // Decode individual bits
   def decodePathMatchers     : List[PathMatcher]           = fromByteSeq[List[PathMatcher]](pathMatchers)
@@ -224,24 +225,24 @@ object DynamicState {
     // 3. In the cases where there is a large number of large instances or templates, parallel serialization might
     //    be something to experiment with.
     DynamicState(
-      uuid                = document.uuid,
-      sequence            = document.sequence,
-      deploymentType      = Option(document.getDeploymentType) map (_.toString),
-      requestMethod       = Option(document.getRequestMethod),
-      requestContextPath  = Option(document.getRequestContextPath),
-      requestPath         = Option(document.getRequestPath),
-      requestHeaders      = document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of toList
-      requestParameters   = document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of toList
-      containerType       = Option(document.getContainerType),
-      containerNamespace  = Option(document.getContainerNamespace),
-      pathMatchers        = toByteSeq(document.getVersionedPathMatchers),
-      focusedControl      = document.controls.getFocusedControl map (_.getEffectiveId),
-      pendingUploads      = toByteSeq(document.getPendingUploads),
-      lastAjaxResponse    = toByteSeq(document.lastAjaxResponse),
-      instances           = toByteSeq(startContainerOpt.iterator flatMap (_.allModels) flatMap (_.instancesIterator) filter (_.mustSerialize) map (new InstanceState(_)) toList),
-      controls            = toByteSeq(controlsToSerialize),
-      initialClientScript = document.initialClientScript,
-      delayedEvents       = toByteSeq(document.delayedEvents),
+      uuid               = document.uuid,
+      sequence           = document.sequence,
+      deploymentType     = Option(document.getDeploymentType) map (_.toString),
+      requestMethod      = Option(document.getRequestMethod),
+      requestContextPath = Option(document.getRequestContextPath),
+      requestPath        = Option(document.getRequestPath),
+      requestHeaders     = document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of toList
+      requestParameters  = document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of toList
+      containerType      = Option(document.getContainerType),
+      containerNamespace = Option(document.getContainerNamespace),
+      pathMatchers       = toByteSeq(document.getVersionedPathMatchers),
+      focusedControl     = document.controls.getFocusedControl map (_.getEffectiveId),
+      pendingUploads     = toByteSeq(document.getPendingUploads),
+      lastAjaxResponse   = toByteSeq(document.lastAjaxResponse),
+      instances          = toByteSeq(startContainerOpt.iterator flatMap (_.allModels) flatMap (_.instancesIterator) filter (_.mustSerialize) map (new InstanceState(_)) toList),
+      controls           = toByteSeq(controlsToSerialize),
+      initializationData = document.getInitializationData,
+      delayedEvents      = toByteSeq(document.delayedEvents),
     )
   }
 

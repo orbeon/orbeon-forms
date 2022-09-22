@@ -24,7 +24,7 @@ import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunnerPersistence}
+import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{ContentTypes, DateUtils, NetUtils}
@@ -163,15 +163,18 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         // Check user can read and set Orbeon-Operations header
         fromDatabase.dataUserOpt.foreach { dataUser =>
 
-          // Read form metadata after we're done with the connection to read the data,
+          // Read form permissions after we're done with the connection to read the data,
           // so we don't use two simultaneous connections
-          val formMetadataForDataRequestOpt = req.forData.option(RelationalUtils.readFormPermissions(
+          val formPermissionsForDataRequestOptOpt = req.forData.option(RelationalUtils.readFormPermissions(
             req.appForm, FormDefinitionVersion.Specific(fromDatabase.formVersion))
           )
 
-          formMetadataForDataRequestOpt foreach { formMetadata =>
+          formPermissionsForDataRequestOptOpt foreach { formPermissionsElemOpt =>
             val authorizedOperations = PermissionsAuthorization.authorizedOperations(
-              PermissionsXML.parse(formMetadata.orNull),
+              FormRunner.permissionsFromElemOrProperties(
+                formPermissionsElemOpt,
+                req.appForm
+              ),
               PermissionsAuthorization.currentUserFromSession,
               dataUser
             )
@@ -179,7 +182,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
               throw HttpStatusCodeException(StatusCode.Forbidden)
             httpResponse.setHeader(
               FormRunnerPersistence.OrbeonOperations,
-              Operations.serialize(authorizedOperations).mkString(" ")
+              Operations.serialize(authorizedOperations, normalized = true).mkString(" ")
             )
           }
         }

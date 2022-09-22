@@ -838,94 +838,9 @@
 
                                 // Submit form
                                 case "submission": {
-                                    var submissionElement = childNode;
-                                    var showProgress = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
-                                    var replace      = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
-                                    var target       = ORBEON.util.Dom.getAttribute(submissionElement, "target");
-                                    var action       = ORBEON.util.Dom.getAttribute(submissionElement, "action");
-
-                                    // Increment and send sequence number
-                                    var requestForm = document.getElementById(formID);
-                                    // Go to another page
-                                    if (showProgress != "false") {
-                                        // Display loading indicator unless the server tells us not to display it
+                                    ORBEON.xforms.XFormsUi.handleSubmission(formID, childNode, function() {
                                         newDynamicStateTriggersReplace = true;
-                                    }
-
-                                    /**
-                                     * Set the action to the URL of the current page.
-                                     *
-                                     * We can't (or don't know how to) set the URL to the URL to which we did a submission
-                                     * replace="all", so the best we can do it to set it to the current URL.
-                                     *
-                                     * We don't do it when the server generated a <form action="…"> that contains
-                                     * xforms-server-submit, which can happen in cases (e.g. running in a portal) where for
-                                     * some reason submitting to the URL of the page wouldn't work.
-                                     *
-                                     * When the target is an iframe, we add a ?t=id to work around a Chrome bug happening
-                                     * when doing a POST to the same page that was just loaded, gut that the POST returns
-                                     * a PDF. See:
-                                     *
-                                     *     https://code.google.com/p/chromium/issues/detail?id=330687
-                                     *     https://github.com/orbeon/orbeon-forms/issues/1480
-                                     */
-                                    if (requestForm.action.indexOf("xforms-server-submit") == -1) {
-                                        var isTargetAnIframe = _.isString(target) && $('#' + target).prop('tagName') == 'IFRAME';
-                                        var a = $('<a>');
-                                        a.prop('href', window.location.href);
-                                        if (isTargetAnIframe) {
-                                            var param = "t=" + _.uniqueId();
-                                            var search = a.prop('search');
-                                            var newSearch = (search == '' || search == '?') ? '?' + param : search + '&' + param;
-                                            a.prop('search', newSearch);
-                                        }
-                                        requestForm.action = a.prop('href');
-                                    }
-
-                                    // Do we set a target on the form to open the page in another frame?
-                                    var noTarget = (function() {
-                                        if (target == null) {
-                                            // Obviously, we won't try to set a target if the server didn't us one
-                                            return true;
-                                        } else if (! _.isUndefined(window.frames[target])) {
-                                            // Pointing to a frame, so this won't open a new new window
-                                            return false;
-                                        } else {
-                                            // See if we're able to open a new window
-                                            if (target == "_blank")
-                                                // Use target name that we can reuse, in case opening the window works
-                                                target = Math.random().toString().substring(2);
-                                            // Don't use "noopener" as we do need to use that window to test on it!
-                                            var newWindow = window.open("about:blank", target);
-                                            if (newWindow && newWindow.close) {
-                                                return false;
-                                            } else {
-                                                return true;
-                                            }
-                                        }
-                                    })();
-
-                                    // Set or reset `target` attribute
-                                    if (noTarget)
-                                        requestForm.removeAttribute("target");
-                                    else
-                                        requestForm.target = target;
-
-                                    if (action == null) {
-                                        // Reset as this may have been changed before by asyncAjaxRequest
-                                        requestForm.removeAttribute("action");
-                                    } else {
-                                        // Set the requested target
-                                        requestForm.action = action;
-                                    }
-
-                                    try {
-                                        requestForm.submit();
-                                    } catch (e) {
-                                        // NOP: This is to prevent the error "Unspecified error" in IE. This can
-                                        // happen when navigating away is cancelled by the user pressing cancel
-                                        // on a dialog displayed on unload.
-                                    }
+                                    });
                                     break;
                                 }
 

@@ -71,7 +71,9 @@
             (
                 $mode != 'new' or
                 frf:allAuthorizedOperationsAssumingOwnerGroupMember(
-                    xxf:instance('fr-form-metadata')/permissions
+                    xxf:instance('fr-form-metadata')/permissions,
+                    $app,
+                    $form
                 ) = ('*', 'update')
             )                                                                   and
             $mode = ('new', 'edit')                                             and
@@ -220,7 +222,7 @@
                                 xxf:absolute-id('fr-form-model'),
                                 instance('fr-initial-instance'),
                                 $format-migrated,
-                                'holesonly'
+                                (xxf:get-request-parameter('data-migration-behavior'), 'holesonly')[1]
                             )
                         return
                             if (exists($simply-migrated)) then
@@ -264,7 +266,7 @@
                         not(fr:is-readonly-mode())        and
                         not($is-background)               and
                         not(fr:is-browser-environment())  and
-                        not(fr:is-embedded())
+                        not(fr:is-embedded()) (: Q: Should we consider enabling this with portlet embedding? :)
                     "/>
                 <xf:setvalue ref="$lease-enabled-elem" value="$lease-enabled"/>
                 <xf:action if="$lease-enabled">
@@ -375,9 +377,9 @@
                 if (exists($from-persistence)) then
                    xxf:split($from-persistence)
                 else if ($mode = 'new') then
-                   frf:allAuthorizedOperationsAssumingOwnerGroupMember(xxf:instance('fr-form-metadata')/permissions)
+                   frf:allAuthorizedOperationsAssumingOwnerGroupMember(xxf:instance('fr-form-metadata')/permissions, $app, $form)
                 else
-                   frf:authorizedOperationsBasedOnRolesXPath          (xxf:instance('fr-form-metadata')/permissions)
+                   frf:authorizedOperationsBasedOnRolesXPath          (xxf:instance('fr-form-metadata')/permissions, $app, $form)
             "/>
 
         <xf:setvalue
@@ -385,14 +387,14 @@
             value="string-join($ops, ' ')"/>
 
         <xf:message level="xxf:log-debug">
-            AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): <xf:output value="string-join($ops, ' ')"/>
+            AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): <xf:output value="instance('fr-authorized-operations')"/>
         </xf:message>
 
         <!-- Send an "Unauthorized" error if the user is unauthorized -->
         <xf:action
             if="not(
                 frf:isUserAuthorizedBasedOnOperationsAndModeXPath(
-                    string-join($ops, ' '),
+                    $ops,
                     $mode,
                     $is-submit
                 )
@@ -788,11 +790,10 @@
                             xxf:instance('fr-form-metadata')/root()
                         )/root()/*,
                     $simply-migrated :=
-                        simple-migration:dataMaybeWithSimpleMigrationWithBehavior(
+                        simple-migration:dataMaybeWithSimpleMigration(
                             xxf:absolute-id('fr-form-model'),
                             instance('fr-initial-instance'),
-                            $format-migrated,
-                            'holesonly'
+                            $format-migrated
                         )
                 return
                     if (exists($simply-migrated)) then

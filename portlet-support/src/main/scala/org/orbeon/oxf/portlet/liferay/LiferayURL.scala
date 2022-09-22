@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import java.{util => ju}
-
 import javax.portlet._
-import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.wsrp.WSRPSupport
+
+import scala.jdk.CollectionConverters.mapAsJavaMapConverter
+
 
 // Liferay-specific portlet support
 object LiferayURL {
@@ -65,15 +66,15 @@ object LiferayURL {
       url                  : T,
       portletMode          : Option[String],
       windowState          : Option[String],
-      navigationParameters : ju.Map[String, Array[String]]
-    ) = {
+      navigationParameters : Map[String, Array[String]]
+    ): String = {
       portletMode foreach (v => url.setPortletMode(new PortletMode(v)))
       windowState foreach (v => url.setWindowState(new WindowState(v)))
-      url.setParameters(navigationParameters)
+      url.setParameters(navigationParameters.asJava)
       url.toString
     }
 
-    WSRPURLRewriter.decodeURL(
+    WSRPSupport.decodeURL(
       encodedURL,
       createResourceURL,
       createPortletURL(response.createActionURL, _, _, _),

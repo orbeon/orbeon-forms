@@ -409,6 +409,7 @@
                 <xh:span
                     class="{
                         (
+                            'xforms-help-popover-control',
                             'input-prepend'[xxf:non-blank($prefix)],
                             'input-append' [xxf:non-blank($suffix)],
                             concat('fr-field-width-', $field-width)

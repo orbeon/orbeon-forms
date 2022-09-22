@@ -156,7 +156,6 @@
         <xbl:template xxbl:transform="oxf:unsafe-xslt" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oxf="http://www.orbeon.com/oxf/processors">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
                 <xsl:template match="/*">
                     <!-- Outer group around outer event handlers -->

@@ -21,19 +21,27 @@ case class Control(id: String, valueOpt: Option[String])
 case class KeyListener(eventName: Set[String], observer: String, keyText: String, modifiers: Set[Modifier])
 case class PollEvent(delay: Long)
 case class UserScript(functionName: String, targetId: String, observerId: String, paramValues: List[String])
+case class Dialog(id: String, neighborId: Option[String])
+case class Error(title: String, details: String, formId: String)
 
 case class Initializations(
-  uuid                   : String,
-  namespacedFormId       : String,
-  repeatTree             : String,
-  repeatIndexes          : String,
-  xformsServerPath       : String,
-  xformsServerUploadPath : String,
-  calendarImagePath      : String,
-  controls               : List[Control],
-  listeners              : List[KeyListener],
-  pollEvent              : Option[PollEvent],
-  userScripts            : List[UserScript]
+  uuid                          : String,
+  namespacedFormId              : String,
+  repeatTree                    : String,
+  repeatIndexes                 : String,
+  xformsServerPath              : String,
+  xformsServerSubmitActionPath  : Option[String],
+  xformsServerSubmitResourcePath: Option[String],
+  xformsServerUploadPath        : String,
+  controls                      : List[Control],
+  listeners                     : List[KeyListener],
+  pollEvent                     : Option[PollEvent],
+  userScripts                   : List[UserScript],
+  messagesToRun                 : List[String],
+  dialogsToShow                 : List[Dialog],
+  focusElementId                : Option[String],
+  errorsToShow                  : Option[Error],
+  configuration                 : ConfigurationProperties,
 )
 
 sealed trait WireAjaxEvent {
@@ -54,3 +62,25 @@ case class WireAjaxEventWithoutTarget(
   eventName  : String,
   properties : Map[String, String]
 ) extends WireAjaxEvent
+
+case class ConfigurationProperties(
+  sessionHeartbeat                : Boolean,
+  sessionHeartbeatDelay           : Long,
+  revisitHandling                 : String,
+  delayBeforeIncrementalRequest   : Int,
+  delayBeforeAjaxTimeout          : Long,
+  internalShortDelay              : Int,
+  delayBeforeDisplayLoading       : Int,
+  delayBeforeUploadProgressRefresh: Int,
+  helpHandler                     : Boolean,
+  helpTooltip                     : Boolean,
+  showErrorDialog                 : Boolean,
+  loginPageDetectionRegexp        : Option[String],
+  retryDelayIncrement             : Int,
+  retryMaxDelay                   : Int,
+  useAria                         : Boolean,
+  resourcesVersioned              : Boolean,
+  resourcesVersionNumber          : Option[String],
+  dateFormatInput                 : String,
+  timeFormatInput                 : String,
+)

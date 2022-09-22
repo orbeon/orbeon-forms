@@ -68,13 +68,17 @@ object XFormsProperties {
   val TypeInputFormatPropertyPrefix             = "format.input."
 
   val DateFormatInputProperty                   = TypeInputFormatPropertyPrefix + "date"
+  val TimeFormatInputProperty                   = TypeInputFormatPropertyPrefix + "time"
 
   val ShowRecoverableErrorsProperty             = "show-recoverable-errors"
 
-  private val LoginPageDetectionRegexp          = "login-page-detection-regexp"
+  val LoginPageDetectionRegexpProperty          = "login-page-detection-regexp"
 
   val SessionHeartbeatProperty                  = "session-heartbeat"
-  val SessionHeartbeatDelayProperty             = "session-heartbeat-delay"
+
+  val DelayBeforeIncrementalRequestProperty     = "delay-before-incremental-request"
+  val InternalShortDelayProperty                = "internal-short-delay"
+  val DelayBeforeDisplayLoadingProperty         = "delay-before-display-loading"
 
   // Could be `upload.delay-before-progress-refresh` for consistency with new properties
   val DelayBeforeUploadProgressRefreshProperty  = "delay-before-upload-progress-refresh"
@@ -82,12 +86,13 @@ object XFormsProperties {
   val RevisitHandlingProperty                   = "revisit-handling"
   val RevisitHandlingRestoreValue               = "restore"
 
-  val HelpHandlerProperty                       = "help-handler"
-  private val HelpTooltipProperty               = "help-tooltip"
+  val HelpTooltipProperty                       = "help-tooltip"
+
+  val ShowErrorDialogProperty                   = "show-error-dialog"
 
   val AsyncSubmissionPollDelay                  = "submission-poll-delay"
 
-  private val UseAria                           = "use-aria"
+  val UseAriaProperty                           = "use-aria"
 
   val Xforms11SwitchProperty                    = "xforms11-switch"
 
@@ -198,20 +203,18 @@ object XFormsProperties {
       PropertyDefinition(AssetsBaselineUpdatesProperty,             "",                          propagateToClient = false),
       PropertyDefinition(InlineResourcesProperty,                   false,                       propagateToClient = false), // properties to propagate to the client
 
-      PropertyDefinition(UseAria,                                   false,                       propagateToClient = true),
+      PropertyDefinition(UseAriaProperty,                           false,                       propagateToClient = true),
       PropertyDefinition(SessionHeartbeatProperty,                  true,                        propagateToClient = true),
-      PropertyDefinition("delay-before-incremental-request",        500,                         propagateToClient = true),
-      PropertyDefinition("internal-short-delay",                    100,                         propagateToClient = true),
-      PropertyDefinition("delay-before-display-loading",            500,                         propagateToClient = true),
+      PropertyDefinition(DelayBeforeIncrementalRequestProperty,     500,                         propagateToClient = true),
+      PropertyDefinition(InternalShortDelayProperty,                100,                         propagateToClient = true),
+      PropertyDefinition(DelayBeforeDisplayLoadingProperty,         500,                         propagateToClient = true),
       PropertyDefinition(DelayBeforeUploadProgressRefreshProperty,  2000,                        propagateToClient = true),
       PropertyDefinition(RevisitHandlingProperty,                   RevisitHandlingRestoreValue, propagateToClient = true),
       PropertyDefinition(HelpTooltipProperty,                       false,                       propagateToClient = true),
       PropertyDefinition(DateFormatInputProperty,                   "[M]/[D]/[Y]",               propagateToClient = true),
-      PropertyDefinition(TypeInputFormatPropertyPrefix + "time",    "[h]:[m]:[s] [P]",           propagateToClient = true),
-      PropertyDefinition("datepicker.navigator",                    true,                        propagateToClient = true),
-      PropertyDefinition("datepicker.two-months",                   false,                       propagateToClient = true),
-      PropertyDefinition("show-error-dialog",                       true,                        propagateToClient = true),
-      PropertyDefinition(LoginPageDetectionRegexp,                  "",                          propagateToClient = true)
+      PropertyDefinition(TimeFormatInputProperty,                   "[h]:[m]:[s] [P]",           propagateToClient = true),
+      PropertyDefinition(ShowErrorDialogProperty,                   true,                        propagateToClient = true),
+      PropertyDefinition(LoginPageDetectionRegexpProperty,          "",                          propagateToClient = true)
   )
 
   val SupportedDocumentProperties: Map[String, PropertyDefinition[_ >: String with Boolean with Int]] =

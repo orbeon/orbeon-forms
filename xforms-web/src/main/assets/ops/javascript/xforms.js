@@ -300,40 +300,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        Property: function() {
-            var Property = function(name, defaultValue) {
-                this.name = name;
-                this.defaultValue = defaultValue;
-            };
-
-            Property.prototype.get = function() {
-                return _.isUndefined(opsXFormsProperties) || _.isUndefined(opsXFormsProperties[this.name])
-                    ? this.defaultValue : opsXFormsProperties[this.name];
-            };
-
-            return Property;
-        }(),
-
-        Properties: {
-            init: function() {
-                this.sessionHeartbeat                 = new ORBEON.util.Property("session-heartbeat", true);
-                this.sessionHeartbeatDelay            = new ORBEON.util.Property("session-heartbeat-delay", 12 * 60 * 60 * 800); // 80 % of 12 hours in ms
-                this.revisitHandling                  = new ORBEON.util.Property("revisit-handling", "restore");
-                this.delayBeforeIncrementalRequest    = new ORBEON.util.Property("delay-before-incremental-request", 500);
-                this.delayBeforeAjaxTimeout           = new ORBEON.util.Property("delay-before-ajax-timeout", 30000);
-                this.internalShortDelay               = new ORBEON.util.Property("internal-short-delay", 100);
-                this.delayBeforeDisplayLoading        = new ORBEON.util.Property("delay-before-display-loading", 0);
-                this.delayBeforeUploadProgressRefresh = new ORBEON.util.Property("delay-before-upload-progress-refresh", 2000);
-                this.helpHandler                      = new ORBEON.util.Property("help-handler", false);
-                this.helpTooltip                      = new ORBEON.util.Property("help-tooltip", false);
-                this.showErrorDialog                  = new ORBEON.util.Property("show-error-dialog", true);
-                this.loginPageDetectionRegexp         = new ORBEON.util.Property("login-page-detection-regexp", "");
-                this.retryDelayIncrement              = new ORBEON.util.Property("retry.delay-increment", 5000);
-                this.retryMaxDelay                    = new ORBEON.util.Property("retry.max-delay", 30000);
-                this.useARIA                          = new ORBEON.util.Property("use-aria", false);
-            }
-        },
-
         /**
          * Utility methods that don't in any other category
          */
@@ -581,26 +547,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             },
 
             /**
-             * Check whether a region is completely visible (i.e. is fully inside the viewport).
-             * Note: this function is different than the function with the same name in YUI.
-             */
-            fitsInViewport: function(element) {
-
-                // Viewport coordinates
-                var viewportFirstTop = YAHOO.util.Dom.getDocumentScrollTop();
-                var viewportFirstLeft = YAHOO.util.Dom.getDocumentScrollLeft();
-                var viewportSecondTop = viewportFirstTop + YAHOO.util.Dom.getViewportHeight();
-                var viewportSecondLeft = viewportFirstLeft + YAHOO.util.Dom.getViewportWidth();
-                var viewportRegion = new YAHOO.util.Region(viewportFirstTop, viewportSecondLeft, viewportSecondTop, viewportFirstLeft);
-
-                // Element coordinates
-                var elementRegion = YAHOO.util.Dom.getRegion(element);
-
-                return viewportRegion.top <= elementRegion.top && viewportRegion.left <= elementRegion.left
-                    && elementRegion.bottom <= viewportRegion.bottom && elementRegion.right <= viewportRegion.right;
-            },
-
-            /**
              * Applies a function to all the elements of an array, and discards the value returned by the function, if any.
              */
             apply: function(array, fn, obj, overrideContext) {
@@ -648,118 +594,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     }
                 }
             }
-        },
-
-        /**
-         * Utility function to make testing with YUI Test easier.
-         */
-        Test: {
-            /**
-             * Tests that rely on instances having a certain value should start by callng this utility function
-             */
-            executeWithInitialInstance: function(testCase, testFunction) {
-                ORBEON.testing.executeCausingAjaxRequest(testCase, function() {
-                    ORBEON.xforms.Document.dispatchEvent("main-model", "restore-instance");
-                }, function() {
-                    testFunction.call(testCase);
-                });
-            },
-
-            /**
-             * Runs a first function as part of a YUI test case, waits for all Ajax requests (if any) that might ensue
-             * to terminate, then run a second function.
-             *
-             * This doesn't use the ajaxResponseProcessedEvent, because we want this to work in cases where we have zero
-             * or more than one Ajax requests.
-             */
-            executeCausingAjaxRequest: function(testCase, causingAjaxRequestFunction, afterAjaxResponseFunction) {
-
-                function checkAjaxReceived() {
-                    if (ORBEON.xforms.AjaxClient.hasEventsToProcess()) {
-                        // Wait another 100 ms
-                        setTimeout(checkAjaxReceived, 100);
-                    } else {
-                        // We done with Ajax requests, continue with the test
-                        testCase.resume(function() {
-                            afterAjaxResponseFunction.call(testCase);
-                        });
-                    }
-                }
-
-                causingAjaxRequestFunction.call(testCase);
-                setTimeout(checkAjaxReceived, 100);
-                testCase.wait(20000);
-            },
-
-            /**
-             * Similar to executeCausingAjaxRequest
-             */
-            executeSequenceCausingAjaxRequest: function(testCase, tests) {
-                if (tests.length > 0) {
-                    var testTuple = tests.shift();
-                    ORBEON.util.Test.executeCausingAjaxRequest(testCase, function() {
-                        testTuple[0].call(testCase);
-                    }, function() {
-                        if (testTuple[1]) testTuple[1].call(testCase);
-                        ORBEON.util.Test.executeSequenceCausingAjaxRequest(testCase, tests);
-                    });
-                }
-            },
-
-            /**
-             * Take a sequence a function, and returns a function(testCase, next). If a function in the sequence
-             * invokes and XHR, then the following function will only run when that XHR finished.
-             */
-            runMayCauseXHR: function(/* testCase, continuations...*/) {
-                var testCase = arguments[0];
-                var continuations = Array.prototype.slice.call(arguments, 1);
-                if (continuations.length > 0) {
-                    var continuation = continuations.shift();
-                    ORBEON.util.Test.executeCausingAjaxRequest(testCase, function() {
-                        continuation.call(testCase);
-                    }, function() {
-                        ORBEON.util.Test.runMayCauseXHR.apply(null, [testCase].concat(continuations));
-                    });
-                }
-            },
-
-            /**
-             * Function to be call in every test to start the test when the page is loaded.
-             *
-             * You can pass one optional argument: the name of a test function (say 'testSomething'). If this argument is present, then
-             * only this specific test will be run. This is useful when debugging test, replacing the call to Test.onOrbeonLoadedRunTest()
-             * by a call to Test.onOrbeonLoadedRunTest('testSomething') to only run testSomething().
-             */
-            onOrbeonLoadedRunTest: function(onlyFunctionName) {
-                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-                    if (parent && parent.TestManager) {
-                        parent.TestManager.load();
-                    } else {
-                        if (! _.isUndefined(onlyFunctionName)) {
-                            _.each(YAHOO.tool.TestRunner.masterSuite.items, function(testCase) {
-                                _.each(_.functions(testCase), function(functionName) {
-                                    if (functionName.indexOf('test') == 0 && functionName != onlyFunctionName)
-                                        delete testCase[functionName];
-                                })
-                            });
-                        }
-                        new YAHOO.tool.TestLogger();
-                        YAHOO.tool.TestRunner.run();
-                    }
-                });
-            },
-
-            /**
-             * Simulate the user clicking on a button.
-             *
-             * @param id    Button id.
-             * @return {void}
-             */
-            click: function(id) {
-                var element = ORBEON.util.Dom.get(id);
-                var button = element.tagName.toLowerCase() == "button" ? element : ORBEON.util.Dom.getElementByTagName(element, "button");
-                button.click();
-            }
         }
     };
 })();
@@ -774,22 +608,14 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
     ORBEON.xforms.Controls = {
 
         // Returns MIP for a given control
-        isRelevant: function (control) {
-            return ! $(control).is('.xforms-disabled');
-        },
         isReadonly: function (control) {
             return $(control).is('.xforms-readonly');
         },
-        isRequired: function (control) {
-            return $(control).is('.xforms-required');
-        },
-        isValid: function (control) {
-            return ! $(control).is('.xforms-invalid');
-        },
 
+        // 2022-09-10: 3 usages left from JavaScript, other usages in Scala
         getForm: function (control) {
             // If the control is not an HTML form control look for an ancestor which is a form
-            if (typeof control.form == "undefined") {
+            if (_.isUndefined(control.form) || control.form == null) {
                 return $(control).closest('form')[0];
             } else {
                 // We have directly a form control
@@ -797,11 +623,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        getCurrentValueEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         getCurrentValue: function (control) {
             var event = {control: control};
-            ORBEON.xforms.Controls.getCurrentValueEvent.fire(event);
-
             var jControl = $(control);
 
             if (! _.isUndefined(event.result)) {
@@ -930,7 +753,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         ORBEON.util.Dom.setStringValue(output[0], newControlValue);
                     }
                 }
-            } else if ((_.isUndefined(force) || force == false) && ORBEON.xforms.AjaxFieldChangeTracker.hasChangedIdsRequest(control.id)) {
+            } else if ((_.isUndefined(force) || force == false) && ORBEON.xforms.AjaxFieldChangeTracker.hasChangedIdsRequest(control)) {
                 // User has modified the value of this control since we sent our request so don't try to update it
                 // 2017-03-29: Added `force` attribute to handle https://github.com/orbeon/orbeon-forms/issues/3130 as we
                 // weren't sure we wanted to fully disable the test on `changedIdsRequest`.
@@ -956,7 +779,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 }
 
                 // Update classes on control
-                ORBEON.xforms.Controls._setRadioCheckboxClasses(control);
+                ORBEON.xforms.XFormsUi.setRadioCheckboxClasses(control);
             } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-compact, .xforms-select1-appearance-minimal, .xforms-input-appearance-compact, .xforms-input-appearance-minimal')) {
                 // Handle lists and comboboxes
                 var selectedValues = jControl.is('.xforms-select-appearance-compact') ? newControlValue.split(" ") : new Array(newControlValue);
@@ -997,23 +820,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             ORBEON.xforms.Controls.afterValueChange.fire(customEvent);
 
             return result;
-        },
-
-        _setRadioCheckboxClasses: function (target) {
-            // Update xforms-selected/xforms-deselected classes on the parent <span> element
-            var checkboxInputs = target.getElementsByTagName("input");
-            for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
-                var checkboxInput = checkboxInputs[checkboxInputIndex];
-                var parentSpan = checkboxInput.parentNode;                                              // Boolean checkboxes are directly inside a span
-                if (parentSpan.tagName.toLowerCase() == 'label') parentSpan = parentSpan.parentNode;    // While xf:select checkboxes have a label in between
-                if (checkboxInput.checked) {
-                    YAHOO.util.Dom.addClass(parentSpan, "xforms-selected");
-                    YAHOO.util.Dom.removeClass(parentSpan, "xforms-deselected");
-                } else {
-                    YAHOO.util.Dom.addClass(parentSpan, "xforms-deselected");
-                    YAHOO.util.Dom.removeClass(parentSpan, "xforms-selected");
-                }
-            }
         },
 
         // Mapping between className (parameter of this method and added after "xforms-") and id of elements
@@ -2157,7 +1963,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 }
 
                 // Help tooltip
-                if (ORBEON.util.Properties.helpTooltip.get() && $(target).is('.xforms-help')) {
+                if (ORBEON.xforms.Page.getFormFromElemOrThrow(target).helpTooltip() && $(target).is('.xforms-help')) {
                     // Get control
                     var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help");
                     if (control) {
@@ -2212,7 +2018,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // We test on `originalTarget` being on the help icon first, so in case the help icon is inside a
                 // trigger, we don't "mistake" the click on the help for a click on the trigger, rendering the help
                 // inaccessible through a click.
-                if (ORBEON.util.Properties.helpHandler.get()) {
+                if (ORBEON.xforms.Page.getFormFromElemOrThrow(controlTarget).helpHandler()) {
                     // We are sending the xforms-help event to the server and the server will tell us what do to
                     var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, null, "xforms-help");
                     ORBEON.xforms.AjaxClient.fireEvent(event);
@@ -2244,8 +2050,10 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // Click on checkbox or radio button
 
                 // Update classes right away to give user visual feedback
-                ORBEON.xforms.Controls._setRadioCheckboxClasses(controlTarget);
+                ORBEON.xforms.XFormsUi.setRadioCheckboxClasses(controlTarget);
+                ORBEON.xforms.XFormsUi.handleShiftSelection(event, controlTarget);
                 var event = new ORBEON.xforms.AjaxEvent(null, controlTarget.id, ORBEON.xforms.Controls.getCurrentValue(controlTarget), "xxforms-value");
+
                 ORBEON.xforms.AjaxClient.fireEvent(event);
                 handled = true;
             } else if (controlTarget != null && $(controlTarget).is('.xforms-upload') && $(originalTarget).is('.xforms-upload-remove')) {
@@ -2301,42 +2109,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // Explore parent
                 node = node.parentNode;
             }
-        },
-
-        /**
-         * Called upon resizing.
-         */
-        _resize: function () {
-            // Move hidden tooltips to the top-left of the document to avoid having a useless scrollbar show up in
-            // case they are outside of the viewport.
-            var collections = [ORBEON.xforms.Globals.hintTooltipForControl, ORBEON.xforms.Globals.helpTooltipForControl, ORBEON.xforms.Globals.alertTooltipForControl];
-            for (var i = 0; i < 3; i++) {
-                var collection = collections[i];
-                for (var control in collection) {
-                    var tooltip = collection[control];
-                    if (tooltip != null) {
-                        if (YAHOO.lang.isObject(tooltip.element) && tooltip.element.style.visibility == "hidden") {
-                            tooltip.element.style.top = 0;
-                            tooltip.element.style.left = 0;
-                        }
-                    }
-                }
-            }
-        },
-
-        /**
-         * Called upon scrolling or resizing.
-         */
-        scrollOrResize: function () {
-            ORBEON.xforms.Events._resize();
-            // Adjust position of dialogs with "constraintoviewport" since YUI doesn't do it automatically
-            // NOTE: comment this one out for now, as that causes issues like unreachable buttons for large dialogs, and funny scrolling
-            //        for (var yuiDialogId in ORBEON.xforms.Globals.dialogs) {
-            //            var yuiDialog = ORBEON.xforms.Globals.dialogs[yuiDialogId];
-            //            if (yuiDialog.cfg.getProperty("visible") && yuiDialog.cfg.getProperty("constraintoviewport")) {
-            //                yuiDialog.cfg.setProperty("xy", yuiDialog.cfg.getProperty("xy"));
-            //            }
-            //        }
         },
 
         sliderValueChange: function (offset) {
@@ -2406,7 +2178,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
         orbeonLoadedEvent           : new YAHOO.util.CustomEvent("orbeonLoaded", window, false, YAHOO.util.CustomEvent.LIST, true),
         errorEvent                  : new YAHOO.util.CustomEvent("errorEvent"),
-        yuiCalendarCreated          : new YAHOO.util.CustomEvent("yuiCalendarCreated"),
         componentChangedLayoutEvent : new YAHOO.util.CustomEvent("componentChangedLayout")
     };
 
@@ -2627,8 +2398,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         instance = new xblClass(container);
                         instance.xblClass = xblClass;
                         instance.container = container;
-                        var formId = ORBEON.xforms.Controls.getForm(instance.container).id;
-                        var form   = ORBEON.xforms.Page.getForm(formId);
+                        var form = ORBEON.xforms.Page.getFormFromElemOrThrow(instance.container);
                         form.xblInstances.push(instance);
                         if (hasInit) {
                             instance.initialized = false;
@@ -2639,21 +2409,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     return instance;
                 }
             };
-        },
-
-        // 2016-03-20: Called from xbl.xsl
-        callValueChanged: function (prefix, component, target, property) {
-            var partial = YAHOO.xbl;
-            if (partial == null) return;
-            partial = partial[prefix];
-            if (partial == null) return;
-            partial = partial[component];
-            if (partial == null) return;
-            partial = partial.instance(target);
-            if (partial == null) return;
-            var method = partial["parameter" + property + "Changed"];
-            if (method == null) return;
-            method.call(partial);
         },
 
         componentInitialized: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT)
@@ -2725,7 +2480,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     fixedcenter: false,
                     constraintoviewport: true,
                     underlay: "none",
-                    usearia: ORBEON.util.Properties.useARIA.get(),
+                    usearia: ORBEON.xforms.Page.getFormFromElemOrThrow(dialog).useARIA(),
                     role: "" // See bug 315634 http://goo.gl/54vzd
                 });
                 // Close the dialog when users click on document
@@ -2740,7 +2495,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     fixedcenter: false,
                     constraintoviewport: true,
                     underlay: "none", // Similarly, setting the underlay to "shadow" conflicts with the CSS used to limit the width and height of the dialog on IE6
-                    usearia: ORBEON.util.Properties.useARIA.get(),
+                    usearia: ORBEON.xforms.Page.getFormFromElemOrThrow(dialog).useARIA(),
                     role: "" // See bug 315634 http://goo.gl/54vzd
                 });
             }

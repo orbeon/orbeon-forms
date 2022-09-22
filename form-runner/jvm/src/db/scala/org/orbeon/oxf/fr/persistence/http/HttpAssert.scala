@@ -32,7 +32,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     def areEqual(left: Operations, right: Any): Boolean =
       (left, right) match {
         case (SpecificOperations(leftSpecific), SpecificOperations(rightSpecific)) =>
-          leftSpecific.toSet == rightSpecific.toSet
+          leftSpecific == rightSpecific
         case _ =>
           left == right
       }

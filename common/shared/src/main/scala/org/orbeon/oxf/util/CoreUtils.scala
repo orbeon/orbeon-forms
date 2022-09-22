@@ -27,7 +27,8 @@ object CoreUtils {
 
   implicit class OptionOps[A](private val a: Option[A]) extends AnyVal {
     // Kestrel / K Combinator (known as tap in Ruby/Underscore)
-    def |!>[B](f: A => B): Option[A] = { a foreach f; a }
+    def kestrel[B](f: A => B): Option[A] = { a foreach f; a }
+    def |!>[B](f: A => B): Option[A] = kestrel(f)
   }
 
   // Extensions on Boolean

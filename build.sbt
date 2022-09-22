@@ -35,6 +35,7 @@ val ScalaJsDomVersion                = "1.2.0"
 val ScalaJsJQueryVersion             = "0.9.6"
 val ScalaJsStubsVersion              = "1.1.0" // can be different from Scala.js version
 val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
+val ScalaJsFakeSecureRandomVersion   = "1.0.0" // switch to `scalajs-java-securerandom` when we upgrade to JSDOM 20+
 val ScalaJsTimeVersion               = "2.4.0"
 val ScalaJsLocalesVersion            = "1.4.1"
 
@@ -44,8 +45,8 @@ val ScalaLoggingVersion           = "3.9.4"
 
 // Shared Scala libraries
 val CatsVersion                   = "2.7.0"
-val ScalaTestVersion              = "3.2.12"
-val CirceVersion                  = "0.14.2"
+val ScalaTestVersion              = "3.2.13"
+val CirceVersion                  = "0.14.3"
 val EnumeratumVersion             = "1.7.0"
 val EnumeratumCirceVersion        = "1.7.0"
 val ShapelessVersion              = "2.3.7"
@@ -57,14 +58,14 @@ val AutowireVersion               = "0.3.3"
 val ScalatagsVersion              = "0.9.4"
 val SbinaryVersion                = "0.5.1"
 val Log4sVersion                  = "1.10.0"
-val ScalaCollectionCompatVersion  = "2.8.0"
+val ScalaCollectionCompatVersion  = "2.8.1"
 
 // Java libraries
 val SaxonJvmVersion               = "9.1.0.8.3"
 val JUnitInterfaceVersion         = "0.13.3"
-val Slf4jVersion                  = "1.7.36"
+val Slf4jVersion                  = "2.0.1"
 val HttpComponentsVersion         = "4.5.13"
-val Log4j2Version                 = "2.18.0"
+val Log4j2Version                 = "2.19.0"
 val CommonsIoVersion              = "2.11.0"
 val FlyingSaucerVersion           = "9.1.22"
 val TinkVersion                   = "1.6.1"
@@ -115,7 +116,7 @@ val CoreLibraryDependencies = Seq(
   "org.apache.httpcomponents"   % "httpcore"                        % "4.4.14",
   "org.slf4j"                   % "jcl-over-slf4j"                  % Slf4jVersion,
   "org.slf4j"                   % "slf4j-api"                       % Slf4jVersion,
-  "org.apache.logging.log4j"    % "log4j-slf4j-impl"                % Log4j2Version, // move to `log4j-slf4j18-impl` for SLF4J 1.8.x releases or newer; seems like 1.8 is dead and replaced by 2.0; but that's still alpha as of 2021-12
+  "org.apache.logging.log4j"    % "log4j-slf4j2-impl"               % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-api"                       % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-core"                      % Log4j2Version,
   "org.apache.logging.log4j"    % "log4j-1.2-api"                   % Log4j2Version, // for eXist JARs
@@ -173,7 +174,7 @@ val orbeonVersionFromProperties    = settingKey[String]("Orbeon Forms version fr
 val orbeonEditionFromProperties    = settingKey[String]("Orbeon Forms edition from system properties.")
 
 
-lazy val scala212 = "2.12.16"
+lazy val scala212 = "2.12.17"
 lazy val scala213 = "2.13.8"
 lazy val supportedScalaVersions = List(scala212, scala213)
 
@@ -404,6 +405,7 @@ lazy val commonScalaJvmSettings = Seq(
 lazy val commonScalaJsSettings = Seq(
 
   libraryDependencies += "org.scala-js" %%% "scala-js-macrotask-executor" % ScalaJsMacrotaskExecutor,
+  libraryDependencies += "org.scala-js" %%% "scalajs-fake-insecure-java-securerandom" % ScalaJsFakeSecureRandomVersion,
 
   packageJSDependencies / skip   := false,
   scalaJSLinkerConfig            ~= (_.withSourceMap(false).withESFeatures(_.withESVersion(ESVersion.ES5_1))),
@@ -532,7 +534,10 @@ lazy val webSupport = (project in file("web-support"))
   )
 
 lazy val embedding = (project in file("embedding"))
-  .dependsOn(core)
+  .dependsOn(
+    core,
+    xformsClientServerJVM
+  )
   .settings(commonSettings: _*)
   .settings(
     name := "orbeon-embedding",

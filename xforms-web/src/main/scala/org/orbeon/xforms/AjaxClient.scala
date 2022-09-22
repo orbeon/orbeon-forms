@@ -20,8 +20,9 @@ import org.orbeon.liferay.LiferaySupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.xforms
 import org.orbeon.xforms.EventNames.{XXFormsUploadProgress, XXFormsValue}
-import org.orbeon.xforms.facade.{AjaxServer, Events, Properties}
+import org.orbeon.xforms.facade.{AjaxServer, Events}
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
@@ -44,6 +45,11 @@ object AjaxClient {
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.AjaxClient")
 
   import Private._
+
+  def initialize(configuration: rpc.ConfigurationProperties): Unit = {
+    EventQueue.shortDelay       = configuration.internalShortDelay.millis
+    EventQueue.incrementalDelay = configuration.delayBeforeIncrementalRequest.millis
+  }
 
   class AjaxResponseDetails(
     val responseXML : dom.Document,
@@ -114,8 +120,8 @@ object AjaxClient {
 
     object LoginRegexpMatcher {
       def unapply(s: String): Boolean = {
-        val loginRegexp = Properties.loginPageDetectionRegexp.get()
-        loginRegexp.nonEmpty && new js.RegExp(loginRegexp).test(s)
+        val loginRegexp = Page.getForm(formId).configuration.loginPageDetectionRegexp
+        loginRegexp.exists(re => new js.RegExp(re).test(s))
       }
     }
 
@@ -269,8 +275,8 @@ object AjaxClient {
     showError(ErrorMessageTitle, sb.toString, formId, ignoreErrors)
   }
 
+  // TODO: After cp to 2021.1, `formId` -> `currentForm`
   // Display the error panel and shows the specified detailed message in the detail section of the panel.
-  @JSExport
   def showError(titleString: String, detailsString: String, formId: String, ignoreErrors: Boolean): Unit = {
     Events.errorEvent.fire(
       new js.Object {
@@ -278,13 +284,13 @@ object AjaxClient {
         val details: String = detailsString
       }
     )
-    if (! ignoreErrors && Properties.showErrorDialog.get())
-      ErrorPanel.showError(formId, detailsString)
+    if (! ignoreErrors && Page.getForm(formId).configuration.showErrorDialog)
+      ErrorPanel.showError(Page.getForm(formId), detailsString)
   }
 
   // Sending a heartbeat event if no event has been sent to server in the last time interval
   // determined by the `session-heartbeat-delay` property.
-  def sendHeartBeatIfNeeded(heartBeatDelay: Int): Unit =
+  def sendHeartBeatIfNeeded(heartBeatDelay: Long): Unit =
     if ((System.currentTimeMillis() - EventQueue.newestEventTime) >= heartBeatDelay)
       AjaxClient.fireEvent(
         AjaxEvent(
@@ -303,8 +309,8 @@ object AjaxClient {
 
     def canSendEvents: Boolean = ! EventQueue.ajaxRequestInProgress
 
-    val shortDelay                                  : FiniteDuration          = Properties.internalShortDelay.get().toInt.millis
-    val incrementalDelay                            : FiniteDuration          = Properties.delayBeforeIncrementalRequest.get().millis
+    var shortDelay       : FiniteDuration = _
+    var incrementalDelay : FiniteDuration = _
 
     var ajaxRequestInProgress : Boolean = false              // actual Ajax request has started and not yet successfully completed including response processing
   }
@@ -339,7 +345,7 @@ object AjaxClient {
 
     def handleResponse(
       responseXML        : dom.Document,
-      formId             : String,
+      currentForm        : xforms.Form,
       requestSequenceOpt : Option[Int],
       showProgress       : Boolean,
       ignoreErrors       : Boolean
@@ -355,15 +361,15 @@ object AjaxClient {
       callbackF(ajaxResponseReceived, forCurrentEventQueue = false, "handleResponseDom") foreach { details =>
 
         requestSequenceOpt foreach { requestSequence =>
-          StateHandling.updateSequence(formId, requestSequence + 1)
+          StateHandling.updateSequence(currentForm.namespacedFormId, requestSequence + 1)
         }
 
         logger.debug("before `handleResponseDom`")
-        AjaxServer.handleResponseDom(responseXML, formId, ignoreErrors)
+        AjaxServer.handleResponseDom(responseXML, currentForm.namespacedFormId, ignoreErrors)
         logger.debug("after `handleResponseDom`")
 
         // Reset changes, as changes are included in this batch of events
-        AjaxFieldChangeTracker.afterResponseProcessed()
+        currentForm.ajaxFieldChangeTracker.afterResponseProcessed()
         ServerValueStore.purgeExpired()
 
         // `require(EventQueue.ajaxRequestInProgress == false)`
@@ -378,14 +384,14 @@ object AjaxClient {
       }
 
       // And then we fire the callback, which triggers both direct callbacks and `Future`s
-      ajaxResponseReceived.fire(new AjaxResponseDetails(responseXML, formId))
+      ajaxResponseReceived.fire(new AjaxResponseDetails(responseXML, currentForm.namespacedFormId))
     }
 
     def findEventsToProcess(originalEvents: NonEmptyList[AjaxEvent]): Option[(html.Form, NonEmptyList[AjaxEvent], List[AjaxEvent])] = {
 
       // Ignore events for form that are no longer part of the document
       def eventsForFormsInDocument(events: NonEmptyList[AjaxEvent]): Option[NonEmptyList[AjaxEvent]] =
-        NonEmptyList.fromList(events.filter(event => dom.document.body.contains(event.form))) // IE11 doesn't support `document.contains`
+        NonEmptyList.fromList(events.filter(event => dom.document.contains(event.form)))
 
       // Coalesce value events for a given `targetId`, but only between boundaries of other events. We used to do this, more
       // or less, between those boundaries, but also including `XXFormsUploadProgress`, and allowing interleaving of `targetId`
@@ -448,11 +454,13 @@ object AjaxClient {
         eventsForOldestEventForm(coalescedEvents)
     }
 
-    def processEvents(currentForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
+    def processEvents(currentHtmlForm: html.Form, events: NonEmptyList[AjaxEvent]): Unit = {
 
-      val eventsAsList = events.toList
+      val eventsAsList  = events.toList
+      val currentFormId = currentHtmlForm.id
+      val currentForm   = Page.getForm(currentFormId)
 
-      AjaxFieldChangeTracker.beforeRequestSent(eventsAsList)
+      currentForm.ajaxFieldChangeTracker.beforeRequestSent(eventsAsList)
 
       eventsAsList foreach { event =>
 
@@ -489,8 +497,6 @@ object AjaxClient {
         }
       }
 
-      val currentFormId = currentForm.id
-
       val foundEventOtherThanHeartBeat = events exists (_.eventName != EventNames.XXFormsSessionHeartbeat)
       val showProgress                 = events exists (_.showProgress)
 
@@ -499,7 +505,7 @@ object AjaxClient {
       // way by the server, skipping the "normal" processing which includes checking if there are
       // any discardable events waiting to be executed.
       if (foundEventOtherThanHeartBeat)
-        Page.getForm(currentFormId).clearDiscardableTimerIds()
+        currentForm.clearDiscardableTimerIds()
 
       // Don't ignore errors if *any* of the events tell us not to ignore errors.
       // (Corollary: We only ignore errors if *all* of the events tell us to ignore errors.)
@@ -518,7 +524,7 @@ object AjaxClient {
       val sequenceNumberOpt = mustIncludeSequence option StateHandling.getSequence(currentFormId).toInt
 
       XFormsApp.clientServerChannel.sendEvents(
-        requestFormId     = currentFormId,
+        requestFormId     = currentForm,
         eventsToSend      = eventsToSend,
         sequenceNumberOpt = sequenceNumberOpt,
         showProgress      = showProgress,
@@ -526,7 +532,7 @@ object AjaxClient {
       ) foreach { responseXml =>
         handleResponse(
           responseXml,
-          currentFormId,
+          currentForm,
           sequenceNumberOpt,
           showProgress,
           ignoreErrors

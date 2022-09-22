@@ -80,4 +80,6 @@ class XFormsLHHAControl(
       XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue)
     else
       getExternalValue
+
+  override def supportAjaxUpdates: Boolean = ! staticControl.isPlaceholder
 }

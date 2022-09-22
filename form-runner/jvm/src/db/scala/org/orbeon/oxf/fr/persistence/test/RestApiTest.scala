@@ -48,16 +48,16 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
   private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
-  val AllOperations       = SpecificOperations(List(Create, Read, Update, Delete))
-  val CanCreate           = SpecificOperations(List(Create))
-  val CanRead             = SpecificOperations(List(Read))
-  val CanUpdate           = SpecificOperations(List(Update))
+  val AllOperations       = SpecificOperations(Set(Create, Read, Update, Delete, Operation.List))
+  val CanCreate           = SpecificOperations(Set(Create))
+  val CanRead             = SpecificOperations(Set(Read))
+  val CanUpdate           = SpecificOperations(Set(Update))
   val CanCreateRead       = Operations.combine(CanCreate, CanRead)
   val CanCreateReadUpdate = Operations.combine(CanCreateRead, CanUpdate)
   val FormName = "my-form"
 
-  val AnyoneCanCreateAndRead = DefinedPermissions(List(Permission(Nil, SpecificOperations(List(Read, Create)))))
-  val AnyoneCanCreate        = DefinedPermissions(List(Permission(Nil, SpecificOperations(List(Create)))))
+  val AnyoneCanCreateAndRead = DefinedPermissions(List(Permission(Nil, SpecificOperations(Set(Read, Create)))))
+  val AnyoneCanCreate        = DefinedPermissions(List(Permission(Nil, SpecificOperations(Set(Create)))))
 
   /**
    * Test form versioning for form definitions.
@@ -190,7 +190,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
               <application-name>{provider.entryName}</application-name>
               <form-name>{FormName}</form-name>
               <title xml:lang="en">{title.getOrElse("")}</title>
-              { PermissionsXML.serialize(permissions).getOrElse("") }
+              { PermissionsXML.serialize(permissions, normalized = false).getOrElse("") }
             </metadata>
           </xf:instance>
         </xf:model>
@@ -223,7 +223,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
         // Anonymous: create and read
         HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, AnyoneCanCreateAndRead)), 201)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(List(Create, Read)), Some(1)))
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(Set(Create, Read)), Some(1)))
 
         // Anonymous: just create, then can't read data
         HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, AnyoneCanCreate)), 201)
@@ -234,18 +234,18 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
         // More complex permissions based on roles
         HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, DefinedPermissions(List(
-          Permission(Nil                              , SpecificOperations(List(Create))),
-          Permission(List(RolesAnyOf(List("clerk"  ))), SpecificOperations(List(Read))),
-          Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(List(Read, Update))),
-          Permission(List(RolesAnyOf(List("admin"  ))), SpecificOperations(List(Read, Update, Delete)))
+          Permission(Nil                              , SpecificOperations(Set(Create))),
+          Permission(List(RolesAnyOf(List("clerk"  ))), SpecificOperations(Set(Read))),
+          Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update))),
+          Permission(List(RolesAnyOf(List("admin"  ))), SpecificOperations(Set(Read, Update, Delete)))
         )))), 201)
         HttpAssert.put(DataURL, Specific(1), HttpCall.XML(data), 201)
 
         // Check who can read
         HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403)                                                                         , guest)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(List(Create, Read))                , Some(1)), clerk)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(List(Create, Read, Update))        , Some(1)), manager)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(List(Create, Read, Update, Delete)), Some(1)), admin)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(Set(Create, Read))                , Some(1)), clerk)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(Set(Create, Read, Update))        , Some(1)), manager)
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(Set(Create, Read, Update, Delete)), Some(1)), admin)
 
         // Only managers and admins can update
         HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), 403, guest)
@@ -288,10 +288,10 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       // User can read their own data, as well as their managers
       HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, DefinedPermissions(List(
-        Permission(Nil                              , SpecificOperations(List(Create))),
-        Permission(List(Owner)                      , SpecificOperations(List(Read, Update))),
-        Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(List(Read))),
-        Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(List(Read, Update)))
+        Permission(Nil                              , SpecificOperations(Set(Create))),
+        Permission(List(Owner)                      , SpecificOperations(Set(Read, Update))),
+        Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(Set(Read))),
+        Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update)))
       )))), 201)
 
       // Data initially created by sfUserA
@@ -376,13 +376,13 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
 
       val expectedBody =
         <forms>
-            <form operations="read create">
+            <form operations="create read">
                 <application-name>{provider.entryName}</application-name>
                 <form-name>my-form</form-name>
                 <form-version>1</form-version>
                 <title xml:lang="en"/>
                 <permissions>
-                    <permission operations="read create"/>
+                    <permission operations="create read -list"/>
                 </permissions>
             </form>
         </forms>.toDocument

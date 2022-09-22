@@ -35,7 +35,6 @@ trait PartGlobalOps {
   // Controls
   def getControlAnalysis(prefixedId: String): ElementAnalysis
   def findControlAnalysis(prefixedId: String): Option[ElementAnalysis]
-  def hasControlByName(controlName: String): Boolean
   def controlsByName(controlName: String): Iterable[ElementAnalysis]
 
   // Events

@@ -202,7 +202,7 @@ object XFormsLoadAction {
           //
           val skipRewrite =
             if (! containingDocument.isPortletContainer) {
-              if (! containingDocument.isEmbeddedFromHeaders)
+              if (containingDocument.embeddingTypeFromHeaders.isEmpty) // TODO: check vs. `containingDocument.isEmbeddedFromHeaderOrUrlParam`
                 false
               else
                 containingDocument.initializing

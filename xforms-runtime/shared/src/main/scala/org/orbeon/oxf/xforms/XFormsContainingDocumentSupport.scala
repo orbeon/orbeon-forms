@@ -575,7 +575,13 @@ trait ContainingDocumentRequest {
   def headersGetter: String => Option[List[String]] = getRequestHeaders.get
 
   def isPortletContainer       = _requestInformation.containerType == "portlet"
-  def isEmbeddedFromHeaders    = _requestInformation.isEmbedded
+  def embeddingTypeFromHeaders = _requestInformation.embeddingType
+
+  def isEmbeddedFromUrlParam: Boolean =
+    _requestInformation.requestParameters.get(ExternalContext.EmbeddableParam) map (_.head) contains true.toString
+
+  def isEmbeddedFromHeaderOrUrlParam: Boolean = embeddingTypeFromHeaders.isDefined || isEmbeddedFromUrlParam
+
   def isServeInlineResources   = staticState.isInlineResources || _requestInformation.forceInlineResources
 
   // Was `protected[xforms]` but we need to call from offline. Find better solution.
@@ -746,37 +752,34 @@ trait ContainingDocumentClientState {
 
   self: XFormsContainingDocument =>
 
-  private var _initialClientScript: Option[String] = None
+  private var _initializationData : Option[(Option[String], String)] = None
 
-  def initialClientScript: Option[String] =
-    _initialClientScript
+  def getInitializationData: Option[(Option[String], String)] = _initializationData
 
-  def setInitialClientScript(): Unit = {
+  def setInitializationData(): Unit = {
 
-    implicit val externalContext = XFormsCrossPlatformSupport.externalContext
+    implicit val externalContext: ExternalContext = XFormsCrossPlatformSupport.externalContext
 
     val response = externalContext.getResponse
 
-    val scripts =
-      ScriptBuilder.findOtherScriptInvocations(this).toList :::
-      ScriptBuilder.findConfigurationProperties(
-        this,
-        URLRewriterUtils.isResourcesVersioned,
-        XFormsStateManager.getHeartbeatDelay(this, XFormsCrossPlatformSupport.externalContext)
-      ).toList :::
-      List(
-        ScriptBuilder.buildJavaScriptInitialData(
-          containingDocument   = this,
-          rewriteResource      = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
-          controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil
-        )
+    val initializationScripts =
+      ScriptBuilder.findOtherScriptInvocations(this)
+
+    val jsonInitializationData =
+      ScriptBuilder.buildJsonInitializationData(
+        containingDocument   = this,
+        rewriteResource      = response.rewriteResourceURL(_: String, UrlRewriteMode.AbsolutePathOrRelative),
+        rewriteAction        = response.rewriteActionURL,
+        controlsToInitialize = controls.getCurrentControlTree.rootOpt map (ScriptBuilder.gatherJavaScriptInitializations(_, includeValue = true)) getOrElse Nil,
+        versionedResources   = URLRewriterUtils.isResourcesVersioned,
+        heartbeatDelay       = XFormsStateManager.getHeartbeatDelay(this, externalContext)
       )
 
-    _initialClientScript = Some(scripts.fold("")(_ + _))
+    _initializationData = (initializationScripts, jsonInitializationData).some
   }
 
   def clearInitialClientScript(): Unit =
-    _initialClientScript = None
+    _initializationData = None
 }
 
 trait ContainingDocumentCacheable extends Cacheable {

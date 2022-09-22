@@ -357,10 +357,11 @@ trait CreateUpdateDelete
     val versionToSet = existing.flatMap(_.formVersion).getOrElse(requestedFormVersion(req))
 
     // Read outside of a `withConnection` block, so we don't use two simultaneous connections
-    val formPermissions = {
-      val elOpt = req.forData.option(RelationalUtils.readFormPermissions(req.appForm, FormDefinitionVersion.Specific(versionToSet))).flatten
-      PermissionsXML.parse(elOpt.orNull)
-    }
+    val formPermissions =
+      FormRunner.permissionsFromElemOrProperties(
+        req.forData.option(RelationalUtils.readFormPermissions(req.appForm, FormDefinitionVersion.Specific(versionToSet))).flatten,
+        req.appForm
+      )
     debug("CRUD: form permissions", List("permissions" -> formPermissions.toString))
 
     // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:
@@ -403,15 +404,14 @@ trait CreateUpdateDelete
                   if (delete)
                     // For deletes, if there is no data to delete, it unclear we think a 404 is clearer than a 403, so
                     // let this check pass, and some code later will return a 404
-                    SpecificOperations(List(Delete))
+                    SpecificOperations(Set(Delete))
                   else
                     PermissionsAuthorization.authorizedOperations(
                       formPermissions,
                       PermissionsAuthorization.currentUserFromSession,
                       CheckWithoutDataUserPessimistic
                     )
-                val requiredOps   = if (delete) List(Delete) else List(Create)
-                Operations.allowsAny(authorizedOps, requiredOps)
+                Operations.allowsAny(authorizedOps, Set(if (delete) Delete else Create))
             }
           } else {
             // Operations on deployed forms are always authorized

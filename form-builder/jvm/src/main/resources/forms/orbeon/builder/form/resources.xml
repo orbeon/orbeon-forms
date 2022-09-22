@@ -1232,11 +1232,12 @@
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
             <owner>Owner</owner>
-            <group-members>Group members</group-members>
+            <group-member>Group members</group-member>
             <create>Create</create>
             <read>Read</read>
             <update>Update</update>
             <delete>Delete</delete>
+            <list>List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow and Permissions</label>
@@ -2568,11 +2569,12 @@
             <operations>Opérations</operations>
             <anyone>Toute personne</anyone>
             <owner>Propriétaire</owner>
-            <group-members>Membres du groupe</group-members>
+            <group-member>Membres du groupe</group-member>
             <create>Créer</create>
             <read>Lire</read>
             <update>Mettre à jour</update>
             <delete>Supprimer</delete>
+            <list>Lister</list>
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow et Permissions</label>
@@ -3914,11 +3916,12 @@
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
             <owner todo="true">[Owner]</owner>
-            <group-members todo="true">[Group members]</group-members>
+            <group-member todo="true">[Group members]</group-member>
             <create>Create</create>
             <read>Read</read>
             <update>Update</update>
             <delete>Delete</delete>
+            <list>List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -5259,11 +5262,12 @@
             <operations>Действия</operations>
             <anyone>Любой пользователь</anyone>
             <owner todo="true">[Owner]</owner>
-            <group-members todo="true">[Group members]</group-members>
+            <group-member todo="true">[Group members]</group-member>
             <create>Заполнять форму</create>
             <read>Просматривать</read>
             <update>редактировать</update>
             <delete>Удалять</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -6597,11 +6601,12 @@
             <operations>Operazioni</operations>
             <anyone>Tutti</anyone>
             <owner>Proprietario</owner>
-            <group-members>Membri del gruppo</group-members>
+            <group-member>Membri del gruppo</group-member>
             <create>Crea</create>
             <read>Leggi</read>
             <update>Aggiorna</update>
             <delete>Cancella</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -7935,12 +7940,13 @@
             <permissions>Berechtigungen</permissions>
             <operations>Operationen</operations>
             <anyone>Alle</anyone>
-         <owner>Inhaber</owner>
-            <group-members>Gruppenmitglieder</group-members>
+            <owner>Inhaber</owner>
+            <group-member>Gruppenmitglieder</group-member>
             <create>Erstellen</create>
             <read>Lesen</read>
             <update>Update</update>
             <delete>Löschen</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -9277,11 +9283,12 @@
             <operations>Operaatiot</operations>
             <anyone>Kuka tahansa</anyone>
             <owner>Omistaja</owner>
-            <group-members>Ryhmän jäsenet</group-members>
+            <group-member>Ryhmän jäsenet</group-member>
             <create>Luo</create>
             <read>Lue</read>
             <update>Päivitä</update>
             <delete>Poista</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -10615,11 +10622,12 @@
             <operations>Operaciones</operations>
             <anyone>Todos</anyone>
             <owner>Propietario</owner>
-            <group-members>Miembros del Grupo</group-members>
+            <group-member>Miembros del Grupo</group-member>
             <create>Crear</create>
             <read>Acceder</read>
             <update>Modificar</update>
             <delete>Eliminar</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -11933,11 +11941,12 @@
             <operations>Bewerkingen</operations>
             <anyone>Iedereen</anyone>
             <owner>Eigenaar</owner>
-            <group-members>Groepleden</group-members>
+            <group-member>Groepleden</group-member>
             <create>Maken</create>
             <read>Lezen</read>
             <update>Updaten</update>
             <delete>Verwijderen</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label>Workflow en bevoegdheden</label>
@@ -13278,11 +13287,12 @@
             <operations>Operações</operations>
             <anyone>Qualquer um</anyone>
             <owner>Administrador</owner>
-            <group-members>Membros do Grupo</group-members>
+            <group-member>Membros do Grupo</group-member>
             <create>Criar</create>
             <read>Ler</read>
             <update>Actualizar</update>
             <delete>Apagar</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>
@@ -14624,11 +14634,12 @@
             <operations>Operationer</operations>
             <anyone>Alla</anyone>
             <owner>Ägaren</owner>
-            <group-members>Grupp</group-members>
+            <group-member>Grupp</group-member>
             <create>Skapa</create>
             <read>Läsa</read>
             <update>Ändra</update>
             <delete>Ta bort</delete>
+            <list todo="true">List</list>
         </dialog-permissions>
         <dialog-workflow>
             <label todo="true">[Workflow and Permissions]</label>

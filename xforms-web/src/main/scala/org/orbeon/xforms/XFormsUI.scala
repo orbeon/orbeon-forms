@@ -20,20 +20,25 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
 import org.orbeon.xforms.facade.{Controls, Utils, XBL}
 import org.scalajs.dom
+import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.ext._
-import org.scalajs.dom.{html, raw}
+import org.scalajs.dom.html.Input
+import org.scalajs.dom.{MouseEvent, html, raw, window}
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 import scalatags.JsDom
 import scalatags.JsDom.all._
+import shapeless.syntax.typeable._
 
-import scala.concurrent.{Future, Promise}
+import scala.collection.immutable
 import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.scalajs.js.{timers, |}
 import scala.scalajs.js.timers.SetTimeoutHandle
+import scala.scalajs.js.{timers, |}
+import scala.util.control.NonFatal
 
 
 // Progressively migrate contents of xforms.js/AjaxServer.js here
@@ -43,6 +48,105 @@ object XFormsUI {
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xforms.XFormsUI")
 
   import Private._
+
+  // Algorithm for a single repeated checkbox click:
+  //
+  // - always remember the last clicked checkbox, whether with shift or not or checked or not
+  // - if an unchecked box is clicked with shift, ensure all the checkboxes in the range are unchecked
+  // - if a checked box is clicked with shift, ensure all the checkboxes in the range are checked
+  //
+  // This matches what GMail does AFAICT.
+  @JSExport
+  def handleShiftSelection(clickEvent: MouseEvent, controlElem: html.Element): Unit =
+    if (controlElem.classList.contains("xforms-select-appearance-full")) {
+      // Only for "checkbox" controls
+      val checkboxInputs = controlElem.getElementsByTagName("input")
+      if (XFormsId.hasEffectiveIdSuffix(controlElem.id) && checkboxInputs.length == 1) {
+        // Click on a single repeated checkbox
+
+        val checkboxElem = checkboxInputs.head.asInstanceOf[html.Input]
+
+        if (clickEvent.getModifierState("Shift")) {
+          // Just got shift-selected
+
+          val newCheckboxChecked = checkboxElem.checked
+
+          def findControlIdsToUpdate(leftId: XFormsId, rightId: XFormsId): Option[immutable.IndexedSeq[String]] =
+            if (leftId.isRepeatNeighbor(rightId) && leftId.iterations.last != rightId.iterations.last) {
+
+              val indexes =
+                if (leftId.iterations.last > rightId.iterations.last)
+                  rightId.iterations.last + 1 to leftId.iterations.last
+                else
+                  leftId.iterations.last until rightId.iterations.last
+
+              Some(indexes map (index => leftId.copy(iterations = leftId.iterations.init :+ index).toEffectiveId))
+            } else {
+              None
+            }
+
+          for {
+            (lastControlElem, _) <- lastCheckboxChecked
+            targetId             = XFormsId.fromEffectiveId(controlElem.id)
+            controlIds           <- findControlIdsToUpdate(XFormsId.fromEffectiveId(lastControlElem.id), targetId)
+            controlId            <- controlIds
+            controlElem          <- Option(dom.document.getElementById(controlId))
+            checkboxValue        <- if (newCheckboxChecked) nestedInputElems(controlElem).headOption.map(_.value) else Some("")
+          } locally {
+            DocumentAPI.setValue(controlId, checkboxValue)
+          }
+        }
+
+        // Update selection no matter what
+        lastCheckboxChecked = Some(controlElem -> checkboxElem)
+
+      } else if (checkboxInputs.length > 1) {
+        // Within a single group of checkboxes
+
+        // LATER: could support click on `<span>` inside `<label>`
+        clickEvent.target.narrowTo[html.Input] foreach { currentCheckboxElem =>
+          if (clickEvent.getModifierState("Shift"))
+            for {
+              (lastControlElem, lastCheckboxElem) <- lastCheckboxChecked
+              if lastControlElem.id == controlElem.id
+              allCheckboxes                       = checkboxInputs.toList.map(_.asInstanceOf[html.Input])
+              lastIndex                           = allCheckboxes.indexWhere(_.value == lastCheckboxElem.value)
+              if lastIndex >= 0
+              currentIndex                        = allCheckboxes.indexWhere(_.value == currentCheckboxElem.value)
+              if currentIndex >= 0 && currentIndex != lastIndex
+              curentIndex                         <- if (currentIndex < lastIndex) currentIndex + 1 to lastIndex else lastIndex until currentIndex
+              checkboxToUpdate                    = allCheckboxes(curentIndex)
+            } locally {
+              checkboxToUpdate.checked = currentCheckboxElem.checked
+            }
+
+          // Update selection no matter what
+          lastCheckboxChecked = Some(controlElem -> currentCheckboxElem)
+        }
+      } else {
+        lastCheckboxChecked = None
+      }
+    } else {
+      lastCheckboxChecked = None
+    }
+
+  // Update `xforms-selected`/`xforms-deselected` classes on the parent `<span>` element
+  @JSExport
+  def setRadioCheckboxClasses(target: html.Element): Unit = {
+    for (checkboxInput <- nestedInputElems(target)) {
+      var parentSpan = checkboxInput.parentNode.asInstanceOf[html.Element] // boolean checkboxes are directly inside a span
+      if (parentSpan.tagName.equalsIgnoreCase("label"))
+        parentSpan = parentSpan.parentNode.asInstanceOf[html.Element]      // while xf:select checkboxes have a label in between
+
+      if (checkboxInput.checked) {
+        parentSpan.classList.add("xforms-selected")
+        parentSpan.classList.remove("xforms-deselected")
+      } else {
+        parentSpan.classList.add("xforms-deselected")
+        parentSpan.classList.remove("xforms-selected")
+      }
+    }
+  }
 
   @JSExport // 2020-04-27: 6 JavaScript usages from xforms.js
   var modalProgressPanelShown: Boolean = false
@@ -392,6 +496,96 @@ object XFormsUI {
     )
   }
 
+  @JSExport
+  def handleSubmission(
+    formID           : String,
+    submissionElement: raw.Element,
+    notifyReplace    : js.Function0[Unit]
+  ): Unit = {
+
+    val urlType         = submissionElement.getAttribute("url-type")
+    val showProgressOpt = Option(submissionElement.getAttribute("show-progress"))
+    val targetOpt       = Option(submissionElement.getAttribute("target"))
+
+    val form = Page.getForm(formID)
+    val formElem = form.elem
+
+    // When the target is an iframe, we add a `?t=id` to work around a Chrome bug happening  when doing a POST to the
+    // same page that was just loaded, gut that the POST returns a PDF. See:
+    //
+    // https://code.google.com/p/chromium/issues/detail?id=330687
+    // https://github.com/orbeon/orbeon-forms/issues/1480
+    //
+    def updatedPath(path: String) =
+      if (path.contains("xforms-server-submit")) {
+
+        val isTargetAnIframe =
+          targetOpt.flatMap(target => Option(dom.document.getElementById(target))).exists(_.tagName.equalsIgnoreCase("iframe"))
+
+        if (isTargetAnIframe) {
+          val url = new URL(path, dom.document.location.href)
+          url.searchParams.delete("t")
+          url.searchParams.append("t", java.util.UUID.randomUUID().toString)
+          url.href
+        } else {
+          path
+        }
+      } else {
+        path
+      }
+
+    val newTargetOpt =
+      targetOpt flatMap {
+        case target if ! js.isUndefined(window.asInstanceOf[js.Dynamic].selectDynamic(target)) =>
+          // Pointing to a frame, so this won't open a new new window
+          Some(target)
+        case target =>
+          // See if we're able to open a new window
+          val targetButNotBlank =
+            if (target == "_blank")
+              Math.random().toString.substring(2) // use target name that we can reuse, in case opening the window works
+            else
+              target
+          // Don't use "noopener" as we do need to use that window to test on it!
+          val newWindow = window.open("about:blank", targetButNotBlank)
+          if (! js.isUndefined(newWindow) && (newWindow ne null)) // unclear if can be `undefined` or `null` or both!
+            Some(targetButNotBlank)
+          else
+            None
+      }
+
+    // Set or reset `target` attribute
+    newTargetOpt match {
+      case None            => formElem.removeAttribute("target")
+      case Some(newTarget) => formElem.target = newTarget
+    }
+
+    formElem.action = updatedPath(
+      (
+        if (urlType == "action")
+          form.xformsServerSubmitActionPath
+        else
+          form.xformsServerSubmitResourcePath
+      ).getOrElse(dom.window.location.toString)
+    )
+
+    // Notify the caller (to handle the loading indicator)
+    if (! showProgressOpt.contains("false"))
+      notifyReplace()
+
+    try {
+      formElem.submit()
+    } catch {
+      case NonFatal(t) =>
+        // NOP: This is to prevent the error "Unspecified error" in IE. This can
+        // happen when navigating away is cancelled by the user pressing cancel
+        // on a dialog displayed on unload.
+        // 2022-08-01: We no longer support IE, so if indeed this only happened with
+        // IE we could remove this code. Adding logging to see if this ever happens.
+        logger.warn(s"`requestForm.submit()` caused an error: ${t.getMessage}")
+    }
+  }
+
   @JSExport // 2020-04-27: 1 JavaScript usage
   def displayModalProgressPanel(): Unit =
     if (! modalProgressPanelShown) {
@@ -427,7 +621,7 @@ object XFormsUI {
         // We remove the modal progress panel before handling DOM response, as script actions may dispatch
         // events and we don't want them to be filtered. If there are server events, we don't remove the
         // panel until they have been processed, i.e. the request sending the server events returns.
-        val mustHideProgressDialog =
+        val mustHideModalPanel =
           ! (
             // `exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])`
             details.responseXML.getElementsByTagNameNS(Namespaces.XXF, "submission").iterator ++
@@ -435,7 +629,7 @@ object XFormsUI {
               (e => ! e.hasAttribute("target") && e.getAttribute("show-progress") != "false")
           )
 
-        if (mustHideProgressDialog)
+        if (mustHideModalPanel)
           hideModalProgressPanel(timerIdOpt, focusControlIdOpt)
       }
     }
@@ -487,9 +681,8 @@ object XFormsUI {
             }
           }
 
-          // IE 11 doesn't support `replaceChildren()`
-          select.innerHTML = ""
-          itemsetTree.toList.map(generateItem).map(_.render).foreach(select.appendChild)
+          // `replaceChildren()` is ok now that IE 11 support is no longer needed
+          select.replaceChildren(itemsetTree.toList.map(generateItem).map(_.render): _*)
 
         case _ =>
           // This should not happen but if it does we'd like to know about it without entirely stopping the
@@ -499,6 +692,13 @@ object XFormsUI {
       }
 
   private object Private {
+
+    // Global information about the last checkbox to check
+    // Q: Should this be by form?
+    var lastCheckboxChecked: Option[(html.Element, html.Input)] = None
+
+    def nestedInputElems(target: dom.Element): Seq[Input] =
+      target.getElementsByTagName("input").map(_.asInstanceOf[html.Input])
 
     private def findLoaderElem: Option[raw.Element] =
       Option(dom.document.querySelector("body > .orbeon-loader"))

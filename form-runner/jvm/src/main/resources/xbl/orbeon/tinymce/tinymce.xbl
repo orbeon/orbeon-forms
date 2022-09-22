@@ -81,9 +81,9 @@
 
                  - tinymce-config.js
                  - https://github.com/orbeon/orbeon-forms/issues/3473
+                 - https://github.com/orbeon/orbeon-forms/issues/5440
              -->
             <xbl:style src="/xbl/orbeon/tinymce/js/tinymce/skins/ui/oxide/skin.min.css"/>
-            <xbl:style src="/xbl/orbeon/tinymce/js/tinymce/skins/ui/oxide/content.min.css"/>
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-set-client-value" phase="target">

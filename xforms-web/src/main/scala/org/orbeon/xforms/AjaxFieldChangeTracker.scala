@@ -13,8 +13,10 @@
  */
 package org.orbeon.xforms
 
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.Events
 import org.scalajs.dom
+import org.scalajs.dom.html
 import org.scalajs.dom.raw.UIEvent
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -28,18 +30,33 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 @JSExportTopLevel("OrbeonAjaxFieldChangeTracker")
 object AjaxFieldChangeTracker {
 
-  import Private._
-
   def initialize(): Unit =
     GlobalEventListenerSupport.addListener(
       dom.document,
-      "input",
-      onInput _
+      DomEventNames.Input,
+      // "The `input` event fires when the value of an `<input>`, `<select>`, or `<textarea>` element has
+      // been changed. [...] The `input` event is fired every time the value of the element changes. This
+      // is unlike the change event, which only fires when the value is committed, such as by pressing the
+      // enter key, selecting a value from a list of options, and the like."
+      //
+      // 2020-05-29: This event appears to work with `<input>` and `<textarea>` with all modern browsers.
+      (ev: UIEvent) =>
+        Option(Events._findParentXFormsControl(ev.target)) foreach { control =>
+          Page.getFormFromElemOrThrow(control).ajaxFieldChangeTracker.onInput(control.id)
+        }
     )
 
   @JSExport
-  def hasChangedIdsRequest(controlId: String): Boolean =
-    changedControlIds.contains(controlId)
+  def hasChangedIdsRequest(control: html.Element): Boolean =
+    Page.getFormFromElemOrThrow(control).ajaxFieldChangeTracker.hasChangedIdsRequest(control.id)
+}
+
+class AjaxFieldChangeTracker {
+
+  private var changedControlIds = Set.empty[String]
+
+  def onInput(controlId: String): Unit =
+    changedControlIds += controlId
 
   def beforeRequestSent(events: List[AjaxEvent]): Unit =
     changedControlIds = Set.empty
@@ -47,20 +64,6 @@ object AjaxFieldChangeTracker {
   def afterResponseProcessed(): Unit =
     changedControlIds = Set.empty
 
-  private object Private {
-
-    var changedControlIds = Set.empty[String]
-
-    // "The `input` event fires when the value of an `<input>`, `<select>`, or `<textarea>` element has
-    // been changed. [...] The `input` event is fired every time the value of the element changes. This
-    // is unlike the change event, which only fires when the value is committed, such as by pressing the
-    // enter key, selecting a value from a list of options, and the like."
-    //
-    // 2020-05-29: This event appears to work with `<input>` and `<textarea>` with all modern browsers.
-    // IE 11 also dispatches it, even for `<textarea>` as intended (MDN was unclear about that).
-    def onInput(ev: UIEvent): Unit =
-      Option(Events._findParentXFormsControl(ev.target)) foreach { control =>
-        changedControlIds += control.id
-      }
-  }
+  def hasChangedIdsRequest(controlId: String): Boolean =
+    changedControlIds.contains(controlId)
 }

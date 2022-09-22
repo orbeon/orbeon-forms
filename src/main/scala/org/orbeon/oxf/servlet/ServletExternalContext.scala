@@ -314,8 +314,10 @@ class ServletExternalContext(
   private lazy val requestImpl = new RequestImpl
   def getRequest: ExternalContext.Request = requestImpl
 
-  // NOTE: use request.getHeaderValuesMap() which normalizes header names to lowercase. This is important if
-  // the headers map is generated internally as in that case it might be lowercase already.
+  // 2022-07-28: With `embeddedClientValueFromHeaders`, should we check that we have specifically the `portlet` token
+  // to enable `WSRPURLRewriter` encoding? Also check uses of `isEmbedded`, which also causes  the `EmbeddableParam` to
+  // be passed during a redirect. We should review this.
+  // See also: https://github.com/orbeon/orbeon-forms/issues/5323
   private def isEmbedded: Boolean =
     Headers.isEmbeddedFromHeaders(requestImpl.headerValuesMap)
 

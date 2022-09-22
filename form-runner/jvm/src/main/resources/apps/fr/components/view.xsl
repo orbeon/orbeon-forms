@@ -195,10 +195,7 @@
                             <xf:trigger>
                                 <xf:label ref="$fr-resources/detail/lease/show-in-view-mode"/>
                                 <xf:action event="DOMActivate" type="xpath">
-                                    fr:run-process(
-                                        'oxf.fr.detail.process',
-                                        'navigate(uri = ''/fr/{fr:app-name()}/{fr:form-name()}/view/{fr:document-id()}'')'
-                                    )
+                                    fr:run-process-by-name('oxf.fr.detail.process', 'lease-view')
                                 </xf:action>
                             </xf:trigger>
                         </xf:case>

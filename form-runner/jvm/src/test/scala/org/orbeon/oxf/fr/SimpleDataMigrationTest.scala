@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import cats.syntax.option._
 import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
 import org.orbeon.oxf.fr.importexport.FormDefinitionOps
 import org.orbeon.oxf.http.StreamedContent
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
@@ -34,10 +35,110 @@ class SimpleDataMigrationTest
      with FormRunnerSupport
      with XMLSupport {
 
+  def runFormRunnerAndAssertData(
+    incomingData         : (NodeInfo, DataFormatVersion),
+    expectedDataOpt      : Option[NodeInfo],
+    formName             : String,
+    dataMigrationBehavior: DataMigrationBehavior
+  ): Unit = {
+
+    def contentToPost(data: NodeInfo): StreamedContent =
+      StreamedContent.fromBytes(
+        TransformerUtils.tinyTreeToString(data).getBytes(ExternalContext.StandardCharacterEncoding),
+        Some(ContentTypes.XmlContentType)
+      )
+
+    val (processorService, docOpt, _) =
+      runFormRunner(
+        app        = "tests",
+        form       = formName,
+        mode       = "new",
+        document   = "",
+        query      = List(
+                       FormRunnerPersistence.DataFormatVersionName     -> incomingData._2.entryName,
+                       FormRunnerPersistence.DataMigrationBehaviorName -> dataMigrationBehavior.entryName,
+                     ),
+        initialize = true,
+        content    = contentToPost(incomingData._1).some
+      )
+
+    expectedDataOpt match {
+      case None =>
+        assert(docOpt.isEmpty)
+      case Some(expectedData) =>
+        assert(docOpt.nonEmpty)
+        val doc = docOpt.get
+        withTestExternalContext { _ =>
+          withFormRunnerDocument(processorService, doc) {
+            assertXMLDocumentsIgnoreNamespacesInScope(
+              left  = expectedData.root,
+              right = doc.findObjectByEffectiveId(Names.FormInstance).get.asInstanceOf[XFormsInstance].root
+            )
+          }
+        }
+    }
+  }
+
   ignore("Simple data migration") {
 
+    val IncomingFormData: NodeInfo =
+      <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.8.0">
+        <section-2>
+          <s1input1/>
+        </section-2>
+        <!-- The entire section must be removed -->
+        <section-1>
+          <section-1-iteration>
+            <s2field1/>
+            <grid-2>
+              <grid-2-iteration>
+                <s2number/>
+              </grid-2-iteration>
+              <grid-2-iteration>
+                <s2number/>
+              </grid-2-iteration>
+            </grid-2>
+          </section-1-iteration>
+          <section-1-iteration>
+            <s2field1/>
+            <grid-2>
+              <grid-2-iteration>
+                <s2number/>
+              </grid-2-iteration>
+              <grid-2-iteration>
+                <s2number/>
+              </grid-2-iteration>
+              <grid-2-iteration>
+                <s2number/>
+              </grid-2-iteration>
+            </grid-2>
+          </section-1-iteration>
+        </section-1>
+        <!-- Section templates are also missing fields -->
+        <section-4>
+          <st1field1/>
+          <st1num1/>
+          <st1grid2>
+            <st1grid2-iteration>
+            </st1grid2-iteration>
+          </st1grid2>
+        </section-4>
+        <section-3>
+          <st1field1/>
+          <st1num1/>
+          <st1grid2>
+            <st1grid2-iteration>
+            </st1grid2-iteration>
+          </st1grid2>
+        </section-3>
+        <!-- Here this should contain `st1image1`, but it matches a different element template from
+               the section template which as attributes. We need to pick the correct template. -->
+        <section-5/>
+        <fr:metadata xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
+      </form>
+
     val ExpectedFormData: NodeInfo =
-      <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
+      <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.8.0">
           <section-2>
               <s1input1/>
           </section-2>
@@ -102,64 +203,8 @@ class SimpleDataMigrationTest
           <fr:metadata xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
       </form>
 
-    val IncomingFormData: NodeInfo =
-      <form>
-          <section-2>
-              <s1input1/>
-          </section-2>
-          <!-- The entire section must be removed -->
-          <section-1>
-              <section-1-iteration>
-                  <s2field1/>
-                  <grid-2>
-                      <grid-2-iteration>
-                          <s2number/>
-                      </grid-2-iteration>
-                      <grid-2-iteration>
-                          <s2number/>
-                      </grid-2-iteration>
-                  </grid-2>
-              </section-1-iteration>
-              <section-1-iteration>
-                  <s2field1/>
-                  <grid-2>
-                      <grid-2-iteration>
-                          <s2number/>
-                      </grid-2-iteration>
-                      <grid-2-iteration>
-                          <s2number/>
-                      </grid-2-iteration>
-                      <grid-2-iteration>
-                          <s2number/>
-                      </grid-2-iteration>
-                  </grid-2>
-              </section-1-iteration>
-          </section-1>
-          <!-- Section templates are also missing fields -->
-          <section-4>
-              <st1field1/>
-              <st1num1/>
-              <st1grid2>
-                  <st1grid2-iteration>
-                  </st1grid2-iteration>
-              </st1grid2>
-          </section-4>
-          <section-3>
-              <st1field1/>
-              <st1num1/>
-              <st1grid2>
-                  <st1grid2-iteration>
-                  </st1grid2-iteration>
-              </st1grid2>
-          </section-3>
-          <!-- Here this should contain `st1image1`, but it matches a different element template from
-               the section template which as attributes. We need to pick the correct template. -->
-          <section-5/>
-          <fr:metadata xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-      </form>
-
     val IncomingFormDataWithExtra: NodeInfo =
-      <form>
+      <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.8.0">
           <section-2>
               <s1input1/>
               <extra1/>
@@ -225,46 +270,93 @@ class SimpleDataMigrationTest
           <fr:metadata xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
       </form>
 
+    val IncomingFormDataWithMoves: NodeInfo =
+      <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
+        <s1>
+          <s1g1c1>s1g1c1value</s1g1c1>
+          <s1g1c2>s1g1c2value</s1g1c2>
+        </s1>
+        <s2>
+          <s2g1c1>s2g1c1value</s2g1c1>
+        </s2>
+        <s3>
+          <s3g1>
+            <s3g1c1>s3g1c1value1</s3g1c1>
+          </s3g1>
+          <s3g1>
+            <s3g1c1>s3g1c1value2</s3g1c1>
+          </s3g1>
+        </s3>
+        <s4>
+          <s4-iteration>
+            <s4g1c1>s4g1c1value1</s4g1c1>
+            <s4g1c2>s4g1c2value1</s4g1c2>
+          </s4-iteration>
+          <s4-iteration>
+            <s4g1c1>s4g1c1value2</s4g1c1>
+            <s4g1c2>s4g1c2value2</s4g1c2>
+          </s4-iteration>
+        </s4>
+      </form>
+
+    val ExpectedFormDataWithMoves: NodeInfo =
+      <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="2019.1.0">
+        <s1>
+          <s1g1/>
+          <s1g2>
+            <s1g1c1>s1g1c1value</s1g1c1>
+          </s1g2>
+        </s1>
+        <s2>
+          <s2g1>
+            <s2g1c1>s2g1c1value</s2g1c1>
+            <s1g1c2>s1g1c2value</s1g1c2>
+          </s2g1>
+        </s2>
+        <s3>
+          <s3g1>
+            <s3g1-iteration>
+              <s3g1c1>s3g1c1value1</s3g1c1>
+            </s3g1-iteration>
+            <s3g1-iteration>
+              <s3g1c1>s3g1c1value2</s3g1c1>
+            </s3g1-iteration>
+          </s3g1>
+        </s3>
+        <s4>
+          <s4-iteration>
+            <s4g1>
+              <s4g1c2>s4g1c2value1</s4g1c2>
+            </s4g1>
+            <s4g2>
+              <s4g1c1>s4g1c1value1</s4g1c1>
+            </s4g2>
+          </s4-iteration>
+          <s4-iteration>
+            <s4g1>
+              <s4g1c2>s4g1c2value2</s4g1c2>
+            </s4g1>
+            <s4g2>
+              <s4g1c1>s4g1c1value2</s4g1c1>
+            </s4g2>
+          </s4-iteration>
+        </s4>
+      </form>
+
     val Expected = List(
-      ("migration of elements in main form and section templates with holes", IncomingFormData,          ExpectedFormData.some),
-      ("migration disallowed when extra elements are present"               , IncomingFormDataWithExtra, None) // #5217
+      ("migration of elements in main form and section templates with holes", "data-migration",          IncomingFormData          -> DataFormatVersion.V480, DataMigrationBehavior.HolesOnly, ExpectedFormData.some),
+      ("migration disallowed when extra elements are present"               , "data-migration",          IncomingFormDataWithExtra -> DataFormatVersion.V480, DataMigrationBehavior.HolesOnly, None), // https://github.com/orbeon/orbeon-forms/issues/5217
+      ("migration with moves including in repeats"                          , "data-migration-improved", IncomingFormDataWithMoves -> DataFormatVersion.V400, DataMigrationBehavior.Enabled,   ExpectedFormDataWithMoves.some),
     )
 
-    def contentToPost(data: NodeInfo) =
-      StreamedContent.fromBytes(
-        TransformerUtils.tinyTreeToString(data).getBytes(ExternalContext.StandardCharacterEncoding),
-        Some(ContentTypes.XmlContentType)
-      )
-
-    for ((desc, incomingData, expectedDataOpt) <- Expected)
+    for ((desc, formName, incomingData, migrationBehavior, expectedDataOpt) <- Expected)
       it(desc) {
-
-        val (processorService, docOpt, _) =
-          runFormRunner(
-            app        = "tests",
-            form       = "data-migration",
-            mode       = "new",
-            document   = "",
-            query      = List(FormRunnerPersistence.DataFormatVersionName -> DataFormatVersion.Edge.entryName),
-            initialize = true,
-            content    = contentToPost(incomingData).some
-          )
-
-        expectedDataOpt match {
-          case None =>
-            assert(docOpt.isEmpty)
-          case Some(expectedData) =>
-            assert(docOpt.nonEmpty)
-            val doc = docOpt.get
-            withTestExternalContext { _ =>
-              withFormRunnerDocument(processorService, doc) {
-                assertXMLDocumentsIgnoreNamespacesInScope(
-                  left  = expectedData.root,
-                  right = doc.findObjectByEffectiveId(Names.FormInstance).get.asInstanceOf[XFormsInstance].root
-                )
-              }
-            }
-        }
+        runFormRunnerAndAssertData(
+          incomingData,
+          expectedDataOpt,
+          formName,
+          migrationBehavior
+        )
       }
   }
 

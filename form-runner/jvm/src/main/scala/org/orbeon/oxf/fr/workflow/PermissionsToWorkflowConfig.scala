@@ -18,7 +18,7 @@ object PermissionsToWorkflowConfig {
         case DefinedPermissions(permissionsList) =>
 
           // Determine the possible "actors" (owner, group member, specific authentication role) with the operations they can perform
-          val actorsOperations: List[(Availability, List[PermissionOperation])] =
+          val actorsOperations: List[(Availability, Set[PermissionOperation])] =
             permissionsList.flatMap { permission =>
               val actors =
                 if (permission.conditions.isEmpty)
@@ -26,22 +26,22 @@ object PermissionsToWorkflowConfig {
                 else
                   permission.conditions
                     .flatMap {
-                      case Owner => List(WorkflowRoleAvailabilityRule(IsComparison, OwnerWorkflowRole))
-                      case Group => List(WorkflowRoleAvailabilityRule(IsComparison, GroupMemberWorkflowRole))
+                      case Owner             => List(WorkflowRoleAvailabilityRule(IsComparison, OwnerWorkflowRole))
+                      case Group             => List(WorkflowRoleAvailabilityRule(IsComparison, GroupMemberWorkflowRole))
                       case RolesAnyOf(roles) => roles.map(AuthenticationRoleAvailabilityRule(IsComparison, _))
                     }.map(ToUsersAvailability(_))
               val operations = permission.operations match {
-                case AnyOperation => PermissionOperations.All
+                case AnyOperation                   => PermissionOperations.AllSet
                 case SpecificOperations(operations) => operations
               }
               actors.map(_ -> operations)
             }
 
           // Group by actor
-          val actorToOperations: Map[Availability, List[PermissionOperation]] =
+          val actorToOperations: Map[Availability, Set[PermissionOperation]] =
             actorsOperations
               .groupBy(_._1)
-              .map { case (actor, operations) => actor -> operations.flatMap(_._2) }
+              .map { case (actor, operations) => actor -> operations.flatMap(_._2).toSet }
 
           // For each actor, find the perspective that applies
           val perspectivesActors: List[(PermissionPerspective, Availability)] =
@@ -186,23 +186,24 @@ object PermissionsToWorkflowConfig {
   private object Private {
 
     def perspectivesFromOperations(
-      operations: List[PermissionOperation]
+      operations: Set[PermissionOperation]
     ): List[PermissionPerspective] = {
-      val creatorOpt = operations.contains(PermissionOperation.Create).option(CreatorPermissionPerspective)
+      val creatorOpt = operations(PermissionOperation.Create).option(CreatorPermissionPerspective)
       val otherPerspectiveOpt =
-        if (operations.contains(PermissionOperation.Update)) {
-          if (operations.contains(PermissionOperation.Delete))
+        if (operations(PermissionOperation.Update)) {
+          if (operations(PermissionOperation.Delete))
             Some(EditorCleanerPermissionPerspective)
           else
             Some(EditorPermissionPerspective)
-        } else if (operations.contains(PermissionOperation.Read)) {
-          if (operations.contains(PermissionOperation.Delete))
+        } else if (operations(PermissionOperation.Read)) {
+          if (operations(PermissionOperation.Delete))
             Some(ReaderCleanerPermissionPerspective)
           else
             Some(ReaderPermissionPerspective)
-        } else if (operations.contains(PermissionOperation.Delete)) {
+        } else if (operations(PermissionOperation.Delete)) {
           Some(CleanerPermissionPerspective)
         } else {
+          // TODO: check if needs to handle `List`, see https://github.com/orbeon/orbeon-forms/issues/5397.
           None
         }
       (creatorOpt ++ otherPerspectiveOpt).toList

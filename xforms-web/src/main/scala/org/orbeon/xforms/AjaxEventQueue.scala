@@ -45,8 +45,8 @@ trait AjaxEventQueue[EventType] {
   def canSendEvents: Boolean
 
   // Configurable delays
-  val shortDelay      : FiniteDuration
-  val incrementalDelay: FiniteDuration
+  def shortDelay      : FiniteDuration
+  def incrementalDelay: FiniteDuration
 
   def newestEventTime: Long            = state.newestEventTime // used by heartbeat only
   def eventsReversed : List[EventType] = state.events

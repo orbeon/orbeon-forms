@@ -14,7 +14,7 @@
 package org.orbeon.oxf.http
 
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.util.{DateUtils, NumericUtils}
+import org.orbeon.oxf.util.NumericUtils
 
 import java.net.URLEncoder
 
@@ -31,6 +31,7 @@ object Headers {
 
   val ContentType             = "Content-Type"
   val ContentDisposition      = "Content-Disposition"
+  val ContentId               = "Content-ID"
   val ContentLength           = "Content-Length"
   val LastModified            = "Last-Modified"
   val Authorization           = "Authorization"
@@ -61,10 +62,19 @@ object Headers {
   val CreatedLower            = Created.toLowerCase
   val TimeoutLower            = Timeout.toLowerCase
 
-  val EmbeddedClient          = "embedded"
-  val PortletClient           = "portlet"
+  val GeneralEmbeddedClient         = "embedded"
+  val PortletEmbeddingClient        = "portlet"
+  val JavaApiEmbeddingClient        = "java-api"
+  val JavaScriptApiEmbeddingClient  = "javascript-api"
+  val AppEmbeddingClient            = "app" // tentative naming
 
-  val EmbeddedClientValues    = Set(EmbeddedClient, PortletClient)
+  val EmbeddedClientValues = Set(
+    GeneralEmbeddedClient,
+    PortletEmbeddingClient,
+    JavaApiEmbeddingClient,
+    JavaScriptApiEmbeddingClient,
+    AppEmbeddingClient
+  )
 
   // These headers are connection headers and must never be forwarded (content-length is handled separately below)
   //
@@ -152,8 +162,12 @@ object Headers {
     "Content-Disposition" -> ("attachment; filename*=UTF-8''" + filenameEncodedForHeader)
   }
 
+  def embeddedClientValueFromHeaders[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Option[String] =
+    Headers.firstItemIgnoreCase(headers, OrbeonClient)
+
+  // 2022-07-28: Only 1 use left.
   def isEmbeddedFromHeaders[T](headers: Iterable[(String, T)])(implicit ev: T => Iterable[String]): Boolean =
-    Headers.firstItemIgnoreCase(headers, OrbeonClient) exists EmbeddedClientValues
+    embeddedClientValueFromHeaders(headers) exists EmbeddedClientValues
 
   // List of common HTTP headers
   val CommonHeaders = Seq(
@@ -169,6 +183,7 @@ object Headers {
     "Cache-Control",
     "Connection",
     "Content-Disposition",
+    "Content-ID",
     "Content-Encoding",
     "Content-Language",
     "Content-Length",

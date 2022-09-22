@@ -13,10 +13,9 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.xforms.facade.Properties
-
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobal
+
 
 @js.native
 @JSGlobal
@@ -32,11 +31,11 @@ class LoadingIndicator extends js.Object { // so that properties/methods can be 
 
   NProgress.configure(new js.Object { val showSpinner = false })
 
-  def requestStarted(showProgress: Boolean): Unit = {
+  def requestStarted(showProgress: Boolean, configuration: rpc.ConfigurationProperties): Unit =
     if (showProgress) {
       if (shownCounter == 0) {
         // Show the indicator after a delay
-        val delay = Properties.delayBeforeDisplayLoading.get()
+        val delay = configuration.delayBeforeDisplayLoading
         if (delay > 0)
           js.timers.setTimeout(delay)(showIfNotAlreadyVisible())
         else
@@ -46,7 +45,6 @@ class LoadingIndicator extends js.Object { // so that properties/methods can be 
         shownCounter += 1
       }
     }
-  }
 
   def requestEnded(showProgress: Boolean): Unit =
     if (showProgress)

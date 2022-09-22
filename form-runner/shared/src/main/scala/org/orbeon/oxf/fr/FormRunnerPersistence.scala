@@ -22,6 +22,7 @@ import org.orbeon.oxf.common
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
@@ -88,8 +89,8 @@ object DataFormatVersion extends Enum[DataFormatVersion] {
 
   val Edge: DataFormatVersion = values.last
 
-  def isLatest(dataFormatVersion: DataFormatVersion): Boolean =
-    dataFormatVersion == Edge
+//  def isLatest(dataFormatVersion: DataFormatVersion): Boolean =
+//    dataFormatVersion == Edge
 
   def withNameIncludeEdge(s: String): DataFormatVersion =
     if (s == "edge")
@@ -110,6 +111,7 @@ object FormRunnerPersistence {
   val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt"
 
   val DataFormatVersionName               = "data-format-version"
+  val DataMigrationBehaviorName           = "data-migration-behavior"
   val FormDefinitionFormatVersionName     = "form-definition-format-version"
   val PruneMetadataName                   = "prune-metadata"
   val ShowProgressName                    = "show-progress"
@@ -221,6 +223,24 @@ object FormRunnerPersistence {
         )
     }
   }
+
+  // We don't store the data format version associated with a form definition explicitly. So we have to get it from
+  // other information in the form definition. We know the version is *at least* that of the highest migration version
+  // information, if any. But there is no guarantee that migration information is present: for example you could have
+  // a form definition with a section containing a single repeated grid, so no 2019.1.0 migrations are present as that
+  // only regards non-repeated grids. So in addition, we look at the `updated-with-version` and `created-with-version`,
+  // which *should* be present unless someone removes them by mistake from the form definition.
+  // If we don't find a version in the form definition, it means it was last updated with a version older than 2018.2.
+  // TODO: We should discriminate between 4.8.0 and 4.0.0 ideally. Currently we don't have a user use case but it would
+  //   be good for correctness.
+  def getOrGuessFormDataFormatVersion(metadataRootElemOpt: Option[NodeInfo]): DataFormatVersion =
+    metadataRootElemOpt flatMap { metadataRootElem =>
+      findFormDefinitionFormatFromStringVersions(
+        (metadataRootElem / "updated-with-version" ++ metadataRootElem / "created-with-version").map(_.stringValue) ++:
+        MigrationSupport.findAllMigrations(metadataRootElem).map(_._1.entryName)
+      )
+    } getOrElse
+      DataFormatVersion.V480
 
   // Parse a list of product versions as found in a form definition and find the closest data format associated
   // with the form definition.
@@ -580,6 +600,56 @@ trait FormRunnerPersistence {
     }
   }
 
+  def getAttachment(
+    fromBasePaths           : Iterable[(String, Int)],
+    beforeUrl               : String)(implicit
+    externalContext         : ExternalContext,
+    coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+  ): ConnectionResult = {
+
+    def rewriteServiceUrl(url: String) =
+      URLRewriterUtils.rewriteServiceURL(
+        externalContext.getRequest,
+        url,
+        UrlRewriteMode.Absolute
+      )
+
+    val attachmentVersionOpt =
+      fromBasePaths collectFirst { case (path, version) if beforeUrl.startsWith(path) => version }
+
+    // We used to use an XForms submission here which handled reading as well as writing. But that
+    // didn't allow for passing HTTP headers when reading, and we need this for versioning headers.
+    // So we now do all the work "natively", which is better anyway.
+    // https://github.com/orbeon/orbeon-forms/issues/4919
+
+    val customGetHeaders =
+      Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*)
+
+    val resolvedGetUri =
+      URI.create(rewriteServiceUrl(beforeUrl))
+
+    val allGetHeaders =
+      Connection.buildConnectionHeadersCapitalizedIfNeeded(
+        url              = resolvedGetUri,
+        hasCredentials   = false,
+        customHeaders    = customGetHeaders,
+        headersToForward = Connection.headersToForwardFromProperty,
+        cookiesToForward = Connection.cookiesToForwardFromProperty,
+        getHeader        = inScopeContainingDocument.headersGetter
+      )
+
+    Connection.connectNow(
+      method      = GET,
+      url         = resolvedGetUri,
+      credentials = None,
+      content     = None,
+      headers     = allGetHeaders,
+      loadState   = true,
+      saveState   = true,
+      logBody     = false
+    )
+  }
+
   def putWithAttachments(
     liveData          : DocumentNodeInfoType,
     migrate           : Option[DocumentNodeInfoType => DocumentNodeInfoType], // 2021-11-22: only from `trySaveAttachmentsAndData`
@@ -626,42 +696,6 @@ trait FormRunnerPersistence {
 
         val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
 
-        val attachmentVersionOpt =
-          fromBasePaths collectFirst { case (path, version) if beforeUrl.startsWith(path) => version }
-
-        // We used to use an XForms submission here which handled reading as well as writing. But that
-        // didn't allow for passing HTTP headers when reading, and we need this for versioning headers.
-        // So we now do all the work "natively", which is better anyway.
-        // https://github.com/orbeon/orbeon-forms/issues/4919
-
-        val customGetHeaders =
-          Map(attachmentVersionOpt.toList map (v => OrbeonFormDefinitionVersion -> List(v.toString)): _*)
-
-        val resolvedGetUri =
-          URI.create(rewriteServiceUrl(beforeUrl))
-
-        val allGetHeaders =
-          Connection.buildConnectionHeadersCapitalizedIfNeeded(
-            url              = resolvedGetUri,
-            hasCredentials   = false,
-            customHeaders    = customGetHeaders,
-            headersToForward = Connection.headersToForwardFromProperty,
-            cookiesToForward = Connection.cookiesToForwardFromProperty,
-            getHeader        = inScopeContainingDocument.headersGetter
-          )
-
-        def connectGet: ConnectionResult =
-          Connection.connectNow(
-            method          = GET,
-            url             = resolvedGetUri,
-            credentials     = None,
-            content         = None,
-            headers         = allGetHeaders,
-            loadState       = true,
-            saveState       = true,
-            logBody         = false
-          )
-
         def connectPut(is: InputStream): ConnectionResult = {
 
           val customPutHeaders =
@@ -701,7 +735,7 @@ trait FormRunnerPersistence {
         }
 
         for {
-          successGetCxr     <- ConnectionResult.trySuccessConnection(connectGet)
+          successGetCxr     <- ConnectionResult.trySuccessConnection(getAttachment(fromBasePaths, beforeUrl))
           putCxr            <- ConnectionResult.tryBody(successGetCxr, closeOnSuccess = true)(connectPut)
           successPutCxr     <- ConnectionResult.trySuccessConnection(putCxr)
           isEncryptedAtRest <- ConnectionResult.tryBody(successPutCxr, closeOnSuccess = true)(_ => getOrbeonDidEncryptHeader(successPutCxr))

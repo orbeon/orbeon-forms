@@ -18,16 +18,16 @@ import java.{util => ju}
 import javax.portlet._
 import org.apache.commons.io.IOUtils
 import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
 import org.orbeon.oxf.fr.embedding.{APISupport, EmbeddingContext, EmbeddingContextWithResponse}
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.portlet.liferay.LiferayURL
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.wsrp.WSRPSupport.PathParameterName
 
 import scala.jdk.CollectionConverters._
 import scala.util.Try
+
 
 class PortletEmbeddingContext(
   context            : PortletContext,
@@ -44,7 +44,7 @@ class PortletEmbeddingContext(
   def setSessionAttribute   (name: String, value: AnyRef): Unit           = session.setAttribute(name, value)
   def removeSessionAttribute(name: String)               : Unit           = session.removeAttribute(name)
 
-  val client: String = Headers.PortletClient
+  val client: String = Headers.PortletEmbeddingClient
 }
 
 class PortletEmbeddingContextWithResponse(
@@ -122,9 +122,7 @@ trait BufferedPortlet {
         val (path, queryOpt) = splitQuery(location)
         val parameters = queryOpt match {
           case Some(query) =>
-            val m = NetUtils.decodeQueryString(query)
-            m.put(PathParameter, Array(path))
-            ju.Collections.unmodifiableMap[String, Array[String]](m)
+            (decodeQueryString(query) + (PathParameter -> Array(path))).asJava
           case None =>
             ju.Collections.singletonMap(PathParameter, Array(path))
         }

@@ -143,10 +143,8 @@ trait SearchRequestParser {
                     }
                 }
             },
-          anyOfOperations = operationsElOpt.map { operationsEl =>
-            val operations: List[String] = operationsEl.attValue("any-of").splitTo[List]()
-            operations.map(Operation.withName)
-          }
+          anyOfOperations =
+            operationsElOpt.map(_.attValue("any-of").splitTo[Set]().map(Operation.withName))
         )
     }
   }

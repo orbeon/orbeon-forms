@@ -1,12 +1,17 @@
 .orbeon .xbl-fr-checkbox-input {
-    &.xforms-required .checkbox span:before {
-        // The following is copied from `form-runner-orbeon.less`
-        font-family    : FontAwesome;
-        content        : "\f005";
-        vertical-align : super;         // So the star doesn't show too high relative to the text of the label
-        line-height    : 1em;           // For the `super` not to change the line height, and keep the label vertical alignment
-        font-size      : 60%;           // Font Awesome star is large
-        margin-right   : 1ch;
+    &.xforms-required .checkbox span {
+        &:before {
+            // The following is copied from `form-runner-orbeon.less`
+            font-family    : FontAwesome;
+            content        : "\f005";
+            vertical-align : super;         // So the star doesn't show too high relative to the text of the label
+            line-height    : 1em;           // For the `super` not to change the line height, and keep the label vertical alignment
+            font-size      : 60%;           // Font Awesome star is large
+            margin-right   : 1ch;
+        }
+        > div:first-child {                 // Make the first `div`, in case of an HTML label, `inline`, so it shows
+            display: inline;                // on the same line as the star.
+        }
     }
     .xforms-select-appearance-full {
         display: inline-block;

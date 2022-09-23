@@ -8,7 +8,7 @@
         <File
             name="SingleFileAppender"
             fileName="../logs/orbeon.log"
-            append="false">
+            append="true">
             <PatternLayout pattern="%date{ISO8601} %-5level %logger{1} - %message%n"/>
         </File>
 

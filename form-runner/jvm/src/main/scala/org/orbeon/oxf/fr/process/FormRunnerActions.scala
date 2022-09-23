@@ -105,20 +105,20 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         fromParam orElse fromProperty orElse fromDefault
       }
 
-      object SendProcessParams extends ProcessParams {
-        def runningProcessId  : String  = self.runningProcessId.get
-        def app               : String  = currentApp
-        def form              : String  = currentForm
-        def formVersion       : Int     = currentFormVersion
-        def document          : String  = currentDocumentOpt.get
-        def valid             : Boolean = FormRunner.dataValid
-        def language          : String  = FormRunner.currentLang
-        def dataFormatVersion : String  = findParamValue(DataFormatVersionName) map evaluateValueTemplate get
-        def workflowStage     : String  = FormRunner.documentWorkflowStage.getOrElse("")
-      }
-
       // Append query parameters to the URL and evaluate XVTs
       val evaluatedPropertiesAsMap = {
+
+        object SendProcessParams extends ProcessParams {
+          def runningProcessId  : String  = self.runningProcessId.get
+          def app               : String  = currentApp
+          def form              : String  = currentForm
+          def formVersion       : Int     = currentFormVersion
+          def document          : String  = currentDocumentOpt.get
+          def valid             : Boolean = FormRunner.dataValid
+          def language          : String  = FormRunner.currentLang
+          def dataFormatVersion : String  = findParamValue(DataFormatVersionName) map evaluateValueTemplate get
+          def workflowStage     : String  = FormRunner.documentWorkflowStage.getOrElse("")
+        }
 
         def updateUri(uri: String) =
           FormRunnerActionsSupport.updateUriWithParams(

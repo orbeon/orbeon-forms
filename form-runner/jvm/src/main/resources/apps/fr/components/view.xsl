@@ -190,7 +190,20 @@
                                     <xf:send submission="fr-acquire-lease-submission"/>
                                 </xf:action>
                             </xf:trigger>
-                            <xf:trigger>
+                            <xf:var name="show-in-view-mode" value="
+                                xxf:evaluate(
+                                    xxf:property(
+                                        string-join(
+                                            (
+                                                'oxf.fr.detail.button.lease.show-in-view-mode.visible',
+                                                fr:app-name(),
+                                                fr:form-name()
+                                            ),
+                                            '.'
+                                        )
+                                    )
+                                )"/>
+                            <xf:trigger ref=".[$show-in-view-mode]">
                                 <xf:label ref="$fr-resources/detail/lease/show-in-view-mode"/>
                                 <xf:action event="DOMActivate" type="xpath">
                                     fr:run-process-by-name('oxf.fr.detail.process', 'lease-view')

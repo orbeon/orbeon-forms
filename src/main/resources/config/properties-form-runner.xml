@@ -155,6 +155,7 @@
     <property as="xs:string"  name="oxf.fr.detail.button.review.visible.*.*"                    value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.summary.visible.*.*"                   value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.home.visible.*.*"                      value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
+    <property as="xs:string"  name="oxf.fr.detail.button.lease.show-in-view-mode.visible.*.*"   value="fr:is-embedded('portlet') or not(fr:is-embedded())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.pdf.visible.*.*"                       value="not(fr:is-browser-environment())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.tiff.visible.*.*"                      value="not(fr:is-browser-environment())"/>
     <property as="xs:string"  name="oxf.fr.detail.button.wizard-prev.visible.*.*"               >

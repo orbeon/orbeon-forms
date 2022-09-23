@@ -34,7 +34,9 @@
         ref="
             let $params := xxf:split(instance('fr-send-submission-params')/@content)
             return
-                if (xxf:non-blank(instance('fr-send-submission-params')/@binary-content-url)) then
+                if ($params = ('pdf-url', 'tiff-url', 'excel-with-named-ranges-url', 'xml-form-structure-and-data-url')) then
+                    xxf:element('url', instance('fr-send-submission-params')/@binary-content-url/string())
+                else if (xxf:non-blank(instance('fr-send-submission-params')/@binary-content-url)) then
                    instance('fr-send-submission-params')/@binary-content-url
                 else if ($params = 'metadata') then
                    metadata:createFormMetadataDocument()

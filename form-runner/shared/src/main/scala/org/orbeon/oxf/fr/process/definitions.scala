@@ -67,7 +67,7 @@ object ContentToken {
   }
   case class Rendered(format: RenderedFormat, urlOnly: Boolean) extends ContentToken {
     def defaultContentType  : String = if (urlOnly) ContentTypes.XmlContentType else RenderedFormat.SupportedRenderFormatsMediatypes(format)
-    def defaultSerialization: String = ContentTypes.OctetStreamContentType
+    def defaultSerialization: String = if (urlOnly) ContentTypes.XmlContentType else ContentTypes.OctetStreamContentType
   }
 
   def fromString(s: String): Set[ContentToken] =

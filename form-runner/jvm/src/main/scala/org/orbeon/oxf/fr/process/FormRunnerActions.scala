@@ -159,16 +159,16 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       // Handle defaults which depend on other properties
       val evaluatedSendProperties = {
 
-        def getDefaultSerialization(method: String): String =
+        def getDefaultSerialization(method: HttpMethod): String =
           (method, contentToSend) match {
-            case ("post" | "put", sd: SerializationDefaults) => sd.defaultSerialization
-            case _                                           => "none"
+            case (HttpMethod.POST | HttpMethod.PUT, sd: SerializationDefaults) => sd.defaultSerialization
+            case _                                                             => "none"
           }
 
-        def findDefaultContentType(method: String): Option[String] =
+        def findDefaultContentType(method: HttpMethod): Option[String] =
           (method, contentToSend) match {
-            case ("post" | "put", sd: SerializationDefaults) => Some(sd.defaultContentType)
-            case _                                           => None
+            case (HttpMethod.POST | HttpMethod.PUT, sd: SerializationDefaults) => Some(sd.defaultContentType)
+            case _                                                             => None
           }
 
         def findDefaultPruneMetadata(dataFormatVersion: String): String = dataFormatVersion match {
@@ -178,11 +178,11 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
         val effectiveSerialization =
           evaluatedPropertiesAsMap.get("serialization").flatten orElse
-            (evaluatedPropertiesAsMap.get("method").flatten map getDefaultSerialization)
+            (evaluatedPropertiesAsMap.get("method").flatten.map(HttpMethod.withNameInsensitive) map getDefaultSerialization)
 
         val effectiveContentType =
           evaluatedPropertiesAsMap.get(Headers.ContentTypeLower).flatten orElse
-            (evaluatedPropertiesAsMap.get("method").flatten flatMap findDefaultContentType)
+            (evaluatedPropertiesAsMap.get("method").flatten.map(HttpMethod.withNameInsensitive) flatMap findDefaultContentType)
 
         val effectivePruneMetadata =
           evaluatedPropertiesAsMap.get(PruneMetadataName).flatten orElse

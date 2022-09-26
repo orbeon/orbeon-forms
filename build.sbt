@@ -145,7 +145,7 @@ val CoreLibraryDependencies = Seq(
   ),
   "com.github.librepdf"         % "openpdf"                         % "1.3.26",
   "org.bouncycastle"            % "bcmail-jdk15on"                  % "1.70", // for `openpdf`, also pulls `bcprov` and `bcpkix`
-  "com.drewnoakes"              % "metadata-extractor"              % "2.16.0",
+  "com.drewnoakes"              % "metadata-extractor"              % "2.18.0",
   "net.coobird"                 % "thumbnailator"                   % ThumbnailatorVersion,
   "com.adobe.xmp"               % "xmpcore"                         % "6.1.11",
 

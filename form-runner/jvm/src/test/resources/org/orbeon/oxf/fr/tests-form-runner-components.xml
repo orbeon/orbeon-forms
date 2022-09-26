@@ -118,7 +118,7 @@
                 <xh:link href="/xbl/orbeon/number/number.css" class="xforms-baseline"/>
                 <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css"/>
                 <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css"/>
-                <xh:script src="/ops/jquery/jquery-3.6.0.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/jquery/jquery-3.6.1.min.js" class="xforms-baseline"/>
                 <xh:script src="/apps/fr/style/bootstrap/js/bootstrap.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/util/jquery-orbeon.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/nprogress-0.2.0/nprogress.min.js" class="xforms-baseline"/>

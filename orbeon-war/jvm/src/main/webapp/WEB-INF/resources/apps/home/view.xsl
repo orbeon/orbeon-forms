@@ -28,7 +28,7 @@
                 <xh:link rel="stylesheet" type="text/css" href="/fr/style/bootstrap/css/bootstrap.css"/>
                 <xh:link rel="stylesheet" type="text/css" href="/fr/style/form-runner-bootstrap-override.css"/>
                 <xh:link rel="stylesheet" type="text/css" href="/home/home.css"/>
-                <xh:script type="text/javascript" src="/ops/jquery/jquery-3.6.0.min.js"/>
+                <xh:script type="text/javascript" src="/ops/jquery/jquery-3.6.1.min.js"/>
             </xh:head>
             <xh:body>
                 <xh:ul class="thumbnails">

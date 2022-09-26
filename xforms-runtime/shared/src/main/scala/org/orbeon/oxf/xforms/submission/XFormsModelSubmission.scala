@@ -515,7 +515,7 @@ class XFormsModelSubmission(
     ): URI Either Document =
       if (requestedSerialization(p.serializationOpt, p.xformsMethod, p.httpMethod).contains(ContentTypes.OctetStreamContentType))
         Left(
-          URI.create(p.refContext.refNodeInfo.getStringValue) // xxx TODO: if error, is it wrapped?
+          URI.create(p.refContext.refNodeInfo.getStringValue)
         )
       else
         Right(

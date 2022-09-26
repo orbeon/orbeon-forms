@@ -63,7 +63,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         }
 
       selectedRenderFormats foreach
-        (tryCreatePdfOrTiffIfNeeded(params, _).get)
+        (tryCreateRenderedFormatIfNeeded(params, _).get)
 
       val currentFormLang = FormRunner.currentLang
 
@@ -206,7 +206,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       // Create rendered format if needed
       val renderedFormatTmpFileUris =
         distinctRenderedFormats map { format =>
-          tryCreatePdfOrTiffIfNeeded(params, format).get._1 -> format
+          tryCreateRenderedFormatIfNeeded(params, format).get._1 -> format
         }
 
       // Create multipart if needed
@@ -442,7 +442,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
   }
 
   // Create if needed and return the element key name
-  private def tryCreatePdfOrTiffIfNeeded(
+  private def tryCreateRenderedFormatIfNeeded(
     params   : ActionParams,
     format   : RenderedFormat)(implicit
     frParams : FormRunnerParams

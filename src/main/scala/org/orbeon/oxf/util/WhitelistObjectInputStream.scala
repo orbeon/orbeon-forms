@@ -43,6 +43,7 @@ object WhitelistObjectInputStream {
   private val AllowedClasses = Set(
     "scala.None$",
     "scala.Some",
-    "scala.Option"
+    "scala.Option",
+    "scala.runtime.ModuleSerializationProxy"
   )
 }

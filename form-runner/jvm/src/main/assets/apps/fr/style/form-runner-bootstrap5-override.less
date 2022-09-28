@@ -1,9 +1,5 @@
 @import (reference) "form-runner-common";
 
-// body {
-//   background-color: blue !important;
-// }
-
 // dropdown menu
 .dropdown-menu .btn-link {
   font-size: 14px;
@@ -79,7 +75,7 @@
 }
 
 .xforms-trigger-appearance-full {
-  .btn:hover, .btn:focus, .btn:active, .btn.active, .open>.dropdown-toggle.btn {
+  .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
     background-color: #e6e6e6 !important;
     border-color: #0a58ca !important;
   }
@@ -93,7 +89,7 @@
 }
 
 .fr-new-button {
-  .btn:hover, .btn:focus, .btn:active, .btn.active, .open>.dropdown-toggle.btn {
+  .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
     color: #fff !important;
     background-color: #0b5ed7 !important;
     border-color: #0a58ca !important;
@@ -116,15 +112,21 @@
 
   // Adapt pagination to use of xf:trigger
   .pagination li {
-    &> .xforms-trigger { cursor: pointer }
-    &> .xforms-trigger.xforms-readonly { cursor: auto; }
-    .btn-link { 
-      text-decoration: none; 
+    & > .xforms-trigger {
+      cursor: pointer
+    }
+
+    & > .xforms-trigger.xforms-readonly {
+      cursor: auto;
+    }
+
+    .btn-link {
+      text-decoration: none;
       background-color: #fff;
     }
 
     // NOTE: Updated for Bootstrap 5
-    >.btn-link, >span {
+    > .btn-link, > span {
       padding: 8px 12px;
       border: 1px solid #ddd;
       background-color: #fff;
@@ -139,8 +141,8 @@
   }
 
   .pagination .disabled {
-    >span {
-      &, &>button {
+    > span {
+      &, & > button {
         background-color: transparent;
       }
     }

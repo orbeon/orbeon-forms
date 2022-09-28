@@ -1,0 +1,137 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+         xmlns:version="java:org.orbeon.oxf.common.Version"
+
+         lang="{xxf:instance('fr-fr-language-instance')}"
+         xml:lang="{xxf:instance('fr-fr-language-instance')}">
+
+    <xh:head>
+        <xh:title><xf:output ref="$fr-resources/landing/title"/></xh:title>
+        <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-landing.css" type="text/css" media="all"/>
+
+        <!-- This page needs access to Form Builder permission -->
+<!--        <xi:include href="oxf:/apps/fr/includes/permissions-model.xml" xxi:omit-xml-base="true"/>-->
+        <!-- FR Home page XForms model -->
+        <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
+
+            <xf:var
+                name="tz"
+                value="
+                    for $offset in frf:defaultTimezoneToOffsetString()
+                    return xs:dayTimeDuration($offset)"/>
+
+            <xf:instance id="fr-form-instance">
+                <i>
+                    <selection/>
+                </i>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view fluid="true">
+            <fr:navbar5/>
+                <div class="row gy-5" xmlns="http://www.w3.org/1999/xhtml">
+                    <div class="col-6 p-2">
+                        <div class="card h-100">
+<!--                            <img src="..." class="card-img-top" alt="..."/>-->
+                            <h5 class="card-title card-header">Form Builder Forms</h5>
+                            <div class="card-body">
+                                <p class="card-text">View and edit your in-progress forms created with Form Builder.</p>
+                                <a href="/fr/orbeon/builder/summary" class="btn btn-primary stretched-link">Form Builder Forms</a>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">An item</li>
+                                <li class="list-group-item">A second item</li>
+                                <li class="list-group-item">A third item</li>
+                                <li class="list-group-item">
+                                    <a href="/fr/orbeon/builder/summary" class="">All Form Builder Forms</a>
+                                </li>
+                              </ul>
+                            <div class="card-body">
+                                <p class="card-text">View and edit your in-progress forms created with Form Builder.</p>
+                                <a href="/fr/orbeon/builder/summary" class="btn btn-primary stretched-link">Form Builder Forms</a>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">Last updated 3 mins ago</small>
+                              </div>
+                        </div>
+                    </div>
+                    <div class="col-6 p-2">
+                        <div class="card h-100">
+<!--                            <img src="..." class="card-img-top" alt="..."/>-->
+                            <h5 class="card-title card-header">Form Builder New Form</h5>
+                            <div class="card-body">
+                                <p class="card-text">Create forms with Form Builder, the Orbeon Forms visual form designer. It allows you to build and deploy forms in minutes right from your web browser. Add form fields, including rich controls such as date, currency, file attachments and more. Group your fields in sections. Define validation logic, visibility rules, initial values. Pre-populate fields from Web or REST services. And there is more!</p>
+                                <a href="/fr/orbeon/builder/new" class="btn btn-primary stretched-link">Create New Form</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row gy-5">
+                    <div class="col-6 p-2">
+                        <div class="card h-100">
+<!--                            <img src="..." class="card-img-top" alt="..."/>-->
+                            <h5 class="card-title card-header">My Forms</h5>
+                            <div class="card-body">
+                                <p class="card-text">Access all your published forms.</p>
+                                <a href="/fr/forms" class="btn btn-primary stretched-link">Go to My Forms</a>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">An item</li>
+                                <li class="list-group-item">A second item</li>
+                                <li class="list-group-item">A third item</li>
+<!--                                <li class="list-group-item">-->
+<!--                                    <a href="/fr/orbeon/builder/summary" class="btn btn-primary stretched-link">Form Builder Forms</a>-->
+<!--                                </li>-->
+                              </ul>
+                            <div class="card-footer">
+                                <small class="text-muted">Last updated 3 mins ago</small>
+                              </div>
+                        </div>
+                    </div>
+                    <div class="col-6 p-2">
+                        <div class="card h-100">
+<!--                            <img src="..." class="card-img-top" alt="..."/>-->
+                            <h5 class="card-title card-header">Admin</h5>
+                            <div class="card-body">
+                                <p class="card-text">Administrative tasks.</p>
+                                <a href="/fr/admin" class="btn btn-primary stretched-link">Go to Admin</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row gy-5">
+                    <div class="col-6 p-2">
+                        <div class="card h-100">
+<!--                            <img src="..." class="card-img-top" alt="..."/>-->
+                            <h5 class="card-header">Demo Forms</h5>
+                            <div class="card-body">
+                                <p class="card-text">These are some demo forms.</p>
+<!--                                <a href="/fr/forms" class="btn btn-primary stretched-link">Go to My Forms</a>-->
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><a href="">Controls</a></li>
+                                <li class="list-group-item"><a href="">Bookshelf</a></li>
+                                <li class="list-group-item"><a href="">DMV-14</a></li>
+                                <li class="list-group-item"><a href="">W-9</a></li>
+                                <li class="list-group-item"><a href="">Travel</a></li>
+                                <li class="list-group-item"><a href="">Contact</a></li>
+<!--                                <li class="list-group-item">-->
+<!--                                    <a href="/fr/orbeon/builder/summary" class="btn btn-primary stretched-link">Form Builder Forms</a>-->
+<!--                                </li>-->
+                              </ul>
+                        </div>
+                    </div>
+                    <div class="col-6 p-2">
+
+                    </div>
+                </div>
+        </fr:view>
+    </xh:body>
+</xh:html>

@@ -463,7 +463,7 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="fr:navbar" name="fr-navbar">
+    <xsl:template match="fr:navbar[not($bs5)]" name="fr-navbar">
         <xf:group
                 xxf:element="div"
                 model="fr-form-model"
@@ -491,7 +491,7 @@
         </xf:group>
     </xsl:template>
 
-    <xsl:template match="fr:navbar5" name="fr-navbar5">
+    <xsl:template match="fr:navbar[$bs5]" name="fr-navbar5">
         <xf:group
             xxf:element="nav"
             model="fr-form-model"

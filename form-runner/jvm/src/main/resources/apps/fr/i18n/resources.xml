@@ -331,6 +331,9 @@
         <admin>
             <title>Form Runner Admin</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Form Runner Forms</title>
             <buttons>
@@ -856,6 +859,9 @@
         <admin>
             <title>Administration Form Runner</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Accueil Form Runner</title>
             <buttons>
@@ -1367,6 +1373,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Inicio Form Runner</title>
             <buttons>
@@ -1876,6 +1885,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title todo="true">[Form Runner Home]</title>
             <buttons>
@@ -2384,6 +2396,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title todo="true">[Form Runner Home]</title>
             <buttons>
@@ -2905,6 +2920,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Form Runner Home</title>
             <buttons>
@@ -3426,6 +3444,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Form Runner Home</title>
             <buttons>
@@ -3947,6 +3968,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Form Runner Koti</title>
             <buttons>
@@ -4468,6 +4492,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Start av formulärmotorn</title>
             <buttons>
@@ -4988,6 +5015,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Form Runner Home</title>
             <buttons>
@@ -5508,6 +5538,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Form Runner</title>
             <buttons>
@@ -6016,6 +6049,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Blanketbehandler start</title>
             <buttons>
@@ -6536,6 +6572,9 @@
         <admin>
             <title todo="true">[Form Runner Admin]</title>
         </admin>
+        <landing>
+            <title>Form Runner</title>
+        </landing>
         <home>
             <title>Form Runner Home</title>
             <buttons>

@@ -117,12 +117,16 @@
   .pagination li {
     &> .xforms-trigger { cursor: pointer }
     &> .xforms-trigger.xforms-readonly { cursor: auto; }
-    .btn-link { text-decoration: none; }
+    .btn-link { 
+      text-decoration: none; 
+      background-color: #fff;
+    }
 
     // NOTE: Updated for Bootstrap 5
     >.btn-link, >span {
       padding: 8px 12px;
       border: 1px solid #ddd;
+      background-color: #fff;
     }
 
     // Reset rules that can be applied by external Bootstrap .pagination a rule
@@ -130,6 +134,15 @@
       padding: 0;
       border: none;
       line-height: normal;
+    }
+  }
+
+  .pagination .disabled {
+    >span {
+      background-color: transparent;
+      >button {
+        background-color: transparent;
+      }
     }
   }
 }

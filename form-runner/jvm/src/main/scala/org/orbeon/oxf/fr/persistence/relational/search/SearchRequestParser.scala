@@ -74,10 +74,10 @@ trait SearchRequestParser {
                       }
 
                     def fromControl: Option[FilterType] =
-                      c.attValueOpt("control") map {
-                        case "input" | "textarea" => FilterType.Substring(filter)
-                        case "select"             => FilterType.Token(filter.splitTo[List]())
-                        case _                    => FilterType.Exact(filter)
+                      c.attValueOpt("control") map Index.matchForControl map {
+                        case "substring" => FilterType.Substring(filter)
+                        case "token"     => FilterType.Token(filter.splitTo[List]())
+                        case _           => FilterType.Exact(filter)
                       }
 
                     fromMatch     orElse

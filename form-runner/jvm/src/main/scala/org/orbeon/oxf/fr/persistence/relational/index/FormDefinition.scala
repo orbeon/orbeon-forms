@@ -64,6 +64,14 @@ trait FormDefinition {
     }
   }
 
+  def matchForControl(control: String): String =
+    if (control == "input" || control == "textarea")
+      "substring"
+    else if (FormRunner.isMultipleSelectionControl(control))
+      "token"
+    else
+      "exact"
+
   case class IndexedControl(
     name      : String,
     inSearch  : Boolean,
@@ -74,18 +82,7 @@ trait FormDefinition {
     htmlLabel : Boolean,
     resources : List[(String, NodeInfo)]
   ) {
-    def toXML: NodeInfo = {
-
-      def matchForControl(control: String): String =
-        if (control == "input" || control == "textarea")
-          "substring"
-        else if (control == "select")
-          "token"
-        else if (control == "select1")
-          "exact"
-        else
-          "substring"
-
+    def toXML: NodeInfo =
       <query
         name={name}
         path={xpath}
@@ -113,6 +110,5 @@ trait FormDefinition {
               labelElemOpt.toList ++ itemElems
             }</resources>
       }</query>
-    }
   }
 }

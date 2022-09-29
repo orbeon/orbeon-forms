@@ -2007,7 +2007,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
             // Prevent readonly checkboxes or radios from changing state on click
             var readonlyWithCheckboxesOrRadio =
-                ":is(.xforms-input, .xforms-select, .xforms-select1).xforms-type-boolean.xforms-readonly";
+                ":is(.xforms-input, .xforms-select, .xforms-select1).xforms-readonly";
             if (controlTarget != null && controlTarget.matches(readonlyWithCheckboxesOrRadio)) {
                 event.preventDefault();
                 return;

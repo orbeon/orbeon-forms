@@ -40,7 +40,7 @@
 
     <!-- Template for the default layout of a form -->
     <xsl:variable name="default-page-template" as="element(*)*">
-        <fr:navbar/>
+        <fr:navbar5/>
 
         <fr:description/>
 

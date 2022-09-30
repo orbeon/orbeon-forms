@@ -989,17 +989,41 @@
 
     <xf:action event="fb-move-selected-cell-into-view">
 
-        <xf:dispatch
+        <xf:action
             iterate="
-                for $elem in reverse(
-                    frf:findAncestorSectionsLeafToRoot(
-                        fbf:getCurrentlySelectedCell(),
-                        false()
+                let $ids :=
+                    for $elem in reverse(
+                        frf:findAncestorSectionsLeafToRoot(
+                            fbf:getCurrentlySelectedCell(),
+                            false()
+                        )
                     )
-                )
-                return $elem/@id"
-            name="fr-expand"
-            targetid="{concat('|fb≡', ., '|')}"/>
+                    return
+                        $elem/@id
+                return
+                    for $i in 1 to count($ids)
+                    return
+                        concat(
+                            '|',
+                            string-join(
+                                (
+                                    'fb',
+                                    subsequence(
+                                        $ids,
+                                        1,
+                                        $i
+                                    )
+                                ),
+                                '≡'
+                            ),
+                            '|'
+                        )">
+            <xf:dispatch
+                name="fr-expand"
+                targetid="{.}"/>
+            <xf:recalculate/>
+            <xf:refresh/>
+        </xf:action>
 
         <xf:action type="javascript">
             ORBEON.builder.private.API.moveFocusedCellIntoView();

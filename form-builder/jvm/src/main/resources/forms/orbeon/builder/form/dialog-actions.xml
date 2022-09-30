@@ -148,160 +148,136 @@
             <xf:label ref="$form-resources/dialog-actions/general-settings"/>
 
             <fr:grid id="fb-action-grid">
-                <xh:tr>
-                    <xh:td>
-                        <!-- Action name -->
-                        <xf:input ref="name" id="fb-binding-name-input" incremental="true">
-                            <xf:label ref="$form-resources/dialog-actions/service-name/label"/>
-                            <xf:hint ref="$form-resources/dialog-actions/service-name/hint"/>
-                        </xf:input>
-                    </xh:td>
-                    <xh:td>
-                        <!-- Condition -->
-                        <xf:var name="if-attribute" value="$action1/@if"/>
-                        <xf:var name="is-predefined-condition" value="$if-attribute = ('true()', '$fr-mode=''new''')"/>
-                        <xf:select1 ref="
-                            (: Bind to transient element, so the dropdown is never invalid, and set the value
-                               of the attribute on `xforms-select` :)
-                            xf:element('_', string($if-attribute))">
+                <fr:c x="1" y="1" w="6">
+                    <!-- Action name -->
+                    <xf:input ref="name" id="fb-binding-name-input" incremental="true">
+                        <xf:label ref="$form-resources/dialog-actions/service-name/label"/>
+                        <xf:hint ref="$form-resources/dialog-actions/service-name/hint"/>
+                    </xf:input>
+                </fr:c>
+                <fr:c x="7" y="1" w="6">
+                    <!-- Condition -->
+                    <xf:var name="if-attribute" value="$action1/@if"/>
+                    <xf:var name="is-predefined-condition" value="$if-attribute = ('true()', '$fr-mode=''new''')"/>
+                    <xf:select1 ref="
+                        (: Bind to transient element, so the dropdown is never invalid, and set the value
+                           of the attribute on `xforms-select` :)
+                        xf:element('_', string($if-attribute))">
 
-                            <xf:label ref="$form-resources/dialog-actions/event-condition/label"/>
-                            <xf:alert/>
-                            <xf:itemset ref="$form-resources/dialog-actions/event-condition/item">
-                                <xf:label ref="."/>
-                                <xf:value
-                                    ref="
-                                        if (@id = 'always') then
-                                            'true()'
-                                        else if (@id = 'new-only') then
-                                            '$fr-mode=''new'''
-                                        else if ($is-predefined-condition) then
-                                            (: If we have a predefined condition, choosing formula resets the value :)
-                                            ''
-                                        else
-                                            $if-attribute"/>
-                            </xf:itemset>
-                            <xf:setvalue
-                                event="xforms-select"
-                                ref="$if-attribute"
-                                value="event('xxf:item-value')"/>
+                        <xf:label ref="$form-resources/dialog-actions/event-condition/label"/>
+                        <xf:alert/>
+                        <xf:itemset ref="$form-resources/dialog-actions/event-condition/item">
+                            <xf:label ref="."/>
+                            <xf:value
+                                ref="
+                                    if (@id = 'always') then
+                                        'true()'
+                                    else if (@id = 'new-only') then
+                                        '$fr-mode=''new'''
+                                    else if ($is-predefined-condition) then
+                                        (: If we have a predefined condition, choosing formula resets the value :)
+                                        ''
+                                    else
+                                        $if-attribute"/>
+                        </xf:itemset>
+                        <xf:setvalue
+                            event="xforms-select"
+                            ref="$if-attribute"
+                            value="event('xxf:item-value')"/>
 
-                        </xf:select1>
-                        <xf:input id="if-formula" ref="$if-attribute[not($is-predefined-condition)]" incremental="true">
-                            <xf:label ref="$form-resources/dialog-control-settings/formula/label" appearance="minimal"/>
-                            <xf:alert ref="$form-resources/dialog-control-settings/formula/alert"/>
-                            <xf:setfocus
-                                event="xforms-enabled"
-                                if="xxf:is-blank()"
-                                control="if-formula"/>
-                        </xf:input>
-                    </xh:td>
-                </xh:tr>
-                <xh:tr>
-                    <xh:td colspan="2">
-                        <xf:group ref="$observer" class="fb-action-phrase-outer">
-                            <xf:label value="$form-resources/dialog-actions/observer-type/label"/>
+                    </xf:select1>
+                    <xf:input id="if-formula" ref="$if-attribute[not($is-predefined-condition)]" incremental="true">
+                        <xf:label ref="$form-resources/dialog-control-settings/formula/label" appearance="minimal"/>
+                        <xf:alert ref="$form-resources/dialog-control-settings/formula/alert"/>
+                        <xf:setfocus
+                            event="xforms-enabled"
+                            if="xxf:is-blank()"
+                            control="if-formula"/>
+                    </xf:input>
+                </fr:c>
+                <fr:c x="1" y="2" w="12">
+                    <xf:group ref="$observer" class="fb-action-phrase-outer">
+                        <xf:label value="$form-resources/dialog-actions/observer-type/label"/>
 
-                            <xh:div class="fb-action-phrase">
-                                <xf:select1 ref="$observer" id="fb-action-react-to" appearance="minimal" class="fb-action-observer">
-                                    <xf:itemset ref="$form-resources/dialog-actions/observer-type/item">
-                                        <xf:label ref="label"/>
-                                        <xf:value
-                                            ref="
-                                                if (@id = 0) then
-                                                    if ($observer = 'fr-form-model') then '' else string($observer)
-                                                else if (@id = 1) then
-                                                    'fr-form-model'
-                                                else
-                                                    error()"/>
-                                    </xf:itemset>
-                                    <xf:alert/>
-
-                                    <xf:setvalue event="xforms-select" ref="$event"/>
-
-                                    <!--<xf:action event="xforms-select" if="event('xxf:item-value') = 'fr-form-model'">-->
-                                        <!--<xf:setvalue event="xforms-select" ref="$event"/>-->
-                                    <!--</xf:action>-->
-
-                                </xf:select1>
-
-                                <xf:select1 ref="$observer[. != 'fr-form-model']" appearance="search" class="fb-action-control">
-                                    <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
-                                    <xf:itemset ref="$body//(*[@ref or @bind or self::xf:trigger or self::fr:button])[ends-with(@id, '-control')]">
-                                        <!-- Try to build a reasonably user-friendly label -->
-                                        <xf:label
-                                            value="
-                                                utils:truncateWithEllipsis(
-                                                    for $name in frf:controlNameFromId(@id)
-                                                    return
-                                                        concat(
-                                                            $current-resources/*[name() = $name]/label,
-                                                            ' (',
-                                                            $name,
-                                                            ')'
-                                                        ),
-                                                    60,
-                                                    6
-                                                )"/>
-                                        <xf:value value="@id"/>
-                                    </xf:itemset>
-                                    <xf:alert/>
-                                </xf:select1>
-
-                                <xf:select1 ref="$event" appearance="dropdown" class="fb-action-event">
-                                    <xf:itemset
+                        <xh:div class="fb-action-phrase">
+                            <xf:select1 ref="$observer" id="fb-action-react-to" appearance="minimal" class="fb-action-observer">
+                                <xf:itemset ref="$form-resources/dialog-actions/observer-type/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value
                                         ref="
-                                            $form-resources/dialog-actions/event-type/item[
-                                                @id = (
-                                                    if ($observer = 'fr-form-model') then
-                                                        (3 to 5)
-                                                    else
-                                                        (0 to 2)
-                                                )
-                                            ]">
-                                        <xf:label ref="label"/>
-                                        <xf:value
-                                            ref="
-                                                if (@id = 0) then
-                                                    'xforms-value-changed'
-                                                else if (@id = 1) then
-                                                    'xforms-value-changed xforms-enabled'
-                                                else if (@id = 2) then
-                                                    'DOMActivate'
-                                                else if (@id = 3) then
-                                                    'fr-run-form-load-action-after-controls'
-                                                else if (@id = 4) then
-                                                    'fr-run-form-load-action-before-data'
-                                                else if (@id = 5) then
-                                                    'fr-run-form-load-action-after-data'
-                                                else
-                                                    error()"/>
-                                    </xf:itemset>
-                                    <xf:alert/>
-                                </xf:select1>
-                            </xh:div>
-                        </xf:group>
-                    </xh:td>
-                </xh:tr>
-                <xh:tr>
-                    <xh:td>
-                        <!-- Service to Call -->
-                        <fr:dropdown-select1 ref="$action1/xf:send/@submission" id="fb-bindings-submission-select">
-                            <xf:label ref="$form-resources/dialog-actions/service-to-call/label"/>
-                            <xf:hint ref="$form-resources/dialog-actions/service-to-call/hint"/>
-                            <!-- Show submissions that are NOT yet used by an action. See https://github.com/orbeon/orbeon-forms/issues/397 -->
-                            <xf:itemset ref="$all-available-services">
-                                <xf:label value="substring-before(@id, '-submission')"/>
-                                <xf:value value="@id"/>
-                            </xf:itemset>
-                            <xf:dispatch
-                                event="xforms-value-changed"
-                                name="fb-update-how-service-value-are-set"
-                                targetid="fb-action-dialog"/>
-                        </fr:dropdown-select1>
-                    </xh:td>
-                    <xh:td/>
-                </xh:tr>
+                                            if (@id = 0) then
+                                                if ($observer = 'fr-form-model') then '' else string($observer)
+                                            else if (@id = 1) then
+                                                'fr-form-model'
+                                            else
+                                                error()"/>
+                                </xf:itemset>
+                                <xf:alert/>
+
+                                <xf:setvalue event="xforms-select" ref="$event"/>
+
+                                <!--<xf:action event="xforms-select" if="event('xxf:item-value') = 'fr-form-model'">-->
+                                    <!--<xf:setvalue event="xforms-select" ref="$event"/>-->
+                                <!--</xf:action>-->
+
+                            </xf:select1>
+
+                            <xf:select1 ref="$observer[. != 'fr-form-model']" appearance="search" class="fb-action-control">
+                                <!-- TODO: See `parameters-editor.xbl` for newer implementation. -->
+                                <xf:itemset ref="$body//(*[@ref or @bind or self::xf:trigger or self::fr:button])[ends-with(@id, '-control')]">
+                                    <!-- Try to build a reasonably user-friendly label -->
+                                    <xf:label
+                                        value="
+                                            utils:truncateWithEllipsis(
+                                                for $name in frf:controlNameFromId(@id)
+                                                return
+                                                    concat(
+                                                        $current-resources/*[name() = $name]/label,
+                                                        ' (',
+                                                        $name,
+                                                        ')'
+                                                    ),
+                                                60,
+                                                6
+                                            )"/>
+                                    <xf:value value="@id"/>
+                                </xf:itemset>
+                                <xf:alert/>
+                            </xf:select1>
+
+                            <xf:select1 ref="$event[$observer = 'fr-form-model']" appearance="dropdown" class="fb-action-event">
+                                <xf:itemset ref="$form-resources/dialog-actions/form-event-type/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                                <xf:alert/>
+                            </xf:select1>
+                            <xf:select ref="$event[not($observer = 'fr-form-model')]" appearance="full xxf:horizontal" class="fb-action-event">
+                                <xf:itemset ref="$form-resources/dialog-actions/control-event-type/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                                <xf:alert/>
+                            </xf:select>
+                        </xh:div>
+                    </xf:group>
+                </fr:c>
+                <fr:c x="1" y="3" w="6">
+                    <!-- Service to Call -->
+                    <fr:dropdown-select1 ref="$action1/xf:send/@submission" id="fb-bindings-submission-select">
+                        <xf:label ref="$form-resources/dialog-actions/service-to-call/label"/>
+                        <xf:hint ref="$form-resources/dialog-actions/service-to-call/hint"/>
+                        <!-- Show submissions that are NOT yet used by an action. See https://github.com/orbeon/orbeon-forms/issues/397 -->
+                        <xf:itemset ref="$all-available-services">
+                            <xf:label value="substring-before(@id, '-submission')"/>
+                            <xf:value value="@id"/>
+                        </xf:itemset>
+                        <xf:dispatch
+                            event="xforms-value-changed"
+                            name="fb-update-how-service-value-are-set"
+                            targetid="fb-action-dialog"/>
+                    </fr:dropdown-select1>
+                </fr:c>
             </fr:grid>
 
         </fr:tab>

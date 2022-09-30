@@ -1059,32 +1059,38 @@
                     <label>the form loads</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
+            <control-event-type>
+                <item>
                     <label>changes its value</label>
-                    <hint/>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label>appears or changes its value</label>
-                    <hint/>
+                <item>
+                    <label>appears</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
+                <item>
+                    <label>disappears</label>
+                    <value>xforms-disabled</value>
+                </item>
+                <item>
                     <label>is activated</label>
-                    <hint/>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="3">
-                    <label>after the controls are ready</label>
-                    <hint/>
-                </item>
-                <item id="5">
-                    <label>after the data is ready</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label>before the data's initial values are calculated</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
+                <item>
+                    <label>after the data is ready</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label>after the controls are ready</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <event-condition>
                 <label>Run the action in the following case</label>
                 <item id="always">Always</item>
@@ -2366,32 +2372,38 @@
                     <label>le formulaire se charge</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
+            <control-event-type>
+                <item>
                     <label>change sa valeur</label>
-                    <hint/>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label>apparait ou change sa valeur</label>
-                    <hint/>
+                <item>
+                    <label>apparait</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
+                <item>
+                    <label>disparait</label>
+                    <value>xforms-disabled</value>
+                </item>
+                <item>
                     <label>est activé</label>
-                    <hint/>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="3">
-                    <label>après que les contrôles soient prêts</label>
-                    <hint/>
-                </item>
-                <item id="5">
-                    <label>après que les données soient prêtes</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label>avant que les valeurs initiales des données ne soient prêtes</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
+                <item>
+                    <label>après que les données soient prêtes</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label>après que les contrôles soient prêts</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <event-condition>
                 <label>Exécute l'action dans le cas suivant</label>
                 <item id="always">Toujours</item>
@@ -3655,32 +3667,38 @@
                     <label todo="true">[the form loads]</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
+            <control-event-type>
+                <item>
                     <label todo="true">[changes its value]</label>
-                    <hint/>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label todo="true">[appears or changes its value]</label>
-                    <hint/>
+                <item>
+                    <label todo="true">[appears]</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
+                <item>
+                    <label todo="true">[disappears]</label>
+                    <value>xforms-disabled</value>
+                </item>
+                <item>
                     <label todo="true">[is activated]</label>
-                    <hint/>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="3">
-                    <label todo="true">[after the controls are ready]</label>
-                    <hint/>
-                </item>
-                <item id="5">
-                    <label todo="true">[after the data is ready]</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label todo="true">[before the data's initial values are calculated]</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
+                <item>
+                    <label todo="true">[after the data is ready]</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label todo="true">[after the controls are ready]</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <!--<event-type>-->
                 <!--<label>Reager på</label>-->
                 <!--<hint>Hendelse (på en kontroll eller globalt) som det skal reageres på</hint>-->
@@ -4971,32 +4989,38 @@
                     <label todo="true">[the form loads]</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
+            <control-event-type>
+                <item>
                     <label todo="true">[changes its value]</label>
-                    <hint/>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label todo="true">[appears or changes its value]</label>
-                    <hint/>
+                <item>
+                    <label todo="true">[appears]</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
+                <item>
+                    <label todo="true">[disappears]</label>
+                    <value>xforms-disabled</value>
+                </item>
+                <item>
                     <label todo="true">[is activated]</label>
-                    <hint/>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="3">
-                    <label todo="true">[after the controls are ready]</label>
-                    <hint/>
-                </item>
-                <item id="5">
-                    <label todo="true">[after the data is ready]</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label todo="true">[before the data's initial values are calculated]</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
+                <item>
+                    <label todo="true">[after the data is ready]</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label todo="true">[after the controls are ready]</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <!--<event-type>-->
                 <!--<label>Реагировать на</label>-->
                 <!--<hint>Событие (отдельного элемента или всей формы), которое вызывает действие.</hint>-->
@@ -6280,60 +6304,38 @@
                     <label todo="true">[the form loads]</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
-                    <label todo="true">[changes its value]</label>
-                    <hint/>
+            <control-event-type>
+                <item>
+                    <label>cambia valore</label>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label todo="true">[appears or changes its value]</label>
-                    <hint/>
+                <item>
+                    <label>appare</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
-                    <label todo="true">[is activated]</label>
-                    <hint/>
+                <item>
+                    <label>scompare</label>
+                    <value>xforms-disabled</value>
                 </item>
-                <item id="3">
-                    <label todo="true">[after the controls are ready]</label>
-                    <hint/>
+                <item>
+                    <label>è attivato</label>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="5">
-                    <label todo="true">[after the data is ready]</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label todo="true">[before the data's initial values are calculated]</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
-            <!--<event-type>-->
-                <!--<label>Reagisce a</label>-->
-                <!--<hint>Evento (su un controllo o globale) sul quale reagire</hint>-->
-                <!--<item id="0">-->
-                    <!--<label>Cambia valore</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="1">-->
-                    <!--<label todo="true">Cambia valore o carica modulo</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="2">-->
-                    <!--<label>Attivazione</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="3">-->
-                    <!--<label todo="true">Carica modulo (after controls ready)</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="4">-->
-                    <!--<label todo="true">Carica modulo (before data ready)</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="5">-->
-                    <!--<label todo="true">Загрузка формы (after data ready)</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-            <!--</event-type>-->
+                <item>
+                    <label todo="true">[after the data is ready]</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label todo="true">[after the controls are ready]</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <event-condition>
                 <label>Condizione d'esecuzione</label>
                 <item id="always">Esegui sempre</item>
@@ -7590,60 +7592,38 @@
                     <label>das Formular lädt</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
+            <control-event-type>
+                <item>
                     <label>hat den Wert geändert</label>
-                    <hint/>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label>erscheint oder den Wert ändert</label>
-                    <hint/>
+                <item>
+                    <label>erscheint</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
+                <item>
+                    <label>verschwindet</label>
+                    <value>xforms-disabled</value>
+                </item>
+                <item>
                     <label>aktiviert wird</label>
-                    <hint/>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="3">
-                    <label>alle Steuerelemente bereit sind</label>
-                    <hint/>
-                </item>
-                <item id="5">
-                    <label>alle Daten bereit sind</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label>bevor die Initialwerte berechnet werden</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
-            <!--<event-type>-->
-                <!--<label>Reagiert auf</label>-->
-                <!--<hint>Ereignis (auf ein Steuerelement oder global) auf das reagiert wird.</hint>-->
-                <!--<item id="0">-->
-                    <!--<label>Wertänderung</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="1">-->
-                    <!--<label todo="true">Wertänderung oder Formular laden</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="2">-->
-                    <!--<label>Aktivierung</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="3">-->
-                    <!--<label todo="true">Formular laden (after controls ready)</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="4">-->
-                    <!--<label todo="true">Formular laden (before data ready)</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-                <!--<item id="5">-->
-                    <!--<label todo="true">Formular laden (after data ready)</label>-->
-                    <!--<hint/>-->
-                <!--</item>-->
-            <!--</event-type>-->
+                <item>
+                    <label>alle Daten bereit sind</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label>alle Steuerelemente bereit sind</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <event-condition>
                 <label>Bedingung</label>
                 <item id="always">Läuft immer</item>
@@ -8902,32 +8882,38 @@
                     <label todo="true">[the form loads]</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
+            <control-event-type>
+                <item>
                     <label todo="true">[changes its value]</label>
-                    <hint/>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label todo="true">[appears or changes its value]</label>
-                    <hint/>
+                <item>
+                    <label todo="true">[appears]</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
+                <item>
+                    <label todo="true">[disappears]</label>
+                    <value>xforms-disabled</value>
+                </item>
+                <item>
                     <label todo="true">[is activated]</label>
-                    <hint/>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="3">
-                    <label todo="true">[after the controls are ready]</label>
-                    <hint/>
-                </item>
-                <item id="5">
-                    <label todo="true">[after the data is ready]</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label todo="true">[before the data's initial values are calculated]</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
+                <item>
+                    <label todo="true">[after the data is ready]</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label todo="true">[after the controls are ready]</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <!--<event-type>-->
                 <!--<label>Reagoi</label>-->
                 <!--<hint>Tapahtuma (kontrollissa tai globaalissa) johon reagoidaan</hint>-->
@@ -10211,32 +10197,38 @@
                     <label todo="true">[the form loads]</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
+            <control-event-type>
+                <item>
                     <label todo="true">[changes its value]</label>
-                    <hint/>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label todo="true">[appears or changes its value]</label>
-                    <hint/>
+                <item>
+                    <label todo="true">[appears]</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
+                <item>
+                    <label todo="true">[disappears]</label>
+                    <value>xforms-disabled</value>
+                </item>
+                <item>
                     <label todo="true">[is activated]</label>
-                    <hint/>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="3">
-                    <label todo="true">[after the controls are ready]</label>
-                    <hint/>
-                </item>
-                <item id="5">
-                    <label todo="true">[after the data is ready]</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label todo="true">[before the data's initial values are calculated]</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
+                <item>
+                    <label todo="true">[after the data is ready]</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label todo="true">[after the controls are ready]</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <!--<event-type>-->
                 <!--<label>Reaccionar a</label>-->
                 <!--<hint>Evento (globla o en un control) para reaccionar a </hint>-->
@@ -11528,32 +11520,38 @@
                     <label>het form laadt</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
+            <control-event-type>
+                <item>
                     <label>zijn waarde wijzigt</label>
-                    <hint/>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label>zijn waarde toont of wijzigt</label>
-                    <hint/>
+                <item>
+                    <label todo="true">toont</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
-                    <label>wordt geactiveerd</label>
-                    <hint/>
+                <item>
+                    <label todo="true">verdwijnt</label>
+                    <value>xforms-disabled</value>
                 </item>
-                <item id="3">
-                    <label>Nadat de controls gereed zijn</label>
-                    <hint/>
+                <item>
+                    <label todo="true">wordt geactiveerd</label>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="5">
-                    <label>Nadat de gegevens gereed zijn</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label>voordat de initiële control-waardes worden berekend</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
+                <item>
+                    <label>Nadat de gegevens gereed zijn</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label>Nadat de controls gereed zijn</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <event-condition>
                 <label>Conditie</label>
                 <item id="always">Start altijd</item>
@@ -12816,32 +12814,38 @@
                     <label todo="true">[the form loads]</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
+            <control-event-type>
+                <item>
                     <label todo="true">[changes its value]</label>
-                    <hint/>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label todo="true">[appears or changes its value]</label>
-                    <hint/>
+                <item>
+                    <label todo="true">[appears]</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
+                <item>
+                    <label todo="true">[disappears]</label>
+                    <value>xforms-disabled</value>
+                </item>
+                <item>
                     <label todo="true">[is activated]</label>
-                    <hint/>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="3">
-                    <label todo="true">[after the controls are ready]</label>
-                    <hint/>
-                </item>
-                <item id="5">
-                    <label todo="true">[after the data is ready]</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label todo="true">[before the data's initial values are calculated]</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
+                <item>
+                    <label todo="true">[after the data is ready]</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label todo="true">[after the controls are ready]</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <!--<event-type>-->
                 <!--<label>Reagir a</label>-->
                 <!--<hint>Evento (num controlo ou global) ao qual reagir</hint>-->
@@ -14133,32 +14137,38 @@
                     <label todo="true">[the form loads]</label>
                 </item>
             </observer-type>
-            <event-type>
-                <item id="0">
+            <control-event-type>
+                <item>
                     <label todo="true">[changes its value]</label>
-                    <hint/>
+                    <value>xforms-value-changed</value>
                 </item>
-                <item id="1">
-                    <label todo="true">[appears or changes its value]</label>
-                    <hint/>
+                <item>
+                    <label todo="true">[appears]</label>
+                    <value>xforms-enabled</value>
                 </item>
-                <item id="2">
+                <item>
+                    <label todo="true">[disappears]</label>
+                    <value>xforms-disabled</value>
+                </item>
+                <item>
                     <label todo="true">[is activated]</label>
-                    <hint/>
+                    <value>DOMActivate</value>
                 </item>
-                <item id="3">
-                    <label todo="true">[after the controls are ready]</label>
-                    <hint/>
-                </item>
-                <item id="5">
-                    <label todo="true">[after the data is ready]</label>
-                    <hint/>
-                </item>
-                <item id="4">
+            </control-event-type>
+            <form-event-type>
+                <item>
                     <label todo="true">[before the data's initial values are calculated]</label>
-                    <hint/>
+                    <value>fr-run-form-load-action-before-data</value>
                 </item>
-            </event-type>
+                <item>
+                    <label todo="true">[after the data is ready]</label>
+                    <value>fr-run-form-load-action-after-data</value>
+                </item>
+                <item>
+                    <label todo="true">[after the controls are ready]</label>
+                    <value>fr-run-form-load-action-after-controls</value>
+                </item>
+            </form-event-type>
             <!--<event-type>-->
                 <!--<label>Reagera på</label>-->
                 <!--<hint>Händelse som ska trigga kommandot</hint>-->

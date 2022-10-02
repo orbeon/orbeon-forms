@@ -503,7 +503,7 @@
                                     <event type="DOMFocusIn" target="my-group-21"/>
                                     <event type="DOMFocusIn" target="my-input-211"/>
                                     <separator/>
-                           <separator/>
+                                    <separator/>
                                 </events>
                             </instance>
                         </instances>

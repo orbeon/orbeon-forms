@@ -605,10 +605,14 @@
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <!-- https://github.com/orbeon/orbeon-forms/issues/5471 -->
+                <xf:delete
+                    ref="_"/>
                 <!-- Clear all possible elements and attributes -->
                 <xf:setvalue
-                    iterate="., @filename, @mediatype, @size, image, image/@filename, image/@mediatype, image/@size, @label"
+                    iterate="(. | image)/(.[empty(*)] | @filename | @mediatype | @size | @label)"
                     ref="."/>
+
             </xf:action>
         </xf:action>
 

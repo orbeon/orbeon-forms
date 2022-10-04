@@ -486,20 +486,14 @@ lazy val common = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Ful
   )
   .jsSettings(commonScalaJsSettings)
   .jsSettings(
-    libraryDependencies += "org.scala-lang.modules" %%  "scala-async"  % ScalaAsyncVersion,
+    libraryDependencies += "org.scala-lang.modules" %%  "scala-async"           % ScalaAsyncVersion,
+    libraryDependencies += "io.github.cquiroz"      %%% "scala-java-time"       % ScalaJsTimeVersion % Test,
+    libraryDependencies += "io.github.cquiroz"      %%% "scala-java-time-tzdb"  % ScalaJsTimeVersion % Test,
     Compile / unmanagedJars := Nil
   )
 
 lazy val commonJVM = common.jvm
 lazy val commonJS  = common.js
-  .enablePlugins(TzdbPlugin)
-  .settings(
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time"       % ScalaJsTimeVersion,
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time-tzdb"  % ScalaJsTimeVersion,
-    zonesFilter := { (z: String) => includeTimezone(z) },
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-locales"    % ScalaJsLocalesVersion,
-    libraryDependencies += "io.github.cquiroz" %%% "locales-minimal-en-db" % ScalaJsLocalesVersion
-  )
 
 // Custom DOM implementation. This must be cross-platform and have no dependencies.
 lazy val dom = (crossProject(JVMPlatform, JSPlatform).crossType(CrossType.Pure) in file("dom"))
@@ -645,7 +639,7 @@ lazy val formRunnerJS = formRunner.js
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
+//      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
     ),
 
     jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "3.6.1/jquery.js",
@@ -693,7 +687,7 @@ lazy val formRunnerCommonJS = formRunnerCommon.js
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion
+//      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -751,7 +745,7 @@ lazy val formRunnerWeb = (project in file("form-runner-web"))
       "org.scala-js"           %%% "scalajs-dom"     % ScalaJsDomVersion,
       "be.doeraene"            %%% "scalajs-jquery"  % ScalaJsJQueryVersion,
       "org.scala-lang.modules" %%% "scala-xml"       % ScalaXmlVersion,
-      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion
+//      "io.github.cquiroz"      %%% "scala-java-time" % ScalaJsTimeVersion,
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -871,7 +865,7 @@ lazy val xformsJS = xforms.js
       "be.doeraene"       %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
       "com.beachape"      %%% "enumeratum"       % EnumeratumVersion,
       "com.beachape"      %%% "enumeratum-circe" % EnumeratumCirceVersion,
-      "io.github.cquiroz" %%% "scala-java-time"  % ScalaJsTimeVersion
+//      "io.github.cquiroz" %%% "scala-java-time"  % ScalaJsTimeVersion,
     ),
 
     fastOptJSToLocalResources := copyScalaJSToExplodedWar(
@@ -1050,6 +1044,7 @@ lazy val xformsRuntimeJS = xformsRuntime.js
     )
   )
 
+
 lazy val xformsWeb = (project in file("xforms-web"))
   .settings(commonSettings: _*)
   .settings(commonScalaJsSettings)
@@ -1076,7 +1071,7 @@ lazy val xformsWeb = (project in file("xforms-web"))
       "be.doeraene"            %%% "scalajs-jquery"   % ScalaJsJQueryVersion,
       "com.beachape"           %%% "enumeratum"       % EnumeratumVersion,
       "com.beachape"           %%% "enumeratum-circe" % EnumeratumCirceVersion,
-      "io.github.cquiroz"      %%% "scala-java-time"  % ScalaJsTimeVersion
+      "io.github.cquiroz"      %%% "scala-java-time"  % ScalaJsTimeVersion,
     ),
 
     jsDependencies                      += "org.webjars" % "jquery" % "3.6.1" / "3.6.1/jquery.js",

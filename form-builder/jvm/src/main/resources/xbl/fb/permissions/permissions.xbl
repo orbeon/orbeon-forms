@@ -53,7 +53,7 @@
                     <xf:bind ref="permissions" id="permissions-bind">
                         <!-- "Anyone" permission -->
                         <xf:bind ref="permission[1]" id="anyone-permission-bind" name="anyone-permission"/>
-                        <!-- All rows: `update` => `read` and `list` => `read` -->
+                        <!-- All rows: `update` => `read` -->
                         <xf:bind
                             ref="permission/operations"
                             readonly="false()"
@@ -64,8 +64,8 @@
                                         $tokens[
                                             not(
                                                 . = 'read' and (
-                                                    $tokens = 'update' or
-                                                    $tokens = 'list'
+                                                    $tokens = 'update'
+                                                    (: 2022-10-03: decided that `list` does not imply `read` :)
                                                 )
                                             )
                                         ],
@@ -83,8 +83,8 @@
                                             not(
                                                 . = $anyone-operations-tokens or
                                                 . = 'read' and (
-                                                    $anyone-operations-tokens = 'update' or (: implies `read` :)
-                                                    $anyone-operations-tokens = 'list'      (: implies `read` :)
+                                                    $anyone-operations-tokens = 'update' (: implies `read` :)
+                                                    (: 2022-10-03: decided that `list` does not imply `read` :)
                                                 )
                                             )
                                         ],
@@ -298,12 +298,12 @@
                                                 (
                                                     not($is-anyone) and (
                                                         $anyone-operations = 'read'   or
-                                                        $anyone-operations = 'update' or (: implies `read` :)
-                                                        $anyone-operations = 'list'      (: implies `read` :)
+                                                        $anyone-operations = 'update' (: implies `read` :)
+                                                        (: 2022-10-03: decided that `list` does not imply `read` :)
                                                     )
                                                 ) or
-                                                xxf:split(operations) = 'update' or
-                                                xxf:split(operations) = 'list'
+                                                xxf:split(operations) = 'update'
+                                                (: 2022-10-03: decided that `list` does not imply `read` :)
                                             ) then
                                                 $ui/readonly-checked
                                             else

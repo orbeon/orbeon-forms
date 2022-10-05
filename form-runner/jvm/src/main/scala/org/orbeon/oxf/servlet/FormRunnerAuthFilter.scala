@@ -13,16 +13,19 @@
  */
 package org.orbeon.oxf.servlet
 
-import com.typesafe.scalalogging.Logger
 import org.apache.logging.log4j.ThreadContext
+import org.orbeon.oxf.externalcontext.ServletPortletRequest
 import org.orbeon.oxf.fr.FormRunnerAuth
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
+import org.slf4j.LoggerFactory
 
 import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
 import scala.collection.JavaConverters._
 import scala.collection.compat._
+
 
 class FormRunnerAuthFilter extends Filter {
 
@@ -68,23 +71,12 @@ class FormRunnerAuthFilter extends Filter {
 
 object FormRunnerAuthFilter {
 
-  import scala.jdk.CollectionConverters._
-
-  // TODO: FIXME: This is a ScalaLogging logger! Use log4s or slf4j
-  private val logger = Logger("org.orbeon.filter.form-runner-auth")
+  private val logger = LoggerFactory.getLogger("org.orbeon.filter.form-runner-auth")
 
   def amendRequest(servletRequest: HttpServletRequest): HttpServletRequest = {
 
-    val authHeaders = FormRunnerAuth.getCredentialsAsHeadersUseSession(
-      userRoles = servletRequest,
-      session   = new ServletSessionImpl(servletRequest.getSession(true)),
-      getHeader = servletRequest.getHeaders(_).asScala.to(List)
-    ).toMap
-
-    trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
-      val headersToRemove  = FormRunnerAuth.AllHeaderNamesLower
-      val headersToPrepend = authHeaders
-    }
+    val httpSession    = new ServletSessionImpl(servletRequest.getSession(true))
+    val getHttpHeaders = (name: String) => servletRequest.getHeaders(name).asScala.to(List)
 
     def headersAsString(r: HttpServletRequest) = {
       r.getHeaderNames.asScala flatMap { name =>
@@ -94,9 +86,49 @@ object FormRunnerAuthFilter {
       } mkString "\n"
     }
 
-    logger.debug("incoming headers:\n" + headersAsString(servletRequest))
-    val amendedHeaders = new HttpServletRequestWrapper(servletRequest) with CustomHeaders
-    logger.debug("amended headers:\n" + headersAsString(amendedHeaders))
-    amendedHeaders
+    logger.debug(s"incoming headers:\n${headersAsString(servletRequest)}")
+
+    // The Form Runner service path is hardcoded but that's ok. When we are filtering a service, we don't retrieve the
+    // credentials, which would be provided by the container or by incoming headers. Instead, credentials are provided
+    // directly with `Orbeon-*` headers. See https://github.com/orbeon/orbeon-forms/issues/2275
+    val requestWithAmendedHeaders =
+      if (servletRequest.getPathInfo.startsWith("/fr/service/")) {
+
+        // `ServletPortletRequest` gets credentials from the session, which means we need to store the credentials into
+        // the session. This is done by `getCredentialsAsHeadersUseSession()` if we are not a service, but here we
+        // don't use that function so we need to do make sure they are stored.
+
+        ServletPortletRequest.findCredentialsInSession(httpSession) match {
+          case None =>
+            ServletPortletRequest.storeCredentialsInSession(
+              httpSession,
+              FormRunnerAuth.fromHeaderValues(
+                credentialsOpt = Option(servletRequest.getHeader(Headers.OrbeonCredentialsLower)),
+                usernameOpt    = Option(servletRequest.getHeader(Headers.OrbeonUsernameLower)),
+                rolesList      = getHttpHeaders(Headers.OrbeonRolesLower),
+                groupOpt       = Option(servletRequest.getHeader(Headers.OrbeonGroupLower)),
+              )
+            )
+          case Some(_) =>
+        }
+
+        servletRequest
+      } else {
+
+        trait CustomHeaders extends RequestRemoveHeaders with RequestPrependHeaders  {
+          val headersToRemove  = FormRunnerAuth.AllHeaderNamesLower
+          val headersToPrepend = FormRunnerAuth.getCredentialsAsHeadersUseSession(
+            userRoles = servletRequest,
+            session   = httpSession,
+            getHeader = getHttpHeaders
+          ).toMap
+        }
+
+        new HttpServletRequestWrapper(servletRequest) with CustomHeaders
+      }
+
+    logger.debug(s"amended headers:\n${headersAsString(requestWithAmendedHeaders)}")
+
+    requestWithAmendedHeaders
   }
 }

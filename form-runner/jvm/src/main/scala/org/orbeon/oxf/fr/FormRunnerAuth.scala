@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.webapp.{OrbeonSessionListener, UserRolesFacade}
@@ -53,6 +54,19 @@ object FormRunnerAuth {
         Logger.info(s"not setting credentials headers because credentials are not found")
         Nil
     }
+
+  def fromHeaderValues(
+    credentialsOpt: => Option[String],
+    usernameOpt   : => Option[String],
+    rolesList     : => List[String],
+    groupOpt      : => Option[String]
+  ): Option[Credentials] =
+    fromCredentialsHeader(credentialsOpt) orElse
+      fromIndividualHeaders(
+        usernameOpt = usernameOpt,
+        rolesList   = rolesList,
+        groupOpt    = groupOpt
+      )
 
   private object Private {
 
@@ -205,57 +219,75 @@ object FormRunnerAuth {
 
           Logger.debug(s"using `$authMethod` method")
 
-          val headerPropertyName =
-            propertySet.getNonBlankString(HeaderRolesPropertyNamePropertyName)
-
           def headerList(name: String) =
             propertySet.getNonBlankString(name).toList flatMap (p => getHeader(p.toLowerCase))
 
-          val rolesSplit = propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
-          def splitRoles(value: String) = value split rolesSplit
-
-          Logger.debug(s"using properties: $HeaderRolesPropertyNamePropertyName=`$headerPropertyName`, $HeaderRolesSplitPropertyName=`$rolesSplit`")
-
-          // If configured, a header can have the form `name=value` where `name` is specified in a property
-          def splitWithinRole(value: String) = headerPropertyName match {
-            case Some(propertyName) =>
-              value match {
-                case NameValueMatch(`propertyName`, value) => List(value)
-                case _                                     => Nil
-              }
-            case _ => List(value)
-          }
-
-          import org.orbeon.oxf.util.CoreUtils._
-
-          // Credentials coming from the JSON-encoded HTTP header
-          def fromCredentialsHeader =
-            headerList(HeaderCredentialsPropertyName).headOption flatMap
-            (CredentialsParser.parseCredentials(_, decodeForHeader = true)) kestrel
-            (_ => Logger.debug(s"found from credential headers"))
-
-          // Credentials coming from individual headers (requires at least the username)
-          def fromIndividualHeaders =
-            headerList(HeaderUsernamePropertyName).headOption map { username =>
-
-              // Roles: all headers with the given name are used, each header value is split, and result combined
-              // See also: https://github.com/orbeon/orbeon-forms/issues/1690
-              val roles =
-                headerList(HeaderRolesPropertyName) flatMap splitRoles flatMap splitWithinRole map SimpleRole.apply
-
-              Credentials(
-                userAndGroup  = UserAndGroup.fromStringsOrThrow(username, headerList(HeaderGroupPropertyName).headOption.getOrElse("")),
-                roles         = roles,
-                organizations = Nil
-              )
-            } kestrel
-            (_ => Logger.debug(s"found from individual headers"))
-
-          fromCredentialsHeader orElse fromIndividualHeaders
+          fromHeaderValues(
+            credentialsOpt = headerList(HeaderCredentialsPropertyName).headOption,
+            usernameOpt    = headerList(HeaderUsernamePropertyName).headOption,
+            rolesList      = headerList(HeaderRolesPropertyName),
+            groupOpt       = headerList(HeaderGroupPropertyName).headOption
+          )
 
         case None =>
           throw new OXFException(s"'$MethodPropertyName' property: unsupported authentication method `$requestedAuthMethod`")
       }
     }
+
+    def fromHeaderValues(
+      credentialsOpt: => Option[String],
+      usernameOpt   : => Option[String],
+      rolesList     : => List[String],
+      groupOpt      : => Option[String]
+    ): Option[Credentials] =
+      fromCredentialsHeader(credentialsOpt) orElse
+        fromIndividualHeaders(
+          usernameOpt = usernameOpt,
+          rolesList   = rolesList,
+          groupOpt    = groupOpt
+        )
+
+    // Credentials coming from the JSON-encoded HTTP header
+    def fromCredentialsHeader(
+      headerValueOpt: => Option[String]
+    ): Option[Credentials] =
+      headerValueOpt flatMap (CredentialsParser.parseCredentials(_, decodeForHeader = true)) kestrel
+        (_ => Logger.debug(s"found from credential headers"))
+
+    // Credentials coming from individual headers (requires at least the username)
+    def fromIndividualHeaders(
+      usernameOpt: => Option[String],
+      rolesList  : => List[String],
+      groupOpt   : => Option[String]
+    ): Option[Credentials] =
+      usernameOpt map { username =>
+        // Roles: all headers with the given name are used, each header value is split, and result combined
+        // See also: https://github.com/orbeon/orbeon-forms/issues/1690
+
+        val propertySet = Properties.instance.getPropertySet
+
+        val headerPropertyName =
+          propertySet.getNonBlankString(HeaderRolesPropertyNamePropertyName)
+
+        // If configured, a header can have the form `name=value` where `name` is specified in a property
+        def splitWithinRole(value: String) = headerPropertyName match {
+          case Some(propertyName) =>
+            value match {
+              case NameValueMatch(`propertyName`, value) => List(value)
+              case _                                     => Nil
+            }
+          case _ => List(value)
+        }
+
+        def splitRoles(value: String) =
+          value split propertySet.getString(HeaderRolesSplitPropertyName, """(\s*[,\|]\s*)+""")
+
+        Credentials(
+          userAndGroup  = UserAndGroup.fromStringsOrThrow(username, groupOpt.getOrElse("")),
+          roles         = rolesList flatMap splitRoles flatMap splitWithinRole map SimpleRole.apply,
+          organizations = Nil
+        )
+      } kestrel
+        (_ => Logger.debug(s"found from individual headers"))
   }
 }

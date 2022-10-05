@@ -41,7 +41,6 @@ val ScalaJsLocalesVersion            = "1.4.1"
 
 // Scala libraries for Scala JVM only
 val Parboiled1Version             = "1.3.1"
-val ScalaLoggingVersion           = "3.9.4"
 
 // Shared Scala libraries
 val CatsVersion                   = "2.7.0"
@@ -94,7 +93,6 @@ val CoreLibraryDependencies = Seq(
   "org.parboiled"               %% "parboiled"                      % Parboiled2Version,
   "org.scala-sbt"               %% "sbinary"                        % SbinaryVersion,
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
-  "com.typesafe.scala-logging"  %% "scala-logging"                  % ScalaLoggingVersion,
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
   "org.apache.commons"          %  "commons-lang3"                  % "3.12.0",
   "net.sf.ehcache"              %  "ehcache"                        % "2.10.9.2",

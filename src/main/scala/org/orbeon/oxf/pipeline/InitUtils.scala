@@ -22,7 +22,7 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
 import org.orbeon.oxf.externalcontext.{ExternalContext, ServletWebAppContext, WebAppExternalContext}
-import org.orbeon.oxf.http.HttpStatusCodeException
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.processor.generator.DOMGenerator
@@ -93,7 +93,7 @@ object InitUtils {
             if (logger.isDebugEnabled)
               logger.debug(e.throwable map OrbeonFormatter.format getOrElse "")
           case e: ResourceNotFoundException =>
-            externalContext.getResponse.sendError(404)
+            externalContext.getResponse.sendError(StatusCode.NotFound)
             logger.info("Resource not found" + (Option(e.resource) map (": " + _) getOrElse "") + " " + locationMessage)
           case _ =>
             throw t

@@ -115,7 +115,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
     if (isServerSide) {
       this._serverSideRedirect = Some(location)
     } else {
-      this._statusCode = 302
+      this._statusCode = StatusCode.Found
       setHeader(Headers.LocationLower, location)
     }
 

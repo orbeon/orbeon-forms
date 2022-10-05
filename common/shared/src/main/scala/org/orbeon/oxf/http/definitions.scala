@@ -228,6 +228,7 @@ trait HttpResponse {
 object StatusCode {
   val Ok                    = 200
   val Created               = 201
+  val Found                 = 302
   val NotModified           = 304
   val Unauthorized          = 401
   val Forbidden             = 403

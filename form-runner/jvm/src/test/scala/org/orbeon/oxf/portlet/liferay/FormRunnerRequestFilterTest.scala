@@ -13,22 +13,21 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import java.{util => ju}
-import javax.portlet.filter.PortletRequestWrapper
-import javax.portlet.{PortletRequest, PortletSession}
-
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.mockito.{Matchers, Mockito}
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.portlet.liferay.LiferayAPI.RoleFacade
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 
-import scala.jdk.CollectionConverters._
+import java.{util => ju}
+import javax.portlet.filter.PortletRequestWrapper
+import javax.portlet.{PortletRequest, PortletSession}
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
 
 
 class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpecLike with MockitoSugar {
@@ -41,11 +40,11 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
     // Session
     val sessionAttributes = mutable.Map[String, AnyRef]()
     val mockSession = mock[PortletSession]
-    Mockito when mockSession.getAttribute(Matchers.anyString) thenAnswer new Answer[AnyRef] {
+    Mockito when mockSession.getAttribute(ArgumentMatchers.anyString) thenAnswer new Answer[AnyRef] {
       def answer(invocation: InvocationOnMock) =
         sessionAttributes.get(invocation.getArguments()(0).asInstanceOf[String]).orNull
     }
-    Mockito when mockSession.setAttribute(Matchers.anyString, Matchers.anyObject) thenAnswer new Answer[Unit] {
+    Mockito when mockSession.setAttribute(ArgumentMatchers.anyString, ArgumentMatchers.any) thenAnswer new Answer[Unit] {
       def answer(invocation: InvocationOnMock) =
         sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] -> invocation.getArguments()(1)
     }

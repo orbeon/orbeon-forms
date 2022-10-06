@@ -13,14 +13,15 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.mockito.{Matchers, Mockito}
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.orbeon.dom.QName
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, PartAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.scalatest.funspec.AnyFunSpecLike
 import org.xml.sax.helpers.AttributesImpl
+
 
 class XFormsControlsTest
   extends DocumentTestBase
@@ -38,7 +39,7 @@ class XFormsControlsTest
     Mockito.when(elementAnalysis.prefixedId).thenReturn(id)
 
     val partAnalysis = Mockito.mock(classOf[PartAnalysis])
-    Mockito.when(partAnalysis.getControlAnalysis(Matchers.anyString)).thenReturn(elementAnalysis)
+    Mockito.when(partAnalysis.getControlAnalysis(ArgumentMatchers.anyString)).thenReturn(elementAnalysis)
     Mockito.when(doc.getPartAnalysis).thenReturn(partAnalysis)
 
     doc

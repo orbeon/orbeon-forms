@@ -15,13 +15,12 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.junit.Assert.{assertFalse, assertTrue}
 import org.junit.{Assume, Test}
-import org.mockito.{Matchers, Mockito}
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.model.{XFormsInstance, XFormsModel}
-import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsId.buildEffectiveId
 import org.scalatestplus.junit.AssertionsForJUnit
@@ -108,7 +107,7 @@ class XFormsStaticStateTest extends ResourceManagerTestBase with AssertionsForJU
 
     Mockito.when(mockDocument.staticOps).thenReturn(ops)
     Mockito.when(mockDocument.controls).thenReturn(mockControls)
-    Mockito.when(mockDocument.getIndentedLogger(Matchers.anyString)).thenReturn(staticState.getIndentedLogger)
+    Mockito.when(mockDocument.getIndentedLogger(ArgumentMatchers.anyString)).thenReturn(staticState.getIndentedLogger)
 
     Mockito.when(mockControls.indentedLogger).thenReturn(staticState.getIndentedLogger)
 

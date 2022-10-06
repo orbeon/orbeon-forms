@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.servlet
 
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpSession}
-
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.mockito.{Matchers, Mockito}
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.funspec.AnyFunSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 
-import scala.jdk.CollectionConverters._
+import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpSession}
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
+import scala.jdk.CollectionConverters._
+
 
 class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpecLike with MockitoSugar {
 
@@ -41,11 +41,11 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
 
     val sessionAttributes = mutable.Map[String, AnyRef]()
     val mockSession = mock[HttpSession]
-    Mockito when mockSession.getAttribute(Matchers.anyString) thenAnswer new Answer[AnyRef] {
+    Mockito when mockSession.getAttribute(ArgumentMatchers.anyString) thenAnswer new Answer[AnyRef] {
       def answer(invocation: InvocationOnMock) =
         sessionAttributes.get(invocation.getArguments()(0).asInstanceOf[String]).orNull
     }
-    Mockito when mockSession.setAttribute(Matchers.anyString, Matchers.anyObject) thenAnswer new Answer[Unit] {
+    Mockito when mockSession.setAttribute(ArgumentMatchers.anyString, ArgumentMatchers.any) thenAnswer new Answer[Unit] {
       def answer(invocation: InvocationOnMock) =
         sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] -> invocation.getArguments()(1)
     }

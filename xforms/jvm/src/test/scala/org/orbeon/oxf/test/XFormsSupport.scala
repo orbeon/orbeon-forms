@@ -15,12 +15,12 @@ package org.orbeon.oxf.test
 
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.mockito.{Matchers, Mockito}
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
+import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl, XFormsSingleNodeControl, XFormsValueControl}
@@ -73,7 +73,7 @@ trait XFormsSupport extends MockitoSugar {
     Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(Loggers.logger)
 
     // Resolve assuming target relative to the document
-    Mockito when actionInterpreter.resolveObject(Matchers.anyObject(), Matchers.anyString) thenAnswer new Answer[XFormsObject] {
+    Mockito when actionInterpreter.resolveObject(ArgumentMatchers.any[ActionTrait], ArgumentMatchers.anyString) thenAnswer new Answer[XFormsObject] {
       def answer(invocation: InvocationOnMock) = {
         val targetStaticOrAbsoluteId = invocation.getArguments()(1).asInstanceOf[String]
         doc.resolveObjectById(Constants.DocumentId, targetStaticOrAbsoluteId, contextItemOpt = None)

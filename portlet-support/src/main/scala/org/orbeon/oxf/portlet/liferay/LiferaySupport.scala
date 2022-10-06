@@ -15,7 +15,7 @@ package org.orbeon.oxf.portlet.liferay
 
 import javax.portlet._
 import com.liferay.portal.kernel.language.LanguageUtil
-import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSupport, Organization, ParametrizedRole, SimpleRole, UserAndGroup}
+import org.orbeon.oxf.externalcontext.{Credentials, CredentialsSerializer, Organization, ParametrizedRole, SimpleRole, UserAndGroup}
 import org.orbeon.oxf.util.StringUtils._
 
 import scala.jdk.CollectionConverters._
@@ -68,7 +68,7 @@ object LiferaySupport {
       case LiferayScreenNameAuthType.name   => u.getScreenName
     }
 
-    CredentialsSupport.serializeCredentials(
+    CredentialsSerializer.serializeCredentials(
       Credentials(
         userAndGroup  = UserAndGroup.fromStringsOrThrow(username, Option(u.getGroup).map(_.getDescriptiveName).getOrElse("")),
         roles         = simpleRoles ++: parametrizedRoles,

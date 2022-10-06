@@ -42,8 +42,8 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
   describe("JSON serialization and deserialization") {
     for {
       encode <- List(false, true)
-      serialized   = CredentialsSupport.serializeCredentials(TestCredentials, encode)
-      deserialized = CredentialsSupport.parseCredentials(serialized, encode)
+      serialized   = CredentialsSerializer.serializeCredentials(TestCredentials, encode)
+      deserialized = CredentialsParser.parseCredentials(serialized, encode)
     } locally {
       it (s"must pass with `encode` set to `$encode`") {
         assert(deserialized === Some(TestCredentials))
@@ -64,7 +64,7 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
     import org.orbeon.scaxon.SimplePath._
 
     val rootElem =
-      Converter.jsonStringToXmlDoc(CredentialsSupport.serializeCredentials(TestCredentials, encodeForHeader = false)).rootElement
+      Converter.jsonStringToXmlDoc(CredentialsSerializer.serializeCredentials(TestCredentials, encodeForHeader = false)).rootElement
 
     val expectedXml: NodeInfo =
       <json type="object">
@@ -224,7 +224,7 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
 
     for ((description, json, credentials) <- expectedPassing)
       it (s"must support $description") {
-        assert(Some(credentials) === CredentialsSupport.parseCredentials(json, decodeForHeader = false))
+        assert(Some(credentials) === CredentialsParser.parseCredentials(json, decodeForHeader = false))
       }
 
     val expectedFailing = List(
@@ -241,7 +241,7 @@ class CredentialsTest extends AnyFunSpec with XMLSupport {
     for ((description, json) <- expectedFailing)
       it (s"must reject $description") {
         intercept[Throwable] {
-          CredentialsSupport.parseCredentials(json, decodeForHeader = false)
+          CredentialsParser.parseCredentials(json, decodeForHeader = false)
         }
       }
   }

@@ -18,6 +18,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.StringUtils._
 
 import java.net.{URLDecoder, URLEncoder}
+import scala.collection.compat._
 
 
 object CredentialsSupport {
@@ -32,14 +33,18 @@ object CredentialsSupport {
     val Levels        = "levels"
   }
 
-  def toHeaders(credentials: Credentials): List[(String, Array[String])] = {
+  def toHeaders[T[_]](
+    credentials: Credentials)(implicit
+    cbf        : Factory[String, T[String]],
+    ev         : T[String] => Traversable[String]
+  ): List[(String, T[String])] = {
 
     import org.orbeon.oxf.util.CoreUtils._
 
-    val usernameArray    = Array(credentials.userAndGroup.username)
-    val credentialsArray = Array(serializeCredentials(credentials, encodeForHeader = true))
-    val groupNameArray   = credentials.userAndGroup.groupname.toArray
-    val roleNamesArray   = credentials.roles collect { case r: SimpleRole => r.roleName } toArray
+    val usernameArray    = (cbf.newBuilder += credentials.userAndGroup.username).result()
+    val credentialsArray = (cbf.newBuilder += serializeCredentials(credentials, encodeForHeader = true)).result()
+    val groupNameArray   = (cbf.newBuilder ++= credentials.userAndGroup.groupname).result()
+    val roleNamesArray   = (cbf.newBuilder ++= credentials.roles collect { case r: SimpleRole => r.roleName }).result()
 
     (                              Headers.OrbeonUsernameLower    -> usernameArray)    ::
     (                              Headers.OrbeonCredentialsLower -> credentialsArray) ::

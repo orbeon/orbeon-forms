@@ -53,7 +53,7 @@ class LocalRequest(
 
     def credentialsHeadersIt =
       incomingRequest.credentials match {
-        case Some(credentials) => CredentialsSupport.toHeaders(credentials).iterator
+        case Some(credentials) => CredentialsSupport.toHeaders[Array](credentials).iterator
         case None              => Iterator.empty
       }
 

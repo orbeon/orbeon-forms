@@ -45,7 +45,7 @@ object FormRunnerAuth {
   ): List[(String, Array[String])] =
     getCredentialsUseSession(userRoles, session, getHeader) match {
       case Some(credentials) =>
-        val result = CredentialsSupport.toHeaders(credentials)
+        val result = CredentialsSupport.toHeaders[Array](credentials)
         Logger.debug(s"setting auth headers to: ${headersAsJSONString(result)}")
         result
       case None =>

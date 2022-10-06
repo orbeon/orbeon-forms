@@ -16,7 +16,6 @@ package org.orbeon.oxf.util
 import java.sql.Timestamp
 
 object SQLUtils {
-  implicit def ordered: Ordering[Timestamp] = new Ordering[Timestamp] {
-      def compare(x: Timestamp, y: Timestamp): Int = x compareTo y
-  }
+  implicit def ordered: Ordering[Timestamp] =
+    (x: Timestamp, y: Timestamp) => x compareTo y
 }

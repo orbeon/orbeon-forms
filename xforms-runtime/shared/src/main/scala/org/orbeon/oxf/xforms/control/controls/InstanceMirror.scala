@@ -18,7 +18,7 @@ import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, VirtualNodeType}
+import org.orbeon.oxf.util.StaticXPath.VirtualNodeType
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.event.Dispatch.EventListener
@@ -102,9 +102,8 @@ object InstanceMirror {
   type MirrorEventListener = XFormsEvent => ListenerResult
 
   // Implicitly convert a MirrorEventListener to a plain EventListener
-  def toEventListener(f: MirrorEventListener): EventListener = new EventListener {
-    def apply(event: XFormsEvent): Unit = f(event)
-  }
+  def toEventListener(f: MirrorEventListener): EventListener =
+    (event: XFormsEvent) => f(event)
 
   case class InstanceDetails(id: String, root: VirtualNodeType, namespaces: NamespaceMapping)
 

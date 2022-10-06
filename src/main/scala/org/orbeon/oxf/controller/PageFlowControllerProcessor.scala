@@ -56,13 +56,16 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     implicit val logger = new IndentedLogger(Logger)
 
     // Get or compile page flow
-    val pageFlow = readCacheInputAsObject(pc, getInputByName(ControllerInput), new CacheableInputReader[PageFlow] {
-      def read(context: PipelineContext, input: ProcessorInput) =
-        compile(
-          configRoot         = readInputAsOrbeonDom(pc, ControllerInput).getRootElement,
-          controllerValidity = ProcessorImpl.getInputValidity(pc, getInputByName(ControllerInput))
-        )
-    })
+    val pageFlow =
+      readCacheInputAsObject(
+        pc,
+        getInputByName(ControllerInput),
+        (_: PipelineContext, _: ProcessorInput) =>
+          compile(
+            configRoot         = readInputAsOrbeonDom(pc, ControllerInput).getRootElement,
+            controllerValidity = ProcessorImpl.getInputValidity(pc, getInputByName(ControllerInput))
+          )
+      )
 
     // Run it
     val ec      = NetUtils.getExternalContext

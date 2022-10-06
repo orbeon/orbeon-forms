@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.servlet
 
-import javax.servlet.ServletException
-import javax.servlet.http._
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.{ServletWebAppContext, WebAppListener}
+import org.orbeon.oxf.externalcontext.ServletWebAppContext
 import org.orbeon.oxf.http.PropertiesApacheHttpClient
 import org.orbeon.oxf.pipeline.api._
 import org.orbeon.oxf.webapp.ServletPortlet._
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet}
 
+import javax.servlet.ServletException
+import javax.servlet.http._
 import scala.jdk.CollectionConverters._
+
 
 // For backward compatibility
 class OrbeonServletDelegate extends OrbeonServlet
@@ -59,9 +59,7 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
       init(ServletWebAppContext(getServletContext), Some("oxf.servlet-initialized-processor." -> "oxf.servlet-initialized-processor.input."))
 
       // Unclear whether there is a better place to do this
-      webAppContext.addListener(new WebAppListener {
-        def webAppDestroyed(): Unit = PropertiesApacheHttpClient.shutdown()
-      })
+      webAppContext.addListener(() => PropertiesApacheHttpClient.shutdown())
     }
 
   // Servlet destroy

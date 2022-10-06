@@ -69,8 +69,10 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
         implicit val logger = new IndentedLogger(Logger)
 
         val config =
-          readCacheInputAsObject(pc, getInputByName(INPUT_CONFIG), new CacheableInputReader[Config] {
-            override def read(pipelineContext: PipelineContext, input: ProcessorInput): Config = {
+          readCacheInputAsObject(
+            pc,
+            getInputByName(INPUT_CONFIG),
+            (pipelineContext: PipelineContext, input: ProcessorInput) => {
 
               val configElem = readInputAsOrbeonDom(pipelineContext, input).getRootElement
 
@@ -92,7 +94,7 @@ class PDFToImageProcessor extends ProcessorImpl with Logging {
 
               Config(scale, format, compression)
             }
-          })
+          )
 
         val outputStream = new ContentHandlerOutputStream(xmlReceiver, true)
         outputStream.setContentType(s"image/${config.format}")

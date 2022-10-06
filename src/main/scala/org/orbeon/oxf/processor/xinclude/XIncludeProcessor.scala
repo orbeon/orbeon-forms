@@ -49,15 +49,17 @@ class XIncludeProcessor extends ProcessorImpl {
         // Read attributes input only if connected (just in case, for backward compatibility, although it shouldn't happen)
         val configurationAttributes =
           if (getConnectedInputs.get(AttributesInput) ne null) {
-            readCacheInputAsObject(pipelineContext, getInputByName(AttributesInput), new CacheableInputReader[Map[String, Boolean]] {
-              def read(pipelineContext: PipelineContext, input: ProcessorInput) = {
+            readCacheInputAsObject(
+              pipelineContext,
+              getInputByName(AttributesInput),
+              (pipelineContext: PipelineContext, input: ProcessorInput) => {
                 val preferencesDocument = readInputAsOrbeonDom(pipelineContext, input)
-                val propertyStore = PropertyStore.parse(preferencesDocument)
-                val propertySet = propertyStore.getGlobalPropertySet
+                val propertyStore       = PropertyStore.parse(preferencesDocument)
+                val propertySet         = propertyStore.getGlobalPropertySet
 
                 propertySet.getBooleanProperties.asScala map { case (k, v) => k -> v.booleanValue } toMap
               }
-            })
+            )
           } else
             Map.empty[String, Boolean]
 
@@ -95,16 +97,18 @@ class XIncludeProcessor extends ProcessorImpl {
         // Try to cache URI references
         // NOTE: Always be careful not to cache refs to TransformerURIResolver. We seem to be fine here.
         var wasRead = false
-        readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader[URIReferences] {
-          def read(context: PipelineContext, input: ProcessorInput) = {
+        readCacheInputAsObject(
+          pipelineContext,
+          getInputByName(INPUT_CONFIG),
+          (_: PipelineContext, _: ProcessorInput) => {
             val uriReferences = new URIReferences
-            val saxStore = new SAXStore
+            val saxStore      = new SAXStore
             readInputAsSAX(pipelineContext, INPUT_CONFIG, saxStore)
             saxStore.replay(new XIncludeReceiver(pipelineContext, xmlReceiver, uriReferences, uriResolver))
             wasRead = true
             uriReferences
           }
-        })
+        )
 
         // Read if not already read
         if (! wasRead) {

@@ -12,6 +12,7 @@ import org.orbeon.saxon.om.{ExternalObjectModel, NodeInfo, ValueRepresentation, 
 import org.orbeon.saxon.pattern.AnyNodeTest
 import org.orbeon.saxon.value.{SingletonNode, Value}
 
+
 /**
   * Copyright (C) 2007 Orbeon, Inc.
   *
@@ -33,14 +34,11 @@ object OrbeonDOMObjectModel extends ExternalObjectModel with Serializable {
   val getIdentifyingURI = "http://orbeon.org/oxf/xml/dom"
 
   def getPJConverter(targetClass: Class[_]): PJConverter =
-    if (isRecognizedNodeClass(targetClass)) {
-      new PJConverter {
-        def convert(value: ValueRepresentation, targetClass: Class[_], context: XPathContext) =
-          convertXPathValueToObject(Value.asValue(value), targetClass)
-      }
-    } else {
+    if (isRecognizedNodeClass(targetClass))
+      (value: ValueRepresentation, targetClass: Class[_], _: XPathContext) =>
+        convertXPathValueToObject(Value.asValue(value), targetClass)
+    else
       null
-    }
 
   def getJPConverter(targetClass: Class[_]): JPConverter =
     if (isRecognizedNodeClass(targetClass)) {

@@ -45,8 +45,8 @@ class ExceptionCatcher extends ProcessorImpl {
         // Try to read config
         val logStackTrace =
           if (getConnectedInputs.get(INPUT_CONFIG) ne null) {
-            readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader[Boolean] {
-              def read(pipelineContext: PipelineContext, input: ProcessorInput) = {
+            readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
+                (_: PipelineContext, input: ProcessorInput) => {
 
                 val doc = readInputAsTinyTree(context, input, XPath.GlobalConfiguration)
 
@@ -62,9 +62,8 @@ class ExceptionCatcher extends ProcessorImpl {
                   null,
                   null
                 ).asInstanceOf[BooleanValue].getBooleanValue
-
               }
-            })
+          )
           } else
             true
 

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.portlet.liferay
 
 import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 import org.mockito.{ArgumentMatchers, Mockito}
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.portlet.liferay.LiferayAPI.RoleFacade
@@ -40,14 +39,10 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
     // Session
     val sessionAttributes = mutable.Map[String, AnyRef]()
     val mockSession = mock[PortletSession]
-    Mockito when mockSession.getAttribute(ArgumentMatchers.anyString) thenAnswer new Answer[AnyRef] {
-      def answer(invocation: InvocationOnMock) =
-        sessionAttributes.get(invocation.getArguments()(0).asInstanceOf[String]).orNull
-    }
-    Mockito when mockSession.setAttribute(ArgumentMatchers.anyString, ArgumentMatchers.any) thenAnswer new Answer[Unit] {
-      def answer(invocation: InvocationOnMock) =
-        sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] -> invocation.getArguments()(1)
-    }
+    Mockito when mockSession.getAttribute(ArgumentMatchers.anyString) thenAnswer
+      ((invocation: InvocationOnMock) => sessionAttributes.get(invocation.getArguments()(0).asInstanceOf[String]).orNull)
+    Mockito when mockSession.setAttribute(ArgumentMatchers.anyString, ArgumentMatchers.any) thenAnswer
+      ((invocation: InvocationOnMock) => sessionAttributes += invocation.getArguments()(0).asInstanceOf[String] -> invocation.getArguments()(1))
 
     // Request with initial properties
     val mockRequest = new PortletRequestWrapper(mock[PortletRequest]) {

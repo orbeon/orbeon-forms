@@ -52,6 +52,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerSupport with AnyFunSpec
         (initialHeaders.get(name) map (_.iterator) getOrElse Iterator.empty).asJavaEnumeration
       override def getHeaderNames = initialHeaders.keysIterator.asJavaEnumeration
       override def getSession(create: Boolean) = mockSession
+      override def getPathInfo: String = "/fr/orbeon/controls/new"
     }
 
     val amendedRequest = FormRunnerAuthFilter.amendRequest(mockRequest)

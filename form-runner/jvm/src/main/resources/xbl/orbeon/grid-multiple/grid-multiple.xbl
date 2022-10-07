@@ -408,9 +408,9 @@
                                 </xsl:if>
                             </xsl:variable>
 
-                            <xsl:choose>
-                                <xsl:when test="not($use-css-grids-output)">
-                                    <xsl:if test="not($appearance = 'minimal' and $static-row-count gt 1)">
+                            <xsl:if test="not($appearance = 'minimal' and $static-row-count gt 1)">
+                                <xsl:choose>
+                                    <xsl:when test="not($use-css-grids-output)">
                                         <xsl:element name="{$thead-elem}">
                                             <xsl:attribute name="class">fr-grid-head</xsl:attribute>
                                             <xsl:element name="{$tr-elem}">
@@ -424,24 +424,24 @@
                                                 </xsl:if>
                                             </xsl:element>
                                         </xsl:element>
-                                    </xsl:if>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:element name="xh:div">
-                                        <xsl:attribute name="class">fr-grid-repeat-top-row</xsl:attribute>
-                                        <xsl:if test="$left-column or $number-rows">
-                                            <xsl:copy-of select="$header-side-block"/>
-                                        </xsl:if>
+                                    </xsl:when>
+                                    <xsl:otherwise>
                                         <xsl:element name="xh:div">
-                                            <xsl:attribute name="class">fr-grid-head</xsl:attribute>
-                                            <xsl:copy-of select="$head-content"/>
+                                            <xsl:attribute name="class">fr-grid-repeat-top-row</xsl:attribute>
+                                            <xsl:if test="$left-column or $number-rows">
+                                                <xsl:copy-of select="$header-side-block"/>
+                                            </xsl:if>
+                                            <xsl:element name="xh:div">
+                                                <xsl:attribute name="class">fr-grid-head</xsl:attribute>
+                                                <xsl:copy-of select="$head-content"/>
+                                            </xsl:element>
+                                            <xsl:if test="$right-column">
+                                                <xsl:copy-of select="$header-side-block"/>
+                                            </xsl:if>
                                         </xsl:element>
-                                        <xsl:if test="$right-column">
-                                            <xsl:copy-of select="$header-side-block"/>
-                                        </xsl:if>
-                                    </xsl:element>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:if>
 
                             <xsl:variable name="side-block" as="element(*)*">
                                 <xsl:if test="$number-rows">

@@ -23,19 +23,13 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ExternalContext;
 import org.orbeon.oxf.externalcontext.WebAppListener;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.xml.dom.IOSupport;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.*;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 // TODO: refactor, use functions in `FileItemSupport`
@@ -82,51 +76,6 @@ public class NetUtils {
         return true;
     }
 
-    /**
-     * Return a request path info that looks like what one would expect. The path starts with a "/", relative to the
-     * servlet context. If the servlet was included or forwarded to, return the path by which the *current* servlet was
-     * invoked, NOT the path of the calling servlet.
-     *
-     * Request path = servlet path + path info.
-     *
-     * @param request   servlet HTTP request
-     * @return          path
-     */
-    public static String getRequestPathInfo(HttpServletRequest request) {
-
-        // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the included
-        // servlet via the getAttribute method on the request object and their values must be equal to the request URI,
-        // context path, servlet path, path info, and query string of the included servlet, respectively."
-        // NOTE: This is very different from the similarly-named forward attributes, which reflect the values of the
-        // first servlet in the chain!
-
-        // Get servlet path
-        String servletPath = (String) request.getAttribute("javax.servlet.include.servlet_path");
-        if (servletPath == null) {
-            servletPath = request.getServletPath();
-            if (servletPath == null)
-                servletPath = "";
-        }
-
-        // Get path info
-        String pathInfo = (String) request.getAttribute("javax.servlet.include.path_info");
-        if (pathInfo == null) {
-            pathInfo = request.getPathInfo();
-            if (pathInfo == null)
-                pathInfo = "";
-        }
-
-        // Concatenate servlet path and path info, avoiding a double slash
-        String requestPath = servletPath.endsWith("/") && pathInfo.startsWith("/")
-                ? servletPath + pathInfo.substring(1)
-                : servletPath + pathInfo;
-
-        // Add starting slash if missing
-        if (!requestPath.startsWith("/"))
-            requestPath = "/" + requestPath;
-
-        return requestPath;
-    }
 
     /**
      * Return the last modification date of the given absolute URL if it is "fast" to do so, i.e. if it is an "oxf:" or

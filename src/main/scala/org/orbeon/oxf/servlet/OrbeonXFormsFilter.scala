@@ -13,17 +13,19 @@
  */
 package org.orbeon.oxf.servlet
 
-import java.io._
-import java.util._
-
-import javax.servlet._
-import javax.servlet.http._
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.Defaults
 import org.orbeon.oxf.http.StatusCode
+import org.orbeon.oxf.util.ContentTypes
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ContentTypes, NetUtils}
+import org.orbeon.oxf.webapp.ServletSupport
+
+import java.io._
+import java.util._
+import javax.servlet._
+import javax.servlet.http._
+
 
 private case class FilterSettings(context: ServletContext, orbeonContextPathOpt: Option[String], defaultEncoding: String) {
   // NOTE: Never match anything if there is no context path
@@ -72,7 +74,7 @@ class OrbeonXFormsFilter extends Filter {
 
         val httpRequest  = servletRequest.asInstanceOf[HttpServletRequest]
         val httpResponse = servletResponse.asInstanceOf[HttpServletResponse]
-        val requestPath  = NetUtils.getRequestPathInfo(httpRequest)
+        val requestPath  = ServletSupport.getRequestPathInfo(httpRequest)
 
         // Set whether deployment is integrated or separate
         // NOTE: Also for resources so that e.g. /xforms-server, /xforms-server-submit can handle URLs properly.

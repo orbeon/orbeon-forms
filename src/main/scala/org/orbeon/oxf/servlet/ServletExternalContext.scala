@@ -13,9 +13,6 @@
   */
 package org.orbeon.oxf.servlet
 
-import java.io._
-import java.{util => ju}
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.http.{Headers, HttpMethod, StatusCode}
 import org.orbeon.oxf.pipeline.InitUtils
@@ -23,7 +20,11 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.webapp.ServletSupport
 
+import java.io._
+import java.{util => ju}
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import scala.jdk.CollectionConverters._
 
 
@@ -123,7 +124,7 @@ class ServletExternalContext(
     lazy val getRequestURI: String =
       servletIncludeAttributeOpt("request_uri") getOrElse nativeRequest.getRequestURI
 
-    lazy val getRequestPath = NetUtils.getRequestPathInfo(nativeRequest)
+    lazy val getRequestPath = ServletSupport.getRequestPathInfo(nativeRequest)
 
     lazy val getAttributesMap: ju.Map[String, AnyRef] = new InitUtils.RequestMap(nativeRequest)
 

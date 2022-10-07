@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.fr.embedding.servlet
 
-import java.io.Writer
-import javax.servlet._
-import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.orbeon.oxf.fr.embedding._
 import org.orbeon.oxf.http._
-import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.webapp.ServletSupport
 import org.orbeon.wsrp.WSRPSupport
 import org.orbeon.xforms.Constants
 
+import java.io.Writer
+import javax.servlet._
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import scala.util.Try
 
 
@@ -114,7 +114,7 @@ class ServletFilter extends Filter {
       val httpRes = res.asInstanceOf[HttpServletResponse]
 
       APISupport.scopeSettings(httpReq, settings) {
-        NetUtils.getRequestPathInfo(httpReq) match {
+        ServletSupport.getRequestPathInfo(httpReq) match {
           case settings.OrbeonSubmitPathRegex() =>
             // Request is for an Orbeon submission
             APISupport.proxySubmission(httpReq, httpRes)

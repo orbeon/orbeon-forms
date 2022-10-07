@@ -257,29 +257,6 @@
                                 <xsl:attribute name="role" select="'presentation'"/>
                             </xsl:if>
 
-                            <!-- If repeat, add header row with buttons and optional headers with control labels -->
-                            <xsl:if test="$is-table">
-                                <!-- Add `colgroup` to make column sizing with CSS easier -->
-                                <xh:colgroup>
-                                    <xsl:if test="$number-rows">
-                                        <xh:col class="fr-repeat-column-number" xxf:control="true" ref=".[not($view-mode)]"/>
-                                    </xsl:if>
-                                    <xsl:if test="$left-column">
-                                        <xh:col class="fr-repeat-column-left" xxf:control="true" ref=".[not($view-mode)]"/>
-                                    </xsl:if>
-                                    <!-- TODO: What to do if `not($lhh-in-header)`? -->
-                                    <!-- Q: No need to handle `colspan` here, right? -->
-                                    <xsl:if test="$lhh-in-header">
-                                        <xsl:for-each select="array:get($rows-array, 1)">
-                                            <xh:col class="fr-grid-col-{position()}"/>
-                                        </xsl:for-each>
-                                    </xsl:if>
-                                    <xsl:if test="right-column">
-                                        <xh:col class="fr-repeat-column-right" xxf:control="true" ref=".[not($view-mode)]"/>
-                                    </xsl:if>
-                                </xh:colgroup>
-                            </xsl:if>
-
                             <xsl:variable name="header-side-block" as="element(*)*">
                                 <xsl:if test="$number-rows">
                                     <xsl:element name="{$th-elem}">

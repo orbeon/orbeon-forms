@@ -91,7 +91,7 @@
 
                             <xsl:variable
                                 name="rows-content"
-                                select="fr:rows-content(false(), false(), false(), false(), ())"/>
+                                select="fr:rows-content(false(), (), ())"/>
 
                             <xsl:variable name="maybe-repeated-content">
 

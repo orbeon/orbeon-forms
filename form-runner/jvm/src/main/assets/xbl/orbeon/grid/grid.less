@@ -114,7 +114,8 @@
         &.xforms-grid-appearance-minimal .fr-grid-bottom-buttons {
 
             display: block;
-            margin-top: 10px;
+            margin-top: 10px; // probably unneeded as the grid already has `margin-bottom`
+            margin-bottom: 10px;
 
             .xforms-trigger {
                 margin-right: 1em;
@@ -123,6 +124,16 @@
 
         // Overrides for minimal appearance
         &.xforms-grid-appearance-minimal {
+            .fr-grid {
+                &.fr-repeat {
+                    .fr-grid-repeat-iteration {
+                        .fr-repeat-column-number {
+                            background-color: transparent;
+                            border: none;
+                        }
+                    }
+                }
+            }
             .fr-grid.fr-grid-css {
                 &.fr-repeat {
 
@@ -146,6 +157,7 @@
                     .fr-grid-td,
                     .fr-repeat-column-left,
                     .fr-repeat-column-right,
+                    .fr-grid-repeat-top-row .fr-repeat-column-number,
                     &.fr-repeat-multiple-rows .fr-grid-head {
                         border: none;
                     }
@@ -154,6 +166,9 @@
                         border-top: 2px solid #ddd;
                     }
                 }
+            }
+            .fr-grid:not(.fr-grid-css) {
+
             }
         }
 

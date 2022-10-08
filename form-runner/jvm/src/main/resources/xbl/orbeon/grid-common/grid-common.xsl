@@ -182,12 +182,10 @@
 
     </xsl:function>
 
-    <xsl:function name="fr:rows-content" as="node()*">
-        <xsl:param name="is-repeat"    as="xs:boolean"/>
-        <xsl:param name="left-column"  as="xs:boolean"/>
-        <xsl:param name="right-column" as="xs:boolean"/>
-        <xsl:param name="number-rows"  as="xs:boolean"/>
-        <xsl:param name="side-block"   as="element(*)*"/>
+    <xsl:function name="fr:rows-content"   as="node()*">
+        <xsl:param name="is-repeat"        as="xs:boolean"/>
+        <xsl:param name="left-side-block"  as="element(*)*"/>
+        <xsl:param name="right-side-block" as="element(*)*"/>
 
         <xsl:variable
             name="lhh-in-header"
@@ -298,12 +296,12 @@
                                 </xsl:otherwise>
                             </xsl:choose>
 
-                            <xsl:if test="($left-column or $number-rows) and $static-row-pos = 1">
-                                <xsl:copy-of select="$side-block"/>
+                            <xsl:if test="$static-row-pos = 1">
+                                <xsl:copy-of select="$left-side-block"/>
                             </xsl:if>
                             <xsl:copy-of select="$cells-content"/>
-                            <xsl:if test="$right-column and $static-row-pos = 1">
-                                <xsl:copy-of select="$side-block"/>
+                            <xsl:if test="$static-row-pos = 1">
+                                <xsl:copy-of select="$right-side-block"/>
                             </xsl:if>
                         </xsl:element>
                     </xsl:if>

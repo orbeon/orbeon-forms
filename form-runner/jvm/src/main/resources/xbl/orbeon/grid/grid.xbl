@@ -541,7 +541,7 @@
 
                             <xsl:variable
                                 name="rows-content"
-                                select="fr:rows-content($is-repeat, $left-column, $right-column, false(), $side-block)"/>
+                                select="fr:rows-content($is-repeat, $side-block[$left-column], $side-block[$right-column])"/>
 
                             <xsl:variable name="maybe-repeated-content">
 

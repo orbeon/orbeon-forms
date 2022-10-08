@@ -89,41 +89,21 @@
                                 <xsl:attribute name="role" select="'presentation'"/>
                             </xsl:if>
 
-                            <xsl:variable
-                                name="rows-content"
-                                select="fr:rows-content(false(), (), ())"/>
-
-                            <xsl:variable name="maybe-repeated-content">
-
-                                <!-- Place all grid `<xf:var>`s here for now -->
-                                <!-- See discussion in https://github.com/orbeon/orbeon-forms/issues/2738  -->
-                                <xsl:apply-templates
-                                    select="
-                                        ($root/*:body | $root/self::*)/
-                                        (*:tr | self::*)/
-                                        xf:var
-                                "/>
-
-                                <xsl:choose>
-                                    <xsl:when test="not($use-css-grids-output)">
-                                        <xsl:element name="{$tbody-elem}">
-                                            <xsl:attribute name="class">fr-grid-body</xsl:attribute>
-                                            <xsl:copy-of select="$rows-content"/>
-                                        </xsl:element>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <!-- CSS grids output -->
-                                        <xsl:element name="xh:div">
-                                            <xsl:attribute name="class">fr-grid-body</xsl:attribute>
-                                            <xsl:copy-of select="$rows-content"/>
-                                        </xsl:element>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:variable>
-
                             <xf:group appearance="xxf:internal" ref="$binding-outer" xxbl:scope="outer">
                                 <xf:group appearance="xxf:internal" xxbl:scope="inner">
-                                    <xsl:copy-of select="$maybe-repeated-content"/>
+                                    <!-- Place all grid `<xf:var>`s here for now -->
+                                    <!-- See discussion in https://github.com/orbeon/orbeon-forms/issues/2738  -->
+                                    <xsl:apply-templates
+                                        select="
+                                            ($root/*:body | $root/self::*)/
+                                            (*:tr | self::*)/
+                                            xf:var
+                                    "/>
+
+                                    <xsl:element name="{$tbody-elem}">
+                                        <xsl:attribute name="class">fr-grid-body</xsl:attribute>
+                                        <xsl:copy-of select="fr:rows-content(false(), (), ())"/>
+                                    </xsl:element>
                                 </xf:group>
                             </xf:group>
                         </xsl:element><!-- $table-elem -->

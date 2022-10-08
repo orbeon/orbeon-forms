@@ -497,12 +497,6 @@
                                     <xsl:when test="not($use-css-grids-output)">
                                         <xsl:copy-of select="$rows-content"/>
                                     </xsl:when>
-                                    <xsl:when test="not($use-css-grids-output)">
-                                        <xsl:element name="{$tbody-elem}">
-                                            <xsl:attribute name="class">fr-grid-body</xsl:attribute>
-                                            <xsl:copy-of select="$rows-content"/>
-                                        </xsl:element>
-                                    </xsl:when>
                                     <xsl:otherwise>
                                         <!-- CSS grids output -->
                                         <xsl:if test="$left-column or $number-rows">

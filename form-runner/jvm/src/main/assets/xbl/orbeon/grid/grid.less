@@ -204,6 +204,12 @@
                     }
                 }
 
+                &.fr-grid-readonly.fr-grid-number-rows {
+                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                        grid-template-columns: 35px auto;
+                    }
+                }
+
                 &:not(.fr-grid-readonly):not(.fr-grid-number-rows) {
                     .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
                         grid-template-columns: 35px auto;

@@ -391,7 +391,7 @@
                                 </xsl:if>
                             </xsl:variable><!-- $head-content -->
 
-                            <xsl:if test="not($appearance = 'minimal' and $static-row-count gt 1)">
+                            <xsl:if test="not(($appearance = 'minimal' or $readonly) and $static-row-count gt 1)">
                                 <xsl:choose>
                                     <xsl:when test="not($use-css-grids-output)">
                                         <xsl:element name="{$thead-elem}">

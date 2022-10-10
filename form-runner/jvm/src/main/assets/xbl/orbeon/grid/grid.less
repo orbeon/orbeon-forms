@@ -146,7 +146,6 @@
                         }
                     }
 
-                    // 2021-12-06: Not supported in `grid-multiple.xbl` yet.
                     &:not(.fr-grid-readonly).fr-grid-number-rows {
                         .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
                             grid-template-columns: 35px auto 35px;
@@ -192,10 +191,6 @@
                     border-top: 1px solid #ddd;
                     line-height: 20px;
                     vertical-align: top;
-                }
-
-                .fr-repeat-column-number {
-                    padding: 4px 5px; // Added by `table-condensed` in the case of a regular table
                 }
 
                 .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
@@ -435,7 +430,11 @@
             }
 
             .fr-repeat-column-number {
-                text-align: right;
+                text-align: center;
+                .badge {
+                    margin: @frGridCellPadding + 2 @frGridCellPadding;
+                    font-size: smaller;
+                }
             }
 
             .fr-grid-head {
@@ -468,6 +467,7 @@
             .can-remove, .can-move-up, .can-move-down, .can-insert-above, .can-insert-below {
                 .dropdown {
                     display: block;
+                    margin: @frGridCellPadding;
                 }
             }
 

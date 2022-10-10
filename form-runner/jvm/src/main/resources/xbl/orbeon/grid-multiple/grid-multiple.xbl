@@ -425,7 +425,9 @@
                                         <xsl:if test="$static-row-count gt 1 and not($use-css-grids-output)">
                                             <xsl:attribute name="{fr:rowspan-attribute()}" select="$static-row-count"/>
                                         </xsl:if>
-                                        <xf:output value="xxf:repeat-position()"/>
+                                        <xh:div class="badge">
+                                            <xf:output value="xxf:repeat-position()"/>
+                                        </xh:div>
                                     </xsl:element>
                                 </xsl:if>
                             </xsl:variable>

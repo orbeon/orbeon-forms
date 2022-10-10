@@ -505,6 +505,23 @@
         }
     }
 
+    .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+        .xbl-fr-grid {
+            .fr-grid.fr-grid-css.fr-repeat {
+                &:not(.fr-grid-readonly):not(.fr-grid-number-rows) {
+                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                        grid-template-columns: auto;
+                    }
+                }
+                &:not(.fr-grid-readonly).fr-grid-number-rows {
+                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                        grid-template-columns: 35px auto;
+                    }
+                }
+            }
+        }
+    }
+
     @media print {
 
         .fr-mode-view, .fr-mode-pdf, .fr-mode-email {

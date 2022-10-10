@@ -81,14 +81,16 @@
   }
 }
 
-// new button
-.fr-new-button .btn {
-  color: #fff !important;
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
+// new/review button
+.fr-new-button, .fr-review-button {
+  .btn{
+    color: #fff !important;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+  }
 }
 
-.fr-new-button {
+.fr-new-button, .fr-review-button {
   .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
     color: #fff !important;
     background-color: #0b5ed7 !important;
@@ -146,5 +148,16 @@
         background-color: transparent;
       }
     }
+  }
+
+  .fr-form-description {
+    margin-bottom: 10px;
+    background-color: #fff;
+    border: 1px solid #e3e3e3;
+    padding: 8px 35px 8px 14px;
+  }
+
+  .fr-section-label .btn-link {
+    border: 1px solid transparent;
   }
 }

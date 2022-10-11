@@ -335,10 +335,21 @@ body.orbeon { background-color: @frBackground }
                     }
                 }
                 .xforms-selected {
-                    background-image: url("images/glyphicons/checkbox-selected.png");
+                    background-image: url("images/other/checkbox-selected-256.svg");
                 }
                 .xforms-deselected {
-                    background-image: url("images/glyphicons/checkbox-deselected.png");
+                    background-image: url("images/other/checkbox-deselected-256.svg");
+                }
+            }
+        }
+
+        .xforms-select1-appearance-full {
+            &.xforms-static {
+                .xforms-selected {
+                    background-image: url("images/other/radio-selected-256.svg");
+                }
+                .xforms-deselected {
+                    background-image: url("images/other/radio-deselected-256.svg");
                 }
             }
         }
@@ -355,25 +366,7 @@ body.orbeon { background-color: @frBackground }
 
 // ***** Retina displays ***********************************************************************************************
 
-@media only screen and (-webkit-min-device-pixel-ratio: 2),
-       only screen and (min--moz-device-pixel-ratio: 2),
-       only screen and (min-resolution: 2dppx),
-       only screen and (min-resolution: 192dpi) {
-    .orbeon {
-        .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-            .xforms-select-appearance-full, .xforms-select1-appearance-full, .xforms-input.xforms-type-boolean {
-                &.xforms-static {
-                    .xforms-selected {
-                        background-image: url("images/glyphicons/checkbox-selected-2x.png");
-                    }
-                    .xforms-deselected {
-                        background-image: url("images/glyphicons/checkbox-deselected-2x.png");
-                    }
-                }
-            }
-        }
-    }
-}
+// 2022-10-11: Using SVG images so no needs for overrides right now.
 
 // ***** Print and PDF *************************************************************************************************
 
@@ -398,10 +391,21 @@ body.orbeon { background-color: @frBackground }
                     }
 
                     .xforms-selected {
-                        background-image: url("images/glyphicons/checkbox-selected-hd.png") !important;
+                        background-image: url("images/other/checkbox-selected-256.png") !important;
                     }
                     .xforms-deselected {
-                        background-image: url("images/glyphicons/checkbox-deselected-hd.png") !important;
+                        background-image: url("images/other/checkbox-deselected-256.png") !important;
+                    }
+                }
+            }
+
+            .xforms-select1-appearance-full {
+                &.xforms-static {
+                    .xforms-selected {
+                        background-image: url("images/other/radio-selected-256.png") !important;
+                    }
+                    .xforms-deselected {
+                        background-image: url("images/other/radio-deselected-256.png") !important;
                     }
                 }
             }

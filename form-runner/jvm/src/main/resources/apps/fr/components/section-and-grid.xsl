@@ -103,19 +103,15 @@
         <xsl:param name="library-name" as="xs:string?" tunnel="yes"/>
         <xsl:copy>
 
-            <!-- Annotate `<fr:grid>` element with the `markup` attribute, based on property using app/name/mode,
-                 as XSLT inside XBL doesn't have access to the app/form/mode. Instead, we could pass the app/form/mode
-                 and let the XSLT inside the XBL component check the property, if doing this, changing the property
-                 and reloading the form doesn't use the new value of the property. -->
-            <xsl:variable
-                name="markup-property"
+            <xsl:attribute
+                name="markup"
                 select="
-                    if ($mode = 'pdf')
-                    then 'html-table'
-                    else p:property(string-join(('oxf.xforms.xbl.fr.grid.markup', $app, $form), '.'))
-                "/>
-
-            <xsl:attribute name="markup" select="$markup-property"/>
+                    if ($mode = 'pdf') then
+                        'html-table' (: CSS grids are not supported by the PDF renderer as of 2022-10-11 :)
+                    else if (exists(@markup)) then
+                        @markup      (: local attribute takes precedence :)
+                    else
+                        $grid-markup (: otherwise use form/property/default :)"/>
 
             <!-- Set repeat appearance if available and needed -->
             <xsl:if test="frf:isRepeat(.)">
@@ -140,7 +136,7 @@
                 <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name)"/>
             </xsl:for-each>
 
-            <xsl:apply-templates select="@* except (@min | @max | @freeze | @remove-constraint) | node()" mode="#current"/>
+            <xsl:apply-templates select="@* except (@min | @max | @freeze | @remove-constraint | @markup) | node()" mode="#current"/>
 
         </xsl:copy>
     </xsl:template>

@@ -321,6 +321,21 @@
                 'false'
             )[1]"/>
 
+
+    <xsl:variable
+        name="grid-markup"
+        as="xs:string"
+        select="
+            (
+                $fr-form-metadata/grid-markup[
+                    . = ('html-table', 'css-grid')
+                ],
+                p:property(string-join(('oxf.xforms.xbl.fr.grid.markup', $app, $form), '.'))[
+                    . = ('html-table', 'css-grid')
+                ],
+                'html-table'
+            )[1]"/>
+
     <xsl:variable
         name="validation-mode"
         as="xs:string"

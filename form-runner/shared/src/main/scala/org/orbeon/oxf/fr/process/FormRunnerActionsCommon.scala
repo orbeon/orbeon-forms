@@ -308,15 +308,13 @@ trait FormRunnerActionsCommon {
     } else
       pathQueryOrUrl
 
-  private def tryNavigateTo(location: String, target: Option[String]): Try[Any] =
-    Try(load(prependCommonFormRunnerParameters(location, forNavigate = true), target, progress = false))
+  private def tryNavigateTo(location: String, target: Option[String], showProgress: Boolean): Try[Any] =
+    Try(load(prependCommonFormRunnerParameters(location, forNavigate = true), target, showProgress = showProgress))
 
   // Navigate to a URL specified in parameters or indirectly in properties
   // If no URL is specified, the action fails
   def tryNavigate(params: ActionParams): Try[Any] =
     Try {
-      implicit val formRunnerParams = FormRunnerParams()
-
       // Heuristic: If the parameter is anonymous, we take it as a URL or path if it looks like one. Otherwise, we
       // consider it is a property. We could also look at whether the value looks like a property. It's better to
       // be explicit and use `uri =` or `property =`.
@@ -326,13 +324,19 @@ trait FormRunnerActionsCommon {
 
       def fromProperties = {
         val propertyName =  params.get(Some("property")) orElse (params.get(None) filterNot isAbsolute) getOrElse "oxf.fr.detail.close.uri"
-        frc.formRunnerProperty(propertyName)
+        frc.formRunnerProperty(propertyName)(FormRunnerParams())
       }
 
-      val location  = fromParams orElse fromProperties map spc.evaluateValueTemplate flatMap trimAllToOpt get
-      val targetOpt = params.get(Some("target")) flatMap trimAllToOpt
+      val location     = fromParams orElse fromProperties map spc.evaluateValueTemplate flatMap trimAllToOpt get
+      val targetOpt    = params.get(Some("target")) flatMap trimAllToOpt
+      val showProgress = {
+        val paramStringOpt    = paramByName(params, ShowProgressName)
+        val paramEvaluatedOpt = paramStringOpt.map(spc.evaluateValueTemplate)
+        val paramBooleanOpt   = paramEvaluatedOpt.map(_ == "true")
+        paramBooleanOpt.getOrElse(false)
+      }
 
-      (location, targetOpt)
+      (location, targetOpt, showProgress)
 
     } flatMap
       (tryNavigateTo _).tupled

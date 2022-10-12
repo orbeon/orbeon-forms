@@ -360,7 +360,7 @@ object XFormsAPI {
   def load(
     url                          : String,
     target                       : Option[String] = None,
-    progress                     : Boolean        = true,
+    showProgress                 : Boolean        = false,
     mustHonorDeferredUpdateFlags : Boolean        = true
   ): Unit =
     XFormsLoadAction.resolveStoreLoadValue(
@@ -371,7 +371,7 @@ object XFormsAPI {
       target                       = target,
       urlType                      = UrlType.Render,
       urlNorewrite                 = false,
-      isShowProgress               = false,
+      isShowProgress               = showProgress,
       mustHonorDeferredUpdateFlags = mustHonorDeferredUpdateFlags
     )
 

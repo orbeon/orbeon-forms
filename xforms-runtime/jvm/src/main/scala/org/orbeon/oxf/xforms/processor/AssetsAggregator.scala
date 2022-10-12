@@ -15,11 +15,11 @@
 package org.orbeon.oxf.xforms.processor
 
 import net.sf.ehcache.{Element => EhElement}
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.dom.QName
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils.StringOps
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
@@ -29,6 +29,7 @@ import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.mutable.{Buffer, LinkedHashSet}
+
 
 // Aggregate CSS and JS resources under `<head>`.
 class AssetsAggregator extends ProcessorImpl {
@@ -252,7 +253,7 @@ object AssetsAggregator extends Logging {
       val appVersion = URLRewriterUtils.getApplicationResourceVersion
 
       // All resource paths are hashed
-      val itemsToHash = resources ++ (if (hasAppResource && StringUtils.isNotBlank(appVersion)) Set(appVersion) else Set())
+      val itemsToHash = resources ++ (if (hasAppResource && appVersion.nonAllBlank) Set(appVersion) else Set())
       val resourcesHash = SecureUtils.digestString(itemsToHash mkString "|", "hex")
 
       // Cache mapping so that resource can be served by resource server

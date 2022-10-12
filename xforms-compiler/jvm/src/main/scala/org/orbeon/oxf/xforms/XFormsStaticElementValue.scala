@@ -82,8 +82,10 @@ object XFormsStaticElementValue {
 
     val outerIsHTML = LHHAAnalysis.isHTML(outerElem)
 
+    // Prefix used for `xxf:evaluate-avt()` and `xxf:repeat-positions()`
     // https://github.com/orbeon/orbeon-forms/issues/5428
-    val xxfPrefix =
+    // https://github.com/orbeon/orbeon-forms/issues/5457
+    lazy val xxfPrefix =
       outerElem.prefixesForNamespaceUri(XXF).nextOption()
         .getOrElse(throw new IllegalArgumentException(s"missing mapping for `$XXF`"))
 

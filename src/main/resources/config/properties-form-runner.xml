@@ -529,7 +529,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.section.insert.*.*"                       value="index"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.appearance.*.*"                      value=""/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.markup.*.*"                          value="html-table"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.markup.*.*"                          value="css-grid"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.insert.*.*"                          value="index"/>
 
     <!-- Blank string means `if (fr:created-with-or-newer('2018.2')) then 'full' else 'minimal'`. But we cannot

@@ -13,12 +13,8 @@
   */
 package org.orbeon.oxf.xforms.state
 
-import java.util.concurrent.locks.{Lock, ReentrantLock}
-import java.util.concurrent.{ConcurrentLinkedQueue, TimeUnit}
-
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
-import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
@@ -28,6 +24,8 @@ import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.locks.ReentrantLock
 import scala.jdk.CollectionConverters._
 
 
@@ -135,7 +133,7 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     parameters           : RequestParameters,
     disableUpdates       : Boolean, // whether to disable updates (for recreating initial document upon browser back)
     disableDocumentCache : Boolean  // for testing only
-  ): XFormsContainingDocument =
+  ): Option[XFormsContainingDocument] =
     // Try cache first unless the initial state is requested
     if (XFormsGlobalProperties.isCacheDocument && ! disableDocumentCache) {
       // Try to find the document in cache using the UUID
@@ -150,10 +148,10 @@ object XFormsStateManager extends XFormsStateManagerTrait {
           Logger.logDebug(LogType, "Document cache enabled. Document from cache has out of date sequence number. Retrieving state from store.")
           XFormsDocumentCache.remove(parameters.uuid)
           createDocumentFromStore(parameters, isInitialState = false, disableUpdates = disableUpdates)
-        case Some(cachedDocument) =>
+        case some @ Some(_) =>
           // Found in cache
           Logger.logDebug(LogType, "Document cache enabled. Returning document from cache.")
-          cachedDocument
+          some
         case None =>
           Logger.logDebug(LogType, "Document cache enabled. Document not found in cache. Retrieving state from store.")
           createDocumentFromStore(parameters, isInitialState = false, disableUpdates = disableUpdates)
@@ -179,7 +177,7 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       (_.asInstanceOf[ConcurrentLinkedQueue[String]]) getOrElse
       (throw new IllegalStateException(s"`$XFormsStateManagerUUIDListKey` was not set in the session. Check your listeners."))
 
-  def createInitialDocumentFromStore(parameters: RequestParameters): XFormsContainingDocument =
+  def createInitialDocumentFromStore(parameters: RequestParameters): Option[XFormsContainingDocument] =
     createDocumentFromStore(
       parameters,
       isInitialState = true,
@@ -190,39 +188,39 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     parameters     : RequestParameters,
     isInitialState : Boolean,
     disableUpdates : Boolean
-  ): XFormsContainingDocument = {
+  ): Option[XFormsContainingDocument] = {
 
     val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
 
     implicit val externalContext = XFormsCrossPlatformSupport.externalContext
 
-    val xformsState = getStateFromParamsOrStore(parameters, isInitialState)
+    getStateFromParamsOrStore(parameters, isInitialState) map { xformsState =>
+      // Create document
+      val documentFromStore =
+        XFormsContainingDocumentBuilder(xformsState, disableUpdates, ! isServerState)(Logger) ensuring { document =>
+          (isServerState && document.staticState.isServerStateHandling) ||
+            document.staticState.isClientStateHandling
+        }
 
-    // Create document
-    val documentFromStore =
-      XFormsContainingDocumentBuilder(xformsState, disableUpdates, ! isServerState)(Logger) ensuring { document =>
-        (isServerState && document.staticState.isServerStateHandling) ||
-          document.staticState.isClientStateHandling
-      }
-
-    // Dispatch event to root control. We should be able to dispatch an event to the document no? But this is not
-    // possible right now.
-    documentFromStore.controls.getCurrentControlTree.rootOpt foreach { rootContainerControl =>
-      XFormsAPI.withContainingDocument(documentFromStore) {
-        documentFromStore.withOutermostActionHandler {
-          Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter))
+      // Dispatch event to root control. We should be able to dispatch an event to the document no? But this is not
+      // possible right now.
+      documentFromStore.controls.getCurrentControlTree.rootOpt foreach { rootContainerControl =>
+        XFormsAPI.withContainingDocument(documentFromStore) {
+          documentFromStore.withOutermostActionHandler {
+            Dispatch.dispatchEvent(new XXFormsStateRestoredEvent(rootContainerControl, XFormsEvent.EmptyGetter))
+          }
         }
       }
-    }
 
-    documentFromStore
+      documentFromStore
+    }
   }
 
   def getStateFromParamsOrStore(
     parameters      : RequestParameters,
     isInitialState  : Boolean)(implicit
     externalContext : ExternalContext
-  ): XFormsState = {
+  ): Option[XFormsState] = {
 
     val isServerState = parameters.encodedClientStaticStateOpt.isEmpty
 
@@ -241,19 +239,18 @@ object XFormsStateManager extends XFormsStateManagerTrait {
             "max store size", EhcacheStateStore.getMaxSize.toString
           )
 
-        val session = externalContext.getRequest.getSession(ForceSessionCreation)
-        EhcacheStateStore.findState(session, parameters.uuid, isInitialState) getOrElse {
-          // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the
-          // document, yet we didn't find it. This means that somehow state was not placed into or expired from
-          // the state store.
-          throw SessionExpiredException("Unable to retrieve XForms engine state. Unable to process incoming request.")
-        }
+        // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the document, yet
+        // we didn't find it. This means that somehow state was not placed into or expired from the state store.
+        // 2022-10-12: Changed to return `Option` instead of throwing.
+        // See https://github.com/orbeon/orbeon-forms/issues/5402
+        EhcacheStateStore.findState(parameters.uuid, isInitialState)
+
       case Some(encodedClientDynamicState) =>
         // State comes directly with request
 
         assert(! isServerState)
 
-        XFormsState(None, parameters.encodedClientStaticStateOpt, Some(DynamicState(encodedClientDynamicState)))
+        Some(XFormsState(None, parameters.encodedClientStaticStateOpt, Some(DynamicState(encodedClientDynamicState))))
     }
   }
 

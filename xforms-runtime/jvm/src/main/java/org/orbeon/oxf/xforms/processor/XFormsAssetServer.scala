@@ -111,11 +111,13 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
             // This is the case where the above doesn't hold, for example upon browser back. It should be a much rarer case, and we bear
             // the cost of getting the state from cache.
-            def fromInitialStateOpt =
+            // 2022-10-13: Returns `None` if the state is not found in the state store, so we can produce an appropriate
+            // error without logging an exception.
+            def fromInitialStateOpt: Option[Option[(Option[String], String)]] =
               XFormsStateManager.getStateFromParamsOrStore(
                 RequestParameters(uuid, None, None, None),
                 isInitialState = true
-              ).dynamicState flatMap (_.initializationData)
+              ).map(_.dynamicState.flatMap(_.initializationData))
 
             response.setContentType(ContentTypes.JavaScriptContentTypeWithCharset)
 
@@ -127,25 +129,32 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
             )
 
             IOUtils.useAndClose(new OutputStreamWriter(response.getOutputStream, CharsetNames.Utf8)) { writer =>
+              fromCurrentStateOpt.map(Some.apply) orElse fromInitialStateOpt match {
+                case Some(initializationDateOpt) =>
+                  initializationDateOpt foreach { case (initializationScriptsOpt, jsonInitializationData) =>
 
-              val namespaceOpt = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)
+                    val namespaceOpt   = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingNamespaceParameter)
+                    val contextPathOpt = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingContextParameter)
 
-              fromCurrentStateOpt orElse fromInitialStateOpt foreach { case (initializationScriptsOpt, jsonInitializationData) =>
-                initializationScriptsOpt foreach { initializationScripts =>
-                  writer.write(
-                    ScriptBuilder.buildXFormsPageLoadedServer(
-                      body         = initializationScripts,
-                      namespaceOpt = namespaceOpt
+                    initializationScriptsOpt foreach { initializationScripts =>
+                      writer.write(
+                        ScriptBuilder.buildXFormsPageLoadedServer(
+                          body         = initializationScripts,
+                          namespaceOpt = namespaceOpt
+                        )
+                      )
+                    }
+                    writer.write(
+                      ScriptBuilder.buildInitializationCall(
+                        jsonInitialization = jsonInitializationData,
+                        contextPathOpt     = contextPathOpt,
+                        namespaceOpt       = namespaceOpt
+                      )
                     )
-                  )
-                }
-                writer.write(
-                  ScriptBuilder.buildInitializationCall(
-                    jsonInitialization = jsonInitializationData,
-                    contextPathOpt     = externalContext.getRequest.getFirstParamAsString(Constants.EmbeddingContextParameter),
-                    namespaceOpt       = namespaceOpt
-                  )
-                )
+                  }
+                case None =>
+                  info(s"document not found in store while building dynamic form initialization")
+                  response.setStatus(StatusCode.Forbidden)
               }
             }
         }

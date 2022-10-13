@@ -22,6 +22,7 @@ import org.orbeon.dom.Element
 import org.orbeon.oxf.cache.Cacheable
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.http.SessionExpiredException
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -74,33 +75,35 @@ object XFormsContainingDocumentSupport {
 
     XFormsStateManager.acquireDocumentLock(params.uuid, timeout) match {
       case LockResponse.Success(lock) =>
-        try {
 
-          LifecycleLogger.eventAssumingRequest(
-            "xforms",
-            "got document lock",
-            LifecycleLogger.basicRequestDetailsAssumingRequest(
-              List(
-                "uuid" -> params.uuid,
-                "wait" -> LifecycleLogger.formatDelay(System.currentTimeMillis)
-              )
+        LifecycleLogger.eventAssumingRequest(
+          "xforms",
+          "got document lock",
+          LifecycleLogger.basicRequestDetailsAssumingRequest(
+            List(
+              "uuid" -> params.uuid,
+              "wait" -> LifecycleLogger.formatDelay(System.currentTimeMillis)
             )
           )
+        )
 
-          val containingDocument =
-            XFormsStateManager.beforeUpdate(params, disableDocumentCache = false)
-
-          var keepDocument = false
-          try {
-            val result = block(Some(containingDocument))
-            keepDocument = true
-            Success(result)
-          } finally {
-            XFormsStateManager.afterUpdate(containingDocument, keepDocument, disableDocumentCache = false)
-          }
-
-        } finally {
-          XFormsStateManager.releaseDocumentLock(lock)
+        XFormsStateManager.beforeUpdate(params, disableDocumentCache = false) match {
+          case some @ Some(containingDocument) =>
+            try {
+              var keepDocument = false
+              try {
+                val result = block(some)
+                keepDocument = true
+                Success(result)
+              } finally {
+                XFormsStateManager.afterUpdate(containingDocument, keepDocument, disableDocumentCache = false)
+              }
+            } finally {
+              XFormsStateManager.releaseDocumentLock(lock)
+            }
+          case None =>
+            // https://github.com/orbeon/orbeon-forms/issues/5402
+            Failure(SessionExpiredException("Document not found in store. Unable to process incoming request."))
         }
       case LockResponse.Busy =>
         LifecycleLogger.eventAssumingRequest("xforms", "document lock busy (zero timeout)", List("uuid" -> params.uuid))

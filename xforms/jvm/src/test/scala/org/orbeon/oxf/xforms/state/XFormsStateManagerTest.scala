@@ -232,7 +232,7 @@ class XFormsStateManagerTest
       XFormsStateManager.acquireDocumentLock(parameters.uuid, 0L) match {
         case LockResponse.Success(lock) =>
           try {
-            val newDoc = XFormsStateManager.beforeUpdate(parameters, ! isCache)
+            val newDoc = XFormsStateManager.beforeUpdate(parameters, ! isCache).get
 
             if (isCache)
               assert(state1.document eq newDoc) // must be the same because cache is enabled and cache has room
@@ -279,7 +279,7 @@ class XFormsStateManagerTest
           parameters,
           isInitialState = true,
           disableUpdates = true
-        )
+        ).get
 
       // can't be the same because either cache is disabled OR we create a duplicate document (could be same if state1 is initial state)
       assert(state1.document ne newDoc)

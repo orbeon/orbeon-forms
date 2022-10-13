@@ -27,8 +27,8 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     parameters           : RequestParameters,
     disableUpdates       : Boolean,
     disableDocumentCache : Boolean
-  ): XFormsContainingDocument =
-    documents.getOrElse(parameters.uuid, throw new IllegalStateException(s"XForms document not found for UUID `${parameters.uuid}]`"))
+  ): Option[XFormsContainingDocument] =
+    documents.get(parameters.uuid)
 
   def afterUpdate(
     containingDocument   : XFormsContainingDocument,
@@ -36,7 +36,8 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     disableDocumentCache : Boolean
   ): Unit = ()
 
-  def createInitialDocumentFromStore(parameters: RequestParameters): XFormsContainingDocument = throw new NotImplementedError("createInitialDocumentFromStore")
+  def createInitialDocumentFromStore(parameters: RequestParameters): Option[XFormsContainingDocument] =
+    throw new NotImplementedError("createInitialDocumentFromStore")
 
   def onAddedToCache(uuid: String): Unit = ()
   def onRemovedFromCache(uuid: String): Unit = documents -= uuid

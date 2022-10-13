@@ -314,177 +314,178 @@ object XFormsServer {
     testOutputAllActions      : Boolean)(implicit
     xmlReceiver               : XMLReceiver,
     indentedLogger            : IndentedLogger
-  ): Unit =
-    withDocument {
-      xmlReceiver.startPrefixMapping(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI)
-      withElement(localName = "event-response", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
+  ): Unit = {
 
-        // Output dynamic state
-        XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach { dynamicState =>
-          element(
-            localName = "dynamic-state",
-            prefix    = XXFORMS_SHORT_PREFIX,
-            uri       = XXFORMS_NAMESPACE_URI,
-            text      = dynamicState
-          )
-        }
+    // Create a containing document in the initial state if required
+    allEvents option XFormsStateManager.createInitialDocumentFromStore(requestParametersForAll) match {
+      case Some(None) =>
+        info(s"document not found in store while computing all initialization events")
+        ClientEvents.errorResponse(StatusCode.Forbidden) // status code debatable
+      case initialContainingDocumentOptOpt =>
+        withDocument {
+          xmlReceiver.startPrefixMapping(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI)
+          withElement(localName = "event-response", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
 
-        // Output action
-        locally {
-          // Create a containing document in the initial state
-          val initialContainingDocumentOpt =
-            allEvents option {
-              // NOTE: Document is removed from cache if it was found there. This may or may not be desirable.
-              // Set disableUpdates = true so that we don't needlessly try to copy the controls tree. Also addresses:
-              // #54: "Browser back causes server exception" https://github.com/orbeon/orbeon-forms/issues/54
-              XFormsStateManager.createInitialDocumentFromStore(requestParametersForAll)
+            // Output dynamic state if using client state handling
+            XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach { dynamicState =>
+              element(
+                localName = "dynamic-state",
+                prefix    = XXFORMS_SHORT_PREFIX,
+                uri       = XXFORMS_NAMESPACE_URI,
+                text      = dynamicState
+              )
             }
 
-          withElement(localName = "action", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
-
-            val controls = containingDocument.controls
-
-            // Output new controls values and associated information
-            withElement(localName = "control-values", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
-              initialContainingDocumentOpt match {
-                case Some(initialContainingDocument) =>
-                  // All events
-                  // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
-                  val currentControlTree = controls.getCurrentControlTree
-                  val initialControlTree = initialContainingDocument.controls.getCurrentControlTree
-                  // Make sure all xxf:dynamic will send full updates during control comparison
-                  // Usually, xxf:dynamic records structural changes at each update. Here, we don't really
-                  // know whether there were any, so we safely force structural changes. This ensures that the
-                  // client will have all the necessary markup, and also prevents the comparator from choking when
-                  // comparing incompatible trees.
-                  for (e <- containingDocument.staticOps.controlsByName("dynamic"))
-                    containingDocument.addControlStructuralChange(e.prefixedId)
-
-                  diffControls(
-                    containingDocument             = containingDocument,
-                    state1                         = initialControlTree.children,
-                    state2                         = currentControlTree.children,
-                    valueChangeControlIdsAndValues = Map.empty,
-                    isTestMode                     = testOutputAllActions
-                  )
-                case None if testOutputAllActions || containingDocument.isDirtySinceLastRequest =>
-                  val currentControlTree = controls.getCurrentControlTree
-                  diffControls(
-                    containingDocument             = containingDocument,
-                    state1                         = controls.getInitialControlTree.children,
-                    state2                         = currentControlTree.children,
-                    valueChangeControlIdsAndValues = eventFindings.valueChangeControlIdsAndValues,
-                    isTestMode                     = testOutputAllActions
-                  )
-                case _ => // NOP
-              }
-            }
-
-            // Add repeat hierarchy update if needed
-            // https://github.com/orbeon/orbeon-forms/issues/2891
-            repeatHierarchyOpt foreach { repeatHierarchy =>
-              val newRepeatHierarchy = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)
-              if (repeatHierarchy != newRepeatHierarchy) {
-                element(
-                  localName = "repeat-hierarchy",
-                  prefix    = XXFORMS_SHORT_PREFIX,
-                  uri       = XXFORMS_NAMESPACE_URI,
-                  text      = newRepeatHierarchy.escapeJavaScript
-                )
-              }
-            }
-
-            // Output index updates
-            val ns = containingDocument.getContainerNamespace
-            initialContainingDocumentOpt match {
-              case Some(initialContainingDocument) =>
-                // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
-                diffIndexState(
-                  ns,
-                  XFormsRepeatControl.initialIndexes(initialContainingDocument),
-                  XFormsRepeatControl.currentIndexes(containingDocument)
-                )
-              case None if testOutputAllActions || containingDocument.isDirtySinceLastRequest =>
-                diffIndexState(
-                  ns,
-                  controls.getInitialControlTree.initialRepeatIndexes,
-                  XFormsRepeatControl.currentIndexes(containingDocument)
-                )
-              case _ => // NOP
-            }
-
-            // Issue an `xxforms-poll` if there are pending delayed events
-            // In case there is a submission AND a poll needed, send both, except if we guess that there
-            // is navigation within the same browsing context. It's just a heuristic to prevent sending
-            // an Ajax request whose response might not succeed because the browsing context has navigated.
-            if (! (containingDocument.findTwoPassSubmitEvent exists (_.browserTarget.isEmpty))) {
-              containingDocument.findEarliestPendingDelayedEvent foreach { event =>
-                outputPoll(event, System.currentTimeMillis)
-              }
-            }
-
-            // TODO: the following should be ordered in the order they were requested
-            // Output messages to display
-            val messages = containingDocument.getMessagesToRun
-            if (messages.nonEmpty)
-              outputMessagesInfo(messages)
-
-            // `javascript:` loads only and regular scripts
-            containingDocument.getScriptsToRun foreach {
-              case Left(load)              => outputLoad(containingDocument, load)
-              case Right(scriptInvocation) => outputScriptInvocation(containingDocument, scriptInvocation)
-            }
-
-            // Output focus instruction
+            // Output action
             locally {
-              val afterFocusedControlOpt = containingDocument.controls.getFocusedControl
+              withElement(localName = "action", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
 
-              // The focus as known by the client, as far as we know: either the focus sent by the client in the
-              // current request, or the focus information we kept since the previous request.
-              val beforeFocusEffectiveIdOpt =
-                eventFindings.clientFocusControlIdOpt match {
-                  case Some(clientFocusControlIdOpt) => clientFocusControlIdOpt
-                  case None                          => beforeFocusedControlIdOpt
+                val initialContainingDocumentOpt = initialContainingDocumentOptOpt.flatten
+                val controls                     = containingDocument.controls
+
+                // Output new controls values and associated information
+                withElement(localName = "control-values", prefix = XXFORMS_SHORT_PREFIX, uri = XXFORMS_NAMESPACE_URI) {
+                  initialContainingDocumentOpt match {
+                    case Some(initialContainingDocument) =>
+                      // All events
+                      // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
+                      val currentControlTree = controls.getCurrentControlTree
+                      val initialControlTree = initialContainingDocument.controls.getCurrentControlTree
+                      // Make sure all xxf:dynamic will send full updates during control comparison
+                      // Usually, xxf:dynamic records structural changes at each update. Here, we don't really
+                      // know whether there were any, so we safely force structural changes. This ensures that the
+                      // client will have all the necessary markup, and also prevents the comparator from choking when
+                      // comparing incompatible trees.
+                      for (e <- containingDocument.staticOps.controlsByName("dynamic"))
+                        containingDocument.addControlStructuralChange(e.prefixedId)
+
+                      diffControls(
+                        containingDocument             = containingDocument,
+                        state1                         = initialControlTree.children,
+                        state2                         = currentControlTree.children,
+                        valueChangeControlIdsAndValues = Map.empty,
+                        isTestMode                     = testOutputAllActions
+                      )
+
+                    case None if testOutputAllActions || containingDocument.isDirtySinceLastRequest =>
+                      diffControls(
+                        containingDocument             = containingDocument,
+                        state1                         = controls.getInitialControlTree.children,
+                        state2                         = controls.getCurrentControlTree.children,
+                        valueChangeControlIdsAndValues = eventFindings.valueChangeControlIdsAndValues,
+                        isTestMode                     = testOutputAllActions
+                      )
+                    case _ => // NOP
+                  }
                 }
 
-              val afterFocusEffectiveIdOpt =
-                afterFocusedControlOpt map (_.getEffectiveId)
+                // Add repeat hierarchy update if needed
+                // https://github.com/orbeon/orbeon-forms/issues/2891
+                repeatHierarchyOpt foreach { repeatHierarchy =>
+                  val newRepeatHierarchy = containingDocument.staticOps.getRepeatHierarchyString(containingDocument.getContainerNamespace)
+                  if (repeatHierarchy != newRepeatHierarchy) {
+                    element(
+                      localName = "repeat-hierarchy",
+                      prefix    = XXFORMS_SHORT_PREFIX,
+                      uri       = XXFORMS_NAMESPACE_URI,
+                      text      = newRepeatHierarchy.escapeJavaScript
+                    )
+                  }
+                }
 
-              (beforeFocusEffectiveIdOpt, afterFocusEffectiveIdOpt) match {
-                case (Some(beforeFocusEffectiveId), None) =>
-                  // Focus removed: notify the client only if the control still exists AND is visible
-                  // See https://github.com/orbeon/orbeon-forms/issues/4113
-                  if (containingDocument.controls.getCurrentControlTree.findControl(beforeFocusEffectiveId) exists (c => ! Focus.isHidden(c)))
-                    outputFocusInfo(containingDocument, focus = false, beforeFocusEffectiveId)
-                case (_, Some(afterFocusEffectiveId)) if afterFocusEffectiveIdOpt != beforeFocusEffectiveIdOpt =>
-                  // There is a focused control and it is different from the focus as known by the client
-                  outputFocusInfo(containingDocument, focus = true, afterFocusEffectiveId)
-                case _ =>
-                  // Nothing to notify
+                // Output index updates
+                val ns = containingDocument.getContainerNamespace
+                initialContainingDocumentOpt match {
+                  case Some(initialContainingDocument) =>
+                    // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
+                    diffIndexState(
+                      ns,
+                      XFormsRepeatControl.initialIndexes(initialContainingDocument),
+                      XFormsRepeatControl.currentIndexes(containingDocument)
+                    )
+                  case None if testOutputAllActions || containingDocument.isDirtySinceLastRequest =>
+                    diffIndexState(
+                      ns,
+                      controls.getInitialControlTree.initialRepeatIndexes,
+                      XFormsRepeatControl.currentIndexes(containingDocument)
+                    )
+                  case _ => // NOP
+                }
+
+                // Issue an `xxforms-poll` if there are pending delayed events
+                // In case there is a submission AND a poll needed, send both, except if we guess that there
+                // is navigation within the same browsing context. It's just a heuristic to prevent sending
+                // an Ajax request whose response might not succeed because the browsing context has navigated.
+                if (! (containingDocument.findTwoPassSubmitEvent exists (_.browserTarget.isEmpty))) {
+                  containingDocument.findEarliestPendingDelayedEvent foreach { event =>
+                    outputPoll(event, System.currentTimeMillis)
+                  }
+                }
+
+                // TODO: the following should be ordered in the order they were requested
+                // Output messages to display
+                val messages = containingDocument.getMessagesToRun
+                if (messages.nonEmpty)
+                  outputMessagesInfo(messages)
+
+                // `javascript:` loads only and regular scripts
+                containingDocument.getScriptsToRun foreach {
+                  case Left(load)              => outputLoad(containingDocument, load)
+                  case Right(scriptInvocation) => outputScriptInvocation(containingDocument, scriptInvocation)
+                }
+
+                // Output focus instruction
+                locally {
+                  val afterFocusedControlOpt = containingDocument.controls.getFocusedControl
+
+                  // The focus as known by the client, as far as we know: either the focus sent by the client in the
+                  // current request, or the focus information we kept since the previous request.
+                  val beforeFocusEffectiveIdOpt =
+                    eventFindings.clientFocusControlIdOpt match {
+                      case Some(clientFocusControlIdOpt) => clientFocusControlIdOpt
+                      case None                          => beforeFocusedControlIdOpt
+                    }
+
+                  val afterFocusEffectiveIdOpt =
+                    afterFocusedControlOpt map (_.getEffectiveId)
+
+                  (beforeFocusEffectiveIdOpt, afterFocusEffectiveIdOpt) match {
+                    case (Some(beforeFocusEffectiveId), None) =>
+                      // Focus removed: notify the client only if the control still exists AND is visible
+                      // See https://github.com/orbeon/orbeon-forms/issues/4113
+                      if (containingDocument.controls.getCurrentControlTree.findControl(beforeFocusEffectiveId) exists (c => ! Focus.isHidden(c)))
+                        outputFocusInfo(containingDocument, focus = false, beforeFocusEffectiveId)
+                    case (_, Some(afterFocusEffectiveId)) if afterFocusEffectiveIdOpt != beforeFocusEffectiveIdOpt =>
+                      // There is a focused control and it is different from the focus as known by the client
+                      outputFocusInfo(containingDocument, focus = true, afterFocusEffectiveId)
+                    case _ =>
+                      // Nothing to notify
+                  }
+                }
+
+                containingDocument.getClientHelpControlEffectiveId foreach { helpControlEffectiveId =>
+                  outputHelpInfo(containingDocument, helpControlEffectiveId)
+                }
+
+                containingDocument.findTwoPassSubmitEvent foreach { twoPassSubmitEvent =>
+                  outputSubmissionInfo(twoPassSubmitEvent)
+                }
+
+                containingDocument.getNonJavaScriptLoadsToRun foreach { load =>
+                  outputLoad(containingDocument, load)
+                }
               }
             }
 
-            containingDocument.getClientHelpControlEffectiveId foreach { helpControlEffectiveId =>
-              outputHelpInfo(containingDocument, helpControlEffectiveId)
-            }
-
-            containingDocument.findTwoPassSubmitEvent foreach { twoPassSubmitEvent =>
-              outputSubmissionInfo(twoPassSubmitEvent)
-            }
-
-            containingDocument.getNonJavaScriptLoadsToRun foreach { load =>
-              outputLoad(containingDocument, load)
-            }
+            // Output errors
+            val errors = containingDocument.getServerErrors
+            if (errors.nonEmpty)
+              XFormsError.outputAjaxErrors(errors)
           }
+          xmlReceiver.endPrefixMapping(XXFORMS_SHORT_PREFIX)
         }
-
-        // Output errors
-        val errors = containingDocument.getServerErrors
-        if (errors.nonEmpty)
-          XFormsError.outputAjaxErrors(errors)
-      }
-      xmlReceiver.endPrefixMapping(XXFORMS_SHORT_PREFIX)
     }
+  }
 
   private object Private {
 

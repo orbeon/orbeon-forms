@@ -90,7 +90,7 @@ trait XFormsStateManagerTrait extends XFormsStateLifecycle {
     *
     * @return document, either from cache or from state information
     */
-  def beforeUpdate(parameters: RequestParameters, disableDocumentCache: Boolean): XFormsContainingDocument =
+  def beforeUpdate(parameters: RequestParameters, disableDocumentCache: Boolean): Option[XFormsContainingDocument] =
     findOrRestoreDocument(
       parameters           = parameters,
       disableUpdates       = false,

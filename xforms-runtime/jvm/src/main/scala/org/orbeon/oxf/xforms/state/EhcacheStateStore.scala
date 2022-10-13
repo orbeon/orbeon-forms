@@ -64,7 +64,6 @@ object EhcacheStateStore {
     Option(Caches.stateCache.get(documentUUID)) map (_.getVersion)
 
   def findState(
-    session        : ExternalContext.Session,
     documentUUID   : String,
     isInitialState : Boolean
   ): Option[XFormsState] = {

@@ -46,15 +46,22 @@
         .xbl-fr-grid .fr-grid:not(.fr-repeat-single-row) {
 
             // https://github.com/orbeon/orbeon-forms/issues/4805
-            & > .fr-grid-body .fr-grid-tr .fr-grid-td {
-                // The main thing this CSS does: change table cells into blocks
-                display: block;
+            &:not(.fr-grid-css) {
+                &> .fr-grid-body .fr-grid-tr .fr-grid-td {
+                    // The main thing this CSS does: change table cells into blocks
+                    display: block;
+                }
+                &.fr-repeat-multiple-rows {
+                    // Only keep 2 table headers: one for the column with the dropdown button, and one for fields
+                    .fr-grid-th:nth-child(n+3) {
+                        display: none
+                    }
+                }
             }
 
-            &.fr-repeat-multiple-rows {
-                // Only keep 2 table headers: one for the column with the dropdown button, and one for fields
-                .fr-grid-th:nth-child(n+3) {
-                    display: none
+            &.fr-grid-css {
+                &> .fr-grid-body, &> .fr-grid-repeat-iteration > .fr-grid-body {
+                    display: block;
                 }
             }
         }

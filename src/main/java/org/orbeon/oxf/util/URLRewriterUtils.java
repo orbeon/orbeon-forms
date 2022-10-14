@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.util;
 
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.externalcontext.*;
@@ -23,9 +22,7 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
@@ -273,7 +270,7 @@ public class URLRewriterUtils {
 
     public static String getApplicationResourceVersion() {
         final String propertyString = Properties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
-        return org.apache.commons.lang3.StringUtils.isBlank(propertyString) ? null : StringUtils.trimAllToEmpty(propertyString);
+        return StringUtils.trimAllToNull(propertyString);
     }
 
     // Return the version string either in clear or encoded with HMAC depending on configuration

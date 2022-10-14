@@ -15,7 +15,6 @@ package org.orbeon.oxf.processor.generator;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.orbeon.datatypes.LocationData;
 import org.orbeon.dom.*;
 import org.orbeon.dom.io.DocumentSource;
@@ -532,7 +531,7 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     private static boolean isFileItemEmpty(FileItem fileItem) {
-        return fileItem.getSize() <= 0 && StringUtils.isBlank(fileItem.getName());
+        return fileItem.getSize() <= 0 && StringUtils.isAllBlank(fileItem.getName());
     }
 
     protected static void addBody(Element requestElement) {

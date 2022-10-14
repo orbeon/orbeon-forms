@@ -51,8 +51,8 @@ class XFormsLoadAction extends XFormsAction {
       UrlType.withNameLowercaseOnly getOrElse
       UrlType.Render
 
-    val urlNorewrite   = resolveUrlNorewrite(actionElem)
-    val isShowProgress = interpreter.resolveAVT(actionContext.analysis, XFormsNames.XXFORMS_SHOW_PROGRESS_QNAME) != "false"
+    val urlNorewrite      = resolveUrlNorewrite(actionElem)
+    val isShowProgressOpt = Option(interpreter.resolveAVT(actionContext.analysis, XFormsNames.XXFORMS_SHOW_PROGRESS_QNAME)).map(_ ==  "true")
 
     // XForms 1.1 had "If both are present, the action has no effect.", but XForms 2.0 no longer requires this.
 
@@ -70,7 +70,7 @@ class XFormsLoadAction extends XFormsAction {
           target             = targetOpt,
           urlType            = urlType,
           urlNorewrite       = urlNorewrite,
-          isShowProgress     = isShowProgress,
+          isShowProgressOpt     = isShowProgressOpt,
           mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis)
         )
       case None =>
@@ -87,7 +87,7 @@ class XFormsLoadAction extends XFormsAction {
                   target             = targetOpt,
                   urlType            = urlType,
                   urlNorewrite       = urlNorewrite,
-                  isShowProgress     = isShowProgress,
+                  isShowProgressOpt     = isShowProgressOpt,
                   mustHonorDeferredUpdateFlags           = interpreter.mustHonorDeferredUpdateFlags(actionContext.analysis)
                 )
               case None =>
@@ -130,7 +130,7 @@ object XFormsLoadAction {
     target                       : Option[String],
     urlType                      : UrlType,
     urlNorewrite                 : Boolean,
-    isShowProgress               : Boolean,
+    isShowProgressOpt            : Option[Boolean],
     mustHonorDeferredUpdateFlags : Boolean
   ): Unit = {
 
@@ -220,12 +220,10 @@ object XFormsLoadAction {
         }
       }
 
-    // Force no progress indication if this is a JavaScript URL
+    // Show progress: if a value is provided, use it, otherwise default to not showing the progress for
+    // `javascript:` URIs, otherwise to showing it
     val effectiveIsShowProgress =
-      if (externalURL.trim.startsWith("javascript:"))
-        false
-      else
-        isShowProgress
+      isShowProgressOpt.getOrElse(! externalURL.trim.startsWith("javascript:"))
 
     containingDocument.addLoadToRun(Load(externalURL, target, urlType, doReplace, effectiveIsShowProgress))
   }

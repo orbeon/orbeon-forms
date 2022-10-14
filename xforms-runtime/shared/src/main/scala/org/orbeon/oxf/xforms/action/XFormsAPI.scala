@@ -371,7 +371,7 @@ object XFormsAPI {
       target                       = target,
       urlType                      = UrlType.Render,
       urlNorewrite                 = false,
-      isShowProgress               = showProgress,
+      isShowProgressOpt            = Some(showProgress),
       mustHonorDeferredUpdateFlags = mustHonorDeferredUpdateFlags
     )
 

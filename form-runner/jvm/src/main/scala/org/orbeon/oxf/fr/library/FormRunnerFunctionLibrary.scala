@@ -147,18 +147,18 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
 private object FormRunnerFunctions {
 
-  val StringGettersByName = List(
-    "mode"                        -> (() => FormRunnerParams().mode),
-    "app-name"                    -> (() => FormRunnerParams().app),
-    "form-name"                   -> (() => FormRunnerParams().form),
-    "document-id"                 -> (() => FormRunnerParams().document.orNull),
-    "form-title"                  -> (() => FormRunner.formTitleFromMetadata.orNull),
-    "lang"                        -> (() => FormRunner.currentLang),
-    "workflow-stage-value"        -> (() => FormRunner.documentWorkflowStage.orNull),
-    "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.userAndGroup.username) orNull),
-    "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.userAndGroup.groupname) orNull),
-    "relevant-form-values-string" -> (() => FormRunnerMetadata.findAllControlsWithValues(html = false)),
-    "wizard-current-page-name"    -> (() => Wizard.wizardCurrentPageNameOpt.orNull)
+  val StringGettersByName: Seq[(String, () => Option[String])] = List(
+    "mode"                        -> (() => Some(FormRunnerParams().mode)),
+    "app-name"                    -> (() => Some(FormRunnerParams().app)),
+    "form-name"                   -> (() => Some(FormRunnerParams().form)),
+    "document-id"                 -> (() => FormRunnerParams().document),
+    "form-title"                  -> (() => FormRunner.formTitleFromMetadata),
+    "lang"                        -> (() => Some(FormRunner.currentLang)),
+    "workflow-stage-value"        -> (() => FormRunner.documentWorkflowStage),
+    "username"                    -> (() => NetUtils.getExternalContext.getRequest.credentials map     (_.userAndGroup.username)),
+    "user-group"                  -> (() => NetUtils.getExternalContext.getRequest.credentials flatMap (_.userAndGroup.groupname)),
+    "relevant-form-values-string" -> (() => Some(FormRunnerMetadata.findAllControlsWithValues(html = false))),
+    "wizard-current-page-name"    -> (() => Wizard.wizardCurrentPageNameOpt)
   )
 
   val BooleanGettersByName = List(

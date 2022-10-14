@@ -13,9 +13,6 @@
  */
 package org.orbeon.oxf.processor.serializer
 
-import java.io._
-
-import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.orbeon.dom.{Namespace, QName}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -30,7 +27,9 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverAdapter}
 import org.xml.sax.Attributes
 
+import java.io._
 import scala.collection.mutable
+
 
 /**
  * ContentHandler able to serialize text or binary documents to an output stream.
@@ -48,8 +47,8 @@ class BinaryTextXMLReceiver(
 
 ) extends XMLReceiverAdapter {
 
-  require(! forceContentType || isNotBlank(requestedContentType.get))
-  require(! forceEncoding    || isNotBlank(requestedEncoding.get))
+  require(! forceContentType || requestedContentType.get.nonAllBlank)
+  require(! forceEncoding    || requestedEncoding.get.nonAllBlank)
 
   val responseOpt  = output.left.toOption
   val outputStream = responseOpt map (_.getOutputStream) getOrElse output.getOrElse(throw new NoSuchElementException)

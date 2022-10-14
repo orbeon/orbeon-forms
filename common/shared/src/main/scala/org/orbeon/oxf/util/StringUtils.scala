@@ -15,9 +15,10 @@ package org.orbeon.oxf.util
 
 import org.orbeon.oxf.util.CoreUtils._
 
+import scala.collection.compat._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Try
-import scala.collection.compat._
+
 
 @JSExportTopLevel("OrbeonStringUtils")
 object StringUtils {
@@ -44,9 +45,9 @@ object StringUtils {
     }
 
   // Mainly for Java callers
-  def trimAllToEmpty(s: String) = s.trimAllToEmpty
-  def trimAllToNull(s: String)  = s.trimAllToNull
-  def trimAllToOpt(s: String)   = s.trimAllToOpt
+  def trimAllToEmpty(s: String): String         = s.trimAllToEmpty
+  def trimAllToNull (s: String): String         = s.trimAllToNull
+  def trimAllToOpt  (s: String): Option[String] = s.trimAllToOpt
 
   implicit class StringOps(private val s: String) extends AnyVal {
 
@@ -124,10 +125,10 @@ object StringUtils {
       c == '\u200b' || c == '\u200c' || c == '\u200d' || c == '\ufeff'
 
     // https://github.com/orbeon/orbeon-forms/issues/4490
-    def isAllBlank  = trimAllToEmpty.isEmpty
-    def nonAllBlank = trimAllToEmpty.nonEmpty
+    def isAllBlank : Boolean = trimAllToEmpty.isEmpty
+    def nonAllBlank: Boolean = trimAllToEmpty.nonEmpty
 
-    def trimAllToEmpty = trimControlAndAllWhitespaceToEmptyCP
+    def trimAllToEmpty: String = trimControlAndAllWhitespaceToEmptyCP
 
     def trimAllToOpt: Option[String] = {
       val trimmed = trimAllToEmpty
@@ -139,14 +140,14 @@ object StringUtils {
       if (trimmed.isEmpty) null else trimmed
     }
 
-    def trimControlAndAllWhitespaceToEmptyCP =
+    def trimControlAndAllWhitespaceToEmptyCP: String =
       trimToEmptyCP(c => Character.isWhitespace(c) || isNonBreakingSpace(c) || isZeroWidthChar(c) || Character.isISOControl(c))
 
     // Trim the string according to a matching function
     // This checks for Unicode code points, unlike String.trim() or StringUtils.trim(). When matching on spaces
     // and control characters, this is not strictly necessary since they are in the BMP and cannot collide with
     // surrogates. But in the general case it is more correct to test on code points.
-    def trimToEmptyCP(matches: Int => Boolean) =
+    def trimToEmptyCP(matches: Int => Boolean): String =
       if ((s eq null) || s.isEmpty) {
         ""
       } else {
@@ -229,15 +230,21 @@ object StringUtils {
         s.substring(0, s.length - suffix.length)
       else
         s
+
+    def trimPrefixIfPresent(prefix: String): String =
+      if (s.startsWith(prefix))
+        s.substring(prefix.length)
+      else
+        s
   }
 
   private class CodePointsIterator(val cs: CharSequence) extends Iterator[Int] {
 
     private var nextIndex = 0
 
-    def hasNext = nextIndex < cs.length
+    def hasNext: Boolean = nextIndex < cs.length
 
-    def next() = {
+    def next(): Int = {
       val result = cs.codePointAt(nextIndex)
       nextIndex += Character.charCount(result)
       result

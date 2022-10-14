@@ -13,9 +13,6 @@
  */
 package org.orbeon.oxf.client
 
-import java.net.URL
-
-import org.apache.commons.lang3.StringUtils
 import org.junit.{After, AfterClass, BeforeClass}
 import org.openqa.selenium._
 import org.openqa.selenium.chrome.ChromeDriverService
@@ -33,7 +30,9 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.time._
 import org.scalatestplus.selenium.WebBrowser
 
+import java.net.URL
 import scala.jdk.CollectionConverters._
+
 
 // Basic client API
 trait OrbeonFormsOps extends WebBrowser with Matchers {
@@ -108,7 +107,7 @@ trait OrbeonFormsOps extends WebBrowser with Matchers {
   // Remove known prefixes used with separator layout
   def removeCaseGroupRepeatPrefix(clientId: String) = {
     val prefixes = Seq("xforms-case-begin-", "group-begin-", "repeat-begin-")
-    prefixes.foldLeft(clientId)(StringUtils.removeStart)
+    prefixes.foldLeft(clientId)(_.trimPrefixIfPresent(_))
   }
 
   def elementByStaticId(staticId: String) =

@@ -14,28 +14,27 @@
 package org.orbeon.oxf.xforms
 
 import cats.syntax.option._
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, PathMatcher, StringConversions}
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.xforms.analysis.{Metadata, StaticStateDocument}
+import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, PathMatcher, StringConversions}
 import org.orbeon.oxf.xforms.XFormsProperties.NoUpdates
+import org.orbeon.oxf.xforms.analysis.{Metadata, StaticStateDocument}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
 import org.orbeon.oxf.xforms.state.{AnnotatedTemplateBuilder, XFormsState, XFormsStaticStateCache}
+import org.orbeon.oxf.xml.EncodeDecode
 import org.orbeon.oxf.xml.dom.XmlExtendedLocationData
+import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{DeploymentType, XFormsCrossPlatformSupport}
 
+import java.{util => ju}
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
-import java.{util => ju}
-
-import org.orbeon.oxf.xml.EncodeDecode
-import org.orbeon.xforms.xbl.Scope
 
 
 object XFormsContainingDocumentBuilder {
@@ -112,7 +111,7 @@ object XFormsContainingDocumentBuilder {
           requestHeaders        = requestHeaders,
           requestParameters     = request.parameters mapValues StringConversions.objectArrayToStringArray mapValues (_.toList) toMap,
           containerType         = containerType,
-          containerNamespace    = StringUtils.defaultIfEmpty(request.getContainerNamespace, ""),
+          containerNamespace    = request.getContainerNamespace.trimAllToOpt.getOrElse(""),
           versionedPathMatchers = versionedPathMatchers.asScala.toList,
           embeddingType         = Headers.embeddedClientValueFromHeaders(requestHeaders),
           forceInlineResources  = isPortletContainerOrRemoteFromHeaders(containerType, requestHeaders)

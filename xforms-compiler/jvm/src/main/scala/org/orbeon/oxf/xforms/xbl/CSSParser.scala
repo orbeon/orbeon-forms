@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.StringUtils._
+
+import scala.collection.mutable
+
 
 // Poor man's CSS selector parser. See XBLTransformerTest for the supported subset of CSS.
 // TODO: handle [att], [att=val], [att~=val], [att|=val]
@@ -22,38 +24,38 @@ object CSSParser {
 
   // Convert a CSS selector to XPath
   def toXPath(cssSelector: String): String = {
-    val sb = new StringBuilder
-    val selectors = StringUtils.split(cssSelector, ',')
+    val sb = new mutable.StringBuilder
+    val selectors = cssSelector.splitTo[Array](",")
 
     var firstSelector = true
     for (selector <- selectors) {
       if (! firstSelector)
         sb append '|'
 
-      val pathsElements = StringUtils.split(selector.trimAllToEmpty, ' ')
+      val pathsElements = selector.trimAllToEmpty.splitTo[Array]()
       var firstElement = true
       var wasChildAxis = false
       for (pathElement <- pathsElements) {
 
-        def appendPathElement() = {
+        def appendPathElement(): Unit =
           if (Set(":root", "*:root")(pathElement))
             sb append "."
           else
             sb append pathElement.replace('|', ':').trimAllToEmpty
-          false
-        }
 
         wasChildAxis =
           if (firstElement) {
             // First path element
             if (Set(":root", "*:root")(pathElement)) {
               appendPathElement()
+              false
             } else if (pathElement == ">") {
               sb append "./"
               true
             } else {
               sb append "descendant-or-self::"
               appendPathElement()
+              false
             }
           } else {
             // Subsequent path element
@@ -63,8 +65,10 @@ object CSSParser {
             } else if (! wasChildAxis) {
               sb append "//"
               appendPathElement()
+              false
             } else {
               appendPathElement()
+              false
             }
           }
 

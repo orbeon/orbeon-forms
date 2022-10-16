@@ -35,6 +35,74 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.pl.min.js"/>
     <xbl:script src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/locales/bootstrap-datepicker.da.min.js"/>
 
+
+<!-- <xbl:script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"/> -->
+
+<!-- <xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.ar.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.az.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.bg.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.bs.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.ca.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.cs.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.cy.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.da.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.de.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.el.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.en-GB.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.es.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.et.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.eu.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.fa.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.fi.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.fo.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.fr.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.fr-CH.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.gl.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.he.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.hr.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.hu.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.hy.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.id.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.is.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.it.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.it-CH.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.ja.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.ka.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.km.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.kk.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.ko.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.lt.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.lv.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.mk.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.ms.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.nl.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.nl-BE.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.no.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.pl.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.pt-BR.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.pt.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.ro.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.sr.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.sr-latin.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.ru.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.sk.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.sl.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.sq.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.sr.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.sr-latin.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.sv.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.sw.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.th.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.tr.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.uk.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.vi.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.zh-CN.min.js" charset="UTF-8"/>
+<xbl:script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.zh-TW.min.js" charset="UTF-8"/> -->
+
+
+
+
     <xbl:binding
         id="fr-date"
         element="fr|date, xf|input:xxf-type('xs:date')"
@@ -134,6 +202,8 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/date/date.css"/>
             <xbl:style src="/xbl/orbeon/date/bootstrap-datepicker-1.8.0-dist/css/bootstrap-datepicker.css"/>
+            <!-- <xbl:link id="bsdp-css" href="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker3.min.css" rel="stylesheet"/> -->
+
         </xbl:resources>
 
         <xbl:implementation>
@@ -167,7 +237,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
                 value="fr:component-param-value('field-width')"/>
 
             <xf:group ref="$binding[not($view)]">
-                <xh:div class="input-append date fr-field-width-{$field-width}">
+                <xh:div class="input-group date fr-field-width-{$field-width}" >
                     <!-- Create placeholder from Orbeon Forms input format
                          https://doc.orbeon.com/configuration/properties/xforms#for-xf-input -->
                     <xf:var
@@ -186,7 +256,7 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
                                 $translated
                         "/>
                     <xh:input type="text" placeholder="{$placeholder}" id="input"/>
-                    <xh:span class="add-on" tabindex="0">
+                    <xh:span class="input-group-addon input-group-text" tabindex="0">
                         <xh:i class="fa fa-fw fa-calendar"/>
                     </xh:span>
                 </xh:div>

@@ -84,9 +84,9 @@
             <xf:var
                 name="document-id"
                 value="
-                    for $d in fr:document-id()
+                    let $d := fr:document-id()
                     return
-                        if (xxf:non-blank($d)) then
+                        if (exists($d) and xxf:non-blank($d)) then
                             $d
                         else
                             xxf:get-request-parameter('document-id')

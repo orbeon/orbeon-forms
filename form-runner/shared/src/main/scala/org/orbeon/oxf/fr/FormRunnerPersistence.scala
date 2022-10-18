@@ -575,7 +575,7 @@ trait FormRunnerPersistence {
     forceAttachments : Boolean // `true` when pushing to/pulling from remote system or when using duplicate
   ): List[AttachmentWithHolder] = {
     for {
-      holder        <- data.descendant(Node).toList
+      holder        <- data.descendantOrSelf(Node).toList
       if holder.isAttribute || holder.isElement && ! holder.hasChildElement
       beforeURL     = holder.stringValue.trimAllToEmpty
       isUploaded    = isUploadedFileURL(beforeURL)

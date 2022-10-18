@@ -30,7 +30,6 @@ import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVers
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.processor.XPLConstants
-import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, NetUtils, PathUtils, URLRewriterUtils, XPath}
@@ -1244,20 +1243,28 @@ object ToolboxOps {
 
           readUnpublishedAttachment(fromPath) foreach { case (tmpFileUrl, _) =>
 
+            // The following attempts to preserve file upload metadata if possible. It's just one way of doing it.
+            // There is in fact not much benefit in keeping the metadata as temporary file URL parameters, as the values
+            // are supposed to be present in the element's attributes already. The HMAC is the more important part.
             val newTmpFileUrl =
               if (isUploadedFileURL(fromPath)) {
 
                 val fromPathParams =
-                  combineValues[String, String, List](PathUtils.splitQuery(fromPath)._2.toList.flatMap(PathUtils.decodeSimpleQuery)).toMap
+                  PathUtils.splitQueryDecodeParams(fromPath)._2
 
                 XFormsUploadControl.hmacURL(
                   url = tmpFileUrl.toString,
-                  fromPathParams.get("filename").flatMap(_.headOption),
-                  fromPathParams.get("mediatype").flatMap(_.headOption),
-                  fromPathParams.get("size").flatMap(_.headOption),
+                  fromPathParams.collectFirst { case ("filename",  value) => value },
+                  fromPathParams.collectFirst { case ("mediatype", value) => value },
+                  fromPathParams.collectFirst { case ("size",      value) => value },
                 )
               } else {
-                tmpFileUrl.toString
+                XFormsUploadControl.hmacURL(
+                  url = tmpFileUrl.toString,
+                  holder.attValueOpt("filename"),
+                  holder.attValueOpt("mediatype"),
+                  holder.attValueOpt("size"),
+                )
               }
 
             debug(s"setting new attachment URL to `$newTmpFileUrl`")

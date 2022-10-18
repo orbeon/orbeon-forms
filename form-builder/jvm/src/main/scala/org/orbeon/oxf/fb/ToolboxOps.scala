@@ -17,6 +17,7 @@ import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.datatypes.Coordinate1
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fb.FormBuilder.{findNestedContainers, _}
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fb.XMLNames._
@@ -25,15 +26,20 @@ import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
+import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.pipeline.Transform
 import org.orbeon.oxf.processor.XPLConstants
+import org.orbeon.oxf.util.CollectionUtils.combineValues
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.{NetUtils, XPath}
+import org.orbeon.oxf.util.PathUtils._
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, NetUtils, PathUtils, URLRewriterUtils, XPath}
 import org.orbeon.oxf.xforms.NodeInfoFactory
 import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.Implicits._
@@ -42,8 +48,10 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsNames.ID_QNAME
 
+import java.net.URI
 import scala.collection.compat._
 import scala.collection.mutable
+import scala.util.Try
 
 
 object ToolboxOps {
@@ -518,7 +526,7 @@ object ToolboxOps {
     val undoInsertControlOpt =
       withDebugGridOperation("dnd paste") {
         selectCell(targetCellElem)
-        xcvElemOpt flatMap (pasteSingleControlFromXcv(_, None))
+        xcvElemOpt flatMap (pasteSingleControlFromXcv(_, None, copyAttachments = false))
       }
 
     undoDeleteControlOpt match {
@@ -747,7 +755,8 @@ object ToolboxOps {
         }
 
       deleteSectionByIdIfPossible(containerId)
-      pasteSectionGridFromXcv(xcvElem, prefix, suffix, None, Set(controlNameFromId(containerId)))
+      // Also copy attachments when merging https://github.com/orbeon/orbeon-forms/issues/
+      pasteSectionGridFromXcv(xcvElem, prefix, suffix, None, Set(controlNameFromId(containerId)), copyAttachments = true)
 
       undoOpt
     }
@@ -764,7 +773,7 @@ object ToolboxOps {
 
       if (IsGrid(controlElem) || IsSection(controlElem)) {
         if (namesToRenameForPaste(xcvElem, "", "", Set.empty) forall (! _._3)) {
-          pasteSectionGridFromXcv(xcvElem, "", "", None, Set.empty)
+          pasteSectionGridFromXcv(xcvElem, "", "", None, Set.empty, copyAttachments = true)
         } else {
           XFormsAPI.dispatch(
             name       = "fb-show-dialog",
@@ -774,23 +783,33 @@ object ToolboxOps {
           None
         }
       } else
-        pasteSingleControlFromXcv(xcvElem, None)
+        pasteSingleControlFromXcv(xcvElem, None, copyAttachments = true)
     } foreach
       Undo.pushUserUndoAction
   }
 
   def pasteSectionGridFromXcv(
-    xcvElem        : NodeInfo,
-    prefix         : String,
-    suffix         : String,
-    insertPosition : Option[ContainerPosition],
-    ignore         : Set[String])(implicit
+    xcvElem         : NodeInfo,
+    prefix          : String,
+    suffix          : String,
+    insertPosition  : Option[ContainerPosition],
+    ignore          : Set[String],
+    copyAttachments : Boolean
+  )(implicit
     ctx            : FormBuilderDocContext
   ): Option[UndoAction] = {
 
     require(xcvElem.isElement)
 
     val containerControlElem = xcvElem / XcvEntry.Control.entryName / * head
+
+    // Handle attachments if needed
+    if (copyAttachments) {
+      implicit val ec                       = CoreCrossPlatformSupport.externalContext
+      implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+      implicit val formRunnerParams         = FormRunnerParams()
+      updateUnpublishedAttachment(xcvElem / XcvEntry.Holder.entryName / *)
+    }
 
     // Rename control names if needed
     locally {
@@ -991,9 +1010,10 @@ object ToolboxOps {
   }
 
   def pasteSingleControlFromXcv(
-    xcvElem        : NodeInfo,
-    insertPosition : Option[ControlPosition])(implicit
-    ctx            : FormBuilderDocContext
+    xcvElem         : NodeInfo,
+    insertPosition  : Option[ControlPosition],
+    copyAttachments : Boolean)(implicit
+    ctx             : FormBuilderDocContext
   ): Option[UndoAction] = {
 
     val insertCellElemOpt =
@@ -1014,6 +1034,13 @@ object ToolboxOps {
 
       def dataHolders = xcvElem / XcvEntry.Holder.entryName / *
       def resources   = xcvElem / XcvEntry.Resources.entryName / "resource" / *
+
+      if (copyAttachments) {
+        implicit val ec                       = CoreCrossPlatformSupport.externalContext
+        implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
+        implicit val formRunnerParams         = FormRunnerParams()
+        updateUnpublishedAttachment(dataHolders)
+      }
 
       val name = {
         val requestedName = getControlName(controlElem)
@@ -1148,6 +1175,96 @@ object ToolboxOps {
 
         case _ => // No cell is selected, add top-level section
           (ctx.bodyElem, childrenContainers(ctx.bodyElem) lastOption)
+      }
+
+    private def readUnpublishedAttachment(sourceUrl: String)(implicit
+      logger                   : IndentedLogger,
+      externalContext          : ExternalContext,
+      coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
+    ): Try[(URI, Long)] = {
+
+      // TODO: Check duplication from `FormRunnerCompiler`.
+      def connect(path: String): ConnectionResult = {
+
+          val resolvedUri =
+            URI.create(
+              URLRewriterUtils.rewriteServiceURL(
+                externalContext.getRequest,
+                path,
+                UrlRewriteMode.Absolute
+              )
+            )
+
+          val allHeaders =
+            Connection.buildConnectionHeadersCapitalizedIfNeeded(
+              url              = resolvedUri,
+              hasCredentials   = false,
+              customHeaders    = Map(OrbeonFormDefinitionVersion -> List(1.toString)), // Form Builder version is always 1
+              headersToForward = Set.empty,
+              cookiesToForward = Connection.cookiesToForwardFromProperty,
+              getHeader        = Connection.getHeaderFromRequest(externalContext.getRequest)
+            )
+
+          Connection.connectNow(
+            method      = GET,
+            url         = resolvedUri,
+            credentials = None,
+            content     = None,
+            headers     = allHeaders,
+            loadState   = true,
+            saveState   = true,
+            logBody     = false
+          )
+        }
+
+      ConnectionResult.tryWithSuccessConnection(connect(sourceUrl), closeOnSuccess = true) { is =>
+        FileItemSupport.inputStreamToAnyURI(is, ExpirationScope.Session)
+      }
+    }
+
+    private def collectUnpublishedAttachments(holderElem: NodeInfo)(implicit params: FormRunnerParams): List[AttachmentWithHolder] =
+      collectAttachments(
+        data             = holderElem,
+        fromBasePaths    = List(createFormDataBasePath(params.app, params.form, params.isDraft.contains(true), "").appendSlash),
+        toBasePath       = "/dummy",
+        forceAttachments = true
+      )
+
+    def updateUnpublishedAttachment(
+      holders                 : Iterable[NodeInfo])(implicit
+      params                  : FormRunnerParams,
+      logger                  : IndentedLogger,
+      externalContext         : ExternalContext,
+      coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
+    ): Unit =
+      holders foreach { holderElem =>
+        collectUnpublishedAttachments(holderElem) foreach { case AttachmentWithHolder(fromPath, _, holder) =>
+
+          debug(s"about to update unpublished attachment upon paste for path `$fromPath`")
+
+          readUnpublishedAttachment(fromPath) foreach { case (tmpFileUrl, _) =>
+
+            val newTmpFileUrl =
+              if (isUploadedFileURL(fromPath)) {
+
+                val fromPathParams =
+                  combineValues[String, String, List](PathUtils.splitQuery(fromPath)._2.toList.flatMap(PathUtils.decodeSimpleQuery)).toMap
+
+                XFormsUploadControl.hmacURL(
+                  url = tmpFileUrl.toString,
+                  fromPathParams.get("filename").flatMap(_.headOption),
+                  fromPathParams.get("mediatype").flatMap(_.headOption),
+                  fromPathParams.get("size").flatMap(_.headOption),
+                )
+              } else {
+                tmpFileUrl.toString
+              }
+
+            debug(s"setting new attachment URL to `$newTmpFileUrl`")
+
+            setvalue(holder, newTmpFileUrl)
+          }
+        }
       }
   }
 }

@@ -871,7 +871,7 @@ object FormBuilderXPathApi {
   ): Unit = {
     implicit val ctx = FormBuilderDocContext()
     ToolboxOps.readXcvFromClipboardAndClone flatMap
-      (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix, None, Set.empty)) foreach
+      (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix, None, Set.empty, copyAttachments = true)) foreach
       Undo.pushUserUndoAction
   }
 
@@ -926,12 +926,14 @@ object FormBuilderXPathApi {
           "",
           "",
           Some(position),
-          Set.empty
+          Set.empty,
+          copyAttachments = false
         )
       case DeleteControl(position, xcvElem) =>
         ToolboxOps.pasteSingleControlFromXcv(
           TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
-          Some(position)
+          Some(position),
+          copyAttachments = false
         )
       case DeleteRow(gridId, xcvElem, rowPos) =>
 
@@ -944,7 +946,8 @@ object FormBuilderXPathApi {
           "",
           "",
           Some(containerPosition),
-          Set.empty
+          Set.empty,
+          copyAttachments = false
         )
 
         Some(UndeleteRow(gridId, rowPos))
@@ -993,7 +996,8 @@ object FormBuilderXPathApi {
           "",
           "",
           Some(containerPosition),
-          Set.empty
+          Set.empty,
+          copyAttachments = false
         )
 
         Some(UnmergeSectionTemplate(sectionId, prefix, suffix))
@@ -1019,7 +1023,8 @@ object FormBuilderXPathApi {
               "",
               "",
               Some(containerPosition),
-              Set.empty
+              Set.empty,
+              copyAttachments = false
             )
 
           } else {
@@ -1030,7 +1035,8 @@ object FormBuilderXPathApi {
 
             ToolboxOps.pasteSingleControlFromXcv(
               TransformerUtils.extractAsMutableDocument(xcvElem).rootElement,
-              Some(position)
+              Some(position),
+              copyAttachments = false
             )
           }
 

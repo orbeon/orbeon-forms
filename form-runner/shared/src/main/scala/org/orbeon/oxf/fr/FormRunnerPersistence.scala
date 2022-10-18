@@ -519,20 +519,17 @@ trait FormRunnerPersistence {
   // Return all nodes which refer to data attachments
   //@XPathFunction
   def collectDataAttachmentNodesJava(data: NodeInfo, fromBasePath: String): ju.List[NodeInfo] =
-    collectAttachments(data.getRoot, List(fromBasePath), fromBasePath, forceAttachments = true).map(_.holder).asJava
+    collectAttachments(data.getRoot, AttachmentMatch.BasePaths(includes = List(fromBasePath), excludes = Nil)).map(_.holder).asJava
 
   //@XPathFunction
   def clearMissingUnsavedDataAttachmentReturnFilenamesJava(data: NodeInfo): ju.List[String] = {
 
-    val FormRunnerParams(app, form, _, documentIdOpt, _, mode) = FormRunnerParams()
+    val FormRunnerParams(_, _, _, documentIdOpt, _, mode) = FormRunnerParams()
 
     val unsavedAttachmentHolders =
       documentIdOpt match {
-        case Some(documentId) if frc.isNewOrEditMode(mode) =>
-          // NOTE: `basePath` is not relevant in our use of `collectAttachments` here, but
-          // we don't just want to pass a magic string in. So we still compute `basePath`.
-          val basePath = createFormDataBasePath(app, form, isDraft = false, documentId)
-          collectAttachments(data.getRoot, List(basePath), basePath, forceAttachments = false).map(_.holder)
+        case Some(_) if frc.isNewOrEditMode(mode) =>
+          collectAttachments(data.getRoot, AttachmentMatch.UploadedOnly).map(_.holder)
         case _ =>
           Nil
       }
@@ -557,9 +554,8 @@ trait FormRunnerPersistence {
   }
 
   case class AttachmentWithHolder(
-    fromPath          : String,
-    toPath            : String,
-    holder            : NodeInfo
+    fromPath : String,
+    holder   : NodeInfo
   )
 
   case class AttachmentWithEncryptedAtRest(
@@ -568,36 +564,43 @@ trait FormRunnerPersistence {
     isEncryptedAtRest : Boolean
   )
 
+  sealed trait AttachmentMatch
+  object AttachmentMatch {
+    case object UploadedOnly                                                      extends AttachmentMatch
+    case class  BasePaths(includes: Iterable[String], excludes: Iterable[String]) extends AttachmentMatch
+  }
+
   def collectAttachments(
-    data             : NodeInfo,
-    fromBasePaths    : Iterable[String],
-    toBasePath       : String,
-    forceAttachments : Boolean // `true` when pushing to/pulling from remote system or when using duplicate
-  ): List[AttachmentWithHolder] = {
+    data           : NodeInfo,
+    attachmentMatch: AttachmentMatch
+  ): List[AttachmentWithHolder] =
     for {
       holder        <- data.descendantOrSelf(Node).toList
       if holder.isAttribute || holder.isElement && ! holder.hasChildElement
       beforeURL     = holder.stringValue.trimAllToEmpty
-      isUploaded    = isUploadedFileURL(beforeURL)
-      if isUploaded ||
-        fromBasePaths.exists(isAttachmentURLFor(_, beforeURL)) && ! isAttachmentURLFor(toBasePath, beforeURL) ||
-        isAttachmentURLFor(toBasePath, beforeURL) && forceAttachments
-    } yield {
-      // Here we could decide to use a nicer extension for the file. But since initially the filename comes from
-      // the client, it cannot be trusted, nor can its mediatype. A first step would be to do content-sniffing to
-      // determine a more trusted mediatype. A second step would be to put in an API for virus scanning. For now,
-      // we just use .bin as an extension.
-      val filename =
-        if (isUploaded)
-          CoreCrossPlatformSupport.randomHexId + ".bin"
-        else
-          getAttachmentPathFilenameRemoveQuery(beforeURL)
+      if isUploadedFileURL(beforeURL) || (
+        attachmentMatch match {
+          case AttachmentMatch.UploadedOnly =>
+            false
+          case AttachmentMatch.BasePaths(includes, excludes) =>
+            includes.exists(isAttachmentURLFor(_, beforeURL)) && ! excludes.exists(isAttachmentURLFor(_, beforeURL))
+        }
+      )
+    } yield
+      AttachmentWithHolder(beforeURL, holder)
 
-      val afterURL =
-        toBasePath + filename
+  // Here we could decide to use a nicer extension for the file. But since initially the filename comes from
+  // the client, it cannot be trusted, nor can its mediatype. A first step would be to do content-sniffing to
+  // determine a more trusted mediatype. A second step would be to put in an API for virus scanning. For now,
+  // we just use .bin as an extension.
+  def createAttachmentFilename(url: String, basePath: String): String = {
+    val filename =
+      if (isUploadedFileURL(url))
+        CoreCrossPlatformSupport.randomHexId + ".bin"
+      else
+        getAttachmentPathFilenameRemoveQuery(url)
 
-      AttachmentWithHolder(beforeURL, afterURL, holder)
-    }
+    basePath.appendSlash + filename
   }
 
   def getAttachment(
@@ -653,9 +656,9 @@ trait FormRunnerPersistence {
   def putWithAttachments(
     liveData          : DocumentNodeInfoType,
     migrate           : Option[DocumentNodeInfoType => DocumentNodeInfoType], // 2021-11-22: only from `trySaveAttachmentsAndData`
-    toBaseURI         : String,
+    toBaseURI         : String, // can be blank
     fromBasePaths     : Iterable[(String, Int)],
-    toBasePath        : String,
+    toBasePath        : String, // not blank, starts with `CRUDBasePath`
     filename          : String,
     commonQueryString : String,
     forceAttachments  : Boolean,
@@ -672,7 +675,13 @@ trait FormRunnerPersistence {
 
     // Find all instance nodes containing file URLs we need to upload
     val attachmentsWithHolder =
-      collectAttachments(savedData, fromBasePaths.map(_._1), toBasePath, forceAttachments)
+      collectAttachments(
+        savedData,
+        if (forceAttachments)
+          AttachmentMatch.BasePaths(includes = toBasePath :: fromBasePaths.map(_._1).toList, excludes = Nil)
+        else
+          AttachmentMatch.BasePaths(includes = fromBasePaths.map(_._1), excludes = List(toBasePath))
+      )
 
     def updateHolder(holder: NodeInfo, afterURL: String, isEncryptedAtRest: Boolean): Unit = {
       setvalue(holder, afterURL)
@@ -685,7 +694,7 @@ trait FormRunnerPersistence {
     }
 
     def trySaveAllAttachments(): Try[List[AttachmentWithEncryptedAtRest]] =
-      TryUtils.sequenceLazily(attachmentsWithHolder) { case AttachmentWithHolder(beforeUrl, afterUrl, migratedHolder) =>
+      TryUtils.sequenceLazily(attachmentsWithHolder) { case AttachmentWithHolder(beforeUrl, migratedHolder) =>
 
         def rewriteServiceUrl(url: String) =
           URLRewriterUtils.rewriteServiceURL(
@@ -695,6 +704,9 @@ trait FormRunnerPersistence {
           )
 
         val pathToHolder = migratedHolder.ancestorOrSelf(*).map(_.localname).reverse.drop(1).mkString("/")
+
+        val afterUrl =
+          createAttachmentFilename(beforeUrl, toBasePath)
 
         def connectPut(is: InputStream): ConnectionResult = {
 
@@ -794,8 +806,8 @@ trait FormRunnerPersistence {
       }
 
     (
-      attachmentsWithHolder.map(_.fromPath),
-      attachmentsWithHolder.map(_.toPath),
+      attachmentsWithEncryptedAtRest.map(_.fromPath),
+      attachmentsWithEncryptedAtRest.map(_.toPath),
       versionOpt map (_.toInt) getOrElse 1
     )
   }

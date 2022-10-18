@@ -1227,10 +1227,12 @@ object ToolboxOps {
 
     private def collectUnpublishedAttachments(holderElem: NodeInfo)(implicit params: FormRunnerParams): List[AttachmentWithHolder] =
       collectAttachments(
-        data             = holderElem,
-        fromBasePaths    = List(createFormDataBasePath(params.app, params.form, params.isDraft.contains(true), "").appendSlash),
-        toBasePath       = "/dummy",
-        forceAttachments = true
+        data            = holderElem,
+        attachmentMatch =
+          AttachmentMatch.BasePaths(
+            includes = List(createFormDataBasePath(params.app, params.form, params.isDraft.contains(true), "").appendSlash),
+            excludes = Nil
+          )
       )
 
     def updateUnpublishedAttachment(
@@ -1241,7 +1243,7 @@ object ToolboxOps {
       coreCrossPlatformSupport: CoreCrossPlatformSupportTrait
     ): Unit =
       holders foreach { holderElem =>
-        collectUnpublishedAttachments(holderElem) foreach { case AttachmentWithHolder(fromPath, _, holder) =>
+        collectUnpublishedAttachments(holderElem) foreach { case AttachmentWithHolder(fromPath, holder) =>
 
           debug(s"about to update unpublished attachment upon paste for path `$fromPath`")
 

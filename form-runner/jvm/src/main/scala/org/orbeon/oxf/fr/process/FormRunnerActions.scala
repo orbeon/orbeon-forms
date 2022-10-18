@@ -92,7 +92,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       ensureDataCalculationsAreUpToDate()
 
       implicit val formRunnerParams: FormRunnerParams = FormRunnerParams()
-      val FormRunnerParams(currentApp, currentForm, currentFormVersion, currentDocumentOpt, isDraft, _) = formRunnerParams
+      val FormRunnerParams(currentApp, currentForm, currentFormVersion, currentDocumentOpt, currentIsDraft, _) = formRunnerParams
 
       val propertyPrefixOpt = paramByNameOrDefault(params, "property")
 
@@ -228,7 +228,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
               frc.createFormDataBasePath(
                 app               = currentApp,
                 form              = currentForm,
-                isDraft           = false, // TODO: check: current idDraft?
+                isDraft           = currentIsDraft.contains(true),
                 documentIdOrEmpty = currentDocumentOpt.getOrElse("")
               )
 
@@ -243,8 +243,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
                 dataMaybeLiveMaybeMigrated = maybeMigrateData(frc.formInstance.root),
                 parts                      = parts,
                 renderedFormatTmpFileUris  = renderedFormatTmpFileUris,
-                fromBasePaths              = List(basePath -> currentFormVersion),
-                toBasePath                 = basePath,
+                dataBasePaths              = List(basePath -> currentFormVersion),
                 relevanceHandling          = relevanceHandling,
                 annotateWith               = evaluatedSendProperties.get("annotate").flatten.map(_.splitTo[Set]()).getOrElse(Set.empty),
                 headersGetter              = inScopeContainingDocument.headersGetter

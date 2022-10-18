@@ -37,6 +37,7 @@
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all"><dummy/></xf:instance>
 
             <xf:var name="requested-document-id" value="xxf:get-request-parameter('document')"/>
+            <!-- 2022-10-18: This doesn't support searching in autosave drafts. -->
             <xf:var name="data-base-path"        value="frf:createFormDataBasePath(fr:app-name(), fr:form-name(), false(), $requested-document-id)"/>
 
             <xf:action event="xforms-model-construct-done">

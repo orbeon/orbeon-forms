@@ -93,8 +93,7 @@ object FormRunnerActionsSupport {
     dataMaybeLiveMaybeMigrated: DocumentNodeInfoType,
     parts                     : NonEmptyList[ContentToken],
     renderedFormatTmpFileUris : Set[(URI, RenderedFormat)],
-    fromBasePaths             : Iterable[(String, Int)],
-    toBasePath                : String,
+    dataBasePaths             : Iterable[(String, Int)],
     relevanceHandling         : RelevanceHandling,
     annotateWith              : Set[String],
     headersGetter             : String => Option[List[String]])(implicit
@@ -120,9 +119,7 @@ object FormRunnerActionsSupport {
     val attachmentsWithHolder =
       FormRunner.collectAttachments(
         new DocumentWrapper(dataCopiedAndMaybeMigrated, null, StaticXPath.GlobalConfiguration),
-        fromBasePaths.map(_._1),
-        toBasePath,
-        forceAttachments = true
+        FormRunner.AttachmentMatch.BasePaths(includes = dataBasePaths.map(_._1), excludes = Nil)
       )
 
     def createCidForNode(node: NodeInfo): String =
@@ -134,7 +131,7 @@ object FormRunnerActionsSupport {
     // We dont do this replacement if the attachments are not sent, both because it's not helpful and for backward
     // compatibility.
     if (parts.exists(_ == ContentToken.Attachments))
-      attachmentsWithHolder foreach { case FormRunner.AttachmentWithHolder(_, _, holder) =>
+      attachmentsWithHolder foreach { case FormRunner.AttachmentWithHolder(_, holder) =>
         setvalue(holder, s"cid:${createCidForNode(holder)}")
       }
 
@@ -194,7 +191,7 @@ object FormRunnerActionsSupport {
       )
 
     def processAllAttachments(builder: MultipartEntityBuilder): Unit =
-      attachmentsWithHolder foreach { case FormRunner.AttachmentWithHolder(beforeUrl, _, holder) =>
+      attachmentsWithHolder foreach { case FormRunner.AttachmentWithHolder(beforeUrl, holder) =>
 
         def writeBody(is: InputStream): Unit =
           processBinary(
@@ -207,7 +204,7 @@ object FormRunnerActionsSupport {
           )
 
         for {
-          successGetCxr <- ConnectionResult.trySuccessConnection(FormRunner.getAttachment(fromBasePaths, beforeUrl))
+          successGetCxr <- ConnectionResult.trySuccessConnection(FormRunner.getAttachment(dataBasePaths, beforeUrl))
           _             <- ConnectionResult.tryBody(successGetCxr, closeOnSuccess = true)(writeBody)
         } yield
           ()

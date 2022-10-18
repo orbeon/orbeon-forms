@@ -135,11 +135,9 @@ class FormRunnerCompiler extends ProcessorImpl {
                   )
 
                 FormRunner.collectAttachments(
-                  data             = dataDoc,
-                  fromBasePaths    = basePaths,
-                  toBasePath       = "/dummy", // TODO: `Option`?
-                  forceAttachments = true
-                ) map { case FormRunner.AttachmentWithHolder(fromPath, _, holder) =>
+                  data            = dataDoc,
+                  attachmentMatch = FormRunner.AttachmentMatch.BasePaths(includes = basePaths, excludes = Nil)
+                ) map { case FormRunner.AttachmentWithHolder(fromPath, holder) =>
                   ManifestEntry(URI.create(fromPath), holder.attValueOpt("mediatype").flatMap(_.trimAllToOpt))
                 }
             }

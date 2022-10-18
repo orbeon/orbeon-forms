@@ -15,12 +15,14 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.oxf.fb.FormBuilder._
-import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
+
 import scala.collection.compat._
+
 
 // These functions run on a simplified "Form Builder" which loads a source form and goes through annotation.
 class ClipboardTest
@@ -45,7 +47,8 @@ class ClipboardTest
     it("Simple cut/paste must remove and restore the control, bind, holders, and resources") {
       withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx =>
 
-        val doc = ctx.formDefinitionRootElem
+        implicit val formRunnerParams: FormRunnerParams =
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
 
         val selectedCell = FormBuilder.findSelectedCell.get
 
@@ -69,7 +72,7 @@ class ClipboardTest
         assert(FormRunner.findDataHolders(Control1).isEmpty)
         assert(FormBuilder.findCurrentResourceHolder(Control1).isEmpty)
 
-        ToolboxOps.pasteFromClipboard()
+        ToolboxOps.pasteFromClipboardImpl()
 
         assertPresent()
       }
@@ -85,6 +88,9 @@ class ClipboardTest
         withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx =>
 
           val doc = ctx.formDefinitionRootElem
+
+          implicit val formRunnerParams: FormRunnerParams =
+            FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
 
           def countContainers = FormBuilderXPathApi.countAllContainers(doc)
 
@@ -112,7 +118,7 @@ class ClipboardTest
 
           // Paste without prefix/suffix (shouldn't conflict)
           locally {
-            ToolboxOps.pasteFromClipboard()
+            ToolboxOps.pasteFromClipboardImpl()
             assert(FormBuilder.findContainerById(containerId).nonEmpty)
             assert(FormRunner.findControlByName(nestedControlName).nonEmpty)
             assert(initialContainerCount === countContainers)
@@ -121,7 +127,7 @@ class ClipboardTest
           // Paste with prefix
           locally {
             val Prefix = "my-"
-            FormBuilderXPathApi.pasteSectionGridFromClipboard(Prefix, "")
+            FormBuilderXPathApi.pasteSectionGridFromClipboardImpl(Prefix, "")
             assert(FormBuilder.findContainerById(Prefix + containerId).nonEmpty)
             assert(FormRunner.findControlByName(Prefix + nestedControlName).nonEmpty)
             assert(initialContainerCount + cutContainersCount === countContainers)
@@ -130,7 +136,7 @@ class ClipboardTest
           // Paste with suffix
           locally {
             val Suffix = "-nice"
-            FormBuilderXPathApi.pasteSectionGridFromClipboard("", Suffix)
+            FormBuilderXPathApi.pasteSectionGridFromClipboardImpl("", Suffix)
             assert(findControlByName(controlNameFromId(containerId) + Suffix).nonEmpty)
             assert(FormRunner.findControlByName(nestedControlName + Suffix).nonEmpty)
             assert(initialContainerCount + cutContainersCount * 2 === countContainers)
@@ -138,7 +144,7 @@ class ClipboardTest
 
           // Paste without prefix/suffix (should create automatic ids and not crash)
           locally {
-            FormBuilderXPathApi.pasteSectionGridFromClipboard("", "")
+            FormBuilderXPathApi.pasteSectionGridFromClipboardImpl("", "")
             assert(initialContainerCount + cutContainersCount * 3 === countContainers)
           }
         }
@@ -153,7 +159,8 @@ class ClipboardTest
 
       withActionAndFBDoc(RepeatedSectionDoc) { implicit ctx =>
 
-        val doc = ctx.formDefinitionRootElem
+        implicit val formRunnerParams: FormRunnerParams =
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
 
         def findValues(controlName: String) =
           ctx.dataRootElem descendant controlName map (_.stringValue)
@@ -163,10 +170,10 @@ class ClipboardTest
           assert(expected == findValues(sourceControlName))
 
           ToolboxOps.cutToClipboard(findControlByName(sourceControlName).get.parentUnsafe)
-          ToolboxOps.pasteFromClipboard()
+          ToolboxOps.pasteFromClipboardImpl()
           assert(expected == findValues(sourceControlName))
 
-          ToolboxOps.pasteFromClipboard()
+          ToolboxOps.pasteFromClipboardImpl()
           assert(expected == findValues(sourceControlName))
           assert(expected == findValues(newControlName))
         }
@@ -181,7 +188,7 @@ class ClipboardTest
           ToolboxOps.copyToClipboard(findControlByName(sourceControlName).get.parentUnsafe)
 
           FormBuilder.selectCell(findControlByName(RepeatedControl1).get.parentUnsafe)
-          ToolboxOps.pasteFromClipboard()
+          ToolboxOps.pasteFromClipboardImpl()
           assert(List(expected)           == findValues(sourceControlName))
           assert(List(expected, expected) == findValues(newControlName))
         }
@@ -194,7 +201,7 @@ class ClipboardTest
           ToolboxOps.copyToClipboard(findControlByName(sourceControlName).get.parentUnsafe)
 
           FormBuilder.selectCell(findControlByName(SingleControl).get.parentUnsafe)
-          ToolboxOps.pasteFromClipboard()
+          ToolboxOps.pasteFromClipboardImpl()
           assert(expected           == findValues(sourceControlName))
           assert(List(expected.head) == findValues(newControlName))
         }
@@ -215,7 +222,8 @@ class ClipboardTest
 
       withActionAndFBDoc(RepeatedSectionDoc) { implicit ctx =>
 
-        val doc = ctx.formDefinitionRootElem
+        implicit val formRunnerParams: FormRunnerParams =
+          FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
 
         def findValues(controlName: String) =
           ctx.dataRootElem descendant controlName map (_.stringValue)
@@ -227,7 +235,7 @@ class ClipboardTest
           FormBuilderRpcApiImpl.containerCut(gridId)
           assert(Nil == (controlNames flatMap findValues))
 
-          ToolboxOps.pasteFromClipboard()
+          ToolboxOps.pasteFromClipboardImpl()
           assert(expected == (controlNames flatMap findValues))
         }
 
@@ -235,6 +243,5 @@ class ClipboardTest
         assertContainerCutPaste(NestedRepeatedGridId, List(RepeatedControl121, RepeatedControl122), List("value121⊙1", "value121⊙2", "value122⊙1", "value122⊙2"))
       }
     }
-
   }
 }

@@ -19,7 +19,7 @@ import org.orbeon.datatypes.Direction
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.NodeInfoCell.NodeInfoCellOps
-import org.orbeon.oxf.fr.{FormRunner, NodeInfoCell}
+import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams, NodeInfoCell}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.SimplePath._
 import org.scalatest.funspec.AnyFunSpecLike
@@ -46,11 +46,14 @@ class FormBuilderUndoTest
         } toList
       }
 
-    containerDetails foreach { case (containerId, isGrid, firstCellId, nestedControlId) =>
+    containerDetails foreach { case (containerId, isGrid, _, nestedControlId) =>
       it(s"Must be able to undo delete of ${if (isGrid) "grid" else "section"} `$containerId` and nested control `$nestedControlId`") {
         withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx =>
 
           val doc = ctx.formDefinitionRootElem
+
+          implicit val formRunnerParams: FormRunnerParams =
+            FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
 
           def countContainers    = FormBuilderXPathApi.countAllContainers(doc)
           def countNonContainers = FormBuilderXPathApi.countAllNonContainers(doc)
@@ -79,7 +82,7 @@ class FormBuilderUndoTest
 
           // Undo delete container
           locally {
-            FormBuilderXPathApi.undoAction()
+            FormBuilderXPathApi.undoActionImpl()
 
             assert(FormBuilder.findContainerById(containerId).nonEmpty)
             assert(FormRunner.findControlByName(nestedControlName).nonEmpty)
@@ -103,7 +106,7 @@ class FormBuilderUndoTest
 
           // Undo delete nested control
           locally {
-            FormBuilderXPathApi.undoAction()
+            FormBuilderXPathApi.undoActionImpl()
 
             assert(FormRunner.findControlByName(nestedControlName).nonEmpty)
 
@@ -118,7 +121,8 @@ class FormBuilderUndoTest
       it(s"Must be able to move cell walls, merge and split cells of grid `$containerId`") {
         withActionAndFBDoc(SectionsGridsRepeatsDoc) { implicit ctx =>
 
-          val doc = ctx.formDefinitionRootElem
+          implicit val formRunnerParams: FormRunnerParams =
+            FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
 
           // Move grid wall
           locally {
@@ -129,7 +133,7 @@ class FormBuilderUndoTest
 
           // Undo move wall
           locally {
-            FormBuilderXPathApi.undoAction()
+            FormBuilderXPathApi.undoActionImpl()
             val cell = resolveId(firstCellId).get
             assert(Some(6) === NodeInfoCellOps.w(cell))
           }
@@ -147,7 +151,7 @@ class FormBuilderUndoTest
 
           // Undo merge cell
           locally {
-            FormBuilderXPathApi.undoAction()
+            FormBuilderXPathApi.undoActionImpl()
             val cell = resolveId(firstCellId).get
             assert(Some(8) === NodeInfoCellOps.w(cell))
           }
@@ -165,7 +169,7 @@ class FormBuilderUndoTest
 
           // Undo split cell
           locally {
-            FormBuilderXPathApi.undoAction()
+            FormBuilderXPathApi.undoActionImpl()
             val cell = resolveId(firstCellId).get
             assert(Some(8) === NodeInfoCellOps.w(cell))
           }

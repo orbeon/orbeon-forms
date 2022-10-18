@@ -506,10 +506,11 @@ object ToolboxOps {
     }
 
   def dndControl(
-    sourceCellElem : NodeInfo,
-    targetCellElem : NodeInfo,
-    copy           : Boolean)(implicit
-    ctx            : FormBuilderDocContext
+    sourceCellElem  : NodeInfo,
+    targetCellElem  : NodeInfo,
+    copy            : Boolean)(implicit
+    ctx             : FormBuilderDocContext,
+    formRunnerParams: FormRunnerParams
   ): Option[UndoAction] = {
 
     val xcvElemOpt = controlElementsInCellToXcv(sourceCellElem)
@@ -736,10 +737,11 @@ object ToolboxOps {
   }
 
   def containerMerge(
-    containerId : String,
-    prefix      : String,
-    suffix      : String)(implicit
-    ctx         : FormBuilderDocContext
+    containerId     : String,
+    prefix          : String,
+    suffix          : String)(implicit
+    ctx             : FormBuilderDocContext,
+    formRunnerParams: FormRunnerParams
   ): Option[UndoAction] =
     xcvFromSectionWithTemplate(containerId) flatMap { xcvElem =>
 
@@ -763,9 +765,15 @@ object ToolboxOps {
   // Paste control from the clipboard
   //@XPathFunction
   def pasteFromClipboard(): Unit = {
+    implicit val ctx              = FormBuilderDocContext()
+    implicit val formRunnerParams = FormRunnerParams()
+    pasteFromClipboardImpl()
+  }
 
-    implicit val ctx = FormBuilderDocContext()
-
+  def pasteFromClipboardImpl()(implicit
+    ctx             : FormBuilderDocContext,
+    formRunnerParams: FormRunnerParams
+  ): Unit =
     readXcvFromClipboardAndClone flatMap { xcvElem =>
 
       val controlElem = xcvElem / XcvEntry.Control.entryName / * head
@@ -785,7 +793,6 @@ object ToolboxOps {
         pasteSingleControlFromXcv(xcvElem, None, copyAttachments = true)
     } foreach
       Undo.pushUserUndoAction
-  }
 
   def pasteSectionGridFromXcv(
     xcvElem         : NodeInfo,
@@ -793,9 +800,9 @@ object ToolboxOps {
     suffix          : String,
     insertPosition  : Option[ContainerPosition],
     ignore          : Set[String],
-    copyAttachments : Boolean
-  )(implicit
-    ctx            : FormBuilderDocContext
+    copyAttachments : Boolean)(implicit
+    ctx             : FormBuilderDocContext,
+    formRunnerParams: FormRunnerParams
   ): Option[UndoAction] = {
 
     require(xcvElem.isElement)
@@ -806,7 +813,6 @@ object ToolboxOps {
     if (copyAttachments) {
       implicit val ec                       = CoreCrossPlatformSupport.externalContext
       implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
-      implicit val formRunnerParams         = FormRunnerParams()
       updateUnpublishedAttachment(xcvElem / XcvEntry.Holder.entryName / *)
     }
 
@@ -1012,7 +1018,8 @@ object ToolboxOps {
     xcvElem         : NodeInfo,
     insertPosition  : Option[ControlPosition],
     copyAttachments : Boolean)(implicit
-    ctx             : FormBuilderDocContext
+    ctx             : FormBuilderDocContext,
+    formRunnerParams: FormRunnerParams
   ): Option[UndoAction] = {
 
     val insertCellElemOpt =
@@ -1027,8 +1034,6 @@ object ToolboxOps {
 
     insertCellElemOpt map { insertCellElem =>
 
-      implicit val ctx = FormBuilderDocContext()
-
       val controlElem = xcvElem / XcvEntry.Control.entryName / * head
 
       def dataHolders = xcvElem / XcvEntry.Holder.entryName / *
@@ -1037,7 +1042,6 @@ object ToolboxOps {
       if (copyAttachments) {
         implicit val ec                       = CoreCrossPlatformSupport.externalContext
         implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
-        implicit val formRunnerParams         = FormRunnerParams()
         updateUnpublishedAttachment(dataHolders)
       }
 

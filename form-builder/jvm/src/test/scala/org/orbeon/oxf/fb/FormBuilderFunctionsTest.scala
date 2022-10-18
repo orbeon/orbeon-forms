@@ -17,7 +17,7 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.{FormRunner, Names, NodeInfoCell}
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XMLSupport}
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
@@ -31,6 +31,7 @@ import org.orbeon.xml.NamespaceMapping
 import org.scalatest.funspec.AnyFunSpecLike
 
 import scala.collection.mutable
+
 
 // These functions run on a simplified "Form Builder" which loads a source form and goes through annotation.
 class FormBuilderFunctionsTest
@@ -73,8 +74,6 @@ class FormBuilderFunctionsTest
   describe("Name and id") {
     withActionAndFBDoc(TemplateDoc) { implicit ctx =>
 
-      val doc = ctx.formDefinitionRootElem
-
       it("must return the control names") {
         assert(controlNameFromId(controlId(Control1)) === Control1)
         assert(controlNameFromId(bindId(Control1))    === Control1)
@@ -89,8 +88,6 @@ class FormBuilderFunctionsTest
 
   describe("Control elements") {
     withActionAndFBDoc(TemplateDoc) { implicit ctx =>
-
-      val doc = ctx.formDefinitionRootElem
 
       it("must find the bind element") {
         assert(findBindByName(Control1).get.uriQualifiedName === URIQualifiedName(XF, "bind"))
@@ -122,8 +119,6 @@ class FormBuilderFunctionsTest
   describe("New binds") {
     it("must find the newly-created binds") {
       withActionAndFBDoc(TemplateDoc) { implicit ctx =>
-
-        val doc = ctx.formDefinitionRootElem
 
         ensureBinds(List(Section1, Control2))
 
@@ -171,8 +166,6 @@ class FormBuilderFunctionsTest
   describe("Insert `xf:input` control") {
     it("must insert all elements in the right places") {
       withActionAndFBDoc(TemplateDoc) { implicit ctx =>
-
-        val doc = ctx.formDefinitionRootElem
 
         // Insert a new control into the next empty td
         selectFirstCell()
@@ -368,8 +361,6 @@ class FormBuilderFunctionsTest
     it("must return the expected statics ids") {
       withActionAndFBDoc(SectionsRepeatsDoc) { implicit ctx =>
 
-        val doc = ctx.formDefinitionRootElem
-
         val expected = Map(
           "|fb≡section-1-section≡grid-1-grid≡control-1-control|"                     -> "control-1-control",
           "|fb≡section-1-section≡grid-4-grid≡control-5-control⊙1|"                   -> "control-5-control",
@@ -467,6 +458,8 @@ class FormBuilderFunctionsTest
         assertSectionsKeepName()
         assertUniqueIds()
 
+        implicit val formRunnerParams = FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
+
         for (sectionId <- SectionIds)
           ToolboxOps.containerMerge(sectionId, "", "")
 
@@ -480,6 +473,8 @@ class FormBuilderFunctionsTest
 
         assertSectionsKeepName()
         assertUniqueIds()
+
+        implicit val formRunnerParams = FormRunnerParams(AppForm.FormBuilder.app, AppForm.FormBuilder.form, 1, None, None, "new")
 
         // First 2 sections will have `my-` prefixes, but other 2 sections not as they are the same
         // section templates and using `my-` would cause conflicts.

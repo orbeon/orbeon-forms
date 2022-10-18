@@ -16,7 +16,7 @@ package org.orbeon.builder.rpc
 import org.orbeon.datatypes.{AboveBelow, Direction}
 import org.orbeon.oxf.fb.UndoAction.ControlSettings
 import org.orbeon.oxf.fb._
-import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.saxon.om.NodeInfo
@@ -93,7 +93,8 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def controlDnD(controlId: String, destCellId: String, copy: Boolean): Unit = {
 
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx              = FormBuilderDocContext()
+    implicit val formRunnerParams = FormRunnerParams()
 
     val sourceCellElem = resolveId(controlId).get.parentUnsafe
     val targetCellElem = resolveId(destCellId).get

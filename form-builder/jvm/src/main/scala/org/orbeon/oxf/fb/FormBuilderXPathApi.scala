@@ -860,7 +860,8 @@ object FormBuilderXPathApi {
     prefix      : String,
     suffix      : String
   ): Unit = {
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx              = FormBuilderDocContext()
+    implicit val formRunnerParams = FormRunnerParams()
     ToolboxOps.containerMerge(containerId, prefix, suffix) foreach Undo.pushUserUndoAction
   }
 
@@ -869,11 +870,20 @@ object FormBuilderXPathApi {
     prefix      : String,
     suffix      : String
   ): Unit = {
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx              = FormBuilderDocContext()
+    implicit val formRunnerParams = FormRunnerParams()
+    pasteSectionGridFromClipboardImpl(prefix, suffix)
+  }
+
+  def pasteSectionGridFromClipboardImpl(
+    prefix          : String,
+    suffix          : String)(implicit
+    ctx             : FormBuilderDocContext,
+    formRunnerParams: FormRunnerParams
+  ): Unit =
     ToolboxOps.readXcvFromClipboardAndClone flatMap
       (ToolboxOps.pasteSectionGridFromXcv(_, prefix, suffix, None, Set.empty, copyAttachments = true)) foreach
       Undo.pushUserUndoAction
-  }
 
   //@XPathFunction
   def saveControlToUndoStack(oldName: String, newName: String): Unit = {
@@ -889,19 +899,21 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
-  def undoAction(): Unit = {
-    implicit val ctx = FormBuilderDocContext()
+  def undoAction(): Unit =
+    undoActionImpl()(FormBuilderDocContext(), FormRunnerParams())
+
+  def undoActionImpl()(implicit ctx: FormBuilderDocContext, formRunnerParams: FormRunnerParams): Unit =
     for {
       undoAction <- Undo.popUndoAction()
       redoAction <- processUndoRedoAction(undoAction)
     } locally {
       Undo.pushAction(UndoOrRedo.Redo, redoAction, undoAction.name)
     }
-  }
 
   //@XPathFunction
   def redoAction(): Unit = {
-    implicit val ctx = FormBuilderDocContext()
+    implicit val ctx              = FormBuilderDocContext()
+    implicit val formRunnerParams = FormRunnerParams()
     for {
       redoAction <- Undo.popRedoAction()
       undoAction <- processUndoRedoAction(redoAction)
@@ -918,7 +930,11 @@ object FormBuilderXPathApi {
   def canMigrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Boolean =
     FormBuilder.findGridColumnMigrationType(gridElem, from, to).isDefined
 
-  private def processUndoRedoAction(undoAction: UndoAction)(implicit ctx: FormBuilderDocContext): Option[UndoAction] =
+  private def processUndoRedoAction(
+    undoAction      : UndoAction)(implicit
+    ctx             : FormBuilderDocContext,
+    formRunnerParams: FormRunnerParams
+  ): Option[UndoAction] =
     undoAction match {
       case DeleteContainer(position, xcvElem) =>
         ToolboxOps.pasteSectionGridFromXcv(

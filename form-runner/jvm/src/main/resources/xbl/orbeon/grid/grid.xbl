@@ -650,7 +650,7 @@
                                                             if="event('xxf:type') = ('fr-move-up', 'fr-move-down', 'fr-clear', 'fr-remove')"
                                                             ref="$source"/>
 
-                                                         <xf:action if="event('xxf:type') = 'fr-clear'">
+                                                        <xf:action if="event('xxf:type') = 'fr-clear'">
 
                                                             <xf:insert
                                                                 context="$repeat-context"

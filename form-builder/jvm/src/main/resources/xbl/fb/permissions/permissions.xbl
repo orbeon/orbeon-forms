@@ -46,6 +46,7 @@
                 <!-- Maintain validity flag -->
                 <xf:setvalue event="xxforms-invalid" observer="ui" ref="@valid">false</xf:setvalue>
                 <xf:setvalue event="xxforms-valid"   observer="ui" ref="@valid">true</xf:setvalue>
+                <xf:var name="show-owner-group-permissions" value="xxf:property('oxf.fb.menu.permissions.owner-group')"/>
                 <xf:bind ref="instance('ui')">
                     <xf:bind ref="apply-trigger" readonly="instance()/@valid = 'false'"/>
                     <xf:bind ref="readonly-checked" readonly="true()"/>
@@ -89,7 +90,11 @@
                                         ],
                                         ' '
                                     )"/>
-                        <xf:bind ref="permission" id="permission-bind">
+                        <xf:bind
+                            id="permission-bind"
+                            ref="permission"
+                            relevant="$show-owner-group-permissions or empty(@for)">
+
                             <xf:bind
                                 ref="role"
                                 constraint="xxf:non-blank()"
@@ -232,7 +237,11 @@
                             repeat="content"
                             bind="permissions-bind"
                             template="instance('permission-with-role-template')"
-                            freeze="{3 + count($ui/always-show-roles/role)}"
+                            freeze="{
+                                1 +                                                     (: Anyone :)
+                                (if ($show-owner-group-permissions) then 2 else 0) +    (: Maybe owner/group :)
+                                count($ui/always-show-roles/role)                       (: Fixed roles :)
+                            }"
                             columns="24"
                             class="fb-permissions-grid">
 

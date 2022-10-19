@@ -89,6 +89,8 @@
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                            value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.edit-source"                                    value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.permissions"                                    value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.permissions.owner-group"                        value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.email"                                          value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.services.http"                                  value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.services.database"                              value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.actions"                                        value="true"/>

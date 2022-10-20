@@ -14,20 +14,21 @@
 package org.orbeon.oxf.xforms.control
 
 
-import org.orbeon.xforms.XFormsNames._
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaPlacementType}
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaPlacementType}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLReceiverSupport}
 import org.orbeon.xforms.XFormsId
+import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl
 import shapeless.syntax.typeable._
 
 import scala.collection.mutable
+
 
 trait ControlAjaxSupport {
 
@@ -232,26 +233,26 @@ object ControlAjaxSupport {
 
   val AriaLabelledby  = "aria-labelledby"
   val AriaDescribedby = "aria-describedby"
-  val AriaDetails     = "aria-details"
+//  val AriaDetails     = "aria-details"
 
-  val LhhaWithAriaAttName = List(
-    LHHA.Label -> AriaLabelledby,
-    LHHA.Hint  -> AriaDescribedby,
-    LHHA.Help  -> AriaDetails
+  val AriaAttsWithLhha: List[(String, List[LHHA])] = List(
+    AriaLabelledby  -> List(LHHA.Label),
+    AriaDescribedby -> List(LHHA.Hint, LHHA.Help),
   )
 
   def iterateAriaByAtts(
     staticControl      : ElementAnalysis,
     control            : XFormsControl)(
     containingDocument : XFormsContainingDocument
-  ): Iterator[(String, String)] = {
+  ): Iterator[(String, List[String])] = {
 
     def cond(lhha: LHHA)(lhhaAnalysis: LHHAAnalysis): Boolean =
       lhhaAnalysis.isForRepeat || lhha != LHHA.Label
 
     for {
-      (lhha, attName) <- ControlAjaxSupport.LhhaWithAriaAttName.iterator
-      attValue        <- ControlAjaxSupport.findAriaByWithNs(staticControl, control, lhha, cond(lhha))(containingDocument)
+      (attName, lhhaSet) <- ControlAjaxSupport.AriaAttsWithLhha.iterator
+      attValue           = lhhaSet.flatMap(lhha => ControlAjaxSupport.findAriaByWithNs(staticControl, control, lhha, cond(lhha))(containingDocument))
+      if attValue.nonEmpty
     } yield
       attName -> attValue
   }

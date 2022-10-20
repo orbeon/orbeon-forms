@@ -17,6 +17,7 @@ import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaLabelledby
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
@@ -196,21 +197,18 @@ abstract class XFormsControlLifecycleHandler(
   final lazy val currentControl: XFormsControl =
     containingDocument.getControlByEffectiveId(getEffectiveId) ensuring (_ ne null)
 
-  // TODO: Remove some duplication with `handleAriaByAtts`. Here we do the same thing but just with
-  //   `LHHA.Label` and don't have a condition.
   final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =
     for {
-      (lhha, attName) <- ControlAjaxSupport.LhhaWithAriaAttName.headOption
-      attValue        <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl, lhha, condition = _ => true)(containingDocument)
+      attValue <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl, LHHA.Label, condition = _ => true)(containingDocument)
     } locally {
-      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
+      atts.addAttribute("", AriaLabelledby, AriaLabelledby, XMLReceiverHelper.CDATA, attValue)
     }
 
   final protected def handleAriaByAtts(atts: AttributesImpl): Unit =
     for {
-      (attName, attValue) <- ControlAjaxSupport.iterateAriaByAtts(elementAnalysis, currentControl)(containingDocument)
+      (attName, attValues) <- ControlAjaxSupport.iterateAriaByAtts(elementAnalysis, currentControl)(containingDocument)
     } locally {
-      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValue)
+      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValues.mkString(" "))
     }
 
   final protected def getStaticLHHA(lhha: LHHA): Option[LHHAAnalysis] =

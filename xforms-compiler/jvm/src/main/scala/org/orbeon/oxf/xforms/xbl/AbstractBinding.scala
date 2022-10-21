@@ -83,7 +83,7 @@ object CommonBindingBuilder {
           modeLHHACustom && ! xblMode(s"-custom-${lhha.entryName}") ||
             modeLHHA     &&   xblMode(s"+custom-${lhha.entryName}")
           ) option
-          lhha
+            lhha
       }
     }
 

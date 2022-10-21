@@ -107,7 +107,7 @@ object XFormsBaseHandler {
     for (i <- 0 until elementAttributes.getLength) {
       if (XMLConstants.XHTML_NAMESPACE_URI == elementAttributes.getURI(i)) {
         val name = elementAttributes.getLocalName(i)
-        if (!("class" == name))
+        if (name != "class")
           reusableAttributes.addAttribute("", name, name, XMLReceiverHelper.CDATA, elementAttributes.getValue(i))
       }
     }

@@ -315,7 +315,7 @@ abstract class XFormsBaseHandlerXHTML (
       val attributes = {
         // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
         val elementAttributes = if (staticLHHAAttributes ne null) staticLHHAAttributes else new AttributesImpl
-        getIdClassXHTMLAttributes(elementAttributes, classes.toString, None)
+        XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, elementAttributes, classes.toString, None)
       }
 
       XFormsBaseHandlerXHTML.outputLabelFor(
@@ -356,7 +356,7 @@ abstract class XFormsBaseHandlerXHTML (
     addCustomClasses(classes, xformsControl)
 
     // Get attributes
-    val newAttributes = getIdClassXHTMLAttributes(attributes, classes.toString, effectiveId.some)
+    val newAttributes = XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, attributes, classes.toString, effectiveId.some)
 
     // Add extension attributes in no namespace if possible
     if (xformsControl ne null)

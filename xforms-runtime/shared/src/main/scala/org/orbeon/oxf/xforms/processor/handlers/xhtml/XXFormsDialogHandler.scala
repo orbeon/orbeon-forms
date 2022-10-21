@@ -4,7 +4,7 @@ import cats.syntax.option._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl
-import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
@@ -71,7 +71,7 @@ class XXFormsDialogHandler(
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
     val divQName = XMLUtils.buildQName(xhtmlPrefix, "div")
     val contentHandler = handlerContext.controller.output
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getIdClassXHTMLAttributes(attributes, classes.toString, effectiveDialogId.some))
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, attributes, classes.toString, effectiveDialogId.some))
 
     // Child `xh:div` for label
     reusableAttributes.clear()

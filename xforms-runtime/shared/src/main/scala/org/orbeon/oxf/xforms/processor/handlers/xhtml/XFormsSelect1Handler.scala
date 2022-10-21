@@ -425,7 +425,7 @@ class XFormsSelect1Handler(
                     // See https://github.com/orbeon/orbeon-forms/issues/4843
 
                     val itemClasses = XFormsSelect1Handler.getItemClasses(item, null)
-                    val optGroupAttributes = getIdClassXHTMLAttributes(XMLReceiverSupport.EmptyAttributes, itemClasses, None)
+                    val optGroupAttributes = XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, XMLReceiverSupport.EmptyAttributes, itemClasses, None)
 
                     optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, item.label.label)
 
@@ -559,7 +559,7 @@ class XFormsSelect1Handler(
   ): Boolean = {
 
     val itemClasses      = XFormsSelect1Handler.getItemClasses(item, null)
-    val optionAttributes = getIdClassXHTMLAttributes(XMLReceiverSupport.EmptyAttributes, itemClasses, None)
+    val optionAttributes = XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, XMLReceiverSupport.EmptyAttributes, itemClasses, None)
 
     // Add item attributes to `<option>`
     XFormsSelect1Handler.addItemAttributes(item, optionAttributes)

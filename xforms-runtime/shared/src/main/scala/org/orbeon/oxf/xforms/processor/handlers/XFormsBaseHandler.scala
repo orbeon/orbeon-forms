@@ -41,9 +41,6 @@ abstract class XFormsBaseHandler protected (
   // TODO: Check callers.
   def isNonRelevant(control: XFormsControl): Boolean =
     (control eq null) || ! control.isRelevant
-
-  protected def getIdClassXHTMLAttributes(elementAttributes: Attributes, classes: String, effectiveIdOpt: Option[String]): AttributesImpl =
-    XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, elementAttributes, classes, effectiveIdOpt)
 }
 
 object XFormsBaseHandler {

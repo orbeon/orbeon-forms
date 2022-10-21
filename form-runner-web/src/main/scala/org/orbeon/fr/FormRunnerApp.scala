@@ -63,6 +63,7 @@ object FormRunnerApp extends App {
     xbl.AutosizeTextarea
     xbl.TinyMCE
     xbl.AttachmentMultiple
+    xbl.Recaptcha
 
     // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
     //FormRunnerPrivateAPI

@@ -25,8 +25,6 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:script src="/xbl/orbeon/recaptcha/recaptcha.js"/>
-
     <xbl:binding id="fr-recaptcha" element="fr|recaptcha" xxbl:mode="binding lhha">
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
@@ -64,11 +62,18 @@
                             <xf:action type="javascript">
                                 <xf:param name="publicKey" value="fr:component-param-value('public-key')"/>
                                 <xf:param name="theme"     value="fr:component-param-value('theme')"/>
-                                <xf:body>YAHOO.xbl.fr.Recaptcha.instance(this).render(publicKey, theme);</xf:body>
+                                <xf:body>ORBEON.xforms.XBL.instanceForControl(this).render(publicKey, theme);</xf:body>
                             </xf:action>
                             <!-- Copy value of private key to local model -->
                             <xf:var name="private-key">
-                                <xxf:value value="{if (fr:private-key/@ref) then fr:private-key/@ref else 'fr:component-param-value(''private-key'')'}" xxbl:scope="outer"/>
+                                <xsl:choose>
+                                    <xsl:when test="exists(fr:private-key/@ref)">
+                                        <xxf:value value="fr:private-key/@ref" xxbl:scope="outer"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:attribute name="value">fr:component-param-value('private-key')</xsl:attribute>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </xf:var>
                             <xf:setvalue ref="secret" value="$private-key"/>
                         </xf:action>

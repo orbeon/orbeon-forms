@@ -60,8 +60,9 @@ abstract class XFormsBaseHandlerXHTML (
   final val getEffectiveId = handlerContext.getEffectiveId(attributes)
 
   // May be overridden by subclasses
-  protected def isDefaultIncremental                                                = false
-  protected def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl) = ()
+  protected def isDefaultIncremental: Boolean = false
+  protected def addCustomAtts(atts: AttributesImpl): Unit = ()
+  protected def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl): Unit = ()
 
   final def isXFormsReadonlyButNotStaticReadonly(control: XFormsControl): Boolean =
     control match {
@@ -357,6 +358,7 @@ abstract class XFormsBaseHandlerXHTML (
 
     // Get attributes
     val newAttributes = XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, attributes, classes.toString, effectiveId.some)
+    addCustomAtts(newAttributes)
 
     // Add extension attributes in no namespace if possible
     if (xformsControl ne null)

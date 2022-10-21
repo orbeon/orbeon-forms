@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsId
+import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
 
 
@@ -62,6 +63,13 @@ class XXFormsComponentHandler(
 
     classes.append(staticControl.commonBinding.cssClasses)
   }
+
+  override protected def addCustomAtts(atts: AttributesImpl): Unit =
+    if (staticControl.commonBinding.labelFor.isEmpty) {
+      atts.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0")
+      atts.addAttribute("", "role",     "role",     XMLReceiverHelper.CDATA, "group")
+      handleAriaByAtts(atts)
+    }
 
   protected def handleControlStart(): Unit = {
 

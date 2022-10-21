@@ -38,7 +38,7 @@ ORBEON.xforms.XBL.declareCompanion("acme|map", {
 
         const jsLoadedPromise = new Promise((resolutionFunc) => {
             (function worker() {
-                const shortDelay      = ORBEON.util.Properties.internalShortDelay.get();
+                const shortDelay      = 100;
                 const googleMapsFound =
                     "google" in window &&
                     "maps"   in google &&

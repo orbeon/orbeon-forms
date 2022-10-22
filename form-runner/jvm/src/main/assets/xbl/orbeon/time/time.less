@@ -1,8 +1,12 @@
 .xbl-fr-time {
-    .orbeon .fr-grid & .input-append .xforms-input .xforms-type-time {
+    .input-group {
+        flex-wrap: nowrap !important;
+    }
+    
+    .xforms-input .xforms-type-time {
         // Override CSS we still kept for pre-2018.2 date/time controls
-        background-image: none;
-        width: 100%;
+        background-image: none !important;
+        width: 100% !important;
     }
 
     .fr-field-width-natural {
@@ -11,6 +15,6 @@
 
     .xforms-ios & {
         // Don't show add-on on iOS, rely on native widget
-        .add-on { display: none }
+        .input-group-text { display: none }
     }
 }

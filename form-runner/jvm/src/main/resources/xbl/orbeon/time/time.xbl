@@ -161,11 +161,11 @@
                 "/>
 
             <xf:group ref="$binding[not($view)]">
-                <xh:div class="input-append fr-field-width-{$field-width}">
+                <xh:div class="input-group fr-field-width-{$field-width}">
                     <xf:input ref="." id="fr-time-input">
                         <xf:hint value="$placeholder" appearance="minimal"/>
                     </xf:input>
-                    <xh:span class="add-on">
+                    <xh:span class="input-group-text">
                         <xh:i class="fa fa-fw fa-clock-o"/>
                     </xh:span>
                 </xh:div>

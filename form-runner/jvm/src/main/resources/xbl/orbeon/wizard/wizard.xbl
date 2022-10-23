@@ -708,13 +708,12 @@
                                     </xf:action>
                                 </xf:action>
 
-                                <!-- This id is used to expose visibility to buttons outside the wizard -->
                                 <xf:group
                                     id="fr-wizard-submit-hide"
                                     ref="xxf:instance('local')/readwrite[not($validated-mode) or empty($next-top-level-case-ids)]"/>
 
-                                <xh:div role="navigation">
-                                    <xh:ul class="nav nav-list">
+                                <xh:div class="d-flex align-items-start" role="navigation">
+                                    <xh:ul class="nav nav-list flex-column nav-pills me-3">
                                         <xsl:apply-templates mode="toc-sections"/>
                                     </xh:ul>
                                 </xh:div>
@@ -1628,8 +1627,8 @@
 
                             <xsl:choose>
                                 <xsl:when test="$static-subsections-toc = 'all' and exists(.//fr:section)">
-                                    <xh:div role="navigation">
-                                        <xh:ul class="nav nav-list">
+                                    <xh:div class="d-flex align-items-start" role="navigation">
+                                        <xh:ul class="nav nav-list flex-column nav-pills me-3">
                                             <xsl:apply-templates mode="toc-sections"/>
                                         </xh:ul>
                                     </xh:div>

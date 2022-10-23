@@ -14,13 +14,19 @@
 @import (reference)  "../../../apps/fr/style/form-runner-orbeon";
 
 @frWizardWidth: 940px;
-@frWizardTocWidth: 199px;
+@frWizardTocWidth: 230px; // before: 199px
 @frWizardBodyWidth: @frWizardWidth - @frWizardTocWidth - 2 - 1;
 
 // Make li the same height as section title
 @wizardLineHeight: @frSectionTitleLineHeight - 2 * 3px; // 3px is the Bootstrap padding on .nav-list > li > [span >] a
 
 .orbeon .xbl-fr-wizard {
+
+    // // Todo: fix the styling when button is active and hover
+    // .btn-link:active {
+    //     color: #fff !important;
+    //     background-color: #0d6efd !important;
+    // }
 
     width: 100%; // comment about #1741 here might be out of date, had explicit width
 
@@ -73,8 +79,12 @@
                 display: flex;
                 align-items: center;
 
-                padding-left: 10px;  // narrower than default
-                padding-right: 10px; // narrower than default
+                // padding-left: 10px;  // narrower than default
+                // padding-right: 10px; // narrower than default
+
+                background: none;
+                border: 0;
+                padding: 0.5rem 1rem;
 
                 .fr-toc-title {
                     order: 1;

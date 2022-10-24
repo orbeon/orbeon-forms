@@ -1186,7 +1186,7 @@
 
     <!-- TOC: handle section -->
     <xsl:template match="fr:section" mode="fr-toc-sections">
-        <xh:li xxf:control="xf:group">
+        <xh:li xxf:control="true">
             <!-- Propagate binding so that entry for section disappears if the section is non-relevant -->
             <xsl:copy-of select="@model | @context | @bind | @ref"/>
             <!-- Clicking sets the focus -->

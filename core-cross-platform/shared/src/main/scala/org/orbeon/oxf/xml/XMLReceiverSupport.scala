@@ -137,25 +137,6 @@ object XMLReceiverSupport extends XMLReceiverSupport {
     def getValue    (s: String)                : String = null
   }
 
-  // Must be used only with non-prefixed attributes!
-  // Used by handlers
-  def addOrAppendToAttribute(
-    attributes     : AttributesImpl,
-    attributeName  : String,
-    attributeValue : String
-  ): Unit = {
-    val oldAttributeIndex = attributes.getIndex(attributeName)
-    if (oldAttributeIndex == -1) {
-      // No existing attribute
-      attributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, attributeValue)
-    } else {
-      // Existing attribute
-      val oldAttributeValue = attributes.getValue(oldAttributeIndex)
-      val newAttributeValue = oldAttributeValue + ' ' + attributeValue
-      attributes.setValue(oldAttributeIndex, newAttributeValue)
-    }
-  }
-
   // Match on URI and localname
   // Used by handlers/extractor/annotator
   def addOrReplaceAttribute(

@@ -507,6 +507,7 @@ trait ContainingDocumentProperties {
   def getHintAppearances                    = staticStringProperty(HintAppearanceProperty).tokenizeToSet
   def getHelpAppearance                     = staticStringProperty(HelpAppearanceProperty)
   def getDateFormatInput                    = staticStringProperty(DateFormatInputProperty)
+  def a11yFocusOnGroups                     = staticBooleanProperty(A11yFocusOnGroupsProperty)
 
   def getShowMaxRecoverableErrors           = staticIntProperty(ShowRecoverableErrorsProperty)
   def getSubmissionPollDelay                = staticIntProperty(AsyncSubmissionPollDelay)

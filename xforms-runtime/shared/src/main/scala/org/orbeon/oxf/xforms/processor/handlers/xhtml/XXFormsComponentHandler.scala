@@ -13,18 +13,16 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import cats.syntax.option._
-
-import java.{lang => jl}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.analysis.controls._
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaControlRef, LhhaPlacementType}
-import org.orbeon.oxf.xforms.analysis.controls.{ComponentControl, LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsId
-import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, Locator}
+
+import java.{lang => jl}
 
 
 class XXFormsComponentHandler(
@@ -64,12 +62,14 @@ class XXFormsComponentHandler(
     classes.append(staticControl.commonBinding.cssClasses)
   }
 
-  override protected def addCustomAtts(atts: AttributesImpl): Unit =
-    if (staticControl.commonBinding.labelFor.isEmpty) {
-      atts.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0")
-      atts.addAttribute("", "role",     "role",     XMLReceiverHelper.CDATA, "group")
-      handleAriaByAtts(atts)
-    }
+  // This scenario is probably not useful right now, see:
+  // https://github.com/orbeon/orbeon-forms/issues/5367
+//  override protected def addCustomAtts(atts: AttributesImpl): Unit =
+//    if (staticControl.commonBinding.modeLHHA && staticControl.commonBinding.labelFor.isEmpty) {
+//      atts.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0")
+//      atts.addAttribute("", "role",     "role",     XMLReceiverHelper.CDATA, "group")
+//      handleAriaByAtts(atts, XFormsLHHAHandler.coreControlLhhaByCondition)
+//    }
 
   protected def handleControlStart(): Unit = {
 
@@ -88,15 +88,20 @@ class XXFormsComponentHandler(
     handlerContext.popComponentContext()
 
   protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
-    if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Label)) // also implied: label is local (from `XFormsControlLifecycleHandler`)
+    if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Label)) { // also implied: label is local (from `XFormsControlLifecycleHandler`)
+
+      val staticReadonly          = XFormsBaseHandler.isStaticReadonly(currentControl)
+      val forEffectiveIdWithNsOpt = if (staticReadonly) None else getForEffectiveIdWithNs(lhhaAnalysis)
+
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
-        elemEffectiveIdOpt      = None,
-        forEffectiveIdWithNsOpt = getForEffectiveIdWithNs,
-        requestedElementNameOpt = (staticControl.commonBinding.labelFor.isEmpty || XFormsBaseHandler.isStaticReadonly(currentControl)) option "span",
+        elemEffectiveIdOpt      = forEffectiveIdWithNsOpt.isEmpty option getEffectiveId, // id could be omitted if unused
+        forEffectiveIdWithNsOpt = forEffectiveIdWithNsOpt,
+        requestedElementNameOpt = forEffectiveIdWithNsOpt.isEmpty option "span",
         controlOrNull           = currentControl,
         isExternal              = false
       )
+    }
 
   protected override def handleAlert(lhhaAnalysis: LHHAAnalysis): Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Alert)) super.handleAlert(lhhaAnalysis)
   protected override def handleHint(lhhaAnalysis: LHHAAnalysis) : Unit = if (staticControl.commonBinding.standardLhhaAsSet(LHHA.Hint))  super.handleHint(lhhaAnalysis)
@@ -104,36 +109,27 @@ class XXFormsComponentHandler(
 
   // If there is a `label-for`, use that, otherwise don't use `@for` as we are not pointing to an HTML form control
   // NOTE: Used by `handleLabel()` above only if there is a local LHHA, and by `findTargetControlForEffectiveId`.
-  override def getForEffectiveIdWithNs: Option[String] =
-    for {
-      staticLabel          <- getStaticLHHA(LHHA.Label)
-      currentControlSuffix = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
-      if mustFindLabelForEffectiveId(staticLabel.lhhaPlacementType)
-      result               <- findLabelForEffectiveIdWithNs(staticLabel.lhhaPlacementType.lhhaControlRef, currentControlSuffix, handlerContext)
-    } yield
-      result
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] =
+    mustFindLabelForEffectiveId(lhhaAnalysis.lhhaPlacementType) flatOption {
+      val currentControlSuffix = XFormsId.getEffectiveIdSuffixWithSeparator(currentControl.getEffectiveId)
+      XFormsLHHAHandler.findLabelForEffectiveIdWithNs(lhhaAnalysis, currentControlSuffix, handlerContext)
+    }
 }
 
 object XXFormsComponentHandler {
 
+  // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#labelable
+//  val labelableElemName = Set("button", "input", "meter", "output", "progress", "select", "textarea")
+
+  // Below, restrict to `CoreControl`, which is our approximation of our native "labelable" controls.
+  // https://github.com/orbeon/orbeon-forms/issues/5367
   def mustFindLabelForEffectiveId(lhhaPlacementType: LhhaPlacementType): Boolean =
     lhhaPlacementType match {
-      case LhhaPlacementType.Local(directTargetControl, LhhaControlRef.Control(targetControl))
-        if targetControl ne directTargetControl                     => true
-      case LhhaPlacementType.Local(_, LhhaControlRef.PrefixedId(_)) => true
-      case _                                                        => false
-    }
-
-  def findLabelForEffectiveIdWithNs(
-    lhhaControlRef      : LhhaControlRef,
-    currentControlSuffix: String,
-    handlerContext      : HandlerContext
-  ): Option[String] =
-    lhhaControlRef match {
-      case LhhaControlRef.Control(targetControl) =>
-        XFormsLHHAHandler.findTargetControlForEffectiveIdWithNs(handlerContext, targetControl)
-      case LhhaControlRef.PrefixedId(targetPrefixedId) =>
-        handlerContext.containingDocument.namespaceId(targetPrefixedId + currentControlSuffix).some
+      case LhhaPlacementType.Local(_, LhhaControlRef.Control(_: AttributeControl)) => false
+      case LhhaPlacementType.Local(directTargetControl, LhhaControlRef.Control(targetControl: CoreControl))
+        if targetControl ne directTargetControl                                    => true
+      case LhhaPlacementType.Local(_, LhhaControlRef.PrefixedId(_))                => true
+      case _                                                                       => false
     }
 
   def processShadowTree[Ctx](controller: ElementHandlerController[Ctx], templateTree: SAXStore): Unit = {
@@ -148,7 +144,7 @@ object XXFormsComponentHandler {
 
       override def startElement(uri: String, localname: String, qName: String, attributes: Attributes): Unit = {
 
-        if (level != 0)
+        if (level != 0) // skip `xbl:template` element
           super.startElement(uri, localname, qName, attributes)
 
         level += 1

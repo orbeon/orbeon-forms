@@ -156,8 +156,8 @@ class XFormsInputHandler(
 
           reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
 
-          handleAccessibilityAttributes(attributes, reusableAttributes)
-          handleAriaByAtts(reusableAttributes)
+          forwardAccessibilityAttributes(attributes, reusableAttributes)
+          handleAriaByAtts(reusableAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
 
           if (isXFormsReadonlyButNotStaticReadonly(inputControl))
             outputReadonlyAttribute(reusableAttributes)
@@ -184,7 +184,7 @@ class XFormsInputHandler(
     ! isBoolean option XFormsInputHandler.firstInputEffectiveIdWithNs(effectiveId)(containingDocument)
 
   // xxx XFormsSelect1Handler.getItemId won't be namespaced!
-  override def getForEffectiveIdWithNs: Option[String] =
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] =
     isBoolean option XFormsSelect1Handler.getItemId(getEffectiveId, 0) orElse getFirstInputEffectiveIdWithNs(getEffectiveId)
 
   protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =

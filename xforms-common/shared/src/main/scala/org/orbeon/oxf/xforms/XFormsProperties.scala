@@ -46,6 +46,8 @@ object XFormsProperties {
   val HintAppearanceProperty                    = "hint.appearance"
   val HelpAppearanceProperty                    = "help.appearance"
 
+  val A11yFocusOnGroupsProperty                 = "a11y.focus-on-groups"
+
   val StaticReadonlyHintProperty                = "static-readonly-hint"
   val StaticReadonlyAlertProperty               = "static-readonly-alert"
 
@@ -179,6 +181,7 @@ object XFormsProperties {
       PropertyDefinition(LabelAppearanceProperty,                   "full",                      propagateToClient = false),
       PropertyDefinition(HintAppearanceProperty,                    "full",                      propagateToClient = false),
       PropertyDefinition(HelpAppearanceProperty,                    "dialog",                    propagateToClient = false),
+      PropertyDefinition(A11yFocusOnGroupsProperty,                 true,                        propagateToClient = false),
       PropertyDefinition(StaticReadonlyHintProperty,                false,                       propagateToClient = false),
       PropertyDefinition(StaticReadonlyAlertProperty,               false,                       propagateToClient = false),
       PropertyDefinition(UploadMaxSizeProperty,                     "",                          propagateToClient = false), // blank default (see #2956)

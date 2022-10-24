@@ -18,8 +18,13 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{ContainerControl, LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
+import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAccessibilityAttributes
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.xforms.XFormsNames
+
 
 // Default group handler
 class XFormsGroupDefaultHandler(
@@ -58,6 +63,26 @@ class XFormsGroupDefaultHandler(
 
   protected def handleControlStart(): Unit = ()
 
+  override protected def addCustomAtts(atts: AttributesImpl): Unit = {
+    super.addCustomAtts(atts)
+    // This handler is used when the group:
+    //
+    // - is not internal
+    // - is not a separator
+    // - is not a fieldset (legacy explicit `xxf:fieldset` appearance OR local LHHA)
+    //
+    // So remains the case of an external LHHA. This is where it makes sense to add the `aria-*` attributes.
+    //
+    if (handleAriaByAtts(reusableAttributes, _ => true)) {
+      // There is at least one reference with `aria-*`, so add new attributes
+      reusableAttributes.addOrReplace("role", "group")
+      if (handlerContext.a11yFocusOnGroups)
+        reusableAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
+    }
+    // After the above so that attributes can be overridden
+    forwardAccessibilityAttributes(attributes, reusableAttributes)
+  }
+
   override protected def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = {
 
     // TODO: check why we output our own label here
@@ -78,15 +103,15 @@ class XFormsGroupDefaultHandler(
     reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes.toString)
 
     XFormsBaseHandlerXHTML.outputLabelFor(
-      handlerContext           = handlerContext,
-      attributes               = reusableAttributes,
-      labelEffectiveIdOpt      = None,
-      forEffectiveIdWithNs     = containingDocument.namespaceId(effectiveId).some,
-      lhha                     = LHHA.Label,
-      elementName              = handlerContext.labelElementName,
-      labelValue               = getLabelValue(groupControl),
-      mustOutputHTMLFragment   = isHtmlLabel,
-      isExternal               = false
+      handlerContext         = handlerContext,
+      attributes             = reusableAttributes,
+      labelEffectiveIdOpt    = None,
+      forEffectiveIdWithNs   = containingDocument.namespaceId(effectiveId).some,
+      lhha                   = LHHA.Label,
+      elementName            = handlerContext.labelElementName,
+      labelValue             = getLabelValue(groupControl),
+      mustOutputHTMLFragment = isHtmlLabel,
+      isExternal             = false
     )
   }
 }

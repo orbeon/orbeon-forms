@@ -1,10 +1,11 @@
 package org.orbeon.oxf.xforms.processor.handlers
 
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml._
-import org.orbeon.xforms.{Constants, XFormsId}
+import org.orbeon.xforms.{Constants, XFormsId, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -45,7 +46,7 @@ abstract class XFormsBaseHandler protected (
 
 object XFormsBaseHandler {
 
-  def handleAccessibilityAttributes(srcAttributes: Attributes, destAttributes: AttributesImpl): Unit = {
+  def forwardAccessibilityAttributes(srcAttributes: Attributes, destAttributes: AttributesImpl): Unit = {
 
     // Handle "tabindex"
     locally {
@@ -56,29 +57,29 @@ object XFormsBaseHandler {
         value = srcAttributes.getValue("tabindex")
       }
       if (value != null)
-        destAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, value)
+        destAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, value)
     }
 
     // Handle "accesskey"
     locally {
       val value = srcAttributes.getValue("accesskey")
       if (value ne null)
-        destAttributes.addAttribute("", "accesskey", "accesskey", XMLReceiverHelper.CDATA, value)
+        destAttributes.addOrReplace(XFormsNames.ACCESSKEY_QNAME, value)
     }
 
     // Handle "role"
     locally {
       val value = srcAttributes.getValue("role")
       if (value ne null)
-        destAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, value)
+        destAttributes.addOrReplace(XFormsNames.ROLE_QNAME, value)
     }
   }
 
   def handleAriaAttributes(required: Boolean, valid: Boolean, visited: Boolean, destAttributes: AttributesImpl): Unit = {
     if (required)
-      destAttributes.addAttribute("", "aria-required", "aria-required", XMLReceiverHelper.CDATA, "true")
+      destAttributes.addOrReplace("aria-required", "true")
     if (! valid && visited)
-      destAttributes.addAttribute("", "aria-invalid", "aria-invalid", XMLReceiverHelper.CDATA, "true")
+      destAttributes.addOrReplace("aria-invalid", "true")
   }
 
   def getIdClassXHTMLAttributes(

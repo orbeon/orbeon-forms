@@ -34,6 +34,8 @@ class HandlerContext(
   val helpElementName  : String                       = containingDocument.getHelpElementName
   val alertElementName : String                       = containingDocument.getAlertElementName
 
+  val a11yFocusOnGroups: Boolean                      = containingDocument.a11yFocusOnGroups
+
   // Context information
   private var partAnalysisStack     : List[PartAnalysis]                 = List(containingDocument.staticState.topLevelPart)
   private var componentContextStack : List[String]                       = Nil

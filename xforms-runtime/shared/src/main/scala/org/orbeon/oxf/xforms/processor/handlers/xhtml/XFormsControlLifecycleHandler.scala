@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASu
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaLabelledby
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
@@ -127,7 +128,7 @@ abstract class XFormsControlLifecycleHandler(
     handleLabelHintHelpAlert(
       lhhaAnalysis            = lhhaAnalysis,
       elemEffectiveIdOpt      = None,
-      forEffectiveIdWithNsOpt = getForEffectiveIdWithNs,
+      forEffectiveIdWithNsOpt = getForEffectiveIdWithNs(lhhaAnalysis),
       requestedElementNameOpt = XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
       controlOrNull           = currentControl,
       isExternal              = false
@@ -190,7 +191,7 @@ abstract class XFormsControlLifecycleHandler(
 
   // Return the effective id of the element to which `label/@for`, etc. must point to.
   // Default: point to `foo≡bar≡≡c⊙1-2-3`
-  def getForEffectiveIdWithNs: Option[String] =
+  def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] =
     XFormsBaseHandler.getLHHACIdWithNs(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.ControlCode).some
 
   // See https://github.com/orbeon/orbeon-forms/issues/4046
@@ -199,17 +200,19 @@ abstract class XFormsControlLifecycleHandler(
 
   final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =
     for {
-      attValue <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl, LHHA.Label, condition = _ => true)(containingDocument)
+      attValue <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl.getEffectiveId, LHHA.Label, condition = _ => true)(containingDocument)
     } locally {
       atts.addAttribute("", AriaLabelledby, AriaLabelledby, XMLReceiverHelper.CDATA, attValue)
     }
 
-  final protected def handleAriaByAtts(atts: AttributesImpl): Unit =
-    for {
-      (attName, attValues) <- ControlAjaxSupport.iterateAriaByAtts(elementAnalysis, currentControl)(containingDocument)
-    } locally {
-      atts.addAttribute("", attName, attName, XMLReceiverHelper.CDATA, attValues.mkString(" "))
+  final protected def handleAriaByAtts(atts: AttributesImpl, condition: LHHAAnalysis => Boolean): Boolean = {
+    val it = ControlAjaxSupport.iterateAriaByAtts(elementAnalysis, currentControl.getEffectiveId, condition)(containingDocument)
+    val nonEmpty = it.nonEmpty
+    it foreach { case (attName, attValues) =>
+      atts.addOrReplace(attName, attValues.mkString(" "))
     }
+    nonEmpty
+  }
 
   final protected def getStaticLHHA(lhha: LHHA): Option[LHHAAnalysis] =
     elementAnalysis.narrowTo[StaticLHHASupport].flatMap { lhhaSupport =>

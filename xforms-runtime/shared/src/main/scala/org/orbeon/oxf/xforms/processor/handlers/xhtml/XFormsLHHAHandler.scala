@@ -50,8 +50,6 @@ class XFormsLHHAHandler(
     forwarding = false
   ) {
 
-  import XFormsLHHAHandler._
-
   override def start(): Unit = {
 
     val lhhaEffectiveId = getEffectiveId
@@ -99,7 +97,7 @@ class XFormsLHHAHandler(
           }
         }
 
-      case LhhaPlacementType.External(directTargetControl, lhhaControlRef, None) =>
+      case LhhaPlacementType.External(directTargetControl, _, None) =>
 
         // One question is what control do we ask for the value of the LHHA? When we have a `xxbl:label-for`, we attach
         // the LHHA to both the direct control (so the XBL component itself) and the destination control if there is
@@ -113,7 +111,7 @@ class XFormsLHHAHandler(
 
           val labelForEffectiveIdWithNsOpt =
             elementAnalysis.lhhaType == LHHA.Label flatOption
-              XXFormsComponentHandler.findLabelForEffectiveIdWithNs(lhhaControlRef, XFormsId.getEffectiveIdSuffix(lhhaEffectiveId), handlerContext)
+              XFormsLHHAHandler.findLabelForEffectiveIdWithNs(elementAnalysis, XFormsId.getEffectiveIdSuffix(lhhaEffectiveId), handlerContext)
 
           handleLabelHintHelpAlert(
             lhhaAnalysis            = elementAnalysis,
@@ -135,9 +133,25 @@ class XFormsLHHAHandler(
 
 object XFormsLHHAHandler {
 
-  def findTargetControlForEffectiveIdWithNs(
-    handlerContext: HandlerContext,
-    targetControl : ElementAnalysis
+  def coreControlLhhaByCondition(lhhaAnalysis: LHHAAnalysis): Boolean =
+    lhhaAnalysis.isForRepeat || lhhaAnalysis.lhhaType != LHHA.Label
+
+  def findLabelForEffectiveIdWithNs(
+    lhhaAnalysis        : LHHAAnalysis,
+    currentControlSuffix: String,
+    handlerContext      : HandlerContext
+  ): Option[String] =
+    lhhaAnalysis.lhhaPlacementType.lhhaControlRef match {
+      case LhhaControlRef.Control(targetControl) =>
+        findTargetControlForEffectiveIdWithNs(lhhaAnalysis, targetControl, handlerContext)
+      case LhhaControlRef.PrefixedId(targetPrefixedId) =>
+        handlerContext.containingDocument.namespaceId(targetPrefixedId + currentControlSuffix).some
+    }
+
+  private def findTargetControlForEffectiveIdWithNs(
+    lhhaAnalysis  : LHHAAnalysis,
+    targetControl : ElementAnalysis,
+    handlerContext: HandlerContext
   ): Option[String] = {
 
     // The purpose of this code is to identify the id of the target of the `for` attribute for the given target
@@ -155,8 +169,8 @@ object XFormsLHHAHandler {
       handlerContext.pushComponentContext(targetControl.scope.scopeId)
     try
       handlerContext.controller.findHandlerFromElem(targetControl.element) match {
-        case Some(handler: XFormsControlLifecycleHandler) => handler.getForEffectiveIdWithNs
-        case _                                           => None
+        case Some(handler: XFormsControlLifecycleHandler) => handler.getForEffectiveIdWithNs(lhhaAnalysis)
+        case _                                            => None
       }
     finally
       if (! targetControl.scope.isTopLevelScope)

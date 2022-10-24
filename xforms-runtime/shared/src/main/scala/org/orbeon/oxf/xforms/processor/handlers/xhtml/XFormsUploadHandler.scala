@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.UploadControl
+import org.orbeon.oxf.xforms.analysis.controls.{LHHAAnalysis, UploadControl}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
@@ -78,7 +78,7 @@ class XFormsUploadHandler(
         reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "file")
         // Generate an id, because JS event handlers are not attached to elements that don't have an id, and
         // this causes issues with IE where we register handlers directly on controls
-        reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, getForEffectiveIdWithNs.getOrElse(throw new IllegalStateException))
+        reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, computeForEffectiveIdWithNs)
         reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId)
         // IE causes issues when the user types in or pastes in an incorrect file name. Some sites use this to
         // disable pasting in the file. See http://tinyurl.com/6dcd6a
@@ -97,8 +97,8 @@ class XFormsUploadHandler(
         uploadControl foreach
           (_.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI))
 
-        XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
-        handleAriaByAtts(reusableAttributes)
+        XFormsBaseHandler.forwardAccessibilityAttributes(attributes, reusableAttributes)
+        handleAriaByAtts(reusableAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
 
         // `@multiple="multiple"`
         if (elementAnalysis.asInstanceOf[UploadControl].multiple)
@@ -138,6 +138,9 @@ class XFormsUploadHandler(
     }
   }
 
-  override def getForEffectiveIdWithNs: Option[String] =
-    containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input")).some
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] =
+    computeForEffectiveIdWithNs.some
+
+  def computeForEffectiveIdWithNs: String =
+    containingDocument.namespaceId(XFormsId.appendToEffectiveId(getEffectiveId, ComponentSeparator + "xforms-input"))
 }

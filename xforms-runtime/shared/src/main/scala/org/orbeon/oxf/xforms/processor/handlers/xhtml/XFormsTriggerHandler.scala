@@ -61,7 +61,7 @@ abstract class XFormsTriggerHandler(
         containerAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, hintValue)
     }
 
-    XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
     containerAttributes
   }
 }

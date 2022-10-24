@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.itemset._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XHTML}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
@@ -32,6 +33,7 @@ import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 import shapeless.syntax.typeable._
+
 
 /**
  * Handle xf:select and xf:select1.
@@ -206,7 +208,7 @@ object XFormsSelect1Handler {
           if (isSelected)
             reusableAttributes.addAttribute("", "checked", "checked", XMLReceiverHelper.CDATA, "checked")
           if (isFirst)
-            XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
+            XFormsBaseHandler.forwardAccessibilityAttributes(attributes, reusableAttributes)
         }
         if (baseHandler.isXFormsReadonlyButNotStaticReadonly(control))
           outputReadonlyAttribute(reusableAttributes)
@@ -385,8 +387,8 @@ class XFormsSelect1Handler(
         containerAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple")
 
       // Handle accessibility attributes
-      XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
-      handleAriaByAtts(containerAttributes)
+      XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
+      handleAriaByAtts(containerAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
 
       if (control ne null)
         control.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XFormsNames.XXFORMS_NAMESPACE_URI)
@@ -494,6 +496,8 @@ class XFormsSelect1Handler(
 
     // For accessibility, label the group, since the control label doesn't apply to a single input
     containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, if (isMultiple) "group" else "radiogroup")
+    if (handlerContext.a11yFocusOnGroups)
+      reusableAttributes.addOrReplace("tabindex", "0")
 
     handleAriaByAttForSelect1Full(containerAttributes)
 
@@ -587,11 +591,11 @@ class XFormsSelect1Handler(
   }
 
   // For full appearance we don't put a `@for` attribute so that selecting the main label doesn't select the item
-  override def getForEffectiveIdWithNs: Option[String] =
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] =
     if (findAppearanceTrait.exists(_.isFull))
       None
     else
-      super.getForEffectiveIdWithNs
+      super.getForEffectiveIdWithNs(lhhaAnalysis)
 
   // For full appearance produce `span` with an `id`
   override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =

@@ -22,10 +22,11 @@ import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.isStaticReadonly
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.withFormattingPrefix
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants.{FORMATTING_URL_TYPE_QNAME, XHTML_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLReceiverHelper._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLReceiverSupport, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.XFormsNames._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
@@ -84,9 +85,9 @@ class XFormsOutputDefaultHandler(
       getContainerAttributes(getEffectiveId, outputControl, isField = hasLabel && ! isMinimal)
 
     // Handle accessibility attributes on control element
-    XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
     if (hasLabel)
-      handleAriaByAtts(containerAttributes)
+      handleAriaByAtts(containerAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
     // See https://github.com/orbeon/orbeon-forms/issues/3583
     if (hasLabel && ! isStaticReadonly(outputControl)) {
       containerAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0")
@@ -154,7 +155,7 @@ class XFormsOutputHTMLHandler(
     val containerAttributes = getContainerAttributes(getEffectiveId, outputControl, isField = false)
 
     // Handle accessibility attributes on <div>
-    XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
 
     withElement("div", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
       val mediatypeValue = attributes.getValue("mediatype")
@@ -164,7 +165,7 @@ class XFormsOutputHTMLHandler(
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs: Option[String] = None
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] = None
 
   override def getContainingElementName: String = "div"
 }
@@ -203,14 +204,14 @@ class XFormsOutputImageHandler(
     val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
     containerAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, if (srcValue ne null) srcValue else DUMMY_IMAGE_URI)
 
-    XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
+    XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
       currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
     element("img", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes)
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs: Option[String] = None
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] = None
 }
 
 // xf:output[@appearance = 'xxf:text']
@@ -243,7 +244,7 @@ class XFormsOutputTextHandler(
   }
 
   // Don't use `for` as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs: Option[String] = None
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] = None
 }
 
 // xf:output[@appearance = 'xxf:download']
@@ -287,7 +288,7 @@ class XFormsOutputDownloadHandler(
         if (hrefValue.isAllBlank) {
           // No URL so make sure a click doesn't cause navigation, and add class
           containerAttributes.addAttribute("", "href", "href", CDATA, "#")
-          XMLReceiverSupport.addOrAppendToAttribute(containerAttributes, "class", "xforms-readonly")
+          containerAttributes.addOrReplace("class", "xforms-readonly")
         } else {
           // URL value
           containerAttributes.addAttribute("", "href", "href", CDATA, hrefValue)
@@ -314,7 +315,7 @@ class XFormsOutputDownloadHandler(
       }
 
       val aAttributes = anchorAttributes
-      XFormsBaseHandler.handleAccessibilityAttributes(attributes, aAttributes)
+      XFormsBaseHandler.forwardAccessibilityAttributes(attributes, aAttributes)
 
       withElement(localName = "a", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = aAttributes) {
         val labelValue             = currentControl.getLabel
@@ -325,5 +326,5 @@ class XFormsOutputDownloadHandler(
   }
 
   // Don't use @for as we are not pointing to an HTML control
-  override def getForEffectiveIdWithNs: Option[String] = None
+  override def getForEffectiveIdWithNs(lhhaAnalysis: LHHAAnalysis): Option[String] = None
 }

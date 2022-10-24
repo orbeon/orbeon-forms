@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaPlacementType}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
+import org.orbeon.oxf.xml.SaxSupport.AttributeOps
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLReceiverSupport}
 import org.orbeon.xforms.XFormsId
@@ -61,7 +62,7 @@ trait ControlAjaxSupport {
 
     // Visited
     if ((previousControlOpt exists (_.visited)) != visited) {
-      XMLReceiverSupport.addOrAppendToAttribute(attributesImpl, "visited", visited.toString)
+      attributesImpl.addOrReplace("visited", visited.toString)
       added |= true
     }
 
@@ -180,7 +181,7 @@ object ControlAjaxSupport {
     if (isNewRepeatIteration && isDefaultValue) {
       false
     } else {
-      XMLReceiverSupport.addOrAppendToAttribute(attributesImpl, name, value)
+      attributesImpl.addOrReplace(name, value)
       true
     }
 
@@ -242,24 +243,20 @@ object ControlAjaxSupport {
 
   def iterateAriaByAtts(
     staticControl      : ElementAnalysis,
-    control            : XFormsControl)(
+    controlEffectiveId : String,
+    condition          : LHHAAnalysis => Boolean)(
     containingDocument : XFormsContainingDocument
-  ): Iterator[(String, List[String])] = {
-
-    def cond(lhha: LHHA)(lhhaAnalysis: LHHAAnalysis): Boolean =
-      lhhaAnalysis.isForRepeat || lhha != LHHA.Label
-
+  ): Iterator[(String, List[String])] =
     for {
       (attName, lhhaSet) <- ControlAjaxSupport.AriaAttsWithLhha.iterator
-      attValue           = lhhaSet.flatMap(lhha => ControlAjaxSupport.findAriaByWithNs(staticControl, control, lhha, cond(lhha))(containingDocument))
+      attValue           = lhhaSet.flatMap(lhha => ControlAjaxSupport.findAriaByWithNs(staticControl, controlEffectiveId, lhha, condition)(containingDocument))
       if attValue.nonEmpty
     } yield
       attName -> attValue
-  }
 
   def findAriaByWithNs(
     staticControl      : ElementAnalysis,
-    control            : XFormsControl,
+    controlEffectiveId : String,
     lhha               : LHHA,
     condition          : LHHAAnalysis => Boolean)(
     containingDocument : XFormsContainingDocument
@@ -279,7 +276,7 @@ object ControlAjaxSupport {
     } yield
       staticLhha.lhhaPlacementType match {
         case LhhaPlacementType.Local(directTargetControl, _) =>
-          val lhhaRepeatIndices = XFormsId.getEffectiveIdSuffixParts(control.effectiveId)
+          val lhhaRepeatIndices = XFormsId.getEffectiveIdSuffixParts(controlEffectiveId)
           XFormsBaseHandler.getLHHACIdWithNs(
             containingDocument,
             XFormsId.buildEffectiveId(directTargetControl.prefixedId, lhhaRepeatIndices),
@@ -287,7 +284,7 @@ object ControlAjaxSupport {
           )
         case LhhaPlacementType.External(_, _, forRepeatNestingOpt) =>
 
-          val controlRepeatIndices = XFormsId.getEffectiveIdSuffixParts(control.effectiveId)
+          val controlRepeatIndices = XFormsId.getEffectiveIdSuffixParts(controlEffectiveId)
 
           val lhhaRepeatIndices =
             forRepeatNestingOpt match {

@@ -71,6 +71,7 @@ object PartAnalysisSupport {
           val repeatNesting = directTargetControl.ancestorRepeats.size - lhhaAnalysis.ancestorRepeats.size
           LhhaPlacementType.External(directTargetControl, searchWithXblLabelFor(directTargetControl), repeatNesting > 0 option repeatNesting)
         case _ =>
+          // Directly nested LHHA
 
           val directTargetControl =
             lhhaAnalysis.getParent match {

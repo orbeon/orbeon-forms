@@ -101,6 +101,8 @@
     <property as="xs:string"  name="oxf.xforms.help-element"                                value="button"/>
     <property as="xs:string"  name="oxf.xforms.alert-element"                               value="span"/>
 
+    <property as="xs:boolean" name="oxf.xforms.a11y.focus-on-groups"                        value="true"/>
+
     <property as="xs:integer" name="oxf.xforms.submission-poll-delay"                       value="2000"/>
     <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>
     <property as="xs:string"  name="oxf.xforms.label.appearance"                            value="full"/>

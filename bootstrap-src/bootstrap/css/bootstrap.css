@@ -1585,7 +1585,7 @@
   *zoom: 1;
 }
 
-.orbeon .input-group,
+.orbeon .input-append,
 .orbeon .input-prepend {
   display: inline-block;
   margin-bottom: 10px;
@@ -1607,11 +1607,11 @@
   font-size: 14px;
 }
 
-.orbeon .input-group input,
+.orbeon .input-append input,
 .orbeon .input-prepend input,
-.orbeon .input-group select,
+.orbeon .input-append select,
 .orbeon .input-prepend select,
-.orbeon .input-group .uneditable-input,
+.orbeon .input-append .uneditable-input,
 .orbeon .input-prepend .uneditable-input {
   position: relative;
   margin-bottom: 0;
@@ -1631,7 +1631,7 @@
   z-index: 2;
 }
 
-.orbeon .input-group .input-group-text,
+.orbeon .input-append .add-on,
 .orbeon .input-prepend .add-on {
   display: inline-block;
   width: auto;
@@ -1659,7 +1659,7 @@
           border-radius: 0;
 }
 
-.orbeon .input-group .active,
+.orbeon .input-append .active,
 .orbeon .input-prepend .active {
   background-color: #a9dba9;
   border-color: #46a546;

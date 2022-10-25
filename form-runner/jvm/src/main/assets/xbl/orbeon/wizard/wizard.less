@@ -14,7 +14,7 @@
 @import (reference)  "../../../apps/fr/style/form-runner-orbeon";
 
 @frWizardWidth: 940px;
-@frWizardTocWidth: 230px; // before: 199px
+@frWizardTocWidth: 234px; // before: 199px
 @frWizardBodyWidth: @frWizardWidth - @frWizardTocWidth - 2 - 1;
 
 // Make li the same height as section title
@@ -22,11 +22,26 @@
 
 .orbeon .xbl-fr-wizard {
 
-    // // Todo: fix the styling when button is active and hover
-    // .btn-link:active {
-    //     color: #fff !important;
-    //     background-color: #0d6efd !important;
-    // }
+    // Todo: fix the styling when button is active and hover
+    .btn-link:hover {
+        color: #005580 !important;
+        background-color: #eee !important;
+        width: 99%;
+    }
+    
+    .btn-link:focus {
+        color: #005580 !important;
+        background-color: #eee !important;
+        width: 99%;
+    }
+
+    .nav-list > .active > span > .btn-link, .orbeon .nav-list > .active > span > .btn-link:hover {
+        background-color: #0d6efd !important;
+        color: #fff !important;
+        width: 99%;
+        border-radius: 0;
+        text-align: left;
+    }
 
     width: 100%; // comment about #1741 here might be out of date, had explicit width
 

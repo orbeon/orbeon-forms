@@ -707,7 +707,8 @@
                                         </xf:action>
                                     </xf:action>
                                 </xf:action>
-
+                                
+                                <!-- This id is used to expose visibility to buttons outside the wizard -->
                                 <xf:group
                                     id="fr-wizard-submit-hide"
                                     ref="xxf:instance('local')/readwrite[not($validated-mode) or empty($next-top-level-case-ids)]"/>

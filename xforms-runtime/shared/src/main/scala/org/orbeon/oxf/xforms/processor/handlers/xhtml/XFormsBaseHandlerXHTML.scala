@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, _}
 import org.orbeon.xforms.analysis.model.ValidationLevel
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.oxf.xml.{XMLReceiverHelper, _}
 import org.orbeon.xforms.XFormsNames
@@ -438,7 +439,7 @@ object XFormsBaseHandlerXHTML {
           )
         case _ =>
           // Remove existing id attribute if any
-          XMLReceiverSupport.removeAttribute(attributes, "", "id")
+          attributes.remove("", "id")
       }
 
     // Add @for attribute if specified and element is a label

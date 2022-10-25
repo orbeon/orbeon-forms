@@ -17,6 +17,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaReadonly
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.isStaticReadonly
@@ -29,7 +30,7 @@ import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.XFormsNames._
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsNames}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -44,7 +45,7 @@ trait XFormsOutputHandler extends XFormsControlLifecycleHandler {
     // Add custom class
     val containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(effectiveId, outputControl, addId = true)
     val nestedCssClass = if (isField) "xforms-field" else "xforms-output-output"
-    containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, nestedCssClass)
+    containerAttributes.addOrReplace(XFormsNames.CLASS_QNAME, nestedCssClass)
     containerAttributes
   }
 }
@@ -90,9 +91,9 @@ class XFormsOutputDefaultHandler(
       handleAriaByAtts(containerAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
     // See https://github.com/orbeon/orbeon-forms/issues/3583
     if (hasLabel && ! isStaticReadonly(outputControl)) {
-      containerAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, "0")
-      containerAttributes.addAttribute("", "aria-readonly", "aria-readonly", XMLReceiverHelper.CDATA, "true")
-      containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, "textbox")
+      containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
+      containerAttributes.addOrReplace(AriaReadonly, "true")
+      containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, "textbox")
     }
 
     withElement(if (hasLabel) "output" else "span", prefix = handlerContext.findXHTMLPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
@@ -202,7 +203,7 @@ class XFormsOutputImageHandler(
     // @src="..."
     // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
     val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
-    containerAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, if (srcValue ne null) srcValue else DUMMY_IMAGE_URI)
+    containerAttributes.addOrReplace("src", if (srcValue ne null) srcValue else DUMMY_IMAGE_URI)
 
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
       currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
@@ -287,11 +288,11 @@ class XFormsOutputDownloadHandler(
 
         if (hrefValue.isAllBlank) {
           // No URL so make sure a click doesn't cause navigation, and add class
-          containerAttributes.addAttribute("", "href", "href", CDATA, "#")
+          containerAttributes.addOrReplace("href", "#")
           containerAttributes.addOrReplace("class", "xforms-readonly")
         } else {
           // URL value
-          containerAttributes.addAttribute("", "href", "href", CDATA, hrefValue)
+          containerAttributes.addOrReplace("href", hrefValue)
         }
 
         // Specify resource URL type for proxy portlet
@@ -305,7 +306,7 @@ class XFormsOutputDownloadHandler(
         // 1. The browser replacing the current page, and
         // 2. The browser displaying the "Are you sure you want to navigate away from this page?" warning dialog
         // This, as of 2009-05, seems to be how most sites handle this
-        containerAttributes.addAttribute("", "target", "target", CDATA, "_blank")
+        containerAttributes.addOrReplace("target", "_blank")
 
         // Output xxf:* extension attributes
         if (outputControl ne null)

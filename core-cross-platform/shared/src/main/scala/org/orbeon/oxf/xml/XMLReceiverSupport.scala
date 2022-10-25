@@ -181,20 +181,4 @@ object XMLReceiverSupport extends XMLReceiverSupport {
         oldClassAttribute + ' ' + newClasses
     addOrReplaceAttribute(attributes, "", "", "class", newClassAttribute)
   }
-
-  // Used by handlers
-  // 2022-03-22: Only one use.
-  def removeAttribute(attributes: Attributes, uri: String, localname: String): AttributesImpl = {
-    val newAttributes = new AttributesImpl
-    for (i <- 0 until attributes.getLength) {
-      val attributeURI       = attributes.getURI(i)
-      val attributeValue     = attributes.getValue(i)
-      val attributeType      = attributes.getType(i)
-      val attributeQName     = attributes.getQName(i)
-      val attributeLocalname = attributes.getLocalName(i)
-      if (uri != attributeURI || localname != attributeLocalname) // not a matched attribute
-        newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue)
-    }
-    newAttributes
-  }
 }

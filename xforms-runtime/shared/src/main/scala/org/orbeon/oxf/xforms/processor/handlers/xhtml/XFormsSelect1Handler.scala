@@ -495,9 +495,9 @@ class XFormsSelect1Handler(
     containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-items xforms-help-popover-control")
 
     // For accessibility, label the group, since the control label doesn't apply to a single input
-    containerAttributes.addAttribute("", "role", "role", XMLReceiverHelper.CDATA, if (isMultiple) "group" else "radiogroup")
+    containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, if (isMultiple) "group" else "radiogroup")
     if (handlerContext.a11yFocusOnGroups)
-      reusableAttributes.addOrReplace("tabindex", "0")
+      reusableAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
 
     handleAriaByAttForSelect1Full(containerAttributes)
 

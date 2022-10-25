@@ -54,7 +54,7 @@ object XFormsBaseHandler {
       var value = srcAttributes.getValue("navindex")
       if (value == null) {
         // Try the the XHTML attribute
-        value = srcAttributes.getValue("tabindex")
+        value = srcAttributes.getValue(XFormsNames.TABINDEX_QNAME.localName)
       }
       if (value != null)
         destAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, value)
@@ -62,14 +62,14 @@ object XFormsBaseHandler {
 
     // Handle "accesskey"
     locally {
-      val value = srcAttributes.getValue("accesskey")
+      val value = srcAttributes.getValue(XFormsNames.ACCESSKEY_QNAME.localName)
       if (value ne null)
         destAttributes.addOrReplace(XFormsNames.ACCESSKEY_QNAME, value)
     }
 
     // Handle "role"
     locally {
-      val value = srcAttributes.getValue("role")
+      val value = srcAttributes.getValue(XFormsNames.ROLE_QNAME.localName)
       if (value ne null)
         destAttributes.addOrReplace(XFormsNames.ROLE_QNAME, value)
     }
@@ -94,19 +94,19 @@ object XFormsBaseHandler {
 
     // Copy "id"
     effectiveIdOpt foreach { effectiveId =>
-      reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, containingDocument.namespaceId(effectiveId))
+      reusableAttributes.addOrReplace(XFormsNames.ID_QNAME, containingDocument.namespaceId(effectiveId))
     }
 
     // Create "class" attribute if necessary
     if (classes != null && classes.nonEmpty)
-      reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes)
+      reusableAttributes.addOrReplace(XFormsNames.CLASS_QNAME, classes)
 
     // Copy attributes in the xhtml namespace to no namespace
     for (i <- 0 until elementAttributes.getLength) {
       if (XMLConstants.XHTML_NAMESPACE_URI == elementAttributes.getURI(i)) {
         val name = elementAttributes.getLocalName(i)
         if (name != "class")
-          reusableAttributes.addAttribute("", name, name, XMLReceiverHelper.CDATA, elementAttributes.getValue(i))
+          reusableAttributes.addOrReplace(name, elementAttributes.getValue(i))
       }
     }
     reusableAttributes

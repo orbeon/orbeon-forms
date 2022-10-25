@@ -20,10 +20,10 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaPlacementType}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
-import org.orbeon.oxf.xml.SaxSupport.AttributeOps
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
-import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLReceiverSupport}
-import org.orbeon.xforms.XFormsId
+import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xforms.XFormsNames._
 import org.xml.sax.helpers.AttributesImpl
 import shapeless.syntax.typeable._
@@ -54,7 +54,7 @@ trait ControlAjaxSupport {
     var added = false
 
     // Control id
-    attributesImpl.addAttribute("", "id", "id", CDATA, containingDocument.namespaceId(getEffectiveId))
+    attributesImpl.addOrReplace(XFormsNames.ID_QNAME, containingDocument.namespaceId(getEffectiveId))
 
     // This is handled specially because it's a list of tokens, some of which can be added and removed
     added |= addAjaxClasses(attributesImpl, previousControlOpt, this)
@@ -232,6 +232,7 @@ object ControlAjaxSupport {
     }
   }
 
+  val AriaReadonly    = "aria-readonly"
   val AriaLabelledby  = "aria-labelledby"
   val AriaDescribedby = "aria-describedby"
 //  val AriaDetails     = "aria-details"

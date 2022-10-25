@@ -21,7 +21,8 @@ import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaLabelledby
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.SaxSupport._
-import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 import shapeless.syntax.typeable._
@@ -179,11 +180,8 @@ abstract class XFormsControlLifecycleHandler(
     reusableAttributes.clear()
     val containerAttributes = reusableAttributes
     if (addId)
-      containerAttributes.addAttribute(
-        "",
-        "id",
-        "id",
-        XMLReceiverHelper.CDATA,
+      containerAttributes.addOrReplace(
+        XFormsNames.ID_QNAME,
         XFormsBaseHandler.getLHHACIdWithNs(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode)
       )
     containerAttributes
@@ -202,7 +200,7 @@ abstract class XFormsControlLifecycleHandler(
     for {
       attValue <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl.getEffectiveId, LHHA.Label, condition = _ => true)(containingDocument)
     } locally {
-      atts.addAttribute("", AriaLabelledby, AriaLabelledby, XMLReceiverHelper.CDATA, attValue)
+      atts.addOrReplace(AriaLabelledby, attValue)
     }
 
   final protected def handleAriaByAtts(atts: AttributesImpl, condition: LHHAAnalysis => Boolean): Boolean = {

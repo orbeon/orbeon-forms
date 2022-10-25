@@ -35,7 +35,8 @@
         id="fr-open-select1"
         element="fr|open-select1[appearance ~= full], fr|open-select1"
         xxbl:container="span"
-        xxbl:mode="lhha binding value">
+        xxbl:mode="lhha binding value"
+        xxbl:label-for="fr-open-select1-elem">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Radio Buttons with "Other"</display-name>
@@ -103,7 +104,7 @@
                         <xf:var name="items"        value="xxf:itemset('hidden-select1', 'xml')//item"/>
                         <xf:var name="closed-value" value="$binding/string() = $items/value/string()"/>
 
-                        <xh:span class="fr-component-group" role="group" aria-label="{{xxf:label('fr-open-select1')}}">
+                        <xh:div id="fr-open-select1-elem" class="fr-component-group" xxf:control="true">
                             <xf:select1
                                 id         = "select1"
                                 ref        = "$binding"
@@ -154,7 +155,7 @@
                                 </xsl:if>
                                 <xf:label class="xforms-hidden" ref="xxf:r('components.labels.other', '|fr-fr-resources|')"/>
                             </xsl:element>
-                        </xh:span>
+                        </xh:div>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

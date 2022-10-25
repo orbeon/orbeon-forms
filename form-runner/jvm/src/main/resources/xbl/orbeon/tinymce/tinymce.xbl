@@ -29,6 +29,7 @@
         id="fr-tinymce"
         element="fr|tinymce, xf|textarea[mediatype = 'text/html']"
         xxbl:mode="lhha binding value focus"
+        xxbl:label-for="tinymce-div"
         xxf:external-events="fr-set-client-value">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
@@ -135,9 +136,10 @@
                     instead of the "textareas" default. Important: Make sure that class
                     attribute corresponds to myDivClass variable in tinymce.js! -->
                 <xh:div
+                    xxf:control="true"
                     class="xbl-fr-tinymce-div xbl-html-input"
                     id="tinymce-div"
-                    aria-label="{xxf:label('fr-tinymce')}"
+                    role="textbox"
                     xbl:attr="style tabindex tabindex=navindex"/>
             </xf:group>
             <!-- FIXME: This should have a label at runtime to help with CSS, see https://github.com/orbeon/orbeon-forms/issues/3856. -->

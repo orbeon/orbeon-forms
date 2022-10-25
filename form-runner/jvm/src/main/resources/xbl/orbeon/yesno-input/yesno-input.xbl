@@ -24,7 +24,8 @@
         id="fr-yesno-input-binding"
         element="fr|yesno-input, xf|input:xxf-type('xs:boolean')[appearance ~= yesno]"
         xxbl:mode="lhha binding value selection"
-        xxbl:container="span">
+        xxbl:container="span"
+        xxbl:label-for="select1">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Yes/No Answer</display-name>
@@ -61,24 +62,22 @@
         </xbl:handlers>
 
         <xbl:template>
-            <xh:div role="group" aria-label="{xxf:label('fr-yesno-input-binding')}">
-                <xf:select1
-                    id="select1"
-                    appearance="full xxf:horizontal"
-                    ref="xxf:binding('fr-yesno-input-binding')"
-                    xbl:attr="xxf:encrypt-item-values">
+            <xf:select1
+                id="select1"
+                appearance="full xxf:horizontal"
+                ref="xxf:binding('fr-yesno-input-binding')"
+                xbl:attr="xxf:encrypt-item-values">
 
-                    <xf:item>
-                        <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
-                        <xf:value>true</xf:value>
-                    </xf:item>
-                    <xf:item>
-                        <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
-                        <xf:value>false</xf:value>
-                    </xf:item>
+                <xf:item>
+                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                    <xf:value>true</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                    <xf:value>false</xf:value>
+                </xf:item>
 
-                </xf:select1>
-            </xh:div>
+            </xf:select1>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

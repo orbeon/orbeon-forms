@@ -1132,7 +1132,7 @@
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-select1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span class="xforms-label" id="my-new-select1≡≡l⊙1">My label</xh:span>
-                    <xh:span class="xforms-items xforms-help-popover-control" role="radiogroup" aria-labelledby="my-new-select1≡≡l⊙1">
+                    <xh:span class="xforms-items xforms-help-popover-control" role="radiogroup" tabindex="0" aria-labelledby="my-new-select1≡≡l⊙1">
                         <xh:span class="xforms-selected">
                             <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e0⊙1" type="radio" name="my-new-select1⊙1" value="apple" checked="checked"/>
@@ -2626,7 +2626,7 @@
                 </xh:span>
                 <xh:span id="select1-full-multiple-nesting-level"
                          class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full">
-                    <xh:span class="xforms-items xforms-help-popover-control" role="radiogroup">
+                    <xh:span class="xforms-items xforms-help-popover-control" role="radiogroup" tabindex="0" >
                         <xh:span class="xforms-deselected">
                             <xh:label class="radio">
                                 <xh:input id="select1-full-multiple-nesting-level≡≡e0" type="radio"
@@ -2696,7 +2696,7 @@
                 <xh:span id="my-group" class="xforms-group">
                     <xh:span id="foo" class="xbl-component xbl-fr-foo">
                         <xh:span class="xforms-label" id="foo≡≡l">Gaga label</xh:span>
-                        <xh:span id="foo≡my-div" class="xforms-group" aria-labelledby="foo≡≡l"/>
+                        <xh:span id="foo≡my-div" class="xforms-group" aria-labelledby="foo≡≡l" role="group" tabindex="0"/>
                     </xh:span>
                 </xh:span>
             </controls>

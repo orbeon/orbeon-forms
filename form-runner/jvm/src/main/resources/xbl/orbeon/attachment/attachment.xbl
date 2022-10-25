@@ -20,10 +20,11 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xbl:binding
-            id="fr-attachment"
-            element="fr|attachment"
-            xxbl:mode="binding lhha javascript-lifecycle"
-            xxbl:container="span">
+        id="fr-attachment"
+        element="fr|attachment"
+        xxbl:mode="binding lhha javascript-lifecycle"
+        xxbl:container="span"
+        xxbl:label-for="fr-attachment-div">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Single File Attachment</display-name>
@@ -316,7 +317,7 @@
                     $readonly or
                     (not(xxf:is-blank(string($binding))) and not($multiple))"/>
 
-            <xh:div role="group" aria-label="{xxf:label('fr-attachment')}">
+            <xh:div id="fr-attachment-div" xxf:control="true">
                 <fr:dnd-repeat
                     ref="
                         if ($multiple) then

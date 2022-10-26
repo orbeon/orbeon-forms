@@ -1,6 +1,7 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.util.CoreUtils._
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -44,6 +45,9 @@ object SaxSupport {
       newAttributes
     }
   }
+
+  def newAttributes(qName: QName, value: String): Attributes =
+    new AttributesImpl kestrel (_.addOrReplace(qName, value))
 
   val EmptyAttributes: Attributes = new Attributes {
     def getLength                              : Int    = 0

@@ -76,9 +76,7 @@ class XXFormsDialogHandler(
     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, attributes, classes.toString, effectiveDialogId.some))
 
     // Child `xh:div` for label
-    val labelAtts = new AttributesImpl
-    labelAtts.addOrReplace(XFormsNames.CLASS_QNAME, "hd xxforms-dialog-head")
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, labelAtts)
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes(XFormsNames.CLASS_QNAME, "hd xxforms-dialog-head"))
     val labelValue =
       if (dialogXFormsControl != null)
         dialogXFormsControl.getLabel
@@ -90,9 +88,7 @@ class XXFormsDialogHandler(
     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName)
 
     // Child `xh:div` for body
-    val bodyAtts = new AttributesImpl
-    labelAtts.addOrReplace(XFormsNames.CLASS_QNAME, "bd xxforms-dialog-body")
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, bodyAtts)
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes(XFormsNames.CLASS_QNAME, "bd xxforms-dialog-body"))
   }
 
   override def `end`(): Unit = {

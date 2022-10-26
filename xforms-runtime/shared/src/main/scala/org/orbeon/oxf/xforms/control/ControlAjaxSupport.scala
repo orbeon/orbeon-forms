@@ -21,10 +21,10 @@ import org.orbeon.oxf.xforms.control.ControlAjaxSupport._
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML
 import org.orbeon.oxf.xml.SaxSupport._
-import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.xforms.{XFormsId, XFormsNames}
+import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.helpers.AttributesImpl
 import shapeless.syntax.typeable._
 
@@ -255,21 +255,16 @@ object ControlAjaxSupport {
     } yield
       attName -> attValue
 
+  // We want the same id that is placed on the `<label>` or `<span>` element in the markup, so follow the logic
+  // present in `XFormsLHHAHandler`.
+  // TODO: We don't want this duplication of logic!
   def findAriaByWithNs(
     staticControl      : ElementAnalysis,
     controlEffectiveId : String,
     lhha               : LHHA,
     condition          : LHHAAnalysis => Boolean)(
     containingDocument : XFormsContainingDocument
-  ): Option[String] = {
-
-    import shapeless._
-    import syntax.typeable._
-
-    // We want the same id that is placed on the `<label>` or `<span>` element in the markup, so follow the logic
-    // present in `XFormsLHHAHandler`.
-    // TODO: We don't want this duplication of logic!
-
+  ): Option[String] =
     for {
       staticLhhaSupport <- staticControl.narrowTo[StaticLHHASupport]
       staticLhha        <- staticLhhaSupport.lhhBy(lhha) orElse staticLhhaSupport.lhh(lhha)
@@ -295,5 +290,4 @@ object ControlAjaxSupport {
 
           containingDocument.namespaceId(XFormsId.buildEffectiveId(staticLhha.prefixedId, lhhaRepeatIndices))
       }
-  }
 }

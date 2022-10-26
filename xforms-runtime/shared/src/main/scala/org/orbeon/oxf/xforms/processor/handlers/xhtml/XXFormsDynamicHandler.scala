@@ -56,7 +56,7 @@ class XXFormsDynamicHandler(
     this.elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName)
 
     val classes = "xxforms-dynamic-control"
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, attributes, classes, effectiveId.some))
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, attributes, classes, effectiveId.some))
     handlerContext.pushComponentContext(prefixedId)
 
     containingDocument.getControlByEffectiveId(effectiveId) match {

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, SelectAppearanceTrait, SelectionControlTrait}
 import org.orbeon.oxf.xforms.control.XFormsValueControl
@@ -22,7 +23,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.itemset._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI => XHTML}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
@@ -77,7 +77,6 @@ object XFormsSelect1Handler {
     baseHandler        : XFormsBaseHandlerXHTML,
     xhtmlPrefix        : String,
     containingDocument : XFormsContainingDocument,
-    reusableAttributes : AttributesImpl,
     attributes         : Attributes,
     templateId         : String,
     itemName           : String,
@@ -93,7 +92,6 @@ object XFormsSelect1Handler {
     ) {                                                                  // so output that even though it's not ideal (FIXME)
       handleItemFull(
         baseHandler        = baseHandler,
-        reusableAttributes = reusableAttributes,
         attributes         = attributes,
         xhtmlPrefix        = xhtmlPrefix,
         containingDocument = containingDocument,
@@ -129,7 +127,6 @@ object XFormsSelect1Handler {
 
   private def handleItemFull(
     baseHandler        : XFormsBaseHandlerXHTML,
-    reusableAttributes : AttributesImpl,
     attributes         : Attributes,
     xhtmlPrefix        : String,
     containingDocument : XFormsContainingDocument,
@@ -156,8 +153,7 @@ object XFormsSelect1Handler {
     val spanAttributes =
       XFormsBaseHandler.getIdClassXHTMLAttributes(
         containingDocument,
-        reusableAttributes,
-        XMLReceiverSupport.EmptyAttributes,
+        SaxSupport.EmptyAttributes,
         itemClasses,
         None
       )
@@ -171,13 +167,13 @@ object XFormsSelect1Handler {
       val labelName = if (! isStaticReadonly) "label" else "span"
 
       if (! isBooleanInput) {
-        reusableAttributes.clear()
+        val atts = new AttributesImpl
         // Add Bootstrap classes
-        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, if (isMultiple) "checkbox" else "radio")
+        atts.addOrReplace(XFormsNames.CLASS_QNAME, if (isMultiple) "checkbox" else "radio")
         // No need for @for as the input, if any, is nested
         outputLabelForStart(
           handlerContext           = xformsHandlerContextForItem,
-          attributes               = reusableAttributes,
+          attributes               = atts,
           labelEffectiveIdOpt      = None,
           forEffectiveIdWithNs     = None,
           lhha                     = LHHA.Label,
@@ -190,9 +186,9 @@ object XFormsSelect1Handler {
       if (! isStaticReadonly) {
         val elementName = "input"
 
-        reusableAttributes.clear()
-        reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, itemNamespacedId)
-        reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, fullItemType)
+        val atts = new AttributesImpl
+        atts.addOrReplace(XFormsNames.ID_QNAME, itemNamespacedId)
+        atts.addOrReplace("type", fullItemType)
 
         // Get group name from selection control if possible
         val name =
@@ -201,19 +197,19 @@ object XFormsSelect1Handler {
             case _ => itemName
           }
 
-        reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, name)
-        reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue(encode))
+        atts.addOrReplace("name", name)
+        atts.addOrReplace("value", item.externalValue(encode))
 
         if (control != null) {
           if (isSelected)
-            reusableAttributes.addAttribute("", "checked", "checked", XMLReceiverHelper.CDATA, "checked")
+            atts.addOrReplace("checked", "checked")
           if (isFirst)
-            XFormsBaseHandler.forwardAccessibilityAttributes(attributes, reusableAttributes)
+            XFormsBaseHandler.forwardAccessibilityAttributes(attributes, atts)
         }
         if (baseHandler.isXFormsReadonlyButNotStaticReadonly(control))
-          outputReadonlyAttribute(reusableAttributes)
+          outputReadonlyAttribute(atts)
 
-        element(localName = elementName, prefix = xhtmlPrefix, uri = XHTML, atts = reusableAttributes)
+        element(localName = elementName, prefix = xhtmlPrefix, uri = XHTML, atts = atts)
       }
 
       if (! isBooleanInput) {
@@ -238,11 +234,11 @@ object XFormsSelect1Handler {
 
         // <span class="xforms-help">
         item.help foreach { help =>
-          reusableAttributes.clear()
-          reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-help")
+          val atts = new AttributesImpl
+          atts.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-help")
           outputLabelFor(
             handlerContext           = xformsHandlerContextForItem,
-            attributes               = reusableAttributes,
+            attributes               = atts,
             labelEffectiveIdOpt      = None,
             forEffectiveIdWithNs     = None,
             lhha                     = LHHA.Help,
@@ -255,11 +251,11 @@ object XFormsSelect1Handler {
 
         // <span class="xforms-hint">
         item.hint foreach { hint =>
-          reusableAttributes.clear()
-          reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-hint")
+          val atts = new AttributesImpl
+          atts.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-hint")
           outputLabelFor(
             handlerContext           = xformsHandlerContextForItem,
-            attributes               = reusableAttributes,
+            attributes               = atts,
             labelEffectiveIdOpt      = None,
             forEffectiveIdWithNs     = None,
             lhha                     = LHHA.Hint, elementName = "span",
@@ -427,7 +423,7 @@ class XFormsSelect1Handler(
                     // See https://github.com/orbeon/orbeon-forms/issues/4843
 
                     val itemClasses = XFormsSelect1Handler.getItemClasses(item, null)
-                    val optGroupAttributes = XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, XMLReceiverSupport.EmptyAttributes, itemClasses, None)
+                    val optGroupAttributes = XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, SaxSupport.EmptyAttributes, itemClasses, None)
 
                     optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, item.label.label)
 
@@ -497,7 +493,7 @@ class XFormsSelect1Handler(
     // For accessibility, label the group, since the control label doesn't apply to a single input
     containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, if (isMultiple) "group" else "radiogroup")
     if (handlerContext.a11yFocusOnGroups)
-      reusableAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
+      containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
 
     handleAriaByAttForSelect1Full(containerAttributes)
 
@@ -529,7 +525,6 @@ class XFormsSelect1Handler(
       for (((item, _), itemIndex) <- itemset.allItemsWithValueIterator(reverse = false).zipWithIndex) {
         XFormsSelect1Handler.handleItemFull(
           baseHandler        = this,
-          reusableAttributes = reusableAttributes,
           attributes         = attributes,
           xhtmlPrefix        = xhtmlPrefix,
           containingDocument = containingDocument,
@@ -563,7 +558,7 @@ class XFormsSelect1Handler(
   ): Boolean = {
 
     val itemClasses      = XFormsSelect1Handler.getItemClasses(item, null)
-    val optionAttributes = XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, XMLReceiverSupport.EmptyAttributes, itemClasses, None)
+    val optionAttributes = XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, SaxSupport.EmptyAttributes, itemClasses, None)
 
     // Add item attributes to `<option>`
     XFormsSelect1Handler.addItemAttributes(item, optionAttributes)

@@ -131,7 +131,6 @@ class XHTMLBodyHandler(
         this,
         htmlPrefix,
         containingDocument,
-        reusableAttributes,
         newAtts,
         s"xforms-select${if (isMultiple) "" else "1"}-full-template",
         "$xforms-item-name$",

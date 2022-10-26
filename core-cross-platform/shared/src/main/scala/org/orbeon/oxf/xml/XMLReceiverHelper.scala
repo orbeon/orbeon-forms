@@ -1,8 +1,8 @@
 package org.orbeon.oxf.xml
 
 import org.orbeon.oxf.common.OXFException
-import org.xml.sax.{Attributes, ContentHandler, SAXException}
 import org.xml.sax.helpers.AttributesImpl
+import org.xml.sax.{Attributes, ContentHandler, SAXException}
 
 
 /**

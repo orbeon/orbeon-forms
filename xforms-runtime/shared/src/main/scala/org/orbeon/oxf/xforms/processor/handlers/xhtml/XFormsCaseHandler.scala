@@ -19,10 +19,12 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, OutputInterceptor}
+import org.orbeon.oxf.xml.SaxSupport.AttributesImplOps
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
 
 /**
  * Handle xf:case.
@@ -105,14 +107,14 @@ class XFormsCaseHandler(
 
         if (isVisible) {
 
-          reusableAttributes.clear()
-          reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, controlClasses)
+          val atts = new AttributesImpl
+          atts.addOrReplace(XFormsNames.CLASS_QNAME, controlClasses)
 
           // `ControlsComparator` skips the root element, so we create a dummy one to be skipped
           if (handlerContext.hasFullUpdateTopLevelControl)
-            currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, XMLReceiverSupport.EmptyAttributes)
+            currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, SaxSupport.EmptyAttributes)
 
-          currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes)
+          currentSavedOutput.startElement(XHTML_NAMESPACE_URI, "span", spanQName, atts)
 
         } else {
           controller.output = new DeferredXMLReceiverAdapter

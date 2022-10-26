@@ -177,14 +177,13 @@ abstract class XFormsControlLifecycleHandler(
     control     : XFormsControl,
     addId       : Boolean
   ): AttributesImpl = {
-    reusableAttributes.clear()
-    val containerAttributes = reusableAttributes
+    val atts = new AttributesImpl
     if (addId)
-      containerAttributes.addOrReplace(
+      atts.addOrReplace(
         XFormsNames.ID_QNAME,
         XFormsBaseHandler.getLHHACIdWithNs(containingDocument, effectiveId, XFormsBaseHandlerXHTML.ControlCode)
       )
-    containerAttributes
+    atts
   }
 
   // Return the effective id of the element to which `label/@for`, etc. must point to.

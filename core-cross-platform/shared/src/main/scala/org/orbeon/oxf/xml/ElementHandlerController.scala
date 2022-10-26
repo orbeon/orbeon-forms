@@ -163,7 +163,7 @@ trait ElementHandlerControllerHandlers[Ctx] extends XMLReceiver {
       uri,
       localname,
       qName,
-      if (attributes.getLength == 0) XMLReceiverSupport.EmptyAttributes else new AttributesImpl(attributes), // Q: Why copy `Attributes`?
+      if (attributes.getLength == 0) SaxSupport.EmptyAttributes else new AttributesImpl(attributes), // Q: Why copy `Attributes`?
       handlerContext
     ) map
       (HandlerInfo(level, _, locator))

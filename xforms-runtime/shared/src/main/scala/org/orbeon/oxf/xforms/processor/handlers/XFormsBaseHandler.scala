@@ -32,9 +32,6 @@ abstract class XFormsBaseHandler protected (
 
   protected val containingDocument: XFormsContainingDocument = handlerContext.containingDocument
 
-  // TODO: Get rid of this?
-  protected var reusableAttributes = new AttributesImpl
-
   // TODO: update to use `repeating` and `forwarding`
   override def isRepeating: Boolean = repeating
   override def isForwarding: Boolean = forwarding
@@ -84,32 +81,31 @@ object XFormsBaseHandler {
 
   def getIdClassXHTMLAttributes(
     containingDocument : XFormsContainingDocument,
-    reusableAttributes : AttributesImpl,
     elementAttributes  : Attributes,
     classes            : String,
     effectiveIdOpt     : Option[String]
   ): AttributesImpl = {
 
-    reusableAttributes.clear()
+    val atts = new AttributesImpl
 
     // Copy "id"
     effectiveIdOpt foreach { effectiveId =>
-      reusableAttributes.addOrReplace(XFormsNames.ID_QNAME, containingDocument.namespaceId(effectiveId))
+      atts.addOrReplace(XFormsNames.ID_QNAME, containingDocument.namespaceId(effectiveId))
     }
 
     // Create "class" attribute if necessary
     if (classes != null && classes.nonEmpty)
-      reusableAttributes.addOrReplace(XFormsNames.CLASS_QNAME, classes)
+      atts.addOrReplace(XFormsNames.CLASS_QNAME, classes)
 
     // Copy attributes in the xhtml namespace to no namespace
     for (i <- 0 until elementAttributes.getLength) {
       if (XMLConstants.XHTML_NAMESPACE_URI == elementAttributes.getURI(i)) {
         val name = elementAttributes.getLocalName(i)
         if (name != "class")
-          reusableAttributes.addOrReplace(name, elementAttributes.getValue(i))
+          atts.addOrReplace(name, elementAttributes.getValue(i))
       }
     }
-    reusableAttributes
+    atts
   }
 
   def isStaticReadonly(control: XFormsControl): Boolean =

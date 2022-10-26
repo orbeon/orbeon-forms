@@ -3,6 +3,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
+import org.orbeon.oxf.xml.SaxSupport.AttributesImplOps
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
@@ -39,17 +40,16 @@ class XFormsSecretHandler(
       val inputQName = XMLUtils.buildQName(xhtmlPrefix, "input")
       containerAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "password")
       containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId)
-      containerAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, if (secretControl == null || secretControl.getExternalValue == null) "" else secretControl.getExternalValue()
-      )
+      containerAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, if (secretControl == null || secretControl.getExternalValue == null) "" else secretControl.getExternalValue())
       // Handle accessibility attributes
       XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
       handleAriaByAtts(containerAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
 
       // Output all extension attributes
       // Output `xxf:*` extension attributes
-      secretControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XFormsNames.XXFORMS_NAMESPACE_URI)
+      secretControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XFormsNames.XXFORMS_NAMESPACE_URI)
       if (isXFormsReadonlyButNotStaticReadonly(secretControl))
-        XFormsBaseHandlerXHTML.outputReadonlyAttribute(reusableAttributes)
+        XFormsBaseHandlerXHTML.outputReadonlyAttribute(containerAttributes)
       XFormsBaseHandler.handleAriaAttributes(secretControl.isRequired, secretControl.isValid, secretControl.visited, containerAttributes)
 
       // Output element
@@ -58,7 +58,7 @@ class XFormsSecretHandler(
     } else {
       // Output static read-only value
       val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
-      containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field")
+      containerAttributes.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-field")
       contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes)
       val value = secretControl.getFormattedValue
       if (value.isDefined)

@@ -21,13 +21,15 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.outputDisabledAttribute
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
 import org.orbeon.oxf.xml._
 import org.orbeon.xforms.Constants.ComponentSeparator
-import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax._
+import org.xml.sax.helpers.AttributesImpl
 
 import java.{lang => jl}
 
@@ -68,72 +70,66 @@ class XFormsUploadHandler(
     val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, currentControl, addId = true)
     val xhtmlPrefix         = handlerContext.findXHTMLPrefix
 
-    // Enclosing xhtml:span
+    // Enclosing xh:span
     withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes) {
 
-      // xhtml:input unless static readonly
+      // xh:input unless static readonly
       if (! XFormsBaseHandler.isStaticReadonly(currentControl)) {
-        reusableAttributes.clear()
-        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-select")
-        reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "file")
+        val atts = new AttributesImpl
+        atts.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-upload-select")
+        atts.addOrReplace("type", "file")
         // Generate an id, because JS event handlers are not attached to elements that don't have an id, and
         // this causes issues with IE where we register handlers directly on controls
-        reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, computeForEffectiveIdWithNs)
-        reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId)
+        atts.addOrReplace(XFormsNames.ID_QNAME, computeForEffectiveIdWithNs)
+        atts.addOrReplace("name", getEffectiveId)
         // IE causes issues when the user types in or pastes in an incorrect file name. Some sites use this to
         // disable pasting in the file. See http://tinyurl.com/6dcd6a
-        reusableAttributes.addAttribute("", "unselectable", "unselectable", XMLReceiverHelper.CDATA, "on")
+        atts.addOrReplace("unselectable", "on")
         // NOTE: @value was meant to suggest an initial file name, but this is not supported by browsers
 
         if (isXFormsReadonlyButNotStaticReadonly(currentControl))
-          outputDisabledAttribute(reusableAttributes)
+          outputDisabledAttribute(atts)
 
         // @accept
         uploadControl       flatMap
           (_.acceptValue)   map
           mediatypeToAccept foreach
-          (accept => reusableAttributes.addAttribute("", "accept", "accept", XMLReceiverHelper.CDATA, accept))
+          (accept => atts.addOrReplace("accept", accept))
 
         uploadControl foreach
-          (_.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI))
+          (_.addExtensionAttributesExceptClassAndAcceptForHandler(atts, XXFORMS_NAMESPACE_URI))
 
-        XFormsBaseHandler.forwardAccessibilityAttributes(attributes, reusableAttributes)
-        handleAriaByAtts(reusableAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
+        XFormsBaseHandler.forwardAccessibilityAttributes(attributes, atts)
+        handleAriaByAtts(atts, XFormsLHHAHandler.coreControlLhhaByCondition)
 
         // `@multiple="multiple"`
         if (elementAnalysis.asInstanceOf[UploadControl].multiple)
-          reusableAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple")
+          atts.addOrReplace("multiple", "multiple")
 
-        element("input", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes)
+        element("input", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = atts)
       }
 
-      // Nested xhtml:span for xforms-upload-info
-      reusableAttributes.clear()
-      reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-info")
-      withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes) {
+      // Nested xh:span for xforms-upload-info
+      withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = List(XFormsNames.CLASS_QNAME.localName -> "xforms-upload-info")) {
 
         // Metadata
-        def outputSpan(name: String, value: XFormsUploadControl => Option[String]): Unit = {
-          reusableAttributes.clear()
-          reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-" + name)
-
-          withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes) {
+        def outputSpan(name: String, value: XFormsUploadControl => Option[String]): Unit =
+          withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = List(XFormsNames.CLASS_QNAME.localName -> s"xforms-upload-$name")) {
             uploadControl flatMap value foreach
               { v => receiver.characters(v.toCharArray, 0, v.length) }
           }
-        }
 
         outputSpan("filename",  _.filename)
         outputSpan("mediatype", _.fileMediatype)
         outputSpan("size",      _.humanReadableFileSize)
 
         // Clickable image
-        reusableAttributes.clear()
-        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-upload-remove")
-        reusableAttributes.addAttribute("", "src",   "src",   XMLReceiverHelper.CDATA, "/ops/images/xforms/remove.gif")
-        reusableAttributes.addAttribute("", "alt",   "alt",   XMLReceiverHelper.CDATA, "Remove File")
-
-        element("img", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = reusableAttributes)
+        val imgAtts = List(
+          XFormsNames.CLASS_QNAME.localName -> "xforms-upload-remove",
+          "src"                             ->  "/ops/images/xforms/remove.gif",
+          "alt"                             ->  "Remove File"
+        )
+        element("img", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = imgAtts)
       }
     }
   }

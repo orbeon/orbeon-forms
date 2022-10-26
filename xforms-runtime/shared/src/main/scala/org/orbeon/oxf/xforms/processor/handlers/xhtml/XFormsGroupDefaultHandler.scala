@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms.analysis.controls.{ContainerControl, LHHA, LHHAAnal
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.forwardAccessibilityAttributes
-import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xml.SaxSupport._
@@ -73,14 +72,14 @@ class XFormsGroupDefaultHandler(
     //
     // So remains the case of an external LHHA. This is where it makes sense to add the `aria-*` attributes.
     //
-    if (handleAriaByAtts(reusableAttributes, _ => true)) {
+    if (handleAriaByAtts(atts, _ => true)) {
       // There is at least one reference with `aria-*`, so add new attributes
-      reusableAttributes.addOrReplace("role", "group")
+      atts.addOrReplace(XFormsNames.ROLE_QNAME, "group")
       if (handlerContext.a11yFocusOnGroups)
-        reusableAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
+        atts.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
     }
     // After the above so that attributes can be overridden
-    forwardAccessibilityAttributes(attributes, reusableAttributes)
+    forwardAccessibilityAttributes(attributes, atts)
   }
 
   override protected def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit = {
@@ -99,12 +98,12 @@ class XFormsGroupDefaultHandler(
       classes.append("xforms-mediatype-text-html")
     }
 
-    reusableAttributes.clear()
-    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes.toString)
+    val atts = new AttributesImpl
+    atts.addOrReplace(XFormsNames.CLASS_QNAME, classes.toString)
 
     XFormsBaseHandlerXHTML.outputLabelFor(
       handlerContext         = handlerContext,
-      attributes             = reusableAttributes,
+      attributes             = atts,
       labelEffectiveIdOpt    = None,
       forEffectiveIdWithNs   = containingDocument.namespaceId(effectiveId).some,
       lhha                   = LHHA.Label,

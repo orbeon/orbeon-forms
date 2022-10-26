@@ -23,13 +23,15 @@ import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
 import org.orbeon.xforms.Constants.ComponentSeparator
-import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
 
 
 /**
@@ -119,17 +121,17 @@ class XFormsInputHandler(
         // Main input field
         locally {
           val inputIdName = getFirstInputEffectiveIdWithNs(getEffectiveId).getOrElse(throw new IllegalStateException)
-          reusableAttributes.clear()
-          reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
-          reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "text")
+          val atts = new AttributesImpl
+          atts.addOrReplace(XFormsNames.ID_QNAME, inputIdName)
+          atts.addOrReplace("type", "text")
           // Use effective id for name of first field
-          reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, inputIdName)
+          atts.addOrReplace("name", inputIdName)
           val inputClasses = new java.lang.StringBuilder("xforms-input-input")
           if (isRelevantControl) {
             // Output value only for concrete control
             val formattedValue = inputControl.getFirstValueUseFormat
             // Regular case, value goes to input control
-            reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, Option(formattedValue) getOrElse "")
+            atts.addOrReplace("value", Option(formattedValue) getOrElse "")
             val firstType = inputControl.getFirstValueType
             if (firstType ne null) {
               inputClasses.append(" xforms-type-")
@@ -142,28 +144,28 @@ class XFormsInputHandler(
 //              case _ =>
 //            }
           } else {
-            reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, "")
+            atts.addOrReplace("value", "")
           }
 
           // Output xxf:* extension attributes
-          inputControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI)
+          inputControl.addExtensionAttributesExceptClassAndAcceptForHandler(atts, XXFORMS_NAMESPACE_URI)
 
           // Add attribute even if the control is not concrete
           placeHolderInfo foreach { placeHolderInfo =>
             if (placeHolderInfo.value ne null) // unclear whether this can ever be null
-              reusableAttributes.addAttribute("", "placeholder", "placeholder", XMLReceiverHelper.CDATA, placeHolderInfo.value)
+              atts.addOrReplace("placeholder", placeHolderInfo.value)
           }
 
-          reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
+          atts.addOrReplace("class", inputClasses.toString)
 
-          forwardAccessibilityAttributes(attributes, reusableAttributes)
-          handleAriaByAtts(reusableAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
+          forwardAccessibilityAttributes(attributes, atts)
+          handleAriaByAtts(atts, XFormsLHHAHandler.coreControlLhhaByCondition)
 
           if (isXFormsReadonlyButNotStaticReadonly(inputControl))
-            outputReadonlyAttribute(reusableAttributes)
-          handleAriaAttributes(inputControl.isRequired, inputControl.isValid, inputControl.visited, reusableAttributes)
+            outputReadonlyAttribute(atts)
+          handleAriaAttributes(inputControl.isRequired, inputControl.isValid, inputControl.visited, atts)
 
-          xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
+          xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, atts)
           xmlReceiver.endElement(XHTML_NAMESPACE_URI, "input", inputQName)
         }
       } else {

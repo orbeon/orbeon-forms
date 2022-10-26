@@ -5,9 +5,11 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
 
 
 /**
@@ -71,12 +73,12 @@ class XXFormsDialogHandler(
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
     val divQName = XMLUtils.buildQName(xhtmlPrefix, "div")
     val contentHandler = handlerContext.controller.output
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, reusableAttributes, attributes, classes.toString, effectiveDialogId.some))
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, attributes, classes.toString, effectiveDialogId.some))
 
     // Child `xh:div` for label
-    reusableAttributes.clear()
-    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "hd xxforms-dialog-head")
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes)
+    val labelAtts = new AttributesImpl
+    labelAtts.addOrReplace(XFormsNames.CLASS_QNAME, "hd xxforms-dialog-head")
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, labelAtts)
     val labelValue =
       if (dialogXFormsControl != null)
         dialogXFormsControl.getLabel
@@ -88,9 +90,9 @@ class XXFormsDialogHandler(
     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName)
 
     // Child `xh:div` for body
-    reusableAttributes.clear()
-    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "bd xxforms-dialog-body")
-    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes)
+    val bodyAtts = new AttributesImpl
+    labelAtts.addOrReplace(XFormsNames.CLASS_QNAME, "bd xxforms-dialog-body")
+    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, bodyAtts)
   }
 
   override def `end`(): Unit = {

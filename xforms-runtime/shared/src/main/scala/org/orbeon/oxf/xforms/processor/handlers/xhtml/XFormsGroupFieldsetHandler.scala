@@ -3,8 +3,11 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.analysis.controls.{GroupControl, LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
 
 
 class XFormsGroupFieldsetHandler(
@@ -36,13 +39,13 @@ class XFormsGroupFieldsetHandler(
     // styling in particular.
     elementAnalysis.firstLhha(LHHA.Label) foreach { lhhaAnalysis =>
       // Handle label classes
-      reusableAttributes.clear()
-      reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, getLabelClasses(groupControl, lhhaAnalysis).toString)
-      reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, XFormsBaseHandler.getLHHACIdWithNs(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(LHHA.Label)))
+      val atts = new AttributesImpl
+      atts.addOrReplace(XFormsNames.CLASS_QNAME, getLabelClasses(groupControl, lhhaAnalysis).toString)
+      atts.addOrReplace(XFormsNames.ID_QNAME, XFormsBaseHandler.getLHHACIdWithNs(containingDocument, getEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(LHHA.Label)))
 
       // Output `xh:legend` with label content
       val legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend")
-      contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, reusableAttributes)
+      contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, atts)
       val labelValue = getLabelValue(groupControl)
       if ((labelValue ne null) && labelValue.nonEmpty)
         contentHandler.characters(labelValue.toCharArray, 0, labelValue.length)

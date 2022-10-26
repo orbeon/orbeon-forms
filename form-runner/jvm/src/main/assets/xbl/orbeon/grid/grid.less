@@ -282,7 +282,7 @@
 
             .xforms-help {
                 float: left;
-                margin-top: (@baseLineHeight - 14)/2 + 1;      // Vertically center help image on first line
+                margin-top: (@baseLineHeight - 14)/2 + 1;   // Vertically center help image on first line
                 margin-right: 3px;
 
                 .help-icon();
@@ -296,6 +296,7 @@
                 display: table;                             // Instead of block, so:
                                                             // - We don't capture clicks to the right of the text
                                                             // - We prevent further content on the same line
+                > div:first-child { display: inline; }      // Don't go on a new line after a required '*'
             }
 
             // Controls

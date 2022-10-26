@@ -3,7 +3,9 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsRangeControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
+import org.orbeon.oxf.xml.SaxSupport.AttributesImplOps
 import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -52,9 +54,9 @@ class XFormsRangeHandler(
 
   private def getThumbAttributes: AttributesImpl = {
     // Just set class
-    reusableAttributes.clear()
-    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, XFormsRangeHandler.RangeThumbClass)
-    reusableAttributes
+    val atts = new AttributesImpl
+    atts.addOrReplace(XFormsNames.CLASS_QNAME, XFormsRangeHandler.RangeThumbClass)
+    atts
   }
 
   private def getBackgroundAttributes(effectiveId: String, xformsControl: XFormsRangeControl): AttributesImpl = {

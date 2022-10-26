@@ -7,10 +7,8 @@
             flex-grow: 1;
         }
 
-        &.fr-field-width-full {
+        &.fr-field-width-full, &.fr-field-width-natural {
             .xbl-fr-date, .xbl-fr-time {
-                // Override natural on date/time components
-                .fr-field-width-natural { max-width: none }
                 // Labels for date and time fields are for accessibility
                 .xforms-label {
                     overflow : hidden;
@@ -21,8 +19,14 @@
                 }
             }
         }
+        &.fr-field-width-full {
+            .xbl-fr-date, .xbl-fr-time {
+                // Override natural on date/time components
+                .fr-field-width-natural { max-width: none }
+            }
+        }
         &.fr-field-width-natural {
-            max-width: 260px;
+            max-width: 260px; // Q: Where does this width come from?
         }
 
         .xbl-fr-date { padding-right : 2px }

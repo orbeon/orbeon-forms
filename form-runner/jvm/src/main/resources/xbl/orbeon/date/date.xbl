@@ -185,7 +185,7 @@
                             return
                                 $translated
                         "/>
-                    <xh:input type="text" placeholder="{$placeholder}" id="input"/>
+                    <xh:input xh:type="text" placeholder="{$placeholder}" id="input" xxf:control="true" role="textbox"/>
                     <xh:span class="add-on" tabindex="0">
                         <xh:i class="fa fa-fw fa-calendar"/>
                     </xh:span>

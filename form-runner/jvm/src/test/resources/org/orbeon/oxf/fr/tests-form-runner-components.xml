@@ -764,7 +764,8 @@
                     <xxf:control-values>
                         <xxf:control class="input-append date fr-field-width-natural" id="my-date≡xf-9"/>
                         <xxf:attribute for="my-date≡input" name="placeholder"/>
-                        <xxf:control id="my-date≡xf-13" relevant="false"/>
+                        <xxf:attribute for="my-date≡input" name="role">textbox</xxf:attribute>
+                        <xxf:control id="my-date≡xf-12" relevant="false"/>
                         <xxf:init id="my-date">
                             <xxf:value>{"value":"2010-01-13","format":"[M]/[D]/[Y]","excludedDates":[],"weekStart":null}</xxf:value>
                         </xxf:init>
@@ -814,11 +815,12 @@
                         <xxf:control id="my-currency≡prefix">
                             <xxf:value>$</xxf:value>
                         </xxf:control>
-                        <xxf:attribute for="my-currency≡html-input" name="aria-describedby">my-currency≡prefix</xxf:attribute>
+                        <xxf:control id="my-currency≡html-input" class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"/>
+                        <xxf:attribute for="my-currency≡html-input" name="step">any</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
-                        <xxf:control id="my-currency≡xf-18" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-14" relevant="false"/>
                         <xxf:init id="my-currency">
                             <xxf:value>{"displayValue":"12.34","editValue":"12.34","decimalSeparator":"."}</xxf:value>
                         </xxf:init>

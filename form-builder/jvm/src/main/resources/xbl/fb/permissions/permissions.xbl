@@ -242,6 +242,7 @@
                                 (if ($show-owner-group-permissions) then 2 else 0) +    (: Maybe owner/group :)
                                 count($ui/always-show-roles/role)                       (: Fixed roles :)
                             }"
+                            clear-constraint="exists(role)"
                             columns="24"
                             class="fb-permissions-grid">
 

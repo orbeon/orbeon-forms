@@ -212,7 +212,7 @@ object XFormsServer {
                               try {
                                 responseStore.replay(xmlReceiver)
                               } catch {
-                                case NonFatal(t) =>
+                                case NonFatal(_) =>
                                   debug("retry: got exception while sending response; ignoring and expecting client to retry") // `t: Throwable`
                               }
 

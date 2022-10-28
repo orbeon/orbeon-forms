@@ -172,13 +172,13 @@ object XFormsSelect1Handler {
         atts.addOrReplace(XFormsNames.CLASS_QNAME, if (isMultiple) "checkbox" else "radio")
         // No need for @for as the input, if any, is nested
         outputLabelForStart(
-          handlerContext           = xformsHandlerContextForItem,
-          attributes               = atts,
-          labelEffectiveIdOpt      = None,
-          forEffectiveIdWithNs     = None,
-          lhha                     = LHHA.Label,
-          elementName              = labelName,
-          isExternal               = false
+          handlerContext       = xformsHandlerContextForItem,
+          attributes           = atts,
+          labelEffectiveIdOpt  = None,
+          forEffectiveIdWithNs = None,
+          lhha                 = LHHA.Label,
+          elementName          = labelName,
+          isExternal           = false
         )
       }
 

@@ -88,7 +88,6 @@ class XHTMLHeadHandler(
     val (scripts, styles)                 = ops.bindingResources
 
     // Stylesheets
-
     outputCSSResources(xhtmlPrefix, isMinimal, containingDocument.staticState.assets, styles, baselineStyles)
 
     // Scripts

@@ -145,6 +145,29 @@
         </xsl:element>
     </xsl:template>
 
+    <!-- Add the class `fr-grid-tr-with-long-content` on table rows, then used in CSS t0 avoid breaking the content of
+         table rows that don't contain long content (we'll be able to avoid adding this class when we upgrade
+         to a PDF rendered that supports `:has()`) -->
+    <xsl:template match="*:tr[p:has-class('fr-grid-tr', .)]" mode="#all">
+        <xsl:variable name="applied-content">
+            <xsl:apply-templates select="node()" mode="#current"/>
+        </xsl:variable>
+        <xsl:variable
+            name="has-long-content"
+            select="$applied-content//*[p:has-class('fr-long-content', .)]"/>
+        <xsl:element name="{local-name()}">
+            <xsl:attribute name="class" select="
+                string-join(
+                    (
+                        if ($has-long-content) then 'fr-grid-tr-with-long-content' else (),
+                        @class
+                    ),
+                    ' '
+                )"/>
+            <xsl:copy-of select="$applied-content"/>
+        </xsl:element>
+    </xsl:template>
+
     <!-- See https://github.com/orbeon/orbeon-forms/issues/2347 -->
     <xsl:template
         priority="10"

@@ -180,8 +180,13 @@
 
                     .fr-grid-tr {
                         page-break-before: auto;
-                        page-break-inside: auto; // https://github.com/orbeon/orbeon-forms/issues/2573
                         page-break-after:  auto;
+
+                        // Keep the content of a row on a same page, unless it contains long content
+                        page-break-inside: avoid;
+                        &.fr-grid-tr-with-long-content {
+                          page-break-inside: auto;
+                        }
 
                         &.fr-page-break-before {
                             page-break-before: always;

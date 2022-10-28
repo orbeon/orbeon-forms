@@ -17,7 +17,8 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsTextareaControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 
@@ -58,7 +59,7 @@ class XFormsTextareaHandler(
     if (! XFormsBaseHandler.isStaticReadonly(textareaControl)) {
 
       val textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea")
-      htmlTextareaAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId)
+      htmlTextareaAttributes.addOrReplace("name", getEffectiveId)
 
       XFormsBaseHandler.forwardAccessibilityAttributes(attributes, htmlTextareaAttributes)
       handleAriaByAtts(htmlTextareaAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
@@ -75,7 +76,7 @@ class XFormsTextareaHandler(
       // Add attribute even if the control is not concrete
       placeHolderInfo foreach { placeHolderInfo =>
         if (placeHolderInfo.value ne null) // unclear whether this can ever be null
-          htmlTextareaAttributes.addAttribute("", "placeholder", "placeholder", XMLReceiverHelper.CDATA, placeHolderInfo.value)
+          htmlTextareaAttributes.addOrReplace("placeholder", placeHolderInfo.value)
       }
 
       xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, htmlTextareaAttributes)

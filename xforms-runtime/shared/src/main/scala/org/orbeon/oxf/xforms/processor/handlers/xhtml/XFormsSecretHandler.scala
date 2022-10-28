@@ -3,8 +3,8 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.SaxSupport.AttributesImplOps
-import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 
@@ -38,9 +38,9 @@ class XFormsSecretHandler(
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
     if (! XFormsBaseHandler.isStaticReadonly(secretControl)) {
       val inputQName = XMLUtils.buildQName(xhtmlPrefix, "input")
-      containerAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "password")
-      containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, getEffectiveId)
-      containerAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, if (secretControl == null || secretControl.getExternalValue == null) "" else secretControl.getExternalValue())
+      containerAttributes.addOrReplace("type", "password")
+      containerAttributes.addOrReplace("name", getEffectiveId)
+      containerAttributes.addOrReplace("value", if (secretControl == null || secretControl.getExternalValue == null) "" else secretControl.getExternalValue())
       // Handle accessibility attributes
       XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
       handleAriaByAtts(containerAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)

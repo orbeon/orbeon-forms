@@ -21,9 +21,10 @@ import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML._
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsTriggerFullHandler._
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
-import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
-import org.orbeon.oxf.xml.{XMLReceiver, XMLReceiverSupport, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -58,7 +59,7 @@ class XFormsTriggerFullHandler(
     val isHTMLLabel = (triggerControl ne null) && triggerControl.isHTMLLabel
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
 
-    addAttribute(containerAttributes, "type", "button")
+    containerAttributes.addOrReplace("type", "button")
 
     // Disabled attribute when needed
     if (isXFormsReadonlyButNotStaticReadonly(triggerControl))
@@ -82,15 +83,13 @@ class XFormsTriggerFullHandler(
 
 private object XFormsTriggerFullHandler {
 
+  // See also `appendToClassAttribute` which takes classes as strings
   def appendClasses(atts: AttributesImpl, classes: List[String]): AttributesImpl = {
     val existingClasses = Option(atts.getValue("class")).toList
     val newClasses = existingClasses ::: classes ::: Nil mkString " "
-
-    XMLReceiverSupport.addOrReplaceAttribute(atts, "", "", "class", newClasses)
+    atts.addOrReplace(XFormsNames.CLASS_QNAME, newClasses)
+    atts
   }
-
-  def addAttribute(atts: AttributesImpl, name: String, value: String): Unit =
-    atts.addAttribute("", name, name, CDATA, value)
 
   // Map appearances to Bootstrap classes, e.g. xxf:primary -> btn-primary
   val BootstrapAppearances: Map[QName, String] =

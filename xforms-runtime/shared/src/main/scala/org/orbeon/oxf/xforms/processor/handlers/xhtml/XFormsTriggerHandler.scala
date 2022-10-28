@@ -5,7 +5,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
-import org.orbeon.oxf.xml.XMLReceiverHelper
+import org.orbeon.oxf.xml.SaxSupport._
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -58,7 +58,7 @@ abstract class XFormsTriggerHandler(
           null
 
       if (hintValue != null)
-        containerAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, hintValue)
+        containerAttributes.addOrReplace("title", hintValue)
     }
 
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)

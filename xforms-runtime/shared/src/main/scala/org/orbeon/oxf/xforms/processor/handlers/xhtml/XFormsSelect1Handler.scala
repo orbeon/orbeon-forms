@@ -276,7 +276,7 @@ object XFormsSelect1Handler {
       if attQName != XFormsNames.CLASS_QNAME // `class` is handled separately
       attributeName = ItemsetSupport.getAttributeName(attQName)
     } locally {
-      spanAttributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, attValue)
+      spanAttributes.addOrReplace(attributeName, attValue)
     }
 
   private def getItemClasses(item: ItemNode, initialClasses: String): String = {
@@ -377,10 +377,10 @@ class XFormsSelect1Handler(
 
       // This was necessary for noscript mode
       // Q: Can remove now?
-      containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId)
+      containerAttributes.addOrReplace("name", effectiveId)
 
       if (findAppearanceTrait.exists(_.isCompact))
-        containerAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple")
+        containerAttributes.addOrReplace("multiple", "multiple")
 
       // Handle accessibility attributes
       XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
@@ -425,7 +425,7 @@ class XFormsSelect1Handler(
                     val itemClasses = XFormsSelect1Handler.getItemClasses(item, null)
                     val optGroupAttributes = XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, SaxSupport.EmptyAttributes, itemClasses, None)
 
-                    optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, item.label.label)
+                    optGroupAttributes.addOrReplace("label", item.label.label)
 
                     // If another optgroup is open, close it - nested optgroups are not allowed. Of course this results in an
                     // incorrect structure for tree-like itemsets, there is no way around that. If the user however does
@@ -449,7 +449,7 @@ class XFormsSelect1Handler(
       }
     } else {
       // Output static read-only value
-      containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field")
+      containerAttributes.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-field")
       withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML, atts = containerAttributes) {
         itemsetOpt foreach { itemset =>
           var selectedFound = false
@@ -488,7 +488,7 @@ class XFormsSelect1Handler(
     // - `xforms-items` for styling
     // - `xforms-help-popover-control` tells the help popover the element relative to which it should positioned,
     //   needed for the case where we only have one
-    containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-items xforms-help-popover-control")
+    containerAttributes.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-items xforms-help-popover-control")
 
     // For accessibility, label the group, since the control label doesn't apply to a single input
     containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, if (isMultiple) "group" else "radiogroup")
@@ -562,9 +562,9 @@ class XFormsSelect1Handler(
 
     // Add item attributes to `<option>`
     XFormsSelect1Handler.addItemAttributes(item, optionAttributes)
-    optionAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue(encode))
+    optionAttributes.addOrReplace("value", item.externalValue(encode))
     item.hint.foreach { hint =>
-      optionAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, hint.label)
+      optionAttributes.addOrReplace("title", hint.label)
     }
 
     // Figure out whether what items are selected
@@ -573,7 +573,7 @@ class XFormsSelect1Handler(
     val mustSelect =
       (isMultiple || ! gotSelected) && XFormsSelect1Handler.isItemSelected(xformsControl, item, isMultiple)
     if (mustSelect)
-      optionAttributes.addAttribute("", "selected", "selected", XMLReceiverHelper.CDATA, "selected")
+      optionAttributes.addOrReplace("selected", "selected")
 
     // `xh:option`
     withElement(localName = "option", prefix = xhtmlPrefix, uri = XHTML, atts = optionAttributes) {

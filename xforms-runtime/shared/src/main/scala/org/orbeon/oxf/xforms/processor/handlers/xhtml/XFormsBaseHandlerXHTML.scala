@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.dom.Extensions._
-import org.orbeon.oxf.xml.{XMLReceiverHelper, _}
+import org.orbeon.oxf.xml._
 import org.orbeon.xforms.XFormsNames
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.xml.sax.Attributes
@@ -445,7 +445,7 @@ object XFormsBaseHandlerXHTML {
     // Add @for attribute if specified and element is a label
     if (elementName == "label")
       forEffectiveIdWithNs foreach
-        (newAttribute.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, _))
+        (newAttribute.addOrReplace("for", _))
 
     val xhtmlPrefix    = handlerContext.findXHTMLPrefix
     val labelQName     = XMLUtils.buildQName(xhtmlPrefix, elementName)
@@ -482,10 +482,10 @@ object XFormsBaseHandlerXHTML {
   }
 
   def outputDisabledAttribute(newAttributes: AttributesImpl): Unit =
-    newAttributes.addAttribute("", "disabled", "disabled", XMLReceiverHelper.CDATA, "disabled")
+    newAttributes.addOrReplace("disabled", "disabled")
 
   def outputReadonlyAttribute(newAttributes: AttributesImpl): Unit =
-    newAttributes.addAttribute("", "readonly", "readonly", XMLReceiverHelper.CDATA, "readonly")
+    newAttributes.addOrReplace("readonly", "readonly")
 
   def withFormattingPrefix[T](body: String => T)(implicit context: HandlerContext): T = {
     val formattingPrefix = context.findFormattingPrefixDeclare

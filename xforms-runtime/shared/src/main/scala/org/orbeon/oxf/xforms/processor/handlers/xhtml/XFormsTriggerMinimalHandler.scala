@@ -4,7 +4,8 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.outputDisabledAttribute
-import org.orbeon.oxf.xml.{XMLConstants, XMLReceiverHelper, XMLUtils}
+import org.orbeon.oxf.xml.SaxSupport._
+import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
 import org.orbeon.xforms.XFormsNames
 import org.xml.sax.Attributes
 
@@ -36,7 +37,7 @@ class XFormsTriggerMinimalHandler(
     val xmlReceiver = handlerContext.controller.output
 
     val buttonAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, triggerControl, addId = true)
-    buttonAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "btn-link")
+    buttonAttributes.addOrReplace(XFormsNames.CLASS_QNAME, "btn-link")
     if (isXFormsReadonlyButNotStaticReadonly(triggerControl))
       outputDisabledAttribute(buttonAttributes)
 

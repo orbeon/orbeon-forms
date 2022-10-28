@@ -13,9 +13,12 @@
   */
 package org.orbeon.oxf.xforms.processor.handlers
 
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml._
+import org.orbeon.xforms.XFormsNames
 import org.xml.sax.helpers.AttributesImpl
 import org.xml.sax.{Attributes, ContentHandler}
+
 import java.{lang => jl}
 
 
@@ -106,10 +109,10 @@ class OutputInterceptor(
     reusableAttributes.clear()
 
     if (id ne null)
-      reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, id)
+      reusableAttributes.addOrReplace(XFormsNames.ID_QNAME, id)
 
     if (classes ne null)
-      reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes)
+      reusableAttributes.addOrReplace(XFormsNames.CLASS_QNAME, classes)
 
     val delimiterQName = XMLUtils.buildQName(delimiterPrefix, delimiterLocalName)
     contentHandler.startElement(delimiterNamespaceURI, delimiterLocalName, delimiterQName, reusableAttributes)

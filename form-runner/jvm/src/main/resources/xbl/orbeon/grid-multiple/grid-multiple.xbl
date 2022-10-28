@@ -93,6 +93,7 @@
                     select="$static-row-count = 1"/>
 
                 <xsl:variable name="remove-constraint"        select="($root/@remove-constraint[normalize-space()], 'true()')[1]"/>
+                <xsl:variable name="clear-constraint"         select="($root/@clear-constraint[normalize-space()], 'true()')[1]"/>
                 <xsl:variable name="repeat-id"                select="concat($root/@id, '-repeat')"/>
 
                 <xsl:variable name="appearance"               select="($root/@appearance, 'full')[1]"/>
@@ -538,6 +539,12 @@
                                                     count($repeat-sequence) gt $min"
                                             />
 
+                                            <xf:var name="can-clear">
+                                                <!-- Evaluate the constraint in the context of the iteration -->
+                                                <xsl:copy-of select="namespace::*"/><!-- FIXME: otherwise if the expression doesn't see all in-scope namespaces -->
+                                                <xxf:value value="{$clear-constraint}" xxbl:scope="outer"/>
+                                            </xf:var>
+
                                             <xf:var
                                                 name="can-classes"
                                                 value="
@@ -546,10 +553,12 @@
                                                     'can-insert-above'[$can-add and not($frozen)],
                                                     'can-insert-below'[$can-add and $repeat-position ge $freeze],
                                                     'can-remove'      [$can-remove],
-                                                    'can-clear'"
+                                                    'can-clear'       [$can-clear]"
                                             />
                                         </xsl:when>
                                         <xsl:otherwise>
+                                            <xf:var name="can-remove" value="false()"/>
+                                            <xf:var name="can-clear"  value="false()"/>
                                             <xf:var name="can-classes"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
@@ -581,7 +590,7 @@
                                                     if="event('xxf:type') = ('fr-move-up', 'fr-move-down', 'fr-clear', 'fr-remove')"
                                                     ref="$source"/>
 
-                                                 <xf:action if="event('xxf:type') = 'fr-clear'">
+                                                <xf:action if="$can-clear and event('xxf:type') = 'fr-clear'">
 
                                                     <xf:insert
                                                         context="$repeat-context"
@@ -600,7 +609,7 @@
 
                                                 </xf:action>
 
-                                                <xf:action if="event('xxf:type') = 'fr-remove'">
+                                                <xf:action if="$can-remove and event('xxf:type') = 'fr-remove'">
 
                                                     <xf:action type="xpath">
                                                         frf:garbageCollectMetadataItemsets($instance)

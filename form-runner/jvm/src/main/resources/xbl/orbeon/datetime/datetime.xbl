@@ -25,7 +25,7 @@
            fr|datetime,
            xf|input:xxf-type('xs:dateTime')"
         xxbl:mode="lhha binding value"
-        xxbl:label-for="fr-datetime-div">
+        xxbl:label-for="fr-datetime-elem">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date and Time</display-name>
@@ -206,7 +206,7 @@
             <xf:var
                 name="field-width"
                 value="fr:component-param-value('field-width')"/>
-            <xh:div id="fr-datetime-div" class="fr-datetime-fields fr-field-width-{$field-width}" xxf:control="true">
+            <xh:div id="fr-datetime-elem" class="fr-datetime-fields fr-field-width-{$field-width}" xxf:control="true">
                 <fr:date ref="$local-date[not($view)]" id="date">
                     <xf:label ref="xxf:r('date')"/>
                 </fr:date>

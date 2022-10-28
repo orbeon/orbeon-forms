@@ -29,7 +29,7 @@
         id="fr-fields-date-binding"
         element="fr|fields-date, xf|input:xxf-type('xs:date')[appearance ~= fields]"
         xxbl:mode="lhha binding value"
-        xxbl:label-for="fr-fields-date-div">
+        xxbl:label-for="fr-fields-date-elem">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -117,7 +117,7 @@
                 </xf:action>
             </xf:var>
 
-            <xh:div id="fr-fields-date-div" class="fr-component-group" xxf:control="true">
+            <xh:div id="fr-fields-date-elem" class="fr-component-group" xxf:control="true">
 
                 <!-- Don't show fields at all in static readonly mode -->
                 <xf:group ref=".[not(is-readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">

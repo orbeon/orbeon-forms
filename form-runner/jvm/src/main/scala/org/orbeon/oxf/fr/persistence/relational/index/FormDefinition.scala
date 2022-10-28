@@ -65,7 +65,7 @@ trait FormDefinition {
   }
 
   def matchForControl(control: String): String =
-    if (control == "input" || control == "textarea")
+    if (control == "input" || control == "textarea" || control == "output")
       "substring"
     else if (FormRunner.isMultipleSelectionControl(control))
       "token"

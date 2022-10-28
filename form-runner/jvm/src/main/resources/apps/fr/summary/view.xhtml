@@ -73,6 +73,10 @@
                 name="has-fb-roles-for-all-apps"
                 value="$has-fb-roles and exists(xxf:instance('fb-permissions')/app[@name = '*'])"/>
 
+            <xf:var name="app-is-dropdown"  value="exists($app-query) and not($has-fb-roles-for-all-apps)"/>
+            <xf:var name="current-app"      value="xxf:instance('fb-permissions')/app[@name = $app-query]"/>
+            <xf:var name="form-is-dropdown" value="exists($form-query) and not($has-fb-roles-for-all-apps) and not($current-app/form[@name = '*'])"/>
+
             <xf:var
                 name="initial-app-value"
                 as="xs:string?"
@@ -242,14 +246,14 @@
                 <xf:bind
                     ref="$app-query"
                     readonly="false()"
-                    calculate="if (normalize-space() = '' and $initial-app-value) then $initial-app-value else ."/>
+                    calculate="if (xxf:is-blank() and exists($initial-app-value)) then $initial-app-value else ."/>
                 <!-- Adjust value for form if there is an app constraint and a form constraint -->
                 <xf:bind
                     ref="$form-query"
                     readonly="false()"
                     calculate="
                         (
-                            for $a in xxf:instance('fb-permissions')/app[@name = $app-query]
+                            for $a in $current-app
                             return
                                 for $current in .
                                     return
@@ -263,12 +267,12 @@
                 <xf:bind
                     ref="$app-query/@match"
                     readonly="false()"
-                    calculate="if ($initial-app-value) then 'exact' else ."/>
+                    calculate="if ($app-is-dropdown) then 'exact' else 'substring'"/>
                 <!-- Force exact query match if there is a form constraint -->
                 <xf:bind
                     ref="$form-query/@match"
                     readonly="false()"
-                    calculate="if (xxf:instance('fb-permissions')/app[@name = $app-query]/form[1][not(@name = '*')]) then 'exact' else ."/>
+                    calculate="if ($form-is-dropdown) then 'exact' else 'substring'"/>
 
             </xf:bind>
 
@@ -734,13 +738,12 @@
                                                         @lang = xxf:instance('fr-language-instance')
                                                     ]/label"/>
                                         <!-- Use an input if app name is a wildcard -->
-                                        <xf:var name="is-input" value="$has-fb-roles-for-all-apps"/>
-                                        <xf:input ref=".[$is-input]">
+                                        <xf:input ref=".[not($app-is-dropdown)]">
                                             <xf:label>
                                                 <xf:output mediatype="text/html" value="$label"/>
                                             </xf:label>
                                         </xf:input>
-                                        <xf:select1 ref=".[not($is-input)]">
+                                        <xf:select1 ref=".[$app-is-dropdown]">
                                             <xf:label>
                                                 <xf:output mediatype="text/html" value="$label"/>
                                             </xf:label>
@@ -769,15 +772,13 @@
                                                     ]/resources[
                                                         @lang = xxf:instance('fr-language-instance')
                                                     ]/label"/>
-                                        <xf:var name="current-app" value="xxf:instance('fb-permissions')/app[@name = $app-query]"/>
                                         <!-- Use an input if app name or form name is a wildcard -->
-                                        <xf:var name="is-input" value="$has-fb-roles-for-all-apps or $current-app/form[@name = '*']"/>
-                                        <xf:input ref=".[$is-input]">
+                                        <xf:input ref=".[not($form-is-dropdown)]">
                                             <xf:label>
                                                 <xf:output mediatype="text/html" value="$label"/>
                                             </xf:label>
                                         </xf:input>
-                                        <xf:select1 ref=".[not($is-input)]">
+                                        <xf:select1 ref=".[$form-is-dropdown]">
                                             <xf:label>
                                                 <xf:output mediatype="text/html" value="$label"/>
                                             </xf:label>

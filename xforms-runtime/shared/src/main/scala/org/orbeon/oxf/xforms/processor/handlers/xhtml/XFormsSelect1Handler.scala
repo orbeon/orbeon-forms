@@ -490,10 +490,23 @@ class XFormsSelect1Handler(
     //   needed for the case where we only have one
     containerAttributes.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-items xforms-help-popover-control")
 
-    // For accessibility, label the group, since the control label doesn't apply to a single input
+    // Keep the group/radiogroup role even if there is no label. It probably doesn't hurt, although if there is only
+    // one item inside the group, those roles are not doing much.
     containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, if (isMultiple) "group" else "radiogroup")
-    if (handlerContext.a11yFocusOnGroups)
-      containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
+    // When a form author explicitly uses a single checkbox, it generally doesn't make sense to have a label on the
+    // control itself, as the label of the single item is sufficient. Also, it is when we have multiple checkboxes
+    // that it makes sense to, at least optionally, give the user a chance to tab to the group of checkboxes, and have
+    // the label and/or hint read if a screen reader is used. When there is no external label, there is no need for
+    // that. So below we don't place a `tabindex` on the group when we don't have a label or hint. From an end user
+    // perspective, an additional drawback of keeping the `tabindex` is that the user needs to tab twice to reach the
+    // checkbox for no obvious reason.
+    // Remains the case of dynamic checkboxes (with a dynamic itemset), where the form author would place a lable on
+    // the control: in case the itemset has only one item, then we would have the double label and double tab issue.
+    // But we leave this problem for another time, as that would require adding the tabindex dynamically depending on
+    // the size of the itemset and we don't have a good mechanism to do that.
+    if (getStaticLHHA(LHHA.Label).isDefined || getStaticLHHA(LHHA.Hint).isDefined)
+      if (handlerContext.a11yFocusOnGroups)
+        containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
 
     handleAriaByAttForSelect1Full(containerAttributes)
 

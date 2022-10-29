@@ -2626,7 +2626,7 @@
                 </xh:span>
                 <xh:span id="select1-full-multiple-nesting-level"
                          class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full">
-                    <xh:span class="xforms-items xforms-help-popover-control" role="radiogroup" tabindex="0" >
+                    <xh:span class="xforms-items xforms-help-popover-control" role="radiogroup">
                         <xh:span class="xforms-deselected">
                             <xh:label class="radio">
                                 <xh:input id="select1-full-multiple-nesting-level≡≡e0" type="radio"

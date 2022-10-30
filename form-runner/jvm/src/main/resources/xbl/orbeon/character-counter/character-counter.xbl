@@ -91,7 +91,7 @@
                 <xh:span class="fr-charcounter-count">
                     <xf:output
                         value="if (empty($remaining)) then $current else abs($remaining)"
-                        class="label fr-charcounter-{{
+                        class="badge bg-secondary fr-charcounter-{{
                             if (empty($remaining)) then
                                 'current'
                             else if ($remaining ge 0) then

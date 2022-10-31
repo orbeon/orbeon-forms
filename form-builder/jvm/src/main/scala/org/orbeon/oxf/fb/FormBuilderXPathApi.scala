@@ -301,8 +301,7 @@ object FormBuilderXPathApi {
         controlName   <- FormRunner.getControlNameOpt(sectionNode).toList
         holder        <- FormRunner.findDataHolders(controlName) // TODO: What about within repeated sections? Templates ok?
         componentNode <- FormRunner.findComponentNodeForSection(sectionNode)
-        xblNode       <- FormRunner.findXblXblForSectionTemplateNamespace(ctx.bodyElem, componentNode.namespaceURI)
-        bindingNode   <- FormRunner.findXblBindingForLocalname(xblNode, componentNode.localname)
+        bindingNode   <- FormRunner.findXblBinding(ctx.bodyElem, componentNode.uriQualifiedName)
         instance      <- FormRunner.findXblInstance(bindingNode, fr.Names.FormTemplate)
         instanceRoot  <- instance / * headOption
       } yield

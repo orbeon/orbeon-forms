@@ -68,15 +68,6 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def controlRequiresNestedIterationElement(node: NodeInfo): Boolean =
     isRepeat(node)
 
-  // Find the binding's first URI qualified name
-  // For now takes the first CSS rule and assume the form foo|bar.
-  def bindingFirstURIQualifiedName(bindingElem: NodeInfo): URIQualifiedName = {
-    val firstElementCSSName = (bindingElem attValue "element") split "," head
-    val elementQName        = firstElementCSSName.replace('|', ':')
-
-    bindingElem.resolveURIQualifiedName(elementQName)
-  }
-
   // Get the name for a section or grid element or null (the empty sequence)
   //@XPathFunction
   def getContainerNameOrEmpty(elem: NodeInfo): String = getControlNameOpt(elem).orNull

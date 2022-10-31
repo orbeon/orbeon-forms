@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fr
 
-import java.{util => ju}
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunnerCommon._
@@ -25,6 +24,7 @@ import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
 import org.orbeon.xforms.XFormsId
 
+import java.{util => ju}
 import scala.jdk.CollectionConverters._
 
 
@@ -47,7 +47,7 @@ trait FormRunnerSectionTemplateOps {
       availableSectionTemplateXBLBindings(xblElems / fr.XMLNames.XBLBindingTest)
 
     bindingsForSectionTemplates map { binding =>
-      frc.bindingFirstURIQualifiedName(binding) -> NodeInfoConversions.extractAsMutableDocument(binding)
+      bindingFirstURIQualifiedName(binding) -> NodeInfoConversions.extractAsMutableDocument(binding)
     } toMap
   }
 
@@ -99,25 +99,17 @@ trait FormRunnerSectionTemplateOps {
   def matchesComponentURI(uri: String): Boolean =
     MatchesComponentUriLibraryRegex.findFirstIn(uri).isDefined
 
-  def findXblXblForSectionTemplateNamespace(publishedFormDoc: NodeInfo, sectionTemplateNamespaceUri: String): Option[NodeInfo] = {
+  def findXblBinding(publishedFormDoc: NodeInfo, uriQualifiedName: URIQualifiedName): Option[NodeInfo] = {
 
-    val xblXblEls =
+    val bindings =
       for {
-        xblXblEl    <- publishedFormDoc.rootElement / fr.XMLNames.XHHeadTest / fr.XMLNames.XBLXBLTest
-        xblBindings = xblXblEl / *
-        if xblBindings.exists(frc.bindingFirstURIQualifiedName(_).uri == sectionTemplateNamespaceUri)
+        xblBinding <- publishedFormDoc.rootElement / fr.XMLNames.XHHeadTest / fr.XMLNames.XBLXBLTest / fr.XMLNames.XBLBindingTest
+        if xblBinding.hasAtt("element") && bindingFirstURIQualifiedName(xblBinding) == uriQualifiedName
       } yield
-        xblXblEl
+        xblBinding
 
-    assert(xblXblEls.length <= 1, s"expect no more than one `<xbl:xbl>` container for the namespace `$sectionTemplateNamespaceUri`")
-    xblXblEls.headOption
-
-  }
-
-  def findXblBindingForLocalname(xblElem: NodeInfo, componentLocalname: String): Option[NodeInfo] = {
-    val els = xblElem / fr.XMLNames.XBLBindingTest filter (_.attValue("element").endsWith("|" + componentLocalname))
-    assert(els.length <= 1, s"expect no more than one `<xbl:binding>` for component `$componentLocalname`")
-    els.headOption
+    assert(bindings.length <= 1, s"expect no more than one `<xbl:binding>` for component `Q{${uriQualifiedName.uri}${uriQualifiedName.localName}`")
+    bindings.headOption
   }
 
   def findXblInstance(bindingElem: NodeInfo, instanceId: String): Option[NodeInfo] =
@@ -156,4 +148,13 @@ trait FormRunnerSectionTemplateOps {
 
   def findSectionsWithTemplates(implicit ctx: FormRunnerDocContext) =
     ctx.bodyElemOpt.toList descendant * filter frc.IsSection filter (_ / * exists isSectionTemplateContent)
+
+    // Find the binding's first URI qualified name
+  // For now takes the first CSS rule and assume the form foo|bar.
+  def bindingFirstURIQualifiedName(bindingElem: NodeInfo): URIQualifiedName = {
+    val firstElementCSSName = (bindingElem attValue "element") split "," head
+    val elementQName        = firstElementCSSName.replace('|', ':')
+
+    bindingElem.resolveURIQualifiedName(elementQName)
+  }
 }

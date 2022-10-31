@@ -74,13 +74,13 @@
 }
 
 // home button
-.xforms-trigger-appearance-full .btn {
+.xforms-trigger-appearance-full .btn, .fr-attachment-select.btn {
   color: #000;
   background-color: #f8f9fa;
   border-color: #f8f9fa;
 }
 
-.xforms-trigger-appearance-full {
+.xforms-trigger-appearance-full, .fr-attachment {
   .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
     background-color: #e6e6e6 !important;
     border-color: #0a58ca !important;
@@ -252,5 +252,17 @@
 
   .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
     padding: 0 4px 0 !important;
+  }
+
+  // form controls > Image and File Attachments
+  .xforms-update-full {
+    img {
+      max-width: 100%;
+    }
+  
+    .btn-link {
+      border: 1px solid transparent;
+      background-color: white;
+    }
   }
 }

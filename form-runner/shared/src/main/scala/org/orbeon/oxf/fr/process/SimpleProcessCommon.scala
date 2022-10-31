@@ -48,7 +48,7 @@ trait SimpleProcessCommon
 
   def AllowedFormRunnerActions: Map[String, Action]
 
-  implicit val logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("process")
+  lazy implicit val logger: IndentedLogger = inScopeContainingDocument.getIndentedLogger("process")
 
   override def extensionActions: Iterable[(String, ProcessInterpreter.Action)] =
     AllowedFormRunnerActions ++ AllowedXFormsActions

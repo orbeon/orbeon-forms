@@ -16,13 +16,14 @@ package org.orbeon.oxf.fr
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunnerCommon._
-import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath.{URIQualifiedName, _}
 import org.orbeon.xforms.XFormsId
+import shapeless.syntax.typeable._
 
 import java.{util => ju}
 import scala.jdk.CollectionConverters._
@@ -40,15 +41,17 @@ trait FormRunnerSectionTemplateOps {
   def sectionTemplateXBLBindingsByURIQualifiedName(xblElems: Seq[NodeInfo]): Map[URIQualifiedName, DocumentWrapper] = {
 
     // All xbl:binding elements available for section templates
-    def availableSectionTemplateXBLBindings(componentBindings: Iterable[NodeInfo]) =
+    def availableSectionTemplateXBLBindings(componentBindings: Iterable[NodeInfo]): Iterable[NodeInfo] =
       componentBindings filter (_.attClasses("fr-section-component"))
 
     val bindingsForSectionTemplates =
       availableSectionTemplateXBLBindings(xblElems / fr.XMLNames.XBLBindingTest)
 
-    bindingsForSectionTemplates map { binding =>
-      bindingFirstURIQualifiedName(binding) -> NodeInfoConversions.extractAsMutableDocument(binding)
-    } toMap
+    (
+      bindingsForSectionTemplates map { binding =>
+        bindingFirstURIQualifiedName(binding) -> NodeInfoConversions.extractAsMutableDocument(binding)
+      }
+    ).toMap
   }
 
   //@XPathFunction
@@ -63,10 +66,10 @@ trait FormRunnerSectionTemplateOps {
     val controlName =
       frc.controlNameFromIdOpt(XFormsId.getStaticIdFromId(XFormsId.absoluteIdToEffectiveId(controlAbsoluteId)))
 
-    def nameMatches =
+    def nameMatches: Boolean =
       controlNames.asScala.exists(controlName.contains)
 
-    def libraryNameMatches = {
+    def libraryNameMatches: Boolean = {
 
       val libraryUri = s"${Controls.SectionTemplateUriPrefix}$libraryName/library"
 
@@ -91,9 +94,9 @@ trait FormRunnerSectionTemplateOps {
       frSectionComponent.staticControl.descendants find
       (c => matchesComponentURI(c.element.getNamespaceURI))
 
-    sectionTemplateElementOpt flatMap
+    sectionTemplateElementOpt                       flatMap
       (e => frSectionComponent.resolve(e.staticId)) flatMap
-      collectByErasedType[XFormsComponentControl]
+      (_.narrowTo[XFormsComponentControl])
   }
 
   def matchesComponentURI(uri: String): Boolean =
@@ -144,15 +147,15 @@ trait FormRunnerSectionTemplateOps {
       MatchesSectionTemplateUriRegex.findFirstIn(containerElem.namespaceURI).nonEmpty
 
   def sectionTemplateBindingName(section: NodeInfo): Option[URIQualifiedName] =
-    section / * filter isSectionTemplateContent map (_.uriQualifiedName) headOption
+    (section / * filter isSectionTemplateContent map (_.uriQualifiedName)).headOption
 
-  def findSectionsWithTemplates(implicit ctx: FormRunnerDocContext) =
+  def findSectionsWithTemplates(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
     ctx.bodyElemOpt.toList descendant * filter frc.IsSection filter (_ / * exists isSectionTemplateContent)
 
-    // Find the binding's first URI qualified name
+  // Find the binding's first URI qualified name
   // For now takes the first CSS rule and assume the form foo|bar.
   def bindingFirstURIQualifiedName(bindingElem: NodeInfo): URIQualifiedName = {
-    val firstElementCSSName = (bindingElem attValue "element") split "," head
+    val firstElementCSSName = (bindingElem attValue "element").splitTo[List](",").head
     val elementQName        = firstElementCSSName.replace('|', ':')
 
     bindingElem.resolveURIQualifiedName(elementQName)

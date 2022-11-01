@@ -27,8 +27,19 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.XFormsNames._
 
+import scala.util.matching.Regex
+
 
 object ImportExportSupport {
+
+  // https://github.com/orbeon/orbeon-forms/issues/5514
+  val DefaultExcelNameManglingConfig =
+    ExcelNameManglingConfig(
+      prefix = "O_",
+      re     = """([A-Z|a-z]+\d+|[CcRr]\d+.+)""".r
+    )
+
+  case class ExcelNameManglingConfig(prefix: String, re: Regex)
 
   sealed trait RepeatsPref
   object RepeatsPref {
@@ -130,10 +141,6 @@ object ImportExportSupport {
 //    cells(rowPos) collect {
 //      case Cell(Some(u), Some(origin), _, y, _, _) if origin.y < y => u
 //    } distinct
-
-  // TODO: correct handling of names
-  def controlNameToNamedRangeName(controlName: String): String =
-    controlName.translate("-", "_")
 
   def controlIsHiddenWithCss(control: om.NodeInfo): Boolean =
     control.attValueOpt(CLASS_QNAME) exists
@@ -452,5 +459,21 @@ object ImportExportSupport {
         DataMigrationBehavior.Disabled
       )
     }
+  }
+
+  def controlNameToNamedRangeName(controlName: String)(implicit config: ExcelNameManglingConfig): String = {
+
+    // Q: Any other characters we can have in a name that we need to translate?
+    val phase1 = controlName.trimAllToEmpty.translate("-", "_")
+
+    // https://github.com/orbeon/orbeon-forms/issues/5514
+    val mustPrefix =
+      phase1 match {
+        case "C" |"c" | "R" | "r" => true // fixed rule
+        case config.re(_)         => true
+        case _                    => false
+      }
+
+    if (mustPrefix) s"${config.prefix}$phase1" else phase1
   }
 }

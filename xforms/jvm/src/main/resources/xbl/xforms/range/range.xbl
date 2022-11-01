@@ -1,5 +1,5 @@
 <xbl:xbl
-xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
@@ -42,11 +42,8 @@ xmlns:xh="http://www.w3.org/1999/xhtml"
             </templates>
         </metadata>
 
-        <xbl:resources>
-        </xbl:resources>
-
         <xbl:template>
-            <xh:input id="fr-range-elem" type="range" xbl:attr="min=start max=end" class="xxxxx"/>
+            <xh:input id="fr-range-elem" type="range" xbl:attr="min=start max=end"/>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

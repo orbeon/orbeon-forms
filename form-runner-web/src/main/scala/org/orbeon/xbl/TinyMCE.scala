@@ -62,7 +62,12 @@ object TinyMCE {
         val tabindex = tinyMceDiv.getAttribute("tabindex")
         myEditor = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
         val xformsValue = DocumentAPI.getValue(serverValueOutputElem).get
+
+        val isReadonly = containerElem.classList.contains("xforms-readonly")
+        xformsUpdateReadonly(isReadonly)
+
         onInit(() => {
+
           // Send value to the server on blur
           myEditor.on("blur", _ => clientToServer())
           // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
@@ -139,8 +144,13 @@ object TinyMCE {
       }
 
       override def xformsFocus(): Unit = { onInit(myEditor.focus) }
-      def readonly   (): Unit = { onInit(() => { myEditor.getBody().contentEditable = "false"; myEditor.setMode("readonly") }) }
-      def readwrite  (): Unit = { onInit(() => { myEditor.getBody().contentEditable = "true" ; myEditor.setMode("design"  ) }) }
+
+      override def xformsUpdateReadonly(readonly: Boolean): Unit = {
+        onInit(() => {
+          myEditor.getBody().contentEditable = (! readonly).toString
+          myEditor.setMode(if (readonly) "readonly" else "design")
+        })
+      }
     }
   )
 }

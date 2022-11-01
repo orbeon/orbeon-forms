@@ -28,7 +28,7 @@
     <xbl:binding
         id="fr-tinymce"
         element="fr|tinymce, xf|textarea[mediatype = 'text/html']"
-        xxbl:mode="lhha binding value focus"
+        xxbl:mode="lhha binding value focus javascript-lifecycle"
         xxbl:label-for="tinymce-div"
         xxf:external-events="fr-set-client-value">
 
@@ -115,8 +115,6 @@
                 <xf:output ref="$binding" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value xforms-hidden">
                     <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
                     <xf:action type="javascript" id="xf-ch" event="xxforms-visible xforms-value-changed xxforms-iteration-moved">var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.serverToClient();</xf:action>
-                    <xf:action type="javascript" id="xf-ro" event="xforms-readonly">var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.readonly();</xf:action>
-                    <xf:action type="javascript" id="xf-rw" event="xforms-readwrite">var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.readwrite();</xf:action>
                 </xf:output>
 
                 <!-- In portlet mode, we want the resource id to be processed into a base URL, and we use a magic value to

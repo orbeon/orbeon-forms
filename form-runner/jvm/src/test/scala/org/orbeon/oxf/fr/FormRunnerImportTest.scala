@@ -50,31 +50,44 @@ class FormRunnerImportTest extends AnyFunSpec {
       "AA1FOO",
       "é",
       "é1",
+      "_",
     )
+
+    val PrefixedNamesUnchanged =
+      NamesUnchanged map { name =>
+        s"_$name"
+      }
 
     val NamesWithDisallowedChars = List(
       "A-B" -> "A_B"
     )
 
     val NamesToPrefix = List(
-      "C"          -> "O_C",
-      "c"          -> "O_c",
-      "R"          -> "O_R",
-      "r"          -> "O_r",
-      "B1"         -> "O_B1",
-      "C1_FOO"     -> "O_C1_FOO",
-      "C123456"    -> "O_C123456",
-      "AA1"        -> "O_AA1",
-      "AAA1"       -> "O_AAA1",
+      "C"       -> "_C",
+      "c"       -> "_c",
+      "R"       -> "_R",
+      "r"       -> "_r",
+      "B1"      -> "_B1",
+      "C1_FOO"  -> "_C1_FOO",
+      "C123456" -> "_C123456",
+      "AA1"     -> "_AA1",
+      "AAA1"    -> "_AAA1",
     )
 
+    val NamesToDoublePrefix =
+      NamesToPrefix map { case (_, prefixed) =>
+        prefixed -> s"_$prefixed"
+      }
+
     val Expected =
-      NamesUnchanged.map(name => name -> name) :::
-        NamesWithDisallowedChars               :::
-        NamesToPrefix
+      NamesUnchanged.map(name => name -> name)         :::
+      PrefixedNamesUnchanged.map(name => name -> name) :::
+      NamesWithDisallowedChars                         :::
+      NamesToPrefix                                    :::
+      NamesToDoublePrefix
 
     for ((in, out) <- Expected)
-      it(s"must handle `$in`") {
+      it(s"must handle `$in` -> `$out`") {
         assert(ImportExportSupport.controlNameToNamedRangeName(in)(ImportExportSupport.DefaultExcelNameManglingConfig) == out)
       }
   }

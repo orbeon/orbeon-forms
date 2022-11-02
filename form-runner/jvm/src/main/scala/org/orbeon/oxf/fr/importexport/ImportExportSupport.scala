@@ -35,7 +35,7 @@ object ImportExportSupport {
   // https://github.com/orbeon/orbeon-forms/issues/5514
   val DefaultExcelNameManglingConfig =
     ExcelNameManglingConfig(
-      prefix = "O_",
+      prefix = "_",
       re     = """([A-Z|a-z]+\d+|[CcRr]\d+.+)""".r
     )
 
@@ -460,19 +460,29 @@ object ImportExportSupport {
     }
   }
 
+  private def isAllowedExcelName(name: String)(implicit config: ExcelNameManglingConfig): Boolean =
+    ! name.contains("-") && (
+      name match {
+        case "C" |"c" | "R" | "r" => false // fixed rule
+        case config.re(_)         => false // configured via regex for convenience
+        case _                    => true
+      }
+    )
+
   def controlNameToNamedRangeName(controlName: String)(implicit config: ExcelNameManglingConfig): String = {
 
     // Q: Any other characters we can have in a name that we need to translate?
     val phase1 = controlName.trimAllToEmpty.translate("-", "_")
 
     // https://github.com/orbeon/orbeon-forms/issues/5514
-    val mustPrefix =
-      phase1 match {
-        case "C" |"c" | "R" | "r" => true // fixed rule
-        case config.re(_)         => true
-        case _                    => false
-      }
+    val disallowed = ! isAllowedExcelName(phase1)
 
-    if (mustPrefix) s"${config.prefix}$phase1" else phase1
+    // Prefix allowed name that starts with prefix only if it could conflict
+    if (! disallowed && phase1.startsWith(config.prefix) && ! isAllowedExcelName(phase1.tail))
+      s"${config.prefix}$phase1"
+    else if (disallowed)
+      s"${config.prefix}$phase1"
+    else
+      phase1
   }
 }

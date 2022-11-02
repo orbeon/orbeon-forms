@@ -964,6 +964,13 @@
                                         </xh:tr>
                                         <xh:tr>
                                             <xh:td>
+                                                <xf:output value="fbf:getExcelRangeName($i/control-name)">
+                                                    <xf:label ref="$resources/dialog-control-settings/excel-field-name/label"/>
+                                                </xf:output>
+                                            </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td>
                                                 <!-- Custom classes -->
                                                 <xf:input ref="$i/custom-classes">
                                                     <xf:label ref="$resources/classes/label"/>

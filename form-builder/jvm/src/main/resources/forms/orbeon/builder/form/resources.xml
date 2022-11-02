@@ -475,6 +475,9 @@
             <pdf-field-name>
                 <label>Name of the PDF field</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label>Name of the Excel range</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label>Index control</label>
@@ -1811,6 +1814,9 @@
             <pdf-field-name>
                 <label>Nom du champ PDF</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label>Nom de la région Excel</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label>Inclure dans l'index</label>
@@ -3130,6 +3136,9 @@
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label todo="true">[Name of the Excel range]</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label todo="true">[Index control]</label>
@@ -4477,6 +4486,9 @@
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label todo="true">[Name of the Excel range]</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label todo="true">[Index control]</label>
@@ -5824,6 +5836,9 @@
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label todo="true">[Name of the Excel range]</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label todo="true">[Index control]</label>
@@ -7163,6 +7178,9 @@
             <pdf-field-name>
                 <label>Name des PDF-Felds</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label todo="true">[Name of the Excel range]</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label todo="true">[Index control]</label>
@@ -8505,6 +8523,9 @@
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label todo="true">[Name of the Excel range]</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label todo="true">[Index control]</label>
@@ -9844,6 +9865,9 @@
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label todo="true">[Name of the Excel range]</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label todo="true">[Index control]</label>
@@ -11184,6 +11208,9 @@
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label todo="true">[Name of the Excel range]</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label todo="true">[Index control]</label>
@@ -12503,6 +12530,9 @@
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label todo="true">[Name of the Excel range]</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label todo="true">[Index control]</label>
@@ -13849,6 +13879,9 @@
             <pdf-field-name>
                 <label todo="true">[Name of the PDF field]</label>
             </pdf-field-name>
+            <excel-field-name>
+                <label todo="true">[Name of the Excel range]</label>
+            </excel-field-name>
             <options>
                 <item>
                     <label todo="true">[Index control]</label>

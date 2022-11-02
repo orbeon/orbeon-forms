@@ -835,6 +835,12 @@ object FormBuilderXPathApi {
   }
 
   //@XPathFunction
+  def getExcelRangeName(currentControlName: String): String = {
+    import org.orbeon.oxf.fr.importexport.ImportExportSupport
+    ImportExportSupport.controlNameToNamedRangeName(currentControlName)(ImportExportSupport.DefaultExcelNameManglingConfig)
+  }
+
+  //@XPathFunction
   def namesToRenameForMergingSectionTemplate(
     containerId : String,
     prefix      : String,

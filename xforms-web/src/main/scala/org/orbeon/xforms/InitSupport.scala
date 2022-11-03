@@ -429,11 +429,11 @@ object InitSupport {
               Controls.setCurrentValue(control, value, force = false)
             }
           } else if ($(control).is(".xforms-dialog.xforms-dialog-visible-true")) {
-              // Initialized visible dialogs
-              Init._dialog(control)
+            // Initialized visible dialogs
+            Init._dialog(control)
           } else if (classList.contains("xforms-select1-appearance-compact") || classList.contains("xforms-select-appearance-compact")) {
-              // Legacy JavaScript initialization
-              Init._compactSelect(control)
+            // Legacy JavaScript initialization
+            Init._compactSelect(control)
           }
         }
       }

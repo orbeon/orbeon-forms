@@ -158,7 +158,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
                 XFormsContainingDocumentBuilder(
                   staticState    = staticState,
                   uriResolver    = uriResolver.some,
-                  response       = Option(PipelineResponse.getResponse(xmlReceiver, externalContext)),
+                  response       = Option(PipelineResponse.getResponse(xmlReceiver.some, externalContext)),
                   mustInitialize = initializeXFormsDocument
                 )
 
@@ -220,7 +220,7 @@ abstract class XFormsProcessorBase extends ProcessorImpl {
               XFormsContainingDocumentBuilder(
                 staticState    = staticState,
                 uriResolver    = uriResolver.some,
-                response       = Option(PipelineResponse.getResponse(xmlReceiver, externalContext)),
+                response       = Option(PipelineResponse.getResponse(xmlReceiver.some, externalContext)),
                 mustInitialize = initializeXFormsDocument
               )
           case Some(containingDocument) =>

@@ -57,7 +57,7 @@ import scala.util.{Failure, Success, Try}
 
 object XFormsContainingDocumentSupport {
 
-  def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument => T): Try[T] = {
+  def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument => T): Try[T] =
     withLock(RequestParameters(uuid, None, None, None), timeout) {
       case Some(containingDocument) =>
         withUpdateResponse(containingDocument, ignoreSequence = true)(block(containingDocument))
@@ -65,7 +65,6 @@ object XFormsContainingDocumentSupport {
         // This happens if the timeout expires!
         throw new IllegalStateException
     }
-  }
 
   def withLock[T](params: RequestParameters, timeout: Long)(block: Option[XFormsContainingDocument] => T): Try[T] = {
 
@@ -211,7 +210,7 @@ trait ContainingDocumentTransientState {
   def getReplaceAllEval: Option[Eval[ConnectResult]] = transientState.replaceAllEval
 
   def setReplaceAllEval(eval: Eval[ConnectResult]): Unit =
-    transientState.replaceAllEval = Option(eval)
+    transientState.replaceAllEval = Some(eval ensuring (_ ne null))
 
   def setGotSubmissionReplaceAll(): Unit = {
     if (transientState.gotSubmissionReplaceAll)

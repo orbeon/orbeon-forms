@@ -66,6 +66,13 @@ trait XFormsDocumentLifecycle[Response] {
   def beforeExternalEvents(response: Response, isAjaxRequest: Boolean): Unit
   def afterExternalEvents(isAjaxRequest: Boolean): Unit
   def afterUpdateResponse(): Unit
+
+  final def withExternalEvents[T](response: Response, isAjaxRequest: Boolean)(block: => T): T = {
+    beforeExternalEvents(response, isAjaxRequest)
+    val result = block
+    afterExternalEvents(isAjaxRequest)
+    result
+  }
 }
 
 case class ErrorInfo(

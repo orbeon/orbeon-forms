@@ -79,7 +79,7 @@ object XFormsServer {
     // - https://github.com/orbeon/orbeon-forms/issues/1984
     // This throws if the lock is not found (UUID is not in the session OR the session doesn't exist)
     val lockResult: Try[Try[Option[Eval[ConnectResult]]]] =
-      withLock(requestParameters, if (isAjaxRequest) 0L else XFormsGlobalProperties.getAjaxTimeout) {
+      withLock(requestParameters, timeout = if (isAjaxRequest) 0L else XFormsGlobalProperties.getAjaxTimeout) {
         case Some(containingDocument) =>
 
           val ignoreSequenceNumber   = ! isAjaxRequest
@@ -109,46 +109,36 @@ object XFormsServer {
                   remainingClientEvents.nonEmpty option {
                     // Scope the containing document for the XForms API
                     XFormsAPI.withContainingDocument(containingDocument) {
-
                       withDebug("handling external events") {
+                        containingDocument.withExternalEvents(responseForReplaceAll , isAjaxRequest) {
 
-                        // Start external events
-                        containingDocument.beforeExternalEvents(responseForReplaceAll , isAjaxRequest)
+                          // Dispatch the events
 
-                        // Dispatch the events
+                          // Flatten client and server events
+                          // NOTE: Only the upload now requires server events
+                          val allClientAndServerEvents =
+                            remainingClientEvents flatMap {
+                              case e @ WireAjaxEventWithoutTarget(EventNames.XXFormsServerEvents, _) =>
+                                e.valueOpt.toList flatMap (v =>
+                                  extractWireEvents(v)
+                                ) collect {
+                                  case e: WireAjaxEventWithTarget => e -> true
+                                }
+                              case e: WireAjaxEventWithTarget =>
+                                List(e -> false)
+                              case _ =>
+                                Nil
+                            }
 
-                        // Flatten client and server events
-                        // NOTE: Only the upload now requires server events
-                        val allClientAndServerEvents =
-                          remainingClientEvents flatMap {
-                            case e @ WireAjaxEventWithoutTarget(EventNames.XXFormsServerEvents, _) =>
-                              e.valueOpt.toList flatMap (v =>
-                                extractWireEvents(v)
-                              ) collect {
-                                case e: WireAjaxEventWithTarget => e -> true
-                              }
-                            case e: WireAjaxEventWithTarget =>
-                              List(e -> false)
-                            case _ =>
-                              Nil
-                          }
-
-                        val result =
-                          ClientEvents.processEvents(containingDocument, allClientAndServerEvents)
-
-                        // End external events
-                        // The following will process async submission and delayed events
-                        containingDocument.afterExternalEvents(isAjaxRequest)
-
-                        result
+                            ClientEvents.processEvents(containingDocument, allClientAndServerEvents)
+                        }
                       } (eventsIndentedLogger)
                     }
                   }
                 } else {
                   XFormsAPI.withContainingDocument(containingDocument) {
                     withDebug("handling two-pass submission event") {
-                      containingDocument.beforeExternalEvents(responseForReplaceAll , isAjaxRequest)
-                      containingDocument.afterExternalEvents(isAjaxRequest)
+                      containingDocument.withExternalEvents(responseForReplaceAll , isAjaxRequest)(())
                       Some(ClientEvents.EmptyEventsFindings)
                     } (eventsIndentedLogger)
                   }

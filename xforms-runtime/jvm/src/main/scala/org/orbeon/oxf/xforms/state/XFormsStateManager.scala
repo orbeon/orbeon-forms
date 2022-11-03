@@ -73,12 +73,9 @@ object XFormsStateManager extends XFormsStateManagerTrait {
   }
 
   // Keep public and static for unit tests and submission processor (called from XSLT)
-  def removeSessionDocument(uuid: String): Unit = {
-    val session = NetUtils.getSession(false)
-    if (session ne null) {
-      session.removeAttribute(getUUIDSessionKey(uuid), ExternalContext.SessionScope.Application)
-    }
-  }
+  def removeSessionDocument(uuid: String): Unit =
+    getSession(false) foreach
+      (_.removeAttribute(getUUIDSessionKey(uuid), ExternalContext.SessionScope.Application))
 
   def onAddedToCache(uuid: String): Unit = addUuidToSession(uuid)
 
@@ -259,13 +256,18 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     val XFormsStateManagerUuidKeyPrefix = "oxf.xforms.state.manager.uuid-key."
     val XFormsStateManagerUUIDListKey   = "oxf.xforms.state.manager.uuid-list-key"
 
-    def addDocumentToSession(uuid: String): Unit = {
-      val session = NetUtils.getSession(ForceSessionCreation)
-      session.setAttribute(getUUIDSessionKey(uuid), SessionDocument(uuid), ExternalContext.SessionScope.Application)
-    }
+    // Can also return `None` if no `ExternalContext` is found.
+    // Q: Can that ever happen?
+    // TODO: Pass implicit `Option[ExternalContext]`?
+    def getSession(create: Boolean): Option[ExternalContext.Session] =
+      Option(NetUtils.getExternalContext).flatMap(_.getSessionOpt(create))
+
+    def addDocumentToSession(uuid: String): Unit =
+      getSession(ForceSessionCreation) foreach
+        (_.setAttribute(getUUIDSessionKey(uuid), SessionDocument(uuid), ExternalContext.SessionScope.Application))
 
     def getSessionDocument(uuid: String): Option[SessionDocument] =
-      Option(NetUtils.getSession(false)) flatMap { session =>
+      getSession(false) flatMap { session =>
         session.getAttribute(getUUIDSessionKey(uuid), ExternalContext.SessionScope.Application)
       } collect {
         case value: SessionDocument => value
@@ -277,8 +279,8 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     // Tricky: if `onRemove()` is called upon session expiration, there might not be an `ExternalContext`. But it's fine,
     // because the session goes away -> all of its attributes go away so we don't have to remove them below.
     def removeUuidFromSession(uuid: String): Unit =
-      Option(NetUtils.getSession(ForceSessionCreation)) map // support missing session for tests
-        getUuidListInSession                    foreach
+      getSession(ForceSessionCreation) map // support missing session for tests
+        getUuidListInSession           foreach
         (_.remove(uuid))
 
     def cacheOrStore(
@@ -314,8 +316,8 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       )
     }
 
-    def addUuidToSession(uuid: String): Boolean =
-      getUuidListInSession(NetUtils.getSession(ForceSessionCreation)).add(uuid)
+    def addUuidToSession(uuid: String): Unit =
+      getSession(ForceSessionCreation) foreach (session => getUuidListInSession(session).add(uuid))
 
     def storeDocumentState(containingDocument: XFormsContainingDocument, isInitialState: Boolean): Unit = {
       require(containingDocument.staticState.isServerStateHandling)

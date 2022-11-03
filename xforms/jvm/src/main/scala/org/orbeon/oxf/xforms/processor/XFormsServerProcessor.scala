@@ -167,21 +167,17 @@ class XFormsServerProcessor extends ProcessorImpl {
 
   private def doIt(pipelineContext: PipelineContext, xmlReceiverOpt: Option[XMLReceiver]): Unit = {
 
-    def assertSessionExists(): Unit =
-      Option(NetUtils.getSession(false)) getOrElse
-        (throw SessionExpiredException("Session has expired. Unable to process incoming request."))
-
     // Use request input provided by client
     val requestDocument = readInputAsOrbeonDom(pipelineContext, XFormsServerProcessor.InputRequest)
     implicit val externalContext = XFormsCrossPlatformSupport.externalContext
-    val request = externalContext.getRequest
 
     // It's not possible to handle a form update without an existing session. We depend on this to check the UUID,
     // to get the lock, and (except for client state) to retrieve form state.
     //
     // NOTE: We should test this at the beginning of this method, but calling readInputAsOrbeonDom() in unit tests
     // can cause the side-effect to create the session, so doing so without changing some tests doesn't work.
-    assertSessionExists()
+    externalContext.getSessionOpt(false) getOrElse
+      (throw SessionExpiredException("Session has expired. Unable to process incoming request."))
 
     // Logger used for heartbeat and request/response
     implicit val indentedLogger = Loggers.getIndentedLogger("server")
@@ -195,9 +191,6 @@ class XFormsServerProcessor extends ProcessorImpl {
     val actionElement   = requestDocument.getRootElement.elementOpt(XXFORMS_ACTION_QNAME)
     val extractedEvents = actionElement map extractWireEvents getOrElse Nil
 
-    // Find an output stream for `xf:submission[@replace = 'all']`
-    val response = PipelineResponse.getResponse(xmlReceiverOpt.orNull, externalContext)
-
     // State to set before running events
     def beforeProcessRequest(containingDocument: XFormsContainingDocument): Unit = {
       // Set URL rewriter resource path information based on information in static state
@@ -208,18 +201,19 @@ class XFormsServerProcessor extends ProcessorImpl {
       }
 
       // Set deployment mode into request (useful for epilogue)
-      request.getAttributesMap.put(OrbeonXFormsFilter.RendererDeploymentAttributeName, containingDocument.getDeploymentType.entryName)
+      externalContext.getRequest.getAttributesMap
+        .put(OrbeonXFormsFilter.RendererDeploymentAttributeName, containingDocument.getDeploymentType.entryName)
     }
 
     XFormsServer.processEvents(
-      logRequestResponse,
-      parameters,
-      extractParameters(requestDocument, isInitialState = true),
-      extractedEvents,
-      xmlReceiverOpt,
-      response,
-      beforeProcessRequest,
-      s => extractWireEvents(EncodeDecode.decodeXML(s, true).getRootElement)
+      logRequestResponse      = logRequestResponse,
+      requestParameters       = parameters,
+      requestParametersForAll = extractParameters(requestDocument, isInitialState = true),
+      extractedEvents         = extractedEvents,
+      xmlReceiverOpt          = xmlReceiverOpt,
+      responseForReplaceAll   = PipelineResponse.getResponse(xmlReceiverOpt, externalContext),
+      beforeProcessRequest    = beforeProcessRequest,
+      extractWireEvents       = s => extractWireEvents(EncodeDecode.decodeXML(s, forceEncryption = true).getRootElement)
     )
   }
 }

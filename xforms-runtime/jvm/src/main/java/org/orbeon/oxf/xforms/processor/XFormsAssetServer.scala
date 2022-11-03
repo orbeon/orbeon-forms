@@ -94,8 +94,8 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
         // any changes to the document, so the document should be in cache and have a sequence number of "1".
         val fromCurrentStateOptTry =
           withDocumentAcquireLock(
-            uuid,
-            XFormsGlobalProperties.uploadXFormsAccessTimeout // same timeout as upload for now (throws if the timeout expires)
+            uuid    = uuid,
+            timeout = XFormsGlobalProperties.uploadXFormsAccessTimeout // same timeout as upload for now (throws if the timeout expires)
           )(d => d.getInitializationData)
 
         fromCurrentStateOptTry match {

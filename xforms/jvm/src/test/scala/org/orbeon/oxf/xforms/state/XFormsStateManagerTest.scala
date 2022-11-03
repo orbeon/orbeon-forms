@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEvent, XFormsEventTarget}
-import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsGlobalProperties}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsContainingDocumentBuilder, XFormsContainingDocumentSupport, XFormsGlobalProperties}
 import org.scalatest.funspec.AnyFunSpecLike
 
 
@@ -240,18 +240,16 @@ class XFormsStateManagerTest
               assert(state1.document ne newDoc) // can't be the same because cache is disabled
 
             // Run events if any
-            newDoc.beforeExternalEvents(null, isAjaxRequest = true)
+            newDoc.withExternalEvents(null, isAjaxRequest = true) {
+              for (event <- callback(newDoc))
+                ClientEvents.processEvent(newDoc, event)
+            }
 
-            for (event <- callback(newDoc))
-              ClientEvents.processEvent(newDoc, event)
+            val result =
+              XFormsContainingDocumentSupport.withUpdateResponse(newDoc, ignoreSequence = false) {
+                TestState(newDoc)
+              }
 
-            newDoc.afterExternalEvents(true)
-
-            XFormsStateManager.beforeUpdateResponse(newDoc, ignoreSequence = false)
-
-            val result = TestState(newDoc)
-
-            XFormsStateManager.afterUpdateResponse(newDoc)
             XFormsStateManager.afterUpdate(newDoc, keepDocument = true, disableDocumentCache = ! isCache)
 
             result

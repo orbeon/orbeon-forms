@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import cats.Eval
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod
@@ -48,15 +49,13 @@ object XFormsModelSubmissionSupport {
   def runDeferredSubmission(eval: Eval[ConnectResult], response: ExternalContext.Response): Unit =
     eval.value.result match {
       case Success((replacer, cxr)) =>
-        try {
+        useAndClose(cxr) { _ =>
           replacer match {
             case _: AllReplacer      => AllReplacer.forwardResultToResponse(cxr, response)
             case _: RedirectReplacer => RedirectReplacer.updateResponse(cxr, response)
             case _: NoneReplacer     => ()
             case r                   => throw new IllegalArgumentException(r.getClass.getName)
           }
-        } finally {
-          cxr.close()
         }
       case Failure(throwable) =>
         // Propagate throwable, which might have come from a separate thread

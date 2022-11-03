@@ -55,6 +55,7 @@
 
     <xsl:variable name="fr-form-metadata" select="($fr-form-model/xf:instance[@id = 'fr-form-metadata']/*)[1]"/>
 
+    <xsl:variable name="is-home-or-admin"    select="$mode = ('home', 'admin')"                       as="xs:boolean"/>
     <xsl:variable name="is-detail"           select="not($mode = ('summary', 'home', 'landing', ''))" as="xs:boolean"/>
     <xsl:variable name="is-summary"          select="$mode = 'summary'"                               as="xs:boolean"/>
     <xsl:variable name="is-landing"          select="$mode = 'landing'"                               as="xs:boolean"/>
@@ -180,7 +181,8 @@
                      'fb'[$is-form-builder and $is-detail],
                      'landing'[$is-landing],
                      'summary'[$is-summary],
-                     'detail'[$is-detail]
+                     'detail'[$is-detail],
+                     'home'[$is-home-or-admin]
                  )
                 return p:property(concat('oxf.xforms.assets.baseline.updates.', $update))
             return string-join($updates, ' ')

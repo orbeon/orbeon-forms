@@ -214,26 +214,28 @@ object UploaderServer {
         }
       }
 
-      fileScanProviderOpt foreach {
-        case Left(fileScanProviderV2) =>
-          fileScanOpt =
-            Try(
-              fileScanProviderV2.startStream(
-                filename  = fileItem.getName,
-                headers   = FileScanProvider.convertHeadersToJava(headersOpt map convertFileItemHeaders getOrElse Nil),
-                language  = requestAcceptLanguageOpt.getOrElse("en"),
-                extension = Map.empty.asJava
-              )
-            ) match {
-              case Success(fs) => Some(Left(fs))
+      // https://github.com/orbeon/orbeon-forms/issues/5516
+      if (Version.isPE)
+        fileScanProviderOpt foreach {
+          case Left(fileScanProviderV2) =>
+            fileScanOpt =
+              Try(
+                fileScanProviderV2.startStream(
+                  filename  = fileItem.getName,
+                  headers   = FileScanProvider.convertHeadersToJava(headersOpt map convertFileItemHeaders getOrElse Nil),
+                  language  = requestAcceptLanguageOpt.getOrElse("en"),
+                  extension = Map.empty.asJava
+                )
+              ) match {
+                case Success(fs) => Some(Left(fs))
+                case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
+              }
+          case Right(fileScanProvider) =>
+            fileScanOpt = fileScanProvider.startStream(fileItem.getName, headersOpt map convertFileItemHeaders getOrElse Nil) match {
+              case Success(fs) => Some(Right(fs))
               case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
             }
-        case Right(fileScanProvider) =>
-          fileScanOpt = fileScanProvider.startStream(fileItem.getName, headersOpt map convertFileItemHeaders getOrElse Nil) match {
-            case Success(fs) => Some(Right(fs))
-            case Failure(t)  => throw FileScanException(fieldName, FileScanErrorResult(Option(t.getMessage), Option(t)))
-          }
-      }
+        }
 
       Some(maxUploadSizeForControl)
     }

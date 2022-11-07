@@ -74,13 +74,13 @@
 }
 
 // home button
-.xforms-trigger-appearance-full .btn, .fr-attachment-select.btn {
+.xforms-trigger-appearance-full .btn, .fr-attachment-select.btn, .fr-grid-dropdown-button.btn {
   color: #000;
   background-color: #f8f9fa;
   border-color: #f8f9fa;
 }
 
-.xforms-trigger-appearance-full, .fr-attachment {
+.xforms-trigger-appearance-full, .fr-attachment, .fr-repeat-column-left {
   .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
     background-color: #e6e6e6 !important;
     border-color: #0a58ca !important;
@@ -267,5 +267,50 @@
       border: 1px solid transparent;
       background-color: white;
     }
+  }
+
+  // bookshelf > Notes
+  table {
+    border-spacing: 0;
+    border-collapse: inherit;
+  }
+  
+  .fr-grid-head .fr-grid-master-row {
+    #notes-section≡note-grid≡xf-848 {
+      border: 1px solid #ddd;
+      border-bottom: 0;
+      border-top-left-radius: 4px;
+    }
+    .fr-grid-th {
+      border-top: 1px solid #ddd;
+      border-top-right-radius: 4px;
+    }
+  }
+
+  .fr-grid-repeat-iteration .fr-grid-tr {
+    #notes-section≡note-grid≡xf-888⊙1 {
+      border: 1px solid #ddd;
+      border-bottom-left-radius: 4px;
+    }
+    .fr-grid-td {
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      border-bottom-right-radius: 4px;
+    }
+    textarea {
+      resize: horizontal;
+      height: 68px;
+      margin-bottom: -6px;
+    }
+  }
+  
+  #notes-section≡note-grid≡xf-855 {
+    font-weight: normal;
+  }
+
+  .btn-mini.fr-grid-dropdown-button {
+    font-size: 13px;
+    padding: 0 6px;
+    border-radius: 3px;
   }
 }

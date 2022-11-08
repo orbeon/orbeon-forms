@@ -383,6 +383,7 @@
     <xsl:template match="fr:service-call" mode="within-action-2018.2">
         <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
+        <xsl:param tunnel="yes" name="library-name"          as="xs:string?"/>
 
         <xsl:variable name="service-name" select="@service/string()"/>
 
@@ -415,7 +416,7 @@
                                 <xf:var
                                     name="value"
                                     context="$original-context"
-                                    value="{$value}">
+                                    value="{frf:replaceVarReferencesWithFunctionCalls(. , $value, false(), $library-name)}">
                                     <xsl:copy-of select="fr:build-context-att(., @expression-context)"/>
                                 </xf:var>
                             </xsl:when>
@@ -424,7 +425,7 @@
                             <xsl:when test="./self::fr:value">
                                 <xsl:variable name="ref" select="@ref/string()" as="xs:string"/>
                                 <xf:setvalue
-                                    ref="{$ref}"
+                                    ref="{frf:replaceVarReferencesWithFunctionCalls(. , $ref, false(), $library-name)}"
                                     value="$value"/>
                             </xsl:when>
                             <xsl:when test="./self::fr:sql-param">
@@ -466,6 +467,7 @@
     <xsl:template match="fr:data-iterate" mode="within-action-2018.2">
         <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
+        <xsl:param tunnel="yes" name="library-name"          as="xs:string?"/>
 
         <xsl:variable name="data-iterate-elem" select="."/>
 
@@ -475,7 +477,7 @@
                 targetid="fr-form-model">
         </xf:dispatch>
         </xf:action>
-        <xf:action iterate="{@ref}">
+        <xf:action iterate="{frf:replaceVarReferencesWithFunctionCalls(. , @ref, false(), $library-name)}">
             <xsl:copy-of select="fr:build-context-att($data-iterate-elem, @expression-context)"/>
 
             <!-- Apply only up to the first delimiter for https://github.com/orbeon/orbeon-forms/issues/4067 -->
@@ -502,11 +504,12 @@
 
         <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
+        <xsl:param tunnel="yes" name="library-name"          as="xs:string?"/>
 
         <xsl:variable name="if-position-within-block" select="count(preceding-sibling::fr:if)"/>
         <xsl:variable name="var-name"                 select="concat('cond', $if-position-within-block + 1)"/>
 
-        <xf:var name="{$var-name}" value="{@condition}">
+        <xf:var name="{$var-name}" value="{frf:replaceVarReferencesWithFunctionCalls(. , @condition, false(), $library-name)}">
             <xsl:copy-of select="fr:build-context-att(., @expression-context)"/>
         </xf:var>
         <xf:action if="${$var-name}">
@@ -569,14 +572,15 @@
 
     <xsl:template match="fr:control-setvalue" mode="within-action-2018.2">
 
-        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+        <xsl:param tunnel="yes" name="model-id"     as="xs:string"/>
+        <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
 
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
 
         <xf:action>
-            <xf:var name="value" value="{$value-expr}"/>
+            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name)}"/>
 
             <xf:rebuild/>
             <xf:recalculate/>
@@ -620,15 +624,18 @@
 
     <xsl:template match="fr:control-setitems" mode="within-action-2018.2">
 
-        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+        <xsl:param tunnel="yes" name="model-id"     as="xs:string"/>
+        <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
 
-        <xsl:variable name="to-control-name" select="@control/string()"            as="xs:string"/>
-        <xsl:variable name="items-expr"      select="@items/string()"              as="xs:string"/>
-        <xsl:variable name="label-expr"      select="@label/string()"              as="xs:string"/>
-        <xsl:variable name="hint-expr"       select="@hint/string()"               as="xs:string?"/>
-        <xsl:variable name="value-expr"      select="@value/string()"              as="xs:string"/>
-        <xsl:variable name="at"              select="@at/string()"                 as="xs:string?"/>
-        <xsl:variable name="context"         select="@expression-context/string()" as="xs:string?"/>
+        <xsl:variable name="elem"            select="."                                  as="element()"/>
+
+        <xsl:variable name="to-control-name" select="$elem/@control/string()"            as="xs:string"/>
+        <xsl:variable name="items-expr"      select="$elem/@items/string()"              as="xs:string"/>
+        <xsl:variable name="label-expr"      select="$elem/@label/string()"              as="xs:string"/>
+        <xsl:variable name="hint-expr"       select="$elem/@hint/string()"               as="xs:string?"/>
+        <xsl:variable name="value-expr"      select="$elem/@value/string()"              as="xs:string"/>
+        <xsl:variable name="at"              select="$elem/@at/string()"                 as="xs:string?"/>
+        <xsl:variable name="context"         select="$elem/@expression-context/string()" as="xs:string?"/>
 
         <xf:action>
 
@@ -658,7 +665,7 @@
                 <xf:var
                     name="response-items"
                     context="$items-expr-context"
-                    value="{$items-expr}">
+                    value="{frf:replaceVarReferencesWithFunctionCalls($elem , $items-expr, false(), $library-name)}">
                     <xsl:copy-of select="fr:build-context-att(., $context)"/>
                 </xf:var>
 
@@ -674,11 +681,11 @@
                 <!-- Should use a version of `XFormsItemUtils.evaluateItemset()`
                      See https://github.com/orbeon/orbeon-forms/issues/3125 -->
                 <xf:action iterate="$response-items">
-                    <xf:var name="item-label" value="{$label-expr}"/>
-                    <xf:var name="item-value" value="{$value-expr}"/>
+                    <xf:var name="item-label" value="{frf:replaceVarReferencesWithFunctionCalls($elem , $label-expr, false(), $library-name)}"/>
+                    <xf:var name="item-value" value="{frf:replaceVarReferencesWithFunctionCalls($elem , $value-expr, false(), $library-name)}"/>
                     <xsl:choose>
                         <xsl:when test="exists($hint-expr)">
-                            <xf:var name="item-hint"  value="{$hint-expr}"/>
+                            <xf:var name="item-hint"  value="{frf:replaceVarReferencesWithFunctionCalls($elem , $hint-expr, false(), $library-name)}"/>
                             <xf:insert
                                 context="$new-choices-holder"
                                 ref="*"
@@ -802,14 +809,15 @@
 
     <xsl:template match="fr:control-setfilename" mode="within-action-2018.2">
 
-        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+        <xsl:param tunnel="yes" name="model-id"     as="xs:string"/>
+        <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
 
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
 
         <xf:action>
-            <xf:var name="value" value="{$value-expr}"/>
+            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name)}"/>
 
             <xf:rebuild/>
             <xf:recalculate/>
@@ -827,14 +835,15 @@
 
     <xsl:template match="fr:control-setmediatype" mode="within-action-2018.2">
 
-        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+        <xsl:param tunnel="yes" name="model-id"     as="xs:string"/>
+        <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
 
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
 
         <xf:action>
-            <xf:var name="value" value="{$value-expr}"/>
+            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name)}"/>
 
             <xf:rebuild/>
             <xf:recalculate/>

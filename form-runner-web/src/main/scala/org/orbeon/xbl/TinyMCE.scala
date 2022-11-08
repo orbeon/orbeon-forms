@@ -19,10 +19,10 @@ import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI, Page}
 import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.dom.raw
-import org.scalajs.jquery.JQueryEventObject
+import org.scalajs.jquery.{JQueryEventObject, JQueryPromise}
 
 import scala.scalajs.js
-
+import scala.scalajs.js.{Promise, UndefOr, |}
 
 object TinyMCE {
 
@@ -33,7 +33,6 @@ object TinyMCE {
     new XBLCompanion {
 
       var myEditor             : TinyMceEditor = _
-      var serverValueOutputElem: html.Element  = _
       var tinymceInitialized   : Boolean       = false
 
       override def init(): Unit = {
@@ -50,7 +49,6 @@ object TinyMCE {
           baseUrlInitialized = true
         }
 
-        serverValueOutputElem = containerElem.querySelector(".xbl-fr-tinymce-xforms-server-value").asInstanceOf[html.Element]
         val tinyMceConfig = TinyMceCustomConfig.getOrElse(TinyMceDefaultConfig)
 
         // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
@@ -61,7 +59,6 @@ object TinyMCE {
         val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
         val tabindex = tinyMceDiv.getAttribute("tabindex")
         myEditor = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)
-        val xformsValue = DocumentAPI.getValue(serverValueOutputElem).get
 
         val isReadonly = containerElem.classList.contains("xforms-readonly")
         xformsUpdateReadonly(isReadonly)
@@ -72,7 +69,6 @@ object TinyMCE {
           myEditor.on("blur", _ => clientToServer())
           // Remove an anchor added by TinyMCE to handle key, as it grabs the focus and breaks tabbing between fields
           $(containerElem).find("a[accesskey]").detach()
-          myEditor.setContent(xformsValue)
           val iframe = $(containerElem).find("iframe")
           // On click inside the iframe, propagate the click outside, so code listening on click on an ancestor gets called
           iframe.contents().on("click", (_: JQueryEventObject) => containerElem.click())
@@ -102,13 +98,7 @@ object TinyMCE {
         val rawContent = myEditor.getContent()
         // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
         val cleanedContent = if (rawContent == "<div>\u00a0</div>") "" else rawContent
-        AjaxClient.fireEvent(
-          AjaxEvent(
-            eventName  = "fr-set-client-value",
-            targetId   = containerElem.id,
-            properties = Map("fr-value" -> cleanedContent)
-          )
-        )
+        DocumentAPI.setValue(containerElem, cleanedContent)
       }
 
       // TinyMCE got the focus
@@ -126,21 +116,22 @@ object TinyMCE {
         focusInsideComponent || focusOnAbsolutelyPositionedMenu
       }
 
-      // Update MCE with server value
-      def serverToClient(): Unit = {
-        val doUpdate =
-          tinymceInitialized &&              // Don't update value until TinyMCE is fully initialized
-            (! hasFocus())                   // Heuristic: if TinyMCE has focus, users might still be editing so don't update
-        if (doUpdate) {
-          val newServerValue = DocumentAPI.getValue(serverValueOutputElem).get
-          myEditor.setContent(newServerValue)
-        }
-      }
-
       // Runs a function when the TinyMCE is initialized
       private def onInit(thunk: () => Unit): Unit = {
         if (tinymceInitialized) thunk()
         else myEditor.on("init", _ => thunk())
+      }
+
+      override def xformsGetValue(): String = {
+        val rawContent = myEditor.getContent()
+        // Workaround to TinyMCE issue, see https://twitter.com/avernet/status/579031182605750272
+        if (rawContent == "<div>\u00a0</div>") "" else rawContent
+      }
+
+      override def xformsUpdateValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise] = {
+        if (! hasFocus()) // Heuristic: if TinyMCE has focus, users might still be editing so don't update
+          onInit(() => myEditor.setContent(newValue))
+        js.undefined
       }
 
       override def xformsFocus(): Unit = { onInit(myEditor.focus) }

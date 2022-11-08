@@ -28,9 +28,15 @@
     <xbl:binding
         id="fr-tinymce"
         element="fr|tinymce, xf|textarea[mediatype = 'text/html']"
-        xxbl:mode="lhha binding value focus javascript-lifecycle"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
         xxbl:label-for="tinymce-div"
-        xxf:external-events="fr-set-client-value">
+        xxbl:deserialize-external-value="
+                    xxf:call-xpl(
+                        'oxf:/ops/xforms/clean-html.xpl',
+                        'dirty-html',
+                        xf:element('value', .),
+                        'clean-html'
+                    )">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
             <display-name lang="en">Formatted Text Area</display-name>
@@ -86,19 +92,6 @@
              -->
             <xbl:style src="/xbl/orbeon/tinymce/js/tinymce/skins/ui/oxide/skin.min.css"/>
         </xbl:resources>
-        <xbl:handlers>
-            <xbl:handler event="fr-set-client-value" phase="target">
-                <xf:setvalue
-                    ref="xxf:binding('fr-tinymce')"
-                    value="
-                        xxf:call-xpl(
-                            'oxf:/ops/xforms/clean-html.xpl',
-                            'dirty-html',
-                            xf:element('value', event('fr-value')),
-                            'clean-html'
-                        )"/>
-            </xbl:handler>
-        </xbl:handlers>
         <xbl:template>
             <xf:var
                 name="binding"
@@ -112,11 +105,6 @@
                     )"/>
 
             <xf:group ref="$binding[$script]" xxf:element="div">
-                <xf:output ref="$binding" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value xforms-hidden">
-                    <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
-                    <xf:action type="javascript" id="xf-ch" event="xxforms-visible xforms-value-changed xxforms-iteration-moved">var i = ORBEON.xforms.XBL.instanceForControl(this); if (i) i.serverToClient();</xf:action>
-                </xf:output>
-
                 <!-- In portlet mode, we want the resource id to be processed into a base URL, and we use a magic value to
                      indicate that. Search for 1b713b2e6d7fd45753f4b8a6270b776e in the code for more details.
                      NOTE: Don't put '/' before 1b713b2e6d7fd45753f4b8a6270b776e because TinyMCE will automatically

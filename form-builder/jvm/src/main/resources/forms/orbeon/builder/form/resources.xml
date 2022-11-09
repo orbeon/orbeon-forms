@@ -1142,7 +1142,7 @@
                 <label>Source Control</label>
             </source-control>
             <destination-xpath>
-                <label>Destination XPath Expression</label>
+                <label>Destination formula</label>
             </destination-xpath>
             <parameter-number>
                 <label>Parameter number</label>
@@ -1154,7 +1154,7 @@
                 <label>Destination Control</label>
             </destination-control>
             <source-xpath>
-                <label>Source XPath expression</label>
+                <label>Source formula</label>
             </source-xpath>
             <response-itemset>
                 <label>Set Response Selection Control Choices</label>
@@ -1163,23 +1163,23 @@
                 <label>Destination Selection Control</label>
             </destination-selection-control>
             <items>
-                <label>Choices XPath expression</label>
+                <label>Choices formula</label>
                 <hint>Return one node for each choice</hint>
             </items>
             <item-label>
-                <label>Label XPath expression</label>
+                <label>Label formula</label>
                 <hint>Relative to choice node</hint>
             </item-label>
             <item-value>
-                <label>Value XPath expression</label>
+                <label>Value formula</label>
                 <hint>Relative to choice node</hint>
             </item-value>
             <item-hint>
-                <label>Hint XPath expression</label>
+                <label>Hint formula</label>
                 <hint>Relative to choice node</hint>
             </item-hint>
             <is-last-page>
-                <label>Is last page XPath expression</label>
+                <label>Is last page formula</label>
             </is-last-page>
             <save>
                 <label>Save</label>
@@ -3865,11 +3865,11 @@
                 <hint todo="true">[XPath expression relative to an item node]</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint XPath expression]</label>
+                <label todo="true">[Hint formula]</label>
                 <hint todo="true">[Relative to choice node]</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page XPath expression]</label>
+                <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <save>
                 <label>Lagre</label>
@@ -5214,11 +5214,11 @@
                 <hint>Выражение XPath, возвращает значение.</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint XPath expression]</label>
+                <label todo="true">[Hint formula]</label>
                 <hint todo="true">[Relative to choice node]</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page XPath expression]</label>
+                <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <save>
                 <label>Сохранить</label>
@@ -6556,11 +6556,11 @@
                 <hint>Espressione XPath relativa a un elemento nodo</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint XPath expression]</label>
+                <label todo="true">[Hint formula]</label>
                 <hint todo="true">[Relative to choice node]</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page XPath expression]</label>
+                <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <save>
                 <label>Salva</label>
@@ -7899,7 +7899,7 @@
                 <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint XPath expression]</label>
+                <label todo="true">[Hint formula]</label>
                 <hint todo="true">[Relative to choice node]</hint>
             </item-hint>
             <is-last-page>
@@ -9244,11 +9244,11 @@
                 <hint>XPath-lausek, joka liittyy osasen solmuun</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint XPath expression]</label>
+                <label todo="true">[Hint formula]</label>
                 <hint todo="true">[Relative to choice node]</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page XPath expression]</label>
+                <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <save>
                 <label>Tallenna</label>
@@ -10586,11 +10586,11 @@
                 <hint>Expresión XPath relativa al nodo-item</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint XPath expression]</label>
+                <label todo="true">[Hint formula]</label>
                 <hint todo="true">[Relative to choice node]</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page XPath expression]</label>
+                <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <save>
                 <label>Guardar</label>
@@ -11908,11 +11908,11 @@
                 <hint>Relatief aan gekozen node</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint XPath expression]</label>
+                <label todo="true">[Hint formula]</label>
                 <hint todo="true">[Relative to choice node]</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page XPath expression]</label>
+                <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <save>
                 <label>Bewaar</label>
@@ -13257,11 +13257,11 @@
                 <hint>Expressão XPath relativa a um item de um nodo</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint XPath expression]</label>
+                <label todo="true">[Hint formula]</label>
                 <hint todo="true">[Relative to choice node]</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page XPath expression]</label>
+                <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <save>
                 <label>Guardar</label>
@@ -14607,11 +14607,11 @@
                 <hint>XPath-uttryck relativt en nod</hint>
             </item-value>
             <item-hint>
-                <label todo="true">[Hint XPath expression]</label>
+                <label todo="true">[Hint formula]</label>
                 <hint todo="true">[Relative to choice node]</hint>
             </item-hint>
             <is-last-page>
-                <label todo="true">[Is last page XPath expression]</label>
+                <label todo="true">[Is last page formula]</label>
             </is-last-page>
             <save>
                 <label>Spara</label>

@@ -202,7 +202,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
    */
   @Test def permissionsTest(): Unit = {
 
-    Connect.withOrbeonTables("permissions") { (connection, provider) =>
+    Connect.withOrbeonTables("permissions") { (_, provider) =>
 
       implicit val externalContext = NetUtils.getExternalContext
 

@@ -22,7 +22,6 @@ import scala.xml.Elem
 
 object PermissionsXML {
 
-  // xxx TODO: sort things in predictable order
   def serialize(permissions: Permissions, normalized: Boolean): Option[Elem] =
     permissions match {
       case UndefinedPermissions =>
@@ -59,13 +58,11 @@ object PermissionsXML {
    *
    *   <permission operations="read update delete">
    *
-   * return the tokenized value of the `operations` attribute.
-   *
    * See backward compatibility handling: https://github.com/orbeon/orbeon-forms/issues/5397
    */
   private def parsePermission(permissionEl: NodeInfo): Permission = {
     val operations =
-      Operations.parse(Operations.normalizeOperations(permissionEl.attValue("operations")).toList)
+      Operations.normalizeAndParseOperations(permissionEl.attValue("operations"))
     val conditions =
       permissionEl.child(*).toList.map(
         conditionEl =>

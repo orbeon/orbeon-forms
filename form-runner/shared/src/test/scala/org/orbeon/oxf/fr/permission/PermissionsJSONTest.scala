@@ -78,9 +78,9 @@ class PermissionsJSONTest extends AnyFunSpecLike {
     val adt4 =
       DefinedPermissions(
         List(
-          Permission(Nil, SpecificOperations(Set.empty)),
-          Permission(List(RolesAnyOf(List("orbeon-user"))), SpecificOperations(Set.empty)),
-          Permission(List(RolesAnyOf(List("orbeon-admin"))), SpecificOperations(Set.empty))
+          Permission(Nil, Operations.None),
+          Permission(List(RolesAnyOf(List("orbeon-user"))), Operations.None),
+          Permission(List(RolesAnyOf(List("orbeon-admin"))), Operations.None)
         )
       )
 

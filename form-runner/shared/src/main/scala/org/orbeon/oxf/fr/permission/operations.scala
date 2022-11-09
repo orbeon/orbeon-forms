@@ -44,10 +44,17 @@ object Operations {
   val AllList: List[Operation] = Operation.values.toList
   val AllSet : Set[Operation]  = AllList.toSet
 
+  // Used by `ImportExportSupport` and tests
   def parseFromHeaders(headers: Map[String, List[String]]): Option[Operations] =
     Headers.firstItemIgnoreCase(headers, FormRunnerPersistence.OrbeonOperations)
       .map(v => parse(v.splitTo[List]()))
 
+  // Used by `persistence-model.xml` and `parseFromHeaders()` above, with the list of operations coming from:
+  //
+  // - persistence headers
+  // - `allAuthorizedOperationsAssumingOwnerGroupMember`
+  // - `authorizedOperationsBasedOnRolesXPath`
+  //
   def parse(stringOperations: List[String]): Operations =
     stringOperations match {
       case List("*") =>
@@ -56,31 +63,40 @@ object Operations {
         SpecificOperations(stringOperations.toSet.map(Operation.withName))
     }
 
-  def normalizeOperations(operations: String): Set[String] = {
+  // `operations` contains tokens, including possibly `*`. This is the value of the `operations` attribute in the
+  // serialized form definition format for permissions.
+  def normalizeAndParseOperations(operations: String): Operations = {
 
     val tokens = operations.tokenizeToSet
-    val hasMinusListToken = tokens(MinusListToken) // https://github.com/orbeon/orbeon-forms/issues/5397
 
-    if (! hasMinusListToken && tokens(Operation.Read.entryName))
-      tokens + Operation.List.entryName
-    else if (hasMinusListToken)
-      tokens.filter(_ != MinusListToken)
-    else
-      tokens
+    if (tokens("*")) {
+      // We shouldn't have `* read`, for example, but in case we do then `*` wins
+      AnyOperation
+    } else {
+      val hasMinusListToken = tokens(MinusListToken) // https://github.com/orbeon/orbeon-forms/issues/5397
+
+      val updatedTokens =
+        if (! hasMinusListToken) // 2022-10-03: decided that `list` does not imply `read`
+          tokens + Operation.List.entryName
+        else
+          tokens.filter(_ != MinusListToken) // Q: what if `list -list`?
+
+      SpecificOperations(updatedTokens.map(Operation.withName))
+    }
   }
 
   def denormalizeOperations(operationsTokens: Set[Operation]): List[String] = {
 
-    // The UI format now no longer includes `read` if there is a `list` or `update`
-    // `list` => `read` and `update` => `read`
+    // The UI format now no longer includes `read` if there is `update`
+    // `update` => `read`
     val withRead =
-      if (operationsTokens(Operation.List) || operationsTokens(Operation.Update))
+      if (operationsTokens(Operation.Update)) // 2022-10-03: decided that `list` does not imply `read`
         operationsTokens + Operation.Read
       else
         operationsTokens
 
     // See https://github.com/orbeon/orbeon-forms/issues/5397
-    if (withRead(Operation.Read) && ! withRead(Operation.List))
+    if (! withRead(Operation.List))
       inDefinitionOrder(withRead).map(_.entryName) :+ MinusListToken // `-list` indicates permission is explicitly removed
     else
       inDefinitionOrder(withRead - Operation.List).map(_.entryName)
@@ -91,6 +107,7 @@ object Operations {
     Operations.AllList.filter(operationsSet)
   }
 
+  // `normalized == false` only when called from `PermissionsUiTest`. Not sure if that's correct.
   def serialize(operations: Operations, normalized: Boolean): List[String] =
     operations match {
       case AnyOperation =>

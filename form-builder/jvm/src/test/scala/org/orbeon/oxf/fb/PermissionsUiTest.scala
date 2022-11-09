@@ -90,7 +90,7 @@ class PermissionsUiTest extends DocumentTestBase
     val fdAnyoneCanReadRoleCanListEl: om.NodeInfo =
       <permissions>
         <permission operations="read -list"/>
-        <permission operations="read">
+        <permission operations="">
           <user-role any-of="admin"/>
         </permission>
       </permissions>
@@ -104,7 +104,7 @@ class PermissionsUiTest extends DocumentTestBase
           ),
           Permission(
             List(RolesAnyOf(List("admin"))),
-            SpecificOperations(Set(Operation.Read, Operation.List))
+            SpecificOperations(Set(Operation.List)) // 2022-10-03: decided that `list` does not imply `read`
           )
         )
       )
@@ -141,7 +141,7 @@ class PermissionsUiTest extends DocumentTestBase
         <permission operations="create read update">
           <user-role any-of="orbeon-admin orbeon-user"/>
         </permission>
-        <permission operations="delete">
+        <permission operations="delete -list">
           <user-role any-of="orbeon-admin"/>
         </permission>
       </permissions>

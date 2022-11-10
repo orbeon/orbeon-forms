@@ -1,4 +1,4 @@
-<!--
+3<!--
   Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -717,6 +717,75 @@
                                         }"/>
                                 </xf:action>
                             </xf:trigger>
+
+                            <div class="pagination pagination-left">
+                                <ul>
+                                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
+                                        <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first">
+                                            <!-- https://github.com/orbeon/orbeon-forms/issues/1042 -->
+                                            <xf:label>
+                                                <xh:i class="fa fa-fw fa-step-backward"/>&#x200b;
+                                            </xf:label>
+                                            <xf:action event="DOMActivate">
+                                                <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+                                                <xf:setindex repeat="documents-repeat" index="1"/>
+                                                <xf:send submission="fr-summary-search-submission"/>
+                                            </xf:action>
+                                        </xf:trigger>
+                                    </li>
+                                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
+                                        <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev">
+                                            <xf:label>
+                                                <xh:i class="fa fa-fw fa-chevron-left"/>&#x200b;
+                                            </xf:label>
+                                            <xf:action event="DOMActivate">
+                                                <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
+                                                <xf:setindex repeat="documents-repeat" index="1"/>
+                                                <xf:send submission="fr-summary-search-submission"/>
+                                            </xf:action>
+                                        </xf:trigger>
+                                    </li>
+                                    <!-- Some results -->
+                                    <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
+                                        <li>
+                                            <span>
+                                                <xf:output value="max((instance('fr-paging-instance')/from, 0))"/>
+                                                <xf:output value="$fr-resources/summary/paging/to"/>
+                                                <xf:output value="max((instance('fr-paging-instance')/to, 0))"/>
+                                                <xf:output value="$fr-resources/summary/paging/of"/>
+                                                <xf:output value="instance('fr-paging-instance')/search-total"/>
+                                            </span>
+                                        </li>
+                                    </xf:group>
+                                    <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
+                                        <!-- No results -->
+                                    </xf:group>
+                                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
+                                        <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next">
+                                            <xf:label>
+                                                <xh:i class="fa fa-fw fa-chevron-right"/>&#x200b;
+                                            </xf:label>
+                                            <xf:action event="DOMActivate">
+                                                <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
+                                                <xf:setindex repeat="documents-repeat" index="1"/>
+                                                <xf:send submission="fr-summary-search-submission"/>
+                                            </xf:action>
+                                        </xf:trigger>
+                                    </li>
+                                    <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
+                                        <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last">
+                                            <xf:label>
+                                                <xh:i class="fa fa-fw fa-step-forward"/>&#x200b;
+                                            </xf:label>
+                                            <xf:action event="DOMActivate">
+                                                <xf:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
+                                                <xf:setindex repeat="documents-repeat" index="1"/>
+                                                <xf:send submission="fr-summary-search-submission"/>
+                                            </xf:action>
+                                        </xf:trigger>
+                                    </li>
+                                </ul>
+                            </div>
                         </xh:div>
 
                         <xf:switch id="fr-search-options-switch">
@@ -1264,75 +1333,6 @@
             </fr:row>
 
             <fr:buttons>
-                <div class="pagination pagination-left">
-                    <ul>
-                        <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
-                            <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first">
-                                <!-- https://github.com/orbeon/orbeon-forms/issues/1042 -->
-                                <xf:label>
-                                    <xh:i class="fa fa-fw fa-step-backward"/>&#x200b;
-                                </xf:label>
-                                <xf:action event="DOMActivate">
-                                    <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
-                                    <xf:setindex repeat="documents-repeat" index="1"/>
-                                    <xf:send submission="fr-summary-search-submission"/>
-                                </xf:action>
-                            </xf:trigger>
-                        </li>
-                        <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
-                            <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev">
-                                <xf:label>
-                                    <xh:i class="fa fa-fw fa-chevron-left"/>&#x200b;
-                                </xf:label>
-                                <xf:action event="DOMActivate">
-                                    <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
-                                    <xf:setindex repeat="documents-repeat" index="1"/>
-                                    <xf:send submission="fr-summary-search-submission"/>
-                                </xf:action>
-                            </xf:trigger>
-                        </li>
-                        <!-- Some results -->
-                        <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
-                            <li>
-                                <span>
-                                    <xf:output value="max((instance('fr-paging-instance')/from, 0))"/>
-                                    <xf:output value="$fr-resources/summary/paging/to"/>
-                                    <xf:output value="max((instance('fr-paging-instance')/to, 0))"/>
-                                    <xf:output value="$fr-resources/summary/paging/of"/>
-                                    <xf:output value="instance('fr-paging-instance')/search-total"/>
-                                </span>
-                            </li>
-                        </xf:group>
-                        <xf:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
-                            <!-- No results -->
-                        </xf:group>
-                        <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
-                            <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next">
-                                <xf:label>
-                                    <xh:i class="fa fa-fw fa-chevron-right"/>&#x200b;
-                                </xf:label>
-                                <xf:action event="DOMActivate">
-                                    <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
-                                    <xf:setindex repeat="documents-repeat" index="1"/>
-                                    <xf:send submission="fr-summary-search-submission"/>
-                                </xf:action>
-                            </xf:trigger>
-                        </li>
-                        <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
-                            <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last">
-                                <xf:label>
-                                    <xh:i class="fa fa-fw fa-step-forward"/>&#x200b;
-                                </xf:label>
-                                <xf:action event="DOMActivate">
-                                    <xf:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
-                                    <xf:setindex repeat="documents-repeat" index="1"/>
-                                    <xf:send submission="fr-summary-search-submission"/>
-                                </xf:action>
-                            </xf:trigger>
-                        </li>
-                    </ul>
-                </div>
-
                 <xf:group model="fr-form-model" class="fr-buttons">
 
                     <xf:var

@@ -12,11 +12,32 @@
 
 @import (reference) "form-runner-common";
 
+@spacing: 10px; // same as .fr-border
+
 .orbeon {
+
+    .fr-admin-top {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: @spacing;
+        margin: 0 0 @spacing 0;
+    }
+
+    .xbl-fr-pager {
+        .pagination {
+            margin: 0;
+            &> ul {
+                display: block;
+            }
+        }
+    }
 
     .btn-toolbar {
         display: inline-block;
         vertical-align: middle;
+        margin: 0;
     }
 
     .fr-reindex-status {
@@ -95,6 +116,7 @@
     .fr-forms-table {
 
         clear: both;
+        border-collapse: collapse;
         // Make the table stand out from background, as done on the summary page
         background-color: white;
 
@@ -166,5 +188,10 @@
         }
 
         img { float: left; margin: 5px 10px 0 10px }
+    }
+
+    .fr-buttons {
+        margin-top: 7px;
+        margin-bottom: 0;
     }
 }

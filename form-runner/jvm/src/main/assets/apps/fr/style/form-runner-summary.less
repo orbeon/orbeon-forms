@@ -21,33 +21,37 @@
         width: auto;
     }
 
-    .fr-summary-search, .fr-summary-table-div, .fr-summary-search-count {
+    .fr-summary-search, .fr-summary-table-div {
         display: block;
-        margin: @spacing 0;   // use margin so we have margin collapsing
+        margin: 0 0 @spacing 0;
     }
 
     .fr-summary-search {
 
         .fr-summary-search-top {
             display: flex;
+            justify-content: space-between;
             flex-wrap: wrap;
             align-items: center;
+            gap: @spacing;
         }
 
-        .fr-summary-selection, .fr-summary-form-version, .fr-summary-search-free-input, .fr-summary-search-search-button, .fr-summary-search-show-button {
-            margin-right: 10px;
+        .fr-summary-selection,
+        .fr-summary-form-version,
+        .fr-summary-search-free-input,
+        .fr-summary-search-search-button,
+        .fr-summary-search-show-button {
         }
 
         .fr-summary-search-free-input {
             flex-grow: 1;
-
             input {
                 width: 100%;
             }
         }
 
         .fr-summary-search-show-button {
-            margin-right: 0;
+            //margin-right: 0;
         }
 
         .fr-search-options {
@@ -98,6 +102,7 @@
 
         overflow: auto;
         background: white;
+        border-collapse: collapse;
 
         .alert  {
             display: block;
@@ -185,12 +190,12 @@
     }
 
     .pagination {
-        margin-top: 0;
-        margin-bottom: 0;
-        float: left;
-
+        margin: 0;
+        &> ul {
+            display: block;
+        }
         .fr-paging-numbers > span {
-            min-width: 125px; // try to allow at least 3 times 3 digits so the size doesn't change too much when paging
+            min-width: 105px; // try to allow at least 3 times 3 digits so the size doesn't change too much when paging
             text-align: center;
         }
     }

@@ -981,37 +981,39 @@
                                                 name="current-document-operations"
                                                 value="if (exists(@operations)) then xxf:split(@operations) else $global-operations" as="xs:string*"/>
                                             <xf:var
-                                                name="edit-view"
+                                                name="edit-view-opt"
                                                 value="
                                                     if ($current-document-operations = ('*', 'update')) then
                                                         'edit'
                                                     else if ($current-document-operations = 'read') then
                                                         'view'
                                                     else
-                                                        ''"/>
+                                                        ()"/>
                                             <xf:var
-                                                name="req-parameters"
+                                                name="req-parameters-opt"
                                                 value="if ($document/@draft = 'true') then 'draft=true' else ()"/>
                                             <xf:var
-                                                name="current-document-href"
+                                                name="current-document-href-opt"
                                                 value="
-                                                    concat(
-                                                        string-join(
-                                                            (
-                                                                '/fr',
-                                                                $app,
-                                                                $form,
-                                                                $edit-view,
-                                                                $current-document-name
+                                                    if (exists($edit-view-opt)) then
+                                                        concat(
+                                                            string-join(
+                                                                (
+                                                                    '/fr',
+                                                                    $app,
+                                                                    $form,
+                                                                    $edit-view-opt,
+                                                                    $current-document-name
+                                                                ),
+                                                                '/'
                                                             ),
-                                                            '/'
-                                                        ),
-                                                        if (exists($req-parameters)) then
-                                                            concat('?', string-join($req-parameters, '&amp;'))
-                                                        else
-                                                            ''
-                                                    )
-                                                    "
+                                                            if (exists($req-parameters-opt)) then
+                                                                concat('?', string-join($req-parameters-opt, '&amp;'))
+                                                            else
+                                                                ''
+                                                        )
+                                                    else
+                                                        ()"
                                             />
                                             <xh:tr class="{if (xxf:split(instance('fr-selection-instance')) = $current-document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
                                                 <xh:td class="fr-summary-repeat-selection-checkbox">
@@ -1047,12 +1049,12 @@
                                                                 then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
                                                                 else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
                                                     <xh:td class="fr-summary-created">
-                                                        <xf:group ref=".[$edit-view != '']">
-                                                            <xh:a href="{$current-document-href}">
+                                                        <xf:group ref=".[exists($current-document-href-opt)]">
+                                                            <xh:a href="{$current-document-href-opt}">
                                                                 <xf:output value="$created"/>
                                                             </xh:a>
                                                         </xf:group>
-                                                        <xf:group ref=".[$edit-view = '']">
+                                                        <xf:group ref=".[empty($current-document-href-opt)]">
                                                             <xf:output value="$created"/>
                                                         </xf:group>
                                                     </xh:td>
@@ -1078,48 +1080,48 @@
                                                                 then format-dateTime($v, $fr-resources/common/formats/day-this-year, $datelang, (), ())
                                                                 else format-dateTime($v, $fr-resources/common/formats/short-date, $datelang, (), ())"/>
                                                     <xh:td class="fr-summary-modified">
-                                                        <xf:group ref=".[$edit-view != '']">
-                                                            <xh:a href="{$current-document-href}">
+                                                        <xf:group ref=".[exists($current-document-href-opt)]">
+                                                            <xh:a href="{$current-document-href-opt}">
                                                                 <xf:output value="$last-modified"/>
                                                             </xh:a>
                                                         </xf:group>
-                                                        <xf:group ref=".[$edit-view = '']">
+                                                        <xf:group ref=".[empty($current-document-href-opt)]">
                                                             <xf:output value="$last-modified"/>
                                                         </xf:group>
                                                     </xh:td>
                                                 </xf:group>
                                                 <xf:group ref="''[$show-created-by]">
                                                     <xh:td class="fr-td">
-                                                        <xf:group ref=".[$edit-view != '']">
-                                                            <xh:a href="{$current-document-href}">
+                                                        <xf:group ref=".[exists($current-document-href-opt)]">
+                                                            <xh:a href="{$current-document-href-opt}">
                                                                 <xf:output value="$document/@created-by"/>
                                                             </xh:a>
                                                         </xf:group>
-                                                        <xf:group ref=".[$edit-view = '']">
+                                                        <xf:group ref=".[empty($current-document-href-opt)]">
                                                             <xf:output value="$document/@created-by"/>
                                                         </xf:group>
                                                     </xh:td>
                                                 </xf:group>
                                                 <xf:group ref="''[$show-last-modified-by]">
                                                     <xh:td class="fr-td">
-                                                        <xf:group ref=".[$edit-view != '']">
-                                                            <xh:a href="{$current-document-href}">
+                                                        <xf:group ref=".[exists($current-document-href-opt)]">
+                                                            <xh:a href="{$current-document-href-opt}">
                                                                 <xf:output value="$document/@last-modified-by"/>
                                                             </xh:a>
                                                         </xf:group>
-                                                        <xf:group ref=".[$edit-view = '']">
+                                                        <xf:group ref=".[empty($current-document-href-opt)]">
                                                             <xf:output value="$document/@last-modified-by"/>
                                                         </xf:group>
                                                     </xh:td>
                                                 </xf:group>
                                                 <xf:group ref="''[$show-workflow-stage]">
                                                     <xh:td class="fr-td">
-                                                        <xf:group ref=".[$edit-view != '']">
-                                                            <xh:a href="{$current-document-href}">
+                                                        <xf:group ref=".[exists($current-document-href-opt)]">
+                                                            <xh:a href="{$current-document-href-opt}">
                                                                 <xf:output value="$document/@workflow-stage"/>
                                                             </xh:a>
                                                         </xf:group>
-                                                        <xf:group ref=".[$edit-view = '']">
+                                                        <xf:group ref=".[empty($current-document-href-opt)]">
                                                             <xf:output value="$document/@workflow-stage"/>
                                                         </xf:group>
                                                     </xh:td>
@@ -1223,9 +1225,9 @@
                                                                                 else
                                                                                     $raw
                                                                 "/>
-                                                            <xf:group ref=".[xxf:non-blank($edit-view)]">
+                                                            <xf:group ref=".[xxf:non-blank($edit-view-opt)]">
                                                                 <!-- We use CSS to make the link area take the entire cell, without wrapping around the content -->
-                                                                <xh:a href="{$current-document-href}"/>
+                                                                <xh:a href="{$current-document-href-opt}"/>
                                                             </xf:group>
                                                             <!-- https://github.com/orbeon/orbeon-forms/issues/2955 -->
                                                             <xf:switch

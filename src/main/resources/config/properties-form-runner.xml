@@ -304,7 +304,7 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"             value="exist"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls">
-        pdf tiff wizard-prev wizard-next review
+        home pdf tiff wizard-prev wizard-next review
     </property>
     <property as="xs:string"  name="oxf.fr.detail.button.review.enabled.orbeon.controls">
         fr:is-wizard-last-page()

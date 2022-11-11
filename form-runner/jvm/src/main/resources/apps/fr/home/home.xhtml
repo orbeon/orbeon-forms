@@ -580,6 +580,15 @@
 
             <xf:bind ref="instance('fr-paging-instance')/(from | to)" type="xs:integer"/>
 
+            <xf:instance id="fr-home-triggers-instance" xxf:exclude-result-prefixes="#all">
+                <_ xmlns="">
+                    <enabled/>
+                    <disabled/>
+                </_>
+            </xf:instance>
+
+            <xf:bind ref="instance('fr-home-triggers-instance')/disabled" readonly="true()"/>
+
         </xf:model>
     </xh:head>
     <xh:body>
@@ -1163,18 +1172,37 @@
                     </xf:group>
                 </xf:group>
             </fr:row>
-
-            <xf:group ref=".[$show-permissions]">
-                <fr:row>
-                    <xh:div class="fr-orbeon-version">
-                        <xf:output
-                            value="version:VersionString()"
-                            xmlns:version="java:org.orbeon.oxf.common.Version"/>
-                    </xh:div>
-                </fr:row>
-            </xf:group>
-
+<!--            <xf:group ref=".[$is-admin]">-->
+<!--                <fr:row>-->
+<!--                    <xh:div class="fr-orbeon-version">-->
+<!--                        <xf:output-->
+<!--                            value="version:VersionString()"-->
+<!--                            xmlns:version="java:org.orbeon.oxf.common.Version"/>-->
+<!--                    </xh:div>-->
+<!--                </fr:row>-->
+<!--            </xf:group>-->
         </fr:view>
+
+        <fr:buttons>
+            <xf:var name="enabled"  value="instance('fr-home-triggers-instance')/enabled"/>
+            <xf:var name="disabled" value="instance('fr-home-triggers-instance')/disabled"/>
+
+            <xf:group model="fr-form-model" class="fr-buttons">
+<!--                <xf:repeat ref="xxf:split(xxf:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')))">-->
+                <xf:repeat ref="'home'">
+                    <xf:var name="button-name" value="."/>
+                    <xh:span>
+                        <!-- Landing -->
+                        <xf:group ref="if ($button-name = 'home') then $enabled else $disabled">
+                            <xf:trigger ref="." class="fr-{$button-name}-button">
+                                <xf:label mediatype="text/html" value="$fr-resources/buttons/home"/>
+                                <xf:load event="DOMActivate" resource="/fr/"/>
+                            </xf:trigger>
+                        </xf:group>
+                    </xh:span>
+                </xf:repeat>
+            </xf:group>
+        </fr:buttons>
 
         <!-- Confirmation dialogs -->
 

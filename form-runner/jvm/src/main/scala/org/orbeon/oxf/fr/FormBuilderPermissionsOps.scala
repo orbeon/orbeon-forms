@@ -29,20 +29,20 @@ import org.orbeon.scaxon.SimplePath._
 
 trait FormBuilderPermissionsOps {
 
+  private val SupportedFormBuilderPermissionsPaths  = List(
+    "/config/form-builder-permissions.xml",
+    "/config/form-runner-roles.xml"
+  )
+
   // Load form-builder-permissions.xml. For code called from XForms, that instance is loaded in permissions-model.xml.
   //@XPathFunction
   def formBuilderPermissionsConfiguration: Option[DocumentInfo] = {
 
-    val supportedPaths  = List(
-      "/config/form-builder-permissions.xml",
-      "/config/form-runner-roles.xml"
-    )
-
     val resourceManager = ResourceManagerWrapper.instance
 
-    supportedPaths collectFirst
-      {case key if resourceManager.exists(key) => resourceManager.getContentAsOrbeonDom(key)} map
-      (new DocumentWrapper(_, null, XPath.GlobalConfiguration))
+    SupportedFormBuilderPermissionsPaths collectFirst { case key if resourceManager.exists(key) =>
+      new DocumentWrapper(resourceManager.getContentAsOrbeonDom(key), null, XPath.GlobalConfiguration)
+    }
   }
 
   //@XPathFunction

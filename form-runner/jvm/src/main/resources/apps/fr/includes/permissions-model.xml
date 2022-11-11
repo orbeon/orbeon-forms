@@ -15,7 +15,6 @@
 <xf:model
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:saxon="http://saxon.sf.net/"
     xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
 
     id="fb-permissions-model">

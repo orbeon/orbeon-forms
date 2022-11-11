@@ -17,10 +17,10 @@
 
                 <xf:instance id="fr-paging-instance" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
                     <_ xmlns="">
-                        <search-total/>
+                        <search-total>0</search-total>
                         <page-size>20</page-size>
                         <page-number>1</page-number>
-                        <page-count/>
+                        <page-count>1</page-count>
                         <from>0</from>
                         <to>0</to>
                         <prev-trigger/>
@@ -32,6 +32,7 @@
                     <xf:bind ref="* except (prev-trigger, next-trigger)" type="xs:integer"/>
                     <xf:bind ref="page-size"    calculate="(fr:component-param-value('page-size'), 10)[. castable as xs:integer][1]"/>
                     <xf:bind ref="page-count"   calculate="(../search-total + ../page-size - 1) idiv ../page-size"/>
+                    <xf:bind ref="page-number"  calculate="max((1, min((., ../page-count))))"/>
                     <xf:bind ref="from"         calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
                     <xf:bind ref="to"           calculate="min((../page-number * ../page-size, ../search-total))"/>
                     <xf:bind ref="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>
@@ -67,6 +68,17 @@
 
                 <xf:group ref="()" xbl:attr="model context ref=to-ref" appearance="xxf:internal" xxbl:scope="outer">
                     <xf:group ref="instance('fr-paging-instance')/to" xxbl:scope="inner" appearance="xxf:internal">
+                        <xf:var name="ref" as="item()?">
+                            <xxf:value value="." xxbl:scope="outer"/>
+                        </xf:var>
+                        <xf:var name="value" as="xs:integer" value="data(.)">
+                            <xf:setvalue event="xforms-enabled xforms-value-changed" ref="$ref" value="$value"/>
+                        </xf:var>
+                    </xf:group>
+                </xf:group>
+
+                <xf:group ref="()" xbl:attr="model context ref=page-number-ref" appearance="xxf:internal" xxbl:scope="outer">
+                    <xf:group ref="instance('fr-paging-instance')/page-number" xxbl:scope="inner" appearance="xxf:internal">
                         <xf:var name="ref" as="item()?">
                             <xxf:value value="." xxbl:scope="outer"/>
                         </xf:var>

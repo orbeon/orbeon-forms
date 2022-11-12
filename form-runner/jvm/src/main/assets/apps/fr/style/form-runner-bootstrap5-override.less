@@ -119,32 +119,41 @@
   }
 
   // Adapt pagination to use of xf:trigger
-  .pagination li {
-    & > .xforms-trigger {
-      cursor: pointer
-    }
+  .pagination {
+    display:flex !important;
+    margin-bottom: 20px !important;
 
-    & > .xforms-trigger.xforms-readonly {
-      cursor: auto;
-    }
+    li {
+      & > .xforms-trigger {
+        cursor: pointer
+      }
+  
+      & > .xforms-trigger.xforms-readonly {
+        cursor: auto;
+      }
+  
+      .btn-link {
+        text-decoration: none;
+        background-color: #fff;
+      }
+  
+      // NOTE: Updated for Bootstrap 5
+      > .btn-link, > span {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        background-color: #fff;
+      }
+  
+      // Reset rules that can be applied by external Bootstrap .pagination a rule
+      span .btn-link {
+        padding: 0;
+        border: none;
+        line-height: normal;
+      }
 
-    .btn-link {
-      text-decoration: none;
-      background-color: #fff;
-    }
-
-    // NOTE: Updated for Bootstrap 5
-    > .btn-link, > span {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      background-color: #fff;
-    }
-
-    // Reset rules that can be applied by external Bootstrap .pagination a rule
-    span .btn-link {
-      padding: 0;
-      border: none;
-      line-height: normal;
+      .xforms-output {
+        padding: 8px 28px !important;
+      }
     }
   }
 
@@ -383,4 +392,18 @@
   .xbl-fr-wizard .fr-wizard-toc .nav .btn-link {
     width: 234px;
   }
+
+  // admin or home page
+  .orbeon .fr-forms-table tbody tr:nth-child(4n+3) > td {
+    border: 1px solid #ddd;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  .table > :not(:first-child) {
+    border-top: 1px solid #ddd;
+  }
+
 }

@@ -313,7 +313,7 @@ object ControlLabelHintTextEditor {
               case Some(content)             => content
               case None                      => ""
             }
-          case _ =>
+          case EditorType.Label | EditorType.Hint =>
             textInput.value().asInstanceOf[String]
         }
 
@@ -326,7 +326,7 @@ object ControlLabelHintTextEditor {
               // https://twitter.com/avernet/status/580798585291177984
               tinyMceObject.execCommand("mceAutoResize")
             }
-          case _ =>
+          case EditorType.Label | EditorType.Hint =>
             textInput.value(newValue)
             textInput.focus()
         }
@@ -351,7 +351,7 @@ object ControlLabelHintTextEditor {
               tinyMceObject.show()
               tinyMceObject.focus()
             }
-          case _ =>
+          case EditorType.Label | EditorType.Hint =>
             textInput.show()
             checkboxInput.show()
         }

@@ -52,6 +52,10 @@ object TinyMCE {
 
         val tinyMceConfig = TinyMceCustomConfig.getOrElse(TinyMceDefaultConfig)
 
+        // Force these important settings
+        tinyMceConfig.inline       = true
+        tinyMceConfig.hidden_input = false
+
         // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
         // TinyMCE tried to load `silver/theme.js`, which doesn't exist
         tinyMceConfig.suffix      = ".min"

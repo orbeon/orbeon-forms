@@ -61,7 +61,8 @@ object TinyMce {
   }
 
   trait TinyMceConfig extends js.Object {
-    var inline                   : js.UndefOr[Boolean]  = js.undefined
+    var inline                   : js.UndefOr[Boolean] = js.undefined
+    var hidden_input             : js.UndefOr[Boolean] = js.undefined
     var language                 : js.UndefOr[String]  = js.undefined
     var statusbar                : js.UndefOr[Boolean] = js.undefined
     var menubar                  : js.UndefOr[Boolean] = js.undefined
@@ -84,6 +85,7 @@ object TinyMce {
 
   object TinyMceDefaultConfig extends TinyMceConfig {
     inline             = true
+    hidden_input       = false
     language           = "en"
     statusbar          = false
     menubar            = false

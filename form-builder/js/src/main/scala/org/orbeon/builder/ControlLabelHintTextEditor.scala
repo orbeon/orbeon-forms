@@ -15,6 +15,8 @@
 package org.orbeon.builder
 
 import autowire._
+import enumeratum._
+import enumeratum.EnumEntry.Lowercase
 import org.orbeon.builder.facade.JQueryTooltip._
 import org.orbeon.builder.facade._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
@@ -25,12 +27,20 @@ import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom
 import org.scalajs.dom.document
 import org.scalajs.jquery.{JQuery, JQueryCallback, JQueryEventObject}
-
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
+
 import scala.scalajs.js
 
 
 object ControlLabelHintTextEditor {
+
+  sealed trait EditorType extends EnumEntry with Lowercase
+  object EditorType extends Enum[EditorType] {
+    val values = findValues
+    case object Label extends EditorType
+    case object Hint  extends EditorType
+    case object Text  extends EditorType
+  }
 
   val controlAdded: JQueryCallback = $.Callbacks(flags = "")
 
@@ -118,7 +128,7 @@ object ControlLabelHintTextEditor {
       Private.container.width(resourceEditorCurrentLabelHint.outerWidth())
       // Cannot just use `show()` because we have `display: none` originally, which would default to `display: block`.
       // This is because we can't use an inline `style` attribute anymore, see https://github.com/orbeon/orbeon-forms/issues/3565
-      Private.container.css( "display", "flex")
+      Private.container.css("display", "flex")
       Private.startEdit()
       val labelHintOffset = resourceEditorCurrentLabelHint.offset()
       Private.container.offset(labelHintOffset)
@@ -128,7 +138,7 @@ object ControlLabelHintTextEditor {
       Private.checkbox.tooltip(new JQueryTooltipConfig() {
         val title = $(".fb-message-lhha-checkbox").text()
       })
-      val labelTextOrHint = Private.labelOrHintOrText
+      val labelTextOrHint = Private.labelOrHintOrText.entryName
       Private.textfield.attr("placeholder", $(s".fb-message-type-$labelTextOrHint").text())
       // Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
       resourceEditorCurrentLabelHint.css("visibility", "hidden")
@@ -141,14 +151,14 @@ object ControlLabelHintTextEditor {
       // If editor is hidden, editing has already been ended (endEdit can be called more than once)
       if (Private.container.is(":visible")) {
         resourceEditorCurrentControlOpt foreach { resourceEditorCurrentControl =>
-          // Send value to server, handled in FB's model.xml
+          // Send value to server, handled in Form Builder's `model.xml`
           val controlId   = resourceEditorCurrentControl.attr("id").get
           val newValue    = Private.getValue
           val isHTML      = Private.isHTML
 
           RpcClient[FormBuilderRpcApi].controlUpdateLabelOrHintOrText(
             controlId = controlId,
-            lhha      = Private.labelOrHintOrText,
+            lhha      = Private.labelOrHintOrText.entryName,
             value     = newValue,
             isHTML    = isHTML
           ).call() // ignoring the `Future` completion
@@ -174,15 +184,17 @@ object ControlLabelHintTextEditor {
       // Also in `LiferayURL`!
       private val URLBaseMagic = "1b713b2e6d7fd45753f4b8a6270b776e"
 
+      private val TinyMceEmptyContent = "<div>\u00A0</div>"
+
       // State
-      var tinyMceObject      : TinyMceEditor = _
-      var tinyMceInitialized : Boolean       = false
+      var tinyMceObjectOpt  : Option[TinyMceEditor] = None
+      var tinyMceInitialized: Boolean               = false
 
       // Create elements for editing
-      val container     = $("""<div   class="xforms-hidden fb-label-editor"/>""")
-      val textfield     = $("""<input class="xforms-hidden" type="text">""")
-      val checkbox      = $("""<input class="xforms-hidden" type="checkbox">""")
-      val tinymceAnchor = $("""<div   class="xforms-hidden">""")
+      val container        = $("""<div   class="xforms-hidden fb-label-editor"/>""")
+      val textfield        = $("""<input class="xforms-hidden" type="text">""")
+      val checkbox         = $("""<input class="xforms-hidden" type="checkbox">""")
+      val tinyMceContainer = $("""<div   class="xforms-hidden">""")
 
       // Add elements to the page
       locally {
@@ -190,7 +202,7 @@ object ControlLabelHintTextEditor {
         container
           .append(textfield)
           .append(checkbox)
-          .append(tinymceAnchor)
+          .append(tinyMceContainer)
          $(".fb-main").append(container)
 
         // Event handlers
@@ -208,15 +220,15 @@ object ControlLabelHintTextEditor {
       }
 
       // Read/write class telling us if the label/hint/text is in HTML, set in grid.xml
-      def labelOrHintOrText: String =
-        if      (resourceEditorCurrentLabelHint.is(".xforms-label"))             "label"
-        else if (resourceEditorCurrentLabelHint.parents(".xforms-text").is("*")) "text"
-        else                                                                     "hint"
+      def labelOrHintOrText: EditorType =
+        if      (resourceEditorCurrentLabelHint.is(".xforms-label"))             EditorType.Label
+        else if (resourceEditorCurrentLabelHint.parents(".xforms-text").is("*")) EditorType.Text
+        else                                                                     EditorType.Hint
 
-      def htmlClass: String = "fb-" + labelOrHintOrText + "-is-html"
+      def htmlClass: String = s"fb-${labelOrHintOrText.entryName}-is-html"
       def isLabelHintHtml: Boolean = resourceEditorCurrentControlOpt exists (_.is("." + htmlClass))
       def setLabelHintHtml(isHtml: Boolean): Unit = resourceEditorCurrentControlOpt foreach (_.toggleClass(htmlClass, isHtml))
-      def annotateWithLhhaClass(add: Boolean) = container.toggleClass("fb-label-editor-for-" + labelOrHintOrText, add)
+      def annotateWithLhhaClass(add: Boolean) = container.toggleClass(s"fb-label-editor-for-${labelOrHintOrText.entryName}", add)
 
       def labelHintValue: String =
         if (isLabelHintHtml) resourceEditorCurrentLabelHint.html()
@@ -225,26 +237,30 @@ object ControlLabelHintTextEditor {
         if (isLabelHintHtml) resourceEditorCurrentLabelHint.html(value)
         else                 resourceEditorCurrentLabelHint.text(value)
 
-      def afterTinyMCEInitialized(thunk: () => Unit): Unit =
+      def withInitializedTinyMce(thunk: TinyMceEditor => Unit): Unit =
         if (tinyMceInitialized)
-          thunk()
+          tinyMceObjectOpt foreach thunk
         else
-          tinyMceObject.on("init", _ => {
-            tinyMceInitialized = true
-            thunk()
-          })
+          tinyMceObjectOpt foreach { tinyMceObject =>
+            tinyMceObject.on("init", _ => {
+              tinyMceInitialized = true
+              thunk(tinyMceObject)
+            })
+          }
 
-      def makeSpaceForMCE(): Unit = {
+      def makeSpaceForTinyMce(): Unit = {
         // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
-        val mceHeight = tinymceAnchor.height()
+        val mceHeight = tinyMceContainer.height()
         resourceEditorCurrentLabelHint.height(mceHeight)
       }
 
       // Function to initialize the TinyMCE, memoized so it runs at most once
-      val initTinyMCE: () => Unit = memoize0(() => {
+      val initTinyMce: () => Unit = memoize0(() => {
 
-        tinymceAnchor.show()
-        tinymceAnchor.attr("id", Underscore.uniqueId())
+        val anchorId = Underscore.uniqueId() // TODO: Don't use `Underscore`
+
+        tinyMceContainer.show()
+        tinyMceContainer.attr("id", anchorId)
 
         // Initialize baseURL
         locally {
@@ -262,64 +278,70 @@ object ControlLabelHintTextEditor {
             Underscore.clone(TinyMceDefaultConfig)
         }
 
+        // Force these important settings
+        tinyMceConfig.inline       = true
+        tinyMceConfig.hidden_input = false
+
         tinyMceConfig.plugins                  += ",autoresize"  // Auto-size MCE height based on the content
         tinyMceConfig.autoresize_min_height    =  100.0          // Min height of 100px
         tinyMceConfig.autoresize_bottom_margin =  16.0           // Default padding for autoresize adds too much empty space at the bottom
         tinyMceConfig.suffix                   =  ".min"
         tinyMceConfig.content_css              =  GlobalTinyMce.baseURL + "/../../content.css"
 
-        tinyMceObject = new TinyMceEditor(tinymceAnchor.attr("id").get, tinyMceConfig, GlobalTinyMce.EditorManager)
+        val tinyMceObject = new TinyMceEditor(anchorId, tinyMceConfig, GlobalTinyMce.EditorManager)
+        tinyMceObjectOpt = Some(tinyMceObject)
         tinyMceObject.render()
 
-        afterTinyMCEInitialized(() =>
-          $(tinyMceObject.getWin()).on("resize", makeSpaceForMCE _)
-        )
+        withInitializedTinyMce { tinyMceObject =>
+          $(tinyMceObject.getWin()).on("resize", makeSpaceForTinyMce _)
+        }
       })
 
       // Set width of TinyMCE to the width of the container
-      def setTinyMCEWidth(): Unit =
-        $(tinymceAnchor).width(container.outerWidth())
+      def setTinyMceWidth(): Unit =
+        $(tinyMceContainer).width(container.outerWidth())
 
       def getValue: String =
-        if (labelOrHintOrText == "text") {
-            val content = tinyMceObject.getContent()
-            // Workaround to TinyMCE issue, see
-            // https://twitter.com/avernet/status/579031182605750272
-            if (content == "<div>\u00A0</div>") "" else content
-        } else {
-            textfield.value().asInstanceOf[String]
-        }
+        if (labelOrHintOrText == EditorType.Text)
+          tinyMceObjectOpt map (_.getContent()) match {
+            case Some(TinyMceEmptyContent) => "" // https://twitter.com/avernet/status/579031182605750272
+            case Some(content)             => content
+            case None                      => ""
+          }
+        else
+          textfield.value().asInstanceOf[String]
 
       def setValue(newValue: String): Unit =
-        if (labelOrHintOrText == "text") {
-          afterTinyMCEInitialized(() => {
+        if (labelOrHintOrText == EditorType.Text) {
+          withInitializedTinyMce { tinyMceObject =>
             tinyMceObject.setContent(newValue)
             // Workaround for resize not happening with empty values, see
             // https://twitter.com/avernet/status/580798585291177984
             tinyMceObject.execCommand("mceAutoResize")
-          })
+          }
         } else {
           textfield.value(newValue)
           textfield.focus()
         }
 
-      def isHTML: Boolean = labelOrHintOrText == "text" || checkbox.is(":checked")
+      def isHTML: Boolean = labelOrHintOrText == EditorType.Text || checkbox.is(":checked")
 
       def startEdit(): Unit = {
         textfield.hide()
         checkbox.hide()
-        if (tinyMceObject ne null)
-          tinyMceObject.hide()
-        if (labelOrHintOrText == "text") {
-          initTinyMCE()
-          afterTinyMCEInitialized(() => {
+        tinyMceObjectOpt foreach (_.hide())
+        tinyMceContainer.hide()
+        if (labelOrHintOrText == EditorType.Text) {
+          initTinyMce()
+          tinyMceContainer.show()
+          withInitializedTinyMce { tinyMceObject =>
             // Without hiding first, the first time after render the TinyMCE can't get the focus
             tinyMceObject.hide()
-            makeSpaceForMCE()
-            setTinyMCEWidth()
+            makeSpaceForTinyMce()
+            setTinyMceWidth()
             tinyMceObject.show()
             tinyMceObject.focus()
-          })
+          }
         } else {
           textfield.show()
           checkbox.show()
@@ -327,7 +349,7 @@ object ControlLabelHintTextEditor {
       }
 
       def endEdit(): Unit =
-        if (labelOrHintOrText == "text")
+        if (labelOrHintOrText == EditorType.Text)
           // Reset height we might have placed on the explanation element inside the cell
           resourceEditorCurrentLabelHint.css("height", "")
     }

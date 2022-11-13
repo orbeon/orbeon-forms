@@ -16,7 +16,6 @@ package org.orbeon.builder
 import autowire._
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum._
-import io.circe.generic.auto._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
 import org.orbeon.jquery.Offset

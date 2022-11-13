@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+
 object CoreUtils {
 
   implicit class PipeOps[A](private val a: A) extends AnyVal {
@@ -40,21 +41,6 @@ object CoreUtils {
     def flatList[A](a: => List[A])     : List[A]     = if (b) a           else Nil
     def set[A](a: => A)                : Set[A]      = if (b) Set(a)      else Set.empty[A]
     def iterator[A](a: => A)           : Iterator[A] = if (b) Iterator(a) else Iterator.empty
-  }
-
-  // Special case of Underscore.memoize() for functions taking no parameters
-  def memoize0[R](
-    f: () => R
-  ):   () => R = {
-
-    var resultOpt: Option[R] = None
-    () => {
-      resultOpt.getOrElse {
-        val result = f()
-        resultOpt = Some(result)
-        result
-      }
-    }
   }
 
   @inline def asUnit(body: => Any): Unit = body

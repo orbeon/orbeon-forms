@@ -15,6 +15,7 @@
 package org.orbeon.builder
 
 import autowire._
+import cats.Eval
 import enumeratum._
 import enumeratum.EnumEntry.Lowercase
 import org.orbeon.builder.facade.JQueryTooltip._
@@ -75,7 +76,7 @@ object ControlLabelHintTextEditor {
 
       // Click on label/hint
       $(document).on(
-        "click.orbeon.builder.resource-editor",
+        s"${EventNames.Click}${Private.ListenerSuffix}",
         LabelHintSelector,
         (event: JQueryEventObject) => {
 
@@ -125,21 +126,21 @@ object ControlLabelHintTextEditor {
       resourceEditorCurrentLabelHint.removeAttr("for")
       // Show, position, and populate editor
       // Get position before showing editor, so showing doesn't move things in the page
-      Private.container.width(resourceEditorCurrentLabelHint.outerWidth())
+      Private.containerDiv.width(resourceEditorCurrentLabelHint.outerWidth())
       // Cannot just use `show()` because we have `display: none` originally, which would default to `display: block`.
       // This is because we can't use an inline `style` attribute anymore, see https://github.com/orbeon/orbeon-forms/issues/3565
-      Private.container.css("display", "flex")
+      Private.containerDiv.css("display", "flex")
       Private.startEdit()
       val labelHintOffset = resourceEditorCurrentLabelHint.offset()
-      Private.container.offset(labelHintOffset)
+      Private.containerDiv.offset(labelHintOffset)
       Private.setValue(Private.labelHintValue)
-      Private.checkbox.prop("checked", Private.isLabelHintHtml)
+      Private.checkboxInput.prop("checked", Private.isLabelHintHtml)
       // Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
-      Private.checkbox.tooltip(new JQueryTooltipConfig() {
+      Private.checkboxInput.tooltip(new JQueryTooltipConfig {
         val title = $(".fb-message-lhha-checkbox").text()
       })
-      val labelTextOrHint = Private.labelOrHintOrText.entryName
-      Private.textfield.attr("placeholder", $(s".fb-message-type-$labelTextOrHint").text())
+      val labelTextOrHint = Private.getEditorType.entryName
+      Private.textInput.attr("placeholder", $(s".fb-message-type-$labelTextOrHint").text())
       // Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
       resourceEditorCurrentLabelHint.css("visibility", "hidden")
       // Add class telling if this is a label or hint editor
@@ -149,7 +150,7 @@ object ControlLabelHintTextEditor {
     // Called when users press enter or tab out
     def resourceEditorEndEdit(): Unit = {
       // If editor is hidden, editing has already been ended (endEdit can be called more than once)
-      if (Private.container.is(":visible")) {
+      if (Private.containerDiv.is(":visible")) {
         resourceEditorCurrentControlOpt foreach { resourceEditorCurrentControl =>
           // Send value to server, handled in Form Builder's `model.xml`
           val controlId   = resourceEditorCurrentControl.attr("id").get
@@ -158,14 +159,14 @@ object ControlLabelHintTextEditor {
 
           RpcClient[FormBuilderRpcApi].controlUpdateLabelOrHintOrText(
             controlId = controlId,
-            lhha      = Private.labelOrHintOrText.entryName,
+            lhha      = Private.getEditorType.entryName,
             value     = newValue,
             isHTML    = isHTML
           ).call() // ignoring the `Future` completion
 
           // Destroy tooltip, or it doesn't get recreated on startEdit()
-          Private.checkbox.tooltip("destroy")
-          Private.container.hide()
+          Private.checkboxInput.tooltip("destroy")
+          Private.containerDiv.hide()
           Private.endEdit()
           Private.annotateWithLhhaClass(false)
           resourceEditorCurrentLabelHint.css("visibility", "")
@@ -185,50 +186,51 @@ object ControlLabelHintTextEditor {
       private val URLBaseMagic = "1b713b2e6d7fd45753f4b8a6270b776e"
 
       private val TinyMceEmptyContent = "<div>\u00A0</div>"
+      val ListenerSuffix      = s".orbeon.builder.lht-editor"
 
       // State
       var tinyMceObjectOpt  : Option[TinyMceEditor] = None
       var tinyMceInitialized: Boolean               = false
 
       // Create elements for editing
-      val container        = $("""<div   class="xforms-hidden fb-label-editor"/>""")
-      val textfield        = $("""<input class="xforms-hidden" type="text">""")
-      val checkbox         = $("""<input class="xforms-hidden" type="checkbox">""")
-      val tinyMceContainer = $("""<div   class="xforms-hidden">""")
+      val containerDiv        = $("""<div   class="xforms-hidden fb-label-editor"/>""")
+      val textInput           = $("""<input class="xforms-hidden" type="text">""")
+      val checkboxInput       = $("""<input class="xforms-hidden" type="checkbox">""")
+      val tinyMceContainerDiv = $("""<div   class="xforms-hidden">""")
 
       // Add elements to the page
       locally {
         // Nest and add to the page
-        container
-          .append(textfield)
-          .append(checkbox)
-          .append(tinyMceContainer)
-         $(".fb-main").append(container)
+        containerDiv
+          .append(textInput)
+          .append(checkboxInput)
+          .append(tinyMceContainerDiv)
+         $(".fb-main").append(containerDiv)
 
         // Event handlers
-        textfield.on(EventNames.KeyPress, (e: JQueryEventObject) => asUnit {
+        textInput.on(s"${EventNames.KeyPress}$ListenerSuffix", (e: JQueryEventObject) => asUnit {
           // End edit when users press enter
           if (e.which == 13) {
             e.preventDefault()
             resourceEditorEndEdit()
           }
         })
-        checkbox.on("click.orbeon.builder.lht-editor", () => asUnit {
+        checkboxInput.on(s"${EventNames.Click}$ListenerSuffix", () => asUnit {
           // When checkbox clicked, set focus back on the text field, where it was before
-          textfield.focus()
+          textInput.focus()
         })
       }
 
       // Read/write class telling us if the label/hint/text is in HTML, set in grid.xml
-      def labelOrHintOrText: EditorType =
+      def getEditorType: EditorType =
         if      (resourceEditorCurrentLabelHint.is(".xforms-label"))             EditorType.Label
         else if (resourceEditorCurrentLabelHint.parents(".xforms-text").is("*")) EditorType.Text
         else                                                                     EditorType.Hint
 
-      def htmlClass: String = s"fb-${labelOrHintOrText.entryName}-is-html"
+      def htmlClass: String = s"fb-${getEditorType.entryName}-is-html"
       def isLabelHintHtml: Boolean = resourceEditorCurrentControlOpt exists (_.is("." + htmlClass))
       def setLabelHintHtml(isHtml: Boolean): Unit = resourceEditorCurrentControlOpt foreach (_.toggleClass(htmlClass, isHtml))
-      def annotateWithLhhaClass(add: Boolean) = container.toggleClass(s"fb-label-editor-for-${labelOrHintOrText.entryName}", add)
+      def annotateWithLhhaClass(add: Boolean): JQuery = containerDiv.toggleClass(s"fb-label-editor-for-${getEditorType.entryName}", add)
 
       def labelHintValue: String =
         if (isLabelHintHtml) resourceEditorCurrentLabelHint.html()
@@ -250,17 +252,17 @@ object ControlLabelHintTextEditor {
 
       def makeSpaceForTinyMce(): Unit = {
         // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
-        val mceHeight = tinyMceContainer.height()
+        val mceHeight = tinyMceContainerDiv.height()
         resourceEditorCurrentLabelHint.height(mceHeight)
       }
 
       // Function to initialize the TinyMCE, memoized so it runs at most once
-      val initTinyMce: () => Unit = memoize0(() => {
+      val initTinyMce: Eval[TinyMceEditor] = Eval.later {
 
         val anchorId = Underscore.uniqueId() // TODO: Don't use `Underscore`
 
-        tinyMceContainer.show()
-        tinyMceContainer.attr("id", anchorId)
+        tinyMceContainerDiv.show()
+        tinyMceContainerDiv.attr("id", anchorId)
 
         // Initialize baseURL
         locally {
@@ -293,63 +295,70 @@ object ControlLabelHintTextEditor {
         tinyMceObject.render()
 
         withInitializedTinyMce { tinyMceObject =>
-          $(tinyMceObject.getWin()).on("resize", makeSpaceForTinyMce _)
+          $(tinyMceObject.getWin()).on(s"${EventNames.Resize}$ListenerSuffix", makeSpaceForTinyMce _)
         }
-      })
+
+        tinyMceObject
+      }
 
       // Set width of TinyMCE to the width of the container
       def setTinyMceWidth(): Unit =
-        $(tinyMceContainer).width(container.outerWidth())
+        $(tinyMceContainerDiv).width(containerDiv.outerWidth())
 
       def getValue: String =
-        if (labelOrHintOrText == EditorType.Text)
-          tinyMceObjectOpt map (_.getContent()) match {
-            case Some(TinyMceEmptyContent) => "" // https://twitter.com/avernet/status/579031182605750272
-            case Some(content)             => content
-            case None                      => ""
-          }
-        else
-          textfield.value().asInstanceOf[String]
-
-      def setValue(newValue: String): Unit =
-        if (labelOrHintOrText == EditorType.Text) {
-          withInitializedTinyMce { tinyMceObject =>
-            tinyMceObject.setContent(newValue)
-            // Workaround for resize not happening with empty values, see
-            // https://twitter.com/avernet/status/580798585291177984
-            tinyMceObject.execCommand("mceAutoResize")
-          }
-        } else {
-          textfield.value(newValue)
-          textfield.focus()
+        getEditorType match {
+          case EditorType.Text =>
+            tinyMceObjectOpt map (_.getContent()) match {
+              case Some(TinyMceEmptyContent) => "" // https://twitter.com/avernet/status/579031182605750272
+              case Some(content)             => content
+              case None                      => ""
+            }
+          case _ =>
+            textInput.value().asInstanceOf[String]
         }
 
-      def isHTML: Boolean = labelOrHintOrText == EditorType.Text || checkbox.is(":checked")
+      def setValue(newValue: String): Unit =
+        getEditorType match {
+          case EditorType.Text =>
+            withInitializedTinyMce { tinyMceObject =>
+              tinyMceObject.setContent(newValue)
+              // Workaround for resize not happening with empty values, see
+              // https://twitter.com/avernet/status/580798585291177984
+              tinyMceObject.execCommand("mceAutoResize")
+            }
+          case _ =>
+            textInput.value(newValue)
+            textInput.focus()
+        }
+
+      def isHTML: Boolean = getEditorType == EditorType.Text || checkboxInput.is(":checked")
 
       def startEdit(): Unit = {
-        textfield.hide()
-        checkbox.hide()
+        textInput.hide()
+        checkboxInput.hide()
         tinyMceObjectOpt foreach (_.hide())
-        tinyMceContainer.hide()
-        if (labelOrHintOrText == EditorType.Text) {
-          initTinyMce()
-          tinyMceContainer.show()
-          withInitializedTinyMce { tinyMceObject =>
-            // Without hiding first, the first time after render the TinyMCE can't get the focus
-            tinyMceObject.hide()
-            makeSpaceForTinyMce()
-            setTinyMceWidth()
-            tinyMceObject.show()
-            tinyMceObject.focus()
-          }
-        } else {
-          textfield.show()
-          checkbox.show()
+        tinyMceContainerDiv.hide()
+
+        getEditorType match {
+          case EditorType.Text =>
+            initTinyMce.value
+            tinyMceContainerDiv.show()
+            withInitializedTinyMce { tinyMceObject =>
+              // Without hiding first, the first time after render the TinyMCE can't get the focus
+              tinyMceObject.hide()
+              makeSpaceForTinyMce()
+              setTinyMceWidth()
+              tinyMceObject.show()
+              tinyMceObject.focus()
+            }
+          case _ =>
+            textInput.show()
+            checkboxInput.show()
         }
       }
 
       def endEdit(): Unit =
-        if (labelOrHintOrText == EditorType.Text)
+        if (getEditorType == EditorType.Text)
           // Reset height we might have placed on the explanation element inside the cell
           resourceEditorCurrentLabelHint.css("height", "")
     }

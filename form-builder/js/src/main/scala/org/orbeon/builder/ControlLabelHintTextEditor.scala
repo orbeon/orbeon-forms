@@ -248,13 +248,15 @@ object ControlLabelHintTextEditor {
               tinyMceInitialized = true
               thunk(tinyMceObject)
             })
+            // Found out experimentally that this event fires (but not `ResizeEditor`/`ResizeWindow`)
+            tinyMceObject.on("ResizeContent", _ => {
+              makeSpaceForTinyMce()
+            })
           }
 
-      def makeSpaceForTinyMce(): Unit = {
-        // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
-        val mceHeight = tinyMceContainerDiv.height()
-        resourceEditorCurrentLabelHint.height(mceHeight)
-      }
+      // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
+      def makeSpaceForTinyMce(): Unit =
+        resourceEditorCurrentLabelHint.height(tinyMceContainerDiv.height())
 
       // Function to initialize the TinyMCE, memoized so it runs at most once
       val initTinyMce: Eval[TinyMceEditor] = Eval.later {
@@ -293,11 +295,6 @@ object ControlLabelHintTextEditor {
         val tinyMceObject = new TinyMceEditor(anchorId, tinyMceConfig, GlobalTinyMce.EditorManager)
         tinyMceObjectOpt = Some(tinyMceObject)
         tinyMceObject.render()
-
-        withInitializedTinyMce { tinyMceObject =>
-          $(tinyMceObject.getWin()).on(s"${EventNames.Resize}$ListenerSuffix", makeSpaceForTinyMce _)
-        }
-
         tinyMceObject
       }
 

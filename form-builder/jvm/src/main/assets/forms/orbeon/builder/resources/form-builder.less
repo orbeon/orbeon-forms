@@ -1100,6 +1100,22 @@ div.orbeon.orbeon-portlet-div {
         &.fb-label-editor-for-hint input {          // Smaller font size for hint, to match hint itself
             font-size: smaller;
         }
+        &.fb-label-editor-for-text {
+            .mce-content-body:focus-within {
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 25%);
+                outline: 0;
+                transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 1px; // so that cursor does not touch border
+                &:focus-within {
+                    box-shadow: 0 0 0 0.2rem @explanatoryTextShadow;
+                    outline: 0;
+                    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+                    border-color: #ccc;
+                }
+            }
+        }
     }
 
     h2 .fr-section-label {
@@ -1217,7 +1233,13 @@ div.orbeon.orbeon-portlet-div {
             }
         }
         // Make click area with the grey background larger, as it will typically contain a longer text
-        .xforms-text .xforms-output-output { min-height: 50px; display: block; }
+        .xforms-text .xforms-output-output {
+            min-height: 50px;
+            display: block;
+            border: 1px solid transparent; // so we can have a visible border when editing without causing resizing
+            border-radius: 4px;
+            padding: 1px; // so that cursor does not touch border
+        }
 
         // Even if the label or hint is empty, we still want space for 1 line to be reserved
         .fr-grid-td .xforms-label, .fr-grid-td .xforms-hint,                                                        // In regular grid content

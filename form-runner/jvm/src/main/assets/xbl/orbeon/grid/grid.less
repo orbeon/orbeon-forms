@@ -10,6 +10,7 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+@import (reference) "../../../../../../../../bootstrap-src/less/variables";
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
 .orbeon {
@@ -179,7 +180,7 @@
                 border-right: 1px solid #ddd;
                 border-bottom: 1px solid #ddd;
                 border-collapse: separate;
-                border-radius: 4px;
+                border-radius: @baseBorderRadius;
 
                 .fr-grid-th,
                 .fr-grid-td,
@@ -362,7 +363,7 @@
             }
             .xforms-mediatype-image img {
                 display: block;
-                border-radius: 4px;
+                border-radius: @baseBorderRadius;
             }
 
             //  Buttons

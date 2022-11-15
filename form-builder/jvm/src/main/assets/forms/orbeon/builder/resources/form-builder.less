@@ -73,6 +73,7 @@ div.orbeon.orbeon-portlet-div {
         left: @fbGutter + @fbToolbarWidth + @fbGutter/2;                    // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
         bottom: @fbBottomHeight + @fbGutter;
         overflow-y: auto;
+        border-radius: @baseBorderRadius;
 
         .fb-main-inner {
             background-color: @wellBackground;
@@ -345,7 +346,7 @@ div.orbeon.orbeon-portlet-div {
                 &.fb-toolbox-top-icons {
                     display: grid;
                     grid-template-columns: repeat(6, 1fr);
-                    border-radius: 4px;
+                    border-radius: @baseBorderRadius;
 
                     .fb-form-settings-button     { grid-row-start: 1; grid-column-start: 1; }
                     .fb-cut-button               { grid-row-start: 1; grid-column-start: 2; }
@@ -464,7 +465,7 @@ div.orbeon.orbeon-portlet-div {
                         }
 
                         &:hover {
-                            border-radius: 4px;
+                            border-radius: @baseBorderRadius;
                             #gradient > .vertical(@grayLighter, @grayLighter);                                                             // effect on hover
                         }
                     }
@@ -483,6 +484,7 @@ div.orbeon.orbeon-portlet-div {
                     grid-template-rows: auto 1fr;
                     .tab-content {
                         overflow-y: auto;
+                        border-radius: 0 0 @baseBorderRadius 0;
                     }
                 }
             }
@@ -1112,12 +1114,12 @@ div.orbeon.orbeon-portlet-div {
             font-size: smaller;
         }
         &.fb-label-editor-for-hint input, &.fb-label-editor-for-label input {
-            border-radius: 4px;
+            border-radius: @baseBorderRadius;
         }
         &.fb-label-editor-for-text {
             .mce-content-body {
                 border: 1px solid transparent;
-                border-radius: 4px;
+                border-radius: @baseBorderRadius;
                 padding: 1px; // so that cursor does not touch border
                 &:focus-within {
                     box-shadow: 0 0 0 0.2rem @explanatoryTextShadow;
@@ -1195,7 +1197,7 @@ div.orbeon.orbeon-portlet-div {
                 box-shadow: 0 0 0 4px @cellHighlight !important;
                 outline: 0;
                 transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-                border-radius: 4px;
+                border-radius: @baseBorderRadius;
                 z-index: 1;                                                             // Highlight to show over grey background for hover cell
             }
         }
@@ -1203,6 +1205,7 @@ div.orbeon.orbeon-portlet-div {
         .fr-grid-td {
             &:hover:not(.fb-selected) {                                                 // Grey background on hover on non-selected cell, to indicate it can be selected
                 background-color: #eee;
+                border-radius: @baseBorderRadius;
             }
         }
 
@@ -1239,7 +1242,7 @@ div.orbeon.orbeon-portlet-div {
                 // Indicate the value can be edited
                 background-color: #ddd;
                 cursor: pointer;
-                border-radius: 4px;
+                border-radius: @baseBorderRadius;
             }
         }
         // Make click area with the grey background larger, as it will typically contain a longer text
@@ -1247,7 +1250,7 @@ div.orbeon.orbeon-portlet-div {
             min-height: 50px;
             display: block;
             border: 1px solid transparent; // so we can have a visible border when editing without causing resizing
-            border-radius: 4px;
+            border-radius: @baseBorderRadius;
             padding: 1px; // so that cursor does not touch border
         }
 

@@ -1110,6 +1110,9 @@ div.orbeon.orbeon-portlet-div {
         &.fb-label-editor-for-hint input {          // Smaller font size for hint, to match hint itself
             font-size: smaller;
         }
+        &.fb-label-editor-for-hint input, &.fb-label-editor-for-label input {
+            border-radius: 4px;
+        }
         &.fb-label-editor-for-text {
             .mce-content-body {
                 border: 1px solid transparent;
@@ -1235,6 +1238,7 @@ div.orbeon.orbeon-portlet-div {
                 // Indicate the value can be edited
                 background-color: #ddd;
                 cursor: pointer;
+                border-radius: 4px;
             }
         }
         // Make click area with the grey background larger, as it will typically contain a longer text

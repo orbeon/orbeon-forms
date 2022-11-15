@@ -146,9 +146,9 @@ private class DateCompanion extends XBLCompanionWithState {
     // Register listeners
 
     // DOM listeners
-    EventSupport.addListener(containerElem.querySelector(".add-on"), DomEventNames.KeyDown,  onIconKeypress)
-    EventSupport.addListener(inputJQueryEl(0),                             DomEventNames.KeyPress, onInputKeypress)
-    EventSupport.addListener(inputJQueryEl(0),                             DomEventNames.Change,   onInputChangeUpdateDatePicker)
+    EventSupport.addListener(containerElem.querySelector(".add-on, .input-group .input-group-addon"), DomEventNames.KeyDown,  onIconKeypress)
+    EventSupport.addListener(inputJQueryEl(0),                                                        DomEventNames.KeyPress, onInputKeypress)
+    EventSupport.addListener(inputJQueryEl(0),                                                        DomEventNames.Change,   onInputChangeUpdateDatePicker)
 
     // Date picker listeners
     enableDatePickerChangeListener()

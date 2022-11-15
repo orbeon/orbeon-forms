@@ -24,6 +24,19 @@
 @fbIconsHeight: 16px;
 @fbGridRowMinHeight: 64px;
 
+// Retro Summer #2 Color Scheme
+@color1: #FFEA48; // Gargoyle Gas
+@color2: #FABB01; // Selective Yellow
+@color3: #F25930; // Portland Orange
+@color4: #0B3D6F; // Ateneo Blue
+@color5: #0081C7; // NCS Blue
+@color6: #48BCD7; // Sea Serpent
+
+@wallAccentLight:  @color2;
+@wallAccentBright: @color3;
+@cellHighlight: @color5;
+@explanatoryTextShadow: rgba(0, 123, 255, 25%);
+
 // Case of non-embedded Form Builder: size body to take the whole viewport
 body.orbeon {
     position: absolute;
@@ -232,13 +245,10 @@ div.orbeon.orbeon-portlet-div {
         &.fb-grid-dnd-wall-vertical   { width : 8px }
         &.fb-grid-dnd-wall-horizontal { height: 8px }
 
-        @accentLight:  #FDCD6D;
-        @accentBright: #FB8604;
-
         position: absolute;
-        background-color: @accentLight;
-        &:hover                 { background-color: @accentBright }         // Cue container can be grabbed
-        &.fb-grid-dnd-wall-drop { background-color: @accentBright }         // On drop, wall will be moved here
+        background-color: @wallAccentLight;
+        &:hover                 { background-color: @wallAccentBright }         // Cue container can be grabbed
+        &.fb-grid-dnd-wall-drop { background-color: @wallAccentBright }         // On drop, wall will be moved here
 
         .fb-grid-dnd-wall-handle {
             height: 100%;
@@ -1101,11 +1111,8 @@ div.orbeon.orbeon-portlet-div {
             font-size: smaller;
         }
         &.fb-label-editor-for-text {
-            .mce-content-body:focus-within {
-                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 25%);
-                outline: 0;
-                transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-                border: 1px solid #ccc;
+            .mce-content-body {
+                border: 1px solid transparent;
                 border-radius: 4px;
                 padding: 1px; // so that cursor does not touch border
                 &:focus-within {
@@ -1186,7 +1193,10 @@ div.orbeon.orbeon-portlet-div {
 
         .fr-grid-td {
             &.fb-selected {
-                box-shadow: 0 0 5px 3px #aaccee !important;                             // Highlight selected cell
+                box-shadow: 0 0 0 4px @cellHighlight !important;
+                outline: 0;
+                transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+                border-radius: 4px;
                 z-index: 1;                                                             // Highlight to show over grey background for hover cell
             }
         }

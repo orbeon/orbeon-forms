@@ -1177,12 +1177,7 @@ div.orbeon.orbeon-portlet-div {
     .fb-label-hint-placeholder,                                                         // Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value
     .fb-label-hint-placeholder .btn { color: #bbb }                                     // To take precedence over color set for button's labels in xforms.css
     .fr-grid .fr-grid-td .xforms-trigger .btn input,                                    // Override margin set in form-runner-base.css for buttons in noscript (rendered as input)
-    .fr-grid .fr-grid-td .xforms-trigger .fb-mock-link input
-        { margin: 0 }
-    .fb-mock-link { color: @darkBlue; text-decoration: underline }                      // Simulate  styling of a link
     .btn .xforms-label { margin: 0 }                                                    // Override margin set in form-runner-base.css for regular labels
-    .fb-label-hint-placeholder .fb-mock-link { color: #bbb; text-decoration: none }     // When placeholder shown, don't underline and use grey color, to make it clear this is a placeholder
-    .fb-mock-link:hover { background-color: @yellow }                                   // Simulated link get yellow background on mouse over to suggest it can be edited
 
     .fr-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
                                                                                         // Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)

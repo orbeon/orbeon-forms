@@ -276,6 +276,16 @@
                             )
                         ) = true()"/>
 
+                <xsl:variable
+                    name="static-full-update-paging"
+                    select="
+                        p:property(
+                            string-join(
+                                ('oxf.xforms.xbl.fr.wizard.full-update-paging', $static-app, $static-form),
+                                '.'
+                            )
+                        ) = true()"/>
+
                 <xsl:template match="/*">
                     <xf:group appearance="xxf:internal">
                         <xf:group
@@ -1133,7 +1143,7 @@
                         <xh:div class="fr-wizard-body{{if (xxf:instance('local')/show-body/data(.)) then '' else ' xforms-hidden'}}">
 
                             <!-- FIXME: Don't like that this is a top-level `switch` id! -->
-                            <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer" xxf:update="full">
+                            <xf:switch id="switch" xbl:attr="caseref=sectionref" xxf:element="div" xxbl:scope="outer" xxf:update="{'full'[$static-full-update-paging]}">
                                 <!-- We need a way to listen to each case, but we don't want to duplicate the script and
                                      anyway event.target doesn't work within case (which would be a bug) -->
                                 <!-- TODO: Move to Scala.js. -->

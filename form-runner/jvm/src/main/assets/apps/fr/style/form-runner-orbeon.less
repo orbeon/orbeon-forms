@@ -157,7 +157,7 @@ body.orbeon { background-color: @frBackground }
     // Copied over Bootstrap styles as we can't reuse them simply as mixins
     // Ideally this would be in box-select.less
     .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
-        .border-radius(@inputBorderRadius);
+        border-radius: @inputBorderRadius;
         background-color: @inputBackground;
         border: 1px solid @inputBorder;
         padding: 4px 6px;
@@ -209,7 +209,7 @@ body.orbeon { background-color: @frBackground }
         color: white;
         position: relative;
         padding: 2px 8px;
-        .border-radius(5px);
+        border-radius: 5px;
         margin-top: 10px;
 
         &:before {
@@ -357,7 +357,7 @@ body.orbeon { background-color: @frBackground }
             border: none;
             height: auto; // https://github.com/orbeon/orbeon-forms/issues/1597
             overflow-y: visible; // shouldn't overflow with above height: auto
-            .box-shadow(none);
+            box-shadow: none;
             padding: 0;
         }
     }

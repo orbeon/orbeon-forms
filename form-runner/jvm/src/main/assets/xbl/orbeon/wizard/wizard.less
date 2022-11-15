@@ -175,8 +175,8 @@
 
     @media (max-width: 980px) {
         // Following #4211, we probably don't need to use `flex` as the markup order is already correct
-        .flex();
-        .flex-direction(column);
+        display: flex;
+        flex-direction: column;
 
         width: 100%;
 
@@ -191,17 +191,17 @@
         }
 
         .fr-wizard-toc {
-            .order(1);
+            order: 1;
             border: none;
         }
 
         .fr-wizard-body {
-            .order(2);
+            order: 2;
             border: none;
         }
 
         .fr-wizard-other {
-            .order(3);
+            order: 3;
         }
 
         .fr-buttons {

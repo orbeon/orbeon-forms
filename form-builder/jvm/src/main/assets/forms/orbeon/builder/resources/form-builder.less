@@ -947,9 +947,9 @@ div.orbeon.orbeon-portlet-div {
         }
 
         .fb-base-tab-div {
-            .flex();
+            display: flex;
             .fb-base-tab-left, .fb-base-tab-right {
-                .flex-flow(column);
+                flex-flow: column;
                 width: 50%;
             }
         }
@@ -1094,21 +1094,21 @@ div.orbeon.orbeon-portlet-div {
         height: @baseLineHeight;
         padding: 0;
         box-sizing: border-box;
-        .border-radius(0);
+        border-radius: 0;
     }
 
     .fb-label-editor {
         position: absolute;                         // If not explicitly set, jQuery uses position: relative, which create scrollbars
         top: 0; left: 0;                            // So the first call to .offset() works when the page is scrolled, see issue #2093
         z-index: 1;                                 // For the editor to be above control, allowing it to catch clicks, see issue #3410
-        .flex();
+        display: flex;
         input[type='text'] {
-            .flex-flow(column);
+            flex-flow: column;
             width: 100%;
         }
         input[type='checkbox'] {                    // Use margin as padding doesn't work well on HTML input elements
             margin-left: 5px;
-            .flex-flow(column);
+            flex-flow: column;
         }
         &.fb-label-editor-for-hint input {          // Smaller font size for hint, to match hint itself
             font-size: smaller;
@@ -1344,7 +1344,7 @@ div.orbeon.orbeon-portlet-div {
     .fb-navbar {
         position: absolute;
         margin-bottom: 0;                                                   // override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
-        .border-radius(0);                                                  // override Bootstrap rounded corners
+        border-radius: 0;                                                   // override Bootstrap rounded corners
         .container {
             line-height: @navbarHeight;                                     // Get the content of the navbar to be vertically aligned
             width: auto;

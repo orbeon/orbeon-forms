@@ -321,6 +321,14 @@
                 'false'
             )[1]"/>
 
+    <xsl:variable
+        name="wizard-full-update"
+        as="xs:boolean"
+        select="
+            (
+                p:property(string-join(('oxf.xforms.xbl.fr.wizard.full-update', $app, $form), '.')),
+                true()
+            )[1]"/>
 
     <xsl:variable
         name="grid-markup"

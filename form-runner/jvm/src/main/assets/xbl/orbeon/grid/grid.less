@@ -326,6 +326,17 @@
                 width: 100%;                // It's a reasonable default for textareas to be as wide as allowed
             }
 
+            .xforms-select-appearance-full, .xforms-select1-appearance-full {
+                .xforms-items {
+                    width: 100%;
+                    box-sizing: border-box;
+                    &[role = group][tabindex = '0'],
+                    &[role = radiogroup][tabindex = '0'] {
+                        padding: 4px 6px;
+                    }
+                }
+            }
+
             // Usually there is no `rows` attribute used, but if there is the
             textarea[rows] {
                 height: auto;

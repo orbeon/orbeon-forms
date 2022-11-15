@@ -6,8 +6,21 @@
         width: 100%;
     }
 
-    .fr-field-width-natural {
-        max-width: 130px;
+    .input-append {
+        &.fr-field-width-natural {
+            max-width: 130px;
+        }
+        input {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .add-on {
+            // Make things look good with icon
+            padding: 3px 6px 5px 4px;
+            i { margin-top: 0 }
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
     }
 
     .xforms-ios & {

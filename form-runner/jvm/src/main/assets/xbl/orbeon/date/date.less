@@ -1,12 +1,20 @@
+@import (reference)  "../../../apps/fr/style/form-runner-common";
 .xbl-fr-date {
     .input-append.date {
         &.fr-field-width-natural {
             max-width: 130px;
         }
+        input {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
         .add-on {
-            // Make things look good with calendar icon
+            // Make things look good with icon
             padding: 3px 6px 5px 4px;
             i { margin-top: 0 }
+            .focusHighlight();
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
         }
     }
 

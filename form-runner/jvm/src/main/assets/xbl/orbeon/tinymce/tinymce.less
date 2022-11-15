@@ -31,17 +31,7 @@
         box-sizing: border-box;
         padding: 4px 6px;
 
-        border: 1px solid @inputBorder;
-        box-shadow: none;
-
-        border-radius: @inputBorderRadius;
-        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-
-        &:focus {
-            border-color: #80bdff;
-            outline: 0;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-        }
+        .focusHighlight();
     }
 
     // 2022-09-08: These don't work anymore in `inline` mode as the TOC is placed under `<body>`.

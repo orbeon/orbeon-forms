@@ -32,6 +32,10 @@
 @controlsBottomMargin: 5px;                 // 5px is the Bootstrap default
 @multipleSelectHeight: (@baseLineHeight + @controlsBottomMargin) * 3 - @controlsBottomMargin + 8px; // 3 lines including margins
 
+@fieldBorderColor: @inputBorder;
+@focusBorderColor: #80bdff;
+@focusHighlightColor: rgba(0,123,255,.25);
+
 @error: #B94A48;
 @warning: lighten(@orange, 15%);
 @info: @infoText;
@@ -102,3 +106,35 @@
     &> * { background-color: white }
 }
 
+.fieldDecorations() {
+    border: 1px solid @fieldBorderColor;
+    border-radius: @inputBorderRadius;
+    box-shadow: none;
+}
+
+.focusDecorations() {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem @focusHighlightColor;
+}
+
+// Mixin to highlight form controls or groups upon keyboard focus
+.focusHighlight() {
+    .fieldDecorations();
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+
+    &:focus {
+        border-color: @focusBorderColor;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem @focusHighlightColor;
+    }
+}
+
+.focusHighlightGroup() {
+    border-radius: @inputBorderRadius;
+    box-shadow: none;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+
+    &:focus {
+        .focusDecorations();
+    }
+}

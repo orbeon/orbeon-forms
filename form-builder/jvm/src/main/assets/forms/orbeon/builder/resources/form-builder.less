@@ -952,6 +952,7 @@ div.orbeon.orbeon-portlet-div {
                 flex-flow: column;
                 width: 50%;
             }
+            margin-bottom: 4px; // so that the highlight around "Email Options" is not truncated at the bottom
         }
 
         .fb-control-settings-required-formula {
@@ -1119,8 +1120,11 @@ div.orbeon.orbeon-portlet-div {
         &.fb-label-editor-for-text {
             .mce-content-body {
                 border: 1px solid transparent;
-                border-radius: @baseBorderRadius;
                 padding: 1px; // so that cursor does not touch border
+
+                border-radius: @baseBorderRadius;
+
+                // Similar to .focusHighlight()
                 &:focus-within {
                     box-shadow: 0 0 0 0.2rem @explanatoryTextShadow;
                     outline: 0;
@@ -1216,7 +1220,6 @@ div.orbeon.orbeon-portlet-div {
                 display: none;
             }
         }
-
 
         .fr-grid-body { grid-gap: 0px }
         &.fr-norepeat {

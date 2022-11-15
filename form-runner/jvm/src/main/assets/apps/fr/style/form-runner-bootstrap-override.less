@@ -85,19 +85,10 @@ body.orbeon {
     // cover field-ish aspects here.
     // See https://github.com/orbeon/orbeon-forms/issues/4004
     .xforms-field {
-        border: 1px solid @inputBorder;
-        border-radius: @inputBorderRadius;
-        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-        //box-shadow: inset 0 1px 2px rgba(0,0,0,.025);
         background-color: darken(@inputBackground, 5%);
-
         cursor: not-allowed;
 
-        &:focus {
-            border-color: #80bdff;
-            outline: 0;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-        }
+        .focusHighlight();
     }
 
     // This applies to fields, but also to the minimal appearance which doesn't show a border but acts as a textbox
@@ -150,11 +141,22 @@ body.orbeon {
         box-sizing: border-box;         // So width: 100% works with the padding added by Bootstrap
         height: @controlsHeight;
         background-image: none;         // Liferay adds background images which don't mix well with Bootstrap
+
+        background-color: @inputBackground;
+        .focusHighlight();
     }
 
-    input:-ms-input-placeholder {
-        color: #777 !important;         // On IE11, the above color overrides the color of the placeholder,
-                                        // reset it to a value similar the initial value (IE11 doesn't support initial)
+    // Focus on checkboxes and radio buttons
+    select:focus,
+    input[type="file"]:focus,
+    input[type="radio"]:focus,
+    input[type="checkbox"]:focus {
+        .focusDecorations();
+    }
+
+    // For example "Selected" button on the Summary/Admin pages
+    .btn-group .btn {
+        .focusHighlightGroup();
     }
 
     .xforms-output label {

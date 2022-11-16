@@ -1088,7 +1088,7 @@
                 <xh:span class="xforms-repeat-selected-item-1 xforms-update-full"/>
                 <xh:span id="my-new-select1⊙1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1 xforms-update-full">
                     <xh:span class="xforms-label" id="my-new-select1≡≡l⊙1">My label</xh:span>
-                    <xh:span class="xforms-items xforms-help-popover-control" role="radiogroup" tabindex="0" aria-labelledby="my-new-select1≡≡l⊙1">
+                    <xh:span class="xforms-items xforms-help-popover-control" role="radiogroup" tabindex="0" aria-labelledby="my-new-select1≡≡l⊙1" aria-describedby="my-new-select1≡≡t⊙1 my-new-select1≡≡p⊙1">
                         <xh:span class="xforms-selected">
                             <xh:label class="radio">
                                 <xh:input id="my-new-select1≡≡e0⊙1" type="radio" name="my-new-select1⊙1" value="apple" checked="checked"/>

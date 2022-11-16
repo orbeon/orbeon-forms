@@ -508,7 +508,7 @@ class XFormsSelect1Handler(
       if (handlerContext.a11yFocusOnGroups)
         containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
 
-    handleAriaByAttForSelect1Full(containerAttributes)
+    handleAriaByAtts(containerAttributes, _ => true)
 
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
     val fullItemType = if (isMultiple) "checkbox" else "radio"

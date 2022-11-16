@@ -194,13 +194,6 @@ abstract class XFormsControlLifecycleHandler(
   final lazy val currentControl: XFormsControl =
     containingDocument.getControlByEffectiveId(getEffectiveId) ensuring (_ ne null)
 
-  final protected def handleAriaByAttForSelect1Full(atts: AttributesImpl): Unit =
-    for {
-      attValue <- ControlAjaxSupport.findAriaByWithNs(elementAnalysis, currentControl.getEffectiveId, LHHA.Label, condition = _ => true)(containingDocument)
-    } locally {
-      atts.addOrReplace(AriaLabelledby, attValue)
-    }
-
   final protected def handleAriaByAtts(atts: AttributesImpl, condition: LHHAAnalysis => Boolean): Boolean = {
     val it = ControlAjaxSupport.iterateAriaByAtts(elementAnalysis, currentControl.getEffectiveId, condition)(containingDocument)
     val nonEmpty = it.nonEmpty

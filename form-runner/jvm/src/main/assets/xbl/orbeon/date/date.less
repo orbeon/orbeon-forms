@@ -15,6 +15,9 @@
             .focusHighlight();
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
+            &:focus {
+                z-index: 3; // so the left box-shadow appears over the rest
+            }
         }
     }
 

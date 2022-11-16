@@ -104,7 +104,11 @@
     // NOTE: `.xforms-hint-appearance-inline` is for backward compatibility only and replaced with `.xforms-hint-appearance-full`.
     .xforms-hint-appearance-full, .xforms-hint-appearance-inline {
 
-        .xforms-hint {
+        .xforms-hint:empty {
+            display: none;
+        }
+
+        .xforms-hint:not(:empty) {
             display: block;
             width: 100%;
             clear: both;

@@ -504,7 +504,7 @@ class XFormsSelect1Handler(
     // the control: in case the itemset has only one item, then we would have the double label and double tab issue.
     // But we leave this problem for another time, as that would require adding the tabindex dynamically depending on
     // the size of the itemset and we don't have a good mechanism to do that.
-    if (getStaticLHHA(LHHA.Label).isDefined || getStaticLHHA(LHHA.Hint).isDefined)
+    if (findStaticLhhaOrLhhaBy(LHHA.Label).isDefined || findStaticLhhaOrLhhaBy(LHHA.Hint).isDefined)
       if (handlerContext.a11yFocusOnGroups)
         containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
 

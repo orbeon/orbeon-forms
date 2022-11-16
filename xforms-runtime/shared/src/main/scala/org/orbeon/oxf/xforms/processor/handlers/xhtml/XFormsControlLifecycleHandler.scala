@@ -211,10 +211,9 @@ abstract class XFormsControlLifecycleHandler(
     nonEmpty
   }
 
-  final protected def getStaticLHHA(lhha: LHHA): Option[LHHAAnalysis] =
-    elementAnalysis.narrowTo[StaticLHHASupport].flatMap { lhhaSupport =>
-      lhhaSupport.firstLhha(lhha)
-    }
+  final protected def findStaticLhhaOrLhhaBy(lhhaType: LHHA): Option[LHHAAnalysis] =
+    elementAnalysis.narrowTo[StaticLHHASupport]
+      .flatMap(lhhaSupport => lhhaSupport.firstLhha(lhhaType).orElse(lhhaSupport.firstLhhaBy(lhhaType)))
 
   private object Private {
 
@@ -224,6 +223,6 @@ abstract class XFormsControlLifecycleHandler(
       handlerContext.documentOrder
 
     def lhhaIfLocal(lhhaType: LHHA): Option[LHHAAnalysis] =
-      getStaticLHHA(lhhaType).filter(_.isLocal)
+      elementAnalysis.narrowTo[StaticLHHASupport].flatMap(_.firstLhha(lhhaType)).filter(_.isLocal)
   }
 }

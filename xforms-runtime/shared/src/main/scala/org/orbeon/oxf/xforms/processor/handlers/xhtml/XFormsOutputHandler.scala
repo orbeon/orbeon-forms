@@ -71,7 +71,7 @@ class XFormsOutputDefaultHandler(
   ) with XFormsOutputHandler {
 
   private val hasLabel =
-    getStaticLHHA(LHHA.Label).isDefined
+    findStaticLhhaOrLhhaBy(LHHA.Label).isDefined
 
   protected def handleControlStart(): Unit = {
 

@@ -105,6 +105,26 @@ private class Select1SearchCompanion extends XBLCompanion {
           val labelId       = DomSupport.generateIdIfNeeded(labelElement)
           comboboxElement.setAttribute("aria-labelledby", labelId)
         }
+
+        // Make the clear button accessible with the keyboard
+        def makeClearAccessible(): Unit = {
+          val clearElementOpt = Option(containerElem.querySelector(".select2-selection__clear"))
+          clearElementOpt.foreach { (clearElement) =>
+            clearElement.setAttribute("tabindex", "0")
+            clearElement.setAttribute("role", "button")
+            clearElement.addEventListener(
+              "keydown", // Instead of `keyup`, so our listeners runs before Select2's
+              (event: dom.KeyboardEvent) =>
+                if (Set(10, 13, 32)(event.keyCode)) { // Enter and space
+                  event.stopPropagation() // Prevent Select2 from opening the dropdown
+                  jSelect.value("").trigger("change")
+                  xformsFocus() // Move the focus from the "x", which disappeared, to the dropdown
+                },
+              useCapture = false)
+          }
+        }
+        makeClearAccessible()
+        jSelect.on("change", makeClearAccessible _)
       }
 
       initOrUpdatePlaceholder()

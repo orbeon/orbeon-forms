@@ -24,10 +24,13 @@
         // Dropdown to be always above everything else
         .select2-dropdown  { z-index: 9999999 }
     }
+
+    // "x" button to clear the dropdown
     .select2-selection__clear {
-        // Better alignment of the clear icon with the selection / arrow down icon
-        line-height: 24px;
-        // Use the same shade of grey as the selection / arrow down icon
-        color: #888;
+        padding: 0 5px;    // Wider to be easier to activate
+        top: 3px;          // For the highlight not to go over or under the dropdown border
+        line-height: 20px; // Better alignment of the clear icon with the selection / arrow down icon
+        color: #888;       // Use the same shade of grey as the selection / arrow down icon
+        .focusHighlightGroup();
     }
 }

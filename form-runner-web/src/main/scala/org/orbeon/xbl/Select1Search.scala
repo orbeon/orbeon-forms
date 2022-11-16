@@ -94,9 +94,9 @@ private class Select1SearchCompanion extends XBLCompanion {
 
         // Register event listeners
         val isDatabound = containerElem.classList.contains("xbl-fr-databound-select1-search")
-        if (isDatabound) jSelect.on("change", (onChange _))
+        if (isDatabound) jSelect.on("change", onChange _)
         jSelect.on("select2:open", (onOpen _))
-        jSelect.data("select2").on("results:focus", (onResultsFocus _))
+        jSelect.data("select2").on("results:focus", onResultsFocus _)
 
         // Update `aria-labelledby`, so the screen reader can read the field's label when it gets the focus
         val comboboxElement = containerElem.querySelector(".select2-selection")
@@ -134,18 +134,6 @@ private class Select1SearchCompanion extends XBLCompanion {
   override def xformsFocus(): Unit =
     containerElem.querySelector("select").asInstanceOf[dom.html.Select].focus()
 
-  def updateSuggestions(results: String, isLastPage: String): Unit = {
-    val parsedResults = js.JSON.parse(results)
-    val data = new Select2.Data {
-      val results    = parsedResults.asInstanceOf[js.Array[Select2.Option]]
-      val pagination = new Select2.Pagination {
-        val more = ! isLastPage.toBoolean
-      }
-    }
-    val success = select2SuccessCallbacks.dequeue()
-    success(data)
-  }
-
   // TODO: not specific to the autocomplete, should be moved to a utility class
   private def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit): Unit = {
     val observer = new MutationObserver((_, _) => listener())
@@ -157,11 +145,10 @@ private class Select1SearchCompanion extends XBLCompanion {
     ))
   }
 
-  // When the value of the underlying dropdown changed, typically because it set based on that the server tells the client,
-  // tell the Select2 component that the value has changed
+  // When the value of the underlying dropdown changed, typically because it set based on that the server
+  // tells the client, tell the Select2 component that the value has changed
   private def onXFormsSelect1ValueChange(event: js.Dynamic): Unit = {
     val control  = event.control.asInstanceOf[html.Element]
-    val newValue = event.newValue.asInstanceOf[String]
     if (containerElem.querySelector(".xforms-select1") == control)
       $(containerElem).find("select").trigger("change")
   }

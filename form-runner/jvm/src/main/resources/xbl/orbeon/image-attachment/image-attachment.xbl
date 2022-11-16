@@ -24,7 +24,8 @@
         id="fr-image-attachment"
         element="fr|image-attachment"
         xxbl:mode="binding lhha value"
-        xxbl:container="span">
+        xxbl:container="span"
+        xxbl:label-for="fr-image-attachment-elem">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -289,78 +290,80 @@
                 name="binding"
                 value="xxf:binding('fr-image-attachment')"/>
 
-            <fr:attachment
-                ref="$binding"
-                accept="{(xxf:custom-mip($binding, 'upload-mediatypes')[xxf:non-blank()], 'image/*')[1]}">
+            <xh:div id="fr-image-attachment-elem" xxf:control="true">
+                <fr:attachment
+                    ref="$binding"
+                    accept="{(xxf:custom-mip($binding, 'upload-mediatypes')[xxf:non-blank()], 'image/*')[1]}">
 
-                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
-                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
-                <xxf:size     ref="@size"      xxbl:scope="outer"/>
+                    <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                    <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
+                    <xxf:size     ref="@size"      xxbl:scope="outer"/>
 
-                <!-- Retarget of upload events -->
-                <!-- NOTE: Duplicated logic in attachment.xbl -->
-                <xf:dispatch
-                    event="xxforms-upload-start xxforms-upload-cancel"
-                    targetid="fr-image-attachment"
-                    name="{event('xxf:type')}"/>
+                    <!-- Retarget of upload events -->
+                    <!-- NOTE: Duplicated logic in attachment.xbl -->
+                    <xf:dispatch
+                        event="xxforms-upload-start xxforms-upload-cancel"
+                        targetid="fr-image-attachment"
+                        name="{event('xxf:type')}"/>
 
-                <xf:dispatch
-                    event="xxforms-upload-done"
-                    targetid="fr-image-attachment"
-                    name="{event('xxf:type')}"
-                    propagate="stop"
-                    defaultAction="cancel">
-                    <xf:property name="file"           value="event('file')"/>
-                    <xf:property name="filename"       value="event('filename')"/>
-                    <xf:property name="content-type"   value="event('content-type')"/>
-                    <xf:property name="content-length" value="event('content-length')"/>
-                </xf:dispatch>
+                    <xf:dispatch
+                        event="xxforms-upload-done"
+                        targetid="fr-image-attachment"
+                        name="{event('xxf:type')}"
+                        propagate="stop"
+                        defaultAction="cancel">
+                        <xf:property name="file"           value="event('file')"/>
+                        <xf:property name="filename"       value="event('filename')"/>
+                        <xf:property name="content-type"   value="event('content-type')"/>
+                        <xf:property name="content-length" value="event('content-length')"/>
+                    </xf:dispatch>
 
-                <xf:dispatch
-                    event="xxforms-upload-error"
-                    targetid="fr-image-attachment"
-                    name="{event('xxf:type')}"
-                    propagate="stop"
-                    defaultAction="cancel">
-                    <xf:property name="error-type" value="event('error-type')"/>
-                    <xf:property name="permitted"  value="event('permitted')"/>
-                    <xf:property name="actual"     value="event('actual')"/>
-                    <xf:property name="message"    value="event('message')"/>
-                </xf:dispatch>
+                    <xf:dispatch
+                        event="xxforms-upload-error"
+                        targetid="fr-image-attachment"
+                        name="{event('xxf:type')}"
+                        propagate="stop"
+                        defaultAction="cancel">
+                        <xf:property name="error-type" value="event('error-type')"/>
+                        <xf:property name="permitted"  value="event('permitted')"/>
+                        <xf:property name="actual"     value="event('actual')"/>
+                        <xf:property name="message"    value="event('message')"/>
+                    </xf:dispatch>
 
-                <xf:action
-                    event="xxforms-upload-done"
-                    if="exists(
-                        (
+                    <xf:action
+                        event="xxforms-upload-done"
+                        if="exists(
+                            (
+                                fr:component-param-value('transform-max-width'),
+                                fr:component-param-value('transform-max-height'),
+                                fr:component-param-value('transform-quality'),
+                                fr:component-param-value('transform-format')
+                            )
+                        )"
+                        type="xpath">
+                        fr:transform-uploaded-image(
+                            $binding,
                             fr:component-param-value('transform-max-width'),
                             fr:component-param-value('transform-max-height'),
                             fr:component-param-value('transform-quality'),
                             fr:component-param-value('transform-format')
                         )
-                    )"
-                    type="xpath">
-                    fr:transform-uploaded-image(
-                        $binding,
-                        fr:component-param-value('transform-max-width'),
-                        fr:component-param-value('transform-max-height'),
-                        fr:component-param-value('transform-quality'),
-                        fr:component-param-value('transform-format')
-                    )
-                </xf:action>
+                    </xf:action>
 
-            </fr:attachment>
-            <xf:output mediatype="image/*" ref="$binding[xxf:non-blank()]">
-                <xf:filename  ref="@filename"  xxbl:scope="outer"/>
-                <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
-                <xf:header ref="fr:attachment-form-version()">
-                    <xf:name>Orbeon-Form-Definition-Version</xf:name>
-                    <xf:value value="."/>
-                </xf:header>
-                <xf:header ref="$binding[@fr:attachment-encrypted = 'true']">
-                    <xf:name>Orbeon-Decrypt</xf:name>
-                    <xf:value>true</xf:value>
-                </xf:header>
-            </xf:output>
+                </fr:attachment>
+                <xf:output mediatype="image/*" ref="$binding[xxf:non-blank()]">
+                    <xf:filename  ref="@filename"  xxbl:scope="outer"/>
+                    <xf:mediatype ref="@mediatype" xxbl:scope="outer"/>
+                    <xf:header ref="fr:attachment-form-version()">
+                        <xf:name>Orbeon-Form-Definition-Version</xf:name>
+                        <xf:value value="."/>
+                    </xf:header>
+                    <xf:header ref="$binding[@fr:attachment-encrypted = 'true']">
+                        <xf:name>Orbeon-Decrypt</xf:name>
+                        <xf:value>true</xf:value>
+                    </xf:header>
+                </xf:output>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

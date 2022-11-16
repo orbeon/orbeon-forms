@@ -167,8 +167,17 @@ body.orbeon { background-color: @frBackground }
         .focusHighlightGroup();
     }
 
+    .xforms-trigger-appearance-minimal .btn-link {
+        border-radius: @inputBorderRadius; // for focus highlight
+    }
+
+    .nav-list .xforms-trigger-appearance-minimal .btn-link {
+        border-radius: 0; // retore for nav list
+    }
+
     .xforms-output-appearance-xxforms-download a {
         .focusHighlightGroup();
+        border-radius: @inputBorderRadius;
         margin-left: 3px;
         line-height: @baseLineHeight + 2px*2;
     }
@@ -178,6 +187,7 @@ body.orbeon { background-color: @frBackground }
     .xforms-items[role = group][tabindex = '0'],
     .xforms-items[role = radiogroup][tabindex = '0'] {
         .focusHighlightGroup();
+        border-radius: @inputBorderRadius;
     }
 
     // ***** Other *****************************************************************************************************
@@ -437,7 +447,10 @@ body.orbeon { background-color: @frBackground }
             }
         }
 
-        a, button.btn-link { color: black; text-decoration: none }
+        a, button.btn-link {
+            color: black;
+            text-decoration: none
+        }
 
         .container {
             width: 100%;

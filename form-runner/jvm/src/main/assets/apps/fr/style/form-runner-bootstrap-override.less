@@ -226,13 +226,35 @@ body.orbeon {
         }
     }
 
-    .input-append .add-on, .input-prepend .add-on {
-        height: @baseLineHeight - 2px;
-    }
-
     .input-append, .input-prepend {
         margin-bottom: 0;                   // Not sure why Bootstrap adds a @baseLineHeight / 2 margin here
+        .add-on {
+            height: @baseLineHeight - 2px;
+        }
     }
+
+    .input-prepend {
+        input {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .add-on {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    }
+
+    .input-append {
+        input {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .add-on {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+
 
     .fr-grid tr th .xforms-label {
         margin: 0;                          //  No margin on label inside table headers as they are not next to a control

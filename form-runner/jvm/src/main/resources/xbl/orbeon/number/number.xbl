@@ -420,8 +420,9 @@
                     </xf:group>
                     <xh:input
                         id="html-input"
+                        xxf:control="true"
                         class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
-                        type="text"
+                        xh:type="text"
                         step="any"
                         aria-describedby="{string-join((xxf:client-id('prefix'), xxf:client-id('suffix')), ' ')}"
                         pattern="{

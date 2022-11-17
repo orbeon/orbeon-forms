@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.dom.QName
+import org.orbeon.oxf.xml.SaxSupport._
 import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.xforms.XFormsNames._
@@ -68,7 +69,7 @@ trait ControlExtensionAttributesSupport {
       if name.namespace.uri == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
       localName = name.localName
     } locally {
-      attributesImpl.addAttribute("", localName, localName, XMLReceiverHelper.CDATA, value)
+      attributesImpl.addOrReplace(localName, value)
     }
 
   final def addExtensionAttributesExceptClassAndAcceptForAjax(

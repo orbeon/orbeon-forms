@@ -247,6 +247,8 @@ class GroupControl(
     elementQName match {
       case Some(elementQName) if Set("td", "th")(elementQName.localName) =>
         Set(QName("rowspan"), QName("colspan"))
+      case Some(elementQName) if elementQName.localName == "input" =>
+        Set(QName("placeholder"), QName("pattern"), QName("min"), QName("max"), QName("step"), QName("minlength"), QName("maxlength"))
       case _ =>
         Set.empty
     }

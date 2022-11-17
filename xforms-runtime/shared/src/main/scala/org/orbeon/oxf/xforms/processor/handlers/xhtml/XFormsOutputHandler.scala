@@ -206,7 +206,7 @@ class XFormsOutputImageHandler(
     containerAttributes.addOrReplace("src", if (srcValue ne null) srcValue else DUMMY_IMAGE_URI)
 
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
-      currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
+    currentControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
     element("img", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = containerAttributes)
   }

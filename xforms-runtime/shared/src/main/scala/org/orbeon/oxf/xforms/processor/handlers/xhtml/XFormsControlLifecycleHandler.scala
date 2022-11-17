@@ -168,7 +168,6 @@ abstract class XFormsControlLifecycleHandler(
         isExternal              = false
       )
 
-  // Must be overridden by subclasses
   protected def handleControlStart(): Unit
   protected def handleControlEnd  (): Unit = ()
 

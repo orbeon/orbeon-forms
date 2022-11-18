@@ -234,7 +234,7 @@ abstract class XFormsBaseHandlerXHTML (
 
   final protected def handleLabelHintHelpAlert(
     lhhaAnalysis           : LHHAAnalysis,
-    elemEffectiveIdOpt     : Option[String],
+    controlEffectiveIdOpt  : Option[String],
     forEffectiveIdWithNsOpt: Option[String],
     requestedElementNameOpt: Option[String],
     controlOrNull          : XFormsControl,
@@ -321,15 +321,15 @@ abstract class XFormsBaseHandlerXHTML (
       }
 
       XFormsBaseHandlerXHTML.outputLabelFor(
-        handlerContext           = handlerContext,
-        attributes               = attributes,
-        labelEffectiveIdOpt      = elemEffectiveIdOpt,
-        forEffectiveIdWithNs     = forEffectiveIdWithNsOpt,
-        lhha                     = lhha,
-        elementName              = elementName,
-        labelValue               = labelHintHelpAlertValue,
-        mustOutputHTMLFragment   = mustOutputHTMLFragment,
-        isExternal               = isExternal
+        handlerContext         = handlerContext,
+        attributes             = attributes,
+        controlEffectiveIdOpt  = controlEffectiveIdOpt,
+        forEffectiveIdWithNs   = forEffectiveIdWithNsOpt,
+        lhha                   = lhha,
+        elementName            = elementName,
+        labelValue             = labelHintHelpAlertValue,
+        mustOutputHTMLFragment = mustOutputHTMLFragment,
+        isExternal             = isExternal
       )
     }
 
@@ -399,7 +399,7 @@ object XFormsBaseHandlerXHTML {
   def outputLabelFor(
     handlerContext        : HandlerContext,
     attributes            : Attributes,
-    labelEffectiveIdOpt   : Option[String],
+    controlEffectiveIdOpt : Option[String],
     forEffectiveIdWithNs  : Option[String],
     lhha                  : LHHA,
     elementName           : String,
@@ -407,25 +407,25 @@ object XFormsBaseHandlerXHTML {
     mustOutputHTMLFragment: Boolean,
     isExternal            : Boolean
   ): Unit = {
-    outputLabelForStart(handlerContext, attributes, labelEffectiveIdOpt, forEffectiveIdWithNs, lhha, elementName, isExternal)
+    outputLabelForStart(handlerContext, attributes, controlEffectiveIdOpt, forEffectiveIdWithNs, lhha, elementName, isExternal)
     outputLabelTextIfNotEmpty(labelValue, handlerContext.findXHTMLPrefix, mustOutputHTMLFragment, None)(handlerContext.controller.output)
     outputLabelForEnd(handlerContext, elementName)
   }
 
   def outputLabelForStart(
-    handlerContext      : HandlerContext,
-    attributes          : Attributes,
-    labelEffectiveIdOpt : Option[String],
-    forEffectiveIdWithNs: Option[String],
-    lhha                : LHHA,
-    elementName         : String,
-    isExternal          : Boolean
+    handlerContext       : HandlerContext,
+    attributes           : Attributes,
+    controlEffectiveIdOpt: Option[String],
+    forEffectiveIdWithNs : Option[String],
+    lhha                 : LHHA,
+    elementName          : String,
+    isExternal           : Boolean
   ): Unit = {
 
     // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
     val newAttribute =
-      labelEffectiveIdOpt match {
-        case Some(labelEffectiveId) =>
+      controlEffectiveIdOpt match {
+        case Some(controlEffectiveId) =>
           // Add or replace existing id attribute
           XMLReceiverSupport.addOrReplaceAttribute(
             attributes,
@@ -433,9 +433,9 @@ object XFormsBaseHandlerXHTML {
             "",
             "id",
             if (isExternal)
-              handlerContext.containingDocument.namespaceId(labelEffectiveId)
+              handlerContext.containingDocument.namespaceId(controlEffectiveId)
             else
-              XFormsBaseHandler.getLHHACIdWithNs(handlerContext.containingDocument, labelEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
+              XFormsBaseHandler.getLHHACIdWithNs(handlerContext.containingDocument, controlEffectiveId, XFormsBaseHandlerXHTML.LHHACodes(lhha))
           )
         case _ =>
           // Remove existing id attribute if any

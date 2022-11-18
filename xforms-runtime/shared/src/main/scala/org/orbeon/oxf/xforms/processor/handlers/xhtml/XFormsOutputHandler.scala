@@ -108,7 +108,7 @@ class XFormsOutputDefaultHandler(
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyHint)
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
-        elemEffectiveIdOpt      = hasLabel option getEffectiveId, // change from default
+        controlEffectiveIdOpt   = hasLabel option getEffectiveId, // change from default
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,
@@ -119,7 +119,7 @@ class XFormsOutputDefaultHandler(
     if (! XFormsBaseHandler.isStaticReadonly(currentControl))
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
-        elemEffectiveIdOpt      = hasLabel option getEffectiveId, // change from default
+        controlEffectiveIdOpt   = hasLabel option getEffectiveId, // change from default
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,

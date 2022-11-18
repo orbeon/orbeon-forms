@@ -172,13 +172,13 @@ object XFormsSelect1Handler {
         atts.addOrReplace(XFormsNames.CLASS_QNAME, if (isMultiple) "checkbox" else "radio")
         // No need for @for as the input, if any, is nested
         outputLabelForStart(
-          handlerContext       = xformsHandlerContextForItem,
-          attributes           = atts,
-          labelEffectiveIdOpt  = None,
-          forEffectiveIdWithNs = None,
-          lhha                 = LHHA.Label,
-          elementName          = labelName,
-          isExternal           = false
+          handlerContext        = xformsHandlerContextForItem,
+          attributes            = atts,
+          controlEffectiveIdOpt = None,
+          forEffectiveIdWithNs  = None,
+          lhha                  = LHHA.Label,
+          elementName           = labelName,
+          isExternal            = false
         )
       }
 
@@ -237,15 +237,15 @@ object XFormsSelect1Handler {
           val atts = new AttributesImpl
           atts.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-help")
           outputLabelFor(
-            handlerContext           = xformsHandlerContextForItem,
-            attributes               = atts,
-            labelEffectiveIdOpt      = None,
-            forEffectiveIdWithNs     = None,
-            lhha                     = LHHA.Help,
-            elementName              = "span",
-            labelValue               = help.label,
-            mustOutputHTMLFragment   = help.isHTML,
-            isExternal               = false
+            handlerContext         = xformsHandlerContextForItem,
+            attributes             = atts,
+            controlEffectiveIdOpt  = None,
+            forEffectiveIdWithNs   = None,
+            lhha                   = LHHA.Help,
+            elementName            = "span",
+            labelValue             = help.label,
+            mustOutputHTMLFragment = help.isHTML,
+            isExternal             = false
           )
         }
 
@@ -254,14 +254,14 @@ object XFormsSelect1Handler {
           val atts = new AttributesImpl
           atts.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-hint")
           outputLabelFor(
-            handlerContext           = xformsHandlerContextForItem,
-            attributes               = atts,
-            labelEffectiveIdOpt      = None,
-            forEffectiveIdWithNs     = None,
-            lhha                     = LHHA.Hint, elementName = "span",
-            labelValue               = hint.label,
-            mustOutputHTMLFragment   = hint.isHTML,
-            isExternal               = false
+            handlerContext         = xformsHandlerContextForItem,
+            attributes             = atts,
+            controlEffectiveIdOpt  = None,
+            forEffectiveIdWithNs   = None,
+            lhha                   = LHHA.Hint, elementName = "span",
+            labelValue             = hint.label,
+            mustOutputHTMLFragment = hint.isHTML,
+            isExternal             = false
           )
         }
       }
@@ -610,7 +610,7 @@ class XFormsSelect1Handler(
     if (findAppearanceTrait.exists(_.isFull))
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
-        elemEffectiveIdOpt      = getEffectiveId.some,
+        controlEffectiveIdOpt   = getEffectiveId.some,
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = "span".some, // make element name a `span`, as a label would need a `for`
         controlOrNull           = currentControl,

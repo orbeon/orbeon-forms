@@ -115,7 +115,7 @@ class XFormsLHHAHandler(
 
           handleLabelHintHelpAlert(
             lhhaAnalysis            = elementAnalysis,
-            elemEffectiveIdOpt      = lhhaEffectiveId.some,
+            controlEffectiveIdOpt   = lhhaEffectiveId.some,
             forEffectiveIdWithNsOpt = labelForEffectiveIdWithNsOpt,
             requestedElementNameOpt = None,
             controlOrNull           = effectiveTargetControlOpt.orNull, // to get the value; Q: When can this be `null`?

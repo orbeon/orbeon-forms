@@ -128,7 +128,7 @@ abstract class XFormsControlLifecycleHandler(
   protected def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
     handleLabelHintHelpAlert(
       lhhaAnalysis            = lhhaAnalysis,
-      elemEffectiveIdOpt      = None,
+      controlEffectiveIdOpt   = XFormsBaseHandler.isStaticReadonly(currentControl) option getEffectiveId,
       forEffectiveIdWithNsOpt = getForEffectiveIdWithNs(lhhaAnalysis),
       requestedElementNameOpt = XFormsBaseHandler.isStaticReadonly(currentControl) option "span",
       controlOrNull           = currentControl,
@@ -139,7 +139,7 @@ abstract class XFormsControlLifecycleHandler(
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyAlert)
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
-        elemEffectiveIdOpt      = None,
+        controlEffectiveIdOpt   = None,
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,
@@ -150,7 +150,7 @@ abstract class XFormsControlLifecycleHandler(
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyHint)
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
-        elemEffectiveIdOpt      = getEffectiveId.some,
+        controlEffectiveIdOpt   = getEffectiveId.some,
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,
@@ -161,7 +161,7 @@ abstract class XFormsControlLifecycleHandler(
     if (! XFormsBaseHandler.isStaticReadonly(currentControl))
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
-        elemEffectiveIdOpt      = getEffectiveId.some,
+        controlEffectiveIdOpt   = getEffectiveId.some,
         forEffectiveIdWithNsOpt = None,
         requestedElementNameOpt = None,
         controlOrNull           = currentControl,

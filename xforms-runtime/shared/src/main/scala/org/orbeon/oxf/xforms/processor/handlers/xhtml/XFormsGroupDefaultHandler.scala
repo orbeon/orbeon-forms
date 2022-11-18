@@ -104,7 +104,7 @@ class XFormsGroupDefaultHandler(
     XFormsBaseHandlerXHTML.outputLabelFor(
       handlerContext         = handlerContext,
       attributes             = atts,
-      labelEffectiveIdOpt    = None,
+      controlEffectiveIdOpt  = None,
       forEffectiveIdWithNs   = containingDocument.namespaceId(effectiveId).some,
       lhha                   = LHHA.Label,
       elementName            = handlerContext.labelElementName,

@@ -95,7 +95,7 @@ class XXFormsComponentHandler(
 
       handleLabelHintHelpAlert(
         lhhaAnalysis            = lhhaAnalysis,
-        elemEffectiveIdOpt      = forEffectiveIdWithNsOpt.isEmpty option getEffectiveId, // id could be omitted if unused
+        controlEffectiveIdOpt   = forEffectiveIdWithNsOpt.isEmpty option getEffectiveId, // id could be omitted if unused
         forEffectiveIdWithNsOpt = forEffectiveIdWithNsOpt,
         requestedElementNameOpt = forEffectiveIdWithNsOpt.isEmpty option "span",
         controlOrNull           = currentControl,

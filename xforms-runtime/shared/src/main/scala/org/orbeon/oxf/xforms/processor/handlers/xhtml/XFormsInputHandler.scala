@@ -17,7 +17,9 @@ import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaReadonlyQName
 import org.orbeon.oxf.xforms.control.controls.{PlaceHolderInfo, XFormsInputControl}
 import org.orbeon.oxf.xforms.itemset.{Item, Itemset, LHHAValue}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext
@@ -170,14 +172,12 @@ class XFormsInputHandler(
         }
       } else {
         // Output static read-only value
-        if (isRelevantControl) {
-          val atts = List("class" -> "xforms-field")
-          withElement("span", prefix = xhtmlPrefix, uri = XHTML_NAMESPACE_URI, atts = atts) {
+        if (isRelevantControl)
+          outputStaticReadonlyField(xhtmlPrefix) {
             inputControl.getFormattedValue foreach { value =>
               xmlReceiver.characters(value.toCharArray, 0, value.length)
             }
           }
-        }
       }
     }
   }

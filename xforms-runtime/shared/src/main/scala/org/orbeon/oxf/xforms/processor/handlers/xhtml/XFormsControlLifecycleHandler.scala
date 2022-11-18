@@ -17,12 +17,15 @@ import cats.syntax.option._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
-import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaLabelledby
+import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaReadonlyQName
 import org.orbeon.oxf.xforms.control.{ControlAjaxSupport, XFormsControl}
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.SaxSupport._
-import org.orbeon.oxf.xml.{XMLConstants, XMLUtils}
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
+import org.orbeon.oxf.xml.XMLReceiverSupport._
+import org.orbeon.oxf.xml.{XMLConstants, XMLReceiver, XMLUtils}
 import org.orbeon.xforms.XFormsNames
+import org.orbeon.xforms.XFormsNames.{CLASS_QNAME, ROLE_QNAME, TABINDEX_QNAME}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 import shapeless.syntax.typeable._
@@ -206,6 +209,35 @@ abstract class XFormsControlLifecycleHandler(
   final protected def findStaticLhhaOrLhhaBy(lhhaType: LHHA): Option[LHHAAnalysis] =
     elementAnalysis.narrowTo[StaticLHHASupport]
       .flatMap(lhhaSupport => lhhaSupport.firstLhha(lhhaType).orElse(lhhaSupport.firstLhhaBy(lhhaType)))
+
+  def outputStaticReadonlyField[T](xhtmlPrefix: String, localName: String = "span")(body: => T)(implicit xmlReceiver: XMLReceiver): T = {
+
+    // NOTE: No need to handle `LHHA.Alert` as that's not handled by `handleAriaByAtts`
+    def ariaByCondition(lhhaAnalysis: LHHAAnalysis): Boolean = (
+      lhhaAnalysis.lhhaType != LHHA.Hint                   ||
+      ! XFormsBaseHandler.isStaticReadonly(currentControl) ||
+      containingDocument.staticReadonlyHint
+    )
+
+    val atts: AttributesImpl =
+      List( // Q: if placeholder label?
+        CLASS_QNAME       -> "xforms-field",
+        TABINDEX_QNAME    -> "0",
+        ROLE_QNAME        -> "textbox",
+        AriaReadonlyQName -> "true",
+      )
+
+    handleAriaByAtts(atts, ariaByCondition)
+
+    withElement(
+      localName = localName,
+      prefix    = xhtmlPrefix,
+      uri       = XHTML_NAMESPACE_URI,
+      atts      = atts
+    ) {
+      body
+    }
+  }
 
   private object Private {
 

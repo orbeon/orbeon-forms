@@ -50,7 +50,7 @@ class XFormsTextareaHandler(
   override protected def handleControlStart(): Unit = {
 
     val textareaControl        = currentControl.asInstanceOf[XFormsTextareaControl]
-    val xmlReceiver            = handlerContext.controller.output
+    implicit val xmlReceiver   = handlerContext.controller.output
     val htmlTextareaAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, textareaControl, addId = true)
 
     // Create xhtml:textarea
@@ -86,19 +86,15 @@ class XFormsTextareaHandler(
       xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName)
     } else {
       // Static readonly
-
-      // Use <pre> in text/plain so that spaces are kept by the serializer
-      // NOTE: Another option would be to transform the text to output &nbsp; and <br/> instead.
-
-      val containerName  = "pre"
-      val containerQName = XMLUtils.buildQName(xhtmlPrefix, containerName)
-
-      xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName, htmlTextareaAttributes)
-      // NOTE: Don't replace spaces with &nbsp;, as this is not the right algorithm for all cases
-      val value = textareaControl.getExternalValue
-      if (value ne null)
-        xmlReceiver.characters(value.toCharArray, 0, value.length)
-      xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName)
+      if (! isNonRelevant(textareaControl))
+        // Use <pre> in text/plain so that spaces are kept by the serializer
+        // NOTE: Another option would be to transform the text to output &nbsp; and <br/> instead.
+        outputStaticReadonlyField(xhtmlPrefix, localName = "pre") {
+          // NOTE: Don't replace spaces with &nbsp;, as this is not the right algorithm for all cases
+          textareaControl.externalValueOpt foreach { value =>
+              xmlReceiver.characters(value.toCharArray, 0, value.length)
+            }
+        }
     }
   }
 

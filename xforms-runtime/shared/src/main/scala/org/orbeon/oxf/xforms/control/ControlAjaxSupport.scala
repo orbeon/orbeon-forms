@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis, StaticLHHASupport}
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, LhhaPlacementType}
@@ -235,6 +236,10 @@ object ControlAjaxSupport {
   val AriaReadonly    = "aria-readonly"
   val AriaLabelledby  = "aria-labelledby"
   val AriaDescribedby = "aria-describedby"
+
+  val AriaReadonlyQName    = QName("aria-readonly")
+  val AriaLabelledbyQName  = QName("aria-labelledby")
+  val AriaDescribedbyQName = QName("aria-describedby")
 //  val AriaDetails     = "aria-details"
 
   val AriaAttsWithLhha: List[(String, List[LHHA])] = List(

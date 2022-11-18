@@ -31,7 +31,7 @@ class XFormsSecretHandler(
   def handleControlStart(): Unit = {
 
     val secretControl = currentControl.asInstanceOf[XFormsSecretControl]
-    val contentHandler = handlerContext.controller.output
+    implicit val xmlReceiver = handlerContext.controller.output
     val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(getEffectiveId, secretControl, addId = true)
 
     // Create `xh:input`
@@ -53,17 +53,14 @@ class XFormsSecretHandler(
       XFormsBaseHandler.handleAriaAttributes(secretControl.isRequired, secretControl.isValid, secretControl.visited, containerAttributes)
 
       // Output element
-      contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes)
-      contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName)
+      xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes)
+      xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName)
     } else {
-      // Output static read-only value
-      val spanQName = XMLUtils.buildQName(xhtmlPrefix, "span")
-      containerAttributes.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-field")
-      contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes)
-      val value = secretControl.getFormattedValue
-      if (value.isDefined)
-        contentHandler.characters(value.get.toCharArray, 0, value.get.length)
-      contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName)
+      outputStaticReadonlyField(xhtmlPrefix) {
+        secretControl.getFormattedValue foreach { value =>
+          xmlReceiver.characters(value.toCharArray, 0, value.length)
+        }
+      }
     }
   }
 }

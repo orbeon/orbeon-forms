@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.analysis.controls.{LHHA, LHHAAnalysis}
 import org.orbeon.oxf.xforms.control.ControlAjaxSupport.AriaReadonly
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler.isStaticReadonly
 import org.orbeon.oxf.xforms.processor.handlers.xhtml.XFormsBaseHandlerXHTML.withFormattingPrefix
 import org.orbeon.oxf.xforms.processor.handlers.{HandlerContext, XFormsBaseHandler}
 import org.orbeon.oxf.xml.SaxSupport._
@@ -87,10 +86,21 @@ class XFormsOutputDefaultHandler(
 
     // Handle accessibility attributes on control element
     XFormsBaseHandler.forwardAccessibilityAttributes(attributes, containerAttributes)
-    if (hasLabel)
-      handleAriaByAtts(containerAttributes, XFormsLHHAHandler.coreControlLhhaByCondition)
-    // See https://github.com/orbeon/orbeon-forms/issues/3583
-    if (hasLabel && ! isStaticReadonly(outputControl)) {
+    if (hasLabel) {
+
+      // NOTE: No need to handle `LHHA.Alert` as that's not handled by `handleAriaByAtts`
+      def ariaByCondition(lhhaAnalysis: LHHAAnalysis): Boolean =
+        XFormsLHHAHandler.coreControlLhhaByCondition(lhhaAnalysis) && (
+          lhhaAnalysis.lhhaType != LHHA.Hint                   ||
+          ! XFormsBaseHandler.isStaticReadonly(currentControl) ||
+          containingDocument.staticReadonlyHint
+        )
+
+      handleAriaByAtts(containerAttributes, ariaByCondition)
+      // See https://github.com/orbeon/orbeon-forms/issues/3583
+      // Also do static readonly, see:
+      // - https://github.com/orbeon/orbeon-forms/issues/5525
+      // - https://github.com/orbeon/orbeon-forms/issues/5367
       containerAttributes.addOrReplace(XFormsNames.TABINDEX_QNAME, "0")
       containerAttributes.addOrReplace(AriaReadonly, "true")
       containerAttributes.addOrReplace(XFormsNames.ROLE_QNAME, "textbox")
@@ -103,6 +113,18 @@ class XFormsOutputDefaultHandler(
         xmlReceiver.characters(textValue.toCharArray, 0, textValue.length)
     }
   }
+
+  // Override as we want to use `<label>` even in static readonly
+  // Alternatively, for static readonly, we could do the same we do for `<xf:input>` and other fields, for consistency
+  protected override def handleLabel(lhhaAnalysis: LHHAAnalysis): Unit =
+    handleLabelHintHelpAlert(
+      lhhaAnalysis            = lhhaAnalysis,
+      controlEffectiveIdOpt   = None,
+      forEffectiveIdWithNsOpt = getForEffectiveIdWithNs(lhhaAnalysis),
+      requestedElementNameOpt = None,
+      controlOrNull           = currentControl,
+      isExternal              = false
+    )
 
   protected override def handleHint(lhhaAnalysis: LHHAAnalysis): Unit =
     if (! XFormsBaseHandler.isStaticReadonly(currentControl) || containingDocument.staticReadonlyHint)

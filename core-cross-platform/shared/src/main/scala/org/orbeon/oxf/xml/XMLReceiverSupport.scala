@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xml
 
+import org.orbeon.dom.QName
 import org.orbeon.oxf.util.MarkupUtils._
+import org.orbeon.oxf.xml.SaxSupport.{AttributesImplOps, EmptyAttributes}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 
@@ -105,17 +107,28 @@ trait XMLReceiverSupport {
       atts map { case (name, value) => s"""$name="${value.escapeXmlForAttribute}"""" } mkString " "
     )
 
-  private def addAttributes(attributesImpl: AttributesImpl, atts: Iterable[(String, String)]): Unit =
+  implicit def pairsToAttributes(atts: Nil.type): Attributes =
+    EmptyAttributes
+
+  implicit def pairsToAttributes(atts: Iterable[(String, String)]): AttributesImpl = {
+    val saxAtts = new AttributesImpl
     atts foreach {
       case (name, value) =>
         require(name ne null)
         if (value ne null)
-          attributesImpl.addAttribute("", name, name, "CDATA", value)
+          saxAtts.addOrReplace(name, value)
     }
+    saxAtts
+  }
 
-  implicit def pairsToAttributes(atts: Iterable[(String, String)]): Attributes = {
+  implicit def qnamePairsToAttributes(atts: Iterable[(QName, String)]): AttributesImpl = {
     val saxAtts = new AttributesImpl
-    addAttributes(saxAtts, atts)
+    atts foreach {
+      case (name, value) =>
+        require(name ne null)
+        if (value ne null)
+          saxAtts.addOrReplace(name, value)
+    }
     saxAtts
   }
 }

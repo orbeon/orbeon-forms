@@ -448,9 +448,7 @@ class XFormsSelect1Handler(
         }
       }
     } else {
-      // Output static read-only value
-      containerAttributes.addOrReplace(XFormsNames.CLASS_QNAME, "xforms-field")
-      withElement(localName = "span", prefix = xhtmlPrefix, uri = XHTML, atts = containerAttributes) {
+      outputStaticReadonlyField(xhtmlPrefix) {
         itemsetOpt foreach { itemset =>
           var selectedFound = false
           val ch = new XMLReceiverHelper(xmlReceiver)

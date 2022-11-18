@@ -353,13 +353,13 @@ class XFormsSelect1Handler(
     implicit val xmlReceiver: XMLReceiver = xformsHandlerContext.controller.output
 
     val containingDocument   = xformsHandlerContext.containingDocument
-    val containerAttributes  = getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, !isFull)
+    val containerAttributes  = getEmptyNestedControlAttributesMaybeWithId(effectiveId, control, ! isFull)
     val xhtmlPrefix          = xformsHandlerContext.findXHTMLPrefix
     val isStaticReadonly     = XFormsBaseHandler.isStaticReadonly(control)
 
     val allowFullStaticReadonly =
       isMultiple && containingDocument.isReadonlyAppearanceStaticSelectFull ||
-        !isMultiple && containingDocument.isReadonlyAppearanceStaticSelect1Full
+        ! isMultiple && containingDocument.isReadonlyAppearanceStaticSelect1Full
 
     val mustOutputFull = isBooleanInput || (isFull && (allowFullStaticReadonly || !isStaticReadonly))
 

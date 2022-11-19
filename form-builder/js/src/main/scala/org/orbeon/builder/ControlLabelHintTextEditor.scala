@@ -248,10 +248,6 @@ object ControlLabelHintTextEditor {
               tinyMceInitialized = true
               thunk(tinyMceObject)
             })
-            // Found out experimentally that this event fires (but not `ResizeEditor`/`ResizeWindow`)
-            tinyMceObject.on("ResizeContent", _ => {
-              makeSpaceForTinyMce()
-            })
           }
 
       // Not using tinymceObject.container, as it is not initialized onInit, while editorContainer is
@@ -294,6 +290,13 @@ object ControlLabelHintTextEditor {
 
         val tinyMceObject = new TinyMceEditor(anchorId, tinyMceConfig, GlobalTinyMce.EditorManager)
         tinyMceObjectOpt = Some(tinyMceObject)
+        withInitializedTinyMce { tinyMceObject =>
+          // Q: Not sure why we need to add listener after initialization?
+          // Found out experimentally that this event fires (but not `ResizeEditor`/`ResizeWindow`)
+          tinyMceObject.on("ResizeContent", _ => {
+            makeSpaceForTinyMce()
+          })
+        }
         tinyMceObject.render()
         tinyMceObject
       }

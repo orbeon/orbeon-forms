@@ -281,7 +281,7 @@ body.orbeon {
 
     // Style static readonly plain text and rich text the same as Bootstrap's pre (see code.less)
     .fr-grid .xforms-static.xforms-readonly {
-        &.xforms-textarea pre, &.xforms-output.xforms-mediatype-text-html {
+        &.xforms-textarea pre {
             color: @grayDark;
             display: block;
             padding: (@baseLineHeight - 1) / 2; // We override these in form-runner-base.less, do we need this here?
@@ -295,6 +295,7 @@ body.orbeon {
 
         // See https://github.com/orbeon/orbeon-forms/issues/3988
         // Use `:not(.xforms-text)` above instead once supported by the PDF renderer.
+        // `.xforms-text` is for the Explanatory Text control
         &.xforms-output.xforms-mediatype-text-html.xforms-text {
             color: @textColor;
             padding: 0;

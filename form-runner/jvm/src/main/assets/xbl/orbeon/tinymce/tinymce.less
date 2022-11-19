@@ -15,9 +15,9 @@
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
 .xbl-fr-tinymce {
-    .xforms-readonly {
+    &.xforms-readonly {
         .xbl-fr-tinymce-div {
-            background-color: darken(@inputBackground, 5%);
+            background-color: darken(@inputBackground, 5%); // Q: Restrict to `.fr-grid`?
             cursor: not-allowed;
         }
         // 2022-09-08: These don't work anymore in `inline` mode as the TOC is placed under `<body>`.

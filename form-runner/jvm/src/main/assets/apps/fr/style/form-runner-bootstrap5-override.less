@@ -1,5 +1,20 @@
 @import (reference) "form-runner-common";
 
+// disable input bar
+.orbeon input[disabled], .orbeon select[disabled], .orbeon textarea[disabled], .orbeon input[readonly], .orbeon select[readonly], .orbeon textarea[readonly] {
+  cursor: not-allowed;
+  background-color: #eee;
+}
+
+input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-control.xforms-select1.xforms-incremental > select {
+    height: 28px;
+}
+
+// date picker
+.fr-grid-body .input-group-text {
+  padding: 0rem 0.5rem;
+}
+
 // dropdown menu
 .dropdown-menu .btn-link {
   font-size: 14px;
@@ -67,28 +82,36 @@
   text-decoration: underline !important;
 }
 
+// form controls > Buttons
+.fr-grid-body .fr-grid-1-2 .btn-link {
+  border: 1px solid transparent;
+  background-color: white;
+}
+
 // home button
-.xforms-trigger-appearance-full .btn {
+.xforms-trigger-appearance-full .btn, .fr-attachment-select.btn, .fr-grid-dropdown-button.btn {
   color: #000;
   background-color: #f8f9fa;
   border-color: #f8f9fa;
 }
 
-.xforms-trigger-appearance-full {
+.xforms-trigger-appearance-full, .fr-attachment, .fr-repeat-column-left {
   .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
     background-color: #e6e6e6 !important;
     border-color: #0a58ca !important;
   }
 }
 
-// new button
-.fr-new-button .btn {
-  color: #fff !important;
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
+// new/review/save button
+.fr-new-button, .fr-review-button, .fr-save-button {
+  .btn{
+    color: #fff !important;
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+  }
 }
 
-.fr-new-button {
+.fr-new-button, .fr-review-button, .fr-save-button {
   .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
     color: #fff !important;
     background-color: #0b5ed7 !important;
@@ -111,32 +134,34 @@
   }
 
   // Adapt pagination to use of xf:trigger
-  .pagination li {
-    & > .xforms-trigger {
-      cursor: pointer
-    }
-
-    & > .xforms-trigger.xforms-readonly {
-      cursor: auto;
-    }
-
-    .btn-link {
-      text-decoration: none;
-      background-color: #fff;
-    }
-
-    // NOTE: Updated for Bootstrap 5
-    > .btn-link, > span {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      background-color: #fff;
-    }
-
-    // Reset rules that can be applied by external Bootstrap .pagination a rule
-    span .btn-link {
-      padding: 0;
-      border: none;
-      line-height: normal;
+  .pagination {
+    li {
+      & > .xforms-trigger {
+        cursor: pointer
+      }
+  
+      & > .xforms-trigger.xforms-readonly {
+        cursor: auto;
+      }
+  
+      .btn-link {
+        text-decoration: none;
+        background-color: #fff;
+      }
+  
+      // NOTE: Updated for Bootstrap 5
+      > .btn-link, > span {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        background-color: #fff;
+      }
+  
+      // Reset rules that can be applied by external Bootstrap .pagination a rule
+      span .btn-link {
+        padding: 0;
+        border: none;
+        line-height: normal;
+      }
     }
   }
 
@@ -145,6 +170,335 @@
       &, & > button {
         background-color: transparent;
       }
+    }
+  }
+
+  // admin or home page: pagination
+  .xforms-group .xbl-fr-pager .pagination {
+    display:flex !important;
+    margin-bottom: 20px !important;
+
+    .xforms-output {
+      padding: 8px 28px !important;
+    }
+  }
+
+  .fr-form-description {
+    margin-bottom: 10px;
+    background-color: #fff;
+    border: 1px solid #e3e3e3;
+    padding: 8px 35px 8px 14px;
+  }
+
+  .fr-section-label .btn-link {
+    border: 1px solid transparent;
+  }
+
+  .fr-error-group {
+    padding-left: 0rem;
+  }
+
+  .fr-error-summary-body .fr-error-title {
+    font-size: inherit !important;
+    float: none !important;
+  }
+
+  .xforms-group .fr-level-error .btn-link {
+    border: 1px solid transparent;
+    background-color: white;
+  }
+
+  .xforms-group .fr-level-error .btn-link .fr-error-label, .fr-error-alert {
+    vertical-align: baseline !important;
+  }
+
+  input, select, textarea {
+    border: 1px solid #ccc !important;
+    border-radius: 0.25rem !important;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    outline: 0 none !important;
+  }
+
+  // fix the color of "*"
+  .fr-grid-body .xforms-label:before, .fr-mode-new .xforms-required.xforms-label:before {
+    color: #B94A48;
+  }
+
+  // form controls > Text Controls
+  textarea, output, input {
+    padding: 2px 6px;
+  }
+
+  #fr-view-component≡text-controls-section≡grid-1-grid≡textarea-control≡≡c {
+    float: left;
+    margin-bottom: 0.2rem;
+    height: 75px;
+  }
+
+  #fr-view-component≡text-controls-section≡grid-1-grid≡textarea-counter-control≡field≡≡c {
+    height: 75px;
+  }
+
+  #fr-view-component≡text-controls-section≡grid-1-grid≡output-control≡≡c {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    background-color: #f2f2f2;
+    cursor: not-allowed;
+    width: 100%;
+  }
+
+  // form controls > Selection Controls
+  .xforms-select-appearance-full, .xforms-select1-appearance-full {
+    input {
+      vertical-align: middle;
+      float: left;
+      line-height: 25px;
+    }
+    .xforms-hint {
+      padding-top: 5px;
+    }
+  }
+  
+  .xforms-select1-appearance-full input[type="radio"], .xforms-select-appearance-full input[type="radio"], 
+  .xforms-select1-appearance-full input[type="checkbox"], .xforms-select-appearance-full input[type="checkbox"]{
+      margin-top: -0.1rem;
+    }
+
+  .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
+    padding: 0 4px 0 !important;
+  }
+
+  // form controls > Image and File Attachments
+  .xforms-update-full {
+    img {
+      max-width: 100%;
+    }
+  
+    .btn-link {
+      border: 1px solid transparent;
+      background-color: white;
+    }
+  }
+
+  // table: bookshelf
+  #notes-section≡note-grid {
+    table {
+      border-spacing: 0;
+      border-collapse: inherit !important;
+    }
+  
+    .fr-grid-head .fr-grid-master-row {
+      #notes-section≡note-grid≡xf-848 {
+        border-top: 1px solid #ddd;
+        border-bottom: 0;
+        border-top-left-radius: 4px;
+      }
+      .fr-grid-th {
+        border-top: 1px solid #ddd;
+        border-top-right-radius: 4px;
+        border-left: 0;
+        border-bottom: unset !important;
+      }
+    }
+
+    #notes-section≡note-grid≡xf-891⊙1 {
+      border-left: 0;
+    }
+  
+    .fr-grid-repeat-iteration .fr-grid-tr {
+      #notes-section≡note-grid≡xf-888⊙1 {
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        border-bottom-left-radius: 4px;
+      }
+      .fr-grid-td {
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        border-bottom-right-radius: 4px;
+      }
+      textarea {
+        resize: horizontal;
+        height: 68px;
+        margin-bottom: -6px;
+      }
+    }
+  }
+
+  // table: dmv-14
+  #fr-view-component≡vehicles-section≡vehicle-repeat {
+    table {
+      border-spacing: 0;
+      border-collapse: inherit !important;
+    }
+
+    // first column
+    #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1378 {
+      border-left: 1px solid #ddd;
+      border-top: 1px solid #ddd;
+      border-top-left-radius: 4px;
+    }
+
+    #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1425⊙1 {
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      border-bottom-left-radius: 4px;
+    }
+
+    // second & third & forth column
+    table thead tr th {
+      border-top: 1px solid #ddd;
+      border-left: 0;
+    }
+
+    #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1428⊙1, #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1431⊙1,
+    #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1434⊙1, #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1436⊙1 {
+      border-bottom: 1px solid #ddd;
+      border-top: 1px solid #ddd;
+      border-left: 0;
+    }
+
+    .fr-grid-head tr th:last-child {
+      border-top-right-radius: 4px;
+    }
+
+    #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1436⊙1 {
+      border-bottom-right-radius: 4px;
+    }
+  }
+
+  #notes-section≡note-grid≡xf-855 {
+    font-weight: normal;
+  }
+
+  .btn-mini.fr-grid-dropdown-button {
+    font-size: 13px;
+    padding: 0 6px;
+    border-radius: 3px;
+  }
+
+  // table: travel
+  #fr-view-component≡master-section-section≡master-grid-grid {
+    table {
+      border-spacing: 0;
+      border-collapse: inherit;
+    }
+
+    // first two column
+    .fr-grid-head .fr-grid-master-row {
+      .fr-repeat-column-number, .fr-repeat-column-left {
+        border-top: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        border-bottom: 0;
+      }
+      .fr-repeat-column-number {
+        border-top-left-radius: 4px;
+      }
+    }
+
+    #fr-view-component≡master-section-section≡master-grid-grid≡xf-1042⊙1 {
+      .fr-repeat-column-number, .fr-repeat-column-left {
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .fr-repeat-column-number {
+        border-bottom-left-radius: 4px;
+      }
+      .fr-grid-tr .fr-grid-td {
+        border-left: 0;
+  
+      }
+    }
+
+    #fr-view-component≡master-section-section≡master-grid-grid≡xf-1025 {
+      border-top-left-radius: 0 !important;
+      border-bottom: unset;
+      border-left: 0;
+      border-right: 1px solid #ddd;
+    }
+  
+    #fr-view-component≡master-section-section≡master-grid-grid≡xf-1069⊙1 {
+      border-bottom-left-radius: 0 !important;
+      border-left: 0;
+    }
+  
+    #fr-view-component≡master-section-section≡master-grid-grid≡xf-1072⊙1 {
+      border-bottom-right-radius: 0;
+      border-left: 0;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+    }
+  
+    // full name
+    table thead tr th[colspan="3"] {
+      border-top: 1px solid #ddd;
+      border-top-right-radius: 0 !important;
+      border-bottom: unset !important;
+    }
+  
+    // birth date
+    .fr-grid-head {
+      .fr-grid-master-row .fr-grid-th {
+        border-top: 1px solid #ddd;
+        border-top-right-radius: 4px;
+        border-left: 0;
+      }
+    }
+  
+    // month-day-year
+    #fr-view-component≡master-section-section≡master-grid-grid≡xf-1075⊙1 {
+      border-bottom-right-radius: 4px;
+      border-left: 0;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+    }
+  
+    // date picker
+    #fr-view-component≡master-section-section≡master-grid-grid≡traveler-birth-date-control≡input⊙1 {
+      border-radius: 0 !important;
+      border-top-left-radius: 4px !important;
+      border-bottom-left-radius: 4px !important;
+    }
+  }
+  
+  // pills: text-overflow
+  .xbl-fr-wizard .fr-wizard-toc .nav .btn-link {
+    width: 234px;
+  }
+
+  // admin or home page
+  .orbeon .fr-forms-table tbody tr:nth-child(4n+3) > td {
+    border: 1px solid #ddd;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  .table > :not(:first-child) {
+    border-top: 1px solid #ddd;
+  }
+
+  // controls review page 
+  .xforms-field, .xforms-textarea pre, .fr-grid-1-1 .xforms-output.xforms-static {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    background-color: #f2f2f2;
+    display: inline-block;
+    width: 100%;
+    padding: 4px 6px;
+    font-size: 13px;
+    min-height: 28px;
+  }
+
+  .xforms-input-appearance-character-counter.xbl-fr-character-counter.xforms-readonly.fr-grid-1-2, .xforms-textarea-appearance-character-counter.xbl-fr-character-counter.xforms-readonly.fr-grid-2-2 {
+    .xforms-label {
+      margin-bottom: 2px;
     }
   }
 }

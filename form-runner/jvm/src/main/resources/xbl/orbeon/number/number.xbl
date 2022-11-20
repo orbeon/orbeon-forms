@@ -411,11 +411,11 @@
                         (
                             'xforms-help-popover-control',
                             'input-prepend'[xxf:non-blank($prefix)],
-                            'input-append' [xxf:non-blank($suffix)],
+                            'input-group' [xxf:non-blank($suffix)],
                             concat('fr-field-width-', $field-width)
                         )
                     }">
-                    <xf:group fr:keep-if-param-non-blank="prefix" class="add-on" ref=".[xxf:non-blank($prefix)]">
+                    <xf:group fr:keep-if-param-non-blank="prefix" class="input-group-text" ref=".[xxf:non-blank($prefix)]">
                         <xf:output id="prefix" value="$prefix"/>
                     </xf:group>
                     <xh:input
@@ -440,7 +440,7 @@
                         }"
                         maxlength="{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}"
                         xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern"/>
-                    <xf:group fr:keep-if-param-non-blank="suffix" class="add-on" ref=".[xxf:non-blank($suffix)]">
+                    <xf:group fr:keep-if-param-non-blank="suffix" class="input-group-text" ref=".[xxf:non-blank($suffix)]">
                         <xf:output id="suffix" value="$suffix"/>
                     </xf:group>
                 </xh:span>

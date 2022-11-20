@@ -42,7 +42,6 @@
         </xbl:implementation>
 
         <xbl:template>
-            <xh:div class="pagination">
 
                 <xf:group ref="()" xbl:attr="model context ref=total-value" appearance="xxf:internal" xxbl:scope="outer">
                     <xf:var name="value" as="item()?" xxbl:scope="inner">
@@ -76,7 +75,7 @@
                     </xf:group>
                 </xf:group>
 
-                <xh:ul>
+                <xh:ul class="pagination">
                     <xh:li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
                         <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first">
                             <xf:label><xh:i class="fa fa-fw fa-step-backward"/></xf:label>
@@ -135,7 +134,6 @@
                         </xf:trigger>
                     </xh:li>
                 </xh:ul>
-            </xh:div>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

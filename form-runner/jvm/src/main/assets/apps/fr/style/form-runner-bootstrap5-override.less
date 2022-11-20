@@ -6,13 +6,13 @@
   background-color: #eee;
 }
 
-// the height of input bar
-#message-section≡grid-2-grid≡topic-control≡select1≡≡c, #fr-view-component≡typed-controls-section≡grid-3-grid≡us-state-control≡select1≡≡c,
-#fr-view-component≡us-address-control≡xf-2183≡grid-1-grid≡state-control≡select1≡≡c, #fr-view-component≡selection-controls-section≡grid-5-grid≡static-dropdown-control≡select1≡≡c, 
-#fr-view-component≡selection-controls-section≡grid-5-grid≡dynamic-data-dropdown-control≡select1≡≡c, #details-section≡details-grid-grid≡language-control≡≡c, 
-#fr-view-component≡residence-address-section≡grid-2-grid≡residence-state-control≡select1≡≡c, #fr-view-component≡mailing-address-section≡grid-4-grid≡mailing-state-control≡select1≡≡c,
-#fr-view-component≡old-address-section≡grid-8-grid≡old-state-control≡select1≡≡c {
-  height: 30px;
+input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-control.xforms-select1.xforms-incremental > select {
+    height: 28px;
+}
+
+// date picker
+.fr-grid-body .input-group-text {
+  padding: 0rem 0.5rem;
 }
 
 // dropdown menu
@@ -262,14 +262,11 @@
       padding-top: 5px;
     }
   }
-
-  .xforms-select-appearance-full input {
-    margin-top: 0.4em;
-  }
-
-  #fr-view-component≡selection-controls-section≡grid-5-grid≡checkboxes-control≡≡e3, .xforms-select1-appearance-full input {
-    margin-top: 0.3rem !important;
-  }
+  
+  .xforms-select1-appearance-full input[type="radio"], .xforms-select-appearance-full input[type="radio"], 
+  .xforms-select1-appearance-full input[type="checkbox"], .xforms-select-appearance-full input[type="checkbox"]{
+      margin-top: -0.1rem;
+    }
 
   .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
     padding: 0 4px 0 !important;
@@ -383,8 +380,6 @@
     border-radius: 3px;
   }
 
-
-
   // table: travel
   #fr-view-component≡master-section-section≡master-grid-grid {
     table {
@@ -489,26 +484,21 @@
   }
 
   // controls review page 
-  .xforms-field, #text-controls-section≡grid-2-grid≡htmlarea-control≡xf-695,
-  #text-controls-section≡grid-1-grid≡textarea-control≡≡c, #text-controls-section≡grid-1-grid≡textarea-counter-control≡field≡≡c {
+  .xforms-field, .xforms-textarea pre, .fr-grid-1-1 .xforms-output.xforms-static {
     border: 1px solid #ccc;
     border-radius: 4px;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     background-color: #f2f2f2;
-    cursor: not-allowed;
-
     display: inline-block;
-    box-sizing: border-box;
     width: 100%;
     padding: 4px 6px;
-    margin-bottom: 0;
-    line-height: 20px;
     font-size: 13px;
-    color: black;
-    background-image: none;
-    white-space: normal;
-    word-wrap: break-word;
     min-height: 28px;
-    height: auto;
+  }
+
+  .xforms-input-appearance-character-counter.xbl-fr-character-counter.xforms-readonly.fr-grid-1-2, .xforms-textarea-appearance-character-counter.xbl-fr-character-counter.xforms-readonly.fr-grid-2-2 {
+    .xforms-label {
+      margin-bottom: 2px;
+    }
   }
 }

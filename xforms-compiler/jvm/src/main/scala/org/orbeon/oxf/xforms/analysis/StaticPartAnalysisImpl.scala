@@ -73,6 +73,7 @@ trait PartAnalysisForXblSupport
      with PartAnalysisForStaticMetadataAndProperties{
 
   def xblSupport: Option[XBLSupport]
+  def functionLibrary: FunctionLibrary
 }
 
 trait PartAnalysisContextForTree

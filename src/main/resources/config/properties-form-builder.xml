@@ -130,6 +130,10 @@
         xf:dispatch(name = "fb-excel-export")
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.process.xml-export.orbeon.builder">
+        xf:dispatch(name = "fb-xml-export")
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.process.test.orbeon.builder">
         xf:dispatch(name = "fb-test-form")
     </property>

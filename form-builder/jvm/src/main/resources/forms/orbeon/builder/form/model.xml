@@ -910,7 +910,23 @@
         </xf:action>
 
         <!-- Export -->
-        <xf:send submission="fb-export-submission"/>
+        <xf:send submission="fb-export-submission">
+            <xf:property name="export-format" value="'excel-with-named-ranges'"/>
+        </xf:send>
+    </xf:action>
+
+    <xf:action event="fb-xml-export">
+
+        <!-- Save -->
+        <!-- See https://github.com/orbeon/orbeon-forms/issues/2611 -->
+        <xf:action type="xpath">
+            fr:run-process-by-name('oxf.fr.detail.process', 'save')
+        </xf:action>
+
+        <!-- Export -->
+        <xf:send submission="fb-export-submission">
+            <xf:property name="export-format" value="'xml-form-structure-and-data'"/>
+        </xf:send>
     </xf:action>
 
     <xf:submission
@@ -947,8 +963,21 @@
                 encode-for-uri($fb-lang)
             }&amp;repeats-at-least={
                 5 (: TODO: use configuration property :)
+            }&amp;export-format={
+                instance('fb-export-submission-params')/@export-format
             }"
         replace="all"/>
+
+    <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
+    <xf:instance id="fb-export-submission-params">
+        <params export-format=""/>
+    </xf:instance>
+    <xf:action event="xforms-submit" observer="fb-export-submission">
+        <xf:setvalue
+            iterate="instance('fb-export-submission-params')/@*"
+            ref="."
+            value="event(name(context()))"/>
+    </xf:action>
 
     <xf:action observer="fb-publish-submission" event="xforms-submit-done">
 

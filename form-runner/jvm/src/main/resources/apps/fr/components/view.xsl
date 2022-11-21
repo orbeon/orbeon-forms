@@ -342,7 +342,14 @@
                 <xsl:when test="not($use-view-appearance)">
                     <xf:group id="fr-view-component" class="fr-view-appearance-full">
 
-                        <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()" mode="within-controls"/>
+                        <xsl:apply-templates
+                            select="if ($body) then $body/(node() except fr:buttons) else node()"
+                            mode="within-controls">
+                            <xsl:with-param
+                                name="binds-root"
+                                select="$fr-form-model/xf:bind[@id = 'fr-form-binds']"
+                                tunnel="yes"/>
+                        </xsl:apply-templates>
 
                         <!-- Keep markup even in `view` mode for form caching. -->
                         <xxf:setvisited
@@ -400,7 +407,14 @@
                         -->
                         <xsl:attribute name="validation-mode" select="$validation-mode"/>
 
-                        <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()" mode="within-controls"/>
+                        <xsl:apply-templates
+                            select="if ($body) then $body/(node() except fr:buttons) else node()"
+                            mode="within-controls">
+                            <xsl:with-param
+                                name="binds-root"
+                                select="$fr-form-model/xf:bind[@id = 'fr-form-binds']"
+                                tunnel="yes"/>
+                        </xsl:apply-templates>
                         <!-- Optional inner buttons -->
                         <xsl:choose>
                             <xsl:when test="exists($custom-inner-buttons)">

@@ -56,6 +56,49 @@
         name="controls-to-check-for-pdf-appearance-ids"
         select="$controls-to-check-for-pdf-appearance/generate-id()"/>
 
+    <!-- Convert `xf:input` of type `date` and `time` to `fr:date` and `fr:time` -->
+    <xsl:template
+        mode="within-controls"
+        match="xf:input[@bind]">
+        <xsl:param name="binds-root" tunnel="yes"/>
+        <xsl:variable name="bind-id" select="@bind"/>
+        <xsl:choose>
+            <xsl:when test="
+                exists(
+                    $binds-root//xf:bind[
+                        @id   = $bind-id and
+                        @type = ('xf:date', 'xs:date')
+                    ]
+                )">
+                <fr:date>
+                    <xsl:apply-templates select="@* | node()" mode="#current"/>
+                    <!-- See other comment further "Q: Do we really need this?" -->
+                    <xsl:if test="empty(xf:alert)">
+                        <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                    </xsl:if>
+                </fr:date>
+            </xsl:when>
+            <xsl:when test="
+                exists(
+                    $binds-root//xf:bind[
+                        @id   = $bind-id and
+                        @type = ('xf:time', 'xs:time')
+                    ]
+                )">
+                <fr:time>
+                    <xsl:apply-templates select="@* | node()" mode="#current"/>
+                    <!-- See other comment further "Q: Do we really need this?" -->
+                    <xsl:if test="empty(xf:alert)">
+                        <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
+                    </xsl:if>
+                </fr:time>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:next-match/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <!-- NOTE: The `xf:label` rule below matches `select1` controls and if it matches this one won't match. But we shouldn't have
          common cases where the `xf:label` is missing as Form Builder adds that element. -->
     <xsl:template
@@ -119,7 +162,9 @@
 
     <!-- Add a default xf:alert for those fields which don't have one. Only do this within grids and dialogs. -->
     <!-- Q: Do we really need this? -->
+    <!-- NOTE: Lower priority so that `xf:input[@bind]` rules match. -->
     <xsl:template
+        priority="-20"
         match="fr:grid//xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]"
         mode="within-controls">
         <xsl:copy>

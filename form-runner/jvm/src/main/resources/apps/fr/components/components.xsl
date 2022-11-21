@@ -949,6 +949,10 @@
                     name="library-name"
                     select="frf:findAppFromSectionTemplateUri(namespace-uri-for-prefix('component', ..))"
                     tunnel="yes"/>
+                <xsl:with-param
+                    name="binds-root"
+                    select="../xbl:implementation/xf:model/xf:bind[@id = 'fr-form-binds']"
+                    tunnel="yes"/>
             </xsl:apply-templates>
         </xsl:copy>
     </xsl:template>

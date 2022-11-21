@@ -320,7 +320,6 @@ object XBLTransformer {
           val attValue = att.getValue
           if (XMLUtils.maybeAVT(attValue)) {
             val newValue = XPathCache.evaluateAsAvt(
-
               boundElementInfo,
               attValue,
               NamespaceMapping(currentElem.allInScopeNamespacesAsStrings),

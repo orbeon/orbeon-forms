@@ -157,11 +157,16 @@
                 name="binding"
                 value="xxf:binding('fr-date')"/>
             <xf:var
+                fr:keep-if-function-available="fr:mode"
                 name="view"
                 value="
                     property('xxf:readonly-appearance') = 'static' or
                     fr:mode() = 'pdf'
                 "/>
+            <xf:var
+                fr:keep-if-function-unavailable="fr:mode"
+                name="view"
+                value="false()"/>
             <xf:var
                 name="field-width"
                 value="fr:component-param-value('field-width')"/>

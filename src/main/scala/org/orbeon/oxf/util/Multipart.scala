@@ -29,6 +29,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreUtils.PipeOps
 import shapeless.syntax.typeable._
 
 import scala.collection.{mutable => m}
@@ -213,6 +214,8 @@ object Multipart {
         (fieldName, Left(value), None)
       } else {
 
+        var fileScanCompleteCalled = false
+
         try {
 
           val fileItem = servletFileUpload.getFileItemFactory.createItem(fieldName, fis.getContentType, false, fis.getName).asInstanceOf[DiskFileItem]
@@ -266,22 +269,31 @@ object Multipart {
           }
 
           lifecycleOpt flatMap (_.fileItemState(UploadState.Completed(fileItem))) match {
-            case Some(r: FileScanAcceptResult) => (fieldName, Right(fileItem), Some(r))
-            case None                          => (fieldName, Right(fileItem), None)
-            case Some(r)                       => throw FileScanException(fieldName, r) // to the `catch` at the bottom
+            case None                          =>
+              // Means there was no file scan
+              (fieldName, Right(fileItem), None)
+            case Some(r: FileScanAcceptResult) =>
+              fileScanCompleteCalled = true
+              (fieldName, Right(fileItem), Some(r))
+            case Some(r)                       =>
+              // File scan with `FileScanErrorResult` or `FileScanRejectResult`
+              fileScanCompleteCalled = true
+              throw FileScanException(fieldName, r) // go to the `catch` below
           }
         } catch {
           case NonFatal(t) =>
-            lifecycleOpt foreach (_.fileItemState( // returns `None` anyway for `Interrupted` so we ignore the result
-              UploadState.Interrupted(
-               Option(Exceptions.getRootThrowable(t))
-               collect {
-                 case root: SizeLimitExceededException                => Reason.SizeReason(root.getPermittedSize, root.getActualSize)
-                 case DisallowedMediatypeException(permitted, actual) => Reason.MediatypeReason(permitted, actual)
-                 case FileScanException(fieldName, fileScanResult)    => Reason.FileScanReason(fieldName, fileScanResult.message)
-               }
-              )
-            ))
+            // Make sure we call `abort()` on the file scan provider but not if we have already called `complete()`
+            if (! fileScanCompleteCalled)
+              lifecycleOpt foreach (_.fileItemState( // returns `None` anyway for `Interrupted` so we ignore the result
+                UploadState.Interrupted(
+                 Option(Exceptions.getRootThrowable(t))
+                 collect {
+                   case root: SizeLimitExceededException                => Reason.SizeReason(root.getPermittedSize, root.getActualSize)
+                   case DisallowedMediatypeException(permitted, actual) => Reason.MediatypeReason(permitted, actual)
+                   case FileScanException(fieldName, fileScanResult)    => Reason.FileScanReason(fieldName, fileScanResult.message)
+                 }
+                )
+              ))
             throw t
         } // catch
       } // ! fis.isFormField

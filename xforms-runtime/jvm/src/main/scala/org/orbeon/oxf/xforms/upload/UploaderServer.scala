@@ -327,7 +327,7 @@ object UploaderServer {
     def withFileScanCall2(block: => JFileScanResult): FileScanResult =
       Try(block) match {
         case Success(fileScanResponse) => fileScanResultFromJavaApi(fileScanResponse)
-        case Failure(t)                => FileScanErrorResult(message   = Option(t.getMessage), throwable = Option(t))
+        case Failure(t)                => FileScanErrorResult(message = Option(t.getMessage), throwable = Option(t))
       }
 
     def loadProvider[T <: { def init(): Unit } : ClassTag]: Option[T] = {

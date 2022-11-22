@@ -302,7 +302,7 @@
                 id="read-local-metadata"
                 method="get"
                 serialization="none"
-                resource="/fr/service/persistence/form?all-versions={$is-admin}"
+                resource="/fr/service/persistence/form?all-versions={$is-admin}&amp;ignore-admin-permissions={not($is-admin)}"
                 replace="instance"
                 targetref="instance('fr-metadata-local')">
 

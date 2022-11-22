@@ -96,7 +96,11 @@ trait FormBuilderPermissionsOps {
    *  - annotates the `<form>` with an `operations="…"` attribute,
    *  - filters out forms the current user can perform no operation on.
    */
-  def filterFormsAndAnnotateWithOperations(formsEls: List[NodeInfo], allForms: Boolean): List[NodeInfo] = {
+  def filterFormsAndAnnotateWithOperations(
+    formsEls              : List[NodeInfo],
+    allForms              : Boolean,
+    ignoreAdminPermissions: Boolean
+  ): List[NodeInfo] = {
 
     // We only need one wrapper; create it when we encounter the first <form>
     var wrapperOpt: Option[DocumentWrapper] = None
@@ -118,7 +122,7 @@ trait FormBuilderPermissionsOps {
 
       val appName  = formEl.elemValue(Names.AppName)
       val formName = formEl.elemValue(Names.FormName)
-      val isAdmin  = {
+      val hasAdminPermissionForAppForm  = {
         def canAccessEverything = fbPermissions.contains("*")
         def canAccessAppForm = {
           val formsUserCanAccess = fbPermissions.getOrElse(appName, Set.empty)
@@ -129,7 +133,7 @@ trait FormBuilderPermissionsOps {
 
       // For each form, compute the operations the user can potentially perform
       val operations = {
-        val adminOperation = isAdmin.list("admin")
+        val adminOperation = hasAdminPermissionForAppForm.list("admin")
         val permissionsElement = formEl.child(Names.Permissions).headOption.orNull
         val otherOperations = FormRunner.allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement, appName, formName)
         adminOperation ++ otherOperations
@@ -137,8 +141,8 @@ trait FormBuilderPermissionsOps {
 
       // Is this form metadata returned by the API?
       val keepForm =
-        allForms ||                                // all forms are explicitly requested
-        isAdmin  ||                                // admins can see everything
+        allForms                                                   || // all forms are explicitly requested
+        (hasAdminPermissionForAppForm && ! ignoreAdminPermissions) || // admins can see everything
         ! (
           formName == Names.LibraryFormName ||     // filter libraries
           operations.isEmpty                ||     // filter forms on which user can't possibly do anything

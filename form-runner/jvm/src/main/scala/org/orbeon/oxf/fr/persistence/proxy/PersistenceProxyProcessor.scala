@@ -382,8 +382,9 @@ private object PersistenceProxyProcessor {
       root     = "forms",
       content  =
         FormRunner.filterFormsAndAnnotateWithOperations(
-          formsEls = allFormElements.flatten,
-          allForms = request.getFirstParamAsString("all-forms") contains "true"
+          formsEls               = allFormElements.flatten,
+          allForms               = request.getFirstParamAsString("all-forms")                contains "true",
+          ignoreAdminPermissions = request.getFirstParamAsString("ignore-admin-permissions") contains "true"
         ),
       response = response
     )

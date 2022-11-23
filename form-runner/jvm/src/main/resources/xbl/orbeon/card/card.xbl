@@ -1,0 +1,54 @@
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xbl:binding
+        id="fr-card"
+        element="fr|card"
+        xxbl:mode="lhha custom-lhha binding"
+        class="p-2"
+    >
+        <xbl:template
+            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xxbl:transform="oxf:unsafe-xslt"
+        >
+            <xh:div class="card h-100" xsl:version="2.0">
+
+                <xf:var name="binding" value="xxf:binding('fr-card')"/>
+                <xf:select ref="xf:element('_')" appearance="xxf:internal" id="hidden-select">
+                    <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                </xf:select>
+                <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
+
+                <xh:h5 class="card-title card-header text-center"><xf:output value="xxf:label('fr-card')"/></xh:h5>
+                <xh:div class="card-body text-center">
+                    <xbl:content includes=":root > fr|card-body > *"/>
+                </xh:div>
+                <xh:ul class="list-group list-group-flush">
+                    <xf:repeat ref="$items/value/string()">
+                        <xf:var name="value" value="."/>
+                        <xf:var name="label" value="$items[value = $value]/label/string()"/>
+                        <xf:var name="hint"  value="$items[value = $value]/hint/string()"/>
+                        <xh:li class="list-group-item text-truncate">
+                            <xh:a href="{{$value}}"><xf:output value="$label"/></xh:a>
+                            <xh:br/>
+                            <xf:output value="$hint"/>
+                        </xh:li>
+                    </xf:repeat>
+                </xh:ul>
+                <xsl:if test="exists(/*/fr:card-footer)">
+                    <xh:div class="card-footer text-center">
+                        <xh:small class="text-muted">
+                            <xbl:content includes=":root > fr|card-footer > *"/>
+                        </xh:small>
+                    </xh:div>
+                </xsl:if>
+            </xh:div>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

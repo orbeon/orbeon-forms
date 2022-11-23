@@ -177,7 +177,8 @@
                 <summary-title>Summary</summary-title>
                 <delete-confirmation>Confirm Deletion</delete-confirmation>
                 <created>Created</created>
-                <last-modified>Modified</last-modified>
+                <modified>Modified</modified>
+                <last-modified>Last Modified</last-modified>
                 <workflow-stage>Workflow stage</workflow-stage>
                 <created-by>Created By</created-by>
                 <last-modified-by>Last Modified By</last-modified-by>
@@ -333,6 +334,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms>Published Forms</published-forms>
+                <form-builder-forms>Form Builder Forms</form-builder-forms>
+                <new-form-builder-form>New Form Builder Form</new-form-builder-form>
+                <demo-forms>Demo Forms</demo-forms>
+                <quick-links>Quick Links</quick-links>
+                <form-runner-admin>Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms>Access your published forms</published-forms>
+                <form-builder-forms>View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms>Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more>Show more…</show-more>
         </landing>
         <home>
             <title>Form Runner Forms</title>
@@ -381,7 +396,8 @@
                 <local>Local</local>
                 <remote>Remote</remote>
                 <form-identification>Form Identification</form-identification>
-                <last-modified>Modified</last-modified>
+                <modified>Modified</modified>
+                <last-modified>Last Modified</last-modified>
                 <reindexing-confirmation>Confirm Reindexing</reindexing-confirmation>
                 <reencrypt-confirmation>Confirm Re-encryption</reencrypt-confirmation>
             </titles>
@@ -704,7 +720,8 @@
                 <summary-title>Sommaire</summary-title>
                 <delete-confirmation>Confirmer la suppression</delete-confirmation>
                 <created>Création</created>
-                <last-modified>Modification</last-modified>
+                <modified>Modification</modified>
+                <last-modified>Dernière modification</last-modified>
                 <workflow-stage>Étape du workflow</workflow-stage>
                 <created-by>Créé par</created-by>
                 <last-modified-by>Modifié par</last-modified-by>
@@ -861,6 +878,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms>Formulaires publiés</published-forms>
+                <form-builder-forms>Formulaires de Form Builder</form-builder-forms>
+                <new-form-builder-form>Nouveau formulaire Form Builder</new-form-builder-form>
+                <demo-forms>Formulaires de démonstration</demo-forms>
+                <quick-links>Raccourcis</quick-links>
+                <form-runner-admin>Fonctions d'administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms>Accédez vos formulaires publiés</published-forms>
+                <form-builder-forms>Visualisez et éditez vos formulaires en cours créés avec Form Builder</form-builder-forms>
+                <demo-forms>Essayez les formulaires de démonstration</demo-forms>
+            </descriptions>
+            <show-more>Voir plus…</show-more>
         </landing>
         <home>
             <title>Accueil Form Runner</title>
@@ -909,7 +940,8 @@
                 <local>Local</local>
                 <remote>Distant</remote>
                 <form-identification>Identification du formulaire</form-identification>
-                <last-modified>Modification</last-modified>
+                <modified>Modification</modified>
+                <last-modified>Dernière modification</last-modified>
                 <reindexing-confirmation>Confirmer le réindexage</reindexing-confirmation>
                 <reencrypt-confirmation>Confirmer le recryptage</reencrypt-confirmation>
             </titles>
@@ -1223,7 +1255,8 @@
                 <summary-title>Resumen</summary-title>
                 <delete-confirmation>Confirma Eliminación</delete-confirmation>
                 <created>Creado</created>
-                <last-modified>Modificación</last-modified>
+                <modified>Modificación</modified>
+                <last-modified todo="true">Modificación</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -1375,6 +1408,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title>Inicio Form Runner</title>
@@ -1423,7 +1470,8 @@
                 <local>Local</local>
                 <remote>Remoto</remote>
                 <form-identification>Identificación de Fomulario</form-identification>
-                <last-modified>Modificado</last-modified>
+                <last>Modificado</last>
+                <last-modified todo="true">Modificado</last-modified>
                 <reindexing-confirmation>Confirmar Reindexación</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
@@ -1737,7 +1785,8 @@
                 <summary-title>Oppsummering</summary-title>
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
                 <created>Opprettet</created>
-                <last-modified>Sist endret</last-modified>
+                <modified>Sist endret</modified>
+                <last-modified todo="true">Sist endret</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -1887,6 +1936,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title todo="true">[Form Runner Home]</title>
@@ -1935,6 +1998,7 @@
                 <local todo="true">[Local]</local>
                 <remote todo="true">[Remote]</remote>
                 <form-identification todo="true">[Form Identification]</form-identification>
+                <modified todo="true">[Modified]</modified>
                 <last-modified todo="true">[Modified]</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
@@ -2249,7 +2313,8 @@
                 <summary-title>Общая информация</summary-title>
                 <delete-confirmation todo="true">[Confirm Deletion]</delete-confirmation>
                 <created>Дата создания</created>
-                <last-modified>Дата изменения</last-modified>
+                <modified>Дата изменения</modified>
+                <last-modified todo="true">Дата изменения</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -2398,6 +2463,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title todo="true">[Form Runner Home]</title>
@@ -2446,6 +2525,7 @@
                 <local todo="true">[Local]</local>
                 <remote todo="true">[Remote]</remote>
                 <form-identification todo="true">[Form Identification]</form-identification>
+                <modified todo="true">[Modified]</modified>
                 <last-modified todo="true">[Modified]</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
@@ -2766,7 +2846,8 @@
                 <summary-title>Sommario</summary-title>
                 <delete-confirmation>Conferma cancella</delete-confirmation>
                 <created>Creato</created>
-                <last-modified>Modificato</last-modified>
+                <modified>Modificato</modified>
+                <last-modified todo="true">Modificato</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -2922,6 +3003,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title>Form Runner Home</title>
@@ -2970,7 +3065,8 @@
                 <local>Locale</local>
                 <remote>Remoto</remote>
                 <form-identification>Identificazione del modulo</form-identification>
-                <last-modified>Modificato</last-modified>
+                <modified>Modificato</modified>
+                <last-modified todo="true">Modificato</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
@@ -3290,7 +3386,8 @@
                 <summary-title>Übersicht</summary-title>
                 <delete-confirmation>Löschen bestätigen</delete-confirmation>
                 <created>Erstellt</created>
-                <last-modified>Änderungsdatum</last-modified>
+                <modified>Änderungsdatum</modified>
+                <last-modified todo="true">Änderungsdatum</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -3446,6 +3543,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title>Form Runner Home</title>
@@ -3494,7 +3605,8 @@
                 <local>Lokal</local>
                 <remote>Remote-System</remote>
                 <form-identification>Formular Identifikation</form-identification>
-                <last-modified>Geändert am</last-modified>
+                <modified>Geändert am</modified>
+                <last-modified todo="true">Geändert am</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
@@ -3814,7 +3926,8 @@
                 <summary-title>Yhteenveto</summary-title>
                 <delete-confirmation>Vahvista poistaminen</delete-confirmation>
                 <created>Luotu</created>
-                <last-modified>Viimeksi muokattu</last-modified>
+                <modified>Viimeksi muokattu</modified>
+                <last-modified todo="true">Viimeksi muokattu</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -3970,6 +4083,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title>Form Runner Koti</title>
@@ -4018,7 +4145,8 @@
                 <local>Paikallinen</local>
                 <remote>Etä</remote>
                 <form-identification>Lomakkeen tunnistetiedot</form-identification>
-                <last-modified>Muokattu</last-modified>
+                <modified>Muokattu</modified>
+                <last-modified todo="true">Muokattu</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
@@ -4338,7 +4466,8 @@
                 <summary-title>Sammanställning</summary-title>
                 <delete-confirmation>Bekräfta borttag</delete-confirmation>
                 <created>Skapad</created>
-                <last-modified>Ändrad</last-modified>
+                <modified>Ändrad</modified>
+                <last-modified todo="true">Ändrad</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -4494,6 +4623,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title>Start av formulärmotorn</title>
@@ -4542,7 +4685,8 @@
                 <local>Lokalt</local>
                 <remote>På servern</remote>
                 <form-identification>Identifiering av formulär</form-identification>
-                <last-modified>Senast ändrad</last-modified>
+                <modified>Senast ändrad</modified>
+                <last-modified todo="true">Senast ändrad</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
@@ -4862,7 +5006,8 @@
                 <summary-title>Samenvatting</summary-title>
                 <delete-confirmation>Verwijderen bevestigen</delete-confirmation>
                 <created>Aangemaakt</created>
-                <last-modified>Bewerkt</last-modified>
+                <modified>Bewerkt</modified>
+                <last-modified todo="true">Bewerkt</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -5017,6 +5162,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title>Form Runner Home</title>
@@ -5065,7 +5224,8 @@
                 <local>Lokaal</local>
                 <remote>Extern</remote>
                 <form-identification>Form-identificatie</form-identification>
-                <last-modified>Bewerkt</last-modified>
+                <modified>Bewerkt</modified>
+                <last-modified todo="true">Bewerkt</last-modified>
                 <reindexing-confirmation>Bevestigen herindexeren</reindexing-confirmation>
                 <reencrypt-confirmation>Bevestigen her-encryptie</reencrypt-confirmation>
             </titles>
@@ -5385,7 +5545,8 @@
                 <summary-title>Sumário</summary-title>
                 <delete-confirmation>Deseja apagar</delete-confirmation>
                 <created>Criado</created>
-                <last-modified>Modificado</last-modified>
+                <modified>Modificado</modified>
+                <last-modified todo="true">Modificado</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -5540,6 +5701,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title>Form Runner</title>
@@ -5588,7 +5763,8 @@
                 <local>Local</local>
                 <remote>Remoto</remote>
                 <form-identification>Identificação do Formulário</form-identification>
-                <last-modified>Modificado</last-modified>
+                <modified>Modificado</modified>
+                <last-modified todo="true">Modificado</last-modified>
                 <reindexing-confirmation todo="true">[Confirm Reindexing]</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
@@ -5902,7 +6078,8 @@
                 <summary-title>Resumé</summary-title>
                 <delete-confirmation>Bekræft sletning</delete-confirmation>
                 <created>Oprettet</created>
-                <last-modified>Senest ændret</last-modified>
+                <modified>Senest ændret</modified>
+                <last-modified todo="true">Senest ændret</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -6051,6 +6228,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title>Blanketbehandler start</title>
@@ -6099,7 +6290,8 @@
                 <local>Lokal</local>
                 <remote>Central</remote>
                 <form-identification>Blanket-indentifikation</form-identification>
-                <last-modified>Ændret</last-modified>
+                <modified>Ændret</modified>
+                <last-modified todo="true">Ændret</last-modified>
                 <reindexing-confirmation>Bekræft genindeksering</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
             </titles>
@@ -6419,7 +6611,8 @@
                 <summary-title>Podsumowanie</summary-title>
                 <delete-confirmation>Potwierdź usunięcie</delete-confirmation>
                 <created>Utworzony</created>
-                <last-modified>Zmodyfikowany</last-modified>
+                <modified>Zmodyfikowany</modified>
+                <last-modified todo="true">Zmodyfikowany</last-modified>
                 <workflow-stage todo="true">[Workflow stage]</workflow-stage>
                 <created-by todo="true">Created By</created-by>
                 <last-modified-by todo="true">Last Modified By</last-modified-by>
@@ -6574,6 +6767,20 @@
         </admin>
         <landing>
             <title>Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
             <title>Form Runner Home</title>
@@ -6622,7 +6829,8 @@
                 <local>Lokalny</local>
                 <remote>Zdalny</remote>
                 <form-identification>Identyfikacja formularza</form-identification>
-                <last-modified>Zmodyfikowany</last-modified>
+                <modified>Zmodyfikowany</modified>
+                <last-modified todo="true">Zmodyfikowany</last-modified>
                 <reindexing-confirmation>Potwierdź reindeksację</reindexing-confirmation>
                 <reencrypt-confirmation>Potwierdź ponowne szyfrowanie</reencrypt-confirmation>
             </titles>

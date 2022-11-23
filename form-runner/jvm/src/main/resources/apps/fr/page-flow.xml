@@ -176,11 +176,6 @@
     <!-- ==== Pages ================================================================================================ -->
 
     <!-- NOTE: Put those here as some URLs starting with /fr/service or /fr/page can erroneously match on those -->
-    <page path="/fr/landing" model="landing/landing.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
-        <setvalue ref="/*/app">*</setvalue>
-        <setvalue ref="/*/form">*</setvalue>
-        <setvalue ref="/*/mode">landing</setvalue>
-    </page>
 
     <!-- Landing page -->
     <page path="/fr/" model="landing/landing.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">

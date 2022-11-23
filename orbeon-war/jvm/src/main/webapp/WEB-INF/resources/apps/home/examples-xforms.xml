@@ -14,8 +14,8 @@
 <examples title="Creating forms by writing XForms by hand"
           xmlns:xh="http://www.w3.org/1999/xhtml">
     <banner>
-        The examples below have been created by writing XForms by hand. If you are not a developer, instead, you might
-        be more interested in <xh:a href="./">creating forms with Form Builder</xh:a>.
+        The examples below have been created by writing XForms by hand. For Orbeon Form Runner,
+        see <xh:a href="/fr/">Form Runner</xh:a>.
     </banner>
     <example title="Espresso Order" href="/xforms-espresso/" img="/home/images/xforms-espresso-small.jpg" size="4"
              source="http://www.flickr.com/photos/kubina/1469914113/">

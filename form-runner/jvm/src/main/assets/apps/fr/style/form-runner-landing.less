@@ -12,6 +12,31 @@
 //
 //@import (reference) "form-runner-common";
 
+html {
+    font-size: 13px; // Bootstrap 5 keeps the 16px browser default
+}
+
 body.orbeon {
     padding-top: 52px;
+}
+
+.orbeon {
+    .card-footer .xforms-label {
+        margin-right: .2rem;
+        font-weight: bold;
+        &:after {
+            content: ":"
+        }
+    }
+
+    // 2022-11-28: This will not work with Firefox yet but it's cosmetic
+    .list-group-item:has(+ .xforms-repeat-begin-end) {
+        border-bottom: none;
+    }
+
+    .card-img-top {
+        border-top: 40px solid transparent;
+        border-right: 40px solid transparent;
+        border-left: 40px solid transparent;
+    }
 }

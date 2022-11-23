@@ -44,6 +44,10 @@
                     for $offset in frf:defaultTimezoneToOffsetString()
                     return xs:dayTimeDuration($offset)"/>
 
+            <xf:var
+                name="link-to-tokens"
+                value="xxf:split(xxf:property('oxf.fr.home.table.link-to'))"/>
+
             <xf:action event="xforms-model-construct-done">
 
                 <!-- Initialize remote servers information only if user is logged in and has at least one matching role -->
@@ -971,12 +975,12 @@
                                         <xh:th/>
                                         <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
                                     </xf:group>
-                                    <xh:th><xf:output value="$fr-resources/home/titles/last-modified"/></xh:th>
+                                    <xh:th><xf:output value="$fr-resources/home/titles/modified"/></xh:th>
                                     <xf:group ref=".[$remote-successful]">
                                         <xf:group ref=".[$show-permissions]">
                                             <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
                                         </xf:group>
-                                        <xh:th><xf:output value="$fr-resources/home/titles/last-modified"/></xh:th>
+                                        <xh:th><xf:output value="$fr-resources/home/titles/modified"/></xh:th>
                                     </xf:group>
                                     <xh:th><xf:output value="$fr-resources/home/titles/app"/></xh:th>
                                     <xh:th><xf:output value="$fr-resources/home/titles/form"/></xh:th>
@@ -999,16 +1003,18 @@
                                     <xf:var name="remote-available"     value="frf:isRemoteAvailable(.)"/>
                                     <xf:var name="remote-unavailable"   value="frf:isRemoteUnavailable(.)"/>
                                     <xf:var name="ops"                  value="xxf:split(@operations)"/>
-                                    <xf:var name="can-navigate-summary" value="$local-available and $ops = ('*', 'update', 'read', 'delete')"/>
-                                    <xf:var name="can-navigate-new"     value="$local-available and $ops = ('*', 'create')"/>
                                     <xf:var name="form-version"         value="(form-version/string(), '1')[1]"/>
 
                                     <xf:var
                                         name="link-to"
-                                        value="xxf:split(xxf:property('oxf.fr.home.table.link-to'))[
-                                            (. = 'summary' and $can-navigate-summary) or
-                                            (. = 'new'     and $can-navigate-new)
-                                        ][1]"/>
+                                        value="
+                                            let $can-navigate-summary := $local-available and $ops = ('*', 'update', 'read', 'delete'),
+                                                $can-navigate-new     := $local-available and $ops = ('*', 'create')
+                                            return
+                                                $link-to-tokens[
+                                                    (. = 'summary' and $can-navigate-summary) or
+                                                    (. = 'new'     and $can-navigate-new)
+                                                ][1]"/>
 
                                     <xf:var
                                         name="link"

@@ -1,0 +1,46 @@
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xbl:binding
+        id="fr-link-card"
+        element="fr|link-card"
+        xxbl:mode="lhha custom-lhha binding"
+        class="p-2"
+    >
+        <xbl:template
+            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xxbl:transform="oxf:unsafe-xslt"
+        >
+            <xh:div class="card h-100" xsl:version="2.0">
+                <xh:h5 class="card-title card-header text-center"><xf:output value="xxf:label('fr-link-card')"/></xh:h5>
+                <xh:img src="{/*/@img-src}" class="card-img-top" alt="{{xxf:label('fr-link-card')}}"/>
+
+                <xsl:if test="exists(/*/fr:card-body)">
+                    <xh:div class="card-body">
+                        <xbl:content includes=":root > fr|card-body > *"/>
+                    </xh:div>
+                </xsl:if>
+
+                <xh:div class="card-body text-center">
+                    <xh:a href="{/*/@href}" class="btn btn-light stretched-link">
+                        <xf:output value="xxf:label('fr-link-card')"/>
+                    </xh:a>
+                </xh:div>
+
+                <xsl:if test="exists(/*/fr:card-footer)">
+                    <xh:div class="card-footer">
+                        <xh:small class="text-muted">
+                            <xbl:content includes=":root > fr|card-footer > *"/>
+                        </xh:small>
+                    </xh:div>
+                </xsl:if>
+            </xh:div>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

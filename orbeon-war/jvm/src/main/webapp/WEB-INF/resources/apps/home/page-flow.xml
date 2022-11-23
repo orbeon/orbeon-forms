@@ -13,9 +13,7 @@
   -->
 <controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
 
-    <!-- Support "/home/" as well as "/" for portlets -->
-    <page path="/(home/)?"      model="examples-form-runner.xml"    view="view.xpl"/>
-    <page path="/home/xforms"   model="examples-xforms.xml"         view="view.xpl"/>
+    <page path="/home/xforms" model="examples-xforms.xml" view="view.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 </controller>

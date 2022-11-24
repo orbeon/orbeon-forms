@@ -7,7 +7,7 @@
 }
 
 input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-control.xforms-select1.xforms-incremental > select {
-    height: 28px;
+  height: 28px;
 }
 
 // date picker
@@ -15,63 +15,69 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   padding: 0rem 0.5rem;
 }
 
-// dropdown menu
-.dropdown-menu .btn-link {
-  font-size: 14px;
-  padding: 6px 12px;
-  margin-bottom: 0;
+// dropdown
+.xforms-group .dropdown, .fr-summary-selection {
+  .btn.btn-secondary.dropdown-toggle {
+    text-decoration: none;
+  }
 
-  display: inline-block;
-  text-decoration: none !important;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  -ms-touch-action: manipulation;
-  touch-action: manipulation;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  background-image: none;
-  border: 1px solid transparent;
-  color: black !important;
-  background-color: white;
-  width: 100%;
-}
+  .dropdown-menu .btn-link {
+    font-size: 14px;
+    padding: 3px 8px;
+    margin-bottom: 0;
+  
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    color: black;
+    background-color: white;
+    width: 100%;
+  }
 
-.dropdown-menu .btn-link:hover,
-.btn-link:focus {
-  color: #333;
-  text-decoration: none;
-  background-color: #e9ecef;
-}
-
-.dropdown-item.active, .dropdown-item:active {
-  color: unset !important;
-  text-decoration: unset !important;
-  background-color: #e9ecef !important;
-}
-
-.dropdown-item:hover .btn-link {
-  background-color: #e9ecef;
+  .dropdown-menu .dropdown-item {
+    &:hover, &:focus, &:active {
+      color: #fff;
+      background-color: #0d6efd;
+      > span {
+        .btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
+          color: #fff;
+          background-color: #0d6efd;
+          background-image: none;
+        }
+      }
+    }
+  }
 }
 
 .disabled .btn-link {
   color: lightgray !important;
 }
 
-.fr-summary-selection .dropdown-toggle {
-  background-color: #f8f9fa;
-  color: #000;
-}
+// form builder's demo forms page
+.fr-summary-selection {
+  .dropdown-toggle {
+    background-color: #f8f9fa;
+    color: #000;
+  }
 
-.fr-summary-selection .badge {
-  background-color: #0d6efd;
-}
+  .badge {
+    background-color: #0d6efd;
+  }
 
-.fr-summary-selection .dropdown-menu {
-  min-width: 15rem;
+  .dropdown-item {
+    padding: 0.35rem 0.25rem;
+  }
 }
 
 // button link: show search options

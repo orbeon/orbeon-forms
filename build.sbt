@@ -36,7 +36,7 @@ val ScalaJsJQueryVersion             = "0.9.6"
 val ScalaJsStubsVersion              = "1.1.0" // can be different from Scala.js version
 val ScalaJsFakeWeakReferencesVersion = "1.0.0" // switch to `scalajs-weakreferences` when browser support is there
 val ScalaJsFakeSecureRandomVersion   = "1.0.0" // switch to `scalajs-java-securerandom` when we upgrade to JSDOM 20+
-val ScalaJsTimeVersion               = "2.4.0"
+val ScalaJsTimeVersion               = "2.5.0"
 val ScalaJsLocalesVersion            = "1.4.1"
 
 // Scala libraries for Scala JVM only

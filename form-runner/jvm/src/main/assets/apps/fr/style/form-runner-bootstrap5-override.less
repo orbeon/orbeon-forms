@@ -238,23 +238,23 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
     padding: 2px 6px;
   }
 
-  #fr-view-component≡text-controls-section≡grid-1-grid≡textarea-control≡≡c {
-    float: left;
-    margin-bottom: 0.2rem;
-    height: 75px;
-  }
-
-  #fr-view-component≡text-controls-section≡grid-1-grid≡textarea-counter-control≡field≡≡c {
-    height: 75px;
-  }
-
-  #fr-view-component≡text-controls-section≡grid-1-grid≡output-control≡≡c {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    background-color: #f2f2f2;
-    cursor: not-allowed;
-    width: 100%;
+  .fr-grid-tr .fr-grid-td {
+    .fr-grid-2-1 > textarea {
+      float: left;
+      margin-bottom: 0.2rem;
+      height: 75px;
+    }
+    .fr-grid-2-2 .fr-charcounter-wrapper .xforms-textarea > textarea {
+      height: 75px;
+    }
+    .fr-grid-3-1 > output {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      background-color: #f2f2f2;
+      cursor: not-allowed;
+      width: 100%;
+    }
   }
 
   // form controls > Selection Controls

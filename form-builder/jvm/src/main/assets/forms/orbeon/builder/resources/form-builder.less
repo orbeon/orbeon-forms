@@ -98,6 +98,7 @@ div.orbeon.orbeon-portlet-div {
     .fb-section-grid-editor,
     .fb-control-editor-left,
     .fb-control-editor-right,
+    .fb-control-editor-top,
     .fb-row-editor {
         position: absolute; top: 0; left: 0;                                // Its left/right in the browser relative to the current section
         display: none;                                                      // Shown in code when mouse over section
@@ -125,7 +126,8 @@ div.orbeon.orbeon-portlet-div {
     }
 
     .fb-control-editor-left,
-    .fb-control-editor-right {
+    .fb-control-editor-right,
+    .fb-control-editor-top {
         .fa {
             height: 16px;
         }
@@ -142,6 +144,23 @@ div.orbeon.orbeon-portlet-div {
         padding-top:   8px;                                                 // Space between icons and the cell border
         padding-right: 8px;
         padding-left:  0;
+    }
+
+    .fb-control-editor-top {
+        box-sizing: border-box;
+        z-index: 1;
+        //transform: rotate(-3deg); // experiment to visually clarify that this is overlay information
+        div {
+            display: block;
+            margin-left: 4px;
+            margin-bottom: 6px;
+            padding: 4px 8px;
+            //background-color: rgba(red(@color1), green(@color1), blue(@color1), 75%);
+            //background-color: rgba(red(@color6), green(@color6), blue(@color6), 75%);
+            background-color: rgba(255, 255, 255, 75%);
+            border: 2px solid @cellHighlight;
+            border-radius: @baseBorderRadius;
+        }
     }
 
     .fb-control-editor-left {

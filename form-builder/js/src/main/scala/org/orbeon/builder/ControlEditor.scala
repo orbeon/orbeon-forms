@@ -18,13 +18,12 @@ import org.orbeon.builder.HtmlElementCell._
 import org.orbeon.builder.rpc.FormBuilderRpcApi
 import org.orbeon.datatypes.Direction
 import org.orbeon.jquery.Offset
-import org.orbeon.oxf.fr.Cell
+import org.orbeon.oxf.fr.{Cell, ControlOps}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.xforms._
 import org.orbeon.xforms.rpc.RpcClient
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
-
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 
@@ -41,7 +40,8 @@ object ControlEditor {
   private var currentCellOpt : Option[Block] = None
   private lazy val controlEditorLeft         = $(".fb-control-editor-left")
   private lazy val controlEditorRight        = $(".fb-control-editor-right")
-  private lazy val controlEditors            = controlEditorLeft.get ++ controlEditorRight.get
+  private lazy val controlEditorTop          = $(".fb-control-editor-top")
+  private lazy val controlEditors            = controlEditorLeft.get ++ controlEditorRight.get ++ controlEditorTop.get
   private var masked: Boolean                = false
 
   // Show/hide editor
@@ -70,12 +70,19 @@ object ControlEditor {
 
   private def showEditors(cell: Block): Unit = {
 
-    // Position editors
     def positionEditor(editor: JQuery, offsetLeft: Double): Unit = {
       editor.show()
       Offset.offset(editor, Offset(
         left = cell.left + offsetLeft,
         top  = cell.top - Position.scrollTop()
+      ))
+    }
+
+    def positionTopEditor(editor: JQuery, offsetLeft: Double): Unit = {
+      editor.show()
+      Offset.offset(editor, Offset(
+        left = cell.left + offsetLeft,
+        top  = cell.top - Position.scrollTop() - editor.height()
       ))
     }
 
@@ -85,13 +92,21 @@ object ControlEditor {
       (cellContent.length > 0).option($(cellContent(0)))
     }
 
+    // Control editor is only show when the cell isn't empty
     controlElOpt.foreach { controlEl =>
-      // Control editor is only show when the cell isn't empty
+
+      // Right editor
       controlEl.append(controlEditorRight)
       positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth())
       // Show/hide itemset icon
       val itemsetIcon = controlEditorRight.find(".fb-control-edit-items")
       itemsetIcon.toggleClass("xforms-disabled", ! controlEl.is(".fb-itemset"))
+
+      // Top editor
+      controlEl.append(controlEditorTop)
+      positionTopEditor(controlEditorTop, 0)
+      val controlName = ControlOps.controlNameFromIdOpt(controlEl.attr("id").get).get
+      controlEditorTop.children().get(0).textContent = controlName
     }
     controlElOpt.getOrElse(cell.el).append(controlEditorLeft)
     positionEditor(controlEditorLeft, 0)
@@ -111,8 +126,10 @@ object ControlEditor {
   private def hideEditors(): Unit = {
     controlEditorLeft.hide()
     controlEditorRight.hide()
+    controlEditorTop.hide()
     controlEditorLeft.detach()
     controlEditorRight.detach()
+    controlEditorTop.detach()
   }
 
   // Control actions

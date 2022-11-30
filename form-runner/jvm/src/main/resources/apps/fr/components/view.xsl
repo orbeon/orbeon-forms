@@ -518,13 +518,13 @@
                             <xh:li class="nav-item {if ($bs5) then 'px-3 d-flex align-items-center' else ''}">
                                 <fr:user-nav/>
                             </xh:li>
-                            <xh:li class="nav-item {if ($bs5) then 'px-3 d-flex align-items-center' else ''}">
-                            <xh:div>
-                                <xh:a href="/fr/">
-                                    <xh:i class="fa fa-fw fa-th"/>
-                                </xh:a>
-                            </xh:div>
-                            </xh:li>
+<!--                            <xh:li class="nav-item {if ($bs5) then 'px-3 d-flex align-items-center' else ''}">-->
+<!--                                <xh:div>-->
+<!--                                    <xh:a href="/fr/">-->
+<!--                                        <xh:i class="fa fa-fw fa-th"/>-->
+<!--                                    </xh:a>-->
+<!--                                </xh:div>-->
+<!--                            </xh:li>-->
                         </xh:ul>
                     </xh:div>
                 </xsl:variable>
@@ -724,6 +724,103 @@
         </xf:group>
     </xsl:template>
 
+    <xsl:template name="fr-user-nav-dropdown-content">
+        <xh:a id="menu-button" href="#" class="{if ($bs5) then 'btn btn-secondary' else ''} dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
+            <xh:i class="fa fa-user"/>
+        </xh:a>
+        <xh:ul class="dropdown-menu dropdown-menu-end" role="menu" aria-labelledBy="menu-button">
+
+            <xf:var name="is-logged-in"  value="exists(xxf:username())"/>
+
+            <!-- Who is logged in -->
+            <xf:var
+                name="logged-in-class"
+                value="
+                    if ($is-logged-in)
+                    then ''
+                    else 'xforms-hidden'
+                "/>
+            <xh:li role="presentation" class="dropdown-item disabled {{$logged-in-class}}">
+                <xh:a role="menuitem" href="#" class="btn btn-link">
+                    <xf:output value="
+                        xxf:format-message(
+                            xxf:r(
+                                'authentication.menu.logged-in-as',
+                                'fr-fr-resources'
+                            ),
+                            xxf:username()
+                        )"/>
+                </xh:a>
+            </xh:li>
+
+            <xh:li role="presentation" class="divider {{$logged-in-class}}"/>
+
+            <!-- Logout -->
+            <xf:var
+                name="logout-url"
+                value="xxf:evaluate-avt(xxf:property('oxf.fr.authentication.user-menu.uri.logout'))"/>
+            <xf:var
+                name="logout-class"
+                value="
+                    if ($is-logged-in and $logout-url != '')
+                    then ''
+                    else 'xforms-hidden'
+                "/>
+            <xh:li role="presentation" class="dropdown-item {{$logout-class}}">
+                <xh:a role="menuitem" href="{{$logout-url}}" class="btn btn-link">
+                    <xf:output value="
+                        xxf:r(
+                            'authentication.menu.logout',
+                            'fr-fr-resources'
+                        )"/>
+                </xh:a>
+            </xh:li>
+
+            <!-- Login -->
+            <xf:var
+                name="login-url"
+                value="xxf:evaluate-avt(xxf:property('oxf.fr.authentication.user-menu.uri.login'))"/>
+            <xf:var
+                name="login-class"
+                value="
+                    if (not($is-logged-in) and $login-url != '')
+                    then ''
+                    else 'xforms-hidden'
+                "/>
+            <xh:li role="presentation" class="dropdown-item {{$login-class}}">
+                <xh:a role="menuitem" href="{{$login-url}}" class="btn btn-link">
+                    <xf:output value="
+                        xxf:r(
+                            'authentication.menu.login',
+                            'fr-fr-resources'
+                        )"/>
+                </xh:a>
+            </xh:li>
+
+            <!-- Register -->
+            <xf:var
+                name="register-url"
+                value="xxf:evaluate-avt(xxf:property('oxf.fr.authentication.user-menu.uri.register'))"/>
+            <xf:var
+                name="register-class"
+                value="
+                    if (not($is-logged-in) and $register-url != '')
+                    then ''
+                    else 'xforms-hidden'
+                "/>
+            <xh:li role="presentation" class="dropdown-item {{$register-class}}">
+                <xh:a role="menuitem" href="{{$register-url}}" class="btn btn-link">
+                    <xf:output value="
+                        xxf:r(
+                            'authentication.menu.register',
+                            'fr-fr-resources'
+                        )"/>
+                </xh:a>
+            </xh:li>
+
+        </xh:ul>
+    </xsl:template>
+
     <xsl:template match="fr:user-nav">
         <xf:group
             class="fr-user-nav"
@@ -731,104 +828,20 @@
                 xxf:property('oxf.fr.authentication.user-menu.enable') and
                 not(fr:is-embedded())
             ]">
-            <xh:ul class="nav {if ($bs5) then '' else 'pull-right'}">
-                <xh:li class="dropdown">
-                    <xh:a id="menu-button" href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <xh:i class="fa fa-user"/>
-                    </xh:a>
-                    <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="menu-button">
-
-                        <xf:var name="is-logged-in"  value="exists(xxf:username())"/>
-
-                        <!-- Who is logged in -->
-                        <xf:var
-                            name="logged-in-class"
-                            value="
-                                if ($is-logged-in)
-                                then ''
-                                else 'xforms-hidden'
-                            "/>
-                        <xh:li role="presentation" class="disabled {{$logged-in-class}}">
-                            <xh:a role="menuitem" href="#">
-                                <xf:output value="
-                                    xxf:format-message(
-                                        xxf:r(
-                                            'authentication.menu.logged-in-as',
-                                            'fr-fr-resources'
-                                        ),
-                                        xxf:username()
-                                    )"/>
-                            </xh:a>
+            <xsl:choose>
+                <xsl:when test="$bs5">
+                    <xh:div class="dropdown">
+                        <xsl:call-template name="fr-user-nav-dropdown-content"/>
+                    </xh:div>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xh:ul class="nav pull-right">
+                        <xh:li class="dropdown">
+                            <xsl:call-template name="fr-user-nav-dropdown-content"/>
                         </xh:li>
-
-                        <xh:li role="presentation" class="divider {{$logged-in-class}}"/>
-
-                        <!-- Logout -->
-                        <xf:var
-                            name="logout-url"
-                            value="xxf:evaluate-avt(xxf:property('oxf.fr.authentication.user-menu.uri.logout'))"/>
-                        <xf:var
-                            name="logout-class"
-                            value="
-                                if ($is-logged-in and $logout-url != '')
-                                then ''
-                                else 'xforms-hidden'
-                            "/>
-                        <xh:li role="presentation" class="{{$logout-class}}">
-                            <xh:a role="menuitem" href="{{$logout-url}}">
-                                <xf:output value="
-                                    xxf:r(
-                                        'authentication.menu.logout',
-                                        'fr-fr-resources'
-                                    )"/>
-                            </xh:a>
-                        </xh:li>
-
-                        <!-- Login -->
-                        <xf:var
-                            name="login-url"
-                            value="xxf:evaluate-avt(xxf:property('oxf.fr.authentication.user-menu.uri.login'))"/>
-                        <xf:var
-                            name="login-class"
-                            value="
-                                if (not($is-logged-in) and $login-url != '')
-                                then ''
-                                else 'xforms-hidden'
-                            "/>
-                        <xh:li role="presentation" class="{{$login-class}}">
-                            <xh:a role="menuitem" href="{{$login-url}}">
-                                <xf:output value="
-                                    xxf:r(
-                                        'authentication.menu.login',
-                                        'fr-fr-resources'
-                                    )"/>
-                            </xh:a>
-                        </xh:li>
-
-                        <!-- Register -->
-                        <xf:var
-                            name="register-url"
-                            value="xxf:evaluate-avt(xxf:property('oxf.fr.authentication.user-menu.uri.register'))"/>
-                        <xf:var
-                            name="register-class"
-                            value="
-                                if (not($is-logged-in) and $register-url != '')
-                                then ''
-                                else 'xforms-hidden'
-                            "/>
-                        <xh:li role="presentation" class="{{$register-class}}">
-                            <xh:a role="menuitem" href="{{$register-url}}">
-                                <xf:output value="
-                                    xxf:r(
-                                        'authentication.menu.register',
-                                        'fr-fr-resources'
-                                    )"/>
-                            </xh:a>
-                        </xh:li>
-
                     </xh:ul>
-                </xh:li>
-            </xh:ul>
+                </xsl:otherwise>
+            </xsl:choose>
         </xf:group>
     </xsl:template>
 

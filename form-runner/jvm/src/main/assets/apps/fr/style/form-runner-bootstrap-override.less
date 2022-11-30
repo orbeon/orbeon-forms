@@ -484,6 +484,17 @@ body.orbeon {
     .xforms-trigger-appearance-xxforms-inverse .btn {
       .buttonBackground(@btnInverseBackground, @btnInverseBackgroundHighlight);
     }
+
+    .xforms-trigger {
+        // Updates to Bootstrap btn-link
+        button.btn-link {
+            white-space: normal;
+            text-align: inherit;
+            text-decoration: underline;
+            font-size: inherit;
+            padding: 0 0 2px 0;
+        }
+    }
 }
 
 @media print {

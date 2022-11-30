@@ -35,26 +35,26 @@
             </xf:select>
             <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
 
-                <xh:div class="dropdown">
-                    <xh:a id="menu-button" href="#" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                        <xf:output value="$items[value/string() = $binding]/label/string()"/>
-                    </xh:a>
-                    <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="menu-button">
-                        <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
-                             repeat nodeset recalculations -->
-                        <xf:repeat ref="$items/value/string()">
-                            <xf:var name="value" value="."/>
-                            <xf:var name="label" value="$items[value = $value]/label/string()"/>
+            <xh:div class="dropdown">
+                <xh:a id="menu-button" href="#" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <xf:output value="$items[value/string() = $binding]/label/string()"/>
+                </xh:a>
+                <xh:ul class="dropdown-menu" role="menu" aria-labelledBy="menu-button">
+                    <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
+                         repeat nodeset recalculations -->
+                    <xf:repeat ref="$items/value/string()">
+                        <xf:var name="value" value="."/>
+                        <xf:var name="label" value="$items[value = $value]/label/string()"/>
 
-                            <xh:li role="presentation" class="dropdown-item{if ($value = $binding) then ' disabled' else ()}">
-                                <xf:trigger appearance="minimal" role="menuitem">
-                                    <xf:label value="$label"/>
-                                    <xf:setvalue event="DOMActivate" ref="$binding" value="$value"/>
-                                </xf:trigger>
-                            </xh:li>
-                        </xf:repeat>
-                    </xh:ul>
-                </xh:div>
+                        <xh:li role="presentation" class="dropdown-item{if ($value = $binding) then ' disabled' else ()}">
+                            <xf:trigger appearance="minimal" role="menuitem">
+                                <xf:label value="$label"/>
+                                <xf:setvalue event="DOMActivate" ref="$binding" value="$value"/>
+                            </xf:trigger>
+                        </xh:li>
+                    </xf:repeat>
+                </xh:ul>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

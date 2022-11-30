@@ -69,6 +69,8 @@
                         <fr:param type="LinkToNewPageParam"    ><fr:name/></fr:param>
                         <fr:param type="LinkToSummaryPageParam"><fr:name/></fr:param>
                         <fr:param type="LinkToHomePageParam"   ><fr:name/></fr:param>
+                        <fr:param type="LinkToFormsPageParam"  ><fr:name/></fr:param>
+                        <fr:param type="LinkToAdminPageParam"  ><fr:name/></fr:param>
                         <fr:param type="LinkToPdfParam"        ><fr:name/></fr:param>
                     </_>
                 </xf:instance>
@@ -163,12 +165,12 @@
                                     return
                                         $resources/components/parameters-editor/type//(
                                             item[
-                                                @id = (0 to 1)                         or
-                                                @id = (2     ) and $all-control-values or
-                                                @id = (3 to 8) and $form-runner-links
+                                                @id = (0 to 1 )                         or
+                                                @id = (2      ) and $all-control-values or
+                                                @id = (3 to 10) and $form-runner-links
                                             ]
                                             |
-                                            choice[$form-runner-links or empty(item[@id = (3 to 8)])]
+                                            choice[$form-runner-links or empty(item[@id = (3 to 10)])]
                                         )">
                                 <xf:label ref="@label, ."/>
                                 <xf:copy
@@ -190,6 +192,10 @@
                                                 'LinkToSummaryPageParam'
                                             else if (@id = 7) then
                                                 'LinkToHomePageParam'
+                                            else if (@id = 9) then
+                                                'LinkToFormsPageParam'
+                                            else if (@id = 10) then
+                                                'LinkToAdminPageParam'
                                             else if (@id = 8) then
                                                 'LinkToPdfParam'
                                             else

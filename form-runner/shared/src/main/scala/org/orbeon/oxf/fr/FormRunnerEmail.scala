@@ -89,8 +89,9 @@ trait FormRunnerEmail {
         case "view"    => "LinkToViewPageParam"
         case "new"     => "LinkToNewPageParam"
         case "summary" => "LinkToSummaryPageParam"
-        case "landing" => "LinkToLandingPageParam"
         case "home"    => "LinkToHomePageParam"
+        case "forms"   => "LinkToFormsPageParam"
+        case "admin"   => "LinkToAdminPageParam"
         case "pdf"     => "LinkToPdfParam"
         case other     => throw new IllegalArgumentException(other)
       }
@@ -118,8 +119,9 @@ trait FormRunnerEmail {
       case "LinkToViewPageParam"    => build("view", documentOpt)
       case "LinkToNewPageParam"     => build("new", None)
       case "LinkToSummaryPageParam" => build("summary", None)
-      case "LinkToLandingPageParam" => s"$baseUrlNoSlash/fr/landing"
       case "LinkToHomePageParam"    => s"$baseUrlNoSlash/fr/"
+      case "LinkToFormsPageParam"   => s"$baseUrlNoSlash/fr/forms"
+      case "LinkToAdminPageParam"   => s"$baseUrlNoSlash/fr/admin"
       case "LinkToPdfParam"         => build("pdf", documentOpt)
       case _                        => throw new IllegalArgumentException(linkType)
     }

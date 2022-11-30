@@ -334,6 +334,8 @@
                         <item id="5">New page</item>
                         <item id="6">Summary page</item>
                         <item id="7">Home page</item>
+                        <item id="9">Published forms page</item>
+                        <item id="10">Administration page</item>
                         <item id="8">PDF file</item>
                     </choice>
                 </type>
@@ -1673,6 +1675,8 @@
                         <item id="5">Page de création</item>
                         <item id="6">Page de sommaire</item>
                         <item id="7">Page d'accueil</item>
+                        <item id="9">Page des formulaires publiés</item>
+                        <item id="10">Page d'administration</item>
                         <item id="8">Fichier PDF</item>
                     </choice>
                 </type>
@@ -2995,6 +2999,8 @@
                         <item id="5" todo="true">[New page]</item>
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
+                        <item id="9" todo="true">[Published forms page]</item>
+                        <item id="10" todo="true">[Administration page]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -4345,6 +4351,8 @@
                         <item id="5" todo="true">[New page]</item>
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
+                        <item id="9" todo="true">[Published forms page]</item>
+                        <item id="10" todo="true">[Administration page]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -5695,6 +5703,8 @@
                         <item id="5" todo="true">[New page]</item>
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
+                        <item id="9" todo="true">[Published forms page]</item>
+                        <item id="10" todo="true">[Administration page]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -7037,6 +7047,8 @@
                         <item id="5" todo="true">[New page]</item>
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
+                        <item id="9" todo="true">[Published forms page]</item>
+                        <item id="10" todo="true">[Administration page]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -8382,6 +8394,8 @@
                         <item id="5" todo="true">[New page]</item>
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
+                        <item id="9" todo="true">[Published forms page]</item>
+                        <item id="10" todo="true">[Administration page]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -9724,6 +9738,8 @@
                         <item id="5" todo="true">[New page]</item>
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
+                        <item id="9" todo="true">[Published forms page]</item>
+                        <item id="10" todo="true">[Administration page]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -11067,6 +11083,8 @@
                         <item id="5" todo="true">[New page]</item>
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
+                        <item id="9" todo="true">[Published forms page]</item>
+                        <item id="10" todo="true">[Administration page]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -12389,6 +12407,8 @@
                         <item id="5" todo="true">[New page]</item>
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
+                        <item id="9" todo="true">[Published forms page]</item>
+                        <item id="10" todo="true">[Administration page]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>
@@ -13738,6 +13758,8 @@
                         <item id="5" todo="true">[New page]</item>
                         <item id="6" todo="true">[Summary page]</item>
                         <item id="7" todo="true">[Home page]</item>
+                        <item id="9" todo="true">[Published forms page]</item>
+                        <item id="10" todo="true">[Administration page]</item>
                         <item id="8" todo="true">[PDF file]</item>
                     </choice>
                 </type>

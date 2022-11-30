@@ -115,6 +115,8 @@
                                                 'LinkToNewPageParam',
                                                 'LinkToSummaryPageParam',
                                                 'LinkToHomePageParam',
+                                                'LinkToFormsPageParam',
+                                                'LinkToAdminPageParam',
                                                 'LinkToPdfParam'
                                             )
                                         ) then

@@ -60,6 +60,9 @@
     <xsl:variable name="is-landing"          select="$mode = 'landing'"                               as="xs:boolean"/>
     <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'"           as="xs:boolean"/>
 
+    <!-- For now, only enable Bootstrap 5 for the landing page -->
+    <xsl:variable name="bs5"                 select="$is-landing"                                     as="xs:boolean"/>
+
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
 
     <!-- MIP filtering -->
@@ -175,7 +178,14 @@
         as="xs:string"
         select="
             let $updates :=
-                for $update in ('fr', 'fb'[$is-form-builder and $is-detail], 'landing'[$is-landing])
+                for $update in (
+                    'fr',
+                     'fb'[$is-form-builder and $is-detail],
+                     (:  For now let those depend on $bs5 :)
+                     'landing'[$is-landing and $bs5],
+                     'summary'[$is-summary and $bs5],
+                     'detail'[$is-detail and $bs5]
+                 )
                 return p:property(concat('oxf.xforms.assets.baseline.updates.', $update))
             return string-join($updates, ' ')
         "/>

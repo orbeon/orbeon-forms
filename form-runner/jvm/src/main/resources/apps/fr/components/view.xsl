@@ -496,7 +496,7 @@
             xxf:element="nav"
             model="fr-form-model"
             ref=".[not(xxf:property(string-join(('oxf.fr.detail.hide-header', fr:app-name(), fr:form-name()), '.')))]"
-            class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            class="navbar navbar-expand-lg navbar-dark bg-dark {if ($bs5) then 'fixed-top' else 'position-sticky'}">
             <xh:div class="container-fluid">
                 <xsl:variable name="default-objects" as="element()+">
                     <fr:goto-content/>
@@ -507,7 +507,7 @@
                         <xh:span class="navbar-toggler-icon"></xh:span>
                     </xh:button>
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <xh:ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+                        <xh:ul class="navbar-nav {if ($bs5) then 'ms-auto mt-2 mt-lg-0' else 'me-auto mb-2 mb-lg-0'}">
                             <!-- These are typically to the right -->
                             <xh:li class="nav-item px-3">
                                 <fr:language-selector appearance="bootstrap5"/>
@@ -515,10 +515,10 @@
                             <xh:li>
                                 <fr:status-icons/>
                             </xh:li>
-                            <xh:li class="nav-item px-3 d-flex align-items-center">
-                            <fr:user-nav/>
+                            <xh:li class="nav-item {if ($bs5) then 'px-3 d-flex align-items-center' else ''}">
+                                <fr:user-nav/>
                             </xh:li>
-                            <xh:li class="nav-item px-3 d-flex align-items-center">
+                            <xh:li class="nav-item {if ($bs5) then 'px-3 d-flex align-items-center' else ''}">
                             <xh:div>
                                 <xh:a href="/fr/">
                                     <xh:i class="fa fa-fw fa-th"/>
@@ -638,7 +638,7 @@
 
     <xsl:template match="fr:title" name="fr-title">
         <!-- Q: Why do we need @ref here? -->
-        <xh:h1 class="text-white-50 fs-3 mb-0"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
+        <xh:h1 class="{if ($bs5) then 'text-white-50 fs-3 mb-0' else ''}"><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
     </xsl:template>
 
     <!-- Description in chosen language or first one if not found -->
@@ -731,7 +731,7 @@
                 xxf:property('oxf.fr.authentication.user-menu.enable') and
                 not(fr:is-embedded())
             ]">
-            <xh:ul class="nav">
+            <xh:ul class="nav {if ($bs5) then '' else 'pull-right'}">
                 <xh:li class="dropdown">
                     <xh:a id="menu-button" href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <xh:i class="fa fa-user"/>

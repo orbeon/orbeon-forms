@@ -15,7 +15,7 @@ package org.orbeon.xforms
 
 import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
 import org.orbeon.xforms.facade.{Controls, Utils, XBL}
@@ -659,30 +659,28 @@ object XFormsUI {
           val selectedValues =
             select.options.filter(_.selected).map(_.value)
 
-          def generateItem(itemElement: ItemsetItem): JsDom.TypedTag[raw.HTMLElement] = {
+          def generateItem(itemElement: ItemsetItem): html.Element = {
 
             val classOpt = itemElement.attributes.toOption.flatMap(_.get("class"))
 
             itemElement.children.toOption match {
               case None =>
-                option(
-                  (value := itemElement.value)                              ::
-                  selectedValues.contains(itemElement.value).list(selected) :::
-                  classOpt.toList.map(`class` := _)
-                )(
-                  itemElement.label
-                )
+                dom.document.createElement("option").asInstanceOf[html.Option].kestrel { option =>
+                  option.value     = itemElement.value
+                  option.selected  = selectedValues.contains(itemElement.value)
+                  option.innerHTML = itemElement.label
+                  classOpt.foreach(option.className = _)
+                }
               case Some(children) =>
-                optgroup(
-                  (attr("label") := itemElement.label) :: classOpt.toList.map(`class` := _)
-                ) {
-                  children.map(generateItem): _*
+                dom.document.createElement("optgroup").asInstanceOf[html.OptGroup].kestrel { optgroup =>
+                  optgroup.label = itemElement.label
+                  classOpt.foreach(optgroup.className = _)
+                  optgroup.replaceChildren(children.toList.map(generateItem): _*)
                 }
             }
           }
 
-          // `replaceChildren()` is ok now that IE 11 support is no longer needed
-          select.replaceChildren(itemsetTree.toList.map(generateItem).map(_.render): _*)
+          select.replaceChildren(itemsetTree.toList.map(generateItem): _*)
 
         case _ =>
           // This should not happen but if it does we'd like to know about it without entirely stopping the

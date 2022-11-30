@@ -1470,7 +1470,7 @@
                 <local>Local</local>
                 <remote>Remoto</remote>
                 <form-identification>Identificación de Fomulario</form-identification>
-                <last>Modificado</last>
+                <modified>Modificado</modified>
                 <last-modified todo="true">Modificado</last-modified>
                 <reindexing-confirmation>Confirmar Reindexación</reindexing-confirmation>
                 <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>

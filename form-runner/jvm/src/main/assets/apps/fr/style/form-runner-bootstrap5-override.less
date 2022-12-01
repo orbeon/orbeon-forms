@@ -238,23 +238,8 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
     padding: 2px 6px;
   }
 
-  .fr-grid-tr .fr-grid-td {
-    .fr-grid-2-1 > textarea {
-      float: left;
-      margin-bottom: 0.2rem;
-      height: 75px;
-    }
-    .fr-grid-2-2 .fr-charcounter-wrapper .xforms-textarea > textarea {
-      height: 75px;
-    }
-    .fr-grid-3-1 > output {
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-      background-color: #f2f2f2;
-      cursor: not-allowed;
-      width: 100%;
-    }
+  .xbl-fr-grid .fr-grid .xforms-textarea textarea {
+    height: 75px;
   }
 
   // form controls > Selection Controls
@@ -273,10 +258,6 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   .xforms-select1-appearance-full input[type="checkbox"], .xforms-select-appearance-full input[type="checkbox"]{
       margin-top: -0.1rem;
     }
-
-  .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
-    padding: 0 4px 0 !important;
-  }
 
   // form controls > Image and File Attachments
   .xforms-update-full {

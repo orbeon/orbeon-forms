@@ -35,8 +35,8 @@ object FormRunnerFormulaDebugger {
 
     val explanation =
       DependencyAnalyzer.determineEvaluationOrder(
-        model   = model,
-        mip     = mip
+        model = model,
+        mip   = mip
       )._2()
 
     val instanceString = XPathAnalysis.buildInstanceString(Names.FormInstance)

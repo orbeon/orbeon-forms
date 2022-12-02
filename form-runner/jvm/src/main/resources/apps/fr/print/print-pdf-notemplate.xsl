@@ -72,7 +72,12 @@
                 }
             </style>
             <bookmarks>
-                <xsl:copy-of select="fr:bookmarks(/*)"/>
+
+                <xsl:variable name="processed-body-content">
+                    <xsl:apply-templates select="../*:body/*"/>
+                </xsl:variable>
+
+                <xsl:copy-of select="fr:bookmarks($processed-body-content)"/>
             </bookmarks>
         </head>
     </xsl:template>
@@ -87,11 +92,12 @@
     <!-- Produce nested `<bookmark>` elements for Open HTML to PDF, based on `h1`, `h2`… -->
     <xsl:function name="fr:bookmarks">
         <xsl:param name="element"/>
-        <xsl:variable name="header" select="$element/xh:*[matches(local-name(), 'h[0-9]')]"/>
+
+        <xsl:variable name="header" select="$element/*[matches(local-name(), 'h[1-9]')][exists(.//span[@class = 'btn-link'])]"/>
 
         <xsl:choose>
             <xsl:when test="exists($header)">
-                <xsl:variable name="button" select="$header//xh:button[@class = 'btn-link']"/>
+                <xsl:variable name="button" select="$header//span[@class = 'btn-link']"/>
                 <bookmark name="{$button}" href="#{$button/@id}">
                     <xsl:copy-of select="$element/*/fr:bookmarks(.)"/>
                 </bookmark>

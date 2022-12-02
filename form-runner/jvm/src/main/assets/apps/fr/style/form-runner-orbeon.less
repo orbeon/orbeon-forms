@@ -393,8 +393,12 @@ body.orbeon { background-color: @frBackground }
 @media print {
 
     html {
-        &, body.orbeon { background-color: white; background-image: none }
+        &, body.orbeon {
+            background-color: white;
+            background-image: none
+        }
         font-family: @baseFontFamily;
+
         body.orbeon { padding-top: 0 } // no need for padding because navbar is position: static
     }
 

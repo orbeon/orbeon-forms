@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import java.io.{File, OutputStream}
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.PageSizeUnits
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.io.IOUtils
@@ -28,13 +28,15 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
 import org.w3c.dom.Document
 
+import java.io.{File, OutputStream}
+import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
-import javax.xml.transform.{OutputKeys, TransformerException, TransformerFactory}
 import scala.util.Try
 import scala.util.control.NonFatal
 
-// XHTML to PDF converter using the Open HTML To PDF library.
+
+// XHTML to PDF converter using the Open HTML To PDF library
 private object XHTMLToPDFProcessor {
 
   val logger = LoggerFactory.createLogger(classOf[XHTMLToPDFProcessor])
@@ -46,8 +48,8 @@ private object XHTMLToPDFProcessor {
     val props = Properties.instance.getPropertySet
 
     for {
-      propName  <- props.propertiesStartsWith("oxf.fr.pdf.font.path") ++ props.propertiesStartsWith("oxf.fr.pdf.font.resource")
-      path      <- props.getNonBlankString(propName)
+      propName <- props.propertiesStartsWith("oxf.fr.pdf.font.path") ++ props.propertiesStartsWith("oxf.fr.pdf.font.resource")
+      path     <- props.getNonBlankString(propName)
       _ :: _ :: _ :: _ :: pathOrResource :: name :: Nil = propName.splitTo[List](".")
     } {
       try {
@@ -88,10 +90,9 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
     val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
     val pdfRendererBuilder = new PdfRendererBuilder()
-    XRLog.listRegisteredLoggers.forEach((logger) => XRLog.setLoggingEnabled(false)) // disbale logging
-    pdfRendererBuilder.useFastMode();
+    XRLog.listRegisteredLoggers.forEach(_ => XRLog.setLoggingEnabled(false)) // disable logging
+    pdfRendererBuilder.useDefaultPageSize(8.5f, 11f, PageSizeUnits.INCHES)
 
-//    pdfRendererBuilder.useSlowMode();
 //    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
 //    pdfRendererBuilder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_U)
 
@@ -100,17 +101,17 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
     // NOTE: Default compression level is 0.75:
     // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
     val jpegCompressionLevel =
-    Properties.instance.getPropertySet.getNonBlankString("oxf.fr.pdf.jpeg.compression") flatMap
-      (s => Try(java.lang.Float.parseFloat(s)).toOption) filter
-      (f => f >= 0f && f <= 1.0f) getOrElse
-      0.9f
+      Properties.instance.getPropertySet.getNonBlankString("oxf.fr.pdf.jpeg.compression") flatMap
+        (s => Try(java.lang.Float.parseFloat(s)).toOption) filter
+        (f => f >= 0f && f <= 1.0f) getOrElse
+        0.9f
 
     IOUtils.useAndClose(outputStream) { os =>
       pdfRendererBuilder.toStream(os)
       val document = readInputAsDOM(pipelineContext, input)
 
-      // used for debbugging. will remove later
-      val documentString = getStringFromDocument(document)
+      // used for debugging. will remove later
+//      val documentString = getStringFromDocument(document)
 
       pdfRendererBuilder.withW3cDocument(
         document,
@@ -121,7 +122,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
       try {
         // set user agent callback
-        val userAgent = new CustomUserAgent(jpegCompressionLevel, pdfBoxRenderer.getOutputDevice(), pipelineContext, pdfBoxRenderer.getSharedContext)
+        val userAgent = new CustomUserAgent(jpegCompressionLevel, pdfBoxRenderer.getOutputDevice, pipelineContext, pdfBoxRenderer.getSharedContext)
         userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
         pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
         pdfBoxRenderer.layout()

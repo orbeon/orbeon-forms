@@ -40,8 +40,7 @@ private object XHTMLToPDFProcessor {
   val logger = LoggerFactory.createLogger(classOf[XHTMLToPDFProcessor])
 
   var DefaultContentType  = ContentTypes.PdfContentType
-  val DefaultDotsPerPoint = 20f * 4f / 3f
-  val DefaultDotsPerPixel = 14
+  val DefaultDotsPerPixel = 14 // default is 20, and makes things larger
 
   def embedFontsConfiguredInProperties(pdfRendererBuilder: PdfRendererBuilder): Unit = {
     val props = Properties.instance.getPropertySet
@@ -118,6 +117,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
         requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
       )
       val pdfBoxRenderer = pdfRendererBuilder.buildPdfRenderer()
+      pdfBoxRenderer.getSharedContext.setDotsPerPixel(DefaultDotsPerPixel)
 
       try {
         // set user agent callback

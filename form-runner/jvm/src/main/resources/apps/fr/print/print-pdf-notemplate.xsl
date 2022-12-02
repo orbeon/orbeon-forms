@@ -77,6 +77,13 @@
         </head>
     </xsl:template>
 
+    <!-- Buttons in `h1`, etc. take space and we don't need them so replace them -->
+    <xsl:template match="*:button" mode="#all">
+        <span>
+            <xsl:apply-templates select="@* | node()"/>
+        </span>
+    </xsl:template>
+
     <!-- Produce nested `<bookmark>` elements for Open HTML to PDF, based on `h1`, `h2`… -->
     <xsl:function name="fr:bookmarks">
         <xsl:param name="element"/>

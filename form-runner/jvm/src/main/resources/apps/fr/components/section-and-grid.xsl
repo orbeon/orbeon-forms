@@ -106,7 +106,7 @@
             <xsl:attribute
                 name="markup"
                 select="
-                    if ($mode = ('pdf', 'tiff')) then
+                    if ($mode = ('pdf', 'tiff', 'test-pdf')) then
                         'html-table' (: CSS grids are not supported by the PDF renderer as of 2022-10-11 :)
                     else if (exists(@markup)) then
                         @markup      (: local attribute takes precedence :)

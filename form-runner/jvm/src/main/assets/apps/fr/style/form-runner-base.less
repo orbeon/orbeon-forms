@@ -12,6 +12,9 @@
 
 @import (reference) "form-runner-common";
 
+@pageTopAndBottomHeight: 26px;
+@pageTopAndBottomFontSize: @frFontSize * 1.1;
+
 .orbeon {
 
     // RTL languages
@@ -72,7 +75,7 @@
     // - visited controls
     // - `view`/`pdf` modes
     //
-    // NOTE: For Flying Saucer, avoid the use of `:not:empty` (see `:empty` rules above).
+    // NOTE: For Flying Saucer, avoid the use of `:not(:empty)` (see `:empty` rules above).
     .xforms-visited > .xforms-alert.xforms-active, // inline alert
     .xforms-visited.xforms-alert.xforms-active,    // external alert
     .fr-mode-view  .xforms-alert.xforms-active,    // `view` mode
@@ -412,6 +415,7 @@
 
     .navbar img {
         position: running(logo);
+        height: @pageTopAndBottomHeight; // 2022-12-02: needed so the image shows!
     }
 
     .fr-header-title {
@@ -426,9 +430,10 @@
 
     .fr-header-title, .fr-footer-title {
         div {
-            max-height: 26px;
+            max-height: @pageTopAndBottomHeight;
             overflow: hidden;
-            text-overflow: ellipsis // not supported by Flying Saucer yet but would be nice
+            text-overflow: ellipsis; // not supported by Flying Saucer yet but would be nice (confirmed 2022-12-02)
+            font-size: @pageTopAndBottomFontSize;
         }
     }
 
@@ -470,7 +475,7 @@
         content: element(header-title);
         border-bottom: 1px solid gray;
         padding-bottom: 10px;
-        vertical-align: bottom;
+        vertical-align: bottom; // 2022-12-02: confirmed necessary here
         width: 100%;
     }
 
@@ -488,7 +493,7 @@
         vertical-align: top;
         font-size: 14px;
         padding-right: 10px;
-        line-height: 26px;
+        line-height: @pageTopAndBottomHeight;
     }
     @bottom-center {
         content: counter(page) " / " counter(pages);
@@ -496,9 +501,9 @@
         padding-top: 10px;
         margin-top: 0;
         vertical-align: top;
-        font-size: 14px;
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        line-height: 26px;
+        font-size: @pageTopAndBottomFontSize;
+        line-height: @pageTopAndBottomHeight;
         white-space: nowrap;
     }
 

@@ -6,7 +6,8 @@
   background-color: #eee;
 }
 
-input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-control.xforms-select1.xforms-incremental > select {
+input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-control.xforms-select1.xforms-incremental > select,
+.xforms-control.xforms-readonly.xforms-static .xforms-field, .xforms-control.xforms-readonly.xforms-static pre{
   height: 28px;
 }
 
@@ -86,12 +87,6 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   background-color: #F3F3F3;
   color: #0d6efd;
   text-decoration: underline;
-}
-
-// form controls > Buttons
-.fr-grid-body .fr-grid-1-2 .btn-link {
-  border: 1px solid transparent;
-  background-color: white;
 }
 
 // home button
@@ -471,7 +466,8 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   }
 
   // controls review page 
-  .xforms-field, .xforms-textarea pre, .fr-grid-1-1 .xforms-output.xforms-static {
+  .xforms-field, .xforms-textarea pre, 
+  .xbl-component.xbl-fr-tinymce .xforms-control.xforms-output.xforms-static {
     border: 1px solid #ccc;
     border-radius: 4px;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -486,6 +482,13 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   .xforms-input-appearance-character-counter.xbl-fr-character-counter.xforms-readonly.fr-grid-1-2, .xforms-textarea-appearance-character-counter.xbl-fr-character-counter.xforms-readonly.fr-grid-2-2 {
     .xforms-label {
       margin-bottom: 2px;
+    }
+  }
+
+  // contact review page
+  .fr-grid-td.xforms-group {
+    .xbl-component.xbl-fr-us-phone .xforms-label , .xbl-component.xbl-fr-dropdown-select1 .xforms-label {
+      margin-top: -2px;
     }
   }
 }

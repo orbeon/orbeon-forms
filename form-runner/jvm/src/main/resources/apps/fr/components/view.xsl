@@ -508,14 +508,13 @@
                     </xh:button>
                     <xh:div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <xh:ul class="navbar-nav {if ($bs5) then 'ms-auto mt-2 mt-lg-0' else 'me-auto mb-2 mb-lg-0'}">
-                            <!-- These are typically to the right -->
-                            <xh:li class="nav-item px-3">
+                            <xh:li class="nav-item px-0 ps-lg-3 py-1 py-lg-1">
                                 <fr:language-selector appearance="bootstrap5"/>
                             </xh:li>
                             <xh:li>
                                 <fr:status-icons/>
                             </xh:li>
-                            <xh:li class="nav-item {if ($bs5) then 'px-3 d-flex align-items-center' else ''}">
+                            <xh:li class="nav-item {if ($bs5) then 'px-0 ps-lg-3 py-1 py-lg-1 d-flex align-items-center' else ''}">
                                 <fr:user-nav/>
                             </xh:li>
 <!--                            <xh:li class="nav-item {if ($bs5) then 'px-3 d-flex align-items-center' else ''}">-->

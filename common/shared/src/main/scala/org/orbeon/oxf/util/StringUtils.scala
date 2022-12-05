@@ -50,7 +50,7 @@ object StringUtils {
   def trimAllToOpt  (s: String): Option[String] = s.trimAllToOpt
   def isAllBlank    (s: String): Boolean        = s.isAllBlank
 
-  implicit class StringOps(private val s: String) extends AnyVal {
+  implicit class OrbeonStringOps(private val s: String) extends AnyVal {
 
     /*
      * Rewrite in Scala of Apache StringUtils.splitWorker (http://www.apache.org/licenses/LICENSE-2.0).

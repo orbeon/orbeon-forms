@@ -2,7 +2,7 @@ package org.orbeon.oxf.fr.permission
 
 import io.circe._
 import io.circe.parser._
-import org.orbeon.oxf.util.StringUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 
 import scala.util.{Success, Try}
 

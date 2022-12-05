@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.oxf.util.StringUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._

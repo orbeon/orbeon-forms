@@ -5,7 +5,7 @@ import cats.syntax.option._
 import enumeratum.EnumEntry.Hyphencase
 import enumeratum.{Enum, EnumEntry}
 import org.orbeon.oxf.util.ContentTypes
-import org.orbeon.oxf.util.StringUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 
 
 trait ProcessParams {

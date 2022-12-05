@@ -9,7 +9,7 @@ import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.oxf.http.BasicCredentials
 import org.orbeon.oxf.properties.PropertySet.PropertyParams
-import org.orbeon.oxf.util.StringUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, LoggerFactory, StaticXPath}
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.analysis.controls._

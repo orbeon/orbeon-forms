@@ -13,7 +13,7 @@
   */
 package org.orbeon.xforms
 
-import org.orbeon.oxf.util.StringUtils.StringOps
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.xforms.facade.XBLCompanion
 import org.orbeon.xforms.rpc.ConfigurationProperties
 import org.scalajs.dom

@@ -77,9 +77,11 @@ private class DateCompanion extends XBLCompanionWithState {
   }
 
   override def destroy(): Unit = {
-
     logger.debug("destroy")
+    destroyImpl()
+  }
 
+  private def destroyImpl(): Unit =
     if (iOS) {
       EventSupport.clearAllListeners()
     } else {
@@ -87,7 +89,6 @@ private class DateCompanion extends XBLCompanionWithState {
       EventSupport.clearAllListeners()
       datePicker.destroy()
     }
-  }
 
   def xformsUpdateState(previousStateOpt: Option[State], newState: State): Unit = {
 
@@ -100,7 +101,8 @@ private class DateCompanion extends XBLCompanionWithState {
         inputJQueryEl.prop("value", newValue)
     } else {
       if (! previousStateOpt.contains(newState)) {
-        destroy()
+        // Don't call `destroy()` directly because that causes the re-initialization of the companion in `xforms.js`!
+        destroyImpl()
         createDatePicker(dateExternalValue = newState.some)
       }
     }

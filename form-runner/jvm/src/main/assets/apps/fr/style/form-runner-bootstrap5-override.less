@@ -238,6 +238,7 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   }
 
   // form controls > Selection Controls
+  // .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected
   .xforms-select-appearance-full, .xforms-select1-appearance-full {
     input {
       vertical-align: middle;
@@ -482,6 +483,13 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   .xforms-input-appearance-character-counter.xbl-fr-character-counter.xforms-readonly.fr-grid-1-2, .xforms-textarea-appearance-character-counter.xbl-fr-character-counter.xforms-readonly.fr-grid-2-2 {
     .xforms-label {
       margin-bottom: 2px;
+    }
+  }
+
+  // review page: checks and radios
+  .fr-mode-view .xforms-select-appearance-full.xforms-static, .fr-mode-view .xforms-items.xforms-help-popover-control {
+    .xforms-selected .checkbox > span, .xforms-selected .radio > span, .xforms-deselected .checkbox > span, .xforms-deselected .radio > span {
+      padding-left: 1rem;
     }
   }
 

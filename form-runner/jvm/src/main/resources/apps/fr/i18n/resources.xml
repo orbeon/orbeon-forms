@@ -337,7 +337,8 @@
             <titles>
                 <published-forms>Published Forms</published-forms>
                 <form-builder-forms>Form Builder Forms</form-builder-forms>
-                <new-form-builder-form>New Form Builder Form</new-form-builder-form>
+                <form-builder-new>New Form Builder Form</form-builder-new>
+                <form-builder-summary>Form Builder Forms</form-builder-summary>
                 <demo-forms>Demo Forms</demo-forms>
                 <quick-links>Quick Links</quick-links>
                 <form-runner-admin>Forms Administration</form-runner-admin>
@@ -881,7 +882,8 @@
             <titles>
                 <published-forms>Formulaires publiés</published-forms>
                 <form-builder-forms>Formulaires de Form Builder</form-builder-forms>
-                <new-form-builder-form>Nouveau formulaire Form Builder</new-form-builder-form>
+                <form-builder-new>Nouveau formulaire Form Builder</form-builder-new>
+                <form-builder-summary>Formulaires Form Builder</form-builder-summary>
                 <demo-forms>Formulaires de démonstration</demo-forms>
                 <quick-links>Raccourcis</quick-links>
                 <form-runner-admin>Fonctions d'administration</form-runner-admin>
@@ -1411,7 +1413,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>
@@ -1939,7 +1942,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>
@@ -2466,7 +2470,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>
@@ -3006,7 +3011,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>
@@ -3546,7 +3552,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>
@@ -4086,7 +4093,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>
@@ -4626,7 +4634,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>
@@ -5165,7 +5174,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>
@@ -5704,7 +5714,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>
@@ -6231,7 +6242,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>
@@ -6770,7 +6782,8 @@
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
-                <new-form-builder-form todo="true">New Form Builder Form</new-form-builder-form>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
                 <demo-forms todo="true">Demo Forms</demo-forms>
                 <quick-links todo="true">Quick Links</quick-links>
                 <form-runner-admin todo="true">Forms Administration</form-runner-admin>

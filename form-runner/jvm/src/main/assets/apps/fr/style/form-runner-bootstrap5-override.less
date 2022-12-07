@@ -238,7 +238,6 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   }
 
   // form controls > Selection Controls
-  // .fr-mode-view .xforms-select-appearance-full.xforms-static .xforms-selected
   .xforms-select-appearance-full, .xforms-select1-appearance-full {
     input {
       vertical-align: middle;
@@ -267,185 +266,53 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
     }
   }
 
-  // table: bookshelf
-  #notes-section≡note-grid {
-    table {
-      border-spacing: 0;
-      border-collapse: inherit !important;
-    }
-  
-    .fr-grid-head .fr-grid-master-row {
-      #notes-section≡note-grid≡xf-848 {
+  // table
+  .xbl-fr-grid-multiple table {
+    border-spacing: 0;
+    border-collapse: inherit;
+
+    tr {
+      th, td {
         border-top: 1px solid #ddd;
-        border-bottom: 0;
+      }
+
+      td {
+        border-bottom: 1px solid #ddd;
+      }
+  
+      th:first-child {
         border-top-left-radius: 4px;
       }
-      .fr-grid-th {
-        border-top: 1px solid #ddd;
-        border-top-right-radius: 4px;
-        border-left: 0;
-        border-bottom: unset !important;
-      }
-    }
-
-    #notes-section≡note-grid≡xf-891⊙1 {
-      border-left: 0;
-    }
   
-    .fr-grid-repeat-iteration .fr-grid-tr {
-      #notes-section≡note-grid≡xf-888⊙1 {
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
+      td:first-child {
         border-bottom-left-radius: 4px;
       }
-      .fr-grid-td {
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
+  
+      th:not(:first-child), td:not(:first-child) {
+        border-left: 0;
+      }
+      
+      th:last-child {
+        border-top-right-radius: 4px;
+      }
+      
+      td:last-child {
         border-bottom-right-radius: 4px;
       }
-      textarea {
-        resize: horizontal;
-        height: 68px;
-        margin-bottom: -6px;
-      }
-    }
-  }
-
-  // table: dmv-14
-  #fr-view-component≡vehicles-section≡vehicle-repeat {
-    table {
-      border-spacing: 0;
-      border-collapse: inherit !important;
     }
 
-    // first column
-    #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1378 {
-      border-left: 1px solid #ddd;
-      border-top: 1px solid #ddd;
-      border-top-left-radius: 4px;
+    // bookshelf
+    textarea {
+      margin-bottom: -6px;
     }
 
-    #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1425⊙1 {
-      border-top: 1px solid #ddd;
-      border-bottom: 1px solid #ddd;
-      border-bottom-left-radius: 4px;
+    // dmv-14
+    .btn-mini.fr-grid-dropdown-button {
+      font-size: 13px;
+      padding: 0 6px;
+      border-radius: 3px;
     }
 
-    // second & third & forth column
-    table thead tr th {
-      border-top: 1px solid #ddd;
-      border-left: 0;
-    }
-
-    #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1428⊙1, #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1431⊙1,
-    #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1434⊙1, #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1436⊙1 {
-      border-bottom: 1px solid #ddd;
-      border-top: 1px solid #ddd;
-      border-left: 0;
-    }
-
-    .fr-grid-head tr th:last-child {
-      border-top-right-radius: 4px;
-    }
-
-    #fr-view-component≡vehicles-section≡vehicle-repeat≡xf-1436⊙1 {
-      border-bottom-right-radius: 4px;
-    }
-  }
-
-  #notes-section≡note-grid≡xf-855 {
-    font-weight: normal;
-  }
-
-  .btn-mini.fr-grid-dropdown-button {
-    font-size: 13px;
-    padding: 0 6px;
-    border-radius: 3px;
-  }
-
-  // table: travel
-  #fr-view-component≡master-section-section≡master-grid-grid {
-    table {
-      border-spacing: 0;
-      border-collapse: inherit;
-    }
-
-    // first two column
-    .fr-grid-head .fr-grid-master-row {
-      .fr-repeat-column-number, .fr-repeat-column-left {
-        border-top: 1px solid #ddd;
-        border-right: 1px solid #ddd;
-        border-bottom: 0;
-      }
-      .fr-repeat-column-number {
-        border-top-left-radius: 4px;
-      }
-    }
-
-    #fr-view-component≡master-section-section≡master-grid-grid≡xf-1042⊙1 {
-      .fr-repeat-column-number, .fr-repeat-column-left {
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-      }
-
-      .fr-repeat-column-number {
-        border-bottom-left-radius: 4px;
-      }
-      .fr-grid-tr .fr-grid-td {
-        border-left: 0;
-  
-      }
-    }
-
-    #fr-view-component≡master-section-section≡master-grid-grid≡xf-1025 {
-      border-top-left-radius: 0 !important;
-      border-bottom: unset;
-      border-left: 0;
-      border-right: 1px solid #ddd;
-    }
-  
-    #fr-view-component≡master-section-section≡master-grid-grid≡xf-1069⊙1 {
-      border-bottom-left-radius: 0 !important;
-      border-left: 0;
-    }
-  
-    #fr-view-component≡master-section-section≡master-grid-grid≡xf-1072⊙1 {
-      border-bottom-right-radius: 0;
-      border-left: 0;
-      border-top: 1px solid #ddd;
-      border-bottom: 1px solid #ddd;
-    }
-  
-    // full name
-    table thead tr th[colspan="3"] {
-      border-top: 1px solid #ddd;
-      border-top-right-radius: 0 !important;
-      border-bottom: unset !important;
-    }
-  
-    // birth date
-    .fr-grid-head {
-      .fr-grid-master-row .fr-grid-th {
-        border-top: 1px solid #ddd;
-        border-top-right-radius: 4px;
-        border-left: 0;
-      }
-    }
-  
-    // month-day-year
-    #fr-view-component≡master-section-section≡master-grid-grid≡xf-1075⊙1 {
-      border-bottom-right-radius: 4px;
-      border-left: 0;
-      border-top: 1px solid #ddd;
-      border-bottom: 1px solid #ddd;
-    }
-  
-    // date picker
-    #fr-view-component≡master-section-section≡master-grid-grid≡traveler-birth-date-control≡input⊙1 {
-      border-radius: 0 !important;
-      border-top-left-radius: 4px !important;
-      border-bottom-left-radius: 4px !important;
-    }
   }
   
   // pills: text-overflow
@@ -454,12 +321,8 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   }
 
   // admin or home page
-  .orbeon .fr-forms-table tbody tr:nth-child(4n+3) > td {
+  .fr-forms-table tbody tr:nth-child(4n+3) > td {
     border: 1px solid #ddd;
-  }
-
-  table {
-    border-collapse: collapse;
   }
 
   .table > :not(:first-child) {

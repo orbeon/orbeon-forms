@@ -254,6 +254,11 @@ div.orbeon.orbeon-portlet-div {
         }
     }
 
+    // Highlight the grid cell when dragging over
+    .fb-main .fr-grid-td:has(.gu-transit) {
+        background-color: #ccc;
+    }
+
     // Use copy or move cursor during D&D
     .gu-mirror.fb-dnd-copy { cursor: copy; cursor: -webkit-copy }
     .gu-mirror.fb-dnd-move { cursor: move; cursor: -webkit-move }
@@ -287,6 +292,18 @@ div.orbeon.orbeon-portlet-div {
         position: absolute;
         background-color: #ccc;
         z-index: 1;                                                         // For shadow to be above controls
+    }
+
+    // D&D from the toolbox
+    .fb-main .fr-grid-td .gu-transit.fb-tool {
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        padding-top: 1.5em;
+    }
+
+    .fb-toolbox .fb-tool .fb-add-control button {
+        cursor: grab;
     }
 
     // ***** Toolbox ***************************************************************************************************

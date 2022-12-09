@@ -102,11 +102,10 @@ private object ControlDnD {
           handle.parentElement.classList.contains("fb-add-control")
 
         // Can only drop into an empty cell
-        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) = {
+        override def accepts(el: html.Element, target: html.Element, source: html.Element, sibling: html.Element) =
           $(target)
             .find("> :not(.gu-mirror, .gu-transit, .fb-control-editor-left)")
             .length == 0
-        }
 
         override def copy(el: html.Element, source: html.Element) = {
           $(el).addClass(CopyClass)

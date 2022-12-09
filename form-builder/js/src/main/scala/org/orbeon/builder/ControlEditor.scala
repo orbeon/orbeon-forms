@@ -86,29 +86,38 @@ object ControlEditor {
       ))
     }
 
-    val controlElOpt = {
-      // Make sure we don't take control editors as the control
-      val cellContent = cell.el.children().get.filter(! controlEditors.contains(_))
-      (cellContent.length > 0).option($(cellContent(0)))
-    }
+    val controlElemWithNames =
+      for {
+        elem <- cell.el.children().get
+        if ! controlEditors.contains(elem)
+        if ! elem.classList.contains("gu-transit")
+        if elem.hasAttribute("id")
+        name <- ControlOps.controlNameFromIdOpt(elem.id)
+      } yield
+        elem -> name
+
+    val firstControlElemWithNameOpt = controlElemWithNames.headOption
 
     // Control editor is only show when the cell isn't empty
-    controlElOpt.foreach { controlEl =>
+    firstControlElemWithNameOpt.foreach { case (controlEl, controlName) =>
+
+      val jControlEl = $(controlEl)
 
       // Right editor
-      controlEl.append(controlEditorRight)
+      jControlEl.append(controlEditorRight)
       positionEditor(controlEditorRight, cell.width - controlEditorRight.outerWidth())
+
       // Show/hide itemset icon
       val itemsetIcon = controlEditorRight.find(".fb-control-edit-items")
-      itemsetIcon.toggleClass("xforms-disabled", ! controlEl.is(".fb-itemset"))
+      itemsetIcon.toggleClass("xforms-disabled", ! controlEl.classList.contains("fb-itemset"))
 
       // Top editor
-      controlEl.append(controlEditorTop)
+      jControlEl.append(controlEditorTop)
       positionTopEditor(controlEditorTop, 0)
-      val controlName = ControlOps.controlNameFromIdOpt(controlEl.attr("id").get).get
+
       controlEditorTop.children().get(0).textContent = controlName
     }
-    controlElOpt.getOrElse(cell.el).append(controlEditorLeft)
+    firstControlElemWithNameOpt.map(e => $(e._1)).getOrElse(cell.el).append(controlEditorLeft)
     positionEditor(controlEditorLeft, 0)
 
     // Enable/disable split/merge icons

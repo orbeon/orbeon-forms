@@ -71,6 +71,22 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   background-color: transparent;
 }
 
+// Test button
+.fr-buttons .xforms-trigger-appearance-xxforms-default.xbl-fr-drop-trigger .btn-group {
+  & > button {
+    color: #000;
+    background-color: #f8f9fa;
+  }
+
+  & > button:first-child {
+    border-right-color: #ccc;
+  }
+  
+  .dropdown-toggle {
+    border-left-color: #ccc;
+  }
+}
+
 // form builder's demo forms page
 .fr-summary-selection {
   .dropdown-toggle {
@@ -102,7 +118,7 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   border-color: #f8f9fa;
 }
 
-.xforms-trigger-appearance-full, .fr-attachment, .fr-repeat-column-left {
+.xforms-trigger-appearance-full, .fr-attachment, .fr-repeat-column-left, .fr-buttons .xforms-trigger-appearance-xxforms-default.xbl-fr-drop-trigger .btn-group {
   .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
     background-color: #e6e6e6;
     border-color: #0a58ca;

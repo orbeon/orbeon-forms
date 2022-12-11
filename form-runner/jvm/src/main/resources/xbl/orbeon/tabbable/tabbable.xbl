@@ -100,11 +100,12 @@
                                                 else
                                                     'active'[$pos = 1],
                                                 '{''xforms-hidden''[not($visible)]}'[$tab/@visible],
+                                                'nav-item',
                                                 'xforms-dnd-item',
                                                 'xforms-dnd-moves'[$reorder]
                                             }">
                                             <!-- Transform *:label into xf:output -->
-                                            <xh:a data-toggle="tabbable">
+                                            <xh:a data-toggle="tabbable" class="nav-link">
                                                 <xsl:choose>
                                                     <!-- Static label, just copy content -->
                                                     <xsl:when test="empty($label/(@ref | @bind | @value))">

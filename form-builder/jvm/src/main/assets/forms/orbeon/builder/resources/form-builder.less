@@ -1077,43 +1077,13 @@ div.orbeon.orbeon-portlet-div {
         }
     }
 
-    .xxforms-dialog-body.bd {
-        background-color: #fafafa;
-    }
-
-    .xxforms-set-height {                           // Dialogs for which we want the main area to take remaining height
-        .xxforms-dialog-body {
-            position: relative;                     // So the source editor and buttons can be absolutely positioned relative to the dialog body
-            overflow: inherit;                      // Override the overflow: auto in xforms.css to avoid a second scrollbar on the body on Firefox
-            @buttonsAreaHeight: @fbGridRowMinHeight;
-            .fb-dialog-remaining-height {           // Contains the CodeMirror editor
-                position: absolute;                 // Take all the vertical space, leaving just @buttonsAreaHeight at the bottom for the buttons
-                top: 0; left: 0; right: 0;
-                bottom: @buttonsAreaHeight;
-                .xbl-fr-code-mirror {
-                    position: absolute;
-                    top: 0; bottom: 0;              // top: 0 can be overridden in dialogs where there is something above the main box
-                    left: 0; right: 0;
-                }
-            }
-            .fr-dialog-buttons {
-                height: @buttonsAreaHeight;         // Fixed height
-                position: absolute;                 // Absolutely positioned
-                bottom: 0; left: 0; right: 0;       // At the bottom of the dialog body
-                line-height: @buttonsAreaHeight;
-                padding: 0 20px 0 0; margin: 0;     // Overrides default for .fr-dialog-buttons
-                box-sizing: border-box;            // So top margin gets include in height
-            }
-        }
-    }
-
     // Test dialog
     .fb-test-dialog {
         width: 90vw;                                // Try to be very wide
         max-width: none;
         .xxforms-dialog-body {
             .fb-dialog-remaining-height {
-                overflow: hidden !important;        // Override scroll above, to avoid 1px scroll (not why this is necessary, or how else to avoid this)
+                height: 100%;
             }
             .fb-test-iframe {
                 height: 100%; width: 100%;          // Use all the space available in container (.fb-dialog-remaining-height)
@@ -1245,7 +1215,6 @@ div.orbeon.orbeon-portlet-div {
         .fr-grid-td {
             &:hover:not(.fb-selected) {                                                 // Grey background on hover on non-selected cell, to indicate it can be selected
                 background-color: #eee;
-                border-radius: @baseBorderRadius;
             }
         }
 

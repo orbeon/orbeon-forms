@@ -87,7 +87,7 @@
 
                 <xf:label ref="$resources/dialog-edit-source/label"/>
 
-                <xh:div class="fb-dialog-remaining-height">
+                <xh:div>
                     <fr:code-mirror ref="source">
                         <xf:alert ref="$resources/dialog-edit-source/source/alert"/>
                     </fr:code-mirror>

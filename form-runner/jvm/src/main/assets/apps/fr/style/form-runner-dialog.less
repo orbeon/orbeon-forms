@@ -1,0 +1,113 @@
+@import (reference) "form-runner-common";
+
+@buttonsAreaHeight: 64px;
+@dialogBackgroundColor: white;
+@dialogTitleBackgroundColor: #fafafa;
+@dialogBorderRadius: 8px;
+
+.yui-panel-container.yui-dialog {
+    width: 100%;
+    height: 100%;
+}
+
+.orbeon {
+    .xforms-dialog {
+
+        // Keep the dialog fairly narrow to increase legibility, but allow it to be narrower on phones
+        max-width: 500px;
+        border: none;
+
+        .bd p {
+            margin: .5em 0 .5em 0
+        }
+
+        .fr-dialog-icon {
+            float: left;
+            font-size: 50px;
+            color: #B94A48; // @error
+            padding-right: 10px;
+            padding-bottom: 10px;
+        }
+
+        .fr-dialog-buttons {
+            text-align: right;
+            padding: 10px 5px 0 5px; // dialog bd already has padding so no padding-bottom
+            margin-top: 5px; // so that content above doesn't touch us
+            border-top: 2px solid @frBorderColor;
+            clear: both
+        }
+
+        .xxforms-dialog-head.hd {
+            background-image: none; // override YUI default
+            background-color: @dialogTitleBackgroundColor;
+            border-top-left-radius: @dialogBorderRadius;
+            border-top-right-radius: @dialogBorderRadius;
+            margin: 0 -1px;
+            border: none;
+            font-size: .9rem; // 2022-12-11: larger font size for dialog title looks better
+            line-height: 2rem;
+        }
+
+        .xxforms-dialog-body.bd {
+            background-color: @dialogBackgroundColor;
+            border-bottom-left-radius: @dialogBorderRadius;
+            border-bottom-right-radius: @dialogBorderRadius;
+            margin: 0 -1px;
+            border: none;
+        }
+
+        // Try automatic centering of the dialog, but this disables the ability to move the dialog by dragging it.
+        //&.xxforms-dialog-auto {
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 2rem;
+        //}
+
+        // Override YUI default using Boostrap 5 styles
+        .container-close {
+            background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+            opacity: .5;
+            width: 1rem;
+            height: 1rem;
+            padding: 0.5rem 0.5rem;
+            margin: -0.5rem -0.5rem -0.5rem auto;
+            top: .5rem;
+        }
+
+        // Dialogs for which we want the main area to take remaining height
+        &.xxforms-set-height {
+
+            &.xforms-dialog-visible-true {
+                display: flex;
+            }
+            flex-direction: column;
+            align-items: normal;
+            min-height: 0; // so that `height` below wins
+            height: ~"calc(100% - 6rem)"; // don't let less calculate this
+
+            .xxforms-dialog-body {
+                padding: 0;
+                height: 100%;
+
+                padding-bottom: @buttonsAreaHeight;
+
+                .fr-dialog-buttons {
+                    height: @buttonsAreaHeight; // Fixed height
+                    padding-bottom: @buttonsAreaHeight;
+                    border-bottom-left-radius: @dialogBorderRadius;
+                    border-bottom-right-radius: @dialogBorderRadius;
+                    padding-top: 0;
+                    padding-right: 20px;
+                    padding-left: 20px;
+                    position: absolute; // Absolutely positioned
+                    bottom: 0;
+                    left: 0;
+                    right: 0; // At the bottom of the dialog body
+                    line-height: @buttonsAreaHeight;
+                    box-sizing: border-box; // So top margin gets include in height
+                    background-color: @dialogBackgroundColor;
+                }
+            }
+        }
+    }
+}

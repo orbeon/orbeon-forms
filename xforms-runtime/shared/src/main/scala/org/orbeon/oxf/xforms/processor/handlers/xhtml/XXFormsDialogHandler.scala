@@ -64,8 +64,11 @@ class XXFormsDialogHandler(
     classes.append(level)
     classes.append(" xforms-dialog-close-")
     classes.append(!("false" == attributes.getValue("close")))
-    classes.append(" xforms-dialog-draggable-")
-    classes.append(!("false" == attributes.getValue("draggable")))
+    // 2022-12-11: For now disable drag and drop of dialog
+    // https://github.com/orbeon/orbeon-forms/issues/5283
+//    classes.append(" xforms-dialog-draggable-")
+//    classes.append(!("false" == attributes.getValue("draggable")))
+    classes.append(" xforms-dialog-draggable-false")
     classes.append(" xforms-dialog-visible-")
     classes.append("true" == attributes.getValue("visible"))
 

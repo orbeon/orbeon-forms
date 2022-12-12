@@ -1354,7 +1354,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
             if (ORBEON.xforms.Globals.currentFocusControlId != null) {
                 var focusedElement = document.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
-                if (focusedElement != null) focusedElement.blur();
+                if (focusedElement != null)
+                    focusedElement.blur();
             }
 
             // Adjust classes on dialog
@@ -1374,10 +1375,13 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             YAHOO.util.Dom.addClass(yuiDialog.innerElement, "yui-module");
             YAHOO.util.Dom.addClass(yuiDialog.innerElement, "yui-overlay");
             YAHOO.util.Dom.addClass(yuiDialog.innerElement, "yui-panel");
+
             // Fixes cursor Firefox issue; more on this in dialog init code
             yuiDialog.element.style.display = "block";
+
             // Show the dialog
             yuiDialog.show();
+
             // Make sure that this dialog is on top of everything else
             yuiDialog.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
 
@@ -1386,7 +1390,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // Center dialog in page after the whole Ajax request has been processed,
                 // giving a chance to the content of the dialog to show itself
                 ORBEON.xforms.AjaxClient.currentAjaxResponseProcessedOrImmediatelyP().then(
-                    function() { yuiDialog.center(); }
+                    // https://github.com/orbeon/orbeon-forms/issues/4475
+                    function() {}
                 );
             } else {
                 // Align dialog relative to neighbor
@@ -2138,18 +2143,18 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
          * Event listener on dialogs called by YUI when the dialog is shown.
          */
         dialogShow: function (type, args, me) {
-            var dialogId = me;
-
-            // Set a max-height on the dialog body, so the dialog doesn't get larger than the viewport
-            var yuiDialog = ORBEON.xforms.Globals.dialogs[dialogId];
-            var maxHeight =
-                    YAHOO.util.Dom.getViewportHeight()
-                    - (yuiDialog.element.clientHeight - yuiDialog.body.clientHeight)
-                        // Don't use the whole height of the viewport, leaving some space at the top of the page,
-                        // which could be used by a navigation bar, as in Liferay
-                    - 80;
-            var property = $(yuiDialog.innerElement).is('.xxforms-set-height') ? 'height' : 'max-height';
-            $(yuiDialog.body).css(property, maxHeight + 'px');
+            // var dialogId = me;
+            //
+            // // Set a max-height on the dialog body, so the dialog doesn't get larger than the viewport
+            // var yuiDialog = ORBEON.xforms.Globals.dialogs[dialogId];
+            // var maxHeight =
+            //         YAHOO.util.Dom.getViewportHeight()
+            //         - (yuiDialog.element.clientHeight - yuiDialog.body.clientHeight)
+            //             // Don't use the whole height of the viewport, leaving some space at the top of the page,
+            //             // which could be used by a navigation bar, as in Liferay
+            //         - 80;
+            // var property = $(yuiDialog.innerElement).is('.xxforms-set-height') ? 'height' : 'max-height';
+            // $(yuiDialog.body).css(property, maxHeight + 'px');
         },
 
         /**

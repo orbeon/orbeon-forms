@@ -1340,13 +1340,13 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (ORBEON.xforms.Controls._delayingUntilLoad(_.partial(showDialog, controlId, neighbor)))
                 return;
 
-            var divElement = document.getElementById(controlId);
+            var dialogUiElem = document.getElementById(controlId);
             var initializedDialog = function() { return ORBEON.xforms.Globals.dialogs[controlId]; }
             var yuiDialog = initializedDialog();
 
             // Initialize dialog now, if it hasn't been done already
             if (! _.isObject(yuiDialog)) {
-                ORBEON.xforms.Init._dialog(divElement);
+                ORBEON.xforms.Init._dialog(dialogUiElem);
                 yuiDialog = initializedDialog();
             }
 
@@ -1359,12 +1359,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
 
             // Adjust classes on dialog
-            divElement.classList.remove("xforms-dialog-visible-false")
-            divElement.classList.add("xforms-dialog-visible-true")
+            dialogUiElem.classList.remove("xforms-dialog-visible-false")
+            dialogUiElem.classList.add("xforms-dialog-visible-true")
 
             // Render the dialog if needed
-            if ($(divElement).is('.xforms-initially-hidden')) {
-                YAHOO.util.Dom.removeClass(divElement, "xforms-initially-hidden");
+            if ($(dialogUiElem).is('.xforms-initially-hidden')) {
+                YAHOO.util.Dom.removeClass(dialogUiElem, "xforms-initially-hidden");
                 yuiDialog.render();
             }
 

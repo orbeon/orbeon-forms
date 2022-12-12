@@ -323,8 +323,9 @@ object XFormsUI {
         yuiDialog.element.style.display = "none"
 
         // Adjust classes on dialog
-        controlElem.classList.remove("xforms-dialog-visible-true")
-        controlElem.classList.add("xforms-dialog-visible-false")
+        val dialogUiElem = dom.document.getElementById(id)
+        dialogUiElem.classList.remove("xforms-dialog-visible-true")
+        dialogUiElem.classList.add("xforms-dialog-visible-false")
       }
   }
 

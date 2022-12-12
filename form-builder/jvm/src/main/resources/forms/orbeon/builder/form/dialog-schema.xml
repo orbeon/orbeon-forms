@@ -83,11 +83,20 @@
                     </xf:trigger>
 
                     <!-- Upload a schema -->
-                    <xf:upload ref="$instance/schema-uri">
-                        <xf:label value="$form-resources/dialog-upload-schema/(if ($is-new-schema) then change-schema else if ($is-existing-schema) then replace-schema else upload-schema)/label"/>
-                        <xf:filename ref="@filename"/>
+                    <fr:attachment ref="$instance/schema-uri">
+                        <xf:label
+                            value="
+                                $form-resources/dialog-upload-schema/
+                                    (if ($is-new-schema) then
+                                        change-schema
+                                    else if ($is-existing-schema) then
+                                        replace-schema
+                                    else
+                                        upload-schema)/label"/>
+
+                        <xf:filename  ref="@filename"/>
                         <xf:mediatype ref="@mediatype"/>
-                        <xxf:size ref="@size"/>
+                        <xxf:size     ref="@size"/>
 
                         <!-- Handle a successful submission -->
                         <xf:action ev:event="xxforms-upload-done" context="$instance">
@@ -121,7 +130,7 @@
                             <xf:setvalue ref="$instance/schema-uri"/>
                             <xf:delete ref="$instance/schema/*"/>
                         </xf:action>
-                    </xf:upload>
+                    </fr:attachment>
                 </xh:div>
             </xf:group>
 

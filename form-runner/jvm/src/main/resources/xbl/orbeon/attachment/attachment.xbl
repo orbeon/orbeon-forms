@@ -489,6 +489,15 @@
                             <xf:property name="message"    value="event('message')"/>
                         </xf:dispatch>
 
+                        <xf:dispatch
+                            event="xforms-deselect"
+                            propagate="stop"
+                            defaultAction="cancel"
+
+                            targetid="fr-attachment"
+                            name="{event('xxf:type')}">
+                        </xf:dispatch>
+
                         <xf:action event="xxforms-upload-done xxforms-upload-error">
                             <xf:setvalue
                                 iterate="instance(), instance()/@*"

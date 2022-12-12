@@ -157,14 +157,15 @@
                 name="binding"
                 value="xxf:binding('fr-date')"/>
             <xf:var
-                fr:keep-if-function-available="fr:mode"
+                xxbl:keep-if-function-available="fr:mode"
                 name="view"
                 value="
+                    (: Q: Do we need to test for `xxf:is-control-readonly('fr-number')` like `fr:number`? :)
                     property('xxf:readonly-appearance') = 'static' or
                     fr:mode() = 'pdf'
                 "/>
             <xf:var
-                fr:keep-if-function-unavailable="fr:mode"
+                xxbl:keep-if-function-unavailable="fr:mode"
                 name="view"
                 value="false()"/>
             <xf:var

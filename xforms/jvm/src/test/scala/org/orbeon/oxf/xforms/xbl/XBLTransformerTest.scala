@@ -14,9 +14,17 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.oxf.test.XMLSupport
+import org.orbeon.oxf.xforms.XFormsStaticStateStaticProperties
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Global, Metadata, PartAnalysis, PartAnalysisContextForTree}
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 import org.scalatest.funspec.AnyFunSpec
 
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.xml.Elem
 
 class XBLTransformerTest extends AnyFunSpec with XMLSupport {
@@ -44,13 +52,39 @@ class XBLTransformerTest extends AnyFunSpec with XMLSupport {
       }
   }
 
+  object MockPartAnalysisContextForTree extends PartAnalysisContextForTree {
+
+    def xblSupport: Option[XBLSupport] = None
+    def functionLibrary: FunctionLibrary = XFormsFunctionLibrary
+
+    def startScope: Scope = ???
+    def ancestorIterator: Iterator[PartAnalysis] = ???
+    def ancestorOrSelfIterator: Iterator[PartAnalysis] = ???
+
+    def parent: Option[PartAnalysis] = None
+    def isTopLevelPart: Boolean = true
+
+    def staticProperties: XFormsStaticStateStaticProperties = ???
+    def metadata: Metadata = ???
+    def scopeForPrefixedId(prefixedId: String): Scope = ???
+    def getNamespaceMapping(prefixedId: String): Option[NamespaceMapping] = ???
+    def controlAnalysisMap: mutable.LinkedHashMap[String, ElementAnalysis] = ???
+    def controlTypes: mutable.HashMap[String, mutable.LinkedHashMap[String, ElementAnalysis]] = ???
+    def initializeScopes(): Unit = ???
+    def newScope(parent: Scope, scopeId: String): Scope = ???
+    def mapScopeIds(staticId: String, prefixedId: String, scope: Scope, ignoreIfPresent: Boolean): Unit = ???
+    def abstractBindingsWithGlobals: mutable.Buffer[AbstractBinding] = ???
+    def allGlobals: ArrayBuffer[Global] = ???
+    def iterateGlobals: Iterator[Global] = ???
+  }
+
   def assertTransforms(data: List[(String, Elem, Elem, Elem)]): Unit =
     for ((description, bound, shadow, expected) <- data)
       it(description) {
         assertXMLDocumentsIgnoreNamespacesInScope(
           elemToOrbeonDom(expected),
           XBLTransformer.transform(
-            partAnalysisCtx       = null, // just for tests, we assume it's not going to be used
+            partAnalysisCtx       = MockPartAnalysisContextForTree,
             xblSupport            = None,
             shadowTreeDocument    = elemToOrbeonDom(shadow),
             boundElement          = elemToOrbeonDomElem(bound),
@@ -114,6 +148,37 @@ class XBLTransformerTest extends AnyFunSpec with XMLSupport {
           <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"><div id="keep"><span/></div><div id="prune" xxbl:use-if-attr="bar"><span/></div></root>,
           <root><div id="keep"><span/></div></root>
         )
+      )
+    )
+  }
+
+  describe("`xxbl:keep-if-function-available`/`xxbl:keep-if-function-unavailable` attribute") {
+     assertTransforms(
+      List(
+        (
+          "keep with available function",
+          <bound bar="baz"/>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xf="http://www.w3.org/2002/xforms"><div id="keep"><span/></div><div id="keep-too" xxbl:keep-if-function-available="xf:index"><span/></div></root>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xf="http://www.w3.org/2002/xforms"><div id="keep"><span/></div><div id="keep-too" xxbl:keep-if-function-available="xf:index"><span/></div></root>
+        ),
+        (
+          "prune with available function",
+          <bound bar="baz"/>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xf="http://www.w3.org/2002/xforms"><div id="keep"><span/></div><div id="keep-too" xxbl:keep-if-function-available="xf:non-existing-function"><span/></div></root>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xf="http://www.w3.org/2002/xforms"><div id="keep"><span/></div></root>
+        ),
+        (
+          "keep with unavailable function",
+          <bound bar="baz"/>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xf="http://www.w3.org/2002/xforms"><div id="keep"><span/></div><div id="keep-too" xxbl:keep-if-function-unavailable="xf:non-existing-function"><span/></div></root>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xf="http://www.w3.org/2002/xforms"><div id="keep"><span/></div><div id="keep-too" xxbl:keep-if-function-unavailable="xf:non-existing-function"><span/></div></root>
+        ),
+        (
+          "prune with unavailable function",
+          <bound bar="baz"/>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xf="http://www.w3.org/2002/xforms"><div id="keep"><span/></div><div id="keep-too" xxbl:keep-if-function-unavailable="xf:index"><span/></div></root>,
+          <root xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xf="http://www.w3.org/2002/xforms"><div id="keep"><span/></div></root>
+        ),
       )
     )
   }

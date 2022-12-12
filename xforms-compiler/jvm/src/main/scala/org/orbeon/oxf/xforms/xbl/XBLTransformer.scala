@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.xbl
 
 import java.{util => ju}
-
 import cats.syntax.option._
 import org.orbeon.dom._
 import org.orbeon.dom.saxon.DocumentWrapper
@@ -25,6 +24,7 @@ import org.orbeon.oxf.xforms.analysis.{EventHandler, PartAnalysisContextForTree,
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom.Extensions._
 import org.orbeon.saxon.om
+import org.orbeon.saxon.om.StructuredQName
 import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.Namespaces
 import org.orbeon.xforms.XFormsNames._
@@ -32,12 +32,16 @@ import org.orbeon.xml.NamespaceMapping
 
 import scala.jdk.CollectionConverters._
 
+
 object XBLTransformer {
 
   val XBLAttrQName       = QName("attr",       XBL_NAMESPACE)
   val XBLContentQName    = QName("content",    XBL_NAMESPACE)
   val XXBLAttrQName      = QName("attr",       XXBL_NAMESPACE)
-  val XXBLUseIfAttrQName = QName("use-if-attr", XXBL_NAMESPACE)
+
+  private val XxblUseIfAttrQName                 = QName("use-if-attr",                  XXBL_NAMESPACE)
+  private val XxblKeepIfFunctionAvailableQName   = QName("keep-if-function-available",   XXBL_NAMESPACE)
+  private val XxblKeepIfFunctionUnavailableQName = QName("keep-if-function-unavailable", XXBL_NAMESPACE)
 
   private object DefaultXblSupport extends XBLSupport {
 
@@ -46,11 +50,33 @@ object XBLTransformer {
       boundElement    : Element,
       directNameOpt   : Option[QName],
       elem            : Element
-    ): Boolean =
-      elem.attributeValueOpt(XXBLUseIfAttrQName) match {
-        case Some(att) => boundElement.attributeValueOpt(att).flatMap(_.trimAllToOpt).nonEmpty
-        case None      => true
+    ): Boolean = {
+
+      def keepIfAttr: Boolean =
+        elem.attributeValueOpt(XxblUseIfAttrQName) match {
+          case Some(att) => boundElement.attributeValueOpt(att).flatMap(_.trimAllToOpt).nonEmpty
+          case None      => true
+        }
+
+      def functionAvailable(fnQualifiedName: String): Boolean = {
+        val fnQName = elem.resolveStringQNameOrThrow(fnQualifiedName, unprefixedIsNoNamespace = true)
+        partAnalysisCtx.functionLibrary.isAvailable(new StructuredQName(fnQName.namespace.prefix, fnQName.namespace.uri, fnQName.localName), -1)
       }
+
+      def keepIfFunctionAvailable: Boolean =
+        elem.attributeValueOpt(XxblKeepIfFunctionAvailableQName) match {
+          case Some(fnQualifiedName) => functionAvailable(fnQualifiedName)
+          case _                     => true
+        }
+
+      def keepIfFunctionUnavailable: Boolean =
+        elem.attributeValueOpt(XxblKeepIfFunctionUnavailableQName) match {
+          case Some(fnQualifiedName) => ! functionAvailable(fnQualifiedName)
+          case _                     => true
+        }
+
+      ! (! keepIfAttr || ! keepIfFunctionAvailable || ! keepIfFunctionUnavailable)
+    }
   }
 
   /**

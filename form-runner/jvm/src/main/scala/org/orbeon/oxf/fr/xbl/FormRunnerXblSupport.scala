@@ -20,16 +20,12 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisForXblSupport
 import org.orbeon.oxf.xforms.xbl.XBLSupport
-import org.orbeon.oxf.xml.dom.Extensions.DomElemOps
-import org.orbeon.saxon.om.StructuredQName
 
 
 object FormRunnerXblSupport extends XBLSupport {
 
   private val FRKeepIfParamQName               = QName("keep-if-param-non-blank",      XMLNames.FRNamespace)
   private val FRKeepIfDesignTimeQName          = QName("keep-if-design-time",          XMLNames.FRNamespace)
-  private val FRKeepIfFunctionAvailableQName   = QName("keep-if-function-available",   XMLNames.FRNamespace)
-  private val FRKeepIfFunctionUnavailableQName = QName("keep-if-function-unavailable", XMLNames.FRNamespace)
 
   def keepElement(
     partAnalysisCtx : PartAnalysisForXblSupport,
@@ -75,23 +71,6 @@ object FormRunnerXblSupport extends XBLSupport {
         case _             => true
       }
 
-    def functionAvailable(fnQualifiedName: String): Boolean = {
-      val fnQName = elem.resolveStringQNameOrThrow(fnQualifiedName, unprefixedIsNoNamespace = true)
-      partAnalysisCtx.functionLibrary.isAvailable(new StructuredQName(fnQName.namespace.prefix, fnQName.namespace.uri, fnQName.localName), -1)
-    }
-
-    def keepIfFunctionAvailable: Boolean =
-      elem.attributeValueOpt(FRKeepIfFunctionAvailableQName) match {
-        case Some(fnQualifiedName) => functionAvailable(fnQualifiedName)
-        case _                     => true
-      }
-
-    def keepIfFunctionUnavailable: Boolean =
-      elem.attributeValueOpt(FRKeepIfFunctionUnavailableQName) match {
-        case Some(fnQualifiedName) => ! functionAvailable(fnQualifiedName)
-        case _                     => true
-      }
-
-    ! (! keepIfParamNonBlank || ! keepIfDesignTime || ! keepIfFunctionAvailable || ! keepIfFunctionUnavailable)
+    ! (! keepIfParamNonBlank || ! keepIfDesignTime)
   }
 }

@@ -75,6 +75,7 @@ object XBLTransformer {
           case _                     => true
         }
 
+      // TODO: Should also remove processed attributes.
       ! (! keepIfAttr || ! keepIfFunctionAvailable || ! keepIfFunctionUnavailable)
     }
   }

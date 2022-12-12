@@ -71,6 +71,7 @@ object FormRunnerXblSupport extends XBLSupport {
         case _             => true
       }
 
+    // TODO: Should also remove processed attributes.
     ! (! keepIfParamNonBlank || ! keepIfDesignTime)
   }
 }

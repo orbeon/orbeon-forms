@@ -2140,24 +2140,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         },
 
         /**
-         * Event listener on dialogs called by YUI when the dialog is shown.
-         */
-        dialogShow: function (type, args, me) {
-            // var dialogId = me;
-            //
-            // // Set a max-height on the dialog body, so the dialog doesn't get larger than the viewport
-            // var yuiDialog = ORBEON.xforms.Globals.dialogs[dialogId];
-            // var maxHeight =
-            //         YAHOO.util.Dom.getViewportHeight()
-            //         - (yuiDialog.element.clientHeight - yuiDialog.body.clientHeight)
-            //             // Don't use the whole height of the viewport, leaving some space at the top of the page,
-            //             // which could be used by a navigation bar, as in Liferay
-            //         - 80;
-            // var property = $(yuiDialog.innerElement).is('.xxforms-set-height') ? 'height' : 'max-height';
-            // $(yuiDialog.body).css(property, maxHeight + 'px');
-        },
-
-        /**
          * Called for each minimal dialog when there is a click on the document.
          * We have one listener per dialog, which listens to those events all the time,
          * not just when the dialog is open.
@@ -2489,7 +2471,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     role: "" // See bug 315634 http://goo.gl/54vzd
                 });
             }
-            yuiDialog.showEvent.subscribe(ORBEON.xforms.Events.dialogShow, dialog.id);
             // Register listener for when the dialog is closed by a click on the "x"
             yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
 

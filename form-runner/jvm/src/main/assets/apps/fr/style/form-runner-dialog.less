@@ -17,7 +17,7 @@
         max-width: 500px;
         border: none;
 
-        .bd p {
+        .xxforms-dialog-body p {
             margin: .5em 0 .5em 0
         }
 
@@ -37,7 +37,7 @@
             clear: both
         }
 
-        .xxforms-dialog-head.hd {
+        .xxforms-dialog-head {
             background-image: none; // override YUI default
             background-color: @dialogTitleBackgroundColor;
             border-top-left-radius: @dialogBorderRadius;
@@ -48,12 +48,17 @@
             line-height: 2rem;
         }
 
-        .xxforms-dialog-body.bd {
+        .xxforms-dialog-body {
             background-color: @dialogBackgroundColor;
             border-bottom-left-radius: @dialogBorderRadius;
             border-bottom-right-radius: @dialogBorderRadius;
             margin: 0 -1px;
             border: none;
+        }
+
+        .xxforms-dialog-head:empty + .xxforms-dialog-body {
+            border-top-left-radius: @dialogBorderRadius;
+            border-top-right-radius: @dialogBorderRadius;
         }
 
         // Try automatic centering of the dialog, but this disables the ability to move the dialog by dragging it.

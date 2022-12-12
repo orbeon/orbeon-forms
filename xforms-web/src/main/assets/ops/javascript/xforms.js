@@ -1357,6 +1357,10 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if (focusedElement != null) focusedElement.blur();
             }
 
+            // Adjust classes on dialog
+            divElement.classList.remove("xforms-dialog-visible-false")
+            divElement.classList.add("xforms-dialog-visible-true")
+
             // Render the dialog if needed
             if ($(divElement).is('.xforms-initially-hidden')) {
                 YAHOO.util.Dom.removeClass(divElement, "xforms-initially-hidden");

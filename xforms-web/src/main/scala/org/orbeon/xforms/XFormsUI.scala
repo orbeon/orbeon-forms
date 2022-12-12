@@ -321,6 +321,10 @@ object XFormsUI {
         Globals.maskDialogCloseEvents = false
         // Fixes cursor Firefox issue; more on this in dialog init code
         yuiDialog.element.style.display = "none"
+
+        // Adjust classes on dialog
+        controlElem.classList.remove("xforms-dialog-visible-true")
+        controlElem.classList.add("xforms-dialog-visible-false")
       }
   }
 

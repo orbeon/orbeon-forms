@@ -370,13 +370,19 @@
                 value="xxf:binding('fr-number')"/>
 
             <xf:var
+                xxbl:keep-if-function-available="fr:mode"
                 name="view"
                 value="
                     xxf:is-control-readonly('fr-number') and (
                         property('xxf:readonly-appearance') = 'static' or
                         (: See https://github.com/orbeon/orbeon-forms/issues/3800 :)
                         fr:mode() = 'pdf'
-                    )"/>
+                    )
+                "/>
+            <xf:var
+                xxbl:keep-if-function-unavailable="fr:mode"
+                name="view"
+                value="false()"/>
 
             <!--<xf:dispatch event="xxforms-iteration-moved" name="fr-iteration-moved" targetid="formatted-value"/>-->
 

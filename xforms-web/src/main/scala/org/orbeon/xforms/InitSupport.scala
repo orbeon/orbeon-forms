@@ -284,7 +284,7 @@ object InitSupport {
         MessageDialog.showMessages(initializations.messagesToRun.toJSArray)
 
       initializations.dialogsToShow foreach { case rpc.Dialog(id, neighborId) =>
-        Controls.showDialog(id, neighborId.orNull)
+        XFormsUI.showDialogForInit(id, neighborId)
       }
 
       // Do this after dialogs as focus might be within a dialog
@@ -428,9 +428,6 @@ object InitSupport {
             } locally {
               Controls.setCurrentValue(control, value, force = false)
             }
-          } else if ($(control).is(".xforms-dialog.xforms-dialog-visible-true")) {
-            // Initialized visible dialogs
-            Init._dialog(control)
           } else if (classList.contains("xforms-select1-appearance-compact") || classList.contains("xforms-select-appearance-compact")) {
             // Legacy JavaScript initialization
             Init._compactSelect(control)

@@ -70,12 +70,13 @@ class XXFormsDialogHandler(
 //    classes.append(!("false" == attributes.getValue("draggable")))
     classes.append(" xforms-dialog-draggable-false")
     classes.append(" xforms-dialog-visible-")
-    classes.append("true" == attributes.getValue("visible"))
+    classes.append(dialogXFormsControl.isDialogVisible)
 
     // Start main `xh:div`
     val xhtmlPrefix = handlerContext.findXHTMLPrefix
     val divQName = XMLUtils.buildQName(xhtmlPrefix, "div")
     val contentHandler = handlerContext.controller.output
+
     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, XFormsBaseHandler.getIdClassXHTMLAttributes(containingDocument, attributes, classes.toString, effectiveDialogId.some))
 
     // Child `xh:div` for label

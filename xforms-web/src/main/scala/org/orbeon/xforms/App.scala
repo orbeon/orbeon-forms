@@ -43,7 +43,8 @@ trait App {
     logger.debug("running initializations after Orbeon API is available")
     onOrbeonApiLoaded()
 
-    DomSupport.atLeastDomInteractiveF(dom.document) flatMap (_ => InitSupport.liferayF) onComplete {
+    DomSupport.atLeastDomReadyStateF(dom.document, DomSupport.DomReadyState.Interactive) flatMap
+      (_ => InitSupport.liferayF) onComplete {
       case Success(_) =>
         logger.debug("running initializations after form markup is available")
         onPageContainsFormsMarkup()

@@ -1334,72 +1334,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             $(control).toggleClass("xforms-filled", isRequired && emptyAttr == "false");
         },
 
-        showDialog: function showDialog(controlId, neighbor) {
-
-            // Wait until all the CSS and images are loaded, as they can influence the positioning of the dialog
-            if (ORBEON.xforms.Controls._delayingUntilLoad(_.partial(showDialog, controlId, neighbor)))
-                return;
-
-            var dialogUiElem = document.getElementById(controlId);
-            var initializedDialog = function() { return ORBEON.xforms.Globals.dialogs[controlId]; }
-            var yuiDialog = initializedDialog();
-
-            // Initialize dialog now, if it hasn't been done already
-            if (! _.isObject(yuiDialog)) {
-                ORBEON.xforms.Init._dialog(dialogUiElem);
-                yuiDialog = initializedDialog();
-            }
-
-            // Take out the focus from the current control. This is particularly important with non-modal dialogs
-            // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
-            if (ORBEON.xforms.Globals.currentFocusControlId != null) {
-                var focusedElement = document.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
-                if (focusedElement != null)
-                    focusedElement.blur();
-            }
-
-            // Adjust classes on dialog
-            dialogUiElem.classList.remove("xforms-dialog-visible-false")
-            dialogUiElem.classList.add("xforms-dialog-visible-true")
-
-            // Render the dialog if needed
-            if ($(dialogUiElem).is('.xforms-initially-hidden')) {
-                YAHOO.util.Dom.removeClass(dialogUiElem, "xforms-initially-hidden");
-                yuiDialog.render();
-            }
-
-            // Reapply those classes. Those are classes added by YUI when creating the dialog, but they are then removed
-            // by YUI if you close the dialog using the "X". So when opening the dialog, we add those again, just to make sure.
-            // A better way to handle this would be to create the YUI dialog every time when we open it, instead of doing this
-            // during initialization.
-            YAHOO.util.Dom.addClass(yuiDialog.innerElement, "yui-module");
-            YAHOO.util.Dom.addClass(yuiDialog.innerElement, "yui-overlay");
-            YAHOO.util.Dom.addClass(yuiDialog.innerElement, "yui-panel");
-
-            // Fixes cursor Firefox issue; more on this in dialog init code
-            yuiDialog.element.style.display = "block";
-
-            // Show the dialog
-            yuiDialog.show();
-
-            // Make sure that this dialog is on top of everything else
-            yuiDialog.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
-
-            // Position the dialog either at the center of the viewport or relative of a neighbor
-            if (neighbor == null) {
-                // Center dialog in page after the whole Ajax request has been processed,
-                // giving a chance to the content of the dialog to show itself
-                ORBEON.xforms.AjaxClient.currentAjaxResponseProcessedOrImmediatelyP().then(
-                    // https://github.com/orbeon/orbeon-forms/issues/4475
-                    function() {}
-                );
-            } else {
-                // Align dialog relative to neighbor
-                yuiDialog.cfg.setProperty("context", [neighbor, "tl", "bl"]);
-                yuiDialog.align();
-            }
-        },
-
         typeChangedEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
         fullUpdateEvent:  new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
 
@@ -2432,7 +2366,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             var isModal     = $(dialog).is('.xforms-dialog-modal');
             var hasClose    = $(dialog).is('.xforms-dialog-close-true');
             var isDraggable = $(dialog).is('.xforms-dialog-draggable-true');
-            var isVisible   = $(dialog).is('.xforms-dialog-visible-true');
             var isMinimal   = $(dialog).is('.xforms-dialog-appearance-minimal');
 
             // If we already have a dialog for the same id, first destroy it, as this is an object left behind
@@ -2502,7 +2435,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 form.appendChild(yuiDialog.element);
 
             ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
-            if (isVisible) ORBEON.xforms.Controls.showDialog(dialog.id, null);
+
+            return yuiDialog;
         }
     };
 

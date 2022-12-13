@@ -15,10 +15,12 @@ package org.orbeon.xforms
 
 import org.log4s.Logger
 import org.orbeon.datatypes.BasicLocationData
-import org.orbeon.oxf.util.CoreUtils.{BooleanOps, PipeOps}
+import org.orbeon.oxf.util.CoreUtils.PipeOps
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
-import org.orbeon.xforms.facade.{Controls, Utils, XBL}
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
+import org.orbeon.web.DomSupport
+import org.orbeon.xforms.facade.{Controls, Init, Utils, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.ext._
@@ -26,8 +28,6 @@ import org.scalajs.dom.html.Input
 import org.scalajs.dom.{MouseEvent, html, raw, window}
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
-import scalatags.JsDom
-import scalatags.JsDom.all._
 import shapeless.syntax.typeable._
 
 import scala.collection.immutable
@@ -302,32 +302,21 @@ object XFormsUI {
   @JSExport
   def handleDialog(
     controlElem : raw.Element,
-    formID      : String
+    formId      : String
   ): Unit = {
 
-    val id        = controlElem.id
-    val visible   = controlElem.getAttribute("visibility") == "visible"
-    val neighbor  = controlElem.getAttribute("neighbor")
+    val id            = controlElem.id
+    val visible       = controlElem.getAttribute("visibility") == "visible"
+    val neighborIdOpt = controlElem.getAttribute("neighbor").trimAllToOpt
 
     if (visible)
-      Controls.showDialog(id, neighbor)
+      showDialog(id, neighborIdOpt, "handleDialog")
     else
-      Globals.dialogs.get(id) foreach { yuiDialog =>
-        // Remove timer to show the dialog asynchronously so it doesn't show later!
-        Page.getForm(formID).removeDialogTimerId(id)
-
-        Globals.maskDialogCloseEvents = true
-        yuiDialog.hide()
-        Globals.maskDialogCloseEvents = false
-        // Fixes cursor Firefox issue; more on this in dialog init code
-        yuiDialog.element.style.display = "none"
-
-        // Adjust classes on dialog
-        val dialogUiElem = dom.document.getElementById(id)
-        dialogUiElem.classList.remove("xforms-dialog-visible-true")
-        dialogUiElem.classList.add("xforms-dialog-visible-false")
-      }
+      hideDialog(id, formId)
   }
+
+  def showDialogForInit(dialogId: String, neighborIdOpt: Option[String]): Unit =
+    showDialog(dialogId, neighborIdOpt, "showDialogForInitWithNeighbor")
 
   // 2022-04-12: AjaxServer.js
   @JSExport
@@ -772,6 +761,92 @@ object XFormsUI {
         // Restore focus
         // See https://github.com/orbeon/orbeon-forms/issues/4511
         focusControlIdOpt foreach Controls.setFocus
+      }
+
+    def showDialog(controlId: String, neighborIdOpt: Option[String], reason: String): Unit = {
+
+      def showDialogImpl(): Unit = {
+
+        val dialogUiElem = dom.document.getElementById(controlId).asInstanceOf[html.Element]
+
+        // Initialize dialog now, if it hasn't been done already
+        val yuiDialog = Globals.dialogs.getOrElseUpdate(controlId, {
+          Init._dialog(dialogUiElem)
+        })
+
+        // Take out the focus from the current control. This is particularly important with non-modal dialogs
+        // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
+        Option(Globals.currentFocusControlId) foreach { currentFocusControlId =>
+          Option(dom.document.getElementById(currentFocusControlId).asInstanceOf[html.Element]) foreach
+            (_.blur())
+        }
+
+        // Adjust classes on dialog
+        dialogUiElem.classList.remove("xforms-dialog-visible-false")
+        dialogUiElem.classList.add("xforms-dialog-visible-true")
+
+        // Render the dialog if needed
+        if (dialogUiElem.classList.contains("xforms-initially-hidden")) {
+          dialogUiElem.classList.remove("xforms-initially-hidden")
+          yuiDialog.render()
+        }
+
+        // Reapply those classes. Those are classes added by YUI when creating the dialog, but they are then removed
+        // by YUI if you close the dialog using the "X". So when opening the dialog, we add those again, just to make sure.
+        // A better way to handle this would be to create the YUI dialog every time when we open it, instead of doing this
+        // during initialization.
+        val innerElem = yuiDialog.innerElement.asInstanceOf[html.Element]
+        innerElem.classList.add("yui-module")
+        innerElem.classList.add("yui-overlay")
+        innerElem.classList.add("yui-panel")
+
+        // Fixes cursor Firefox issue; more on this in dialog init code
+        // 2022-12-12: This seems to be still needed
+        yuiDialog.element.style.display = "block"
+
+        // 2022-12-12: Not sure who sets those to other values, but we need to control that now
+        yuiDialog.element.style.top = 0;
+        yuiDialog.element.style.left = 0;
+
+        // Show the dialog
+        yuiDialog.show()
+
+        // Make sure that this dialog is on top of everything else
+        yuiDialog.cfg.setProperty("zIndex", {
+          Globals.lastDialogZIndex += 1
+          Globals.lastDialogZIndex
+        })
+
+        // See for old centering logic: https://github.com/orbeon/orbeon-forms/issues/4475
+        neighborIdOpt foreach { neighborId =>
+          yuiDialog.cfg.setProperty("context", js.Array(neighborId, "tl", "bl"))
+          yuiDialog.align()
+        }
+      }
+
+      // Check if we need to wait until all the CSS and images are loaded, as they can influence positioning
+      // NOTE: We want dialogs to be shown synchronously if possible so we don't use a future here
+      if (DomSupport.interactiveReadyState(dom.document, DomSupport.DomReadyState.Complete))
+        showDialogImpl()
+      else
+        DomSupport.atLeastDomReadyStateF(dom.document, DomSupport.DomReadyState.Complete) foreach (_ => showDialogImpl())
+    }
+
+    def hideDialog(id: String, formID: String): Unit =
+      Globals.dialogs.get(id) foreach { yuiDialog =>
+        // Remove timer to show the dialog asynchronously so it doesn't show later!
+        Page.getForm(formID).removeDialogTimerId(id)
+
+        Globals.maskDialogCloseEvents = true
+        yuiDialog.hide()
+        Globals.maskDialogCloseEvents = false
+        // Fixes cursor Firefox issue; more on this in dialog init code
+        yuiDialog.element.style.display = "none"
+
+        // Adjust classes on dialog
+        val dialogUiElem = dom.document.getElementById(id)
+        dialogUiElem.classList.remove("xforms-dialog-visible-true")
+        dialogUiElem.classList.add("xforms-dialog-visible-false")
       }
   }
 }

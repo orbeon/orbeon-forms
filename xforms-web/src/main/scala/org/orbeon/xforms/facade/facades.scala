@@ -25,9 +25,9 @@ import scala.scalajs.js.|
 
 @js.native
 trait InitTrait extends js.Object {
-  def _range(control: html.Element)         : Unit = js.native
-  def _compactSelect(control: html.Element) : Unit = js.native
-  def _dialog(control: html.Element)        : Unit = js.native
+  def _range(control: html.Element)         : Unit       = js.native
+  def _compactSelect(control: html.Element) : Unit       = js.native
+  def _dialog(control: html.Element)        : js.Dynamic = js.native
 }
 
 @js.native
@@ -96,7 +96,6 @@ object Controls extends js.Object {
   def getForm(control: dom.Element)                                                  : js.UndefOr[html.Form]                        = js.native
   def getLabelMessage(elem: html.Element)                                            : String                                       = js.native
   def getHelpMessage(elem: html.Element)                                             : String                                       = js.native
-  def showDialog(controlId: String, neighbor: String)                                : Unit                                         = js.native
   def setRepeatIterationRelevance(formID: String, repeatID: String, iteration: String, relevant: Boolean): Unit                     = js.native
   val afterValueChange                                                               : YUICustomEvent                               = js.native
 }

@@ -203,7 +203,7 @@ class OrbeonClientTest extends AsyncFunSpec {
 
     for {
       jsdom <- JSDOM.fromURL(urlToLoad, options).toFuture
-      _     <- web.DomSupport.atLeastDomInteractiveF(jsdom.window.document)
+      _     <- web.DomSupport.atLeastDomReadyStateF(jsdom.window.document, web.DomSupport.DomReadyState.Interactive)
       if jsdom.window.document.querySelector(".orbeon") ne null // this will throw if not satisfied
     } yield
       jsdom.window

@@ -83,8 +83,6 @@ class XXFormsDialogControl(
     }
   }
 
-  override def hasJavaScriptInitialization = true
-
   private def dialogCurrentLocal = getCurrentLocal.asInstanceOf[XXFormsDialogControlLocal]
 
   def isDialogVisible       = dialogCurrentLocal.dialogVisible

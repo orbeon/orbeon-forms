@@ -14,13 +14,26 @@ object DomSupport {
 
   private var lastUsedSuffix: Int = 0
 
-  def atLeastDomInteractiveF(doc: html.Document): Future[Unit] = {
+  val AtLeastDomInteractiveStates = Set(InteractiveReadyState, CompleteReadyState)
+  val DomCompleteStates           = Set(CompleteReadyState)
+
+  sealed trait DomReadyState
+  case object DomReadyState {
+    case object Interactive extends DomReadyState // doc parsed but scripts, images, stylesheets and frames are still loading
+    case object Complete    extends DomReadyState // doc and all sub-resources have finished loading, `load` about to fire
+  }
+
+  def interactiveReadyState(doc: html.Document, state: DomReadyState): Boolean =
+    state == DomReadyState.Interactive && AtLeastDomInteractiveStates(doc.readyState) ||
+    state == DomReadyState.Complete    && DomCompleteStates(doc.readyState)
+
+  def atLeastDomReadyStateF(doc: html.Document, state: DomReadyState): Future[Unit] = {
 
     val promise = Promise[Unit]()
 
-    if (doc.readyState == InteractiveReadyState || doc.readyState == CompleteReadyState) {
+    if (interactiveReadyState(doc, state)) {
 
-      // Because yes, the document is interactive, but JavaScript placed after us might not have run yet.
+      // Because yes, even if the document is interactive, JavaScript placed after us might not have run yet.
       // Although if we do everything in an async way, that should be changed.
       // TODO: Review once full order of JavaScript is determined in `App` doc.
       js.timers.setTimeout(0) {
@@ -28,12 +41,17 @@ object DomSupport {
       }
     } else {
 
+      val eventName = state match {
+        case DomReadyState.Interactive => DOMContentLoaded
+        case DomReadyState.Complete    => Load
+      }
+
       lazy val contentLoaded: js.Function1[dom.Event, _] = (_: dom.Event) => {
-        doc.removeEventListener(DOMContentLoaded, contentLoaded)
+        doc.removeEventListener(eventName, contentLoaded)
         promise.success(())
       }
 
-      doc.addEventListener(DOMContentLoaded, contentLoaded)
+      doc.addEventListener(eventName, contentLoaded)
     }
 
     promise.future

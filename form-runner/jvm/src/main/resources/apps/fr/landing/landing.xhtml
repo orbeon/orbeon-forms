@@ -2,6 +2,8 @@
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
          xmlns:version="java:org.orbeon.oxf.common.Version"
@@ -14,7 +16,7 @@
         <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-landing.css" type="text/css" media="all"/>
 
         <!-- This page needs access to Form Builder permission -->
-<!--        <xi:include href="oxf:/apps/fr/includes/permissions-model.xml" xxi:omit-xml-base="true"/>-->
+        <xi:include href="oxf:/apps/fr/includes/permissions-model.xml" xxi:omit-xml-base="true"/>
         <!-- FR Home page XForms model -->
         <xf:model id="fr-form-model" xxf:xpath-analysis="true" xxf:expose-xpath-types="true">
 
@@ -36,6 +38,10 @@
             <xf:var
                 name="link-to-tokens"
                 value="xxf:split(xxf:property('oxf.fr.home.table.link-to'))"/>
+
+            <xf:var
+                name="has-any-matching-roles"
+                value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
 
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
                 <_/>
@@ -141,7 +147,7 @@
                                     <xh:figcaption><xf:output value="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/></xh:figcaption>
                                 </xh:figure>
                             </xh:a>
-                            <xh:a href="/fr/admin" class="text-center">
+                            <xh:a href="/fr/admin" class="text-center {'xforms-hidden'[not($has-any-matching-roles)]}">
                                 <xh:figure>
                                     <xh:img src="/home/images/cogwheels.jpg" class="img-thumbnail w-100"/>
                                     <xh:figcaption><xf:output value="xxf:r('landing.titles.form-runner-admin', '|fr-fr-resources|')"/></xh:figcaption>

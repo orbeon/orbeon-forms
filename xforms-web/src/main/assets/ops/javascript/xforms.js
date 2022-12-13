@@ -2374,35 +2374,21 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 ORBEON.xforms.Globals.dialogs[dialog.id].destroy();
 
             // Create dialog object
-            var yuiDialog;
-            if (isMinimal) {
-                // Create minimal dialog
-                yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
-                    modal: isModal,
-                    close: hasClose,
-                    visible: false,
-                    draggable: false,
-                    fixedcenter: false,
+            var yuiDialog =
+                new YAHOO.widget.Dialog(dialog.id, {
+                    modal              : isModal,
+                    close              : hasClose,
+                    visible            : false,
+                    draggable          : ! isMinimal && isDraggable,
+                    fixedcenter        : false,
                     constraintoviewport: true,
-                    underlay: "none",
-                    usearia: ORBEON.xforms.Page.getFormFromElemOrThrow(dialog).useARIA(),
-                    role: "" // See bug 315634 http://goo.gl/54vzd
+                    underlay           : "none",
+                    usearia            : ORBEON.xforms.Page.getFormFromElemOrThrow(dialog).useARIA(),
+                    role               : "" // See bug 315634 http://goo.gl/54vzd
                 });
+            if (isMinimal) {
                 // Close the dialog when users click on document
                 YAHOO.util.Event.addListener(document.body, "click", ORBEON.xforms.Events.dialogMinimalBodyClick, yuiDialog);
-            } else {
-                // Create full dialog
-                yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
-                    modal: isModal,
-                    close: hasClose,
-                    visible: false,
-                    draggable: isDraggable,
-                    fixedcenter: false,
-                    constraintoviewport: true,
-                    underlay: "none", // Similarly, setting the underlay to "shadow" conflicts with the CSS used to limit the width and height of the dialog on IE6
-                    usearia: ORBEON.xforms.Page.getFormFromElemOrThrow(dialog).useARIA(),
-                    role: "" // See bug 315634 http://goo.gl/54vzd
-                });
             }
             // Register listener for when the dialog is closed by a click on the "x"
             yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);

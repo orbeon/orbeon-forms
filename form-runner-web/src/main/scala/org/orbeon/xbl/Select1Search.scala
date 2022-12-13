@@ -109,7 +109,7 @@ private class Select1SearchCompanion extends XBLCompanion {
         // Make the clear button accessible with the keyboard
         def makeClearAccessible(): Unit = {
           val clearElementOpt = Option(containerElem.querySelector(".select2-selection__clear"))
-          clearElementOpt.foreach { (clearElement) =>
+          clearElementOpt.foreach { clearElement =>
             clearElement.setAttribute("tabindex", "0")
             clearElement.setAttribute("role", "button")
             clearElement.addEventListener(

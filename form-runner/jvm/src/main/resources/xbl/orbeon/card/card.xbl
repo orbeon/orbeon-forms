@@ -35,9 +35,9 @@
                         <xf:var name="label" value="$items[value = $value]/label/string()"/>
                         <xf:var name="hint"  value="$items[value = $value]/hint/string()"/>
                         <xh:li class="list-group-item text-truncate">
-                            <xh:a href="{{$value}}"><xf:output value="$label"/></xh:a>
-                            <xh:br/>
-                            <xf:output value="$hint"/>
+                            <xh:a href="{{$value}}" title="{{$hint}}"><xf:output value="$label"/></xh:a>
+<!--                            <xh:br/>-->
+<!--                            <xf:output value="$hint"/>-->
                         </xh:li>
                     </xf:repeat>
                 </xh:ul>

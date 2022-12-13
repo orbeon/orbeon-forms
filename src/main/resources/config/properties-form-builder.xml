@@ -106,7 +106,7 @@
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save.orbeon.builder"        value="inline"/>
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.publish.orbeon.builder"     value="modal"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.builder">
-        summary new test|test-pdf|test-offline|test-formulas publish save
+        home summary new test|test-pdf|test-offline|test-formulas publish save
     </property>
 
     <!-- Form Builder summary page  -->

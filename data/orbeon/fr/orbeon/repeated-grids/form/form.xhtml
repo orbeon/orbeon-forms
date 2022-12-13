@@ -1,0 +1,2181 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:saxon="http://saxon.sf.net/" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>Appearances of Orbeon Forms Repeated Grids</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <section>
+                        <single-grid>
+                            <single-grid-iteration>
+                                <f1/>
+                            </single-grid-iteration>
+                        </single-grid>
+                        <multiple-grid>
+                            <multiple-grid-iteration>
+                                <f2/>
+                                <f3/>
+                                <f4/>
+                            </multiple-grid-iteration>
+                        </multiple-grid>
+                    </section>
+                    <repeated-full-number-readwrite-table-section>
+                        <repeated-full-number-readwrite-table-single-grid>
+                            <repeated-full-number-readwrite-table-single-grid-iteration>
+                                <repeated-full-number-readwrite-table-f1/>
+                            </repeated-full-number-readwrite-table-single-grid-iteration>
+                        </repeated-full-number-readwrite-table-single-grid>
+                        <repeated-full-number-readwrite-table-multiple-grid>
+                            <repeated-full-number-readwrite-table-multiple-grid-iteration>
+                                <repeated-full-number-readwrite-table-f2/>
+                                <repeated-full-number-readwrite-table-f3/>
+                                <repeated-full-number-readwrite-table-f4/>
+                            </repeated-full-number-readwrite-table-multiple-grid-iteration>
+                        </repeated-full-number-readwrite-table-multiple-grid>
+                    </repeated-full-number-readwrite-table-section>
+                    <repeated-minimal-number-readwrite-table-section>
+                        <repeated-minimal-number-readwrite-table-single-grid>
+                            <repeated-minimal-number-readwrite-table-single-grid-iteration>
+                                <repeated-minimal-number-readwrite-table-f1/>
+                            </repeated-minimal-number-readwrite-table-single-grid-iteration>
+                        </repeated-minimal-number-readwrite-table-single-grid>
+                        <repeated-minimal-number-readwrite-table-multiple-grid>
+                            <repeated-minimal-number-readwrite-table-multiple-grid-iteration>
+                                <repeated-minimal-number-readwrite-table-f2/>
+                                <repeated-minimal-number-readwrite-table-f3/>
+                                <repeated-minimal-number-readwrite-table-f4/>
+                            </repeated-minimal-number-readwrite-table-multiple-grid-iteration>
+                        </repeated-minimal-number-readwrite-table-multiple-grid>
+                    </repeated-minimal-number-readwrite-table-section>
+                    <repeated-full-nonumber-readwrite-table-section>
+                        <repeated-full-nonumber-readwrite-table-single-grid>
+                            <repeated-full-nonumber-readwrite-table-single-grid-iteration>
+                                <repeated-full-nonumber-readwrite-table-f1/>
+                            </repeated-full-nonumber-readwrite-table-single-grid-iteration>
+                        </repeated-full-nonumber-readwrite-table-single-grid>
+                        <repeated-full-nonumber-readwrite-table-multiple-grid>
+                            <repeated-full-nonumber-readwrite-table-multiple-grid-iteration>
+                                <repeated-full-nonumber-readwrite-table-f2/>
+                                <repeated-full-nonumber-readwrite-table-f3/>
+                                <repeated-full-nonumber-readwrite-table-f4/>
+                            </repeated-full-nonumber-readwrite-table-multiple-grid-iteration>
+                        </repeated-full-nonumber-readwrite-table-multiple-grid>
+                    </repeated-full-nonumber-readwrite-table-section>
+                    <repeated-minimal-nonumber-readwrite-table-section>
+                        <repeated-minimal-nonumber-readwrite-table-single-grid>
+                            <repeated-minimal-nonumber-readwrite-table-single-grid-iteration>
+                                <repeated-minimal-nonumber-readwrite-table-f1/>
+                            </repeated-minimal-nonumber-readwrite-table-single-grid-iteration>
+                        </repeated-minimal-nonumber-readwrite-table-single-grid>
+                        <repeated-minimal-nonumber-readwrite-table-multiple-grid>
+                            <repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration>
+                                <repeated-minimal-nonumber-readwrite-table-f2/>
+                                <repeated-minimal-nonumber-readwrite-table-f3/>
+                                <repeated-minimal-nonumber-readwrite-table-f4/>
+                            </repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration>
+                        </repeated-minimal-nonumber-readwrite-table-multiple-grid>
+                    </repeated-minimal-nonumber-readwrite-table-section>
+                    <repeated-full-number-readonly-table-section>
+                        <repeated-full-number-readonly-table-single-grid>
+                            <repeated-full-number-readonly-table-single-grid-iteration>
+                                <repeated-full-number-readonly-table-f1/>
+                            </repeated-full-number-readonly-table-single-grid-iteration>
+                        </repeated-full-number-readonly-table-single-grid>
+                        <repeated-full-number-readonly-table-multiple-grid>
+                            <repeated-full-number-readonly-table-multiple-grid-iteration>
+                                <repeated-full-number-readonly-table-f2/>
+                                <repeated-full-number-readonly-table-f3/>
+                                <repeated-full-number-readonly-table-f4/>
+                            </repeated-full-number-readonly-table-multiple-grid-iteration>
+                        </repeated-full-number-readonly-table-multiple-grid>
+                    </repeated-full-number-readonly-table-section>
+                    <repeated-minimal-number-readonly-table-section>
+                        <repeated-minimal-number-readonly-table-single-grid>
+                            <repeated-minimal-number-readonly-table-single-grid-iteration>
+                                <repeated-minimal-number-readonly-table-f1/>
+                            </repeated-minimal-number-readonly-table-single-grid-iteration>
+                        </repeated-minimal-number-readonly-table-single-grid>
+                        <repeated-minimal-number-readonly-table-multiple-grid>
+                            <repeated-minimal-number-readonly-table-multiple-grid-iteration>
+                                <repeated-minimal-number-readonly-table-f2/>
+                                <repeated-minimal-number-readonly-table-f3/>
+                                <repeated-minimal-number-readonly-table-f4/>
+                            </repeated-minimal-number-readonly-table-multiple-grid-iteration>
+                        </repeated-minimal-number-readonly-table-multiple-grid>
+                    </repeated-minimal-number-readonly-table-section>
+                    <repeated-full-nonumber-readonly-table-section>
+                        <repeated-full-nonumber-readonly-table-single-grid>
+                            <repeated-full-nonumber-readonly-table-single-grid-iteration>
+                                <repeated-full-nonumber-readonly-table-f1/>
+                            </repeated-full-nonumber-readonly-table-single-grid-iteration>
+                        </repeated-full-nonumber-readonly-table-single-grid>
+                        <repeated-full-nonumber-readonly-table-multiple-grid>
+                            <repeated-full-nonumber-readonly-table-multiple-grid-iteration>
+                                <repeated-full-nonumber-readonly-table-f2/>
+                                <repeated-full-nonumber-readonly-table-f3/>
+                                <repeated-full-nonumber-readonly-table-f4/>
+                            </repeated-full-nonumber-readonly-table-multiple-grid-iteration>
+                        </repeated-full-nonumber-readonly-table-multiple-grid>
+                    </repeated-full-nonumber-readonly-table-section>
+                    <repeated-minimal-nonumber-readonly-table-section>
+                        <repeated-minimal-nonumber-readonly-table-single-grid>
+                            <repeated-minimal-nonumber-readonly-table-single-grid-iteration>
+                                <repeated-minimal-nonumber-readonly-table-f1/>
+                            </repeated-minimal-nonumber-readonly-table-single-grid-iteration>
+                        </repeated-minimal-nonumber-readonly-table-single-grid>
+                        <repeated-minimal-nonumber-readonly-table-multiple-grid>
+                            <repeated-minimal-nonumber-readonly-table-multiple-grid-iteration>
+                                <repeated-minimal-nonumber-readonly-table-f2/>
+                                <repeated-minimal-nonumber-readonly-table-f3/>
+                                <repeated-minimal-nonumber-readonly-table-f4/>
+                            </repeated-minimal-nonumber-readonly-table-multiple-grid-iteration>
+                        </repeated-minimal-nonumber-readonly-table-multiple-grid>
+                    </repeated-minimal-nonumber-readonly-table-section>
+                    <repeated-full-number-readwrite-css-section>
+                        <repeated-full-number-readwrite-css-single-grid>
+                            <repeated-full-number-readwrite-css-single-grid-iteration>
+                                <repeated-full-number-readwrite-css-f1/>
+                            </repeated-full-number-readwrite-css-single-grid-iteration>
+                        </repeated-full-number-readwrite-css-single-grid>
+                        <repeated-full-number-readwrite-css-multiple-grid>
+                            <repeated-full-number-readwrite-css-multiple-grid-iteration>
+                                <repeated-full-number-readwrite-css-f2/>
+                                <repeated-full-number-readwrite-css-f3/>
+                                <repeated-full-number-readwrite-css-f4/>
+                            </repeated-full-number-readwrite-css-multiple-grid-iteration>
+                        </repeated-full-number-readwrite-css-multiple-grid>
+                    </repeated-full-number-readwrite-css-section>
+                    <repeated-minimal-number-readwrite-css-section>
+                        <repeated-minimal-number-readwrite-css-single-grid>
+                            <repeated-minimal-number-readwrite-css-single-grid-iteration>
+                                <repeated-minimal-number-readwrite-css-f1/>
+                            </repeated-minimal-number-readwrite-css-single-grid-iteration>
+                        </repeated-minimal-number-readwrite-css-single-grid>
+                        <repeated-minimal-number-readwrite-css-multiple-grid>
+                            <repeated-minimal-number-readwrite-css-multiple-grid-iteration>
+                                <repeated-minimal-number-readwrite-css-f2/>
+                                <repeated-minimal-number-readwrite-css-f3/>
+                                <repeated-minimal-number-readwrite-css-f4/>
+                            </repeated-minimal-number-readwrite-css-multiple-grid-iteration>
+                        </repeated-minimal-number-readwrite-css-multiple-grid>
+                    </repeated-minimal-number-readwrite-css-section>
+                    <repeated-full-nonumber-readwrite-css-section>
+                        <repeated-full-nonumber-readwrite-css-single-grid>
+                            <repeated-full-nonumber-readwrite-css-single-grid-iteration>
+                                <repeated-full-nonumber-readwrite-css-f1/>
+                            </repeated-full-nonumber-readwrite-css-single-grid-iteration>
+                        </repeated-full-nonumber-readwrite-css-single-grid>
+                        <repeated-full-nonumber-readwrite-css-multiple-grid>
+                            <repeated-full-nonumber-readwrite-css-multiple-grid-iteration>
+                                <repeated-full-nonumber-readwrite-css-f2/>
+                                <repeated-full-nonumber-readwrite-css-f3/>
+                                <repeated-full-nonumber-readwrite-css-f4/>
+                            </repeated-full-nonumber-readwrite-css-multiple-grid-iteration>
+                        </repeated-full-nonumber-readwrite-css-multiple-grid>
+                    </repeated-full-nonumber-readwrite-css-section>
+                    <repeated-minimal-nonumber-readwrite-css-section>
+                        <repeated-minimal-nonumber-readwrite-css-single-grid>
+                            <repeated-minimal-nonumber-readwrite-css-single-grid-iteration>
+                                <repeated-minimal-nonumber-readwrite-css-f1/>
+                            </repeated-minimal-nonumber-readwrite-css-single-grid-iteration>
+                        </repeated-minimal-nonumber-readwrite-css-single-grid>
+                        <repeated-minimal-nonumber-readwrite-css-multiple-grid>
+                            <repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration>
+                                <repeated-minimal-nonumber-readwrite-css-f2/>
+                                <repeated-minimal-nonumber-readwrite-css-f3/>
+                                <repeated-minimal-nonumber-readwrite-css-f4/>
+                            </repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration>
+                        </repeated-minimal-nonumber-readwrite-css-multiple-grid>
+                    </repeated-minimal-nonumber-readwrite-css-section>
+                    <repeated-full-number-readonly-css-section>
+                        <repeated-full-number-readonly-css-single-grid>
+                            <repeated-full-number-readonly-css-single-grid-iteration>
+                                <repeated-full-number-readonly-css-f1/>
+                            </repeated-full-number-readonly-css-single-grid-iteration>
+                        </repeated-full-number-readonly-css-single-grid>
+                        <repeated-full-number-readonly-css-multiple-grid>
+                            <repeated-full-number-readonly-css-multiple-grid-iteration>
+                                <repeated-full-number-readonly-css-f2/>
+                                <repeated-full-number-readonly-css-f3/>
+                                <repeated-full-number-readonly-css-f4/>
+                            </repeated-full-number-readonly-css-multiple-grid-iteration>
+                        </repeated-full-number-readonly-css-multiple-grid>
+                    </repeated-full-number-readonly-css-section>
+                    <repeated-minimal-number-readonly-css-section>
+                        <repeated-minimal-number-readonly-css-single-grid>
+                            <repeated-minimal-number-readonly-css-single-grid-iteration>
+                                <repeated-minimal-number-readonly-css-f1/>
+                            </repeated-minimal-number-readonly-css-single-grid-iteration>
+                        </repeated-minimal-number-readonly-css-single-grid>
+                        <repeated-minimal-number-readonly-css-multiple-grid>
+                            <repeated-minimal-number-readonly-css-multiple-grid-iteration>
+                                <repeated-minimal-number-readonly-css-f2/>
+                                <repeated-minimal-number-readonly-css-f3/>
+                                <repeated-minimal-number-readonly-css-f4/>
+                            </repeated-minimal-number-readonly-css-multiple-grid-iteration>
+                        </repeated-minimal-number-readonly-css-multiple-grid>
+                    </repeated-minimal-number-readonly-css-section>
+                    <repeated-full-nonumber-readonly-css-section>
+                        <repeated-full-nonumber-readonly-css-single-grid>
+                            <repeated-full-nonumber-readonly-css-single-grid-iteration>
+                                <repeated-full-nonumber-readonly-css-f1/>
+                            </repeated-full-nonumber-readonly-css-single-grid-iteration>
+                        </repeated-full-nonumber-readonly-css-single-grid>
+                        <repeated-full-nonumber-readonly-css-multiple-grid>
+                            <repeated-full-nonumber-readonly-css-multiple-grid-iteration>
+                                <repeated-full-nonumber-readonly-css-f2/>
+                                <repeated-full-nonumber-readonly-css-f3/>
+                                <repeated-full-nonumber-readonly-css-f4/>
+                            </repeated-full-nonumber-readonly-css-multiple-grid-iteration>
+                        </repeated-full-nonumber-readonly-css-multiple-grid>
+                    </repeated-full-nonumber-readonly-css-section>
+                    <repeated-minimal-nonumber-readonly-css-section>
+                        <repeated-minimal-nonumber-readonly-css-single-grid>
+                            <repeated-minimal-nonumber-readonly-css-single-grid-iteration>
+                                <repeated-minimal-nonumber-readonly-css-f1/>
+                            </repeated-minimal-nonumber-readonly-css-single-grid-iteration>
+                        </repeated-minimal-nonumber-readonly-css-single-grid>
+                        <repeated-minimal-nonumber-readonly-css-multiple-grid>
+                            <repeated-minimal-nonumber-readonly-css-multiple-grid-iteration>
+                                <repeated-minimal-nonumber-readonly-css-f2/>
+                                <repeated-minimal-nonumber-readonly-css-f3/>
+                                <repeated-minimal-nonumber-readonly-css-f4/>
+                            </repeated-minimal-nonumber-readonly-css-multiple-grid-iteration>
+                        </repeated-minimal-nonumber-readonly-css-multiple-grid>
+                    </repeated-minimal-nonumber-readonly-css-section>
+
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-bind" ref="section" name="section">
+                    <xf:bind id="single-grid-bind" ref="single-grid" name="single-grid">
+                        <xf:bind id="single-grid-iteration-bind" ref="single-grid-iteration" name="single-grid-iteration">
+                            <xf:bind id="f1-bind" ref="f1" name="f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="multiple-grid-bind" ref="multiple-grid" name="multiple-grid">
+                        <xf:bind id="multiple-grid-iteration-bind" ref="multiple-grid-iteration" name="multiple-grid-iteration">
+                            <xf:bind id="f2-bind" ref="f2" name="f2" xxf:whitespace="trim"/>
+                            <xf:bind id="f3-bind" ref="f3" name="f3"/>
+                            <xf:bind id="f4-bind" ref="f4" name="f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-full-number-readwrite-table-section-bind" ref="repeated-full-number-readwrite-table-section" name="repeated-full-number-readwrite-table-section">
+                    <xf:bind id="repeated-full-number-readwrite-table-single-grid-bind" ref="repeated-full-number-readwrite-table-single-grid" name="repeated-full-number-readwrite-table-single-grid">
+                        <xf:bind id="repeated-full-number-readwrite-table-single-grid-iteration-bind" ref="repeated-full-number-readwrite-table-single-grid-iteration" name="repeated-full-number-readwrite-table-single-grid-iteration">
+                            <xf:bind id="repeated-full-number-readwrite-table-f1-bind"
+                                     ref="repeated-full-number-readwrite-table-f1"
+                                     name="repeated-full-number-readwrite-table-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-full-number-readwrite-table-multiple-grid-bind" ref="repeated-full-number-readwrite-table-multiple-grid" name="repeated-full-number-readwrite-table-multiple-grid">
+                        <xf:bind id="repeated-full-number-readwrite-table-multiple-grid-iteration-bind" ref="repeated-full-number-readwrite-table-multiple-grid-iteration" name="repeated-full-number-readwrite-table-multiple-grid-iteration">
+                            <xf:bind id="repeated-full-number-readwrite-table-f2-bind"
+                                     ref="repeated-full-number-readwrite-table-f2"
+                                     name="repeated-full-number-readwrite-table-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-full-number-readwrite-table-f3-bind"
+                                     ref="repeated-full-number-readwrite-table-f3"
+                                     name="repeated-full-number-readwrite-table-f3"/>
+                            <xf:bind id="repeated-full-number-readwrite-table-f4-bind"
+                                     ref="repeated-full-number-readwrite-table-f4"
+                                     name="repeated-full-number-readwrite-table-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-minimal-number-readwrite-table-section-bind" ref="repeated-minimal-number-readwrite-table-section" name="repeated-minimal-number-readwrite-table-section">
+                    <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-bind" ref="repeated-minimal-number-readwrite-table-single-grid" name="repeated-minimal-number-readwrite-table-single-grid">
+                        <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-iteration-bind" ref="repeated-minimal-number-readwrite-table-single-grid-iteration" name="repeated-minimal-number-readwrite-table-single-grid-iteration">
+                            <xf:bind id="repeated-minimal-number-readwrite-table-f1-bind"
+                                     ref="repeated-minimal-number-readwrite-table-f1"
+                                     name="repeated-minimal-number-readwrite-table-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-minimal-number-readwrite-table-multiple-grid-bind" ref="repeated-minimal-number-readwrite-table-multiple-grid" name="repeated-minimal-number-readwrite-table-multiple-grid">
+                        <xf:bind id="repeated-minimal-number-readwrite-table-multiple-grid-iteration-bind" ref="repeated-minimal-number-readwrite-table-multiple-grid-iteration" name="repeated-minimal-number-readwrite-table-multiple-grid-iteration">
+                            <xf:bind id="repeated-minimal-number-readwrite-table-f2-bind"
+                                     ref="repeated-minimal-number-readwrite-table-f2"
+                                     name="repeated-minimal-number-readwrite-table-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-minimal-number-readwrite-table-f3-bind"
+                                     ref="repeated-minimal-number-readwrite-table-f3"
+                                     name="repeated-minimal-number-readwrite-table-f3"/>
+                            <xf:bind id="repeated-minimal-number-readwrite-table-f4-bind"
+                                     ref="repeated-minimal-number-readwrite-table-f4"
+                                     name="repeated-minimal-number-readwrite-table-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-full-nonumber-readwrite-table-section-bind" ref="repeated-full-nonumber-readwrite-table-section" name="repeated-full-nonumber-readwrite-table-section">
+                    <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-bind" ref="repeated-full-nonumber-readwrite-table-single-grid" name="repeated-full-nonumber-readwrite-table-single-grid">
+                        <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-iteration-bind" ref="repeated-full-nonumber-readwrite-table-single-grid-iteration" name="repeated-full-nonumber-readwrite-table-single-grid-iteration">
+                            <xf:bind id="repeated-full-nonumber-readwrite-table-f1-bind"
+                                     ref="repeated-full-nonumber-readwrite-table-f1"
+                                     name="repeated-full-nonumber-readwrite-table-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-full-nonumber-readwrite-table-multiple-grid-bind" ref="repeated-full-nonumber-readwrite-table-multiple-grid" name="repeated-full-nonumber-readwrite-table-multiple-grid">
+                        <xf:bind id="repeated-full-nonumber-readwrite-table-multiple-grid-iteration-bind" ref="repeated-full-nonumber-readwrite-table-multiple-grid-iteration" name="repeated-full-nonumber-readwrite-table-multiple-grid-iteration">
+                            <xf:bind id="repeated-full-nonumber-readwrite-table-f2-bind"
+                                     ref="repeated-full-nonumber-readwrite-table-f2"
+                                     name="repeated-full-nonumber-readwrite-table-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-full-nonumber-readwrite-table-f3-bind"
+                                     ref="repeated-full-nonumber-readwrite-table-f3"
+                                     name="repeated-full-nonumber-readwrite-table-f3"/>
+                            <xf:bind id="repeated-full-nonumber-readwrite-table-f4-bind"
+                                     ref="repeated-full-nonumber-readwrite-table-f4"
+                                     name="repeated-full-nonumber-readwrite-table-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-minimal-nonumber-readwrite-table-section-bind" ref="repeated-minimal-nonumber-readwrite-table-section" name="repeated-minimal-nonumber-readwrite-table-section">
+                    <xf:bind id="repeated-minimal-nonumber-readwrite-table-single-grid-bind" ref="repeated-minimal-nonumber-readwrite-table-single-grid" name="repeated-minimal-nonumber-readwrite-table-single-grid">
+                        <xf:bind id="repeated-minimal-nonumber-readwrite-table-single-grid-iteration-bind" ref="repeated-minimal-nonumber-readwrite-table-single-grid-iteration" name="repeated-minimal-nonumber-readwrite-table-single-grid-iteration">
+                            <xf:bind id="repeated-minimal-nonumber-readwrite-table-f1-bind"
+                                     ref="repeated-minimal-nonumber-readwrite-table-f1"
+                                     name="repeated-minimal-nonumber-readwrite-table-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-minimal-nonumber-readwrite-table-multiple-grid-bind" ref="repeated-minimal-nonumber-readwrite-table-multiple-grid" name="repeated-minimal-nonumber-readwrite-table-multiple-grid">
+                        <xf:bind id="repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration-bind" ref="repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration" name="repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration">
+                            <xf:bind id="repeated-minimal-nonumber-readwrite-table-f2-bind"
+                                     ref="repeated-minimal-nonumber-readwrite-table-f2"
+                                     name="repeated-minimal-nonumber-readwrite-table-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-minimal-nonumber-readwrite-table-f3-bind"
+                                     ref="repeated-minimal-nonumber-readwrite-table-f3"
+                                     name="repeated-minimal-nonumber-readwrite-table-f3"/>
+                            <xf:bind id="repeated-minimal-nonumber-readwrite-table-f4-bind"
+                                     ref="repeated-minimal-nonumber-readwrite-table-f4"
+                                     name="repeated-minimal-nonumber-readwrite-table-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-full-number-readonly-table-section-bind" ref="repeated-full-number-readonly-table-section" name="repeated-full-number-readonly-table-section">
+                    <xf:bind id="repeated-full-number-readonly-table-single-grid-bind" ref="repeated-full-number-readonly-table-single-grid" name="repeated-full-number-readonly-table-single-grid">
+                        <xf:bind id="repeated-full-number-readonly-table-single-grid-iteration-bind" ref="repeated-full-number-readonly-table-single-grid-iteration" name="repeated-full-number-readonly-table-single-grid-iteration">
+                            <xf:bind id="repeated-full-number-readonly-table-f1-bind"
+                                     ref="repeated-full-number-readonly-table-f1"
+                                     name="repeated-full-number-readonly-table-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-full-number-readonly-table-multiple-grid-bind" ref="repeated-full-number-readonly-table-multiple-grid" name="repeated-full-number-readonly-table-multiple-grid">
+                        <xf:bind id="repeated-full-number-readonly-table-multiple-grid-iteration-bind" ref="repeated-full-number-readonly-table-multiple-grid-iteration" name="repeated-full-number-readonly-table-multiple-grid-iteration">
+                            <xf:bind id="repeated-full-number-readonly-table-f2-bind"
+                                     ref="repeated-full-number-readonly-table-f2"
+                                     name="repeated-full-number-readonly-table-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-full-number-readonly-table-f3-bind"
+                                     ref="repeated-full-number-readonly-table-f3"
+                                     name="repeated-full-number-readonly-table-f3"/>
+                            <xf:bind id="repeated-full-number-readonly-table-f4-bind"
+                                     ref="repeated-full-number-readonly-table-f4"
+                                     name="repeated-full-number-readonly-table-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-minimal-number-readonly-table-section-bind" ref="repeated-minimal-number-readonly-table-section" name="repeated-minimal-number-readonly-table-section">
+                    <xf:bind id="repeated-minimal-number-readonly-table-single-grid-bind" ref="repeated-minimal-number-readonly-table-single-grid" name="repeated-minimal-number-readonly-table-single-grid">
+                        <xf:bind id="repeated-minimal-number-readonly-table-single-grid-iteration-bind" ref="repeated-minimal-number-readonly-table-single-grid-iteration" name="repeated-minimal-number-readonly-table-single-grid-iteration">
+                            <xf:bind id="repeated-minimal-number-readonly-table-f1-bind"
+                                     ref="repeated-minimal-number-readonly-table-f1"
+                                     name="repeated-minimal-number-readonly-table-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-minimal-number-readonly-table-multiple-grid-bind" ref="repeated-minimal-number-readonly-table-multiple-grid" name="repeated-minimal-number-readonly-table-multiple-grid">
+                        <xf:bind id="repeated-minimal-number-readonly-table-multiple-grid-iteration-bind" ref="repeated-minimal-number-readonly-table-multiple-grid-iteration" name="repeated-minimal-number-readonly-table-multiple-grid-iteration">
+                            <xf:bind id="repeated-minimal-number-readonly-table-f2-bind"
+                                     ref="repeated-minimal-number-readonly-table-f2"
+                                     name="repeated-minimal-number-readonly-table-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-minimal-number-readonly-table-f3-bind"
+                                     ref="repeated-minimal-number-readonly-table-f3"
+                                     name="repeated-minimal-number-readonly-table-f3"/>
+                            <xf:bind id="repeated-minimal-number-readonly-table-f4-bind"
+                                     ref="repeated-minimal-number-readonly-table-f4"
+                                     name="repeated-minimal-number-readonly-table-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-full-nonumber-readonly-table-section-bind" ref="repeated-full-nonumber-readonly-table-section" name="repeated-full-nonumber-readonly-table-section">
+                    <xf:bind id="repeated-full-nonumber-readonly-table-single-grid-bind" ref="repeated-full-nonumber-readonly-table-single-grid" name="repeated-full-nonumber-readonly-table-single-grid">
+                        <xf:bind id="repeated-full-nonumber-readonly-table-single-grid-iteration-bind" ref="repeated-full-nonumber-readonly-table-single-grid-iteration" name="repeated-full-nonumber-readonly-table-single-grid-iteration">
+                            <xf:bind id="repeated-full-nonumber-readonly-table-f1-bind"
+                                     ref="repeated-full-nonumber-readonly-table-f1"
+                                     name="repeated-full-nonumber-readonly-table-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-full-nonumber-readonly-table-multiple-grid-bind" ref="repeated-full-nonumber-readonly-table-multiple-grid" name="repeated-full-nonumber-readonly-table-multiple-grid">
+                        <xf:bind id="repeated-full-nonumber-readonly-table-multiple-grid-iteration-bind" ref="repeated-full-nonumber-readonly-table-multiple-grid-iteration" name="repeated-full-nonumber-readonly-table-multiple-grid-iteration">
+                            <xf:bind id="repeated-full-nonumber-readonly-table-f2-bind"
+                                     ref="repeated-full-nonumber-readonly-table-f2"
+                                     name="repeated-full-nonumber-readonly-table-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-full-nonumber-readonly-table-f3-bind"
+                                     ref="repeated-full-nonumber-readonly-table-f3"
+                                     name="repeated-full-nonumber-readonly-table-f3"/>
+                            <xf:bind id="repeated-full-nonumber-readonly-table-f4-bind"
+                                     ref="repeated-full-nonumber-readonly-table-f4"
+                                     name="repeated-full-nonumber-readonly-table-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-minimal-nonumber-readonly-table-section-bind" ref="repeated-minimal-nonumber-readonly-table-section" name="repeated-minimal-nonumber-readonly-table-section">
+                    <xf:bind id="repeated-minimal-nonumber-readonly-table-single-grid-bind" ref="repeated-minimal-nonumber-readonly-table-single-grid" name="repeated-minimal-nonumber-readonly-table-single-grid">
+                        <xf:bind id="repeated-minimal-nonumber-readonly-table-single-grid-iteration-bind" ref="repeated-minimal-nonumber-readonly-table-single-grid-iteration" name="repeated-minimal-nonumber-readonly-table-single-grid-iteration">
+                            <xf:bind id="repeated-minimal-nonumber-readonly-table-f1-bind"
+                                     ref="repeated-minimal-nonumber-readonly-table-f1"
+                                     name="repeated-minimal-nonumber-readonly-table-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-minimal-nonumber-readonly-table-multiple-grid-bind" ref="repeated-minimal-nonumber-readonly-table-multiple-grid" name="repeated-minimal-nonumber-readonly-table-multiple-grid">
+                        <xf:bind id="repeated-minimal-nonumber-readonly-table-multiple-grid-iteration-bind" ref="repeated-minimal-nonumber-readonly-table-multiple-grid-iteration" name="repeated-minimal-nonumber-readonly-table-multiple-grid-iteration">
+                            <xf:bind id="repeated-minimal-nonumber-readonly-table-f2-bind"
+                                     ref="repeated-minimal-nonumber-readonly-table-f2"
+                                     name="repeated-minimal-nonumber-readonly-table-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-minimal-nonumber-readonly-table-f3-bind"
+                                     ref="repeated-minimal-nonumber-readonly-table-f3"
+                                     name="repeated-minimal-nonumber-readonly-table-f3"/>
+                            <xf:bind id="repeated-minimal-nonumber-readonly-table-f4-bind"
+                                     ref="repeated-minimal-nonumber-readonly-table-f4"
+                                     name="repeated-minimal-nonumber-readonly-table-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-full-number-readwrite-css-section-bind" ref="repeated-full-number-readwrite-css-section" name="repeated-full-number-readwrite-css-section">
+                    <xf:bind id="repeated-full-number-readwrite-css-single-grid-bind" ref="repeated-full-number-readwrite-css-single-grid" name="repeated-full-number-readwrite-css-single-grid">
+                        <xf:bind id="repeated-full-number-readwrite-css-single-grid-iteration-bind" ref="repeated-full-number-readwrite-css-single-grid-iteration" name="repeated-full-number-readwrite-css-single-grid-iteration">
+                            <xf:bind id="repeated-full-number-readwrite-css-f1-bind"
+                                     ref="repeated-full-number-readwrite-css-f1"
+                                     name="repeated-full-number-readwrite-css-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-full-number-readwrite-css-multiple-grid-bind" ref="repeated-full-number-readwrite-css-multiple-grid" name="repeated-full-number-readwrite-css-multiple-grid">
+                        <xf:bind id="repeated-full-number-readwrite-css-multiple-grid-iteration-bind" ref="repeated-full-number-readwrite-css-multiple-grid-iteration" name="repeated-full-number-readwrite-css-multiple-grid-iteration">
+                            <xf:bind id="repeated-full-number-readwrite-css-f2-bind"
+                                     ref="repeated-full-number-readwrite-css-f2"
+                                     name="repeated-full-number-readwrite-css-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-full-number-readwrite-css-f3-bind"
+                                     ref="repeated-full-number-readwrite-css-f3"
+                                     name="repeated-full-number-readwrite-css-f3"/>
+                            <xf:bind id="repeated-full-number-readwrite-css-f4-bind"
+                                     ref="repeated-full-number-readwrite-css-f4"
+                                     name="repeated-full-number-readwrite-css-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-minimal-number-readwrite-css-section-bind" ref="repeated-minimal-number-readwrite-css-section" name="repeated-minimal-number-readwrite-css-section">
+                    <xf:bind id="repeated-minimal-number-readwrite-css-single-grid-bind" ref="repeated-minimal-number-readwrite-css-single-grid" name="repeated-minimal-number-readwrite-css-single-grid">
+                        <xf:bind id="repeated-minimal-number-readwrite-css-single-grid-iteration-bind" ref="repeated-minimal-number-readwrite-css-single-grid-iteration" name="repeated-minimal-number-readwrite-css-single-grid-iteration">
+                            <xf:bind id="repeated-minimal-number-readwrite-css-f1-bind"
+                                     ref="repeated-minimal-number-readwrite-css-f1"
+                                     name="repeated-minimal-number-readwrite-css-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-minimal-number-readwrite-css-multiple-grid-bind" ref="repeated-minimal-number-readwrite-css-multiple-grid" name="repeated-minimal-number-readwrite-css-multiple-grid">
+                        <xf:bind id="repeated-minimal-number-readwrite-css-multiple-grid-iteration-bind" ref="repeated-minimal-number-readwrite-css-multiple-grid-iteration" name="repeated-minimal-number-readwrite-css-multiple-grid-iteration">
+                            <xf:bind id="repeated-minimal-number-readwrite-css-f2-bind"
+                                     ref="repeated-minimal-number-readwrite-css-f2"
+                                     name="repeated-minimal-number-readwrite-css-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-minimal-number-readwrite-css-f3-bind"
+                                     ref="repeated-minimal-number-readwrite-css-f3"
+                                     name="repeated-minimal-number-readwrite-css-f3"/>
+                            <xf:bind id="repeated-minimal-number-readwrite-css-f4-bind"
+                                     ref="repeated-minimal-number-readwrite-css-f4"
+                                     name="repeated-minimal-number-readwrite-css-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-full-nonumber-readwrite-css-section-bind" ref="repeated-full-nonumber-readwrite-css-section" name="repeated-full-nonumber-readwrite-css-section">
+                    <xf:bind id="repeated-full-nonumber-readwrite-css-single-grid-bind" ref="repeated-full-nonumber-readwrite-css-single-grid" name="repeated-full-nonumber-readwrite-css-single-grid">
+                        <xf:bind id="repeated-full-nonumber-readwrite-css-single-grid-iteration-bind" ref="repeated-full-nonumber-readwrite-css-single-grid-iteration" name="repeated-full-nonumber-readwrite-css-single-grid-iteration">
+                            <xf:bind id="repeated-full-nonumber-readwrite-css-f1-bind"
+                                     ref="repeated-full-nonumber-readwrite-css-f1"
+                                     name="repeated-full-nonumber-readwrite-css-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-full-nonumber-readwrite-css-multiple-grid-bind" ref="repeated-full-nonumber-readwrite-css-multiple-grid" name="repeated-full-nonumber-readwrite-css-multiple-grid">
+                        <xf:bind id="repeated-full-nonumber-readwrite-css-multiple-grid-iteration-bind" ref="repeated-full-nonumber-readwrite-css-multiple-grid-iteration" name="repeated-full-nonumber-readwrite-css-multiple-grid-iteration">
+                            <xf:bind id="repeated-full-nonumber-readwrite-css-f2-bind"
+                                     ref="repeated-full-nonumber-readwrite-css-f2"
+                                     name="repeated-full-nonumber-readwrite-css-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-full-nonumber-readwrite-css-f3-bind"
+                                     ref="repeated-full-nonumber-readwrite-css-f3"
+                                     name="repeated-full-nonumber-readwrite-css-f3"/>
+                            <xf:bind id="repeated-full-nonumber-readwrite-css-f4-bind"
+                                     ref="repeated-full-nonumber-readwrite-css-f4"
+                                     name="repeated-full-nonumber-readwrite-css-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-minimal-nonumber-readwrite-css-section-bind" ref="repeated-minimal-nonumber-readwrite-css-section" name="repeated-minimal-nonumber-readwrite-css-section">
+                    <xf:bind id="repeated-minimal-nonumber-readwrite-css-single-grid-bind" ref="repeated-minimal-nonumber-readwrite-css-single-grid" name="repeated-minimal-nonumber-readwrite-css-single-grid">
+                        <xf:bind id="repeated-minimal-nonumber-readwrite-css-single-grid-iteration-bind" ref="repeated-minimal-nonumber-readwrite-css-single-grid-iteration" name="repeated-minimal-nonumber-readwrite-css-single-grid-iteration">
+                            <xf:bind id="repeated-minimal-nonumber-readwrite-css-f1-bind"
+                                     ref="repeated-minimal-nonumber-readwrite-css-f1"
+                                     name="repeated-minimal-nonumber-readwrite-css-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-minimal-nonumber-readwrite-css-multiple-grid-bind" ref="repeated-minimal-nonumber-readwrite-css-multiple-grid" name="repeated-minimal-nonumber-readwrite-css-multiple-grid">
+                        <xf:bind id="repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration-bind" ref="repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration" name="repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration">
+                            <xf:bind id="repeated-minimal-nonumber-readwrite-css-f2-bind"
+                                     ref="repeated-minimal-nonumber-readwrite-css-f2"
+                                     name="repeated-minimal-nonumber-readwrite-css-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-minimal-nonumber-readwrite-css-f3-bind"
+                                     ref="repeated-minimal-nonumber-readwrite-css-f3"
+                                     name="repeated-minimal-nonumber-readwrite-css-f3"/>
+                            <xf:bind id="repeated-minimal-nonumber-readwrite-css-f4-bind"
+                                     ref="repeated-minimal-nonumber-readwrite-css-f4"
+                                     name="repeated-minimal-nonumber-readwrite-css-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-full-number-readonly-css-section-bind" ref="repeated-full-number-readonly-css-section" name="repeated-full-number-readonly-css-section">
+                    <xf:bind id="repeated-full-number-readonly-css-single-grid-bind" ref="repeated-full-number-readonly-css-single-grid" name="repeated-full-number-readonly-css-single-grid">
+                        <xf:bind id="repeated-full-number-readonly-css-single-grid-iteration-bind" ref="repeated-full-number-readonly-css-single-grid-iteration" name="repeated-full-number-readonly-css-single-grid-iteration">
+                            <xf:bind id="repeated-full-number-readonly-css-f1-bind"
+                                     ref="repeated-full-number-readonly-css-f1"
+                                     name="repeated-full-number-readonly-css-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-full-number-readonly-css-multiple-grid-bind" ref="repeated-full-number-readonly-css-multiple-grid" name="repeated-full-number-readonly-css-multiple-grid">
+                        <xf:bind id="repeated-full-number-readonly-css-multiple-grid-iteration-bind" ref="repeated-full-number-readonly-css-multiple-grid-iteration" name="repeated-full-number-readonly-css-multiple-grid-iteration">
+                            <xf:bind id="repeated-full-number-readonly-css-f2-bind"
+                                     ref="repeated-full-number-readonly-css-f2"
+                                     name="repeated-full-number-readonly-css-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-full-number-readonly-css-f3-bind"
+                                     ref="repeated-full-number-readonly-css-f3"
+                                     name="repeated-full-number-readonly-css-f3"/>
+                            <xf:bind id="repeated-full-number-readonly-css-f4-bind"
+                                     ref="repeated-full-number-readonly-css-f4"
+                                     name="repeated-full-number-readonly-css-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-minimal-number-readonly-css-section-bind" ref="repeated-minimal-number-readonly-css-section" name="repeated-minimal-number-readonly-css-section">
+                    <xf:bind id="repeated-minimal-number-readonly-css-single-grid-bind" ref="repeated-minimal-number-readonly-css-single-grid" name="repeated-minimal-number-readonly-css-single-grid">
+                        <xf:bind id="repeated-minimal-number-readonly-css-single-grid-iteration-bind" ref="repeated-minimal-number-readonly-css-single-grid-iteration" name="repeated-minimal-number-readonly-css-single-grid-iteration">
+                            <xf:bind id="repeated-minimal-number-readonly-css-f1-bind"
+                                     ref="repeated-minimal-number-readonly-css-f1"
+                                     name="repeated-minimal-number-readonly-css-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-minimal-number-readonly-css-multiple-grid-bind" ref="repeated-minimal-number-readonly-css-multiple-grid" name="repeated-minimal-number-readonly-css-multiple-grid">
+                        <xf:bind id="repeated-minimal-number-readonly-css-multiple-grid-iteration-bind" ref="repeated-minimal-number-readonly-css-multiple-grid-iteration" name="repeated-minimal-number-readonly-css-multiple-grid-iteration">
+                            <xf:bind id="repeated-minimal-number-readonly-css-f2-bind"
+                                     ref="repeated-minimal-number-readonly-css-f2"
+                                     name="repeated-minimal-number-readonly-css-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-minimal-number-readonly-css-f3-bind"
+                                     ref="repeated-minimal-number-readonly-css-f3"
+                                     name="repeated-minimal-number-readonly-css-f3"/>
+                            <xf:bind id="repeated-minimal-number-readonly-css-f4-bind"
+                                     ref="repeated-minimal-number-readonly-css-f4"
+                                     name="repeated-minimal-number-readonly-css-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-full-nonumber-readonly-css-section-bind" ref="repeated-full-nonumber-readonly-css-section" name="repeated-full-nonumber-readonly-css-section">
+                    <xf:bind id="repeated-full-nonumber-readonly-css-single-grid-bind" ref="repeated-full-nonumber-readonly-css-single-grid" name="repeated-full-nonumber-readonly-css-single-grid">
+                        <xf:bind id="repeated-full-nonumber-readonly-css-single-grid-iteration-bind" ref="repeated-full-nonumber-readonly-css-single-grid-iteration" name="repeated-full-nonumber-readonly-css-single-grid-iteration">
+                            <xf:bind id="repeated-full-nonumber-readonly-css-f1-bind"
+                                     ref="repeated-full-nonumber-readonly-css-f1"
+                                     name="repeated-full-nonumber-readonly-css-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-full-nonumber-readonly-css-multiple-grid-bind" ref="repeated-full-nonumber-readonly-css-multiple-grid" name="repeated-full-nonumber-readonly-css-multiple-grid">
+                        <xf:bind id="repeated-full-nonumber-readonly-css-multiple-grid-iteration-bind" ref="repeated-full-nonumber-readonly-css-multiple-grid-iteration" name="repeated-full-nonumber-readonly-css-multiple-grid-iteration">
+                            <xf:bind id="repeated-full-nonumber-readonly-css-f2-bind"
+                                     ref="repeated-full-nonumber-readonly-css-f2"
+                                     name="repeated-full-nonumber-readonly-css-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-full-nonumber-readonly-css-f3-bind"
+                                     ref="repeated-full-nonumber-readonly-css-f3"
+                                     name="repeated-full-nonumber-readonly-css-f3"/>
+                            <xf:bind id="repeated-full-nonumber-readonly-css-f4-bind"
+                                     ref="repeated-full-nonumber-readonly-css-f4"
+                                     name="repeated-full-nonumber-readonly-css-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="repeated-minimal-nonumber-readonly-css-section-bind" ref="repeated-minimal-nonumber-readonly-css-section" name="repeated-minimal-nonumber-readonly-css-section">
+                    <xf:bind id="repeated-minimal-nonumber-readonly-css-single-grid-bind" ref="repeated-minimal-nonumber-readonly-css-single-grid" name="repeated-minimal-nonumber-readonly-css-single-grid">
+                        <xf:bind id="repeated-minimal-nonumber-readonly-css-single-grid-iteration-bind" ref="repeated-minimal-nonumber-readonly-css-single-grid-iteration" name="repeated-minimal-nonumber-readonly-css-single-grid-iteration">
+                            <xf:bind id="repeated-minimal-nonumber-readonly-css-f1-bind"
+                                     ref="repeated-minimal-nonumber-readonly-css-f1"
+                                     name="repeated-minimal-nonumber-readonly-css-f1" xxf:whitespace="trim"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="repeated-minimal-nonumber-readonly-css-multiple-grid-bind" ref="repeated-minimal-nonumber-readonly-css-multiple-grid" name="repeated-minimal-nonumber-readonly-css-multiple-grid">
+                        <xf:bind id="repeated-minimal-nonumber-readonly-css-multiple-grid-iteration-bind" ref="repeated-minimal-nonumber-readonly-css-multiple-grid-iteration" name="repeated-minimal-nonumber-readonly-css-multiple-grid-iteration">
+                            <xf:bind id="repeated-minimal-nonumber-readonly-css-f2-bind"
+                                     ref="repeated-minimal-nonumber-readonly-css-f2"
+                                     name="repeated-minimal-nonumber-readonly-css-f2" xxf:whitespace="trim"/>
+                            <xf:bind id="repeated-minimal-nonumber-readonly-css-f3-bind"
+                                     ref="repeated-minimal-nonumber-readonly-css-f3"
+                                     name="repeated-minimal-nonumber-readonly-css-f3"/>
+                            <xf:bind id="repeated-minimal-nonumber-readonly-css-f4-bind"
+                                     ref="repeated-minimal-nonumber-readonly-css-f4"
+                                     name="repeated-minimal-nonumber-readonly-css-f4"/>
+                        </xf:bind>
+                    </xf:bind>
+                </xf:bind>
+
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>repeated-grids</form-name>
+                    <title xml:lang="en">Appearances of Orbeon Forms Repeated Grids</title>
+                    <description xml:lang="en" mediatype="text/html">&lt;div&gt;This form illustrates the different appearances of repeated grids depending on the following parameters:&lt;/div&gt;&lt;div&gt;&amp;nbsp;&lt;/div&gt;&lt;ol&gt;&lt;li&gt;Repetition over one vs. more rows&lt;/li&gt;&lt;li&gt;Full appearance vs. minimal appearance&lt;/li&gt;&lt;li&gt;Whether to show the repetition number or not&lt;/li&gt;&lt;li&gt;Modifiable vs. readonly grid&lt;/li&gt;&lt;li&gt;Use of HTML tables vs. CSS grids for rendering&lt;/li&gt;&lt;/ol&gt;&lt;div&gt;With Form Builder, you can control the appearance, numbering, and readonly parameters in the Container Settings dialog. With Orbeon Forms 2022.1, Orbeon Forms uses CSS grids by default. This default can be changed using configuration properties.&lt;/div&gt;</description>
+                    <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>
+                    <library-versions>
+                        <orbeon>1</orbeon>
+                    </library-versions>
+                    <grid-markup>html-table</grid-markup>
+                <updated-with-version>2021.1-SNAPSHOT PE</updated-with-version><migration version="4.8.0">[{ "path": "section/single-grid", "iteration-name": "single-grid-iteration" },{ "path": "section/multiple-grid", "iteration-name": "multiple-grid-iteration" },{ "path": "repeated-full-number-readwrite-table-section/repeated-full-number-readwrite-table-single-grid", "iteration-name": "repeated-full-number-readwrite-table-single-grid-iteration" },{ "path": "repeated-full-number-readwrite-table-section/repeated-full-number-readwrite-table-multiple-grid", "iteration-name": "repeated-full-number-readwrite-table-multiple-grid-iteration" },{ "path": "repeated-minimal-number-readwrite-table-section/repeated-minimal-number-readwrite-table-single-grid", "iteration-name": "repeated-minimal-number-readwrite-table-single-grid-iteration" },{ "path": "repeated-minimal-number-readwrite-table-section/repeated-minimal-number-readwrite-table-multiple-grid", "iteration-name": "repeated-minimal-number-readwrite-table-multiple-grid-iteration" },{ "path": "repeated-full-nonumber-readwrite-table-section/repeated-full-nonumber-readwrite-table-single-grid", "iteration-name": "repeated-full-nonumber-readwrite-table-single-grid-iteration" },{ "path": "repeated-full-nonumber-readwrite-table-section/repeated-full-nonumber-readwrite-table-multiple-grid", "iteration-name": "repeated-full-nonumber-readwrite-table-multiple-grid-iteration" },{ "path": "repeated-minimal-nonumber-readwrite-table-section/repeated-minimal-nonumber-readwrite-table-single-grid", "iteration-name": "repeated-minimal-nonumber-readwrite-table-single-grid-iteration" },{ "path": "repeated-minimal-nonumber-readwrite-table-section/repeated-minimal-nonumber-readwrite-table-multiple-grid", "iteration-name": "repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration" },{ "path": "repeated-full-number-readonly-table-section/repeated-full-number-readonly-table-single-grid", "iteration-name": "repeated-full-number-readonly-table-single-grid-iteration" },{ "path": "repeated-full-number-readonly-table-section/repeated-full-number-readonly-table-multiple-grid", "iteration-name": "repeated-full-number-readonly-table-multiple-grid-iteration" },{ "path": "repeated-minimal-number-readonly-table-section/repeated-minimal-number-readonly-table-single-grid", "iteration-name": "repeated-minimal-number-readonly-table-single-grid-iteration" },{ "path": "repeated-minimal-number-readonly-table-section/repeated-minimal-number-readonly-table-multiple-grid", "iteration-name": "repeated-minimal-number-readonly-table-multiple-grid-iteration" },{ "path": "repeated-full-nonumber-readonly-table-section/repeated-full-nonumber-readonly-table-single-grid", "iteration-name": "repeated-full-nonumber-readonly-table-single-grid-iteration" },{ "path": "repeated-full-nonumber-readonly-table-section/repeated-full-nonumber-readonly-table-multiple-grid", "iteration-name": "repeated-full-nonumber-readonly-table-multiple-grid-iteration" },{ "path": "repeated-minimal-nonumber-readonly-table-section/repeated-minimal-nonumber-readonly-table-single-grid", "iteration-name": "repeated-minimal-nonumber-readonly-table-single-grid-iteration" },{ "path": "repeated-minimal-nonumber-readonly-table-section/repeated-minimal-nonumber-readonly-table-multiple-grid", "iteration-name": "repeated-minimal-nonumber-readonly-table-multiple-grid-iteration" },{ "path": "repeated-full-number-readwrite-css-section/repeated-full-number-readwrite-css-single-grid", "iteration-name": "repeated-full-number-readwrite-css-single-grid-iteration" },{ "path": "repeated-full-number-readwrite-css-section/repeated-full-number-readwrite-css-multiple-grid", "iteration-name": "repeated-full-number-readwrite-css-multiple-grid-iteration" },{ "path": "repeated-minimal-number-readwrite-css-section/repeated-minimal-number-readwrite-css-single-grid", "iteration-name": "repeated-minimal-number-readwrite-css-single-grid-iteration" },{ "path": "repeated-minimal-number-readwrite-css-section/repeated-minimal-number-readwrite-css-multiple-grid", "iteration-name": "repeated-minimal-number-readwrite-css-multiple-grid-iteration" },{ "path": "repeated-full-nonumber-readwrite-css-section/repeated-full-nonumber-readwrite-css-single-grid", "iteration-name": "repeated-full-nonumber-readwrite-css-single-grid-iteration" },{ "path": "repeated-full-nonumber-readwrite-css-section/repeated-full-nonumber-readwrite-css-multiple-grid", "iteration-name": "repeated-full-nonumber-readwrite-css-multiple-grid-iteration" },{ "path": "repeated-minimal-nonumber-readwrite-css-section/repeated-minimal-nonumber-readwrite-css-single-grid", "iteration-name": "repeated-minimal-nonumber-readwrite-css-single-grid-iteration" },{ "path": "repeated-minimal-nonumber-readwrite-css-section/repeated-minimal-nonumber-readwrite-css-multiple-grid", "iteration-name": "repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration" },{ "path": "repeated-full-number-readonly-css-section/repeated-full-number-readonly-css-single-grid", "iteration-name": "repeated-full-number-readonly-css-single-grid-iteration" },{ "path": "repeated-full-number-readonly-css-section/repeated-full-number-readonly-css-multiple-grid", "iteration-name": "repeated-full-number-readonly-css-multiple-grid-iteration" },{ "path": "repeated-minimal-number-readonly-css-section/repeated-minimal-number-readonly-css-single-grid", "iteration-name": "repeated-minimal-number-readonly-css-single-grid-iteration" },{ "path": "repeated-minimal-number-readonly-css-section/repeated-minimal-number-readonly-css-multiple-grid", "iteration-name": "repeated-minimal-number-readonly-css-multiple-grid-iteration" },{ "path": "repeated-full-nonumber-readonly-css-section/repeated-full-nonumber-readonly-css-single-grid", "iteration-name": "repeated-full-nonumber-readonly-css-single-grid-iteration" },{ "path": "repeated-full-nonumber-readonly-css-section/repeated-full-nonumber-readonly-css-multiple-grid", "iteration-name": "repeated-full-nonumber-readonly-css-multiple-grid-iteration" },{ "path": "repeated-minimal-nonumber-readonly-css-section/repeated-minimal-nonumber-readonly-css-single-grid", "iteration-name": "repeated-minimal-nonumber-readonly-css-single-grid-iteration" },{ "path": "repeated-minimal-nonumber-readonly-css-section/repeated-minimal-nonumber-readonly-css-multiple-grid", "iteration-name": "repeated-minimal-nonumber-readonly-css-multiple-grid-iteration" }]</migration></metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <section>
+                            <label>Template</label>
+                        </section>
+                        <repeated-full-number-readwrite-table-section>
+                            <label>repeated-full-number-readwrite-table</label>
+                        </repeated-full-number-readwrite-table-section>
+                        <repeated-minimal-number-readwrite-table-section>
+                            <label>repeated-minimal-number-readwrite-table</label>
+                        </repeated-minimal-number-readwrite-table-section>
+                        <repeated-full-nonumber-readwrite-table-section>
+                            <label>repeated-full-nonumber-readwrite-table</label>
+                        </repeated-full-nonumber-readwrite-table-section>
+                        <repeated-minimal-nonumber-readwrite-table-section>
+                            <label>repeated-minimal-nonumber-readwrite-table</label>
+                        </repeated-minimal-nonumber-readwrite-table-section>
+                        <repeated-full-number-readonly-table-section>
+                            <label>repeated-full-number-readonly-table</label>
+                        </repeated-full-number-readonly-table-section>
+                        <repeated-minimal-number-readonly-table-section>
+                            <label>repeated-minimal-number-readonly-table</label>
+                        </repeated-minimal-number-readonly-table-section>
+                        <repeated-full-nonumber-readonly-table-section>
+                            <label>repeated-full-nonumber-readonly-table</label>
+                        </repeated-full-nonumber-readonly-table-section>
+                        <repeated-minimal-nonumber-readonly-table-section>
+                            <label>repeated-minimal-nonumber-readonly-table</label>
+                        </repeated-minimal-nonumber-readonly-table-section>
+                        <repeated-full-number-readwrite-css-section>
+                            <label>repeated-full-number-readwrite-css</label>
+                        </repeated-full-number-readwrite-css-section>
+                        <repeated-minimal-number-readwrite-css-section>
+                            <label>repeated-minimal-number-readwrite-css</label>
+                        </repeated-minimal-number-readwrite-css-section>
+                        <repeated-full-nonumber-readwrite-css-section>
+                            <label>repeated-full-nonumber-readwrite-css</label>
+                        </repeated-full-nonumber-readwrite-css-section>
+                        <repeated-minimal-nonumber-readwrite-css-section>
+                            <label>repeated-minimal-nonumber-readwrite-css</label>
+                        </repeated-minimal-nonumber-readwrite-css-section>
+                        <repeated-full-number-readonly-css-section>
+                            <label>repeated-full-number-readonly-css</label>
+                        </repeated-full-number-readonly-css-section>
+                        <repeated-minimal-number-readonly-css-section>
+                            <label>repeated-minimal-number-readonly-css</label>
+                        </repeated-minimal-number-readonly-css-section>
+                        <repeated-full-nonumber-readonly-css-section>
+                            <label>repeated-full-nonumber-readonly-css</label>
+                        </repeated-full-nonumber-readonly-css-section>
+                        <repeated-minimal-nonumber-readonly-css-section>
+                            <label>repeated-minimal-nonumber-readonly-css</label>
+                        </repeated-minimal-nonumber-readonly-css-section>
+                        <repeated-minimal-nonumber-readonly-css-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readonly-css-f1>
+                        <repeated-minimal-nonumber-readonly-css-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readonly-css-f2>
+                        <repeated-minimal-nonumber-readonly-css-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readonly-css-f3>
+                        <repeated-minimal-nonumber-readonly-css-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-minimal-nonumber-readonly-css-f4>
+                        <repeated-full-nonumber-readonly-css-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-nonumber-readonly-css-f1>
+                        <repeated-full-nonumber-readonly-css-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-nonumber-readonly-css-f2>
+                        <repeated-full-nonumber-readonly-css-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-full-nonumber-readonly-css-f3>
+                        <repeated-full-nonumber-readonly-css-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-full-nonumber-readonly-css-f4>
+                        <repeated-minimal-number-readonly-css-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-number-readonly-css-f1>
+                        <repeated-minimal-number-readonly-css-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-number-readonly-css-f2>
+                        <repeated-minimal-number-readonly-css-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-minimal-number-readonly-css-f3>
+                        <repeated-minimal-number-readonly-css-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-minimal-number-readonly-css-f4>
+                        <repeated-full-number-readonly-css-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-number-readonly-css-f1>
+                        <repeated-full-number-readonly-css-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-number-readonly-css-f2>
+                        <repeated-full-number-readonly-css-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-full-number-readonly-css-f3>
+                        <repeated-full-number-readonly-css-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-full-number-readonly-css-f4>
+                        <repeated-minimal-nonumber-readwrite-css-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readwrite-css-f1>
+                        <repeated-minimal-nonumber-readwrite-css-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readwrite-css-f2>
+                        <repeated-minimal-nonumber-readwrite-css-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readwrite-css-f3>
+                        <repeated-minimal-nonumber-readwrite-css-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-minimal-nonumber-readwrite-css-f4>
+                        <repeated-full-nonumber-readwrite-css-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-nonumber-readwrite-css-f1>
+                        <repeated-full-nonumber-readwrite-css-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-nonumber-readwrite-css-f2>
+                        <repeated-full-nonumber-readwrite-css-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-full-nonumber-readwrite-css-f3>
+                        <repeated-full-nonumber-readwrite-css-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-full-nonumber-readwrite-css-f4>
+                        <repeated-minimal-number-readwrite-css-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-number-readwrite-css-f1>
+                        <repeated-minimal-number-readwrite-css-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-number-readwrite-css-f2>
+                        <repeated-minimal-number-readwrite-css-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-minimal-number-readwrite-css-f3>
+                        <repeated-minimal-number-readwrite-css-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-minimal-number-readwrite-css-f4>
+                        <repeated-full-number-readwrite-css-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-number-readwrite-css-f1>
+                        <repeated-full-number-readwrite-css-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-number-readwrite-css-f2>
+                        <repeated-full-number-readwrite-css-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-full-number-readwrite-css-f3>
+                        <repeated-full-number-readwrite-css-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-full-number-readwrite-css-f4>
+
+
+
+
+
+                        <repeated-minimal-nonumber-readonly-table-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readonly-table-f1>
+                        <repeated-minimal-nonumber-readonly-table-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readonly-table-f2>
+                        <repeated-minimal-nonumber-readonly-table-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readonly-table-f3>
+                        <repeated-minimal-nonumber-readonly-table-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-minimal-nonumber-readonly-table-f4>
+                        <repeated-full-nonumber-readonly-table-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-nonumber-readonly-table-f1>
+                        <repeated-full-nonumber-readonly-table-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-nonumber-readonly-table-f2>
+                        <repeated-full-nonumber-readonly-table-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-full-nonumber-readonly-table-f3>
+                        <repeated-full-nonumber-readonly-table-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-full-nonumber-readonly-table-f4>
+                        <repeated-minimal-number-readonly-table-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-number-readonly-table-f1>
+                        <repeated-minimal-number-readonly-table-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-number-readonly-table-f2>
+                        <repeated-minimal-number-readonly-table-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-minimal-number-readonly-table-f3>
+                        <repeated-minimal-number-readonly-table-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-minimal-number-readonly-table-f4>
+                        <repeated-full-number-readonly-table-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-number-readonly-table-f1>
+                        <repeated-full-number-readonly-table-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-number-readonly-table-f2>
+                        <repeated-full-number-readonly-table-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-full-number-readonly-table-f3>
+                        <repeated-full-number-readonly-table-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-full-number-readonly-table-f4>
+                        <repeated-minimal-nonumber-readwrite-table-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readwrite-table-f1>
+                        <repeated-minimal-nonumber-readwrite-table-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readwrite-table-f2>
+                        <repeated-minimal-nonumber-readwrite-table-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-minimal-nonumber-readwrite-table-f3>
+                        <repeated-minimal-nonumber-readwrite-table-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-minimal-nonumber-readwrite-table-f4>
+                        <repeated-full-nonumber-readwrite-table-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-nonumber-readwrite-table-f1>
+                        <repeated-full-nonumber-readwrite-table-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-nonumber-readwrite-table-f2>
+                        <repeated-full-nonumber-readwrite-table-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-full-nonumber-readwrite-table-f3>
+                        <repeated-full-nonumber-readwrite-table-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-full-nonumber-readwrite-table-f4>
+                        <repeated-minimal-number-readwrite-table-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-number-readwrite-table-f1>
+                        <repeated-minimal-number-readwrite-table-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-minimal-number-readwrite-table-f2>
+                        <repeated-minimal-number-readwrite-table-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-minimal-number-readwrite-table-f3>
+                        <repeated-minimal-number-readwrite-table-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-minimal-number-readwrite-table-f4>
+                        <repeated-full-number-readwrite-table-f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-number-readwrite-table-f1>
+                        <repeated-full-number-readwrite-table-f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </repeated-full-number-readwrite-table-f2>
+                        <repeated-full-number-readwrite-table-f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </repeated-full-number-readwrite-table-f3>
+                        <repeated-full-number-readwrite-table-f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </repeated-full-number-readwrite-table-f4>
+                        <f1>
+                            <label>Text Field</label>
+                            <hint/>
+                        </f1>
+                        <f2>
+                            <label>Text Field</label>
+                            <hint/>
+                        </f2>
+                        <f3>
+                            <label>Text Area</label>
+                            <hint/>
+                        </f3>
+                        <f4>
+                            <label>Radio Buttons</label>
+                            <hint/>
+                            <item>
+                                <label>First choice</label>
+                                <value>1</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Second choice</label>
+                                <value>2</value>
+                                <hint/>
+                            </item>
+                            <item>
+                                <label>Third choice</label>
+                                <value>3</value>
+                                <hint/>
+                            </item>
+                        </f4>
+
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="single-grid-template"><single-grid-iteration>
+                <f1/></single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="multiple-grid-template"><multiple-grid-iteration>
+                <f2/>
+                <f3/>
+                <f4/></multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-number-readwrite-table-single-grid-template"><repeated-full-number-readwrite-table-single-grid-iteration>
+                <repeated-full-number-readwrite-table-f1/></repeated-full-number-readwrite-table-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-number-readwrite-table-multiple-grid-template"><repeated-full-number-readwrite-table-multiple-grid-iteration>
+                <repeated-full-number-readwrite-table-f2/>
+                <repeated-full-number-readwrite-table-f3/>
+                <repeated-full-number-readwrite-table-f4/></repeated-full-number-readwrite-table-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-number-readwrite-table-single-grid-template"><repeated-minimal-number-readwrite-table-single-grid-iteration>
+                <repeated-minimal-number-readwrite-table-f1/></repeated-minimal-number-readwrite-table-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-number-readwrite-table-multiple-grid-template"><repeated-minimal-number-readwrite-table-multiple-grid-iteration>
+                <repeated-minimal-number-readwrite-table-f2/>
+                <repeated-minimal-number-readwrite-table-f3/>
+                <repeated-minimal-number-readwrite-table-f4/></repeated-minimal-number-readwrite-table-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-nonumber-readwrite-table-single-grid-template"><repeated-full-nonumber-readwrite-table-single-grid-iteration>
+                <repeated-full-nonumber-readwrite-table-f1/></repeated-full-nonumber-readwrite-table-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-nonumber-readwrite-table-multiple-grid-template"><repeated-full-nonumber-readwrite-table-multiple-grid-iteration>
+                <repeated-full-nonumber-readwrite-table-f2/>
+                <repeated-full-nonumber-readwrite-table-f3/>
+                <repeated-full-nonumber-readwrite-table-f4/></repeated-full-nonumber-readwrite-table-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-nonumber-readwrite-table-single-grid-template"><repeated-minimal-nonumber-readwrite-table-single-grid-iteration>
+                <repeated-minimal-nonumber-readwrite-table-f1/></repeated-minimal-nonumber-readwrite-table-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-nonumber-readwrite-table-multiple-grid-template"><repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration>
+                <repeated-minimal-nonumber-readwrite-table-f2/>
+                <repeated-minimal-nonumber-readwrite-table-f3/>
+                <repeated-minimal-nonumber-readwrite-table-f4/></repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-number-readonly-table-single-grid-template"><repeated-full-number-readonly-table-single-grid-iteration>
+                <repeated-full-number-readonly-table-f1/></repeated-full-number-readonly-table-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-number-readonly-table-multiple-grid-template"><repeated-full-number-readonly-table-multiple-grid-iteration>
+                <repeated-full-number-readonly-table-f2/>
+                <repeated-full-number-readonly-table-f3/>
+                <repeated-full-number-readonly-table-f4/></repeated-full-number-readonly-table-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-number-readonly-table-single-grid-template"><repeated-minimal-number-readonly-table-single-grid-iteration>
+                <repeated-minimal-number-readonly-table-f1/></repeated-minimal-number-readonly-table-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-number-readonly-table-multiple-grid-template"><repeated-minimal-number-readonly-table-multiple-grid-iteration>
+                <repeated-minimal-number-readonly-table-f2/>
+                <repeated-minimal-number-readonly-table-f3/>
+                <repeated-minimal-number-readonly-table-f4/></repeated-minimal-number-readonly-table-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-nonumber-readonly-table-single-grid-template"><repeated-full-nonumber-readonly-table-single-grid-iteration>
+                <repeated-full-nonumber-readonly-table-f1/></repeated-full-nonumber-readonly-table-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-nonumber-readonly-table-multiple-grid-template"><repeated-full-nonumber-readonly-table-multiple-grid-iteration>
+                <repeated-full-nonumber-readonly-table-f2/>
+                <repeated-full-nonumber-readonly-table-f3/>
+                <repeated-full-nonumber-readonly-table-f4/></repeated-full-nonumber-readonly-table-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-nonumber-readonly-table-single-grid-template"><repeated-minimal-nonumber-readonly-table-single-grid-iteration>
+                <repeated-minimal-nonumber-readonly-table-f1/></repeated-minimal-nonumber-readonly-table-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-nonumber-readonly-table-multiple-grid-template"><repeated-minimal-nonumber-readonly-table-multiple-grid-iteration>
+                <repeated-minimal-nonumber-readonly-table-f2/>
+                <repeated-minimal-nonumber-readonly-table-f3/>
+                <repeated-minimal-nonumber-readonly-table-f4/></repeated-minimal-nonumber-readonly-table-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-number-readwrite-css-single-grid-template"><repeated-full-number-readwrite-css-single-grid-iteration>
+                <repeated-full-number-readwrite-css-f1/></repeated-full-number-readwrite-css-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-number-readwrite-css-multiple-grid-template"><repeated-full-number-readwrite-css-multiple-grid-iteration>
+                <repeated-full-number-readwrite-css-f2/>
+                <repeated-full-number-readwrite-css-f3/>
+                <repeated-full-number-readwrite-css-f4/></repeated-full-number-readwrite-css-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-number-readwrite-css-single-grid-template"><repeated-minimal-number-readwrite-css-single-grid-iteration>
+                <repeated-minimal-number-readwrite-css-f1/></repeated-minimal-number-readwrite-css-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-number-readwrite-css-multiple-grid-template"><repeated-minimal-number-readwrite-css-multiple-grid-iteration>
+                <repeated-minimal-number-readwrite-css-f2/>
+                <repeated-minimal-number-readwrite-css-f3/>
+                <repeated-minimal-number-readwrite-css-f4/></repeated-minimal-number-readwrite-css-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-nonumber-readwrite-css-single-grid-template"><repeated-full-nonumber-readwrite-css-single-grid-iteration>
+                <repeated-full-nonumber-readwrite-css-f1/></repeated-full-nonumber-readwrite-css-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-nonumber-readwrite-css-multiple-grid-template"><repeated-full-nonumber-readwrite-css-multiple-grid-iteration>
+                <repeated-full-nonumber-readwrite-css-f2/>
+                <repeated-full-nonumber-readwrite-css-f3/>
+                <repeated-full-nonumber-readwrite-css-f4/></repeated-full-nonumber-readwrite-css-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-nonumber-readwrite-css-single-grid-template"><repeated-minimal-nonumber-readwrite-css-single-grid-iteration>
+                <repeated-minimal-nonumber-readwrite-css-f1/></repeated-minimal-nonumber-readwrite-css-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-nonumber-readwrite-css-multiple-grid-template"><repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration>
+                <repeated-minimal-nonumber-readwrite-css-f2/>
+                <repeated-minimal-nonumber-readwrite-css-f3/>
+                <repeated-minimal-nonumber-readwrite-css-f4/></repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-number-readonly-css-single-grid-template"><repeated-full-number-readonly-css-single-grid-iteration>
+                <repeated-full-number-readonly-css-f1/></repeated-full-number-readonly-css-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-number-readonly-css-multiple-grid-template"><repeated-full-number-readonly-css-multiple-grid-iteration>
+                <repeated-full-number-readonly-css-f2/>
+                <repeated-full-number-readonly-css-f3/>
+                <repeated-full-number-readonly-css-f4/></repeated-full-number-readonly-css-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-number-readonly-css-single-grid-template"><repeated-minimal-number-readonly-css-single-grid-iteration>
+                <repeated-minimal-number-readonly-css-f1/></repeated-minimal-number-readonly-css-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-number-readonly-css-multiple-grid-template"><repeated-minimal-number-readonly-css-multiple-grid-iteration>
+                <repeated-minimal-number-readonly-css-f2/>
+                <repeated-minimal-number-readonly-css-f3/>
+                <repeated-minimal-number-readonly-css-f4/></repeated-minimal-number-readonly-css-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-nonumber-readonly-css-single-grid-template"><repeated-full-nonumber-readonly-css-single-grid-iteration>
+                <repeated-full-nonumber-readonly-css-f1/></repeated-full-nonumber-readonly-css-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-full-nonumber-readonly-css-multiple-grid-template"><repeated-full-nonumber-readonly-css-multiple-grid-iteration>
+                <repeated-full-nonumber-readonly-css-f2/>
+                <repeated-full-nonumber-readonly-css-f3/>
+                <repeated-full-nonumber-readonly-css-f4/></repeated-full-nonumber-readonly-css-multiple-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-nonumber-readonly-css-single-grid-template"><repeated-minimal-nonumber-readonly-css-single-grid-iteration>
+                <repeated-minimal-nonumber-readonly-css-f1/></repeated-minimal-nonumber-readonly-css-single-grid-iteration></xf:instance>
+            <xf:instance xxf:readonly="true" xxf:exclude-result-prefixes="#all" id="repeated-minimal-nonumber-readonly-css-multiple-grid-template"><repeated-minimal-nonumber-readonly-css-multiple-grid-iteration>
+                <repeated-minimal-nonumber-readonly-css-f2/>
+                <repeated-minimal-nonumber-readonly-css-f3/>
+                <repeated-minimal-nonumber-readonly-css-f4/></repeated-minimal-nonumber-readonly-css-multiple-grid-iteration></xf:instance>
+
+
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="section-section" bind="section-bind">
+                    <xf:label ref="$form-resources/section/label"/>
+                    <fr:grid id="single-grid-grid" bind="single-grid-bind" repeat="content" min="1" template="instance('single-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="f1-control" bind="f1-bind">
+                                <xf:label ref="$form-resources/f1/label"/>
+                                <xf:hint ref="$form-resources/f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="multiple-grid-grid" bind="multiple-grid-bind" repeat="content" min="1" template="instance('multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="f2-control" bind="f2-bind">
+                                <xf:label ref="$form-resources/f2/label"/>
+                                <xf:hint ref="$form-resources/f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="f3-control" bind="f3-bind">
+                                <xf:label ref="$form-resources/f3/label"/>
+                                <xf:hint ref="$form-resources/f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="f4-control" appearance="full" bind="f4-bind">
+                                <xf:label ref="$form-resources/f4/label"/>
+                                <xf:hint ref="$form-resources/f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-full-number-readwrite-table-section-section" bind="repeated-full-number-readwrite-table-section-bind">
+                    <xf:label ref="$form-resources/repeated-full-number-readwrite-table-section/label"/>
+                    <fr:grid id="repeated-full-number-readwrite-table-single-grid-grid" bind="repeated-full-number-readwrite-table-single-grid-bind" repeat="content" min="1" template="instance('repeated-full-number-readwrite-table-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-number-readwrite-table-f1-control" bind="repeated-full-number-readwrite-table-f1-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readwrite-table-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readwrite-table-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="repeated-full-number-readwrite-table-multiple-grid-grid" bind="repeated-full-number-readwrite-table-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-full-number-readwrite-table-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-number-readwrite-table-f2-control" bind="repeated-full-number-readwrite-table-f2-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readwrite-table-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readwrite-table-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-full-number-readwrite-table-f3-control" bind="repeated-full-number-readwrite-table-f3-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readwrite-table-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readwrite-table-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-full-number-readwrite-table-f4-control" appearance="full" bind="repeated-full-number-readwrite-table-f4-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readwrite-table-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readwrite-table-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-full-number-readwrite-table-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-minimal-number-readwrite-table-section-section" bind="repeated-minimal-number-readwrite-table-section-bind">
+                    <xf:label ref="$form-resources/repeated-minimal-number-readwrite-table-section/label"/>
+                    <fr:grid id="repeated-minimal-number-readwrite-table-single-grid-grid" bind="repeated-minimal-number-readwrite-table-single-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-number-readwrite-table-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-number-readwrite-table-f1-control" bind="repeated-minimal-number-readwrite-table-f1-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readwrite-table-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readwrite-table-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="repeated-minimal-number-readwrite-table-multiple-grid-grid" bind="repeated-minimal-number-readwrite-table-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-number-readwrite-table-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-number-readwrite-table-f2-control" bind="repeated-minimal-number-readwrite-table-f2-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readwrite-table-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readwrite-table-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-minimal-number-readwrite-table-f3-control" bind="repeated-minimal-number-readwrite-table-f3-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readwrite-table-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readwrite-table-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-minimal-number-readwrite-table-f4-control" appearance="full" bind="repeated-minimal-number-readwrite-table-f4-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readwrite-table-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readwrite-table-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-minimal-number-readwrite-table-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-full-nonumber-readwrite-table-section-section" bind="repeated-full-nonumber-readwrite-table-section-bind">
+                    <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-table-section/label"/>
+                    <fr:grid id="repeated-full-nonumber-readwrite-table-single-grid-grid" bind="repeated-full-nonumber-readwrite-table-single-grid-bind" repeat="content" min="1" template="instance('repeated-full-nonumber-readwrite-table-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-nonumber-readwrite-table-f1-control" bind="repeated-full-nonumber-readwrite-table-f1-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-table-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readwrite-table-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="repeated-full-nonumber-readwrite-table-multiple-grid-grid" bind="repeated-full-nonumber-readwrite-table-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-full-nonumber-readwrite-table-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-nonumber-readwrite-table-f2-control" bind="repeated-full-nonumber-readwrite-table-f2-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-table-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readwrite-table-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-full-nonumber-readwrite-table-f3-control" bind="repeated-full-nonumber-readwrite-table-f3-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-table-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readwrite-table-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-full-nonumber-readwrite-table-f4-control" appearance="full" bind="repeated-full-nonumber-readwrite-table-f4-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-table-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readwrite-table-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-full-nonumber-readwrite-table-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-minimal-nonumber-readwrite-table-section-section" bind="repeated-minimal-nonumber-readwrite-table-section-bind">
+                    <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-table-section/label"/>
+                    <fr:grid id="repeated-minimal-nonumber-readwrite-table-single-grid-grid" bind="repeated-minimal-nonumber-readwrite-table-single-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-nonumber-readwrite-table-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-nonumber-readwrite-table-f1-control" bind="repeated-minimal-nonumber-readwrite-table-f1-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-table-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readwrite-table-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="repeated-minimal-nonumber-readwrite-table-multiple-grid-grid" bind="repeated-minimal-nonumber-readwrite-table-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-nonumber-readwrite-table-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-nonumber-readwrite-table-f2-control" bind="repeated-minimal-nonumber-readwrite-table-f2-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-table-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readwrite-table-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-minimal-nonumber-readwrite-table-f3-control" bind="repeated-minimal-nonumber-readwrite-table-f3-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-table-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readwrite-table-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-minimal-nonumber-readwrite-table-f4-control" appearance="full" bind="repeated-minimal-nonumber-readwrite-table-f4-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-table-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readwrite-table-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-minimal-nonumber-readwrite-table-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-full-number-readonly-table-section-section" bind="repeated-full-number-readonly-table-section-bind">
+                    <xf:label ref="$form-resources/repeated-full-number-readonly-table-section/label"/>
+                    <fr:grid readonly="true" id="repeated-full-number-readonly-table-single-grid-grid" bind="repeated-full-number-readonly-table-single-grid-bind" repeat="content" min="1" template="instance('repeated-full-number-readonly-table-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-number-readonly-table-f1-control" bind="repeated-full-number-readonly-table-f1-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readonly-table-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readonly-table-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid readonly="true" id="repeated-full-number-readonly-table-multiple-grid-grid" bind="repeated-full-number-readonly-table-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-full-number-readonly-table-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-number-readonly-table-f2-control" bind="repeated-full-number-readonly-table-f2-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readonly-table-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readonly-table-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-full-number-readonly-table-f3-control" bind="repeated-full-number-readonly-table-f3-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readonly-table-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readonly-table-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-full-number-readonly-table-f4-control" appearance="full" bind="repeated-full-number-readonly-table-f4-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readonly-table-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readonly-table-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-full-number-readonly-table-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-minimal-number-readonly-table-section-section" bind="repeated-minimal-number-readonly-table-section-bind">
+                    <xf:label ref="$form-resources/repeated-minimal-number-readonly-table-section/label"/>
+                    <fr:grid readonly="true" id="repeated-minimal-number-readonly-table-single-grid-grid" bind="repeated-minimal-number-readonly-table-single-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-number-readonly-table-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-number-readonly-table-f1-control" bind="repeated-minimal-number-readonly-table-f1-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readonly-table-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readonly-table-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid readonly="true" id="repeated-minimal-number-readonly-table-multiple-grid-grid" bind="repeated-minimal-number-readonly-table-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-number-readonly-table-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-number-readonly-table-f2-control" bind="repeated-minimal-number-readonly-table-f2-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readonly-table-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readonly-table-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-minimal-number-readonly-table-f3-control" bind="repeated-minimal-number-readonly-table-f3-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readonly-table-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readonly-table-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-minimal-number-readonly-table-f4-control" appearance="full" bind="repeated-minimal-number-readonly-table-f4-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readonly-table-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readonly-table-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-minimal-number-readonly-table-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-full-nonumber-readonly-table-section-section" bind="repeated-full-nonumber-readonly-table-section-bind">
+                    <xf:label ref="$form-resources/repeated-full-nonumber-readonly-table-section/label"/>
+                    <fr:grid readonly="true" id="repeated-full-nonumber-readonly-table-single-grid-grid" bind="repeated-full-nonumber-readonly-table-single-grid-bind" repeat="content" min="1" template="instance('repeated-full-nonumber-readonly-table-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-nonumber-readonly-table-f1-control" bind="repeated-full-nonumber-readonly-table-f1-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readonly-table-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readonly-table-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid readonly="true" id="repeated-full-nonumber-readonly-table-multiple-grid-grid" bind="repeated-full-nonumber-readonly-table-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-full-nonumber-readonly-table-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-nonumber-readonly-table-f2-control" bind="repeated-full-nonumber-readonly-table-f2-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readonly-table-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readonly-table-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-full-nonumber-readonly-table-f3-control" bind="repeated-full-nonumber-readonly-table-f3-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readonly-table-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readonly-table-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-full-nonumber-readonly-table-f4-control" appearance="full" bind="repeated-full-nonumber-readonly-table-f4-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readonly-table-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readonly-table-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-full-nonumber-readonly-table-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-minimal-nonumber-readonly-table-section-section" bind="repeated-minimal-nonumber-readonly-table-section-bind">
+                    <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-table-section/label"/>
+                    <fr:grid readonly="true" id="repeated-minimal-nonumber-readonly-table-single-grid-grid" bind="repeated-minimal-nonumber-readonly-table-single-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-nonumber-readonly-table-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-nonumber-readonly-table-f1-control" bind="repeated-minimal-nonumber-readonly-table-f1-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-table-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readonly-table-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid readonly="true" id="repeated-minimal-nonumber-readonly-table-multiple-grid-grid" bind="repeated-minimal-nonumber-readonly-table-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-nonumber-readonly-table-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-nonumber-readonly-table-f2-control" bind="repeated-minimal-nonumber-readonly-table-f2-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-table-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readonly-table-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-minimal-nonumber-readonly-table-f3-control" bind="repeated-minimal-nonumber-readonly-table-f3-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-table-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readonly-table-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-minimal-nonumber-readonly-table-f4-control" appearance="full" bind="repeated-minimal-nonumber-readonly-table-f4-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-table-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readonly-table-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-minimal-nonumber-readonly-table-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-full-number-readwrite-css-section-section" bind="repeated-full-number-readwrite-css-section-bind">
+                    <xf:label ref="$form-resources/repeated-full-number-readwrite-css-section/label"/>
+                    <fr:grid id="repeated-full-number-readwrite-css-single-grid-grid" bind="repeated-full-number-readwrite-css-single-grid-bind" repeat="content" min="1" template="instance('repeated-full-number-readwrite-css-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" markup="css-grid" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-number-readwrite-css-f1-control" bind="repeated-full-number-readwrite-css-f1-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readwrite-css-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readwrite-css-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="repeated-full-number-readwrite-css-multiple-grid-grid" bind="repeated-full-number-readwrite-css-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-full-number-readwrite-css-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" markup="css-grid" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-number-readwrite-css-f2-control" bind="repeated-full-number-readwrite-css-f2-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readwrite-css-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readwrite-css-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-full-number-readwrite-css-f3-control" bind="repeated-full-number-readwrite-css-f3-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readwrite-css-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readwrite-css-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-full-number-readwrite-css-f4-control" appearance="full" bind="repeated-full-number-readwrite-css-f4-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readwrite-css-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readwrite-css-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-full-number-readwrite-css-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-minimal-number-readwrite-css-section-section" bind="repeated-minimal-number-readwrite-css-section-bind">
+                    <xf:label ref="$form-resources/repeated-minimal-number-readwrite-css-section/label"/>
+                    <fr:grid id="repeated-minimal-number-readwrite-css-single-grid-grid" bind="repeated-minimal-number-readwrite-css-single-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-number-readwrite-css-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" markup="css-grid" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-number-readwrite-css-f1-control" bind="repeated-minimal-number-readwrite-css-f1-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readwrite-css-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readwrite-css-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="repeated-minimal-number-readwrite-css-multiple-grid-grid" bind="repeated-minimal-number-readwrite-css-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-number-readwrite-css-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" markup="css-grid" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-number-readwrite-css-f2-control" bind="repeated-minimal-number-readwrite-css-f2-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readwrite-css-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readwrite-css-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-minimal-number-readwrite-css-f3-control" bind="repeated-minimal-number-readwrite-css-f3-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readwrite-css-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readwrite-css-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-minimal-number-readwrite-css-f4-control" appearance="full" bind="repeated-minimal-number-readwrite-css-f4-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readwrite-css-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readwrite-css-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-minimal-number-readwrite-css-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-full-nonumber-readwrite-css-section-section" bind="repeated-full-nonumber-readwrite-css-section-bind">
+                    <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-css-section/label"/>
+                    <fr:grid id="repeated-full-nonumber-readwrite-css-single-grid-grid" bind="repeated-full-nonumber-readwrite-css-single-grid-bind" repeat="content" min="1" template="instance('repeated-full-nonumber-readwrite-css-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" markup="css-grid" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-nonumber-readwrite-css-f1-control" bind="repeated-full-nonumber-readwrite-css-f1-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-css-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readwrite-css-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="repeated-full-nonumber-readwrite-css-multiple-grid-grid" bind="repeated-full-nonumber-readwrite-css-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-full-nonumber-readwrite-css-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" markup="css-grid" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-nonumber-readwrite-css-f2-control" bind="repeated-full-nonumber-readwrite-css-f2-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-css-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readwrite-css-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-full-nonumber-readwrite-css-f3-control" bind="repeated-full-nonumber-readwrite-css-f3-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-css-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readwrite-css-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-full-nonumber-readwrite-css-f4-control" appearance="full" bind="repeated-full-nonumber-readwrite-css-f4-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readwrite-css-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readwrite-css-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-full-nonumber-readwrite-css-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-minimal-nonumber-readwrite-css-section-section" bind="repeated-minimal-nonumber-readwrite-css-section-bind">
+                    <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-css-section/label"/>
+                    <fr:grid id="repeated-minimal-nonumber-readwrite-css-single-grid-grid" bind="repeated-minimal-nonumber-readwrite-css-single-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-nonumber-readwrite-css-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" markup="css-grid" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-nonumber-readwrite-css-f1-control" bind="repeated-minimal-nonumber-readwrite-css-f1-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-css-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readwrite-css-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid id="repeated-minimal-nonumber-readwrite-css-multiple-grid-grid" bind="repeated-minimal-nonumber-readwrite-css-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-nonumber-readwrite-css-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" markup="css-grid" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-nonumber-readwrite-css-f2-control" bind="repeated-minimal-nonumber-readwrite-css-f2-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-css-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readwrite-css-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-minimal-nonumber-readwrite-css-f3-control" bind="repeated-minimal-nonumber-readwrite-css-f3-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-css-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readwrite-css-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-minimal-nonumber-readwrite-css-f4-control" appearance="full" bind="repeated-minimal-nonumber-readwrite-css-f4-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readwrite-css-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readwrite-css-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-minimal-nonumber-readwrite-css-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-full-number-readonly-css-section-section" bind="repeated-full-number-readonly-css-section-bind">
+                    <xf:label ref="$form-resources/repeated-full-number-readonly-css-section/label"/>
+                    <fr:grid readonly="true" id="repeated-full-number-readonly-css-single-grid-grid" bind="repeated-full-number-readonly-css-single-grid-bind" repeat="content" min="1" template="instance('repeated-full-number-readonly-css-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" markup="css-grid" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-number-readonly-css-f1-control" bind="repeated-full-number-readonly-css-f1-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readonly-css-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readonly-css-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid readonly="true" id="repeated-full-number-readonly-css-multiple-grid-grid" bind="repeated-full-number-readonly-css-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-full-number-readonly-css-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" markup="css-grid" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-number-readonly-css-f2-control" bind="repeated-full-number-readonly-css-f2-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readonly-css-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readonly-css-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-full-number-readonly-css-f3-control" bind="repeated-full-number-readonly-css-f3-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readonly-css-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readonly-css-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-full-number-readonly-css-f4-control" appearance="full" bind="repeated-full-number-readonly-css-f4-bind">
+                                <xf:label ref="$form-resources/repeated-full-number-readonly-css-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-number-readonly-css-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-full-number-readonly-css-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-minimal-number-readonly-css-section-section" bind="repeated-minimal-number-readonly-css-section-bind">
+                    <xf:label ref="$form-resources/repeated-minimal-number-readonly-css-section/label"/>
+                    <fr:grid readonly="true" id="repeated-minimal-number-readonly-css-single-grid-grid" bind="repeated-minimal-number-readonly-css-single-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-number-readonly-css-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" markup="css-grid" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-number-readonly-css-f1-control" bind="repeated-minimal-number-readonly-css-f1-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readonly-css-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readonly-css-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid readonly="true" id="repeated-minimal-number-readonly-css-multiple-grid-grid" bind="repeated-minimal-number-readonly-css-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-number-readonly-css-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" markup="css-grid" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-number-readonly-css-f2-control" bind="repeated-minimal-number-readonly-css-f2-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readonly-css-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readonly-css-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-minimal-number-readonly-css-f3-control" bind="repeated-minimal-number-readonly-css-f3-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readonly-css-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readonly-css-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-minimal-number-readonly-css-f4-control" appearance="full" bind="repeated-minimal-number-readonly-css-f4-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-number-readonly-css-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-number-readonly-css-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-minimal-number-readonly-css-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-full-nonumber-readonly-css-section-section" bind="repeated-full-nonumber-readonly-css-section-bind">
+                    <xf:label ref="$form-resources/repeated-full-nonumber-readonly-css-section/label"/>
+                    <fr:grid readonly="true" id="repeated-full-nonumber-readonly-css-single-grid-grid" bind="repeated-full-nonumber-readonly-css-single-grid-bind" repeat="content" min="1" template="instance('repeated-full-nonumber-readonly-css-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" markup="css-grid" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-nonumber-readonly-css-f1-control" bind="repeated-full-nonumber-readonly-css-f1-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readonly-css-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readonly-css-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid readonly="true" id="repeated-full-nonumber-readonly-css-multiple-grid-grid" bind="repeated-full-nonumber-readonly-css-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-full-nonumber-readonly-css-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" markup="css-grid" appearance="full">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-full-nonumber-readonly-css-f2-control" bind="repeated-full-nonumber-readonly-css-f2-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readonly-css-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readonly-css-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-full-nonumber-readonly-css-f3-control" bind="repeated-full-nonumber-readonly-css-f3-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readonly-css-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readonly-css-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-full-nonumber-readonly-css-f4-control" appearance="full" bind="repeated-full-nonumber-readonly-css-f4-bind">
+                                <xf:label ref="$form-resources/repeated-full-nonumber-readonly-css-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-full-nonumber-readonly-css-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-full-nonumber-readonly-css-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-minimal-nonumber-readonly-css-section-section" bind="repeated-minimal-nonumber-readonly-css-section-bind">
+                    <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-css-section/label"/>
+                    <fr:grid readonly="true" id="repeated-minimal-nonumber-readonly-css-single-grid-grid" bind="repeated-minimal-nonumber-readonly-css-single-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-nonumber-readonly-css-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" markup="css-grid" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-nonumber-readonly-css-f1-control" bind="repeated-minimal-nonumber-readonly-css-f1-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-css-f1/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readonly-css-f1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                    <fr:grid readonly="true" id="repeated-minimal-nonumber-readonly-css-multiple-grid-grid" bind="repeated-minimal-nonumber-readonly-css-multiple-grid-bind" repeat="content" min="1" template="instance('repeated-minimal-nonumber-readonly-css-multiple-grid-template')" apply-defaults="true" fb:initial-iterations="first" markup="css-grid" appearance="minimal">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="repeated-minimal-nonumber-readonly-css-f2-control" bind="repeated-minimal-nonumber-readonly-css-f2-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-css-f2/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readonly-css-f2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6" h="2">
+                            <xf:textarea xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:f="http://orbeon.org/oxf/xml/formatting" mediatype="text/html" id="repeated-minimal-nonumber-readonly-css-f3-control" bind="repeated-minimal-nonumber-readonly-css-f3-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-css-f3/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readonly-css-f3/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:select1 id="repeated-minimal-nonumber-readonly-css-f4-control" appearance="full" bind="repeated-minimal-nonumber-readonly-css-f4-bind">
+                                <xf:label ref="$form-resources/repeated-minimal-nonumber-readonly-css-f4/label"/>
+                                <xf:hint ref="$form-resources/repeated-minimal-nonumber-readonly-css-f4/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                <xf:itemset ref="$form-resources/repeated-minimal-nonumber-readonly-css-f4/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
+                                </xf:itemset>
+                            </xf:select1>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

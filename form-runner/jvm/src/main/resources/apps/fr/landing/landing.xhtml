@@ -80,7 +80,7 @@
             <xf:instance id="fr-search-instance" xxf:exclude-result-prefixes="#all">
                 <search xmlns="" return-all-indexed-fields="true">
                     <query/>
-                    <page-size>10</page-size>
+                    <page-size/>
                     <page-number>1</page-number>
                     <lang/>
                 </search>
@@ -102,9 +102,10 @@
 
                 <!-- Set language upon submitting -->
                 <xf:action event="xforms-submit">
+                    <xf:setvalue ref="page-size" value="$page-size + 1"/>
+                    <xf:setvalue ref="lang" value="'en'"/>
                     <!-- NOTE: xxf:lang() doesn't seem to work here -->
 <!--                    <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>-->
-                    <xf:setvalue ref="lang" value="'en'"/>
                 </xf:action>
                 <xf:action event="xforms-submit-error">
                     <!-- TODO: i18n -->

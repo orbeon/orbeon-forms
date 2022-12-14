@@ -168,6 +168,8 @@
                     <local-delete-action/>
                     <remote-delete-action/>
 
+                    <all-select/>
+                    <none-select/>
                     <local-unpublish-select/>
                     <local-publish-select/>
                     <remote-unpublish-select/>
@@ -201,7 +203,7 @@
             <xf:var name="remote-successful"        value="remote-successful = 'true'"/>
 
             <!-- Binds for admin tasks -->
-            <xf:bind ref="instance('fr-form-instance')[$any-has-admin-permission]">
+            <xf:bind ref="instance('fr-form-instance')[$is-admin]">
                 <xf:bind ref="local-unpublish-action"  readonly="not(exists($selection) and frf:canUnpublishLocal(../selection, $forms))"/>
                 <xf:bind ref="local-publish-action"    readonly="not(exists($selection) and frf:canPublishLocal(../selection, $forms))"/>
                 <xf:bind ref="remote-unpublish-action" readonly="not(exists($selection) and frf:canUnpublishRemote(../selection, $forms))"/>
@@ -216,12 +218,14 @@
                 <xf:bind ref="local-delete-action"     readonly="not(exists($selection) and (frf:canUnpublishLocal(../selection,  $forms) or frf:canPublishLocal(../selection,  $forms)))"/>
                 <xf:bind ref="remote-delete-action"    readonly="not(exists($selection) and (frf:canUnpublishRemote(../selection, $forms) or frf:canPublishRemote(../selection, $forms)))"/>
 
-                <xf:bind ref="local-unpublish-select"  readonly="not(frf:canSelectUnpublishedLocal(../selection, $forms))"/>
-                <xf:bind ref="local-publish-select"    readonly="not(frf:canSelectPublishedLocal(../selection, $forms))"/>
-                <xf:bind ref="remote-unpublish-select" readonly="not(frf:canSelectUnpublishedRemote(../selection, $forms))"/>
-                <xf:bind ref="remote-publish-select"   readonly="not(frf:canSelectPublishedRemote(../selection, $forms))"/>
-                <xf:bind ref="local-newer-select"      readonly="not(frf:canSelectLocalNewer(../selection, $forms))"/>
-                <xf:bind ref="remote-newer-select"     readonly="not(frf:canSelectRemoteNewer(../selection, $forms))"/>
+                <xf:bind ref="all-select"              readonly="not($any-has-admin-permission)"/>
+                <xf:bind ref="none-select"             readonly="not($any-has-admin-permission)"/>
+                <xf:bind ref="local-unpublish-select"  readonly="not($any-has-admin-permission) or not(frf:canSelectUnpublishedLocal(../selection, $forms))"/>
+                <xf:bind ref="local-publish-select"    readonly="not($any-has-admin-permission) or not(frf:canSelectPublishedLocal(../selection, $forms))"/>
+                <xf:bind ref="remote-unpublish-select" readonly="not($any-has-admin-permission) or not(frf:canSelectUnpublishedRemote(../selection, $forms))"/>
+                <xf:bind ref="remote-publish-select"   readonly="not($any-has-admin-permission) or not(frf:canSelectPublishedRemote(../selection, $forms))"/>
+                <xf:bind ref="local-newer-select"      readonly="not($any-has-admin-permission) or not(frf:canSelectLocalNewer(../selection, $forms))"/>
+                <xf:bind ref="remote-newer-select"     readonly="not($any-has-admin-permission) or not(frf:canSelectRemoteNewer(../selection, $forms))"/>
             </xf:bind>
 
             <xf:bind ref="instance('fr-form-instance')">
@@ -348,7 +352,7 @@
 
                 <!-- Only show admin ops column if at least one form has op -->
                 <xf:var name="has-admin"        value="saxon:expression('xxf:split(@operations) = ''admin''')"/>
-                <xf:var name="has-remote-admin" value="saxon:expression('exists(remote-last-modified-time)')"/>
+<!--                <xf:var name="has-remote-admin" value="saxon:expression('exists(remote-last-modified-time)')"/>-->
 
                 <xf:setvalue
                     ref="instance()/any-has-admin-permission"
@@ -612,7 +616,7 @@
 
                     <xh:div class="fr-admin-top">
                         <xf:group
-                            ref=".[$show-permissions]"
+                            ref=".[$is-admin]"
                             class="btn-toolbar"
                             xmlns="http://www.w3.org/1999/xhtml"
                             xxf:element="div">
@@ -626,7 +630,7 @@
                                     <xh:span class="caret"/>
                                 </button>
                                 <ul class="dropdown-menu" role="menu" aria-labelledBy="select-button">
-                                    <li role="presentation">
+                                    <li role="presentation" class="{if (xxf:readonly(all-select)) then 'disabled' else ()}">
                                         <xf:trigger appearance="minimal" role="menuitem">
                                             <xf:label ref="$fr-resources/home/buttons/all"/>
                                             <xf:setvalue
@@ -644,7 +648,7 @@
                                                     )"/>
                                         </xf:trigger>
                                     </li>
-                                    <li role="presentation">
+                                    <li role="presentation" class="{if (xxf:readonly(none-select)) then 'disabled' else ()}">
                                         <xf:trigger appearance="minimal" role="menuitem">
                                             <xf:label ref="$fr-resources/home/buttons/none"/>
                                             <xf:setvalue event="DOMActivate" ref="instance()/selection"/>

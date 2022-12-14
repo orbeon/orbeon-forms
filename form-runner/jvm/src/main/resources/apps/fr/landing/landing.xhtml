@@ -64,8 +64,21 @@
                 method="get"
                 serialization="none"
                 resource="/fr/service/persistence/form?all-versions=false&amp;ignore-admin-permissions=true"
-                replace="instance"
-                targetref="instance('fr-landing-form-metadata-instance')">
+                replace="none">
+
+                <xf:action event="xforms-submit-done">
+                    <xf:insert
+                        ref="instance('fr-landing-form-metadata-instance')"
+                        origin="
+                            xf:element('forms',
+                                xxf:sort(
+                                    event('response-body')/*/form,
+                                    xs:dateTime(last-modified-time),
+                                    'text',
+                                    'descending'
+                                )
+                            )"/>
+                </xf:action>
             </xf:submission>
 
             <xf:submission

@@ -40,8 +40,19 @@
                 value="xxf:split(xxf:property('oxf.fr.home.table.link-to'))"/>
 
             <xf:var
+                name="fb-permissions"
+                value="xxf:instance('fb-permissions')"/>
+
+            <xf:var
                 name="has-any-matching-roles"
-                value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
+                value="not($fb-permissions/@has-roles = 'false')"/>
+
+            <!-- Similar logic in Form Builder model.xml -->
+            <xf:var
+                name="is-allow-new-form-builder"
+                value="
+                    not($has-any-matching-roles) or
+                    $fb-permissions/app/@name = '*' or exists($fb-permissions/app[1]/@name[xxf:non-blank()])"/>
 
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
                 <_/>
@@ -143,7 +154,7 @@
                     <xh:div class="card h-100">
                         <xh:h5 class="card-title card-header text-center"><xf:output value="xxf:r('landing.titles.quick-links', '|fr-fr-resources|')"/></xh:h5>
                         <xh:div class="row row-cols-2 p-2">
-                            <xh:a href="/fr/orbeon/builder/new" class="text-center">
+                            <xh:a href="/fr/orbeon/builder/new" class="text-center {'xforms-hidden'[not($is-allow-new-form-builder)]}">
                                 <xh:figure>
                                     <xh:img src="/home/images/crane.jpg" class="img-thumbnail w-100"/>
                                     <xh:figcaption><xf:output value="xxf:r('landing.titles.form-builder-new', '|fr-fr-resources|')"/></xh:figcaption>

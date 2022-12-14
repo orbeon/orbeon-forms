@@ -535,6 +535,9 @@ class FormBuilderFunctionsTest
               </xf:bind>
               <xf:bind id="calculated-from-section-template-bind" ref="calculated-from-section-template" name="calculated-from-section-template"
                        fb:calculate="fr:control-string-value('my-control-in-library-section', false(), 'my-section-containing-template-renamed'), fr:control-typed-value('my-control-in-library-section', false(), 'my-section-containing-template-renamed')"/>
+              <xf:bind id="calculated-using-direct-function-call-bind" ref="calculated-using-direct-function-call" name="calculated-using-direct-function-call"
+                       fb:calculate="concat(fr:control-string-value('qux', false()), fr:control-string-value('baz', false()), fr:control-string-value('toto', false()), fr:control-string-value('gaga', false()))"
+                       fb:readonly="false()"/>
             </xf:bind>
           </xf:bind>
 

@@ -74,14 +74,21 @@ object FormRunnerRename {
         )
       }
 
+    // Here we have to use a heuristic because we don't have exact information about position of the function
+    // parameters. In addition, if an expression contains a mix of functions of different arity, we can't know for sure
+    // which function we are dealing with. So we just replace and hope for the best! We could try to be smarter and
+    // detect that we are in a most likely unsupported case, and not perform the replacement in that case, but then
+    // we would need to have some UI to report the problem to the user.
     val withFunctionReplacement = {
       val xpathStringMaybeWithVarReplacement = withVarReplacement.getOrElse(xpathString)
       (
         xpathStringMaybeWithVarReplacement.contains(s"""'$oldName'""") ||
         xpathStringMaybeWithVarReplacement.contains(s""""$oldName""")
       ) && (
-        containsFnWithParam(expr, oldName, FRControlStringValueName, 2) ||
-        containsFnWithParam(expr, oldName, FRControlTypedValueName,  2)
+        containsFnWithParam(expr, FRControlStringValueName, 2, oldName, 0) ||
+        containsFnWithParam(expr, FRControlTypedValueName,  2, oldName, 0) ||
+        containsFnWithParam(expr, FRControlStringValueName, 3, oldName, 2) ||
+        containsFnWithParam(expr, FRControlTypedValueName,  3, oldName, 2)
       ) option {
         replaceQuotedStringUseRegex(
           xpathStringMaybeWithVarReplacement,
@@ -97,10 +104,14 @@ object FormRunnerRename {
   private val FRControlStringValueName = new StructuredQName(FRPrefix, FR, "control-string-value")
   private val FRControlTypedValueName  = new StructuredQName(FRPrefix, FR, "control-typed-value")
 
-  private def containsFnWithParam(expr: Expression, oldName: String, fnName: StructuredQName, argPos: Int): Boolean =
-    SaxonUtils.iterateFnArg(expr, fnName, argPos) exists {
-      case s: StringLiteral if s.getStringValue == oldName => println(s"xxx found fn for $fnName"); true
-      case s                                               => println(s"xxx didn't find for $fnName, arg = $s"); false
+  private def containsFnWithParam(expr: Expression, fnName: StructuredQName, arity: Int, oldName: String, argPos: Int): Boolean =
+    SaxonUtils.iterateFunctions(expr, fnName) exists {
+      case fn if fn.getArguments.size == arity =>
+        fn.getArguments()(argPos) match {
+          case s: StringLiteral if s.getStringValue == oldName => true
+          case _                                               => false
+        }
+      case _ => false
     }
 
   // What follows is a heuristic, as we don't have exact positions provided by the XPath parser. So we try to avoid

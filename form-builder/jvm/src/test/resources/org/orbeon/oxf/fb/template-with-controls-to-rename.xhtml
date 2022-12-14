@@ -42,6 +42,7 @@
                             <control-3/>
                             <multiple/>
                             <calculated-from-section-template/>
+                            <calculated-using-direct-function-call/>
                         </formulas-grid>
                     </formulas>
                     <lhha>
@@ -110,6 +111,11 @@
                                  ref="calculated-from-section-template"
                                  name="calculated-from-section-template"
                                  calculate="fr:control-string-value('my-control-in-library-section', false(), 'my-section-containing-template'), fr:control-typed-value('my-control-in-library-section', false(), 'my-section-containing-template')"/>
+                        <xf:bind id="calculated-using-direct-function-call-bind"
+                                 ref="calculated-using-direct-function-call"
+                                 name="calculated-using-direct-function-call"
+                                 calculate="concat(fr:control-string-value('foo', false()), fr:control-string-value('bar', false()), fr:control-string-value('toto', false()), fr:control-string-value('gaga', false()))"
+                                 readonly="false()"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="lhha-bind" ref="lhha" name="lhha">
@@ -273,6 +279,10 @@
                             <label>Calculated from section template</label>
                             <hint/>
                         </calculated-from-section-template>
+                        <calculated-using-direct-function-call>
+                            <label>Calculated using direct function call</label>
+                            <hint/>
+                        </calculated-using-direct-function-call>
                         <lhha>
                             <label>LHHA</label>
                         </lhha>
@@ -561,8 +571,20 @@
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
+
                             </xf:output>
                         </fr:c>
+                        <fr:c x="1" y="6" w="6">
+                            <xf:output id="calculated-using-direct-function-call-control"
+                                       bind="calculated-using-direct-function-call-bind">
+                                <xf:label ref="$form-resources/calculated-using-direct-function-call/label"/>
+                                <xf:hint ref="$form-resources/calculated-using-direct-function-call/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="6" w="6"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="lhha-section" bind="lhha-bind">

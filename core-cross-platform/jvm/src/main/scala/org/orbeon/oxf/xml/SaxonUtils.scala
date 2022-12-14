@@ -74,10 +74,9 @@ object SaxonUtils {
         vr.getBinding.getVariableQName.getLocalName
     }
 
-  def iterateFnArg(expr: Expression, fnName: StructuredQName, argPos: Int): Iterator[Expression] =
+  def iterateFunctions(expr: Expression, fnName: StructuredQName): Iterator[FunctionCall] =
     SaxonUtils.iterateExpressionTree(expr) collect {
-      case fn: FunctionCall if fn.getFunctionName == fnName && fn.getArguments.size > argPos =>
-        fn.getArguments()(argPos)
+      case fn: FunctionCall if fn.getFunctionName == fnName => fn
     }
 
   // Parse the given qualified name and return the separated prefix and local name

@@ -41,6 +41,7 @@
                             <control-2/>
                             <control-3/>
                             <multiple/>
+                            <calculated-from-section-template/>
                         </formulas-grid>
                     </formulas>
                     <lhha>
@@ -105,6 +106,10 @@
                             <xf:constraint id="validation-5-validation" value="string-length(concat($bar, $gaga)) lt 10"/>
                             <xf:constraint id="validation-6-validation" value="$toto != $gaga"/>
                         </xf:bind>
+                        <xf:bind id="calculated-from-section-template-bind"
+                                 ref="calculated-from-section-template"
+                                 name="calculated-from-section-template"
+                                 calculate="fr:control-string-value('my-control-in-library-section', false(), 'my-section-containing-template'), fr:control-typed-value('my-control-in-library-section', false(), 'my-section-containing-template')"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="lhha-bind" ref="lhha" name="lhha">
@@ -264,6 +269,10 @@
                             <hint/>
                             <alert>Custom error</alert>
                         </multiple>
+                        <calculated-from-section-template>
+                            <label>Calculated from section template</label>
+                            <hint/>
+                        </calculated-from-section-template>
                         <lhha>
                             <label>LHHA</label>
                         </lhha>
@@ -544,7 +553,16 @@
 
                             </xf:input>
                         </fr:c>
-                        <fr:c x="7" y="5" w="6"/>
+                        <fr:c x="7" y="5" w="6">
+                            <xf:output id="calculated-from-section-template-control"
+                                       bind="calculated-from-section-template-bind">
+                                <xf:label ref="$form-resources/calculated-from-section-template/label"/>
+                                <xf:hint ref="$form-resources/calculated-from-section-template/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:output>
+                        </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="lhha-section" bind="lhha-bind">

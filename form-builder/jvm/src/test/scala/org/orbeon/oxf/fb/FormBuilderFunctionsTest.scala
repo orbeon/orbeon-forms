@@ -533,6 +533,8 @@ class FormBuilderFunctionsTest
                 <fb:constraint id="validation-5-validation" value="string-length(concat($baz, $gaga)) lt 10"/>
                 <fb:constraint id="validation-6-validation" value="$toto != $gaga"/>
               </xf:bind>
+              <xf:bind id="calculated-from-section-template-bind" ref="calculated-from-section-template" name="calculated-from-section-template"
+                       fb:calculate="fr:control-string-value('my-control-in-library-section', false(), 'my-section-containing-template-renamed'), fr:control-typed-value('my-control-in-library-section', false(), 'my-section-containing-template-renamed')"/>
             </xf:bind>
           </xf:bind>
 
@@ -593,6 +595,7 @@ class FormBuilderFunctionsTest
 
         FormBuilder.renameControlReferences("foo", "qux")
         FormBuilder.renameControlReferences("bar", "baz")
+        FormBuilder.renameControlReferences("my-section-containing-template", "my-section-containing-template-renamed")
 
         it("must rename references from variables") {
           assertXMLElementsIgnoreNamespacesInScope(

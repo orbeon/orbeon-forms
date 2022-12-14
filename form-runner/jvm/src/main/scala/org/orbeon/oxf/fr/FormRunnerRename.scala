@@ -1,11 +1,13 @@
 package org.orbeon.oxf.fr
 
+import org.orbeon.oxf.fr.XMLNames.{FR, FRPrefix}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.expr.Expression
+import org.orbeon.saxon.expr.{Expression, StringLiteral}
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.saxon.om.StructuredQName
 import org.orbeon.xml.NamespaceMapping
 
 import java.util.regex.Matcher
@@ -37,7 +39,7 @@ object FormRunnerRename {
       SaxonUtils.iterateExternalVariableReferences(expr).toList.sortBy(_.length).reverse
 
     varRefsByLengthDesc.foldLeft(xpathString) { case (xpathString, oldName) =>
-      replaceSingleVarReferenceUseRegex(
+      replaceVarReferenceUseRegex(
         xpathString,
         oldName,
         replace(oldName)
@@ -45,7 +47,7 @@ object FormRunnerRename {
     }
   }
 
-  def replaceSingleVarReference(
+  def replaceVarAndFnReferences(
     xpathString      : String,
     namespaceMapping : NamespaceMapping,
     functionLibrary  : FunctionLibrary,
@@ -63,23 +65,61 @@ object FormRunnerRename {
         avt              = avt
       )
 
-    xpathString.contains(s"$$$oldName") && DependencyAnalyzer.containsVariableReference(expr, oldName) option {
-      replaceSingleVarReferenceUseRegex(
-        xpathString,
-        oldName,
-        s"$$$newName"
-      )
+    val withVarReplacement =
+      xpathString.contains(s"$$$oldName") && DependencyAnalyzer.containsVariableReference(expr, oldName) option {
+        replaceVarReferenceUseRegex(
+          xpathString,
+          oldName,
+          s"$$$newName"
+        )
+      }
+
+    val withFunctionReplacement = {
+      val xpathStringMaybeWithVarReplacement = withVarReplacement.getOrElse(xpathString)
+      (
+        xpathStringMaybeWithVarReplacement.contains(s"""'$oldName'""") ||
+        xpathStringMaybeWithVarReplacement.contains(s""""$oldName""")
+      ) && (
+        containsFnWithParam(expr, oldName, FRControlStringValueName, 2) ||
+        containsFnWithParam(expr, oldName, FRControlTypedValueName,  2)
+      ) option {
+        replaceQuotedStringUseRegex(
+          xpathStringMaybeWithVarReplacement,
+          oldName,
+          newName
+        )
+      }
     }
+
+    withFunctionReplacement.orElse(withVarReplacement)
   }
+
+  private val FRControlStringValueName = new StructuredQName(FRPrefix, FR, "control-string-value")
+  private val FRControlTypedValueName  = new StructuredQName(FRPrefix, FR, "control-typed-value")
+
+  private def containsFnWithParam(expr: Expression, oldName: String, fnName: StructuredQName, argPos: Int): Boolean =
+    SaxonUtils.iterateFnArg(expr, fnName, argPos) exists {
+      case s: StringLiteral if s.getStringValue == oldName => println(s"xxx found fn for $fnName"); true
+      case s                                               => println(s"xxx didn't find for $fnName, arg = $s"); false
+    }
 
   // What follows is a heuristic, as we don't have exact positions provided by the XPath parser. So we try to avoid
   // matching subsequences by saying that the name must not be followed by a character that can be part of an NCName.
-  private def replaceSingleVarReferenceUseRegex(
+  private def replaceVarReferenceUseRegex(
     xpathString      : String,
     name             : String,
     replacement      : String
   ): String =
     xpathString.replaceAll(s"\\$$$name(?![\\p{IsLetter}\\p{IsDigit}.·\\-_])", Matcher.quoteReplacement(replacement))
+
+  private def replaceQuotedStringUseRegex(
+    xpathString      : String,
+    name             : String,
+    replacement      : String
+  ): String =
+    xpathString
+      .replaceAll(s"""'$name'""", Matcher.quoteReplacement(s"""'$replacement'"""))
+      .replaceAll(s""""$name"""", Matcher.quoteReplacement(s""""$replacement""""))
 
   private def compileExpression(
     xpathString     : String,

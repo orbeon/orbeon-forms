@@ -60,7 +60,10 @@ trait FormBuilderSupport extends XFormsSupport {
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
         <xh:head>
-          <xf:model id="fr-form-model">
+          <xf:model
+            id="fr-form-model"
+            xxf:function-library="org.orbeon.oxf.fr.library.FormRunnerFunctionLibrary">
+
             <xf:instance id="fb-form-instance"  xxf:index="id"><dummy/></xf:instance>
             <xf:instance id="fr-form-instance"  src={url}/>
             <xf:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"

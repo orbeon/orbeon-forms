@@ -682,7 +682,7 @@ trait ControlOps extends ResourcesOps {
     }
 
     def renameNodeContent(elemOrAtt: NodeInfo, avt: Boolean): Unit =
-      FormRunnerRename.replaceSingleVarReference(
+      FormRunnerRename.replaceVarAndFnReferences(
         xpathString        = elemOrAtt.stringValue,
         namespaceMapping   = NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
         functionLibrary    = inScopeContainingDocument.partAnalysis.functionLibrary,

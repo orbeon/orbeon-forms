@@ -563,30 +563,33 @@ class FormBuilderFunctionsTest
           </xf:label>
 
         val RenamedEmail: NodeInfo =
-          <email xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-            <subject>
-              <template xml:lang="en">Subject: {{$my-foo}} with {{$my-bar}}</template>
-              <fr:param type="ControlValueParam">
-                <fr:name>my-foo</fr:name>
-                <fr:controlName>qux</fr:controlName>
-              </fr:param>
-              <fr:param type="ControlValueParam">
-                <fr:name>my-bar</fr:name>
-                <fr:controlName>baz</fr:controlName>
-              </fr:param>
-            </subject>
-            <body>
-              <template xml:lang="en" mediatype="text/html">&lt;div&gt;Body: {{$her-foo}} with {{$her-bar}}&lt;/div&gt;</template>
-              <fr:param type="ControlValueParam">
-                <fr:name>her-foo</fr:name>
-                <fr:controlName>qux</fr:controlName>
-              </fr:param>
-              <fr:param type="ControlValueParam">
-                <fr:name>her-bar</fr:name>
-                <fr:controlName>baz</fr:controlName>
-              </fr:param>
-            </body>
-          </email>
+          <email>
+            <templates>
+              <template name="default" xml:lang="en">
+                <form-fields/>
+                <subject>Subject: {{$my-foo}} with {{$my-bar}}</subject>
+                <body mediatype="text/html">&lt;div&gt;Body: {{$her-foo}} with {{$her-bar}}&lt;/div&gt;</body>
+              </template>
+            </templates>
+            <parameters>
+              <param type="ControlValueParam">
+                <name>my-foo</name>
+                <controlName>qux</controlName>
+              </param>
+              <param type="ControlValueParam">
+                <name>my-bar</name>
+                <controlName>baz</controlName>
+              </param>
+              <param type="ControlValueParam">
+                <name>her-foo</name>
+                <controlName>qux</controlName>
+              </param>
+              <param type="ControlValueParam">
+                <name>her-bar</name>
+                <controlName>baz</controlName>
+              </param>
+            </parameters>
+        </email>
 
         FormBuilder.renameControlReferences("foo", "qux")
         FormBuilder.renameControlReferences("bar", "baz")

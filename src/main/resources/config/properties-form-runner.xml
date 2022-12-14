@@ -346,6 +346,10 @@
         fr:is-wizard-last-page()
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.repeated-grids">
+        home pdf|tiff review
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
 
     <!-- Button processes -->

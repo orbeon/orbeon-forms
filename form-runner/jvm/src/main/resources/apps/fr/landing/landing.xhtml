@@ -54,6 +54,11 @@
                     not($has-any-matching-roles) or
                     $fb-permissions/app/@name = '*' or exists($fb-permissions/app[1]/@name[xxf:non-blank()])"/>
 
+            <xf:var
+                name="is-allow-admin"
+                value="
+                    $fb-permissions/app/@name = '*' or exists($fb-permissions/app[1]/@name[xxf:non-blank()])"/>
+
             <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
                 <_/>
             </xf:instance>
@@ -90,6 +95,7 @@
                                 )
                             )"/>
                 </xf:action>
+
             </xf:submission>
 
             <xf:submission
@@ -172,7 +178,7 @@
                                     <xh:figcaption><xf:output value="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/></xh:figcaption>
                                 </xh:figure>
                             </xh:a>
-                            <xh:a href="/fr/admin" class="text-center {'xforms-hidden'[not($has-any-matching-roles)]}">
+                            <xh:a href="/fr/admin" class="text-center {'xforms-hidden'[not($is-allow-admin)]}">
                                 <xh:figure>
                                     <xh:img src="/home/images/cogwheels.jpg" class="img-thumbnail w-100"/>
                                     <xh:figcaption><xf:output value="xxf:r('landing.titles.form-runner-admin', '|fr-fr-resources|')"/></xh:figcaption>

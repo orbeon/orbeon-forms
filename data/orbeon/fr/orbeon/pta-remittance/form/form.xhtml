@@ -1,0 +1,424 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:array="http://www.w3.org/2005/xpath-functions/array" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xh:head>
+        <xh:title>Springfield PTA Remittance Form</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <unit-details>
+                        <grid-1>
+                            <pta-unit-name></pta-unit-name>
+                            <unit-number></unit-number>
+                            <unit-address></unit-address>
+                        </grid-1>
+
+                    </unit-details>
+                    <submission-details>
+                        <grid-2>
+                            <submitter-name></submitter-name>
+                            <submitter-phone></submitter-phone>
+                            <submitter-pta-position></submitter-pta-position>
+                            <submitter-email></submitter-email>
+                            <date-submitted></date-submitted>
+                            <check-number></check-number>
+                            <comment></comment>
+                        </grid-2>
+                    </submission-details>
+                    <dues>
+                        <grid-3>
+                            <control-4></control-4>
+                            <members-count></members-count>
+                            <per-capita-dues>4.75</per-capita-dues>
+                            <member-dues></member-dues>
+                            <control-3></control-3>
+                            <include-annual-dues>false</include-annual-dues>
+                            <annual-dues>125</annual-dues>
+                            <annual-council-dues></annual-council-dues>
+                            <control-9></control-9>
+                            <parent-education-donation>0</parent-education-donation>
+                            <total-check-amount></total-check-amount>
+                        </grid-3>
+
+
+
+                    </dues>
+                </form>
+            </xf:instance>
+
+
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="unit-details-bind" name="unit-details" ref="unit-details">
+                    <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
+                        <xf:bind id="pta-unit-name-bind" name="pta-unit-name" ref="pta-unit-name" xxf:whitespace="trim" required="true()"></xf:bind>
+                        <xf:bind id="unit-number-bind" ref="unit-number" name="unit-number" xxf:whitespace="trim" required="true()"></xf:bind>
+                        <xf:bind id="unit-address-bind" ref="unit-address" name="unit-address" xxf:whitespace="trim" required="true()"></xf:bind>
+                    </xf:bind>
+
+                </xf:bind>
+                <xf:bind id="submission-details-bind" ref="submission-details" name="submission-details">
+                    <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
+                        <xf:bind id="submitter-name-bind" ref="submitter-name" name="submitter-name" xxf:whitespace="trim" required="true()"></xf:bind>
+                        <xf:bind id="submitter-phone-bind" ref="submitter-phone" name="submitter-phone" constraint=". = '' or matches(., '^\d{10}$')" required="true()"></xf:bind>
+                        <xf:bind id="submitter-pta-position-bind" ref="submitter-pta-position" name="submitter-pta-position" xxf:whitespace="trim" required="true()"></xf:bind>
+                        <xf:bind id="submitter-email-bind" ref="submitter-email" name="submitter-email" type="xf:email" xxf:whitespace="trim" required="true()"></xf:bind>
+                        <xf:bind id="date-submitted-bind" ref="date-submitted" name="date-submitted" type="xs:date" required="true()"></xf:bind>
+                        <xf:bind id="check-number-bind" ref="check-number" name="check-number" xxf:whitespace="trim" type="xs:integer" required="true()"></xf:bind>
+                        <xf:bind id="comment-bind" ref="comment" name="comment" xxf:whitespace="trim"></xf:bind>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind id="dues-bind" ref="dues" name="dues">
+                    <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                        <xf:bind id="control-4-bind" ref="control-4" name="control-4"></xf:bind>
+                        <xf:bind id="members-count-bind" ref="members-count" name="members-count" type="xs:integer" required="true()"></xf:bind>
+                        <xf:bind id="per-capita-dues-bind" ref="per-capita-dues" name="per-capita-dues" type="xf:decimal" readonly="true()"></xf:bind>
+                        <xf:bind id="member-dues-bind" ref="member-dues" name="member-dues" type="xf:decimal" calculate="$members-count * $per-capita-dues"></xf:bind>
+                        <xf:bind id="control-3-bind" ref="control-3" name="control-3"></xf:bind>
+                        <xf:bind id="include-annual-dues-bind" ref="include-annual-dues" name="include-annual-dues" type="xf:boolean"></xf:bind>
+                        <xf:bind id="annual-dues-bind" ref="annual-dues" name="annual-dues" type="xf:decimal" readonly="true()"></xf:bind>
+                        <xf:bind id="annual-council-dues-bind" ref="annual-council-dues" name="annual-council-dues" type="xf:decimal" constraint="xxf:fraction-digits(2)" calculate="if ($include-annual-dues = true()) then $annual-dues else 0.0"></xf:bind>
+                        <xf:bind id="control-9-bind" ref="control-9" name="control-9"></xf:bind>
+                        <xf:bind id="parent-education-donation-bind" ref="parent-education-donation" name="parent-education-donation" type="xf:decimal" constraint="xxf:fraction-digits(2)"></xf:bind>
+                        <xf:bind id="total-check-amount-bind" ref="total-check-amount" name="total-check-amount" type="xf:decimal" constraint="xxf:fraction-digits(2)" calculate="$member-dues + $annual-council-dues + $parent-education-donation"></xf:bind>
+                    </xf:bind>
+
+
+
+                </xf:bind>
+            </xf:bind>
+
+
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>pta-remittance</form-name>
+                    <title xml:lang="en">Springfield PTA Remittance Form</title>
+                    <description xml:lang="en">This is a remittance form for the Springfield PTA Council.</description>
+                    <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>
+                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"unit-details"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"pta-unit-name"},{"value":"unit-number"},{"value":"unit-address"}],"topLevel":true},{"containerPath":[{"value":"submission-details"}],"newGridElem":{"value":"grid-2"},"afterElem":null,"content":[{"value":"submitter-name"},{"value":"submitter-phone"},{"value":"submitter-pta-position"},{"value":"submitter-email"},{"value":"date-submitted"},{"value":"check-number"},{"value":"comment"}],"topLevel":true},{"containerPath":[{"value":"dues"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"control-4"},{"value":"members-count"},{"value":"per-capita-dues"},{"value":"member-dues"},{"value":"control-3"},{"value":"include-annual-dues"},{"value":"annual-dues"},{"value":"annual-council-dues"},{"value":"control-9"},{"value":"parent-education-donation"},{"value":"total-check-amount"}],"topLevel":true}]}</migration>
+                    <data-migration>enabled</data-migration>
+                </metadata>
+            </xf:instance>
+
+
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments><pdf name="" lang="en" filename="PTA Remittance Form.pdf" mediatype="application/pdf" size="78447">/fr/service/persistence/crud/orbeon/pta-remittance/form/4ccffb5e691d8b2ec4c29f9bea88feb2e625580c.bin</pdf>
+
+                </attachments>
+            </xf:instance>
+
+
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <submitter-name>
+                            <label>Submitted by</label>
+                            <hint></hint>
+                        </submitter-name>
+                        <submitter-phone>
+                            <label>Phone</label>
+                            <hint></hint>
+                        </submitter-phone>
+                        <submitter-pta-position>
+                            <label>Position</label>
+                            <hint></hint>
+                        </submitter-pta-position>
+                        <submitter-email>
+                            <label>Email</label>
+                            <hint></hint>
+                        </submitter-email>
+                        <date-submitted>
+                            <label>Date Submitted</label>
+                            <hint></hint>
+                        </date-submitted>
+                        <check-number>
+                            <label>Check #</label>
+                            <hint></hint>
+                        </check-number>
+                        <comment>
+                            <label>Comment</label>
+                            <hint></hint>
+                        </comment>
+                        <control-4>
+                            <text xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">&lt;div&gt;Per Capita Dues (due monthly)&lt;/div&gt;</text>
+                        </control-4>
+                        <members-count>
+                            <label>Members Count</label>
+                            <hint></hint>
+                        </members-count>
+                        <per-capita-dues>
+                            <label>Fee per Member</label>
+                            <hint></hint>
+                        </per-capita-dues>
+                        <member-dues>
+                            <label>Member Dues</label>
+                            <hint></hint>
+                        </member-dues>
+                        <control-3>
+                            <text xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">&lt;div&gt;One time annual Council Dues (due 11/1)&lt;/div&gt;</text>
+                        </control-3>
+                        <include-annual-dues>
+                            <label>Include Dues</label>
+                            <hint></hint>
+                        </include-annual-dues>
+                        <annual-dues>
+                            <label>Annual Dues</label>
+                            <hint></hint>
+                        </annual-dues>
+                        <annual-council-dues>
+                            <label>Annual Council Dues</label>
+                            <hint></hint>
+                        </annual-council-dues>
+                        <control-9>
+                            <text xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">&lt;div&gt;Donation (optional)&lt;/div&gt;</text>
+                        </control-9>
+                        <parent-education-donation>
+                            <label></label>
+                            <hint></hint>
+                        </parent-education-donation>
+                        <total-check-amount>
+                            <label>Total Check Amount</label>
+                            <hint></hint>
+                        </total-check-amount>
+
+                        <unit-details>
+                            <label>Unit Details</label>
+                        </unit-details>
+                        <submission-details>
+                            <label>Submission Details</label>
+
+                        </submission-details>
+                        <dues>
+                            <label>Amounts</label>
+
+                        </dues>
+                        <pta-unit-name>
+                            <label>Name of PTA Unit</label>
+                            <hint></hint>
+
+                        </pta-unit-name>
+                        <unit-number>
+                            <label>Unit Number</label>
+                            <hint></hint>
+                        </unit-number>
+                        <unit-address>
+                            <label>Address of Unit</label>
+                            <hint></hint>
+                        </unit-address>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="unit-details-section" bind="unit-details-bind">
+                    <xf:label ref="$form-resources/unit-details/label"></xf:label>
+                    <fr:grid id="grid-1-grid" bind="grid-1-bind">
+                        <fr:c y="1" x="1" w="6">
+                                <xf:input id="pta-unit-name-control" bind="pta-unit-name-bind">
+                                    <xf:label ref="$form-resources/pta-unit-name/label"></xf:label>
+                                    <xf:hint ref="$form-resources/pta-unit-name/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+                                </xf:input>
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:input id="unit-number-control" bind="unit-number-bind">
+                                <xf:label ref="$form-resources/unit-number/label"></xf:label>
+                                <xf:hint ref="$form-resources/unit-number/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="12">
+                            <xf:input id="unit-address-control" bind="unit-address-bind">
+                                <xf:label ref="$form-resources/unit-address/label"></xf:label>
+                                <xf:hint ref="$form-resources/unit-address/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="submission-details-section" bind="submission-details-bind">
+                    <xf:label ref="$form-resources/submission-details/label"></xf:label>
+                    <fr:grid id="grid-2-grid" bind="grid-2-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="submitter-name-control" bind="submitter-name-bind">
+                                <xf:label ref="$form-resources/submitter-name/label"></xf:label>
+                                <xf:hint ref="$form-resources/submitter-name/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="submitter-phone-control" bind="submitter-phone-bind" field-width="natural">
+                                <xf:label ref="$form-resources/submitter-phone/label"></xf:label>
+                                <xf:hint ref="$form-resources/submitter-phone/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </fr:us-phone>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:input id="submitter-pta-position-control" bind="submitter-pta-position-bind">
+                                <xf:label ref="$form-resources/submitter-pta-position/label"></xf:label>
+                                <xf:hint ref="$form-resources/submitter-pta-position/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:input id="submitter-email-control" bind="submitter-email-bind">
+                                <xf:label ref="$form-resources/submitter-email/label"></xf:label>
+                                <xf:hint ref="$form-resources/submitter-email/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6">
+                            <fr:date xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="date-submitted-control" bind="date-submitted-bind" field-width="natural" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/date-submitted/label"></xf:label>
+                                <xf:hint ref="$form-resources/date-submitted/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </fr:date>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6">
+                            <fr:number id="check-number-control" bind="check-number-bind" grouping-separator="" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/check-number/label"></xf:label>
+                                <xf:hint ref="$form-resources/check-number/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </fr:number>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="6">
+                            <xf:input id="comment-control" bind="comment-bind" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/comment/label"></xf:label>
+                                <xf:hint ref="$form-resources/comment/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="4" w="6"></fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="dues-section" bind="dues-bind">
+                    <xf:label ref="$form-resources/dues/label"></xf:label>
+                    <fr:grid id="grid-3-grid" bind="grid-3-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <fr:explanation xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-4-control" bind="control-4-bind">
+                                <fr:text ref="$form-resources/control-4/text" mediatype="text/html"></fr:text>
+                            </fr:explanation>
+
+                        </fr:c>
+                        <fr:c x="7" y="1" w="2" h="1">
+                            <fr:number xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="members-count-control" bind="members-count-bind" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/members-count/label"></xf:label>
+                                <xf:hint ref="$form-resources/members-count/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+
+                            </fr:number>
+
+                        </fr:c>
+                        <fr:c x="9" y="1" w="2" h="1">
+                            <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="per-capita-dues-control" bind="per-capita-dues-bind">
+                                <xf:label ref="$form-resources/per-capita-dues/label"></xf:label>
+                                <xf:hint ref="$form-resources/per-capita-dues/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+
+                            </fr:currency>
+
+                        </fr:c>
+                        <fr:c x="11" y="1" w="2" h="1">
+                            <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="member-dues-control" bind="member-dues-bind">
+                                <xf:label ref="$form-resources/member-dues/label"></xf:label>
+                                <xf:hint ref="$form-resources/member-dues/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </fr:currency>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <fr:explanation xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-3-control" bind="control-3-bind">
+                                <fr:text ref="$form-resources/control-3/text" mediatype="text/html"></fr:text>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="2">
+                            <fr:checkbox-input xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="include-annual-dues-control" bind="include-annual-dues-bind">
+                                <xf:label ref="$form-resources/include-annual-dues/label"></xf:label>
+                                <xf:hint ref="$form-resources/include-annual-dues/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </fr:checkbox-input>
+                        </fr:c>
+                        <fr:c x="9" y="2" w="2">
+                            <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:NumberSupport="java:org.orbeon.xbl.NumberSupportJava" id="annual-dues-control" bind="annual-dues-bind">
+                                <xf:label ref="$form-resources/annual-dues/label"></xf:label>
+                                <xf:hint ref="$form-resources/annual-dues/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+
+                            </fr:currency>
+                        </fr:c>
+                        <fr:c x="11" y="2" w="2">
+                            <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="annual-council-dues-control" bind="annual-council-dues-bind">
+                                <xf:label ref="$form-resources/annual-council-dues/label"></xf:label>
+                                <xf:hint ref="$form-resources/annual-council-dues/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </fr:currency>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6">
+                            <fr:explanation xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="control-9-control" bind="control-9-bind">
+                                <fr:text ref="$form-resources/control-9/text" mediatype="text/html"></fr:text>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="1"></fr:c>
+                        <fr:c x="8" y="3" w="3"></fr:c>
+                        <fr:c x="11" y="3" w="2">
+                            <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="parent-education-donation-control" bind="parent-education-donation-bind">
+                                <xf:label ref="$form-resources/parent-education-donation/label"></xf:label>
+                                <xf:hint ref="$form-resources/parent-education-donation/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </fr:currency>
+                        </fr:c>
+                        <fr:c x="1" y="4" w="4"></fr:c>
+                        <fr:c x="5" y="4" w="3"></fr:c>
+                        <fr:c x="8" y="4" w="3"></fr:c>
+                        <fr:c x="11" y="4" w="2">
+                            <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="total-check-amount-control" bind="total-check-amount-bind" class="fr-summary fr-search">
+                                <xf:label ref="$form-resources/total-check-amount/label"></xf:label>
+                                <xf:hint ref="$form-resources/total-check-amount/hint"></xf:hint>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+
+
+                            </fr:currency>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

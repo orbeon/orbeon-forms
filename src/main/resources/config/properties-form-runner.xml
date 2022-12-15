@@ -354,6 +354,10 @@
         home pdf|tiff review
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.pta-remittance">
+        summary clear pdf|tiff save-final review
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
 
     <!-- Button processes -->

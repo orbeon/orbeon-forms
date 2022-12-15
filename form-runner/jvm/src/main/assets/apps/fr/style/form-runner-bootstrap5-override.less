@@ -7,7 +7,7 @@
 }
 
 input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-control.xforms-select1.xforms-incremental > select,
-.xforms-control.xforms-readonly.xforms-static .xforms-field, .xforms-control.xforms-readonly.xforms-static pre{
+.xforms-control.xforms-readonly.xforms-incremental.xforms-static .xforms-field, .xforms-control.xforms-incremental.xforms-readonly.xforms-static pre {
   height: 28px;
 }
 
@@ -373,6 +373,10 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
 
   // review page: checks and radios
   .fr-mode-view .xforms-select-appearance-full.xforms-static, .fr-mode-view .xforms-items.xforms-help-popover-control {
+    .xforms-selected, .xforms-deselected {
+      background-position: 0px;
+    }
+
     .xforms-selected .checkbox > span, .xforms-selected .radio > span, .xforms-deselected .checkbox > span, .xforms-deselected .radio > span {
       padding-left: 1rem;
     }

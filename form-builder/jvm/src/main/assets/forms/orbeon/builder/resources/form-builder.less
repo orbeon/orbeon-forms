@@ -1340,9 +1340,14 @@ div.orbeon.orbeon-portlet-div {
         padding: 0 @fbGutter;
 
         .fr-status-icons { display: none }                                  // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
+
+        // Override Form Runner defaults
         .fr-buttons {
             display: inline-block;                                          // We have messages shown on the same line
+            position: static;
+            width: auto;
             margin: 0;
+            padding: 0 10px;
             vertical-align: top;
         }
     }

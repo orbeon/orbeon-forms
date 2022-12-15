@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import cats.syntax.option._
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.fr.FormRunner._
@@ -596,8 +597,8 @@ class FormBuilderFunctionsTest
             </parameters>
         </email>
 
-        FormBuilder.renameControlReferences("foo", "qux")
-        FormBuilder.renameControlReferences("bar", "baz")
+        FormBuilder.renameControlReferences("foo", "qux", "foo-control".some)
+        FormBuilder.renameControlReferences("bar", "baz", "bar-control".some)
         FormBuilder.renameControlReferences("my-section-containing-template", "my-section-containing-template-renamed")
 
         it("must rename references from variables") {
@@ -673,10 +674,10 @@ class FormBuilderFunctionsTest
             </xf:action>
           </fb:action>
 
-        FormBuilder.renameControlReferences("foo",         "qux")
-        FormBuilder.renameControlReferences("bar",         "baz")
-        FormBuilder.renameControlReferences("toto",        "xyzzy")
-        FormBuilder.renameControlReferences("my-dropdown", "her-dropdown")
+        FormBuilder.renameControlReferences("foo",         "qux",          "foo-control".some)
+        FormBuilder.renameControlReferences("bar",         "baz",          "bar-control".some)
+        FormBuilder.renameControlReferences("toto",        "xyzzy",        "toto-control".some)
+        FormBuilder.renameControlReferences("my-dropdown", "her-dropdown", "my-dropdown-control".some)
 
         it("must rename references from actions") {
           assertXMLElementsIgnoreNamespacesInScope(
@@ -764,10 +765,10 @@ class FormBuilderFunctionsTest
 
           </fr:action>
 
-        FormBuilder.renameControlReferences("control-foo", "control-qux")
-        FormBuilder.renameControlReferences("control-bar", "control-baz")
-        FormBuilder.renameControlReferences("my-grid",     "her-grid")
-        FormBuilder.renameControlReferences("my-dropdown", "her-dropdown")
+        FormBuilder.renameControlReferences("control-foo", "control-qux",  None)
+        FormBuilder.renameControlReferences("control-bar", "control-baz",  None)
+        FormBuilder.renameControlReferences("my-grid",     "her-grid",     None)
+        FormBuilder.renameControlReferences("my-dropdown", "her-dropdown", None)
 
         it("must rename references from listeners") {
           assertXMLElementsIgnoreNamespacesInScope(
@@ -805,8 +806,8 @@ class FormBuilderFunctionsTest
             </xf:itemset>
           </fr:databound-select1>
 
-        FormBuilder.renameControlReferences("foo", "qux")
-        FormBuilder.renameControlReferences("bar", "baz")
+        FormBuilder.renameControlReferences("foo", "qux", "foo-control".some)
+        FormBuilder.renameControlReferences("bar", "baz", "bar-control".some)
 
         it("must rename references from `resource` attribute") {
           assertXMLElementsIgnoreNamespacesInScope(

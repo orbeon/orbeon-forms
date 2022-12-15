@@ -222,6 +222,9 @@ trait ControlOps extends ResourcesOps {
   def renameControlIfNeeded(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Option[Rename] =
     oldName != newName option {
 
+      // Get the control id before changing it in the form, so we can pass it to `renameControlReferences()`
+      val oldControlIdOpt = findControlIdByName(oldName)
+
       require(! newName.endsWith(DefaultIterationSuffix), s"control cannot end with `$DefaultIterationSuffix` (#3359)")
 
       // Maybe rename section template content
@@ -240,7 +243,7 @@ trait ControlOps extends ResourcesOps {
         updateTemplatesCheckContainers(findAncestorRepeatNames(newControl).to(Set))
       }
 
-      renameControlReferences(oldName, newName)
+      renameControlReferences(oldName, newName, oldControlIdOpt)
 
       Rename(oldName, newName)
     }
@@ -671,7 +674,12 @@ trait ControlOps extends ResourcesOps {
 
   // See also `controls.xsl` for the handling of `replaceVarReferencesWithFunctionCalls()`. Unfortunately there is
   // duplication of logic here.
-  def renameControlReferences(oldName: String, newName: String)(implicit ctx: FormBuilderDocContext): Int = {
+  def renameControlReferences(
+    oldName        : String,
+    newName        : String,
+    oldControlIdOpt: Option[String] = None)(implicit
+    ctx            : FormBuilderDocContext
+  ): Int = {
 
     var countOfUpdatedValues = 0
 
@@ -749,7 +757,7 @@ trait ControlOps extends ResourcesOps {
     locally {
       val legacyActions = findLegacyActions
 
-      findControlIdByName(oldName) foreach { oldControlId =>
+      oldControlIdOpt foreach { oldControlId =>
 
         val newControlId = newName + oldControlId.substringAfter(oldName)
 

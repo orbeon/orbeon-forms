@@ -25,23 +25,37 @@
 
     -webkit-text-size-adjust: 100%; // Prevent font scaling in landscape while allowing user zoom
 
-    .navbar .navbar-inner .container {
+    .xforms-form {
+        margin: 0;
+        .fr-view {
+            margin: 0 auto;
+        }
+    }
 
-        display: flex;
+    .navbar {
 
-        .fr-language-choice {
-            margin-left: auto; // So this and what follows aligned to the left
+        &.navbar-fixed-top {
+            margin-top: 0;
         }
 
-        .fr-status-icons {
-            display: block;
-            i { margin-left: 5px; }
+        .navbar-inner .container {
+
+            display: flex;
+
+            .fr-language-choice {
+                margin-left: auto; // So this and what follows aligned to the left
+            }
+
+            .fr-status-icons {
+                display: block;
+                i { margin-left: 5px; }
+            }
+
+            .badge { margin-left: 5px; }
+
+            img { margin-right: 15px; }
+            h1 { margin-left: 0; }
         }
-
-        .badge { margin-left: 5px; }
-
-        img { margin-right: 15px; }
-        h1 { margin-left: 0; }
     }
 
     .fr-body {
@@ -195,12 +209,20 @@
     // Explanation message if present
     .fr-explanation { padding: 10px }
 
-    // Button bar
-
+    // Buttons bar
     .fr-buttons {
         display: block;
         text-align: right;
         font-size: 0; // Removes space between buttons, see http://stackoverflow.com/a/19038859/5295
+
+        // Make buttons stick to the viewport
+        // https://github.com/orbeon/orbeon-forms/issues/4809
+        position: sticky;
+        bottom: 0;
+        width: 100%;
+        box-sizing: border-box;
+        background-color: @frBackground;
+        padding: 10px 0;
 
         .fr-buttons-message div { display: inline }
 

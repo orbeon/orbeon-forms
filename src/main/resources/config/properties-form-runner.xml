@@ -342,6 +342,10 @@
         fr:is-wizard-last-page()
     </property>
 
+    <property as="xs:string"  name="oxf.fr.detail.button.tiff.visible.orbeon.travel">
+        fr:is-wizard-last-page()
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.button.save.enabled.orbeon.travel">
         fr:is-wizard-last-page()
     </property>

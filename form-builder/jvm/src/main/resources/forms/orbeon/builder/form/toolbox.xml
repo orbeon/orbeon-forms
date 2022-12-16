@@ -128,7 +128,8 @@
                         <xh:i title="{$undo-title}" class="fa fa-undo fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
-                        fbf:undoAction()
+                        fbf:undoAction(),
+                        fr:run-process('oxf.fr.detail.process', concat('success-message(message = "', $undo-title, '")'))
                     </xf:action>
                 </xf:trigger>
 
@@ -148,7 +149,8 @@
                         <xh:i title="{$redo-title}" class="fa fa-repeat fa-fw"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate" type="xpath">
-                        fbf:redoAction()
+                        fbf:redoAction(),
+                        fr:run-process('oxf.fr.detail.process', concat('success-message(message = "', $redo-title, '")'))
                     </xf:action>
                 </xf:trigger>
 

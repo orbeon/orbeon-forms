@@ -13,15 +13,19 @@
  */
 package org.orbeon.builder.rpc
 
+import cats.syntax.option._
 import org.orbeon.datatypes.{AboveBelow, Direction}
 import org.orbeon.oxf.fb.UndoAction.ControlSettings
 import org.orbeon.oxf.fb._
+import org.orbeon.oxf.fr.FormRunnerCommon._
+import org.orbeon.oxf.fr.process.SimpleProcess
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
+
 
 object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
@@ -169,8 +173,11 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
   }
 
   def containerDelete(containerId: String): Unit = {
-
     implicit val ctx = FormBuilderDocContext()
+    containerDeleteImpl(containerId)
+  }
+
+  private def containerDeleteImpl(containerId: String)(implicit ctx: FormBuilderDocContext): Unit = {
 
     val undoAction =
       if (FormRunner.IsGrid(FormBuilder.containerById(containerId)))
@@ -183,8 +190,12 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
 
   def containerCopy(containerId: String): Unit = {
     implicit val ctx = FormBuilderDocContext()
-    ToolboxOps.controlOrContainerElemToXcv(FormBuilder.containerById(containerId)) foreach ToolboxOps.writeXcvToClipboard
+    containerCopyImpl(containerId)
+    SimpleProcess.trySuccessMessage(Map("message".some -> (frc.currentFormResources / "copy" / "label" stringValue))).get
   }
+
+  private def containerCopyImpl(containerId: String)(implicit ctx: FormBuilderDocContext): Unit =
+    ToolboxOps.controlOrContainerElemToXcv(FormBuilder.containerById(containerId)) foreach ToolboxOps.writeXcvToClipboard
 
   def containerCut(containerId: String): Unit = {
 
@@ -193,8 +204,9 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
     val containerElem = FormBuilder.containerById(containerId)
 
     if (FormBuilder.canDeleteContainer(containerElem)) {
-      containerCopy(containerId)
-      containerDelete(containerId)
+      containerCopyImpl(containerId)
+      containerDeleteImpl(containerId)
+      SimpleProcess.trySuccessMessage(Map("message".some -> (frc.currentFormResources / "cut" / "label" stringValue))).get
     }
   }
 
@@ -205,6 +217,7 @@ object FormBuilderRpcApiImpl extends FormBuilderRpcApi {
       targetId   = "dialog-ids",
       properties = Map("container-id" -> Some(containerId), "action" -> Some("merge"))
     )
+    SimpleProcess.trySuccessMessage(Map("message".some -> (frc.currentFormResources / "merge-section" / "label" stringValue))).get
   }
 
   def resolveId(id: String)(implicit ctx: FormBuilderDocContext): Option[NodeInfo] =

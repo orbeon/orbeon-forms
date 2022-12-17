@@ -330,7 +330,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title>Form Runner Admin</title>
+            <title>Form Runner Administration</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -1406,7 +1406,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -1935,7 +1935,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -2463,7 +2463,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -3004,7 +3004,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -3545,7 +3545,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -4086,7 +4086,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -4627,7 +4627,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -5167,7 +5167,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -5707,7 +5707,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -6235,7 +6235,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>
@@ -6775,7 +6775,7 @@
             </dialog-body>
         </save-locally>
         <admin>
-            <title todo="true">[Form Runner Admin]</title>
+            <title todo="true">[Form Runner Administration]</title>
         </admin>
         <landing>
             <title>Orbeon Form Runner</title>

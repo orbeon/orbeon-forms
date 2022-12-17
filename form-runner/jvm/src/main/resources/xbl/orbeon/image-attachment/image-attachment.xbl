@@ -285,6 +285,10 @@
 
         </metadata>
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/image-attachment/image-attachment.css"/>
+        </xbl:resources>
+
         <xbl:template>
             <xf:var
                 name="binding"

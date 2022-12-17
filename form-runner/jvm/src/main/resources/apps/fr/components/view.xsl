@@ -468,7 +468,7 @@
                 xxf:element="div"
                 model="fr-form-model"
                 ref=".[not(xxf:property(string-join(('oxf.fr.detail.hide-header', fr:app-name(), fr:form-name()), '.')))]"
-                class="navbar navbar-inverse">
+                class="navbar navbar-inverse navbar-fixed-top">
             <xh:div class="navbar-inner">
                 <xh:div class="container">
                     <xsl:variable name="default-objects" as="element()+">

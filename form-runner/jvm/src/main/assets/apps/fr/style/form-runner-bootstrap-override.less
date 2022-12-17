@@ -46,15 +46,29 @@ body.orbeon {
         border           : 1px solid #e3e3e3;
     }
 
-    .row-fluid [class*="span"] {
+    .row, .row-fluid [class*="span"] {
+        &:empty {
+            display: none;
+        }
         min-height: 1px; // Bootstrap has 30px, which is different from `.row` where it is 1px
     }
 
     .navbar-inverse {
+
+        &.navbar-fixed-top .container {
+            width: auto;
+        }
+
         .navbar-inner {
-            #gradient > .vertical(@gray, @grayDarker);
+
+            // No gradient to match Bootstrap 5
+            color: rgb(33, 37, 41); // temporary, copied from the default Bootstrap 5 theme
+            background-color: rgb(33, 37, 41); // temporary, copied from the default Bootstrap 5 theme
+            background-image: none;
+
             border: none;
             border-radius: 0;
+
             .container {
                 line-height: @navbarHeight;             // Get the content of the navbar to be vertically aligned
                 img, h1 { vertical-align: middle }      // See: http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Center-content-vertically-inside-a-box
@@ -62,8 +76,8 @@ body.orbeon {
                 h1 {
                     margin: 0 0 0 15px;                 // Space between image and title
                     padding: 0;
-                    font-size: 16px;
-                    font-weight: normal;
+                    font-size: 1.75em;
+                    font-weight: @frNavBarFontWeight;
                     color: @frNavBarTextColor;
                     text-shadow: none;
                     text-decoration: none;

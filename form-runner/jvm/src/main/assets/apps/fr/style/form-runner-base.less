@@ -38,29 +38,66 @@
         }
     }
 
+    .container, .container-fluid {
+        padding: 0 0.75em;
+        .row, .row-fluid {
+        }
+    }
+
     .navbar {
 
         &.navbar-fixed-top {
-            margin-top: 0;
+            margin: 0;
         }
 
-        .navbar-inner .container {
+        .navbar-inner {
+            padding-top: .5em;
+            padding-bottom: .5em;
+            min-height: 0;
+            .container {
 
-            display: flex;
+                display: flex;
+                align-items: center;
+                padding-left: .75em;
+                padding-right: .75em;
+                line-height: normal;
 
-            .fr-language-choice {
-                margin-left: auto; // So this and what follows aligned to the left
+                .fr-language-choice {
+                    margin-left: auto; // So this and what follows aligned to the left
+                }
+
+                .fr-status-icons {
+                    display: block;
+                    i { margin-left: 5px; }
+                }
+
+                .badge { margin-left: 5px; }
+
+                .navbar-brand {
+                    margin-top: 0.3125em;
+                    margin-bottom: 0.3125em;
+                    margin-right: 15px;
+                    img {
+                        vertical-align: middle;
+                    }
+                }
+                h1 {
+                    //flex-grow: 1;
+                    margin-left: 0;
+                    line-height: normal;
+                }
+
+                .nav {
+                    &> li {
+                        padding-top: 0.25em;
+                        padding-bottom: 0.25em;
+                        &> a {
+                            padding-top: 0.375em;
+                            padding-bottom: 0.375em;
+                        }
+                    }
+                }
             }
-
-            .fr-status-icons {
-                display: block;
-                i { margin-left: 5px; }
-            }
-
-            .badge { margin-left: 5px; }
-
-            img { margin-right: 15px; }
-            h1 { margin-left: 0; }
         }
     }
 
@@ -278,8 +315,6 @@
     }
 
     #fr-view {
-
-        margin-bottom: 10px;    // otherwise buttons at the bottom touch the viewport
 
         .fr-grid .fr-grid-body .fr-grid-td {
 

@@ -103,8 +103,22 @@
                 method="get"
                 serialization="none"
                 resource="/fr/service/persistence/form/orbeon?all-versions=false&amp;ignore-admin-permissions=true"
-                replace="instance"
-                targetref="instance('fr-landing-demo-forms-instance')">
+                replace="none">
+
+                <!-- Sort alphabetically by title -->
+                <xf:action event="xforms-submit-done">
+                    <xf:insert
+                        ref="instance('fr-landing-demo-forms-instance')"
+                        origin="
+                            xf:element('forms',
+                                xxf:sort(
+                                    event('response-body')/*/form,
+                                    title[1],
+                                    'text',
+                                    'ascending'
+                                )
+                            )"/>
+                </xf:action>
             </xf:submission>
 
             <xf:instance id="fr-search-instance" xxf:exclude-result-prefixes="#all">

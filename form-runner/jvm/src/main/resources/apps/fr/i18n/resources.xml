@@ -333,7 +333,7 @@
             <title>Form Runner Admin</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms>Published Forms</published-forms>
                 <form-builder-forms>Form Builder Forms</form-builder-forms>
@@ -878,7 +878,7 @@
             <title>Administration Form Runner</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms>Formulaires publiés</published-forms>
                 <form-builder-forms>Formulaires de Form Builder</form-builder-forms>
@@ -1409,7 +1409,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
@@ -1938,7 +1938,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
@@ -2466,7 +2466,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
@@ -3007,7 +3007,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
@@ -3548,7 +3548,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
@@ -4089,7 +4089,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
@@ -4630,7 +4630,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
@@ -5170,7 +5170,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
@@ -5710,7 +5710,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
@@ -5728,7 +5728,7 @@
             <show-more todo="true">Show more…</show-more>
         </landing>
         <home>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <buttons>
                 <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Não publicar</unpublish>
                 <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
@@ -6238,7 +6238,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
@@ -6778,7 +6778,7 @@
             <title todo="true">[Form Runner Admin]</title>
         </admin>
         <landing>
-            <title>Form Runner</title>
+            <title>Orbeon Form Runner</title>
             <titles>
                 <published-forms todo="true">Published Forms</published-forms>
                 <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>

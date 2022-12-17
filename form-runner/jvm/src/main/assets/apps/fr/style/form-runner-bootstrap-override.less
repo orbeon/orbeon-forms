@@ -22,7 +22,14 @@ body.orbeon {
     font-size: @frFontSize;         // Use our own preferred font size
     line-height: @baseLineHeight;
     color: @textColor;
-    position: relative; // For correct positioning of the date picker
+
+    body& {
+        .container, .container-fluid {
+            &.fr-view {
+                padding-top: 62px; // to match BS5 landing page
+            }
+        }
+    }
 
     label, button, .btn  {
         font-size: @frLabelSize;
@@ -53,7 +60,7 @@ body.orbeon {
         min-height: 1px; // Bootstrap has 30px, which is different from `.row` where it is 1px
     }
 
-    .navbar-inverse {
+    .navbar, .navbar-inverse {
 
         &.navbar-fixed-top .container {
             width: auto;
@@ -61,24 +68,17 @@ body.orbeon {
 
         .navbar-inner {
 
-            // No gradient to match Bootstrap 5
-            color: rgb(33, 37, 41); // temporary, copied from the default Bootstrap 5 theme
-            background-color: rgb(33, 37, 41); // temporary, copied from the default Bootstrap 5 theme
             background-image: none;
 
             border: none;
             border-radius: 0;
 
             .container {
-                line-height: @navbarHeight;             // Get the content of the navbar to be vertically aligned
-                img, h1 { vertical-align: middle }      // See: http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Center-content-vertically-inside-a-box
-                img { max-height: @navbarHeight }       // So the navbar height isn't increased if users select a larger logo image
                 h1 {
                     margin: 0 0 0 15px;                 // Space between image and title
                     padding: 0;
                     font-size: 1.75em;
                     font-weight: @frNavBarFontWeight;
-                    color: @frNavBarTextColor;
                     text-shadow: none;
                     text-decoration: none;
                     display: inline;
@@ -86,6 +86,24 @@ body.orbeon {
             }
         }
         margin: 10px 0;                 // Space before and after the navbar
+    }
+
+    .navbar-inverse {
+        .navbar-inner {
+
+            // No gradient to match Bootstrap 5
+            color: rgb(33, 37, 41); // temporary, copied from the default Bootstrap 5 theme
+            background-color: rgb(33, 37, 41); // temporary, copied from the default Bootstrap 5 theme
+
+            .container {
+                h1 {
+                    color: @frNavBarTextColor;
+                }
+                i {
+                    color: white;
+                }
+            }
+        }
     }
 
     // For fields and wrapping, see also:
@@ -338,8 +356,6 @@ body.orbeon {
         }
 
     }
-
-    .navbar-inverse i { color: white }
 
     // Make disabled icons a bit opaque
     .disabled[class^="icon-"],

@@ -51,10 +51,10 @@
         <xh:div class="fb-navbar navbar navbar-fixed-top">
             <xh:div class="navbar-inner">
                 <xh:div class="container">
-                    <xh:span>
+                    <xh:div class="navbar-brand">
                         <xh:img src="/apps/fr/style/orbeon-navbar-logo.png" alt=""/>
-                    </xh:span>
-                    <xh:h1 class="brand">Form Builder</xh:h1>
+                    </xh:div>
+                    <xh:h1 class="brand">Orbeon Form Builder</xh:h1>
                     <xh:ul class="nav">
                         <xh:li>
                             <xh:a tabindex="-1" href="https://doc.orbeon.com/form-builder/" target="_blank" rel="noopener">Form Builder User Guide</xh:a>
@@ -131,6 +131,7 @@
                         <xh:div class="container">
                             <!-- Custom logo upload is removed in 4.0 -->
                             <xf:group
+                                class="navbar-brand"
                                 ref="
                                     xxf:trim(
                                         xxf:property(

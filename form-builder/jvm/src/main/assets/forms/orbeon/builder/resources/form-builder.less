@@ -64,7 +64,7 @@ div.orbeon.orbeon-portlet-div {
 
     .fb-main {
         position: absolute;
-        top: 40px + @fbGutter;
+        top: 48px + @fbGutter;
         right: @fbGutter;
         left: @fbGutter + @fbToolbarWidth + @fbGutter/2;                    // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
         bottom: @fbBottomHeight + @fbGutter;
@@ -307,7 +307,7 @@ div.orbeon.orbeon-portlet-div {
     .fb-toolbox {
         position: absolute;
         left: @fbGutter;
-        top: 40px + @fbGutter;
+        top: 48px + @fbGutter;
         bottom: @fbBottomHeight + @fbGutter;
         width: @fbToolbarWidth;
         box-sizing: border-box;
@@ -1327,6 +1327,8 @@ div.orbeon.orbeon-portlet-div {
     .fb-bottom {
         position: absolute;
         bottom: 0;
+        left: 0;
+        right: 0;
         width: 100%;
         box-sizing: border-box;
         height: @fbBottomHeight;
@@ -1360,20 +1362,20 @@ div.orbeon.orbeon-portlet-div {
         position: absolute;
         margin-bottom: 0;                                                   // override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
         border-radius: 0;                                                   // override Bootstrap rounded corners
-        .container {
-            line-height: @navbarHeight;                                     // Get the content of the navbar to be vertically aligned
-            width: auto;
-            margin-left: 15px;
-            margin-right: 15px;
-            img, .brand { vertical-align: middle }                          // Logo and title vertically centered
-            img { padding: 0 0 0 10px }                                     // Space to the left of the logo
-            .brand {                                                        // For the title, reuse some of the styling defined in Bootstrap for .brand
-                float: none;                                                // Override Bootstrap float, which doesn't allow us to vertically align logo and title
-                margin: 0; padding: 0; display: inline;                     // Override h1 styles
-            }
-            .nav {
-                margin-left: auto;                                          // Show at the end of the line in `flex` layout
-                margin-right: 0;                                            // Override excessive margin set by Bootstrap
+        .navbar-inner {
+            .container {
+                width: auto;
+                h1 {
+                    color: #777;
+                }
+                .nav {
+                    &> li {
+                        padding-top: 0;
+                        padding-bottom: 0;
+                    }
+                    margin-left: auto;                                          // Show at the end of the line in `flex` layout
+                    margin-right: 0;                                            // Override excessive margin set by Bootstrap
+                }
             }
         }
     }

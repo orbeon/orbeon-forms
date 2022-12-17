@@ -12,7 +12,7 @@
 The creation, performance, significance, and even the definition of music vary according to culture and social context. Music ranges from strictly organized compositions (and their recreation in performance), through improvisational music to aleatoric forms. Music can be divided into genres and subgenres, although the dividing lines and relationships between music genres are often subtle, sometimes open to individual interpretation, and occasionally controversial. Within "the arts", music may be classified as a performing art, a fine art, and auditory art.
 
 From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
-                            <textarea-counter>Let's write a Tweet. It must fit in 140 characters.</textarea-counter>
+                            <textarea-counter>Let's write a Tweet. It must fit in 280 characters.</textarea-counter>
                             <output>Great love and great achievements involve great risk.</output>
                             <secret>42</secret>
                         </grid-1>
@@ -97,7 +97,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </xf:bind>
                         <xf:bind id="textarea-bind" ref="textarea" name="textarea" xxf:whitespace="trim"></xf:bind>
                         <xf:bind id="textarea-counter-bind" ref="textarea-counter" name="textarea-counter">
-                            <xf:constraint id="constraint-49-constraint" value="xxf:max-length(140)"></xf:constraint>
+                            <xf:constraint id="constraint-49-constraint" value="xxf:max-length(280)"></xf:constraint>
                         </xf:bind>
                         <xf:bind ref="output" id="output-bind" name="output"></xf:bind>
                         <xf:bind id="secret-bind" ref="secret" name="secret" type="xs:string" required="true()" constraint=". = '42'"></xf:bind>
@@ -430,7 +430,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <textarea-counter>
                             <label>Text Area with Character counter</label>
                             <hint>This is a text area with a character counter</hint>
-                            <alert>140 characters at most</alert>
+                            <alert>280 characters at most</alert>
                         </textarea-counter>
                         <output>
                             <label>Text Output</label>
@@ -702,7 +702,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <textarea-counter>
                             <label>Zone de texte avec compteur de caractères</label>
                             <hint>Ceci est une zone de texte avec compteur de caractères</hint>
-                            <alert>140 caractères au plus</alert>
+                            <alert>280 caractères au plus</alert>
                         </textarea-counter>
                         <output>
                             <label>Sortie texte</label>

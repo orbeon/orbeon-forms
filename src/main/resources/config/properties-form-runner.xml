@@ -312,7 +312,7 @@
     <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.controls"                          value="-1"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.dmv-14">
-        summary clear save-final review
+        home summary clear save-final review
     </property>
     <property as="xs:string"  name="oxf.fr.resource.orbeon.dmv-14.*.print.formats.date"         value="[Y0001]-[M01]-[D01]"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state.*"                 value="select-value"/>
@@ -324,7 +324,7 @@
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.inner.orbeon.w9">
-        wizard-prev wizard-next review
+        home summary wizard-prev wizard-next review
     </property>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.w9">
         edit save
@@ -335,7 +335,7 @@
     </property>
 
     <property as="xs:string" name="oxf.fr.detail.buttons.orbeon.travel">
-        wizard-prev wizard-next pdf save
+        home wizard-prev wizard-next pdf save
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.button.pdf.visible.orbeon.travel">
@@ -355,7 +355,7 @@
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.pta-remittance">
-        summary clear pdf|tiff save-final review
+        home summary clear pdf|tiff save-final review
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>

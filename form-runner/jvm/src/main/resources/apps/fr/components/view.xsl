@@ -483,6 +483,7 @@
 <!--                        </xh:div>-->
                         <fr:status-icons/>
                         <fr:user-nav/>
+                        <fr:navbar-home-link/>
                     </xsl:variable>
 
                     <xsl:apply-templates select="$default-objects"/>
@@ -688,8 +689,9 @@
                 model="fr-resources-model"
                 ref="
                     .[
-                        not(fr:is-readonly-mode())       and
-                        count($available-languages) gt 1 and
+                        xxf:property('oxf.fr.navbar.language-selector.enable') and
+                        not(fr:is-readonly-mode())                             and
+                        count($available-languages) gt 1                       and
                         empty(
                             xxf:get-request-header('orbeon-liferay-language')[
                                 xxf:non-blank()
@@ -824,6 +826,7 @@
         <xf:group
             class="fr-user-nav"
             ref=".[
+                not(fr:mode() = 'test')                                and
                 xxf:property('oxf.fr.authentication.user-menu.enable') and
                 not(fr:is-embedded())
             ]">
@@ -841,6 +844,22 @@
                     </xh:ul>
                 </xsl:otherwise>
             </xsl:choose>
+        </xf:group>
+    </xsl:template>
+
+    <xsl:template match="fr:navbar-home-link">
+        <xf:group
+            class="fr-navbar-home-link"
+            ref=".[
+                not(fr:mode() = 'test')                        and
+                xxf:property('oxf.fr.navbar.home-link.enable') and
+                not(fr:is-embedded())
+            ]">
+            <xh:ul class="nav">
+              <xh:li class="">
+                <xh:a href="/fr/" title="{{xxf:r('landing.title', '|fr-fr-resources|')}}"><xh:i class="fa fa-th"/></xh:a>
+              </xh:li>
+            </xh:ul>
         </xf:group>
     </xsl:template>
 

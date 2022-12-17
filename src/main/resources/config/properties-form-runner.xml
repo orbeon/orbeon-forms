@@ -98,6 +98,9 @@
     <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.logout"                 value="/fr/logout?source={xxf:get-request-path()}"/>
     <property as="xs:string"  name="oxf.fr.authentication.user-menu.uri.register"               value=""/>
 
+    <property as="xs:boolean" name="oxf.fr.navbar.home-link.enable"                             value="true"/>
+    <property as="xs:boolean" name="oxf.fr.navbar.language-selector.enable"                     value="true"/>
+
     <property as="xs:string"  name="oxf.fr.permissions.*.*"                                     value=""/>
 
     <property as="xs:integer" name="oxf.fr.summary.page-size.*.*"                               value="20"/>

@@ -26,8 +26,8 @@
             <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Approve</approve>
             <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Reject</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Home</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Home</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Review</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -567,8 +567,8 @@
             <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Approuver</approve>
             <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Rejeter</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Accueil</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Accueil3</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Accueil3</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Visualiser</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -1112,8 +1112,8 @@
             <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
             <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Inicio</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Inicio</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Inicio</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Inicio</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Ver</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -1643,8 +1643,8 @@
             <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
             <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Hjem</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Hjem</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Hjem</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Hjem</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Vis</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -2172,8 +2172,8 @@
             <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
             <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; На главную</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; На главную</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; На главную</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; На главную</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Проверить</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -2700,8 +2700,8 @@
             <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
             <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Home</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Home</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Recensione</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -3241,8 +3241,8 @@
             <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
             <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Home</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Home</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Übersicht</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -3782,8 +3782,8 @@
             <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
             <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Koti</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Koti</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Koti</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Koti</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Käy läpi</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; Näytä PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -4323,8 +4323,8 @@
             <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
             <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Start</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Start</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Start</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Start</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Granska</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -4864,8 +4864,8 @@
             <approve>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Goedkeuren</approve>
             <reject>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Weigeren</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Start</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Start</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Start</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Start</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Review</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -5404,8 +5404,8 @@
             <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
             <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Início</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Início</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Início</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Início</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Rever</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -5944,8 +5944,8 @@
             <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Approve</approve>
             <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Reject</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Hjem</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Hjem</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Hjem</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Hjem</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Opsummering</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
@@ -6472,8 +6472,8 @@
             <approve>&lt;i class="icon-ok-circle"&gt;&lt;/i&gt; Akceptuj</approve>
             <reject>&lt;i class="icon-ban-circle"&gt;&lt;/i&gt; Odrzuć</reject>
 
-            <home>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</home>
-            <landing>&lt;i class="fa fa-fw fa-home"&gt;&lt;/i&gt; Home</landing>
+            <home>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Home</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Home</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Przeglądaj</review>
             <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
             <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>

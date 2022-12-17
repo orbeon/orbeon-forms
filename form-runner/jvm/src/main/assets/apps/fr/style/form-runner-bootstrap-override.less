@@ -178,6 +178,10 @@ body.orbeon {
         .focusHighlight();
     }
 
+    input, button, select, textarea {
+        font-family: @frBaseFontFamily;
+    }
+
     // Focus on checkboxes and radio buttons
     select:focus,
     input[type="file"]:focus,
@@ -563,6 +567,27 @@ body.orbeon {
             .btn-group,
             .btn-toolbar {
                 font-size: .5px;
+            }
+        }
+
+        body& {
+            .container, .container-fluid {
+                &.fr-view {
+                    padding-top: 0; // remove padding added above
+                }
+            }
+        }
+
+        .fr-view {
+            .navbar, .navbar-inverse {
+                .navbar-inner .container {
+                    margin-left: 0;
+                    padding-left: 0;
+                    h1 {
+                        margin-left: 0; // remove margin added above
+                        padding-left: 0;
+                    }
+                }
             }
         }
     }

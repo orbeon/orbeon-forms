@@ -419,14 +419,27 @@
 
 @media print {
 
+    .orbeon {
+        body& {
+            .fr-view {
+                padding-top: 0; // remove padding added above
+            }
+        }
+
+        .container {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+
     .orbeon #xforms-form { // make contained rules strong
+
         .fr-status-icons,                                              // no status icons
         .fr-user-nav,                                                  // no user navigation
         .xforms-upload-remove,                                         // upload remove button
         .xforms-help,                                                  // no help
         .fr-buttons                                                    // no buttons at bottom
         { display: none }
-
 
         // Remove background attachment image
         .xforms-upload-info { background: transparent none repeat scroll 0 0; padding-left: 2px }

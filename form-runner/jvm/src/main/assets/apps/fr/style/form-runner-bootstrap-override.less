@@ -266,7 +266,8 @@ body.orbeon {
     }
 
     .input-prepend {
-        input {
+        input,
+        input.xforms-group[role = group][tabindex] {
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }
@@ -277,7 +278,8 @@ body.orbeon {
     }
 
     .input-append {
-        input {
+        input,
+        input.xforms-group[role = group][tabindex] {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
         }

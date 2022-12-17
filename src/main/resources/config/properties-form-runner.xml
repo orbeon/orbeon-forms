@@ -301,6 +301,10 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="exist"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"             value="exist"/>
 
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf">
+        home summary clear pdf|tiff wizard-toc wizard-prev wizard-next save-final review
+    </property>
+
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls">
         home pdf tiff wizard-prev wizard-next review
     </property>

@@ -104,11 +104,13 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
 }
 
 // button link: show search options
-.fr-summary-search-show-button .btn-link {
-  border: 1px solid transparent;
-  background-color: #F3F3F3;
-  color: #0d6efd;
-  text-decoration: underline;
+.fr-summary-search-show-button, .xforms-trigger-appearance-minimal {
+  .btn-link {
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: #0d6efd;
+    text-decoration: underline;
+  }
 }
 
 // home button
@@ -126,7 +128,7 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
 }
 
 // new/review/save button
-.fr-new-button, .fr-review-button, .fr-save-button {
+.fr-new-button, .fr-review-button, .fr-save-button, .xforms-trigger-appearance-xxforms-primary {
   .btn{
     color: #fff;
     background-color: #0d6efd;
@@ -134,7 +136,7 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   }
 }
 
-.fr-new-button, .fr-review-button, .fr-save-button {
+.fr-new-button, .fr-review-button, .fr-save-button, .xforms-trigger-appearance-xxforms-primary {
   .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
     color: #fff;
     background-color: #0b5ed7;

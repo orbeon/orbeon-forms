@@ -412,8 +412,24 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
   // form builder: form settings
   .fb-dialog-form-settings-fields.xbl-component.xbl-fr-tabbable {
     font-size: 14px;
+    .nav-tabs {
+      & > li:not(:first-child), li:not(:last-child) {
+        padding: 0px 1px;
+      }
+      & > li:first-child {
+        padding: 0px 1px 0px 0px;
+      }
+      & > li:last-child {
+        padding: 0px 0px 0px 1px;
+      }
+    }
+    .nav-tabs .nav-item:not(.active) .nav-link:hover {
+      border-color: #eee #eee #ddd;
+      background-color: #eee;
+      height: 38px;
+    }
     .nav-tabs .nav-item .nav-link {
-      padding: 0.5rem 0.628rem;
+      padding: 0.5rem 0.576rem;
     }
   }
 }

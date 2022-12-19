@@ -199,7 +199,7 @@
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 
-            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-2.0.5.jar
+            -libraryjars orbeon-war/jvm/target/webapp/WEB-INF/lib/slf4j-api-2.0.6.jar
 
             -libraryjars lib/proguard/(javax.servlet-api-*.jar;)
             -libraryjars lib/proguard/(portlet-api-*.jar;)

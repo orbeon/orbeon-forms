@@ -517,6 +517,9 @@
                 name="global-operations"
                 value="xxf:split(xxf:instance('fr-authorized-operations'))"/>
 
+            <xf:var name="enabled"  value="instance('fr-summary-triggers-instance')/enabled"/>
+            <xf:var name="disabled" value="instance('fr-summary-triggers-instance')/disabled"/>
+
             <fr:row>
                 <!--<fr:header>-->
                     <!--&lt;!&ndash; Make sure to use the source form's logo &ndash;&gt;-->
@@ -666,13 +669,16 @@
                             </xf:trigger>
 
                             <!-- Don't allow showing search options if there are no search fields specified -->
+
                             <xf:trigger
-                                appearance="minimal"
-                                ref=".[instance('fr-search-instance')/query[@path and @search-field = 'true']]"
+                                appearance="full"
+                                ref="if (instance('fr-search-instance')/query[@path and @search-field = 'true']) then $enabled else $disabled"
                                 class="fr-summary-search-show-button">
 
                                 <!-- Switch label depending on which case is shown -->
-                                <xf:label ref="$fr-resources/summary/search/(if (case('fr-search-options-switch') = 'fr-search-free-case') then show-options else close-options)"/>
+                                <xf:label
+                                    mediatype="text/html"
+                                    ref="$fr-resources/summary/search/(if (case('fr-search-options-switch') = 'fr-search-free-case') then show-options else close-options)"/>
                                 <xf:action event="DOMActivate">
                                     <!-- Clear all queries when switching -->
                                     <xf:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
@@ -1287,9 +1293,6 @@
                                                                       return if (substring-before($selection, '/') = 'draft') then 1 else ()
                                                                   ) = 0
                                                                   "/>
-
-                    <xf:var name="enabled"                 value="instance('fr-summary-triggers-instance')/enabled"/>
-                    <xf:var name="disabled"                value="instance('fr-summary-triggers-instance')/disabled"/>
 
                     <!-- Directly iterate over the tokenized property -->
                     <xf:repeat ref="xxf:split(xxf:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')))">

@@ -199,8 +199,8 @@
             <search>
                 <search>Search</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Search Forms</search-forms>
-                <show-options>Show Search Options</show-options>
-                <close-options>Hide Search Options</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Options</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Options</close-options>
             </search>
             <paging>
                 <to>to</to>
@@ -743,8 +743,8 @@
             <search>
                 <search>Recherche</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Rechercher</search-forms>
-                <show-options>Montrer les options de recherche</show-options>
-                <close-options>Cacher les options de recherche</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer les options</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher les options</close-options>
             </search>
             <paging>
                 <to>à</to>
@@ -1279,8 +1279,8 @@
             <search>
                 <search>Buscar</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulario</search-forms>
-                <show-options>Mostrar opciones de búsqueda</show-options>
-                <close-options>Cerrar opciones de búsqueda</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opciones</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cerrar opciones</close-options>
             </search>
             <paging>
                 <to>al</to>
@@ -1810,8 +1810,8 @@
             <search>
                 <search>Søk</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søk etter skjema</search-forms>
-                <show-options>Vis alternativer for søk</show-options>
-                <close-options>Lukk alternativer for søk</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søk</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Lukk alternativer for søk</close-options>
             </search>
             <paging>
                 <to>til</to>
@@ -2339,8 +2339,8 @@
             <search>
                 <search>Поиск</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Поиск формы</search-forms>
-                <show-options>Показать настройки поиска</show-options>
-                <close-options>Закрыть настройки поиска</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Показать настройки поиска</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Закрыть настройки поиска</close-options>
             </search>
             <paging>
                 <to>до</to>
@@ -2873,8 +2873,8 @@
             <search>
                 <search>Cerca</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Cerca moduli</search-forms>
-                <show-options>Mostra opzioni di ricerca</show-options>
-                <close-options>Chiudi opzioni di ricerca</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostra opzioni</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Chiudi opzioni</close-options>
             </search>
             <paging>
                 <to>a</to>
@@ -3414,8 +3414,8 @@
             <search>
                 <search>Suchen</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formular suchen</search-forms>
-                <show-options>Suchoptionen anzeigen</show-options>
-                <close-options>Suchoptionen schließen</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Optionen anzeigen</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Optionen schließen</close-options>
             </search>
             <paging>
                 <to>bis</to>
@@ -3955,8 +3955,8 @@
             <search>
                 <search>Etsi</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Etsi lomakkeita</search-forms>
-                <show-options>Näytä hakuvaihtoehdot</show-options>
-                <close-options>Sulje hakuvaihtoehdot</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Näytä hakuvaihtoehdot</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Sulje hakuvaihtoehdot</close-options>
             </search>
             <paging>
                 <to>-</to>
@@ -4496,8 +4496,8 @@
             <search>
                 <search>Sök</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Sök formulär</search-forms>
-                <show-options>Visa sökalternativ</show-options>
-                <close-options>Dölj sökalternativ</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Visa sökalternativ</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Dölj sökalternativ</close-options>
             </search>
             <paging>
                 <to>till</to>
@@ -5037,8 +5037,8 @@
             <search>
                 <search>Zoeken</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Forms zoeken</search-forms>
-                <show-options>Zoekopties tonen</show-options>
-                <close-options>Zoektopties sluiten</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Zoekopties tonen</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zoektopties sluiten</close-options>
             </search>
             <paging>
                 <to>tot</to>
@@ -5577,8 +5577,8 @@
             <search>
                 <search>Procurar</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt;  Procurar formulários</search-forms>
-                <show-options>Mostrar opções de procura</show-options>
-                <close-options>Fechar opções de procura</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opções</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Fechar opções</close-options>
             </search>
             <paging>
                 <to>a</to>
@@ -6111,8 +6111,8 @@
             <search>
                 <search>Søg</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Søg efter blanket</search-forms>
-                <show-options>Vis alternativer for søgning</show-options>
-                <close-options>Luk alternativer for søgnng</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søgning</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Luk alternativer for søgnng</close-options>
             </search>
             <paging>
                 <to>til</to>
@@ -6645,8 +6645,8 @@
             <search>
                 <search>Szukaj</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"/&lt; Wyszukaj formularze</search-forms>
-                <show-options>Pokaż opcje wyszukiwania</show-options>
-                <close-options>Zamknij opcje wyszukiwania</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Pokaż opcje wyszukiwania</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zamknij opcje wyszukiwania</close-options>
             </search>
             <paging>
                 <to>do</to>

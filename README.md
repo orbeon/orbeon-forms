@@ -4,7 +4,7 @@ Orbeon Forms
 Web Forms for the Enterprise and the Government
 -----------------------------------------------
 
-Last updated for Orbeon Forms 2021.1.6 (November 2022)
+Last updated for Orbeon Forms 2021.2.1 (December 2022)
 
 [![Build Status](https://travis-ci.org/orbeon/orbeon-forms.svg?branch=master)](https://travis-ci.org/orbeon/orbeon-forms)
 
@@ -23,6 +23,7 @@ For more information about Orbeon Forms, please visit [orbeon.com](https://www.o
 What's new
 ----------
 
+- [Orbeon Forms 2022.1](https://doc.orbeon.com/release-notes/orbeon-forms-2022.1)
 - [Orbeon Forms 2021.1.6 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.6)
 - [Orbeon Forms 2021.1.5 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.5)
 - [Orbeon Forms 2021.1.4 PE](https://doc.orbeon.com/release-notes/orbeon-forms-2021.1.4)

@@ -33,6 +33,8 @@
 @cellHighlight: @color5;
 @explanatoryTextShadow: rgba(0, 123, 255, 25%);
 
+@fbButtonsBackground: white; // so that the borderless buttons look good
+
 // Case of non-embedded Form Builder: size body to take the whole viewport
 body.orbeon {
     position: absolute;
@@ -86,7 +88,7 @@ div.orbeon.orbeon-portlet-div {
 
     .fb-bottom {
         z-index: @zindexFixedNavbar;                                        // put in front like the navbar
-        background-color: @frBackground;
+        background-color: @fbButtonsBackground;
     }
 
     .fb-messages { display: none; }                                         // Section of the HTML we use to output localized text used by client-side code
@@ -1347,6 +1349,7 @@ div.orbeon.orbeon-portlet-div {
             margin: 0;
             padding: 0 10px;
             vertical-align: top;
+            background-color: @fbButtonsBackground;
         }
     }
 

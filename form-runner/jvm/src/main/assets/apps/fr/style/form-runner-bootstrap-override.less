@@ -502,34 +502,61 @@ body.orbeon {
       cursor: default;
     }
 
-    .xforms-trigger-appearance-xxforms-primary .btn {
-      .buttonBackground(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
-    }
-    .xforms-trigger-appearance-xxforms-warning .btn {
-      .buttonBackground(@btnWarningBackground, @btnWarningBackgroundHighlight);
-    }
-    .xforms-trigger-appearance-xxforms-danger .btn {
-      .buttonBackground(@btnDangerBackground, @btnDangerBackgroundHighlight);
-    }
-    .xforms-trigger-appearance-xxforms-success .btn {
-      .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
-    }
-    .xforms-trigger-appearance-xxforms-info .btn {
-      .buttonBackground(@btnInfoBackground, @btnInfoBackgroundHighlight);
-    }
-    .xforms-trigger-appearance-xxforms-inverse .btn {
-      .buttonBackground(@btnInverseBackground, @btnInverseBackgroundHighlight);
+    .gradientBarOrbeon(@primaryColor, @secondaryColor, @textColor: #fff) {
+        color: @textColor;
+        background-color: @primaryColor;
+        background-image: none;
+        text-shadow: none;
     }
 
-    .xforms-trigger {
-        // Updates to Bootstrap btn-link
-        button.btn-link {
-            white-space: normal;
-            text-align: inherit;
-            text-decoration: underline;
-            font-size: inherit;
-            padding: 0 0 2px 0;
+    .buttonBackgroundOrbeon(@startColor, @endColor, @textColor: #fff) {
+        // gradientBar will set the background to a pleasing blend of these, to support IE<=9
+        .gradientBarOrbeon(@startColor, @endColor, @textColor);
+
+        // in these cases the gradient won't cover the background, so we override
+        &:hover, &:focus, &:active, &.active, &.disabled, &[disabled] {
+            color: @textColor;
+            background-color: @endColor;
         }
+    }
+
+    .xforms-trigger-appearance-xxforms-primary .btn {
+        .buttonBackgroundOrbeon(@btnPrimaryBackground, @btnPrimaryBackgroundHighlight);
+    }
+
+    .xforms-trigger-appearance-xxforms-warning .btn {
+        .buttonBackgroundOrbeon(@btnWarningBackground, @btnWarningBackgroundHighlight);
+    }
+
+    .xforms-trigger-appearance-xxforms-danger .btn {
+        .buttonBackgroundOrbeon(@btnDangerBackground, @btnDangerBackgroundHighlight);
+    }
+
+    .xforms-trigger-appearance-xxforms-success .btn {
+        .buttonBackgroundOrbeon(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
+    }
+
+    .xforms-trigger-appearance-xxforms-info .btn {
+        .buttonBackgroundOrbeon(@btnInfoBackground, @btnInfoBackgroundHighlight);
+    }
+
+    .xforms-trigger-appearance-xxforms-inverse .btn {
+        .buttonBackgroundOrbeon(@btnInverseBackground, @btnInverseBackgroundHighlight);
+    }
+
+    button.btn, label.btn {
+        background-image: none;
+        text-shadow: none;
+        border: none;
+    }
+
+    // Updates to Bootstrap btn-link
+    button.btn-link {
+        white-space: normal;
+        text-align: inherit;
+        text-decoration: underline;
+        font-size: inherit;
+        padding: 0 0 2px 0;
     }
 }
 

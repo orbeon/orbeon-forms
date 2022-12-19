@@ -255,7 +255,6 @@
     // Buttons bar
     .fr-buttons {
         display: block;
-        text-align: right;
         font-size: 0; // Removes space between buttons, see http://stackoverflow.com/a/19038859/5295
 
         // Make buttons stick to the viewport
@@ -264,14 +263,21 @@
         bottom: 0;
         width: 100%;
         box-sizing: border-box;
-        background-color: @frBackground;
-        padding: 10px 0;
 
-        .fr-buttons-message div { display: inline }
+        padding: 10px;
+        background-color: white;
+        border-radius: @baseBorderRadius;
+        text-align: center;
+
+        .fr-buttons-message div {
+            display: inline;
+        }
 
         // Space between the image and the text in a button, only for the buttons bar
         //   (not other buttons in the form which might contain just an image)
-        .xforms-trigger button img { margin-right: 10px }
+        .xforms-trigger button img {
+            margin-right: 10px;
+        }
 
         .xforms-trigger, .xforms-submit, .xbl-fr-drop-trigger {
             button[class ~= btn]:first-of-type, input {

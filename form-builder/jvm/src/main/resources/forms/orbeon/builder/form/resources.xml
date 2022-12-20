@@ -498,41 +498,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label>Email Options</label>
-                <item>
-                    <label>Email recipient</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>Email carbon copy recipient</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>Email blind carbon copy recipient</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>Email sender</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label>Email reply-to</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label>Include as email attachment</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label>Exclude from email body</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label>Show in email subject (Deprecated)</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label>Control Appearance</label>
             </control-appearance>
@@ -1839,41 +1804,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label>Options email</label>
-                <item>
-                    <label>Destinataire email</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>Destinataire email en copie carbone</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>Destinataire email en copie carbone invisible</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>Expéditeur email</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label>"Répondre à" email</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label>Inclure à l'email comme fichier joint</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label>Exclure du contenu de l'email</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label>Inclure dans le sujet d'email (déprécié)</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label>Apparence du contrôle</label>
             </control-appearance>
@@ -3163,41 +3093,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label todo="true">[Email Options]</label>
-                <item>
-                    <label>Epostmottaker</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>[Email Carbon Copy Recipient]</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>[Email Sender]</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label todo="true">[Email reply-to recipient]</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label todo="true">[Include as Email Attachment]</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label todo="true">[Exclude from Email Body]</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label todo="true">Vis i epostemne</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -4515,41 +4410,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label todo="true">[Email Options]</label>
-                <item>
-                    <label>Адрес получателя почты</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>[Email Carbon Copy Recipient]</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>[Email Sender]</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label todo="true">[Email reply-to recipient]</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label todo="true">[Include as Email Attachment]</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label todo="true">[Exclude from Email Body]</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label todo="true">Показывать в теме письма</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -5867,41 +5727,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label todo="true">[Email Options]</label>
-                <item>
-                    <label>Destinatario email</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>[Email Carbon Copy Recipient]</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>[Email Sender]</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label todo="true">[Email reply-to recipient]</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label todo="true">[Include as Email Attachment]</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label todo="true">[Exclude from Email Body]</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label todo="true">Mostra in oggetto</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -7211,41 +7036,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label>E-Mail Optionen</label>
-                <item>
-                    <label>E-Mail-Empfänger</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>E-Mail CC Empfänger</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>E-Mail BCC Empfänger</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>E-Mail Absender</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label todo="true">[Email reply-to recipient]</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label>Als E-Mail Anhang einfügen</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label>In E-Mail Text ausblenden</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label>In E-Mail-Betreff anzeigen</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label>Erscheinungsbild der Steuerelemente</label>
             </control-appearance>
@@ -8558,41 +8348,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label todo="true">[Email Options]</label>
-                <item>
-                    <label>Sähköpostin vastaanottaja</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>[Email Carbon Copy Recipient]</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>[Email Sender]</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label todo="true">[Email reply-to recipient]</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label todo="true">[Include as Email Attachment]</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label todo="true">[Exclude from Email Body]</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label todo="true">Näytä sähköpostin aiheena</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -9902,41 +9657,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label todo="true">[Email Options]</label>
-                <item>
-                    <label>Es receptor del Emails</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>[Email Carbon Copy Recipient]</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>[Email Sender]</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label todo="true">[Email reply-to recipient]</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label>Incluir como Adjuntos al Mail</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label todo="true">[Exclude from Email Body]</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label todo="true">Mostrar en Asunto del Mail</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label>Presentación del Control</label>
             </control-appearance>
@@ -11247,41 +10967,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label todo="true">[Email Options]</label>
-                <item>
-                    <label>E-mail ontvanger</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>E-mail cc ontvanger</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>E-mail bcc ontvanger</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>E-mail afzender</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label todo="true">[Email reply-to recipient]</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label>Voeg toe als e-mailbijlage</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label>Verwijder uit e-mailinhoud</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label>Toon in e-mail onderwerp (deprecated)</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label>Control weergave</label>
             </control-appearance>
@@ -12571,41 +12256,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label todo="true">[Email Options]</label>
-                <item>
-                    <label>Receptor do Email</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>[Email Carbon Copy Recipient]</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>[Email Sender]</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label todo="true">[Email reply-to recipient]</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label todo="true">[Include as Email Attachment]</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label todo="true">[Exclude from Email Body]</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label todo="true">Mostrar no assunto do email</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label todo="true">[Control Appearance]</label>
             </control-appearance>
@@ -13922,41 +13572,6 @@
                     <value>fr-encrypt</value>
                 </item>
             </options>
-            <email-options>
-                <label todo="true">[Email Options]</label>
-                <item>
-                    <label>Mottagare av mejl</label>
-                    <value>fr-email-recipient</value>
-                </item>
-                <item>
-                    <label>[Email Carbon Copy Recipient]</label>
-                    <value>fr-email-cc</value>
-                </item>
-                <item>
-                    <label>[Email Bind Carbon Copy Recipient]</label>
-                    <value>fr-email-bcc</value>
-                </item>
-                <item>
-                    <label>[Email Sender]</label>
-                    <value>fr-email-sender</value>
-                </item>
-                <item>
-                    <label todo="true">[Email reply-to recipient]</label>
-                    <value>fr-email-reply-to</value>
-                </item>
-                <item>
-                    <label>Lägg till som mejlbilaga</label>
-                    <value>fr-email-attachment</value>
-                </item>
-                <item>
-                    <label todo="true">[Exclude from Email Body]</label>
-                    <value>fr-exclude-from-email-body</value>
-                </item>
-                <item>
-                    <label todo="true">Visa i ärenderaden för mejl</label>
-                    <value>fr-email-subject</value>
-                </item>
-            </email-options>
             <control-appearance>
                 <label>Kontrollens utseende</label>
             </control-appearance>

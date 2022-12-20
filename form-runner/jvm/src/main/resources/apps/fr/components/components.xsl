@@ -62,7 +62,8 @@
     <xsl:variable name="is-form-builder"     select="$app = 'orbeon' and $form = 'builder'"           as="xs:boolean"/>
 
     <!-- For now, only enable Bootstrap 5 for the landing page -->
-    <xsl:variable name="bs5"                 select="$is-landing"                                     as="xs:boolean"/>
+<!--    <xsl:variable name="bs5"                 select="$is-landing"                                     as="xs:boolean"/>-->
+    <xsl:variable name="bs5"                 select="true()"                                     as="xs:boolean"/>
 
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
 

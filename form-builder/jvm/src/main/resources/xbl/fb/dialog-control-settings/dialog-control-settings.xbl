@@ -47,7 +47,7 @@
                 <xf:var name="resources"                    value="frf:currentFormResources()"/>
 
                 <!-- Split out classes -->
-                <xf:var name="standard-classes"             value="$resources/dialog-control-settings/(options | email-options)/item/value/string(), 'fr-attachment', 'fr-static-attachment'"/>
+                <xf:var name="standard-classes"             value="$resources/dialog-control-settings/options/item/value/string(), 'fr-attachment', 'fr-static-attachment'"/>
                 <xf:var name="control-classes"              value="xxf:split($control/@class)"/>
 
                 <!-- Imply 'fr-index' as needed but for the UI only -->
@@ -909,34 +909,6 @@
                                                         </xf:select>
                                                     </xf:repeat>
                                                 </xf:group>
-                                            </xh:td>
-                                        </xh:tr>
-                                        <xh:tr>
-                                            <xh:td>
-
-                                                <xf:var
-                                                    name="is-static-attachment"
-                                                    value="xxf:split($i/standard-classes) = 'fr-static-attachment'"/>
-
-                                                <xf:var
-                                                    name="email-items-to-show"
-                                                    value="
-                                                        $resources/dialog-control-settings/email-options/item[
-                                                            (
-                                                                $is-attachment or value != 'fr-email-attachment'
-                                                            ) and not(
-                                                                ($is-attachment or $is-static-attachment) and value = ('fr-email-recipient', 'fr-email-subject')
-                                                            )
-                                                        ]
-                                                    "/>
-
-                                                <xf:select ref="$i/standard-classes" appearance="full">
-                                                    <xf:label ref="$resources/dialog-control-settings/email-options/label"/>
-                                                    <xf:itemset ref="$email-items-to-show[contains(value, 'email')]">
-                                                        <xf:label ref="label"/>
-                                                        <xf:value ref="value"/>
-                                                    </xf:itemset>
-                                                </xf:select>
                                             </xh:td>
                                         </xh:tr>
                                     </fr:grid>

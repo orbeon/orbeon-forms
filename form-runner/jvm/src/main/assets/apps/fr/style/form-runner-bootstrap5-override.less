@@ -6,7 +6,7 @@
   background-color: #eee;
 }
 
-input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-control.xforms-select1.xforms-incremental > select,
+input:not([type='checkbox']):not([type='radio']), output, .xforms-control.xforms-select1.xforms-incremental, .xforms-control.xforms-select1.xforms-incremental > select,
 .xforms-control.xforms-readonly.xforms-incremental.xforms-static .xforms-field, .xforms-control.xforms-incremental.xforms-readonly.xforms-static pre {
   height: 28px;
 }
@@ -273,10 +273,15 @@ input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-contro
     }
   }
   
+  // todo: margin-top should be the same value with same font size
   .xforms-select1-appearance-full input[type="radio"], .xforms-select-appearance-full input[type="radio"], 
   .xforms-select1-appearance-full input[type="checkbox"], .xforms-select-appearance-full input[type="checkbox"]{
-      margin-top: -0.1rem;
+      margin-top: 5px;
     }
+
+  .yui-panel-container input[type="radio"], .yui-panel-container input[type="checkbox"] {
+    margin-top: 3px;
+  }
 
   // form controls > Image and File Attachments
   .xforms-update-full {

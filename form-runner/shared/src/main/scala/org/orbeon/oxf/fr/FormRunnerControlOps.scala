@@ -204,9 +204,10 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       val withSectionTemplatesOpt =
         headOpt map { head =>
           frc.searchControlsUnderSectionTemplates(
-            head      = head,
-            data      = None,
-            predicate = frc.hasAnyClassPredicate(classes)
+            head             = head,
+            data             = None,
+            sectionPredicate = _ => true,
+            controlPredicate = frc.hasAnyClassPredicate(classes)
           )
         }
 
@@ -250,13 +251,15 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     )
 
   def searchControlsUnderSectionTemplates(
-    head      : NodeInfo,
-    data      : Option[NodeInfo],
-    predicate : NodeInfo => Boolean)(implicit
-    ctx       : FormRunnerDocContext
+    head             : NodeInfo,
+    data             : Option[NodeInfo],
+    sectionPredicate : NodeInfo => Boolean,
+    controlPredicate : NodeInfo => Boolean)(implicit
+    ctx              : FormRunnerDocContext
   ): Seq[ControlBindPathHoldersResources] =
     for {
       section         <- frc.findSectionsWithTemplates
+      if sectionPredicate(section)
       sectionName     <- getControlNameOpt(section).toList
 
       BindPathHolders(
@@ -281,7 +284,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       )              <- searchControlBindPathHoldersInDoc(
                          controlElems   = xblBinding.rootElement / XBLTemplateTest descendant * filter IsControl,
                          contextItemOpt = contextItemOpt,
-                         predicate      = predicate
+                         predicate      = controlPredicate
                        )(new InDocFormRunnerDocContext(xblBinding))
     } yield
       ControlBindPathHoldersResources(control, bind, sectionPath ::: path, holdersOpt, labels)

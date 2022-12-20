@@ -72,9 +72,10 @@ trait FormRunnerEmail {
     classNames: String
   ): SequenceIterator =
     frc.searchControlsUnderSectionTemplates(
-      head = head,
-      data = Option(data),
-      predicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
+      head             = head,
+      data             = Option(data),
+      sectionPredicate = _ => true,
+      controlPredicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
     )(
       new InDocFormRunnerDocContext(body)
     ) flatMap {

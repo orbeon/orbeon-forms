@@ -27,7 +27,7 @@
             vertical-align: middle;
             .add-on {
                 // Rounded corners on all sides, not just right side
-                border-radius: @inputBorderRadius;
+                border-radius: 4px 4px 4px 4px;
                 // Center calendar icon
                 padding: 3px 6px 5px 6px;
             }
@@ -37,4 +37,15 @@
     // For use outside of Form Runner
     .fr-width-2digits .xforms-input-input { width: 29px }
     .fr-width-4digits .xforms-input-input { width: 43px }
+
+    // BS5 [CHECK]
+    .fr-width-2digits .xforms-input-input {
+        width: 29px;
+        padding-left: 5px;
+    }
+    // BS5 [CHECK]
+    .fr-width-4digits .xforms-input-input {
+        width: 55px;
+        padding-left: 6px;
+     }
 }

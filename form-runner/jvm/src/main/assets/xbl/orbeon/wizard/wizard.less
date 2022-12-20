@@ -14,13 +14,32 @@
 @import (reference)  "../../../apps/fr/style/form-runner-orbeon";
 
 @frWizardWidth: 940px;
-@frWizardTocWidth: 199px;
+@frWizardTocWidth: 234px; // before: 199px
 @frWizardBodyWidth: @frWizardWidth - @frWizardTocWidth - 2 - 1;
 
 // Make li the same height as section title
 @wizardLineHeight: @frSectionTitleLineHeight - 2 * 3px; // 3px is the Bootstrap padding on .nav-list > li > [span >] a
 
 .orbeon .xbl-fr-wizard {
+    .fr-wizard-toc .btn-link:hover {
+        color: #005580 !important;
+        background-color: #eee !important;
+        width: 234px;
+    }
+    
+    .fr-wizard-toc .btn-link:focus {
+        color: #005580 !important;
+        background-color: #eee !important;
+        width: 234px;
+    }
+
+    .fr-wizard-toc .nav-list > .active > span > .btn-link, .orbeon .nav-list > .active > span > .btn-link:hover {
+        background-color: #0d6efd !important;
+        color: #fff !important;
+        width: 234px;
+        border-radius: 0;
+        text-align: left;
+    }
 
     width: 100%; // comment about #1741 here might be out of date, had explicit width
 
@@ -73,8 +92,12 @@
                 display: flex;
                 align-items: center;
 
-                padding-left: 10px;  // narrower than default
-                padding-right: 10px; // narrower than default
+                // padding-left: 10px;  // narrower than default
+                // padding-right: 10px; // narrower than default
+
+                background: none;
+                border: 0;
+                padding: 0.5rem 1rem;
 
                 .fr-toc-title {
                     order: 1;
@@ -147,13 +170,31 @@
 
     .fr-wizard-navigation {
         .pagination {
-            margin: 10px 0;
-            display: block; // Liferay resets this
+            margin: 10px 20px;
+            // display: block; // Liferay resets this
             .fr-page-number {
                 min-width: 60px; // https://github.com/orbeon/orbeon-forms/issues/4165
+                padding: 8px 28px;
+                margin-left: -1px;
                 .xforms-output-output {
                     white-space: nowrap;
                 }
+            }
+
+            .fr-wizard-prev {
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 4px;
+            }
+
+            .fr-wizard-next {
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+                margin-left: -1px;
+            }
+
+            .btn-link:hover, .btn-link:focus, .btn-link:active {
+                width: unset;
+                background-color: transparent !important;
             }
         }
     }

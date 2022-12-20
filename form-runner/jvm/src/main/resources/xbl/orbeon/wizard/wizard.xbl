@@ -707,14 +707,14 @@
                                         </xf:action>
                                     </xf:action>
                                 </xf:action>
-
+                                
                                 <!-- This id is used to expose visibility to buttons outside the wizard -->
                                 <xf:group
                                     id="fr-wizard-submit-hide"
                                     ref="xxf:instance('local')/readwrite[not($validated-mode) or empty($next-top-level-case-ids)]"/>
 
-                                <xh:div role="navigation">
-                                    <xh:ul class="nav nav-list">
+                                <xh:div class="d-flex align-items-start" role="navigation">
+                                    <xh:ul class="nav nav-list flex-column nav-pills me-3">
                                         <xsl:apply-templates mode="toc-sections"/>
                                     </xh:ul>
                                 </xh:div>
@@ -796,61 +796,59 @@
 
                                     </xf:action>
 
-                                    <xh:div class="pagination pagination-centered">
-                                        <xh:ul>
-                                            <xh:li class="{{if ($prev-button-ref instance of xs:string) then 'disabled' else ''}}">
-                                                <xf:trigger id="fr-wizard-prev"  ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
-                                                    <xf:label><xh:i class="fa fa-fw fa-chevron-left"/></xf:label>
-                                                    <xf:action event="DOMActivate" type="xpath">
-                                                        fr:run-process-by-name('oxf.fr.detail.process', 'wizard-prev')
-                                                    </xf:action>
-                                                </xf:trigger>
-                                            </xh:li>
-                                            <xh:li>
-                                                <xh:span class="fr-page-number">
-                                                    <xf:output value="
-                                                        sum(
-                                                            (
-                                                                if (exists($prev-repeat-id-and-index-opt)) then
-                                                                    $prev-repeat-id-and-index-opt[2] + 1
+                                    <xh:ul class="pagination pagination-centered">
+                                        <xh:li class="{{if ($prev-button-ref instance of xs:string) then 'disabled' else ''}}">
+                                            <xf:trigger id="fr-wizard-prev"  ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
+                                                <xf:label><xh:i class="fa fa-fw fa-chevron-left"/></xf:label>
+                                                <xf:action event="DOMActivate" type="xpath">
+                                                    fr:run-process-by-name('oxf.fr.detail.process', 'wizard-prev')
+                                                </xf:action>
+                                            </xf:trigger>
+                                        </xh:li>
+                                        <xh:li>
+                                            <xh:span class="fr-page-number">
+                                                <xf:output value="
+                                                    sum(
+                                                        (
+                                                            if (exists($prev-repeat-id-and-index-opt)) then
+                                                                $prev-repeat-id-and-index-opt[2] + 1
+                                                            else
+                                                                1,
+                                                            for $case-id in $prev-nav-case-ids
+                                                            return
+                                                                if (
+                                                                    $case-id = $sections-with-paging-case-ids
+                                                                ) then
+                                                                    count(xxf:binding(Wizard:sectionIdFromCaseIdOpt($case-id))/*)
                                                                 else
-                                                                    1,
-                                                                for $case-id in $prev-nav-case-ids
-                                                                return
-                                                                    if (
-                                                                        $case-id = $sections-with-paging-case-ids
-                                                                    ) then
-                                                                        count(xxf:binding(Wizard:sectionIdFromCaseIdOpt($case-id))/*)
-                                                                    else
-                                                                        1
-                                                            )
-                                                        )"/>
+                                                                    1
+                                                        )
+                                                    )"/>
 
-                                                    <xf:output value="concat(' ', $fr-resources/summary/paging/of, ' ')"/>
-                                                    <xf:output value="
-                                                        sum(
-                                                            (
-                                                                count(
-                                                                    $relevant-nav-case-ids[
-                                                                        not(. = $sections-with-paging-case-ids)
-                                                                    ]
-                                                                ),
-                                                                for $section-id in $sections-with-paging-section-ids
-                                                                return
-                                                                    count(xxf:binding($section-id)/*)
-                                                            )
-                                                        )"/>
-                                                </xh:span>
-                                            </xh:li>
-                                            <xh:li class="{{if ($next-button-ref instance of xs:string) then 'disabled' else ''}}">
-                                                <xf:trigger id="fr-wizard-next" ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
-                                                    <xf:label><xh:i class="fa fa-fw fa-chevron-right"/></xf:label>
-                                                    <xf:action event="DOMActivate" type="xpath">
-                                                        fr:run-process-by-name('oxf.fr.detail.process', 'wizard-next')
-                                                    </xf:action>
-                                                </xf:trigger>
-                                            </xh:li>
-                                        </xh:ul>
+                                                <xf:output value="concat(' ', $fr-resources/summary/paging/of, ' ')"/>
+                                                <xf:output value="
+                                                    sum(
+                                                        (
+                                                            count(
+                                                                $relevant-nav-case-ids[
+                                                                    not(. = $sections-with-paging-case-ids)
+                                                                ]
+                                                            ),
+                                                            for $section-id in $sections-with-paging-section-ids
+                                                            return
+                                                                count(xxf:binding($section-id)/*)
+                                                        )
+                                                    )"/>
+                                            </xh:span>
+                                        </xh:li>
+                                        <xh:li class="{{if ($next-button-ref instance of xs:string) then 'disabled' else ''}}">
+                                            <xf:trigger id="fr-wizard-next" ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
+                                                <xf:label><xh:i class="fa fa-fw fa-chevron-right"/></xf:label>
+                                                <xf:action event="DOMActivate" type="xpath">
+                                                    fr:run-process-by-name('oxf.fr.detail.process', 'wizard-next')
+                                                </xf:action>
+                                            </xf:trigger>
+                                        </xh:li>
 
                                         <!-- NOTE: This shouldn't be in the outer scope ideally. -->
                                         <xf:group id="fr-wizard-update-validity" appearance="xxf:internal">
@@ -998,7 +996,7 @@
                                             </xf:action>
                                             <!-- NOTE: We *could* collapse the corresponding top-level sections. Should we? -->
                                         </xf:group>
-                                    </xh:div>
+                                    </xh:ul>
                                 </xh:div>
 
                                 <!--
@@ -1632,8 +1630,8 @@
 
                             <xsl:choose>
                                 <xsl:when test="$static-subsections-toc = 'all' and exists(.//fr:section)">
-                                    <xh:div role="navigation">
-                                        <xh:ul class="nav nav-list">
+                                    <xh:div class="d-flex align-items-start" role="navigation">
+                                        <xh:ul class="nav nav-list flex-column nav-pills me-3">
                                             <xsl:apply-templates mode="toc-sections"/>
                                         </xh:ul>
                                     </xh:div>

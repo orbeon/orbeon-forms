@@ -2,158 +2,467 @@
 
 .orbeon {
 
-  // dropdown menu
-  .dropdown-menu .btn-link {
-    font-size: 14px;
-    padding: 6px 12px;
-    margin-bottom: 0;
-
-    display: inline-block;
-    text-decoration: none !important;
-    text-align: left;
-    white-space: nowrap;
-    vertical-align: middle;
-    -ms-touch-action: manipulation;
-    touch-action: manipulation;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    background-image: none;
-    border: 1px solid transparent;
-    color: black !important;
-    background-color: white;
-    width: 100%;
-  }
-
-  .dropdown-menu .btn-link:hover,
-  .btn-link:focus {
-    color: #333;
-    text-decoration: none;
-    background-color: #e9ecef;
-  }
-
-  .dropdown-item.active, .dropdown-item:active {
-    color: unset !important;
-    text-decoration: unset !important;
-    background-color: #e9ecef !important;
-  }
-
-  .dropdown-item:hover .btn-link {
-    background-color: #e9ecef;
-  }
-
-  .disabled .btn-link {
-    color: lightgray !important;
-  }
-
-  .fr-summary-selection .dropdown-toggle {
-    background-color: #f8f9fa;
-    color: #000;
-  }
-
-  .fr-summary-selection .badge {
-    background-color: #0d6efd;
-  }
-
-  .fr-summary-selection .dropdown-menu {
-    min-width: 15rem;
-  }
-
-  // button link: show search options
-  .fr-summary-search-show-button .btn-link {
-    border: 1px solid transparent;
-    background-color: #F3F3F3;
-    color: #0d6efd !important;
-    text-decoration: underline !important;
-  }
-
-  // home button
-  .xforms-trigger-appearance-full .btn {
-    color: #000;
-    background-color: #f8f9fa;
-    border-color: #f8f9fa;
-  }
-
-  .xforms-trigger-appearance-full {
-    .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
-      background-color: #e6e6e6 !important;
-      border-color: #0a58ca !important;
-    }
-  }
-
-  // new button
-  .fr-new-button .btn {
-    color: #fff !important;
-    background-color: #0d6efd !important;
-    border-color: #0d6efd !important;
-  }
-
-  .fr-new-button {
-    .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
-      color: #fff !important;
-      background-color: #0b5ed7 !important;
-      border-color: #0a58ca !important;
-    }
-  }
-
-  // Use `.btn-link` instead of `.xforms-trigger` to catch cases where used directly in an `<xf:button>`
-  .btn-link .fa {
-    color: @textColor;
-  }
-
-  // Make disabled icons a bit opaque
-  .disabled[class^="icon-"],
-  .disabled [class^="icon-"],
-  .xforms-trigger.xforms-readonly .fa,
-  .fa.disabled {
-    opacity: 0.4;
-  }
-
-  // Adapt pagination to use of xf:trigger
-  .pagination li {
-    & > .xforms-trigger {
-      cursor: pointer
+    // disable input bar
+    .orbeon input[disabled], .orbeon select[disabled], .orbeon textarea[disabled], .orbeon input[readonly], .orbeon select[readonly], .orbeon textarea[readonly] {
+        cursor: not-allowed;
+        background-color: #eee;
     }
 
-    & > .xforms-trigger.xforms-readonly {
-      cursor: auto;
+    input, output, .xforms-control.xforms-select1.xforms-incremental, .xforms-control.xforms-select1.xforms-incremental > select,
+    .xforms-control.xforms-readonly.xforms-incremental.xforms-static .xforms-field, .xforms-control.xforms-incremental.xforms-readonly.xforms-static pre {
+        height: 28px;
     }
 
-    .btn-link {
-      text-decoration: none;
-      background-color: #fff;
+    // date picker
+    .fr-grid-body .input-group-text {
+        padding: 0rem 0.5rem;
     }
 
-    // NOTE: Updated for Bootstrap 5
-    > .btn-link, > span {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      background-color: #fff;
+    // dropdown
+    .xforms-group .dropdown, .fr-summary-selection {
+        .btn.btn-secondary.dropdown-toggle {
+            text-decoration: none;
+        }
+
+        .dropdown-menu .btn-link {
+            font-size: 14px;
+            padding: 3px 8px;
+            margin-bottom: 0;
+
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -ms-touch-action: manipulation;
+            touch-action: manipulation;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid transparent;
+            color: black;
+            background-color: white;
+            width: 100%;
+        }
+
+        .dropdown-menu .dropdown-item {
+            &:hover, &:focus, &:active {
+                color: #fff;
+                background-color: #0d6efd;
+
+                > span {
+                    .btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
+                        color: #fff;
+                        background-color: #0d6efd;
+                        background-image: none;
+                    }
+                }
+            }
+        }
     }
 
-    // Reset rules that can be applied by external Bootstrap .pagination a rule
-    span .btn-link {
-      padding: 0;
-      border: none;
-      line-height: normal;
+    .disabled .btn-link {
+        color: lightgray !important;
     }
-  }
 
-  .pagination .disabled {
-    > span {
-      &, & > button {
+    // form builder page: buttons above the tab
+    .fr-mode-new .fb-toolbox .fb-tools .fb-toolbox-icons-tools .btn-link, .fb-hide-alert .xxforms-dynamic-control .fb-body .fr-section-label .btn-link {
+        border-color: transparent;
         background-color: transparent;
-      }
     }
-  }
 
-  .navbar {
-    .container, .container-fluid {
-      h1 {
-        font-weight: @frNavBarFontWeight;
-      }
+    // Test button
+    .fr-buttons .xforms-trigger-appearance-xxforms-default.xbl-fr-drop-trigger .btn-group {
+        & > button {
+            color: #000;
+            background-color: #f8f9fa;
+        }
+
+        & > button:first-child {
+            border-right-color: #ccc;
+        }
+
+        .dropdown-toggle {
+            border-left-color: #ccc;
+        }
     }
-  }
+
+    // form builder's demo forms page
+    .fr-summary-selection {
+        .dropdown-toggle {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+        .badge {
+            background-color: #0d6efd;
+        }
+
+        .dropdown-item {
+            padding: 0.35rem 0.25rem;
+        }
+    }
+
+    // button link: show search options
+    .fr-summary-search-show-button, .xforms-trigger-appearance-minimal {
+        .btn-link {
+            border: 1px solid transparent;
+            background-color: transparent;
+            color: #0d6efd;
+            text-decoration: underline;
+        }
+    }
+
+    // home button
+    .xforms-trigger-appearance-full .btn, .fr-attachment-select.btn, .fr-grid-dropdown-button.btn {
+        color: #000;
+        background-color: #f8f9fa;
+        border-color: #f8f9fa;
+    }
+
+    .xforms-trigger-appearance-full, .fr-attachment, .fr-repeat-column-left, .fr-buttons .xforms-trigger-appearance-xxforms-default.xbl-fr-drop-trigger .btn-group {
+        .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
+            background-color: #e6e6e6;
+            border-color: #0a58ca;
+        }
+    }
+
+    // new/review/save button
+    .fr-new-button, .fr-review-button, .fr-save-button, .xforms-trigger-appearance-xxforms-primary {
+        .btn {
+            color: #fff;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+    }
+
+    .fr-new-button, .fr-review-button, .fr-save-button, .xforms-trigger-appearance-xxforms-primary {
+        .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .dropdown-toggle.btn {
+            color: #fff;
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+    }
+
+    // Use `.btn-link` instead of `.xforms-trigger` to catch cases where used directly in an `<xf:button>`
+    .btn-link .fa {
+        color: @textColor;
+    }
+
+    // Make disabled icons a bit opaque
+    .disabled[class^="icon-"],
+    .disabled [class^="icon-"],
+    .xforms-trigger.xforms-readonly .fa,
+    .fa.disabled {
+        opacity: 0.4;
+    }
+
+    // Adapt pagination to use of xf:trigger
+    .pagination {
+        li {
+            & > .xforms-trigger {
+                cursor: pointer
+            }
+
+            & > .xforms-trigger.xforms-readonly {
+                cursor: auto;
+            }
+
+            .btn-link {
+                text-decoration: none;
+                background-color: #fff;
+            }
+
+            // NOTE: Updated for Bootstrap 5
+            > .btn-link, > span {
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                background-color: #fff;
+            }
+
+            // Reset rules that can be applied by external Bootstrap .pagination a rule
+            span .btn-link {
+                padding: 0;
+                border: none;
+                line-height: normal;
+            }
+        }
+    }
+
+    .pagination .disabled {
+        > span {
+            &, & > button {
+                background-color: transparent;
+            }
+        }
+    }
+
+    // admin or home page: pagination
+    .xforms-group .xbl-fr-pager .pagination {
+        display: flex;
+        margin-bottom: 20px;
+
+        .xforms-output {
+            padding: 8px 28px;
+        }
+    }
+
+    .fr-form-description {
+        margin-bottom: 10px;
+        background-color: #fff;
+        border: 1px solid #e3e3e3;
+        padding: 8px 35px 8px 14px;
+    }
+
+    .fr-section-label .btn-link {
+        border: 1px solid transparent;
+    }
+
+    .fr-error-group {
+        padding-left: 0rem;
+    }
+
+    .fr-error-summary-body .fr-error-title {
+        font-size: inherit;
+        float: none;
+    }
+
+    .xforms-group .fr-level-error .btn-link {
+        border: 1px solid transparent;
+        background-color: white;
+    }
+
+    .xforms-group .fr-level-error .btn-link .fr-error-label, .xforms-control.xforms-trigger button span {
+        vertical-align: baseline;
+    }
+
+    input, select, textarea {
+        border: 1px solid #ccc;
+        border-radius: 0.25rem;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        outline: 0 none;
+    }
+
+    // fix the color of "*"
+    .fr-grid-body .xforms-label:before, .fr-mode-new .xforms-required.xforms-label:before {
+        color: #B94A48;
+    }
+
+    // form controls > Text Controls
+    textarea, output, input {
+        padding: 2px 6px;
+    }
+
+    .xbl-fr-grid .fr-grid .xforms-textarea textarea {
+        height: 75px;
+    }
+
+    // form controls > Selection Controls
+    .xforms-select-appearance-full, .xforms-select1-appearance-full {
+        input {
+            vertical-align: middle;
+            float: left;
+            line-height: 25px;
+        }
+
+        .xforms-hint {
+            padding-top: 5px;
+        }
+    }
+
+    .xforms-select1-appearance-full input[type="radio"], .xforms-select-appearance-full input[type="radio"],
+    .xforms-select1-appearance-full input[type="checkbox"], .xforms-select-appearance-full input[type="checkbox"] {
+        margin-top: -0.1rem;
+    }
+
+    // form controls > Image and File Attachments
+    .xforms-update-full {
+        img {
+            max-width: 100%;
+        }
+
+        .btn-link {
+            border: 1px solid transparent;
+            background-color: white;
+        }
+    }
+
+    // table
+    .xbl-fr-grid-multiple table {
+        border-spacing: 0;
+        border-collapse: inherit;
+
+        tr {
+            th, td {
+                border-top: 1px solid #ddd;
+
+                .xforms-label, .xforms-hint {
+                    font-weight: lighter;
+                }
+            }
+
+            td {
+                border-bottom: 1px solid #ddd;
+            }
+
+            th:first-child {
+                border-top-left-radius: 4px;
+            }
+
+            td:first-child {
+                border-bottom-left-radius: 4px;
+            }
+
+            th:not(:first-child), td:not(:first-child) {
+                border-left: 0;
+            }
+
+            th:last-child {
+                border-top-right-radius: 4px;
+            }
+
+            td:last-child {
+                border-bottom-right-radius: 4px;
+            }
+        }
+
+        // bookshelf
+        textarea {
+            margin-bottom: -6px;
+        }
+
+        // dmv-14
+        .btn-mini.fr-grid-dropdown-button {
+            font-size: 13px;
+            padding: 0 6px;
+            border-radius: 3px;
+        }
+
+    }
+
+    // review page: table
+    .xbl-fr-grid-multiple.xforms-readonly table {
+        tr {
+            th {
+                border-left: 1px solid #ddd;
+                border-top-left-radius: 4px;
+            }
+
+            td {
+                border-left: 1px solid #ddd;
+                border-bottom-left-radius: 4px;
+            }
+        }
+    }
+
+    // pills: text-overflow
+    .xbl-fr-wizard .fr-wizard-toc .nav .btn-link {
+        width: 234px;
+    }
+
+    // admin or home page
+    .fr-forms-table tbody tr:nth-child(4n+3) > td {
+        border: 1px solid #ddd;
+    }
+
+    .table > :not(:first-child) {
+        border-top: 1px solid #ddd;
+    }
+
+    // controls review page
+    .xforms-field, .xforms-textarea pre,
+    .xbl-component.xbl-fr-tinymce .xforms-control.xforms-output.xforms-static {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        background-color: #f2f2f2;
+        display: inline-block;
+        width: 100%;
+        padding: 4px 6px;
+        font-size: 13px;
+        min-height: 28px;
+    }
+
+    .xforms-input-appearance-character-counter.xbl-fr-character-counter.xforms-readonly.fr-grid-1-2, .xforms-textarea-appearance-character-counter.xbl-fr-character-counter.xforms-readonly.fr-grid-2-2 {
+        .xforms-label {
+            margin-bottom: 2px;
+        }
+    }
+
+    // review page: checks and radios
+    .fr-mode-view .xforms-select-appearance-full.xforms-static, .fr-mode-view .xforms-items.xforms-help-popover-control {
+        .xforms-selected, .xforms-deselected {
+            background-position: 0px;
+        }
+
+        .xforms-selected .checkbox > span, .xforms-selected .radio > span, .xforms-deselected .checkbox > span, .xforms-deselected .radio > span {
+            padding-left: 1rem;
+        }
+    }
+
+    // contact review page
+    .fr-grid-td.xforms-group {
+        .xbl-component.xbl-fr-us-phone .xforms-label, .xbl-component.xbl-fr-dropdown-select1 .xforms-label {
+            margin-top: -2px;
+        }
+    }
+
+    // form builder: form settings
+    // General Settings
+    .fb-dialog-form-settings-fields.xbl-component.xbl-fr-tabbable {
+        font-size: 14px;
+
+        .nav-tabs {
+            & > li:not(:first-child), li:not(:last-child) {
+                padding: 0px 1px;
+            }
+
+            & > li:first-child {
+                padding: 0px 1px 0px 0px;
+            }
+
+            & > li:last-child {
+                padding: 0px 0px 0px 1px;
+            }
+        }
+
+        .nav-tabs .nav-item:not(.active) .nav-link:hover {
+            border-color: #eee #eee #ddd;
+            background-color: #eee;
+            height: 38px;
+        }
+
+        .nav-tabs .nav-item .nav-link {
+            padding: 0.5rem 0.576rem;
+        }
+    }
+
+    // Form Options
+    .fb-settings-mode-edit .fb-dialog-form-settings-fields .tab-content .fb-dialog-form-settings-options {
+        height: 560px;
+
+        .xforms-group .input-group.xforms-help-popover-control {
+            display: flex;
+            flex-wrap: nowrap;
+
+            .xbl-fr-number-visible-input.xforms-input-input {
+                max-width: none;
+            }
+        }
+    }
+
+    .navbar {
+        .container, .container-fluid {
+            h1 {
+                font-weight: @frNavBarFontWeight;
+            }
+        }
+    }
 }

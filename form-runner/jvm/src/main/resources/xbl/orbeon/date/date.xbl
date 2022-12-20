@@ -173,7 +173,8 @@
                 value="fr:component-param-value('field-width')"/>
 
             <xf:group ref="$binding[not($view)]">
-                <xh:div class="input-append date fr-field-width-{$field-width}">
+                <!-- `input-group` for BS5 -->
+                <xh:div class="input-append input-group date fr-field-width-{$field-width}">
                     <!-- Create placeholder from Orbeon Forms input format
                          https://doc.orbeon.com/configuration/properties/xforms#for-xf-input -->
                     <xf:var
@@ -191,7 +192,7 @@
                             return
                                 $translated
                         "/>
-                    <xh:input xh:type="text" placeholder="{$placeholder}" id="input" xxf:control="true" role="textbox"/>
+                    <xh:input type="text" placeholder="{$placeholder}" id="input"/>
                     <xh:span class="add-on" tabindex="0">
                         <xh:i class="fa fa-fw fa-calendar"/>
                     </xh:span>

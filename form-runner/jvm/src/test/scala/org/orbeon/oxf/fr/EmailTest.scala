@@ -118,6 +118,7 @@ class EmailTest
             frc.searchControlsUnderSectionTemplates(
               head,
               Some(data),
+              _ => true,
               FormRunner.hasAllClassesPredicate(classNames.splitTo[List]())
             )(new InDocFormRunnerDocContext(body))
           }

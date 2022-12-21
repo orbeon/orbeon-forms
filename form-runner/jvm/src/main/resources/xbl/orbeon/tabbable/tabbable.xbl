@@ -69,10 +69,11 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
                 <xsl:variable name="root"     select="/*[1]"/>
-                <xsl:variable name="readonly" select="$root/@readonly = 'true'"/>
 
                 <xsl:template match="/*">
                     <xh:div class="{'tabs-left'[p:split($root/@appearance) = 'left']}">
+                        <xf:var name="readonly-avt" xxbl:scope="outer" xbl:attr="xbl:text=readonly"/>
+                        <xf:var name="readonly"><xxf:value value="xxf:evaluate-avt($readonly-avt)" xxbl:scope="outer"/></xf:var>
 
                         <!-- Tab labels -->
                         <xh:ul class="nav nav-tabs">
@@ -147,7 +148,8 @@
                                                     <xsl:copy-of select="$content"/>
                                                 </xf:group>
                                             </xf:repeat>
-                                            <xsl:if test="not($readonly)">
+
+                                            <xf:group ref=".[$readonly = 'false']">
                                                 <xh:li class="fr-tabbable-add">
                                                     <xf:trigger appearance="xxf:mini" ref="xxf:binding('fr-tabbable')">
                                                         <xf:label value="xxf:r('add')"/>
@@ -157,7 +159,8 @@
                                                             targetid="fr-tabbable"/>
                                                     </xf:trigger>
                                                 </xh:li>
-                                            </xsl:if>
+                                            </xf:group>
+
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:copy-of select="$content"/>

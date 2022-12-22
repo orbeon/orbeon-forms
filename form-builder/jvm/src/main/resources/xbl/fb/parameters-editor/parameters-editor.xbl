@@ -75,6 +75,9 @@
                     </_>
                 </xf:instance>
 
+                <!-- Make template readonly, as it is used as a placeholder when we have no params -->
+                <xf:bind ref="instance('values-template')//*" readonly="true()"/>
+
                 <!-- Change param templates to remove the `fr:` prefix if user set `form-runner-namespace="false"` -->
                 <xf:insert
                     event="xforms-model-construct-done"

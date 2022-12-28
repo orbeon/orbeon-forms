@@ -11,11 +11,19 @@
 }
 
 .orbeon {
-    .xforms-dialog {
+
+    .xforms-dialog, .xforms-message-dialog {
 
         // Keep the dialog fairly narrow to increase legibility, but allow it to be narrower on phones
         max-width: 500px;
         border: none;
+
+        // Try automatic centering of the dialog, but this disables the ability to move the dialog by dragging it.
+        //&.xxforms-dialog-auto {
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 4rem;
+        //}
 
         .xxforms-dialog-body p {
             margin: .5em 0 .5em 0
@@ -60,13 +68,6 @@
             border-top-left-radius: @dialogBorderRadius;
             border-top-right-radius: @dialogBorderRadius;
         }
-
-        // Try automatic centering of the dialog, but this disables the ability to move the dialog by dragging it.
-        //&.xxforms-dialog-auto {
-            margin-left: auto;
-            margin-right: auto;
-            margin-top: 2rem;
-        //}
 
         // Override YUI default using Boostrap 5 styles
         .container-close {

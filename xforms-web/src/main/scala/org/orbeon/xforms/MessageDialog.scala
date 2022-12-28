@@ -83,8 +83,9 @@ object MessageDialog {
       messageDialog.render(document.body)
       Utils.overlayUseDisplayHidden(messageDialog)
 
-      // This is for JAWS to read the content of the dialog (otherwise it just reads the button)
-      $("#xforms-message-dialog").attr("aria-live", "polite")
+      val dialogElem = document.getElementById("xforms-message-dialog")
+      dialogElem.setAttribute("aria-live", "polite") // so JAWS reads the content of the dialog (otherwise it just reads the button)
+      dialogElem.classList.add("xforms-message-dialog")
 
       yuiMessageDialogOpt = Some(messageDialog)
       messageDialog

@@ -106,6 +106,15 @@
         display: block;
     }
 
+    .fr-mode-new, .fr-mode-edit, .fr-mode-view, .fr-mode-test {
+        .fr-view-appearance-full {
+            display: block;
+            border: 1px solid darken(@wellBackground, 7%);
+            border-radius: @baseBorderRadius;
+            background-color: white;
+        }
+    }
+
     // ***** Utilities *************************************************************************************************
     .fr-clear { clear: both }
 
@@ -437,6 +446,10 @@
         .container {
             width: 100%;
             box-sizing: border-box;
+        }
+
+        .fr-view-appearance-full {
+            border: none;
         }
     }
 

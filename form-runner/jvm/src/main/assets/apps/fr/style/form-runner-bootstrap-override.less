@@ -502,9 +502,14 @@ body.orbeon {
       cursor: default;
     }
 
+    // Make default button a little darker
+    .btn {
+        background-color: darken(#f5f5f5, 5%);
+    }
+
     .btn {
         &.disabled, &[disabled] {
-            background-color: #f5f5f5; // restore default color or buttons are too dark when disabled
+            background-color: darken(#f5f5f5, 5%); // restore default color or buttons are too dark when disabled
         }
     }
 

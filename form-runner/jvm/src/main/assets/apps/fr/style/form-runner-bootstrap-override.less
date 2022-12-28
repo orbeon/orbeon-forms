@@ -502,6 +502,12 @@ body.orbeon {
       cursor: default;
     }
 
+    .btn {
+        &.disabled, &[disabled] {
+            background-color: #f5f5f5; // restore default color or buttons are too dark when disabled
+        }
+    }
+
     .buttonBackgroundOrbeon(@startColor, @endColor, @textColor: #fff) {
 
         color: @textColor;

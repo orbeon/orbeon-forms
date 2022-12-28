@@ -319,7 +319,6 @@
             id="fr-form-group"
             class="{
                 'fr-body',
-                'fr-border'[$is-detail],
                 concat('fr-validation-mode-', $validation-mode)
             }"
             model="fr-form-model"

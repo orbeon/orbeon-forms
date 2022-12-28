@@ -124,7 +124,7 @@
                 <!-- fr:body → xf:group -->
                 <xsl:template match="xh:body//fr:body[not(parent::fr:repeat) and not (parent::fr:grid)]">
 
-                    <xf:group id="fb-body" class="fb-body">
+                    <xf:group id="fb-body" class="fb-body fr-view-appearance-full">
                         <xsl:copy-of select="namespace::*"/>
                         <!-- Scope $lang which is the language of the form being edited -->
                         <xf:var

@@ -244,21 +244,24 @@ body.orbeon {
     }
 
     // Adapt pagination to use of xf:trigger
-    .pagination ul > li {
-        &> .xforms-trigger { cursor: pointer }
-        &> .xforms-trigger.xforms-readonly { cursor: auto; }
-        .btn-link { text-decoration: none; }
+    .pagination ul {
+        box-shadow: none;
+        & > li {
+            &> .xforms-trigger { cursor: pointer }
+            &> .xforms-trigger.xforms-readonly { cursor: auto; }
+            .btn-link { text-decoration: none; }
 
-        // NOTE: Updated for Bootstrap 2.3.2
-        >.btn-link, >span {
-            padding: 8px 12px;
-        }
+            // NOTE: Updated for Bootstrap 2.3.2
+            >.btn-link, >span {
+                padding: 8px 12px;
+            }
 
-        // Reset rules that can be applied by external Bootstrap .pagination a rule
-        span .btn-link {
-            padding: 0;
-            border: none;
-            line-height: normal;
+            // Reset rules that can be applied by external Bootstrap .pagination a rule
+            span .btn-link {
+                padding: 0;
+                border: none;
+                line-height: normal;
+            }
         }
     }
 

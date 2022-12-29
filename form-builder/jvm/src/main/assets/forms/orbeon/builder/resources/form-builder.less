@@ -1269,13 +1269,21 @@ div.orbeon.orbeon-portlet-div {
         }
 
         // Even if the label or hint is empty, we still want space for 1 line to be reserved
-        .fr-grid-td,  // In regular grid content
-        .fr-grid-th { // In grid header, for the repeat single line
+        // In regular grid content
+        .fr-grid-td {
             & > .xbl-component, & > .xforms-control {
                 & > .xforms-label, & > .xforms-hint {
                     min-height: 20px; // Use min-height instead of height so text wraps if it doesn't fit on 1 line
                     display: block;
                 }
+            }
+        }
+
+        // In grid header, for the repeat single line
+        .fr-grid-th {
+            .xforms-label, .xforms-hint {
+                min-height: 20px; // Use min-height instead of height so text wraps if it doesn't fit on 1 line
+                display: block;
             }
         }
 

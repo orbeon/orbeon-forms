@@ -31,13 +31,10 @@
     // Following #4211, we don't need to use the `rtl` trick to reverse columns
     display: table;
     table-layout: fixed;
+    border-collapse: collapse; // so that "other" border shows
 
     .fr-wizard-body, .fr-wizard-toc {
         display: table-cell;
-    }
-
-    .fr-wizard-other {
-        display: table-row;
     }
 
     // https://github.com/orbeon/orbeon-forms/issues/4450
@@ -155,6 +152,11 @@
 
     .fr-wizard-body {
         border-left: 1px solid darken(@wellBackground, 7%);
+    }
+
+    .fr-wizard-other {
+        display: table-row;
+        border-top: 1px solid darken(@wellBackground, 7%);
     }
 
     .fr-wizard-navigation {

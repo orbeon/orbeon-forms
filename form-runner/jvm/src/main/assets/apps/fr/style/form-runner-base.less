@@ -74,6 +74,7 @@
                 .badge { margin-left: 5px; }
 
                 .navbar-brand {
+                    flex-shrink: 0; // avoid logo shrinking if title is long
                     margin-top: 0.3125em;
                     margin-bottom: 0.3125em;
                     margin-right: 15px;
@@ -85,6 +86,7 @@
                     flex-grow: 1;
                     margin-left: 0;
                     line-height: normal;
+                    .text-overflow(); // especially so that when in narrow mode, the title doesn't wrap
                 }
 
                 .nav {

@@ -23,6 +23,10 @@
 .orbeon .xbl-fr-wizard {
 
     width: 100%; // comment about #1741 here might be out of date, had explicit width
+    box-sizing: border-box;
+
+    border: 1px solid darken(@wellBackground, 7%);
+    border-radius: @baseBorderRadius;
 
     // Following #4211, we don't need to use the `rtl` trick to reverse columns
     display: table;
@@ -48,7 +52,6 @@
     .fr-wizard-toc {
         width: @frWizardTocWidth;
         margin-bottom: 0;
-        border-bottom: 1px solid darken(@wellBackground, 7%);
 
         &.fr-wizard-separate-toc {
             .nav {
@@ -62,12 +65,19 @@
 
         .nav {
 
+            & > li:first-of-type + li .btn-link {
+                border-top-left-radius: @baseBorderRadius;
+            }
+
             ul, li {
                 clear: both;
             }
 
             .btn-link {
                 text-decoration: none;
+                text-shadow: none;
+                border: none;
+                line-height: 24px; // to align with section title
                 .text-overflow();
 
                 display: flex;
@@ -140,9 +150,6 @@
 
     .fr-wizard-body {
         border-left: 1px solid darken(@wellBackground, 7%);
-        border-bottom: 1px solid darken(@wellBackground, 7%);
-
-        background-color: white;
     }
 
     .fr-wizard-navigation {
@@ -193,6 +200,12 @@
         .fr-wizard-toc {
             order: 1;
             border: none;
+
+            .nav {
+                & > li:first-of-type + li .btn-link {
+                    border-top-right-radius: @baseBorderRadius;
+                }
+            }
         }
 
         .fr-wizard-body {

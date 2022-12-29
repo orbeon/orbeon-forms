@@ -43,20 +43,6 @@
             }
         }
 
-        .fr-section-title {
-
-            .xforms-help {
-                .help-icon();
-            }
-
-            .xforms-help:not(:empty) {
-                float: left;                       // Help on the same line as section title in display: block
-                margin-top: (@frSectionTitleLineHeight - @frGridPlusMinusIconWidth) / 2;    // To make it vertically centered
-                margin-right: 5px;                 // Space between help icon and section title
-                margin-bottom: -1px;               // as `.help-icon()` sets a different margin
-            }
-        }
-
         .fr-section-open-close img { margin-right: 0 }
         .fr-section-open-close {
             // Padding is designed to make the <a> box around the section open/close images a square
@@ -78,19 +64,30 @@
         .fr-section-title {
 
             .fr-section-label {
-                display: inline-table;          // We don't want the label to expands all the way to the right
-                padding-left: 10px;
-                font-size: @frSectionTitleHeight;
-                vertical-align: top;            // Avoid space at the bottom (http://stackoverflow.com/q/36146704/5295)
+                display: flex;
+                align-items: center;
 
-                // <a> is collapsible section, <output> for non-collapsible
+                padding-left: 10px;
+                padding-right: 10px;
+                font-size: @frSectionTitleHeight;
+
+                .xforms-help {
+                    .help-icon();
+                    flex-shrink: 0; // so long title doesn't make it disappear
+                }
+
+                .xforms-help:not(:empty) {
+                    margin-right: 5px;                 // Space between help icon and section title
+                }
+
+                // `<button>` for collapsible section, `<output>` for non-collapsible
                 .btn-link, .xforms-output-output {
-                    display: table-cell;        // So it extends all the way to the right
                     min-height: @frSectionTitleLineHeight;
+                    white-space: normal;   // so long titles don't get truncated (we could also go with `.text-overflow()`)
                 }
                 .btn-link {
                     text-decoration: none;
-                    color: @frHeaderColor;      // Don't use the default styling for anchors
+                    color: @frHeaderColor; // Don't use the default styling for anchors
                 }
 
                 // Override default label styles

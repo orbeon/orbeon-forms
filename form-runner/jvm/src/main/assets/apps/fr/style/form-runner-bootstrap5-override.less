@@ -453,7 +453,6 @@
         .nav-tabs .nav-item:not(.active) .nav-link:hover {
             border-color: #eee #eee #ddd;
             background-color: #eee;
-            height: 38px;
         }
 
         .nav-tabs .nav-item .nav-link {
@@ -484,7 +483,35 @@
     }
 
     // Control Settings
-    .tab-content .tab-pane .xbl-component.xbl-fr-tabbable .tabs-left .nav.nav-tabs {
-        flex-direction: column!important;
+    .tab-content .tab-pane .xbl-component.xbl-fr-tabbable .tabs-left {
+        &>.nav-tabs>li>a {
+            margin-bottom: 3px;
+        }
+
+        .nav.nav-tabs {
+            flex-direction: column;
+            border-right: 1px solid #ddd;
+            border-bottom: unset;
+
+            .nav-item .nav-link {
+                transition: unset;
+            }
+            
+            .nav-item.active .nav-link {
+                border-right: 1px solid white;
+                margin-right: -2px;
+                border-bottom: 1px solid #ddd;
+                border-top-right-radius: unset;
+                border-bottom-left-radius: 4px;
+            }
+    
+            .nav-item:not(.active) {
+                .nav-link:hover, .nav-link:focus {
+                    border-color: #eee;
+                    border-top-right-radius: unset;
+                    border-bottom-left-radius: 4px;
+                }
+            }
+        }
     }
 }

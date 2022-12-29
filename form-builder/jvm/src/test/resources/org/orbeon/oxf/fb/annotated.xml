@@ -266,7 +266,7 @@
     </xh:head>
     <xh:body>
         <fr:view width="800px" appearance="custom">
-            <xf:group id="fb-body" class="fb-body">
+            <xf:group id="fb-body" class="fb-body fr-view-appearance-full">
                 <xf:var name="lang" value="xxf:get-variable('fr-form-model', 'fb-lang')" as="element()" class="fb-annotation"/>
                 <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?" class="fb-annotation"/>
                 <xf:var name="fr-resources" value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?" class="fb-annotation"/>

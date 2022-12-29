@@ -31,7 +31,6 @@
     // Following #4211, we don't need to use the `rtl` trick to reverse columns
     display: table;
     table-layout: fixed;
-    border-collapse: collapse; // so that "other" border shows
 
     .fr-wizard-body, .fr-wizard-toc {
         display: table-cell;
@@ -156,7 +155,13 @@
 
     .fr-wizard-other {
         display: table-row;
-        border-top: 1px solid darken(@wellBackground, 7%);
+        // Tricky to get the border to show correctly without `border-collapse: collapse` (which causes corners not to
+        // be rounded)
+        .fr-wizard-cell-placeholder, .fr-buttons {
+            border-top: 1px solid darken(@wellBackground, 7%);
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
     }
 
     .fr-wizard-navigation {

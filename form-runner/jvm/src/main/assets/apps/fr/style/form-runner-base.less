@@ -211,6 +211,13 @@
         display: none;
     }
 
+    .xforms-help {
+        border-radius: 50%;
+        &:focus {
+            .focusDecorations();
+        }
+    }
+
     .xforms-trigger {
         // Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox)
         button, input {

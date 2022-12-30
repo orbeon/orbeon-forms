@@ -997,7 +997,7 @@
                                     </xf:group>
                                     <xh:th><xf:output value="$fr-resources/home/titles/app"/></xh:th>
                                     <xh:th><xf:output value="$fr-resources/home/titles/form"/></xh:th>
-                                    <xh:th><xf:output value="$fr-resources/home/titles/version"/></xh:th>
+                                    <xh:th class="fr-align-right"><xf:output value="$fr-resources/home/titles/version"/></xh:th>
                                     <xh:th><xf:output value="$fr-resources/home/titles/title"/></xh:th>
                                 </xh:tr>
                             </xh:thead>
@@ -1156,7 +1156,7 @@
                                             </xh:a>
                                             <xf:output ref=".[not($link)]" value="form-name"/>
                                         </xh:td>
-                                        <xh:td class="fr-home-version">
+                                        <xh:td class="fr-align-right">
                                             <xh:a href="{$link}" class="{if ($link) then '' else 'xforms-hidden'}">
                                                 <xf:output ref=".[$link]" value="$form-version"/>
                                             </xh:a>

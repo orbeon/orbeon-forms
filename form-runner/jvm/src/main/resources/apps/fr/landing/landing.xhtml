@@ -121,9 +121,23 @@
                 </xf:action>
             </xf:submission>
 
-            <xf:instance id="fr-search-instance" xxf:exclude-result-prefixes="#all">
+            <!-- Don't use `xxf:exclude-result-prefixes="#all"` as eXist search needs the `xh` and `xf` namespaces -->
+            <!-- With eXist, `return-all-indexed-fields="true"` is not supported, so pass the `<query>` elements anyway -->
+            <xf:instance id="fr-search-instance">
                 <search xmlns="" return-all-indexed-fields="true">
                     <query/>
+                    <query name="application-name"
+                           path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/application-name"
+                           match="substring"/>
+                    <query name="form-name"
+                           path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/form-name"
+                           match="substring"/>
+                    <query name="title"
+                           path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/title"
+                           match="substring"/>
+                    <query name="description"
+                           path="xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*/description"
+                           match="substring"/>
                     <page-size/>
                     <page-number>1</page-number>
                     <lang/>

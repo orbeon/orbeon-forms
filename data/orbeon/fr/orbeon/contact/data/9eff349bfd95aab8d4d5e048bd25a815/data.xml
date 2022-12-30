@@ -1,13 +1,13 @@
 <form xmlns:fr="http://orbeon.org/oxf/xml/form-runner" fr:data-format-version="4.0.0">
     <contact>
-        <first-name>Erik</first-name>
-        <last-name>Bruchez</last-name>
-        <email>info@orbeon.com</email>
-        <phone>6505555555</phone>
+        <first-name>Homer</first-name>
+        <last-name>Simpson</last-name>
+        <email>chunkylover53@aol.com</email>
+        <phone>9395550113</phone>
     </contact>
     <message>
         <order-number>O888</order-number>
         <topic>returns</topic>
-        <comments>Please answer me!</comments>
+        <comments>D'oh!</comments>
     </message>
 </form>

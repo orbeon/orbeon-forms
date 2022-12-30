@@ -44,6 +44,15 @@
         }
     }
 
+    // Revert some aspects of `.navbar-fixed-top` when embedded
+    &.orbeon-portlet-div .navbar.navbar-fixed-top {
+        position: static;
+        margin-bottom: 10px;
+        .navbar-inner {
+            border-radius: 4px;
+        }
+    }
+
     .navbar {
 
         &.navbar-fixed-top {

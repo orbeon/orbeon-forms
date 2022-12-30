@@ -47,7 +47,7 @@ body.orbeon {
 }
 
 // Case of embedded Form Builder: size with some defaults (expecting that the embedding code will override this)
-div.orbeon.orbeon-portlet-div {
+.orbeon.orbeon-portlet-div {
     position: absolute;
     left: 1vw;
     top: 50px;
@@ -56,6 +56,14 @@ div.orbeon.orbeon-portlet-div {
     box-sizing: border-box;
     border: 1px solid @grayLight;
     background-color: @grayLight;
+
+    // Reset general embedding styles
+    .navbar.navbar-fixed-top {
+        position: absolute;
+        .navbar-inner {
+            border-radius: 0;
+        }
+    }
 
     .fr-summary-button, .fr-new-button {
         display: none;

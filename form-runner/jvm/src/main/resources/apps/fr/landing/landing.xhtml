@@ -219,7 +219,10 @@
                 <fr:card class="{'xforms-hidden'[not($cards-tokens = 'published-forms')]}">
                     <xf:label ref="xxf:r('landing.titles.published-forms', '|fr-fr-resources|')"/>
                     <xf:itemset ref="instance('fr-landing-form-metadata-instance')/*[position() le $page-size]">
-                        <xf:label ref="string-join(((title[@xml:lang = xxf:lang()], title)[1], (description[@xml:lang = xxf:lang()], description)[1]), ' - ')"/>
+                        <!-- 2022-12-30: Don't use `<description>` as 1. it's not present with relational and 2. it can
+                             be in HTML and shows unescaped markup in the list. Not ideal. -->
+<!--                        <xf:label ref="string-join(((title[@xml:lang = xxf:lang()], title)[normalize-space()][1], (description[@xml:lang = xxf:lang()], description)[normalize-space()][1]), ' - ')"/>-->
+                        <xf:label ref="(title[@xml:lang = xxf:lang()], title)[normalize-space()][1]"/>
                         <xf:value ref="
                             let $ops                  := xxf:split(@operations),
                                 $can-navigate-summary := $ops = ('*', 'update', 'read', 'delete'),
@@ -243,7 +246,7 @@
                                 else
                                     ()"/>
                         <!-- This doesn't work because we remove the form description from the metadata -->
-<!--                        <xf:hint ref="(description[@xml:lang = xxf:lang()], description)[1]"/>-->
+<!--                        <xf:hint ref="(description[@xml:lang = xxf:lang()], description)[normalize-space()][1]"/>-->
                     </xf:itemset>
                     <xf:itemset ref=".[count(instance('fr-landing-form-metadata-instance')/*) gt $page-size]">
                         <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
@@ -327,7 +330,10 @@
                 <fr:card class="{'xforms-hidden'[not($cards-tokens = 'demo-forms')]}">
                     <xf:label ref="xxf:r('landing.titles.demo-forms', '|fr-fr-resources|')"/>
                     <xf:itemset ref="instance('fr-landing-demo-forms-instance')/*[position() le $page-size]">
-                        <xf:label ref="string-join(((title[@xml:lang = xxf:lang()], title)[1], (description[@xml:lang = xxf:lang()], description)[1]), ' - ')"/>
+                        <!-- 2022-12-30: Don't use `<description>` as 1. it's not present with relational and 2. it can
+                             be in HTML and shows unescaped markup in the list. Not ideal. -->
+<!--                        <xf:label ref="string-join(((title[@xml:lang = xxf:lang()], title)[normalize-space()][1], (description[@xml:lang = xxf:lang()], description)[normalize-space()][1]), ' - ')"/>-->
+                        <xf:label ref="(title[@xml:lang = xxf:lang()], title)[normalize-space()][1]"/>
                         <xf:value ref="
                             concat(
                                 '/fr/',
@@ -343,7 +349,7 @@
                                 form-version
                             )"/>
                         <!-- This doesn't work because we remove the form description from the metadata -->
-<!--                        <xf:hint ref="(description[@xml:lang = xxf:lang()], description)[1]"/>-->
+<!--                        <xf:hint ref="(description[@xml:lang = xxf:lang()], description)[normalize-space()][1]"/>-->
                     </xf:itemset>
                     <xf:itemset ref=".[count(instance('fr-landing-demo-forms-instance')/*) gt $page-size]">
                         <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>

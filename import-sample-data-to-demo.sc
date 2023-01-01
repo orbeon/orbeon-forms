@@ -5,7 +5,7 @@
 def main(username: String, password: String): Unit = {
 
   val root         = os.pwd / os.RelPath("data/orbeon/fr")
-  val crudEndPoint = "https://demo.orbeon.com/demo/fr/service/persistence/crud/"
+  val crudEndPoint = "http://localhost:8080/orbeon/fr/service/persistence/crud/"
 
   os.walk(root)                   filter
     (os.isFile)                   filterNot

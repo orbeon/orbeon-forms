@@ -271,6 +271,12 @@ body.orbeon {
         }
     }
 
+    input, textarea {
+        &[readonly] {
+          background-color: darken(@inputBackground, 5%);
+        }
+    }
+
     select[multiple],
     .xforms-select1-appearance-compact select,
     .xforms-select-appearance-compact select {

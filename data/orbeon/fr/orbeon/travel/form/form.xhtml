@@ -235,7 +235,7 @@
                         </fr:c>
                     </fr:grid>
                 </fr:section>
-                <fr:section page-size="1" id="detail-section-section" bind="detail-section-bind" repeat="content" min="1" template="instance('detail-section-template')" apply-defaults="true" fb:initial-iterations="first">
+                <fr:section readonly="true" page-size="1" id="detail-section-section" bind="detail-section-bind" repeat="content" min="1" template="instance('detail-section-template')" apply-defaults="true" fb:initial-iterations="first">
                     <xf:label ref="$form-resources/detail-section/label"/>
                     <fr:iteration-label ref="$form-resources/detail-section/iteration-label">
                         <fr:param type="ControlValueParam">

@@ -267,7 +267,8 @@
                         </fr:c>
                     </fr:grid>
                 </fr:section>
-                <fr:section page-size="1" id="detail-section-section" bind="detail-section-bind"
+                <fr:section readonly="true" page-size="1" id="detail-section-section"
+                            bind="detail-section-bind"
                             repeat="content"
                             min="1"
                             template="instance('detail-section-template')"

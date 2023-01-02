@@ -36,7 +36,11 @@
             value="xxf:property(string-join(('oxf.fr.detail.submit.content-from-persistence', fr:app-name(), fr:form-name()), '.'))"/>
         <xf:output
             mediatype="text/html"
-            ref="if ($content-from-persistence) then instance('fr-submission-result-instance') else $fr-resources/detail/messages/submit-dialog-message"/>
+            ref="
+                if ($content-from-persistence) then
+                    instance('fr-submission-result-instance')
+                else
+                    xxf:evaluate-avt($fr-resources/detail/messages/submit-dialog-message)"/>
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xf:group>

@@ -567,7 +567,7 @@
                                         <fr:checkbox-input ref="initially-open">
                                             <xf:label ref="$resources/dialog-container-settings/options/item[value = 'fr-initially-open']/label"/>
                                         </fr:checkbox-input>
-                                        <xf:select ref="$i/standard-classes" appearance="full">
+                                        <xf:select ref="$i/standard-classes" appearance="full" class="fb-standard-classes">
                                             <xf:label ref="$resources/dialog-container-settings/options/label" class="xforms-hidden"/>
                                             <xf:itemset ref="$resources/dialog-container-settings/options/item[value != 'fr-initially-open']">
                                                 <xf:label ref="label"/>

@@ -24,7 +24,8 @@
     <xbl:binding
         id="fb-boolean-or-formula"
         element="fb|boolean-or-formula"
-        xxbl:mode="binding lhha">
+        xxbl:mode="binding lhha"
+        xxbl:label-for="fr-boolean-or-formula-elem">
 
         <xbl:template>
             <!-- Bindings specified on control -->
@@ -34,36 +35,37 @@
             <xf:var name="true-or-false" value="$binding = ('true()', 'false()')"/>
             <xf:var name="items"         value="$resources/dialog-control-settings/required/item"/>
 
-            <xf:select1 ref="$binding" appearance="full xxf:horizontal">
-                <xf:itemset ref="$items[@id = (0, 1, 2)]">
-                    <xf:label ref="."/>
-                    <!-- Tricky bits: map @id to XPath and handle case where we switch from
-                         `true()` or `false()` to XPath -->
-                    <xf:value
-                        ref="
-                            if (@id = 0) then
-                                'true()'
-                            else if (@id = 1) then
-                                'false()'
-                            else
-                                string($binding[not($true-or-false)])"/>
-                </xf:itemset>
-            </xf:select1>
-            <xf:textarea
-                id="xpath-textarea"
-                ref="if ($true-or-false) then '' else $binding"
-                class="fb-control-settings-required-formula">
+            <xh:div id="fr-boolean-or-formula-elem" class="fr-component-group" xxf:control="true">
+                <xf:select1 ref="$binding" appearance="full xxf:horizontal">
+                    <xf:itemset ref="$items[@id = (0, 1, 2)]">
+                        <xf:label ref="."/>
+                        <!-- Tricky bits: map @id to XPath and handle case where we switch from
+                             `true()` or `false()` to XPath -->
+                        <xf:value
+                            ref="
+                                if (@id = 0) then
+                                    'true()'
+                                else if (@id = 1) then
+                                    'false()'
+                                else
+                                    string($binding[not($true-or-false)])"/>
+                    </xf:itemset>
+                </xf:select1>
+                <xf:textarea
+                    id="xpath-textarea"
+                    ref="if ($true-or-false) then '' else $binding">
 
-                <xf:label ref="$resources/dialog-control-settings/formula/label" appearance="minimal"/>
-                <xf:alert ref="$resources/dialog-control-settings/formula/alert"/>
+                    <xf:label ref="$resources/dialog-control-settings/formula/label" appearance="minimal"/>
+                    <xf:alert ref="$resources/dialog-control-settings/formula/alert"/>
 
-                <!-- When the control appears and its value is empty, it means that the
-                     user just chose the "Formula" option. -->
-                <xf:setfocus
-                    event="xforms-readwrite"
-                    if="xxf:is-blank()"
-                    control="xpath-textarea"/>
-            </xf:textarea>
+                    <!-- When the control appears and its value is empty, it means that the
+                         user just chose the "Formula" option. -->
+                    <xf:setfocus
+                        event="xforms-readwrite"
+                        if="xxf:is-blank()"
+                        control="xpath-textarea"/>
+                </xf:textarea>
+            </xh:div>
 
         </xbl:template>
     </xbl:binding>

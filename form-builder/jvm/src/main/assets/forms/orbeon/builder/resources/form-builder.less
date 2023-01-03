@@ -611,6 +611,16 @@ body.orbeon {
                 grid-column: 2;
             }
         }
+
+        // Indent all radio controls, not only those with
+        .xforms-select1-appearance-full .xforms-items,
+        .xbl-fb-boolean-or-formula .fr-component-group .xforms-textarea {
+            padding: 4px 6px;
+        }
+
+        .xbl-fb-boolean-or-formula .xforms-textarea {
+            display: block;
+        }
     }
 
     // Metadata editor dialog
@@ -707,13 +717,25 @@ body.orbeon {
         }
 
         .fb-attachment-max-size-control, .fb-attachment-max-size-aggregate-control, .fb-attachment-mediatypes-control {
-            &> .fr-component-group {
+            & > .fr-component-group {
                 display: flex;
-                min-height: 28px; // so that there is no change in height when showing/hiding
                 align-items: center;
 
-                &> .xforms-input, &> .xbl-fr-number {
+                label.radio {
+                    margin-bottom: 0; // remove extra margin for `align-items`
+                }
+
+                & > .xforms-input, &> .xbl-fr-number {
                     flex-grow: 1;
+                }
+            }
+        }
+
+        .xbl-fr-grid .fr-grid-td > .xbl-component {
+            &.fb-labels-placeholders, &.fb-hints-placeholders {
+                margin-top: 0; // make closer to the previous control
+                .xforms-items {
+                    padding-left: 6px; // align with previous control
                 }
             }
         }
@@ -1005,11 +1027,6 @@ body.orbeon {
             margin-bottom: 4px; // so that the highlight around "Email Options" is not truncated at the bottom
         }
 
-        .fb-control-settings-required-formula {
-            display: block;
-            margin-top: 5px;
-        }
-
         .fr-grid .fb-control-settings-alert-block {
             display: flex;
             margin: 4px 0;
@@ -1032,11 +1049,27 @@ body.orbeon {
                 margin-left: 20px;
             }
         }
+
+        .fb-validations-tab {
+            .xbl-fb-boolean-or-formula .fr-component-group {
+                .xforms-items, .xforms-textarea {
+                    padding: 0; // no padding here as we are within a small visible grid cell and want to look like the rest
+                }
+            }
+        }
     }
 
     .fb-dialog-container-settings {
         width: 900px;
         max-width: none;
+
+        .xbl-fr-grid .fr-grid-td > .xforms-control {
+            &.fb-standard-classes {
+                .xforms-items[role = group][tabindex] {
+                    padding-left: 0; // align with previous control
+                }
+            }
+        }
     }
 
     #fb-schema-upload-dialog {

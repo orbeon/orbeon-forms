@@ -1007,7 +1007,7 @@
                                 </xh:div>
                             </xh:div>
                         </fr:tab>
-                        <fr:tab id="validations-tab" context="validations">
+                        <fr:tab id="validations-tab" context="validations" class="fb-validations-tab">
                             <fr:label ref="$resources/dialog-control-settings/tab-validations/label"/>
                             <fr:grid>
                                 <xh:tr>

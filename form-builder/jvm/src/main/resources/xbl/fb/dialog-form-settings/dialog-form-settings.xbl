@@ -754,7 +754,7 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
-                                            <fr:checkbox-input ref="labels-placeholders">
+                                            <fr:checkbox-input ref="labels-placeholders" class="fb-labels-placeholders">
                                                 <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/placeholders/hint"/>
                                                 <xf:setvalue
@@ -787,7 +787,7 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
-                                            <fr:checkbox-input ref="hints-placeholders">
+                                            <fr:checkbox-input ref="hints-placeholders" class="fb-hints-placeholders">
                                                 <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/placeholders/hint"/>
                                                 <xf:setvalue

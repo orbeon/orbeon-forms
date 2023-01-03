@@ -820,18 +820,6 @@
                                             </xf:select1>
                                         </xh:td>
                                     </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xf:select1 ref="analysis-calculate" appearance="full xxf:horizontal">
-                                                <xf:label ref="$resources/dialog-form-settings/analysis-calculate/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/analysis-calculate/hint"/>
-                                                <xf:itemset ref="$resources/default-always-never/item">
-                                                    <xf:label ref="."/>
-                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
-                                                </xf:itemset>
-                                            </xf:select1>
-                                        </xh:td>
-                                    </xh:tr>
                                 </fr:grid>
 
                             </fr:tab>
@@ -1017,6 +1005,18 @@
 <!--                                                <xf:hint  ref="$resources/dialog-control-settings/visibility/hint"/>-->
 <!--                                            </fb:boolean-or-formula>-->
 <!--                                        </xh:td>-->
+                                    </xh:tr>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:select1 ref="analysis-calculate" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/analysis-calculate/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/analysis-calculate/hint"/>
+                                                <xf:itemset ref="$resources/default-always-never/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value ref="if (@id = 0) then 'default' else if (@id = 1) then 'true' else 'false'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
                                     </xh:tr>
                                 </fr:grid>
                             </fr:tab>

@@ -17,17 +17,23 @@
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-test-dialog" level="modal" close="true" draggable="false" class="fb-test-dialog xxforms-set-height">
 
     <xf:label ref="$form-resources/dialog-test/label"/>
+
+    <!-- Set value that controls whether the "Test PDF" button shows -->
+    <xf:setvalue
+        event="xxforms-dialog-open"
+        ref="instance('fb-triggers-instance')/test-pdf"
+        value="event('show-test-pdf')"/>
+
     <xh:div class="fb-dialog-remaining-height">
         <xh:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"/>
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xh:span>
-            <xf:trigger>
+            <xf:trigger ref="instance('fb-triggers-instance')/test-pdf">
                 <xf:label mediatype="text/html" value="$fr-resources/buttons/test-pdf"/>
                 <xf:action event="DOMActivate">
                     <xf:dispatch name="fb-show-dialog" targetid="dialog-test-pdf">

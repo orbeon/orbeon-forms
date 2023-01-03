@@ -536,18 +536,12 @@
 
     <!-- Similar to fr-triggers-instance, but for FB-specific buttons -->
     <xf:instance id="fb-triggers-instance">
-        <triggers>
+        <_>
             <data-status/>
             <publish/>
             <save-as/>
             <other/>
-        </triggers>
-    </xf:instance>
-
-    <xf:instance id="fb-static-upload">
-        <_>
-            <empty/>
-            <non-empty>content</non-empty>
+            <test-pdf/>
         </_>
     </xf:instance>
 
@@ -560,7 +554,15 @@
         <!-- Condition for disabling Save as… button -->
         <!-- HACK: Not sure why, but if we don't put a calculate here (which is useless), then the readonly is not evaluated on recalculate -->
         <xf:bind ref="save-as" readonly="$mode != 'edit'" calculate="$mode"/>
+        <xf:bind ref="test-pdf" relevant=". = 'true'"/>
     </xf:bind>
+
+    <xf:instance id="fb-static-upload">
+        <_>
+            <empty/>
+            <non-empty>content</non-empty>
+        </_>
+    </xf:instance>
 
     <!-- HACK: Bind has inter-model dependency -->
     <xf:recalculate ev:event="xxforms-value-changed" ev:observer="fr-parameters-instance"/>
@@ -846,17 +848,23 @@
 
     <!-- Dispatched from the client, see above action -->
     <xf:action event="fb-test-form-show-dialog">
-        <xxf:show dialog="fb-test-dialog"/>
+        <xxf:show dialog="fb-test-dialog">
+            <xf:property name="show-test-pdf" value="true()"/>
+        </xxf:show>
         <xf:send submission="fb-test-form-submission"/>
     </xf:action>
 
     <xf:action event="fb-test-formulas-show-dialog">
-        <xxf:show dialog="fb-test-dialog"/>
+        <xxf:show dialog="fb-test-dialog">
+            <xf:property name="show-test-pdf" value="false()"/>
+        </xxf:show>
         <xf:send submission="fb-test-formulas-form-submission"/>
     </xf:action>
 
     <xf:action event="fb-test-offline-show-dialog">
-        <xxf:show dialog="fb-test-dialog"/>
+        <xxf:show dialog="fb-test-dialog">
+            <xf:property name="show-test-pdf" value="false()"/>
+        </xxf:show>
         <xf:send submission="fb-test-offline-submission"/>
     </xf:action>
 

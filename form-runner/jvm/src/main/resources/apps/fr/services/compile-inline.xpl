@@ -43,7 +43,7 @@
                             <xh:script>
                                 window.addEventListener('DOMContentLoaded', function() {
                                    window.ORBEON.fr.FormRunnerOffline.renderFormFromBase64(
-                                       document.querySelector(".orbeon"),
+                                       document.querySelector(".orbeon-wrapper"),
                                        document.querySelector("#fr-compiled-form").content.textContent,
                                        {
                                             "appName"    : "<xsl:value-of select="doc('input:parameters')/*/app"/>",
@@ -55,8 +55,8 @@
                                 });
                             </xh:script>
                         </xh:head>
-                        <xh:body style="padding: 2em">
-                            <xh:div class="orbeon"/>
+                        <xh:body class="orbeon">
+                            <xh:div class="orbeon-wrapper"/>
                             <xh:template id="fr-compiled-form">
                                 <xh:div><xsl:value-of select="/*"/></xh:div>
                             </xh:template>

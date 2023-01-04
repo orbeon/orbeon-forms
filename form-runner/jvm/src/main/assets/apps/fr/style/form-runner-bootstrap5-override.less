@@ -2,13 +2,18 @@
 
 .orbeon {
 
+    & legend {
+        font-size: 13px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
     // disable input bar
     .orbeon input[disabled], .orbeon select[disabled], .orbeon textarea[disabled], .orbeon input[readonly], .orbeon select[readonly], .orbeon textarea[readonly] {
         cursor: not-allowed;
         background-color: #eee;
     }
 
-    input:not([type='checkbox']):not([type='radio']), output, .xforms-control.xforms-select1.xforms-incremental, .xforms-control.xforms-select1.xforms-incremental > select,
+    input:not([type='checkbox']):not([type='radio']), output, .xforms-control.xforms-select1.xforms-incremental > select,
     .xforms-control.xforms-readonly.xforms-incremental.xforms-static .xforms-field, .xforms-control.xforms-incremental.xforms-readonly.xforms-static pre {
         height: 28px;
     }
@@ -283,8 +288,15 @@
         margin-top: 5px;
     }
 
+    // todo: still need a background image
     .yui-panel-container input[type="radio"], .yui-panel-container input[type="checkbox"] {
         margin-top: 3px;
+        // border-radius: 50%;
+        // appearance: none;
+        // width: 1em;
+        // height: 1em;
+        // background-color: #0d6efd;
+        // border-color: #0d6efd;
     }
 
     // form controls > Image and File Attachments
@@ -420,6 +432,18 @@
     }
 
     // form builder: form settings
+    .xforms-switch .fr-section-content.xforms-group .xbl-component.xbl-fr-grid-single .fr-grid.fr-editable .fr-grid-body .fr-grid-td.fb-selected {
+        box-shadow: 0 0 5px 3px #aaccee !important;
+    }
+
+    .fb-dialog-form-settings.xforms-dialog.xforms-dialog-modal {
+        width: 898px;
+    }
+
+    .fr-dialog-buttons .xforms-control.xforms-trigger .btn {
+        min-width: unset;
+    }
+
     // General Settings
     .fb-dialog-form-settings-fields.xbl-component.xbl-fr-tabbable {
         font-size: 14px;
@@ -441,7 +465,6 @@
         .nav-tabs .nav-item:not(.active) .nav-link:hover {
             border-color: #eee #eee #ddd;
             background-color: #eee;
-            height: 38px;
         }
 
         .nav-tabs .nav-item .nav-link {
@@ -452,15 +475,6 @@
     // Form Options
     .fb-settings-mode-edit .fb-dialog-form-settings-fields .tab-content .fb-dialog-form-settings-options {
         height: 560px;
-
-        .xforms-group .input-group.xforms-help-popover-control {
-            display: flex;
-            flex-wrap: nowrap;
-
-            .xbl-fr-number-visible-input.xforms-input-input {
-                max-width: none;
-            }
-        }
     }
 
     .navbar {
@@ -468,6 +482,61 @@
             h1 {
                 font-weight: @frNavBarFontWeight;
             }
+        }
+    }
+
+    .xforms-group .input-group.xforms-help-popover-control {
+        display: flex;
+        flex-wrap: nowrap;
+
+        .xbl-fr-number-visible-input.xforms-input-input {
+            max-width: none;
+        }
+    }
+
+    // Control Settings
+    .tab-content .tab-pane .xbl-component.xbl-fr-tabbable .tabs-left {
+        &>.nav-tabs>li>a {
+            margin-bottom: 3px;
+        }
+
+        .nav.nav-tabs {
+            flex-direction: column;
+            border-right: 1px solid #ddd;
+            border-bottom: unset;
+
+            .nav-item .nav-link {
+                transition: unset;
+            }
+            
+            .nav-item.active .nav-link {
+                border-right: 1px solid white;
+                margin-right: -2px;
+                border-bottom: 1px solid #ddd;
+                border-top-right-radius: unset;
+                border-bottom-left-radius: 4px;
+            }
+    
+            .nav-item:not(.active) {
+                .nav-link:hover, .nav-link:focus {
+                    border-color: #eee;
+                    border-top-right-radius: unset;
+                    border-bottom-left-radius: 4px;
+                }
+            }
+        }
+    }
+
+    // About this Form
+    .fb-dialog-form-settings .fb-dialog-form-settings-info > .fb-dialog-form-settings-info-stats table tbody th {
+        font-weight: normal;
+    }
+
+    .table-condensed {
+        th, td {
+            padding: 4px 5px;
+            border-top: 1px solid #ddd;
+            border-bottom: unset;
         }
     }
 }

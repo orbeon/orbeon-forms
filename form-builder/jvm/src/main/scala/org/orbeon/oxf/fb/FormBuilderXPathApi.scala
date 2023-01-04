@@ -21,15 +21,18 @@ import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.Undo.UndoOrRedo
 import org.orbeon.oxf.fb.UndoAction._
 import org.orbeon.oxf.fr
-import org.orbeon.oxf.fr.FormRunner.findControlByName
+import org.orbeon.oxf.fr.FormRunner.{findControlByName, formRunnerProperty}
 import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFSendTest}
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.process.SimpleProcess.{currentXFormsDocumentId, evaluateString}
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI
+import org.orbeon.oxf.util.{ContentTypes, Mediatypes, PathUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
@@ -53,6 +56,27 @@ import scala.util.{Failure, Success, Try}
 
 
 object FormBuilderXPathApi {
+
+  //@XPathFunction
+  def buildContentDispositionHeader(doc: NodeInfo, formatName: String): String = {
+
+    // TODO: Use namespaces from appropriate scope.
+    // TODO: Ideally the expression would have access to various aspects of the form, e.g. the form title in a
+    //  structured way. For now, we pass a reference to the root element of the edited form's metadata, which gives a
+    //  little flexibility.
+    val filenameProperty      = s"oxf.fr.detail.$formatName.filename"
+    val filenamePropertyValue = formRunnerProperty(filenameProperty, AppForm.FormBuilder).flatMap(trimAllToOpt)
+    val filenameFromProperty  = filenamePropertyValue.map(evaluateString(_, FormBuilderDocContext(doc).metadataRootElem)).flatMap(trimAllToOpt)
+    val filename              = filenameFromProperty.getOrElse(currentXFormsDocumentId)
+
+    val filenameWithExt =
+      PathUtils.findExtension(filename) match {
+        case Some(_) => filename
+        case None    => s"$filename.${Mediatypes.getExtensionForMediatypeOrThrow(ContentTypes.XhtmlContentType)}"
+      }
+
+    Headers.buildContentDispositionHeader(s"$filenameWithExt")._2
+  }
 
   // This is called when the user adds/removes an iteration, as we want to update the templates in this case in order
   // to adjust the default number of iterations. See https://github.com/orbeon/orbeon-forms/issues/2379

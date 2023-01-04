@@ -107,7 +107,7 @@
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.save.orbeon.builder"        value="inline"/>
     <property as="xs:string"  name="oxf.fr.detail.loading-indicator.publish.orbeon.builder"     value="modal"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.builder">
-        home summary new test|test-pdf|test-offline|test-formulas publish save
+        home summary new form-definition-xhtml-export test|test-pdf|test-offline|test-formulas publish save
     </property>
 
     <!-- Form Builder summary page  -->
@@ -133,6 +133,10 @@
 
     <property as="xs:string"  name="oxf.fr.detail.process.xml-export.orbeon.builder">
         xf:dispatch(name = "fb-xml-export")
+    </property>
+
+    <property as="xs:string"  name="oxf.fr.detail.process.form-definition-xhtml-export.orbeon.builder">
+        xf:dispatch(name = "fb-form-definition-xhtml")
     </property>
 
     <property as="xs:string"  name="oxf.fr.detail.process.test.orbeon.builder">
@@ -185,5 +189,12 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.field-width.orbeon.builder"     value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.datetime.field-width.orbeon.builder" value="full"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.us-phone.field-width.orbeon.builder" value="full"/>
+
+    <property as="xs:string" name="oxf.fr.detail.form-definition-xhtml.filename.orbeon.builder">
+        concat(
+            (title[@xml:lang = fr:lang()], title)[1],
+            '.xhtml'
+        )
+    </property>
 
 </properties>

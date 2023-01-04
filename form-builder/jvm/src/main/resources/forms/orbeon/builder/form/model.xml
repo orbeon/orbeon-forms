@@ -943,6 +943,12 @@
         </xf:send>
     </xf:action>
 
+    <xf:action event="fb-form-definition-xhtml">
+        <!-- Probably no need to save, so don't do it for now. -->
+        <!-- Export -->
+        <xf:send submission="fb-form-definition-xhtml-export-submission"/>
+    </xf:action>
+
     <xf:submission
         id="fb-publish-submission"
         ref="event('doc')"
@@ -981,6 +987,27 @@
                 instance('fb-export-submission-params')/@export-format
             }"
         replace="all"/>
+
+    <xf:submission
+        id="fb-form-definition-xhtml-export-submission"
+        ref="
+            xxf:call-xpl(
+                'oxf:/forms/orbeon/builder/form/deannotate.xpl',
+                'data',
+                instance('fb-form-instance'),
+                'data'
+            )"
+        serialization="application/xml"
+        method="post"
+        resource="echo:"
+        replace="all"
+        xxf:target="fb-test-iframe"
+        xxf:show-progress="false">
+        <xf:header>
+            <xf:name>Content-Disposition</xf:name>
+            <xf:value value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'form-definition-xhtml')"/>
+        </xf:header>
+    </xf:submission>
 
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
     <xf:instance id="fb-export-submission-params">

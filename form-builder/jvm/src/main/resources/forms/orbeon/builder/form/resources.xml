@@ -306,6 +306,9 @@
         <or>
             <label>or</label>
         </or>
+        <back-to-summary>
+            <label>Back to List of Forms</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">Fixed View</item>
             <item id="1">Fluid View</item>
@@ -1618,6 +1621,9 @@
         <or>
             <label>ou</label>
         </or>
+        <back-to-summary>
+            <label>Retour à la liste des formulaires</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">Vue fixe</item>
             <item id="1">Vue fluide</item>
@@ -2913,6 +2919,9 @@
         <or>
             <label>eller</label>
         </or>
+        <back-to-summary>
+            <label todo="true">Back to List of Forms</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">[Fixed View]</item>
             <item id="1">[Fluid View]</item>
@@ -4236,6 +4245,9 @@
         <or>
             <label>или</label>
         </or>
+        <back-to-summary>
+            <label todo="true">Back to List of Forms</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">[Fixed View]</item>
             <item id="1">[Fluid View]</item>
@@ -5559,6 +5571,9 @@
         <or>
             <label>o</label>
         </or>
+        <back-to-summary>
+            <label todo="true">Back to List of Forms</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">[Fixed View]</item>
             <item id="1">[Fluid View]</item>
@@ -6846,6 +6861,9 @@
         <or>
             <label>oder</label>
         </or>
+        <back-to-summary>
+            <label todo="true">Back to List of Forms</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">[Fixed View]</item>
             <item id="1">[Fluid View]</item>
@@ -8136,6 +8154,9 @@
         <or>
             <label>tai</label>
         </or>
+        <back-to-summary>
+            <label todo="true">Back to List of Forms</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">[Fixed View]</item>
             <item id="1">[Fluid View]</item>
@@ -9451,6 +9472,9 @@
         <or>
             <label>o</label>
         </or>
+        <back-to-summary>
+            <label todo="true">Back to List of Forms</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">[Fixed View]</item>
             <item id="1">[Fluid View]</item>
@@ -10767,6 +10791,9 @@
         <or>
             <label>of</label>
         </or>
+        <back-to-summary>
+            <label todo="true">Back to List of Forms</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">[Fixed View]</item>
             <item id="1">[Fluid View]</item>
@@ -12062,6 +12089,9 @@
         <or>
             <label>ou</label>
         </or>
+        <back-to-summary>
+            <label todo="true">Back to List of Forms</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">[Fixed View]</item>
             <item id="1">[Fluid View]</item>
@@ -13384,6 +13414,9 @@
         <or>
             <label>eller</label>
         </or>
+        <back-to-summary>
+            <label todo="true">Back to List of Forms</label>
+        </back-to-summary>
         <form-builder-page-layout>
             <item id="0">[Fixed View]</item>
             <item id="1">[Fluid View]</item>

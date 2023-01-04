@@ -1121,7 +1121,7 @@
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>
                         <xf:trigger appearance="minimal">
-                            <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then close else cancel)/label"/>
+                            <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then back-to-summary else cancel)/label"/>
                             <!-- Hide this dialog without saving -->
                             <xxf:hide
                                 event="DOMActivate"

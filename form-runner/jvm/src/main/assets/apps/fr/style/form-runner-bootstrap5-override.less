@@ -2,8 +2,9 @@
 
 .orbeon {
 
-    legend {
+    & legend {
         font-size: 13px;
+        border-bottom: 1px solid #e5e5e5;
     }
 
     // disable input bar
@@ -529,5 +530,13 @@
     // About this Form
     .fb-dialog-form-settings .fb-dialog-form-settings-info > .fb-dialog-form-settings-info-stats table tbody th {
         font-weight: normal;
+    }
+
+    .table-condensed {
+        th, td {
+            padding: 4px 5px;
+            border-top: 1px solid #ddd;
+            border-bottom: unset;
+        }
     }
 }

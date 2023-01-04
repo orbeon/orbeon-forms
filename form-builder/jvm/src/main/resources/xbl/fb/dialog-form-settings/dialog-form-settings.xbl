@@ -700,8 +700,6 @@
                                                 </xf:itemset>
                                             </fr:open-select1>
                                         </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
                                         <xh:td>
                                             <fr:open-select1
                                                 ref="attachment-max-size-aggregate"
@@ -734,6 +732,7 @@
                                                 </xf:itemset>
                                             </fr:open-select1>
                                         </xh:td>
+                                        <xh:td/>
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
@@ -751,22 +750,6 @@
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
-                                            <fr:checkbox-input ref="labels-placeholders" class="fb-labels-placeholders">
-                                                <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
-                                                <xf:hint  ref="$resources/dialog-form-settings/placeholders/hint"/>
-                                                <xf:setvalue
-                                                    event="xforms-value-changed"
-                                                    if="event('xxf:value') = 'true'"
-                                                    ref="../hints-placeholders"
-                                                    value="false()"
-                                                />
-                                            </fr:checkbox-input>
-                                        </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
                                         <xh:td>
                                             <xf:select1 ref="hints" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/hints/label"/>
@@ -786,6 +769,18 @@
                                         </xh:td>
                                     </xh:tr>
                                     <xh:tr>
+                                        <xh:td>
+                                            <fr:checkbox-input ref="labels-placeholders" class="fb-labels-placeholders">
+                                                <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/placeholders/hint"/>
+                                                <xf:setvalue
+                                                    event="xforms-value-changed"
+                                                    if="event('xxf:value') = 'true'"
+                                                    ref="../hints-placeholders"
+                                                    value="false()"
+                                                />
+                                            </fr:checkbox-input>
+                                        </xh:td>
                                         <xh:td>
                                             <fr:checkbox-input ref="hints-placeholders" class="fb-hints-placeholders">
                                                 <xf:label ref="$resources/dialog-form-settings/placeholders/label"/>
@@ -873,8 +868,6 @@
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
                                         <xh:td>
                                             <xf:select1 ref="wizard-mode" appearance="full xxf:horizontal">
                                                 <xf:label ref="$resources/dialog-form-settings/wizard-mode/label"/>
@@ -901,9 +894,7 @@
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>
-                                    </xh:tr>
-                                    <xh:tr>
-                                        <xh:td>
+                                        <xh:td rowspan="2">
                                             <xf:select1 ref="wizard-subsections-toc" appearance="full">
                                                 <xf:label ref="$resources/dialog-form-settings/wizard-subsections-toc/label"/>
                                                 <xf:hint  ref="$resources/dialog-form-settings/wizard-subsections-toc/hint"/>

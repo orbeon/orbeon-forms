@@ -363,7 +363,7 @@
             </singleton>
             <wizard>
                 <label>Wizard View</label>
-                <hint>Whether to show top-level sections as separate wizard pages</hint>
+                <hint>Show top-level sections as separate wizard pages</hint>
             </wizard>
             <wizard-mode>
                 <label>Wizard Navigation Validation Mode</label>
@@ -375,7 +375,7 @@
             </wizard-mode>
             <wizard-subsections-nav>
                 <label>Wizard Subsections Navigation</label>
-                <hint>Whether the wizard enables navigation for sections and grids within top-level sections</hint>
+                <hint>Enable wizard navigation for sections and grids within top-level sections</hint>
             </wizard-subsections-nav>
             <wizard-subsections-toc>
                 <label>Wizard Subsections Table of Contents</label>

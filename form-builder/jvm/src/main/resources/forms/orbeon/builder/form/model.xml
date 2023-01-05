@@ -747,6 +747,8 @@
             disable-calculate=""
             disable-relevant=""
 
+            fr-rendered-filename=""
+
             fr-use-pdf-template=""
             fr-pdf-template-name=""
             fr-pdf-template-lang=""
@@ -763,7 +765,11 @@
         <!-- Only change parameters that are passed -->
         <xf:setvalue
             iterate="instance('fb-test-pdf-submission-params')/@*"
-            if="starts-with(name(context()), 'disable-') and exists(event(name(context())))"
+            if="
+                (
+                    starts-with(name(context()), 'disable-') or
+                    name(context()) = ('fr-rendered-filename')
+                ) and exists(event(name(context())))"
             ref="."
             value="event(name(context()))"/>
         <!-- But always update the data -->
@@ -884,8 +890,9 @@
     <!-- Dispatched from the client -->
     <xf:action event="fb-test-pdf-with-data">
         <xf:send submission="fb-test-pdf-submission">
-            <xf:property name="fr-form-data" value="event('fr-form-data')"/>
-            <xf:property name="language"     value="event('language')"/>
+            <xf:property name="fr-form-data"         value="event('fr-form-data')"/>
+            <xf:property name="language"             value="event('language')"/>
+            <xf:property name="fr-rendered-filename" value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'pdf')"/>
         </xf:send>
     </xf:action>
 

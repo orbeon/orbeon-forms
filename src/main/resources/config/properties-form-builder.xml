@@ -204,4 +204,15 @@
         )
     </property>
 
+    <property as="xs:string" name="oxf.fr.detail.pdf.filename.orbeon.builder">
+        let $fb-lang := xxf:instance('fb-language-instance')
+        return
+            concat(
+                (title[@xml:lang = $fb-lang], title)[1],
+                ' (',
+                $fb-lang,
+                ').pdf'
+            )
+    </property>
+
 </properties>

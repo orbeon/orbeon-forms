@@ -21,7 +21,8 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
     <xh:head>
         <xi:include href="oxf:/apps/fr/includes/permissions-model.xml"      xxi:omit-xml-base="true"/>
         <xi:include href="oxf:/forms/orbeon/builder/form/model.xml"         xxi:omit-xml-base="true"/>
@@ -857,8 +858,9 @@
                                         <xf:action if="not($for-form-being-tested)">
                                             <!-- Run directly -->
                                             <xf:send submission="fb-test-pdf-submission">
-                                                <xf:property name="fr-form-data" value="''"/>
-                                                <xf:property name="language"     value="$fb-lang"/>
+                                                <xf:property name="fr-form-data"         value="''"/>
+                                                <xf:property name="language"             value="$fb-lang"/>
+                                                <xf:property name="fr-rendered-filename" value="fbf:buildContentDispositionHeader(instance('fb-form-instance'), 'pdf')"/>
                                             </xf:send>
                                         </xf:action>
                                     </xf:action>

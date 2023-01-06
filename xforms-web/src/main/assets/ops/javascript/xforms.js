@@ -661,11 +661,11 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     }
                 }
                 return selectValue;
-            } else if (jControl.is('.xforms-textarea')) {
+            } else if (jControl.is('.xforms-textarea') && ! jControl.is('.xforms-static')) {
                 // Text area
                 var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
                 return textarea.value
-            } else if (jControl.is('.xforms-output, .xforms-input.xforms-static')) {
+            } else if (jControl.is('.xforms-output, .xforms-input.xforms-static, .xforms-textarea.xforms-static')) {
                 // Output and static input
                 var output = jControl.children(".xforms-output-output, .xforms-field").first();
                 if (output.length > 0) {
@@ -1262,6 +1262,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     ORBEON.xforms.Globals.maskFocusEvents = false;
             }
 
+            // TODO: Should we *not* call this for static read-only controls?
             // Save current value as server value. We usually do this on focus, but for control where we set the focus
             // with xf:setfocus, we still receive the focus event when the value changes, but after the change event
             // (which means we then don't send the new value to the server).

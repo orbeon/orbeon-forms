@@ -2106,6 +2106,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
     (function () {
 
+        // 2023-01-09: This is only for backward compatibility with old code that doesn't use `javascript-lifecycle`.
         ORBEON.xforms.FullUpdate = {
 
             /** @private @type {Object.<string, Array.<string>>} */                 _fullUpdateToComponents: {},
@@ -2122,13 +2123,14 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
              * @param component
              * @return {void}
              */
-            onComponentInitialized: function (component) {
-                if (! ORBEON.xforms.XBL.isJavaScriptLifecycle(component.container)) {
-                    if (! this._knownComponents[component.container.id]) {
+            onComponentInitialized: function (instanceAndConstructor) {
+
+                if (! ORBEON.xforms.XBL.isJavaScriptLifecycle(instanceAndConstructor.instance.container)) {
+                    if (! this._knownComponents[instanceAndConstructor.instance.container.id]) {
 
                         // Find if this instance is in a full update container
                         /** @type {HTMLElement} */ var fullUpdate = null;
-                        ORBEON.util.Dom.existsAncestorOrSelf(component.container, function (node) {
+                        ORBEON.util.Dom.existsAncestorOrSelf(instanceAndConstructor.instance.container, function (node) {
                             if ($(node).is('.xforms-update-full, .xxforms-dynamic-control')) {
                                 fullUpdate = node;
                                 return true;
@@ -2141,9 +2143,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         if (fullUpdate != null) {
                             // Remember that component is associated with full update
                             if (this._fullUpdateToComponents[fullUpdate.id] == null) this._fullUpdateToComponents[fullUpdate.id] = [];
-                            this._fullUpdateToComponents[fullUpdate.id].push(component.container.id);
+                            this._fullUpdateToComponents[fullUpdate.id].push(instanceAndConstructor.instance.container.id);
                             // Remember factory for this component
-                            this._componentsXblClass[component.container.id] = component.xblClass;
+                            this._componentsXblClass[instanceAndConstructor.instance.container.id] = instanceAndConstructor.constructor;
                         }
 
                         // Remember we looked at this one, so we don't have to do it again
@@ -2223,7 +2225,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
                 var identifyingCssClass =
                     _.find(xblControlElem.className.split(" "), function(clazz) {
-                        // The "identifying class" should be the the first after `xbl-component`, but filter
+                        // The "identifying class" should be the first after `xbl-component`, but filter
                         // known classes just in case
                         return clazz.indexOf("xbl-") == 0 &&
                                clazz != "xbl-component"   &&
@@ -2234,7 +2236,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if (identifyingCssClass) {
                     var factory = this._cssClassesToConstructors[identifyingCssClass];
                     if (factory) {
-                        return factory.instance(xblControlElem);
+                        return factory(xblControlElem);
                     } else {
                         return null;
                     }
@@ -2244,94 +2246,142 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        // Declare a companion JavaScript class. The class is defined by a simple prototype and will map
-        // to elements with the CSS class inferred from the binding name.
-        declareCompanion: function(bindingName, prototype) {
+        // Declare a companion JavaScript class. The class is defined by a prototype or a class.
+        declareCompanion: function(bindingName, prototypeOrClass) {
 
-            var parts = bindingName.split("|");
-            var head = parts[0];
-            var tail = bindingName.substring(head.length + 1);
+            const isClass = typeof prototypeOrClass === "function";
 
-            var cssClass = "xbl-" + head + "-" + tail;
+            const parts = bindingName.split("|");
+            const head = parts[0];
+            const tail = bindingName.substring(head.length + 1);
 
-            var xblClass = function() {};
+            const cssClass = "xbl-" + head + "-" + tail;
+
+            var xblClass;
+            if (isClass) {
+                xblClass = prototypeOrClass;
+            } else {
+                xblClass = function() {};
+                Object.assign(xblClass.prototype, prototypeOrClass);
+            }
+
             this.declareClass(xblClass, cssClass);
-            xblClass.prototype = prototype;
-            return xblClass;
         },
 
-        /**
-         *  Called by JavaScript companion code upon load.
-         *
-         *  This adds an `instance(target)` function to `xblClass`.
-         */
-        declareClass: function(xblClass, cssClass) {
-            var doNothingSingleton = null;
-            var instanceAlreadyCalled = false;
+        // This creates a subclass of the class passed. This provides us with a clean way to override `init()` and
+        // `destroy()`, as well as to initialize the `container` member of the class. Before we had the proper
+        // `javascript-lifecycle` mode, `init()` used to be called by the implementor of the component. It could
+        // be called multiple times for a given instance, and by overriding `init()` we were able to ensure that the
+        // underlying `init()` was only called once per instance. This is probably not needed anymore, but we
+        // keep it for backward compatibility. In addition:
+        //
+        // - fire internal `componentInitialized` for full updates (for backward compatibility)
+        // - remove the instance reference upon `destroy()`
+        // - SINCE 2022.1.1: pass `containerElem` to the parent class, as this makes that value accessible in the class
+        //   constructor, and is better than setting the property magically; but for backward compatibility the
+        //   `container` property is preserved
+        createSubclass: function(superclass) {
 
-            this._cssClassesToConstructors[cssClass] = xblClass;
+            const privateInitCalledSymbol = Symbol("initCalled");
+            const ComponentSubclass = (function(containerElem) {
+                superclass.call(this, containerElem);
+                Object.defineProperty(this, "container", {
+                    "value": containerElem,
+                    "writable": false,
+                    "enumerable": true,
+                    "configurable": true
+                });
+                this[privateInitCalledSymbol] = false;
+                if (! this.container)
+                    this.container = containerElem;
+            });
 
-            // Define factory function for this class
-            xblClass.instance = function (target) {
-                var hasInit = ! _.isUndefined(xblClass.prototype.init);
-
-                // Get the top-level element in the HTML DOM corresponding to this control
-                var container = target == null || ! YAHOO.util.Dom.inDocument(target, document)
-                        ? null
-                        : (YAHOO.util.Dom.hasClass(target, cssClass) ? target
-                        : YAHOO.util.Dom.getAncestorByClassName(target, cssClass));
-
-                // The first time instance() is called for this class, override init() on the class object
-                // to make sure that the init method is not called more than once
-                if (! instanceAlreadyCalled) {
-                    instanceAlreadyCalled = true;
-                    // Inject init
-                    if (hasInit) {
-                        var originalInit = this.prototype.init;
-                        this.prototype.init = function () {
-                            if (! this.initialized) {
-                                originalInit.call(this);
-                                this.initialized = true;
-                                ORBEON.xforms.XBL.componentInitialized.fire(this);
-                            }
-                        }
-                    }
-                    // Inject destroy
-                    var originalDestroy = this.prototype.destroy;
-                    this.prototype.destroy = function () {
-                        if (! _.isUndefined(originalDestroy))
-                            originalDestroy.call(this);
-                        $(this.container).data('xforms-xbl-object', null);
-                    }
+            const Superclass = (function() {});
+            Superclass.prototype = superclass.prototype;
+            ComponentSubclass.prototype = new Superclass();
+            ComponentSubclass.prototype.constructor = ComponentSubclass;
+            ComponentSubclass.prototype.init = (function() {
+                if (! this[privateInitCalledSymbol] && superclass.prototype.init) {
+                    this[privateInitCalledSymbol] = true;
+                    superclass.prototype.init.call(this);
+                    ORBEON.xforms.XBL.componentInitialized.fire({
+                        instance: this,
+                        constructor: ComponentSubclass
+                    });
                 }
+            });
+            ComponentSubclass.prototype.destroy = (function() {
+                if (superclass.prototype.destroy)
+                    superclass.prototype.destroy.call(this);
+                // We can debate whether the following clean-up should happen here or next to the caller of `destroy()`.
+                // However, legacy users might call `destroy()` manually, in which case it's better to clean-up here.
+                $(this.container).removeData("xforms-xbl-object");
+            })
+            return ComponentSubclass
+        },
 
-                if (container == null) {
+        declareClass: function(xblClass, cssClass) {
+
+            // 2023-01-09: TODO: Check cases where this is useful, and what kind of class we create below. Could we have
+            //  simply an adapter class?
+            var doNothingSingleton = null;
+
+            this._cssClassesToConstructors[cssClass] = function(targetElem) {
+
+                const subclass = ORBEON.xforms.XBL.createSubclass(xblClass);
+
+                const containerElem =
+                    targetElem == null || ! YAHOO.util.Dom.inDocument(targetElem, document)
+                    ? null
+                    : targetElem.classList.contains(cssClass)
+                        ? targetElem
+                        : YAHOO.util.Dom.getAncestorByClassName(targetElem, cssClass);
+
+                if (containerElem == null) {
                     // If we get an event for a target which is not in the document, return a mock object
                     // that won't do anything when its methods are called
+                    // Q: Under what circumstances can this happen?
                     if (doNothingSingleton == null) {
                         doNothingSingleton = {};
-                        for (var methodName in xblClass.prototype)
+                        for (var methodName in xblClass.prototype) {
+                            console.trace("instanceForControl: creating `doNothingSingleton` for `" + methodName + "`");
                             doNothingSingleton[methodName] = function () {};
+                        }
                     }
+                    console.debug("instanceForControl: returning mock `doNothingSingleton` for `" + cssClass + "`");
                     return doNothingSingleton;
                 } else {
                     // Get or create instance
-                    var instance = $(container).data('xforms-xbl-object');
-                    if (! _.isObject(instance) || instance.container != container) {
-                        instance = new xblClass(container);
-                        instance.xblClass = xblClass;
-                        instance.container = container;
-                        var form = ORBEON.xforms.Page.getFormFromElemOrThrow(instance.container);
-                        form.xblInstances.push(instance);
-                        if (hasInit) {
-                            instance.initialized = false;
-                            instance.init();
+                    var instance = $(containerElem).data("xforms-xbl-object");
+                    if (! _.isObject(instance) || instance.container != containerElem) {
+
+                        // Q: Under what circumstances can this happen?
+                        if (_.isObject(instance) && instance.container != containerElem) {
+                            console.debug(
+                                "instanceForControl: instance found in data but for different container: `" +
+                                instance.container.id + "` and `" + containerElem.id + "`"
+                            );
                         }
-                        $(container).data('xforms-xbl-object', instance);
+
+                        // Instantiate and initialize
+                        instance = new subclass(containerElem);
+                        instance.init();
+
+                        // Keep track of the instance
+                        // TODO: We remove those in `Form.destroy()`, but should we do it when the instance is destroyed
+                        //  here too?
+                        ORBEON.xforms.Page.getFormFromElemOrThrow(instance.container).xblInstances.push(instance);
+                        $(containerElem).data('xforms-xbl-object', instance);
                     }
                     return instance;
                 }
             };
+
+            // For backward compatibility only (4.10 and earlier components):
+            // - used internally for full updates code
+            // - documented for 4.10 and earlier components
+            // We can remove this once we remove backward compatibility support for 4.10 and earlier components.
+            xblClass.instance = this._cssClassesToConstructors[cssClass];
         },
 
         componentInitialized: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT)

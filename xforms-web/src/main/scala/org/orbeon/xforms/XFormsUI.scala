@@ -266,16 +266,9 @@ object XFormsUI {
         //     instance.init();
         callXFormsUpdateReadonlyIfNeeded()
       } else if (becomesNonRelevant) {
-
         // We ignore `readonly` when we become non-relevant
-
-        if (isObjectWithMethod(instance, "destroy"))
-          instance.destroy()
-
-        // The class's `destroy()` should do that anyway as we inject our own `destroy()`, but ideally
-        // `destroy()` should only be called from there, and so the `null`ing of `xforms-xbl-object` should
-        // take place here as well.
-        $(documentElement).data("xforms-xbl-object", null)
+        // Our component subclass's `destroy()` removes "xforms-xbl-object" data as well
+        instance.destroy()
       } else {
         // Stays relevant or non-relevant (but we should never be here if we are non-relevant)
         callXFormsUpdateReadonlyIfNeeded()

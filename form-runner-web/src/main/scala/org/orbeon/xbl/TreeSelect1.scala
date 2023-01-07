@@ -21,124 +21,124 @@ import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 
+
 object TreeSelect1 {
 
-  XBL.declareCompanion(
-    "fr|tree-select1",
-    new XBLCompanion {
+  XBL.declareCompanion("fr|tree-select1", js.constructorOf[TreeSelect1Companion])
 
-      def findTreeContainer         = $(containerElem).find(".xbl-fr-tree-select1-container")
-      def removeListeners()         = findTreeContainer.off()
-      def logDebug(message: String) = () // println(s"TreeSelect: $message")
+  private class TreeSelect1Companion extends XBLCompanion {
 
-      var isReadonly        : Boolean           = false
-      var hasJavaScriptTree : Boolean           = true
-      var currentValue      : String            = ""
-      var treeConfiguration : Option[Fancytree] = None
+    def findTreeContainer         = $(containerElem).find(".xbl-fr-tree-select1-container")
+    def removeListeners()         = findTreeContainer.off()
+    def logDebug(message: String) = () // println(s"TreeSelect: $message")
 
-      override def init(): Unit = {
-        logDebug("init")
-        this.isReadonly        = containerElem.classList.contains("xforms-readonly")
-        this.hasJavaScriptTree = ! $(containerElem).find(".xbl-fr-tree-select1-container-static-readonly").is(":not('.xforms-disabled')")
-      }
+    var isReadonly        : Boolean           = false
+    var hasJavaScriptTree : Boolean           = true
+    var currentValue      : String            = ""
+    var treeConfiguration : Option[Fancytree] = None
 
-      override def destroy(): Unit =
-        if (this.hasJavaScriptTree) {
-          removeListeners()
-          this.currentValue      = ""
-          this.treeConfiguration = None
-        }
-
-      override def xformsUpdateReadonly(readonly: Boolean): Unit =
-        if (this.hasJavaScriptTree) {
-          this.isReadonly = readonly
-        }
-
-      override def xformsGetValue(): String = this.currentValue
-
-      override def xformsUpdateValue(newValue: String): js.UndefOr[Nothing] = {
-        if (this.hasJavaScriptTree) {
-          logDebug(s"xformsUpdateValue = `$newValue`")
-
-          this.currentValue = newValue ensuring (_ ne null)
-
-          val activatedNodeOpt = this.treeConfiguration flatMap (tree => Option(tree.activateKey(newValue)))
-
-          if (activatedNodeOpt.isEmpty)
-            logDebug(s"no matching node for `$newValue`")
-        }
-        js.undefined
-      }
-
-      override def xformsFocus(): Unit =
-        if (this.hasJavaScriptTree) {
-          logDebug("xformsFocus")
-        }
-
-      // This is called explicitly from tree-select1.xbl upon `xforms-enabled` and itemset change
-      def updateItemset(itemset: String): Unit =
-        if (this.hasJavaScriptTree) {
-
-          logDebug(s"itemset = `$itemset`")
-
-          def itemOpen(item: Item) =
-            item.attributes flatMap (_.`xxforms-open`) exists (_ == "true")
-
-          def itemChildrenOpen(nodesOrUndef: js.UndefOr[js.Array[FancytreeJsonNode]]) =
-            nodesOrUndef exists (_ exists (_.expanded exists identity))
-
-          def convertItems(items: js.Array[Item]): js.Array[FancytreeJsonNode] =
-            for {
-              item            <- items
-              childrenOrUndef = item.children map convertItems
-            } yield
-              FancytreeJsonNode(
-                label           = item.label,
-                value           = item.value,
-                open            = itemOpen(item) || itemChildrenOpen(childrenOrUndef),
-                classesOrUndef  = item.attributes flatMap (_.`class`),
-                childrenOrUndef = childrenOrUndef
-              )
-
-          val jTreeContainer        = findTreeContainer
-          val jTreeContainerDynamic = jTreeContainer.asInstanceOf[js.Dynamic]
-
-          val items = convertItems(js.JSON.parse(itemset).asInstanceOf[js.Array[Item]])
-
-          this.treeConfiguration match {
-            case Some(tree) =>
-              tree.reload(items)
-            case None =>
-              jTreeContainerDynamic.fancytree(new js.Object { val source = items })
-              jTreeContainerDynamic.fancytree("option", "toggleEffect", false)
-
-              // Always allow click on expanders but don't allow selection when readonly
-              val onClick: js.Function = (event: JQueryEventObject, data: FancytreeEventData) =>
-                (data.targetType exists (_ == "expander")) || ! this.isReadonly
-
-              val onActivate: js.Function = (event: JQueryEventObject, data: FancytreeEventData) =>
-                if (! this.isReadonly) {
-                  val newValue = data.node.key ensuring (_ ne null)
-
-                  if (this.currentValue != newValue) {
-                    this.currentValue = newValue
-
-                    xforms.DocumentAPI.setValue(
-                        containerElem.id,
-                        newValue
-                    )
-                  }
-                }
-
-              jTreeContainer.on("fancytreeclick",    onClick)
-              jTreeContainer.on("fancytreeactivate", onActivate)
-
-              this.treeConfiguration = Some(jTreeContainerDynamic.fancytree("getTree").asInstanceOf[Fancytree])
-          }
-
-          // Make sure to update the value into the tree
-          xformsUpdateValue(this.currentValue)
-        }
+    override def init(): Unit = {
+      logDebug("init")
+      this.isReadonly        = containerElem.classList.contains("xforms-readonly")
+      this.hasJavaScriptTree = ! $(containerElem).find(".xbl-fr-tree-select1-container-static-readonly").is(":not('.xforms-disabled')")
     }
-  )
+
+    override def destroy(): Unit =
+      if (this.hasJavaScriptTree) {
+        removeListeners()
+        this.currentValue      = ""
+        this.treeConfiguration = None
+      }
+
+    override def xformsUpdateReadonly(readonly: Boolean): Unit =
+      if (this.hasJavaScriptTree) {
+        this.isReadonly = readonly
+      }
+
+    override def xformsGetValue(): String = this.currentValue
+
+    override def xformsUpdateValue(newValue: String): js.UndefOr[Nothing] = {
+      if (this.hasJavaScriptTree) {
+        logDebug(s"xformsUpdateValue = `$newValue`")
+
+        this.currentValue = newValue ensuring (_ ne null)
+
+        val activatedNodeOpt = this.treeConfiguration flatMap (tree => Option(tree.activateKey(newValue)))
+
+        if (activatedNodeOpt.isEmpty)
+          logDebug(s"no matching node for `$newValue`")
+      }
+      js.undefined
+    }
+
+    override def xformsFocus(): Unit =
+      if (this.hasJavaScriptTree) {
+        logDebug("xformsFocus")
+      }
+
+    // This is called explicitly from tree-select1.xbl upon `xforms-enabled` and itemset change
+    def updateItemset(itemset: String): Unit =
+      if (this.hasJavaScriptTree) {
+
+        logDebug(s"itemset = `$itemset`")
+
+        def itemOpen(item: Item) =
+          item.attributes flatMap (_.`xxforms-open`) exists (_ == "true")
+
+        def itemChildrenOpen(nodesOrUndef: js.UndefOr[js.Array[FancytreeJsonNode]]) =
+          nodesOrUndef exists (_ exists (_.expanded exists identity))
+
+        def convertItems(items: js.Array[Item]): js.Array[FancytreeJsonNode] =
+          for {
+            item            <- items
+            childrenOrUndef = item.children map convertItems
+          } yield
+            FancytreeJsonNode(
+              label           = item.label,
+              value           = item.value,
+              open            = itemOpen(item) || itemChildrenOpen(childrenOrUndef),
+              classesOrUndef  = item.attributes flatMap (_.`class`),
+              childrenOrUndef = childrenOrUndef
+            )
+
+        val jTreeContainer        = findTreeContainer
+        val jTreeContainerDynamic = jTreeContainer.asInstanceOf[js.Dynamic]
+
+        val items = convertItems(js.JSON.parse(itemset).asInstanceOf[js.Array[Item]])
+
+        this.treeConfiguration match {
+          case Some(tree) =>
+            tree.reload(items)
+          case None =>
+            jTreeContainerDynamic.fancytree(new js.Object { val source = items })
+            jTreeContainerDynamic.fancytree("option", "toggleEffect", false)
+
+            // Always allow click on expanders but don't allow selection when readonly
+            val onClick: js.Function = (event: JQueryEventObject, data: FancytreeEventData) =>
+              (data.targetType exists (_ == "expander")) || ! this.isReadonly
+
+            val onActivate: js.Function = (event: JQueryEventObject, data: FancytreeEventData) =>
+              if (! this.isReadonly) {
+                val newValue = data.node.key ensuring (_ ne null)
+
+                if (this.currentValue != newValue) {
+                  this.currentValue = newValue
+
+                  xforms.DocumentAPI.setValue(
+                      containerElem.id,
+                      newValue
+                  )
+                }
+              }
+
+            jTreeContainer.on("fancytreeclick",    onClick)
+            jTreeContainer.on("fancytreeactivate", onActivate)
+
+            this.treeConfiguration = Some(jTreeContainerDynamic.fancytree("getTree").asInstanceOf[Fancytree])
+        }
+
+        // Make sure to update the value into the tree
+        xformsUpdateValue(this.currentValue)
+      }
+  }
 }

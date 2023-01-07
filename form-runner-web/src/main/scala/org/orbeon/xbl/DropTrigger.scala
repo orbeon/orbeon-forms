@@ -17,38 +17,38 @@ object DropTrigger {
   val ListenerSuffix   = ".drop-trigger"
   val ListenerSelector = "button[data-orbeon-value], a[data-orbeon-value]"
 
-  XBL.declareCompanion("fr|drop-trigger",
-    new XBLCompanion {
+  XBL.declareCompanion("fr|drop-trigger", js.constructorOf[DropTriggerCompanion])
 
-      override def init(): Unit = {
+  private class DropTriggerCompanion extends XBLCompanion {
 
-        logger.debug("init")
+    override def init(): Unit = {
 
-        $(containerElem).on(s"click.$ListenerSuffix", ListenerSelector, {
-          (bound: html.Element, e: JQueryEventObject) => {
+      logger.debug("init")
 
-            logger.debug(s"reacting to event ${e.`type`}")
+      $(containerElem).on(s"click.$ListenerSuffix", ListenerSelector, {
+        (bound: html.Element, e: JQueryEventObject) => {
 
-            AjaxClient.fireEvent(
-              AjaxEvent(
-                eventName  = "fr-activate",
-                targetId   = containerElem.id,
-                properties = Map(
-                  "fr-value" -> bound.dataset("orbeonValue")
-                )
+          logger.debug(s"reacting to event ${e.`type`}")
+
+          AjaxClient.fireEvent(
+            AjaxEvent(
+              eventName  = "fr-activate",
+              targetId   = containerElem.id,
+              properties = Map(
+                "fr-value" -> bound.dataset("orbeonValue")
               )
             )
+          )
 
-            // Avoid navigation to "#"
-            e.preventDefault()
-          }
-        }: js.ThisFunction)
-      }
-
-      override def destroy(): Unit = {
-        logger.debug("destroy")
-        $(containerElem).off(s"click.$ListenerSuffix", ListenerSelector)
-      }
+          // Avoid navigation to "#"
+          e.preventDefault()
+        }
+      }: js.ThisFunction)
     }
-  )
+
+    override def destroy(): Unit = {
+      logger.debug("destroy")
+      $(containerElem).off(s"click.$ListenerSuffix", ListenerSelector)
+    }
+  }
 }

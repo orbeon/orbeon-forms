@@ -32,7 +32,7 @@ import scala.scalajs.js.JSConverters._
 
 object Date {
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Date")
-  XBL.declareCompanion("fr|date", new DateCompanion)
+  XBL.declareCompanion("fr|date", js.constructorOf[DateCompanion])
 }
 
 private class DateCompanion extends XBLCompanionWithState {

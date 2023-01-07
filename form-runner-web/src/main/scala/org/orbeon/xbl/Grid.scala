@@ -15,16 +15,17 @@ package org.orbeon.xbl
 
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 
+import scala.scalajs.js
+
 
 object Grid {
 
-  XBL.declareCompanion(
-    "fr|grid-multiple",
-    new XBLCompanion {
-      override def init()   : Unit = GridMenus // initialize menus once
-      override def destroy(): Unit = ()
-    }
-  )
+  XBL.declareCompanion("fr|grid-multiple", js.constructorOf[GridCompanion])
+
+  private class GridCompanion extends XBLCompanion {
+    override def init()   : Unit = GridMenus // initialize menus once
+    override def destroy(): Unit = ()
+  }
 }
 
 object GridMenus extends GridSectionMenus {

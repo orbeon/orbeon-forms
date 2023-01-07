@@ -17,41 +17,38 @@ import org.orbeon.facades.Autosize
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom.html
-import org.scalajs.jquery.JQueryPromise
 
 import scala.scalajs.js
-import scala.scalajs.js.|
 
 
 object AutosizeTextarea {
 
-  XBL.declareCompanion(
-    "fr|autosize-textarea",
-    new XBLCompanion {
+  XBL.declareCompanion("fr|autosize-textarea", js.constructorOf[AutosizeTextareaCompanion])
 
-      private def textarea: html.TextArea =
-        $(containerElem).find("textarea")(0).asInstanceOf[html.TextArea]
+  private class AutosizeTextareaCompanion extends XBLCompanion {
 
-      override def init(): Unit =
-        Autosize(textarea)
+    private def textarea: html.TextArea =
+      $(containerElem).find("textarea")(0).asInstanceOf[html.TextArea]
 
-      override def destroy(): Unit =
-        Autosize.destroy(textarea)
+    override def init(): Unit =
+      Autosize(textarea)
 
-      override def xformsUpdateValue(newValue: String): js.UndefOr[Nothing] = {
-        Autosize.update(textarea)
-        js.undefined
-      }
+    override def destroy(): Unit =
+      Autosize.destroy(textarea)
 
-      // In order to be notified of value updates, we enable the `external-value` mode.
-      // This means that we also need to implement this method, even though we don't
-      // actually need to store the value independently from the textarea. So we just
-      // delegate to the text area. This is required when the server updates client
-      // values, in which case we check the current client value for comparison.
-      override def xformsGetValue(): String = {
-        Autosize.update(textarea)
-        textarea.value
-      }
+    override def xformsUpdateValue(newValue: String): js.UndefOr[Nothing] = {
+      Autosize.update(textarea)
+      js.undefined
     }
-  )
+
+    // In order to be notified of value updates, we enable the `external-value` mode.
+    // This means that we also need to implement this method, even though we don't
+    // actually need to store the value independently from the textarea. So we just
+    // delegate to the text area. This is required when the server updates client
+    // values, in which case we check the current client value for comparison.
+    override def xformsGetValue(): String = {
+      Autosize.update(textarea)
+      textarea.value
+    }
+  }
 }

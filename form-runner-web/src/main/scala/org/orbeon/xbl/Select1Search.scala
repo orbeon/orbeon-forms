@@ -17,8 +17,8 @@ import org.orbeon.facades.Select2
 import org.orbeon.facades.Select2.{Success, toJQuerySelect2}
 import org.orbeon.jquery._
 import org.orbeon.web.DomSupport
-import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
 import org.orbeon.xforms._
+import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
 import org.scalajs.dom
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
@@ -26,9 +26,10 @@ import org.scalajs.jquery.{JQuery, JQueryEventObject}
 import scala.collection.mutable
 import scala.scalajs.js
 
+
 object Select1Search {
-  XBL.declareCompanion(name = "fr|dropdown-select1-search" , new Select1SearchCompanion)
-  XBL.declareCompanion(name = "fr|databound-select1-search", new Select1SearchCompanion)
+  XBL.declareCompanion(name = "fr|dropdown-select1-search" , js.constructorOf[Select1SearchCompanion])
+  XBL.declareCompanion(name = "fr|databound-select1-search", js.constructorOf[Select1SearchCompanion])
 }
 
 private class Select1SearchCompanion extends XBLCompanion {

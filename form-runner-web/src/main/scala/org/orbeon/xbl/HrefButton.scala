@@ -16,26 +16,28 @@ package org.orbeon.xbl
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 
+import scala.scalajs.js
+
 
 object HrefButton {
 
-  XBL.declareCompanion(
-    "fr|href-button",
-    new XBLCompanion {
-      override def init(): Unit = {
-        $(containerElem).find("button").on("click.orbeon.href-button", onClick _)
-      }
+  XBL.declareCompanion("fr|href-button", js.constructorOf[HrefButton])
 
-      def enabled() = ()
+  private class HrefButton extends XBLCompanion {
 
-      private def onClick(): Unit = {
-        val a = $(containerElem).find(".fr-href-button-anchor")
-        org.scalajs.dom.window.open(
-          url      = a.attr("href"  ).toString,
-          target   = a.attr("target").toString,
-          features = "noopener"
-        )
-      }
+    override def init(): Unit = {
+      $(containerElem).find("button").on("click.orbeon.href-button", onClick _)
     }
-  )
+
+    def enabled() = ()
+
+    private def onClick(): Unit = {
+      val a = $(containerElem).find(".fr-href-button-anchor")
+      org.scalajs.dom.window.open(
+        url      = a.attr("href"  ).toString,
+        target   = a.attr("target").toString,
+        features = "noopener"
+      )
+    }
+  }
 }

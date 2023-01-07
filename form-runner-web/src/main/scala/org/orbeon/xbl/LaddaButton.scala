@@ -21,6 +21,7 @@ import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
 
+
 object LaddaButton {
 
   sealed trait State
@@ -34,57 +35,56 @@ object LaddaButton {
   val ListenerSuffix = s".orbeon-$ComponentName"
   val ClickEventName = s"click$ListenerSuffix"
 
-  XBL.declareCompanion(
-    name      = s"fr|$ComponentName",
-    companion = new XBLCompanion {
+  XBL.declareCompanion(s"fr|$ComponentName", js.constructorOf[LaddaButtonCompanion])
 
-      var state: State = State.Begin
-      var ladda: Option[Ladda] = None
+  private class LaddaButtonCompanion extends XBLCompanion {
 
-      private def findButton: JQuery = $(containerElem).find("button")
+    var state: State = State.Begin
+    var ladda: Option[Ladda] = None
 
-      override def init(): Unit = {
+    private def findButton: JQuery = $(containerElem).find("button")
 
-        val jButton = findButton
-        jButton.attr("data-style", "slide-left")
+    override def init(): Unit = {
 
-        val isPrimary = jButton.parents(".xforms-trigger-appearance-xxforms-primary").is("*")
-        jButton.attr("data-spinner-color", if (isPrimary) "white" else "black")
-        jButton.addClass("ladda-button")
+      val jButton = findButton
+      jButton.attr("data-style", "slide-left")
 
-        ladda = Some(Ladda.create(jButton(0)))
+      val isPrimary = jButton.parents(".xforms-trigger-appearance-xxforms-primary").is("*")
+      jButton.attr("data-spinner-color", if (isPrimary) "white" else "black")
+      jButton.addClass("ladda-button")
 
-        jButton.onWithSelector(
-          events   = ClickEventName,
-          selector = null,
-          handler  = (_: JQueryEventObject) => {
-            if (state == State.Begin)
-              js.timers.setTimeout(0) { // defer so we don't prevent other `click` listeners from being called
-                ladda.foreach (_.start())
-                state = State.Clicked
-              }
-          }
-        )
+      ladda = Some(Ladda.create(jButton(0)))
 
-        AjaxClient.beforeSendingEvent.add(_ => {
-          if (state == State.Clicked)
-            state = State.Sent
-        })
+      jButton.onWithSelector(
+        events   = ClickEventName,
+        selector = null,
+        handler  = (_: JQueryEventObject) => {
+          if (state == State.Begin)
+            js.timers.setTimeout(0) { // defer so we don't prevent other `click` listeners from being called
+              ladda.foreach (_.start())
+              state = State.Clicked
+            }
+        }
+      )
 
-        AjaxClient.ajaxResponseReceived.add(_ => {
-          if (state == State.Sent) {
-            ladda.foreach (_.stop())
-            state = State.Begin
-          }
-        })
-      }
+      AjaxClient.beforeSendingEvent.add(_ => {
+        if (state == State.Clicked)
+          state = State.Sent
+      })
 
-      override def destroy(): Unit = {
-        // TODO: remove from `AjaxClient.beforeSendingEvent` and `AjaxClient.ajaxResponseReceived`
-        findButton.off(events = ClickEventName, selector = null)
-        ladda.foreach (_.remove())
-        ladda = None
-      }
+      AjaxClient.ajaxResponseReceived.add(_ => {
+        if (state == State.Sent) {
+          ladda.foreach (_.stop())
+          state = State.Begin
+        }
+      })
     }
-  )
+
+    override def destroy(): Unit = {
+      // TODO: remove from `AjaxClient.beforeSendingEvent` and `AjaxClient.ajaxResponseReceived`
+      findButton.off(events = ClickEventName, selector = null)
+      ladda.foreach (_.remove())
+      ladda = None
+    }
+  }
 }

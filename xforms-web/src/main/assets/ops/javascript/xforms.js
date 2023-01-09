@@ -2123,34 +2123,31 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
              * @param component
              * @return {void}
              */
-            onComponentInitialized: function (instanceAndConstructor) {
+            onComponentInitialized: function (containerAndConstructor) {
+                if (! this._knownComponents[containerAndConstructor.container.id]) {
 
-                if (! ORBEON.xforms.XBL.isJavaScriptLifecycle(instanceAndConstructor.instance.container)) {
-                    if (! this._knownComponents[instanceAndConstructor.instance.container.id]) {
-
-                        // Find if this instance is in a full update container
-                        /** @type {HTMLElement} */ var fullUpdate = null;
-                        ORBEON.util.Dom.existsAncestorOrSelf(instanceAndConstructor.instance.container, function (node) {
-                            if ($(node).is('.xforms-update-full, .xxforms-dynamic-control')) {
-                                fullUpdate = node;
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        });
-
-                        // This component is inside a full update
-                        if (fullUpdate != null) {
-                            // Remember that component is associated with full update
-                            if (this._fullUpdateToComponents[fullUpdate.id] == null) this._fullUpdateToComponents[fullUpdate.id] = [];
-                            this._fullUpdateToComponents[fullUpdate.id].push(instanceAndConstructor.instance.container.id);
-                            // Remember factory for this component
-                            this._componentsXblClass[instanceAndConstructor.instance.container.id] = instanceAndConstructor.constructor;
+                    // Find if this instance is in a full update container
+                    /** @type {HTMLElement} */ var fullUpdate = null;
+                    ORBEON.util.Dom.existsAncestorOrSelf(containerAndConstructor.container, function (node) {
+                        if ($(node).is('.xforms-update-full, .xxforms-dynamic-control')) {
+                            fullUpdate = node;
+                            return true;
+                        } else {
+                            return false;
                         }
+                    });
 
-                        // Remember we looked at this one, so we don't have to do it again
-                        this._knownComponents[component.container.id] = true;
+                    // This component is inside a full update
+                    if (fullUpdate != null) {
+                        // Remember that component is associated with full update
+                        if (this._fullUpdateToComponents[fullUpdate.id] == null) this._fullUpdateToComponents[fullUpdate.id] = [];
+                        this._fullUpdateToComponents[fullUpdate.id].push(containerAndConstructor.container.id);
+                        // Remember factory for this component
+                        this._componentsXblClass[containerAndConstructor.container.id] = containerAndConstructor.constructor;
                     }
+
+                    // Remember we looked at this one, so we don't have to do it again
+                    this._knownComponents[containerAndConstructor.container.id] = true;
                 }
             },
 
@@ -2304,10 +2301,11 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 if (! this[privateInitCalledSymbol] && superclass.prototype.init) {
                     this[privateInitCalledSymbol] = true;
                     superclass.prototype.init.call(this);
-                    ORBEON.xforms.XBL.componentInitialized.fire({
-                        instance: this,
-                        constructor: ComponentSubclass
-                    });
+                    if (! ORBEON.xforms.XBL.isJavaScriptLifecycle(this.container))
+                        ORBEON.xforms.XBL.componentInitialized.fire({
+                            container: this.container,
+                            constructor: ComponentSubclass
+                        });
                 }
             });
             ComponentSubclass.prototype.destroy = (function() {

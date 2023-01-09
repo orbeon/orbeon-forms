@@ -2359,6 +2359,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                                 "instanceForControl: instance found in data but for different container: `" +
                                 instance.container.id + "` and `" + containerElem.id + "`"
                             );
+                            // Q: In this case, should we call `destroy()` on the class?
                         }
 
                         // Instantiate and initialize

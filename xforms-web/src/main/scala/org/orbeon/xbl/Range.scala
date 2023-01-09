@@ -15,7 +15,7 @@ object Range {
 
   XBL.declareCompanion("xf|range", js.constructorOf[RangeCompanion])
 
-  private class RangeCompanion extends XBLCompanion {
+  private class RangeCompanion(containerElem: html.Element) extends XBLCompanion {
 
     companion =>
 

@@ -19,7 +19,7 @@ object DropTrigger {
 
   XBL.declareCompanion("fr|drop-trigger", js.constructorOf[DropTriggerCompanion])
 
-  private class DropTriggerCompanion extends XBLCompanion {
+  private class DropTriggerCompanion(containerElem: html.Element) extends XBLCompanion {
 
     override def init(): Unit = {
 

@@ -17,6 +17,7 @@ import org.orbeon.facades.Ladda
 import org.orbeon.jquery._
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient}
+import org.scalajs.dom.html
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
 import scala.scalajs.js
@@ -37,7 +38,7 @@ object LaddaButton {
 
   XBL.declareCompanion(s"fr|$ComponentName", js.constructorOf[LaddaButtonCompanion])
 
-  private class LaddaButtonCompanion extends XBLCompanion {
+  private class LaddaButtonCompanion(containerElem: html.Element) extends XBLCompanion {
 
     var state: State = State.Begin
     var ladda: Option[Ladda] = None

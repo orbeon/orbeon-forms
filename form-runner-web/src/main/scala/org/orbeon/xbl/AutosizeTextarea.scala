@@ -25,7 +25,7 @@ object AutosizeTextarea {
 
   XBL.declareCompanion("fr|autosize-textarea", js.constructorOf[AutosizeTextareaCompanion])
 
-  private class AutosizeTextareaCompanion extends XBLCompanion {
+  private class AutosizeTextareaCompanion(containerElem: html.Element) extends XBLCompanion {
 
     private def textarea: html.TextArea =
       $(containerElem).find("textarea")(0).asInstanceOf[html.TextArea]

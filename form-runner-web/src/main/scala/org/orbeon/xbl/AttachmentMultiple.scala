@@ -33,7 +33,7 @@ object AttachmentMultiple {
   XBL.declareCompanion("fr|attachment",          js.constructorOf[AttachmentCompanion])
   XBL.declareCompanion("fr|attachment-multiple", js.constructorOf[AttachmentCompanion])
 
-  private class AttachmentCompanion extends XBLCompanion {
+  private class AttachmentCompanion(containerElem: html.Element) extends XBLCompanion {
 
     companion =>
 

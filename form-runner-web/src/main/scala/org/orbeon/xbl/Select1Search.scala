@@ -32,7 +32,7 @@ object Select1Search {
   XBL.declareCompanion(name = "fr|databound-select1-search", js.constructorOf[Select1SearchCompanion])
 }
 
-private class Select1SearchCompanion extends XBLCompanion {
+private class Select1SearchCompanion(containerElem: html.Element) extends XBLCompanion {
 
   private val DataPlaceholder              = "data-placeholder"
   private val DataServicePerformsSearch    = "data-service-performs-search"

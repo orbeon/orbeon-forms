@@ -17,7 +17,7 @@ import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.Constants.DUMMY_IMAGE_URI
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{$, AjaxClient, AjaxEvent}
-import org.scalajs.dom.document
+import org.scalajs.dom.{document, html}
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
@@ -28,7 +28,7 @@ object WPaint {
 
   XBL.declareCompanion("fr|wpaint", js.constructorOf[WPaintCompanion])
 
-  private class WPaintCompanion extends XBLCompanion {
+  private class WPaintCompanion(containerElem: html.Element) extends XBLCompanion {
 
     def annotationEl : JQuery = $(containerElem).find(".fr-wpaint-annotation img")
     def imageEl      : JQuery = $(containerElem).find(".fr-wpaint-image img")

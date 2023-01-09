@@ -38,7 +38,7 @@ object Number {
 
   val ListenerSuffix = ".number"
 
-  private class NumberCompanion extends XBLCompanionWithState {
+  private class NumberCompanion(containerElem: html.Element) extends XBLCompanionWithState(containerElem) {
 
     companion =>
 

@@ -24,6 +24,7 @@ import org.orbeon.xforms.Constants.XFormsIosClass
 import org.orbeon.xforms.facade.XBL
 import org.orbeon.xforms._
 import org.scalajs.dom
+import org.scalajs.dom.html
 import org.scalajs.jquery.JQuery
 
 import scala.scalajs.js
@@ -35,7 +36,7 @@ object Date {
   XBL.declareCompanion("fr|date", js.constructorOf[DateCompanion])
 }
 
-private class DateCompanion extends XBLCompanionWithState {
+private class DateCompanion(containerElem: html.Element) extends XBLCompanionWithState(containerElem) {
 
   companion =>
 

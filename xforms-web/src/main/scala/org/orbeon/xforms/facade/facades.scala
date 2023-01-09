@@ -72,9 +72,7 @@ class XBLCompanion extends js.Object {
   def xformsFocus()                           : Unit                                         = ()
 
   // Helpers
-
-  def containerElem: html.Element = this.asInstanceOf[js.Dynamic].container.asInstanceOf[html.Element]
-
+  private def containerElem: html.Element = this.asInstanceOf[js.Dynamic].container.asInstanceOf[html.Element]
   def isMarkedReadonly: Boolean = containerElem.classList.contains("xforms-readonly")
 }
 

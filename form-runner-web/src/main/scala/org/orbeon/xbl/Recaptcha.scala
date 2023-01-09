@@ -4,7 +4,7 @@ import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{DocumentAPI, Page}
 import org.scalajs.dom
 import org.scalajs.dom.raw.HTMLScriptElement
-import org.scalajs.dom.window
+import org.scalajs.dom.{html, window}
 
 import scala.scalajs.js
 
@@ -16,7 +16,7 @@ object Recaptcha {
 
   XBL.declareCompanion(s"fr|$ComponentName", js.constructorOf[RecaptchaCompanion])
 
-  private class RecaptchaCompanion extends XBLCompanion {
+  private class RecaptchaCompanion(containerElem: html.Element) extends XBLCompanion {
 
     var rendered: Boolean = false
 

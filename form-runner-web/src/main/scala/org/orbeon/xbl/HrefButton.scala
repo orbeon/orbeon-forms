@@ -15,6 +15,7 @@ package org.orbeon.xbl
 
 import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
+import org.scalajs.dom.html
 
 import scala.scalajs.js
 
@@ -23,7 +24,7 @@ object HrefButton {
 
   XBL.declareCompanion("fr|href-button", js.constructorOf[HrefButton])
 
-  private class HrefButton extends XBLCompanion {
+  private class HrefButton(containerElem: html.Element) extends XBLCompanion {
 
     override def init(): Unit = {
       $(containerElem).find("button").on("click.orbeon.href-button", onClick _)

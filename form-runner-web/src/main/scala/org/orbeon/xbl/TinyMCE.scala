@@ -17,6 +17,7 @@ import org.orbeon.facades.TinyMce._
 import org.orbeon.xforms.facade.{Events, XBL, XBLCompanion}
 import org.orbeon.xforms.{$, DocumentAPI, Page}
 import org.scalajs.dom
+import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
@@ -32,7 +33,7 @@ object TinyMCE {
 
   XBL.declareCompanion("fr|tinymce", js.constructorOf[TinyMCECompanion])
 
-  private class TinyMCECompanion extends XBLCompanion {
+  private class TinyMCECompanion(containerElem: html.Element) extends XBLCompanion {
 
     var tinyMceObjectOpt  : Option[TinyMceEditor] = None
     var tinyMceInitialized: Boolean               = false

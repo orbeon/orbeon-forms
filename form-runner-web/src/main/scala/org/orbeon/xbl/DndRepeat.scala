@@ -41,7 +41,7 @@ object DndRepeat {
 
   XBL.declareCompanion("fr|dnd-repeat", js.constructorOf[DndRepeatCompanion])
 
-  private class DndRepeatCompanion extends XBLCompanion {
+  private class DndRepeatCompanion(containerElem: html.Element) extends XBLCompanion {
 
     case class DragState(
       currentDragStartPrev     : html.Element,

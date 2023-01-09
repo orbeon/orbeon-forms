@@ -38,7 +38,7 @@ object Tabbable {
 
   XBL.declareCompanion("fr|tabbable", js.constructorOf[TabbableCompanion])
 
-  private class TabbableCompanion extends XBLCompanion {
+  private class TabbableCompanion(containerElem: html.Element) extends XBLCompanion {
 
     case class DragState(
       currentDragStartPrev     : Element,

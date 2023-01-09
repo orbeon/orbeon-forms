@@ -18,6 +18,7 @@ import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.xforms.DocumentAPI
 import org.orbeon.xforms.facade.XBLCompanion
+import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryPromise
 
 import scala.scalajs.js
@@ -28,7 +29,7 @@ object XBLCompanionWithState {
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.XBLCompanionWithState")
 }
 
-abstract class XBLCompanionWithState extends XBLCompanion {
+abstract class XBLCompanionWithState(containerElem: html.Element) extends XBLCompanion {
 
   import XBLCompanionWithState._
   import io.circe.syntax._

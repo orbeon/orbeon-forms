@@ -264,9 +264,11 @@ body.orbeon {
         input[type="radio"],
         input[type="checkbox"] {
             margin-top: 3px;    // override Bootstrap
-            &[readonly] {
-              // Styling similar to disabled, not done by browsers out-of-the-box
-              filter: grayscale(1) opacity(0.5);
+            &[disabled] {
+                // BS5 style for disabled
+                pointer-events: none;
+                filter: none;
+                opacity: .5;
             }
         }
     }

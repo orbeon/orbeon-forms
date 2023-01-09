@@ -987,6 +987,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         },
 
         setDisabledOnFormElement: function (element, disabled) {
+            // Q: Could use `element.disabled = disabled`?
             if (disabled) {
                 element.setAttribute("disabled", "disabled");
             } else {
@@ -994,8 +995,9 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        setReadonlyOnFormElement: function (element, disabled) {
-            if (disabled) {
+        setReadonlyOnFormElement: function (element, readonly) {
+            // Q: Could use `element.readonly = readonly`?
+            if (readonly) {
                 element.setAttribute("readonly", "readonly");
             } else {
                 element.removeAttribute("readonly");
@@ -1090,13 +1092,14 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 else YAHOO.util.Dom.removeClass(control, "xforms-readonly");
 
                 // Update disabled on input fields
+                // See:
+                // - https://github.com/orbeon/orbeon-forms/issues/5595
+                // - https://github.com/orbeon/orbeon-forms/issues/5427
                 var inputs = control.getElementsByTagName("input");
                 for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
                     var input = inputs[inputIndex];
-                    ORBEON.xforms.Controls.setReadonlyOnFormElement(input, isReadonly);
+                    ORBEON.xforms.Controls.setDisabledOnFormElement(input, isReadonly);
                 }
-                if (control.tagName.toLowerCase() == "input")
-                    ORBEON.xforms.Controls.setDisabledOnFormElement(control, isReadonly);
             } else if (jControl.is('.xforms-select-appearance-compact, .xforms-select1-appearance-minimal, .xforms-select1-appearance-compact, .xforms-input-appearance-minimal, .xforms-input-appearance-compact')) {
                 // Lists
                 var select = control.getElementsByTagName("select")[0];
@@ -1945,14 +1948,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             if (event.button != 0 && event.button != 1) return;
             var originalTarget = YAHOO.util.Event.getTarget(event);
             var controlTarget = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
-
-            // Prevent readonly checkboxes or radios from changing state on click
-            var readonlyWithCheckboxesOrRadio =
-                ":is(.xforms-input, .xforms-select, .xforms-select1).xforms-readonly";
-            if (controlTarget != null && controlTarget.matches(readonlyWithCheckboxesOrRadio)) {
-                event.preventDefault();
-                return;
-            }
 
             // Listeners might be interested in click events even if they don't target an XForms control
             ORBEON.xforms.Events.clickEvent.fire({target: originalTarget, control: controlTarget});

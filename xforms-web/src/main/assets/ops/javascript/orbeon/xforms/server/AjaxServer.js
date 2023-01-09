@@ -149,11 +149,13 @@
                                     // NOTE: jQuery went back and forth on using `attr()` vs. `prop()` but this seems to work.
                                     var controlEl = document.getElementById(controlId);
                                     var isReadonly = ORBEON.xforms.Controls.isReadonly(controlEl);
+
                                     var inputCheckboxOrRadio = templateClone.getElementsByTagName("input")[0];
-                                    if (isReadonly)
-                                        $(inputCheckboxOrRadio).attr('disabled', 'disabled');
-                                    else
-                                        $(inputCheckboxOrRadio).removeAttr('disabled');
+
+                                    // See:
+                                    // - https://github.com/orbeon/orbeon-forms/issues/5595
+                                    // - https://github.com/orbeon/orbeon-forms/issues/5427
+                                    ORBEON.xforms.Controls.setDisabledOnFormElement(inputCheckboxOrRadio, isReadonly);
 
                                     // Restore checked state after copy
                                     if (valueToChecked[itemElement.value] == true) {

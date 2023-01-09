@@ -206,8 +206,12 @@ object XFormsSelect1Handler {
           if (isFirst)
             XFormsBaseHandler.forwardAccessibilityAttributes(attributes, atts)
         }
+
+        // See:
+        // - https://github.com/orbeon/orbeon-forms/issues/5595
+        // - https://github.com/orbeon/orbeon-forms/issues/5427
         if (baseHandler.isXFormsReadonlyButNotStaticReadonly(control))
-          outputReadonlyAttribute(atts)
+          outputDisabledAttribute(atts)
 
         element(localName = elementName, prefix = xhtmlPrefix, uri = XHTML, atts = atts)
       }

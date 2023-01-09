@@ -496,6 +496,7 @@
                                     <event type="DOMFocusIn" target="my-input-311"/>
                                     <separator/>
                                     <separator/>
+                                    <separator/>
                                     <event type="DOMFocusOut" target="my-input-311"/>
                                     <event type="DOMFocusOut" target="my-group-31"/>
                                     <event type="DOMFocusOut" target="my-group-3"/>
@@ -503,7 +504,9 @@
                                     <event type="DOMFocusIn" target="my-group-21"/>
                                     <event type="DOMFocusIn" target="my-input-211"/>
                                     <separator/>
-                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-211"/>
+                                    <event type="DOMFocusOut" target="my-group-21"/>
+                                    <event type="DOMFocusOut" target="my-group-2"/>
                                 </events>
                             </instance>
                         </instances>
@@ -516,12 +519,11 @@
                         <xxf:control id="my-input-111" visited="true"/>
                         <xxf:control id="my-group-2" visited="true"/>
                         <xxf:control id="my-group-21" visited="true"/>
-                        <xxf:control id="my-input-211" readonly="true"/>
+                        <xxf:control id="my-input-211" visited="true" readonly="true"/>
                         <xxf:control id="my-group-3" visited="true"/>
                         <xxf:control id="my-group-31" visited="true"/>
                         <xxf:control id="my-input-311" visited="true" readonly="true"/>
                     </xxf:control-values>
-                    <xxf:focus control-id="my-input-211"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

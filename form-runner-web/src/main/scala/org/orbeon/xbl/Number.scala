@@ -62,65 +62,70 @@ object Number {
       // Switch the input type after cleaning up the value for edition
       $(visibleInputElem).on(s"${DomEventNames.TouchStart}$ListenerSuffix ${DomEventNames.FocusIn}$ListenerSuffix", {
         (bound: html.Element, e: JQueryEventObject) => {
+          if (! isMarkedReadonly) {
 
-          logger.debug(s"reacting to event ${e.`type`}")
+            logger.debug(s"reacting to event ${e.`type`}")
 
-          // Don't set value if not needed, so not to unnecessarily disturb the cursor position
-          stateOpt foreach { state =>
-            if (readValue(visibleInputElem, state.decimalSeparator) != state.editValue) {
-              writeValue(visibleInputElem, state.decimalSeparator, state.editValue)
+            // Don't set value if not needed, so not to unnecessarily disturb the cursor position
+            stateOpt foreach { state =>
+              if (readValue(visibleInputElem, state.decimalSeparator) != state.editValue) {
+                writeValue(visibleInputElem, state.decimalSeparator, state.editValue)
+              }
             }
-          }
 
-          setInputTypeIfNeeded("number")
+            setInputTypeIfNeeded("number")
+          }
         }
       }: js.ThisFunction)
 
       // Restore input type, send the value to the server, and updates value after server response
       $(visibleInputElem).on(s"${DomEventNames.FocusOut}$ListenerSuffix", {
         (bound: html.Element, e: JQueryEventObject) => {
+          if (! isMarkedReadonly) {
+            logger.debug(s"reacting to event ${e.`type`}")
 
-          logger.debug(s"reacting to event ${e.`type`}")
+            updateStateAndSendValueToServer()
+            setInputTypeIfNeeded("text")
 
-          updateStateAndSendValueToServer()
-          setInputTypeIfNeeded("text")
-
-          // Always update visible value with XForms value:
-          //
-          // - relying just value change event from server is not enough
-          // - value change is not dispatched if the server value hasn't changed
-          // - if the visible changed, but XForms hasn't, we still need to show XForms value
-          // - see: https://github.com/orbeon/orbeon-forms/issues/1026
-          //
-          // So either:
-          //
-          // - the Ajax response called `updateWithServerValues()` and then `updateVisibleValue()`
-          // - or it didn't, and we force `updateVisibleValue()` after the response is processed
-          //
-          // We also call `updateVisibleValue()` immediately in `updateStateAndSendValueToServer()` if the
-          // edit value hasn't changed.
-          //
-          val formId = $(containerElem).parents("form").attr("id").get
-          AjaxClient.allEventsProcessedF("number") foreach { _ =>
-            updateVisibleValue()
+            // Always update visible value with XForms value:
+            //
+            // - relying just value change event from server is not enough
+            // - value change is not dispatched if the server value hasn't changed
+            // - if the visible changed, but XForms hasn't, we still need to show XForms value
+            // - see: https://github.com/orbeon/orbeon-forms/issues/1026
+            //
+            // So either:
+            //
+            // - the Ajax response called `updateWithServerValues()` and then `updateVisibleValue()`
+            // - or it didn't, and we force `updateVisibleValue()` after the response is processed
+            //
+            // We also call `updateVisibleValue()` immediately in `updateStateAndSendValueToServer()` if the
+            // edit value hasn't changed.
+            //
+            val formId = $(containerElem).parents("form").attr("id").get
+            AjaxClient.allEventsProcessedF("number") foreach { _ =>
+              updateVisibleValue()
+            }
           }
         }
       }: js.ThisFunction)
 
       $(visibleInputElem).on(s"${DomEventNames.KeyPress}$ListenerSuffix", {
         (_: html.Element, e: JQueryEventObject) => {
+          if (! isMarkedReadonly) {
 
-          logger.debug(s"reacting to event ${e.`type`}")
+            logger.debug(s"reacting to event ${e.`type`}")
 
-          if (Set(10, 13)(e.which)) {
-            e.preventDefault()
-            updateStateAndSendValueToServer()
-            AjaxClient.fireEvent(
-              AjaxEvent(
-                eventName = DomEventNames.DOMActivate,
-                targetId  = containerElem.id
+            if (Set(10, 13)(e.which)) {
+              e.preventDefault()
+              updateStateAndSendValueToServer()
+              AjaxClient.fireEvent(
+                AjaxEvent(
+                  eventName = DomEventNames.DOMActivate,
+                  targetId  = containerElem.id
+                )
               )
-            )
+            }
           }
         }
       }: js.ThisFunction)

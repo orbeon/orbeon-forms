@@ -32,11 +32,10 @@ import scala.scalajs.js.timers
 object Number {
 
   private val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Number")
+  private val ListenerSuffix = ".number"
 
   XBL.declareCompanion("fr|number",   js.constructorOf[NumberCompanion])
   XBL.declareCompanion("fr|currency", js.constructorOf[NumberCompanion])
-
-  val ListenerSuffix = ".number"
 
   private class NumberCompanion(containerElem: html.Element) extends XBLCompanionWithState(containerElem) {
 
@@ -146,7 +145,7 @@ object Number {
       updateReadonly(readonly)
     }
 
-    def xformsUpdateState(previousStateOpt: Option[NumberExternalValue], newState: NumberExternalValue): Unit = {
+    def xformsUpdateState(previousStateOpt: Option[State], newState: State): Unit = {
 
       val NumberExternalValue(displayValue, editValue, decimalSeparator) = newState
 

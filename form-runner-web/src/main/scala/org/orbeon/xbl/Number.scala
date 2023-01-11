@@ -56,7 +56,7 @@ object Number {
 
       logger.debug("init")
 
-      val visibleInputElem = $(containerElem).find(".xbl-fr-number-visible-input")(0).asInstanceOf[html.Input]
+      val visibleInputElem = containerElem.querySelector(".xbl-fr-number-visible-input").asInstanceOf[html.Input]
       companion.visibleInputElemOpt = Some(visibleInputElem)
 
       // Switch the input type after cleaning up the value for edition

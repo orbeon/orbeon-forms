@@ -20,3 +20,8 @@ case class DateExternalValue(
   excludedDates : List[String],
   weekStart     : Option[Int]
 )
+
+case class TimeExternalValue(
+  isoOrUnrecognizedValue: String,
+  format                : String
+)

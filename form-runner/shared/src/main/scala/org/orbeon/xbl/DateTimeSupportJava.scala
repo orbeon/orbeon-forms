@@ -47,3 +47,24 @@ object DateSupportJava {
   def deserializeExternalValueJava(externalValue: String): String =
     parser.decode[DateExternalValue](externalValue).fold(Failure.apply, Success.apply) map (_.value) getOrElse ""
 }
+
+object TimeSupportJava {
+
+  import io.circe.generic.auto._
+  import io.circe.parser
+  import io.circe.syntax._
+
+  //@XPathFunction
+  def serializeExternalValueJava(
+    binding   : om.Item,
+    format    : String
+  ): String =
+    TimeExternalValue(
+      isoOrUnrecognizedValue = binding.getStringValue,
+      format                 = format
+    ).asJson.noSpaces
+
+  //@XPathFunction
+  def deserializeExternalValueJava(externalValue: String): String =
+    parser.decode[TimeExternalValue](externalValue).fold(Failure.apply, Success.apply) map (_.isoOrUnrecognizedValue) getOrElse ""
+}

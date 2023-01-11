@@ -13,6 +13,7 @@
   */
 package org.orbeon.date
 
+import cats.syntax.option._
 import org.orbeon.date.JSDateUtils._
 import org.scalatest.funspec.AnyFunSpec
 
@@ -66,5 +67,86 @@ class JSDateUtilsTest extends AnyFunSpec {
 
       assert(parseIsoDateUsingLocalTimezone(dateToIsoStringUsingLocalTimezone(current)) map (_.getTime) contains current.getTime)
     }
+  }
+
+  describe("Magic time parsing") {
+
+    val StringsToIsoDates = List(
+      "21:22:23"      -> IsoTime(21, 22, 23.some).some,
+      "12:34:56 p.m." -> IsoTime(12, 34, 56.some).some,
+      "12:34 p.m."    -> IsoTime(12, 34, None).some,
+      "12 p.m."       -> IsoTime(12, 0,  None).some, // by convention
+      "12:34:56 a.m." -> IsoTime(0,  34, 56.some).some,
+      "12:34 a.m."    -> IsoTime(0,  34, None).some,
+      "12 a.m."       -> IsoTime(0,  0,  None).some, // by convention
+      "12:34:56p.m."  -> IsoTime(12, 34, 56.some).some,
+      "12:34p.m."     -> IsoTime(12, 34, None).some,
+      "12p.m."        -> IsoTime(12, 0,  None).some,
+      "12:34:56a.m."  -> IsoTime(0,  34, 56.some).some,
+      "12:34a.m."     -> IsoTime(0,  34, None).some,
+      "12a.m."        -> IsoTime(0,  0,  None).some,
+      "12:34:56pm"    -> IsoTime(12, 34, 56.some).some,
+      "12:34pm"       -> IsoTime(12, 34, None).some,
+      "12pm"          -> IsoTime(12, 0,  None).some,
+      "12:34:56am"    -> IsoTime(0,  34, 56.some).some,
+      "12:34am"       -> IsoTime(0,  34, None).some,
+      "12am"          -> IsoTime(0,  0,  None).some,
+      "0"             -> IsoTime(0,  0,  None).some,
+//      "24"            -> IsoTime(0,  0,  None).some,
+      // Reject invalid strings, including out of range to avoid silent autocorrection
+      "foo"           -> None,
+      "25:22:23"      -> None,
+      "21:60:23"      -> None,
+      "21:22:60"      -> None,
+    )
+
+    for ((s, expected) <- StringsToIsoDates)
+      it(s"must pass for `$s`") {
+        assert(findMagicTimeAsIsoTime(s) == expected)
+      }
+  }
+
+  describe("Time formatting") {
+
+    val FormatWithSecondsAndLongAmPm  = "[h]:[m]:[s] [P]"
+    val FormatWithSecondsAndShortAmPm = "[h]:[m]:[s] [P,2-2]"
+    val FormatWithSeconds24Hour       = "[H]:[m]:[s]"
+
+    val FormatNoSecondsAndLongAmPm    = "[h]:[m] [P]"
+    val FormatNoSecondsAndShortAmPm   = "[h]:[m] [P,2-2]"
+    val FormatNoSeconds24Hour         = "[H]:[m]"
+
+    val StringsToIsoDates = List(
+      (IsoTime(0,  22, 23.some), FormatWithSecondsAndLongAmPm)  -> "12:22:23 a.m.",
+      (IsoTime(0,  22, 23.some), FormatWithSecondsAndShortAmPm) -> "12:22:23 am",
+      (IsoTime(0,  22, 23.some), FormatWithSeconds24Hour)       -> "0:22:23",
+      (IsoTime(3,  22, 23.some), FormatWithSecondsAndLongAmPm)  -> "3:22:23 a.m.",
+      (IsoTime(3,  22, 23.some), FormatWithSecondsAndShortAmPm) -> "3:22:23 am",
+      (IsoTime(3,  22, 23.some), FormatWithSeconds24Hour)       -> "3:22:23",
+      (IsoTime(12, 22, 23.some), FormatWithSecondsAndLongAmPm)  -> "12:22:23 p.m.",
+      (IsoTime(12, 22, 23.some), FormatWithSecondsAndShortAmPm) -> "12:22:23 pm",
+      (IsoTime(12, 22, 23.some), FormatWithSeconds24Hour)       -> "12:22:23",
+      (IsoTime(21, 22, 23.some), FormatWithSecondsAndLongAmPm)  -> "9:22:23 p.m.",
+      (IsoTime(21, 22, 23.some), FormatWithSecondsAndShortAmPm) -> "9:22:23 pm",
+      (IsoTime(21, 22, 23.some), FormatWithSeconds24Hour)       -> "21:22:23",
+
+      (IsoTime(0,  22, 23.some), FormatNoSecondsAndLongAmPm)    -> "12:22 a.m.",
+      (IsoTime(0,  22, 23.some), FormatNoSecondsAndShortAmPm)   -> "12:22 am",
+      (IsoTime(0,  22, 23.some), FormatNoSeconds24Hour)         -> "0:22",
+      (IsoTime(3,  22, 23.some), FormatNoSecondsAndLongAmPm)    -> "3:22 a.m.",
+      (IsoTime(3,  22, 23.some), FormatNoSecondsAndShortAmPm)   -> "3:22 am",
+      (IsoTime(3,  22, 23.some), FormatNoSeconds24Hour)         -> "3:22",
+      (IsoTime(12, 22, 23.some), FormatNoSecondsAndLongAmPm)    -> "12:22 p.m.",
+      (IsoTime(12, 22, 23.some), FormatNoSecondsAndShortAmPm)   -> "12:22 pm",
+      (IsoTime(12, 22, 23.some), FormatNoSeconds24Hour)         -> "12:22",
+      (IsoTime(21, 22, 23.some), FormatNoSecondsAndLongAmPm)    -> "9:22 p.m.",
+      (IsoTime(21, 22, 23.some), FormatNoSecondsAndShortAmPm)   -> "9:22 pm",
+      (IsoTime(21, 22, 23.some), FormatNoSeconds24Hour)         -> "21:22",
+    )
+
+    for (((s, format), expected) <- StringsToIsoDates)
+      it(s"must pass for `${s.toIsoString}` with format `$format`") {
+        assert(formatTime(s, format) == expected)
+      }
   }
 }

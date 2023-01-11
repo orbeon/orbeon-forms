@@ -71,6 +71,7 @@ object XFormsApp extends App {
     // Register XBL components
     org.orbeon.xforms.Upload
     org.orbeon.xbl.Date
+    org.orbeon.xbl.Time
     org.orbeon.xbl.Range
 
     org.orbeon.xforms.ItemHint

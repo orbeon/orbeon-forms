@@ -11,19 +11,30 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
-         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:xf="http://www.w3.org/2002/xforms"
-         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-         xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+<xbl:xbl
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:TimeSupport="java:org.orbeon.xbl.TimeSupportJava">
 
     <xbl:binding
         id="fr-time"
         element="fr|time, xf|input:xxf-type('xs:time')"
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
         xxbl:label-for="fr-time-input"
-        xxbl:mode="lhha binding value">
+
+        xxbl:serialize-external-value="
+            TimeSupport:serializeExternalValueJava(
+                xxf:binding('fr-time'),
+                property('xxf:format.input.time')
+            )"
+
+        xxbl:deserialize-external-value="TimeSupport:deserializeExternalValueJava(.)"
+    >
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Time</display-name>
@@ -162,9 +173,7 @@
 
             <xf:group ref="$binding[not($view)]">
                 <xh:div class="input-append fr-field-width-{$field-width}">
-                    <xf:input ref="." id="fr-time-input">
-                        <xf:hint value="$placeholder" appearance="minimal"/>
-                    </xf:input>
+                    <xh:input xh:type="text" placeholder="{$placeholder}" id="fr-time-input" xxf:control="true" role="textbox"/>
                     <xh:span class="add-on">
                         <xh:i class="fa fa-fw fa-clock-o"/>
                     </xh:span>

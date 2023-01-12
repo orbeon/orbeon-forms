@@ -184,12 +184,9 @@ object Time {
 //              if (hasFocus) state.editValue
 //              else          state.displayValue
 
-          val formId = $(containerElem).parents("form").attr("id").get
-          val timeFormatInput = Page.getForm(formId).configuration.timeFormatInput
-
           val newValue =
             findMagicTimeAsIsoTime(state.isoOrUnrecognizedValue)
-              .map(formatTime(_, timeFormatInput))
+              .map(formatTime(_, state.format))
               .getOrElse(state.isoOrUnrecognizedValue)
 
           writeValue(visibleInputElem, newValue)

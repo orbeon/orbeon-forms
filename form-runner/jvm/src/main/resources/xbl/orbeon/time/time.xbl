@@ -180,6 +180,16 @@
                 </xh:div>
             </xf:group>
 
+            <!--
+                This should use the same format configured above, currently `property('xxf:format.input.time')`. Use
+                `xxf:format="TimeSupport:formatTime($binding, property('xxf:format.input.time'))"`. Then change to
+                using for example `fr:component-param-value('output-format')`.
+
+                See:
+
+                - https://github.com/orbeon/orbeon-forms/issues/5490
+                - https://github.com/orbeon/orbeon-forms/issues/2991
+            -->
             <xf:input ref="$binding[$view]"/>
 
         </xbl:template>

@@ -81,6 +81,6 @@ case class ConfigurationProperties(
   useAria                         : Boolean,
   resourcesVersioned              : Boolean,
   resourcesVersionNumber          : Option[String],
-  dateFormatInput                 : String,
-  timeFormatInput                 : String,
+  dateFormatInput                 : String, // set but not used anymore
+  timeFormatInput                 : String, // set but not used anymore
 )

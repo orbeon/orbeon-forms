@@ -20,6 +20,7 @@ import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
 @JSExportAll
 object Globals {
 
+  // TODO: Most of these should be removed
   var maskFocusEvents             : Boolean                   = _ // avoid catching focus event when we do call setfocus upon server request
   var maskDialogCloseEvents       : Boolean                   = _ // avoid catching a dialog close event received from the server, so we don't sent it back to the server
   var currentFocusControlId       : String                    = _ // id of the control that got the focus last

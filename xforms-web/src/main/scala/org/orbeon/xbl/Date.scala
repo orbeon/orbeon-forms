@@ -49,8 +49,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
   val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
   val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
 
-  def inputJQueryEl : JQuery         = $(containerElem).find("input").first()
-  def inputHtmlEl   : dom.html.Input = inputJQueryEl(0).asInstanceOf[dom.html.Input]
+  def inputHtmlEl   : dom.html.Input = containerElem.querySelector("input").asInstanceOf[dom.html.Input]
   def iOS           : Boolean        = dom.document.body.classList.contains(XFormsIosClass)
   var datePicker    : DatePicker     = _
 
@@ -65,7 +64,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
     if (iOS) {
 
       // On iOS, use native date picker
-      inputJQueryEl.attr("type", "date")
+      inputHtmlEl.`type` = "date"
       EventSupport.addListener(inputHtmlEl, DomEventNames.Change, (_: dom.raw.Event) => onDateSelectedUpdateStateAndSendValueToServer())
 
       // Also set `disabled` on iOS (see #5376)
@@ -99,7 +98,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
 
     if (iOS) {
       if (! (previousStateOpt map (_.value) contains newValue))
-        inputJQueryEl.prop("value", newValue)
+        inputHtmlEl.value = newValue
     } else {
       if (! previousStateOpt.contains(newState)) {
         // Don't call `destroy()` directly because that causes the re-initialization of the companion in `xforms.js`!
@@ -144,19 +143,19 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
       opts
     }
 
-    datePicker = inputJQueryEl.parent().datepicker(options)
+    datePicker = $(inputHtmlEl).parent().datepicker(options)
 
     // Register listeners
 
     // DOM listeners
     EventSupport.addListener(containerElem.querySelector(".add-on, .input-group .input-group-addon"), DomEventNames.KeyDown,  onIconKeypress)
-    EventSupport.addListener(inputJQueryEl(0),                                                        DomEventNames.KeyPress, onInputKeypress)
-    EventSupport.addListener(inputJQueryEl(0),                                                        DomEventNames.Change,   onInputChangeUpdateDatePicker)
+    EventSupport.addListener(inputHtmlEl,                                                             DomEventNames.KeyPress, onInputKeypress)
+    EventSupport.addListener(inputHtmlEl,                                                             DomEventNames.Change,   onInputChangeUpdateDatePicker)
 
     // Date picker listeners
     enableDatePickerChangeListener()
-    datePicker.onHide(              ()                     => { inputJQueryEl.focus() }) // Set focus back on field when done with the picker
-    datePicker.onShow(              ()                     => { inputJQueryEl.focus() }) // For date picker to be usable with the keyboard
+    datePicker.onHide(() => { inputHtmlEl.focus() }) // Set focus back on field when done with the picker
+    datePicker.onShow(() => { inputHtmlEl.focus() }) // For date picker to be usable with the keyboard
 
     // Global language listener
     Language.onLangChange(
@@ -193,7 +192,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
               // I think we need a better date picker.
               disableDatePickerChangeListener()
               datePicker.clearDates()
-              inputJQueryEl.prop("value", newValue)
+              inputHtmlEl.value = newValue
               enableDatePickerChangeListener()
           }
         case None           =>
@@ -206,7 +205,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
     updateReadonly(readonly)
 
   override def xformsFocus(): Unit =
-    inputJQueryEl.focus()
+    inputHtmlEl.focus()
 
   private object EventSupport extends EventListenerSupport
 
@@ -217,7 +216,7 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
     datePicker.offChangeDate()
 
   private def getInputFieldValue: String =
-    inputJQueryEl.prop("value").asInstanceOf[String]
+    inputHtmlEl.value
 
   private def updateReadonly(readonly: Boolean): Unit = {
     inputHtmlEl.readOnly = readonly

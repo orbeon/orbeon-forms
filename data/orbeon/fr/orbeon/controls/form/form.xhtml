@@ -1,4 +1,17 @@
-<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:math="http://www.w3.org/2005/xpath-functions/math" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:saxon="http://saxon.sf.net/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xf="http://www.w3.org/2002/xforms">
+<xh:html xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:xf="http://www.w3.org/2002/xforms">
     <xh:head>
         <xf:model xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="fr-form-model">
             <xf:instance id="fr-form-instance" xxf:index="id">
@@ -9,10 +22,11 @@
                             <input-counter>This must not be "too long"!</input-counter>
                             <textarea>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
 
-The creation, performance, significance, and even the definition of music vary according to culture and social context. Music ranges from strictly organized compositions (and their recreation in performance), through improvisational music to aleatoric forms. Music can be divided into genres and subgenres, although the dividing lines and relationships between music genres are often subtle, sometimes open to individual interpretation, and occasionally controversial. Within "the arts", music may be classified as a performing art, a fine art, and auditory art.
-
 From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <textarea-counter>Let's write a Tweet. It must fit in 280 characters.</textarea-counter>
+                            <textarea-resize>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
+
+From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <output>Great love and great achievements involve great risk.</output>
                             <secret>42</secret>
                         </grid-1>
@@ -35,10 +49,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <date-time-controls>
                         <grid-4>
                             <date>2009-10-16</date>
-                            <time>17:47:57</time>
-                            <datetime>2009-10-16T17:48:03</datetime>
                             <dropdown-date>2009-10-16</dropdown-date>
                             <fields-date>2009-10-16</fields-date>
+                            <time>17:47:57</time>
+                            <datetime>2009-10-16T17:48:03</datetime>
                         </grid-4>
                     </date-time-controls>
                     <selection-controls>
@@ -69,11 +83,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     </attachment-controls>
                     <buttons>
                         <grid-8>
-                            <standard-button></standard-button>
-                            <link-button></link-button>
+                            <standard-button/>
+                            <link-button/>
                         </grid-8>
                     </buttons>
-                    <us-address><grid-1>
+                    <us-address>
+                        <grid-1>
                             <street-number>1600</street-number>
                             <street-name>Pennsylvania Ave NW</street-name>
                             <apt-suite/>
@@ -81,76 +96,92 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <state>DC</state>
                             <zip>20500</zip>
                         </grid-1>
-
                     </us-address>
                 </form>
             </xf:instance>
             <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
                 <xf:bind id="text-controls-bind" ref="text-controls" name="text-controls">
                     <xf:bind id="grid-2-bind" ref="grid-2" name="grid-2">
-                        <xf:bind ref="htmlarea" id="htmlarea-bind" name="htmlarea"></xf:bind>
+                        <xf:bind ref="htmlarea" id="htmlarea-bind" name="htmlarea"/>
                     </xf:bind>
                     <xf:bind id="grid-1-bind" ref="grid-1" name="grid-1">
-                        <xf:bind id="input-bind" ref="input" name="input" xxf:whitespace="trim"></xf:bind>
+                        <xf:bind id="input-bind" ref="input" name="input" xxf:whitespace="trim"/>
                         <xf:bind id="input-counter-bind" ref="input-counter" name="input-counter">
-                            <xf:constraint id="validation-49-validation" value="xxf:max-length(30)"></xf:constraint>
+                            <xf:constraint id="validation-49-validation" value="xxf:max-length(30)"/>
                         </xf:bind>
-                        <xf:bind id="textarea-bind" ref="textarea" name="textarea" xxf:whitespace="trim"></xf:bind>
+                        <xf:bind id="textarea-bind" ref="textarea" name="textarea" xxf:whitespace="trim"/>
                         <xf:bind id="textarea-counter-bind" ref="textarea-counter" name="textarea-counter">
-                            <xf:constraint id="constraint-49-constraint" value="xxf:max-length(280)"></xf:constraint>
+                            <xf:constraint id="constraint-49-constraint" value="xxf:max-length(280)"/>
                         </xf:bind>
-                        <xf:bind ref="output" id="output-bind" name="output"></xf:bind>
-                        <xf:bind id="secret-bind" ref="secret" name="secret" type="xs:string" required="true()" constraint=". = '42'"></xf:bind>
+                        <xf:bind id="secret-bind" ref="secret" name="secret" type="xs:string" required="true()"
+                                 constraint=". = '42'"/>
+                        <xf:bind id="textarea-resize-bind" ref="textarea-resize" name="textarea-resize"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind ref="output" id="output-bind" name="output"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="date-time-controls-bind" ref="date-time-controls" name="date-time-controls">
                     <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
-                        <xf:bind id="date-bind" ref="date" type="xf:date" name="date"></xf:bind>
-                        <xf:bind id="time-bind" ref="time" type="xf:time" name="time"></xf:bind>
-                        <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"></xf:bind>
-                        <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date"></xf:bind>
-                        <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"></xf:bind>
+                        <xf:bind id="date-bind" ref="date" type="xf:date" name="date"/>
+                        <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date"/>
+                        <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"/>
+                        <xf:bind id="time-bind" ref="time" type="xf:time" name="time"/>
+                        <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
                     <xf:bind id="grid-5-bind" ref="grid-5" name="grid-5">
-                        <xf:bind id="dropdown-bind" ref="dropdown" name="dropdown"></xf:bind>
-                        <xf:bind id="checkboxes-bind" ref="checkboxes" name="checkboxes"></xf:bind>
-                        <xf:bind id="radio-buttons-bind" ref="radio-buttons" name="radio-buttons"></xf:bind>
-                        <xf:bind id="dropdown-with-search-bind" ref="dropdown-with-search" name="dropdown-with-search"></xf:bind>
-                        <xf:bind name="dynamic-dropdown" id="dynamic-dropdown-bind" ref="dynamic-dropdown"></xf:bind>
-                        <xf:bind name="dynamic-dropdown-with-search" id="dynamic-dropdown-with-search-bind" ref="dynamic-dropdown-with-search"></xf:bind>
-                        <xf:bind id="dropdown-with-other-bind" ref="dropdown-with-other" name="dropdown-with-other"></xf:bind>
-                        <xf:bind id="radio-buttons-with-other-bind" ref="radio-buttons-with-other" name="radio-buttons-with-other" required="true()" xxf:whitespace="trim"></xf:bind>
-                        <xf:bind id="scrollable-checkboxes-bind" ref="scrollable-checkboxes" name="scrollable-checkboxes"></xf:bind>
-                        <xf:bind id="checkbox-input-bind" ref="checkbox-input" type="xf:boolean" name="checkbox-input"></xf:bind>
-                        <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"></xf:bind>
+                        <xf:bind id="dropdown-bind" ref="dropdown" name="dropdown"/>
+                        <xf:bind id="checkboxes-bind" ref="checkboxes" name="checkboxes"/>
+                        <xf:bind id="radio-buttons-bind" ref="radio-buttons" name="radio-buttons"/>
+                        <xf:bind id="dropdown-with-search-bind" ref="dropdown-with-search"
+                                 name="dropdown-with-search"/>
+                        <xf:bind name="dynamic-dropdown" id="dynamic-dropdown-bind" ref="dynamic-dropdown"/>
+                        <xf:bind name="dynamic-dropdown-with-search" id="dynamic-dropdown-with-search-bind"
+                                 ref="dynamic-dropdown-with-search"/>
+                        <xf:bind id="dropdown-with-other-bind" ref="dropdown-with-other"
+                                 name="dropdown-with-other"/>
+                        <xf:bind id="radio-buttons-with-other-bind" ref="radio-buttons-with-other"
+                                 name="radio-buttons-with-other"
+                                 required="true()"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind id="scrollable-checkboxes-bind" ref="scrollable-checkboxes"
+                                 name="scrollable-checkboxes"/>
+                        <xf:bind id="checkbox-input-bind" ref="checkbox-input" type="xf:boolean"
+                                 name="checkbox-input"/>
+                        <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="attachment-controls-bind" ref="attachment-controls" name="attachment-controls">
                     <xf:bind id="grid-7-bind" ref="grid-7" name="grid-7">
-                        <xf:bind ref="static-image" id="static-image-bind" type="xf:anyURI" name="static-image"></xf:bind>
-                        <xf:bind id="single-file-attachment-bind" ref="single-file-attachment" type="xf:anyURI" name="single-file-attachment"></xf:bind>
-                        <xf:bind id="multiple-file-attachment-bind" ref="multiple-file-attachment" type="xf:anyURI" name="multiple-file-attachment"></xf:bind>
-                            <xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment" type="xf:anyURI"></xf:bind>
+                        <xf:bind ref="static-image" id="static-image-bind" type="xf:anyURI" name="static-image"/>
+                        <xf:bind id="single-file-attachment-bind" ref="single-file-attachment" type="xf:anyURI"
+                                 name="single-file-attachment"/>
+                        <xf:bind id="multiple-file-attachment-bind" ref="multiple-file-attachment"
+                                 type="xf:anyURI"
+                                 name="multiple-file-attachment"/>
+                            <xf:bind id="image-attachment-bind" ref="image-attachment" name="image-attachment"
+                                 type="xf:anyURI"/>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="buttons-bind" ref="buttons" name="buttons" relevant="$fr-mode = ('new', 'edit', 'test')">
+                <xf:bind id="buttons-bind" ref="buttons" name="buttons"
+                         relevant="$fr-mode = ('new', 'edit', 'test')">
                     <xf:bind id="grid-8-bind" ref="grid-8" name="grid-8">
-                        <xf:bind id="standard-button-bind" ref="standard-button" name="standard-button"></xf:bind>
-                        <xf:bind id="link-button-bind" ref="link-button" name="link-button"></xf:bind>
+                        <xf:bind id="standard-button-bind" ref="standard-button" name="standard-button"/>
+                        <xf:bind id="link-button-bind" ref="link-button" name="link-button"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind name="typed-controls" id="typed-controls-bind" ref="typed-controls">
                     <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
-                        <xf:bind ref="email" id="email-bind" type="xf:email" name="email" xxf:whitespace="trim"></xf:bind>
-                        <xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')" name="us-phone"></xf:bind>
-                        <xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"></xf:bind>
-                        <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"></xf:bind>
-                        <xf:bind ref="us-state" id="us-state-bind" type="xf:string" name="us-state"></xf:bind>
+                        <xf:bind ref="email" id="email-bind" type="xf:email" name="email" xxf:whitespace="trim"/>
+                        <xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')"
+                                 name="us-phone"/>
+                        <xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"/>
+                        <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/>
+                        <xf:bind ref="us-state" id="us-state-bind" type="xf:string" name="us-state"/>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind name="us-address" id="us-address-bind" ref="us-address"></xf:bind>
+                <xf:bind name="us-address" id="us-address-bind" ref="us-address"/>
             </xf:bind>
             <xf:instance xxf:readonly="true" id="fr-form-metadata">
                 <metadata>
@@ -158,22 +189,23 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <form-name>controls</form-name>
                     <title xml:lang="en">All Form Controls</title>
                     <description xml:lang="en">This form shows all the built-in controls supported by Form Builder</description>
-                    <title xml:lang="fr">Tous les contrôles disponibles</title>
+                    <title xml:lang="fr">Tous les contrôles de formulaire</title>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
-
-
+                    <updated-with-version>2020.1 PE</updated-with-version>
+                    <updated-with-version>2022.1 PE</updated-with-version>
                     <library-versions>
                         <orbeon>1</orbeon>
                     </library-versions>
                     <xbl>
-                        <fr:calculated-value appearance="full"></fr:calculated-value>
+                        <fr:calculated-value appearance="full"/>
                     </xbl>
-                <updated-with-version>2020.1</updated-with-version><updated-with-version>2022.1-SNAPSHOT PE</updated-with-version><updated-with-version>2021.1-SNAPSHOT PE</updated-with-version><migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"input"},{"value":"input-counter"},{"value":"textarea"},{"value":"textarea-counter"},{"value":"output"},{"value":"secret"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"htmlarea"}],"topLevel":true},{"containerPath":[{"value":"typed-controls"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"email"},{"value":"us-phone"},{"value":"number"},{"value":"currency"},{"value":"us-state"}],"topLevel":true},{"containerPath":[{"value":"date-time-controls"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"date"},{"value":"time"},{"value":"datetime"},{"value":"dropdown-date"},{"value":"fields-date"}],"topLevel":true},{"containerPath":[{"value":"selection-controls"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"dropdown"},{"value":"dropdown-with-other"},{"value":"dropdown-with-search"},{"value":"dynamic-dropdown"},{"value":"dynamic-dropdown-with-search"},{"value":"checkboxes"},{"value":"scrollable-checkboxes"},{"value":"checkbox-input"},{"value":"radio-buttons"},{"value":"radio-buttons-with-other"},{"value":"yesno-input"}],"topLevel":true},{"containerPath":[{"value":"signature-controls"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"handwritten-signature"}],"topLevel":true},{"containerPath":[{"value":"attachment-controls"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"static-image"},{"value":"image-attachment"},{"value":"single-file-attachment"},{"value":"multiple-file-attachment"}],"topLevel":true},{"containerPath":[{"value":"buttons"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"standard-button"},{"value":"link-button"}],"topLevel":true},{"containerPath":[{"value":"us-address"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"street-number"},{"value":"street-name"},{"value":"apt-suite"},{"value":"city"},{"value":"state"},{"value":"zip"}],"topLevel":false}]}</migration></metadata>
+                    <migration version="2019.1.0">{"migrations":[{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"input"},{"value":"input-counter"},{"value":"textarea"},{"value":"textarea-counter"},{"value":"textarea-resize"},{"value":"output"},{"value":"secret"}],"topLevel":true},{"containerPath":[{"value":"text-controls"}],"newGridElem":{"value":"grid-2"},"afterElem":{"value":"grid-1"},"content":[{"value":"htmlarea"}],"topLevel":true},{"containerPath":[{"value":"typed-controls"}],"newGridElem":{"value":"grid-3"},"afterElem":null,"content":[{"value":"email"},{"value":"us-phone"},{"value":"number"},{"value":"currency"},{"value":"us-state"}],"topLevel":true},{"containerPath":[{"value":"date-time-controls"}],"newGridElem":{"value":"grid-4"},"afterElem":null,"content":[{"value":"date"},{"value":"dropdown-date"},{"value":"fields-date"},{"value":"time"},{"value":"datetime"}],"topLevel":true},{"containerPath":[{"value":"selection-controls"}],"newGridElem":{"value":"grid-5"},"afterElem":null,"content":[{"value":"dropdown"},{"value":"dropdown-with-other"},{"value":"dropdown-with-search"},{"value":"dynamic-dropdown"},{"value":"dynamic-dropdown-with-search"},{"value":"checkboxes"},{"value":"scrollable-checkboxes"},{"value":"checkbox-input"},{"value":"radio-buttons"},{"value":"radio-buttons-with-other"},{"value":"yesno-input"}],"topLevel":true},{"containerPath":[{"value":"signature-controls"}],"newGridElem":{"value":"grid-6"},"afterElem":null,"content":[{"value":"handwritten-signature"}],"topLevel":true},{"containerPath":[{"value":"attachment-controls"}],"newGridElem":{"value":"grid-7"},"afterElem":null,"content":[{"value":"static-image"},{"value":"image-attachment"},{"value":"single-file-attachment"},{"value":"multiple-file-attachment"}],"topLevel":true},{"containerPath":[{"value":"buttons"}],"newGridElem":{"value":"grid-8"},"afterElem":null,"content":[{"value":"standard-button"},{"value":"link-button"}],"topLevel":true},{"containerPath":[{"value":"us-address"}],"newGridElem":{"value":"grid-1"},"afterElem":null,"content":[{"value":"street-number"},{"value":"street-name"},{"value":"apt-suite"},{"value":"city"},{"value":"state"},{"value":"zip"}],"topLevel":false}]}</migration>
+                </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">
                 <attachments>
-                    <css mediatype="text/css" filename="" size=""></css>
-                    <pdf mediatype="application/pdf" filename="" size=""></pdf>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
             </xf:instance>
             <xf:instance xxf:readonly="true" id="fr-form-resources">
@@ -181,7 +213,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <resource xml:lang="en">
                         <dropdown>
                             <label>Dropdown</label>
-                            <hint></hint>
+                            <hint/>
                             <item>
                                 <label>Cat</label>
                                 <value>cat</value>
@@ -201,26 +233,26 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </dropdown>
                         <dropdown-with-other>
                             <label>Dropdown with "Other"</label>
-                            <hint></hint>
+                            <hint/>
                             <item>
                                 <label>Chocolate</label>
-                                <hint></hint>
+                                <hint/>
                                 <value>chocolate</value>
                             </item>
                             <item>
                                 <label>Vanilla</label>
-                                <hint></hint>
+                                <hint/>
                                 <value>vanilla</value>
                             </item>
                             <item>
                                 <label>Strawberry</label>
-                                <hint></hint>
+                                <hint/>
                                 <value>strawberry</value>
                             </item>
                         </dropdown-with-other>
                         <dropdown-with-search>
                             <label>Dropdown with Search</label>
-                            <hint></hint>
+                            <hint/>
                             <item>
                                 <label>Cat</label>
                                 <value>cat</value>
@@ -240,11 +272,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </dropdown-with-search>
                         <dynamic-dropdown>
                             <label>Dynamic Dropdown</label>
-                            <hint></hint>
+                            <hint/>
                         </dynamic-dropdown>
                         <dynamic-dropdown-with-search>
                             <label>Dynamic Dropdown with Search</label>
-                            <hint></hint>
+                            <hint/>
                         </dynamic-dropdown-with-search>
                         <checkboxes>
                             <label>Checkboxes</label>
@@ -323,19 +355,19 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </link-button>
                         <static-image>
                             <label>Static Image</label>
-                            <hint></hint>
+                            <hint/>
                         </static-image>
                         <image-attachment>
                             <label>Image Attachment</label>
-                            <hint></hint>
+                            <hint/>
                         </image-attachment>
                         <single-file-attachment>
                             <label>Single File Attachment</label>
-                            <hint></hint>
+                            <hint/>
                         </single-file-attachment>
                         <multiple-file-attachment>
                             <label>Multiple File Attachment</label>
-                            <hint></hint>
+                            <hint/>
                         </multiple-file-attachment>
                         <selection-controls>
                             <label>Selection Controls</label>
@@ -362,7 +394,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </radio-buttons>
                         <radio-buttons-with-other>
                             <label>Radio Buttons with "Other"</label>
-                            <hint></hint>
+                            <hint/>
                             <item>
                                 <label>Chocolate</label>
                                 <value>chocolate</value>
@@ -378,24 +410,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </radio-buttons-with-other>
                         <yesno-input>
                             <label>Yes/No Answer</label>
-                            <hint></hint>
+                            <hint/>
                         </yesno-input>
-                        <checkbox-input>
-                            <label>Single Checkbox</label>
-                            <hint>An input which captures "true" or "false"</hint>
-                        </checkbox-input>
                         <date>
                             <label>Date</label>
                             <hint>Standard date field</hint>
                         </date>
-                        <time>
-                            <label>Time</label>
-                            <hint>Standard time field</hint>
-                        </time>
-                        <datetime>
-                            <label>Date and Time</label>
-                            <hint>Standard date and time field</hint>
-                        </datetime>
                         <dropdown-date>
                             <label>Dropdown Date</label>
                             <hint>Date selector with dropdown menus</hint>
@@ -404,8 +424,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Fields Date</label>
                             <hint>Date selector with separate fields</hint>
                         </fields-date>
+                        <time>
+                            <label>Time</label>
+                            <hint>Standard time field</hint>
+                        </time>
+                        <datetime>
+                            <label>Date and Time</label>
+                            <hint>Standard date and time field</hint>
+                        </datetime>
                         <htmlarea>
-                            <label>Formatted Text</label>
+                            <label>Formatted Text Area</label>
                             <hint>Rich text editor</hint>
                         </htmlarea>
                         <text-controls>
@@ -415,29 +443,33 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Typed Controls</label>
                         </typed-controls>
                         <input>
-                            <label>Input Field</label>
+                            <label>Text Field</label>
                             <hint>Standard input field</hint>
                         </input>
                         <input-counter>
-                            <label>Input Field with Character Counter</label>
+                            <label>Text Field with Character Counter</label>
                             <hint>This is an input field with a character counter</hint>
                             <alert>30 characters maximum</alert>
                         </input-counter>
                         <textarea>
-                            <label>Text Area</label>
+                            <label>Plain Text Area</label>
                             <hint>Standard text area</hint>
                         </textarea>
                         <textarea-counter>
-                            <label>Text Area with Character counter</label>
+                            <label>Plain Text Area with Character counter</label>
                             <hint>This is a text area with a character counter</hint>
                             <alert>280 characters at most</alert>
                         </textarea-counter>
+                        <textarea-resize>
+                            <label>Plain Text Area with Resizing</label>
+                            <hint>Standard text area</hint>
+                        </textarea-resize>
                         <output>
-                            <label>Text Output</label>
+                            <label>Calculated Value</label>
                             <hint>Standard text output with a label</hint>
                         </output>
                         <secret>
-                            <label>Password Field</label>
+                            <label>Secret Field</label>
                             <hint>The password is 42 ;)</hint>
                         </secret>
                         <date-time-controls>
@@ -453,7 +485,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <resource xml:lang="fr">
                         <dropdown>
                             <label>Menu déroulant</label>
-                            <hint></hint>
+                            <hint/>
                             <item>
                                 <label>Chat</label>
                                 <value>cat</value>
@@ -473,26 +505,26 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </dropdown>
                         <dropdown-with-other>
                             <label>Menu déroulant avec "Autre"</label>
-                            <hint></hint>
+                            <hint/>
                             <item>
                                 <label>Chocolat</label>
-                                <hint></hint>
+                                <hint/>
                                 <value>chocolate</value>
                             </item>
                             <item>
                                 <label>Vanille</label>
-                                <hint></hint>
+                                <hint/>
                                 <value>vanilla</value>
                             </item>
                             <item>
                                 <label>Fraise</label>
-                                <hint></hint>
+                                <hint/>
                                 <value>strawberry</value>
                             </item>
                         </dropdown-with-other>
                         <dropdown-with-search>
                             <label>Menu déroulant avec recherche</label>
-                            <hint></hint>
+                            <hint/>
                             <item>
                                 <label>Chat</label>
                                 <value>cat</value>
@@ -512,11 +544,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </dropdown-with-search>
                         <dynamic-dropdown>
                             <label>Menu déroulant dynamique</label>
-                            <hint></hint>
+                            <hint/>
                         </dynamic-dropdown>
                         <dynamic-dropdown-with-search>
                             <label>Menu déroulant dynamique avec recherche</label>
-                            <hint></hint>
+                            <hint/>
                         </dynamic-dropdown-with-search>
                         <checkboxes>
                             <label>Cases à cocher</label>
@@ -595,19 +627,19 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </link-button>
                         <static-image>
                             <label>Image fixe</label>
-                            <hint></hint>
+                            <hint/>
                         </static-image>
                         <image-attachment>
                             <label>Image jointe</label>
-                            <hint></hint>
+                            <hint/>
                         </image-attachment>
                         <single-file-attachment>
                             <label>Fichier joint</label>
-                            <hint></hint>
+                            <hint/>
                         </single-file-attachment>
                         <multiple-file-attachment>
                             <label>Fichier joint</label>
-                            <hint></hint>
+                            <hint/>
                         </multiple-file-attachment>
                         <selection-controls>
                             <label>Contrôles de sélection</label>
@@ -634,7 +666,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         </radio-buttons>
                         <radio-buttons-with-other>
                             <label>Boutons radio avec "Autre"</label>
-                            <hint></hint>
+                            <hint/>
                             <item>
                                 <label>Chocolat</label>
                                 <value>chocolate</value>
@@ -652,22 +684,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Réponse oui/non</label>
                             <hint>Un champ qui capture "true" ou "false"</hint>
                         </yesno-input>
-                        <checkbox-input>
-                            <label>Case à cocher unique</label>
-                            <hint>Un champ qui capture "true" ou "false"</hint>
-                        </checkbox-input>
                         <date>
                             <label>Date</label>
                             <hint>Champ date standard</hint>
                         </date>
-                        <time>
-                            <label>Heure</label>
-                            <hint>Champ heure standard</hint>
-                        </time>
-                        <datetime>
-                            <label>Date et heure</label>
-                            <hint>Champ date et heure standard</hint>
-                        </datetime>
                         <dropdown-date>
                             <label>Date avec menus</label>
                             <hint>Sélecteur de date avec menus</hint>
@@ -676,6 +696,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Date avec champs</label>
                             <hint>Sélecteur de date avec champs séparés</hint>
                         </fields-date>
+                        <time>
+                            <label>Heure</label>
+                            <hint>Champ heure standard</hint>
+                        </time>
+                        <datetime>
+                            <label>Date et heure</label>
+                            <hint>Champ date et heure standard</hint>
+                        </datetime>
                         <htmlarea>
                             <label>Texte formatté</label>
                             <hint>Editeur de texte enrichi</hint>
@@ -704,12 +732,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <hint>Ceci est une zone de texte avec compteur de caractères</hint>
                             <alert>280 caractères au plus</alert>
                         </textarea-counter>
+                        <textarea-resize>
+                            <label>Zone de texte avec redimensionnement</label>
+                            <hint>Zone de texte standard</hint>
+                        </textarea-resize>
                         <output>
-                            <label>Sortie texte</label>
+                            <label>Valeur calculée</label>
                             <hint>Sortie texte standard avec libellé</hint>
                         </output>
                         <secret>
-                            <label>Mot de passe</label>
+                            <label>Champ secret</label>
                             <hint>Le mot de passe est 42 ;)</hint>
                         </secret>
                         <date-time-controls>
@@ -724,442 +756,526 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     </resource>
                 </resources>
             </xf:instance>
-        </xf:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors"><xbl:binding xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="orbeon-address-component" element="component|address" class="fr-section-component"><xbl:implementation><xf:model id="address-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id"><empty></empty></xf:instance><xf:instance id="fr-form-template"><address xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
+        </xf:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors"><xbl:binding xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="orbeon-address-component" element="component|address" class="fr-section-component"><xbl:implementation><xf:model id="address-model"><xf:instance id="fr-form-instance" xxbl:mirror="true" xxf:index="id">
+        <empty/></xf:instance><xf:instance id="fr-form-template"><address xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                         <grid-1>
-                            <street-number></street-number>
-                            <street-name></street-name>
-                            <apt-suite></apt-suite>
-                            <city></city>
-                            <state></state>
-                            <zip></zip>
+                            <street-number/>
+                            <street-name/>
+                            <apt-suite/>
+                            <city/>
+                            <state/>
+                            <zip/>
                         </grid-1>
                     </address></xf:instance><xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"><xf:bind xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" id="grid-1-bind" ref="grid-1" name="grid-1">
                         <xf:bind id="street-number-bind" name="street-number" required="true()" xxf:whitespace="trim" ref="street-number">
-                            <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer" level="warning" xxf:whitespace="trim"></xf:constraint>
+                            <xf:constraint id="constraint-8-constraint" value="string() castable as xs:integer"
+                                           level="warning" xxf:whitespace="trim"/>
                         </xf:bind>
-                        <xf:bind id="street-name-bind" name="street-name" ref="street-name" required="true()" xxf:whitespace="trim"></xf:bind>
-                        <xf:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite" xxf:whitespace="trim"></xf:bind>
-                        <xf:bind id="city-bind" name="city" ref="city" required="true()" xxf:whitespace="trim"></xf:bind>
-                        <xf:bind id="state-bind" name="state" ref="state" required="true()"></xf:bind>
-                        <xf:bind id="zip-bind" name="zip" required="true()" ref="zip" type="xs:integer" xxf:whitespace="trim"></xf:bind>
+        <xf:bind id="street-name-bind" name="street-name" ref="street-name" required="true()" xxf:whitespace="trim"/>
+        <xf:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite" xxf:whitespace="trim"/>
+        <xf:bind id="city-bind" name="city" ref="city" required="true()" xxf:whitespace="trim"/>
+        <xf:bind id="state-bind" name="state" ref="state" required="true()"/>
+        <xf:bind id="zip-bind" name="zip" required="true()" ref="zip" type="xs:integer" xxf:whitespace="trim"/>
                     </xf:bind></xf:bind><xf:instance id="fr-form-resources" xxf:readonly="true"><resources><resource xml:lang="en"><address xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>US Address</label>
-                            <help></help>
+        <help/>
                         </address><street-number xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Street Number</label>
-                            <hint></hint>
+        <hint/>
                             <alert>The street number is usually a number</alert>
                         </street-number><street-name xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Street Name</label>
-                            <hint></hint>
-                            <help></help>
-                            <alert></alert>
+        <hint/>
+        <help/>
+        <alert/>
                         </street-name><apt-suite xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Apt/Suite</label>
-                            <hint></hint>
-                            <help></help>
-                            <alert></alert>
+        <hint/>
+        <help/>
+        <alert/>
                         </apt-suite><city xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>City</label>
-                            <hint></hint>
-                            <help></help>
-                            <alert></alert>
+        <hint/>
+        <help/>
+        <alert/>
                         </city><state xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>State</label>
-                            <hint></hint>
-                            <help></help>
-                            <alert></alert>
+        <hint/>
+        <help/>
+        <alert/>
                         </state><zip xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Zip</label>
-                            <hint></hint>
+        <hint/>
                         </zip></resource><resource xml:lang="fr"><address xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Adresse US</label>
-                            <help></help>
+        <help/>
                         </address><street-number xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Numéro de rue</label>
-                            <hint></hint>
+        <hint/>
                             <alert>Le numéro de rue est en général un nombre</alert>
                         </street-number><street-name xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Nom de rue</label>
-                            <hint></hint>
-                            <help></help>
-                            <alert></alert>
+        <hint/>
+        <help/>
+        <alert/>
                         </street-name><apt-suite xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Appartement/suite</label>
-                            <hint></hint>
-                            <help></help>
-                            <alert></alert>
+        <hint/>
+        <help/>
+        <alert/>
                         </apt-suite><city xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Ville</label>
-                            <hint></hint>
-                            <help></help>
-                            <alert></alert>
+        <hint/>
+        <help/>
+        <alert/>
                         </city><state xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Etat</label>
-                            <hint></hint>
-                            <help></help>
-                            <alert></alert>
+        <hint/>
+        <help/>
+        <alert/>
                         </state><zip xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array">
                             <label>Code postal</label>
-                            <hint></hint>
-                        </zip></resource></resources></xf:instance><xf:instance id="readonly"><readonly></readonly></xf:instance><xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"></xf:var><xf:var name="fr-mode" value="$fr-params/mode"></xf:var><xf:bind ref="instance('fr-form-instance')" readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"></xf:bind><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve"><xf:var name="is-empty" value="empty(instance()/*)"></xf:var><xf:action if="$is-empty"><xf:insert context="instance()" origin="instance('fr-form-template')/*"></xf:insert><xf:rebuild></xf:rebuild><xf:recalculate xxf:defaults="true"></xf:recalculate></xf:action><xf:action if="not($is-empty)"><xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated" value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"></xf:var><xf:action if="exists($simply-migrated)"><xf:delete ref="instance()/*"></xf:delete><xf:insert context="instance()" origin="$simply-migrated/*"></xf:insert><xf:rebuild></xf:rebuild><xf:recalculate xxf:defaults="true"></xf:recalculate></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done"><xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="." origin="xf:attribute('fr:relevant', 'false')"></xf:insert></xf:action><xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true" if="event('xxf:binding')/root()/* is instance('fr-form-instance')" context="event('xxf:binding')" origin="xf:attribute('fr:relevant', 'false')"></xf:insert><xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true" if="event('xxf:binding')/root() is instance('fr-form-instance')/root()" ref="event('xxf:binding')/@fr:relevant"></xf:delete></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="address-model" id="fr-section-template-view"><xf:var name="context" id="context" value="xxf:binding-context('orbeon-address-component')"></xf:var><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)"><xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)" class="fr-design-time-preserve"></xf:setvalue></xf:var><xf:var name="fr-resources" as="element()?"><xxf:value value="$fr-resources" xxbl:scope="outer"></xxf:value></xf:var><xf:var fr:keep-if-design-time="false" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"></xf:var><xf:var fr:keep-if-design-time="true" name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]" as="element(resource)"></xf:var><xh:div fr:keep-if-design-time="true" class="fb-section-template-details"><xh:i class="fa fa-fw fa-puzzle-piece"></xh:i>orbeon / address / v1</xh:div><xf:label xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" ref="$form-resources/address/label"></xf:label><fr:grid xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" columns="3" id="grid-1-grid" bind="grid-1-bind">
+        <hint/>
+                        </zip></resource></resources></xf:instance><xf:instance id="fr-form-metadata" xxf:readonly="true"><metadata><email xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array"><templates><template name="default">
+        <form-fields/></template></templates>
+        <parameters/></email></metadata></xf:instance><xf:instance id="readonly">
+        <readonly/></xf:instance>
+        <xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/>
+        <xf:var name="fr-mode" value="$fr-params/mode"/>
+        <xf:bind ref="instance('fr-form-instance')"
+                 readonly="                             fr:is-readonly-mode()         or                             instance('readonly') = 'true' or                             fr:is-design-time()"/><xf:action event="xforms-model-construct-done" class="fr-design-time-preserve">
+            <xf:var name="is-empty" value="empty(instance()/*)"/><xf:action if="$is-empty">
+            <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>
+            <xf:rebuild/>
+            <xf:recalculate xxf:defaults="true"/></xf:action><xf:action if="not($is-empty)">
+            <xf:var xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration" name="simply-migrated"
+                    value="                                     migration:dataMaybeWithSimpleMigration(                                         event('xxf:absolute-targetid'),                                         instance('fr-form-template'),                                         instance()                                     )"/><xf:action if="exists($simply-migrated)">
+            <xf:delete ref="instance()/*"/>
+            <xf:insert context="instance()" origin="$simply-migrated/*"/>
+            <xf:rebuild/>
+            <xf:recalculate xxf:defaults="true"/></xf:action></xf:action></xf:action><xf:action event="xforms-model-construct-done">
+            <xf:insert xmlns:migration="java:org.orbeon.oxf.fr.SimpleDataMigration"
+                       iterate="migration:iterateBinds(event('xxf:absolute-targetid'), instance())" context="."
+                       origin="xf:attribute('fr:relevant', 'false')"/></xf:action>
+        <xf:insert observer="fr-section-template-view" event="xforms-disabled" xxf:phantom="true"
+                   if="event('xxf:binding')/root()/* is instance('fr-form-instance')" context="event('xxf:binding')"
+                   origin="xf:attribute('fr:relevant', 'false')"/>
+        <xf:delete observer="fr-section-template-view" event="xforms-enabled" xxf:phantom="true"
+                   if="event('xxf:binding')/root() is instance('fr-form-instance')/root()"
+                   ref="event('xxf:binding')/@fr:relevant"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" model="address-model" id="fr-section-template-view">
+        <xf:var name="context" id="context" value="xxf:binding-context('orbeon-address-component')"/><xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">
+        <xf:setvalue event="xforms-enabled xforms-value-changed" ref="instance('readonly')"
+                     value="exf:readonly($context)" class="fr-design-time-preserve"/></xf:var><xf:var name="fr-resources" as="element()?">
+        <xxf:value value="$fr-resources" xxbl:scope="outer"/></xf:var>
+        <xf:var fr:keep-if-design-time="false" name="form-resources"
+                value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]"
+                as="element(resource)"/>
+        <xf:var fr:keep-if-design-time="true" name="form-resources"
+                value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fb-language-instance')], resource[1])[1]"
+                as="element(resource)"/><xh:div fr:keep-if-design-time="true" class="fb-section-template-details">
+        <xh:i class="fa fa-fw fa-puzzle-piece"/>orbeon / address / v1</xh:div>
+        <xf:label xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+                  xmlns:array="http://www.w3.org/2005/xpath-functions/array" ref="$form-resources/address/label"/><fr:grid xmlns:map="http://www.w3.org/2005/xpath-functions/map" xmlns:array="http://www.w3.org/2005/xpath-functions/array" columns="3" id="grid-1-grid" bind="grid-1-bind">
                         <fr:c y="1" x="1" w="4">
                             <xf:input id="street-number-control" bind="street-number-bind">
-                                <xf:label ref="$form-resources/street-number/label"></xf:label>
-                                <xf:hint ref="$form-resources/street-number/hint"></xf:hint>
-                                <xf:alert ref="$form-resources/street-number/alert" validation="constraint-8-constraint"></xf:alert>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/street-number/label"/>
+                                <xf:hint ref="$form-resources/street-number/hint"/>
+                                <xf:alert ref="$form-resources/street-number/alert"
+                                          validation="constraint-8-constraint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="5" w="4">
                             <xf:input id="street-name-control" bind="street-name-bind">
-                                <xf:label ref="$form-resources/street-name/label"></xf:label>
-                                <xf:hint ref="$form-resources/street-name/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/street-name/label"/>
+                                <xf:hint ref="$form-resources/street-name/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="9" w="4">
                             <xf:input id="apt-suite-control" bind="apt-suite-bind">
-                                <xf:label ref="$form-resources/apt-suite/label"></xf:label>
-                                <xf:hint ref="$form-resources/apt-suite/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/apt-suite/label"/>
+                                <xf:hint ref="$form-resources/apt-suite/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:input>
                         </fr:c>
                         <fr:c y="2" x="1" w="4">
                             <xf:input id="city-control" bind="city-bind">
-                                <xf:label ref="$form-resources/city/label"></xf:label>
-                                <xf:hint ref="$form-resources/city/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/city/label"/>
+                                <xf:hint ref="$form-resources/city/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:input>
                         </fr:c>
                         <fr:c y="2" x="5" w="4">
                             <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" id="state-control" bind="state-bind">
-                                <xf:label ref="$form-resources/state/label"></xf:label>
-                                <xf:hint ref="$form-resources/state/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/state/label"/>
+                                <xf:hint ref="$form-resources/state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:us-state>
                         </fr:c>
                         <fr:c y="2" x="9" w="4">
                             <fr:number id="zip-control" bind="zip-bind" grouping-separator="" field-width="full">
-                                <xf:label ref="$form-resources/zip/label"></xf:label>
-                                <xf:hint ref="$form-resources/zip/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/zip/label"/>
+                                <xf:hint ref="$form-resources/zip/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:number>
                         </fr:c>
                     </fr:grid></xf:group></xbl:template></xbl:binding></xbl:xbl>
     </xh:head>
     <xh:body>
         <fr:view>
-            <fr:body xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xbl="http://www.w3.org/ns/xbl">
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <fr:section id="text-controls-section" bind="text-controls-bind">
-                    <xf:label ref="$form-resources/text-controls/label"></xf:label>
+                    <xf:label ref="$form-resources/text-controls/label"/>
                     <fr:grid columns="3" id="grid-1-grid" bind="grid-1-bind">
                         <fr:c y="1" x="1" w="6">
                             <xf:input bind="input-bind" id="input-control">
-                                <xf:label ref="$form-resources/input/label"></xf:label>
-                                <xf:hint ref="$form-resources/input/hint"></xf:hint>
+                                <xf:label ref="$form-resources/input/label"/>
+                                <xf:hint ref="$form-resources/input/hint"/>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="7" w="6">
-                            <xf:input id="input-counter-control" bind="input-counter-bind" appearance="character-counter">
-                                <xf:label ref="$form-resources/input-counter/label"></xf:label>
-                                <xf:hint ref="$form-resources/input-counter/hint"></xf:hint>
-                                <xf:alert ref="$form-resources/input-counter/alert" validation="validation-49-validation"></xf:alert>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <xf:input id="input-counter-control" bind="input-counter-bind"
+                                      appearance="character-counter">
+                                <xf:label ref="$form-resources/input-counter/label"/>
+                                <xf:hint ref="$form-resources/input-counter/hint"/>
+                                <xf:alert ref="$form-resources/input-counter/alert" validation="validation-49-validation"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:input>
                         </fr:c>
                         <fr:c y="2" x="1" w="6">
                             <xf:textarea bind="textarea-bind" id="textarea-control">
-                                <xf:label ref="$form-resources/textarea/label"></xf:label>
-                                <xf:hint ref="$form-resources/textarea/hint"></xf:hint>
+                                <xf:label ref="$form-resources/textarea/label"/>
+                                <xf:hint ref="$form-resources/textarea/hint"/>
                             </xf:textarea>
                         </fr:c>
                         <fr:c y="2" x="7" w="6">
-                            <xf:textarea id="textarea-counter-control" bind="textarea-counter-bind" appearance="character-counter">
-                                <xf:label ref="$form-resources/textarea-counter/label"></xf:label>
-                                <xf:hint ref="$form-resources/textarea-counter/hint"></xf:hint>
-                                <xf:alert ref="$form-resources/textarea-counter/alert" validation="constraint-49-constraint"></xf:alert>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <xf:textarea id="textarea-counter-control" bind="textarea-counter-bind"
+                                         appearance="character-counter">
+                                <xf:label ref="$form-resources/textarea-counter/label"/>
+                                <xf:hint ref="$form-resources/textarea-counter/hint"/>
+                                <xf:alert ref="$form-resources/textarea-counter/alert"
+                                          validation="constraint-49-constraint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:textarea>
                         </fr:c>
-                        <fr:c y="3" x="1" w="6">
+                        <fr:c x="1" y="3" w="6" h="2">
+                            <xf:textarea bind="textarea-resize-bind" id="textarea-resize-control"
+                                         appearance="xxf:autosize">
+                                <xf:label ref="$form-resources/textarea-resize/label"/>
+                                <xf:hint ref="$form-resources/textarea-resize/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6">
                             <xf:output bind="output-bind" id="output-control">
-                                <xf:label ref="$form-resources/output/label"></xf:label>
-                                <xf:hint ref="$form-resources/output/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/output/label"/>
+                                <xf:hint ref="$form-resources/output/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:output>
                         </fr:c>
-                        <fr:c y="3" x="7" w="6">
+                        <fr:c y="4" x="7" w="6">
                             <xf:secret id="secret-control" bind="secret-bind" xxf:autocomplete="off">
-                                <xf:label ref="$form-resources/secret/label"></xf:label>
-                                <xf:hint ref="$form-resources/secret/hint"></xf:hint>
+                                <xf:label ref="$form-resources/secret/label"/>
+                                <xf:hint ref="$form-resources/secret/hint"/>
                             </xf:secret>
                         </fr:c>
                     </fr:grid>
                     <fr:grid columns="1" id="grid-2-grid" bind="grid-2-bind">
                         <fr:c y="1" x="1" w="12">
                             <fr:tinymce bind="htmlarea-bind" id="htmlarea-control">
-                                <xf:label ref="$form-resources/htmlarea/label"></xf:label>
-                                <xf:hint ref="$form-resources/htmlarea/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/htmlarea/label"/>
+                                <xf:hint ref="$form-resources/htmlarea/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:tinymce>
                         </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="typed-controls-section" bind="typed-controls-bind">
-                    <xf:label ref="$form-resources/typed-controls/label"></xf:label>
+                    <xf:label ref="$form-resources/typed-controls/label"/>
                     <fr:grid id="grid-3-grid" bind="grid-3-bind">
                         <fr:c y="1" x="1" w="4">
                             <xf:input bind="email-bind" id="email-control">
-                                <xf:label ref="$form-resources/email/label"></xf:label>
-                                <xf:hint ref="$form-resources/email/hint"></xf:hint>
+                                <xf:label ref="$form-resources/email/label"/>
+                                <xf:hint ref="$form-resources/email/hint"/>
                             </xf:input>
                         </fr:c>
                         <fr:c y="1" x="5" w="4">
                             <fr:us-phone bind="us-phone-bind" id="us-phone-control">
-                                <xf:label ref="$form-resources/us-phone/label"></xf:label>
-                                <xf:hint ref="$form-resources/us-phone/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/us-phone/label"/>
+                                <xf:hint ref="$form-resources/us-phone/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:us-phone>
                         </fr:c>
                         <fr:c y="1" x="9" w="4">
                             <fr:number id="number-control" digits-after-decimal="0" bind="number-bind" suffix="m/s">
-                                <xf:label ref="$form-resources/number/label"></xf:label>
-                                <xf:hint ref="$form-resources/number/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/number/label"/>
+                                <xf:hint ref="$form-resources/number/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:number>
                         </fr:c>
                         <fr:c y="2" x="1" w="4">
                             <fr:currency bind="currency-bind" id="currency-control">
-                                <xf:label ref="$form-resources/currency/label"></xf:label>
-                                <xf:hint ref="$form-resources/currency/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/currency/label"/>
+                                <xf:hint ref="$form-resources/currency/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:currency>
                         </fr:c>
                         <fr:c y="2" x="5" w="4">
                             <fr:us-state bind="us-state-bind" id="us-state-control">
-                                <xf:label ref="$form-resources/us-state/label"></xf:label>
-                                <xf:hint ref="$form-resources/us-state/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/us-state/label"/>
+                                <xf:hint ref="$form-resources/us-state/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:us-state>
                         </fr:c>
-                        <fr:c y="2" x="9" w="4"></fr:c>
+                        <fr:c y="2" x="9" w="4"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="date-time-controls-section" bind="date-time-controls-bind">
-                    <xf:label ref="$form-resources/date-time-controls/label"></xf:label>
+                    <xf:label ref="$form-resources/date-time-controls/label"/>
                     <fr:grid columns="3" id="grid-4-grid" bind="grid-4-bind">
-                        <fr:c y="1" x="1" w="2">
-                            <fr:date bind="date-bind" id="date-control">
-                                <xf:label ref="$form-resources/date/label"></xf:label>
-                                <xf:hint ref="$form-resources/date/hint"></xf:hint>
+                        <fr:c y="1" x="1" w="4">
+                            <fr:date bind="date-bind" id="date-control" field-width="natural">
+                                <xf:label ref="$form-resources/date/label"/>
+                                <xf:hint ref="$form-resources/date/hint"/>
                             </fr:date>
                         </fr:c>
-                        <fr:c y="1" x="3" w="2"></fr:c>
-                        <fr:c x="5" y="1" w="2" h="1">
-                            <fr:time bind="time-bind" id="time-control">
-                                <xf:label ref="$form-resources/time/label"></xf:label>
-                                <xf:hint ref="$form-resources/time/hint"></xf:hint>
-                            </fr:time>
-                        </fr:c>
-                        <fr:c x="7" y="1" w="2" h="1"></fr:c>
-                        <fr:c y="1" x="9" w="4">
-                            <fr:datetime bind="datetime-bind" id="datetime-control">
-                                <xf:label ref="$form-resources/datetime/label"></xf:label>
-                                <xf:hint ref="$form-resources/datetime/hint"></xf:hint>
-                            </fr:datetime>
-                        </fr:c>
-                        <fr:c y="2" x="1" w="4">
+
+                        <fr:c x="5" y="1" w="4" h="1">
                             <fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">
-                                <xf:label ref="$form-resources/dropdown-date/label"></xf:label>
-                                <xf:hint ref="$form-resources/dropdown-date/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/dropdown-date/label"/>
+                                <xf:hint ref="$form-resources/dropdown-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:dropdown-date>
                         </fr:c>
-                        <fr:c y="2" x="5" w="4">
+                        <fr:c y="1" x="9" w="4">
                             <fr:fields-date bind="fields-date-bind" id="fields-date-control">
-                                <xf:label ref="$form-resources/fields-date/label"></xf:label>
-                                <xf:hint ref="$form-resources/fields-date/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/fields-date/label"/>
+                                <xf:hint ref="$form-resources/fields-date/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:fields-date>
                         </fr:c>
-                        <fr:c y="2" x="9" w="4"></fr:c>
+                        <fr:c y="2" x="1" w="4">
+                            <fr:time bind="time-bind" id="time-control" field-width="natural">
+                                <xf:label ref="$form-resources/time/label"/>
+                                <xf:hint ref="$form-resources/time/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:time>
+                        </fr:c>
+                        <fr:c y="2" x="5" w="4">
+                        </fr:c>
+                        <fr:c y="2" x="9" w="4"/>
+                        <fr:c x="1" y="3" w="4">
+                            <fr:datetime bind="datetime-bind" id="datetime-control" field-width="natural">
+                                <xf:label ref="$form-resources/datetime/label"/>
+                                <xf:hint ref="$form-resources/datetime/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:datetime>
+                        </fr:c>
+                        <fr:c x="5" y="3" w="4"/>
+                        <fr:c x="9" y="3" w="4"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="selection-controls-section" bind="selection-controls-bind">
-                    <xf:label ref="$form-resources/selection-controls/label"></xf:label>
+                    <xf:label ref="$form-resources/selection-controls/label"/>
                     <fr:grid columns="3" id="grid-5-grid" bind="grid-5-bind">
                         <fr:c y="1" x="1" w="4">
                             <xf:select1 bind="dropdown-bind" id="dropdown-control" ref="" appearance="dropdown">
-                                <xf:label ref="$form-resources/dropdown/label"></xf:label>
-                                <xf:hint ref="$form-resources/dropdown/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/dropdown/label"/>
+                                <xf:hint ref="$form-resources/dropdown/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="$form-resources/dropdown/item">
-                                    <xf:label ref="label"></xf:label>
-                                    <xf:value ref="value"></xf:value>
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
                         <fr:c x="5" y="1" w="4" h="1">
-                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dropdown-with-other-control" appearance="minimal" bind="dropdown-with-other-bind">
-                                <xf:label ref="$form-resources/dropdown-with-other/label"></xf:label>
-                                <xf:hint ref="$form-resources/dropdown-with-other/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dropdown-with-other-control"
+                                             appearance="minimal"
+                                             bind="dropdown-with-other-bind">
+                                <xf:label ref="$form-resources/dropdown-with-other/label"/>
+                                <xf:hint ref="$form-resources/dropdown-with-other/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="$form-resources/dropdown-with-other/item">
-                                    <xf:label ref="label"></xf:label>
-                                    <xf:value ref="value"></xf:value>
-                                    <xf:hint ref="hint"></xf:hint>
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                    <xf:hint ref="hint"/>
                                 </xf:itemset>
                             </fr:open-select1>
                         </fr:c>
                         <fr:c x="9" y="1" w="4" h="1">
-                            <xf:select1 bind="dropdown-with-search-bind" id="dropdown-with-search-control" appearance="search" ref="">
-                                <xf:label ref="$form-resources/dropdown-with-search/label"></xf:label>
-                                <xf:hint ref="$form-resources/dropdown-with-search/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <xf:select1 bind="dropdown-with-search-bind" id="dropdown-with-search-control"
+                                        appearance="search"
+                                        ref="">
+                                <xf:label ref="$form-resources/dropdown-with-search/label"/>
+                                <xf:hint ref="$form-resources/dropdown-with-search/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="$form-resources/dropdown-with-search/item">
-                                    <xf:label ref="label"></xf:label>
-                                    <xf:value ref="value"></xf:value>
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
                         <fr:c x="1" y="2" w="4">
-                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-dropdown-control" resource="/fr/service/custom/orbeon/controls/countries?all=true" bind="dynamic-dropdown-bind">
-                                <xf:label ref="$form-resources/dynamic-dropdown/label"></xf:label>
-                                <xf:hint ref="$form-resources/dynamic-dropdown/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-dropdown-control"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  bind="dynamic-dropdown-bind">
+                                <xf:label ref="$form-resources/dynamic-dropdown/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="/*/country">
-                                    <xf:label ref="name"></xf:label>
-                                    <xf:value ref="us-code"></xf:value>
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
                                 </xf:itemset>
                             </fr:databound-select1>
                         </fr:c>
-                        <fr:c x="5" y="2" w="4" h="1"></fr:c>
+                        <fr:c x="5" y="2" w="4" h="1"/>
                         <fr:c x="9" y="2" w="4">
-                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-dropdown-with-search-control" bind="dynamic-dropdown-with-search-bind" appearance="search" resource="/fr/service/custom/orbeon/controls/countries?all=true" ref="" service-performs-search="false" service-supports-paging="false" is-last-page="">
-                                <xf:label ref="$form-resources/dynamic-dropdown-with-search/label"></xf:label>
-                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                  id="dynamic-dropdown-with-search-control"
+                                                  bind="dynamic-dropdown-with-search-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                  ref=""
+                                                  service-performs-search="false"
+                                                  service-supports-paging="false"
+                                                  is-last-page="">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="/*/country">
-                                    <xf:label ref="name"></xf:label>
-                                    <xf:value ref="us-code"></xf:value>
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
                                 </xf:itemset>
                             </fr:databound-select1>
                         </fr:c>
                         <fr:c y="3" x="1" w="4">
                             <xf:select appearance="full" bind="checkboxes-bind" id="checkboxes-control">
-                                <xf:label ref="$form-resources/checkboxes/label"></xf:label>
-                                <xf:hint ref="$form-resources/checkboxes/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/checkboxes/label"/>
+                                <xf:hint ref="$form-resources/checkboxes/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="$form-resources/checkboxes/item">
-                                    <xf:label ref="label"></xf:label>
-                                    <xf:value ref="value"></xf:value>
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
                                 </xf:itemset>
                             </xf:select>
                         </fr:c>
                         <fr:c x="5" y="3" w="4" h="1">
-                            <xf:select bind="scrollable-checkboxes-bind" id="scrollable-checkboxes-control" appearance="scroll">
-                                <xf:label ref="$form-resources/scrollable-checkboxes/label"></xf:label>
-                                <xf:hint ref="$form-resources/scrollable-checkboxes/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <xf:select bind="scrollable-checkboxes-bind" id="scrollable-checkboxes-control"
+                                       appearance="scroll">
+                                <xf:label ref="$form-resources/scrollable-checkboxes/label"/>
+                                <xf:hint ref="$form-resources/scrollable-checkboxes/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="$form-resources/scrollable-checkboxes/item">
-                                    <xf:label ref="label"></xf:label>
-                                    <xf:value ref="value"></xf:value>
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
                                 </xf:itemset>
                             </xf:select>
                         </fr:c>
                         <fr:c y="3" x="9" w="4">
                             <fr:checkbox-input bind="checkbox-input-bind" id="checkbox-input-control">
-                                <xf:label ref="$form-resources/checkbox-input/label"></xf:label>
-                                <xf:hint ref="$form-resources/checkbox-input/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/checkbox-input/label"/>
+                                <xf:hint ref="$form-resources/checkbox-input/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:checkbox-input>
                         </fr:c>
                         <fr:c y="4" x="1" w="4">
                             <xf:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">
-                                <xf:label ref="$form-resources/radio-buttons/label"></xf:label>
-                                <xf:hint ref="$form-resources/radio-buttons/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/radio-buttons/label"/>
+                                <xf:hint ref="$form-resources/radio-buttons/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="$form-resources/radio-buttons/item">
-                                    <xf:label ref="label"></xf:label>
-                                    <xf:value ref="value"></xf:value>
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
                         <fr:c x="5" y="4" w="4" h="1">
-                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="radio-buttons-with-other-control" bind="radio-buttons-with-other-bind" appearance="full">
-                                <xf:label ref="$form-resources/radio-buttons-with-other/label"></xf:label>
-                                <xf:hint ref="$form-resources/radio-buttons-with-other/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="radio-buttons-with-other-control"
+                                             bind="radio-buttons-with-other-bind"
+                                             appearance="full">
+                                <xf:label ref="$form-resources/radio-buttons-with-other/label"/>
+                                <xf:hint ref="$form-resources/radio-buttons-with-other/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="$form-resources/radio-buttons-with-other/item">
-                                    <xf:label ref="label"></xf:label>
-                                    <xf:value ref="value"></xf:value>
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
                                 </xf:itemset>
                             </fr:open-select1>
                         </fr:c>
                         <fr:c y="4" x="9" w="4">
                             <fr:yesno-input bind="yesno-input-bind" id="yesno-input-control">
-                                <xf:label ref="$form-resources/yesno-input/label"></xf:label>
-                                <xf:hint ref="$form-resources/yesno-input/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/yesno-input/label"/>
+                                <xf:hint ref="$form-resources/yesno-input/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:yesno-input>
                         </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="attachment-controls-section" bind="attachment-controls-bind">
-                    <xf:label ref="$form-resources/attachment-controls/label"></xf:label>
+                    <xf:label ref="$form-resources/attachment-controls/label"/>
                     <fr:grid id="grid-7-grid" bind="grid-7-bind">
                         <fr:c y="1" x="1" w="6">
                             <fr:image bind="static-image-bind" id="static-image-control">
-                                <xf:label ref="$form-resources/static-image/label"></xf:label>
+                                <xf:label ref="$form-resources/static-image/label"/>
                             </fr:image>
                         </fr:c>
                         <fr:c x="7" y="1" w="6" h="1">
-                            <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="image-attachment-control" bind="image-attachment-bind" class="fr-attachment">
-                                <xf:label ref="$form-resources/image-attachment/label"></xf:label>
-                                <xf:hint ref="$form-resources/image-attachment/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                                 id="image-attachment-control"
+                                                 bind="image-attachment-bind"
+                                                 class="fr-attachment">
+                                <xf:label ref="$form-resources/image-attachment/label"/>
+                                <xf:hint ref="$form-resources/image-attachment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:image-attachment>
                         </fr:c>
                         <fr:c x="1" y="2" w="6">
-                            <fr:attachment bind="single-file-attachment-bind" id="single-file-attachment-control" class="fr-attachment">
-                                <xf:label ref="$form-resources/single-file-attachment/label"></xf:label>
-                                <xf:hint ref="$form-resources/single-file-attachment/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <fr:attachment bind="single-file-attachment-bind" id="single-file-attachment-control"
+                                           class="fr-attachment">
+                                <xf:label ref="$form-resources/single-file-attachment/label"/>
+                                <xf:hint ref="$form-resources/single-file-attachment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:attachment>
                         </fr:c>
                         <fr:c x="7" y="2" w="6" h="1">
-                            <fr:attachment bind="multiple-file-attachment-bind" id="multiple-file-attachment-control" multiple="true" class="fr-attachment">
-                                <xf:label ref="$form-resources/multiple-file-attachment/label"></xf:label>
-                                <xf:hint ref="$form-resources/multiple-file-attachment/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                            <fr:attachment bind="multiple-file-attachment-bind" id="multiple-file-attachment-control"
+                                           multiple="true"
+                                           class="fr-attachment">
+                                <xf:label ref="$form-resources/multiple-file-attachment/label"/>
+                                <xf:hint ref="$form-resources/multiple-file-attachment/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:attachment>
                         </fr:c>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="buttons-section" bind="buttons-bind">
-                    <xf:label ref="$form-resources/buttons/label"></xf:label>
+                    <xf:label ref="$form-resources/buttons/label"/>
                     <fr:grid columns="2" id="grid-8-grid" bind="grid-8-bind">
                         <fr:c y="1" x="1" w="3">
                             <xf:trigger bind="standard-button-bind" id="standard-button-control">
-                                <xf:label ref="$form-resources/standard-button/label"></xf:label>
-                                <xf:hint ref="$form-resources/standard-button/hint"></xf:hint>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"></xf:alert>
+                                <xf:label ref="$form-resources/standard-button/label"/>
+                                <xf:hint ref="$form-resources/standard-button/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:trigger>
                         </fr:c>
                         <fr:c y="1" x="4" w="3">
                             <xf:trigger appearance="minimal" bind="link-button-bind" id="link-button-control">
-                                <xf:label ref="$form-resources/link-button/label"></xf:label>
-                                <xf:hint ref="$form-resources/link-button/hint"></xf:hint>
+                                <xf:label ref="$form-resources/link-button/label"/>
+                                <xf:hint ref="$form-resources/link-button/hint"/>
                             </xf:trigger>
                         </fr:c>
-                        <fr:c y="1" x="7" w="3"></fr:c>
-                        <fr:c y="1" x="10" w="3"></fr:c>
+                        <fr:c y="1" x="7" w="3"/>
+                        <fr:c y="1" x="10" w="3"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="us-address-control" bind="us-address-bind">
-                    <xf:label ref="$form-resources/us-address/label"></xf:label>
-                    <component:address xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"></component:address>
+                    <xf:label ref="$form-resources/us-address/label"/>
+                    <component:address xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
                 </fr:section>
             </fr:body>
         </fr:view>

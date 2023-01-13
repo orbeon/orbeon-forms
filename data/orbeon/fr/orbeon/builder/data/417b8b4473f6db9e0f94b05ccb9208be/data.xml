@@ -22,10 +22,11 @@
                             <input-counter>This must not be "too long"!</input-counter>
                             <textarea>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
 
-The creation, performance, significance, and even the definition of music vary according to culture and social context. Music ranges from strictly organized compositions (and their recreation in performance), through improvisational music to aleatoric forms. Music can be divided into genres and subgenres, although the dividing lines and relationships between music genres are often subtle, sometimes open to individual interpretation, and occasionally controversial. Within "the arts", music may be classified as a performing art, a fine art, and auditory art.
-
 From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <textarea-counter>Let's write a Tweet. It must fit in 280 characters.</textarea-counter>
+                            <textarea-resize>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
+
+From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <output>Great love and great achievements involve great risk.</output>
                             <secret>42</secret>
                         </grid-1>
@@ -48,10 +49,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <date-time-controls>
                         <grid-4>
                             <date>2009-10-16</date>
-                            <time>17:47:57</time>
-                            <datetime>2009-10-16T17:48:03</datetime>
                             <dropdown-date>2009-10-16</dropdown-date>
                             <fields-date>2009-10-16</fields-date>
+                            <time>17:47:57</time>
+                            <datetime>2009-10-16T17:48:03</datetime>
                         </grid-4>
                     </date-time-controls>
                     <selection-controls>
@@ -121,18 +122,20 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                         <xf:bind id="textarea-counter-bind" ref="textarea-counter" name="textarea-counter">
                             <xf:constraint id="constraint-49-constraint" value="xxf:max-length(280)"/>
                         </xf:bind>
-                        <xf:bind ref="output" id="output-bind" name="output"/>
                         <xf:bind id="secret-bind" ref="secret" name="secret" type="xs:string" required="true()"
                                  constraint=". = '42'"/>
+                        <xf:bind id="textarea-resize-bind" ref="textarea-resize" name="textarea-resize"
+                                 xxf:whitespace="trim"/>
+                        <xf:bind ref="output" id="output-bind" name="output"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="date-time-controls-bind" ref="date-time-controls" name="date-time-controls">
                     <xf:bind id="grid-4-bind" ref="grid-4" name="grid-4">
                         <xf:bind id="date-bind" ref="date" type="xf:date" name="date"/>
-                        <xf:bind id="time-bind" ref="time" type="xf:time" name="time"/>
-                        <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"/>
                         <xf:bind id="dropdown-date-bind" ref="dropdown-date" type="xf:date" name="dropdown-date"/>
                         <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"/>
+                        <xf:bind id="time-bind" ref="time" type="xf:time" name="time"/>
+                        <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
@@ -203,10 +206,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                     <form-name>controls</form-name>
                     <title xml:lang="en">All Form Controls</title>
                     <description xml:lang="en">This form shows all the built-in controls supported by Form Builder</description>
-                    <title xml:lang="fr">Tous les Tous les contrôles disponibles</title>
+                    <title xml:lang="fr">Tous les contrôles de formulaire</title>
                     <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
-                    <updated-with-version>2020.1</updated-with-version>
-                    <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>
+                    <updated-with-version>2020.1 PE</updated-with-version>
+                    <updated-with-version>2022.1 PE</updated-with-version>
                     <library-versions>
                         <orbeon>1</orbeon>
                     </library-versions>
@@ -437,14 +440,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Date</label>
                             <hint>Standard date field</hint>
                         </date>
-                        <time>
-                            <label>Time</label>
-                            <hint>Standard time field</hint>
-                        </time>
-                        <datetime>
-                            <label>Date and Time</label>
-                            <hint>Standard date and time field</hint>
-                        </datetime>
                         <dropdown-date>
                             <label>Dropdown Date</label>
                             <hint>Date selector with dropdown menus</hint>
@@ -453,8 +448,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Fields Date</label>
                             <hint>Date selector with separate fields</hint>
                         </fields-date>
+                        <time>
+                            <label>Time</label>
+                            <hint>Standard time field</hint>
+                        </time>
+                        <datetime>
+                            <label>Date and Time</label>
+                            <hint>Standard date and time field</hint>
+                        </datetime>
                         <htmlarea>
-                            <label>Formatted Text</label>
+                            <label>Formatted Text Area</label>
                             <hint>Rich text editor</hint>
                         </htmlarea>
                         <text-controls>
@@ -464,29 +467,33 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Typed Controls</label>
                         </typed-controls>
                         <input>
-                            <label>Input Field</label>
+                            <label>Text Field</label>
                             <hint>Standard input field</hint>
                         </input>
                         <input-counter>
-                            <label>Input Field with Character Counter</label>
+                            <label>Text Field with Character Counter</label>
                             <hint>This is an input field with a character counter</hint>
                             <alert>30 characters maximum</alert>
                         </input-counter>
                         <textarea>
-                            <label>Text Area</label>
+                            <label>Plain Text Area</label>
                             <hint>Standard text area</hint>
                         </textarea>
                         <textarea-counter>
-                            <label>Text Area with Character counter</label>
+                            <label>Plain Text Area with Character counter</label>
                             <hint>This is a text area with a character counter</hint>
                             <alert>280 characters at most</alert>
                         </textarea-counter>
+                        <textarea-resize>
+                            <label>Plain Text Area with Resizing</label>
+                            <hint>Standard text area</hint>
+                        </textarea-resize>
                         <output>
-                            <label>Text Output</label>
+                            <label>Calculated Value</label>
                             <hint>Standard text output with a label</hint>
                         </output>
                         <secret>
-                            <label>Password Field</label>
+                            <label>Secret Field</label>
                             <hint>The password is 42 ;)</hint>
                         </secret>
                         <date-time-controls>
@@ -713,14 +720,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Date</label>
                             <hint>Champ date standard</hint>
                         </date>
-                        <time>
-                            <label>Heure</label>
-                            <hint>Champ heure standard</hint>
-                        </time>
-                        <datetime>
-                            <label>Date et heure</label>
-                            <hint>Champ date et heure standard</hint>
-                        </datetime>
                         <dropdown-date>
                             <label>Date avec menus</label>
                             <hint>Sélecteur de date avec menus</hint>
@@ -729,6 +728,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <label>Date avec champs</label>
                             <hint>Sélecteur de date avec champs séparés</hint>
                         </fields-date>
+                        <time>
+                            <label>Heure</label>
+                            <hint>Champ heure standard</hint>
+                        </time>
+                        <datetime>
+                            <label>Date et heure</label>
+                            <hint>Champ date et heure standard</hint>
+                        </datetime>
                         <htmlarea>
                             <label>Texte formatté</label>
                             <hint>Editeur de texte enrichi</hint>
@@ -757,12 +764,16 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <hint>Ceci est une zone de texte avec compteur de caractères</hint>
                             <alert>280 caractères au plus</alert>
                         </textarea-counter>
+                        <textarea-resize>
+                            <label>Zone de texte avec redimensionnement</label>
+                            <hint>Zone de texte standard</hint>
+                        </textarea-resize>
                         <output>
-                            <label>Sortie texte</label>
+                            <label>Valeur calculée</label>
                             <hint>Sortie texte standard avec libellé</hint>
                         </output>
                         <secret>
-                            <label>Mot de passe</label>
+                            <label>Champ secret</label>
                             <hint>Le mot de passe est 42 ;)</hint>
                         </secret>
                         <date-time-controls>
@@ -818,14 +829,22 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:textarea>
                         </fr:c>
-                        <fr:c y="3" x="1" w="6">
+                        <fr:c x="1" y="3" w="6" h="2">
+                            <xf:textarea bind="textarea-resize-bind" id="textarea-resize-control"
+                                         appearance="xxf:autosize">
+                                <xf:label ref="$form-resources/textarea-resize/label"/>
+                                <xf:hint ref="$form-resources/textarea-resize/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </xf:textarea>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6">
                             <xf:output bind="output-bind" id="output-control">
                                 <xf:label ref="$form-resources/output/label"/>
                                 <xf:hint ref="$form-resources/output/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:output>
                         </fr:c>
-                        <fr:c y="3" x="7" w="6">
+                        <fr:c y="4" x="7" w="6">
                             <xf:secret id="secret-control" bind="secret-bind" xxf:autocomplete="off">
                                 <xf:label ref="$form-resources/secret/label"/>
                                 <xf:hint ref="$form-resources/secret/hint"/>
@@ -885,41 +904,46 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                 <fr:section id="date-time-controls-section" bind="date-time-controls-bind">
                     <xf:label ref="$form-resources/date-time-controls/label"/>
                     <fr:grid columns="3" id="grid-4-grid" bind="grid-4-bind">
-                        <fr:c y="1" x="1" w="2">
-                            <fr:date bind="date-bind" id="date-control">
+                        <fr:c y="1" x="1" w="4">
+                            <fr:date bind="date-bind" id="date-control" field-width="natural">
                                 <xf:label ref="$form-resources/date/label"/>
                                 <xf:hint ref="$form-resources/date/hint"/>
                             </fr:date>
                         </fr:c>
-                        <fr:c y="1" x="3" w="2"/>
-                        <fr:c x="5" y="1" w="2" h="1">
-                            <fr:time bind="time-bind" id="time-control">
-                                <xf:label ref="$form-resources/time/label"/>
-                                <xf:hint ref="$form-resources/time/hint"/>
-                            </fr:time>
-                        </fr:c>
-                        <fr:c x="7" y="1" w="2" h="1"/>
-                        <fr:c y="1" x="9" w="4">
-                            <fr:datetime bind="datetime-bind" id="datetime-control">
-                                <xf:label ref="$form-resources/datetime/label"/>
-                                <xf:hint ref="$form-resources/datetime/hint"/>
-                            </fr:datetime>
-                        </fr:c>
-                        <fr:c y="2" x="1" w="4">
+
+                        <fr:c x="5" y="1" w="4" h="1">
                             <fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">
                                 <xf:label ref="$form-resources/dropdown-date/label"/>
                                 <xf:hint ref="$form-resources/dropdown-date/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:dropdown-date>
                         </fr:c>
-                        <fr:c y="2" x="5" w="4">
+                        <fr:c y="1" x="9" w="4">
                             <fr:fields-date bind="fields-date-bind" id="fields-date-control">
                                 <xf:label ref="$form-resources/fields-date/label"/>
                                 <xf:hint ref="$form-resources/fields-date/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:fields-date>
                         </fr:c>
+                        <fr:c y="2" x="1" w="4">
+                            <fr:time bind="time-bind" id="time-control" field-width="natural">
+                                <xf:label ref="$form-resources/time/label"/>
+                                <xf:hint ref="$form-resources/time/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:time>
+                        </fr:c>
+                        <fr:c y="2" x="5" w="4">
+                        </fr:c>
                         <fr:c y="2" x="9" w="4"/>
+                        <fr:c x="1" y="3" w="4">
+                            <fr:datetime bind="datetime-bind" id="datetime-control" field-width="natural">
+                                <xf:label ref="$form-resources/datetime/label"/>
+                                <xf:hint ref="$form-resources/datetime/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:datetime>
+                        </fr:c>
+                        <fr:c x="5" y="3" w="4"/>
+                        <fr:c x="9" y="3" w="4"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="selection-controls-section" bind="selection-controls-bind">

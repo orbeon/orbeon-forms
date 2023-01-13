@@ -108,40 +108,50 @@ class JSDateUtilsTest extends AnyFunSpec {
 
   describe("Time formatting") {
 
-    val FormatWithSecondsAndLongAmPm  = "[h]:[m]:[s] [P]"
-    val FormatWithSecondsAndShortAmPm = "[h]:[m]:[s] [P,2-2]"
-    val FormatWithSeconds24Hour       = "[H]:[m]:[s]"
+    val FormatWithSecondsAndLongAmPm   = "[h]:[m]:[s] [P]"
+    val FormatWithSecondsAndShortAmPm  = "[h]:[m]:[s] [P,2-2]"
+    val FormatWithSeconds24Hour        = "[H]:[m]:[s]"
+    val FormatWithSeconds24Hour2Digits = "[H01]:[m]:[s]"
 
     val FormatNoSecondsAndLongAmPm    = "[h]:[m] [P]"
     val FormatNoSecondsAndShortAmPm   = "[h]:[m] [P,2-2]"
     val FormatNoSeconds24Hour         = "[H]:[m]"
+    val FormatNoSeconds24Hour2Digits  = "[H01]:[m]"
 
     val StringsToIsoDates = List(
-      (IsoTime(0,  22, 23.some), FormatWithSecondsAndLongAmPm)  -> "12:22:23 a.m.",
-      (IsoTime(0,  22, 23.some), FormatWithSecondsAndShortAmPm) -> "12:22:23 am",
-      (IsoTime(0,  22, 23.some), FormatWithSeconds24Hour)       -> "0:22:23",
-      (IsoTime(3,  22, 23.some), FormatWithSecondsAndLongAmPm)  -> "3:22:23 a.m.",
-      (IsoTime(3,  22, 23.some), FormatWithSecondsAndShortAmPm) -> "3:22:23 am",
-      (IsoTime(3,  22, 23.some), FormatWithSeconds24Hour)       -> "3:22:23",
-      (IsoTime(12, 22, 23.some), FormatWithSecondsAndLongAmPm)  -> "12:22:23 p.m.",
-      (IsoTime(12, 22, 23.some), FormatWithSecondsAndShortAmPm) -> "12:22:23 pm",
-      (IsoTime(12, 22, 23.some), FormatWithSeconds24Hour)       -> "12:22:23",
-      (IsoTime(21, 22, 23.some), FormatWithSecondsAndLongAmPm)  -> "9:22:23 p.m.",
-      (IsoTime(21, 22, 23.some), FormatWithSecondsAndShortAmPm) -> "9:22:23 pm",
-      (IsoTime(21, 22, 23.some), FormatWithSeconds24Hour)       -> "21:22:23",
+      (IsoTime(0,  22, 23.some), FormatWithSecondsAndLongAmPm)   -> "12:22:23 a.m.",
+      (IsoTime(0,  22, 23.some), FormatWithSecondsAndShortAmPm)  -> "12:22:23 am",
+      (IsoTime(0,  22, 23.some), FormatWithSeconds24Hour)        -> "0:22:23",
+      (IsoTime(3,  22, 23.some), FormatWithSecondsAndLongAmPm)   -> "3:22:23 a.m.",
+      (IsoTime(3,  22, 23.some), FormatWithSecondsAndShortAmPm)  -> "3:22:23 am",
+      (IsoTime(3,  22, 23.some), FormatWithSeconds24Hour)        -> "3:22:23",
+      (IsoTime(12, 22, 23.some), FormatWithSecondsAndLongAmPm)   -> "12:22:23 p.m.",
+      (IsoTime(12, 22, 23.some), FormatWithSecondsAndShortAmPm)  -> "12:22:23 pm",
+      (IsoTime(12, 22, 23.some), FormatWithSeconds24Hour)        -> "12:22:23",
+      (IsoTime(21, 22, 23.some), FormatWithSecondsAndLongAmPm)   -> "9:22:23 p.m.",
+      (IsoTime(21, 22, 23.some), FormatWithSecondsAndShortAmPm)  -> "9:22:23 pm",
+      (IsoTime(21, 22, 23.some), FormatWithSeconds24Hour)        -> "21:22:23",
+      (IsoTime(1,   2,  3.some), FormatWithSecondsAndLongAmPm)   -> "1:02:03 a.m.",
+      (IsoTime(1,   2,  3.some), FormatWithSecondsAndShortAmPm)  -> "1:02:03 am",
+      (IsoTime(1,   2,  3.some), FormatWithSeconds24Hour)        -> "1:02:03",
+      (IsoTime(1,   2,  3.some), FormatWithSeconds24Hour2Digits) -> "01:02:03",
 
-      (IsoTime(0,  22, 23.some), FormatNoSecondsAndLongAmPm)    -> "12:22 a.m.",
-      (IsoTime(0,  22, 23.some), FormatNoSecondsAndShortAmPm)   -> "12:22 am",
-      (IsoTime(0,  22, 23.some), FormatNoSeconds24Hour)         -> "0:22",
-      (IsoTime(3,  22, 23.some), FormatNoSecondsAndLongAmPm)    -> "3:22 a.m.",
-      (IsoTime(3,  22, 23.some), FormatNoSecondsAndShortAmPm)   -> "3:22 am",
-      (IsoTime(3,  22, 23.some), FormatNoSeconds24Hour)         -> "3:22",
-      (IsoTime(12, 22, 23.some), FormatNoSecondsAndLongAmPm)    -> "12:22 p.m.",
-      (IsoTime(12, 22, 23.some), FormatNoSecondsAndShortAmPm)   -> "12:22 pm",
-      (IsoTime(12, 22, 23.some), FormatNoSeconds24Hour)         -> "12:22",
-      (IsoTime(21, 22, 23.some), FormatNoSecondsAndLongAmPm)    -> "9:22 p.m.",
-      (IsoTime(21, 22, 23.some), FormatNoSecondsAndShortAmPm)   -> "9:22 pm",
-      (IsoTime(21, 22, 23.some), FormatNoSeconds24Hour)         -> "21:22",
+      (IsoTime(0,  22, 23.some), FormatNoSecondsAndLongAmPm)     -> "12:22 a.m.",
+      (IsoTime(0,  22, 23.some), FormatNoSecondsAndShortAmPm)    -> "12:22 am",
+      (IsoTime(0,  22, 23.some), FormatNoSeconds24Hour)          -> "0:22",
+      (IsoTime(3,  22, 23.some), FormatNoSecondsAndLongAmPm)     -> "3:22 a.m.",
+      (IsoTime(3,  22, 23.some), FormatNoSecondsAndShortAmPm)    -> "3:22 am",
+      (IsoTime(3,  22, 23.some), FormatNoSeconds24Hour)          -> "3:22",
+      (IsoTime(12, 22, 23.some), FormatNoSecondsAndLongAmPm)     -> "12:22 p.m.",
+      (IsoTime(12, 22, 23.some), FormatNoSecondsAndShortAmPm)    -> "12:22 pm",
+      (IsoTime(12, 22, 23.some), FormatNoSeconds24Hour)          -> "12:22",
+      (IsoTime(21, 22, 23.some), FormatNoSecondsAndLongAmPm)     -> "9:22 p.m.",
+      (IsoTime(21, 22, 23.some), FormatNoSecondsAndShortAmPm)    -> "9:22 pm",
+      (IsoTime(21, 22, 23.some), FormatNoSeconds24Hour)          -> "21:22",
+      (IsoTime(1,   2,  3.some), FormatNoSecondsAndLongAmPm)     -> "1:02 a.m.",
+      (IsoTime(1,   2,  3.some), FormatNoSecondsAndShortAmPm)    -> "1:02 am",
+      (IsoTime(1,   2,  3.some), FormatNoSeconds24Hour)          -> "1:02",
+      (IsoTime(1,   2,  3.some), FormatNoSeconds24Hour2Digits)   -> "01:02",
     )
 
     for (((s, format), expected) <- StringsToIsoDates)

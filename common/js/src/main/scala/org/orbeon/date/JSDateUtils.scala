@@ -113,16 +113,22 @@ object JSDateUtils {
   def formatTime(time: IsoTime, formatInputTime: String): String = {
 
     val hours =
-      if (formatInputTime.contains("[H]"))
-        pad2(time.hour)
-      else
+      if (formatInputTime.contains("[H]") || formatInputTime.contains("[H1]") || formatInputTime.contains("[H01]")) // 24-hour format
+        time.hour
+      else // for now assume a required `[h]`/`[h1]` for 12-hour format
         time.hour match {
           case 0 | 12 => 12
           case other  => other % 12
         }
 
-    val minutes =
-      pad2(time.minute)
+    val hoursString =
+      if (formatInputTime.contains("[H01]") || formatInputTime.contains("[h01]"))
+        pad2(hours)
+      else
+        hours.toString
+
+    val minutesString =
+      pad2(time.minute) // for now assume `[m]`/`[m01]`
 
     val secondsOpt =
       formatInputTime.contains("[s]") option pad2(time.second.getOrElse(0): Int)
@@ -130,12 +136,12 @@ object JSDateUtils {
     val amPmOpt =
       formatInputTime.contains("[P") option {
         if (formatInputTime.endsWith("-2]"))
-          if (time.hour < 12) "am" else "pm"
+          if (time.hour < 12) "am" else "pm" // XSLT 2 supports `[Pn]` for this, and `[PN]` for `AM`/`PM`
         else
           if (time.hour < 12) "a.m." else "p.m."
       }
 
-    ((hours.toString :: minutes :: secondsOpt.toList).mkString(":") :: amPmOpt.toList).mkString(" ")
+    ((hoursString :: minutesString :: secondsOpt.toList).mkString(":") :: amPmOpt.toList).mkString(" ")
   }
 
   private val MagicTimeRe = """(\d{1,2})(?::(\d{1,2})(?::(\d{1,2}))?)?(?:\s*(p|pm|p\.m\.|a|am|a\.m\.))?""".r

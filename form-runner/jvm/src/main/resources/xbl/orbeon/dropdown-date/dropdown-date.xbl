@@ -109,14 +109,14 @@
 
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-dropdown-date-grid">
-                    <fr:c x="1" y="1" w="12">
+                    <fr:c x="1" y="1" w="6">
                         <xf:input ref="instance('local')/start-year" id="start-year-control">
                             <xf:label ref="xxf:r('start-year.label')"/>
                             <xf:hint ref="xxf:r('start-year.hint')"/>
                             <xf:alert ref="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/>
                         </xf:input>
                     </fr:c>
-                    <fr:c x="1" y="2" w="12">
+                    <fr:c x="7" y="1" w="6">
                         <xf:input ref="instance('local')/end-year" id="end-year-control">
                             <xf:label ref="xxf:r('end-year.label')"/>
                             <xf:hint ref="xxf:r('end-year.hint')"/>

@@ -1265,11 +1265,11 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     ORBEON.xforms.Globals.maskFocusEvents = false;
             }
 
-            // TODO: Should we *not* call this for static read-only controls?
+            // 2023-01-12: Don't do this for static readonly controls.
             // Save current value as server value. We usually do this on focus, but for control where we set the focus
-            // with xf:setfocus, we still receive the focus event when the value changes, but after the change event
+            // with `xf:setfocus`, we still receive the focus event when the value changes, but after the change event
             // (which means we then don't send the new value to the server).
-            if (ORBEON.xforms.ServerValueStore.get(controlId) == null) {
+            if (! control.classList.contains("xforms-static") && ORBEON.xforms.ServerValueStore.get(controlId) == null) {
                 var currentValue = ORBEON.xforms.Controls.getCurrentValue(control);
                 ORBEON.xforms.ServerValueStore.set(controlId, currentValue);
             }
@@ -1643,10 +1643,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 var currentFocusControlElement = ORBEON.xforms.Globals.currentFocusControlId != null ? document.getElementById(ORBEON.xforms.Globals.currentFocusControlId) : null;
 
                 if (newFocusControlElement != null) {
-                    // Store initial value of control if we don't have a server value already, and if this is is not a list
+                    // 2023-01-12: Don't do this for static readonly controls.
+                    // Store initial value of control if we don't have a server value already, and if this is not a list
                     // Initial value for lists is set up initialization, as when we receive the focus event the new value is already set.
-                    if (ORBEON.xforms.ServerValueStore.get(newFocusControlElement.id) == null
-                            && ! $(newFocusControlElement).is('.xforms-select-appearance-compact, .xforms-select1-appearance-compact')) {
+                    if (! newFocusControlElement.classList.contains("xforms-static") &&
+                        ORBEON.xforms.ServerValueStore.get(newFocusControlElement.id) == null
+                        && ! $(newFocusControlElement).is('.xforms-select-appearance-compact, .xforms-select1-appearance-compact')) {
                         var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(newFocusControlElement);
                         ORBEON.xforms.ServerValueStore.set(newFocusControlElement.id, controlCurrentValue);
                     }

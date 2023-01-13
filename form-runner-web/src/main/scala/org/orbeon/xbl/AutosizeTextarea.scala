@@ -14,7 +14,6 @@
 package org.orbeon.xbl
 
 import org.orbeon.facades.Autosize
-import org.orbeon.xforms.$
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.scalajs.dom.html
 
@@ -27,17 +26,21 @@ object AutosizeTextarea {
 
   private class AutosizeTextareaCompanion(containerElem: html.Element) extends XBLCompanion {
 
-    private def textarea: html.TextArea =
-      $(containerElem).find("textarea")(0).asInstanceOf[html.TextArea]
+    private def textareaElem: Option[html.TextArea] =
+      Option(containerElem.querySelector("textarea").asInstanceOf[html.TextArea])
+
+    // For static readonly
+    private def preElem: Option[html.Element] =
+      Option(containerElem.querySelector("pre").asInstanceOf[html.Element])
 
     override def init(): Unit =
-      Autosize(textarea)
+      textareaElem.foreach(Autosize.apply)
 
     override def destroy(): Unit =
-      Autosize.destroy(textarea)
+      textareaElem.foreach(Autosize.destroy)
 
     override def xformsUpdateValue(newValue: String): js.UndefOr[Nothing] = {
-      Autosize.update(textarea)
+      textareaElem.foreach(Autosize.update)
       js.undefined
     }
 
@@ -47,8 +50,10 @@ object AutosizeTextarea {
     // delegate to the text area. This is required when the server updates client
     // values, in which case we check the current client value for comparison.
     override def xformsGetValue(): String = {
-      Autosize.update(textarea)
-      textarea.value
+      textareaElem.foreach(Autosize.update)
+      textareaElem.map(_.value)
+        .orElse(preElem.map(_.textContent))
+        .getOrElse("")
     }
   }
 }

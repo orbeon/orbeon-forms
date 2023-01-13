@@ -14,6 +14,7 @@
 package org.orbeon.date
 
 import cats.syntax.option._
+import org.orbeon.date.IsoTime.{findMagicTimeAsIsoTime, formatTime, parseFormat}
 import org.orbeon.date.JSDateUtils._
 import org.scalatest.funspec.AnyFunSpec
 
@@ -71,7 +72,10 @@ class JSDateUtilsTest extends AnyFunSpec {
 
   describe("Magic time parsing") {
 
+    val NowIsoTime = IsoTime(14, 9, 27.some)  // some randomly chosen time
+
     val StringsToIsoDates = List(
+      "now"           -> NowIsoTime.some,
       "21:22:23"      -> IsoTime(21, 22, 23.some).some,
       "12:34:56 p.m." -> IsoTime(12, 34, 56.some).some,
       "12:34 p.m."    -> IsoTime(12, 34, None).some,
@@ -102,7 +106,7 @@ class JSDateUtilsTest extends AnyFunSpec {
 
     for ((s, expected) <- StringsToIsoDates)
       it(s"must pass for `$s`") {
-        assert(findMagicTimeAsIsoTime(s) == expected)
+        assert(findMagicTimeAsIsoTime(s, NowIsoTime) == expected)
       }
   }
 
@@ -156,7 +160,7 @@ class JSDateUtilsTest extends AnyFunSpec {
 
     for (((s, format), expected) <- StringsToIsoDates)
       it(s"must pass for `${s.toIsoString}` with format `$format`") {
-        assert(formatTime(s, format) == expected)
+        assert(formatTime(s, parseFormat(format)) == expected)
       }
   }
 }

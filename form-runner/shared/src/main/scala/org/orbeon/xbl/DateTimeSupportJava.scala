@@ -14,6 +14,7 @@
 package org.orbeon.xbl
 
 import cats.syntax.option._
+import org.orbeon.date.IsoTime
 import org.orbeon.dom.QName
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.model.InstanceData
@@ -61,7 +62,7 @@ object TimeSupportJava {
   ): String =
     TimeExternalValue(
       isoOrUnrecognizedValue = binding.getStringValue,
-      format                 = format
+      format                 = IsoTime.parseFormat(format) // Q: could parse earlier/cache?
     ).asJson.noSpaces
 
   //@XPathFunction

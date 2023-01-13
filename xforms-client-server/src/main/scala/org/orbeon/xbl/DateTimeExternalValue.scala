@@ -13,6 +13,8 @@
   */
 package org.orbeon.xbl
 
+import org.orbeon.date.TimeFormat
+
 
 case class DateExternalValue(
   value         : String,
@@ -23,5 +25,5 @@ case class DateExternalValue(
 
 case class TimeExternalValue(
   isoOrUnrecognizedValue: String,
-  format                : String
+  format                : TimeFormat
 )

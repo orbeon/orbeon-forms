@@ -14,7 +14,8 @@
 package org.orbeon.xbl
 
 import org.log4s.Logger
-import org.orbeon.date.JSDateUtils.{findMagicTimeAsIsoTime, formatTime}
+import org.orbeon.date.IsoTime._
+import org.orbeon.date.JSDateUtils.nowAsIsoTime
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms._
@@ -27,6 +28,7 @@ import scala.scalajs.js
 
 
 object Time {
+
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Time")
   private val ListenerSuffix = ".time"
 
@@ -160,7 +162,7 @@ object Time {
             val newState =
               state.copy(
                 isoOrUnrecognizedValue =
-                  findMagicTimeAsIsoTime(visibleInputElemValue).map(_.toIsoString)
+                  findMagicTimeAsIsoTime(visibleInputElemValue, nowAsIsoTime).map(_.toIsoString)
                     .getOrElse(visibleInputElemValue)
               )
 
@@ -185,7 +187,7 @@ object Time {
 //              else          state.displayValue
 
           val newValue =
-            findMagicTimeAsIsoTime(state.isoOrUnrecognizedValue)
+            findMagicTimeAsIsoTime(state.isoOrUnrecognizedValue, nowAsIsoTime)
               .map(formatTime(_, state.format))
               .getOrElse(state.isoOrUnrecognizedValue)
 

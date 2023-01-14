@@ -265,7 +265,7 @@ object InstanceMirror {
               // Find destination node in inline instance in original doc
               evalOne(instanceWrapper, path) match {
                 case newNode: VirtualNodeType => Match(outerInstance, newNode)
-                case _                    => throw new IllegalStateException
+                case _                        => throw new IllegalStateException
               }
           }
         case _ => throw new IllegalStateException

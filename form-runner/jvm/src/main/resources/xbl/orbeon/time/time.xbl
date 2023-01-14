@@ -30,7 +30,7 @@
         xxbl:serialize-external-value="
             TimeSupport:serializeExternalValueJava(
                 xxf:binding('fr-time'),
-                property('xxf:format.input.time')
+                (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1]
             )"
 
         xxbl:deserialize-external-value="TimeSupport:deserializeExternalValueJava(.)"
@@ -64,37 +64,147 @@
             <control-details>
                 <xf:model xmlns="" id="fb-editor-time-model">
 
-                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/*">
+                    <xf:action event="xforms-model-construct-done" iterate="instance('local')/(* except output-format-details)">
                         <xf:var name="c" value="."/>
                         <xf:setvalue ref="$c" value="instance()/@*[name() = name($c)]"/>
                     </xf:action>
 
-                    <xf:instance id="local" xxf:exclude-result-prefixes="#all">
+                    <xf:action event="xforms-model-construct-done">
+                        <xf:var
+                            name="use-default"
+                            value="empty(instance()/@output-format[xxf:non-blank()])"/>
+                        <xf:setvalue
+                            ref="instance('local')/output-format-details/@default"
+                            value="$use-default"/>
+                        <xf:delete
+                            ref="instance('local')/output-format-details/*"/>
+                        <xf:insert
+                            xmlns:tfui="java:org.orbeon.oxf.fr.xbl.TimeFormatUi"
+                            context="instance('local')/output-format-details"
+                            origin="tfui:timeFormatToXml(if (not($use-default)) then instance()/@output-format else property('xxf:format.input.time'))/*/*"/>
+                    </xf:action>
+
+                    <xf:instance id="local" xxf:expose-xpath-types="true" xxf:exclude-result-prefixes="#all">
                         <_>
                             <field-width/>
+                            <output-format-details default="true">
+                                <is24Hour        type="boolean"/>
+                                <isPadHourDigits type="boolean"/>
+                                <hasSeconds      type="boolean"/>
+                                <amPmFormat      type="None"/>
+                            </output-format-details>
                         </_>
                     </xf:instance>
+
+                    <xf:bind ref="instance('local')/output-format-details">
+                        <xf:bind ref="@default | is24Hour | isPadHourDigits | hasSeconds" type="xs:boolean"/>
+                        <xf:bind ref="*" readonly="instance('local')/output-format-details/@default/data(.)"/>
+                    </xf:bind>
+
+                    <xf:instance id="fr-form-resources" xxf:readonly="true">
+                        <_>
+                            <resource xml:lang="en">
+                                <output-format>Output Format</output-format>
+                                <default-custom>
+                                    <item id="0">Use default</item>
+                                    <item id="1">Custom format</item>
+                                </default-custom>
+                            </resource>
+                            <resource xml:lang="fr">
+                                <output-format>Format de sortie</output-format>
+                                <default-custom>
+                                    <item id="0">Utiliser le défaut</item>
+                                    <item id="1">Format sur mesure</item>
+                                </default-custom>
+<!--                              TODO -->
+                            </resource>
+                        </_>
+                    </xf:instance>
+
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-time-grid">
-                    <xh:tr>
-                        <xh:td colspan="6">
-                            <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
-                                <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
-                                <xf:item>
-                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
-                                    <xf:value/>
-                                </xf:item>
-                                <xf:item>
-                                    <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
-                                    <xf:value>full</xf:value>
-                                </xf:item>
-                                <xf:item>
-                                    <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
-                                    <xf:value>natural</xf:value>
-                                </xf:item>
-                            </xf:select1>
-                        </xh:td>
-                    </xh:tr>
+                    <fr:c x="1" y="1" w="12">
+                        <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
+                            <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
+                            <xf:item>
+                                <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                <xf:value/>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label ref="xxf:r('xbl-control-settings.full', '|fr-form-resources|')"/>
+                                <xf:value>full</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label ref="xxf:r('xbl-control-settings.natural', '|fr-form-resources|')"/>
+                                <xf:value>natural</xf:value>
+                            </xf:item>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="2" w="12">
+                        <xf:select1 ref="instance('local')/output-format-details/@default" appearance="full xxf:horizontal" id="output-format-control">
+                            <xf:label ref="xxf:r('output-format')"/>
+                            <xf:itemset ref="xxf:resource-elements('default-custom.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="if (@id = 0) then 'true' else 'false'"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="3" w="6">
+                        <xf:select1 ref="instance('local')/output-format-details/is24Hour" appearance="full xxf:horizontal" id="is-24-hour-control">
+                            <xf:label>12-hour/24-hour</xf:label>
+                            <xf:item>
+                                <xf:label>12-hour</xf:label>
+                                <xf:value>false</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>24-hour</xf:label>
+                                <xf:value>true</xf:value>
+                            </xf:item>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="7" y="3" w="6">
+                        <xf:select1 ref="instance('local')/output-format-details/hasSeconds" appearance="full xxf:horizontal" id="has-seconds-control">
+                            <xf:label>Include seconds</xf:label>
+                            <xf:item>
+                                <xf:label>Yes</xf:label>
+                                <xf:value>true</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>No</xf:label>
+                                <xf:value>false</xf:value>
+                            </xf:item>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="1" y="4" w="6">
+                        <xf:select1 ref="instance('local')/output-format-details/isPadHourDigits" appearance="full" id="is-pad-hour-digits-control">
+                            <xf:label>Hour format</xf:label>
+                            <xf:item>
+                                <xf:label>Leading zero (01)</xf:label>
+                                <xf:value>true</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>No leading zero (1)</xf:label>
+                                <xf:value>false</xf:value>
+                            </xf:item>
+                        </xf:select1>
+                    </fr:c>
+                    <fr:c x="7" y="4" w="6">
+                        <xf:select1 ref="instance('local')/output-format-details/amPmFormat/@type" appearance="minimal" id="am-pm-format-control">
+                            <xf:label>AM/PM format</xf:label>
+                            <xf:item>
+                                <xf:label>None</xf:label>
+                                <xf:value>None</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>am/pm</xf:label>
+                                <xf:value>Lower</xf:value>
+                            </xf:item>
+                            <xf:item>
+                                <xf:label>a.m./p.m.</xf:label>
+                                <xf:value>LowerDots</xf:value>
+                            </xf:item>
+                        </xf:select1>
+                    </fr:c>
                 </fr:grid>
                 <xf:action
                     id="fb-editor-time-action"
@@ -110,6 +220,24 @@
                     <xf:delete
                         if="xxf:is-blank($new-value)"
                         ref="instance()/@*[name() = $name]"/>
+                </xf:action>
+                <xf:action
+                    id="fb-editor-time-format-action"
+                    event="xforms-value-changed"
+                    observer="
+                        output-format-control
+                        is-24-hour-control
+                        is-pad-hour-digits-control
+                        has-seconds-control
+                        am-pm-format-control">
+                    <xf:insert
+                        xmlns:tfui="java:org.orbeon.oxf.fr.xbl.TimeFormatUi"
+                        if="not(instance('local')/output-format-details/@default/data(.))"
+                        context="instance()"
+                        origin="xf:attribute('output-format', tfui:xmlFormatToFormatString(instance('local')/output-format-details))"/>
+                    <xf:delete
+                        if="instance('local')/output-format-details/@default/data(.)"
+                        ref="instance()/@output-format"/>
                 </xf:action>
             </control-details>
         </metadata>

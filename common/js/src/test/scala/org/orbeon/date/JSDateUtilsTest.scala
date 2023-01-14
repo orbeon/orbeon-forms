@@ -14,7 +14,7 @@
 package org.orbeon.date
 
 import cats.syntax.option._
-import org.orbeon.date.IsoTime.{findMagicTimeAsIsoTime, formatTime, parseFormat}
+import org.orbeon.date.IsoTime._
 import org.orbeon.date.JSDateUtils._
 import org.scalatest.funspec.AnyFunSpec
 
@@ -117,10 +117,10 @@ class JSDateUtilsTest extends AnyFunSpec {
     val FormatWithSeconds24Hour        = "[H]:[m]:[s]"
     val FormatWithSeconds24Hour2Digits = "[H01]:[m]:[s]"
 
-    val FormatNoSecondsAndLongAmPm    = "[h]:[m] [P]"
-    val FormatNoSecondsAndShortAmPm   = "[h]:[m] [P,2-2]"
-    val FormatNoSeconds24Hour         = "[H]:[m]"
-    val FormatNoSeconds24Hour2Digits  = "[H01]:[m]"
+    val FormatNoSecondsAndLongAmPm     = "[h]:[m] [P]"
+    val FormatNoSecondsAndShortAmPm    = "[h]:[m] [P,2-2]"
+    val FormatNoSeconds24Hour          = "[H]:[m]"
+    val FormatNoSeconds24Hour2Digits   = "[H01]:[m]"
 
     val StringsToIsoDates = List(
       (IsoTime(0,  22, 23.some), FormatWithSecondsAndLongAmPm)   -> "12:22:23 a.m.",
@@ -161,6 +161,26 @@ class JSDateUtilsTest extends AnyFunSpec {
     for (((s, format), expected) <- StringsToIsoDates)
       it(s"must pass for `${s.toIsoString}` with format `$format`") {
         assert(formatTime(s, parseFormat(format)) == expected)
+      }
+  }
+
+  describe("Picture string generation") {
+
+    val Formats = List(
+      TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = true,  AmPmFormat.LowerDots)  -> "[h]:[m]:[s] [P]",
+      TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = true,  AmPmFormat.Lower)      -> "[h]:[m]:[s] [P,2-2]",
+      TimeFormat(is24Hour = true,  isPadHourDigits = false, hasSeconds = true,  AmPmFormat.None)       -> "[H]:[m]:[s]",
+      TimeFormat(is24Hour = true,  isPadHourDigits = true,  hasSeconds = true,  AmPmFormat.None)       -> "[H01]:[m]:[s]",
+
+      TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = false, AmPmFormat.LowerDots)  -> "[h]:[m] [P]",
+      TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = false, AmPmFormat.Lower)      -> "[h]:[m] [P,2-2]",
+      TimeFormat(is24Hour = true,  isPadHourDigits = false, hasSeconds = false, AmPmFormat.None)       -> "[H]:[m]",
+      TimeFormat(is24Hour = true,  isPadHourDigits = true,  hasSeconds = false, AmPmFormat.None)       -> "[H01]:[m]",
+    )
+
+    for ((timeFormat, timeFormatString) <- Formats)
+      it(s"must pass for `$timeFormat`") {
+        assert(generateFormat(timeFormat) == timeFormatString)
       }
   }
 }

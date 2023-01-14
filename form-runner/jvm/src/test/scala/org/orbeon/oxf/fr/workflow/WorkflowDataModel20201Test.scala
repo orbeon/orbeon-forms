@@ -148,7 +148,7 @@ class WorkflowDataModel20201Test extends AnyFunSpec with XMLSupport {
 
     it("must encode/decode back to original via simplified XML") {
       assert(
-        Success(TestState) == Workflow20201.simplifiedXmlToWorkflowState(Workflow20201.fullXmlToSimplifiedXml(Workflow20201.stateToFullXml(TestState)).rootElement)
+        Success(TestState) == Workflow20201.simplifiedXmlToState(Workflow20201.fullXmlToSimplifiedXml(Workflow20201.stateToFullXml(TestState)).rootElement)
       )
     }
   }

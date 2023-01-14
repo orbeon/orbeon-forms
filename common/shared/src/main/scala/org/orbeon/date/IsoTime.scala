@@ -109,6 +109,21 @@ object IsoTime {
     TimeFormat(is24Hour = is24Hour, isPadHourDigits = isPadHourDigits, hasSeconds = hasSeconds, amPmFormat = amPmFormat)
   }
 
+  def generateFormat(timeFormat: TimeFormat): String = {
+
+    val hours = s"[${if (timeFormat.is24Hour) "H" else "h"}${if (timeFormat.isPadHourDigits) "01" else ""}]"
+
+    val secondsSuffix = if (timeFormat.hasSeconds) ":[s]" else ""
+
+    val amPmSuffix = timeFormat.amPmFormat match {
+      case AmPmFormat.None      => ""
+      case AmPmFormat.Lower     => " [P,2-2]"
+      case AmPmFormat.LowerDots => " [P]"
+    }
+
+    s"$hours:[m]$secondsSuffix$amPmSuffix"
+  }
+
   def findMagicTimeAsIsoTime(magicTime: String, currentTime: => IsoTime): Option[IsoTime] =
     magicTime.some.map(_.trimAllToEmpty) collect {
       case "now" =>

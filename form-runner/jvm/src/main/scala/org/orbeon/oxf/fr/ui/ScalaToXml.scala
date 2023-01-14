@@ -39,8 +39,8 @@ trait ScalaToXml {
 
   type MyState
 
-  def encode[T : Encoder](state: T)          : String = state.asJson.noSpaces
-  def decode[T : Decoder](jsonString: String): Try[T] = parser.decode[T](jsonString).fold(Failure.apply, Success.apply)
+  private def encode[T : Encoder](state: T)          : String = state.asJson.noSpaces
+  private def decode[T : Decoder](jsonString: String): Try[T] = parser.decode[T](jsonString).fold(Failure.apply, Success.apply)
 
   private val TypeQName: QName = QName("type")
 
@@ -53,9 +53,9 @@ trait ScalaToXml {
     Symbols.Array
   )
 
-  def simplifiedXmlToWorkflowState[MyState : Decoder](workflowElem: NodeInfo): Try[MyState] = {
+  def simplifiedXmlToState[MyState : Decoder](rootElem: NodeInfo): Try[MyState] = {
 
-    require(workflowElem.isElement)
+    require(rootElem.isElement)
 
     // Create XForms JSON document
     val simplifiedXmlDoc = new DocumentWrapper(
@@ -67,7 +67,7 @@ trait ScalaToXml {
 
     XFormsAPI.insert(
       into   = simplifiedXmlDoc.rootElement,
-      origin = workflowElem child *
+      origin = rootElem child *
     )
 
     val fullXmlDoc = simplifiedXmlToFullXml(simplifiedXmlDoc)

@@ -131,6 +131,8 @@
                                     <item id="2">AM/PM</item>
                                     <item id="3">a.m./p.m.</item>
                                     <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
                                 </am-pm>
                             </resource>
                             <resource xml:lang="fr">
@@ -161,6 +163,8 @@
                                     <item id="2">AM/PM</item>
                                     <item id="3">a.m./p.m.</item>
                                     <item id="4">A.M./P.M.</item>
+                                    <item id="5">a/p</item>
+                                    <item id="6">A/P</item>
                                 </am-pm>
                             </resource>
                         </_>
@@ -238,6 +242,10 @@
                                             'LowerDots'
                                         else if (@id = 4) then
                                             'UpperDots'
+                                        else if (@id = 5) then
+                                            'LowerShort'
+                                        else if (@id = 6) then
+                                            'UpperShort'
                                         else
                                             error()"/>
                             </xf:itemset>

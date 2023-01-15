@@ -116,6 +116,8 @@ class JSDateUtilsTest extends AnyFunSpec {
     val FormatWithSecondsAndUpperDotsAmPm   = "[h]:[m]:[s] [PN]"
     val FormatWithSecondsAndLowerAmPm       = "[h]:[m]:[s] [P,2-2]"
     val FormatWithSecondsAndUpperAmPm       = "[h]:[m]:[s] [PN,2-2]"
+    val FormatWithSecondsAndLowerShortAmPm  = "[h]:[m]:[s] [P,1-1]"
+    val FormatWithSecondsAndUpperShortAmPm  = "[h]:[m]:[s] [PN,1-1]"
     val FormatWithSeconds24Hour             = "[H]:[m]:[s]"
     val FormatWithSeconds24Hour2Digits      = "[H01]:[m]:[s]"
 
@@ -123,6 +125,8 @@ class JSDateUtilsTest extends AnyFunSpec {
     val FormatNoSecondsAndUpperDotsAmPm     = "[h]:[m] [PN]"
     val FormatNoSecondsAndLowerAmPm         = "[h]:[m] [P,2-2]"
     val FormatNoSecondsAndUpperAmPm         = "[h]:[m] [PN,2-2]"
+    val FormatNoSecondsAndLowerShortAmPm    = "[h]:[m] [P,1-1]"
+    val FormatNoSecondsAndUpperShortAmPm    = "[h]:[m] [PN,1-1]"
     val FormatNoSeconds24Hour               = "[H]:[m]"
     val FormatNoSeconds24Hour2Digits        = "[H01]:[m]"
 
@@ -131,6 +135,8 @@ class JSDateUtilsTest extends AnyFunSpec {
       (IsoTime(0,  22, 23.some), FormatWithSecondsAndUpperDotsAmPm)   -> "12:22:23 A.M.",
       (IsoTime(0,  22, 23.some), FormatWithSecondsAndLowerAmPm)       -> "12:22:23 am",
       (IsoTime(0,  22, 23.some), FormatWithSecondsAndUpperAmPm)       -> "12:22:23 AM",
+      (IsoTime(0,  22, 23.some), FormatWithSecondsAndLowerShortAmPm)  -> "12:22:23 a",
+      (IsoTime(0,  22, 23.some), FormatWithSecondsAndUpperShortAmPm)  -> "12:22:23 A",
       (IsoTime(0,  22, 23.some), FormatWithSeconds24Hour)             -> "0:22:23",
       (IsoTime(3,  22, 23.some), FormatWithSecondsAndLowerDotsAmPm)   -> "3:22:23 a.m.",
       (IsoTime(3,  22, 23.some), FormatWithSecondsAndLowerAmPm)       -> "3:22:23 am",
@@ -150,6 +156,8 @@ class JSDateUtilsTest extends AnyFunSpec {
       (IsoTime(0,  22, 23.some), FormatNoSecondsAndUpperDotsAmPm)     -> "12:22 A.M.",
       (IsoTime(0,  22, 23.some), FormatNoSecondsAndLowerAmPm)         -> "12:22 am",
       (IsoTime(0,  22, 23.some), FormatNoSecondsAndUpperAmPm)         -> "12:22 AM",
+      (IsoTime(0,  22, 23.some), FormatNoSecondsAndLowerShortAmPm)    -> "12:22 a",
+      (IsoTime(0,  22, 23.some), FormatNoSecondsAndUpperShortAmPm)    -> "12:22 A",
       (IsoTime(0,  22, 23.some), FormatNoSeconds24Hour)               -> "0:22",
       (IsoTime(3,  22, 23.some), FormatNoSecondsAndLowerDotsAmPm)     -> "3:22 a.m.",
       (IsoTime(3,  22, 23.some), FormatNoSecondsAndLowerAmPm)         -> "3:22 am",
@@ -178,14 +186,18 @@ class JSDateUtilsTest extends AnyFunSpec {
       TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = true,  AmPmFormat.Lower)      -> "[h]:[m]:[s] [P,2-2]",
       TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = true,  AmPmFormat.Upper)      -> "[h]:[m]:[s] [PN,2-2]",
       TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = true,  AmPmFormat.LowerDots)  -> "[h]:[m]:[s] [P]",
+      TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = true,  AmPmFormat.LowerShort) -> "[h]:[m]:[s] [P,1-1]",
       TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = true,  AmPmFormat.UpperDots)  -> "[h]:[m]:[s] [PN]",
+      TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = true,  AmPmFormat.UpperShort) -> "[h]:[m]:[s] [PN,1-1]",
       TimeFormat(is24Hour = true,  isPadHourDigits = false, hasSeconds = true,  AmPmFormat.None)       -> "[H]:[m]:[s]",
       TimeFormat(is24Hour = true,  isPadHourDigits = true,  hasSeconds = true,  AmPmFormat.None)       -> "[H01]:[m]:[s]",
 
       TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = false, AmPmFormat.Lower)      -> "[h]:[m] [P,2-2]",
       TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = false, AmPmFormat.Upper)      -> "[h]:[m] [PN,2-2]",
       TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = false, AmPmFormat.LowerDots)  -> "[h]:[m] [P]",
+      TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = false, AmPmFormat.LowerShort) -> "[h]:[m] [P,1-1]",
       TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = false, AmPmFormat.UpperDots)  -> "[h]:[m] [PN]",
+      TimeFormat(is24Hour = false, isPadHourDigits = false, hasSeconds = false, AmPmFormat.UpperShort) -> "[h]:[m] [PN,1-1]",
       TimeFormat(is24Hour = true,  isPadHourDigits = false, hasSeconds = false, AmPmFormat.None)       -> "[H]:[m]",
       TimeFormat(is24Hour = true,  isPadHourDigits = true,  hasSeconds = false, AmPmFormat.None)       -> "[H01]:[m]",
     )

@@ -24,10 +24,10 @@ object AmPmFormat {
 
   case object None  extends AmPmFormat
   case object Lower extends AmPmFormat
-//    case object Upper extends AmPmFormat
+  case object Upper extends AmPmFormat
   case object LowerDots  extends AmPmFormat
 //    case object LowerShort extends AmPmFormat
-//    case object UpperDots  extends AmPmFormat
+  case object UpperDots  extends AmPmFormat
 //    case object UpperShort extends AmPmFormat
 }
 
@@ -80,8 +80,10 @@ object IsoTime {
     val amPmOpt =
       timeFormat.amPmFormat match {
         case AmPmFormat.None      => None
-        case AmPmFormat.Lower     => Some(if (time.hour < 12) "am"  else "pm")
+        case AmPmFormat.Lower     => Some(if (time.hour < 12) "am"   else "pm")
+        case AmPmFormat.Upper     => Some(if (time.hour < 12) "AM"   else "PM")
         case AmPmFormat.LowerDots => Some(if (time.hour < 12) "a.m." else "p.m.")
+        case AmPmFormat.UpperDots => Some(if (time.hour < 12) "A.M." else "P.M.")
       }
 
     ((hoursString :: minutesString :: secondsOpt.toList).mkString(":") :: amPmOpt.toList).mkString(" ")
@@ -99,8 +101,12 @@ object IsoTime {
       formatInputTime.contains("[s]")
 
     val amPmFormat =
-      if (formatInputTime.contains("[P") && formatInputTime.endsWith("-2]"))
+      if (formatInputTime.contains("[PN") && formatInputTime.endsWith("-2]"))
+        AmPmFormat.Upper
+      else if (formatInputTime.contains("[P") && formatInputTime.endsWith("-2]"))
         AmPmFormat.Lower
+      else if (formatInputTime.contains("[PN"))
+        AmPmFormat.UpperDots
       else if (formatInputTime.contains("[P"))
         AmPmFormat.LowerDots
       else
@@ -118,7 +124,9 @@ object IsoTime {
     val amPmSuffix = timeFormat.amPmFormat match {
       case AmPmFormat.None      => ""
       case AmPmFormat.Lower     => " [P,2-2]"
+      case AmPmFormat.Upper     => " [PN,2-2]"
       case AmPmFormat.LowerDots => " [P]"
+      case AmPmFormat.UpperDots => " [PN]"
     }
 
     s"$hours:[m]$secondsSuffix$amPmSuffix"

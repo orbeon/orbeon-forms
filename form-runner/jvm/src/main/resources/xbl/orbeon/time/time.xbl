@@ -109,6 +109,29 @@
                                     <item id="0">Use default</item>
                                     <item id="1">Custom format</item>
                                 </default-custom>
+                                <hour-system>
+                                    <label>12-hour/24-hour</label>
+                                    <item id="0">12-hour</item>
+                                    <item id="1">24-hour</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Hour format</label>
+                                    <item id="0">No Leading zero (1)</item>
+                                    <item id="1">leading zero (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Include seconds</label>
+                                    <item id="0">No</item>
+                                    <item id="1">Yes</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>AM/PM format</label>
+                                    <item id="0">None</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                </am-pm>
                             </resource>
                             <resource xml:lang="fr">
                                 <output-format>Format de sortie</output-format>
@@ -116,7 +139,29 @@
                                     <item id="0">Utiliser le défaut</item>
                                     <item id="1">Format sur mesure</item>
                                 </default-custom>
-<!--                              TODO -->
+                                <hour-system>
+                                    <label>Format 12 heures/24 heures</label>
+                                    <item id="0">12 heures</item>
+                                    <item id="1">24 heures</item>
+                                </hour-system>
+                                <pad-hour>
+                                    <label>Format de l'heure</label>
+                                    <item id="0">Sans zéro initial (1)</item>
+                                    <item id="1">Avec zéro initial (01)</item>
+                                </pad-hour>
+                                <seconds>
+                                    <label>Inclure les secondes</label>
+                                    <item id="0">Non</item>
+                                    <item id="1">Oui</item>
+                                </seconds>
+                                <am-pm>
+                                    <label>Format AM/PM</label>
+                                    <item id="0">Aucun</item>
+                                    <item id="1">am/pm</item>
+                                    <item id="2">AM/PM</item>
+                                    <item id="3">a.m./p.m.</item>
+                                    <item id="4">A.M./P.M.</item>
+                                </am-pm>
                             </resource>
                         </_>
                     </xf:instance>
@@ -151,58 +196,51 @@
                     </fr:c>
                     <fr:c x="1" y="3" w="6">
                         <xf:select1 ref="instance('local')/output-format-details/is24Hour" appearance="full xxf:horizontal" id="is-24-hour-control">
-                            <xf:label>12-hour/24-hour</xf:label>
-                            <xf:item>
-                                <xf:label>12-hour</xf:label>
-                                <xf:value>false</xf:value>
-                            </xf:item>
-                            <xf:item>
-                                <xf:label>24-hour</xf:label>
-                                <xf:value>true</xf:value>
-                            </xf:item>
+                            <xf:label ref="xxf:r('hour-system.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('hour-system.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="if (@id = 0) then 'false' else 'true'"/>
+                            </xf:itemset>
                         </xf:select1>
                     </fr:c>
                     <fr:c x="7" y="3" w="6">
                         <xf:select1 ref="instance('local')/output-format-details/hasSeconds" appearance="full xxf:horizontal" id="has-seconds-control">
-                            <xf:label>Include seconds</xf:label>
-                            <xf:item>
-                                <xf:label>Yes</xf:label>
-                                <xf:value>true</xf:value>
-                            </xf:item>
-                            <xf:item>
-                                <xf:label>No</xf:label>
-                                <xf:value>false</xf:value>
-                            </xf:item>
+                            <xf:label ref="xxf:r('seconds.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('seconds.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="if (@id = 0) then 'false' else 'true'"/>
+                            </xf:itemset>
                         </xf:select1>
                     </fr:c>
                     <fr:c x="1" y="4" w="6">
                         <xf:select1 ref="instance('local')/output-format-details/isPadHourDigits" appearance="full" id="is-pad-hour-digits-control">
-                            <xf:label>Hour format</xf:label>
-                            <xf:item>
-                                <xf:label>Leading zero (01)</xf:label>
-                                <xf:value>true</xf:value>
-                            </xf:item>
-                            <xf:item>
-                                <xf:label>No leading zero (1)</xf:label>
-                                <xf:value>false</xf:value>
-                            </xf:item>
+                            <xf:label ref="xxf:r('pad-hour.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('pad-hour.item')">
+                                <xf:label ref="."/>
+                                <xf:value ref="if (@id = 0) then 'false' else 'true'"/>
+                            </xf:itemset>
                         </xf:select1>
                     </fr:c>
                     <fr:c x="7" y="4" w="6">
                         <xf:select1 ref="instance('local')/output-format-details/amPmFormat/@type" appearance="minimal" id="am-pm-format-control">
-                            <xf:label>AM/PM format</xf:label>
-                            <xf:item>
-                                <xf:label>None</xf:label>
-                                <xf:value>None</xf:value>
-                            </xf:item>
-                            <xf:item>
-                                <xf:label>am/pm</xf:label>
-                                <xf:value>Lower</xf:value>
-                            </xf:item>
-                            <xf:item>
-                                <xf:label>a.m./p.m.</xf:label>
-                                <xf:value>LowerDots</xf:value>
-                            </xf:item>
+                            <xf:label ref="xxf:r('am-pm.label')"/>
+                            <xf:itemset ref="xxf:resource-elements('am-pm.item')">
+                                <xf:label ref="."/>
+                                <xf:value
+                                    ref="
+                                        if (@id = 0) then
+                                            'None'
+                                        else if (@id = 1) then
+                                            'Lower'
+                                        else if (@id = 2) then
+                                            'Upper'
+                                        else if (@id = 3) then
+                                            'LowerDots'
+                                        else if (@id = 4) then
+                                            'UpperDots'
+                                        else
+                                            error()"/>
+                            </xf:itemset>
                         </xf:select1>
                     </fr:c>
                 </fr:grid>

@@ -2597,7 +2597,7 @@
 
         </dialog-workflow>
         <xbl-control-settings>
-            <field-width>Largeur du champs</field-width>
+            <field-width>Largeur du champ</field-width>
             <default>Utiliser le défaut</default>
             <full>Espace disponible</full>
             <natural>Naturel</natural>

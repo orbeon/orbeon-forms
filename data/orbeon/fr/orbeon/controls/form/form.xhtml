@@ -52,6 +52,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <dropdown-date>2009-10-16</dropdown-date>
                             <fields-date>2009-10-16</fields-date>
                             <time>17:47:57</time>
+                            <time-24hour>17:47:57</time-24hour>
                             <datetime>2009-10-16T17:48:03</datetime>
                         </grid-4>
                     </date-time-controls>
@@ -127,6 +128,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"/>
                         <xf:bind id="time-bind" ref="time" type="xf:time" name="time"/>
                         <xf:bind id="datetime-bind" ref="datetime" type="xf:dateTime" name="datetime"/>
+                        <xf:bind id="time-24hour-bind" ref="time-24hour" type="xf:time" name="time-24hour"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
@@ -428,6 +430,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Time</label>
                             <hint>Standard time field</hint>
                         </time>
+                        <time-24hour>
+                            <label>24-Hour Time</label>
+                            <hint>Standard time field</hint>
+                        </time-24hour>
                         <datetime>
                             <label>Date and Time</label>
                             <hint>Standard date and time field</hint>
@@ -697,9 +703,13 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <hint>Sélecteur de date avec champs séparés</hint>
                         </fields-date>
                         <time>
-                            <label>Heure</label>
+                            <label>Heure sur 12 heures</label>
                             <hint>Champ heure standard</hint>
                         </time>
+                        <time-24hour>
+                            <label>Heure sur 24 heures</label>
+                            <hint>Champ heure standard</hint>
+                        </time-24hour>
                         <datetime>
                             <label>Date et heure</label>
                             <hint>Champ date et heure standard</hint>
@@ -1058,13 +1068,20 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             </fr:fields-date>
                         </fr:c>
                         <fr:c y="2" x="1" w="4">
-                            <fr:time bind="time-bind" id="time-control" field-width="natural">
+                            <fr:time bind="time-bind" id="time-control" field-width="natural"
+                                     output-format="[h]:[m]:[s] [P,2-2]">
                                 <xf:label ref="$form-resources/time/label"/>
                                 <xf:hint ref="$form-resources/time/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:time>
                         </fr:c>
                         <fr:c y="2" x="5" w="4">
+                            <fr:time bind="time-24hour-bind" id="time-24hour-control" field-width="natural"
+                                     output-format="[H]:[m]:[s]">
+                                <xf:label ref="$form-resources/time-24hour/label"/>
+                                <xf:hint ref="$form-resources/time-24hour/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:time>
                         </fr:c>
                         <fr:c y="2" x="9" w="4"/>
                         <fr:c x="1" y="3" w="4">

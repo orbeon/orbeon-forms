@@ -218,6 +218,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                     <xbl>
                         <fr:calculated-value appearance="full"/>
                     </xbl>
+                    <data-migration>enabled</data-migration>
                 </metadata>
             </xf:instance>
             <xf:instance id="fr-form-attachments">

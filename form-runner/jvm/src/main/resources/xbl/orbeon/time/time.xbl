@@ -79,7 +79,7 @@
                         <xf:delete
                             ref="instance('local')/output-format-details/*"/>
                         <xf:insert
-                            xmlns:tfui="java:org.orbeon.oxf.fr.xbl.TimeFormatUi"
+                            xmlns:tfui="java:org.orbeon.oxf.fb.xbl.TimeFormatUi"
                             context="instance('local')/output-format-details"
                             origin="tfui:timeFormatToXml(if (not($use-default)) then instance()/@output-format else property('xxf:format.input.time'))/*/*"/>
                     </xf:action>
@@ -277,7 +277,7 @@
                         has-seconds-control
                         am-pm-format-control">
                     <xf:insert
-                        xmlns:tfui="java:org.orbeon.oxf.fr.xbl.TimeFormatUi"
+                        xmlns:tfui="java:org.orbeon.oxf.fb.xbl.TimeFormatUi"
                         if="not(instance('local')/output-format-details/@default/data(.))"
                         context="instance()"
                         origin="xf:attribute('output-format', tfui:xmlFormatToFormatString(instance('local')/output-format-details))"/>

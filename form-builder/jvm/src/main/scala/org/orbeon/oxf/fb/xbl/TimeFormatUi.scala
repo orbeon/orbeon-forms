@@ -1,11 +1,10 @@
-package org.orbeon.oxf.fr.xbl
+package org.orbeon.oxf.fb.xbl
 
 import org.orbeon.date.{IsoTime, TimeFormat}
 import org.orbeon.oxf.fr.ui.ScalaToXml
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 
 
-// xxx TODO: move to fb UI package?
 object TimeFormatUi extends ScalaToXml {
 
   type MyState = TimeFormat

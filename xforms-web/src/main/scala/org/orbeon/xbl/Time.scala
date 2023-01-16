@@ -162,7 +162,7 @@ object Time {
             val newState =
               state.copy(
                 isoOrUnrecognizedValue =
-                  findMagicTimeAsIsoTime(visibleInputElemValue, nowAsIsoTime).map(_.toIsoString)
+                  findMagicTimeAsIsoTimeWithNow(visibleInputElemValue, nowAsIsoTime).map(_.toIsoString)
                     .getOrElse(visibleInputElemValue)
               )
 
@@ -187,7 +187,7 @@ object Time {
 //              else          state.displayValue
 
           val newValue =
-            findMagicTimeAsIsoTime(state.isoOrUnrecognizedValue, nowAsIsoTime)
+            findMagicTimeAsIsoTimeWithNow(state.isoOrUnrecognizedValue, nowAsIsoTime)
               .map(formatTime(_, state.format))
               .getOrElse(state.isoOrUnrecognizedValue)
 

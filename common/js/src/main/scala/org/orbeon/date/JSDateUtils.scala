@@ -53,7 +53,7 @@ object JSDateUtils {
     jsDateToIsoTimeUsingLocalTimezone(new js.Date(), millis = false)
 
   def dateToIsoStringUsingLocalTimezone(date: js.Date): String =
-    date.getFullYear.toString + '-' + IsoTime.pad2(date.getMonth + 1) + '-' + IsoTime.pad2(date.getDate)
+    date.getFullYear.toString + '-' + IsoTime.pad2(date.getMonth.toInt + 1) + '-' + IsoTime.pad2(date.getDate.toInt)
 
   def jsDateToIsoTimeUsingLocalTimezone(time: js.Date, millis: Boolean): IsoTime =
     IsoTime(time.getHours.toInt, time.getMinutes.toInt, time.getSeconds.toInt.some) // , millis option time.getMilliseconds.toInt

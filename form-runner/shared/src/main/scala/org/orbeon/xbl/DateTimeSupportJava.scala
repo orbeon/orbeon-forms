@@ -57,8 +57,8 @@ object TimeSupportJava {
 
   //@XPathFunction
   def serializeExternalValueJava(
-    binding   : om.Item,
-    format    : String
+    binding : om.Item,
+    format  : String
   ): String =
     TimeExternalValue(
       isoOrUnrecognizedValue = binding.getStringValue,
@@ -68,4 +68,13 @@ object TimeSupportJava {
   //@XPathFunction
   def deserializeExternalValueJava(externalValue: String): String =
     parser.decode[TimeExternalValue](externalValue).fold(Failure.apply, Success.apply) map (_.isoOrUnrecognizedValue) getOrElse ""
+
+  //@XPathFunction
+  def formatReadonlyModeTime(
+    binding : om.Item,
+    format  : String
+  ): String =
+    IsoTime.findMagicTimeAsIsoTime(binding.getStringValue)
+      .map(IsoTime.formatTime(_, IsoTime.parseFormat(format)))
+      .getOrElse(binding.getStringValue)
 }

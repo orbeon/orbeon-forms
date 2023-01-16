@@ -364,7 +364,13 @@
                 - https://github.com/orbeon/orbeon-forms/issues/5490
                 - https://github.com/orbeon/orbeon-forms/issues/2991
             -->
-            <xf:input ref="$binding[$view]"/>
+            <xf:input
+                ref="$binding[$view]"
+                xxf:format="
+                    TimeSupport:formatReadonlyModeTime(
+                        xxf:binding('fr-time'),
+                        (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1]
+                    )"/>
 
         </xbl:template>
     </xbl:binding>

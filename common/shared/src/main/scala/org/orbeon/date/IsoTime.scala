@@ -75,7 +75,7 @@ object IsoTime {
       pad2(time.minute) // for now assume `[m]`/`[m01]`
 
     val secondsOpt =
-      timeFormat.hasSeconds option pad2(time.second.getOrElse(0): Int)
+      timeFormat.hasSeconds option pad2(time.second.getOrElse(0))
 
     val amPmOpt =
       timeFormat.amPmFormat match {
@@ -140,10 +140,14 @@ object IsoTime {
     s"$hours:[m]$secondsSuffix$amPmSuffix"
   }
 
-  def findMagicTimeAsIsoTime(magicTime: String, currentTime: => IsoTime): Option[IsoTime] =
+  def findMagicTimeAsIsoTimeWithNow(magicTime: String, currentTime: => IsoTime): Option[IsoTime] =
     magicTime.some.map(_.trimAllToEmpty) collect {
-      case "now" =>
-        currentTime
+      case "now" => currentTime
+    } orElse
+      findMagicTimeAsIsoTime(magicTime)
+
+  def findMagicTimeAsIsoTime(magicTime: String): Option[IsoTime] =
+    magicTime.some.map(_.trimAllToEmpty) collect {
       case MagicTimeRe(h, m, s, amPm)
         if h.toInt >=0 && h.toInt < 24  &&
           ((m eq null) || m.toInt >= 0 && m.toInt <= 59) &&
@@ -167,7 +171,7 @@ object IsoTime {
         IsoTime(hh, mInt, Option(s).map(_.toInt))
     }
 
-  def pad2(n: Double): String =
+  def pad2(n: Int): String =
     if (n < 10)
       "0" + n
     else

@@ -106,7 +106,7 @@ class JSDateUtilsTest extends AnyFunSpec {
 
     for ((s, expected) <- StringsToIsoDates)
       it(s"must pass for `$s`") {
-        assert(findMagicTimeAsIsoTime(s, NowIsoTime) == expected)
+        assert(findMagicTimeAsIsoTimeWithNow(s, NowIsoTime) == expected)
       }
   }
 

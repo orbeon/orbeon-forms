@@ -12,6 +12,10 @@ case class IsoTime(
   second : Option[Int],
 //    millis : Option[Int]
 ) {
+  require(hour   >=0 && hour   <= 23) // with ISO, "24 then the values of the minutes element and the seconds element must be 00 and 00"
+  require(minute >=0 && minute <= 59) // with ISO, "60 or more is allowed only in the case of leap seconds"
+  require(second.isEmpty || second.exists(s => s >=0 && s <= 59))
+
   def toIsoString: String =
     formatTime(
       this,
@@ -21,7 +25,6 @@ case class IsoTime(
 
 sealed trait AmPmFormat
 object AmPmFormat {
-
   case object None       extends AmPmFormat
   case object Lower      extends AmPmFormat
   case object Upper      extends AmPmFormat

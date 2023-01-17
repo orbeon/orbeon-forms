@@ -24,6 +24,6 @@ case class DateExternalValue(
 )
 
 case class TimeExternalValue(
-  isoOrUnrecognizedValue: String,
+  isoOrUnrecognizedValue: String, // TODO: `IsoTime Either String`
   format                : TimeFormat
 )

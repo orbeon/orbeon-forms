@@ -67,11 +67,10 @@ object Number {
 
             logger.debug(s"reacting to event ${e.`type`}")
 
-            // Don't set value if not needed, so not to unnecessarily disturb the cursor position
             stateOpt foreach { state =>
-              if (readValue(visibleInputElem, state.decimalSeparator) != state.editValue) {
+              // Don't set value if not needed, so not to unnecessarily disturb the cursor position
+              if (readValue(visibleInputElem, state.decimalSeparator) != state.editValue)
                 writeValue(visibleInputElem, state.decimalSeparator, state.editValue)
-              }
             }
 
             setInputTypeIfNeeded("number")

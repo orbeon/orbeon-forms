@@ -14,6 +14,7 @@
 package org.orbeon.xbl
 
 import org.log4s.Logger
+import org.orbeon.date.IsoTime
 import org.orbeon.date.IsoTime._
 import org.orbeon.date.JSDateUtils.nowAsIsoTime
 import org.orbeon.oxf.util.LoggerFactory
@@ -55,6 +56,26 @@ object Time {
 
       val visibleInputElem = containerElem.querySelector("input").asInstanceOf[html.Input]
       companion.visibleInputElemOpt = Some(visibleInputElem)
+
+      $(visibleInputElem).on(s"${DomEventNames.TouchStart}$ListenerSuffix ${DomEventNames.FocusIn}$ListenerSuffix", {
+        (_: html.Element, e: JQueryEventObject) => {
+          if (! isMarkedReadonly) {
+
+            logger.debug(s"reacting to event ${e.`type`}")
+
+            stateOpt foreach { state =>
+              // Upon `focusin`, if the format omits seconds, but the value has non-zero seconds, then we want to show
+              // the value with seconds, so that the value is not lost.
+              if (! state.format.hasSeconds)
+                IsoTime.findMagicTimeAsIsoTime(state.isoOrUnrecognizedValue) match {
+                  case Some(t @ IsoTime(_, _, Some(s))) if s != 0 =>
+                    writeValue(visibleInputElem, IsoTime.formatTime(t, state.format.copy(hasSeconds = true)))
+                  case _ =>
+                }
+            }
+          }
+        }
+      }: js.ThisFunction)
 
       $(visibleInputElem).on(s"${DomEventNames.FocusOut}$ListenerSuffix", {
         (_: html.Element, e: JQueryEventObject) => {

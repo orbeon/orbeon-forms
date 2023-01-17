@@ -308,4 +308,20 @@ class VersionTest
       assert(tryLicenseInfo(license).get.isExpired)
     }
   }
+
+  describe("License number parsing") {
+
+    val Expected = List(
+      "3.8"                    -> (3, 8),
+      "4.1.0.201301281947"     -> (4, 1),
+      "2022.1.202212310402-PE" -> (2022, 1),
+      "2022.1 PE"              -> (2022, 1), // https://github.com/orbeon/orbeon-forms/issues/5632
+
+    )
+
+    for ((s, majorMinor) <- Expected)
+      it(s"must succeed for `$s`") {
+        assert(VersionSupport.majorMinor(s).contains(majorMinor))
+      }
+  }
 }

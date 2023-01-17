@@ -62,7 +62,7 @@ abstract class XBLCompanionWithState(containerElem: html.Element) extends XBLCom
     js.undefined
   }
 
-  final def updateStateAndSendValueToServerIfNeeded(newState: State, valueFromState: State => String): Boolean = {
+  final def updateStateAndSendValueToServerIfNeeded[V](newState: State, valueFromState: State => V): Boolean = {
 
     val mustUpdateStateAndSendValue =
       ! (stateOpt exists (state => valueFromState(state) == valueFromState(newState)))

@@ -46,7 +46,10 @@ object DateSupportJava {
 
   //@XPathFunction
   def deserializeExternalValueJava(externalValue: String): String =
-    parser.decode[DateExternalValue](externalValue).fold(Failure.apply, Success.apply) map (_.value) getOrElse ""
+    parser.decode[DateExternalValue](externalValue)
+      .fold(Failure.apply, Success.apply)
+      .map(_.value)
+      .getOrElse("")
 }
 
 object TimeSupportJava {
@@ -61,13 +64,16 @@ object TimeSupportJava {
     format  : String
   ): String =
     TimeExternalValue(
-      isoOrUnrecognizedValue = binding.getStringValue,
+      isoOrUnrecognizedValue = IsoTime.findMagicTimeAsIsoTime(binding.getStringValue).toLeft(binding.getStringValue),
       format                 = IsoTime.parseFormat(format) // Q: could parse earlier/cache?
     ).asJson.noSpaces
 
   //@XPathFunction
   def deserializeExternalValueJava(externalValue: String): String =
-    parser.decode[TimeExternalValue](externalValue).fold(Failure.apply, Success.apply) map (_.isoOrUnrecognizedValue) getOrElse ""
+    parser.decode[TimeExternalValue](externalValue)
+      .fold(Failure.apply, Success.apply)
+      .map(_.isoOrUnrecognizedValue.fold(_.toIsoString, identity))
+      .getOrElse("")
 
   //@XPathFunction
   def formatReadonlyModeTime(

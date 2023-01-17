@@ -67,8 +67,8 @@ object Time {
               // Upon `focusin`, if the format omits seconds, but the value has non-zero seconds, then we want to show
               // the value with seconds, so that the value is not lost.
               if (! state.format.hasSeconds)
-                IsoTime.findMagicTimeAsIsoTime(state.isoOrUnrecognizedValue) match {
-                  case Some(t @ IsoTime(_, _, Some(s))) if s != 0 =>
+                state.isoOrUnrecognizedValue match {
+                  case Left(t @ IsoTime(_, _, Some(s))) if s != 0 =>
                     writeValue(visibleInputElem, IsoTime.formatTime(t, state.format.copy(hasSeconds = true)))
                   case _ =>
                 }
@@ -183,8 +183,7 @@ object Time {
             val newState =
               state.copy(
                 isoOrUnrecognizedValue =
-                  findMagicTimeAsIsoTimeWithNow(visibleInputElemValue, nowAsIsoTime).map(_.toIsoString)
-                    .getOrElse(visibleInputElemValue)
+                  findMagicTimeAsIsoTimeWithNow(visibleInputElemValue, nowAsIsoTime).toLeft(visibleInputElemValue)
               )
 
             val stateUpdated =
@@ -207,12 +206,10 @@ object Time {
 //              if (hasFocus) state.editValue
 //              else          state.displayValue
 
-          val newValue =
-            findMagicTimeAsIsoTimeWithNow(state.isoOrUnrecognizedValue, nowAsIsoTime)
-              .map(formatTime(_, state.format))
-              .getOrElse(state.isoOrUnrecognizedValue)
+          val newStringValue =
+            state.isoOrUnrecognizedValue.fold(formatTime(_, state.format), identity)
 
-          writeValue(visibleInputElem, newValue)
+          writeValue(visibleInputElem, newStringValue)
         }
 
       def readValue(input: html.Input): String =

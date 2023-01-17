@@ -19,7 +19,7 @@ case class IsoTime(
   def toIsoString: String =
     formatTime(
       this,
-      parseFormat("[H]:[m]:[s]")
+      IsoTimeFormat
     )
 }
 
@@ -40,8 +40,9 @@ case class TimeFormat(
   hasSeconds     : Boolean,
   amPmFormat     : AmPmFormat,
 )
-
 object IsoTime {
+
+  val IsoTimeFormat = TimeFormat(is24Hour = true, isPadHourDigits = true, hasSeconds = true, AmPmFormat.None)
 
   // Supported format only:
   //

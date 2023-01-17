@@ -83,4 +83,8 @@ object TimeSupportJava {
     IsoTime.findMagicTimeAsIsoTime(binding.getStringValue)
       .map(IsoTime.formatTime(_, IsoTime.parseFormat(format)))
       .getOrElse(binding.getStringValue)
+
+  //@XPathFunction
+  def generatePlaceholder(formatString: String, hmsEn: String, hms: String): String =
+    IsoTime.generatePlaceholder(IsoTime.parseFormat(formatString), hmsEn, hms)
 }

@@ -144,6 +144,20 @@ object IsoTime {
     s"$hours:[m]$secondsSuffix$amPmSuffix"
   }
 
+  def generatePlaceholder(timeFormat: TimeFormat, hmsEn: String, hms: String): String = {
+
+    val secondsSuffix = if (timeFormat.hasSeconds) ":ss" else ""
+
+    val amPmSuffix = timeFormat.amPmFormat match {
+      case AmPmFormat.None  => ""
+      case _                => " am"
+    }
+
+    val translatedHms = s"hh:mm$secondsSuffix".translate(hmsEn, hms)
+
+    s"$translatedHms$amPmSuffix"
+  }
+
   def findMagicTimeAsIsoTimeWithNow(magicTime: String, currentTime: => IsoTime): Option[IsoTime] =
     magicTime.some.map(_.trimAllToEmpty) collect {
       case "now" => currentTime

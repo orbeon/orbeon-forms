@@ -323,31 +323,20 @@
                     property('xxf:readonly-appearance') = 'static' or
                     fr:mode() = 'pdf'
                 "/>
-            <xf:var
-                name="field-width"
-                value="fr:component-param-value('field-width')"/>
-            <xf:var
-                name="placeholder"
-                value="
-                    let $format      := property('xxf:format.input.time'),
-                        $cleaned     := translate(lower-case($format), '[]', ''),
-                        $duplicate   := replace(replace(replace(replace(replace(replace($cleaned,
-                                        'h'      , 'hh'  ),
-                                        'm'      , 'mm'  ),
-                                        's'      , 'ss'  ),
-                                        'p,2\-2' , 'am'  ),
-                                        'p,\*\-2', 'am'  ),
-                                        'p'      , 'a.m.'),
-                        $format-en   := instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
-                        $format-lang := xxf:r('format'),
-                        $translated  := translate($duplicate, $format-en, $format-lang)
-                    return
-                        $translated
-                "/>
 
             <xf:group ref="$binding[not($view)]">
-                <xh:div class="input-append fr-field-width-{$field-width}">
-                    <xh:input xh:type="text" placeholder="{$placeholder}" id="fr-time-input" xxf:control="true" role="textbox"/>
+                <xh:div class="input-append fr-field-width-{fr:component-param-value('field-width')}">
+                    <xh:input
+                        xh:type="text"
+                        placeholder="{
+                            TimeSupport:generatePlaceholder(
+                                (fr:component-param-value('output-format'), property('xxf:format.input.time'))[1],
+                                instance('orbeon-resources')/resource[@xml:lang = 'en']/format,
+                                xxf:r('format')
+                            )}"
+                        id="fr-time-input"
+                        xxf:control="true"
+                        role="textbox"/>
                     <xh:span class="add-on">
                         <xh:i class="fa fa-fw fa-clock-o"/>
                     </xh:span>

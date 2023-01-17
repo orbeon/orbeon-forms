@@ -228,7 +228,7 @@
                     <fr:c x="7" y="4" w="6">
                         <xf:select1 ref="instance('local')/output-format-details/amPmFormat/@type" appearance="minimal" id="am-pm-format-control">
                             <xf:label ref="xxf:r('am-pm.label')"/>
-                            <xf:itemset ref="xxf:resource-elements('am-pm.item')">
+                            <xf:itemset ref="xxf:resource-elements('am-pm.item')[xs:integer(@id) le 4 (: don't support a/p for now :)]">
                                 <xf:label ref="."/>
                                 <xf:value
                                     ref="

@@ -16,17 +16,18 @@ package org.orbeon.xbl
 import cats.syntax.option.*
 import io.udash.wrappers.jquery.JQueryPromise
 import org.log4s.Logger
-import org.orbeon.date.JSDateUtils
+import org.orbeon.date.JSDateUtils.todayAsIsoDate
+import org.orbeon.date.{IsoDate, JSDateUtils}
 import org.orbeon.facades.DatePicker.*
 import org.orbeon.oxf.util.CoreUtils.*
 import org.orbeon.oxf.util.LoggerFactory
-import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.*
 import org.orbeon.xforms.Constants.XFormsIosClass
 import org.orbeon.xforms.facade.XBL
 import org.scalajs.dom
 import org.scalajs.dom.html
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.*
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
@@ -34,258 +35,331 @@ import scala.scalajs.js.{Promise, UndefOr, |}
 
 
 object Date {
+
   val logger: Logger = LoggerFactory.createLogger("org.orbeon.xbl.Date")
+
   XBL.declareCompanion("fr|date", js.constructorOf[DateCompanion])
-}
 
-private class DateCompanion(containerElem: html.Element) extends XBLCompanionWithState(containerElem) {
+  // TODO: Can we reduce duplication with `TimeCompanion`?
+  private class DateCompanion(containerElem: html.Element) extends XBLCompanionWithState(containerElem) {
 
-  companion =>
+    companion =>
 
-  import Date.*
-  import io.circe.generic.auto.*
-  import io.circe.{Decoder, Encoder}
+    import Private.*
+    import io.circe.generic.auto.*
+    import io.circe.{Decoder, Encoder}
 
-  type State = DateExternalValue
+    type State = DateExternalValue
 
-  val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
-  val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
+    val stateEncoder: Encoder[State] = implicitly[Encoder[State]]
+    val stateDecoder: Decoder[State] = implicitly[Decoder[State]]
 
-  private def inputHtmlEl   : dom.html.Input = containerElem.querySelector("input").asInstanceOf[dom.html.Input]
-  private var datePicker    : DatePicker     = _
+    private object EventSupport           extends EventListenerSupport
+    private object DatePickerEventSupport extends EventListenerSupport
 
-  override def init(): Unit = {
+    private var visibleInputElemOpt: Option[html.Input] = None
+    private var datePickerOpt: Option[DatePicker] = None
 
-    logger.debug("init")
+    override def init(): Unit = {
 
-    // Add `readonly` attribute on the input if the control is readonly
-    val isReadonly = containerElem.classList.contains("xforms-readonly")
-    updateReadonly(isReadonly)
+      logger.debug("init")
 
-    if (isNativePicker) {
-      inputHtmlEl.`type` = "date"
-      EventSupport.addListener(inputHtmlEl, DomEventNames.Change, (_: dom.Event) => onDateSelectedUpdateStateAndSendValueToServer())
+      val visibleInputElem = containerElem.querySelector("input").asInstanceOf[html.Input]
+      companion.visibleInputElemOpt = Some(visibleInputElem)
 
-      // Also set `disabled` on iOS (see #5376)
-      if (inputHtmlEl.readOnly)
-        inputHtmlEl.disabled = true
+      // Add `readonly` attribute on the input if the control is readonly
+      val isReadonly = containerElem.classList.contains("xforms-readonly")
+      updateReadonly(isReadonly)
 
-    } else {
-      createDatePicker(dateExternalValue = None)
-    }
-  }
+      if (isNativePicker) {
+        visibleInputElem.`type` = "date"
+        EventSupport.addListener(visibleInputElem, DomEventNames.Change, (_: dom.Event) => onDateSelectedUpdateStateAndSendValueToServer())
 
-  override def destroy(): Unit = {
-    logger.debug("destroy")
-    destroyImpl()
-  }
+        // Also set `disabled` on iOS (see #5376)
+        if (visibleInputElem.readOnly)
+          visibleInputElem.disabled = true
 
-  override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] =
-    updateStateAndSendValueToServer(newValue)
+      } else {
 
-  private def destroyImpl(): Unit =
-    if (isNativePicker) {
-      EventSupport.clearAllListeners()
-    } else {
-      Language.offLangChange(containerElem.id)
-      EventSupport.clearAllListeners()
-      datePicker.destroy()
-    }
+        // 2024-12-06: Use `focusout` like for `fr:time`
+        EventSupport.addListener(visibleInputElem, DomEventNames.FocusOut,
+          (e: dom.Event) => {
+            if (! isMarkedReadonly) {
+              logger.debug(s"reacting to event ${e.`type`}")
 
-  def xformsUpdateState(previousStateOpt: Option[State], newState: State): Unit = {
+              updateStateAndSendValueToServer(readValue)
 
-    val DateExternalValue(newValue, newFormat, newExcludedDates, newWeekStart) = newState
-
-    logger.debug(s"updateWithServerValues: `$newValue`, `$newFormat`, `$newExcludedDates`, `$newWeekStart`")
-
-    if (isNativePicker) {
-      if (! (previousStateOpt map (_.value) contains newValue))
-        inputHtmlEl.value = newValue
-    } else {
-      if (! previousStateOpt.contains(newState)) {
-        // Don't call `destroy()` directly because that causes the re-initialization of the companion in `xforms.js`!
-        destroyImpl()
-        createDatePicker(dateExternalValue = newState.some)
-      }
-    }
-  }
-
-  // Orbeon Forms format:         https://doc.orbeon.com/configuration/properties/xforms#for-xf-input
-  // bootstrap-datepicker format: https://bootstrap-datepicker.readthedocs.io/en/latest/options.html#format
-  private def orbeonFormatToBootstrapFormat(format: String): String =
-    format
-      .replace("[D]"  , "d"   )
-      .replace("[D01]", "dd"  )
-      .replace("[M]"  , "m"   )
-      .replace("[M01]", "mm"  )
-      .replace("[Y]"  , "yyyy")
-
-  private def createDatePicker(dateExternalValue: Option[DateExternalValue]): Unit = {
-
-    logger.debug(s"createDatePicker: `$dateExternalValue`")
-
-    val options =  {
-      val opts = new DatePickerOptions
-
-      opts.autoclose        = true
-      opts.enableOnReadonly = false
-      opts.assumeNearbyYear = true
-      opts.showOnFocus      = false
-      opts.forceParse       = false
-      opts.language         = Language.getLang()
-      opts.container        = containerElem.closest("dialog, .orbeon")
-
-      dateExternalValue foreach { case DateExternalValue(_, format, excludedDates, weekStart) =>
-        opts.format = orbeonFormatToBootstrapFormat(format)
-        weekStart.foreach(opts.weekStart = _)
-        if (excludedDates.nonEmpty)
-          opts.datesDisabled = excludedDates.flatMap(JSDateUtils.parseIsoDateUsingLocalTimezone).toJSArray
-      }
-
-      opts
-    }
-
-    datePicker = $(inputHtmlEl).parent().datepicker(options)
-
-    // Register listeners
-
-    // DOM listeners
-    EventSupport.addListener(containerElem.querySelector(".add-on, .input-group .input-group-addon"), DomEventNames.KeyDown,  onIconKeypress)
-    EventSupport.addListener(inputHtmlEl,                                                             DomEventNames.KeyPress, onInputKeypress)
-    EventSupport.addListener(inputHtmlEl,                                                             DomEventNames.Change,   onInputChangeUpdateDatePicker)
-
-    // Date picker listeners
-    enableDatePickerChangeListener()
-    datePicker.onHide(() => { inputHtmlEl.focus() }) // Set focus back on field when done with the picker
-    datePicker.onShow(() => { inputHtmlEl.focus() }) // For date picker to be usable with the keyboard
-
-    // Global language listener
-    Language.onLangChange(
-      listenerId = containerElem.id,
-      listener   = { _ =>
-        destroy()
-        createDatePicker(stateOpt)
-      }
-    )
-
-    // When the focus leaves the input going to the date picker, we stop propagation, so our generic code doesn't take this as
-    // the field loosing the focus, which might prematurely show the field as invalid, before users got a chance to select a value
-    // in the date picker
-    val inputElement = containerElem.querySelector("input")
-    Support.stopFocusOutPropagationUseEventListenerSupport(inputElement, _.relatedTarget, "datepicker-dropdown", EventSupport)
-
-    // Set date value if needed
-    dateExternalValue foreach { case DateExternalValue(value, _, _, _) =>
-      value.trimAllToOpt match {
-        case Some(newValue) =>
-
-          JSDateUtils.parseIsoDateUsingLocalTimezone(newValue) match {
-            case Some(date) =>
-              datePicker.setDate(date)
-            case None       =>
-              // https://github.com/orbeon/orbeon-forms/issues/4794
-              // Issue: `clearDates()` itself sets the value of the field AND causes the `onChangeDate` listener
-              // to run and send a blank value to the server. The listener for `clearDates()` runs synchronously
-              // and so runs before what follows below here.
-              // Now there is at least one issue, which is that when opening the date picker with a value like
-              // `2021-11-33` in the field the picker shows a year of `1933`. We'd probably like to be something
-              // closer to either a guess of the date entered, or the current date, but not `1933`. I tried a few
-              // options, including `update()` on the picker, passing a `new js.Date()`, etc. but nothing does it.
-              // I think we need a better date picker.
-              disableDatePickerChangeListener()
-              datePicker.clearDates()
-              inputHtmlEl.value = newValue
-              enableDatePickerChangeListener()
+              // Always update visible value with XForms value:
+              //
+              // - relying on just value change event from server is not enough
+              // - value change is not dispatched if the server value hasn't changed
+              // - if the visible changed, but XForms hasn't, we still need to show XForms value
+              // - see: https://github.com/orbeon/orbeon-forms/issues/1026
+              //
+              // So either:
+              //
+              // - the Ajax response called `updateWithServerValues()` and then `updateVisibleValue()`
+              // - or it didn't, and we force `updateVisibleValue()` after the response is processed
+              //
+              // We also call `updateVisibleValue()` immediately in `updateStateAndSendValueToServer()` if the
+              // edit value hasn't changed.
+              //
+  //            val formId = $(containerElem).parents("form").attr("id").get
+              AjaxClient.allEventsProcessedF("date").foreach { _ =>
+                stateOpt.foreach(updateVisibleValue)
+              }
+            }
           }
-        case None           =>
-          datePicker.clearDates()
+        )
+
+        EventSupport.addListener(visibleInputElem, DomEventNames.KeyPress,
+          (e: dom.KeyboardEvent) => {
+            if (! isMarkedReadonly) {
+
+              logger.debug(s"reacting to event ${e.`type`}")
+
+              if (Set(10, 13)(e.keyCode)) {
+                e.preventDefault()
+                updateStateAndSendValueToServer(readValue)
+                AjaxClient.fireEvent(
+                  AjaxEvent(
+                    eventName = DomEventNames.DOMActivate,
+                    targetId  = containerElem.id
+                  )
+                )
+              }
+            }
+          }
+        )
+
+        createDatePicker(visibleInputElem, dateExternalValue = None)
       }
     }
-  }
 
-  override def xformsUpdateReadonly(readonly: Boolean): Unit =
-    updateReadonly(readonly)
+    override def destroy(): Unit = {
+      logger.debug("destroy")
+      EventSupport.clearAllListeners()
+      if (! isNativePicker)
+        destroyDatePicker()
+    }
 
-  override def xformsFocus(): Unit =
-    inputHtmlEl.focus()
+    private def destroyDatePicker(): Unit = {
+      Language.offLangChange(containerElem.id)
+      DatePickerEventSupport.clearAllListeners()
+      datePickerOpt.foreach(_.destroy())
+      datePickerOpt = None
+    }
 
-  private object EventSupport extends EventListenerSupport
+    override def xformsUpdateReadonly(readonly: Boolean): Unit = {
+      logger.debug(s"xformsUpdateReadonly: $readonly")
+      updateReadonly(readonly)
+    }
 
-  private def isNativePicker: Boolean = {
-    val always  = containerElem.querySelector(":scope > .fr-native-picker-always") != null
-    val iOS     = dom.document.body.classList.contains(XFormsIosClass)
-    always || iOS
-  }
+    def xformsUpdateState(previousStateOpt: Option[State], newState: State): Unit = {
 
-  private def enableDatePickerChangeListener(): Unit =
-    datePicker.onChangeDate(        ()                     => onDateSelectedUpdateStateAndSendValueToServer())
+      val DateExternalValue(newValue, newFormat, newExcludedDates, newWeekStart) = newState
 
-  private def disableDatePickerChangeListener(): Unit =
-    datePicker.offChangeDate()
+      logger.debug(s"updateWithServerValues: `$newValue`, `$newFormat`, `$newExcludedDates`, `$newWeekStart`")
 
-  private def getInputFieldValue: String =
-    inputHtmlEl.value
+      if (isNativePicker) {
+        if (! previousStateOpt.map(_.stringValue).contains(newState.stringValue)) // test probably not needed as we just set the input value? might avoid focus issues?
+          updateVisibleValue(newState)
+      } else {
+        if (! previousStateOpt.contains(newState)) {
+          // Don't call `destroy()` directly because that causes the re-initialization of the companion in `xforms.js`!
+          destroyDatePicker()
+          companion.visibleInputElemOpt.foreach(createDatePicker(_, dateExternalValue = newState.some))
+          updateVisibleValue(newState)
+        }
+      }
 
-  private def updateReadonly(readonly: Boolean): Unit = {
-    inputHtmlEl.readOnly = readonly
-    if (isNativePicker)
-      // Also set `disabled` on iOS (see #5376)
-      inputHtmlEl.disabled = readonly
-  }
+      // Also update disabled because this might be called upon an iteration being moved, in which
+      // case all the control properties must be updated.
+      updateReadonly(companion.isMarkedReadonly)
+    }
 
-  // Send the new value to the server when it changes
-  private def onDateSelectedUpdateStateAndSendValueToServer(): Unit =
-    stateOpt foreach { state =>
+    override def xformsFocus(): Unit = {
+      logger.debug(s"xformsFocus")
+      companion.visibleInputElemOpt.foreach(_.focus())
+    }
 
-      val valueFromUIOpt =
-        if (isNativePicker) {
-          Some(getInputFieldValue)
-        } else {
-          Option(datePicker.getDate) match {
-            case None       => Some(getInputFieldValue)
-            case Some(uiDate) =>
-              // Don't send UI date to server if it's the same as the state date
-              val stateDateOpt = JSDateUtils.parseIsoDateUsingLocalTimezone(state.value)
-              val dateChanged  = stateDateOpt.isEmpty || stateDateOpt.exists(_.getTime() != uiDate.getTime())
-              dateChanged.option(JSDateUtils.dateToIsoStringUsingLocalTimezone(uiDate))
+    override def setUserValue(newValue: String): UndefOr[Promise[Unit] | JQueryPromise[js.Function1[js.Any, js.Any], js.Any]] =
+      updateStateAndSendValueToServer(_ => newValue)
+
+    private object Private {
+
+      def updateReadonly(readonly: Boolean): Unit =
+        visibleInputElemOpt.foreach { visibleInputElem =>
+          visibleInputElem.readOnly = readonly
+          if (isNativePicker)
+            // Also set `disabled` on iOS (see #5376)
+            visibleInputElem.disabled = readonly
+        }
+
+      def updateStateAndSendValueToServer(read: html.Input => String): Unit =
+        visibleInputElemOpt.foreach { visibleInputElem =>
+          stateOpt.foreach { state =>
+
+            val visibleInputElemValue = read(visibleInputElem)
+
+            val newState =
+              state.copy(
+                isoOrUnrecognizedValue =
+                  IsoDate.findMagicDateAsIsoDateWithNow(state.format, visibleInputElemValue, todayAsIsoDate).toLeft(visibleInputElemValue)
+              )
+
+            val stateUpdated =
+              updateStateAndSendValueToServerIfNeeded(
+                newState       = newState,
+                valueFromState = _.isoOrUnrecognizedValue,
+              )
+
+            if (! stateUpdated)
+              updateVisibleValue(newState)
           }
         }
 
-      valueFromUIOpt.foreach(updateStateAndSendValueToServer)
-    }
+      def updateVisibleValue(state: State): Unit =
+        companion.visibleInputElemOpt.foreach { visibleInputElem =>
+          writeValue(visibleInputElem, state.stringValue)
+        }
 
-  private def updateStateAndSendValueToServer(newValue: String): Unit =
-    stateOpt foreach { state =>
-      updateStateAndSendValueToServerIfNeeded(
-        newState       = state.copy(value = newValue),
-        valueFromState = _.value
-      )
-    }
+      def readValue(input: html.Input): String =
+        input.value
 
-  // Force an update of the date picker if we have a valid date, so when users type "1/2", the value
-  // goes "1/2/2019" when the control looses the focus, or users press enter. (I would have thought that
-  // the datepicker control would do this on it own, but apparently it doesn't.)
-  private def onInputChangeUpdateDatePicker(e: dom.Event): Unit =
-    Option(datePicker.getDate) match {
-      case Some(date) => datePicker.setDate(date)
-      case None       => datePicker.clearDates()
-    }
+      def writeValue(input: html.Input, value: String): Unit =
+        input.value = value
 
-  private def onInputKeypress(e: dom.KeyboardEvent): Unit =
-    if (Set(10, 13)(e.keyCode)) {
-      e.preventDefault()
-      onDateSelectedUpdateStateAndSendValueToServer()
-      AjaxClient.fireEvent(
-        AjaxEvent(
-          eventName = DomEventNames.DOMActivate,
-          targetId  = containerElem.id
+      def createDatePicker(visibleInputElem: html.Input, dateExternalValue: Option[DateExternalValue]): Unit = {
+
+        logger.debug(s"createDatePicker: `$dateExternalValue`")
+
+        val options =  {
+          val opts = new DatePickerOptions
+
+          opts.autoclose        = true
+          opts.enableOnReadonly = false
+          opts.assumeNearbyYear = true
+          opts.showOnFocus      = false
+          opts.forceParse       = false
+          opts.language         = Language.getLang()
+          opts.container        = containerElem.closest("dialog, .orbeon")
+
+          dateExternalValue.foreach { case DateExternalValue(_, format, excludedDates, weekStart) =>
+            opts.format = IsoDate.generateBootstrapFormat(format)
+            weekStart.foreach(opts.weekStart = _)
+            if (excludedDates.nonEmpty)
+              opts.datesDisabled = excludedDates.flatMap(JSDateUtils.parseIsoDateUsingLocalTimezone).toJSArray
+          }
+
+          opts
+        }
+
+        val datePicker = $(visibleInputElem).parent().datepicker(options)
+        datePickerOpt = Some(datePicker)
+
+        // Register listeners
+
+        // DOM listeners
+        DatePickerEventSupport.addListener(containerElem.querySelector(".add-on, .input-group .input-group-addon"), DomEventNames.KeyDown,  onIconKeypress)
+
+        // Date picker listeners
+        enableDatePickerChangeListener(datePicker)
+        datePicker.onHide(() => { visibleInputElem.focus() }) // Set focus back on field when done with the picker
+        datePicker.onShow(() => { visibleInputElem.focus() }) // For date picker to be usable with the keyboard
+
+        // Global language listener
+        Language.onLangChange(
+          listenerId = containerElem.id,
+          listener   = { _ =>
+            destroy()
+            createDatePicker(visibleInputElem, stateOpt)
+          }
         )
-      )
-    }
 
-  private def onIconKeypress(event: dom.KeyboardEvent): Unit =
-    if (event.key == " " || event.key == "Enter") {
-      event.preventDefault()
-      datePicker.showDatepicker()
+        // When the focus leaves the input going to the date picker, we stop propagation, so our generic code doesn't take this as
+        // the field losing the focus, which might prematurely show the field as invalid, before users got a chance to select a value
+        // in the date picker
+        val inputElement = containerElem.querySelector("input")
+        Support.stopFocusOutPropagationUseEventListenerSupport(inputElement, _.relatedTarget, "datepicker-dropdown", EventSupport)
+
+        // Set date value
+        dateExternalValue.foreach { case DateExternalValue(value, _, _, _) =>
+          value match {
+            case Left(newIsoDate) =>
+              datePicker.setDate(JSDateUtils.isoDateToJsDate(newIsoDate))
+              // TODO: set field value?
+            case Right(unrecognizedValue) =>
+              disableDatePickerChangeListener(datePicker)
+              datePicker.clearDates()
+              writeValue(visibleInputElem, unrecognizedValue)
+              enableDatePickerChangeListener(datePicker)
+          }
+        }
+      }
+
+      def isNativePicker: Boolean = {
+        val always  = containerElem.querySelector(":scope > .fr-native-picker-always") != null
+        val iOS     = dom.document.body.classList.contains(XFormsIosClass)
+        always || iOS
+      }
+
+      def enableDatePickerChangeListener(datePicker: DatePicker): Unit =
+        datePicker.onChangeDate(() => onDateSelectedUpdateStateAndSendValueToServer())
+
+      def disableDatePickerChangeListener(datePicker: DatePicker): Unit =
+        datePicker.offChangeDate()
+
+      // Send the new value to the server when it changes
+      def onDateSelectedUpdateStateAndSendValueToServer(): Unit =
+        visibleInputElemOpt.foreach { visibleInputElem =>
+          stateOpt.foreach { state =>
+
+            val valueFromUIOpt =
+              if (isNativePicker) {
+                Some(readValue(visibleInputElem))
+              } else {
+                datePickerOpt.flatMap(datePicker => Option(datePicker.getDate)) match {
+                  case None       =>
+                    Some(readValue(visibleInputElem))
+                  case Some(pickerJsDate) =>
+
+                    val pickerIsoDate =
+                      JSDateUtils.jsDateToIsoDateUsingLocalTimezone(pickerJsDate)
+
+                    val stateIsoDateOpt =
+                      state.isoOrUnrecognizedValue.left.toOption
+
+                    val dateChanged =
+                      stateIsoDateOpt.isEmpty || stateIsoDateOpt.exists(_ != pickerIsoDate)
+
+                    // Don't send UI date to server if it's the same as the state date
+                    dateChanged.option(IsoDate.formatDate(pickerIsoDate, state.format))
+                }
+              }
+
+            valueFromUIOpt.foreach(valueFromUI => updateStateAndSendValueToServer(_ => valueFromUI))
+          }
+        }
+
+      // Force an update of the date picker if we have a valid date, so when users type "1/2", the value
+      // goes "1/2/2019" when the control looses the focus, or users press enter. (I would have thought that
+      // the datepicker control would do this on it own, but apparently it doesn't.)
+//      def onInputChangeUpdateDatePicker(e: dom.Event): Unit =
+//        Option(datePicker.getDate) match {
+//          case Some(date) =>
+//            println(s"xxx onInputChangeUpdateDatePicker Some($date)")
+//            datePicker.setDate(date)
+//          case None       =>
+//            println(s"xxx onInputChangeUpdateDatePicker: none")
+//            datePicker.clearDates()
+//        }
+
+      def onIconKeypress(event: dom.KeyboardEvent): Unit =
+        if (event.key == " " || event.key == "Enter") {
+          event.preventDefault()
+          datePickerOpt.foreach(_.showDatepicker())
+        }
     }
+  }
 }

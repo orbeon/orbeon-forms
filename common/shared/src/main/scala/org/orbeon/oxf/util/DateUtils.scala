@@ -32,6 +32,17 @@ object DateUtils {
   def formatRfc1123DateTimeGmt(instant: Instant): String =
     RFC1123Date.format(instant)
 
+  // Date can be local or with a timezone offset, which is ignored
+  def tryParseISODate(date: String): Try[(Int, Int, Int)] =
+    Try {
+      val accessor = DateTimeFormatter.ISO_DATE.parse(date)
+      (
+        accessor.get(ChronoField.YEAR),
+        accessor.get(ChronoField.MONTH_OF_YEAR),
+        accessor.get(ChronoField.DAY_OF_MONTH)
+      )
+    }
+
   // Parse an RFC 1123 dateTime
   // NOTE: See https://tools.ietf.org/html/rfc2616#page-20
   // Q: Should we still parse format 2 and 3? That's a pain.

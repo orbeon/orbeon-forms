@@ -14,8 +14,9 @@
 package org.orbeon.xbl
 
 import cats.syntax.option.*
-import org.orbeon.date.IsoTime
+import org.orbeon.date.{IsoDate, IsoTime}
 import org.orbeon.dom.QName
+import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.StringUtils.*
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.saxon.om
@@ -25,9 +26,9 @@ import scala.util.{Failure, Success}
 
 object DateSupportJava {
 
-  import io.circe.generic.auto._
+  import io.circe.generic.auto.*
   import io.circe.parser
-  import io.circe.syntax._
+  import io.circe.syntax.*
 
   private val ExcludedDatesQName = QName("excluded-dates")
 
@@ -38,25 +39,30 @@ object DateSupportJava {
     weekStart : String
   ): String =
     DateExternalValue(
-      value         = binding.getStringValue,
-      format        = format,
-      excludedDates = InstanceData.findCustomMip(binding, ExcludedDatesQName) map (_.splitTo[List]()) getOrElse Nil,
-      weekStart     = weekStart.trimAllToOpt.flatMap(v => if (v == "sunday") 0.some else if (v == "monday") 1.some else None)
+      isoOrUnrecognizedValue =
+        DateUtils
+          .tryParseISODate(binding.getStringValue)
+          .map((IsoDate.apply _).tupled)
+          .toOption
+          .toLeft(binding.getStringValue),
+      format                 = IsoDate.parseFormat(format),
+      excludedDates          = InstanceData.findCustomMip(binding, ExcludedDatesQName) map (_.splitTo[List]()) getOrElse Nil,
+      weekStart              = weekStart.trimAllToOpt.flatMap(v => if (v == "sunday") 0.some else if (v == "monday") 1.some else None)
     ).asJson.noSpaces
 
   //@XPathFunction
   def deserializeExternalValueJava(externalValue: String): String =
     parser.decode[DateExternalValue](externalValue)
       .fold(Failure.apply, Success.apply)
-      .map(_.value)
+      .map(_.isoOrUnrecognizedValue.fold(_.toIsoString, identity))
       .getOrElse("")
 }
 
 object TimeSupportJava {
 
-  import io.circe.generic.auto._
+  import io.circe.generic.auto.*
   import io.circe.parser
-  import io.circe.syntax._
+  import io.circe.syntax.*
 
   //@XPathFunction
   def serializeExternalValueJava(

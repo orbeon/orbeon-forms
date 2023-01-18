@@ -348,8 +348,9 @@
                     if ($.inArray(e.keyCode, [27, 37, 39, 38, 40, 32, 13, 9]) === -1)
                         this.update();
                 }, this),
-                keydown: $.proxy(this.keydown, this),
-                paste: $.proxy(this.paste, this)
+                keydown: $.proxy(this.keydown, this)
+                // ORBEON: remove `paste` listener
+                // , paste: $.proxy(this.paste, this)
             };
 
             if (this.o.showOnFocus === true) {

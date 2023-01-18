@@ -52,9 +52,18 @@ object JSDateUtils {
   def nowAsIsoTime: IsoTime =
     jsDateToIsoTimeUsingLocalTimezone(new js.Date(), millis = false)
 
+  def todayAsIsoDate: IsoDate =
+    jsDateToIsoDateUsingLocalTimezone(new js.Date())
+
   def dateToIsoStringUsingLocalTimezone(date: js.Date): String =
     date.getFullYear().toString + '-' + IsoTime.pad2(date.getMonth().toInt + 1) + '-' + IsoTime.pad2(date.getDate().toInt)
 
   def jsDateToIsoTimeUsingLocalTimezone(time: js.Date, millis: Boolean): IsoTime =
     IsoTime(time.getHours().toInt, time.getMinutes().toInt, time.getSeconds().toInt.some) // , millis option time.getMilliseconds.toInt
+
+  def jsDateToIsoDateUsingLocalTimezone(time: js.Date): IsoDate =
+    IsoDate(year = time.getFullYear().toInt, month = time.getMonth().toInt + 1, day = time.getDate().toInt)
+
+  def isoDateToJsDate(date: IsoDate): js.Date =
+    new js.Date(year = date.year, month = date.month - 1, date = date.day)
 }

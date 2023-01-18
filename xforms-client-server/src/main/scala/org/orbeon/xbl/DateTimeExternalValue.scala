@@ -13,17 +13,23 @@
   */
 package org.orbeon.xbl
 
-import org.orbeon.date.{IsoTime, TimeFormat}
+import org.orbeon.date.{DateFormat, IsoDate, IsoTime, TimeFormat}
 
 
 case class DateExternalValue(
-  value         : String,
-  format        : String,
-  excludedDates : List[String],
-  weekStart     : Option[Int]
-)
+  isoOrUnrecognizedValue: IsoDate Either String,
+  format                : DateFormat,
+  excludedDates         : List[String],
+  weekStart             : Option[Int]
+) {
+  def stringValue: String =
+    isoOrUnrecognizedValue.fold(IsoDate.formatDate(_, format), identity)
+}
 
 case class TimeExternalValue(
   isoOrUnrecognizedValue: IsoTime Either String,
   format                : TimeFormat
-)
+) {
+  def stringValue: String =
+    isoOrUnrecognizedValue.fold(IsoTime.formatTime(_, format), identity)
+}

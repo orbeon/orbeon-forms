@@ -14,8 +14,9 @@
 package org.orbeon.oxf.util
 
 import java.time.Instant
-
 import org.scalatest.funspec.AnyFunSpec
+
+import scala.util.Success
 
 
 class DateUtilsTest extends AnyFunSpec {
@@ -23,7 +24,7 @@ class DateUtilsTest extends AnyFunSpec {
   describe("RFC1123 date parsing") {
     for (value <- List("Tue, 29 May 2012 19:35:04 GMT")) // "Tuesday, 29-May-12 19:35:04 GMT", "Tue May 29 19:35:04 2012"
       it(s"must parse `$value` in all formats") {
-        assert(1338320104000L === DateUtils.parseRFC1123(value))
+        assert(1338320104000L == DateUtils.parseRFC1123(value))
       }
   }
 
@@ -38,7 +39,24 @@ class DateUtilsTest extends AnyFunSpec {
 
     for ((expected, formatterName, formatter, instant) <- data)
       it(s"must format instant `$instant` using formatter `$formatterName`") {
-        assert(expected === formatter.format(Instant.ofEpochMilli(instant)))
+        assert(expected == formatter.format(Instant.ofEpochMilli(instant)))
+      }
+  }
+
+  describe("ISO date parsing") {
+
+    val data = List(
+      "1970-01-01"       -> (Some(1970, 1, 1)),
+      "2012-05-29"       -> Some((2012, 5, 29)),
+      "2012-05-29+01:00" -> Some((2012, 5, 29)),
+      "2012-05-29+23:00" -> Some((2012, 5, 29)),
+      "2012-05-29+25:00" -> None,
+      "2023-02-29"       -> None,
+    )
+
+    for ((value, expected) <- data)
+      it(s"must parse `$value` with no explicit timezone") {
+        assert(DateUtils.tryParseISODate(value).toOption == expected)
       }
   }
 }

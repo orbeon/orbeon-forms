@@ -156,7 +156,7 @@ object Connection extends ConnectionTrait {
           } toMap
 
         val responseContentTypeOpt =
-          responseHeaders.get(Headers.ContentType).flatMap(_.headOption)
+          Headers.firstItemIgnoreCase(responseHeaders, Headers.ContentType)
 
         def contentFromJsIterable(v: js.Iterable[_]) =
           StreamedContent.fromBytes(v.asInstanceOf[js.Iterable[Byte]].toArray[Byte], responseContentTypeOpt)

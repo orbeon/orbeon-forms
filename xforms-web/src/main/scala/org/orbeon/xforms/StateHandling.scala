@@ -13,6 +13,7 @@
   */
 package org.orbeon.xforms
 
+import cats.syntax.option._
 import enumeratum._
 import io.circe.generic.auto._
 import io.circe.parser._
@@ -69,7 +70,7 @@ object StateHandling {
         )
       )
 
-    findClientState(formId) match {
+    findClientState(formId, initialUuid.some) match {
       case None =>
 
         logger.debug("no state found, setting initial state")
@@ -115,15 +116,23 @@ object StateHandling {
   def getClientStateOrThrow(formId: String): ClientState =
     findClientState(formId) getOrElse (throw new IllegalStateException(s"client state not found for form `$formId`"))
 
-  def findClientState(formId: String): Option[ClientState] =
+  def findClientState(formId: String, uuid: Option[String] = None): Option[ClientState] =
     findRawState flatMap (_.get(formId)) flatMap { serialized =>
       decode[ClientState](serialized) match {
         case Left(_)  =>
           logger.debug(s"error parsing state for form `$formId` and value `$serialized`")
           None
-        case Right(state) =>
-          logger.trace(s"found state for form `$formId` and value `$state`")
+        case Right(state) if uuid.isEmpty =>
+          logger.debug(s"found state for form `$formId` and value `$state` with ignored UUID")
           Some(state)
+        case Right(state) if uuid.contains(state.uuid) =>
+          logger.debug(s"found state for form `$formId` and value `$state` with matching UUID (`${state.uuid}`)")
+          Some(state)
+        case Right(state) =>
+          // https://github.com/orbeon/orbeon-forms/issues/5572
+          logger.debug(s"found state for form `$formId` and value `$state` with non-matching UUID, clearing state")
+          clearClientState(formId)
+          None
       }
     }
 
@@ -160,10 +169,10 @@ object StateHandling {
       // Saving to history can help getting around Firefox issue 1183881
       // Avoid calling `saveStateToHistory()` unless necessary, to avoid hitting Safari rate-limit on `replaceState()`
       (varStateOpt, Option(dom.window.history.state)) match {
-        case (Some(_)       , Some(_)    ) => // nop (all good)
-        case (Some(varState), None       ) => saveStateToHistory(varState)
-        case (None          , Some(state)) => varStateOpt = Some(state.asInstanceOf[js.Dictionary[String]])
-        case (None          , None       ) => // nop (nothing we can do here; we might be in trouble later)
+        case (Some(_)       , Some(_)    ) => logger.debug(s"Some/Some"); // nop (all good)
+        case (Some(varState), None       ) => logger.debug(s"Some/None"); saveStateToHistory(varState)
+        case (None          , Some(state)) => logger.debug(s"None/Some"); dom.console.log(state); varStateOpt = Some(state.asInstanceOf[js.Dictionary[String]])
+        case (None          , None       ) => logger.debug(s"None/None"); // nop (nothing we can do here; we might be in trouble later)
       }
 
       // Just return `varStateOpt` as it is now up-to-date

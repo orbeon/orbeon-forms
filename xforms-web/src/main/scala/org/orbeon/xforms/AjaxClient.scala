@@ -145,7 +145,7 @@ object AjaxClient {
       case Left(LoginRegexpMatcher()) =>
 
          // It seems we got a login page back, so display dialog and reload form
-        val dialogEl = $(s"$$$formId .xforms-login-detected-dialog")
+        val dialogEl = $(s"#$formId .xforms-login-detected-dialog")
 
         def getUniqueId(prefix: String): String = {
           var i = 0

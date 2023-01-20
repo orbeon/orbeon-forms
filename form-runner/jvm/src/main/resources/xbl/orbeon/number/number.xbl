@@ -137,6 +137,7 @@
                             <round-when-formatting/>
                             <round-when-storing/>
                             <field-width/>
+                            <field-align/>
                         </_>
                     </xf:instance>
 
@@ -271,8 +272,8 @@
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
-                        <xh:td colspan="6">
-                            <xf:select1 ref="instance('local')/round-when-formatting" appearance="full xxf:horizontal" id="round-when-formatting-control">
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/round-when-formatting" appearance="full" id="round-when-formatting-control">
                                 <xf:label ref="xxf:r('round-when-formatting')"/>
                                 <xf:alert/>
                                 <xf:itemset ref="xxf:resource-elements('default-always-never.item')">
@@ -281,10 +282,8 @@
                                 </xf:itemset>
                             </xf:select1>
                         </xh:td>
-                    </xh:tr>
-                    <xh:tr>
-                        <xh:td colspan="6">
-                            <xf:select1 ref="instance('local')/round-when-storing" appearance="full xxf:horizontal" id="round-when-storing-control">
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/round-when-storing" appearance="full" id="round-when-storing-control">
                                 <xf:label ref="xxf:r('round-when-storing')"/>
                                 <xf:alert/>
                                 <xf:itemset ref="xxf:resource-elements('default-always-never.item')">
@@ -295,8 +294,8 @@
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
-                        <xh:td colspan="6">
-                            <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/field-width" appearance="full" id="field-width-control">
                                 <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
                                 <xf:alert/>
                                 <xf:item>
@@ -313,6 +312,24 @@
                                 </xf:item>
                             </xf:select1>
                         </xh:td>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/field-align" appearance="full" id="field-align-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-align', '|fr-form-resources|')"/>
+                                <xf:alert/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.left', '|fr-form-resources|')"/>
+                                    <xf:value>left</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.right', '|fr-form-resources|')"/>
+                                    <xf:value>right</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
                     </xh:tr>
                 </fr:grid>
                 <xf:action
@@ -326,7 +343,8 @@
                         digits-after-decimal-control
                         round-when-formatting-control
                         round-when-storing-control
-                        field-width-control">
+                        field-width-control
+                        field-align-control">
 
                     <xf:var name="name" value="name(event('xxf:binding'))"/>
 
@@ -386,12 +404,20 @@
 
             <!--<xf:dispatch event="xxforms-iteration-moved" name="fr-iteration-moved" targetid="formatted-value"/>-->
 
-            <!-- Readwrite mode -->
-            <xf:group ref="$binding[not($view)]">
+            <xf:var name="prefix" value="fr:component-param-value('prefix')"/>
+            <xf:var name="suffix" value="fr:component-param-value('suffix')"/>
 
-                <xf:var name="prefix"      value="fr:component-param-value('prefix')"/>
-                <xf:var name="suffix"      value="fr:component-param-value('suffix')"/>
-                <xf:var name="field-width" value="fr:component-param-value('field-width')"/>
+            <!-- Readwrite mode -->
+            <xf:group
+                ref="$binding[not($view)]"
+                class="{
+                    'xforms-help-popover-control',
+                    'input-prepend'[xxf:non-blank($prefix)],
+                    'input-append' [xxf:non-blank($suffix)],
+                    concat('fr-field-width-', fr:component-param-value('field-width')),
+                    for $v in fr:component-param-value('field-align') return concat('fr-field-align-', $v)
+                }"
+            >
 
                 <!-- See also https://github.com/orbeon/orbeon-forms/issues/2495 -->
 
@@ -412,48 +438,39 @@
                         - if a `maxlength` or `xxf:maxlength` is placed on the bound element, that takes precedence
                     - `min`: makes control natively invalid as the user types, if the value cannot be negative
                 -->
-                <xh:span
-                    class="{
-                        (
-                            'xforms-help-popover-control',
-                            'input-prepend'[xxf:non-blank($prefix)],
-                            'input-append' [xxf:non-blank($suffix)],
-                            concat('fr-field-width-', $field-width)
-                        )
-                    }">
-                    <xf:group fr:keep-if-param-non-blank="prefix" class="add-on" ref=".[xxf:non-blank($prefix)]">
-                        <xf:output id="prefix" value="$prefix"/>
-                    </xf:group>
-                    <xh:input
-                        id="html-input"
-                        xxf:control="true"
-                        class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
-                        xh:type="text"
-                        step="any"
-                        aria-describedby="{string-join((xxf:client-id('prefix'), xxf:client-id('suffix')), ' ')}"
-                        pattern="{
-                            if (NumberSupport:isZeroValidationFractionDigitsJava($binding) and
-                                xxf:custom-mip($binding, 'non-negative') = 'true'
-                            ) then
-                                '[0-9]*'
-                            else
-                                '.*'
-                        }"
-                        min="{
-                            if (xxf:custom-mip($binding, 'non-negative') = 'true') then
-                                '0'
-                            else
-                                ''
-                        }"
-                        maxlength="{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}"
-                        xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern"/>
-                    <xf:group fr:keep-if-param-non-blank="suffix" class="add-on" ref=".[xxf:non-blank($suffix)]">
-                        <xf:output id="suffix" value="$suffix"/>
-                    </xf:group>
-                </xh:span>
+                <xf:group fr:keep-if-param-non-blank="prefix" class="add-on" ref=".[xxf:non-blank($prefix)]">
+                    <xf:output id="prefix" value="$prefix"/>
+                </xf:group>
+                <xh:input
+                    id="html-input"
+                    xxf:control="true"
+                    class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
+                    xh:type="text"
+                    step="any"
+                    aria-describedby="{string-join((xxf:client-id('prefix'), xxf:client-id('suffix')), ' ')}"
+                    pattern="{
+                        if (NumberSupport:isZeroValidationFractionDigitsJava($binding) and
+                            xxf:custom-mip($binding, 'non-negative') = 'true'
+                        ) then
+                            '[0-9]*'
+                        else
+                            '.*'
+                    }"
+                    min="{
+                        if (xxf:custom-mip($binding, 'non-negative') = 'true') then
+                            '0'
+                        else
+                            ''
+                    }"
+                    maxlength="{xs:integer(xxf:custom-mip($binding, 'max-length')[. castable as xs:integer])}"
+                    xbl:attr="tabindex tabindex=navindex maxlength=xxf:maxlength maxlength pattern=xxf:pattern"/>
+                <xf:group fr:keep-if-param-non-blank="suffix" class="add-on" ref=".[xxf:non-blank($suffix)]">
+                    <xf:output id="suffix" value="$suffix"/>
+                </xf:group>
             </xf:group>
             <!-- Static readonly mode -->
             <xf:input
+                class="{for $v in fr:component-param-value('field-align') return concat('fr-field-align-', $v)}"
                 ref="$binding[$view]"
                 xxf:format="xxf:formatted-value('fr-number')"/>
 

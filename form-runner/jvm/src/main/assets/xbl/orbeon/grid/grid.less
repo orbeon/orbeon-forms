@@ -281,6 +281,19 @@
 
         .fr-grid {
 
+            &.fr-repeat .fr-grid-th {
+                &.fr-field-align-left {
+                    .xforms-label, .xforms-hint {
+                        text-align: left;
+                    }
+                }
+                &.fr-field-align-right {
+                    .xforms-label, .xforms-hint {
+                        text-align: right;
+                    }
+                }
+            }
+
             .xforms-help {
                 float: left;
                 margin-top: (@baseLineHeight - 14)/2 + 1;   // Vertically center help image on first line

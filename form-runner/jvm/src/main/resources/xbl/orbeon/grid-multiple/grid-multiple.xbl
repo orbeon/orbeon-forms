@@ -315,9 +315,26 @@
                                                     empty(self::xf:trigger | self::xf:submit)
                                                 ][1]"/>
 
-                                        <xsl:copy-of select="fr:scope-outer-avt-class($c/@class)"/>
+                                        <xsl:variable name="original-class" select="$c/@class"/>
+                                        <xsl:variable
+                                            name="align-class-opt"
+                                            select="
+                                                if (exists($control/xf:label | $control/xf:hint) and exists($control/self::fr:number | $control/self::fr:currency)) then
+                                                    (: Only for some controls :)
+                                                    if ($control/@field-align = ('left', 'right')) then
+                                                        (: Static case :)
+                                                        concat('fr-field-align-', $control/@field-align)
+                                                    else
+                                                        (: Dynamic case :)
+                                                        concat(' {for $v in fr:component-param-value(''field-align'', ''', $control/@id, ''') return concat(''fr-field-align-'', $v)}')
+                                                else
+                                                    ()"/>
+
+                                        <xsl:copy-of select="fr:scope-outer-avt-class(($c/@class, $align-class-opt))"/>
                                         <xsl:element name="{$th-elem}">
-                                            <xsl:copy-of select="fr:th-td-tr-classes-attr('th', $c/@class, $c/@id)"/>
+
+                                            <xsl:copy-of select="fr:th-td-tr-classes-attr('th', exists(($c/@class, $align-class-opt)), $c/@id)"/>
+
                                             <xsl:if test="$w gt 1">
                                                 <xsl:attribute name="{fr:colspan-attribute()}" select="$w"/>
                                             </xsl:if>
@@ -374,7 +391,9 @@
                                                                     select="$source-class, '{''xforms-required''[xxf:required($control-bindings-or-empty[1])]}'"/>
                                                             </xsl:when>
                                                             <xsl:otherwise>
-                                                                <xsl:copy-of select="$source-class"/>
+                                                                <xsl:attribute
+                                                                    name="class"
+                                                                    select="$source-class"/>
                                                             </xsl:otherwise>
                                                         </xsl:choose>
 

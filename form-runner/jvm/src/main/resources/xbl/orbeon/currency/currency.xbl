@@ -142,6 +142,7 @@
                             <round-when-formatting/>
                             <round-when-storing/>
                             <field-width/>
+                            <field-align/>
                         </_>
                     </xf:instance>
 
@@ -154,7 +155,7 @@
                     </xf:bind>
 
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
-                        <resources>
+                        <_>
                             <resource xml:lang="en">
                                 <prefix>Prefix</prefix>
                                 <suffix>Suffix</suffix>
@@ -209,7 +210,7 @@
                                     <item id="5">Point (.)</item>
                                 </grouping-separators>
                             </resource>
-                        </resources>
+                        </_>
                     </xf:instance>
                 </xf:model>
                 <fr:grid xmlns="" id="fb-editor-number-grid">
@@ -276,8 +277,8 @@
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
-                        <xh:td colspan="6">
-                            <xf:select1 ref="instance('local')/round-when-formatting" appearance="full xxf:horizontal" id="round-when-formatting-control">
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/round-when-formatting" appearance="full" id="round-when-formatting-control">
                                 <xf:label ref="xxf:r('round-when-formatting')"/>
                                 <xf:alert/>
                                 <xf:itemset ref="xxf:resource-elements('default-always-never.item')">
@@ -286,10 +287,8 @@
                                 </xf:itemset>
                             </xf:select1>
                         </xh:td>
-                    </xh:tr>
-                    <xh:tr>
-                        <xh:td colspan="6">
-                            <xf:select1 ref="instance('local')/round-when-storing" appearance="full xxf:horizontal" id="round-when-storing-control">
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/round-when-storing" appearance="full" id="round-when-storing-control">
                                 <xf:label ref="xxf:r('round-when-storing')"/>
                                 <xf:alert/>
                                 <xf:itemset ref="xxf:resource-elements('default-always-never.item')">
@@ -300,8 +299,8 @@
                         </xh:td>
                     </xh:tr>
                     <xh:tr>
-                        <xh:td colspan="6">
-                            <xf:select1 ref="instance('local')/field-width" appearance="full xxf:horizontal" id="field-width-control">
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/field-width" appearance="full" id="field-width-control">
                                 <xf:label ref="xxf:r('xbl-control-settings.field-width', '|fr-form-resources|')"/>
                                 <xf:alert/>
                                 <xf:item>
@@ -318,6 +317,24 @@
                                 </xf:item>
                             </xf:select1>
                         </xh:td>
+                        <xh:td colspan="3">
+                            <xf:select1 ref="instance('local')/field-align" appearance="full" id="field-align-control">
+                                <xf:label ref="xxf:r('xbl-control-settings.field-align', '|fr-form-resources|')"/>
+                                <xf:alert/>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.default', '|fr-form-resources|')"/>
+                                    <xf:value/>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.left', '|fr-form-resources|')"/>
+                                    <xf:value>left</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label ref="xxf:r('xbl-control-settings.right', '|fr-form-resources|')"/>
+                                    <xf:value>right</xf:value>
+                                </xf:item>
+                            </xf:select1>
+                        </xh:td>
                     </xh:tr>
                 </fr:grid>
                 <xf:action
@@ -331,7 +348,8 @@
                         digits-after-decimal-control
                         round-when-formatting-control
                         round-when-storing-control
-                        field-width-control">
+                        field-width-control
+                        field-align-control">
 
                     <xf:var name="name" value="name(event('xxf:binding'))"/>
 

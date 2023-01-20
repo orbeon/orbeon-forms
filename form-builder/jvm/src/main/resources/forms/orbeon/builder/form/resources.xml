@@ -1285,6 +1285,9 @@
             <default>Use default</default>
             <full>Full</full>
             <natural>Natural</natural>
+            <field-align>Field alignment</field-align>
+            <left>Left</left>
+            <right>Right</right>
             <learn-settings-below>Learn more about the settings below</learn-settings-below>
         </xbl-control-settings>
         <messages>
@@ -2601,6 +2604,9 @@
             <default>Utiliser le défaut</default>
             <full>Espace disponible</full>
             <natural>Naturel</natural>
+            <field-align>Alignment du champ</field-align>
+            <left>À gauche</left>
+            <right>À droite</right>
             <learn-settings-below>Plus d'information à propos des configurations ci-dessous</learn-settings-below>
         </xbl-control-settings>
         <messages>
@@ -3927,6 +3933,9 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <field-align todo="true">Field alignment</field-align>
+            <left todo="true">Left</left>
+            <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
@@ -5252,6 +5261,9 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <field-align todo="true">Field alignment</field-align>
+            <left todo="true">Left</left>
+            <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
@@ -6542,6 +6554,9 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <field-align todo="true">Field alignment</field-align>
+            <left todo="true">Left</left>
+            <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
@@ -7833,6 +7848,9 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <field-align todo="true">Field alignment</field-align>
+            <left todo="true">Left</left>
+            <right todo="true">Right</right>
             <learn-settings-below>Dokumentation der untenstehenden Einstellungen</learn-settings-below>
         </xbl-control-settings>
         <messages>
@@ -9154,6 +9172,9 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <field-align todo="true">Field alignment</field-align>
+            <left todo="true">Left</left>
+            <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
@@ -10472,6 +10493,9 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <field-align todo="true">Field alignment</field-align>
+            <left todo="true">Left</left>
+            <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
@@ -11770,6 +11794,9 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <field-align todo="true">Field alignment</field-align>
+            <left todo="true">Left</left>
+            <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
@@ -13095,6 +13122,9 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <field-align todo="true">Field alignment</field-align>
+            <left todo="true">Left</left>
+            <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>
@@ -14421,6 +14451,9 @@
             <default todo="true">Use default</default>
             <full todo="true">Full</full>
             <natural todo="true">Natural</natural>
+            <field-align todo="true">Field alignment</field-align>
+            <left todo="true">Left</left>
+            <right todo="true">Right</right>
             <learn-settings-below todo="true">[Learn more about the settings below]</learn-settings-below>
         </xbl-control-settings>
         <messages>

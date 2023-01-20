@@ -2,6 +2,7 @@ package org.orbeon.xbl
 
 import org.log4s.Logger
 import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.web.DomEventNames
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
 import org.orbeon.xforms.{AjaxClient, AjaxEvent, EventListenerSupport, XFormsUI}
 import org.scalajs.dom.{html, raw}
@@ -31,7 +32,7 @@ object Range {
 
       xformsUpdateReadonly(containerElem.classList.contains("xforms-readonly"))
 
-      EventSupport.addListener[raw.Event](inputElem, "input", e => {
+      EventSupport.addListener[raw.Event](inputElem, DomEventNames.Input, e => {
         if (XFormsUI.modalProgressPanelShown) {
            e.preventDefault()
         } else {

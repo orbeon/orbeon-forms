@@ -24,7 +24,7 @@ import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
+import org.orbeon.oxf.xforms.function.xxforms.ComponentParamSupport
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
@@ -32,7 +32,7 @@ import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.`type`.Type.ITEM_TYPE
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.function.{AncestorOrganizations, UserOrganizations, UserRoles}
+import org.orbeon.saxon.function.{AncestorOrganizations, Property, UserOrganizations, UserRoles}
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.value._
@@ -118,6 +118,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
     )
 
     Fun("component-param-value", classOf[FRComponentParam], op = 0, min = 1, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+      Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
 
@@ -345,19 +346,20 @@ private object FormRunnerFunctions {
 
     override def evaluateItem(context: XPathContext): AtomicValue = {
 
-      implicit val ctx  = context
+      implicit val xpc = context
+      implicit val xfc = XFormsFunction.context
 
-      val paramName = QName(stringArgument(0))
+      val paramName            = QName(stringArgument(0))
+      val sourceComponentIdOpt = stringArgumentOpt(1)
 
-      import XXFormsComponentParam._
-
-      findSourceComponent(XFormsFunction.context) flatMap { sourceComponent =>
+      // TODO: 2023-01-20: move common code to `ComponentParamSupport`
+      ComponentParamSupport.findSourceComponent(sourceComponentIdOpt) flatMap { sourceComponent =>
 
         val staticControl   = sourceComponent.staticControl
         val concreteBinding = staticControl.bindingOrThrow
 
         def fromAttributes: Option[AtomicValue] =
-          fromElem(
+          ComponentParamSupport.fromElem(
             atts        = concreteBinding.boundElementAtts.lift,
             paramName   = paramName
           )
@@ -366,7 +368,8 @@ private object FormRunnerFunctions {
           FRComponentParamSupport.fromMetadataAndProperties(
             partAnalysis  = sourceComponent.container.partAnalysis,
             directNameOpt = staticControl.commonBinding.directName,
-            paramName     = paramName
+            paramName     = paramName,
+            property      = Property.property
           )
 
         fromAttributes orElse fromMetadataAndProperties map {

@@ -8,7 +8,7 @@ import org.orbeon.dom.QName
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.{AppForm, FormRunnerParams, Names, XMLNames}
 import org.orbeon.oxf.xforms.analysis.{PartAnalysisForStaticMetadataAndProperties, model}
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam
+import org.orbeon.oxf.xforms.function.xxforms.ComponentParamSupport
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
@@ -52,7 +52,7 @@ object FRComponentParamSupport {
   def findHierarchicalElem(directNameOpt: Option[QName], paramName: QName, rootElem: om.NodeInfo): Option[String] =
     for {
       directName    <- directNameOpt
-      xblElem       <- rootElem.firstChildOpt(XXFormsComponentParam.XblLocalName)
+      xblElem       <- rootElem.firstChildOpt(ComponentParamSupport.XblLocalName)
       componentElem <- xblElem.firstChildOpt(directName)
       paramValue    <- componentElem.attValueOpt(paramName)
     } yield
@@ -70,7 +70,8 @@ object FRComponentParamSupport {
   def fromMetadataAndProperties(
     partAnalysis  : PartAnalysisForStaticMetadataAndProperties,
     directNameOpt : Option[QName],
-    paramName     : QName
+    paramName     : QName,
+    property      : String => Option[AtomicValue]
   ): Option[AtomicValue] = {
 
     def iterateMetadataInParts =
@@ -87,11 +88,11 @@ object FRComponentParamSupport {
       (
         iterateMetadataInParts flatMap
         appFormFromMetadata  flatMap
-        (appForm => XXFormsComponentParam.fromProperties(paramName, appForm.toList, directNameOpt))
+        (appForm => ComponentParamSupport.fromProperties(paramName, appForm.toList, directNameOpt, property))
       ).nextOption()
 
     def fromPropertiesWithoutSuffix: Option[AtomicValue] =
-      XXFormsComponentParam.fromProperties(paramName, Nil, directNameOpt)
+      ComponentParamSupport.fromProperties(paramName, Nil, directNameOpt, property)
 
     fromMetadataInstance       orElse
       fromPropertiesWithSuffix orElse

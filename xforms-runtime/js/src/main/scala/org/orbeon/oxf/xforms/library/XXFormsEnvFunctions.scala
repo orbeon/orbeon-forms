@@ -5,21 +5,20 @@ import org.orbeon.dom.QName
 import org.orbeon.io.CharsetNames.Iso88591
 import org.orbeon.macros.XPathFunction
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{MessageFormatter, MessageFormatCache, XPathCache}
+import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter, XPathCache}
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.control.{XFormsSingleNodeControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.function.XFormsFunction._
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsComponentParam.{findSourceComponent, fromElemAlsoTryAvt, fromProperties}
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang.resolveXMLangHandleAVTs
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport.{findResourceElementForLang, pathFromTokens, splitResourceName}
-import org.orbeon.oxf.xforms.function.xxforms.{NumericValidation, ValidationFunctionNames, XXFormsLang}
+import org.orbeon.oxf.xforms.function.xxforms.{ComponentParamSupport, NumericValidation, ValidationFunctionNames, XXFormsLang}
 import org.orbeon.oxf.xforms.itemset.ItemsetSupport
 import org.orbeon.oxf.xforms.library.XFormsEnvFunctions.findIndexForRepeatId
 import org.orbeon.oxf.xforms.model.{InstanceData, XFormsInstance, XFormsModel}
 import org.orbeon.oxf.xml.{OrbeonFunctionLibrary, SaxonUtils}
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.function.{GetRequestHeaderSupport, ProcessTemplateSupport}
+import org.orbeon.saxon.function.{CoreSupport, GetRequestHeaderSupport, ProcessTemplateSupport}
 import org.orbeon.saxon.ma.map.MapItem
 import org.orbeon.saxon.model.BuiltInAtomicType
 import org.orbeon.saxon.om
@@ -29,7 +28,6 @@ import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
 import scala.collection.compat._
-
 import scala.jdk.CollectionConverters._
 
 
@@ -203,7 +201,8 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     //  See `getQNameFromItem`.
     val paramName = QName(paramNameString)
 
-    findSourceComponent flatMap { sourceComponent =>
+    // TODO: 2023-01-20: move common code to `ComponentParamSupport`
+    ComponentParamSupport.findSourceComponent(None) flatMap { sourceComponent =>
 
       val staticControl   = sourceComponent.staticControl
       val concreteBinding = staticControl.bindingOrThrow
@@ -212,17 +211,18 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       // AVTs to support dependencies. Those should probably be stored lazily at the control
       // level.
       val attrValue =
-        fromElemAlsoTryAvt(
+        ComponentParamSupport.fromElemAlsoTryAvt(
           concreteBinding.boundElementAtts.lift,
           sourceComponent.evaluateAvt,
           paramName
         )
 
       attrValue orElse
-        fromProperties(
+        ComponentParamSupport.fromProperties(
           paramName,
           Nil,
-          staticControl.commonBinding.directName
+          staticControl.commonBinding.directName,
+          CoreSupport.property
         )
     }
   }

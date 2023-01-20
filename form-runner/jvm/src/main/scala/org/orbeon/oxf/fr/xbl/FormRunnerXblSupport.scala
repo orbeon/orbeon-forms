@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.PartAnalysisForXblSupport
 import org.orbeon.oxf.xforms.xbl.XBLSupport
+import org.orbeon.saxon.function.Property
 
 
 object FormRunnerXblSupport extends XBLSupport {
@@ -41,7 +42,8 @@ object FormRunnerXblSupport extends XBLSupport {
       FRComponentParamSupport.fromMetadataAndProperties(
         partAnalysis  = partAnalysisCtx,
         directNameOpt = directNameOpt,
-        paramName     = paramName
+        paramName     = paramName,
+        property      = Property.property
       ) map
         (_.getStringValue)
 

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.function
 
 import java.util.{Locale, Iterator => JIterator}
-
 import org.orbeon.dom
 import org.orbeon.dom.Namespace
 import org.orbeon.oxf.common.OXFException
@@ -36,6 +35,7 @@ import org.orbeon.saxon.value.{AtomicValue, QNameValue}
 import org.orbeon.xforms.XFormsId
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
+import org.orbeon.xml.NamespaceMapping
 
 import scala.jdk.CollectionConverters._
 import scala.collection.{mutable => m}
@@ -113,13 +113,9 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
   def getSourceEffectiveId: String =
     context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
 
+  // TODO: 
   def elementAnalysisForSource: Option[ElementAnalysis] = {
     val prefixedId = XFormsId.getPrefixedId(getSourceEffectiveId)
-    context.container.partAnalysis.findControlAnalysis(prefixedId)
-  }
-
-  def elementAnalysisForStaticId(staticId: String)(implicit xpathContext: XPathContext): Option[ElementAnalysis] = {
-    val prefixedId = sourceScope.prefixedIdForStaticId(staticId)
     context.container.partAnalysis.findControlAnalysis(prefixedId)
   }
 
@@ -317,79 +313,12 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
   }
 }
 
-object XFormsFunction {
+object XFormsFunction extends CommonFunctionSupport {
 
-  case class Context(
-    container         : XBLContainer,
-    bindingContext    : BindingContext,
-    sourceEffectiveId : String,
-    modelOpt          : Option[XFormsModel],
-    data              : Any
-  ) extends FunctionContext {
-
-    def containingDocument = container.containingDocument
-
-    private var _properties: Option[m.Map[String, Option[String]]] = None
-    def properties = _properties
-
-    def setProperty(name: String, value: Option[String]) = {
-      if (_properties.isEmpty)
-        _properties = Some(m.Map.empty[String, Option[String]])
-      _properties foreach (_ += name -> value)
-    }
-  }
-
+  // Only used at compile time
   def sourceElementAnalysis(pathMap: PathMap): ElementAnalysis =
     pathMap.getPathMapContext match {
       case context: ElementAnalysisTreeXPathAnalyzer.SimplePathMapContext => context.element
       case _ => throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-    }
-
-  def context: Context =
-    XPath.functionContext map (_.asInstanceOf[XFormsFunction.Context]) orNull
-
-  // This ADT or something like it should be defined somewhere else
-  sealed trait QNameType
-  case   class UnprefixedName(local: String) extends QNameType
-  case   class PrefixedName(prefix: String, local: String) extends QNameType
-
-  def parseQNameToQNameType(lexicalQName: String): QNameType =
-    SaxonUtils.parseQName(lexicalQName) match {
-      case ("", local)     => UnprefixedName(local)
-      case (prefix, local) => PrefixedName(prefix, local)
-    }
-
-  def qNameFromQNameValue(value: QNameValue): dom.QName =
-    dom.QName(
-      value.getLocalName,
-      Namespace(value.getPrefix, value.getNamespaceURI)
-    )
-
-  def qNameFromStringValue(value: String, bindingContext: BindingContext): dom.QName =
-    parseQNameToQNameType(value) match {
-      case PrefixedName(prefix, local) =>
-
-        def prefixNotInScope() =
-          throw new OXFException(s"Namespace prefix not in scope for QName `$value`")
-
-        val namespaceMapping = context.data match {
-          case Some(bindNode: BindNode) =>
-            // Function was called from a bind
-            bindNode.parentBind.staticBind.namespaceMapping
-          case _ if bindingContext.controlElement ne null =>
-            // Function was called from a control
-            // `controlElement` is mainly used in `BindingContext` to handle repeats and context.
-            context.container.getNamespaceMappings(bindingContext.controlElement)
-          case _ =>
-            // Unclear which cases reach here!
-            // TODO: The context should simply have an `ElementAnalysis` or a `NamespaceMapping`.
-            prefixNotInScope()
-        }
-
-        val qNameURI = namespaceMapping.mapping.getOrElse(prefix, prefixNotInScope())
-
-        dom.QName(local, Namespace(prefix, qNameURI))
-      case UnprefixedName(local) =>
-        dom.QName(local)
     }
 }

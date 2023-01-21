@@ -13,18 +13,22 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import java.{util => ju}
+import org.orbeon.datatypes.LocationData
 
+import cats.syntax.option._
+import java.{util => ju}
 import org.orbeon.oxf.util.StaticXPath.ValueRepresentationType
 import org.orbeon.oxf.util.{FunctionContext, XPathCache}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om
 import org.orbeon.xml.NamespaceMapping
 
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
+
 
 trait ControlXPathSupport {
 
@@ -46,38 +50,13 @@ trait ControlXPathSupport {
 
     assert(isRelevant)
 
-    if (! XMLUtils.maybeAVT(attributeValue))
-      // Definitely not an AVT
-      attributeValue
-    else {
-      // Possible AVT
-
-      // NOTE: the control may or may not be bound, so don't use getBoundItem()
-      val bc = bindingContext
-      val contextNodeset = bc.nodeset
-      if (contextNodeset.size == 0)
-        null // TODO: in the future we should be able to try evaluating anyway
-      else {
-        try
-          XPathCache.evaluateAsAvt(
-            contextNodeset,
-            bc.position,
-            attributeValue,
-            getNamespaceMappings,
-            bc.getInScopeVariables,
-            containingDocument.functionLibrary,
-            newFunctionContext,
-            null,
-            getLocationData,
-            containingDocument.getRequestStats.addXPathStat
-          )
-        catch {
-          case NonFatal(t) =>
-            XFormsError.handleNonFatalXPathError(container, t, Some(attributeValue))
-            null
-        }
-      }
-    }
+    ControlXPathSupport.evaluateAvt(
+      attributeValue    = attributeValue,
+      bindingContext    = bindingContext,
+      namespaceMappings = getNamespaceMappings,
+      container         = container,
+      locationData      = getLocationData
+    )(newFunctionContext).orNull
   }
 
   // Evaluate an XPath expression as a string in the context of this control.
@@ -123,4 +102,48 @@ trait ControlXPathSupport {
   // Return an XPath function context having this control as source control.
   def newFunctionContext =
     XFormsFunction.Context(container, bindingContext, getEffectiveId, bindingContext.modelOpt, null)
+}
+
+object ControlXPathSupport {
+
+  def evaluateAvt(
+    attributeValue   : String,
+    bindingContext   : BindingContext,
+    namespaceMappings: NamespaceMapping,
+    container        : XBLContainer, // used for `PartAnalysis` and `XFCD`
+    locationData     : LocationData
+  )(implicit xfc: XFormsFunction.Context): Option[String] = {
+
+    if (! XMLUtils.maybeAVT(attributeValue))
+      // Definitely not an AVT
+      attributeValue.some
+    else {
+      // Possible AVT
+
+      // NOTE: the control may or may not be bound, so don't use getBoundItem()
+      val contextNodeset = bindingContext.nodeset
+      if (contextNodeset.size == 0)
+        None // TODO: in the future we should be able to try evaluating anyway
+      else {
+        try
+          XPathCache.evaluateAsAvt(
+            contextNodeset,
+            bindingContext.position,
+            attributeValue,
+            namespaceMappings,
+            bindingContext.getInScopeVariables,
+            container.containingDocument.functionLibrary,
+            xfc,
+            null,
+            locationData,
+            container.containingDocument.getRequestStats.addXPathStat
+          ).some
+        catch {
+          case NonFatal(t) =>
+            XFormsError.handleNonFatalXPathError(container, t, Some(attributeValue))
+            None
+        }
+      }
+    }
+  }
 }

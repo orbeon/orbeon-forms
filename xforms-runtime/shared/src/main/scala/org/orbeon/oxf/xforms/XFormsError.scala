@@ -62,6 +62,7 @@ object XFormsError {
     containingDocument.addServerError(ServerError(reason.message, Option(locationData)))
   }
 
+  // `container`: used for `PartAnalysis` and `XFCD`
   def handleNonFatalXPathError(container: XBLContainer, t: Throwable, expressionOpt: Option[String] = None): Unit = {
     val expressionForMessage = expressionOpt.map(e => s" `$e`").getOrElse("")
     val message = "exception while evaluating XPath expression" + expressionForMessage

@@ -134,13 +134,14 @@ class XFormsContextStack {
   def getFunctionContext(sourceEffectiveId: String): XFormsFunction.Context =
     getFunctionContext(sourceEffectiveId, this.head)
 
+  // 2023-01-21: `data` can only be `null` or a `BindNode`
   def getFunctionContext(sourceEffectiveId: String, data: Any): XFormsFunction.Context =
     getFunctionContext(sourceEffectiveId, this.head, data)
 
   def getFunctionContext(sourceEffectiveId: String, binding: BindingContext): XFormsFunction.Context =
     XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt, null)
 
-  def getFunctionContext(sourceEffectiveId: String, binding: BindingContext, data: Any): XFormsFunction.Context =
+  private def getFunctionContext(sourceEffectiveId: String, binding: BindingContext, data: Any): XFormsFunction.Context =
     XFormsFunction.Context(container, binding, sourceEffectiveId, binding.modelOpt, data)
 
   /**

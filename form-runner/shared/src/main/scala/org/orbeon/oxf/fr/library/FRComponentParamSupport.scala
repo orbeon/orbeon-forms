@@ -1,5 +1,6 @@
 package org.orbeon.oxf.fr.library
 
+import cats.syntax.option._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.saxon.om
@@ -13,7 +14,7 @@ import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.{ControlXPathSupport, XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
@@ -31,7 +32,7 @@ object FRComponentParamSupport {
     sourceComponentIdOpt : Option[String],
     property             : String => Option[AtomicValue])(implicit
     xfc                  : XFormsFunction.Context
-  ): Option[AtomicValue] = {
+  ): Option[AtomicValue] =
     ComponentParamSupport.findSourceComponent(sourceComponentIdOpt) flatMap { sourceComponent =>
 
       val staticControl   = sourceComponent.staticControl
@@ -55,6 +56,34 @@ object FRComponentParamSupport {
         case paramValue: StringValue => stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue))
         case paramValue              => paramValue
       }
+    }
+
+  def componentParamValueByType(
+    paramName  : QName,
+    directName : QName,
+    property   : String => Option[AtomicValue])(implicit
+    xfc        : XFormsFunction.Context
+  ): Option[AtomicValue] = {
+
+    def fromMetadataAndProperties: Option[AtomicValue] =
+      FRComponentParamSupport.fromMetadataAndProperties(
+        partAnalysis  = xfc.container.partAnalysis,
+        directNameOpt = directName.some,
+        paramName     = paramName,
+        property      = property
+      )
+
+    fromMetadataAndProperties flatMap {
+      case paramValue: StringValue =>
+        ControlXPathSupport.evaluateAvt(
+          attributeValue    = paramValue.getStringValue,
+          bindingContext    = xfc.bindingContext,
+          namespaceMappings = xfc.namespaceMapping,
+          container         = xfc.container,
+          locationData      = xfc.bindingContext.locationData
+        ).map(stringToStringValue)
+      case paramValue =>
+        paramValue.some
     }
   }
 
@@ -112,7 +141,7 @@ object FRComponentParamSupport {
 
     def fromMetadataInstance: Option[StringValue] =
       (
-        iterateMetadataInParts                                flatMap
+        iterateMetadataInParts                              flatMap
         (findHierarchicalElem(directNameOpt, paramName, _)) map
         StringValue.makeStringValue
       ).nextOption()
@@ -120,7 +149,7 @@ object FRComponentParamSupport {
     def fromPropertiesWithSuffix: Option[AtomicValue] =
       (
         iterateMetadataInParts flatMap
-        appFormFromMetadata  flatMap
+        appFormFromMetadata    flatMap
         (appForm => ComponentParamSupport.fromProperties(paramName, appForm.toList, directNameOpt, property))
       ).nextOption()
 

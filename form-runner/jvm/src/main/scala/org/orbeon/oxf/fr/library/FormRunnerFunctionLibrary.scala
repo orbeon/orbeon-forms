@@ -120,6 +120,11 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, EXACTLY_ONE)
     )
 
+    Fun("component-param-value-by-type", classOf[FRComponentParamByType], op = 0, min = 2, ANY_ATOMIC, ALLOWS_ZERO_OR_ONE,
+      Arg(QNAME, EXACTLY_ONE),
+      Arg(QNAME, EXACTLY_ONE)
+    )
+
     Fun("pdf-templates", classOf[FRListPdfTemplates], op = 0, min = 0, ANY_ATOMIC, ALLOWS_ZERO_OR_MORE)
 
     Fun("created-with-or-newer", classOf[FRCreatedWithOrNewer], op = 0, min = 1, BOOLEAN, EXACTLY_ONE,
@@ -351,6 +356,21 @@ private object FormRunnerFunctions {
         paramName            = QName(stringArgument(0)),
         sourceComponentIdOpt = stringArgumentOpt(1),
         property             = Property.property
+      ).orNull
+    }
+  }
+
+  class FRComponentParamByType extends FunctionSupport with RuntimeDependentFunction {
+
+    override def evaluateItem(context: XPathContext): AtomicValue = {
+
+      implicit val xpc = context
+      implicit val xfc = XFormsFunction.context
+
+      FRComponentParamSupport.componentParamValueByType(
+        paramName  = qNameArgument(0),
+        directName = qNameArgument(1),
+        property   = Property.property
       ).orNull
     }
   }

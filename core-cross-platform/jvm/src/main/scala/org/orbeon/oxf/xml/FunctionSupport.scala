@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
+import org.orbeon.dom.QName
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
 import org.orbeon.saxon.expr.{ExpressionVisitor, _}
 import org.orbeon.saxon.functions.SystemFunction
@@ -69,6 +70,12 @@ trait FunctionSupport extends SystemFunction {
 
   def stringArgument(i: Int)(implicit xpathContext: XPathContext): String =
     arguments(i).evaluateAsString(xpathContext).toString
+
+  def qNameArgument(i: Int)(implicit xpathContext: XPathContext): QName =
+    arguments(i).evaluateItem(xpathContext) match {
+      case v: QNameValue => QName(v.getLocalName, org.orbeon.dom.Namespace(v.getPrefix, v.getNamespaceURI))
+      case _             => throw new IllegalArgumentException
+    }
 
   def stringArgumentOpt(i: Int)(implicit xpathContext: XPathContext): Option[String] =
     arguments.lift(i) map (_.evaluateAsString(xpathContext).toString)

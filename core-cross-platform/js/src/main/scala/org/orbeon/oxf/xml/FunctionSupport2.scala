@@ -1,9 +1,10 @@
 package org.orbeon.oxf.xml
 
+import org.orbeon.dom.QName
 import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{Chain, SequenceTool}
-import org.orbeon.saxon.value.{AtomicValue, BooleanValue, DateTimeValue, DoubleValue, EmptySequence, Int64Value, StringValue}
+import org.orbeon.saxon.value.{AtomicValue, BooleanValue, DateTimeValue, DoubleValue, EmptySequence, Int64Value, QNameValue, StringValue}
 import org.orbeon.scaxon.Implicits
 
 import java.time.Instant
@@ -87,6 +88,12 @@ object FunctionSupport2 {
       case _                => throw new IllegalArgumentException
     }
 
+  implicit val QNameDecode: Decode[QName] = (s: om.Sequence) =>
+    s.iterate().next() match {
+      case v: QNameValue => org.orbeon.dom.QName(v.getLocalName, org.orbeon.dom.Namespace(v.getPrefix, v.getNamespaceURI))
+      case _             => throw new IllegalArgumentException
+    }
+
   implicit def OptionDecode[U : Decode]: Decode[Option[U]] = (s: om.Sequence) =>
     s.iterate().next() match {
       case null  => None
@@ -109,6 +116,7 @@ object FunctionSupport2 {
   implicit val NodeInfoEncode    : Encode[om.NodeInfo] = (v: om.NodeInfo) => new om.One(v)
   implicit val AtomicValueEncode : Encode[AtomicValue] = (v: AtomicValue) => new om.One(v)
   implicit val InstantEncode     : Encode[Instant]     = (v: Instant)     => new om.One(DateTimeValue.fromJavaInstant(v))
+  implicit val QNameEncode       : Encode[QName]       = (v: QName)       => new om.One(new QNameValue(v.namespace.prefix, v.namespace.uri, v.localName))
 
   implicit def OptionEncode[U : Encode]: Encode[Option[U]] = {
     case Some(i) => implicitly[Encode[U]].apply(i)

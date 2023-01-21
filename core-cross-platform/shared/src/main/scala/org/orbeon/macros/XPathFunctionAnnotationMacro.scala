@@ -38,6 +38,7 @@ import scala.reflect.macros.whitebox
 // - `Item`
 // - `NodeInfo`
 // - `AtomicValue`
+// - `Qname`
 // - `Instant`
 // - `Option`
 // - `Iterable`
@@ -95,26 +96,30 @@ object XPathFunctionAnnotationMacro {
 
       val (returnTypeIsOption, returnTypeIsIterable, returnTypeString) =
         returnType match {
-          case tq"Option[Int]"                 => (true,  false, "int")
-          case tq"Option[String]"              => (true,  false, "string")
-          case tq"Option[Boolean]"             => (true,  false, "boolean")
-          case tq"Option[java.time.Instant]"   => (true,  false, "instant")
-          case tq"Option[$tpe]"                => (true,  false, "item")
-          case tq"Iterable[Int]"               => (false, true,  "int")
-          case tq"Iterable[String]"            => (false, true,  "string")
-          case tq"Iterable[Boolean]"           => (false, true,  "boolean")
-          case tq"Iterable[java.time.Instant]" => (false, true,  "instant")
-          case tq"Iterable[$tpe]"              => (false, true,  "item")
-          case tq"List[Int]"                   => (false, true,  "int")
-          case tq"List[String]"                => (false, true,  "string")
-          case tq"List[Boolean]"               => (false, true,  "boolean")
-          case tq"List[java.time.Instant]"     => (false, true,  "instant")
-          case tq"List[$tpe]"                  => (false, true,  "item")
-          case tq"Int"                         => (false, false, "int")
-          case tq"String"                      => (false, false, "string")
-          case tq"Boolean"                     => (false, false, "boolean")
-          case tq"java.time.Instant"           => (false, false, "instant")
-          case tq"$tpe"                        => (false, false, "item")
+          case tq"Option[Int]"                    => (true,  false, "int")
+          case tq"Option[String]"                 => (true,  false, "string")
+          case tq"Option[Boolean]"                => (true,  false, "boolean")
+          case tq"Option[java.time.Instant]"      => (true,  false, "instant")
+          case tq"Option[org.orbeon.dom.QName]"   => (true,  false, "qname")
+          case tq"Option[$tpe]"                   => (true,  false, "item")
+          case tq"Iterable[Int]"                  => (false, true,  "int")
+          case tq"Iterable[String]"               => (false, true,  "string")
+          case tq"Iterable[Boolean]"              => (false, true,  "boolean")
+          case tq"Iterable[java.time.Instant]"    => (false, true,  "instant")
+          case tq"Iterable[org.orbeon.dom.QName]" => (false, true,  "qname")
+          case tq"Iterable[$tpe]"                 => (false, true,  "item")
+          case tq"List[Int]"                      => (false, true,  "int")
+          case tq"List[String]"                   => (false, true,  "string")
+          case tq"List[Boolean]"                  => (false, true,  "boolean")
+          case tq"List[java.time.Instant]"        => (false, true,  "instant")
+          case tq"List[org.orbeon.dom.QName]"     => (false, true,  "qname")
+          case tq"List[$tpe]"                     => (false, true,  "item")
+          case tq"Int"                            => (false, false, "int")
+          case tq"String"                         => (false, false, "string")
+          case tq"Boolean"                        => (false, false, "boolean")
+          case tq"java.time.Instant"              => (false, false, "instant")
+          case tq"org.orbeon.dom.QName"           => (false, false, "qname")
+          case tq"$tpe"                           => (false, false, "item")
         }
 
       val returnTypeCard =
@@ -131,26 +136,30 @@ object XPathFunctionAnnotationMacro {
 
             val (isOption, isIterable, typeString) =
               arg match {
-                case q"$mods val $name: Option[Int]                 = $rhs" => (true,  false, "int")
-                case q"$mods val $name: Option[String]              = $rhs" => (true,  false, "string")
-                case q"$mods val $name: Option[Boolean]             = $rhs" => (true,  false, "boolean")
-                case q"$mods val $name: Option[java.time.Instant]   = $rhs" => (true,  false, "instant")
-                case q"$mods val $name: Option[$tpe]                = $rhs" => (true,  false, "item")
-                case q"$mods val $name: Iterable[Int]               = $rhs" => (false, true,  "int")
-                case q"$mods val $name: Iterable[String]            = $rhs" => (false, true,  "string")
-                case q"$mods val $name: Iterable[Boolean]           = $rhs" => (false, true,  "boolean")
-                case q"$mods val $name: Iterable[java.time.Instant] = $rhs" => (false, true,  "instant")
-                case q"$mods val $name: Iterable[$tpe]              = $rhs" => (false, true,  "item")
-                case q"$mods val $name: List[Int]                   = $rhs" => (false, true,  "int")
-                case q"$mods val $name: List[String]                = $rhs" => (false, true,  "string")
-                case q"$mods val $name: List[Boolean]               = $rhs" => (false, true,  "boolean")
-                case q"$mods val $name: List[java.time.Instant]     = $rhs" => (false, true,  "instant")
-                case q"$mods val $name: List[$tpe]                  = $rhs" => (false, true,  "item")
-                case q"$mods val $name: Int                         = $rhs" => (false, false, "int")
-                case q"$mods val $name: String                      = $rhs" => (false, false, "string")
-                case q"$mods val $name: Boolean                     = $rhs" => (false, false, "boolean")
-                case q"$mods val $name: java.time.Instant           = $rhs" => (false, false, "instant")
-                case q"$mods val $name: $tpe                        = $rhs" => (false, false, "item")
+                case q"$mods val $name: Option[Int]                    = $rhs" => (true,  false, "int")
+                case q"$mods val $name: Option[String]                 = $rhs" => (true,  false, "string")
+                case q"$mods val $name: Option[Boolean]                = $rhs" => (true,  false, "boolean")
+                case q"$mods val $name: Option[java.time.Instant]      = $rhs" => (true,  false, "instant")
+                case q"$mods val $name: Option[org.orbeon.dom.QName]   = $rhs" => (true,  false, "qname")
+                case q"$mods val $name: Option[$tpe]                   = $rhs" => (true,  false, "item")
+                case q"$mods val $name: Iterable[Int]                  = $rhs" => (false, true,  "int")
+                case q"$mods val $name: Iterable[String]               = $rhs" => (false, true,  "string")
+                case q"$mods val $name: Iterable[Boolean]              = $rhs" => (false, true,  "boolean")
+                case q"$mods val $name: Iterable[java.time.Instant]    = $rhs" => (false, true,  "instant")
+                case q"$mods val $name: Iterable[org.orbeon.dom.QName] = $rhs" => (false, true,  "qname")
+                case q"$mods val $name: Iterable[$tpe]                 = $rhs" => (false, true,  "item")
+                case q"$mods val $name: List[Int]                      = $rhs" => (false, true,  "int")
+                case q"$mods val $name: List[String]                   = $rhs" => (false, true,  "string")
+                case q"$mods val $name: List[Boolean]                  = $rhs" => (false, true,  "boolean")
+                case q"$mods val $name: List[java.time.Instant]        = $rhs" => (false, true,  "instant")
+                case q"$mods val $name: List[org.orbeon.dom.QName]     = $rhs" => (false, true,  "qname")
+                case q"$mods val $name: List[$tpe]                     = $rhs" => (false, true,  "item")
+                case q"$mods val $name: Int                            = $rhs" => (false, false, "int")
+                case q"$mods val $name: String                         = $rhs" => (false, false, "string")
+                case q"$mods val $name: Boolean                        = $rhs" => (false, false, "boolean")
+                case q"$mods val $name: java.time.Instant              = $rhs" => (false, false, "instant")
+                case q"$mods val $name: org.orbeon.dom.QName           = $rhs" => (false, false, "qname")
+                case q"$mods val $name: $tpe                           = $rhs" => (false, false, "item")
               }
 
             val (decodeCall, defaultOpt) = {
@@ -175,6 +184,7 @@ object XPathFunctionAnnotationMacro {
           case "string"  => q"""org.orbeon.saxon.model.BuiltInAtomicType.STRING"""
           case "boolean" => q"""org.orbeon.saxon.model.BuiltInAtomicType.BOOLEAN"""
           case "instant" => q"""org.orbeon.saxon.model.BuiltInAtomicType.DATE_TIME"""
+          case "qname"   => q"""org.orbeon.saxon.model.BuiltInAtomicType.QNAME"""
           case "item"    => q"""org.orbeon.saxon.model.AnyItemType"""
         }
 

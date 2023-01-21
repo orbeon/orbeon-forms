@@ -202,12 +202,14 @@ object Number {
       def updateVisibleValue(): Unit =
         companion.visibleInputElemOpt foreach { visibleInputElem =>
 
-          val hasFocus = visibleInputElem eq dom.document.activeElement
+          def hasFocus = visibleInputElem eq dom.document.activeElement
 
           stateOpt foreach { state =>
             val newValue =
-              if (hasFocus) state.editValue
-              else          state.displayValue
+              if (! companion.isMarkedReadonly && hasFocus)
+                state.editValue
+              else
+                state.displayValue
             writeValue(visibleInputElem, state.decimalSeparator, newValue)
           }
         }

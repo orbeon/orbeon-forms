@@ -316,7 +316,6 @@ class VersionTest
       "4.1.0.201301281947"     -> (4, 1),
       "2022.1.202212310402-PE" -> (2022, 1),
       "2022.1 PE"              -> (2022, 1), // https://github.com/orbeon/orbeon-forms/issues/5632
-
     )
 
     for ((s, majorMinor) <- Expected)

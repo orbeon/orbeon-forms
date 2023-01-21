@@ -41,9 +41,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         <grid-3>
                             <email>info@orbeon.com</email>
                             <us-phone>5555555555</us-phone>
-                            <number>299792458</number>
-                            <currency>10.99</currency>
                             <us-state>CA</us-state>
+                            <currency>10.99</currency>
+                            <number>299792458</number>
+                            <currency-right>10.99</currency-right>
+                            <number-right>299792458</number-right>
                         </grid-3>
                     </typed-controls>
                     <date-time-controls>
@@ -184,9 +186,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         <xf:bind ref="email" id="email-bind" type="xf:email" name="email" xxf:whitespace="trim"/>
                         <xf:bind ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')"
                                  name="us-phone"/>
-                        <xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"/>
-                        <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/>
                         <xf:bind ref="us-state" id="us-state-bind" type="xf:string" name="us-state"/>
+                        <xf:bind ref="currency" id="currency-bind" type="xf:decimal" name="currency"/>
+                        <xf:bind ref="number" id="number-bind" name="number" type="xf:decimal"/>
+                        <xf:bind ref="currency-right" id="currency-right-bind" type="xf:decimal"
+                                 name="currency-right"/>
+                        <xf:bind ref="number-right" id="number-right-bind" name="number-right" type="xf:decimal"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind name="us-address" id="us-address-bind" ref="us-address"/>
@@ -342,18 +347,26 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>US Phone Number</label>
                             <hint>US phone number field</hint>
                         </us-phone>
-                        <number>
-                            <label>Number</label>
-                            <hint>Number field with validation</hint>
-                        </number>
-                        <currency>
-                            <label>Currency</label>
-                            <hint>Currency field</hint>
-                        </currency>
                         <us-state>
                             <label>US State</label>
                             <hint>US state selector</hint>
                         </us-state>
+                        <currency>
+                            <label>Currency</label>
+                            <hint>Currency field</hint>
+                        </currency>
+                        <number>
+                            <label>Number</label>
+                            <hint>Number field with validation</hint>
+                        </number>
+                        <currency-right>
+                            <label>Currency (right-aligned)</label>
+                            <hint>Currency field</hint>
+                        </currency-right>
+                        <number-right>
+                            <label>Number (right-aligned)</label>
+                            <hint>Number field with validation</hint>
+                        </number-right>
                         <standard-button>
                             <label>Standard Button</label>
                             <hint>Standard browser button</hint>
@@ -626,18 +639,26 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Téléphone US</label>
                             <hint>US phone number field</hint>
                         </us-phone>
-                        <number>
-                            <label>Nombre</label>
-                            <hint>Number field with validation</hint>
-                        </number>
-                        <currency>
-                            <label>Devise</label>
-                            <hint>Currency field</hint>
-                        </currency>
                         <us-state>
                             <label>Etat US</label>
                             <hint>US state selector</hint>
                         </us-state>
+                        <currency>
+                            <label>Devise</label>
+                            <hint>Currency field</hint>
+                        </currency>
+                        <number>
+                            <label>Nombre</label>
+                            <hint>Number field with validation</hint>
+                        </number>
+                        <currency-right>
+                            <label>Devise (alignement à droite)</label>
+                            <hint>Currency field</hint>
+                        </currency-right>
+                        <number-right>
+                            <label>Nombre (alignement à droite)</label>
+                            <hint>Number field with validation</hint>
+                        </number-right>
                         <standard-button>
                             <label>Bouton</label>
                             <hint>Bouton navigateur standard</hint>
@@ -1043,11 +1064,11 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             </fr:us-phone>
                         </fr:c>
                         <fr:c y="1" x="9" w="4">
-                            <fr:number id="number-control" digits-after-decimal="0" bind="number-bind" suffix="m/s">
-                                <xf:label ref="$form-resources/number/label"/>
-                                <xf:hint ref="$form-resources/number/hint"/>
+                            <fr:us-state bind="us-state-bind" id="us-state-control">
+                                <xf:label ref="$form-resources/us-state/label"/>
+                                <xf:hint ref="$form-resources/us-state/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </fr:number>
+                            </fr:us-state>
                         </fr:c>
                         <fr:c y="2" x="1" w="4">
                             <fr:currency bind="currency-bind" id="currency-control">
@@ -1057,13 +1078,30 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             </fr:currency>
                         </fr:c>
                         <fr:c y="2" x="5" w="4">
-                            <fr:us-state bind="us-state-bind" id="us-state-control">
-                                <xf:label ref="$form-resources/us-state/label"/>
-                                <xf:hint ref="$form-resources/us-state/hint"/>
+                            <fr:number id="number-control" digits-after-decimal="0" bind="number-bind" suffix="m/s">
+                                <xf:label ref="$form-resources/number/label"/>
+                                <xf:hint ref="$form-resources/number/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </fr:us-state>
+                            </fr:number>
                         </fr:c>
                         <fr:c y="2" x="9" w="4"/>
+                        <fr:c x="1" y="3" w="4">
+                            <fr:currency bind="currency-right-bind" id="currency-right-control" field-align="right">
+                                <xf:label ref="$form-resources/currency-right/label"/>
+                                <xf:hint ref="$form-resources/currency-right/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:currency>
+                        </fr:c>
+                        <fr:c x="5" y="3" w="4">
+                            <fr:number id="number-right-control" bind="number-right-bind" digits-after-decimal="0"
+                                       suffix="m/s"
+                                       field-align="right">
+                                <xf:label ref="$form-resources/number-right/label"/>
+                                <xf:hint ref="$form-resources/number-right/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                            </fr:number>
+                        </fr:c>
+                        <fr:c x="9" y="3" w="4"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="date-time-controls-section" bind="date-time-controls-bind">

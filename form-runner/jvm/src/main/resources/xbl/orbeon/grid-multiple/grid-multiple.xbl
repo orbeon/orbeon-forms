@@ -322,11 +322,22 @@
                                                 if (exists($control/xf:label | $control/xf:hint) and exists($control/self::fr:number | $control/self::fr:currency)) then
                                                     (: Only for some controls :)
                                                     if ($control/@field-align = ('left', 'right')) then
-                                                        (: Static case :)
+                                                        (: Optimized static case :)
                                                         concat('fr-field-align-', $control/@field-align)
+                                                    else if (contains($control/@field-align, '{')) then
+                                                        (: Dynamic case where we must ask the control to resolve the AVT :)
+                                                        concat(
+                                                            '{for $v in fr:component-param-value(''field-align'', ''',
+                                                            $control/@id,
+                                                            ''') return concat(''fr-field-align-'', $v)}'
+                                                        )
                                                     else
-                                                        (: Dynamic case :)
-                                                        concat(' {for $v in fr:component-param-value(''field-align'', ''', $control/@id, ''') return concat(''fr-field-align-'', $v)}')
+                                                        (: Dynamic case where we must search for the parameter at the form/properties level :)
+                                                        concat(
+                                                            '{for $v in fr:component-param-value-by-type(QName((), ''field-align''), QName(''http://orbeon.org/oxf/xml/form-runner'', ''',
+                                                            name($control),
+                                                            ''')) return concat(''fr-field-align-'', $v)}'
+                                                        )
                                                 else
                                                     ()"/>
 

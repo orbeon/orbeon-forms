@@ -15,6 +15,7 @@ import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
@@ -24,6 +25,38 @@ import scala.collection.compat._
 object FRComponentParamSupport {
 
   import org.orbeon.scaxon.SimplePath._
+
+  def componentParamValue(
+    paramName            : QName,
+    sourceComponentIdOpt : Option[String],
+    property             : String => Option[AtomicValue])(implicit
+    xfc                  : XFormsFunction.Context
+  ): Option[AtomicValue] = {
+    ComponentParamSupport.findSourceComponent(sourceComponentIdOpt) flatMap { sourceComponent =>
+
+      val staticControl   = sourceComponent.staticControl
+      val concreteBinding = staticControl.bindingOrThrow
+
+      def fromAttributes: Option[AtomicValue] =
+        ComponentParamSupport.fromElem(
+          atts        = concreteBinding.boundElementAtts.lift,
+          paramName   = paramName
+        )
+
+      def fromMetadataAndProperties: Option[AtomicValue] =
+        FRComponentParamSupport.fromMetadataAndProperties(
+          partAnalysis  = sourceComponent.container.partAnalysis,
+          directNameOpt = staticControl.commonBinding.directName,
+          paramName     = paramName,
+          property      = property
+        )
+
+      fromAttributes orElse fromMetadataAndProperties map {
+        case paramValue: StringValue => stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue))
+        case paramValue              => paramValue
+      }
+    }
+  }
 
   def findConstantMetadataRootElem(part: PartAnalysisForStaticMetadataAndProperties): Option[om.NodeInfo] = {
 

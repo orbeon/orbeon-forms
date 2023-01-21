@@ -18,13 +18,11 @@ import org.orbeon.dom.saxon.TypedNodeWrapper.TypedValueException
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.process.{FormRunnerRenderedFormat, SimpleProcess}
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerMetadata, XMLNames, _}
-import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.fr._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, NetUtils}
 import org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.oxf.xforms.function.xxforms.ComponentParamSupport
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 import org.orbeon.oxf.xml.{FunctionSupport, OrbeonFunctionLibrary, RuntimeDependentFunction, SaxonUtils}
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
@@ -349,35 +347,11 @@ private object FormRunnerFunctions {
       implicit val xpc = context
       implicit val xfc = XFormsFunction.context
 
-      val paramName            = QName(stringArgument(0))
-      val sourceComponentIdOpt = stringArgumentOpt(1)
-
-      // TODO: 2023-01-20: move common code to `ComponentParamSupport`
-      ComponentParamSupport.findSourceComponent(sourceComponentIdOpt) flatMap { sourceComponent =>
-
-        val staticControl   = sourceComponent.staticControl
-        val concreteBinding = staticControl.bindingOrThrow
-
-        def fromAttributes: Option[AtomicValue] =
-          ComponentParamSupport.fromElem(
-            atts        = concreteBinding.boundElementAtts.lift,
-            paramName   = paramName
-          )
-
-        def fromMetadataAndProperties: Option[AtomicValue] =
-          FRComponentParamSupport.fromMetadataAndProperties(
-            partAnalysis  = sourceComponent.container.partAnalysis,
-            directNameOpt = staticControl.commonBinding.directName,
-            paramName     = paramName,
-            property      = Property.property
-          )
-
-        fromAttributes orElse fromMetadataAndProperties map {
-            case paramValue: StringValue => stringToStringValue(sourceComponent.evaluateAvt(paramValue.getStringValue))
-            case paramValue              => paramValue
-          }
-
-      } orNull
+      FRComponentParamSupport.componentParamValue(
+        paramName            = QName(stringArgument(0)),
+        sourceComponentIdOpt = stringArgumentOpt(1),
+        property             = Property.property
+      ).orNull
     }
   }
 

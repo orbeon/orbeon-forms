@@ -21,33 +21,10 @@ import org.orbeon.saxon.value.AtomicValue
 
 class XXFormsComponentParam extends XFormsFunction {
 
-  override def evaluateItem(xpathContext: XPathContext): AtomicValue = {
-
-    val paramName = getQNameFromExpression(argument.head)(xpathContext)
-
-    // TODO: 2023-01-20: move common code to `ComponentParamSupport`
-    ComponentParamSupport.findSourceComponent(None)(XFormsFunction.context) flatMap { sourceComponent =>
-
-      val staticControl   = sourceComponent.staticControl
-      val concreteBinding = staticControl.bindingOrThrow
-
-      // NOTE: In the future, we would like constant values to be available right away, and
-      // AVTs to support dependencies. Those should probably be stored lazily at the control
-      // level.
-      val attrValue =
-        ComponentParamSupport.fromElemAlsoTryAvt(
-          concreteBinding.boundElementAtts.lift,
-          sourceComponent.evaluateAvt,
-          paramName
-        )
-
-      attrValue orElse
-        ComponentParamSupport.fromProperties(
-          paramName,
-          Nil,
-          staticControl.commonBinding.directName,
-          Property.property
-        )
-    } orNull
-  }
+  override def evaluateItem(xpathContext: XPathContext): AtomicValue =
+    ComponentParamSupport.componentParamValue(
+      paramName = getQNameFromExpression(argument.head)(xpathContext),
+      property  = Property.property)(
+      XFormsFunction.context
+    ).orNull
 }

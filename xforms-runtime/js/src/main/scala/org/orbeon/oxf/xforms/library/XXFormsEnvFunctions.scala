@@ -195,37 +195,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       item
 
   @XPathFunction
-  def componentParamValue(paramNameString: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[AtomicValue] = {
-
-    // TODO: Support QName params + QName resolution? For now, all callers pass a `String`.
-    //  See `getQNameFromItem`.
-    val paramName = QName(paramNameString)
-
-    // TODO: 2023-01-20: move common code to `ComponentParamSupport`
-    ComponentParamSupport.findSourceComponent(None) flatMap { sourceComponent =>
-
-      val staticControl   = sourceComponent.staticControl
-      val concreteBinding = staticControl.bindingOrThrow
-
-      // NOTE: In the future, we would like constant values to be available right away, and
-      // AVTs to support dependencies. Those should probably be stored lazily at the control
-      // level.
-      val attrValue =
-        ComponentParamSupport.fromElemAlsoTryAvt(
-          concreteBinding.boundElementAtts.lift,
-          sourceComponent.evaluateAvt,
-          paramName
-        )
-
-      attrValue orElse
-        ComponentParamSupport.fromProperties(
-          paramName,
-          Nil,
-          staticControl.commonBinding.directName,
-          CoreSupport.property
-        )
-    }
-  }
+  def componentParamValue(paramNameString: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[AtomicValue] =
+    ComponentParamSupport.componentParamValue(
+      paramName = QName(paramNameString),
+      property  = CoreSupport.property
+    )
 
   @XPathFunction
   def instance(

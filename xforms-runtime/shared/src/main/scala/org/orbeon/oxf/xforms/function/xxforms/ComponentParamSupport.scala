@@ -14,6 +14,36 @@ object ComponentParamSupport {
 
   val XblLocalName = XFormsNames.XBL_XBL_QNAME.localName
 
+  def componentParamValue(
+    paramName : QName,
+    property  : String => Option[AtomicValue])(implicit
+    xfc       : XFormsFunction.Context
+  ): Option[AtomicValue] = {
+    findSourceComponent(None) flatMap { sourceComponent =>
+
+      val staticControl   = sourceComponent.staticControl
+      val concreteBinding = staticControl.bindingOrThrow
+
+      // NOTE: In the future, we would like constant values to be available right away, and
+      // AVTs to support dependencies. Those should probably be stored lazily at the control
+      // level.
+      val attrValue =
+        fromElemAlsoTryAvt(
+          concreteBinding.boundElementAtts.lift,
+          sourceComponent.evaluateAvt,
+          paramName
+        )
+
+      attrValue orElse
+        fromProperties(
+          paramName,
+          Nil,
+          staticControl.commonBinding.directName,
+          property
+        )
+    }
+  }
+
   def findSourceComponent(sourceComponentIdOpt: Option[String])(implicit xfc: XFormsFunction.Context): Option[XFormsComponentControl] = {
 
     def fromParamOpt: Option[XFormsComponentControl] =
@@ -81,5 +111,4 @@ object ComponentParamSupport {
     directNameOpt map { qName =>
       XblLocalName :: qName.namespace.prefix :: qName.localName :: paramName.localName :: Nil
     }
-
 }

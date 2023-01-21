@@ -369,6 +369,7 @@ private object FormRunnerFunctions {
       }
   }
 
+  // TODO: Remove code duplication with `def createdWithOrNewer()`
   class FRCreatedWithOrNewer extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): BooleanValue = {
 

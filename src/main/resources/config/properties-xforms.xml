@@ -163,7 +163,7 @@
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.currency.round-when-formatting"       value="false"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.currency.round-when-storing"          value="false"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-width"                 value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-align"                 value="left"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.field-align"                 value=""/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.prefix"                        value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.suffix"                        value=""/>
@@ -173,7 +173,7 @@
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-formatting"         value="false"/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.number.round-when-storing"            value="false"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-width"                   value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
-    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-align"                   value="left"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.field-align"                   value=""/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.date.field-width"                     value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.time.field-width"                     value="{if (fr:created-with-or-newer('2018.2')) then 'full' else 'natural'}"/>

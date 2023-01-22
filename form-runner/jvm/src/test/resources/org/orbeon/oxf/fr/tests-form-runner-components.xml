@@ -810,8 +810,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control class="xforms-help-popover-control input-prepend fr-field-width-natural" id="my-currency≡xf-11"/>
-                        <xxf:control id="my-currency≡xf-13" class="add-on"/>
+                       <xxf:control id="my-currency≡xf-9" class="xforms-help-popover-control input-prepend fr-field-width-natural"/>
+                       <xxf:control id="my-currency≡xf-10" class="add-on"/>
                         <xxf:control id="my-currency≡prefix">
                             <xxf:value>$</xxf:value>
                         </xxf:control>
@@ -820,7 +820,7 @@
                         <xxf:attribute for="my-currency≡html-input" name="pattern">.*</xxf:attribute>
                         <xxf:attribute for="my-currency≡html-input" name="min"/>
                         <xxf:attribute for="my-currency≡html-input" name="maxlength"/>
-                        <xxf:control id="my-currency≡xf-14" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-11" relevant="false"/>
                         <xxf:init id="my-currency">
                             <xxf:value>{"displayValue":"12.34","editValue":"12.34","decimalSeparator":"."}</xxf:value>
                         </xxf:init>

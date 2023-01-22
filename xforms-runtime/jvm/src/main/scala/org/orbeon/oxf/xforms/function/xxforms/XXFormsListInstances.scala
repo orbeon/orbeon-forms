@@ -24,8 +24,11 @@ class XXFormsListInstances extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
+
     val itOpt =
-      resolveOrFindByStaticOrAbsoluteId(stringArgument(0)(xpathContext))(xpathContext) collect {
+      XFormsFunction.resolveOrFindByStaticOrAbsoluteId(stringArgument(0)) collect {
         case model: XFormsModel =>
           for {
             instance    <- model.instancesIterator

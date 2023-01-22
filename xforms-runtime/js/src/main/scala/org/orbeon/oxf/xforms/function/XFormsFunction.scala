@@ -13,19 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.orbeon.dom
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsLang
 import org.orbeon.saxon.expr._
-import org.orbeon.saxon.om
 import org.orbeon.saxon.sxpath.IndependentContext
-import org.orbeon.saxon.value.{AtomicValue, QNameValue}
-import org.orbeon.xforms.XFormsId
-import org.orbeon.xforms.runtime.XFormsObject
-import org.orbeon.xforms.xbl.Scope
 
 import java.util.Locale
 
@@ -38,92 +28,8 @@ import java.util.Locale
  */
 object XFormsFunction extends CommonFunctionSupport {
 
-  // Resolve the relevant control by argument expression
-  // TODO: Check callers and consider using `relevantControls`.
-  def relevantControl(
-    staticOrAbsoluteId : String)(implicit
-    xpc                : XPathContext,
-    xfc                : XFormsFunction.Context
-  ): Option[XFormsControl] =
-    findRelevantControls(staticOrAbsoluteId, followIndexes = true).headOption
-
-  // Resolve a relevant control by id
-  def findRelevantControls(
-    staticOrAbsoluteId : String,
-    followIndexes      : Boolean)(implicit
-    xpc                : XPathContext,
-    xfc                : XFormsFunction.Context
-  ): List[XFormsControl] =
-    findControlsByStaticOrAbsoluteId(staticOrAbsoluteId, followIndexes) collect
-      { case control: XFormsControl if control.isRelevant => control }
-
-  // Resolve a control by id
-  def findControlsByStaticOrAbsoluteId(
-    staticOrAbsoluteId : String,
-    followIndexes      : Boolean)(implicit
-    xpc                : XPathContext,
-    xfc                : XFormsFunction.Context
-  ): List[XFormsControl] = {
-
-    val sourceEffectiveId        = getSourceEffectiveId
-    val sourcePrefixedId         = XFormsId.getPrefixedId(sourceEffectiveId)
-    val resolutionScopeContainer = context.container.findScopeRoot(sourcePrefixedId)
-
-    resolutionScopeContainer.resolveObjectsById(
-      sourceEffectiveId,
-      staticOrAbsoluteId,
-      contextItemOpt = None,
-      followIndexes
-    ) collect {
-      case c: XFormsControl => c
-    }
-  }
-
-  // Resolve an object by id
-  def resolveOrFindByStaticOrAbsoluteId(
-    staticOrAbsoluteId : String)(implicit
-    xpc                : XPathContext,
-    xfc                : XFormsFunction.Context
-  ): Option[XFormsObject] =
-    context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticOrAbsoluteId)
-
-  def resolveStaticOrAbsoluteId(
-    staticIdExpr : Option[Expression])(implicit
-    xpc          : XPathContext,
-    xfc          : XFormsFunction.Context
-  ): Option[String] =
-    staticIdExpr match {
-      case None =>
-        // If no argument is supplied, return the closest id (source id)
-        Option(getSourceEffectiveId)
-      case Some(expr) =>
-        // Otherwise resolve the id passed against the source id
-        val staticOrAbsoluteId = expr.evaluateAsString(xpc).toString
-        resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map
-          (_.getEffectiveId)
-    }
-
-  def bindingContext: BindingContext = context.bindingContext
-
-  def getSourceEffectiveId(implicit xfc: XFormsFunction.Context): String =
-    xfc.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
-
-  def elementAnalysisForSource(implicit xfc: XFormsFunction.Context): Option[ElementAnalysis] = {
-    val prefixedId = XFormsId.getPrefixedId(getSourceEffectiveId)
-    xfc.container.partAnalysis.findControlAnalysis(prefixedId)
-  }
-
-  def sourceScope(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Scope =
-    xfc.container.partAnalysis.scopeForPrefixedId(XFormsId.getPrefixedId(getSourceEffectiveId))
-
-  def getContainingDocument(implicit xpc: XPathContext): XFormsContainingDocument =
-    Option(context) map (_.container.getContainingDocument) orNull
-
   def setProperty(name: String, value: Option[String]): Unit =
     context.setProperty(name, value)
-
-  def currentLangOpt(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =
-    elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _))
 
   def currentLocale(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Locale =
     currentLangOpt match {
@@ -193,18 +99,6 @@ object XFormsFunction extends CommonFunctionSupport {
 
 //  def getQNameFromExpression(qNameExpression: Expression)(implicit xpathContext: XPathContext): dom.QName =
 //    getQNameFromItem(qNameExpression.evaluateItem(xpathContext))
-
-  def getQNameFromItem(evaluatedExpression: om.Item)(implicit xpathContext: XPathContext): dom.QName =
-    evaluatedExpression match {
-      case qName: QNameValue =>
-        // Directly got a QName so there is no need for namespace resolution
-        qNameFromQNameValue(qName)
-      case atomic: AtomicValue =>
-        // Must resolve prefix if present
-        qNameFromStringValue(atomic.getStringValue, bindingContext)
-      case other =>
-        throw new OXFException(s"Cannot create QName from non-atomic item of class '${other.getClass.getName}'")
-    }
 
   // See comments in Saxon Evaluate.java
   private var staticContext: IndependentContext = null

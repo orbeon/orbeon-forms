@@ -22,11 +22,12 @@ class XXFormsEvaluateBindProperty extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): Item = {
 
     implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
 
     val bindId   = stringArgument(0)
-    val mipQName = getQNameFromExpression(arguments(1))(xpathContext)
+    val mipQName = getQNameFromExpression(arguments(1))
 
-    XFormsFunction.context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, bindingContext.singleItemOpt) collect {
+    XFormsFunction.context.container.resolveObjectByIdInScope(XFormsFunction.getSourceEffectiveId, bindId, bindingContext.singleItemOpt) collect {
       case bind: RuntimeBind => bind
     } flatMap { bind =>
       bind.model.modelBindsOpt.flatMap(_.evaluateBindByType(bind, position = 1, mipType = mipQName))

@@ -21,8 +21,11 @@ import org.orbeon.scaxon.Implicits._
 
 class XXFormsIsControlRelevant extends XFormsFunction {
 
-  override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-    relevantControl(0)(xpathContext).nonEmpty
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue = {
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
+    relevantControl(0).nonEmpty
+  }
 
   // NOTE: We depend on MIPs so we cannot compute PathMap dependencies at this point.
 }
@@ -31,20 +34,23 @@ trait SingleNodeControlMipFunction extends XFormsFunction {
 
   protected def getMip(c: XFormsSingleNodeControl): Boolean
 
-  override def evaluateItem(xpathContext: XPathContext): BooleanValue =
-    relevantControl(0)(xpathContext) collect { case c: XFormsSingleNodeControl => getMip(c) } contains true
+  override def evaluateItem(xpathContext: XPathContext): BooleanValue = {
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
+    relevantControl(0) collect { case c: XFormsSingleNodeControl => getMip(c) } contains true
+  }
 
   // NOTE: We depend on MIPs so we cannot compute PathMap dependencies at this point.
 }
 
 class XXFormsIsControlReadonly extends SingleNodeControlMipFunction {
-  protected def getMip(c: XFormsSingleNodeControl) = c.isReadonly
+  protected def getMip(c: XFormsSingleNodeControl): Boolean = c.isReadonly
 }
 
 class XXFormsIsControlRequired extends SingleNodeControlMipFunction {
-  protected def getMip(c: XFormsSingleNodeControl) = c.isRequired
+  protected def getMip(c: XFormsSingleNodeControl): Boolean = c.isRequired
 }
 
 class XXFormsIsControlValid extends SingleNodeControlMipFunction {
-  protected def getMip(c: XFormsSingleNodeControl) = c.isValid
+  protected def getMip(c: XFormsSingleNodeControl): Boolean = c.isValid
 }

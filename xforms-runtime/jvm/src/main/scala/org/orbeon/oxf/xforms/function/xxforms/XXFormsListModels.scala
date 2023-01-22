@@ -20,11 +20,15 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
 
 class XXFormsListModels extends XFormsFunction {
-  override def iterate(xpathContext: XPathContext): SequenceIterator =
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
+
+    implicit val ctx = xpathContext
+
     for {
-      model       <- getContainingDocument(xpathContext).allModels
+      model       <- XFormsFunction.getContainingDocument.allModels
       effectiveId = model.getEffectiveId
       absoluteId  = XFormsId.effectiveIdToAbsoluteId(effectiveId)
     } yield
       absoluteId
+  }
 }

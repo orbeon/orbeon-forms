@@ -25,6 +25,7 @@ class XXFormsLHHA extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
     implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
 
     def evaluateControlItem(f: XFormsControl => String) =
       relevantControl(0) map f

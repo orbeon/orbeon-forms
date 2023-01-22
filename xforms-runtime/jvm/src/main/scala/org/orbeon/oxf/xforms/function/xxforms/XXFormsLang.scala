@@ -27,10 +27,9 @@ class XXFormsLang extends XFormsFunction {
   import XXFormsLang._
 
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
-
     implicit val ctx = xpathContext
-
-    elementAnalysisForSource flatMap (resolveXMLangHandleAVTs(getContainingDocument, _))
+    implicit val xfc = XFormsFunction.context
+    XFormsFunction.elementAnalysisForSource flatMap (resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, _))
   }
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {

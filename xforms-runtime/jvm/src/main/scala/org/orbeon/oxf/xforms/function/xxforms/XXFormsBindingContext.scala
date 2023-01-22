@@ -19,8 +19,11 @@ import org.orbeon.saxon.om.Item
 
 class XXFormsBindingContext extends XFormsFunction {
 
-  override def evaluateItem(xpathContext: XPathContext): Item =
-    relevantControl(0)(xpathContext) flatMap (_.contextForBinding) orNull
+  override def evaluateItem(xpathContext: XPathContext): Item = {
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
+    relevantControl(0) flatMap (_.contextForBinding) orNull
+  }
 
   // TODO: PathMap
 }

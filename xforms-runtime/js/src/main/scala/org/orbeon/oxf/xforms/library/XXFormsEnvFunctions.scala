@@ -123,7 +123,12 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
   // so that the prefix is not involved. The limitation for now is that you have to use the same prefix as
   // the one used on the binds. See also https://github.com/orbeon/orbeon-forms/issues/3721.
   @XPathFunction
-  def customMip(binding: Iterable[om.Item], qName: om.Item)(implicit xpc: XPathContext): Option[String] =
+  def customMip(
+    binding : Iterable[om.Item],
+    qName   : om.Item)(implicit
+    xpc     : XPathContext,
+    xfc     : XFormsFunction.Context
+  ): Option[String] =
     InstanceData.findCustomMip(
       binding = binding.headOption.orNull,
       qName   = XFormsFunction.getQNameFromItem(qName)

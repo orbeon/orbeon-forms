@@ -22,7 +22,7 @@ class XXFormsGetVariable extends XFormsFunction {
 
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
-    val containingDocument = getContainingDocument(xpathContext)
+    val containingDocument = XFormsFunction.getContainingDocument(xpathContext)
     val modelEffectiveId   = stringArgument(0)(xpathContext)
     val variableName       = stringArgument(1)(xpathContext)
 

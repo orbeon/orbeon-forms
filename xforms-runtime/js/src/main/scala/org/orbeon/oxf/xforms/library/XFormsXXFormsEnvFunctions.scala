@@ -12,11 +12,21 @@ import org.orbeon.saxon.value.{AtomicValue, StringValue}
 trait XFormsXXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
-  def element(name: AtomicValue, content: Iterable[om.Item] = Iterable.empty)(implicit xpc: XPathContext): om.NodeInfo =
+  def element(
+    name    : AtomicValue,
+    content : Iterable[om.Item] = Iterable.empty)(implicit
+    xpc     : XPathContext,
+    xfc     : XFormsFunction.Context
+  ): om.NodeInfo =
     elementInfo(XFormsFunction.getQNameFromItem(name), content.toList)
 
   @XPathFunction
-  def attribute(name: AtomicValue, value: AtomicValue = StringValue.EMPTY_STRING)(implicit xpc: XPathContext): om.NodeInfo =
+  def attribute(
+    name  : AtomicValue,
+    value : AtomicValue = StringValue.EMPTY_STRING)(implicit
+    xpc   : XPathContext,
+    xfc   : XFormsFunction.Context
+  ): om.NodeInfo =
     attributeInfo(XFormsFunction.getQNameFromItem(name), value.getStringValue)
 
 //    Fun("case", classOf[XFormsCase], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,

@@ -21,8 +21,10 @@ import org.orbeon.scaxon.Implicits._
 
 class XXFormsClientId extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
-    val containingDocument = getContainingDocument(xpathContext)
-    val effectiveId        = resolveStaticOrAbsoluteId(argument.headOption)(xpathContext)
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
+    val containingDocument = XFormsFunction.getContainingDocument
+    val effectiveId        = XFormsFunction.resolveStaticOrAbsoluteId(argument.headOption)
     effectiveId.map(containingDocument.namespaceId)
   }
 }

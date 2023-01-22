@@ -31,8 +31,9 @@ class Event extends XFormsFunction with RuntimeDependentFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
     implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
 
-    Option(getContainingDocument) flatMap (_.currentEventOpt) match {
+    Option(XFormsFunction.getContainingDocument) flatMap (_.currentEventOpt) match {
       case Some(event) => findEventAttribute(event, stringArgument(0)).orNull
       case None        => EmptyIterator.getInstance
     }

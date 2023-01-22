@@ -22,6 +22,7 @@ class XXFormsFocusable extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): BooleanValue = {
 
     implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
 
     val it =
       if (booleanArgument(1, default = true))

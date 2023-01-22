@@ -26,18 +26,19 @@ class XXFormsResourceElem extends XFormsFunction {
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
     implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
 
     val resourceKeyArgument = stringArgument(0)
     val instanceArgumentOpt = stringArgumentOpt(1)
 
     def findResourcesElement =
-      resolveOrFindByStaticOrAbsoluteId(instanceArgumentOpt getOrElse "fr-form-resources") collect
+      XFormsFunction.resolveOrFindByStaticOrAbsoluteId(instanceArgumentOpt getOrElse "fr-form-resources") collect
         { case instance: XFormsInstance => instance.rootElement }
 
     for {
-      elementAnalysis <- elementAnalysisForSource.iterator
+      elementAnalysis <- XFormsFunction.elementAnalysisForSource.iterator
       resources       <- findResourcesElement.iterator
-      requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, elementAnalysis).iterator
+      requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, elementAnalysis).iterator
       resourceRoot    <- findResourceElementForLang(resources, requestedLang).iterator
       leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).iterator
     } yield

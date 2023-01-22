@@ -24,11 +24,14 @@ import org.orbeon.scaxon.Implicits._
  * Extension xxf:cases($switch-id as xs:string) as xs:string* function.
  */
 class XXFormsCases extends XFormsFunction {
-  override def iterate(xpathContext: XPathContext): SequenceIterator =
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
     stringSeqToSequenceIterator(
-      relevantControl(0)(xpathContext)             flatMap
+      relevantControl(0)                         flatMap
         collectByErasedType[XFormsSwitchControl] map
         (_.getChildrenCases map (_.getId))       getOrElse
         Nil
     )
+  }
 }

@@ -23,11 +23,16 @@ import org.orbeon.scaxon.Implicits._
  * case($switch-id as xs:string) as xs:string? function.
  */
 class XFormsCase extends XFormsFunction {
-  override def evaluateItem(xpathContext: XPathContext): StringValue =
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
+
     for {
-      control      <- relevantControl(0)(xpathContext)
+      control      <- relevantControl(0)
       switch       <- collectByErasedType[XFormsSwitchControl](control)
       selectedCase <- switch.selectedCaseIfRelevantOpt
     } yield
       selectedCase.getId
+  }
 }

@@ -29,7 +29,7 @@ class Index extends XFormsFunction {
     findIndexForRepeatId(stringArgument(0)(xpathContext))
 
   protected def findIndexForRepeatId(repeatStaticId: String): Int64Value =
-    XFormsFunction.context.container.getRepeatIndex(getSourceEffectiveId, repeatStaticId) match {
+    XFormsFunction.context.container.getRepeatIndex(XFormsFunction.getSourceEffectiveId(XFormsFunction.context), repeatStaticId) match {
       case Some(index) =>
         new Int64Value(index)
       case None =>

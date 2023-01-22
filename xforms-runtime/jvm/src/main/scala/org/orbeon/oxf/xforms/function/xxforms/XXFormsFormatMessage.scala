@@ -25,6 +25,7 @@ class XXFormsFormatMessage extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
     implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
 
     val template         = stringArgument(0)
     val messageArguments = argument(1).iterate(xpathContext)

@@ -15,10 +15,14 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.value.StringValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.xforms.XFormsId
 
 class XXFormsAbsoluteId extends XFormsFunction {
-  override def evaluateItem(xpathContext: XPathContext) =
-    resolveStaticOrAbsoluteId(argument.headOption)(xpathContext) map XFormsId.effectiveIdToAbsoluteId
+  override def evaluateItem(xpathContext: XPathContext): StringValue = {
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
+    XFormsFunction.resolveStaticOrAbsoluteId(argument.headOption) map XFormsId.effectiveIdToAbsoluteId
+  }
 }

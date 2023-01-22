@@ -24,8 +24,11 @@ import org.orbeon.scaxon.Implicits._
 
 class XXFormsBinding extends XFormsFunction {
 
-  override def iterate(xpathContext: XPathContext): SequenceIterator =
-    findControls(0, followIndexes = true)(xpathContext).headOption map (_.bindingEvenIfNonRelevant)
+  override def iterate(xpathContext: XPathContext): SequenceIterator = {
+    implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
+    findControls(0, followIndexes = true).headOption map (_.bindingEvenIfNonRelevant)
+  }
 
   override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
 

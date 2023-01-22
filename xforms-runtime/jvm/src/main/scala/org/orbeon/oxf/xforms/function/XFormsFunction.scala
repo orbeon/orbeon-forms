@@ -53,85 +53,31 @@ abstract class XFormsFunction extends DefaultFunctionSupport {
 
   // Resolve the relevant control by argument expression
   // TODO: Check callers and consider using `relevantControls`.
-  def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
-    findRelevantControls(arguments(i).evaluateAsString(xpathContext).toString, followIndexes = true).headOption
+  def relevantControl(i: Int)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[XFormsControl] =
+    findRelevantControls(arguments(i).evaluateAsString(xpc).toString, followIndexes = true).headOption
 
   def relevantControls(
     i             : Int,
     followIndexes : Boolean)(implicit
-    xpathContext  : XPathContext
+    xpc           : XPathContext,
+    xfc           : XFormsFunction.Context
   ): List[XFormsControl] =
     findRelevantControls(
-      arguments(i).evaluateAsString(xpathContext).toString,
+      arguments(i).evaluateAsString(xpc).toString,
       followIndexes
     )
 
-  // Resolve a relevant control by id
-  def findRelevantControls(
-    staticOrAbsoluteId : String,
-    followIndexes      : Boolean)(implicit
-    xpathContext       : XPathContext
-  ): List[XFormsControl] =
-    findControlsByStaticOrAbsoluteId(staticOrAbsoluteId, followIndexes) collect
-      { case control: XFormsControl if control.isRelevant => control }
-
-  def findControls(i: Int, followIndexes: Boolean)(implicit xpathContext: XPathContext): List[XFormsControl] =
-    findControlsByStaticOrAbsoluteId(arguments(i).evaluateAsString(xpathContext).toString, followIndexes)
-
-  // Resolve a control by id
-  def findControlsByStaticOrAbsoluteId(
-    staticOrAbsoluteId : String,
-    followIndexes      : Boolean)(implicit
-    xpathContext       : XPathContext
-  ): List[XFormsControl] = {
-
-    val sourceEffectiveId        = getSourceEffectiveId
-    val sourcePrefixedId         = XFormsId.getPrefixedId(sourceEffectiveId)
-    val resolutionScopeContainer = context.container.findScopeRoot(sourcePrefixedId)
-
-    resolutionScopeContainer.resolveObjectsById(sourceEffectiveId, staticOrAbsoluteId, contextItemOpt = None, followIndexes) collect { case c: XFormsControl => c }
-  }
-
-  // Resolve an object by id
-  def resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsObject] =
-    context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticOrAbsoluteId)
-
-  def resolveStaticOrAbsoluteId(staticIdExpr: Option[Expression])(implicit xpathContext: XPathContext): Option[String] =
-    staticIdExpr match {
-      case None =>
-        // If no argument is supplied, return the closest id (source id)
-        Option(getSourceEffectiveId)
-      case Some(expr) =>
-        // Otherwise resolve the id passed against the source id
-        val staticOrAbsoluteId = expr.evaluateAsString(xpathContext).toString
-        resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) map
-          (_.getEffectiveId)
-    }
+  def findControls(i: Int, followIndexes: Boolean)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): List[XFormsControl] =
+    findControlsByStaticOrAbsoluteId(arguments(i).evaluateAsString(xpc).toString, followIndexes)
 
   def bindingContext: BindingContext = context.bindingContext
 
-  def getSourceEffectiveId: String =
-    context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
-
-  // TODO: 
-  def elementAnalysisForSource: Option[ElementAnalysis] = {
-    val prefixedId = XFormsId.getPrefixedId(getSourceEffectiveId)
-    context.container.partAnalysis.findControlAnalysis(prefixedId)
-  }
-
-  def sourceScope(implicit xpathContext: XPathContext): Scope =
-    context.container.partAnalysis.scopeForPrefixedId(XFormsId.getPrefixedId(getSourceEffectiveId))
-
-  def getContainingDocument(implicit xpathContext: XPathContext): XFormsContainingDocument =
-    Option(context) map (_.container.getContainingDocument) orNull
+  // TODO: remove duplication
 
   def setProperty(name: String, value: Option[String]): Unit =
     context.setProperty(name, value)
 
-  def currentLangOpt(implicit xpathContext: XPathContext): Option[String] =
-    elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _))
-
-  def currentLocale(implicit xpathContext: XPathContext): Locale =
+  def currentLocale(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Locale =
     currentLangOpt match {
       case Some(lang) =>
         // Not sure how xml:lang should be parsed, see:

@@ -26,6 +26,7 @@ class Bind extends XFormsFunction with DependsOnContextItem {
   override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
     implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
 
     val bindId          = stringArgument(0)
     val searchAncestors = booleanArgument(1, default = false)
@@ -33,10 +34,10 @@ class Bind extends XFormsFunction with DependsOnContextItem {
     val contextItemOpt =
       Option(xpathContext.getContextItem)
 
-    val startContainer = XFormsFunction.context.container
+    val startContainer = xfc.container
 
     val startContainerIt =
-      startContainer.searchContainedModelsInScope(getSourceEffectiveId, bindId, contextItemOpt).iterator
+      startContainer.searchContainedModelsInScope(XFormsFunction.getSourceEffectiveId, bindId, contextItemOpt).iterator
 
     val searchIt =
       if (searchAncestors)

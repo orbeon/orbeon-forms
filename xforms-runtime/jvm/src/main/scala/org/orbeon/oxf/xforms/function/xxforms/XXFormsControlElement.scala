@@ -21,6 +21,7 @@ class XXFormsControlElement extends XFormsFunction {
 
   override def evaluateItem(xpathContext: XPathContext): NodeInfo = {
     implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
     relevantControl(0) flatMap { control =>
       control.container.partAnalysis.controlElement(control.prefixedId)
     } orNull

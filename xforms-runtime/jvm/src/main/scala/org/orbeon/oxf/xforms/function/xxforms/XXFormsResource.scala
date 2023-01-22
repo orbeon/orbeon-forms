@@ -38,14 +38,15 @@ class XXFormsResource extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
     implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
 
     val resourceKeyArgument = stringArgument(0)
     val instanceArgumentOpt = stringArgumentOpt(1)
     val templateParamsOpt   = itemsArgumentOpt(2) map (it => MapFunctions.collectMapValues(it).next())
 
     def findInstance = instanceArgumentOpt match {
-      case Some(instanceName) => resolveOrFindByStaticOrAbsoluteId(instanceName)
-      case None               => resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
+      case Some(instanceName) => XFormsFunction.resolveOrFindByStaticOrAbsoluteId(instanceName)
+      case None               => XFormsFunction.resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse XFormsFunction.resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
     }
 
     def findResourcesElement = findInstance collect { case instance: XFormsInstance => instance.rootElement }
@@ -68,9 +69,9 @@ class XXFormsResource extends XFormsFunction {
 
     val resultOpt =
       for {
-        elementAnalysis <- elementAnalysisForSource
+        elementAnalysis <- XFormsFunction.elementAnalysisForSource
         resources       <- findResourcesElement
-        requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, elementAnalysis)
+        requestedLang   <- XXFormsLang.resolveXMLangHandleAVTs(XFormsFunction.getContainingDocument, elementAnalysis)
         resourceRoot    <- findResourceElementForLang(resources, requestedLang)
         leaf            <- pathFromTokens(resourceRoot, splitResourceName(resourceKeyArgument)).headOption
       } yield

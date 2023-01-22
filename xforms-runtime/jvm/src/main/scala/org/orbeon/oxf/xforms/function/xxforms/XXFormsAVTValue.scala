@@ -25,14 +25,15 @@ class XXFormsAVTValue extends XFormsFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
 
     implicit val ctx = xpathContext
+    implicit val xfc = XFormsFunction.context
 
     val forId   = stringArgument(0)
     val attName = stringArgument(1)
     // TODO: handle also absolute id
     for {
-      forPrefixedId      <- sourceScope.prefixedIdForStaticIdOpt(forId)
+      forPrefixedId      <- XFormsFunction.sourceScope.prefixedIdForStaticIdOpt(forId)
       attControlAnalysis <- Option(XFormsFunction.context.container.partAnalysis.getAttributeControl(forPrefixedId, attName))
-      control            <- findRelevantControls(attControlAnalysis.staticId, followIndexes = true).headOption
+      control            <- XFormsFunction.findRelevantControls(attControlAnalysis.staticId, followIndexes = true).headOption
       attControl         <- CollectionUtils.collectByErasedType[XXFormsAttributeControl](control)
       value              <- attControl.valueOpt
     } yield

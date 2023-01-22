@@ -46,7 +46,7 @@ trait RequestFunction extends XFormsFunction with RuntimeDependentFunction {
 
     implicit val ctx = xpathContext
 
-    fromDocument(getContainingDocument, stringArgument(0)) map
+    fromDocument(XFormsFunction.getContainingDocument, stringArgument(0)) map
       stringSeqToSequenceIterator                          getOrElse
       EmptyIterator.getInstance
   }
@@ -54,15 +54,15 @@ trait RequestFunction extends XFormsFunction with RuntimeDependentFunction {
 
 class GetRequestMethodTryXFormsDocument extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
-    getContainingDocument(xpathContext).getRequestMethod.entryName.toUpperCase
+    XFormsFunction.getContainingDocument(xpathContext).getRequestMethod.entryName.toUpperCase
 }
 
 class GetRequestPathTryXFormsDocument extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
-    getContainingDocument(xpathContext).getRequestPath
+    XFormsFunction.getContainingDocument(xpathContext).getRequestPath
 }
 
 class GetRequestContextPathTryXFormsDocument extends XFormsFunction with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): StringValue =
-    getContainingDocument(xpathContext).getRequestContextPath
+    XFormsFunction.getContainingDocument(xpathContext).getRequestContextPath
 }

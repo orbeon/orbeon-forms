@@ -171,7 +171,7 @@ object StateHandling {
       (varStateOpt, Option(dom.window.history.state)) match {
         case (Some(_)       , Some(_)    ) => logger.debug(s"Some/Some"); // nop (all good)
         case (Some(varState), None       ) => logger.debug(s"Some/None"); saveStateToHistory(varState)
-        case (None          , Some(state)) => logger.debug(s"None/Some"); dom.console.log(state); varStateOpt = Some(state.asInstanceOf[js.Dictionary[String]])
+        case (None          , Some(state)) => logger.debug(s"None/Some"); varStateOpt = Some(state.asInstanceOf[js.Dictionary[String]])
         case (None          , None       ) => logger.debug(s"None/None"); // nop (nothing we can do here; we might be in trouble later)
       }
 

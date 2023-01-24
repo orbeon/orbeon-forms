@@ -257,76 +257,44 @@
 
     fieldset.xforms-select1-appearance-full { margin: 0; border: none } // when fieldset is used for full selection controls
 
-    // For checkboxes and radio buttons, unlike what is done by default by Bootstrap, we don't want the "white"
-    // area to the right of the label text to be clickable. Otherwise users might select a radio or checkbox by
-    // mistake, while they intended to click on the background of the page. This means that the <label> should
-    // only extend as far to the right as necessary for the text of the label, but not always all the way to the
-    // right of the space available to the control.
-
-    // https://github.com/orbeon/orbeon-forms/issues/3775
-    // NOTE: In order for things to work nicely in plain XForms, we need to do more, like setting a default for the
-    // `display` of all controls, as well as labels.
+    // General radio/checkbox layout using `flex`
     .xforms-select1-appearance-full,
     .xforms-select-appearance-full  {
-
-        // So the block takes just the space it needs, which improves positing of the help popover
-        .xforms-selected,
-        .xforms-deselected,
         .xforms-items {
-            display: block;
-            float: left;
-            clear: left;
+            display: flex;
+            flex-direction: column;
+            row-gap: 5px;
+            margin-bottom: 5px; // for case where multiples controls are stacked up (FB UI)
         }
-
-        // Prevent the checkbox or radio button (from being separated from its label)
-        .xforms-selected,
-        .xforms-deselected {
-            @media print {
-                page-break-inside: avoid;
+        .xforms-selected, .xforms-deselected {
+            display: inline;    // just to make sure (should be default for `<span>`)
+        }
+        label.radio, label.checkbox {
+            display: flex;
+            width: fit-content; // otherwise clicking on the "white" area can select the radio/checkbox
+            column-gap: .5em;   // space between radio/checkbox and label
+            padding-left: 0;    // reset BS2
+            margin-bottom: 0;   // reset
+            input {
+                flex-shrink: 0; // don't allow radio/checkbox to become smaller
+                flex-grow: 0;   // needed?
+                float: none;    // reset BS2
+                margin-left: 0; // reset BS2
             }
-        }
-
-        label.radio,
-        label.checkbox {
-            display: inline-block;
-            padding-left: 0;
-        }
-        input[type="radio"],
-        input[type="checkbox"] {
-            margin-left: 0;
-        }
-        label.radio > span,
-        label.checkbox > span {
-            display: block;
-            margin-left: 20px;
+            span {
+                overflow-wrap: anywhere; // so that very long unbreakable "words" don't overflow in a weird way
+            }
         }
     }
 
-    // Allow the CSS class to be outside of the `<xf:select1>`, for the `<fr:open-select1>`
-    .xforms-select1-appearance-full.xforms-select1-appearance-xxforms-horizontal,
-    .xforms-select-appearance-full.xforms-select-appearance-xxforms-horizontal,
-    .xforms-select1-appearance-xxforms-horizontal .xforms-select1-appearance-full,
-    .xforms-select-appearance-xxforms-horizontal .xforms-select-appearance-full {
-
-        // Don't clear float for horizontal display
-        .xforms-selected,
-        .xforms-deselected,
-        .xforms-items {
-            clear: none;
-        }
-
-        // Make sure there is more space between items
-        .xforms-selected,
-        .xforms-deselected {
-            label {
-                margin-right: 12px;
-            }
-        }
-
-        &.xforms-static.xforms-readonly {
-            .xforms-selected,
-            .xforms-deselected {
-                margin-right: 12px;
+    // https://github.com/orbeon/orbeon-forms/issues/3775
+    .xforms-select1-appearance-xxforms-horizontal, .xforms-select-appearance-xxforms-horizontal {
+        &.xforms-select1-appearance-full, &.xforms-select-appearance-full, // allow CSS class to be outside of the `<xf:select1>` for `<fr:open-select1>`
+        .xforms-select1-appearance-full, .xforms-select-appearance-full {
+            .xforms-items {
+                flex-direction: row;
+                flex-wrap: wrap;
+                column-gap: 1em;
             }
         }
     }
@@ -537,5 +505,67 @@
 
         // <noscript> must never show, and <style> can show due to a bug in Flying Saucer
         noscript, style { display: none }
+    }
+
+    .orbeon {
+
+        // Radio/checkbox: `flex` is currently not supported by the PDF renderer
+        .xforms-select1-appearance-full,
+        .xforms-select-appearance-full  {
+
+            // So the block takes just the space it needs, which improves positing of the help popover
+            .xforms-selected,
+            .xforms-deselected,
+            .xforms-items {
+                display: block;
+                float: left;
+                clear: left;
+            }
+
+            // Prevent the checkbox or radio button from being separated from its label
+            .xforms-selected,
+            .xforms-deselected {
+                page-break-inside: avoid;
+            }
+
+            label.radio,
+            label.checkbox {
+                display: inline-block;
+                padding-left: 0;
+            }
+            label.radio > span,
+            label.checkbox > span {
+                display: block;
+                margin-left: 20px;
+            }
+        }
+
+        .xforms-select1-appearance-xxforms-horizontal, .xforms-select-appearance-xxforms-horizontal {
+            &.xforms-select1-appearance-full, &.xforms-select-appearance-full, // allow CSS class to be outside of the `<xf:select1>` for `<fr:open-select1>`
+            .xforms-select1-appearance-full, .xforms-select-appearance-full {
+
+                // Don't clear float for horizontal display
+                .xforms-selected,
+                .xforms-deselected,
+                .xforms-items {
+                    clear: none;
+                }
+
+                // Make sure there is more space between items
+                .xforms-selected,
+                .xforms-deselected {
+                    label {
+                        margin-right: 12px;
+                    }
+                }
+
+                &.xforms-static.xforms-readonly {
+                    .xforms-selected,
+                    .xforms-deselected {
+                        margin-right: 12px;
+                    }
+                }
+            }
+        }
     }
 }

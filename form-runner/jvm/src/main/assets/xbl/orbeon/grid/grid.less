@@ -313,6 +313,10 @@
                 > div:first-child { display: inline; }      // Don't go on a new line after a required '*'
             }
 
+            .xforms-label:empty {
+                display: none; // no reason for the label to take space in this case
+            }
+
             // Controls
             select,
             textarea,

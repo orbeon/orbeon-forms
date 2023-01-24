@@ -423,7 +423,7 @@
             font-family: @sansFontFamily;   // use regular font, not monospaced font
             cursor: not-allowed;
 
-            word-wrap: break-word;          // called `overflow-wrap` as of 2013 (http://www.w3.org/TR/css3-text/#overflow-wrap-property)
+            overflow-wrap: break-word;
             word-break: normal;             // Bootstrap overrides word-break (`word-break` is generally used for for CJK)
 
             min-height: @controlsHeight;
@@ -454,7 +454,7 @@
     .fr-mode-pdf, .fr-mode-email {
         .xbl-fr-tinymce .xforms-output.xforms-mediatype-text-html > .xforms-output-output pre {
             white-space: normal;
-            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
     }
 }

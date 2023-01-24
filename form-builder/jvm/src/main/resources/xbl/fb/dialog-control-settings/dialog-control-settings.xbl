@@ -860,7 +860,7 @@
                                                             not(contains(value, 'email'))
                                                         ]
                                                     "/>
-                                                <xf:group ref=".[exists($items-to-show)]">
+                                                <xf:group ref=".[exists($items-to-show)]" class="fb-control-settings-options">
                                                     <xf:var name="selected-values"   value="xxf:split($i/standard-classes)"/>
                                                     <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
                                                         <xf:var name="item-to-show"      value="."/>

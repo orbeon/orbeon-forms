@@ -621,6 +621,15 @@ body.orbeon {
         .xbl-fb-boolean-or-formula .xforms-textarea {
             display: block;
         }
+
+        // Same as in `grid.less`, but with email dialog this is not in a grid!
+        .xbl-fr-checkbox-input {
+            .xforms-select-appearance-full, .xforms-select1-appearance-full {
+                .xforms-items {
+                    padding: 4px 0;
+                }
+            }
+        }
     }
 
     // Metadata editor dialog
@@ -1043,10 +1052,17 @@ body.orbeon {
             }
         }
 
-        // Indent these two options under the `index` option
-        .fb-control-settings-summary, .fb-control-settings-search {
+        .fb-control-settings-options {
+
             .xforms-items {
-                margin-left: 20px;
+                margin-bottom: 5px; // otherwise they are too close from each other
+            }
+
+            // Indent these two options under the `index` option
+            .fb-control-settings-summary, .fb-control-settings-search {
+                .xforms-items {
+                    margin-left: 20px;
+                }
             }
         }
 

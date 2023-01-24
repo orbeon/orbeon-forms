@@ -30,8 +30,7 @@ class XXFormsType extends XXFormsMIPFunction {
             new QNameValue(
               StandardNames.getPrefix(fingerprint),
               StandardNames.getURI(fingerprint),
-              StandardNames.getLocalName(fingerprint),
-              null
+              StandardNames.getLocalName(fingerprint)
             )
           case _ =>
             null
@@ -43,8 +42,7 @@ class XXFormsType extends XXFormsMIPFunction {
             new QNameValue(
               "",
               typeQName.namespace.uri,
-              typeQName.localName,
-              null
+              typeQName.localName
             )
           case _ =>
             null

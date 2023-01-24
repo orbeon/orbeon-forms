@@ -64,7 +64,7 @@ class XFormsModelBinds(protected val model: XFormsModel)
       eventsToDispatch += event
 
     def makeQNameValue(qName: QName) =
-      new QNameValue(qName.namespace.prefix, qName.namespace.uri, qName.localName, null)
+      new QNameValue(qName.namespace.prefix, qName.namespace.uri, qName.localName)
 
     def hasSuccessfulErrorConstraints =
       bind.staticBind.constraintsByLevel.nonEmpty option {

@@ -97,8 +97,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
             new QNameValue(
               StandardNames.getPrefix(fingerprint),
               StandardNames.getURI(fingerprint),
-              StandardNames.getLocalName(fingerprint),
-              null
+              StandardNames.getLocalName(fingerprint)
             ).some
           case _ =>
             None
@@ -109,8 +108,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
             new QNameValue(
               "",
               typeQName.namespace.uri,
-              typeQName.localName,
-              null
+              typeQName.localName
             ).some
           case _ =>
             None

@@ -73,6 +73,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <radio-buttons>cat</radio-buttons>
                             <radio-buttons-with-other>Pistachio</radio-buttons-with-other>
                             <yesno-input>false</yesno-input>
+                            <checkboxes-horizontal>cat bird</checkboxes-horizontal>
+                            <radio-buttons-horizontal>cat</radio-buttons-horizontal>
                         </grid-5>
                     </selection-controls>
                     <attachment-controls>
@@ -160,6 +162,10 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         <xf:bind id="checkbox-input-bind" ref="checkbox-input" type="xf:boolean"
                                  name="checkbox-input"/>
                         <xf:bind id="yesno-input-bind" ref="yesno-input" type="xf:boolean" name="yesno-input"/>
+                        <xf:bind id="checkboxes-horizontal-bind" ref="checkboxes-horizontal"
+                                 name="checkboxes-horizontal"/>
+                        <xf:bind id="radio-buttons-horizontal-bind" ref="radio-buttons-horizontal"
+                                 name="radio-buttons-horizontal"/>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="attachment-controls-bind" ref="attachment-controls" name="attachment-controls">
@@ -434,6 +440,46 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Yes/No Answer</label>
                             <hint/>
                         </yesno-input>
+                        <checkboxes-horizontal>
+                            <label>Horizontal Checkboxes</label>
+                            <hint>Horizontal checkboxes</hint>
+                            <item>
+                                <label>Cat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Dog</label>
+                                <value>dog</value>
+                            </item>
+                            <item>
+                                <label>Bird</label>
+                                <value>bird</value>
+                            </item>
+                            <item>
+                                <label>Fish</label>
+                                <value>fish</value>
+                            </item>
+                        </checkboxes-horizontal>
+                        <radio-buttons-horizontal>
+                            <label>Horizontal Radio Buttons</label>
+                            <hint>Horizontal radio buttons</hint>
+                            <item>
+                                <label>Cat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Dog</label>
+                                <value>dog</value>
+                            </item>
+                            <item>
+                                <label>Bird</label>
+                                <value>bird</value>
+                            </item>
+                            <item>
+                                <label>Fish</label>
+                                <value>fish</value>
+                            </item>
+                        </radio-buttons-horizontal>
                         <date>
                             <label>Date</label>
                             <hint>Standard date field</hint>
@@ -726,6 +772,46 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Réponse oui/non</label>
                             <hint>Un champ qui capture "true" ou "false"</hint>
                         </yesno-input>
+                        <checkboxes-horizontal>
+                            <label>Cases à cocher horizontales</label>
+                            <hint>Cases à cocher horizontales</hint>
+                            <item>
+                                <label>Chat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Chien</label>
+                                <value>dog</value>
+                            </item>
+                            <item>
+                                <label>Oiseau</label>
+                                <value>bird</value>
+                            </item>
+                            <item>
+                                <label>Poisson</label>
+                                <value>fish</value>
+                            </item>
+                        </checkboxes-horizontal>
+                        <radio-buttons-horizontal>
+                            <label>Boutons radio horizontaux</label>
+                            <hint>Boutons radio horizontaux</hint>
+                            <item>
+                                <label>Chat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Chien</label>
+                                <value>dog</value>
+                            </item>
+                            <item>
+                                <label>Oiseau</label>
+                                <value>bird</value>
+                            </item>
+                            <item>
+                                <label>Poisson</label>
+                                <value>fish</value>
+                            </item>
+                        </radio-buttons-horizontal>
                         <date>
                             <label>Date</label>
                             <hint>Champ date standard</hint>
@@ -1306,6 +1392,34 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                                 <xf:hint ref="$form-resources/yesno-input/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="1" y="5" w="6">
+                            <xf:select appearance="full" bind="checkboxes-horizontal-bind"
+                                       id="checkboxes-horizontal-control"
+                                       class="xforms-select-appearance-xxforms-horizontal">
+                                <xf:label ref="$form-resources/checkboxes-horizontal/label"/>
+                                <xf:hint ref="$form-resources/checkboxes-horizontal/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <xf:itemset ref="$form-resources/checkboxes-horizontal/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select>
+                        </fr:c>
+                        <fr:c x="7" y="5" w="6">
+                            <xf:select1 appearance="full" bind="radio-buttons-horizontal-bind"
+                                        id="radio-buttons-horizontal-control"
+                                        class="xforms-select1-appearance-xxforms-horizontal">
+                                <xf:label ref="$form-resources/radio-buttons-horizontal/label"/>
+                                <xf:hint ref="$form-resources/radio-buttons-horizontal/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <xf:itemset ref="$form-resources/radio-buttons-horizontal/item">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select1>
                         </fr:c>
                     </fr:grid>
                 </fr:section>

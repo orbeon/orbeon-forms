@@ -173,12 +173,9 @@ object Time {
 
       def updateStateAndSendValueToServer(): Unit =
         visibleInputElemOpt foreach { visibleInputElem =>
-          logger.debug(s"xxx $stateOpt")
           stateOpt foreach { state =>
 
             val visibleInputElemValue = readValue(visibleInputElem)
-
-            println(s"xxx visibleInputElemValue $visibleInputElemValue")
 
             val newState =
               state.copy(

@@ -2042,7 +2042,8 @@ if (!YAHOO.util.Event) {
 
 
         EU._simpleAdd(window, "load", EU._load);
-        EU._simpleAdd(window, "unload", EU._unload);
+        // ORBEON: https://github.com/orbeon/orbeon-forms/issues/5643
+        // EU._simpleAdd(window, "unload", EU._unload);
         EU._tryPreloadAttach();
     })();
 

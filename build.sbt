@@ -401,7 +401,7 @@ lazy val commonScalaJsSettings = Seq(
   libraryDependencies += "org.scala-js" %%% "scalajs-fake-insecure-java-securerandom" % ScalaJsFakeSecureRandomVersion,
 
   packageJSDependencies / skip   := false,
-  scalaJSLinkerConfig            ~= (_.withSourceMap(false).withESFeatures(_.withESVersion(ESVersion.ES5_1))),
+  scalaJSLinkerConfig            ~= (_.withSourceMap(false).withESFeatures(_.withESVersion(ESVersion.ES2018))),
 
 //  scalaJSLinkerConfig in (Compile, fullOptJS) ~= { _.withParallel(false) },
 //  scalaJSLinkerConfig ~= { _.withOptimizer(false) },

@@ -2262,59 +2262,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             this.declareClass(xblClass, cssClass);
         },
 
-        // This creates a subclass of the class passed. This provides us with a clean way to override `init()` and
-        // `destroy()`, as well as to initialize the `container` member of the class. Before we had the proper
-        // `javascript-lifecycle` mode, `init()` used to be called by the implementor of the component. It could
-        // be called multiple times for a given instance, and by overriding `init()` we were able to ensure that the
-        // underlying `init()` was only called once per instance. This is probably not needed anymore, but we
-        // keep it for backward compatibility. In addition:
-        //
-        // - fire internal `componentInitialized` for full updates (for backward compatibility)
-        // - remove the instance reference upon `destroy()`
-        // - SINCE 2022.1.1: pass `containerElem` to the parent class, as this makes that value accessible in the class
-        //   constructor, and is better than setting the property magically; but for backward compatibility the
-        //   `container` property is preserved
-        createSubclass: function(superclass) {
-
-            const privateInitCalledSymbol = Symbol("initCalled");
-            const ComponentSubclass = (function(containerElem) {
-                superclass.call(this, containerElem);
-                Object.defineProperty(this, "container", {
-                    "value": containerElem,
-                    "writable": false,
-                    "enumerable": true,
-                    "configurable": true
-                });
-                this[privateInitCalledSymbol] = false;
-                if (! this.container)
-                    this.container = containerElem;
-            });
-
-            const Superclass = (function() {});
-            Superclass.prototype = superclass.prototype;
-            ComponentSubclass.prototype = new Superclass();
-            ComponentSubclass.prototype.constructor = ComponentSubclass;
-            ComponentSubclass.prototype.init = (function() {
-                if (! this[privateInitCalledSymbol] && superclass.prototype.init) {
-                    this[privateInitCalledSymbol] = true;
-                    superclass.prototype.init.call(this);
-                    if (! ORBEON.xforms.XBL.isJavaScriptLifecycle(this.container))
-                        ORBEON.xforms.XBL.componentInitialized.fire({
-                            container: this.container,
-                            constructor: ComponentSubclass
-                        });
-                }
-            });
-            ComponentSubclass.prototype.destroy = (function() {
-                if (superclass.prototype.destroy)
-                    superclass.prototype.destroy.call(this);
-                // We can debate whether the following clean-up should happen here or next to the caller of `destroy()`.
-                // However, legacy users might call `destroy()` manually, in which case it's better to clean-up here.
-                $(this.container).removeData("xforms-xbl-object");
-            })
-            return ComponentSubclass
-        },
-
         declareClass: function(xblClass, cssClass) {
 
             // 2023-01-09: TODO: Check cases where this is useful, and what kind of class we create below. Could we have

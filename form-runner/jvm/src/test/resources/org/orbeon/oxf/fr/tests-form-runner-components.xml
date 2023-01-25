@@ -136,6 +136,7 @@
                 <xh:script src="/ops/yui/slider/slider.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/underscore/underscore.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/xforms.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/xbl-subclass.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/scalajs/orbeon-xforms-web.js" class="xforms-baseline"/>

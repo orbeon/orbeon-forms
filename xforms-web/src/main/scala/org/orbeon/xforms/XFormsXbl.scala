@@ -42,7 +42,8 @@ object XFormsXBL {
         })
       }
 
-      private var initCalled = false
+      private var initCalled    = false
+      private var destroyCalled = false
 
       override def init(): Unit =
         if (! initCalled) {
@@ -57,11 +58,14 @@ object XFormsXBL {
         }
 
       override def destroy(): Unit = {
-        if (! js.isUndefined(superclass.asInstanceOf[js.Dynamic].prototype.destroy))
-          superclass.asInstanceOf[js.Dynamic].prototype.destroy.call(this)
-        // We can debate whether the following clean-up should happen here or next to the caller of `destroy()`.
-        // However, legacy users might call `destroy()` manually, in which case it's better to clean-up here.
-        $(containerElem).removeData("xforms-xbl-object")
+        if (! destroyCalled) {
+          destroyCalled = true
+          if (! js.isUndefined(superclass.asInstanceOf[js.Dynamic].prototype.destroy))
+            superclass.asInstanceOf[js.Dynamic].prototype.destroy.call(this)
+          // We can debate whether the following clean-up should happen here or next to the caller of `destroy()`.
+          // However, legacy users might call `destroy()` manually, in which case it's better to clean-up here.
+          $(containerElem).removeData("xforms-xbl-object")
+        }
       }
     }
 

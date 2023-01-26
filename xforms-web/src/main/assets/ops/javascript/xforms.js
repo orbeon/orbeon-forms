@@ -2270,7 +2270,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
             this._cssClassesToConstructors[cssClass] = function(targetElem) {
 
-                const subclass = ORBEON.xforms.XBL.createSubclass(xblClass);
+                const subclass = ORBEON.xforms.XFormsXBL.createSubclass(xblClass);
 
                 const containerElem =
                     targetElem == null || ! YAHOO.util.Dom.inDocument(targetElem, document)

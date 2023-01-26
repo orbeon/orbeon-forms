@@ -1,10 +1,7 @@
 package org.orbeon.saxon.function
 
 import org.orbeon.oxf.util.{MessageFormatCache, MessageFormatter}
-
-import java.util.Locale
 import java.util.regex.Matcher
-
 
 object ProcessTemplateSupport {
 
@@ -50,4 +47,17 @@ object ProcessTemplateSupport {
       javaNamedParams.map(v => formatValue(v._2)).toVector
     )
   }
+
+  def renameParamInTemplate(
+    templateWithNames : String,
+    originalName      : String,
+    newName           : String
+  ): String =
+    MatchTemplateKey.replaceAllIn(templateWithNames, m => {
+      val matchedName       = m.group(1)
+      val foundOriginalName = matchedName == originalName
+      val replacement       = if (foundOriginalName) "{$" + newName else m.group(0)
+      Matcher.quoteReplacement(replacement)
+    })
+
 }

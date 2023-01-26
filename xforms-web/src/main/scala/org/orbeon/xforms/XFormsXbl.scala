@@ -45,23 +45,29 @@ object XFormsXbl {
 
     class Subclass(containerElem: html.Element) extends outer.InnerClass(containerElem) {
 
-      if (js.isUndefined(this.asInstanceOf[js.Dynamic].container)) {
-        js.Object.defineProperty(this, "container", new js.PropertyDescriptor {
-          value        = containerElem
-          writable     = false
-          enumerable   = true
-          configurable = true
-        })
-      }
+      if (js.isUndefined(this.asInstanceOf[js.Dynamic].container)) // `js.Object.hasProperty()` only check enumerable properties
+        js.Object.defineProperty(
+          this,
+          "container",
+          new js.PropertyDescriptor {
+            value        = containerElem
+            writable     = false
+            enumerable   = true
+            configurable = true
+          }
+        )
 
       private var initCalled    = false
       private var destroyCalled = false
 
+      private def superPrototypeAsDynamic: js.Dynamic =
+        superclass.asInstanceOf[js.Dynamic].prototype
+
       override def init(): Unit =
         if (! initCalled) {
           initCalled = true
-          if (! js.isUndefined(superclass.asInstanceOf[js.Dynamic].prototype.init))
-            superclass.asInstanceOf[js.Dynamic].prototype.init.call(this)
+          if (superPrototypeAsDynamic.init.isInstanceOf[js.Function])
+            superPrototypeAsDynamic.init.call(this) // `super.init()` fails at compilation
           if (! isJavaScriptLifecycle(containerElem))
             XBL.componentInitialized.fire(new js.Object {
               val container   = containerElem
@@ -72,8 +78,8 @@ object XFormsXbl {
       override def destroy(): Unit = {
         if (! destroyCalled) {
           destroyCalled = true
-          if (! js.isUndefined(superclass.asInstanceOf[js.Dynamic].prototype.destroy))
-            superclass.asInstanceOf[js.Dynamic].prototype.destroy.call(this)
+          if (superPrototypeAsDynamic.destroy.isInstanceOf[js.Function])
+            superPrototypeAsDynamic.destroy.call(this) // `super.destroy()` fails at compilation
           // We can debate whether the following clean-up should happen here or next to the caller of `destroy()`.
           // However, legacy users might call `destroy()` manually, in which case it's better to clean-up here.
           $(containerElem).removeData("xforms-xbl-object")

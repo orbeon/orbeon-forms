@@ -80,9 +80,7 @@ class XBLCompanion extends js.Object {
 @js.native
 object XBL extends js.Object {
   def declareCompanion(name: String, prototypeOrClass: js.Dynamic): Unit         = js.native
-  def isComponent(control: html.Element)                          : Boolean      = js.native
   def instanceForControl(control: html.Element)                   : XBLCompanion = js.native
-  def isJavaScriptLifecycle(control: html.Element)                : Boolean      = js.native
 
   val componentInitialized                                        : YUICustomEvent = js.native
 }

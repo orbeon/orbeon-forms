@@ -7,8 +7,20 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
-@JSExportTopLevel("OrbeonXFormsXBL")
-object XFormsXBL {
+@JSExportTopLevel("OrbeonXFormsXbl")
+object XFormsXbl {
+
+  @JSExport
+  def isComponent(control: html.Element): Boolean =
+    control.classList.contains("xbl-component")
+
+  @JSExport
+  def isJavaScriptLifecycle(control: html.Element): Boolean =
+    isComponent(control) && control.classList.contains("xbl-javascript-lifecycle")
+
+  @JSExport
+  def isFocusable(control: html.Element): Boolean =
+    isComponent(control) && control.classList.contains("xbl-focusable")
 
   // See:
   //
@@ -50,7 +62,7 @@ object XFormsXBL {
           initCalled = true
           if (! js.isUndefined(superclass.asInstanceOf[js.Dynamic].prototype.init))
             superclass.asInstanceOf[js.Dynamic].prototype.init.call(this)
-          if (! XBL.isJavaScriptLifecycle(containerElem))
+          if (! isJavaScriptLifecycle(containerElem))
             XBL.componentInitialized.fire(new js.Object {
               val container   = containerElem
               val constructor = js.constructorOf[Subclass]

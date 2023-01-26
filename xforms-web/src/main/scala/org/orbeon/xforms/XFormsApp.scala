@@ -57,7 +57,7 @@ object XFormsApp extends App {
     xformsDyn.AjaxClient             = js.Dynamic.global.OrbeonAjaxClient
     xformsDyn.Globals                = js.Dynamic.global.OrbeonGlobals
     xformsDyn.XFormsUi               = js.Dynamic.global.OrbeonXFormsUi
-    xformsDyn.XFormsXBL              = js.Dynamic.global.OrbeonXFormsXBL
+    xformsDyn.XFormsXbl              = js.Dynamic.global.OrbeonXFormsXbl
     xformsDyn.Help                   = js.Dynamic.global.OrbeonHelp
     xformsDyn.InitSupport            = js.Dynamic.global.OrbeonInitSupport
     xformsDyn.RpcClient              = js.Dynamic.global.OrbeonRpcClient

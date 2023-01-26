@@ -679,7 +679,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         return ORBEON.util.Dom.getStringValue(output[0]);
                     }
                 }
-            } else if (ORBEON.xforms.XBL.isComponent(control)) {
+            } else if (ORBEON.xforms.XFormsXbl.isComponent(control)) {
                 var instance = ORBEON.xforms.XBL.instanceForControl(control);
                 if (_.isObject(instance) && _.isFunction(instance.xformsGetValue))
                     return instance.xformsGetValue();
@@ -802,7 +802,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                 // Text area
                 var textarea = control.getElementsByTagName("textarea")[0];
                 textarea.value = newControlValue;
-            } else if (ORBEON.xforms.XBL.isComponent(control)) {
+            } else if (ORBEON.xforms.XFormsXbl.isComponent(control)) {
                 var instance = ORBEON.xforms.XBL.instanceForControl(control);
                 if (_.isObject(instance) && _.isFunction(instance.xformsUpdateValue)) {
                     // Return `undefined` or a JavaScript or jQuery `Promise` once the value is actually set
@@ -1241,7 +1241,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     // Set focus on either selected item if we found one or on first item otherwise
                     ORBEON.util.Dom.focus(formInputs[foundSelected ? itemIndex : 0]);
                 }
-            } else if (ORBEON.xforms.XBL.isFocusable(control)) {
+            } else if (ORBEON.xforms.XFormsXbl.isFocusable(control)) {
                 var instance = ORBEON.xforms.XBL.instanceForControl(control);
                 if (_.isObject(instance)) {
                     if (_.isFunction(instance.xformsFocus))
@@ -1294,7 +1294,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                         ORBEON.util.Dom.blur(formInput);
                     }
                 }
-            } else if (ORBEON.xforms.XBL.isFocusable(control)) {
+            } else if (ORBEON.xforms.XFormsXbl.isFocusable(control)) {
                 var instance = ORBEON.xforms.XBL.instanceForControl(control);
                 if (_.isObject(instance)) {
                     if (_.isFunction(instance.xformsBlur))
@@ -2179,33 +2179,6 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
     ORBEON.xforms.XBL = {
 
-        /**
-         * Base class for classes implementing an XBL component.
-         */
-        _BaseClass: function () {
-            var BaseClass = function () {
-            };
-            BaseClass.prototype = {
-
-                /**
-                 * The HTML element that contains the component on the page.
-                 */
-                container: null
-            }
-        }(),
-
-        isComponent: function(control) {
-            return $(control).is('.xbl-component');
-        },
-
-        isJavaScriptLifecycle: function(control) {
-            return $(control).is('.xbl-component.xbl-javascript-lifecycle');
-        },
-
-        isFocusable: function(control) {
-            return $(control).is('.xbl-component.xbl-focusable');
-        },
-
         // Map the XBL CSS class to the JavaScript class
         _cssClassesToConstructors: {},
 
@@ -2270,7 +2243,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
             this._cssClassesToConstructors[cssClass] = function(targetElem) {
 
-                const subclass = ORBEON.xforms.XFormsXBL.createSubclass(xblClass);
+                const subclass = ORBEON.xforms.XFormsXbl.createSubclass(xblClass);
 
                 const containerElem =
                     targetElem == null || ! YAHOO.util.Dom.inDocument(targetElem, document)

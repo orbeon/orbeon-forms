@@ -420,7 +420,7 @@ object InitSupport {
       controls foreach { case rpc.Control(id, valueOpt) =>
         Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control =>
           val classList = control.classList
-          if (XBL.isComponent(control)) {
+          if (XFormsXbl.isComponent(control)) {
             // Custom XBL component initialization
             for {
               _     <- Option(XBL.instanceForControl(control))
@@ -438,7 +438,7 @@ object InitSupport {
     def destroyJavaScriptControls(controls: List[rpc.Control]): Unit =
       controls foreach { case rpc.Control(id, _) =>
         Option(dom.document.getElementById(id).asInstanceOf[html.Element]) foreach { control =>
-          if (XBL.isComponent(control)) {
+          if (XFormsXbl.isComponent(control)) {
             for {
               instance <- Option(XBL.instanceForControl(control))
             } locally {

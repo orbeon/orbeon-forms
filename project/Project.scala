@@ -43,7 +43,7 @@ object OrbeonSupport {
       def endsWithMin  = Seq("-min.js", ".min.js") exists path.endsWith
       def existsSource = new File(prefix + "_src.js").exists
 
-      endsWithMin || existsSource || path.endsWith("xbl-subclass.js")
+      endsWithMin || existsSource
     }
   )
 

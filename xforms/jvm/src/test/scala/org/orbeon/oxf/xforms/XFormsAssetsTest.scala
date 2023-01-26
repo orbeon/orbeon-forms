@@ -54,7 +54,6 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/javascript/underscore/underscore.min.js",                        "min": false },
 
           { "full": "/ops/javascript/xforms.js",                                           "min": true  },
-          { "full": "/ops/javascript/xbl-subclass.js",                                     "min": false },
           { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
 
@@ -96,7 +95,6 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/javascript/underscore/underscore.min.js",                        "min": false },
 
           { "full": "/ops/javascript/xforms.js",                                           "min": true  },
-          { "full": "/ops/javascript/xbl-subclass.js",                                     "min": false },
           { "full": "/ops/javascript/orbeon/xforms/server/AjaxServer.js",                  "min": true  },
           { "full": "/ops/javascript/orbeon/xforms/control/Placeholder.js",                "min": true  },
 

@@ -82,7 +82,7 @@
                         )
                     ]/
                     (@value, @select)/
-                    replace(., '''([^..]*)''', '$1-control')
+                    replace(., '''(.*)''', '$1-control')
                 )"/>
     </xsl:function>
 

@@ -594,4 +594,69 @@
         +/apps/fr/style/bootstrap-5.1.3-dist/js/bootstrap.js
     </property>
 
+    <property as="xs:string" name="oxf.fr.detail.pdf.header-footer.default.*.*">
+        {
+          "pages": {
+            "all": {
+              "header": {
+                "left": {
+                  "Template": {
+                    "values": {
+                      "_": "{$fr-logo}"
+                    }
+                  }
+                },
+                "center": {
+                  "Template": {
+                    "values": {
+                      "_": "{$fr-form-title}"
+                    }
+                  }
+                }
+              },
+              "footer": {
+                "left": {
+                  "Template": {
+                    "values": {
+                      "_": "{$fr-form-title}"
+                    }
+                  }
+                },
+                "center": {
+                  "Template": {
+                    "values": {
+                      "_": "{$fr-page-number} / {$fr-page-count}"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "parameters": [
+            {
+              "FormLogoParam": {
+                "name": "fr-logo"
+              }
+            },
+            {
+              "FormTitleParam": {
+                "name": "fr-form-title"
+              }
+            },
+            {
+              "PageNumberParam": {
+                "name": "fr-page-number",
+                "format": {"Decimal": {}}
+              }
+            },
+            {
+              "PageCountParam": {
+                "name": "fr-page-count",
+                "format": {"Decimal": {}}
+              }
+            }
+          ]
+        }
+    </property>
+
 </properties>

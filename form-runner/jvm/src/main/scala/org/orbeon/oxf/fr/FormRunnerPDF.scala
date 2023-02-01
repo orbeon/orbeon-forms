@@ -119,7 +119,6 @@ trait FormRunnerPDF {
   //@XPathFunction
   def hyperlinkURLs(s: String, hyperlinks: Boolean): String =
     replaceURLs(s, if (hyperlinks) replaceWithHyperlink else replaceWithPlaceholder)
-
 }
 
 object FormRunnerPDF extends FormRunnerPDF

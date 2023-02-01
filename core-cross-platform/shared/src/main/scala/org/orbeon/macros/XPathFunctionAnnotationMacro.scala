@@ -1,9 +1,10 @@
 package org.orbeon.macros
 
 import cats.syntax.option._
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 
-import scala.annotation.{StaticAnnotation, compileTimeOnly, tailrec}
+import scala.annotation.{StaticAnnotation, compileTimeOnly}
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 
@@ -83,7 +84,7 @@ object XPathFunctionAnnotationMacro {
           case _ => c.abort(c.enclosingPosition, "Annotation `@XPathFunction` can be used only on methods")
         }
 
-      val kebabMethodNameString = camelToKebab(methodName.toString)
+      val kebabMethodNameString = methodName.toString.camelToKebab
 
       // See https://stackoverflow.com/questions/32631372/getting-parameters-from-scala-macro-annotation
       val resolvedFunctionName =
@@ -303,17 +304,5 @@ object XPathFunctionAnnotationMacro {
 //    println(result)
 
     c.Expr[Any](result)
-  }
-
-  // Inspired from function found online
-  private def camelToKebab(name: String): String = {
-    @tailrec
-    def recurse(accDone: List[Char], acc: List[Char]): List[Char] = acc match {
-      case Nil => accDone
-      case a :: b :: c :: tail if a.isUpper && b.isUpper && c.isLower => recurse(accDone ++ List(a, '-', b, c), tail)
-      case      a :: b :: tail if a.isLower && b.isUpper              => recurse(accDone ++ List(a, '-', b),    tail)
-      case           a :: tail                                        => recurse(accDone :+ a,                  tail)
-    }
-    recurse(Nil, name.toList).mkString.toLowerCase
   }
 }

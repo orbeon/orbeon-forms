@@ -559,14 +559,12 @@
     padding-bottom: 10px;
 
     @top-left {
-        content: element(logo);
         border-bottom: 1px solid gray;
         padding-bottom: 10px;
         vertical-align: bottom;
     }
 
     @top-center {
-        content: element(header-title);
         border-bottom: 1px solid gray;
         padding-bottom: 10px;
         vertical-align: bottom; // 2022-12-02: confirmed necessary here
@@ -580,21 +578,21 @@
     }
 
     @bottom-left {
-        content: element(footer-title);
         border-top: 1px solid gray;
         padding-top: 10px;
         margin-top: 0;
         vertical-align: top;
+
         font-size: 14px;
         padding-right: 10px;
         line-height: @pageTopAndBottomHeight;
     }
     @bottom-center {
-        content: counter(page) " / " counter(pages);
         border-top: 1px solid gray;
         padding-top: 10px;
         margin-top: 0;
         vertical-align: top;
+
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         font-size: @pageTopAndBottomFontSize;
         line-height: @pageTopAndBottomHeight;
@@ -604,6 +602,11 @@
     @bottom-right {
         border-top: 1px solid gray;
         padding-top: 10px;
+        margin-top: 0;
         vertical-align: top;
+
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: @pageTopAndBottomFontSize;
+        line-height: @pageTopAndBottomHeight;
     }
 }

@@ -78,6 +78,7 @@
             <fr:version/>
         </fr:row>
         <fr:buttons-bar/>
+        <fr:pdf-header-footer/>
     </xsl:variable>
 
     <xsl:template match="fr:row">
@@ -1295,6 +1296,52 @@
         </xsl:choose>
     </xsl:template>
 
+    <xsl:template match="fr:pdf-header-footer[$is-readonly-mode]">
+
+        <xsl:variable
+            xmlns:FormRunnerPdfConfig="java:org.orbeon.oxf.fr.pdf.PdfConfig20231"
+            name="pdf-header-footer-config-elem"
+            select="FormRunnerPdfConfig:getHeaderFooterConfigXml($app, $form)/*"/>
+
+        <xf:group ref="instance('fr-form-instance')[fr:mode() = 'pdf']" class="fr-pdf-header-footer-details">
+
+            <!-- We need this in XForms as well, so we can handle the choice of language dynamically -->
+            <xf:var
+                xmlns:FormRunnerPdfConfig="java:org.orbeon.oxf.fr.pdf.PdfConfig20231"
+                name="pdf-header-footer-config-elem"
+                value="FormRunnerPdfConfig:getHeaderFooterConfigXml(fr:app-name(), fr:form-name())/*"/>
+
+            <!-- Parameters are shared among all settings -->
+            <!-- TODO: Error in comparison when the variable contains a `map()` -->
+<!--            <xf:var-->
+<!--                name="template-params"-->
+<!--                value="{fr:build-template-param-map($pdf-header-footer-config-elem/parameters/_, ())}"/>-->
+
+            <xsl:for-each select="$pdf-header-footer-config-elem//*[@type = 'Template']">
+                <xf:output
+                    class="fr-{../../name()}-{../name()}-{name()}"
+                    ref=".[{(relevant[not(@type = 'null')], 'true()')[1]}]"
+                    value="
+                        let $current  := $pdf-header-footer-config-elem/pages/{../../name()}/{../name()}/{name()},
+                            $template := $current/values/(*[name() = fr:lang()], *[name() = '_'], *)[1]
+                        return
+                            if (exists($template)) then
+                                concat(
+                                    '&quot;',
+                                    xxf:process-template(
+                                        replace($template, '&quot;', '\\&quot;'),
+                                        'en', (: unused! :)
+                                        {fr:build-template-param-map($pdf-header-footer-config-elem/parameters/_, (), true())}
+                                    ),
+                                    '&quot;'
+                                )
+                            else
+                                ''"/>
+            </xsl:for-each>
+
+        </xf:group>
+    </xsl:template>
+
     <!-- TOC: Top-level -->
     <xsl:template match="fr:toc" name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->
@@ -1337,5 +1384,22 @@
             </xsl:if>
         </xh:li>
     </xsl:template>
+
+    <xsl:function name="fr:maybe-replace" as="xs:string?">
+        <xsl:param name="content" as="xs:string?"/>
+        <xsl:param name="replace" as="xs:boolean"/>
+        <xsl:value-of select="
+            if (exists($content)) then
+                if ($replace) then
+                    replace(
+                        $content,
+                        '&quot;',
+                        '\\&quot;'
+                    )
+                else
+                    $content
+            else
+                ()"/>
+    </xsl:function>
 
 </xsl:stylesheet>

@@ -56,4 +56,7 @@ object NamespaceMapping {
   // For legacy callers
   def apply(mapping: ju.Map[String, String]): NamespaceMapping =
     apply(mapping.asScala.toMap)
+
+  def merge(m1: NamespaceMapping, m2: NamespaceMapping): NamespaceMapping =
+    NamespaceMapping(m1.mapping ++ m2.mapping)
 }

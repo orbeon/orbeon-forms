@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import org.orbeon.oxf.util.CoreUtils._
 
+import scala.annotation.tailrec
 import scala.collection.compat._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Try
@@ -237,6 +238,17 @@ object StringUtils {
         s.substring(prefix.length)
       else
         s
+
+    def camelToKebab: String = {
+      @tailrec
+      def recurse(accDone: List[Char], acc: List[Char]): List[Char] = acc match {
+        case Nil => accDone
+        case a :: b :: c :: tail if a.isUpper && b.isUpper && c.isLower => recurse(accDone ++ List(a, '-', b, c), tail)
+        case      a :: b :: tail if a.isLower && b.isUpper              => recurse(accDone ++ List(a, '-', b),    tail)
+        case           a :: tail                                        => recurse(accDone :+ a,                  tail)
+      }
+      recurse(Nil, s.toList).mkString.toLowerCase
+    }
   }
 
   private class CodePointsIterator(val cs: CharSequence) extends Iterator[Int] {

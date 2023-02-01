@@ -189,9 +189,8 @@
 
         <xsl:copy>
             <xsl:apply-templates select="@*" mode="#current"/>
-
-            <xsl:variable
-                name="expr"
+            <xsl:attribute
+                name="ref"
                 select="
                     concat(
                         'xxf:r(''',
@@ -199,64 +198,106 @@
                             '.',
                             local-name(),
                             ''',''fr-form-resources'',',
-                            'map:merge((',
-                                string-join(
-                                    for $p in fr:param
-                                    return
-                                        concat(
-                                            'map:entry(''',
-                                                $p/fr:name[1],
-                                                ''',',
-                                                if ($p/@type = 'ExpressionParam') then
-                                                    concat(
-                                                        'string((',
-                                                        frf:replaceVarReferencesWithFunctionCalls($p/fr:expr, $p/fr:expr, false(), $library-name),
-                                                        ')[1])'
-                                                    )
-                                                else if ($p/@type = 'ControlValueParam') then
-                                                    concat(
-                                                        'string((',
-                                                        frf:replaceVarReferencesWithFunctionCalls(
-                                                            $p/fr:controlName,
-                                                            concat('$', $p/fr:controlName),
-                                                            false(),
-                                                            $library-name
-                                                        ),
-                                                        ')[1])'
-                                                    )
-                                                else if (
-                                                    $p/@type = (
-                                                        'LinkToEditPageParam',
-                                                        'LinkToViewPageParam',
-                                                        'LinkToNewPageParam',
-                                                        'LinkToSummaryPageParam',
-                                                        'LinkToHomePageParam',
-                                                        'LinkToFormsPageParam',
-                                                        'LinkToAdminPageParam',
-                                                        'LinkToPdfParam'
-                                                    )
-                                                ) then
-                                                    concat(
-                                                        'frf:buildLinkBackToFormRunner(''',
-                                                         $p/@type,
-                                                        ''')'
-                                                    )
-                                                else
-                                                    error(),
-                                            ')'
-                                        ),
-                                    ','
-                                ),
-                            '))',
+                            fr:build-template-param-map(fr:param, $library-name, false()),
                         ')'
-                    )
-                "/>
-
-            <xsl:attribute
-                name="ref"
-                select="$expr"/>
-
+                    )"/>
         </xsl:copy>
     </xsl:template>
+
+    <xsl:function name="fr:build-template-param-map">
+        <xsl:param name="params"       as="element(*)*"/>
+        <xsl:param name="library-name" as="xs:string?"/>
+        <xsl:param name="for-pdf"      as="xs:boolean"/>
+
+        <xsl:value-of
+            xmlns:FormRunnerPdfConfig="java:org.orbeon.oxf.fr.pdf.PdfConfig20231"
+            select="
+                concat(
+                    'map:merge((',
+                        string-join(
+                            for $p in $params
+                            return
+                                concat(
+                                    'map:entry(''',
+                                        $p/*:name[1],
+                                        ''',',
+                                        if ($p/@type = 'ExpressionParam') then
+                                            fr:maybe-replace(
+                                                concat(
+                                                    'string((',
+                                                    frf:replaceVarReferencesWithFunctionCalls($p/*:expr, $p/*:expr, false(), $library-name),
+                                                    ')[1])'
+                                                ),
+                                                $for-pdf
+                                            )
+                                        else if ($p/@type = 'ControlValueParam') then
+                                            fr:maybe-replace(
+                                                concat(
+                                                    'string((',
+                                                    frf:replaceVarReferencesWithFunctionCalls(
+                                                        $p/*:controlName,
+                                                        concat('$', $p/*:controlName),
+                                                        false(),
+                                                        $library-name
+                                                    ),
+                                                    ')[1])'
+                                                ),
+                                                $for-pdf
+                                            )
+                                        else if (
+                                            $p/@type = (
+                                                'LinkToEditPageParam',
+                                                'LinkToViewPageParam',
+                                                'LinkToNewPageParam',
+                                                'LinkToSummaryPageParam',
+                                                'LinkToHomePageParam',
+                                                'LinkToFormsPageParam',
+                                                'LinkToAdminPageParam',
+                                                'LinkToPdfParam'
+                                            )
+                                        ) then
+                                            fr:maybe-replace(
+                                                concat(
+                                                    'frf:buildLinkBackToFormRunner(''',
+                                                     $p/@type,
+                                                    ''')'
+                                                ),
+                                                $for-pdf
+                                            )
+                                        else if ($for-pdf and $p/@type = ('PageNumberParam', 'PageCountParam')) then
+                                            string-join(
+                                                (
+                                                    '''',
+                                                    '&quot; counter(',
+                                                    if ($p/@type = 'PageNumberParam') then 'page' else 'pages',
+                                                    ', ',
+                                                    ($p/format/@type[. != 'null']/FormRunnerPdfConfig:camelToKebab(.), 'decimal')[1],
+                                                    ') &quot;',
+                                                    ''''
+                                                ),
+                                                ''
+                                            )
+                                        else if ($for-pdf and $p/@type = 'FormTitleParam') then
+                                            fr:maybe-replace('fr:form-title()', $for-pdf)
+                                        else if ($for-pdf and $p/@type = 'FormLogoParam') then
+                                            (: TODO: `*:url` :)
+                                            if (exists($p/*:relevant)) then
+                                                concat(
+                                                    'if (',
+                                                    frf:replaceVarReferencesWithFunctionCalls($p/*:relevant, $p/*:relevant, false(), $library-name),
+                                                    ') then ''&quot; element(logo) &quot;'' else '''''
+                                                )
+                                            else
+                                                '''&quot; element(logo) &quot;'''
+                                        else
+                                            error(),
+                                    ')'
+                                ),
+                            ','
+                        ),
+                '))'
+            )"/>
+
+    </xsl:function>
 
 </xsl:stylesheet>

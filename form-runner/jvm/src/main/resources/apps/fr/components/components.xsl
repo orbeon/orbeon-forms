@@ -43,6 +43,10 @@
     <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
+    <xsl:variable
+        name="is-readonly-mode"
+        select="$mode = ('view', 'pdf', 'tiff', 'test-pdf', 'email', 'controls')" as="xs:boolean"/>
+
     <!-- Same logic as in `fr:is-background()` -->
     <xsl:variable
         name="is-background"
@@ -119,7 +123,7 @@
             if (($is-background or $mode = 'test-pdf') and exists($disable-calculate-param-opt)) then
                 $disable-calculate-param-opt
             else
-                $mode = ('view', 'pdf', 'test-pdf', 'email', 'controls') (: fr:is-readonly-mode() :) and
+                $is-readonly-mode and
                 $disable-calculate-in-readonly-modes"
         as="xs:boolean"/>
 

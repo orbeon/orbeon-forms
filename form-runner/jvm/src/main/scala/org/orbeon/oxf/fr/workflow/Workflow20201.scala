@@ -13,12 +13,18 @@
  */
 package org.orbeon.oxf.fr.workflow
 
+import io.circe.{Decoder, Encoder}
 import org.orbeon.oxf.fr.ui.ScalaToXml
 
 
 object Workflow20201 extends ScalaToXml {
 
   type MyState = definitions20201.WorkflowConfig
+
+  import io.circe.generic.auto._
+
+  val encoder: Encoder[MyState] = implicitly
+  val decoder: Decoder[MyState] = implicitly
 
   val StartedStageName   = "started"
   val SubmittedStageName = "submitted"

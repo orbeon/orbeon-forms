@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fr.ui
 
 import io.circe.syntax._
-import io.circe.{Decoder, Encoder, parser}
+import io.circe.{Decoder, Encoder, Json, parser}
 import org.orbeon.dom
 import org.orbeon.dom.QName
 import org.orbeon.dom.saxon.DocumentWrapper
@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
+import org.orbeon.xml.NamespaceMapping
 
 import scala.util.{Failure, Success, Try}
 import scala.collection.compat._
@@ -39,8 +40,11 @@ trait ScalaToXml {
 
   type MyState
 
-  private def encode[T : Encoder](state: T)          : String = state.asJson.noSpaces
-  private def decode[T : Decoder](jsonString: String): Try[T] = parser.decode[T](jsonString).fold(Failure.apply, Success.apply)
+  implicit val encoder: Encoder[MyState]
+  implicit val decoder: Decoder[MyState]
+
+  def encode(state: MyState)    : String = state.asJson.noSpaces
+  def decode(jsonString: String): Try[MyState] = parser.decode[MyState](jsonString).fold(Failure.apply, Success.apply)
 
   private val TypeQName: QName = QName("type")
 
@@ -53,7 +57,7 @@ trait ScalaToXml {
     Symbols.Array
   )
 
-  def simplifiedXmlToState[MyState : Decoder](rootElem: NodeInfo): Try[MyState] = {
+  def simplifiedXmlToState(rootElem: NodeInfo): Try[MyState] = {
 
     require(rootElem.isElement)
 
@@ -77,16 +81,24 @@ trait ScalaToXml {
     decode(jsonString)
   }
 
-  def stateToFullXml[MyState : Encoder](state: MyState): DocumentInfo =
+  def stateToFullXml(state: MyState): DocumentInfo =
     Converter.jsonStringToXmlDoc(encode(state))
 
-  def fullXmlToSimplifiedXml(fullXmlDoc: DocumentInfo, typeName: String = Symbols.Object): DocumentInfo = {
+  def fullXmlToSimplifiedXml(
+    fullXmlDoc       : DocumentInfo,
+    typeName         : String = Symbols.Object,
+    namespaceMapping : NamespaceMapping = NamespaceMapping.EmptyMapping
+  ): DocumentInfo = {
 
     val simplifiedXmlDoc = TransformerUtils.extractAsMutableDocument(fullXmlDoc)
 
     // Update type on root element
     if (mustConvertAdtType(typeName))
       XFormsAPI.setvalue(ref = simplifiedXmlDoc.rootElement att TypeQName, value = typeName)
+
+    // Add namespaces if needed
+    for ((prefix, uri) <- namespaceMapping.mapping)
+      XFormsAPI.insert(into = simplifiedXmlDoc.rootElement, origin = NodeInfoFactory.namespaceInfo(prefix, uri), doDispatch = false)
 
     val elemsForAdtTypes =
       simplifiedXmlDoc descendant * filter (e => mustConvertAdtType(e.localname))
@@ -139,4 +151,16 @@ trait ScalaToXml {
 
     fullXmlDoc
   }
+
+  def configToJson(config: MyState): Json =
+    config.asJson
+
+  def configToJsonStringCompact(config: MyState): String =
+    config.asJson.noSpaces
+
+  def configToJsonStringIndented(config: MyState): String =
+    config.asJson.spaces2
+
+  def configToXml(config: MyState): DocumentInfo =
+    fullXmlToSimplifiedXml(stateToFullXml(config))
 }

@@ -62,7 +62,7 @@
         </xsl:if>
 
         <!-- Error summary (if at bottom) -->
-        <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
+        <!-- If the configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
              This is necessary because the persistence model relies on the error summary to know if the data is valid. -->
         <xh:div>
             <xsl:if test="not($error-summary-bottom)">

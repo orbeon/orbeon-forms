@@ -58,5 +58,4 @@ object XFormsCompiler {
         chw.write(jsonString)
       }
     }
-
 }

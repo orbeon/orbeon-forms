@@ -1,9 +1,10 @@
 package org.orbeon.oxf.fr.pdf
 
-import io.circe.{Decoder, DecodingFailure, Encoder, HCursor, Json, KeyDecoder, KeyEncoder}
+import io.circe._
 import org.orbeon.oxf.fr.pdf.definitions20231._
 import org.orbeon.oxf.fr.ui.ScalaToXml
 import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams}
+import org.orbeon.oxf.properties.Property
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.DocumentInfo
@@ -12,8 +13,8 @@ import org.orbeon.xml.NamespaceMapping
 
 object PdfConfig20231 extends ScalaToXml {
 
-  val HeaderFooterPropertyName        = "oxf.fr.detail.pdf.header-footer"
-  val HeaderFooterDefaultPropertyName = "oxf.fr.detail.pdf.header-footer.default"
+  private val HeaderFooterUserPropertyName    = "oxf.fr.detail.pdf.header-footer"
+  private val HeaderFooterDefaultPropertyName = "oxf.fr.detail.pdf.header-footer.default"
 
   type MyState = FormRunnerPdfConfigRoot
 
@@ -94,32 +95,66 @@ object PdfConfig20231 extends ScalaToXml {
   def getHeaderFooterConfigXml(app: String, form: String): DocumentInfo = {
 
     // Only `app` and `form` are used
-    implicit val params = FormRunnerParams(AppForm(app, form), "pdf")
+    implicit val params: FormRunnerParams = FormRunnerParams(AppForm(app, form), "pdf")
 
-    def findConfig(propertyName: String): Option[(MyState, NamespaceMapping)] =
-      FormRunner.formRunnerPropertyWithNs(propertyName) filter (_._1.nonAllBlank) map {
-        case (configJson, configNs) =>
-          decode(configJson).get -> configNs
-        }
+    type CachedConfig = (MyState, NamespaceMapping, Option[DocumentInfo])
 
-    findConfig(HeaderFooterPropertyName) match {
-      case Some((userConfig, userConfigNs)) =>
+    def findAndCacheDecodedConfig(propertyName: String): Option[(Property, CachedConfig)] =
+      FormRunner.formRunnerRawProperty(propertyName) collect { case p if p.stringValue.nonAllBlank =>
+        p ->
+          p.associatedValue { _ =>
+            (
+              decode(p.stringValue).get, // can throw if invalid JSON
+              p.namespaceMapping,
+              None // don't associate any XML here, see other comments
+            )
+          }
+      }
 
-        val (combinedConfig, combinedConfigNs) =
-          findConfig(HeaderFooterDefaultPropertyName) match {
-            case Some((defaultConfig, defaultConfigNs)) =>
-              merge(defaultConfig, userConfig) ->
-                NamespaceMapping.merge(defaultConfigNs, userConfigNs) // merging not perfect as one just wins over the other
+    findAndCacheDecodedConfig(HeaderFooterUserPropertyName) match {
+      case Some((_, (_, _, Some(xml)))) =>
+        // Already fully associated, including the XML
+        xml
+      case Some((userProperty, (userConfig, userConfigNs, None))) =>
+        // Local state is associated, but not the XML
+
+        val (combinedConfig, combinedConfigNs, canAssociate) =
+          findAndCacheDecodedConfig(HeaderFooterDefaultPropertyName) match {
+            case Some((defaultProperty, (defaultConfig, defaultConfigNs, _))) =>
+              (
+                merge(defaultConfig, userConfig),
+                NamespaceMapping.merge(defaultConfigNs, userConfigNs), // not perfect as one just wins over the other
+                // Associating a final XML result with the default property works in all cases. Associating a final XML
+                // result with the user property works only if the base property is less specific than the user property.
+                // This means things will be slower if we cannot associate with the user property, but we don't expect
+                // that to happen. We should probably warn in that case.
+                FormRunner.trailingAppFormFromProperty(HeaderFooterUserPropertyName, userProperty)
+                  .isMoreSpecificThan(FormRunner.trailingAppFormFromProperty(HeaderFooterDefaultPropertyName, defaultProperty))
+              )
             case None =>
-              userConfig -> userConfigNs
+              // This shouldn't happen as we have a default property for `*.*` in `properties-form-runner.xml`
+              (userConfig, userConfigNs, true)
           }
 
-        fullXmlToSimplifiedXml(stateToFullXml(combinedConfig), namespaceMapping = combinedConfigNs)
+        val combinedConfigXml = fullXmlToSimplifiedXml(stateToFullXml(combinedConfig), namespaceMapping = combinedConfigNs)
+        if (canAssociate)
+          userProperty.associateValue((combinedConfig, combinedConfigNs, Some(combinedConfigXml)))
+        else
+          () // TODO: warn?
+        combinedConfigXml
       case None =>
-        findConfig(HeaderFooterDefaultPropertyName) match {
-          case Some((defaultConfig, defaultConfigNs)) =>
-            fullXmlToSimplifiedXml(stateToFullXml(defaultConfig), namespaceMapping = defaultConfigNs)
+        // No user property found, just use the default property
+        findAndCacheDecodedConfig(HeaderFooterDefaultPropertyName) match {
+          case Some((_, (_, _, Some(xml)))) =>
+            // Already fully associated, including the XML
+            xml
+          case Some((defaultProperty, (defaultConfig, defaultConfigNs, None))) =>
+            // State is associated, but not the XML, so compute that and update the associated value
+            val defaultConfigXml = fullXmlToSimplifiedXml(stateToFullXml(defaultConfig), namespaceMapping = defaultConfigNs)
+            defaultProperty.associateValue((defaultConfig, defaultConfigNs, Some(defaultConfigXml)))
+            defaultConfigXml
           case None =>
+            // This shouldn't happen as we have a default property for `*.*` in `properties-form-runner.xml`
             null
         }
     }
@@ -127,7 +162,7 @@ object PdfConfig20231 extends ScalaToXml {
 
   // Cell configurations of the new config override those of the base config. The `Inherit` value can be used to
   // explicitly inherit a value from the base config. The `None` value can be used to explicitly make a cell blank.
-  def merge(baseConfig: MyState, newConfig: MyState): MyState = {
+  def merge(superConfig: MyState, subConfig: MyState): MyState = {
 
     val pageTypes =
       HeaderFooterPageType.AllValues flatMap { headerFooterPageType =>
@@ -137,14 +172,14 @@ object PdfConfig20231 extends ScalaToXml {
 
             val cells =
               HeaderFooterPosition.AllValues flatMap { headerFooterPosition =>
-                val baseValue = baseConfig.pages.get(headerFooterPageType).flatMap(_.get(headerFooterType)).flatMap(_.get(headerFooterPosition))
-                val newValue  = newConfig .pages.get(headerFooterPageType).flatMap(_.get(headerFooterType)).flatMap(_.get(headerFooterPosition))
+                val superValue = superConfig.pages.get(headerFooterPageType).flatMap(_.get(headerFooterType)).flatMap(_.get(headerFooterPosition))
+                val subValue   = subConfig  .pages.get(headerFooterPageType).flatMap(_.get(headerFooterType)).flatMap(_.get(headerFooterPosition))
 
                 (
-                  if (newValue.contains(PdfHeaderFooterCellConfig.Inherit))
-                    baseValue
+                  if (subValue.contains(PdfHeaderFooterCellConfig.Inherit))
+                    superValue
                   else
-                    newValue.orElse(baseValue)
+                    subValue.orElse(superValue)
                 ).map(headerFooterPosition ->)
               }
 
@@ -154,6 +189,6 @@ object PdfConfig20231 extends ScalaToXml {
         headerOrFooters.nonEmpty option (headerFooterPageType -> headerOrFooters.toMap)
       }
 
-    FormRunnerPdfConfigRoot(pageTypes.toMap, baseConfig.parameters ++ newConfig.parameters) // parameters are not merged, just overridden
+    FormRunnerPdfConfigRoot(pageTypes.toMap, superConfig.parameters ++ subConfig.parameters) // parameters are not merged, just overridden
   }
 }

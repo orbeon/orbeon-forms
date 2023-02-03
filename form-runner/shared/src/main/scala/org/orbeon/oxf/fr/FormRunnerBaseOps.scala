@@ -20,7 +20,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
-import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.PathUtils._
@@ -269,6 +269,9 @@ trait FormRunnerBaseOps {
 
   def formRunnerProperty(name: String, appForm: AppForm): Option[String] =
     properties.getObjectOpt(buildPropertyName(name, appForm)) map (_.toString)
+
+  def formRunnerRawProperty(name: String)(implicit p: FormRunnerParams): Option[Property] =
+    properties.getPropertyOpt(buildPropertyName(name))
 
   def formRunnerPropertyWithNs(name: String)(implicit p: FormRunnerParams): Option[(String, NamespaceMapping)] =
     properties.getPropertyOpt(buildPropertyName(name)) map { p => (p.stringValue, p.namespaceMapping) }

@@ -321,6 +321,11 @@
                                 </xf:dispatch>
                             </xf:action>
 
+                            <!-- Open dialogs -->
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o f" name="DOMActivate" targetid="open-form-settings-trigger"/>
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o e" name="DOMActivate" targetid="open-email-settings-trigger"/>
+                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o s" name="DOMActivate" targetid="open-edit-source-trigger"/>
+
 <!--                            <xf:action type="xpath" if="$dialogs-closed" observer="#document" event="keydown" xxf:modifiers="command option" xxf:text="t">-->
 <!--                                fr:run-process-by-name('oxf.fr.detail.process', 'test')-->
 <!--                            </xf:action>-->
@@ -333,7 +338,6 @@
 <!--                                fr:run-process-by-name('oxf.fr.detail.process', 'new')-->
 <!--                            </xf:action>-->
 
-<!--                            &lt;!&ndash; Open dialogs &ndash;&gt;-->
 <!--                            <xxf:show if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o s" dialog="dialog-edit-source"/>-->
 
 <!--                            <xf:dispatch if="$dialogs-closed" observer="#document" event="keypress" xxf:text="o c" name="fb-show-dialog" targetid="dialog-control-settings">-->

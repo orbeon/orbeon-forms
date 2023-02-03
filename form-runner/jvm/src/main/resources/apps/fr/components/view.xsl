@@ -1303,7 +1303,7 @@
             name="pdf-header-footer-config-elem"
             select="FormRunnerPdfConfig:getHeaderFooterConfigXml($app, $form)/*"/>
 
-        <xf:group ref="instance('fr-form-instance')[fr:mode() = 'pdf']" class="fr-pdf-header-footer-details">
+        <xf:group ref="instance('fr-form-instance')[fr:mode() = 'pdf']" class="fr-pdf-header-footer-details xforms-hidden">
 
             <!-- We need this in XForms as well, so we can handle the choice of language dynamically -->
             <xf:var

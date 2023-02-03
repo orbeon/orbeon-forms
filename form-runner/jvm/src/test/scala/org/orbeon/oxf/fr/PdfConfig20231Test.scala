@@ -9,7 +9,7 @@ import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.funspec.AnyFunSpec
 
 
-class FormRunnerPdfConfigTest extends AnyFunSpec with XMLSupport {
+class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
 
   describe("PDF header/footer configuration conversions between ADT/JSON/XML") {
 

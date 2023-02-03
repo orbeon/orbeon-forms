@@ -82,10 +82,12 @@ object PdfConfig20231 extends ScalaToXml {
   val encoder: Encoder[MyState] = implicitly
   val decoder: Decoder[MyState] = implicitly
 
+  // Called from XSLT
   //@XPathFunction
   def camelToKebab(s: String): String =
     s.camelToKebab
 
+  // Called from XSLT and XForms
   // TODO: cache config at property level
   //@XPathFunction
   def getHeaderFooterConfigXml(app: String, form: String): DocumentInfo = {
@@ -130,6 +132,8 @@ object PdfConfig20231 extends ScalaToXml {
     }
   }
 
+  // Cell configurations of the new config override those of the base config. The `Inherit` value can be used to
+  // explicitly inherit a value from the base config. The `None` value can be used to explicitly make a cell blank.
   def merge(baseConfig: MyState, newConfig: MyState): MyState = {
 
     val pageTypes =

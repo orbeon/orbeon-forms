@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<resources>
+  <resources>
     <resource xml:lang="en">
         <common>
             <formats>
@@ -1098,6 +1098,7 @@
             </login-error>
         </authentication>
     </resource>
+	
     <resource xml:lang="es">
         <common>
             <formats>
@@ -1603,6 +1604,579 @@
                 <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
                 <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
                 <reading-form-definition todo="true">[An error occurred while reading the form definition.]</reading-form-definition>
+            </error-messages>
+        </import>
+        <authentication>
+            <menu>
+                <logged-in-as todo="true">[Logged in as {0}]</logged-in-as>
+                <logout todo="true">[Logout]</logout>
+                <login todo="true">[Login]</login>
+                <register todo="true">[Register]</register>
+            </menu>
+            <login>
+                <title todo="true">[Form Runner Login]</title>
+                <username todo="true">[Username]</username>
+                <password todo="true">[Password]</password>
+                <login todo="true">[Login]</login>
+            </login>
+            <logout-done>
+                <title todo="true">[Form Runner Logout]</title>
+                <message todo="true">[You're logged out.]</message>
+            </logout-done>
+            <login-error>
+                <title todo="true">[Form Runner Login Error]</title>
+                <unrecognized todo="true">[The username or password you entered wasn't recognized.]</unrecognized>
+                <try-again todo="true">[Please try again.]</try-again>
+            </login-error>
+        </authentication>
+    </resource>
+    <resource xml:lang="ca">
+        <common>
+            <formats>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
+                <day-this-year>[D] [MNn]</day-this-year>
+                <short-date>[D01]/[M01]/[Y01]</short-date>
+            </formats>
+        </common>
+        <buttons>
+            <create todo="true">&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; [Create]</create>
+            <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
+            <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
+            <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
+    
+    
+            <home>&lt;i class="fa fa-fw -th"&gt;&lt;/i&gt; Inici</home>
+            <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Inici</landing>
+            <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Veure</review>
+            <pdf>&lt;i class="fa fa-fw fa-file-pdf-o"&gt;&lt;/i&gt; PDF</pdf>
+            <tiff>&lt;i class="fa fa-fw fa-image"&gt;&lt;/i&gt; TIFF</tiff>
+            <delete>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Eliminar</delete>
+            <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importar</import>
+            <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nou</new>
+            <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicar</duplicate>
+    
+            <!-- Standard process buttons -->
+            <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Desar</save>
+            <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Desar definitiu</save-final>
+            <save-draft todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Desar esborrany</save-draft>
+            <save-progress todo="true">&lt;i class="fa fa-fw fa-inbox"&gt;&lt;/i&gt; Desar progres</save-progress>
+            <edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editar</edit>
+            <send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</send>
+            <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
+            <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validar</validate>
+            <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
+    
+            <!-- Legacy buttons -->
+            <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</submit>
+            <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Veure</workflow-review>
+            <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editar</workflow-edit>
+            <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</workflow-send>
+    
+            <!-- Other standard buttons -->
+            <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Resum</summary>
+            <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Tancar</close>
+            <clear>&lt;i class="fa fa-fw fa-remove"&gt;&lt;/i&gt; Netejar</clear>
+            <cancel>Cancel·lar</cancel>
+            <save-locally>Guardar Localment</save-locally>
+            <collapse-all>&lt;i class="fa fa-fw fa-compress"&gt;&lt;/i&gt;</collapse-all>
+            <expand-all>&lt;i class="fa fa-fw fa-expand"&gt;&lt;/i&gt;</expand-all>
+            <refresh>&lt;i class="fa fa-fw fa-refresh" aria-label="Actualitzar"&gt;&lt;/i&gt;</refresh>
+            <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Següent</wizard-next>
+            <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previ</wizard-prev>
+            <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contingut</wizard-toc>
+    
+            <!-- Submit dialog -->
+            <submit-dialog-clear>Netejar i tancar</submit-dialog-clear>
+            <submit-dialog-keep>Mantindre valors i tancar</submit-dialog-keep>
+            <submit-dialog-go>Acceptar</submit-dialog-go>
+            <submit-dialog-close-window>Tancar finestra</submit-dialog-close-window>
+    
+            <!-- Warning dialog -->
+            <validation-dialog-review>Revisar</validation-dialog-review>
+            <validation-dialog-continue>Continuar</validation-dialog-continue>
+    
+            <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testejar</test>
+            <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspeccionar
+                fòrmules (Experimental)</test-formulas>
+            <test-offline todo="true">&lt;i class="fa fa-fw fa-plane"&gt;&lt;/i&gt; Test Offline
+                (Experimental)</test-offline>
+            <excel-export todo="true">&lt;i class="fa fa-fw fa-file-excel-o"/&gt;&lt;/i&gt; Exportar a
+                excel</excel-export>
+            <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
+            <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</save-publish>
+    
+            <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Sí</yes>
+            <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; No</no>
+            <ok>Acceptar</ok>
+            <previous>Previ</previous>
+            <next>Pròxim</next>
+        </buttons>
+        <components>
+            <labels>
+                <open-section>Mostrar Secció</open-section>
+                <close-section>Ocultar Secció</close-section>
+                <section-name>Nom de la Secció</section-name>
+                <yes>Sí</yes>
+                <no>No</no>
+                <other>Un altre</other>
+            </labels>
+            <grid>
+                <menu>Menú</menu>
+                <insert-above>Insereix a dalt</insert-above>
+                <insert-below>Insereix a baix</insert-below>
+                <move-up>Moure a dalt</move-up>
+                <move-down>Moure a sota</move-down>
+                <clear>
+                    <label todo="true">Netejar la fila</label>
+                </clear>
+                <remove>
+                    <label>Remoure</label>
+                    <hint>Remoure una fila de la Graella</hint>
+                </remove>
+                <add-another>
+                    <label>Afegir</label>
+                    <hint>Afegir una fila a la graella</hint>
+                </add-another>
+            </grid>
+            <section>
+                <remove>
+                    <label>Remoure</label>
+                    <hint>Remoure Iteració de Secció Repetible</hint>
+                </remove>
+                <add-another>
+                    <label>Afegir un Altre</label>
+                    <hint>Afegir Iteració a la Graella Repetible</hint>
+                </add-another>
+            </section>
+            <date-time>
+                <year>Any</year>
+                <month>Mes</month>
+                <day>Dia</day>
+            </date-time>
+            <wizard>
+                <errors>Errors</errors>
+                <incomplete>Incomplet</incomplete>
+                <complete>Completar</complete>
+                <not-started>No iniciat</not-started>
+                <edit>Editar</edit>
+            </wizard>
+            <error-summary>
+                <show-more>Mostrar Més</show-more>
+                <show-less>Mostrar Menys</show-less>
+            </error-summary>
+        </components>
+        <untitled-form>Formulari sense Títol</untitled-form>
+        <errors>
+            <summary-title>El seu formulari {1,choice,0#no te cap missatge|1#té els següents missatges
+                '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;té els següents
+                '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}</summary-title>
+            <form-title>[{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational
+                Message|3#Message}' - |1&lt;{1,number,integer}
+                '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
+            <none>No hi ha errors al formulari</none>
+            <unsaved>Canvis sense desar</unsaved>
+            <canvas-not-supported>Per a realitzar anotacions a les imatges, el seu explorador ha de
+                suportar HTML5</canvas-not-supported>
+        </errors>
+        <email>
+            <subject>Confirmació de formulari Orbeon</subject>
+            <body>Per favor trobi les dades del formulari adjuntades al correu</body>
+            <na>N/A</na>
+            <iteration>Iteració {$iteration}</iteration>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[MNn] [D], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <titles>
+                <summary-title>Resúm</summary-title>
+                <delete-confirmation>Confirma Eliminació</delete-confirmation>
+                <created>Creat</created>
+                <last-modified>Modificació</last-modified>
+                <workflow-stage todo="true">[Workflow stage]</workflow-stage>
+                <created-by todo="true">Creat per</created-by>
+                <last-modified-by todo="true">Última modificació per</last-modified-by>
+                <selected>Seleccionat</selected>
+                <refresh>Aquest botó actualitzarà la pàgina</refresh>
+                <toc>Taula de continguts</toc>
+                <description>Descripció</description>
+                <help>Ajuda</help>
+                <error-count>Errors al seu formulari</error-count>
+                <errors-count>Errors al seu formulari</errors-count>
+            </titles>
+            <buttons>
+                <select-all todo="true">Seleccionar tot</select-all>
+                <deselect-all todo="true">Deseleccionar tot</deselect-all>
+                <select-saved todo="true">Seleccionar només el guardat</select-saved>
+                <select-drafts todo="true">Seleccionar només esborranys</select-drafts>
+            </buttons>
+            <search>
+                <search>Buscar</search>
+                <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Buscar formulari</search-forms>
+                <show-options>Mostrar opcions de cerca</show-options>
+                <close-options>Tancar opcions de cerca</close-options>
+            </search>
+            <paging>
+                <to>al</to>
+                <of>de</of>
+            </paging>
+            <messages>
+                <no-form-found>No es va trobar el formulari.</no-form-found>
+                <delete-confirmation>Està segur que vol esborrar un o més formularis? Nota quan
+                    s'esborra un formualri desat, s'esborraran els formularis en estat esborrat també</delete-confirmation>
+                <version todo="true">[Form Version {0,number,integer}]</version>
+            </messages>
+            <labels>
+                <draft>Esborranys</draft>
+                <read-only>Només lectura</read-only>
+                <language-choice>Triï idioma</language-choice>
+                <form-choice>Seleccioni formulari</form-choice>
+                <free-search>Cerca lliure</free-search>
+                <any>Qualsevol</any>
+                <script>Versió completa</script>
+                <refresh>Actualitzar</refresh>
+                <close-box>Tancar</close-box>
+                <help-back>Anterior</help-back>
+                <goto-content>Anar al contingut</goto-content>
+            </labels>
+            <formats>
+                <date>[MNn] [D], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+                <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <messages>
+                <save-success>Document guardat correctament!</save-success>
+                <save-draft-success todo="true">Esborrany guardat correctament!</save-draft-success>
+                <save-progress-success todo="true">Esborrany guardat correctament!</save-progress-success>
+                <email-success>Correu enviat correctament!</email-success>
+                <form-validation-error>Hi ha errors de validació. Corregeixi els errors i intenti
+                    novament</form-validation-error>
+                <database-error>Error de comunicació amb la base de dades. Contacti amb els
+                    administradors de la aplicació.</database-error>
+                <service-error todo="true">Error de comunicació amb el servei. Contacti amb els
+                    administradors de la aplicació.</service-error>
+                <process-error>Error amb el procés. Contacti amb els administradors de la aplicació.</process-error>
+                <wizard-prev-error todo="true">Per favor, corregeix els errors abans d'anar enrere</wizard-prev-error>
+                <wizard-next-error todo="true">Per favor, corregeix els errors abans d'anar endavant</wizard-next-error>
+                <clear-confirm-message>Està segur de netejar tots els camps de la pàgina? Es perdran les
+                    dades si no les guarda.</clear-confirm-message>
+                <error-dialog-title>Impossible completar la acció</error-dialog-title>
+                <confirmation-dialog-title>Confirmació</confirmation-dialog-title>
+                <confirmation-dialog-message>Està segur de continuar?</confirmation-dialog-message>
+                <submit-dialog-title>Formulari enviat</submit-dialog-title>
+                <submit-dialog-message>La seva informació he estat enviada.</submit-dialog-message>
+                <validation-dialog-title>Revisi els missatges de validació del seu Formualri</validation-dialog-title>
+                <validation-dialog-message>El seu formulari {1,choice,0#no té cap missatge|1#té un
+                    '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;té
+                    {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational
+                    messages|3#messages}'}. Pot revisar-los si vol {1,choice,1#it|1&lt;them} primer o
+                    ingorar-los {1,choice,1#it|1&lt;them} i continuar amb l'operació.</validation-dialog-message>
+                <buttons-message />
+                <saved-locally-open> Fes click aquí per obrir el document. La informació ingressada és
+                    mostrarà per la eina de la mateixa forma com va ser guardada.</saved-locally-open>
+                <upload-in-progress>Hi ha una pujada d'arxius en progres. Per favor, Intenteu-ho
+                    novament quan la pujada de fitxers hagi estat completada o cancel·lada.</upload-in-progress>
+                <upload-start>Ha començat la pujada e fitxers</upload-start>
+                <upload-cancel>Pujada de fitxers cancel·lada per l'usuari</upload-cancel>
+                <upload-done>Pujada de fitxers completada.</upload-done>
+                <upload-error>Hi ha hagut una errada en la pujada de fitxers. Torni a intentar-ho.</upload-error>
+                <upload-error-size>L'arxiu es massa gran. El tamany permes és {0,number,integer} bytes i
+                    el tamany del fitxer pujat és {1,number,integer} bytes.</upload-error-size>
+                <upload-error-mediatype>L'arxiu pujat és de tipus incorrecte.</upload-error-mediatype>
+                <upload-error-file-scan>L'arxiu pujat ha estat rebutjat per l'escàner de fitxers.
+                    Asseguris que el fitxer no està infectat. Aquest és el missatge de l'escàner de
+                    fitxers: "{0}".</upload-error-file-scan>
+                <lost-attachments>Alguns fitxers s'han perdut per un incident amb el servidor. Verifiqui
+                    tots els annexos i puja'ls de nou si és necessari.</lost-attachments>
+            </messages>
+            <draft-singleton>
+                <found-draft>Esborrany trobat</found-draft>
+                <found-drafts>Esborranys trobats</found-drafts>
+                <found-draft-for-document>Despres de guardar aquest document, és va guardar
+                    automàticament un esborrany, i pot contindre una actualització. Desitja obrir el
+                    document guardat o obrir l'últim esborrany?</found-draft-for-document>
+                <found-draft-for-never-saved>Hi ha un esborrany d'aquest formulari. Vols començar amb el
+                    formulari en blanc o amb l'esborrany</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Hi ha varis esborranys d'aquest formulari. Vols començar
+                    amb un formulari en blanc o algun dels esborranys?</found-drafts-for-never-saved>
+                <open-saved>Obrir document guardat</open-saved>
+                <open-draft>Obrir esborrany auto-guardat</open-draft>
+                <view-drafts>Veure esborrany auto-guardat</view-drafts>
+                <start-new>Començar amb un formulari en blanc</start-new>
+                <multiple-docs-title>S'ha trobat un formulari amb aquestes dades</multiple-docs-title>
+                <multiple-docs-explanation>No és poden crear noves dades per aquest Formulari, de totes
+                    maneres pot editar els existents.</multiple-docs-explanation>
+                <multiple-docs-view-data>Veure dades existents</multiple-docs-view-data>
+            </draft-singleton>
+            <labels>
+                <language-choice>Idioma</language-choice>
+                <errors>Número d'errors</errors>
+                <check-errors-in-form>Aquest formulari conte errades</check-errors-in-form>
+                <error-details>Veure detall de les errades</error-details>
+                <confirm>Confirmar</confirm>
+                <alert>Valor no informat o incorrecte</alert>
+                <captcha-label>CAPTCHA</captcha-label>
+                <captcha-alert>El valor ingressat és diferent de la imatge, torni a intentar-lo</captcha-alert>
+            </labels>
+            <view>
+                <explanation>
+                    Vista de només lectura.
+                </explanation>
+            </view>
+            <lease>
+                <renew-lease-title>Renovar bloqueig</renew-lease-title>
+                <renew-lease-message>El seu bloqueig expirarà aviat. Desitja renovar-lo?</renew-lease-message>
+                <current-user-left>Voste disposa d'un bloqueig d'aquest document sobre un altre usuari</current-user-left>
+                <current-user-right>.</current-user-right>
+                <relinquished>Voste ja no disposa d'un bloqueig d'aquest document.</relinquished>
+                <other-user>Un altre usuari amb el nom "{0}" té bloquejat actualment aquest document</other-user>
+                <relinquish>Treure bloqueig</relinquish>
+                <renew>Renovar Bloqueig</renew>
+                <try-acquire>Intentar adquirir Bloqueig</try-acquire>
+                <show-in-view-mode todo="true">Mostrar-lo en només lectura</show-in-view-mode>
+            </lease>
+        </detail>
+        <save-locally>
+            <dialog-title>Guardar localment</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Faci clic al botó Guardar per guardar les dades al seu ordinador en format HTML.
+                    </p>
+                    <p>
+                        Per reobrir el formulari:
+                    </p>
+                    <ul>
+                        <li>Obri el fitxer HTML del seu ordinador (fent clic al fitxer, o arrosegant-lo
+                            a la finestra del navegador).</li>
+                        <li>Faci clic al botó Obrir que sortirà per confirmar.</li>
+                    </ul>
+                    <p>
+                        <b>ADVERTÈNCIA:</b> Cap dada s'ha guardat al servidor i si elimina l'arxiu de
+                        les dades, es perdran. </p>
+                </div>
+            </dialog-body>
+        </save-locally>
+        <admin>
+            <title todo="true">[Form Runner Administration]</title>
+        </admin>
+        <landing>
+            <title>Orbeon Form Runner</title>
+            <titles>
+                <published-forms todo="true">Published Forms</published-forms>
+                <form-builder-forms todo="true">Form Builder Forms</form-builder-forms>
+                <form-builder-new todo="true">New Form Builder Form</form-builder-new>
+                <form-builder-summary todo="true">[Form Builder Forms]</form-builder-summary>
+                <demo-forms todo="true">Demo Forms</demo-forms>
+                <quick-links todo="true">Quick Links</quick-links>
+                <form-runner-admin todo="true">Forms Administration</form-runner-admin>
+            </titles>
+            <descriptions>
+                <published-forms todo="true">Access your published forms</published-forms>
+                <form-builder-forms todo="true">View and edit your in-progress forms created with Form
+                    Builder</form-builder-forms>
+                <demo-forms todo="true">Try out the demo forms that ship with Orbeon Forms</demo-forms>
+            </descriptions>
+            <show-more todo="true">Show more…</show-more>
+        </landing>
+        <home>
+            <title>Inici Form Runner</title>
+            <buttons>
+                <unpublish>&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; Despublicar</unpublish>
+                <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
+                <cancel>Cancel·lar</cancel>
+                <connect>Connectar</connect>
+                <select>Seleccionar</select>
+                <operation>Operació</operation>
+                <reindex>Reindexar base de dades</reindex>
+                <stop-reindex>Aturar la reindexació</stop-reindex>
+                <all>Tots</all>
+                <none>Cap</none>
+                <unpublished-local>Despublicar formularis locals</unpublished-local>
+                <published-local>Publicar formularis locals</published-local>
+                <unpublished-remote>Despublicar formularis remots</unpublished-remote>
+                <published-remote>Publicar formularis remots</published-remote>
+                <newer-local>Formularis locals nous</newer-local>
+                <newer-remote>Formularis remots nous</newer-remote>
+                <publish-local>Publicar formularis locals</publish-local>
+                <unpublish-local>Despublicar formularis locals</unpublish-local>
+                <publish-remote>Publicar formularis remots</publish-remote>
+                <unpublish-remote>Despublicar formularis remots</unpublish-remote>
+                <push-to-remote>Pujar al remot</push-to-remote>
+                <pull-from-remote>Baixar del remot</pull-from-remote>
+                <navigate-summary>Anar al resum</navigate-summary>
+                <navigate-new>Anar al nou</navigate-new>
+                <upgrade-local>Actualitzar formularis locals</upgrade-local>
+                <upgrade-remote>Actualitzar formularis remots</upgrade-remote>
+                <delete-local todo="true">Esborrar formularis locals</delete-local>
+                <delete-remote todo="true">Esborrar formularis remots</delete-remote>
+                <reencrypt todo="true">[Re-encrypt form definitions]</reencrypt>
+                <reload-resources todo="true">Recarregar recursos</reload-resources>
+            </buttons>
+            <titles>
+                <publish-confirmation>Confirmar Publicació/Despublicació</publish-confirmation>
+                <credentials>Credencials del servidor remot</credentials>
+                <status>Estat</status>
+                <app>Aplicació</app>
+                <form>Formulari</form>
+                <version todo="true">Versió</version>
+                <title>Títol</title>
+                <view>Veure</view>
+                <new>Nou</new>
+                <local>Local</local>
+                <remote>Remot</remote>
+                <form-identification>Identificació del fomulari</form-identification>
+                <last-modified>Modificat</last-modified>
+                <reindexing-confirmation>Confirmar reindexació</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[Confirm Re-encryption]</reencrypt-confirmation>
+            </titles>
+            <messages>
+                <no-forms>No té permisos per cap formulari de Producció</no-forms>
+                <publish-confirmation>Está segur de {0,choice,0#publish|1#unpublish|2#upgrade|3#delete}
+                    {1,choice,1#one form|1&lt;{1,number,integer} formularis}?</publish-confirmation>
+                <reindexing-confirmation>Mentre es reindexen algunes funcionalitats no estaran
+                    disponibles, com el Form-Runner. Per la qual cosa es recomana fer la reindexació amb
+                    el sistema fora de línia. Està segur que vol fer la reindexació?</reindexing-confirmation>
+                <reencrypt-confirmation todo="true">[We recommend you perform re-encryption while the
+                    system is offline. Are you sure you want to proceed with re-encryption?]</reencrypt-confirmation>
+            </messages>
+            <labels>
+                <available>Disponible</available>
+                <unavailable>No Disponible</unavailable>
+                <library>Llibreria</library>
+                <newer>Més Nous</newer>
+                <remote-server>Servidor remot</remote-server>
+                <username>Usuari</username>
+                <password>Contrasenya</password>
+                <reindexing-generic>Reindexant
+                    &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-generic>
+                <reindexing-provider>Reindexant ({1,number}/{2,number}]</reindexing-provider>
+                <reindexing-stopping>La reindexació s'està parant
+                    &lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;&lt;span&gt;.&lt;/span&gt;]</reindexing-stopping>
+                <reindexing-finished>La reindexació ha finalitzat</reindexing-finished>
+                <reencrypt-state todo="true">[Re-encrypting {0,number}/{1,number}]</reencrypt-state>
+                <reencrypt-started todo="true">[Re-encryption started]</reencrypt-started>
+                <reencrypt-finished todo="true">[Re-encryption finished]</reencrypt-finished>
+            </labels>
+        </home>
+        <import>
+            <form-version>
+                <label todo="true">Versió del formulari</label>
+                <alert todo="true">No hi ha versió del formulari</alert>
+            </form-version>
+            <application-name>
+                <label todo="true">Nom de la aplicació</label>
+            </application-name>
+            <form-name>
+                <label todo="true">Nom del formulari</label>
+            </form-name>
+            <version-comment>
+                <label todo="true">Comentari de la versió</label>
+            </version-comment>
+            <upload>
+                <label todo="true">Pujar</label>
+            </upload>
+            <file>
+                <label todo="true">Fitxer per importar</label>
+                <hint todo="true">El fitxer ha de ser en Excel 2007 (.xlsx) o XML</hint>
+                <alert todo="true">Fitxer no suportat o faltant</alert>
+                <excel-headings-format todo="true">Excel 2007 amb capçaleres formatades (.xslx)</excel-headings-format>
+                <excel-named-ranges-format todo="true">Excel 2007 amb intervals formatats (.xslx)</excel-named-ranges-format>
+                <xml-form-structure-and-data-format todo="true">Orbeon XML Format d'exportació (.xml)</xml-form-structure-and-data-format>
+            </file>
+            <validation>
+                <label todo="true">Validació</label>
+                <alert todo="true">Per favor comenci la validació abans de la importació</alert>
+            </validation>
+            <start-validation>
+                <label todo="true">Començar la validació</label>
+            </start-validation>
+            <total todo="true">Total</total>
+            <valid todo="true">Valid</valid>
+            <invalid todo="true">Invalid</invalid>
+            <imported todo="true">Importat</imported>
+            <skipped todo="true">Esquivat</skipped>
+            <eta todo="true">ETA</eta>
+            <cancel-validation>
+                <label todo="true">Cancelar validació</label>
+            </cancel-validation>
+            <validation-canceled todo="true">Validació cancelada.</validation-canceled>
+            <import>
+                <label todo="true">Importar</label>
+            </import>
+            <existing-records>
+                <label todo="true">Valors de la BD existents</label>
+                <item id="0" todo="true">Mantindre</item>
+                <item id="1" todo="true">Esborrar</item>
+            </existing-records>
+            <invalid-data>
+                <label todo="true">Files amb dades invalides</label>
+                <item id="0" todo="true">Ometre</item>
+                <item id="1" todo="true">Importar</item>
+            </invalid-data>
+            <start-import>
+                <label todo="true">Començar la importació</label>
+            </start-import>
+            <cancel-import>
+                <label todo="true">Cancelar la importació</label>
+            </cancel-import>
+            <import-canceled todo="true">Importació cancelada.</import-canceled>
+            <start-over>
+                <label todo="true">Començar de nou</label>
+            </start-over>
+            <review-data>
+                <label todo="true">Revisar les dades</label>
+            </review-data>
+            <existing-records-message todo="true">
+                There {0,choice,1#is|1&lt;are} {0,number,integer} existing
+                {0,choice,1#document|1&lt;documents} in the database for version {3} of form {1}/{2}.
+            </existing-records-message>
+            <eta-message todo="true">
+                {0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer}
+                minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}
+            </eta-message>
+            <invalid-records-message todo="true">
+                {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents}
+                {0,choice,1#is|1&lt;are} invalid.
+            </invalid-records-message>
+            <valid-records-message todo="true">
+                {0,number,integer} {0,choice,1#document|1&lt;documents} {0,choice,1#has|1&lt;have} been
+                validated and will be imported.
+            </valid-records-message>
+            <invalid-document-message todo="true">
+                The document uploaded contains validation errors. Use the "Review Data" button to review
+                and fix errors before saving.
+            </invalid-document-message>
+            <valid-document-message todo="true">
+                The document uploaded contains valid data. Use the "Review Data" button to review the
+                form data before saving.
+            </valid-document-message>
+            <import-complete-message todo="true">
+                Import of {0,number,integer} {0,choice,1#document|1&lt;documents} is complete.
+                {1,number,integer} invalid {1,choice,1#document was|1&lt;documents were} skipped.
+            </import-complete-message>
+            <na todo="true">N/A</na>
+            <fields-found todo="true">Fields Found</fields-found>
+            <values-found todo="true">Values Found</values-found>
+            <errors todo="true">Errors</errors>
+            <warnings todo="true">Warnings</warnings>
+            <error-messages>
+                <validating todo="true">[An error occurred while validating the data.]</validating>
+                <importing todo="true">[An error occurred while importing the data.]</importing>
+                <deleting todo="true">[An error occurred while deleting the data.]</deleting>
+                <unauthorized todo="true">[You are not authorized to access this data.]</unauthorized>
+                <reading-form-data todo="true">[An error occurred while retrieving form data.]</reading-form-data>
+                <reading-form-metadata todo="true">[An error occurred while reading form metadata.]</reading-form-metadata>
+                <reading-form-definition todo="true">[An error occurred while reading the form
+                    definition.]</reading-form-definition>
             </error-messages>
         </import>
         <authentication>

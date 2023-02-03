@@ -1,6 +1,6 @@
 package org.orbeon.oxf.fr.pdf
 
-import io.circe.{Decoder, Encoder, KeyDecoder, KeyEncoder}
+import io.circe.{Decoder, DecodingFailure, Encoder, HCursor, Json, KeyDecoder, KeyEncoder}
 import org.orbeon.oxf.fr.pdf.definitions20231._
 import org.orbeon.oxf.fr.ui.ScalaToXml
 import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
@@ -58,26 +58,27 @@ object PdfConfig20231 extends ScalaToXml {
     case "right"  => Some(HeaderFooterPosition.Right)
   }
 
-//  implicit val counterFormatEncoder: Encoder[CounterFormat] = {
-//    case CounterFormat.Decimal            => Json.fromString("decimal")
-//    case CounterFormat.DecimalLeadingZero => Json.fromString("decimal-leading-zero")
-//    case CounterFormat.LowerRoman         => Json.fromString("lower-roman")
-//    case CounterFormat.UpperRoman         => Json.fromString("upper-roman")
-//    case CounterFormat.LowerGreek         => Json.fromString("lower-greek")
-//    case CounterFormat.LowerAlpha         => Json.fromString("lower-alpha")
-//    case CounterFormat.UpperAlpha         => Json.fromString("upper-alpha")
-//  }
+  implicit val counterFormatEncoder: Encoder[CounterFormat] = {
+    case CounterFormat.Decimal            => Json.fromString("decimal")
+    case CounterFormat.DecimalLeadingZero => Json.fromString("decimal-leading-zero")
+    case CounterFormat.LowerRoman         => Json.fromString("lower-roman")
+    case CounterFormat.UpperRoman         => Json.fromString("upper-roman")
+    case CounterFormat.LowerGreek         => Json.fromString("lower-greek")
+    case CounterFormat.LowerAlpha         => Json.fromString("lower-alpha")
+    case CounterFormat.UpperAlpha         => Json.fromString("upper-alpha")
+  }
 
-//  implicit val counterFormatDecoder: Decoder[CounterFormat] = (c: HCursor) => {
-//    case "decimal"             => Right(CounterFormat.Decimal)
-//    case "decimal-leading-zero" => Right(CounterFormat.DecimalLeadingZero)
-//    case "lower-roman"         => Right(CounterFormat.LowerRoman)
-//    case "upper-roman"         => Right(CounterFormat.UpperRoman)
-//    case "lower-greek"         => Right(CounterFormat.LowerGreek)
-//    case "lower-alpha"         => Right(CounterFormat.LowerAlpha)
-//    case "upper-alpha"         => Right(CounterFormat.UpperAlpha)
-//    case other                 => Left(DecodingFailure(s"Invalid counter format: `$other`", Nil))
-//  }
+  implicit val counterFormatDecoder: Decoder[CounterFormat] = (c: HCursor) =>
+    c.value.asString match {
+      case None | Some("decimal")       => Right(CounterFormat.Decimal)
+      case Some("decimal-leading-zero") => Right(CounterFormat.DecimalLeadingZero)
+      case Some("lower-roman")          => Right(CounterFormat.LowerRoman)
+      case Some("upper-roman")          => Right(CounterFormat.UpperRoman)
+      case Some("lower-greek")          => Right(CounterFormat.LowerGreek)
+      case Some("lower-alpha")          => Right(CounterFormat.LowerAlpha)
+      case Some("upper-alpha")          => Right(CounterFormat.UpperAlpha)
+      case other                        => Left(DecodingFailure(s"Invalid counter format: `$other`", Nil))
+  }
 
   val encoder: Encoder[MyState] = implicitly
   val decoder: Decoder[MyState] = implicitly

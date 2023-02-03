@@ -103,11 +103,11 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
               </_>
               <_ type="PageNumberParam">
                   <name>fr-page-number</name>
-                  <format type="LowerRoman"/>
+                  <format>lower-roman</format>
               </_>
               <_ type="PageCountParam">
                   <name>fr-page-count</name>
-                  <format type="LowerRoman"/>
+                  <format>lower-roman</format>
               </_>
           </parameters>
       </json>
@@ -169,13 +169,13 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |    {
         |      "PageNumberParam": {
         |        "name": "fr-page-number",
-        |        "format": {"LowerRoman": {}}
+        |        "format": "lower-roman"
         |      }
         |    },
         |    {
         |      "PageCountParam": {
         |        "name": "fr-page-count",
-        |        "format": {"LowerRoman": {}}
+        |        "format": "lower-roman"
         |      }
         |    }
         |  ]
@@ -315,17 +315,13 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |    {
         |      "PageNumberParam": {
         |        "name": "fr-page-number",
-        |        "format": {
-        |          "LowerRoman": {}
-        |        }
+        |        "format": "lower-roman"
         |      }
         |    },
         |    {
         |      "PageCountParam": {
         |        "name": "fr-page-count",
-        |        "format": {
-        |          "LowerRoman": {}
-        |        }
+        |        "format": "lower-roman"
         |      }
         |    },
         |    {

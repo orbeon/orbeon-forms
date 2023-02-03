@@ -271,7 +271,7 @@
                                                     '&quot; counter(',
                                                     if ($p/@type = 'PageNumberParam') then 'page' else 'pages',
                                                     ', ',
-                                                    ($p/format/@type[. != 'null']/FormRunnerPdfConfig:camelToKebab(.), 'decimal')[1],
+                                                    ($p/format/FormRunnerPdfConfig:camelToKebab(.), 'decimal')[1],
                                                     ') &quot;',
                                                     ''''
                                                 ),

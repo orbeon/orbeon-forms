@@ -482,25 +482,6 @@ public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver 
         namespaceContext.endElement();
     }
 
-    private boolean hasAVT(Attributes attributes) {
-        final int attributesCount = attributes.getLength();
-        if (attributesCount > 0) {
-            for (int i = 0; i < attributesCount; i++) {
-                final String currentAttributeURI = attributes.getURI(i);
-                if ("".equals(currentAttributeURI) || XMLConstants.XML_URI().equals(currentAttributeURI)) {
-                    // For now we only support AVTs on attributes in no namespace or in the XML namespace (for xml:lang)
-                    final String attributeValue = attributes.getValue(i);
-                    if (XMLUtils.maybeAVT(attributeValue)) {
-                        // This is an AVT
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
     @Override
     public void startPrefixMapping(String prefix, String uri) {
         namespaceContext.startPrefixMapping(prefix, uri);

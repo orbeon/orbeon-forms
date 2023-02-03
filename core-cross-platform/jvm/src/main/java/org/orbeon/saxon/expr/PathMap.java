@@ -901,39 +901,6 @@ public class PathMap implements Cloneable {
                 (targetNode.isReturnable() ? " #" : "") +
                 (targetNode.hasUnknownDependencies() ? " ...??" : ""));
     }
-
-    /**
-     * Main method for testing
-     * @param args Takes one argument, the XPath expression to be analyzed
-     * @throws Exception
-     */
-
-    public static void main(String[] args) throws Exception {
-        Configuration config = StaticXPath.GlobalConfiguration();
-        Expression exp;
-        if (args[0].equals("xpath")) {
-            XPathEvaluator xpath = new XPathEvaluator(config);
-            XPathExpression xpexp = xpath.createExpression(args[1]);
-            exp = xpexp.getInternalExpression();
-        } else if (args[0].equals("xquery")) {
-            StaticQueryContext sqc = new StaticQueryContext(config);
-            sqc.setBaseURI(new File(args[1]).toURI().toString());
-            XQueryExpression xqe = sqc.compileQuery(new FileReader(args[1]));
-            exp = xqe.getExpression();
-        } else {
-            throw new IllegalArgumentException("first argument must be xpath or xquery");
-        }
-        exp.explain(System.err);
-        PathMap initialPath = new PathMap(exp);
-        initialPath.diagnosticDump(System.err);
-
-        PathMapRoot[] roots = initialPath.getPathMapRoots();
-        for (int i=0; i<roots.length; i++) {
-            initialPath.reduceToDownwardsAxes(roots[i]);
-        }
-        System.err.println("AFTER REDUCTION:");
-        initialPath.diagnosticDump(System.err);
-    }
 }
 
 //

@@ -58,6 +58,9 @@
             <!-- As done for XForms selection controls, consider the control visited on selection -->
             <xbl:handler event="xforms-select xforms-deselect" observer="select1">
                 <xxf:setvisited control="fr-yesno-input-binding"/>
+                <xf:dispatch name="{event('xxf:type')}" targetid="fr-yesno-input-binding">
+                    <xf:property name="xxf:item-value" value="event('xxf:item-value')"/>
+                </xf:dispatch>
             </xbl:handler>
         </xbl:handlers>
 

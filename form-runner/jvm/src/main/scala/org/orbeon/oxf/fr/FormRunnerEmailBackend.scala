@@ -19,15 +19,7 @@ trait FormRunnerEmailBackend {
 
     // NOTE: We don't use `FormRunnerParams()` for that this works in tests.
     // Callees only require, as of 2018-05-31, `app` and `form`.
-    implicit val params =
-      FormRunnerParams(
-        app         = app,
-        form        = form,
-        formVersion = 1,
-        document    = None,
-        isDraft     = None,
-        mode        = "email"
-      )
+    implicit val params = FormRunnerParams(AppForm(app, form), "email")
 
     for {
       (expr, mapping) <- formRunnerPropertyWithNs(s"oxf.fr.email.$attachmentType.filename")

@@ -62,7 +62,7 @@ object FormRunnerParams {
   def apply(): FormRunnerParams =
     apply(frc.parametersInstance.get.rootElement)
 
-  def apply(paramsRootElem: NodeInfo): FormRunnerParams = {
+  def apply(paramsRootElem: NodeInfo): FormRunnerParams =
     FormRunnerParams(
       app         = paramsRootElem elemValue "app",
       form        = paramsRootElem elemValue "form",
@@ -71,20 +71,40 @@ object FormRunnerParams {
       isDraft     = paramsRootElem.elemValue("draft").trimAllToOpt.map(_ == "true"),
       mode        = paramsRootElem elemValue "mode"
     )
-  }
+
+  def apply(appForm: AppForm, mode: String): FormRunnerParams =
+    FormRunnerParams(
+      app         = appForm.app,
+      form        = appForm.form,
+      formVersion = 1,
+      document    = None,
+      isDraft     = None,
+      mode        = mode
+    )
 
   type AppFormVersion = (AppForm, Int)
 }
 
 case class AppForm(app: String, form: String) {
-  val toList = List(app, form)
+
+  val toList: List[String] = List(app, form)
+
+  def isSpecificAppForm: Boolean = AppForm.isSpecificAppForm(app, form)
+
+  def isMoreSpecificThan(other: AppForm): Boolean = {
+    (! AppForm.isSpecificPart(other.app)  || AppForm.isSpecificPart(app)) &&
+    (! AppForm.isSpecificPart(other.form) || AppForm.isSpecificPart(form))
+  }
 }
 
 object AppForm {
   val FormBuilder: AppForm = AppForm("orbeon", "builder")
 
+  def isSpecificPart(part: String): Boolean =
+    part != "*" && part.nonEmpty
+
   def isSpecificAppForm(app: String, form: String): Boolean =
-    app != "*" && app.nonEmpty && form != "*" && form.nonEmpty
+    isSpecificPart(app) && isSpecificPart(form)
 }
 
 trait FormRunnerBaseOps {
@@ -231,7 +251,7 @@ trait FormRunnerBaseOps {
     }
 
   def buildPropertyName(name: String)(implicit p: FormRunnerParams): String =
-    if (AppForm.isSpecificAppForm(p.app, p.form))
+    if (p.appForm.isSpecificAppForm)
       buildPropertyName(name, AppForm(p.app, p.form))
     else
       name
@@ -256,6 +276,13 @@ trait FormRunnerBaseOps {
   // Return a boolean property using the form's app/name, false if the property is not defined
   def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Boolean =
     properties.getObjectOpt(buildPropertyName(name)) map (_.toString) contains "true"
+
+  // We expect that the app/form are the last two parts of the property
+  def trailingAppFormFromProperty(requestedName: String, property: Property): AppForm =
+    property.name.substringAfter(requestedName).splitTo[List](".") match {
+      case List(app, form) => AppForm(app, form)
+      case _               => throw new IllegalArgumentException(s"cannot match property name `$requestedName` with `${property.name}`")
+    }
 
   // Interrupt current processing and send an error code to the client.
   // NOTE: This could be done through ExternalContext

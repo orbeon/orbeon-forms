@@ -3,7 +3,7 @@ package org.orbeon.oxf.fr.pdf
 import io.circe.{Decoder, DecodingFailure, Encoder, HCursor, Json, KeyDecoder, KeyEncoder}
 import org.orbeon.oxf.fr.pdf.definitions20231._
 import org.orbeon.oxf.fr.ui.ScalaToXml
-import org.orbeon.oxf.fr.{FormRunner, FormRunnerParams}
+import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.DocumentInfo
@@ -94,15 +94,7 @@ object PdfConfig20231 extends ScalaToXml {
   def getHeaderFooterConfigXml(app: String, form: String): DocumentInfo = {
 
     // Only `app` and `form` are used
-    implicit val params =
-      FormRunnerParams(
-        app         = app,
-        form        = form,
-        formVersion = 1,
-        document    = None,
-        isDraft     = None,
-        mode        = "pdf"
-      )
+    implicit val params = FormRunnerParams(AppForm(app, form), "pdf")
 
     def findConfig(propertyName: String): Option[(MyState, NamespaceMapping)] =
       FormRunner.formRunnerPropertyWithNs(propertyName) filter (_._1.nonAllBlank) map {

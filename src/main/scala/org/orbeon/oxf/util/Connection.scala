@@ -147,7 +147,7 @@ object Connection extends ConnectionTrait {
   def isInternalPath(path: String): Boolean = {
     val propertySet = Properties.instance.getPropertySet
     val p = propertySet.getPropertyOrThrow(HttpInternalPathsProperty)
-    val r = p.associatedValue(_.value.toString.r)
+    val r = p.associatedValue(_.stringValue.r)
 
     r.pattern.matcher(path).matches()
   }

@@ -77,7 +77,7 @@ trait BindingLoader extends Logging {
         val nsUriToPrefix = readURLMappingsCacheAgainstProperty
 
         def propertyQNames(property: Property) =
-          property.value.toString.tokenizeToSet flatMap
+          property.stringValue.tokenizeToSet flatMap
             (Extensions.resolveQName(property.namespaces.get, _, unprefixedIsNoNamespace = true))
 
         // 1. Legacy `oxf.xforms.resources.baseline` property

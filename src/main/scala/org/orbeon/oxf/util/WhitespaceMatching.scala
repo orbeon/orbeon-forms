@@ -96,7 +96,7 @@ object WhitespaceMatching  {
 
     def whitespacePropertyDontAssociate(scope: String, policy: String) = (
       propertySet.getPropertyOpt(scope + '.' + policy)
-      map (property => property.namespaces -> property.value.toString.trimAllToEmpty)
+      map (property => property.namespaces -> property.stringValue.trimAllToEmpty)
     )
 
     // NOTE: Not ideal if no whitespace property is present, there won't be any caching associated with properties.

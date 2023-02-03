@@ -33,7 +33,7 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 
-case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) {
+case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String], name: String) {
 
   private var _associatedValue: Option[Any] = None
 
@@ -43,6 +43,10 @@ case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) 
     _associatedValue.get.asInstanceOf[U]
   }
 
+  def associateValue[U](associatedValue: U): Unit =
+    _associatedValue = Option(associatedValue)
+
+  def stringValue: String = value.toString
   def namespaceMapping: NamespaceMapping = NamespaceMapping(namespaces)
 }
 
@@ -74,7 +78,7 @@ object PropertySet {
 
     def setProperty(namespaces: Map[String, String], name: String, typeQName: QName, value: AnyRef): Unit = {
 
-      val property = Property(typeQName, value, if (namespaces eq null) Map.empty else namespaces) // shouldn't be null!
+      val property = Property(typeQName, value, if (namespaces eq null) Map.empty else namespaces, name) // shouldn't be null!
 
       // Store exact property name anyway
       exactProperties += name -> property
@@ -198,7 +202,7 @@ class PropertySet private (
       for {
         (name, prop) <- exactProperties.toList.sortBy(_._1)
         propType     = prop.typ.toString
-        propValue    = if (name.toLowerCase.contains("password")) PasswordPlaceholder else prop.value.toString
+        propValue    = if (name.toLowerCase.contains("password")) PasswordPlaceholder else prop.stringValue
       } yield
           s"""|  "$name": {
               |    "type": "${propType.escapeJavaScript}",
@@ -283,11 +287,13 @@ class PropertySet private (
           }
       }
 
-    def getExact = exactProperties.get(name)
+    def getExact: Option[Property] =
+      exactProperties.get(name)
 
-    def getWildcard = wildcardSearch(Some(wildcardProperties), name.splitTo[List]("."))
+    def getWildcard: Option[Property] =
+      wildcardSearch(Some(wildcardProperties), name.splitTo[List]("."))
 
-    def checkType(p: Property) =
+    def checkType(p: Property): Property =
       if ((typ ne null) && typ != p.typ)
         throw new OXFException(
           s"Invalid attribute type requested for property `$name`: expected `${typ.qualifiedName}`, found `${p.typ.qualifiedName}`"

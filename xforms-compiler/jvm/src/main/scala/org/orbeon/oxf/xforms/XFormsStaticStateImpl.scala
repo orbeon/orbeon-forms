@@ -130,7 +130,8 @@ class XFormsStaticStateImpl(
             //   property value is read and copied over to an attribute on the first model, but the
             //   namespace context from the properties file is lost in this process. Maybe we should
             //   instead convert QNames to EQNames.
-            .getOrElse(throw new IllegalArgumentException("can't find namespace mapping"))
+            .getOrElse(throw new IllegalArgumentException("can't find namespace mapping")),
+          P.AssetsBaselineUpdatesProperty
         )
       )
     )

@@ -44,7 +44,7 @@ trait FormRunnerSummary {
   //@XPathFunction
   def defaultTimezoneToOffsetString: String =
     properties.getPropertyOpt("oxf.fr.default-timezone")
-      .flatMap(_.value.toString.trimAllToOpt)
+      .flatMap(_.stringValue.trimAllToOpt)
       .map(zoneIdToOffsetAsOfNow)
       .map(offsetToDuration)
       .orNull

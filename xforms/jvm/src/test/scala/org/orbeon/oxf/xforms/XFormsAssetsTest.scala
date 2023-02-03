@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import org.orbeon.oxf.properties.Property
+import org.orbeon.oxf.xforms.XFormsProperties.AssetsBaselineUpdatesProperty
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.scalatest.funspec.AnyFunSpec
 
@@ -118,7 +119,8 @@ class XFormsAssetsTest extends AnyFunSpec{
                -/ops/yui/calendar/assets/skins/sam/calendar.css
                +/apps/fr/assets/foo.css
             """,
-            Map.empty
+            Map.empty,
+            AssetsBaselineUpdatesProperty
           )
         )
       )

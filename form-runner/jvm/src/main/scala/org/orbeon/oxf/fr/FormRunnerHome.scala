@@ -308,13 +308,13 @@ object FormRunnerHome {
     properties.getPropertyOpt("oxf.fr.home.remote-servers") map { property =>
       Try(
         property.associatedValue(p =>
-          parser.parse(p.value.toString).toTry.getOrElse(throw new IllegalArgumentException(p.value.toString))
+          parser.parse(p.stringValue).toTry.getOrElse(throw new IllegalArgumentException(p.stringValue))
         )
       ) flatMap tryRemoteServersFromJSON getOrElse {
         implicit val logger = inScopeContainingDocument.getIndentedLogger("form-runner")
         warn(
           s"incorrect JSON configuration for property `oxf.fr.home.remote-servers`",
-          Seq("JSON" -> property.value.toString)
+          Seq("JSON" -> property.stringValue)
         )
         Nil
       }

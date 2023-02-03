@@ -76,14 +76,14 @@ object XFormsAssetsBuilder {
 
     val allUpdates =
       excludesProp.toList.flatMap(_.splitTo[List]() map ("-" + _)) ::: // translate to "remove" updates
-      updatesProp.toList.flatMap(_.value.toString.splitTo[List]())
+      updatesProp.toList.flatMap(_.stringValue.splitTo[List]())
 
     allUpdates.foldLeft(assets)(maybeAddOrRemoveOne)
   }
 
   def fromJsonProperty(propertySet: PropertySet): XFormsAssets = {
     val prop = propertySet.getPropertyOrThrow(AssetsBaselineProperty)
-    prop.associatedValue(v => fromJsonString(v.value.toString, prop.namespaces))
+    prop.associatedValue(v => fromJsonString(v.stringValue, prop.namespaces))
   }
 
   // Public for tests

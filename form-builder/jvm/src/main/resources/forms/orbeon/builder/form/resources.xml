@@ -391,6 +391,7 @@
             <section-templates>Section templates</section-templates>
             <controls>Controls</controls>
             <all>All</all>
+            <use-property>Use property</use-property>
             <singleton>
                 <label>Singleton Form</label>
                 <hint>Only allow one accessible instance of form data for this form definition</hint>
@@ -472,6 +473,21 @@
                 <item id="1">Rows</item>
                 <item id="2">Columns</item>
             </grid-tab-order>
+            <availability>
+                <label>Availability</label>
+                <available>
+                    <available-from>
+                        <label>Only available from</label>
+                        <date>Start date and time</date>
+                        <message>Pending message</message>
+                    </available-from>
+                    <available-to>
+                        <label>Only available until</label>
+                        <date>End date and time</date>
+                        <message>Expired message</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label>PDF page orientation</label>
                 <hint/>
@@ -1893,6 +1909,7 @@
             <section-templates>Modèles de sections</section-templates>
             <controls>Contrôles</controls>
             <all>Total</all>
+            <use-property>Utiliser la propriété</use-property>
             <singleton>
                 <label>Formulaire singleton</label>
                 <hint> Ne permet qu'une instance de données accessible par l'utilisateur pour ce formulaire</hint>
@@ -1974,6 +1991,21 @@
                 <item id="1">Rangées</item>
                 <item id="2">Colonnes</item>
             </grid-tab-order>
+            <availability>
+                <label>Disponibilité</label>
+                <available>
+                    <available-from>
+                    <label>Disponible uniquement à partir de</label>
+                    <date>Date et heure de début</date>
+                    <message>Message en attente</message>
+                    </available-from>
+                    <available-to>
+                    <label>Disponible uniquement jusqu'à</label>
+                    <date>Date et heure de fin</date>
+                    <message>Message expiré</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label>Orientation de page PDF</label>
                 <hint/>
@@ -3461,6 +3493,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
+            <availability>
+                <label todo="true">[Availability]</label>
+                <available>
+                    <available-from>
+                        <label todo="true">[Only available from]</label>
+                        <date todo="true">[Start date and time]</date>
+                        <message todo="true">[Pending message]</message>
+                    </available-from>
+                    <available-to>
+                        <label todo="true">[Only available until]</label>
+                        <date todo="true">[End date and time]</date>
+                        <message todo="true">[Expired message]</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -4974,6 +5021,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
+            <availability>
+                <label todo="true">[Availability]</label>
+                <available>
+                    <available-from>
+                        <label todo="true">[Only available from]</label>
+                        <date todo="true">[Start date and time]</date>
+                        <message todo="true">[Pending message]</message>
+                    </available-from>
+                    <available-to>
+                        <label todo="true">[Only available until]</label>
+                        <date todo="true">[End date and time]</date>
+                        <message todo="true">[Expired message]</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -6406,6 +6468,7 @@
             <section-templates>Modelli di sezione</section-templates>
             <controls>Controlli</controls>
             <all>Tutti</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
@@ -6487,6 +6550,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
+            <availability>
+                <label todo="true">[Availability]</label>
+                <available>
+                    <available-from>
+                        <label todo="true">[Only available from]</label>
+                        <date todo="true">[Start date and time]</date>
+                        <message todo="true">[Pending message]</message>
+                    </available-from>
+                    <available-to>
+                        <label todo="true">[Only available until]</label>
+                        <date todo="true">[End date and time]</date>
+                        <message todo="true">[Expired message]</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -7883,6 +7961,7 @@
             <section-templates>Abschnittsvorlagen</section-templates>
             <controls>Steuerelemente</controls>
             <all>Alle</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label>Nur eine einzige Formularinstanz erlauben</label>
                 <hint>Verhindert, dass Benutzer weitere Formulare dieses Typs erstellen, wenn sie bereits Zugriff auf ein Formular dieses Typs haben</hint>
@@ -7964,6 +8043,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
+            <availability>
+                <label todo="true">[Availability]</label>
+                <available>
+                    <available-from>
+                        <label todo="true">[Only available from]</label>
+                        <date todo="true">[Start date and time]</date>
+                        <message todo="true">[Pending message]</message>
+                    </available-from>
+                    <available-to>
+                        <label todo="true">[Only available until]</label>
+                        <date todo="true">[End date and time]</date>
+                        <message todo="true">[Expired message]</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -9363,6 +9457,7 @@
             <section-templates>Lohkomallinteet</section-templates>
             <controls>Kontrollit</controls>
             <all>Kaikki</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
@@ -9444,6 +9539,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
+            <availability>
+                <label todo="true">[Availability]</label>
+                <available>
+                    <available-from>
+                        <label todo="true">[Only available from]</label>
+                        <date todo="true">[Start date and time]</date>
+                        <message todo="true">[Pending message]</message>
+                    </available-from>
+                    <available-to>
+                        <label todo="true">[Only available until]</label>
+                        <date todo="true">[End date and time]</date>
+                        <message todo="true">[Expired message]</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -10868,6 +10978,7 @@
             <section-templates>Plantillas de Sección</section-templates>
             <controls>Controles</controls>
             <all>Todos</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label>Es Formulario único</label>
                 <hint>Impide que los usuarios ingresen nuevos formularios si existen formularios ingresados.</hint>
@@ -10949,6 +11060,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
+            <availability>
+                <label todo="true">[Availability]</label>
+                <available>
+                    <available-from>
+                        <label todo="true">[Only available from]</label>
+                        <date todo="true">[Start date and time]</date>
+                        <message todo="true">[Pending message]</message>
+                    </available-from>
+                    <available-to>
+                        <label todo="true">[Only available until]</label>
+                        <date todo="true">[End date and time]</date>
+                        <message todo="true">[Expired message]</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -12374,6 +12500,7 @@
             <section-templates>Sectie-templates</section-templates>
             <controls>Controls</controls>
             <all>Alle</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label>Singleton form</label>
                 <hint>Sta slechts één toegankelijke instantie van de formgegevens toe voor deze formdefinitie</hint>
@@ -12455,6 +12582,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
+            <availability>
+                <label todo="true">[Availability]</label>
+                <available>
+                    <available-from>
+                        <label todo="true">[Only available from]</label>
+                        <date todo="true">[Start date and time]</date>
+                        <message todo="true">[Pending message]</message>
+                    </available-from>
+                    <available-to>
+                        <label todo="true">[Only available until]</label>
+                        <date todo="true">[End date and time]</date>
+                        <message todo="true">[Expired message]</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -13859,6 +14001,7 @@
             <section-templates>Templates da Secção</section-templates>
             <controls>Controlos</controls>
             <all>Todos</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
@@ -13940,6 +14083,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
+            <availability>
+                <label todo="true">[Availability]</label>
+                <available>
+                    <available-from>
+                        <label todo="true">[Only available from]</label>
+                        <date todo="true">[Start date and time]</date>
+                        <message todo="true">[Pending message]</message>
+                    </available-from>
+                    <available-to>
+                        <label todo="true">[Only available until]</label>
+                        <date todo="true">[End date and time]</date>
+                        <message todo="true">[Expired message]</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -15371,6 +15529,7 @@
             <section-templates>Sektionsmallar</section-templates>
             <controls>Kontroller</controls>
             <all>Allt</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label>Singulärt formulär</label>
                 <hint>Användare kan inte skapa ytterligare ifyllda formulär om de har tillgång något ifyllt formulär av denna typ</hint>
@@ -15452,6 +15611,21 @@
                 <item id="1" todo="true">[Rows]</item>
                 <item id="2" todo="true">[Columns]</item>
             </grid-tab-order>
+            <availability>
+                <label todo="true">[Availability]</label>
+                <available>
+                    <available-from>
+                        <label todo="true">[Only available from]</label>
+                        <date todo="true">[Start date and time]</date>
+                        <message todo="true">[Pending message]</message>
+                    </available-from>
+                    <available-to>
+                        <label todo="true">[Only available until]</label>
+                        <date todo="true">[End date and time]</date>
+                        <message todo="true">[Expired message]</message>
+                    </available-to>
+                </available>
+            </availability>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>

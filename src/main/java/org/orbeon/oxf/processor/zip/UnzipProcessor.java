@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.zip;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.orbeon.io.IOUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
@@ -61,33 +62,35 @@ public class UnzipProcessor extends ProcessorImpl {
                     // <files>
                     xmlReceiver.startElement("", "files", "files", SAXUtils.EMPTY_ATTRIBUTES);
                     ZipFile zipFile = new ZipFile(temporaryZipFile);
-                    for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
-                        // Go through each entry in the zip file
-                        ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-                        // Get file name
-                        String fileName = zipEntry.getName();
-                        long fileSize = zipEntry.getSize();
-                        String fileTime = DateUtils.formatIsoDateTimeUtc(zipEntry.getTime());
+                    try {
+                        for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
+                            // Go through each entry in the zip file
+                            ZipEntry zipEntry = (ZipEntry) entries.nextElement();
+                            // Get file name
+                            String fileName = zipEntry.getName();
+                            long fileSize = zipEntry.getSize();
+                            String fileTime = DateUtils.formatIsoDateTimeUtc(zipEntry.getTime());
 
-                        InputStream entryInputStream = zipFile.getInputStream(zipEntry);
-                        String uri = FileItemSupport.inputStreamToAnyURI(entryInputStream, ExpirationScope.Request$.MODULE$)._1().toString();
-                        // <file name="filename.ext">uri</file>
-                        AttributesImpl fileAttributes = new AttributesImpl();
-                        fileAttributes.addAttribute("", "name", "name", "CDATA", fileName);
-                        fileAttributes.addAttribute("", "size", "size", "CDATA", Long.toString(fileSize));
-                        fileAttributes.addAttribute("", "dateTime", "dateTime", "CDATA", fileTime);
-                        xmlReceiver.startElement("", "file", "file", fileAttributes);
-                        xmlReceiver.characters(uri.toCharArray(), 0, uri.length());
-                        // </file>
-                        xmlReceiver.endElement("", "file", "file");
+                            InputStream entryInputStream = zipFile.getInputStream(zipEntry);
+                            String uri = FileItemSupport.inputStreamToAnyURI(entryInputStream, ExpirationScope.Request$.MODULE$)._1().toString();
+                            // <file name="filename.ext">uri</file>
+                            AttributesImpl fileAttributes = new AttributesImpl();
+                            fileAttributes.addAttribute("", "name", "name", "CDATA", fileName);
+                            fileAttributes.addAttribute("", "size", "size", "CDATA", Long.toString(fileSize));
+                            fileAttributes.addAttribute("", "dateTime", "dateTime", "CDATA", fileTime);
+                            xmlReceiver.startElement("", "file", "file", fileAttributes);
+                            xmlReceiver.characters(uri.toCharArray(), 0, uri.length());
+                            // </file>
+                            xmlReceiver.endElement("", "file", "file");
+                        }
+                        // </files>
+                        xmlReceiver.endElement("", "files", "files");
+                        xmlReceiver.endDocument();
+                    } finally {
+                        zipFile.close();
                     }
-                    // </files>
-                    xmlReceiver.endElement("", "files", "files");
-                    xmlReceiver.endDocument();
 
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                } catch (SAXException e) {
+                } catch (IOException | SAXException e) {
                     throw new OXFException(e);
                 }
             }

@@ -102,7 +102,7 @@
                         </xf:select1>
 
                         <xf:var name="items"        value="xxf:itemset('hidden-select1', 'xml')//item"/>
-                        <xf:var name="closed-value" value="$binding/string() = $items/value/string()"/>
+                        <xf:var name="closed-value" value="xxf:value('fr-open-select1') = $items/value/string()"/>
 
                         <xh:div id="fr-open-select1-elem" class="fr-component-group" xxf:control="true">
                             <xf:select1

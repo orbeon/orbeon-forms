@@ -255,7 +255,7 @@
                     value="xxf:binding('fr-dropdown-date-binding')"/>
             <xf:var name="view"
                 value="is-readonly = 'true' and property('xxf:readonly-appearance') = 'static'"/>
-            <xf:var name="value" as="xs:string" value="$binding/string()">
+            <xf:var name="value" as="xs:string" value="xxf:value('fr-dropdown-date-binding')">
                 <xf:action ev:event="xforms-value-changed xforms-enabled">
                     <!-- Only set local values if the bound node is an xs:date -->
                     <xf:action if="$value castable as xs:date">

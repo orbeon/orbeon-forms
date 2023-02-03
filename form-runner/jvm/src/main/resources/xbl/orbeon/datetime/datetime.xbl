@@ -159,7 +159,7 @@
             <xf:var name="view"       value="xxf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
 
             <!-- Update local date and time from bound node -->
-            <xf:var name="value" as="xs:string" value="$binding/string()">
+            <xf:var name="value" as="xs:string" value="xxf:value('fr-datetime')">
                 <xf:action event="xforms-value-changed xforms-enabled">
                     <xf:var name="is-valid" value="$value castable as xs:dateTime"/>
                     <xf:action if="$is-valid">

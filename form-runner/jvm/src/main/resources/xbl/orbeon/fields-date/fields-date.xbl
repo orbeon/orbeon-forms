@@ -93,7 +93,7 @@
         <xbl:template>
             <!-- Read external value -->
             <xf:var name="binding" value="xxf:binding('fr-fields-date-binding')"/>
-            <xf:var name="value" as="xs:string" value="$binding/string()">
+            <xf:var name="value" as="xs:string" value="xxf:value('fr-fields-date-binding')">
                 <xf:action ev:event="xforms-value-changed xforms-enabled">
                     <!-- Only set local values if the bound node is an `xs:date` -->
                     <xf:action if="$value castable as xs:date">

@@ -108,10 +108,10 @@
                                     <xsl:value-of select="concat($prefix, '-', $header-footer-position, ' { content: ')"/>
 
                                     <xsl:choose>
-                                        <xsl:when test="@type = 'None'">
+                                        <xsl:when test="empty(value)">
                                             <xsl:text>''</xsl:text>
                                         </xsl:when>
-                                        <xsl:when test="@type = 'Template'">
+                                        <xsl:otherwise>
 
                                             <xsl:variable
                                                 name="class-name"
@@ -132,7 +132,7 @@
                                             <xsl:value-of
                                                 select="$pdf-header-footer-details/*[p:has-class($class-name)]/*"/>
 
-                                        </xsl:when>
+                                        </xsl:otherwise>
                                     </xsl:choose>
 
                                     <xsl:value-of select="';'"/>

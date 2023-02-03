@@ -1,6 +1,7 @@
 package org.orbeon.oxf.fr.pdf
 
 import io.circe._
+import io.circe.syntax.EncoderOps
 import org.orbeon.oxf.fr.pdf.definitions20231._
 import org.orbeon.oxf.fr.ui.ScalaToXml
 import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerParams}
@@ -80,6 +81,28 @@ object PdfConfig20231 extends ScalaToXml {
       case Some("upper-alpha")          => Right(CounterFormat.UpperAlpha)
       case other                        => Left(DecodingFailure(s"Invalid counter format: `$other`", Nil))
   }
+
+  implicit val pdfHeaderFooterCellConfigEncoder: Encoder[PdfHeaderFooterCellConfig] = {
+    case PdfHeaderFooterCellConfig.None                      => Json.fromString("none")
+    case PdfHeaderFooterCellConfig.Inherit                   => Json.fromString("inherit")
+    case PdfHeaderFooterCellConfig.Template(values, visible) =>
+      Json.fromFields(
+        ("values" -> values.asJson) :: visible.map(v => "visible" -> Json.fromString(v)).toList ::: Nil
+      )
+  }
+
+  implicit val pdfHeaderFooterCellConfigDecoder: Decoder[PdfHeaderFooterCellConfig] = (c: HCursor) =>
+    c.value.asString.map {
+      case "none"    => Right(PdfHeaderFooterCellConfig.None)
+      case "inherit" => Right(PdfHeaderFooterCellConfig.Inherit)
+      case other     => Left(DecodingFailure(s"Invalid PDF header/footer cell config: `$other`", Nil))
+    } getOrElse {
+      for {
+        values  <- c.get[Map[String, String]]("values")
+        visible <- c.getOrElse[Option[String]]("visible")(None)
+      } yield
+        PdfHeaderFooterCellConfig.Template(values, visible)
+    }
 
   val encoder: Encoder[MyState] = implicitly
   val decoder: Decoder[MyState] = implicitly

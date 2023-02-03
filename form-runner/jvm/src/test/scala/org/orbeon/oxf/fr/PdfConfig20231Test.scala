@@ -62,34 +62,31 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
           <pages type="object">
               <all type="object">
                   <header type="object">
-                      <left type="Template">
+                      <left type="object">
                           <values type="object">
                               <_>{{$fr-logo}}</_>
                           </values>
                           <visible>not(xxf:get-request-parameter('show-logo') = 'false')</visible>
                       </left>
-                      <center type="Template">
+                      <center type="object">
                           <values type="object">
                               <_>{{$fr-form-title}}</_>
                           </values>
-                          <visible type="null"/>
                       </center>
                   </header>
                   <footer type="object">
-                      <left type="Template">
+                      <left type="object">
                           <values type="object">
                               <_>{{$fr-form-title}}</_>
                           </values>
-                          <visible type="null"/>
                       </left>
-                      <center type="Template">
+                      <center type="object">
                           <values type="object">
                               <en>Page {{$fr-page-number}} of {{$fr-page-count}}</en>
                               <fr>Page {{$fr-page-number}} sur {{$fr-page-count}}</fr>
                           </values>
-                          <visible type="null"/>
                       </center>
-                      <right type="None"/>
+                      <right>none</right>
                   </footer>
               </all>
           </pages>
@@ -118,40 +115,30 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |    "all": {
         |      "header": {
         |        "left": {
-        |          "Template": {
-        |            "values": {
-        |              "_": "{$fr-logo}"
-        |            },
-        |            "visible": "not(xxf:get-request-parameter('show-logo') = 'false')"
-        |          }
+        |          "values": {
+        |            "_": "{$fr-logo}"
+        |          },
+        |          "visible": "not(xxf:get-request-parameter('show-logo') = 'false')"
         |        },
         |        "center": {
-        |          "Template": {
-        |            "values": {
-        |              "_": "{$fr-form-title}"
-        |            }
+        |          "values": {
+        |            "_": "{$fr-form-title}"
         |          }
         |        }
         |      },
         |      "footer": {
         |        "left": {
-        |          "Template": {
-        |            "values": {
-        |              "_": "{$fr-form-title}"
-        |            }
+        |          "values": {
+        |            "_": "{$fr-form-title}"
         |          }
         |        },
         |        "center": {
-        |          "Template": {
-        |            "values": {
-        |              "en": "Page {$fr-page-number} of {$fr-page-count}",
-        |              "fr": "Page {$fr-page-number} sur {$fr-page-count}"
-        |            }
+        |          "values": {
+        |            "en": "Page {$fr-page-number} of {$fr-page-count}",
+        |            "fr": "Page {$fr-page-number} sur {$fr-page-count}"
         |          }
         |        },
-        |        "right": {
-        |          "None": {}
-        |        }
+        |        "right": "none"
         |      }
         |    }
         |  },
@@ -209,12 +196,11 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
           <pages type="object">
               <all type="object">
                   <footer type="object">
-                      <right type="Template">
+                      <right type="object">
                           <values type="object">
                               <en>Submitted on: {{$current-dateTime}}</en>
                               <fr>Envoyé le: {{$current-dateTime}}</fr>
                           </values>
-                          <visible type="null"/>
                       </right>
                   </footer>
               </all>
@@ -233,11 +219,9 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |    "all": {
         |      "footer": {
         |        "right": {
-        |          "Template": {
-        |            "values": {
-        |              "en": "Submitted on: {$current-dateTime}",
-        |              "fr": "Envoyé le: {$current-dateTime}"
-        |            }
+        |          "values": {
+        |            "en": "Submitted on: {$current-dateTime}",
+        |            "fr": "Envoyé le: {$current-dateTime}"
         |          }
         |        }
         |      }
@@ -259,43 +243,33 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |    "all": {
         |      "header": {
         |        "left": {
-        |          "Template": {
-        |            "values": {
-        |              "_": "{$fr-logo}"
-        |            },
-        |            "visible": "not(xxf:get-request-parameter('show-logo') = 'false')"
-        |          }
+        |          "values": {
+        |            "_": "{$fr-logo}"
+        |          },
+        |          "visible": "not(xxf:get-request-parameter('show-logo') = 'false')"
         |        },
         |        "center": {
-        |          "Template": {
-        |            "values": {
-        |              "_": "{$fr-form-title}"
-        |            }
+        |          "values": {
+        |            "_": "{$fr-form-title}"
         |          }
         |        }
         |      },
         |      "footer": {
         |        "left": {
-        |          "Template": {
-        |            "values": {
-        |              "_": "{$fr-form-title}"
-        |            }
+        |          "values": {
+        |            "_": "{$fr-form-title}"
         |          }
         |        },
         |        "center": {
-        |          "Template": {
-        |            "values": {
-        |              "en": "Page {$fr-page-number} of {$fr-page-count}",
-        |              "fr": "Page {$fr-page-number} sur {$fr-page-count}"
-        |            }
+        |          "values": {
+        |            "en": "Page {$fr-page-number} of {$fr-page-count}",
+        |            "fr": "Page {$fr-page-number} sur {$fr-page-count}"
         |          }
         |        },
         |        "right": {
-        |          "Template": {
-        |            "values": {
-        |              "en": "Submitted on: {$current-dateTime}",
-        |              "fr": "Envoyé le: {$current-dateTime}"
-        |            }
+        |          "values": {
+        |            "en": "Submitted on: {$current-dateTime}",
+        |            "fr": "Envoyé le: {$current-dateTime}"
         |          }
         |        }
         |      }
@@ -331,8 +305,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |      }
         |    }
         |  ]
-        |}
-        |""".stripMargin
+        |}""".stripMargin
 
     val Expected: List[(String, PdfConfig20231.MyState, NodeInfo, String)] = List(
       ("default Orbeon Forms config", defaultOrbeonFormsConfigAdt, defaultOrbeonFormsConfigXml, defaultOrbeonFormsConfigJson),
@@ -350,7 +323,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
           xml.getDocumentRoot,
           PdfConfig20231.configToXml(adt)
         )
-        assert(PdfConfig20231.decode(json).toOption.contains(adt))
+        assert(PdfConfig20231.decode(json).get == adt)
       }
 
     it("must merge configs") {
@@ -363,7 +336,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
 
 //      println(FormRunnerPdfConfig.encode(merged))
 
-      assert(PdfConfig20231.decode(mergedJson).toOption.contains(merged))
+      assert(PdfConfig20231.decode(mergedJson).get == merged)
     }
   }
 }

@@ -1317,7 +1317,7 @@
 <!--                name="template-params"-->
 <!--                value="{fr:build-template-param-map($pdf-header-footer-config-elem/parameters/_, ())}"/>-->
 
-            <xsl:for-each select="$pdf-header-footer-config-elem//*[@type = 'Template']">
+            <xsl:for-each select="$pdf-header-footer-config-elem/pages/*/*/*[exists(values)]">
                 <xf:output
                     class="fr-{../../name()}-{../name()}-{name()}"
                     ref=".[{(visible[not(@type = 'null')], 'true()')[1]}]"

@@ -600,33 +600,25 @@
             "all": {
               "header": {
                 "left": {
-                  "Template": {
-                    "values": {
-                      "_": "{$fr-logo}"
-                    }
+                  "values": {
+                    "_": "{$fr-logo}"
                   }
                 },
                 "center": {
-                  "Template": {
-                    "values": {
-                      "_": "{$fr-form-title}"
-                    }
+                  "values": {
+                    "_": "{$fr-form-title}"
                   }
                 }
               },
               "footer": {
                 "left": {
-                  "Template": {
-                    "values": {
-                      "_": "{$fr-form-title}"
-                    }
+                  "values": {
+                    "_": "{$fr-form-title}"
                   }
                 },
                 "center": {
-                  "Template": {
-                    "values": {
-                      "_": "{$fr-page-number} / {$fr-page-count}"
-                    }
+                  "values": {
+                    "_": "{$fr-page-number} / {$fr-page-count}"
                   }
                 }
               }
@@ -646,13 +638,17 @@
             {
               "PageNumberParam": {
                 "name": "fr-page-number",
-                "format": {"Decimal": {}}
+                "format": {
+                  "Decimal": {}
+                }
               }
             },
             {
               "PageCountParam": {
                 "name": "fr-page-count",
-                "format": {"Decimal": {}}
+                "format": {
+                  "Decimal": {}
+                }
               }
             }
           ]

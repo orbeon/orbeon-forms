@@ -87,91 +87,91 @@
 
                 <style type="text/css">
                     <xsl:variable name="css">
-                    <xsl:for-each select="$pdf-header-footer-config-elem/pages/*">
-                        <xsl:variable name="header-footer-page-type" select="name()"/>
-                        <xsl:value-of select="
-                            if      ($header-footer-page-type = 'all')   then '@page {'
-                            else if ($header-footer-page-type = 'first') then '@page :first {'
-                            else if ($header-footer-page-type = 'odd')   then '@page :right {'
-                            else if ($header-footer-page-type = 'even')  then '@page :left {'
-                            else ''"/>
-
-                        <xsl:for-each select="*">
-                            <xsl:variable name="header-footer-type" select="name()"/>
-                            <xsl:variable name="prefix" select="
-                                if      ($header-footer-type = 'header') then '@top'
-                                else if ($header-footer-type = 'footer') then '@bottom'
+                        <xsl:for-each select="$pdf-header-footer-config-elem/pages/*">
+                            <xsl:variable name="header-footer-page-type" select="name()"/>
+                            <xsl:value-of select="
+                                if      ($header-footer-page-type = 'all')   then '@page {'
+                                else if ($header-footer-page-type = 'first') then '@page :first {'
+                                else if ($header-footer-page-type = 'odd')   then '@page :right {'
+                                else if ($header-footer-page-type = 'even')  then '@page :left {'
                                 else ''"/>
 
                             <xsl:for-each select="*">
-                                <xsl:variable name="header-footer-position" select="name()"/>
-                                <xsl:value-of select="concat($prefix, '-', $header-footer-position, ' { content: ')"/>
+                                <xsl:variable name="header-footer-type" select="name()"/>
+                                <xsl:variable name="prefix" select="
+                                    if      ($header-footer-type = 'header') then '@top'
+                                    else if ($header-footer-type = 'footer') then '@bottom'
+                                    else ''"/>
 
-                                <xsl:choose>
-                                    <xsl:when test="@type = 'None'">
-                                        <xsl:text>''</xsl:text>
-                                    </xsl:when>
-                                    <xsl:when test="@type = 'Template'">
+                                <xsl:for-each select="*">
+                                    <xsl:variable name="header-footer-position" select="name()"/>
+                                    <xsl:value-of select="concat($prefix, '-', $header-footer-position, ' { content: ')"/>
 
-                                        <xsl:variable
-                                            name="class-name"
-                                            select="
-                                                string-join(
-                                                    (
-                                                        'fr',
-                                                         $header-footer-page-type,
-                                                         $header-footer-type,
-                                                         $header-footer-position
-                                                     ),
-                                                     '-'
-                                                    )"/>
+                                    <xsl:choose>
+                                        <xsl:when test="@type = 'None'">
+                                            <xsl:text>''</xsl:text>
+                                        </xsl:when>
+                                        <xsl:when test="@type = 'Template'">
 
-                                        <!-- NOTE: "Non-Latin characters must be encoded using their Unicode escape
-                                             sequences: for example, \000A9 represents the copyright symbol." (MDN)
-                                             Q: Is this true? -->
-                                        <xsl:value-of
-                                            select="$pdf-header-footer-details/*[p:has-class($class-name)]/*"/>
+                                            <xsl:variable
+                                                name="class-name"
+                                                select="
+                                                    string-join(
+                                                        (
+                                                            'fr',
+                                                             $header-footer-page-type,
+                                                             $header-footer-type,
+                                                             $header-footer-position
+                                                         ),
+                                                         '-'
+                                                        )"/>
 
-                                    </xsl:when>
-                                </xsl:choose>
+                                            <!-- NOTE: "Non-Latin characters must be encoded using their Unicode escape
+                                                 sequences: for example, \000A9 represents the copyright symbol." (MDN)
+                                                 Q: Is this true? -->
+                                            <xsl:value-of
+                                                select="$pdf-header-footer-details/*[p:has-class($class-name)]/*"/>
 
-                                <xsl:value-of select="';'"/>
+                                        </xsl:when>
+                                    </xsl:choose>
 
-                                <!-- Apparently, the CSS doesn't combine with the default :( -->
-                                <xsl:choose>
-                                    <xsl:when test="$header-footer-type = 'header'">
-                                        <xsl:text>
-                                            border-bottom: 1px solid gray;
-                                            padding-bottom: 10px;
-                                            margin-bottom: 0;
-                                            vertical-align: bottom;
-                                        </xsl:text>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:text>
-                                            border-top: 1px solid gray;
-                                            padding-top: 10px;
-                                            margin-top: 0;
-                                            vertical-align: top;
-                                        </xsl:text>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                                <xsl:text>
-                                    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-                                    font-size: 14.3px;
-                                    line-height: 26px;
-                                </xsl:text>
-                                <xsl:value-of select="
-                                    if      ($header-footer-position = 'left')   then 'text-align: left;'
-                                    else if ($header-footer-position = 'center') then 'text-align: center;'
-                                    else 'padding-left: 30px; text-align: right;'"/>
+                                    <xsl:value-of select="';'"/>
 
-                                <xsl:value-of select="'}'"/>
+                                    <!-- Apparently, the CSS doesn't combine with the default :( -->
+                                    <xsl:choose>
+                                        <xsl:when test="$header-footer-type = 'header'">
+                                            <xsl:text>
+                                                border-bottom: 1px solid gray;
+                                                padding-bottom: 10px;
+                                                margin-bottom: 0;
+                                                vertical-align: bottom;
+                                            </xsl:text>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:text>
+                                                border-top: 1px solid gray;
+                                                padding-top: 10px;
+                                                margin-top: 0;
+                                                vertical-align: top;
+                                            </xsl:text>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                    <xsl:text>
+                                        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                                        font-size: 14.3px;
+                                        line-height: 26px;
+                                    </xsl:text>
+                                    <xsl:value-of select="
+                                        if      ($header-footer-position = 'left')   then 'text-align: left;'
+                                        else if ($header-footer-position = 'center') then 'text-align: center;'
+                                        else 'padding-left: 30px; text-align: right;'"/>
+
+                                    <xsl:value-of select="'}'"/>
+                                </xsl:for-each>
                             </xsl:for-each>
-                        </xsl:for-each>
 
-                        <xsl:value-of select="'}'"/>
-                    </xsl:for-each>
+                            <xsl:value-of select="'}'"/>
+                        </xsl:for-each>
                     </xsl:variable>
                     <xsl:value-of select="$css"/>
                 </style>

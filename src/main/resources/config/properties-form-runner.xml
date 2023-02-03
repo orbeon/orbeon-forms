@@ -634,7 +634,7 @@
           },
           "parameters": [
             {
-              "FormLogoParam": {
+              "ImageParam": {
                 "name": "fr-logo"
               }
             },

@@ -50,7 +50,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
           )
         ),
         List(
-          Param.FormLogoParam("fr-logo", None),
+          Param.ImageParam("fr-logo", None),
           Param.FormTitleParam("fr-form-title"),
           Param.PageNumberParam("fr-page-number", Some(CounterFormat.LowerRoman)),
           Param.PageCountParam("fr-page-count", Some(CounterFormat.LowerRoman))
@@ -66,13 +66,13 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                           <values type="object">
                               <_>{{$fr-logo}}</_>
                           </values>
-                          <relevant>not(xxf:get-request-parameter('show-logo') = 'false')</relevant>
+                          <visible>not(xxf:get-request-parameter('show-logo') = 'false')</visible>
                       </left>
                       <center type="Template">
                           <values type="object">
                               <_>{{$fr-form-title}}</_>
                           </values>
-                          <relevant type="null"/>
+                          <visible type="null"/>
                       </center>
                   </header>
                   <footer type="object">
@@ -80,21 +80,21 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                           <values type="object">
                               <_>{{$fr-form-title}}</_>
                           </values>
-                          <relevant type="null"/>
+                          <visible type="null"/>
                       </left>
                       <center type="Template">
                           <values type="object">
                               <en>Page {{$fr-page-number}} of {{$fr-page-count}}</en>
                               <fr>Page {{$fr-page-number}} sur {{$fr-page-count}}</fr>
                           </values>
-                          <relevant type="null"/>
+                          <visible type="null"/>
                       </center>
                       <right type="None"/>
                   </footer>
               </all>
           </pages>
           <parameters type="array">
-              <_ type="FormLogoParam">
+              <_ type="ImageParam">
                   <name>fr-logo</name>
                   <url type="null"/>
               </_>
@@ -122,7 +122,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |            "values": {
         |              "_": "{$fr-logo}"
         |            },
-        |            "relevant": "not(xxf:get-request-parameter('show-logo') = 'false')"
+        |            "visible": "not(xxf:get-request-parameter('show-logo') = 'false')"
         |          }
         |        },
         |        "center": {
@@ -157,7 +157,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |  },
         |  "parameters": [
         |    {
-        |      "FormLogoParam": {
+        |      "ImageParam": {
         |        "name": "fr-logo"
         |      }
         |    },
@@ -214,7 +214,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                               <en>Submitted on: {{$current-dateTime}}</en>
                               <fr>Envoyé le: {{$current-dateTime}}</fr>
                           </values>
-                          <relevant type="null"/>
+                          <visible type="null"/>
                       </right>
                   </footer>
               </all>
@@ -263,7 +263,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |            "values": {
         |              "_": "{$fr-logo}"
         |            },
-        |            "relevant": "not(xxf:get-request-parameter('show-logo') = 'false')"
+        |            "visible": "not(xxf:get-request-parameter('show-logo') = 'false')"
         |          }
         |        },
         |        "center": {
@@ -303,7 +303,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |  },
         |  "parameters": [
         |    {
-        |      "FormLogoParam": {
+        |      "ImageParam": {
         |        "name": "fr-logo"
         |      }
         |    },

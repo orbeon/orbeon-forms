@@ -17,7 +17,7 @@ object Param {
   case class PageNumberParam       (name: String, format: Option[CounterFormat]) extends Param
   case class PageCountParam        (name: String, format: Option[CounterFormat]) extends Param
   case class FormTitleParam        (name: String)                                extends Param
-  case class FormLogoParam         (name: String, url: Option[String])           extends Param
+  case class ImageParam            (name: String, url: Option[String])           extends Param
 }
 
 sealed trait HeaderFooterPosition
@@ -63,9 +63,9 @@ object CounterFormat {
 
 sealed trait PdfHeaderFooterCellConfig
 object PdfHeaderFooterCellConfig {
-  case object None                                                            extends PdfHeaderFooterCellConfig
-  case object Inherit                                                         extends PdfHeaderFooterCellConfig
-  case class  Template(values: Map[String, String], relevant: Option[String]) extends PdfHeaderFooterCellConfig
+  case object None                                                           extends PdfHeaderFooterCellConfig
+  case object Inherit                                                        extends PdfHeaderFooterCellConfig
+  case class  Template(values: Map[String, String], visible: Option[String]) extends PdfHeaderFooterCellConfig
 }
 
 case class FormRunnerPdfConfigRoot(

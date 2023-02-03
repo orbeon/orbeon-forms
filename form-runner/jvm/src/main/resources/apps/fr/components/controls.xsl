@@ -279,7 +279,7 @@
                                             )
                                         else if ($for-pdf and $p/@type = 'FormTitleParam') then
                                             fr:maybe-replace('fr:form-title()', $for-pdf)
-                                        else if ($for-pdf and $p/@type = 'FormLogoParam') then
+                                        else if ($for-pdf and $p/@type = 'ImageParam') then
                                             (: TODO: `*:url` :)
                                             if (exists($p/*:relevant)) then
                                                 concat(

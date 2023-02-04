@@ -1320,7 +1320,7 @@
             <xsl:for-each select="$pdf-header-footer-config-elem//*[@type = 'Template']">
                 <xf:output
                     class="fr-{../../name()}-{../name()}-{name()}"
-                    ref=".[{(relevant[not(@type = 'null')], 'true()')[1]}]"
+                    ref=".[{(visible[not(@type = 'null')], 'true()')[1]}]"
                     value="
                         let $current  := $pdf-header-footer-config-elem/pages/{../../name()}/{../name()}/{name()},
                             $template := $current/values/(*[name() = fr:lang()], *[name() = '_'], *)[1]

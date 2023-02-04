@@ -281,10 +281,10 @@
                                             fr:maybe-replace('fr:form-title()', $for-pdf)
                                         else if ($for-pdf and $p/@type = 'ImageParam') then
                                             (: TODO: `*:url` :)
-                                            if (exists($p/*:relevant)) then
+                                            if (exists($p/*:visible)) then
                                                 concat(
                                                     'if (',
-                                                    frf:replaceVarReferencesWithFunctionCalls($p/*:relevant, $p/*:relevant, false(), $library-name),
+                                                    frf:replaceVarReferencesWithFunctionCalls($p/*:visible, $p/*:visible, false(), $library-name),
                                                     ') then ''&quot; element(logo) &quot;'' else '''''
                                                 )
                                             else

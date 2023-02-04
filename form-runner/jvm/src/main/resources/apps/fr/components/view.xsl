@@ -1303,43 +1303,46 @@
             name="pdf-header-footer-config-elem"
             select="FormRunnerPdfConfig:getHeaderFooterConfigXml($app, $form)/*"/>
 
-        <xf:group ref="instance('fr-form-instance')[fr:mode() = 'pdf']" class="fr-pdf-header-footer-details xforms-hidden">
+        <xsl:if test="exists($pdf-header-footer-config-elem/pages/*/*/*/values)">
+            <xf:group ref="instance('fr-form-instance')[fr:mode() = 'pdf']" class="fr-pdf-header-footer-details xforms-hidden">
 
-            <!-- We need this in XForms as well, so we can handle the choice of language dynamically -->
-            <xf:var
-                xmlns:FormRunnerPdfConfig="java:org.orbeon.oxf.fr.pdf.PdfConfig20231"
-                name="pdf-header-footer-config-elem"
-                value="FormRunnerPdfConfig:getHeaderFooterConfigXml(fr:app-name(), fr:form-name())/*"/>
+                <!-- We need this in XForms as well, so we can handle the choice of language dynamically -->
+                <xf:var
+                    xmlns:FormRunnerPdfConfig="java:org.orbeon.oxf.fr.pdf.PdfConfig20231"
+                    name="pdf-header-footer-config-elem"
+                    value="FormRunnerPdfConfig:getHeaderFooterConfigXml(fr:app-name(), fr:form-name())/*"/>
 
-            <!-- Parameters are shared among all settings -->
-            <!-- TODO: Error in comparison when the variable contains a `map()` -->
-<!--            <xf:var-->
-<!--                name="template-params"-->
-<!--                value="{fr:build-template-param-map($pdf-header-footer-config-elem/parameters/_, ())}"/>-->
+                <!-- Parameters are shared among all settings -->
+                <!-- TODO: Error in comparison when the variable contains a `map()` -->
+    <!--            <xf:var-->
+    <!--                name="template-params"-->
+    <!--                value="{fr:build-template-param-map($pdf-header-footer-config-elem/parameters/_, ())}"/>-->
 
-            <xsl:for-each select="$pdf-header-footer-config-elem/pages/*/*/*[exists(values)]">
-                <xf:output
-                    class="fr-{../../name()}-{../name()}-{name()}"
-                    ref=".[{(visible[not(@type = 'null')], 'true()')[1]}]"
-                    value="
-                        let $current  := $pdf-header-footer-config-elem/pages/{../../name()}/{../name()}/{name()},
-                            $template := $current/values/(*[name() = fr:lang()], *[name() = '_'], *)[1]
-                        return
-                            if (exists($template)) then
-                                concat(
-                                    '&quot;',
-                                    xxf:process-template(
-                                        replace($template, '&quot;', '\\&quot;'),
-                                        'en', (: unused! :)
-                                        {fr:build-template-param-map($pdf-header-footer-config-elem/parameters/_, (), true())}
-                                    ),
-                                    '&quot;'
-                                )
-                            else
-                                ''"/>
-            </xsl:for-each>
+                <xsl:for-each select="$pdf-header-footer-config-elem/pages/*/*/*[exists(values)]">
+                    <xf:output
+                        class="fr-{../../name()}-{../name()}-{name()}"
+                        ref=".[{(visible[not(@type = 'null')], 'true()')[1]}]"
+                        value="
+                            let $current  := $pdf-header-footer-config-elem/pages/{../../name()}/{../name()}/{name()},
+                                $template := $current/values/(*[name() = fr:lang()], *[name() = '_'], *)[1]
+                            return
+                                if (exists($template)) then
+                                    concat(
+                                        '&quot;',
+                                        xxf:process-template(
+                                            replace($template, '&quot;', '\\&quot;'),
+                                            'en', (: unused! :)
+                                            {fr:build-template-param-map($pdf-header-footer-config-elem/parameters/_, (), true())}
+                                        ),
+                                        '&quot;'
+                                    )
+                                else
+                                    ''"/>
+                </xsl:for-each>
 
-        </xf:group>
+            </xf:group>
+        </xsl:if>
+
     </xsl:template>
 
     <!-- TOC: Top-level -->

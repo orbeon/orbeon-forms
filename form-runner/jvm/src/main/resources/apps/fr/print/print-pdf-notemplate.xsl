@@ -79,7 +79,7 @@
                 name="pdf-header-footer-config-elem"
                 select="FormRunnerPdfConfig:getHeaderFooterConfigXml($app, $form)/*"/>
 
-            <xsl:if test="exists($pdf-header-footer-config-elem)">
+            <xsl:if test="exists($pdf-header-footer-config-elem/pages/*/*/*/values)">
 
                 <xsl:variable
                     name="pdf-header-footer-details"

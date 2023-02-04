@@ -91,7 +91,7 @@ case class AppForm(app: String, form: String) {
 
   def isSpecificAppForm: Boolean = AppForm.isSpecificAppForm(app, form)
 
-  def isMoreSpecificThan(other: AppForm): Boolean = {
+  def isNotLessSpecificThan(other: AppForm): Boolean = {
     (! AppForm.isSpecificPart(other.app)  || AppForm.isSpecificPart(app)) &&
     (! AppForm.isSpecificPart(other.form) || AppForm.isSpecificPart(form))
   }

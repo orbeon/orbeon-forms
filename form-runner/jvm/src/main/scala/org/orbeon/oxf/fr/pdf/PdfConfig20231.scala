@@ -147,7 +147,7 @@ object PdfConfig20231 extends ScalaToXml {
                 // This means things will be slower if we cannot associate with the user property, but we don't expect
                 // that to happen. We should probably warn in that case.
                 FormRunner.trailingAppFormFromProperty(HeaderFooterUserPropertyName, userProperty)
-                  .isMoreSpecificThan(FormRunner.trailingAppFormFromProperty(HeaderFooterDefaultPropertyName, defaultProperty))
+                  .isNotLessSpecificThan(FormRunner.trailingAppFormFromProperty(HeaderFooterDefaultPropertyName, defaultProperty))
               )
             case None =>
               // This shouldn't happen as we have a default property for `*.*` in `properties-form-runner.xml`

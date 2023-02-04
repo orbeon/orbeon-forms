@@ -7,7 +7,7 @@ import org.scalatest.funspec.AnyFunSpecLike
 
 class BaseOpsTest extends AnyFunSpecLike {
 
-  describe("The `isMoreSpecificThan` function") {
+  describe("The `isNotLessSpecificThan` function") {
 
     val Expected = List(
       ("*.*",         "*.*",        true ),
@@ -31,7 +31,7 @@ class BaseOpsTest extends AnyFunSpecLike {
 
     for ((superConfig, subConfig, expected) <- Expected) {
       it(s"must satisfy `$subConfig` ${if (expected) ">" else "<"} `$superConfig`") {
-        assert(parseAppForm(subConfig).isMoreSpecificThan(parseAppForm(superConfig)) == expected)
+        assert(parseAppForm(subConfig).isNotLessSpecificThan(parseAppForm(superConfig)) == expected)
       }
     }
   }

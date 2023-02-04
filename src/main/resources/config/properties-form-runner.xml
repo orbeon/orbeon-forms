@@ -624,34 +624,22 @@
               }
             }
           },
-          "parameters": [
-            {
-              "ImageParam": {
-                "name": "fr-logo"
-              }
+          "parameters": {
+            "fr-logo": {
+              "type": "image"
             },
-            {
-              "FormTitleParam": {
-                "name": "fr-form-title"
-              }
+            "fr-form-title": {
+              "type": "form-title"
             },
-            {
-              "PageNumberParam": {
-                "name": "fr-page-number",
-                "format": {
-                  "Decimal": {}
-                }
-              }
+            "fr-page-number": {
+              "type": "page-number",
+              "format": "decimal"
             },
-            {
-              "PageCountParam": {
-                "name": "fr-page-count",
-                "format": {
-                  "Decimal": {}
-                }
-              }
+            "fr-page-count": {
+              "type": "page-count",
+              "format": "decimal"
             }
-          ]
+          }
         }
     </property>
 

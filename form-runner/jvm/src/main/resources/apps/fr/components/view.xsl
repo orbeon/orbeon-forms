@@ -1332,7 +1332,7 @@
                                         xxf:process-template(
                                             replace($template, '&quot;', '\\&quot;'),
                                             'en', (: unused! :)
-                                            {fr:build-template-param-map($pdf-header-footer-config-elem/parameters/_, (), true())}
+                                            {fr:build-template-param-map($pdf-header-footer-config-elem/parameters/*, (), true())}
                                         ),
                                         '&quot;'
                                     )

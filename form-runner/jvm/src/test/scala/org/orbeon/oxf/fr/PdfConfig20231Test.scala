@@ -3,7 +3,6 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.pdf.PdfConfig20231
 import org.orbeon.oxf.fr.pdf.definitions20231._
 import org.orbeon.oxf.test.XMLSupport
-import org.orbeon.oxf.xml.IntelliJ.tinyTreeToPrettyString
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.funspec.AnyFunSpec
@@ -29,7 +28,8 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                   "_" -> "{$fr-form-title}"
                 ),
                 None
-              )
+              ),
+              HeaderFooterPosition.Right -> PdfHeaderFooterCellConfig.None
             ),
             HeaderFooterType.Footer -> Map(
               HeaderFooterPosition.Left -> PdfHeaderFooterCellConfig.Template(
@@ -73,6 +73,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                               <_>{{$fr-form-title}}</_>
                           </values>
                       </center>
+                      <right>none</right>
                   </header>
                   <footer type="object">
                       <left type="object">
@@ -90,22 +91,22 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                   </footer>
               </all>
           </pages>
-          <parameters type="array">
-              <_ type="ImageParam">
-                  <name>fr-logo</name>
+          <parameters type="object">
+              <fr-logo type="object">
+                  <type>image</type>
                   <url type="null"/>
-              </_>
-              <_ type="FormTitleParam">
-                  <name>fr-form-title</name>
-              </_>
-              <_ type="PageNumberParam">
-                  <name>fr-page-number</name>
+              </fr-logo>
+              <fr-form-title type="object">
+                  <type>form-title</type>
+              </fr-form-title>
+              <fr-page-number type="object">
+                  <type>page-number</type>
                   <format>lower-roman</format>
-              </_>
-              <_ type="PageCountParam">
-                  <name>fr-page-count</name>
+              </fr-page-number>
+              <fr-page-count type="object">
+                  <type>page-count</type>
                   <format>lower-roman</format>
-              </_>
+              </fr-page-count>
           </parameters>
       </json>
 
@@ -124,7 +125,8 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |          "values": {
         |            "_": "{$fr-form-title}"
         |          }
-        |        }
+        |        },
+        |        "right": "none"
         |      },
         |      "footer": {
         |        "left": {
@@ -142,30 +144,22 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |      }
         |    }
         |  },
-        |  "parameters": [
-        |    {
-        |      "ImageParam": {
-        |        "name": "fr-logo"
-        |      }
+        |  "parameters": {
+        |    "fr-logo": {
+        |      "type": "image"
         |    },
-        |    {
-        |      "FormTitleParam": {
-        |        "name": "fr-form-title"
-        |      }
+        |    "fr-form-title": {
+        |      "type": "form-title"
         |    },
-        |    {
-        |      "PageNumberParam": {
-        |        "name": "fr-page-number",
-        |        "format": "lower-roman"
-        |      }
+        |    "fr-page-number": {
+        |      "type": "page-number",
+        |      "format": "lower-roman"
         |    },
-        |    {
-        |      "PageCountParam": {
-        |        "name": "fr-page-count",
-        |        "format": "lower-roman"
-        |      }
+        |    "fr-page-count": {
+        |      "type": "page-count",
+        |      "format": "lower-roman"
         |    }
-        |  ]
+        |  }
         |}""".stripMargin
 
     val customConfigAdt: PdfConfig20231.MyState =
@@ -205,13 +199,14 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                   </footer>
               </all>
           </pages>
-          <parameters type="array">
-              <_ type="ExpressionParam">
-                  <name>current-dateTime</name>
-                  <expr>format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())</expr>
-              </_>
+          <parameters type="object">
+              <current-dateTime type="object">
+                  <type>expression</type>
+                  <expression>format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())</expression>
+              </current-dateTime>
           </parameters>
       </json>
+
 
     val customConfigJson =
       """{
@@ -227,14 +222,12 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |      }
         |    }
         |  },
-        |  "parameters": [
-        |    {
-        |      "ExpressionParam": {
-        |        "name": "current-dateTime",
-        |        "expr": "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
-        |      }
+        |  "parameters": {
+        |    "current-dateTime": {
+        |      "type": "expression",
+        |      "expression": "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
         |    }
-        |  ]
+        |  }
         |}""".stripMargin
 
     val mergedJson =
@@ -252,7 +245,8 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |          "values": {
         |            "_": "{$fr-form-title}"
         |          }
-        |        }
+        |        },
+        |        "right": "none"
         |      },
         |      "footer": {
         |        "left": {
@@ -275,36 +269,26 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |      }
         |    }
         |  },
-        |  "parameters": [
-        |    {
-        |      "ImageParam": {
-        |        "name": "fr-logo"
-        |      }
+        |  "parameters": {
+        |    "fr-logo": {
+        |      "type": "image"
         |    },
-        |    {
-        |      "FormTitleParam": {
-        |        "name": "fr-form-title"
-        |      }
+        |    "fr-form-title": {
+        |      "type": "form-title"
         |    },
-        |    {
-        |      "PageNumberParam": {
-        |        "name": "fr-page-number",
-        |        "format": "lower-roman"
-        |      }
+        |    "fr-page-number": {
+        |      "type": "page-number",
+        |      "format": "lower-roman"
         |    },
-        |    {
-        |      "PageCountParam": {
-        |        "name": "fr-page-count",
-        |        "format": "lower-roman"
-        |      }
+        |    "fr-page-count": {
+        |      "type": "page-count",
+        |      "format": "lower-roman"
         |    },
-        |    {
-        |      "ExpressionParam": {
-        |        "name": "current-dateTime",
-        |        "expr": "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
-        |      }
+        |    "current-dateTime": {
+        |      "type": "expression",
+        |      "expression": "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
         |    }
-        |  ]
+        |  }
         |}""".stripMargin
 
     val Expected: List[(String, PdfConfig20231.MyState, NodeInfo, String)] = List(
@@ -315,9 +299,10 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
     for ((name, adt, xml, json) <- Expected)
       it(s"must pass for $name") {
 
-//        println(FormRunnerPdfConfig.decode(json))
-//        println(FormRunnerPdfConfig.configToJsonStringIndented(adt))
-//        println(tinyTreeToPrettyString(FormRunnerPdfConfig.configToXml(adt)))
+//        import org.orbeon.oxf.xml.IntelliJ.tinyTreeToPrettyString
+//        pprint.pprintln(PdfConfig20231.decode(json))
+//        println(PdfConfig20231.configToJsonStringIndented(adt))
+//        println(tinyTreeToPrettyString(PdfConfig20231.configToXml(adt)))
 
         assertXMLDocumentsIgnoreNamespacesInScope(
           xml.getDocumentRoot,
@@ -336,7 +321,10 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
 
 //      println(FormRunnerPdfConfig.encode(merged))
 
-      assert(PdfConfig20231.decode(mergedJson).get == merged)
+      assert(
+        PdfConfig20231.decode(mergedJson).map(x => x.copy(parameters = x.parameters.sortBy(_.name))).get ==
+          merged.copy(parameters = merged.parameters.sortBy(_.name))
+      )
     }
   }
 }

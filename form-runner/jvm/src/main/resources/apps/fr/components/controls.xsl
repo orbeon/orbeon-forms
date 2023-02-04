@@ -210,33 +210,34 @@
         <xsl:param name="for-pdf"      as="xs:boolean"/>
 
         <xsl:value-of
-            xmlns:FormRunnerPdfConfig="java:org.orbeon.oxf.fr.pdf.PdfConfig20231"
             select="
                 concat(
                     'map:merge((',
                         string-join(
                             for $p in $params
+                                return for $name in ($p/*:name, name($p))[1]
+                                    return for $type in ($p/*:type, $p/@type)[1] (: element first as attribute can also exist with for example value `object` :)
                             return
                                 concat(
                                     'map:entry(''',
-                                        $p/*:name[1],
+                                        $name,
                                         ''',',
-                                        if ($p/@type = 'ExpressionParam') then
+                                        if ($type = ('ExpressionParam', 'expression')) then
                                             fr:maybe-replace(
                                                 concat(
                                                     'string((',
-                                                    frf:replaceVarReferencesWithFunctionCalls($p/*:expr, $p/*:expr, false(), $library-name),
+                                                    frf:replaceVarReferencesWithFunctionCalls($p/(*:expr, *:expression)[1], $p/(*:expr, *:expression)[1], false(), $library-name),
                                                     ')[1])'
                                                 ),
                                                 $for-pdf
                                             )
-                                        else if ($p/@type = 'ControlValueParam') then
+                                        else if ($type = ('ControlValueParam', 'control-value')) then
                                             fr:maybe-replace(
                                                 concat(
                                                     'string((',
                                                     frf:replaceVarReferencesWithFunctionCalls(
-                                                        $p/*:controlName,
-                                                        concat('$', $p/*:controlName),
+                                                        $p/(*:controlName, *:control-name)[1],
+                                                        concat('$', $p/(*:controlName, *:control-name)[1]),
                                                         false(),
                                                         $library-name
                                                     ),
@@ -245,41 +246,41 @@
                                                 $for-pdf
                                             )
                                         else if (
-                                            $p/@type = (
-                                                'LinkToEditPageParam',
-                                                'LinkToViewPageParam',
-                                                'LinkToNewPageParam',
-                                                'LinkToSummaryPageParam',
-                                                'LinkToHomePageParam',
-                                                'LinkToFormsPageParam',
-                                                'LinkToAdminPageParam',
-                                                'LinkToPdfParam'
+                                            $type = (
+                                                ('LinkToEditPageParam',    'link-to-edit-page'),
+                                                ('LinkToViewPageParam',    'link-to-view-page'),
+                                                ('LinkToNewPageParam',     'link-to-new-page'),
+                                                ('LinkToSummaryPageParam', 'link-to-summary-page'),
+                                                ('LinkToHomePageParam',    'link-to-home-page'),
+                                                ('LinkToFormsPageParam',   'link-to-forms-page'),
+                                                ('LinkToAdminPageParam',   'link-to-admin-page'),
+                                                ('LinkToPdfParam',         'link-to-pdf')
                                             )
                                         ) then
                                             fr:maybe-replace(
                                                 concat(
                                                     'frf:buildLinkBackToFormRunner(''',
-                                                     $p/@type,
+                                                     $type,
                                                     ''')'
                                                 ),
                                                 $for-pdf
                                             )
-                                        else if ($for-pdf and $p/@type = ('PageNumberParam', 'PageCountParam')) then
+                                        else if ($for-pdf and $type = (('PageNumberParam', 'page-number'), ('PageCountParam', 'page-count'))) then
                                             string-join(
                                                 (
                                                     '''',
                                                     '&quot; counter(',
-                                                    if ($p/@type = 'PageNumberParam') then 'page' else 'pages',
+                                                    if ($type = 'PageNumberParam') then 'page' else 'pages',
                                                     ', ',
-                                                    ($p/format, 'decimal')[1],
+                                                    ($p/*:format, 'decimal')[1],
                                                     ') &quot;',
                                                     ''''
                                                 ),
                                                 ''
                                             )
-                                        else if ($for-pdf and $p/@type = 'FormTitleParam') then
+                                        else if ($for-pdf and $type = ('FormTitleParam', 'form-title')) then
                                             fr:maybe-replace('fr:form-title()', $for-pdf)
-                                        else if ($for-pdf and $p/@type = 'ImageParam') then
+                                        else if ($for-pdf and $type = ('ImageParam', 'image')) then
                                             (: TODO: `*:url` :)
                                             if (exists($p/*:visible)) then
                                                 concat(

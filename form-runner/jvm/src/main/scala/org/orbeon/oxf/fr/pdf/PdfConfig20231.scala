@@ -19,9 +19,7 @@ object PdfConfig20231 extends ScalaToXml {
 
   type MyState = FormRunnerPdfConfigRoot
 
-//  import io.circe.generic.extras.semiauto._
-//  import io.circe.generic.extras.Configuration
-//  implicit val config: Configuration = Configuration.default.withKebabCaseMemberNames.withKebabCaseConstructorNames
+  // We use `auto` for what we can, and custom encoders/decoders for the rest
   import io.circe.generic.auto._
 
   implicit val headerFooterTypeEncoder: KeyEncoder[HeaderFooterType] = {
@@ -103,6 +101,116 @@ object PdfConfig20231 extends ScalaToXml {
       } yield
         PdfHeaderFooterCellConfig.Template(values, visible)
     }
+
+  implicit val paramEncoder: Encoder[List[Param]] = list =>
+    Json.fromFields(list.map {
+      case Param.ControlValueParam(name, controlName) =>
+        name ->
+          Json.obj(
+            "type"         -> Json.fromString("control-value"),
+            "control-name" -> controlName.asJson
+          )
+      case Param.ExpressionParam(name, expr) =>
+        name ->
+          Json.obj(
+            "type"         -> Json.fromString("expression"),
+            "expression"   -> expr.asJson
+          )
+      case Param.PageNumberParam(name, format) =>
+        name ->
+          Json.obj(
+            "type"         -> Json.fromString("page-number"),
+            "format"       -> format.asJson
+          )
+      case Param.PageCountParam(name, format) =>
+        name ->
+          Json.obj(
+            "type"         -> Json.fromString("page-count"),
+            "format"       -> format.asJson
+          )
+      case Param.FormTitleParam(name) =>
+        name ->
+          Json.obj(
+            "type"         -> Json.fromString("form-title")
+          )
+      case Param.ImageParam(name, url) =>
+        name ->
+          Json.obj(
+            "type"         -> Json.fromString("image"),
+            "url"          -> url.asJson
+          )
+      case Param.LinkToEditPageParam   (name) => name -> Json.obj("type" -> Json.fromString("link-to-edit-page"))
+      case Param.LinkToViewPageParam   (name) => name -> Json.obj("type" -> Json.fromString("link-to-view-page"))
+      case Param.LinkToNewPageParam    (name) => name -> Json.obj("type" -> Json.fromString("link-to-new-page"))
+      case Param.LinkToSummaryPageParam(name) => name -> Json.obj("type" -> Json.fromString("link-to-summary-page"))
+      case Param.LinkToHomePageParam   (name) => name -> Json.obj("type" -> Json.fromString("link-to-home-page"))
+      case Param.LinkToFormsPageParam  (name) => name -> Json.obj("type" -> Json.fromString("link-to-forms-page"))
+      case Param.LinkToAdminPageParam  (name) => name -> Json.obj("type" -> Json.fromString("link-to-admin-page"))
+      case Param.LinkToPdfParam        (name) => name -> Json.obj("type" -> Json.fromString("link-to-pdf"))
+    })
+
+  private def decodeParamEntry(nameWithJson: (String, Json)): Either[DecodingFailure, Param] = nameWithJson match {
+    case (name, json) =>
+      json.asObject match {
+        case Some(obj) =>
+          obj("type").flatMap(_.asString) match {
+            case Some("control-value") =>
+              obj("control-name").map(_.asString) match {
+                case Some(Some(controlName)) => Right(Param.ControlValueParam(name, controlName))
+                case _                       => Left(DecodingFailure(s"Missing `control-name` for control-value param `$name`", Nil))
+              }
+            case Some("expression") =>
+              obj("expression").map(_.asString) match {
+                case Some(Some(expr)) => Right(Param.ExpressionParam(name, expr))
+                case _                => Left(DecodingFailure(s"Missing `expression` for expression param `$name`", Nil))
+              }
+            case Some("page-number") =>
+              obj("format").map(_.as[Option[CounterFormat]]) match {
+                case Some(Right(format)) => Right(Param.PageNumberParam(name, format))
+                case Some(Left(err))     => Left(err)
+                case None                => Right(Param.PageNumberParam(name, None))
+              }
+            case Some("page-count") =>
+              obj("format").map(_.as[Option[CounterFormat]]) match {
+                case Some(Right(format)) => Right(Param.PageCountParam(name, format))
+                case Some(Left(err))     => Left(err)
+                case None                => Right(Param.PageCountParam(name, None))
+              }
+            case Some("form-title") =>
+              Right(Param.FormTitleParam(name))
+            case Some("image") =>
+              obj("url").map(_.as[Option[String]]) match {
+                case Some(Right(url)) => Right(Param.ImageParam(name, url))
+                case Some(Left(err))  => Left(err)
+                case None             => Right(Param.ImageParam(name, None))
+              }
+            case Some("link-to-edit-page")    => Right(Param.LinkToEditPageParam   (name))
+            case Some("link-to-view-page")    => Right(Param.LinkToViewPageParam   (name))
+            case Some("link-to-new-page")     => Right(Param.LinkToNewPageParam    (name))
+            case Some("link-to-summary-page") => Right(Param.LinkToSummaryPageParam(name))
+            case Some("link-to-home-page")    => Right(Param.LinkToHomePageParam   (name))
+            case Some("link-to-forms-page")   => Right(Param.LinkToFormsPageParam  (name))
+            case Some("link-to-admin-page")   => Right(Param.LinkToAdminPageParam  (name))
+            case Some("link-to-pdf")          => Right(Param.LinkToPdfParam        (name))
+            case Some(other) =>
+              Left(DecodingFailure(s"Invalid param type: `$other`", Nil))
+            case None =>
+              Left(DecodingFailure(s"Missing `type` for param `$name`", Nil))
+          }
+        case None =>
+          Left(DecodingFailure(s"Invalid param `$name`", Nil))
+      }
+  }
+
+  private def foldEitherList[A, B](x: List[Either[A, B]]): Either[A, List[B]] =
+    x.foldRight[Either[A, List[B]]](Right(Nil)) {
+      case (Right(b), Right(bs)) => Right(b :: bs)
+      case (Left(a), _)          => Left(a)
+      case (_, Left(a))          => Left(a)
+    }
+
+  implicit val paramDecoder: Decoder[List[Param]] = (c: HCursor) =>
+    c.as[Map[String, Json]].flatMap(m => foldEitherList(m.toList.map(decodeParamEntry)))
 
   val encoder: Encoder[MyState] = implicitly
   val decoder: Decoder[MyState] = implicitly

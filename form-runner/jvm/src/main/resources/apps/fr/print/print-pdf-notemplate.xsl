@@ -108,7 +108,7 @@
                                     <xsl:value-of select="concat($prefix, '-', $header-footer-position, ' { content: ')"/>
 
                                     <xsl:choose>
-                                        <xsl:when test="empty(value)">
+                                        <xsl:when test="empty(values)">
                                             <xsl:text>''</xsl:text>
                                         </xsl:when>
                                         <xsl:otherwise>

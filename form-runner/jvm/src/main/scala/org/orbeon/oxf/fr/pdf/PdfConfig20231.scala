@@ -107,11 +107,6 @@ object PdfConfig20231 extends ScalaToXml {
   val encoder: Encoder[MyState] = implicitly
   val decoder: Decoder[MyState] = implicitly
 
-  // Called from XSLT
-  //@XPathFunction
-  def camelToKebab(s: String): String =
-    s.camelToKebab
-
   // Called from XSLT and XForms
   // TODO: cache config at property level
   //@XPathFunction

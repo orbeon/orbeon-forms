@@ -113,8 +113,8 @@ object PdfConfig20231 extends ScalaToXml {
       case Param.ExpressionParam(name, expr) =>
         name ->
           Json.obj(
-            "type"         -> Json.fromString("expression"),
-            "expression"   -> expr.asJson
+            "type"         -> Json.fromString("formula"),
+            "value"        -> expr.asJson
           )
       case Param.PageNumberParam(name, format) =>
         name ->
@@ -159,8 +159,8 @@ object PdfConfig20231 extends ScalaToXml {
                 case Some(Some(controlName)) => Right(Param.ControlValueParam(name, controlName))
                 case _                       => Left(DecodingFailure(s"Missing `control-name` for control-value param `$name`", Nil))
               }
-            case Some("expression") =>
-              obj("expression").map(_.asString) match {
+            case Some("formula") =>
+              obj("value").map(_.asString) match {
                 case Some(Some(expr)) => Right(Param.ExpressionParam(name, expr))
                 case _                => Left(DecodingFailure(s"Missing `expression` for expression param `$name`", Nil))
               }

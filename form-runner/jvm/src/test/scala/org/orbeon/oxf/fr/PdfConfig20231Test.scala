@@ -201,8 +201,8 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
           </pages>
           <parameters type="object">
               <current-dateTime type="object">
-                  <type>expression</type>
-                  <expression>format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())</expression>
+                  <type>formula</type>
+                  <value>format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())</value>
               </current-dateTime>
           </parameters>
       </json>
@@ -224,8 +224,8 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |  },
         |  "parameters": {
         |    "current-dateTime": {
-        |      "type": "expression",
-        |      "expression": "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
+        |      "type": "formula",
+        |      "value": "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
         |    }
         |  }
         |}""".stripMargin
@@ -285,8 +285,8 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |      "format": "lower-roman"
         |    },
         |    "current-dateTime": {
-        |      "type": "expression",
-        |      "expression": "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
+        |      "type": "formula",
+        |      "value": "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
         |    }
         |  }
         |}""".stripMargin

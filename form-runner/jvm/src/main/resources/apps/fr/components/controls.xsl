@@ -222,11 +222,11 @@
                                     'map:entry(''',
                                         $name,
                                         ''',',
-                                        if ($type = ('ExpressionParam', 'expression')) then
+                                        if ($type = ('ExpressionParam', 'formula')) then
                                             fr:maybe-replace(
                                                 concat(
                                                     'string((',
-                                                    frf:replaceVarReferencesWithFunctionCalls($p/(*:expr, *:expression)[1], $p/(*:expr, *:expression)[1], false(), $library-name),
+                                                    frf:replaceVarReferencesWithFunctionCalls($p/(*:expr, *:expression)[1], $p/(*:expr, *:value)[1], false(), $library-name),
                                                     ')[1])'
                                                 ),
                                                 $for-pdf

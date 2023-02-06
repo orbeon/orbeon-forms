@@ -53,11 +53,11 @@ object XFormsStaticStateSerializer {
 
     val b = ListBuffer[(String, Json)]()
 
-    b += "localName"          -> Json.fromString(a.localName)
+    b += "localName" -> Json.fromString(a.localName)
     if (a.namespace.prefix.nonEmpty)
-      b += "prefix"             -> Json.fromString(a.namespace.prefix)
+      b += "prefix"  -> Json.fromString(a.namespace.prefix)
     if (a.namespace.uri.nonEmpty)
-      b += "uri"                -> Json.fromString(a.namespace.uri)
+      b += "uri"     -> Json.fromString(a.namespace.uri)
 
     Json.fromFields(b)
   }

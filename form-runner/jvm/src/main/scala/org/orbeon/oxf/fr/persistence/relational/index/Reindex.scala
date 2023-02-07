@@ -14,10 +14,11 @@
 package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.io.IOUtils._
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
-import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner, FormRunnerPersistence}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
@@ -219,7 +220,7 @@ trait Reindex extends FormDefinition {
             case _ =>
               // Compute indexed controls reading the form definition
               val appForm = AppForm(app, form)
-              FormRunner.readPublishedForm(appForm, FormDefinitionVersion.Specific(formVersion))(RelationalUtils.Logger) match {
+              PersistenceMetadataSupport.readPublishedForm(appForm, FormDefinitionVersion.Specific(formVersion)) match {
                 case None =>
                   RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
                   Seq.empty

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.fr.{AppForm, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.fr.permission.Operation
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon.requestedFormVersion
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
@@ -22,6 +22,7 @@ import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
+import org.orbeon.oxf.fr.{AppForm, FormRunnerPersistence}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
@@ -94,7 +95,7 @@ trait SearchRequestParser {
             val specificColumnsByPath =
               specificColumns.map(c => c.path -> c).toMap
 
-            FormRunner.readPublishedForm(appForm, requestedFormVersion(appForm, version)).toList flatMap { formDoc =>
+            PersistenceMetadataSupport.readPublishedForm(appForm, requestedFormVersion(appForm, version)).toList flatMap { formDoc =>
               Index.findIndexedControls(
                 formDoc,
                 FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)

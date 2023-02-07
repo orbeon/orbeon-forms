@@ -57,4 +57,30 @@
            maxElementsOnDisk="0"
            diskExpiryThreadIntervalSeconds="120"/>
 
+    <!-- Form Runner persistence form definitions. Only modify if you know what you are doing! -->
+    <cache name="form-runner.persistence.form-definition"
+           maxElementsInMemory="10"
+           memoryStoreEvictionPolicy="LFU"
+           overflowToDisk="false"
+           diskSpoolBufferSizeMB="1"
+           eternal="false"
+           timeToLiveSeconds="30"
+           timeToIdleSeconds="0"
+           diskPersistent="false"
+           maxElementsOnDisk="0"
+           diskExpiryThreadIntervalSeconds="120"/>
+
+    <!-- Form Runner persistence form metadata. Only modify if you know what you are doing! -->
+    <cache name="form-runner.persistence.form-metadata"
+           maxElementsInMemory="10"
+           memoryStoreEvictionPolicy="LFU"
+           overflowToDisk="false"
+           diskSpoolBufferSizeMB="1"
+           eternal="false"
+           timeToLiveSeconds="30"
+           timeToIdleSeconds="0"
+           diskPersistent="false"
+           maxElementsOnDisk="0"
+           diskExpiryThreadIntervalSeconds="120"/>
+
 </ehcache>

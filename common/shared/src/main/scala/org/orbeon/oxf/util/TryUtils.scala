@@ -42,6 +42,10 @@ object TryUtils {
       }
 
     def iterator: Iterator[U] = t.toOption.iterator
+
+    // Kestrel / K Combinator (known as tap in Ruby/Underscore)
+    def kestrel[B](f: U => B): Try[U] = { t foreach f; t }
+    def |!>[B](f: U => B): Try[U] = kestrel(f)
   }
 
   // Sequence a bunch of `Try`s:

@@ -23,11 +23,10 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
-import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, PUT}
-import org.orbeon.oxf.http.{BasicCredentials, HttpMethod, StreamedContent}
+import org.orbeon.oxf.http.{BasicCredentials, StreamedContent}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
@@ -377,130 +376,6 @@ trait FormRunnerPersistence {
 
   def isActiveProvider(provider: String): Boolean =
     providerPropertyAsBoolean(provider, "active", default = true)
-
-  private def readConnectionResult(
-    method          : HttpMethod,
-    urlString       : String,
-    customHeaders   : Map[String, List[String]]
-  ): ConnectionResult = {
-
-    implicit val externalContext         : ExternalContext = CoreCrossPlatformSupport.externalContext
-    implicit val coreCrossPlatformSupport: CoreCrossPlatformSupport.type = CoreCrossPlatformSupport
-
-    val request = externalContext.getRequest
-
-    val rewrittenURLString =
-      URLRewriterUtils.rewriteServiceURL(
-        request,
-        urlString,
-        UrlRewriteMode.Absolute
-      )
-
-    val url = URI.create(rewrittenURLString)
-
-    val headers = Connection.buildConnectionHeadersCapitalizedIfNeeded(
-      url              = url,
-      hasCredentials   = false,
-      customHeaders    = customHeaders,
-      headersToForward = Connection.headersToForwardFromProperty,
-      cookiesToForward = Connection.cookiesToForwardFromProperty,
-      Connection.getHeaderFromRequest(request)
-    )
-
-    Connection.connectNow(
-      method      = method,
-      url         = url,
-      credentials = None,
-      content     = None,
-      headers     = headers,
-      loadState   = true,
-      saveState   = true,
-      logBody     = false
-    )
-  }
-
-  // Reads a document forwarding headers. The URL is rewritten, and is expected to be like "/fr/…"
-  def readDocument(
-    urlString       : String,
-    customHeaders   : Map[String, List[String]]
-  ): Option[DocumentNodeInfoType] = {
-
-    val cxr = readConnectionResult(HttpMethod.GET, urlString, customHeaders)
-
-    // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the test
-    // on status code),  but the MySQL persistence layer returns a [200 with an empty body][1] (thus a body is
-    // required).
-    //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
-    ConnectionResult.tryWithSuccessConnection(cxr, closeOnSuccess = true) { is =>
-      XFormsCrossPlatformSupport.readTinyTree(
-        XPath.GlobalConfiguration,
-        is,
-        urlString,
-        handleXInclude = true, // do process XInclude, so FB's model gets included
-        handleLexical  = false
-      )
-    } toOption
-  }
-
-  def readHeaders(
-    urlString       : String,
-    customHeaders   : Map[String, List[String]])(
-    implicit logger : IndentedLogger
-  ): Map[String, List[String]] = {
-    val cxr = readConnectionResult(HttpMethod.HEAD, urlString, customHeaders)
-    cxr.headers
-  }
-
-  // Retrieves a form definition from the persistence layer
-  def readPublishedForm(
-    appForm         : AppForm,
-    version         : FormDefinitionVersion)(
-    implicit logger : IndentedLogger
-  ): Option[DocumentNodeInfoType] = {
-    val path = createFormDefinitionBasePath(appForm.app, appForm.form) + "form.xhtml"
-    val customHeaders = version match {
-      case FormDefinitionVersion.Latest            => Map.empty[String, List[String]]
-      case FormDefinitionVersion.Specific(version) => Map(OrbeonFormDefinitionVersion -> List(version.toString))
-    }
-    readDocument(path, customHeaders)
-  }
-
-  // Retrieves from the persistence layer the metadata for a form, return an `Option[<form>]`
-  def readFormMetadataOpt(
-    appForm  : AppForm,
-    version  : FormDefinitionVersion)(implicit
-    logger   : IndentedLogger
-  ): Option[NodeInfo] = {
-    val formsDoc = readDocument(
-      createFormMetadataPathAndQuery(
-        app         = appForm.app,
-        form        = appForm.form,
-        allVersions = version != FormDefinitionVersion.Latest,
-        allForms    = true
-      ),
-      Map.empty
-    )
-
-    val formElements = formsDoc.get / "forms" / "form"
-    val formByVersion = version match {
-      case FormDefinitionVersion.Specific(v) =>
-        formElements.find(_.child("form-version").stringValue == v.toString)
-      case FormDefinitionVersion.Latest =>
-        None
-    }
-
-    formByVersion.orElse(formElements.headOption)
-  }
-
-  def readDocumentFormVersion(
-    appForm         : AppForm,
-    documentId      : String,
-    isDraft         : Boolean
-  ): Option[Int] = {
-    val path = createFormDataBasePath(appForm.app, appForm.form, isDraft, documentId) + "data.xml"
-    val headers = readHeaders(path, Map.empty)
-    headers.get(Version.OrbeonFormDefinitionVersion).map(_.head).map(_.toInt)
-  }
 
   // Whether the form data is valid as per the error summary
   // We use instance('fr-error-summary-instance')/valid and not valid() because the instance validity may not be

@@ -13,10 +13,11 @@
   */
 package org.orbeon.oxf.fr.persistence.relational
 
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Version._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.{SearchRequest, SearchVersion}
-import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner}
+import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchVersion
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 
@@ -41,7 +42,7 @@ object RelationalCommon {
       case Next                        => Private.latest(req.appForm).map(_ + 1).getOrElse(1)
       case Specific(v)                 => v
       case ForDocument(docId, isDraft) =>
-        FormRunner.readDocumentFormVersion(req.appForm, docId, isDraft)
+        PersistenceMetadataSupport.readDocumentFormVersion(req.appForm, docId, isDraft)
           .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
     }
 
@@ -59,7 +60,7 @@ object RelationalCommon {
 
     def latest(appForm: AppForm): Option[Int] =
       for {
-        metadata    <- FormRunner.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
+        metadata    <- PersistenceMetadataSupport.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
         formVersion <- metadata.child("form-version").headOption
       } yield
         formVersion.stringValue.toInt

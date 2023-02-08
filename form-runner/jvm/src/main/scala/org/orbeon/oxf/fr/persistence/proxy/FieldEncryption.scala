@@ -10,6 +10,9 @@ import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.util.IndentedLogger
 
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
+import javax.xml.transform.stream.StreamResult
+
 
 object FieldEncryption {
 

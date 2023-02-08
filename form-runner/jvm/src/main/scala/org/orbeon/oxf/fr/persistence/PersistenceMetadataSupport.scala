@@ -61,8 +61,8 @@ object PersistenceMetadataSupport {
         }
         readDocument(path, customHeaders) map { formDefinitionDoc =>
           EncryptionAndIndexDetails(
-            encryptedFields = Eval.later(FieldEncryption.getFieldsToEncrypt(formDefinitionDoc, appForm)),
-            indexedFields   = Eval.later(Index.findIndexedControls(formDefinitionDoc, FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)))
+            encryptedFieldsPaths = Eval.later(FieldEncryption.getFieldsToEncrypt(formDefinitionDoc, appForm).map(_.path)),
+            indexedFieldsXPaths  = Eval.later(Index.findIndexedControls(formDefinitionDoc, FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)).map(_.xpath))
           )
         }
       }

@@ -188,10 +188,10 @@ trait Reindex extends FormDefinition {
 
         // Info on indexed controls for a given app/form
         case class FormIndexedControls(
-          app             : String,
-          form            : String,
-          formVersion     : Int,
-          indexedControls : List[IndexedControl]
+          app                  : String,
+          form                 : String,
+          formVersion          : Int,
+          indexedControlsXPaths: List[String]
         )
 
         // Go through each data document
@@ -205,10 +205,10 @@ trait Reindex extends FormDefinition {
           val formVersion = currentData.getInt   ("form_version")
 
           // Get indexed controls for current app/form
-          val indexedControls: List[IndexedControl] = prevIndexedControls match {
-            case Some(FormIndexedControls(`app`, `form`, `formVersion`, indexedControls)) =>
+          val indexedControlsXPaths: List[String] = prevIndexedControls match {
+            case Some(FormIndexedControls(`app`, `form`, `formVersion`, indexedControlsXPaths)) =>
               // Use indexed controls from previous iteration
-              indexedControls
+              indexedControlsXPaths
             case _ =>
               // Compute indexed controls reading the form definition
               val appForm = AppForm(app, form)
@@ -272,9 +272,9 @@ trait Reindex extends FormDefinition {
           }
 
           // Extract and insert value for each indexed control
-          for (control <- indexedControls) {
+          for (controlXPath <- indexedControlsXPaths) {
 
-            val nodes = scaxon.XPath.eval(dataRootElement, control.xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
+            val nodes = scaxon.XPath.eval(dataRootElement, controlXPath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
             for ((node, pos) <- nodes.zipWithIndex) {
               val nodeValue = truncateValue(provider, node.getStringValue)
               // For indexing, we are not interested in empty values
@@ -291,7 +291,7 @@ trait Reindex extends FormDefinition {
                 useAndClose(connection.prepareStatement(insertIntoControlTextSql)) { ps =>
                   ps.setInt   (position.next(), currentData.getInt("id"))
                   ps.setInt   (position.next(), pos + 1)
-                  ps.setString(position.next(), control.xpath)
+                  ps.setString(position.next(), controlXPath)
                   ps.setString(position.next(), nodeValue)
                   ps.executeUpdate()
                   ps.close()
@@ -300,7 +300,7 @@ trait Reindex extends FormDefinition {
             }
           }
           // Pass current indexed controls to the next iteration
-          prevIndexedControls = Some(FormIndexedControls(app, form, formVersion, indexedControls))
+          prevIndexedControls = Some(FormIndexedControls(app, form, formVersion, indexedControlsXPaths))
         }
       }
     }

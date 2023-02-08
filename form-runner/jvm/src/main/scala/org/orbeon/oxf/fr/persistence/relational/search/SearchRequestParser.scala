@@ -99,11 +99,11 @@ trait SearchRequestParser {
               specificColumns.map(c => c.path -> c).toMap
 
             PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, requestedFormVersion(appForm, version)) match {
-              case Success(EncryptionAndIndexDetails(_, indexedControls)) =>
-                indexedControls.value map { indexedControl =>
+              case Success(EncryptionAndIndexDetails(_, indexedControlsXPaths)) =>
+                indexedControlsXPaths.value map { indexedControlXPath =>
                   Column(
-                    indexedControl.xpath,
-                    specificColumnsByPath.get(indexedControl.xpath).map(_.filterType).getOrElse(FilterType.None)
+                    indexedControlXPath,
+                    specificColumnsByPath.get(indexedControlXPath).map(_.filterType).getOrElse(FilterType.None)
                   )
                 }
               case Failure(_) =>

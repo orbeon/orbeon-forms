@@ -1,8 +1,9 @@
 package org.orbeon.oxf.fr.persistence.relational
 
 import cats.Eval
+import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.datamigration.PathElem
 import org.orbeon.oxf.fr.persistence.relational.index.Index.matchForControl
-import org.orbeon.oxf.fr.{AppForm, FormRunnerCommon}
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.NodeConversions._
@@ -25,9 +26,10 @@ object StageHeader {
   val HeaderNameLower = HeaderName.toLowerCase
 }
 
+// Only keep the information needed, also avoiding to point to underlying `NodeInfo`
 case class EncryptionAndIndexDetails(
-  encryptedFields: Eval[List[FormRunnerCommon.ControlBindPathHoldersResources]],
-  indexedFields  : Eval[List[IndexedControl]]
+  encryptedFieldsPaths: Eval[List[List[PathElem]]],
+  indexedFieldsXPaths : Eval[List[String]]
 )
 
 sealed trait WhatToReindex

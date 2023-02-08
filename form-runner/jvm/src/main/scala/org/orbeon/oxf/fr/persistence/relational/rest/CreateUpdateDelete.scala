@@ -378,11 +378,10 @@ trait CreateUpdateDelete
         // Delete: no version can be specified
         req.forData && delete && ! (req.version == Unspecified)
 
-      if (badVersion)
+      if (badVersion) {
         debug("CRUD: bad version", List("status code" -> StatusCode.BadRequest.toString))
-
-      if (badVersion)
         throw HttpStatusCodeException(StatusCode.BadRequest)
+      }
     }
 
     def checkAuthorized(existing: Option[Row]): Unit = {
@@ -421,11 +420,10 @@ trait CreateUpdateDelete
             true
         }
 
-      if (! authorized)
+      if (! authorized) {
         debug("CRUD: not authorized", List("status code" -> StatusCode.Forbidden.toString))
-
-      if (! authorized)
         throw HttpStatusCodeException(StatusCode.Forbidden)
+      }
     }
 
     def checkVersionWithExisting(existing: Option[Row]): Unit = {
@@ -453,11 +451,10 @@ trait CreateUpdateDelete
         (req.forData && isUpdate && ! isUnspecifiedOrSpecificVersion) ||
         (req.forData && isCreate && ! isSpecificVersion)
 
-      if (badVersion)
+      if (badVersion) {
         debug("CRUD: bad version", List("status code" -> StatusCode.BadRequest.toString))
-
-      if (badVersion)
         throw HttpStatusCodeException(StatusCode.BadRequest)
+      }
     }
 
     def checkDocExistsForDelete(existing: Option[Row]): Unit = {

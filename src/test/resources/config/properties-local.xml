@@ -15,6 +15,8 @@
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.data"      value="exist"/>             <!-- So we can find the imported data -->
 
+    <property as="xs:boolean" name="oxf.fr.persistence.form-definition-cache.enable"        value="false"/>             <!-- So tests can avoid stepping on each other -->
+
     <property as="xs:string"  processor-name="oxf:page-flow" name="service-public-methods"  value="GET HEAD POST PUT DELETE"/>
     <property as="xs:string"  processor-name="oxf:page-flow" name="page-public-methods"     value="GET HEAD POST PUT DELETE"/>
 

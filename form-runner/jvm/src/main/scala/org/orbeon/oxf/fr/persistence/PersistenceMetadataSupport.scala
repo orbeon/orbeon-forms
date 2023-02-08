@@ -8,6 +8,8 @@ import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.http.HttpMethod
+import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
@@ -34,8 +36,11 @@ object PersistenceMetadataSupport {
   private implicit val Logger: IndentedLogger =
     new IndentedLogger(LoggerFactory.createLogger("org.orbeon.fr.persistence.form-definition-cache"))
 
-  private val formDefinitionCache = Caches.getOrElseThrow("form-runner.persistence.form-definition")
-  private val formMetadataCache   = Caches.getOrElseThrow("form-runner.persistence.form-metadata")
+  private def cacheEnabled =
+    ! Properties.instance.getPropertySet.getBooleanOpt("oxf.fr.persistence.form-definition-cache.enable").contains(false)
+
+  private val formDefinitionCache = cacheEnabled option Caches.getOrElseThrow("form-runner.persistence.form-definition")
+  private val formMetadataCache   = cacheEnabled option Caches.getOrElseThrow("form-runner.persistence.form-metadata")
 
   import Private._
 
@@ -102,14 +107,22 @@ object PersistenceMetadataSupport {
 
   private object Private {
 
-    def readMaybeFromCache[T](appForm: AppForm, version: FormDefinitionVersion, cache: Cache)(read: => Try[T]): Try[T] =
-      version match {
-        case FormDefinitionVersion.Latest =>
+    def readMaybeFromCache[T](
+      appForm  : AppForm,
+      version  : FormDefinitionVersion,
+      cacheOpt : Option[Cache])(
+      read     : => Try[T]
+    ): Try[T] =
+      (version, cacheOpt) match {
+        case (_, None) =>
+          debug(s"cache is disabled, reading directly")
+          read
+        case (FormDefinitionVersion.Latest, Some(cache)) =>
           // We don't know the version number, so we can't try the cache. We could check the resulting version number
           // returned from headers and cache the document afterwards. Unclear if it helps.
           debug(s"version is `Latest`, not using cache `${cache.getName}`")
           read
-        case FormDefinitionVersion.Specific(versionNumber) =>
+        case (FormDefinitionVersion.Specific(versionNumber), Some(cache)) =>
 
           val cacheKey = (appForm.app, appForm.form, versionNumber)
 

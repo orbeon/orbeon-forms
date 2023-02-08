@@ -357,12 +357,14 @@ trait CreateUpdateDelete
     val versionToSet = existing.flatMap(_.formVersion).getOrElse(requestedFormVersion(req))
 
     // Read outside of a `withConnection` block, so we don't use two simultaneous connections
-    val formPermissions =
-      FormRunner.permissionsFromElemOrProperties(
-        req.forData.option(RelationalUtils.readFormPermissions(req.appForm, FormDefinitionVersion.Specific(versionToSet))).flatten,
-        req.appForm
-      )
-    debug("CRUD: form permissions", List("permissions" -> formPermissions.toString))
+    // Do this only if the request is for form data, not for form definitions!
+    val formPermissionsIfForData =
+      req.forData option
+        FormRunner.permissionsFromElemOrProperties(
+          req.forData.option(RelationalUtils.readFormPermissions(req.appForm, FormDefinitionVersion.Specific(versionToSet))).flatten,
+          req.appForm
+        ) |!>
+          (formPermissions => debug("CRUD: form permissions", List("permissions" -> formPermissions.toString)))
 
     // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:
     // - For correctness: e.g., a PUT for a document id is an invalid request, but if we start by checking
@@ -384,8 +386,9 @@ trait CreateUpdateDelete
     }
 
     def checkAuthorized(existing: Option[Row]): Unit = {
-        val authorized =
-          if (req.forData) {
+      val authorized =
+        formPermissionsIfForData match {
+          case Some(formPermissions) =>
             existing match {
               case Some(existing) =>
 
@@ -413,7 +416,7 @@ trait CreateUpdateDelete
                     )
                 Operations.allowsAny(authorizedOps, Set(if (delete) Delete else Create))
             }
-          } else {
+          case None =>
             // Operations on deployed forms are always authorized
             true
         }

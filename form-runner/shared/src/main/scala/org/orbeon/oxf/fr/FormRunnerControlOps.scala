@@ -191,7 +191,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     classes           : Set[String],
     dataFormatVersion : DataFormatVersion)(implicit
     ctx               : FormRunnerDocContext
-  ): Seq[ControlBindPathHoldersResources] = {
+  ): List[ControlBindPathHoldersResources] = {
     val headOpt = (ctx.formDefinitionRootElem / "*:head").headOption
     val controlBindPathHoldersResourcesList = {
 
@@ -211,7 +211,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
           )
         }
 
-      topLevelOnly ++ withSectionTemplatesOpt.toList.flatten
+      topLevelOnly ++: withSectionTemplatesOpt.toList.flatten
     }
     dataFormatVersion match {
       case DataFormatVersion.Edge => controlBindPathHoldersResourcesList

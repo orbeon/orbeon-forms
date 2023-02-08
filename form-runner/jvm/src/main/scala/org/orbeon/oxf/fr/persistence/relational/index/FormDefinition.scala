@@ -15,11 +15,10 @@ package org.orbeon.oxf.fr.persistence.relational.index
 
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.persistence.relational.IndexedControl
 import org.orbeon.oxf.fr.{DataFormatVersion, FormRunner, InDocFormRunnerDocContext}
-import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.saxon.om
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import org.orbeon.scaxon.NodeConversions._
+import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SimplePath._
 
 
@@ -35,7 +34,7 @@ trait FormDefinition {
   def findIndexedControls(
     formDoc                   : DocumentInfo,
     databaseDataFormatVersion : DataFormatVersion
-  ): Seq[IndexedControl] = {
+  ): List[IndexedControl] = {
 
     implicit val ctx = new InDocFormRunnerDocContext(formDoc) {
       override lazy val bodyElemOpt: Option[om.NodeInfo] = {
@@ -71,44 +70,4 @@ trait FormDefinition {
       "token"
     else
       "exact"
-
-  case class IndexedControl(
-    name      : String,
-    inSearch  : Boolean,
-    inSummary : Boolean,
-    xpath     : String,
-    xsType    : String,
-    control   : String,
-    htmlLabel : Boolean,
-    resources : List[(String, NodeInfo)]
-  ) {
-    def toXML: NodeInfo =
-      <query
-        name={name}
-        path={xpath}
-        type={xsType}
-        control={control}
-        search-field={inSearch.toString}
-        summary-field={inSummary.toString}
-        match={matchForControl(control)}
-        html-label={htmlLabel.toString}>{
-        for ((lang, resourceHolder) <- resources)
-          yield
-            <resources lang={lang}>{
-              val labelElemOpt =
-                resourceHolder elemValueOpt "label" map { label =>
-                  <label>{if (htmlLabel) label else label.escapeXmlMinimal}</label>
-                }
-
-              val itemElems = resourceHolder child "item" map { item =>
-                <item>{
-                  <label>{item elemValue "label"}</label>
-                  <value>{item elemValue "value"}</value>
-                }</item>
-              }
-
-              labelElemOpt.toList ++ itemElems
-            }</resources>
-      }</query>
-  }
 }

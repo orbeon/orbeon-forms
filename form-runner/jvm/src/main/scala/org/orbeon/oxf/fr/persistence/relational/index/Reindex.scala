@@ -16,9 +16,10 @@ package org.orbeon.oxf.fr.persistence.relational.index
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.Provider.MySQL
+import org.orbeon.oxf.fr.persistence.relational.WhatToReindex._
+import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.fr.persistence.relational.index.status.{Backend, Status, StatusStore}
-import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
-import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om.NodeInfo
@@ -28,19 +29,10 @@ import org.orbeon.xforms.XFormsNames
 import org.orbeon.xml.NamespaceMapping
 
 import java.sql.{Connection, PreparedStatement}
+import scala.util.{Failure, Success}
 
 
 trait Reindex extends FormDefinition {
-
-  sealed trait WhatToReindex
-
-  object WhatToReindex {
-    case object  AllData                                     extends WhatToReindex
-    case class   DataForDocumentId(documentId: String)       extends WhatToReindex
-    case class   DataForForm(appForm: AppForm, version: Int) extends WhatToReindex
-  }
-
-  import WhatToReindex._
 
   // Reindexing is a 3 step process:
   //   1. Clean the index
@@ -199,7 +191,7 @@ trait Reindex extends FormDefinition {
           app             : String,
           form            : String,
           formVersion     : Int,
-          indexedControls : Seq[IndexedControl]
+          indexedControls : List[IndexedControl]
         )
 
         // Go through each data document
@@ -213,22 +205,19 @@ trait Reindex extends FormDefinition {
           val formVersion = currentData.getInt   ("form_version")
 
           // Get indexed controls for current app/form
-          val indexedControls: Seq[IndexedControl] = prevIndexedControls match {
+          val indexedControls: List[IndexedControl] = prevIndexedControls match {
             case Some(FormIndexedControls(`app`, `form`, `formVersion`, indexedControls)) =>
               // Use indexed controls from previous iteration
               indexedControls
             case _ =>
               // Compute indexed controls reading the form definition
               val appForm = AppForm(app, form)
-              PersistenceMetadataSupport.readPublishedForm(appForm, FormDefinitionVersion.Specific(formVersion)) match {
-                case None =>
+              PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, FormDefinitionVersion.Specific(formVersion)) match {
+                case Failure(_) =>
                   RelationalUtils.Logger.logError("", s"Can't index documents for $app/$form as form definition can't be found")
-                  Seq.empty
-                case Some(formDefinition) =>
-                  findIndexedControls(
-                    formDefinition,
-                    FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
-                  )
+                  Nil
+                case Success(EncryptionAndIndexDetails(_, indexedFields)) =>
+                  indexedFields.value
               }
           }
 
@@ -346,5 +335,4 @@ trait Reindex extends FormDefinition {
     "xh" -> XMLConstants.XHTML_NAMESPACE_URI,
     "xf" -> XFormsNames.XFORMS_NAMESPACE_URI
   ))
-
 }

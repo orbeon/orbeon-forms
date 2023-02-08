@@ -48,5 +48,4 @@ object Statement {
       useAndClose(ps.executeQuery())(block)
     }
   }
-
 }

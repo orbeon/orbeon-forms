@@ -1,20 +1,23 @@
 package org.orbeon.oxf.fr.persistence
 
+import cats.Eval
 import net.sf.ehcache.{Cache, Element => EhElement}
 import org.orbeon.oxf.cache.Caches
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunner.{createFormDataBasePath, createFormDefinitionBasePath, createFormMetadataPathAndQuery}
-import org.orbeon.oxf.fr.persistence.relational.Version
+import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
-import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
+import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Version}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
+import org.orbeon.oxf.util.TryUtils._
 import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, URLRewriterUtils, XPath}
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
@@ -44,12 +47,11 @@ object PersistenceMetadataSupport {
 
   import Private._
 
-  // TODO: This should return a `Try`, or throw. Callers should handle the error.
   // Retrieves a form definition from the persistence layer
-  def readPublishedForm(
+  def readPublishedFormEncryptionAndIndexDetails(
     appForm : AppForm,
     version : FormDefinitionVersion
-  ): Option[DocumentInfo] =
+  ): Try[EncryptionAndIndexDetails] =
     readMaybeFromCache(appForm, version, formDefinitionCache) {
       withDebug("reading published form for indexing/encryption details") {
         val path = createFormDefinitionBasePath(appForm.app, appForm.form) + "form.xhtml"
@@ -57,9 +59,14 @@ object PersistenceMetadataSupport {
           case FormDefinitionVersion.Latest            => Map.empty[String, List[String]]
           case FormDefinitionVersion.Specific(version) => Map(OrbeonFormDefinitionVersion -> List(version.toString))
         }
-        readDocument(path, customHeaders)
+        readDocument(path, customHeaders) map { formDefinitionDoc =>
+          EncryptionAndIndexDetails(
+            encryptedFields = Eval.later(FieldEncryption.getFieldsToEncrypt(formDefinitionDoc, appForm)),
+            indexedFields   = Eval.later(Index.findIndexedControls(formDefinitionDoc, FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)))
+          )
+        }
       }
-    } .toOption
+    }
 
   // TODO: This should return a `Try`. Right now it throws if the document cannot be read.
   // Retrieves from the persistence layer the metadata for a form, return an `Option[<form>]`
@@ -95,6 +102,8 @@ object PersistenceMetadataSupport {
       }
     } .get
 
+  // TODO: Clarify conditions of failure: form definition missing in database, connection failing, etc. Do we get a
+  //  `None` in all cases, or can an exception be thrown?
   def readDocumentFormVersion(
     appForm    : AppForm,
     documentId : String,

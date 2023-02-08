@@ -13,28 +13,31 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
+import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.Operation
-import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.relational.Provider
+import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider}
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon.requestedFormVersion
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
-import org.orbeon.oxf.fr.{AppForm, FormRunnerPersistence}
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.scaxon.SimplePath._
 
+import scala.util.{Failure, Success}
+
 
 trait SearchRequestParser {
 
   val SearchPath = "/fr/service/([^/]+)/search/([^/]+)/([^/]+)".r
 
-  def httpRequest = NetUtils.getExternalContext.getRequest
+  def httpRequest: ExternalContext.Request = NetUtils.getExternalContext.getRequest
 
   def parseRequest(searchDocument: DocumentInfo, version: SearchVersion): SearchRequest = {
 
@@ -95,16 +98,18 @@ trait SearchRequestParser {
             val specificColumnsByPath =
               specificColumns.map(c => c.path -> c).toMap
 
-            PersistenceMetadataSupport.readPublishedForm(appForm, requestedFormVersion(appForm, version)).toList flatMap { formDoc =>
-              Index.findIndexedControls(
-                formDoc,
-                FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm)
-              ) map { indexedControl =>
-                Column(
-                  indexedControl.xpath,
-                  specificColumnsByPath.get(indexedControl.xpath).map(_.filterType).getOrElse(FilterType.None)
-                )
-              }
+            PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, requestedFormVersion(appForm, version)) match {
+              case Success(EncryptionAndIndexDetails(_, indexedControls)) =>
+                indexedControls.value map { indexedControl =>
+                  Column(
+                    indexedControl.xpath,
+                    specificColumnsByPath.get(indexedControl.xpath).map(_.filterType).getOrElse(FilterType.None)
+                  )
+                }
+              case Failure(_) =>
+                // TODO: throw or log?
+                //throw new IllegalArgumentException(s"Form not found: $appForm")
+                Nil
             }
           } else
             specificColumns

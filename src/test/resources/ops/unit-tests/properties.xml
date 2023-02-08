@@ -55,6 +55,8 @@
 
     <property as="xs:string"   name="oxf.fr.persistence.provider.tests.*.form"              value="resource"/>
 
+    <property as="xs:boolean" name="oxf.fr.persistence.form-definition-cache.enable"        value="false"/>             <!-- So tests can avoid stepping on each other -->
+
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.tests.noscript-false-pdf-template-wizard-true" value="wizard"/>
 
     <!-- So that email tests doesn't depend on the presence of a Form Runner form at runtime -->

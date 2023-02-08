@@ -20,6 +20,7 @@ import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Update}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUserPessimistic}
 import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
@@ -354,7 +355,11 @@ trait CreateUpdateDelete
       RelationalUtils.withConnection { connection =>
         existingRow(connection, req)
       }
+
     val versionToSet = existing.flatMap(_.formVersion).getOrElse(requestedFormVersion(req))
+
+    if (req.forForm)
+      PersistenceMetadataSupport.maybeInvalidateCachesFor(req.appForm, versionToSet)
 
     // Read outside of a `withConnection` block, so we don't use two simultaneous connections
     // Do this only if the request is for form data, not for form definitions!

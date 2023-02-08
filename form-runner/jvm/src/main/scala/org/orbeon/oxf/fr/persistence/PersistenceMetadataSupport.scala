@@ -45,7 +45,23 @@ object PersistenceMetadataSupport {
   private val formDefinitionCache = cacheEnabled option Caches.getOrElseThrow("form-runner.persistence.form-definition")
   private val formMetadataCache   = cacheEnabled option Caches.getOrElseThrow("form-runner.persistence.form-metadata")
 
+  private type CacheKey = (String, String, Int) // app/form/version
+
   import Private._
+
+  // When publishing a form, we need to invalidate the caches. This doesn't cover cases where form definitions are
+  // updated directly in the database, but it's the most frequent case.
+  def maybeInvalidateCachesFor(appForm: AppForm, version: Int): Unit = {
+
+    val cacheKey: CacheKey = (appForm.app, appForm.form, version)
+
+    def log(cache: Cache)(removed: Boolean): Unit =
+      if (removed)
+        debug(s"removed form definition from cache `${cache.getName}` for `$cacheKey`")
+
+    formDefinitionCache.foreach(cache => cache.remove(cacheKey).kestrel(log(cache)))
+    formMetadataCache  .foreach(cache => cache.remove(cacheKey).kestrel(log(cache)))
+  }
 
   // Retrieves a form definition from the persistence layer
   def readPublishedFormEncryptionAndIndexDetails(
@@ -133,7 +149,7 @@ object PersistenceMetadataSupport {
           read
         case (FormDefinitionVersion.Specific(versionNumber), Some(cache)) =>
 
-          val cacheKey = (appForm.app, appForm.form, versionNumber)
+          val cacheKey: CacheKey = (appForm.app, appForm.form, versionNumber)
 
           Option(cache.get(cacheKey)) match {
             case Some(cacheElem) =>

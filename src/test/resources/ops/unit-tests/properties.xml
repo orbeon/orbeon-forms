@@ -61,6 +61,8 @@
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.issue.*.form"               value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.tests.*.form"               value="resource"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.tests.*.data"               value="resource"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.tests.pdf-production.data"  value="resource"/>
 
     <property as="xs:boolean" name="oxf.fr.persistence.form-definition-cache.enable"        value="false"/>             <!-- So tests can avoid stepping on each other -->
 

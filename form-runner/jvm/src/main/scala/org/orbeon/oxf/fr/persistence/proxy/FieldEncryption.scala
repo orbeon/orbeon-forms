@@ -3,15 +3,14 @@
  */
 package org.orbeon.oxf.fr.persistence.proxy
 
-import java.io.{InputStream, OutputStream}
-
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext.Request
 import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.FormRunnerCommon.ControlBindPathHoldersResources
 import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.saxon.om.DocumentInfo
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
-import javax.xml.transform.stream.StreamResult
+import java.io.{InputStream, OutputStream}
 
 
 object FieldEncryption {
@@ -35,4 +34,9 @@ object FieldEncryption {
     outputStream : OutputStream
   ): Unit =
     IOUtils.copyStreamAndClose(inputStream, outputStream)
+
+  def getFieldsToEncrypt(
+    formDefinition  : DocumentInfo,
+    appForm         : AppForm
+  ): List[ControlBindPathHoldersResources] = Nil
 }

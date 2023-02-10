@@ -9,7 +9,6 @@ import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.outputdevice.helper.PageDimensions;
 import com.openhtmltopdf.outputdevice.helper.UnicodeImplementation;
 import com.openhtmltopdf.pdfboxout.PdfBoxFontResolver.FontGroup;
-import com.openhtmltopdf.render.FSFont;
 import com.openhtmltopdf.util.LogMessageId;
 import com.openhtmltopdf.util.XRLog;
 
@@ -22,30 +21,30 @@ import java.io.OutputStream;
 import java.util.EnumSet;
 import java.util.logging.Level;
 
-public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, PdfRendererBuilderState> {
+public class CustomPdfRendererBuilder extends BaseRendererBuilder<com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder, PdfRendererBuilderState> {
 
-	public PdfRendererBuilder() {
+	public CustomPdfRendererBuilder() {
 		super(new PdfRendererBuilderState());
 
-		for (CacheStore cacheStore : CacheStore.values()) {
+		for (PdfRendererBuilder.CacheStore cacheStore : PdfRendererBuilder.CacheStore.values()) {
 		    // Use the flyweight pattern to initialize all caches with a no-op implementation to
 		    // avoid excessive null handling.
 		    state._caches.put(cacheStore, FSNoOpCacheStore.INSTANCE);
 		}
 	}
 
-	/**
-	 * Run the XHTML/XML to PDF conversion and output to an output stream set by
-	 * toStream.
-	 *
-	 * @throws IOException
-	 */
-	public void run() throws IOException {
-		try (Closeable d = applyDiagnosticConsumer(); PdfBoxRenderer renderer = this.buildPdfRenderer(d)){
-			renderer.layout();
-			renderer.createPDF();
-		}
-	}
+//	/**
+//	 * Run the XHTML/XML to PDF conversion and output to an output stream set by
+//	 * toStream.
+//	 *
+//	 * @throws IOException
+//	 */
+//	public void run() throws IOException {
+//		try (Closeable d = applyDiagnosticConsumer(); CustomPdfBoxRenderer renderer = this.buildPdfRenderer(d)){
+//			renderer.layout();
+//			renderer.createPDF();
+//		}
+//	}
 
 	/**
 	 * Build a PdfBoxRenderer for further customization. Remember to call
@@ -53,11 +52,11 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 *
 	 * @return
 	 */
-	public PdfBoxRenderer buildPdfRenderer() {
-		return buildPdfRenderer(applyDiagnosticConsumer());
+	public CustomPdfBoxRenderer buildPdfRenderer(java.util.function.Function<PdfBoxOutputDevice, PdfBoxUserAgent> createUserAgent) {
+		return buildPdfRenderer(applyDiagnosticConsumer(), createUserAgent);
 	}
 
-	public PdfBoxRenderer buildPdfRenderer(Closeable diagnosticConsumer) {
+	public CustomPdfBoxRenderer buildPdfRenderer(Closeable diagnosticConsumer, java.util.function.Function<PdfBoxOutputDevice, PdfBoxUserAgent> createUserAgent) {
 		UnicodeImplementation unicode = new UnicodeImplementation(state._reorderer, state._splitter, state._lineBreaker,
 				state._unicodeToLowerTransformer, state._unicodeToUpperTransformer, state._unicodeToTitleTransformer, state._textDirection,
 				state._charBreaker);
@@ -66,7 +65,7 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 
 		BaseDocument doc = new BaseDocument(state._baseUri, state._html, state._document, state._file, state._uri);
 
-		PdfBoxRenderer renderer = new PdfBoxRenderer(doc, unicode, pageSize, state, diagnosticConsumer);
+		CustomPdfBoxRenderer renderer = new CustomPdfBoxRenderer(doc, unicode, pageSize, state, diagnosticConsumer, createUserAgent);
 
 		/*
 		 * Register all Fonts
@@ -156,7 +155,7 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 * @param out
 	 * @return
 	 */
-	public PdfRendererBuilder toStream(OutputStream out) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder toStream(OutputStream out) {
 		state._os = out;
 		return this;
 	}
@@ -168,7 +167,7 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 * @param version
 	 * @return
 	 */
-	public PdfRendererBuilder usePdfVersion(float version) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder usePdfVersion(float version) {
 		state._pdfVersion = version;
 		return this;
 	}
@@ -183,7 +182,7 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 * @param pdfAConformance
 	 * @return
 	 */
-	public PdfRendererBuilder usePdfAConformance(PdfAConformance pdfAConformance) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder usePdfAConformance(PdfRendererBuilder.PdfAConformance pdfAConformance) {
 		this.state._pdfAConformance = pdfAConformance;
         if (pdfAConformance.getPdfVersion() != 0f) {
             this.state._pdfVersion = pdfAConformance.getPdfVersion();
@@ -196,7 +195,7 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 * @param pdfUaAccessibility
 	 * @return this for method chaining
 	 */
-	public PdfRendererBuilder usePdfUaAccessbility(boolean pdfUaAccessibility) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder usePdfUaAccessbility(boolean pdfUaAccessibility) {
 	    this.state._pdfUaConform = pdfUaAccessibility;
 	    return this;
 	}
@@ -209,7 +208,7 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 * @param colorProfile
 	 * @return
 	 */
-	public PdfRendererBuilder useColorProfile(byte[] colorProfile) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder useColorProfile(byte[] colorProfile) {
 		this.state._colorProfile = colorProfile;
 		return this;
 	}
@@ -222,7 +221,7 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 * @param doc a (usually empty) PDDocument
 	 * @return this for method chaining
 	 */
-	public PdfRendererBuilder usePDDocument(PDDocument doc) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder usePDDocument(PDDocument doc) {
 	    state.pddocument = doc;
 	    return this;
 	}
@@ -232,8 +231,8 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 * allows to supply a PDFont directly. Subclass {@link PDFontSupplier} if you need
 	 * special font-loading rules (like using a font-cache).
 	 */
-	public PdfRendererBuilder useFont(PDFontSupplier supplier, String fontFamily, Integer fontWeight,
-			FontStyle fontStyle, boolean subset) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder useFont(PDFontSupplier supplier, String fontFamily, Integer fontWeight,
+                                                                        FontStyle fontStyle, boolean subset) {
 		state._fonts.add(new AddedFont(supplier, fontWeight, fontFamily, subset, fontStyle, EnumSet.of(FSFontUseCase.DOCUMENT)));
 		return this;
 	}
@@ -242,7 +241,7 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 * Simpler overload for
 	 * {@link #useFont(PDFontSupplier, String, Integer, FontStyle, boolean)}
 	 */
-	public PdfRendererBuilder useFont(PDFontSupplier supplier, String fontFamily) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder useFont(PDFontSupplier supplier, String fontFamily) {
 		return this.useFont(supplier, fontFamily, 400, FontStyle.NORMAL, true);
 	}
 
@@ -253,31 +252,18 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 *            the name of the producer to set defaults to openhtmltopdf.com
 	 * @return this for method chaining
 	 */
-	public PdfRendererBuilder withProducer(String producer) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder withProducer(String producer) {
 		state._producer = producer;
 		return this;
-	}
-
-	/**
-	 * List of caches available.
-	 */
-	public enum CacheStore {
-
-	    /**
-	     * Caches font metrics, based on a combined key of family name, weight and style.
-	     * Using this cache avoids loading fallback fonts if the metrics are already in the cache
-	     * and the previous fonts contain the needed characters.
-	     */
-	    PDF_FONT_METRICS;
 	}
 
 	/**
 	 * Use a specific cache. Cache values should be thread safe, so provided your cache store itself
 	 * is thread safe can be used accross threads.
 	 * @return this for method chaining.
-	 * @see CacheStore
+	 * @see PdfRendererBuilder.CacheStore
 	 */
-	public PdfRendererBuilder useCacheStore(CacheStore which, FSCacheEx<String, FSCacheValue> cache) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder useCacheStore(PdfRendererBuilder.CacheStore which, FSCacheEx<String, FSCacheValue> cache) {
 	    state._caches.put(which, cache);
 	    return this;
 	}
@@ -289,7 +275,7 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
 	 *            {@link PageSupplier} to use
 	 * @return this for method chaining.
 	 */
-	public PdfRendererBuilder usePageSupplier(PageSupplier pageSupplier) {
+	public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder usePageSupplier(PageSupplier pageSupplier) {
 		state._pageSupplier = pageSupplier;
 		return this;
 	}
@@ -305,43 +291,9 @@ public class PdfRendererBuilder extends BaseRendererBuilder<PdfRendererBuilder, 
      * @return this for method chaining.
      */
     @Deprecated
-    public PdfRendererBuilder useSlowMode() {
+    public com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder useSlowMode() {
         state._useFastRenderer = false;
         return this;
     }
-
-	/**
-	 * Various level of PDF/A conformance:
-	 *
-	 * PDF/A-1, PDF/A-2 and PDF/A-3
-	 */
-	public enum PdfAConformance {
-		NONE(-1, "", 0f),
-		PDFA_1_A(1, "A", 1.4f), PDFA_1_B(1, "B", 1.4f),
-		PDFA_2_A(2, "A", 1.7f), PDFA_2_B(2, "B", 1.7f), PDFA_2_U(2, "U", 1.7f),
-		PDFA_3_A(3, "A", 1.7f), PDFA_3_B(3, "B", 1.7f), PDFA_3_U(3, "U", 1.7f);
-
-		PdfAConformance(int part, String value, float pdfVersion) {
-			this.part = part;
-			this.value = value;
-			this.pdfVersion = pdfVersion;
-		}
-
-		private final int part;
-		private final String value;
-		private final float pdfVersion;
-
-		public String getConformanceValue() {
-		    return this.value;
-		}
-
-		public int getPart() {
-			return this.part;
-		}
-
-		public float getPdfVersion() {
-			return this.pdfVersion;
-		}
-	}
 }
 

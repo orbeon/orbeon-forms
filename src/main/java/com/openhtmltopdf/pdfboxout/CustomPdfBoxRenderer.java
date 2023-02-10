@@ -38,8 +38,6 @@ import com.openhtmltopdf.extend.FSDOMMutator;
 import com.openhtmltopdf.outputdevice.helper.PageDimensions;
 import com.openhtmltopdf.outputdevice.helper.UnicodeImplementation;
 import com.openhtmltopdf.pdfboxout.PdfBoxSlowOutputDevice.Metadata;
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder.CacheStore;
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder.PdfAConformance;
 import com.openhtmltopdf.render.BlockBox;
 import com.openhtmltopdf.render.Box;
 import com.openhtmltopdf.render.PageBox;
@@ -93,7 +91,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class PdfBoxRenderer implements Closeable, PageSupplier {
+public class CustomPdfBoxRenderer implements Closeable, PageSupplier {
     // See discussion of units at top of PdfBoxOutputDevice.
     private static final float DEFAULT_DOTS_PER_POINT = 20f * 4f / 3f;
     private static final int DEFAULT_DOTS_PER_PIXEL = 20;
@@ -117,7 +115,7 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
     // Usually 1.7
     private float _pdfVersion;
 
-    private PdfAConformance _pdfAConformance;
+    private PdfRendererBuilder.PdfAConformance _pdfAConformance;
     private boolean _pdfUaConformance;
 
     private byte[] _colorProfile;
@@ -144,8 +142,8 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
     /**
      * This method is constantly changing as options are added to the builder.
      */
-    PdfBoxRenderer(BaseDocument doc, UnicodeImplementation unicode,
-            PageDimensions pageSize, PdfRendererBuilderState state, Closeable diagnosticConsumer) {
+    CustomPdfBoxRenderer(BaseDocument doc, UnicodeImplementation unicode,
+            PageDimensions pageSize, PdfRendererBuilderState state, Closeable diagnosticConsumer, java.util.function.Function<PdfBoxOutputDevice, PdfBoxUserAgent> createUserAgent) {
 
         this.diagnosticConsumer = diagnosticConsumer;
 
@@ -170,12 +168,12 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
         _outputDevice = state._useFastRenderer ?
                 new PdfBoxFastOutputDevice(DEFAULT_DOTS_PER_POINT, _testMode,
                         state._pdfUaConform || state._pdfAConformance.getConformanceValue().equals("A"),
-                        state._pdfAConformance != PdfAConformance.NONE) :
+                        state._pdfAConformance != PdfRendererBuilder.PdfAConformance.NONE) :
                 new PdfBoxSlowOutputDevice(DEFAULT_DOTS_PER_POINT, _testMode);
         _outputDevice.setWriter(_pdfDoc);
         _outputDevice.setStartPageNo(_pdfDoc.getNumberOfPages());
 
-        PdfBoxUserAgent userAgent = new PdfBoxUserAgent(_outputDevice);
+        PdfBoxUserAgent userAgent = createUserAgent.apply(_outputDevice);
 
         if (_svgImpl != null) {
             _svgImpl.withUserAgent(userAgent);
@@ -201,7 +199,7 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
         userAgent.setSharedContext(_sharedContext);
         _outputDevice.setSharedContext(_sharedContext);
 
-        PdfBoxFontResolver fontResolver = new PdfBoxFontResolver(_sharedContext, _pdfDoc, state._caches.get(CacheStore.PDF_FONT_METRICS), state._pdfAConformance, state._pdfUaConform);
+        PdfBoxFontResolver fontResolver = new PdfBoxFontResolver(_sharedContext, _pdfDoc, state._caches.get(PdfRendererBuilder.CacheStore.PDF_FONT_METRICS), state._pdfAConformance, state._pdfUaConform);
         _sharedContext.setFontResolver(fontResolver);
 
         PdfBoxReplacedElementFactory replacedElementFactory = new PdfBoxReplacedElementFactory(_outputDevice, state._svgImpl, state._objectDrawerFactory, state._mathmlImpl);
@@ -328,7 +326,7 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
 
         _sharedContext.setBaseURL(url);
         _sharedContext.setNamespaceHandler(nsh);
-        _sharedContext.getCss().setDocumentContext(_sharedContext, _sharedContext.getNamespaceHandler(), doc, new NullUserInterface());
+        _sharedContext.getCss().setDocumentContext(_sharedContext, _sharedContext.getNamespaceHandler(), doc, new com.openhtmltopdf.pdfboxout.CustomPdfBoxRenderer.NullUserInterface());
         getFontResolver().importFontFaces(_sharedContext.getCss().getFontFaceRules());
 
         if (_svgImpl != null) {
@@ -578,19 +576,19 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
 
     private void firePreOpen() {
         if (_listener != null) {
-            _listener.preOpen(this);
+//            _listener.preOpen(this);
         }
     }
 
     private void firePreWrite(int pageCount) {
         if (_listener != null) {
-            _listener.preWrite(this, pageCount);
+//            _listener.preWrite(this, pageCount);
         }
     }
 
     private void fireOnClose() {
         if (_listener != null) {
-            _listener.onClose(this);
+//            _listener.onClose(this);
         }
     }
 
@@ -610,7 +608,7 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
         firePreWrite(pageCount); // opportunity to adjust meta data
         setDidValues(doc); // set PDF header fields from meta data
 
-        if (_pdfUaConformance || _pdfAConformance != PdfAConformance.NONE) {
+        if (_pdfUaConformance || _pdfAConformance != PdfRendererBuilder.PdfAConformance.NONE) {
             addPdfASchema(doc, _pdfAConformance, _pdfUaConformance);
         }
 
@@ -689,7 +687,7 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
         firePreWrite(pageCount); // opportunity to adjust meta data
         setDidValues(doc); // set PDF header fields from meta data
 
-        if (_pdfUaConformance || _pdfAConformance != PdfAConformance.NONE) {
+        if (_pdfUaConformance || _pdfAConformance != PdfRendererBuilder.PdfAConformance.NONE) {
             addPdfASchema(doc, _pdfAConformance, _pdfUaConformance);
         }
 
@@ -716,7 +714,7 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
 
     // Kindly provided by GurpusMaximus at:
     // https://stackoverflow.com/questions/49682339/how-can-i-create-an-accessible-pdf-with-java-pdfbox-2-0-8-library-that-is-also-v
-    private void addPdfASchema(PDDocument document, PdfAConformance pdfAConformance, boolean isPdfUa) {
+    private void addPdfASchema(PDDocument document, PdfRendererBuilder.PdfAConformance pdfAConformance, boolean isPdfUa) {
         PDDocumentInformation information = document.getDocumentInformation();
         XMPMetadata metadata = XMPMetadata.createXMPMetadata();
 
@@ -736,7 +734,7 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
                 XRLog.log(Level.WARNING, LogMessageId.LogMessageId0Param.GENERAL_PDF_ACCESSIBILITY_NO_DOCUMENT_TITLE_PROVIDED);
             }
 
-            if (pdfAConformance != PdfAConformance.NONE) {
+            if (pdfAConformance != PdfRendererBuilder.PdfAConformance.NONE) {
                 PDFAIdentificationSchema pdfaid = metadata.createAndAddPFAIdentificationSchema();
                 pdfaid.setConformance(pdfAConformance.getConformanceValue());
                 pdfaid.setPart(pdfAConformance.getPart());
@@ -785,7 +783,7 @@ public class PdfBoxRenderer implements Closeable, PageSupplier {
             pdfAExt.addNamespace("http://www.aiim.org/pdfa/ns/schema#", "pdfaSchema");
             pdfAExt.addNamespace("http://www.aiim.org/pdfa/ns/property#", "pdfaProperty");
 
-            if (pdfAConformance != PdfAConformance.NONE) {
+            if (pdfAConformance != PdfRendererBuilder.PdfAConformance.NONE) {
                 // Description of Adobe PDF Schema
                 List<XMPSchema> pdfProperties = new ArrayList<>(3);
                 pdfProperties.add(

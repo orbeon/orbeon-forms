@@ -37,6 +37,12 @@ private object XHTMLToPDFProcessor {
 
   val logger = LoggerFactory.createLogger(classOf[XHTMLToPDFProcessor])
 
+  val PdfFontPropertyPrefix       = "oxf.fr.pdf.font."
+  val PdfFontPathProperty         = PdfFontPropertyPrefix + "path"
+  val PdfFontResourceProperty     = PdfFontPropertyPrefix + "resource"
+  val PdfFontFamilyPropertyPrefix = PdfFontPropertyPrefix + "family."
+  val PdfJpegCompressionProperty  = "oxf.fr.pdf.jpeg.compression"
+
   var DefaultContentType  = ContentTypes.PdfContentType
   val DefaultDotsPerPixel = 14 // default is 20, and makes things larger
 
@@ -44,13 +50,13 @@ private object XHTMLToPDFProcessor {
     val props = Properties.instance.getPropertySet
 
     for {
-      propName <- props.propertiesStartsWith("oxf.fr.pdf.font.path") ++ props.propertiesStartsWith("oxf.fr.pdf.font.resource")
+      propName <- props.propertiesStartsWith(PdfFontPathProperty) ++ props.propertiesStartsWith(PdfFontResourceProperty)
       path     <- props.getNonBlankString(propName)
       _ :: _ :: _ :: _ :: pathOrResource :: name :: Nil = propName.splitTo[List](".")
     } {
       try {
 
-        val familyOpt = props.getNonBlankString(s"oxf.fr.pdf.font.family.$name")
+        val familyOpt = props.getNonBlankString(s"$PdfFontFamilyPropertyPrefix$name")
 
         val absolutePath =
           pathOrResource match {
@@ -66,9 +72,17 @@ private object XHTMLToPDFProcessor {
       }
     }
   }
+
+  // NOTE: Default compression level is 0.75:
+  // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
+  def jpegCompressionLevel: Float =
+    Properties.instance.getPropertySet.getNonBlankString(PdfJpegCompressionProperty) flatMap
+      (s => Try(java.lang.Float.parseFloat(s)).toOption) filter
+      (f => f >= 0f && f <= 1.0f) getOrElse
+      0.9f
 }
 
-class XHTMLToPDFProcessor() extends HttpBinarySerializer {
+class XHTMLToPDFProcessor extends HttpBinarySerializer {
 
   import XHTMLToPDFProcessor._
 
@@ -99,14 +113,6 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
     embedFontsConfiguredInProperties(pdfRendererBuilder)
 
-    // NOTE: Default compression level is 0.75:
-    // https://docs.oracle.com/javase/8/docs/api/javax/imageio/plugins/jpeg/JPEGImageWriteParam.html#JPEGImageWriteParam-java.util.Locale-
-    val jpegCompressionLevel =
-      Properties.instance.getPropertySet.getNonBlankString("oxf.fr.pdf.jpeg.compression") flatMap
-        (s => Try(java.lang.Float.parseFloat(s)).toOption) filter
-        (f => f >= 0f && f <= 1.0f) getOrElse
-        0.9f
-
     IOUtils.useAndClose(outputStream) { os =>
 
       pdfRendererBuilder.toStream(os)
@@ -128,9 +134,8 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
         // Page count might be zero!
         // Q: Log if no pages?
         val hasPages = Option(pdfBoxRenderer.getRootBox.getLayer.getPages) exists (_.size > 0)
-        if (hasPages) {
+        if (hasPages)
           pdfBoxRenderer.createPDF()
-        }
       }
     }
   }

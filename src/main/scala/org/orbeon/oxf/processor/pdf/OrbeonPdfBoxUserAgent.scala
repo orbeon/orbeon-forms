@@ -34,14 +34,14 @@ import java.util.logging.Level
 import javax.imageio.ImageIO
 
 
-class CustomUserAgent(
-  jpegCompressionLevel      : Float,
-  outputDevice              : PdfBoxOutputDevice,
-  pipelineContext           : PipelineContext,
-  sharedContext             : SharedContext)(implicit
-  externalContext           : ExternalContext,
-  indentedLogger            : IndentedLogger,
-  coreCrossPlatformSupport  : CoreCrossPlatformSupportTrait
+class OrbeonPdfBoxUserAgent(
+  jpegCompressionLevel     : Float,
+  outputDevice             : PdfBoxOutputDevice,
+  pipelineContext          : PipelineContext,
+  dotsPerPixel             : Int)(implicit
+  externalContext          : ExternalContext,
+  indentedLogger           : IndentedLogger,
+  coreCrossPlatformSupport : CoreCrossPlatformSupportTrait
 ) extends PdfBoxUserAgent(outputDevice) {
   import Private._
 
@@ -59,10 +59,9 @@ class CustomUserAgent(
       out.toByteArray
     }
 
-    def scaleToOutputResolution(image: PdfBoxImage): Unit = {
-      val factor = sharedContext.getDotsPerPixel
-      if (factor != 1.0f) image.scale((image.getWidth * factor).toInt, (image.getHeight * factor).toInt)
-    }
+    def scaleToOutputResolution(image: PdfBoxImage): Unit =
+      if (dotsPerPixel != 1.0f)
+        image.scale((image.getWidth * dotsPerPixel), (image.getHeight * dotsPerPixel))
 
     val uriResolved = resolveURI(uriStr)
     if (uriResolved == null) {

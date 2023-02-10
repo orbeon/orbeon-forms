@@ -13,10 +13,8 @@
  */
 package org.orbeon.oxf.processor.pdf
 
-import com.openhtmltopdf.extend.FSUriResolver
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.PageSizeUnits
-import com.openhtmltopdf.outputdevice.helper.NullUserInterface
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
+import com.openhtmltopdf.pdfboxout.CustomPdfRendererBuilder
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -28,13 +26,8 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
-import org.w3c.dom.Document
 
 import java.io.{File, OutputStream}
-import java.net.{URI, URISyntaxException, URL}
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
 import scala.util.Try
 import scala.util.control.NonFatal
 
@@ -47,7 +40,7 @@ private object XHTMLToPDFProcessor {
   var DefaultContentType  = ContentTypes.PdfContentType
   val DefaultDotsPerPixel = 14 // default is 20, and makes things larger
 
-  def embedFontsConfiguredInProperties(pdfRendererBuilder: PdfRendererBuilder): Unit = {
+  def embedFontsConfiguredInProperties(pdfRendererBuilder: CustomPdfRendererBuilder): Unit = {
     val props = Properties.instance.getPropertySet
 
     for {
@@ -83,17 +76,22 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
   protected def getDefaultContentType: String = XHTMLToPDFProcessor.DefaultContentType
 
-  protected def readInput(pipelineContext: PipelineContext,
-                          input: ProcessorInput,
-                          config: HttpSerializerBase.Config,
-                          outputStream: OutputStream): Unit = {
-    implicit val externalContext: ExternalContext = NetUtils.getExternalContext
-    implicit val indentedLogger: IndentedLogger = new IndentedLogger(XHTMLToPDFProcessor.logger)
+  protected def readInput(
+    pipelineContext : PipelineContext,
+    input           : ProcessorInput,
+    config          : HttpSerializerBase.Config,
+    outputStream    : OutputStream
+  ): Unit = {
+
+    implicit val externalContext         : ExternalContext               = NetUtils.getExternalContext
+    implicit val indentedLogger          : IndentedLogger                = new IndentedLogger(XHTMLToPDFProcessor.logger)
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
     val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
-    val pdfRendererBuilder = new PdfRendererBuilder
+
+    val pdfRendererBuilder = new CustomPdfRendererBuilder
     XRLog.listRegisteredLoggers.forEach(_ => XRLog.setLoggingEnabled(false)) // disable logging
+
     pdfRendererBuilder.useDefaultPageSize(8.5f, 11f, PageSizeUnits.INCHES)
 
 //    pdfRendererBuilder.usePdfUaAccessbility(true) // java.lang.IndexOutOfBoundsException if uncomment
@@ -110,36 +108,21 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
         0.9f
 
     IOUtils.useAndClose(outputStream) { os =>
-      pdfRendererBuilder.toStream(os)
 
+      pdfRendererBuilder.toStream(os)
 
       pdfRendererBuilder.withW3cDocument(
         readInputAsDOM(pipelineContext, input),
         requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
       )
-      val pdfBoxRenderer = pdfRendererBuilder.buildPdfRenderer()
 
-      try {
-        // set user agent callback
-        val userAgent = new CustomUserAgent(jpegCompressionLevel, pdfBoxRenderer.getOutputDevice, pipelineContext, pdfBoxRenderer.getSharedContext)
-        userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
-        pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
+      IOUtils.useAndClose(
+        pdfRendererBuilder.buildPdfRenderer(outputDevice =>
+          new OrbeonPdfBoxUserAgent(jpegCompressionLevel, outputDevice, pipelineContext, DefaultDotsPerPixel)
+        )
+      ) { pdfBoxRenderer =>
+
         pdfBoxRenderer.getSharedContext.setDotsPerPixel(DefaultDotsPerPixel)
-
-        locally {
-          // The following is called internally by `buildPdfRenderer()`, and it is too early. So we run this here, but
-          // right now we can't call the SVG/MathML code. This will cause double loading of some CSS files.
-          // https://github.com/orbeon/orbeon-forms/issues/5671
-          val sharedContext = pdfBoxRenderer.getSharedContext
-          sharedContext.getCss.setDocumentContext(sharedContext, sharedContext.getNamespaceHandler, pdfBoxRenderer.getDocument, new NullUserInterface)
-          pdfBoxRenderer.getFontResolver.importFontFaces(sharedContext.getCss.getFontFaceRules)
-  //        if (_svgImpl != null)
-  //          _svgImpl.importFontFaceRules(_sharedContext.getCss.getFontFaceRules, _sharedContext)
-  //
-  //        if (_mathmlImpl != null)
-  //          _mathmlImpl.importFontFaceRules(_sharedContext.getCss.getFontFaceRules, _sharedContext)
-        }
-
         pdfBoxRenderer.layout()
 
         // Page count might be zero!
@@ -148,22 +131,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
         if (hasPages) {
           pdfBoxRenderer.createPDF()
         }
-      } finally {
-        // Free resources associated with the rendering context
-        pdfBoxRenderer.close()
       }
     }
-  }
-
-  // used for debbugging. will remove later
-  import java.io.StringWriter
-  def getStringFromDocument(doc: Document): String = {
-    val domSource = new DOMSource(doc)
-    val writer = new StringWriter
-    val result = new StreamResult(writer)
-    val tf = TransformerFactory.newInstance
-    val transformer = tf.newTransformer
-    transformer.transform(domSource, result)
-    writer.toString
   }
 }

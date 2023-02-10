@@ -196,6 +196,7 @@
             -dontwarn org.orbeon.oxf.util.ImageSupport**
             -dontwarn org.orbeon.xforms.**
             -dontwarn org.orbeon.oxf.xforms.**
+            -dontwarn com.openhtmltopdf.pdfboxout.**
 
             -libraryjars ${java.home}/jmods(java/**.class,javax/**.class,org/w3c/**.class,org/xml/**.class)
 

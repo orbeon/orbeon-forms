@@ -22,14 +22,17 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.ImageSupport.{compressJpegImage, findImageOrientation, findTransformation, transformImage}
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.TryUtils.TryOps
 import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupportTrait, IndentedLogger, URLRewriterUtils}
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, IOException, InputStream}
+import java.io._
 import java.net.URI
+import java.nio.charset.StandardCharsets
 import java.util.Locale
 import java.util.logging.Level
 import javax.imageio.ImageIO
+
 
 class CustomUserAgent(
   jpegCompressionLevel      : Float,
@@ -135,17 +138,13 @@ class CustomUserAgent(
     // NOTE: We used to call rewriteResourceURL() here as the PDF pipeline did not do URL rewriting.
     // However this caused issues, for example resources like background images referred by CSS files
     // could be rewritten twice: once by the XForms resource rewriter, and a second time here.
-    indentedLogger.logDebug("pdf", "before resolving URL", "url", uri)
-
-    val resolved =
+    withDebug(s"before resolving URL `$uri`") {
       URLRewriterUtils.rewriteServiceURL(
         requestOpt.orNull,
         uri,
         UrlRewriteMode.AbsoluteNoContext
       )
-
-    indentedLogger.logDebug("pdf", "after resolving URL", "url", resolved)
-    resolved
+    }
   }
 
   // Called by:
@@ -154,6 +153,8 @@ class CustomUserAgent(
   // - getBinaryResource (not sure when called)
   // - getXMLResource (not sure when called)
   override protected def openStream(uri: String): InputStream = {
+
+    debug(s"openStream($uri)")
 
     val resolvedURI = resolveURI(uri)
 
@@ -181,7 +182,7 @@ class CustomUserAgent(
         content         = None,
         headers         = headers,
         loadState       = true,
-        saveState   = true,
+        saveState       = true,
         logBody         = false)(
         logger          = indentedLogger,
         externalContext = externalContext
@@ -192,8 +193,12 @@ class CustomUserAgent(
     } get
   }
 
-  private object Private {
+  override protected def openReader(uri: String): Reader = {
+    debug(s"openReader($uri)")
+    new InputStreamReader(openStream(uri), StandardCharsets.UTF_8)
+  }
 
+  private object Private {
     val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
   }
 }

@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.processor.pdf
 
+import com.openhtmltopdf.extend.FSUriResolver
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.PageSizeUnits
+import com.openhtmltopdf.outputdevice.helper.NullUserInterface
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
 import com.openhtmltopdf.util.XRLog
 import org.orbeon.io.IOUtils
@@ -29,6 +31,7 @@ import org.orbeon.oxf.util._
 import org.w3c.dom.Document
 
 import java.io.{File, OutputStream}
+import java.net.{URI, URISyntaxException, URL}
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
@@ -89,7 +92,7 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
     implicit val coreCrossPlatformSupport: CoreCrossPlatformSupportTrait = CoreCrossPlatformSupport
 
     val requestOpt = Option(externalContext) flatMap (ctx => Option(ctx.getRequest))
-    val pdfRendererBuilder = new PdfRendererBuilder()
+    val pdfRendererBuilder = new PdfRendererBuilder
     XRLog.listRegisteredLoggers.forEach(_ => XRLog.setLoggingEnabled(false)) // disable logging
     pdfRendererBuilder.useDefaultPageSize(8.5f, 11f, PageSizeUnits.INCHES)
 
@@ -108,23 +111,35 @@ class XHTMLToPDFProcessor() extends HttpBinarySerializer {
 
     IOUtils.useAndClose(outputStream) { os =>
       pdfRendererBuilder.toStream(os)
-      val document = readInputAsDOM(pipelineContext, input)
 
-      // used for debugging. will remove later
-//      val documentString = getStringFromDocument(document)
 
       pdfRendererBuilder.withW3cDocument(
-        document,
+        readInputAsDOM(pipelineContext, input),
         requestOpt map (_.getRequestURL) orNull // no base URL if can't get request URL from context
       )
       val pdfBoxRenderer = pdfRendererBuilder.buildPdfRenderer()
-      pdfBoxRenderer.getSharedContext.setDotsPerPixel(DefaultDotsPerPixel)
 
       try {
         // set user agent callback
         val userAgent = new CustomUserAgent(jpegCompressionLevel, pdfBoxRenderer.getOutputDevice, pipelineContext, pdfBoxRenderer.getSharedContext)
         userAgent.setSharedContext(pdfBoxRenderer.getSharedContext)
         pdfBoxRenderer.getSharedContext.setUserAgentCallback(userAgent)
+        pdfBoxRenderer.getSharedContext.setDotsPerPixel(DefaultDotsPerPixel)
+
+        locally {
+          // The following is called internally by `buildPdfRenderer()`, and it is too early. So we run this here, but
+          // right now we can't call the SVG/MathML code. This will cause double loading of some CSS files.
+          // https://github.com/orbeon/orbeon-forms/issues/5671
+          val sharedContext = pdfBoxRenderer.getSharedContext
+          sharedContext.getCss.setDocumentContext(sharedContext, sharedContext.getNamespaceHandler, pdfBoxRenderer.getDocument, new NullUserInterface)
+          pdfBoxRenderer.getFontResolver.importFontFaces(sharedContext.getCss.getFontFaceRules)
+  //        if (_svgImpl != null)
+  //          _svgImpl.importFontFaceRules(_sharedContext.getCss.getFontFaceRules, _sharedContext)
+  //
+  //        if (_mathmlImpl != null)
+  //          _mathmlImpl.importFontFaceRules(_sharedContext.getCss.getFontFaceRules, _sharedContext)
+        }
+
         pdfBoxRenderer.layout()
 
         // Page count might be zero!

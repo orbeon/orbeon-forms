@@ -193,9 +193,9 @@
     <listener>
         <listener-class>org.orbeon.oxf.webapp.OrbeonSessionListener</listener-class>
     </listener>
-    <!--Ehcache shutdown listener-->
+    <!-- Cache shutdown listener-->
     <listener>
-        <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
+        <listener-class>org.orbeon.oxf.cache.ShutdownListener</listener-class>
     </listener>
     <!--This is the main Orbeon Forms servlet-->
     <servlet>

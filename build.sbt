@@ -96,7 +96,12 @@ val CoreLibraryDependencies = Seq(
   "org.scala-lang.modules"      %% "scala-xml"                      % ScalaXmlVersion,
   "org.log4s"                   %% "log4s"                          % Log4sVersion,
   "org.apache.commons"          %  "commons-lang3"                  % "3.12.0",
+  "javax.cache"                 % "cache-api"                       % "1.1.1",
   "net.sf.ehcache"              %  "ehcache"                        % "2.10.9.2",
+  "org.ehcache"                 % "ehcache"                         % "3.10.8",
+  "javax.xml.bind"              % "jaxb-api"                        % "2.3.1",   // for Ehcache 3
+  "com.sun.xml.bind"            % "jaxb-core"                       % "2.3.0.1", // for Ehcache 3
+  "com.sun.xml.bind"            % "jaxb-impl"                       % "2.3.1",   // for Ehcache 3
   "commons-codec"               %  "commons-codec"                  % "1.15",
   "org.apache.commons"          %  "commons-collections4"           % "4.4",
   "commons-fileupload"          %  "commons-fileupload"             % "1.5",

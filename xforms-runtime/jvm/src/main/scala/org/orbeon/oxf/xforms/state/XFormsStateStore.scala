@@ -13,16 +13,20 @@
  */
 package org.orbeon.oxf.xforms.state
 
-import net.sf.ehcache.{Element => EhElement}
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, SecureUtils}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.util.Logging._
 
-object EhcacheStateStore {
+import java.io
+
+
+object XFormsStateStore {
 
   import Private._
+
+  type CacheValueMappingType = (String, Long)
 
   def storeDocumentState(
     document       : XFormsContainingDocument,
@@ -40,7 +44,7 @@ object EhcacheStateStore {
 
     withDebug("storing document state", List(
       "document UUID"             -> documentUUID,
-      "store size before storing" -> getCurrentSize.toString,
+      "store size before storing" -> getCurrentSize.map(_.toString).getOrElse("unknown"),
       "isInitialState"            -> isInitialState.toString,
       "replication"               -> XFormsGlobalProperties.isReplication.toString
     )) {
@@ -48,20 +52,17 @@ object EhcacheStateStore {
       val dynamicStateKey   = createDynamicStateKey(documentUUID, isInitialState)
       val sequence          = document.sequence
 
-      def addOrReplaceOne(key: String, value: java.io.Serializable): Unit =
-        Caches.stateCache.put(new EhElement(key, value, sequence))
-
       // Mapping (UUID -> static state key : dynamic state key
-      addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
+      Caches.stateCache.put(documentUUID, (staticStateDigest + ":" + dynamicStateKey, sequence): CacheValueMappingType)
 
       // Static and dynamic states
-      addOrReplaceOne(staticStateDigest, document.staticState.encodedState) // XXX Q: is there a cost to replacing static state? value will be the same!
-      addOrReplaceOne(dynamicStateKey, DynamicState(document))
+      Caches.stateCache.put(staticStateDigest, document.staticState.encodedState) // XXX Q: is there a cost to replacing static state? value will be the same!
+      Caches.stateCache.put(dynamicStateKey,   DynamicState(document))
     }
   }
 
   def findSequence(documentUUID: String): Option[Long] =
-    Option(Caches.stateCache.get(documentUUID)) map (_.getVersion)
+    Caches.stateCache.get(documentUUID).map(_.asInstanceOf[CacheValueMappingType]).map(_._2)
 
   def findState(
     documentUUID   : String,
@@ -79,12 +80,10 @@ object EhcacheStateStore {
       )
     ) {
 
-      debug(s"store size before finding: $getCurrentSize entries.")
+      debug(s"store size before finding: ${getCurrentSize.map(_.toString).getOrElse("unknown")} entries.")
 
-      def findOne(key: String) = Option(Caches.stateCache.get(key)) map (_.getObjectValue)
-
-      findOne(documentUUID) match {
-        case Some(keyString: String) =>
+      Caches.stateCache.get(documentUUID).map(_.asInstanceOf[CacheValueMappingType]) match {
+        case Some((keyString: String, _: Long)) =>
 
           // Found the keys, split into parts
           val parts = keyString split ':'
@@ -96,7 +95,7 @@ object EhcacheStateStore {
           val dynamicStateKey = if (isInitialState) createDynamicStateKey(documentUUID, isInitialState = true) else parts(1)
 
           // Gather values from cache for both keys and return state only if both are non-null
-          Stream(parts(0), dynamicStateKey) flatMap findOne filter (_ ne null) match {
+          Stream(parts(0), dynamicStateKey) flatMap Caches.stateCache.get filter (_ != null) match {
             case Stream(staticState: String, dynamicState: DynamicState) =>
               Some(XFormsState(Some(parts(0)), Some(staticState), Some(dynamicState)))
             case _ =>
@@ -116,8 +115,8 @@ object EhcacheStateStore {
     Caches.stateCache.remove(createDynamicStateKey(documentUUID, isInitialState = false))
   }
 
-  def getMaxSize     : Long = Caches.stateCache.getCacheConfiguration.getMaxEntriesLocalHeap
-  def getCurrentSize : Long = Caches.stateCache.getStatistics.getLocalHeapSize
+  def getMaxSize     : Option[Long] = Caches.stateCache.getMaxEntriesLocalHeap
+  def getCurrentSize : Option[Long] = Caches.stateCache.getLocalHeapSize
 
   private object Private {
 

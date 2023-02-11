@@ -1,8 +1,7 @@
 package org.orbeon.oxf.fr.persistence
 
 import cats.Eval
-import net.sf.ehcache.{Cache, Element => EhElement}
-import org.orbeon.oxf.cache.Caches
+import org.orbeon.oxf.cache.{CacheApi, CacheSupport}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunner.{createFormDefinitionBasePath, createFormMetadataPathAndQuery}
 import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
@@ -42,8 +41,9 @@ object PersistenceMetadataSupport {
   private def cacheEnabled =
     ! Properties.instance.getPropertySet.getBooleanOpt("oxf.fr.persistence.form-definition-cache.enable").contains(false)
 
-  private val formDefinitionCache = cacheEnabled option Caches.getOrElseThrow("form-runner.persistence.form-definition")
-  private val formMetadataCache   = cacheEnabled option Caches.getOrElseThrow("form-runner.persistence.form-metadata")
+  // Use `lazy val`s so we get an exception other than `ExceptionInInitializerError`
+  private lazy val formDefinitionCache = cacheEnabled option CacheSupport.getOrElseThrow("form-runner.persistence.form-definition")
+  private lazy val formMetadataCache   = cacheEnabled option CacheSupport.getOrElseThrow("form-runner.persistence.form-metadata")
 
   private type CacheKey = (String, String, Int) // app/form/version
 
@@ -55,7 +55,7 @@ object PersistenceMetadataSupport {
 
     val cacheKey: CacheKey = (appForm.app, appForm.form, version)
 
-    def log(cache: Cache)(removed: Boolean): Unit =
+    def log(cache: CacheApi)(removed: Boolean): Unit =
       if (removed)
         debug(s"removed form definition from cache `${cache.getName}` for `$cacheKey`")
 
@@ -140,10 +140,10 @@ object PersistenceMetadataSupport {
 
   private object Private {
 
-    def readMaybeFromCache[T](
+    def readMaybeFromCache[T <: Serializable](
       appForm  : AppForm,
       version  : FormDefinitionVersion,
-      cacheOpt : Option[Cache])(
+      cacheOpt : Option[CacheApi])(
       read     : => Try[T]
     ): Try[T] =
       (version, cacheOpt) match {
@@ -159,13 +159,13 @@ object PersistenceMetadataSupport {
 
           val cacheKey: CacheKey = (appForm.app, appForm.form, versionNumber)
 
-          Option(cache.get(cacheKey)) match {
+          cache.get(cacheKey) match {
             case Some(cacheElem) =>
               debug(s"got elem from cache for `$cacheKey` from `${cache.getName}`")
-              Success(cacheElem.getObjectValue.asInstanceOf[T])
+              Success(cacheElem.asInstanceOf[T])
             case None =>
               debug(s"did not get elem from cache for `$cacheKey` from `${cache.getName}`")
-              read |!> (t => cache.put(new EhElement(cacheKey, t)))
+              read |!> (t => cache.put(cacheKey, t))
           }
       }
 
@@ -187,7 +187,7 @@ object PersistenceMetadataSupport {
             XPath.GlobalConfiguration,
             is,
             urlString,
-            handleXInclude = true, // do process XInclude, so FB's model gets included
+            handleXInclude = true, // do process XInclude, so Form Builder's model gets included
             handleLexical  = false
           )
         }

@@ -265,15 +265,14 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
 
     val resources = {
       // New hash-based mechanism
-      val cacheElement = Caches.resourcesCache.get(hash)
-      if (cacheElement ne null) {
-        // Mapping found
-        val resourcesStrings = cacheElement.getObjectValue.asInstanceOf[Array[String]].toList
-        resourcesStrings map (r => AssetPath(r, hasMin = false))
-      } else {
-        // Not found, either because the hash is invalid, or because the cache lost the mapping
-        response.setStatus(StatusCode.NotFound)
-        return
+      Caches.resourcesCache.get(hash) match {
+        case Some(value: Array[String]) =>
+          // Mapping found
+          value.toList map (r => AssetPath(r, hasMin = false))
+        case _ =>
+          // Not found, either because the hash is invalid, or because the cache lost the mapping
+          response.setStatus(StatusCode.NotFound)
+          return
       }
     }
 
@@ -421,8 +420,8 @@ object XFormsAssetServer {
     }
 
   // For unit tests only (called from XSLT)
-  def testGetResources(key: String)  =
-    Option(Caches.resourcesCache.get(key)) map (_.getObjectValue.asInstanceOf[Array[String]]) orNull
+  def testGetResources(key: String): Array[String] =
+    Caches.resourcesCache.get(key) map (_.asInstanceOf[Array[String]]) orNull
 
   // Information about the resource, stored into the session
   case class DynamicResource(

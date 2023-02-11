@@ -14,7 +14,6 @@
 
 package org.orbeon.oxf.xforms.processor
 
-import net.sf.ehcache.{Element => EhElement}
 import org.orbeon.dom.QName
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor._
@@ -257,7 +256,7 @@ object AssetsAggregator extends Logging {
       val resourcesHash = SecureUtils.digestStringToHexShort(itemsToHash mkString "|")
 
       // Cache mapping so that resource can be served by resource server
-      Caches.resourcesCache.put(new EhElement(resourcesHash, resources.toArray)) // use Array which is compact, serializable and usable from Java
+      Caches.resourcesCache.put(resourcesHash, resources.toArray) // use `Array` which is compact, serializable and usable from Java
 
       // Extension and optional namespace parameter
       def extension = if (isCSS) ".css" else ".js"

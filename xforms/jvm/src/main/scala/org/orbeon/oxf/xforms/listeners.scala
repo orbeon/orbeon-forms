@@ -13,21 +13,22 @@
   */
 package org.orbeon.oxf.xforms
 
-import javax.servlet.http.{HttpSessionEvent, HttpSessionListener}
-import javax.servlet.{ServletContextEvent, ServletContextListener}
-
 import org.orbeon.oxf.cache
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.servlet.ServletSessionImpl
 import org.orbeon.oxf.util.SLF4JLogging._
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 
+import javax.servlet.http.{HttpSessionEvent, HttpSessionListener}
+import javax.servlet.{ServletContextEvent, ServletContextListener}
+
+
 class ReplicationServletContextListener extends ServletContextListener {
 
   override def contextInitialized(servletContextEvent: ServletContextEvent): Unit =
     if (XFormsGlobalProperties.isReplication) {
       Version.instance.requirePEFeature("State replication")
-      withDebug("eagerly bootstrapping caches for replication")(Caches)(cache.Caches.Logger)
+      withDebug("eagerly bootstrapping caches for replication")(Caches)(cache.CacheSupport.Logger)
     }
 
   override def contextDestroyed(servletContextEvent: ServletContextEvent): Unit = ()

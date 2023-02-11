@@ -14,8 +14,9 @@
 
 package org.orbeon.oxf.xforms
 
-// All Ehcache-based caches for XForms support.
+
 object Caches {
-  val stateCache     = org.orbeon.oxf.cache.Caches.getOrElseThrow("xforms.state")
-  val resourcesCache = org.orbeon.oxf.cache.Caches.getOrElseThrow("xforms.resources")
+  // Use `lazy val`s so we get an exception other than `ExceptionInInitializerError`
+  lazy val stateCache     = org.orbeon.oxf.cache.CacheSupport.getOrElseThrow("xforms.state")
+  lazy val resourcesCache = org.orbeon.oxf.cache.CacheSupport.getOrElseThrow("xforms.resources")
 }

@@ -63,7 +63,7 @@ object XFormsStateManager extends XFormsStateManagerTrait {
     if (session.getAttributeNames(ExternalContext.SessionScope.Application).contains(XFormsStateManagerUUIDListKey))
       getUuidListInSession(session).iterator.asScala foreach { uuid =>
         XFormsDocumentCache.remove(uuid)
-        EhcacheStateStore.removeDynamicState(uuid)
+        XFormsStateStore.removeDynamicState(uuid)
       }
   }
 
@@ -137,8 +137,8 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       // NOTE: If the document has cache.document="false", then it simply won't be found in the cache, but
       // we can't know that the property is set to false before trying.
 
-      def newerSequenceNumberInStore(cachedDocument: XFormsContainingDocument) =
-        ReplicationEnabled && (EhcacheStateStore.findSequence(parameters.uuid) exists (_ > cachedDocument.sequence))
+      def newerSequenceNumberInStore(cachedDocument: XFormsContainingDocument): Boolean =
+        ReplicationEnabled && (XFormsStateStore.findSequence(parameters.uuid) exists (_ > cachedDocument.sequence))
 
       XFormsDocumentCache.take(parameters.uuid) match {
         case Some(cachedDocument) if newerSequenceNumberInStore(cachedDocument)  =>
@@ -232,15 +232,15 @@ object XFormsStateManager extends XFormsStateManagerTrait {
             LogType,
             "Getting document state from store.",
             "current cache size", XFormsDocumentCache.getCurrentSize.toString,
-            "current store size", EhcacheStateStore.getCurrentSize.toString,
-            "max store size", EhcacheStateStore.getMaxSize.toString
+            "current store size", XFormsStateStore.getCurrentSize.map(_.toString).getOrElse("unknown"),
+            "max store size",     XFormsStateStore.getMaxSize.map(_.toString).getOrElse("undefined")
           )
 
         // 2014-11-12: This means that 1. We had a valid incoming session and 2. we obtained a lock on the document, yet
         // we didn't find it. This means that somehow state was not placed into or expired from the state store.
         // 2022-10-12: Changed to return `Option` instead of throwing.
         // See https://github.com/orbeon/orbeon-forms/issues/5402
-        EhcacheStateStore.findState(parameters.uuid, isInitialState)
+        XFormsStateStore.findState(parameters.uuid, isInitialState)
 
       case Some(encodedClientDynamicState) =>
         // State comes directly with request
@@ -321,7 +321,7 @@ object XFormsStateManager extends XFormsStateManagerTrait {
 
     def storeDocumentState(containingDocument: XFormsContainingDocument, isInitialState: Boolean): Unit = {
       require(containingDocument.staticState.isServerStateHandling)
-      EhcacheStateStore.storeDocumentState(
+      XFormsStateStore.storeDocumentState(
         containingDocument,
         isInitialState
       )

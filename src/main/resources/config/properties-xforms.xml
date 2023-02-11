@@ -62,6 +62,9 @@
     <property as="xs:boolean" name="oxf.xforms.xpath-analysis"                          value="false"/>
 
     <!-- XForms cache configuration -->
+    <property as="xs:string"  name="oxf.xforms.cache.provider"                          value="ehcache2"/> <!-- ehcache2 | jcache -->
+    <property as="xs:string"  name="oxf.xforms.cache.resource"                          value=""/>
+    <property as="xs:string"  name="oxf.xforms.cache.uri"                               value=""/>
     <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="50"/>
     <property as="xs:integer" name="oxf.xforms.cache.static-state.size"                 value="50"/>
     <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>

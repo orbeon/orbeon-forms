@@ -31,7 +31,7 @@ ORBEON.xforms.XBL.declareCompanion("acme|map", {
             const mapElement       = this.container.querySelector('.acme-map-google');
             const googleMapsKey    = mapElement.getAttribute("data-google-maps-key");
             const googleMapsScript = document.createElement("script");
-            googleMapsScript.src   = googleMapsJs + "?key=" + googleMapsKey;
+            googleMapsScript.src   = googleMapsJs + "?callback=ORBEON.jQuery.noop&key=" + googleMapsKey;
             googleMapsScript.async = true;
             document.head.appendChild(googleMapsScript);
         }

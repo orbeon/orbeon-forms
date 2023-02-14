@@ -290,62 +290,6 @@ public class TransformerUtils {
         return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
 
-    /**
-     * Transform a SAXStore into a DOM document
-     *
-     * @param   saxStore input SAXStore
-     * @return  DOM document
-     */
-    public static org.w3c.dom.Document saxStoreToDomDocument(SAXStore saxStore) {
-        try {
-            // Convert to Orbeon DOM and then to W3C DOM
-            return TransformerUtils.orbeonDomToW3CDomDocument(saxStoreToOrbeonDomDocument(saxStore));
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
-
-        // NOTE: The more straight and efficient implementation below doesn't seem to work
-//        final TransformerHandler identity = getIdentityTransformerHandler();
-//        final DOMResult domResult = new DOMResult();
-//        identity.setResult(domResult);
-//        try {
-//            saxStore.replay(identity);
-//        } catch (SAXException e) {
-//            throw new OXFException(e);
-//        }
-//        return domResult.getNode().getOwnerDocument();
-    }
-
-    /**
-     * Transform an Orbeon DOM Document into a TinyTree.
-     */
-    // Only used by `Instance`
-    public static DocumentInfo orbeonDomToTinyTree(Configuration configuration, Document document, boolean location) {
-        final TinyBuilder treeBuilder = new TinyBuilder();
-        try {
-            final Transformer identity = getIdentityTransformer(configuration);
-            identity.transform(location ? new LocationDocumentSource(document) : new DocumentSource(document), treeBuilder);
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
-        return (DocumentInfo) treeBuilder.getCurrentRoot();
-    }
-
-    /**
-     * Transform an Orbeon DOM document into a W3C DOM document
-     *
-     * @param   document dom4j document
-     * @return  W3C DOM document
-     * @throws TransformerException
-     */
-    public static org.w3c.dom.Document orbeonDomToW3CDomDocument(Document document) throws TransformerException {
-        final Transformer identity = getIdentityTransformer();
-        final DOMResult domResult = new DOMResult();
-        identity.transform(new DocumentSource(document), domResult);
-        final Node resultNode = domResult.getNode();
-        return (resultNode instanceof org.w3c.dom.Document) ? ((org.w3c.dom.Document) resultNode) : resultNode.getOwnerDocument();
-    }
-
     public static Transformer testCreateTransformerWrapper(Transformer transformer, String publicProperty, String privateProperty) {
         return new TransformerWrapper(transformer, publicProperty, privateProperty);
     }

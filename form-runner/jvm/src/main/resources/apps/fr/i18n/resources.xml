@@ -1098,7 +1098,6 @@
             </login-error>
         </authentication>
     </resource>
-	
     <resource xml:lang="es">
         <common>
             <formats>
@@ -1643,8 +1642,7 @@
             <view todo="true">&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; [View]</view>
             <approve todo="true">&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; [Approve]</approve>
             <reject todo="true">&lt;i class="fa fa-fw fa-close"&gt;&lt;/i&gt; [Reject]</reject>
-    
-    
+
             <home>&lt;i class="fa fa-fw -th"&gt;&lt;/i&gt; Inici</home>
             <landing>&lt;i class="fa fa-fw fa-th"&gt;&lt;/i&gt; Inici</landing>
             <review>&lt;i class="fa fa-fw fa-eye"&gt;&lt;/i&gt; Veure</review>
@@ -1654,7 +1652,7 @@
             <import>&lt;i class="fa fa-fw fa-upload"&gt;&lt;/i&gt; Importar</import>
             <new>&lt;i class="fa fa-fw fa-plus"&gt;&lt;/i&gt; Nou</new>
             <duplicate>&lt;i class="fa fa-fw fa-copy"&gt;&lt;/i&gt; Duplicar</duplicate>
-    
+
             <!-- Standard process buttons -->
             <save>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Desar</save>
             <save-final>&lt;i class="fa fa-fw fa-hdd-o"&gt;&lt;/i&gt; Desar definitiu</save-final>
@@ -1665,13 +1663,13 @@
             <email>&lt;i class="fa fa-fw fa-envelope"&gt;&lt;/i&gt; Email</email>
             <validate>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Validar</validate>
             <test-pdf todo="true">&lt;i class="fa fa-fw fa-file-pdf-o"/&gt;&lt;/i&gt; Test PDF</test-pdf>
-    
+
             <!-- Legacy buttons -->
             <submit>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</submit>
             <workflow-review>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Veure</workflow-review>
             <workflow-edit>&lt;i class="fa fa-fw fa-arrow-left"&gt;&lt;/i&gt; Editar</workflow-edit>
             <workflow-send>&lt;i class="fa fa-fw fa-arrow-right"&gt;&lt;/i&gt; Enviar</workflow-send>
-    
+
             <!-- Other standard buttons -->
             <summary>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Resum</summary>
             <close>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; Tancar</close>
@@ -1684,17 +1682,17 @@
             <wizard-next>&lt;i class="fa fa-fw fa-chevron-right"&gt;&lt;/i&gt; Següent</wizard-next>
             <wizard-prev>&lt;i class="fa fa-fw fa-chevron-left"&gt;&lt;/i&gt; Previ</wizard-prev>
             <wizard-toc>&lt;i class="fa fa-fw fa-list"&gt;&lt;/i&gt; Contingut</wizard-toc>
-    
+
             <!-- Submit dialog -->
             <submit-dialog-clear>Netejar i tancar</submit-dialog-clear>
             <submit-dialog-keep>Mantindre valors i tancar</submit-dialog-keep>
             <submit-dialog-go>Acceptar</submit-dialog-go>
             <submit-dialog-close-window>Tancar finestra</submit-dialog-close-window>
-    
+
             <!-- Warning dialog -->
             <validation-dialog-review>Revisar</validation-dialog-review>
             <validation-dialog-continue>Continuar</validation-dialog-continue>
-    
+
             <test>&lt;i class="fa fa-fw fa-cog"&gt;&lt;/i&gt; Testejar</test>
             <test-formulas todo="true">&lt;i class="fa fa-fw fa-calculator"&gt;&lt;/i&gt; Inspeccionar
                 fòrmules (Experimental)</test-formulas>
@@ -1704,7 +1702,7 @@
                 excel</excel-export>
             <publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</publish>
             <save-publish>&lt;i class="fa fa-fw fa-globe"&gt;&lt;/i&gt; Publicar</save-publish>
-    
+
             <yes>&lt;i class="fa fa-fw fa-check"&gt;&lt;/i&gt; Sí</yes>
             <no>&lt;i class="fa fa-fw fa-times"&gt;&lt;/i&gt; No</no>
             <ok>Acceptar</ok>

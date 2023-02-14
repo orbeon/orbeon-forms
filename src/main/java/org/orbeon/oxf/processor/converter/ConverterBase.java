@@ -71,7 +71,7 @@ public abstract class ConverterBase extends ProcessorImpl {
                         config.systemDoctype = XPathUtils.selectStringValueNormalize(configElement, "/config/system-doctype");
                         config.omitXMLDeclaration = ProcessorUtils.selectBooleanValue(configElement, "/config/omit-xml-declaration", DEFAULT_OMIT_XML_DECLARATION);
                         String standaloneString = XPathUtils.selectStringValueNormalize(configElement, "/config/standalone");
-                        config.standalone = (standaloneString == null) ? null : new Boolean(standaloneString);
+                        config.standalone = (standaloneString == null) ? null : Boolean.parseBoolean(standaloneString);
                         config.indent = ProcessorUtils.selectBooleanValue(configElement, "/config/indent", DEFAULT_INDENT);
                         final Integer indentAmount = XPathUtils.selectIntegerValue(configElement, "/config/indent-amount");
                         if (indentAmount != null) config.indentAmount = indentAmount.intValue();

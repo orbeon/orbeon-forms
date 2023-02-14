@@ -119,7 +119,7 @@ public class FileSerializer extends ProcessorImpl {
             if (indentString == null)
                 indent = DEFAULT_INDENT;
             else
-                indent = new Boolean(indentString).booleanValue();
+                indent = Boolean.parseBoolean(indentString);
             // Indent amount
             Integer indentAmountInteger = XPathUtils.selectIntegerValue(document, "/config/indent-amount");
             if (indentAmountInteger == null)
@@ -130,19 +130,19 @@ public class FileSerializer extends ProcessorImpl {
             // Omit XML declaration
             String omitXMLDeclarationString = XPathUtils.selectStringValueNormalize(document, "/config/omit-xml-declaration");
             if (omitXMLDeclarationString != null)
-                omitXMLDeclaration = new Boolean(omitXMLDeclarationString).booleanValue();
+                omitXMLDeclaration = Boolean.parseBoolean(omitXMLDeclarationString);
 
             // Standalone
             String standaloneString = XPathUtils.selectStringValueNormalize(document, "/config/standalone");
             if (standaloneString != null)
-                standalone = new Boolean(standaloneString);
+                standalone = Boolean.parseBoolean(standaloneString);
 
             // Cache control
             String cacheUseLocalCacheString = XPathUtils.selectStringValueNormalize(document, "/config/cache-control/use-local-cache");
             if (cacheUseLocalCacheString == null)
                 cacheUseLocalCache = CachedSerializer.DEFAULT_CACHE_USE_LOCAL_CACHE;
             else
-                cacheUseLocalCache = new Boolean(cacheUseLocalCacheString).booleanValue();
+                cacheUseLocalCache = Boolean.parseBoolean(cacheUseLocalCacheString);
         }
 
         public String getContentType() {

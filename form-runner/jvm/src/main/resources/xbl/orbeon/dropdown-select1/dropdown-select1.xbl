@@ -142,6 +142,8 @@
                         <resource xml:lang="sv"><select>Välj:</select></resource>
                         <resource xml:lang="da"><select>Vælg:</select></resource>
                         <resource xml:lang="pl"><select>Wybierz:</select></resource>
+                        <resource xml:lang="zh-Hant"><select>請選擇:</select></resource>
+                        <resource xml:lang="zh-Hans"><select>请选择:</select></resource>
                     </_>
                 </xf:instance>
             </xf:model>

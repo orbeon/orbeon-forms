@@ -245,20 +245,20 @@ object ErrorSummary {
       return
 
     // Update the iteration in a control's absolute id
-    def updateIteration(absoluteId: String, repeatAbsoluteId: String, fromIterations: Array[Int], toIterations: Array[Int]): String = {
+    def updateIteration(existingErrorAbsoluteId: String, repeatAbsoluteId: String, fromIterations: Array[Int], toIterations: Array[Int]): String = {
 
-      val effectiveId = XFormsId.absoluteIdToEffectiveId(absoluteId)
-      val prefixedId  = XFormsId.getPrefixedId(effectiveId)
+      val existingErrorEffectiveId = XFormsId.absoluteIdToEffectiveId(existingErrorAbsoluteId)
+      val existingErrorPrefixedId  = XFormsId.getPrefixedId(existingErrorEffectiveId)
 
       val repeatEffectiveId = XFormsId.absoluteIdToEffectiveId(repeatAbsoluteId)
       val repeatPrefixedId  = XFormsId.getPrefixedId(repeatEffectiveId)
 
-      val ancestorRepeats = inScopeContainingDocument.staticOps.getAncestorRepeatIds(prefixedId)
+      val ancestorRepeatsLeafToRoot = inScopeContainingDocument.staticOps.getAncestorRepeatIds(existingErrorPrefixedId)
 
-      if (ancestorRepeats contains repeatPrefixedId) {
+      if (ancestorRepeatsLeafToRoot contains repeatPrefixedId) {
         // Control is a descendant of the repeat so might be impacted
 
-        val idIterationPairs = XFormsId.getEffectiveIdSuffixParts(effectiveId) zip ancestorRepeats
+        val idIterationPairs = XFormsId.getEffectiveIdSuffixParts(existingErrorEffectiveId) zip ancestorRepeatsLeafToRoot.reverse
         val iterationsMap    = fromIterations zip toIterations toMap
 
         val newIterations = idIterationPairs map {
@@ -266,12 +266,12 @@ object ErrorSummary {
           case (iteration, _)                                                 => iteration
         }
 
-        val newEffectiveId = XFormsId.buildEffectiveId(prefixedId, newIterations)
+        val newEffectiveId = XFormsId.buildEffectiveId(existingErrorPrefixedId, newIterations)
 
         XFormsId.effectiveIdToAbsoluteId(newEffectiveId)
 
       } else
-        absoluteId // id is not impacted
+        existingErrorAbsoluteId // id is not impacted
     }
 
     val rootElem = errorsInstanceDoc.rootElement

@@ -13,6 +13,8 @@
 @import (reference) "../../../../../../../../bootstrap-src/less/variables";
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
+@minimalRepeatSeparatorSpacing: 5px;
+
 .orbeon {
 
     // Mixin as Flying Saucer doesn't support `:not()`!
@@ -127,7 +129,27 @@
         &.xforms-grid-appearance-minimal {
             .fr-grid {
                 &.fr-repeat {
+
                     .fr-grid-repeat-iteration {
+
+                        .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
+                            border: none; // reset default, as we import other styles that set a border
+                        }
+
+                        // Apparently the PDF renderer doesn't support `:first-of-type` :(
+                        .fr-grid-tr:first-child > {
+                            .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
+                                border-top: 2px solid #ddd;
+                                padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
+                            }
+                        }
+
+                        .fr-grid-tr:last-child > {
+                            .fr-grid-td, .fr-repeat-column-number, .fr-repeat-column-right {
+                                padding-bottom: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
+                            }
+                        }
+
                         .fr-repeat-column-number {
                             background-color: transparent;
                             border: none;
@@ -164,6 +186,8 @@
 
                     .fr-grid-repeat-iteration {
                         border-top: 2px solid #ddd;
+                        margin-top: @minimalRepeatSeparatorSpacing;  // to surround the border with more space on top and bottom
+                        padding-top: @minimalRepeatSeparatorSpacing; // to surround the border with more space on top and bottom
                     }
                 }
             }

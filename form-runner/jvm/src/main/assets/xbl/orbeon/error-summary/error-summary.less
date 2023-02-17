@@ -65,6 +65,7 @@
             &.fr-level-error   { border-color: @error; }
         }
 
+        // 2023-02-17: No longer used
         .fr-error-number {
             display: none;
         }
@@ -75,6 +76,13 @@
 
         .btn-link {
             text-decoration: none;
+            white-space: normal;    // prevent wrapping, see https://github.com/orbeon/orbeon-forms/issues/5681
+            border: none;           // to align with list number
+            vertical-align: bottom; // to align with list number
+            padding: 0;             // to align with list number
+            margin: 0;              // probably unneeded
+            appearance: none;       // probably unneeded
+            display: inline;        // probably unneeded
         }
 
         .fr-error-label, .fr-error-alert {

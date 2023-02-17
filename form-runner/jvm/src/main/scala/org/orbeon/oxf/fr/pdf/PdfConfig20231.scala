@@ -162,7 +162,7 @@ object PdfConfig20231 extends ScalaToXml {
             case Some("formula") =>
               obj("value").map(_.asString) match {
                 case Some(Some(expr)) => Right(Param.ExpressionParam(name, expr))
-                case _                => Left(DecodingFailure(s"Missing `expression` for expression param `$name`", Nil))
+                case _                => Left(DecodingFailure(s"Missing `value` for expression param `$name`", Nil))
               }
             case Some("page-number") =>
               obj("format").map(_.as[Option[CounterFormat]]) match {

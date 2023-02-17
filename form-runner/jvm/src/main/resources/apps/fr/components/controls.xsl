@@ -226,7 +226,7 @@
                                             fr:maybe-replace(
                                                 concat(
                                                     'string((',
-                                                    frf:replaceVarReferencesWithFunctionCalls($p/(*:expr, *:expression)[1], $p/(*:expr, *:value)[1], false(), $library-name),
+                                                    frf:replaceVarReferencesWithFunctionCalls($p/(*:expr, *:value)[1], $p/(*:expr, *:value)[1], false(), $library-name),
                                                     ')[1])'
                                                 ),
                                                 $for-pdf

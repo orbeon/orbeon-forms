@@ -270,7 +270,7 @@
                                                 (
                                                     '''',
                                                     '&quot; counter(',
-                                                    if ($type = 'PageNumberParam') then 'page' else 'pages',
+                                                    if ($type = ('PageNumberParam', 'page-number')) then 'page' else 'pages',
                                                     ', ',
                                                     ($p/*:format, 'decimal')[1],
                                                     ') &quot;',

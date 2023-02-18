@@ -103,6 +103,7 @@ CREATE TABLE orbeon_i_control_text (
 )   ENGINE = InnoDB;
 
 CREATE        INDEX orbeon_form_definition_i1     ON orbeon_form_definition        (app, form);
+CREATE        INDEX orbeon_form_definition_i2     ON orbeon_form_definition        (app, form, form_version, last_modified_time);
 CREATE        INDEX orbeon_form_definition_att_i1 ON orbeon_form_definition_attach (app, form, file_name);
 CREATE        INDEX orbeon_from_data_i1           ON orbeon_form_data              (app, form, document_id, draft);
 CREATE        INDEX orbeon_form_data_i2           ON orbeon_form_data              (document_id);

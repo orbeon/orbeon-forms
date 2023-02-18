@@ -1,3 +1,9 @@
 .xbl-fr-ladda-button {
-    display: inline;
+  display: inline;
+}
+
+/* Undo the `z-index: 3` in the Ladda theme, otherwise the label of the button shows over the
+   buttons bar (`.fr-buttons`). We're not sure why Ladda would have that `z-index: 3`. */
+.xbl-fr-ladda-button .ladda-button .ladda-label {
+  z-index: auto;
 }

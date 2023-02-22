@@ -216,7 +216,6 @@ object PdfConfig20231 extends ScalaToXml {
   val decoder: Decoder[MyState] = implicitly
 
   // Called from XSLT and XForms
-  // TODO: cache config at property level
   //@XPathFunction
   def getHeaderFooterConfigXml(app: String, form: String): DocumentInfo = {
 

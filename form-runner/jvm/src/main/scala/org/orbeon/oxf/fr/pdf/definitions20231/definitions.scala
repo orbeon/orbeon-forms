@@ -4,8 +4,8 @@ package org.orbeon.oxf.fr.pdf.definitions20231
 // See also `EmailMetadata.Param`
 sealed trait Param { val name: String }
 object Param {
-  case class ControlValueParam     (name: String, controlName: String)           extends Param // preserve `controlName` to match `<*:controlName>`
-  case class ExpressionParam       (name: String, expr: String)                  extends Param // preserve `expr` to match `<*:expr>`
+  case class ControlValueParam     (name: String, controlName: String)           extends Param
+  case class ExpressionParam       (name: String, expr: String)                  extends Param
   case class LinkToEditPageParam   (name: String)                                extends Param
   case class LinkToViewPageParam   (name: String)                                extends Param
   case class LinkToNewPageParam    (name: String)                                extends Param

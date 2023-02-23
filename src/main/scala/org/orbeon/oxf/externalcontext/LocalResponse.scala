@@ -26,7 +26,7 @@ class LocalResponse(rewriter: URLRewriter) extends Response with CachingResponse
 
   private var _statusCode                         = 200
   private var _serverSideRedirect: Option[String] = None
-  private var _lowerCaseHeaders                   = mutable.LinkedHashMap[String, List[String]]()
+  private val _lowerCaseHeaders                   = mutable.LinkedHashMap[String, List[String]]()
 
   private var _stringWriter: StringBuilderWriter        = null
   private var _printWriter : PrintWriter                = null

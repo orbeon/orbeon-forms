@@ -37,6 +37,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 import org.orbeon.xml.NamespaceMapping
 
+import scala.collection.compat._
 import scala.collection.immutable
 import scala.util.Try
 
@@ -66,7 +67,7 @@ object FormRunnerParams {
     FormRunnerParams(
       app         = paramsRootElem elemValue "app",
       form        = paramsRootElem elemValue "form",
-      formVersion = Try(paramsRootElem elemValue "form-version" toInt) getOrElse 1, // in `test` mode, for example, `form-version` is blank
+      formVersion = (paramsRootElem elemValue "form-version").toIntOption.getOrElse(1), // in `test` mode, for example, `form-version` is blank
       document    = paramsRootElem elemValue "document" trimAllToOpt,
       isDraft     = paramsRootElem.elemValue("draft").trimAllToOpt.map(_ == "true"),
       mode        = paramsRootElem elemValue "mode"

@@ -41,8 +41,8 @@
     <language top="true" code="pt" english-name="Portuguese" native-name="Português"/>
     <language top="true" code="de" english-name="German" native-name="Deutsch"/>
 
-    <language top="true" code="zh-Hant" english-name="Traditional Chinese" native-name="中文 (正體字)"/>
-    <language top="true" code="zh-Hans" english-name="Simplified Chinese" native-name="中文 (简化字)"/>
+    <language top="true" code="zh-Hant" english-name="Traditional Chinese" native-name="繁體中文"/>
+    <language top="true" code="zh-Hans" english-name="Simplified Chinese" native-name="简体中文"/>
     <language top="true" code="hi" english-name="Hindi" native-name="हिन्दी"/>
     <language top="true" code="ar" english-name="Arabic" native-name="‫العربية"/>
     <language top="true" code="bn" english-name="Bengali" native-name="বাংলা"/>

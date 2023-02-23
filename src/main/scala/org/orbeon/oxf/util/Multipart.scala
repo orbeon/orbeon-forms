@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.util
 
-import java.io.OutputStream
-import java.{util => ju}
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
 import org.apache.commons.fileupload._
 import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
 import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.apache.commons.fileupload.util.Streams
-import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
 import org.orbeon.datatypes.MaximumSize.LimitedSize
+import org.orbeon.datatypes.{MaximumSize, Mediatype, MediatypeRange}
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils._
 import org.orbeon.io.{CharsetNames, LimiterInputStream}
@@ -29,9 +27,10 @@ import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
-import org.orbeon.oxf.util.CoreUtils.PipeOps
 import shapeless.syntax.typeable._
 
+import java.io.OutputStream
+import java.{util => ju}
 import scala.collection.{mutable => m}
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
@@ -103,10 +102,11 @@ object Multipart {
       def getContentLength     = if (contentLength > Int.MaxValue) -1 else contentLength.toInt // this won't be used anyway
     }
 
-    val maxSize = MaximumSize.unapply(RequestGenerator.getMaxSizeProperty.toString) getOrElse LimitedSize(0)
+    val maxSize  = MaximumSize.unapply(RequestGenerator.getMaxSizeProperty.toString) getOrElse LimitedSize(0)
+    val maxFiles = Some(RequestGenerator.getMaxFilesProperty.toLong).filter(_ >= 0)
 
     // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
-    parseMultipartRequest(uploadContext, None, maxSize, headerEncoding, RequestGenerator.getMaxMemorySizeProperty) match {
+    parseMultipartRequest(uploadContext, None, maxSize, maxFiles, headerEncoding, RequestGenerator.getMaxMemorySizeProperty) match {
       case (nameValuesFileScan, None) =>
 
         // Add a listener to destroy file items when the pipeline context is destroyed
@@ -132,6 +132,7 @@ object Multipart {
     uploadContext  : UploadContext,
     lifecycleOpt   : Option[MultipartLifecycle],
     maxSize        : MaximumSize,
+    maxFiles       : Option[Long],
     headerEncoding : String,
     maxMemorySize  : Int
   ): (List[(String, UploadItem, Option[FileScanAcceptResult])], Option[Throwable]) = {
@@ -151,6 +152,7 @@ object Multipart {
 
     servletFileUpload.setSizeMax(adjustedMaxSize)
     servletFileUpload.setFileSizeMax(adjustedMaxSize)
+    servletFileUpload.setFileCountMax(maxFiles.getOrElse(-1))
 
     // Parse the request and add file information
     useAndClose(uploadContext.getInputStream) { _ =>

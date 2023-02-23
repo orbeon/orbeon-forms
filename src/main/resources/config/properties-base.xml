@@ -74,6 +74,7 @@
 
     <!-- Processor-specific properties -->
     <property as="xs:integer" processor-name="oxf:request"   name="max-upload-size"          value="100000000"/>
+    <property as="xs:integer" processor-name="oxf:request"   name="max-upload-files"         value="20"/>
     <property as="xs:integer" processor-name="oxf:request"   name="max-upload-memory-size"   value="10240"/>
     <property as="xs:anyURI"  processor-name="oxf:page-flow" name="authorizer"               value=""/><!-- e.g. /orbeon-auth -->
     <property as="xs:string"  processor-name="oxf:page-flow" name="page-public-methods"      value="GET HEAD"/>

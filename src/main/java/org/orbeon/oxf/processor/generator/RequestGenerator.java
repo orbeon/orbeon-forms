@@ -72,7 +72,9 @@ public class RequestGenerator extends ProcessorImpl {
 
     // Maximum upload size
     private static final int DEFAULT_MAX_UPLOAD_SIZE = 1024 * 1024;
+    private static final int DEFAULT_MAX_UPLOAD_FILES = 20;
     private static final String MAX_UPLOAD_SIZE_PROPERTY = "max-upload-size";
+    private static final String MAX_UPLOAD_FILES_PROPERTY = "max-upload-files";
 
     // Maximum size kept in memory
     private static final int DEFAULT_MAX_UPLOAD_MEMORY_SIZE = 10 * 1024;
@@ -589,6 +591,12 @@ public class RequestGenerator extends ProcessorImpl {
         PropertySet propertySet = Properties.instance().getPropertySet(XPLConstants.REQUEST_PROCESSOR_QNAME());
         Integer maxSizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY);
         return (maxSizeProperty != null) ? maxSizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE;
+    }
+
+    public static int getMaxFilesProperty() {
+        PropertySet propertySet = Properties.instance().getPropertySet(XPLConstants.REQUEST_PROCESSOR_QNAME());
+        Integer maxFilesProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_FILES_PROPERTY);
+        return (maxFilesProperty != null) ? maxFilesProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_FILES;
     }
 
     public static int getMaxMemorySizeProperty() {

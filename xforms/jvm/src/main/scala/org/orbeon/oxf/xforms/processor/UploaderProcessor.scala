@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor
 
+import org.apache.commons.fileupload.FileCountLimitExceededException
 import org.apache.commons.fileupload.FileUploadBase.{FileSizeLimitExceededException, SizeLimitExceededException}
 import org.apache.commons.fileupload.disk.DiskFileItem
 import org.orbeon.io.IOUtils.useAndClose
@@ -135,7 +136,7 @@ class UploaderProcessor extends ProcessorImpl {
                       </xxf:event>
                     </xxf:events>
                   )
-                case _: SizeLimitExceededException | _: FileSizeLimitExceededException =>
+                case _: SizeLimitExceededException | _: FileSizeLimitExceededException | _: FileCountLimitExceededException =>
                   throw HttpStatusCodeException(StatusCode.RequestEntityTooLarge, throwable = someThrowable)
                 case _ =>
                   throw HttpStatusCodeException(StatusCode.InternalServerError, throwable = someThrowable)

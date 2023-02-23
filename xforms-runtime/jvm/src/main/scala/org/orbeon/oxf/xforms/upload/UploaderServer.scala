@@ -91,6 +91,7 @@ object UploaderServer {
         }
       ),
       maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter
+      maxFiles       = None, // because we use our own limiter
       headerEncoding = ExternalContext.StandardHeaderCharacterEncoding,
       maxMemorySize  = -1 // make sure that the `FileItem`s returned always have an associated file
     )

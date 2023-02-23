@@ -88,6 +88,7 @@ class MultipartTest extends ResourceManagerSupport with AnyFunSpecLike {
           }
         ),
         MaximumSize.unapply(maxSize.toString) getOrElse LimitedSize(0L),
+        None,
         ExternalContext.StandardHeaderCharacterEncoding,
         0
       )

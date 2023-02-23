@@ -44,7 +44,7 @@ object InternalHttpClient extends HttpClient[CookieStore] {
       ProcessorService.currentProcessorService.value getOrElse
       (throw new OXFException(s"InternalHttpClient: missing current servlet or portlet connecting to $url."))
 
-    val incomingExternalContext = NetUtils.getExternalContext
+    val incomingExternalContext = NetUtils.getExternalContext // should be passed as implicit value
     val incomingRequest         = incomingExternalContext.getRequest
 
     // NOTE: Only `oxf:redirect` calls `Response.sendRedirect` with `isServerSide = true`. In turn, `oxf:redirect`
@@ -75,10 +75,12 @@ object InternalHttpClient extends HttpClient[CookieStore] {
         Headers.firstItemIgnoreCase(headers, Headers.OrbeonClient) match {
           case Some(client) if Headers.EmbeddedClientValues(client) =>
             new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable, request, wsrpEncodeResources = true)
-          case Some(_) =>
+          case _ =>
             new ServletURLRewriter(request)
-          case None =>
-            incomingExternalContext.getResponse: URLRewriter
+          // We used to have `incomingExternalContext.getResponse: URLRewriter`, but this must not be done for async
+          // submissions. In practice, either we use the WSRP rewriter when in embedded mode, or we use the servlet
+          // rewriter, so we should never have to use the response rewriter.
+          // See https://github.com/orbeon/orbeon-forms/issues/5696
         }
 
       val response = new LocalResponse(urlRewriter)

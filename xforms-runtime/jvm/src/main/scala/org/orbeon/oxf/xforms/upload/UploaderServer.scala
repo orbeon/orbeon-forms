@@ -24,6 +24,7 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Session}
 import org.orbeon.oxf.http.Headers
+import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.Multipart.UploadItem
 import org.orbeon.oxf.util.SLF4JLogging._
 import org.orbeon.oxf.util.StringUtils._
@@ -43,7 +44,6 @@ import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
-
 import scala.collection.compat._
 
 
@@ -91,7 +91,7 @@ object UploaderServer {
         }
       ),
       maxSize        = MaximumSize.UnlimitedSize, // because we use our own limiter
-      maxFiles       = None, // because we use our own limiter
+      maxFiles       = Some(RequestGenerator.getMaxFilesProperty.toLong).filter(_ >= 0), // probably not really needed
       headerEncoding = ExternalContext.StandardHeaderCharacterEncoding,
       maxMemorySize  = -1 // make sure that the `FileItem`s returned always have an associated file
     )

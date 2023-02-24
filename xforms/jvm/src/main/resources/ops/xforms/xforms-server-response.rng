@@ -190,6 +190,9 @@
                                                 <!-- For selection controls only -->
                                                 <optional>
                                                     <element name="xxf:itemset">
+                                                        <optional>
+                                                            <attribute name="group"/>
+                                                        </optional>
                                                         <data type="string"/>
                                                     </element>
                                                 </optional>

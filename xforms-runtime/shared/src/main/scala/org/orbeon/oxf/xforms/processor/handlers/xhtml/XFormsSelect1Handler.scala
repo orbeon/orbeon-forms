@@ -193,8 +193,8 @@ object XFormsSelect1Handler {
         // Get group name from selection control if possible
         val name =
           control match {
-            case c: XFormsSelect1Control if ! isMultiple => c.getGroupName // TODO: fix select/select1 inheritance
-            case _ => itemName
+            case c: XFormsSelect1Control => c.getGroupName.getOrElse(c.getEffectiveId)
+            case _                       => itemName // `$xforms-item-name$` or `effectiveId`
           }
 
         atts.addOrReplace("name", name)

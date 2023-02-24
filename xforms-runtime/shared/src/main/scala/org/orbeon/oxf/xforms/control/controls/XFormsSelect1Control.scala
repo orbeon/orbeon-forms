@@ -68,9 +68,9 @@ class XFormsSelect1Control(
       getItemset
   }
 
-  // Return the custom group name if present, otherwise return the effective id
-  def getGroupName: String =
-    extensionAttributeValue(XXFORMS_GROUP_QNAME) getOrElse getEffectiveId
+  // The static control ensures that this can be present only for `xf|select1[appearance = full]`
+  def getGroupName: Option[String] =
+    extensionAttributeValue(XXFORMS_GROUP_QNAME)
 
   override def hasJavaScriptInitialization: Boolean =
     staticControl.appearances contains XFORMS_COMPACT_APPEARANCE_QNAME
@@ -341,7 +341,11 @@ class XFormsSelect1Control(
       mustSendItemsetUpdate(previousControl map (_.asInstanceOf[XFormsSelect1Control]) orNull)
 
     val outputNestedContent = (ch: XMLReceiverHelper) => {
-      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "itemset", Array[String]())
+
+      val atts =
+        getGroupName.map(name => Array("group", name)).getOrElse(Array.empty)
+
+      ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "itemset", atts)
 
       val itemset = getItemset
       if (itemset ne null) {

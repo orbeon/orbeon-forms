@@ -73,6 +73,7 @@
                         function handleItemset(elem, controlId) {
 
                             var itemsetTree = JSON.parse(ORBEON.util.Dom.getStringValue(elem));
+                            var groupName   = elem.getAttribute("group");
 
                             if (itemsetTree == null)
                                 itemsetTree = [];
@@ -125,7 +126,7 @@
                                     ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-value$", itemElement.value, false);
                                     var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e" + itemIndex);
                                     ORBEON.util.Utils.replaceInDOM(templateClone, isSelect ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId, false);
-                                    ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-item-name$", controlId, false);
+                                    ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-item-name$", ! _.isNull(groupName) ? groupName : controlId, false);
 
                                     if (itemElement.help && itemElement.help != "") {
                                         ORBEON.util.Utils.replaceInDOM(templateClone, "$xforms-template-help$", itemElement.help, false);

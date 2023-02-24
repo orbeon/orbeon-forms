@@ -31,6 +31,7 @@
         <xsl:param name="model-id"        as="xs:string"/>
         <xsl:param name="to-control-name" as="xs:string"/>
         <xsl:param name="at"              as="xs:string?"/>
+        <xsl:param name="library-name"    as="xs:string?"/>
 
         <xsl:choose>
             <xsl:when test="exists($at)">
@@ -61,7 +62,9 @@
                         concat(
                             'frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute(''fr-action-source''), ''',
                             $to-control-name,
-                            ''', true(), ())'
+                            ''', true(),',
+                            if (exists($library-name)) then concat('''', $library-name, '''') else '()',
+                            ')'
                         )"/>
             </xsl:otherwise>
         </xsl:choose>
@@ -107,17 +110,27 @@
                 )"/>
     </xsl:function>
 
-    <!-- Match and modify `fr:action`s -->
+    <!-- Match and modify `fr:listener`s -->
     <xsl:template
+        xmlns:xbl="http://www.w3.org/ns/xbl"
         match="
             /xh:html/xh:head//
                 xf:model[
                     generate-id() = $candidate-action-models-ids
                 ]/fr:listener[
                     @version = '2018.2'
+                ]
+            |
+            /xh:html/xh:head//
+                xbl:handlers/fr:listener[
+                    @version = '2018.2'
                 ]">
 
-        <xsl:variable name="model-id" select="../@id/string()" as="xs:string"/>
+        <!-- This must be in scope in the case of `<xbl:handlers>` content -->
+        <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
+
+        <xsl:variable name="is-handler" select="exists(parent::xbl:handlers)" as="xs:boolean"/>
+        <xsl:variable name="model-id"   select="(if ($is-handler) then ../../xbl:implementation/xf:model else ..)/@id/string()" as="xs:string"/>
 
         <xsl:variable name="modes"          select="p:split(@modes)"/>
         <xsl:variable name="events"         select="p:split(@events)"/>
@@ -150,13 +163,54 @@
         </xsl:if>
 
         <xsl:if test="exists($control-events)">
-            <xf:action
-                observer="{for $c in $control-names return concat($c, '-control')}"
-                target="#observer"
-                event="{
-                    for $e in $control-events
-                    return $controls-xforms-action-names[index-of($controls-2018.2-action-names, $e)]
-                }">
+
+            <xsl:variable
+                xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                name="is-outer"
+                select="@xxbl:scope = 'outer'"/>
+
+            <xsl:element name="{if ($is-handler) then 'xbl:handler' else 'xf:action'}">
+                <xsl:attribute
+                    name="observer"
+                    select="
+                        if ($is-outer) then
+                            'fr-view-component'
+                        else
+                            string-join(
+                                for $c in $control-names
+                                    return concat($c, '-control'),
+                                ' '
+                            )"/>
+                <xsl:if test="not($is-outer)">
+                    <xsl:attribute name="target">#observer</xsl:attribute>
+                </xsl:if>
+                <xsl:attribute
+                    name="event"
+                    select="
+                        string-join(
+                            for $e in $control-events
+                                return $controls-xforms-action-names[
+                                    index-of($controls-2018.2-action-names, $e)
+                                ],
+                            ' '
+                        )"/>
+
+                <xsl:if test="$is-outer">
+                    <xsl:copy-of select="@xxbl:scope" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"/>
+                    <xsl:attribute name="xxf:phantom">true</xsl:attribute>
+                    <xsl:attribute name="if" select="
+                        concat(
+                            'frf:controlMatchesNameAndLibrary(event(''xxf:absolute-targetid''), (',
+                            string-join(
+                                for $o in $control-names
+                                    return concat('''', $o, ''''),
+                                ','
+                            ),
+                            '), ''',
+                            $library-name,
+                            ''')'
+                        )"/>
+                </xsl:if>
 
                 <xsl:if test="exists($modes)">
                     <xsl:attribute name="if">fr:mode() = (<xsl:value-of
@@ -165,11 +219,14 @@
 
                 <xsl:for-each select="$actions">
                     <xf:dispatch name="fr-call-user-{.}-action" targetid="{$model-id}">
+                        <xsl:if test="$is-outer">
+                            <xsl:attribute name="xxbl:scope" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">inner</xsl:attribute>
+                        </xsl:if>
                         <xf:property name="action-source" value="event('xxf:absolute-targetid')"/>
                     </xf:dispatch>
                 </xsl:for-each>
 
-            </xf:action>
+            </xsl:element>
         </xsl:if>
 
     </xsl:template>
@@ -414,7 +471,7 @@
                                 <xsl:variable name="control" select="@control/string()" as="xs:string"/>
                                 <xf:var
                                     name="value"
-                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), '{$control}', true(), ())"/>
+                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), '{$control}', true(), {if (exists($library-name)) then concat('''', $library-name, '''') else '()'})"/>
                             </xsl:when>
                             <xsl:when test="exists(@value)">
                                 <xsl:variable name="value" select="@value/string()" as="xs:string"/>
@@ -591,7 +648,7 @@
             <xf:recalculate/>
 
             <xf:action>
-                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
                 <xf:setvalue
                     ref="."
                     value="$value"/>
@@ -602,7 +659,8 @@
 
     <xsl:template match="fr:control-clear" mode="within-action-2018.2">
 
-        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+        <xsl:param tunnel="yes" name="model-id"     as="xs:string"/>
+        <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
 
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
@@ -613,7 +671,7 @@
             <xf:recalculate/>
 
             <xf:action>
-                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
                 <!-- https://github.com/orbeon/orbeon-forms/issues/5471 -->
                 <xf:delete
                     ref="_"/>
@@ -821,7 +879,8 @@
 
     <xsl:template match="fr:control-setattachment" mode="within-action-2018.2">
 
-        <xsl:param tunnel="yes" name="model-id" as="xs:string"/>
+        <xsl:param tunnel="yes" name="model-id"     as="xs:string"/>
+        <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
 
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
@@ -835,7 +894,7 @@
             <xf:recalculate/>
 
             <xf:action>
-                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
                 <xf:setvalue
                     ref="image, ."
                     value="$value"/>
@@ -867,7 +926,7 @@
             <xf:recalculate/>
 
             <xf:action>
-                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
                 <xf:setvalue
                     ref="@filename"
                     value="$value"/>
@@ -893,7 +952,7 @@
             <xf:recalculate/>
 
             <xf:action>
-                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at)"/>
+                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
                 <xf:setvalue
                     ref="image/@mediatype, ./@mediatype"
                     value="$value"/>

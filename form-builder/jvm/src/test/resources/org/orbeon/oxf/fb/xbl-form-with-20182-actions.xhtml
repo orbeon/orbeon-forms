@@ -1,0 +1,252 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map"
+         xmlns:array="http://www.w3.org/2005/xpath-functions/array"
+         xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:sql="http://orbeon.org/oxf/xml/sql"
+         xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    <xh:head>
+        <xh:title>form-with-20182-actions</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true" xxf:analysis.calculate="true">
+
+            <!-- Listener and action upon initialization -->
+            <!-- 2023-02-24: here we target controls in both sections. At runtime, actions might not be able to
+                 find the controls unless we filter them out in `form-to-xbl.xsl`, but right now we don't. -->
+            <fr:listener
+                version="2018.2"
+                events="form-load-after-data"
+                actions="my-load-action"/>
+
+            <fr:action
+                name="my-load-action"
+                version="2018.2">
+                <fr:control-setvalue control="s1c1" value="'gaga'"/>
+                <fr:control-setvalue control="s2c1" value="'toto'"/>
+            </fr:action>
+
+            <!-- Listener and action within `my-section-2` only -->
+            <fr:listener
+                version="2018.2"
+                events="value-changed activated"
+                controls="s2c1"
+                actions="my-section-2-action"/>
+
+            <fr:action
+                name="my-section-2-action"
+                version="2018.2">
+                <fr:control-setvalue control="s2c2" value="$s2c1"/>
+            </fr:action>
+
+            <!-- Listener on `my-section-1` and action within `my-section-2` -->
+            <fr:listener
+                version="2018.2"
+                events="value-changed activated"
+                controls="s1c1"
+                actions="my-section-2-action"/>
+
+            <!-- Listeners on `my-section-1` and actions impact `my-section-2` -->
+            <fr:listener version="2018.2" events="activated" controls="s1b1"
+                         actions="my-copy-s1c1-to-s2c1"/>
+
+            <fr:action name="my-copy-s1c1-to-s2c1" version="2018.2">
+                <fr:control-setvalue control="s2c1" value="$s1c1"/>
+            </fr:action>
+
+            <fr:listener version="2018.2" events="activated" controls="s1b2"
+                         actions="my-copy-s1c2-to-s2c2"/>
+
+            <fr:action name="my-copy-s1c2-to-s2c2" version="2018.2">
+                <fr:control-setvalue control="s2c2" value="$s1c2"/>
+            </fr:action>
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all" xxf:index="id">
+                <form>
+                    <my-section-1>
+                        <s1g1>
+                            <s1c1/>
+                            <s1c2/>
+                            <s1b1/>
+                            <s1b2/>
+                        </s1g1>
+                    </my-section-1>
+                    <my-section-2>
+                        <s2g1>
+                            <s2c1/>
+                            <s2c2/>
+                        </s2g1>
+                    </my-section-2>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="my-section-1-bind" name="my-section-1" ref="my-section-1">
+                    <xforms:bind xmlns:xforms="http://www.w3.org/2002/xforms" id="s1g1-bind" ref="s1g1"
+                                 name="s1g1">
+                        <xf:bind id="s1c1-bind" name="s1c1" ref="s1c1" xxf:whitespace="trim"/>
+                        <xf:bind id="s1c2-bind" name="s1c2" ref="s1c2" xxf:whitespace="trim"/>
+                        <xf:bind id="s1b1-bind" ref="s1b1" name="s1b1"/>
+                        <xf:bind id="s1b2-bind" ref="s1b2" name="s1b2"/>
+                    </xforms:bind>
+
+                </xf:bind>
+                <xf:bind id="my-section-2-bind" ref="my-section-2" name="my-section-2">
+                    <xf:bind id="s2g1-bind" ref="s2g1" name="s2g1">
+                        <xf:bind id="s2c1-bind" ref="s2c1" name="s2c1" xxf:whitespace="trim"/>
+                        <xf:bind id="s2c2-bind" ref="s2c2" name="s2c2" xxf:whitespace="trim"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true" xxf:exclude-result-prefixes="#all">
+                <metadata>
+                    <application-name>tests</application-name>
+                    <form-name>library</form-name>
+                    <title xml:lang="en">form-with-20182-actions</title>
+                    <description xml:lang="en"/>
+                    <created-with-version>2022.1-SNAPSHOT PE</created-with-version>
+                    <updated-with-version>2022.1-SNAPSHOT PE</updated-with-version>
+                    <email>
+                        <templates>
+                            <template name="default">
+                                <form-fields/>
+                            </template>
+                        </templates>
+                        <parameters/>
+                    </email>
+                    <library-versions>
+                        <orbeon>3</orbeon>
+                        <app>1</app>
+                    </library-versions>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments" xxf:exclude-result-prefixes="#all">
+                <attachments/>
+            </xf:instance>
+
+            <!-- All form resources -->
+            <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
+                <resources>
+                    <resource xml:lang="en">
+                        <s2c1>
+                            <label>S2C1</label>
+                            <hint/>
+                        </s2c1>
+                        <s2c2>
+                            <label>S2C2</label>
+                            <hint/>
+                        </s2c2>
+                        <my-section-1>
+                            <label>My section 1</label>
+                        </my-section-1>
+                        <my-section-2>
+                            <label>My section 2</label>
+                        </my-section-2>
+                        <s1c1>
+                            <label>S1C1</label>
+                            <hint/>
+
+                        </s1c1>
+                        <s1c2>
+                            <label>S1C2</label>
+                            <hint/>
+
+                        </s1c2>
+                        <s1b1>
+                            <label>Button 1</label>
+                            <hint/>
+                        </s1b1>
+                        <s1b2>
+                            <label>Button 2</label>
+                            <hint/>
+                        </s1b2>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <fr:section id="my-section-1-section" bind="my-section-1-bind">
+                    <xf:label ref="$form-resources/my-section-1/label"/>
+                    <fr:grid id="s1g1-grid" bind="s1g1-bind">
+                        <fr:c y="1" x="1" w="6">
+                                <xf:input id="s1c1-control" bind="s1c1-bind">
+                                    <xf:label ref="$form-resources/s1c1/label"/>
+                                    <xf:hint ref="$form-resources/s1c1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                </xf:input>
+                            </fr:c>
+                        <fr:c y="1" x="7" w="6">
+                            <xf:input id="s1c2-control" bind="s1c2-bind">
+                                    <xf:label ref="$form-resources/s1c2/label"/>
+                                    <xf:hint ref="$form-resources/s1c2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                                </xf:input>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:trigger id="s1b1-control" bind="s1b1-bind">
+                                <xf:label ref="$form-resources/s1b1/label"/>
+
+                                <xf:hint ref="$form-resources/s1b1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:trigger id="s1b2-control" bind="s1b2-bind">
+                                <xf:label ref="$form-resources/s1b2/label"/>
+
+                                <xf:hint ref="$form-resources/s1b2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:trigger>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="my-section-2-section" bind="my-section-2-bind">
+                    <xf:label ref="$form-resources/my-section-2/label"/>
+                    <fr:grid id="s2g1-grid" bind="s2g1-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <xf:input id="s2c1-control" bind="s2c1-bind">
+                                <xf:label ref="$form-resources/s2c1/label"/>
+                                <xf:hint ref="$form-resources/s2c1/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6">
+                            <xf:input id="s2c2-control" bind="s2c2-bind">
+                                <xf:label ref="$form-resources/s2c2/label"/>
+                                <xf:hint ref="$form-resources/s2c2/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

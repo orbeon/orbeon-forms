@@ -1,0 +1,73 @@
+<xbl:xbl
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+>
+    <xbl:binding id="tests-my-section-1-component" element="component|my-section-1" class="fr-section-component">
+        <xbl:implementation>
+            <xf:model id="my-section-1-model">
+                <fr:listener
+                    version="2018.2"
+                    events="form-load-after-data"
+                    actions="my-load-action"/>
+                <fr:action
+                    name="my-load-action"
+                    version="2018.2">
+                    <fr:control-setvalue control="s1c1" value="'gaga'"/>
+                    <fr:control-setvalue control="s2c1" value="'toto'"/>
+                </fr:action>
+            </xf:model>
+        </xbl:implementation>
+    </xbl:binding>
+    <xbl:binding id="tests-my-section-2-component" element="component|my-section-2" class="fr-section-component">
+        <xbl:handlers>
+            <fr:listener
+                version="2018.2"
+                events="value-changed activated"
+                actions="my-section-2-action"
+                controls="s2c1"/>
+            <fr:listener
+                xxbl:scope="outer"
+                version="2018.2"
+                events="value-changed activated"
+                actions="my-section-2-action"
+                controls="s1c1"/>
+            <fr:listener
+                xxbl:scope="outer"
+                version="2018.2"
+                events="activated"
+                actions="my-copy-s1c1-to-s2c1"
+                controls="s1b1"/>
+            <fr:listener
+                xxbl:scope="outer"
+                version="2018.2"
+                events="activated"
+                actions="my-copy-s1c2-to-s2c2"
+                controls="s1b2"/>
+        </xbl:handlers>
+        <xbl:implementation>
+            <xf:model id="my-section-2-model">
+                <fr:listener
+                    version="2018.2"
+                    events="form-load-after-data"
+                    actions="my-load-action"/>
+                <fr:action
+                    name="my-load-action"
+                    version="2018.2">
+                    <fr:control-setvalue control="s1c1" value="'gaga'"/>
+                    <fr:control-setvalue control="s2c1" value="'toto'"/>
+                </fr:action>
+                <fr:action name="my-section-2-action" version="2018.2">
+                    <fr:control-setvalue control="s2c2" value="$s2c1"/>
+                </fr:action>
+                <fr:action name="my-copy-s1c1-to-s2c1" version="2018.2">
+                    <fr:control-setvalue control="s2c1" value="$s1c1"/>
+                </fr:action>
+                <fr:action name="my-copy-s1c2-to-s2c2" version="2018.2">
+                    <fr:control-setvalue control="s2c2" value="$s1c2"/>
+                </fr:action>
+            </xf:model>
+        </xbl:implementation>
+    </xbl:binding>
+</xbl:xbl>

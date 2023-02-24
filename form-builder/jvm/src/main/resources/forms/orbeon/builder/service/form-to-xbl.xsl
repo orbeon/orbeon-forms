@@ -53,6 +53,9 @@
     <xsl:variable name="fr-metadata-instance"  select="$fr-form-model/xf:instance[@id = 'fr-form-metadata']"    as="element(xf:instance)*"/>
 
     <!-- Actions and services -->
+
+    <!-- Start legacy actions -->
+
     <!-- NOTE: Actions and services are implemented, for historical reasons, as XForms instances, submissions, and action
          blocks. This means that we must analyze them to try to make sense of them, and this is a bit fragile. In the
          future, actions should be described in a more declarative format. See also:
@@ -111,6 +114,62 @@
         name="all-actions-without-destination-controls"
         select="
             $actions[empty(fr:action-destination-control-ids(.))]"/>
+
+    <!-- End legacy actions -->
+
+    <!-- Start 2018.2 actions -->
+
+    <xsl:variable name="actions-20182"   select="$fr-form-model/fr:action[@version = '2018.2']"/>
+    <xsl:variable name="listeners-20182" select="$fr-form-model/fr:listener[@version = '2018.2']"/>
+
+    <xsl:function name="fr:listeners-20182-for-action" as="element(fr:listener)*">
+        <xsl:param name="action" as="element(fr:action)"/>
+        <xsl:sequence select="$listeners-20182[@actions/p:split() = $action/@name]"/>
+    </xsl:function>
+
+    <!-- Distinct source names for the given listener -->
+    <!-- NOTE: Source can NOT be a model (it is implicit for model events) -->
+    <xsl:function name="fr:action-20182-observer-names" as="xs:string*">
+        <xsl:param name="action" as="element(fr:action)"/>
+        <xsl:sequence select="distinct-values(fr:listeners-20182-for-action($action)/@controls/p:split())"/>
+    </xsl:function>
+
+    <xsl:function name="fr:action-20182-destination-control-names" as="xs:string*">
+        <xsl:param name="action-20182" as="element(fr:action)"/>
+        <xsl:sequence
+            select="
+                distinct-values(
+                    $action-20182//(
+                        fr:*/@repeat-name,
+                        (
+                            fr:control-setvalue      |
+                            fr:control-clear         |
+                            fr:control-setitems      |
+                            fr:control-setvisited    |
+                            fr:control-setfocus      |
+                            fr:control-setattachment |
+                            fr:control-setfilename   |
+                            fr:control-setmediatype
+                        )/@control
+                    )
+                )"/>
+    </xsl:function>
+
+    <xsl:function name="fr:action-20182-for-affected-control-name" as="element(fr:action)*">
+        <xsl:param name="name" as="xs:string"/>
+        <xsl:sequence select="$actions-20182[$name = fr:action-20182-destination-control-names(.)]"/>
+    </xsl:function>
+
+    <xsl:variable
+        name="all-action-20182-destination-control-names"
+        select="distinct-values($actions-20182/fr:action-20182-destination-control-names(.))"/>
+
+    <xsl:variable
+        name="all-actions-20182-without-destination-controls"
+        select="
+            $actions-20182[empty(fr:action-20182-destination-control-names(.))]"/>
+
+    <!-- End 2018.2 actions -->
 
     <!-- Generate XBL container -->
     <xsl:template match="/">
@@ -224,6 +283,8 @@
             name="this-section-maybe-controls"
             select="$fr-section//*[exists(@id)]"/>
 
+        <!-- Start legacy actions -->
+
         <!-- All controls that can be affected by any action -->
         <xsl:variable
             name="this-section-controls-affected-by-actions"
@@ -233,9 +294,11 @@
             name="relevant-actions"
             select="
                 $actions[
+                    (: Actions that have at least one control of this section as destination :)
                     @id = distinct-values(
                         $this-section-controls-affected-by-actions/@id/fr:action-for-affected-control-id(.)/@id
                     ) or (
+                        (: Actions that have no control as destination, but observe controls in this section :)
                         @id = $all-actions-without-destination-controls/@id and
                         fr:action-observer-ids(.) = $this-section-maybe-controls/@id
                     )
@@ -243,18 +306,56 @@
 
         <!-- Unique service ids used by relevant actions -->
         <xsl:variable
-            name="relevant-service-ids"
+            name="relevant-service-names"
             select="
                 distinct-values(
                     $relevant-actions/xf:action[position() = (2, 3)]/@*:observer/replace(., '(.*)-submission$', '$1')
                 )"/>
 
-        <!-- Unique service instances and submissions used by relevant actions -->
+        <!-- End legacy actions -->
+
+        <!-- Start 2018.2 actions -->
+
+        <xsl:variable
+            name="this-section-controls-affected-by-actions-20182"
+            select="$this-section-maybe-controls[frf:controlNameFromId(@id) = $all-action-20182-destination-control-names]"/>
+
+        <xsl:variable
+            name="relevant-actions-20182"
+            as="element(fr:action)*"
+            select="
+                $actions-20182[
+                    (: Actions that have at least one control of this section as destination :)
+                    @name = distinct-values(
+                        $this-section-controls-affected-by-actions-20182/@id/fr:action-20182-for-affected-control-name(frf:controlNameFromId(.))/@name
+                    ) or (
+                        (: Actions that have no control as destination, but observe controls in this section :)
+                        @name = $all-actions-20182-without-destination-controls/@name and
+                        fr:action-20182-observer-names(.) = $this-section-maybe-controls/@id/frf:controlNameFromId(.)
+                    )
+                ]"/>
+
+        <xsl:variable
+            name="relevant-model-listeners-20182"
+            as="element(fr:listener)*"
+            select="$relevant-actions-20182/fr:listeners-20182-for-action(.)[empty(@controls) (: implying model actions only :)]"/>
+
+        <xsl:variable
+            name="relevant-service-20182-names"
+            as="xs:string*"
+            select="
+                distinct-values(
+                    $relevant-actions-20182//fr:service-call/@service/string()
+                )"/>
+
+        <!-- End 2018.2 actions -->
+
+        <!-- Unique service instances and submissions used by relevant actions (legacy and 2018.2) -->
         <xsl:variable
             name="relevant-services"
             select="
-                $service-instances  [replace(@id, '(.*)-instance$', '$1')   = $relevant-service-ids] |
-                $service-submissions[replace(@id, '(.*)-submission$', '$1') = $relevant-service-ids]"/>
+                $service-instances  [replace(@id, '(.*)-instance$', '$1')   = ($relevant-service-names, $relevant-service-20182-names)] |
+                $service-submissions[replace(@id, '(.*)-submission$', '$1') = ($relevant-service-names, $relevant-service-20182-names)]"/>
 
         <!-- Create binding for the section/grid as a component -->
         <!-- NOTE: In component|foo-section, the namespace already contains the app name. So it's not necessary to
@@ -297,9 +398,21 @@
             <!-- Handlers for actions that listen to events from controls-->
             <xsl:variable
                 name="relevant-actions-triggered-by-controls"
-                select="$relevant-actions[exists(xf:action[1][exists(@*:observer) and @*:observer != 'fr-form-model'])]"/>
+                select="$relevant-actions[
+                    exists(
+                        fr:action-observer-ids(.)[. != 'fr-form-model']
+                    )
+                ]"/>
 
-            <xsl:if test="exists($relevant-actions-triggered-by-controls)">
+            <xsl:variable
+                name="relevant-actions-20182-triggered-by-controls"
+                select="$relevant-actions-20182[
+                    exists(
+                        fr:action-20182-observer-names(.)
+                    )
+                ]"/>
+
+            <xsl:if test="exists(($relevant-actions-triggered-by-controls, $relevant-actions-20182-triggered-by-controls))">
                 <xbl:handlers>
                     <xsl:for-each select="$relevant-actions-triggered-by-controls">
 
@@ -347,6 +460,31 @@
 
                             </xbl:handler>
                         </xsl:if>
+                    </xsl:for-each>
+                    <xsl:for-each select="$relevant-actions-20182-triggered-by-controls">
+
+                        <xsl:variable name="current-action"                 select="."/>
+                        <xsl:variable name="current-observer-names"         select="fr:action-20182-observer-names($current-action)"/>
+                        <xsl:variable name="current-control-observer-names" select="$current-observer-names[. = $this-section-maybe-controls/@id/frf:controlNameFromId(.)]"/>
+                        <xsl:variable name="current-inner-listeners"        select="fr:listeners-20182-for-action($current-action)[exists(@controls/p:split()[. = $current-control-observer-names])]"/>
+                        <xsl:variable name="current-outer-listeners"        select="fr:listeners-20182-for-action($current-action)[exists(@controls/p:split()[not(. = $current-control-observer-names)])]"/>
+
+                        <!-- Observers within this section -->
+                        <xsl:for-each select="$current-inner-listeners">
+                            <xsl:copy>
+                                <xsl:copy-of select="@* except @controls"/>
+                                <xsl:attribute name="controls" select="@controls/p:split()[. = $current-control-observer-names]"/>
+                                <xsl:copy-of select="node()"/>
+                            </xsl:copy>
+                        </xsl:for-each>
+                        <xsl:for-each select="$current-outer-listeners">
+                            <xsl:copy>
+                                <xsl:attribute name="xxbl:scope">outer</xsl:attribute>
+                                <xsl:copy-of select="@* except @controls"/>
+                                <xsl:attribute name="controls" select="@controls/p:split()[not(. = $current-control-observer-names)]"/>
+                                <xsl:copy-of select="node()"/>
+                            </xsl:copy>
+                        </xsl:for-each>
                     </xsl:for-each>
                 </xbl:handlers>
             </xsl:if>
@@ -481,8 +619,8 @@
                         ref="event('xxf:binding')/@fr:relevant"/>
 
                     <!-- Services and actions -->
-                    <xsl:if test="exists(($relevant-services, $relevant-actions))">
-                        <xsl:apply-templates select="$relevant-services, $relevant-actions" mode="filter-actions">
+                    <xsl:if test="exists(($relevant-services, $relevant-actions, $relevant-model-listeners-20182, $relevant-actions-20182))">
+                        <xsl:apply-templates select="$relevant-services, $relevant-actions, $relevant-model-listeners-20182, $relevant-actions-20182" mode="filter-actions">
                             <xsl:with-param name="model-id"                    tunnel="yes" select="$model-id"/>
                             <xsl:with-param name="this-section-maybe-controls" tunnel="yes" select="$this-section-maybe-controls"/>
                         </xsl:apply-templates>

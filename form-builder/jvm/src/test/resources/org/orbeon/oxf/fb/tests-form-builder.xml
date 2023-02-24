@@ -66,6 +66,50 @@
             <output name="data" href="/org/orbeon/oxf/fr/grids-12-columns.xml"/>
         </test>
 
+        <test description="2018.2 actions in XBL files" name="oxf:pipeline">
+            <input name="config">
+                <p:config>
+                    <p:param type="output" name="filtered-xbl"/>
+
+                    <!-- Convert form to XBL -->
+                    <p:processor name="oxf:unsafe-xslt">
+                        <p:input  name="data"   href="xbl-form-with-20182-actions.xhtml"/>
+                        <p:input  name="parameters">
+                            <_>
+                                <app>tests</app>
+                                <form>form-with-20182-actions</form>
+                            </_>
+                        </p:input>
+                        <p:input  name="config" href="oxf:/forms/orbeon/builder/service/form-to-xbl.xsl"/>
+                        <p:output name="data"   id="xbl-result"/>
+                    </p:processor>
+
+                    <!-- Remove everything but actions and listeners -->
+                    <p:processor name="oxf:unsafe-xslt">
+                        <p:input  name="data" href="#xbl-result"/>
+                        <p:input  name="config">
+                            <xsl:stylesheet
+                                version="2.0"
+                                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                                xmlns:xf="http://www.w3.org/2002/xforms"
+                                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                xmlns:xbl="http://www.w3.org/ns/xbl"
+                            >
+                                <xsl:import href="/oxf/xslt/utils/copy-modes.xsl"/>
+
+                                <xsl:template match="fb:metadata | xbl:template"/>
+                                <xsl:template match="xbl:implementation/xf:model/*[not(self::fr:action | self::fr:listener)]"/>
+
+                            </xsl:stylesheet>
+                        </p:input>
+                        <p:output name="data" ref="filtered-xbl"/>
+                    </p:processor>
+                </p:config>
+            </input>
+            <output name="filtered-xbl" href="xbl-result-with-20182-actions.xml"/>
+        </test>
+
     </group>
 
 </tests>

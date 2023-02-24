@@ -56,7 +56,7 @@
     <!-- NOTE: Actions and services are implemented, for historical reasons, as XForms instances, submissions, and action
          blocks. This means that we must analyze them to try to make sense of them, and this is a bit fragile. In the
          future, actions should be described in a more declarative format. See also:
-         https://github.com/orbeon/orbeon-forms/issues/224
+         https://github.com/orbeon/orbeon-forms/issues/3855
      -->
     <xsl:variable name="actions"             select="$fr-form-model/xf:action[ends-with(@id, '-binding')]"/>
     <xsl:variable name="service-instances"   select="$fr-form-model/xf:instance[p:classes() = ('fr-service', 'fr-database-service')]"/>
@@ -98,14 +98,10 @@
     </xsl:function>
 
     <xsl:function name="fr:value-except" as="xs:anyAtomicType*">
-      <xsl:param name="arg1" as="xs:anyAtomicType*"/>
-      <xsl:param name="arg2" as="xs:anyAtomicType*"/>
-      <xsl:sequence select="distinct-values($arg1[not(. = $arg2)])"/>
+        <xsl:param name="arg1" as="xs:anyAtomicType*"/>
+        <xsl:param name="arg2" as="xs:anyAtomicType*"/>
+        <xsl:sequence select="distinct-values($arg1[not(. = $arg2)])"/>
     </xsl:function>
-
-    <xsl:variable
-        name="all-distinct-action-observer-ids"
-        select="distinct-values($actions/fr:action-observer-ids(.))"/>
 
     <xsl:variable
         name="all-action-destination-control-ids"
@@ -237,7 +233,9 @@
             name="relevant-actions"
             select="
                 $actions[
-                    @id = distinct-values($this-section-controls-affected-by-actions/@id/fr:action-for-affected-control-id(.)/@id) or (
+                    @id = distinct-values(
+                        $this-section-controls-affected-by-actions/@id/fr:action-for-affected-control-id(.)/@id
+                    ) or (
                         @id = $all-actions-without-destination-controls/@id and
                         fr:action-observer-ids(.) = $this-section-maybe-controls/@id
                     )
@@ -409,7 +407,7 @@
                             fr:is-design-time()"/>
 
                     <!-- Schema: simply copy so that the types are available locally -->
-                    <!-- NOTE: Could optimized to check if any of the types are actually used -->
+                    <!-- NOTE: Could be optimized to check if any of the types are actually used -->
                     <xsl:copy-of select="$fr-form-model/xs:schema"/>
 
                     <!-- Section becomes relevant -->

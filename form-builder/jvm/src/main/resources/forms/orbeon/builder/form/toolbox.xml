@@ -341,7 +341,7 @@
                                 <xf:dispatch if="not($is-pe)" name="fr-show"        targetid="fb-pe-dialog"/>
                             </xf:action>
                         </xf:trigger>
-                        <xf:trigger bind="fb-toolbox-permissions-bind">
+                        <xf:trigger bind="fb-toolbox-permissions-bind" id="open-permissions-trigger">
                             <xf:label>
                                 <xh:i class="fa fa-lock fa-fw"/>
                                 <xf:output value="$form-resources/dialog-permissions/label"/>

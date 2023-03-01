@@ -34,11 +34,12 @@
         </xbl:resources>
         <xbl:implementation>
             <xf:model id="permissions-model">
-                <xf:instance id="ui">
+                <xf:instance id="ui" xxf:exclude-result-prefixes="#all">
                     <ui valid="true">
                         <apply-trigger/>
                         <has-permissions/>
                         <readonly-checked>create read update delete list</readonly-checked>
+                        <readonly-unchecked/>
                         <permissions/>
                         <always-show-roles/>
                     </ui>
@@ -49,47 +50,12 @@
                 <xf:var name="show-owner-group-permissions" value="xxf:property('oxf.fb.menu.permissions.owner-group')"/>
                 <xf:bind ref="instance('ui')">
                     <xf:bind ref="apply-trigger" readonly="instance()/@valid = 'false'"/>
-                    <xf:bind ref="readonly-checked" readonly="true()"/>
+                    <xf:bind ref="readonly-checked | readonly-unchecked" readonly="true()"/>
                     <xf:bind ref="permissions" id="permissions-bind">
                         <!-- "Anyone" permission -->
-                        <xf:bind ref="permission[1]" id="anyone-permission-bind" name="anyone-permission"/>
-                        <!-- All rows: `update` => `read` -->
-                        <xf:bind
-                            ref="permission/operations"
-                            readonly="false()"
-                            calculate="
-                                let $tokens := xxf:split()
-                                return
-                                    string-join(
-                                        $tokens[
-                                            not(
-                                                . = 'read' and (
-                                                    $tokens = 'update'
-                                                    (: 2022-10-03: decided that `list` does not imply `read` :)
-                                                )
-                                            )
-                                        ],
-                                        ' '
-                                    )"/>
-                        <!-- "Other" rows: "Anyone" permission => this row's permission -->
-                        <xf:bind
-                            ref="permission[position() > 1]/operations"
-                            readonly="false()"
-                            calculate="
-                                let $anyone-operations-tokens := xxf:split($anyone-permission/operations)
-                                return
-                                    string-join(
-                                        xxf:split()[
-                                            not(
-                                                . = $anyone-operations-tokens or
-                                                . = 'read' and (
-                                                    $anyone-operations-tokens = 'update' (: implies `read` :)
-                                                    (: 2022-10-03: decided that `list` does not imply `read` :)
-                                                )
-                                            )
-                                        ],
-                                        ' '
-                                    )"/>
+                        <xf:bind ref="permission[1]"                               id="anyone-permission-bind"/>
+                        <xf:bind ref="permission[@for = 'anyone-with-token']"      id="anyone-with-token-bind"/>
+                        <xf:bind ref="permission[@for = 'any-authenticated-user']" id="any-authenticated-user-bind"/>
                         <xf:bind
                             id="permission-bind"
                             ref="permission"
@@ -102,12 +68,12 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:instance id="permission-template">
+                <xf:instance id="permission-template" xxf:exclude-result-prefixes="#all">
                     <permission>
                         <operations/>
                     </permission>
                 </xf:instance>
-                <xf:instance id="permission-with-role-template">
+                <xf:instance id="permission-with-role-template" xxf:exclude-result-prefixes="#all">
                     <permission>
                         <operations/>
                         <role/>
@@ -139,10 +105,14 @@
 
                     <!-- Clean UI permissions -->
                     <xf:delete ref="$ui/permissions/*"/>
-                    <xf:insert context="$ui/permissions" origin="instance('permission-template')"/>
-                    <xf:insert context="$ui/permissions" ref="*" origin="instance('permission-template')"/>
+                    <xf:insert context="$ui/permissions"                    origin="instance('permission-template')"/>
+                    <xf:insert context="$ui/permissions" ref="*"            origin="instance('permission-template')"/>
+                    <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'anyone-with-token')"/>
+                    <xf:insert context="$ui/permissions" ref="*"            origin="instance('permission-template')"/>
+                    <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'any-authenticated-user')"/>
+                    <xf:insert context="$ui/permissions" ref="*"            origin="instance('permission-template')"/>
                     <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'owner')"/>
-                    <xf:insert context="$ui/permissions" ref="*" origin="instance('permission-template')"/>
+                    <xf:insert context="$ui/permissions" ref="*"            origin="instance('permission-template')"/>
                     <xf:insert context="$ui/permissions/permission[last()]" origin="xf:attribute('for', 'group-member')"/>
                     <xf:action iterate="$ui/always-show-roles/role">
                         <xf:var name="role" value="."/>
@@ -232,13 +202,15 @@
                     </xf:select>
                     <xf:group ref=".[$ui/has-permissions = 'true']">
                         <!-- Edit roles -->
-                        <xf:var name="anyone-operations" value="xxf:split(bind('anyone-permission-bind')/operations)"/>
+                        <xf:var name="anyone-operations"                 value="xxf:split(bind('anyone-permission-bind')/operations)"/>
+                        <xf:var name="anyone-with-token-operations"      value="xxf:split(bind('anyone-with-token-bind')/operations)"/>
+                        <xf:var name="any-authenticated-user-operations" value="xxf:split(bind('any-authenticated-user-bind')/operations)"/>
                         <fr:grid
                             repeat="content"
                             bind="permissions-bind"
                             template="instance('permission-with-role-template')"
                             freeze="{
-                                1 +                                                     (: Anyone :)
+                                3 +                                                     (: Anyone, Require token, Any authenticated user :)
                                 (if ($show-owner-group-permissions) then 2 else 0) +    (: Maybe owner/group :)
                                 count($ui/always-show-roles/role)                       (: Fixed roles :)
                             }"
@@ -246,20 +218,25 @@
                             columns="24"
                             class="fb-permissions-grid">
 
-                                <xf:var name="is-anyone"      value="empty(role) and empty(@for)"/>
-                                <xf:var name="is-owner-group" value="exists(@for)"/>
-                                <!-- Role name or "anyone" -->
+                                <xf:var name="is-anyone"                 value="empty(role) and empty(@for)"/>
+                                <xf:var name="is-anyone-with-token"      value="@for = 'anyone-with-token'"/>
+                                <xf:var name="is-any-authenticated-user" value="@for = 'any-authenticated-user'"/>
+                                <xf:var name="is-owner-group"            value="@for = ('owner', 'group-member')"/>
+                                <xf:var name="current-ops"               value="xxf:split(operations)"/>
+
+                                <!-- Column 1: role name or Anyone, etc. -->
                                 <fr:c class="fb-role" x="1" w="9">
                                     <xf:output
-                                        ref=".[$is-anyone or $is-owner-group]"
+                                        ref=".[$is-anyone or exists(@for)]"
                                         value="
-                                            $resources/dialog-permissions/(
-                                                if (context()/@for = 'owner') then
-                                                    owner
-                                                else if (context()/@for = 'group-member') then
-                                                    group-member
-                                                else
-                                                    anyone)">
+                                            let $for-value := context()/@for
+                                            return
+                                                $resources/dialog-permissions/(
+                                                    if (exists($for-value)) then
+                                                        *[name() = $for-value]
+                                                    else
+                                                        anyone
+                                                )">
                                         <xf:label value="$resources/dialog-permissions/role"/>
                                     </xf:output>
                                     <xf:group ref=".[exists(role)]">
@@ -270,18 +247,31 @@
                                 </fr:c>
                                 <!-- Checkboxes for operations -->
                                 <!-- NOTE: Put `id` on controls as `grid.xbl` needs this -->
+                                <!-- Column 2: "Create" -->
                                 <fr:c x="10" w="3">
                                     <xf:select
                                         id="fb-permissions-create-checkbox"
                                         ref="
-                                            if ($is-owner-group) then
+                                            if ($is-anyone) then
+                                                operations
+                                            else if ($is-anyone-with-token) then
                                                 ()
-                                            else if (not($is-anyone) and $anyone-operations = 'create') then
+                                            else if ($is-any-authenticated-user) then
+                                                if ($anyone-operations = 'create' and not($anyone-with-token-operations = 'create')) then
+                                                    $ui/readonly-checked
+                                                else
+                                                    operations
+                                            else if ($is-owner-group) then
+                                                ()
+                                            else if (
+                                                $anyone-operations = 'create' and not($anyone-with-token-operations = 'create') or
+                                                $any-authenticated-user-operations = 'create'
+                                            ) then
                                                 $ui/readonly-checked
                                             else
                                                 operations"
                                         appearance="full"
-                                        class="fb-create-permission">
+                                        class="fb-create-permission{' fb-align-right'[$is-anyone-with-token]}">
                                         <xf:label ref="$resources/dialog-permissions/create"/>
                                         <xf:item>
                                             <xf:label ref="$resources/dialog-permissions/create"/>
@@ -289,27 +279,43 @@
                                         </xf:item>
                                     </xf:select>
                                 </fr:c>
+                                <!-- Column 3: "Read" -->
                                 <fr:c x="13" w="3">
-                                    <!-- If this role has the 'update' permission, make the 'read' checkbox read-only -->
                                     <xf:select
                                         id="fb-permissions-read-checkbox"
                                         ref="
-                                            if (
-                                                (
-                                                    not($is-anyone) and (
-                                                        $anyone-operations = 'read'   or
-                                                        $anyone-operations = 'update' (: implies `read` :)
-                                                        (: 2022-10-03: decided that `list` does not imply `read` :)
-                                                    )
-                                                ) or
-                                                xxf:split(operations) = 'update'
-                                                (: 2022-10-03: decided that `list` does not imply `read` :)
+                                            if ($is-anyone) then
+                                                if (xxf:split(operations) = 'update') then
+                                                    $ui/readonly-checked
+                                                else
+                                                    operations
+                                            else if ($is-anyone-with-token) then
+                                                if ($anyone-with-token-operations = ('read', 'update')) then
+                                                    $ui/readonly-checked
+                                                else if ($anyone-operations = ('read', 'update')) then
+                                                    operations
+                                                else
+                                                    $ui/readonly-unchecked
+                                            else if ($is-any-authenticated-user) then
+                                                if (
+                                                    $anyone-operations = ('read', 'update') and
+                                                    not($anyone-with-token-operations = ('read', 'update')) or
+                                                    $any-authenticated-user-operations = 'update'
+                                                ) then
+                                                    $ui/readonly-checked
+                                                else
+                                                    operations
+                                            else if (
+                                                $anyone-operations = ('read', 'update') and
+                                                not($anyone-with-token-operations = ('read', 'update')) or
+                                                $any-authenticated-user-operations = ('read', 'update') or
+                                                $current-ops = 'update'
                                             ) then
                                                 $ui/readonly-checked
                                             else
                                                 operations"
                                             appearance="full"
-                                        class="fb-read-permission">
+                                        class="fb-read-permission{' fb-align-right'[$is-anyone-with-token]}">
                                         <xf:label ref="$resources/dialog-permissions/read"/>
                                         <xf:item>
                                             <xf:label ref="$resources/dialog-permissions/read"/>
@@ -317,16 +323,35 @@
                                         </xf:item>
                                     </xf:select>
                                 </fr:c>
+                                <!-- Column 4: "Update" -->
                                 <fr:c x="16" w="3">
                                     <xf:select
                                         id="fb-permissions-update-checkbox"
                                         ref="
-                                            if (not($is-anyone) and $anyone-operations = 'update') then
-                                                $ui/readonly-checked
-                                            else
-                                                operations"
+                                            (: TODO: make this a function :)
+                                            let $op := 'update'
+                                            return
+                                                if ($is-anyone) then
+                                                    operations
+                                                else if ($is-anyone-with-token) then
+                                                    if ($anyone-operations = $op) then
+                                                        operations
+                                                    else
+                                                        $ui/readonly-unchecked
+                                                else if ($is-any-authenticated-user) then
+                                                    if ($anyone-operations = $op and not($anyone-with-token-operations = $op)) then
+                                                        $ui/readonly-checked
+                                                    else
+                                                        operations
+                                                else if (
+                                                    $anyone-operations = $op and not($anyone-with-token-operations = $op) or
+                                                    $any-authenticated-user-operations = $op
+                                                ) then
+                                                    $ui/readonly-checked
+                                                else
+                                                    operations"
                                         appearance="full"
-                                        class="fb-update-permission">
+                                        class="fb-update-permission{' fb-align-right'[$is-anyone-with-token]}">
                                         <xf:label ref="$resources/dialog-permissions/update"/>
                                         <xf:item>
                                             <xf:label ref="$resources/dialog-permissions/update"/>
@@ -334,16 +359,32 @@
                                         </xf:item>
                                     </xf:select>
                                 </fr:c>
+                                <!-- Column 5: "Delete" -->
                                 <fr:c x="19" w="3">
                                     <xf:select
                                         id="fb-permissions-delete-checkbox"
                                         ref="
-                                            if (not($is-anyone) and $anyone-operations = 'delete') then
-                                                $ui/readonly-checked
-                                            else
-                                                operations"
+                                            (: TODO: make this a function :)
+                                            let $op := 'delete'
+                                            return
+                                                if ($is-anyone) then
+                                                    operations
+                                                else if ($is-anyone-with-token) then
+                                                    ()
+                                                else if ($is-any-authenticated-user) then
+                                                    if ($anyone-operations = $op and not($anyone-with-token-operations = $op)) then
+                                                        $ui/readonly-checked
+                                                    else
+                                                        operations
+                                                else if (
+                                                    $anyone-operations = $op and not($anyone-with-token-operations = $op) or
+                                                    $any-authenticated-user-operations = $op
+                                                ) then
+                                                    $ui/readonly-checked
+                                                else
+                                                    operations"
                                         appearance="full"
-                                        class="fb-delete-permission">
+                                        class="fb-delete-permission{' fb-align-right'[$is-anyone-with-token]}">
                                         <xf:label ref="$resources/dialog-permissions/delete"/>
                                         <xf:item>
                                             <xf:label ref="$resources/dialog-permissions/delete"/>
@@ -351,18 +392,32 @@
                                         </xf:item>
                                     </xf:select>
                                 </fr:c>
+                                <!-- Column 5: "List" -->
                                 <fr:c x="22" w="3">
                                     <xf:select
                                         id="fb-permissions-list-checkbox"
                                         ref="
-                                            if ($is-owner-group) then
-                                                ()
-                                            else if (not($is-anyone) and $anyone-operations = 'list') then
-                                                $ui/readonly-checked
-                                            else
-                                                operations"
+                                            (: TODO: make this a function :)
+                                            let $op := 'list'
+                                            return
+                                                if ($is-anyone) then
+                                                    operations
+                                                else if ($is-anyone-with-token) then
+                                                    ()
+                                                else if ($is-any-authenticated-user) then
+                                                    if ($anyone-operations = $op and not($anyone-with-token-operations = $op)) then
+                                                        $ui/readonly-checked
+                                                    else
+                                                        operations
+                                                else if (
+                                                    $anyone-operations = $op and not($anyone-with-token-operations = $op) or
+                                                    $any-authenticated-user-operations = $op
+                                                ) then
+                                                    $ui/readonly-checked
+                                                else
+                                                    operations"
                                         appearance="full"
-                                        class="fb-list-permission">
+                                        class="fb-list-permission{' fb-align-right'[$is-anyone-with-token]}">
                                         <xf:label ref="$resources/dialog-permissions/list"/>
                                         <xf:item>
                                             <xf:label ref="$resources/dialog-permissions/list"/>
@@ -372,6 +427,8 @@
                                 </fr:c>
                         </fr:grid>
                     </xf:group>
+
+                    <fr:xforms-inspector/>
 
                     <!-- Buttons -->
                     <xh:div class="fr-dialog-buttons">

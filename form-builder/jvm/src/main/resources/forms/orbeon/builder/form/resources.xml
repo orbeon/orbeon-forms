@@ -1215,6 +1215,8 @@
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
+            <anyone-with-token>Require token</anyone-with-token>
+            <any-authenticated-user>Any authenticated user</any-authenticated-user>
             <owner>Owner</owner>
             <group-member>Group members</group-member>
             <create>Create</create>

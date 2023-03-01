@@ -27,7 +27,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea>
                             <textarea-resize>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
 
 From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
-                            <output>Great love and great achievements involve great risk.</output>
                             <secret>42</secret>
                         </grid-1>
                         <grid-2>
@@ -37,6 +36,14 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
 &lt;/div&gt;</htmlarea>
                         </grid-2>
                     </text-controls>
+                    <utility-controls>
+                        <grid-9>
+                            <explanatory-text/>
+                            <calculated-value>Great love and great achievements involve great risk.</calculated-value>
+                            <calculated-value-borderless>Great love and great achievements involve great risk.</calculated-value-borderless>
+                            <hidden-field/>
+                        </grid-9>
+                    </utility-controls>
                     <typed-controls>
                         <grid-3>
                             <email>info@orbeon.com</email>
@@ -120,11 +127,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         <xf:bind id="textarea-counter-bind" ref="textarea-counter" name="textarea-counter">
                             <xf:constraint id="constraint-49-constraint" value="xxf:max-length(280)"/>
                         </xf:bind>
-                        <xf:bind id="secret-bind" ref="secret" name="secret" type="xs:string" required="true()"
-                                 constraint=". = '42'"/>
+
                         <xf:bind id="textarea-resize-bind" ref="textarea-resize" name="textarea-resize"
                                  xxf:whitespace="trim"/>
-                        <xf:bind ref="output" id="output-bind" name="output"/>
+                        <xf:bind id="secret-bind" ref="secret" name="secret" required="true()"
+                                 constraint=". = '42'"/>
+
                     </xf:bind>
                 </xf:bind>
                 <xf:bind id="date-time-controls-bind" ref="date-time-controls" name="date-time-controls">
@@ -201,6 +209,15 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                     </xf:bind>
                 </xf:bind>
                 <xf:bind name="us-address" id="us-address-bind" ref="us-address"/>
+                <xf:bind id="utility-controls-bind" ref="utility-controls" name="utility-controls">
+                    <xf:bind id="grid-9-bind" ref="grid-9" name="grid-9">
+                        <xf:bind id="explanatory-text-bind" ref="explanatory-text" name="explanatory-text"/>
+                        <xf:bind ref="calculated-value" id="calculated-value-bind" name="calculated-value"/>
+                        <xf:bind ref="calculated-value-borderless" id="calculated-value-borderless-bind"
+                                 name="calculated-value-borderless"/>
+                        <xf:bind id="hidden-field-bind" ref="hidden-field" name="hidden-field"/>
+                    </xf:bind>
+                </xf:bind>
             </xf:bind>
             <xf:instance xxf:readonly="true" id="fr-form-metadata">
                 <metadata>
@@ -231,6 +248,35 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
             <xf:instance xxf:readonly="true" id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
+                        <explanatory-text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;&lt;strong&gt;This is an explanatory text:&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt; &lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&lt;/li&gt;
+&lt;li&gt;Nam condimentum quam ut orci efficitur, sit amet elementum nunc lobortis.&lt;/li&gt;
+&lt;li&gt;Sed consequat viverra varius.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;This can also be a template and get values from other controls:&lt;/div&gt;
+&lt;div&gt; &lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;From the &lt;em&gt;Text Field&lt;/em&gt;: {$item1}&lt;/li&gt;
+&lt;li&gt;From the &lt;em&gt;Text Field with Character Counter&lt;/em&gt;: {$item2}&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;Here is a &lt;a href="{$link}" target="_blank" rel="noopener"&gt;link to this form&lt;/a&gt;.&lt;/div&gt;</text>
+                        </explanatory-text>
+                        <calculated-value>
+                            <label>Calculated Value</label>
+                            <hint>Standard text output with a label</hint>
+                        </calculated-value>
+                        <calculated-value-borderless>
+                            <label>Calculated Value without border</label>
+                            <hint>Standard text output with a label but no border</hint>
+                        </calculated-value-borderless>
+                        <hidden-field>
+                            <label/>
+                            <hint/>
+                        </hidden-field>
                         <dropdown>
                             <label>Dropdown</label>
                             <hint/>
@@ -519,6 +565,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         <text-controls>
                             <label>Text Controls</label>
                         </text-controls>
+                        <utility-controls>
+                            <label>Utility Controls</label>
+                        </utility-controls>
                         <typed-controls>
                             <label>Typed Controls</label>
                         </typed-controls>
@@ -544,10 +593,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Plain Text Area with Resizing</label>
                             <hint>Standard text area</hint>
                         </textarea-resize>
-                        <output>
-                            <label>Calculated Value</label>
-                            <hint>Standard text output with a label</hint>
-                        </output>
                         <secret>
                             <label>Secret Field</label>
                             <hint>The password is 42 ;)</hint>
@@ -563,6 +608,37 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         </attachment-controls>
                     </resource>
                     <resource xml:lang="fr">
+                        <explanatory-text>
+                            <text xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:xbl="http://www.w3.org/ns/xbl"
+                                  xmlns:p="http://www.orbeon.com/oxf/pipeline">&lt;div&gt;
+&lt;div&gt;&lt;strong&gt;Ceci est un texte explicatif:&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt; &lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&lt;/li&gt;
+&lt;li&gt;Nam condimentum quam ut orci efficitur, sit amet elementum nunc lobortis.&lt;/li&gt;
+&lt;li&gt;Sed consequat viverra varius.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;Ceci peut aussi être un template et obtenir des valeurs d'autres champs :&lt;/div&gt;
+&lt;div&gt; &lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Du &lt;em&gt;Champ de texte &lt;/em&gt;: {$item1}&lt;/li&gt;
+&lt;li&gt;Du &lt;em&gt;Champ de texte avec compteur de caractères &lt;/em&gt;: {$item2}&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;Voici un &lt;a href="{$link}" target="_blank" rel="noopener"&gt;lien vers ce formulaires&lt;/a&gt;.&lt;/div&gt;
+&lt;/div&gt;</text>
+                        </explanatory-text>
+                        <calculated-value>
+                            <label>Valeur calculée</label>
+                            <hint>Sortie texte standard avec libellé</hint>
+                        </calculated-value>
+                        <calculated-value-borderless>
+                            <label>Valeur calculée sans bord</label>
+                            <hint>Sortie texte standard avec libellé mais sans bord</hint>
+                        </calculated-value-borderless>
+                        <hidden-field>
+                            <label/>
+                            <hint/>
+                        </hidden-field>
                         <dropdown>
                             <label>Menu déroulant</label>
                             <hint/>
@@ -851,6 +927,9 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         <text-controls>
                             <label>Contrôles texte</label>
                         </text-controls>
+                        <utility-controls>
+                            <label>Contrôles utilitaires</label>
+                        </utility-controls>
                         <typed-controls>
                             <label>Contrôles typés</label>
                         </typed-controls>
@@ -876,10 +955,6 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Zone de texte avec redimensionnement</label>
                             <hint>Zone de texte standard</hint>
                         </textarea-resize>
-                        <output>
-                            <label>Valeur calculée</label>
-                            <hint>Sortie texte standard avec libellé</hint>
-                        </output>
                         <secret>
                             <label>Champ secret</label>
                             <hint>Le mot de passe est 42 ;)</hint>
@@ -1110,17 +1185,15 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             </xf:textarea>
                         </fr:c>
                         <fr:c x="7" y="3" w="6">
-                            <xf:output bind="output-bind" id="output-control">
-                                <xf:label ref="$form-resources/output/label"/>
-                                <xf:hint ref="$form-resources/output/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                            </xf:output>
-                        </fr:c>
-                        <fr:c y="4" x="7" w="6">
                             <xf:secret id="secret-control" bind="secret-bind" xxf:autocomplete="off">
                                 <xf:label ref="$form-resources/secret/label"/>
                                 <xf:hint ref="$form-resources/secret/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:secret>
+
+                        </fr:c>
+                        <fr:c y="4" x="7" w="6">
+
                         </fr:c>
                     </fr:grid>
                     <fr:grid columns="1" id="grid-2-grid" bind="grid-2-bind">
@@ -1131,6 +1204,59 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </fr:tinymce>
                         </fr:c>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="utility-controls-section" bind="utility-controls-bind">
+                    <xf:label ref="$form-resources/utility-controls/label"/>
+                    <fr:grid id="grid-9-grid" bind="grid-9-bind">
+                        <fr:c x="1" y="1" w="12">
+                            <fr:explanation xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="explanatory-text-control"
+                                            bind="explanatory-text-bind">
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                <fr:text ref="$form-resources/explanatory-text/text" mediatype="text/html">
+                                    <fr:param type="ControlValueParam">
+                                        <fr:name>item1</fr:name>
+                                        <fr:controlName>input</fr:controlName>
+                                    </fr:param>
+                                    <fr:param type="ControlValueParam">
+                                        <fr:name>item2</fr:name>
+                                        <fr:controlName>input-counter</fr:controlName>
+                                    </fr:param>
+                                    <fr:param type="LinkToNewPageParam">
+                                        <fr:name>link</fr:name>
+                                    </fr:param>
+                                </fr:text>
+                            </fr:explanation>
+                        </fr:c>
+                        <fr:c x="1" y="2" w="6">
+                            <xf:output bind="calculated-value-bind" id="calculated-value-control">
+                                <xf:label ref="$form-resources/calculated-value/label"/>
+                                <xf:hint ref="$form-resources/calculated-value/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="7" y="2" w="6">
+                            <xf:output bind="calculated-value-borderless-bind"
+                                       id="calculated-value-borderless-control"
+                                       appearance="minimal">
+                                <xf:label ref="$form-resources/calculated-value-borderless/label"/>
+                                <xf:hint ref="$form-resources/calculated-value-borderless/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                            </xf:output>
+                        </fr:c>
+                        <fr:c x="1" y="3" w="6">
+                            <fr:hidden xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="hidden-field-control"
+                                       bind="hidden-field-bind">
+                                <xf:label ref="$form-resources/hidden-field/label"/>
+                                <xf:hint ref="$form-resources/hidden-field/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:hidden>
+                        </fr:c>
+                        <fr:c x="7" y="3" w="6"/>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="typed-controls-section" bind="typed-controls-bind">

@@ -106,7 +106,8 @@
                 <xh:link href="/ops/yui/container/assets/skins/sam/container.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/bootstrap/css/bootstrap.min.css" class="xforms-baseline"/>
                 <xh:link href="/apps/fr/style/form-runner-bootstrap-override.css" class="xforms-baseline"/>
-                <xh:link href="/apps/fr/style/font-awesome/css/font-awesome.min.css" class="xforms-baseline"/>
+                <xh:link href="/apps/fr/style/fontawesome-free-6.3.0-web/css/all.min.css" class="xforms-baseline"/>
+                <xh:link href="/apps/fr/style/fontawesome-free-6.3.0-web/css/v4-shims.min.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/xforms.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/error.css" class="xforms-baseline"/>
                 <xh:link href="/ops/nprogress-0.2.0/nprogress.css" class="xforms-baseline"/>

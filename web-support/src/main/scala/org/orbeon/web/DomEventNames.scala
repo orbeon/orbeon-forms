@@ -10,8 +10,6 @@ object DomEventNames {
   val TouchStart               = "touchstart"
   val FocusIn                  = "focusin"
   val FocusOut                 = "focusout"
-  val DOMContentLoaded         = "DOMContentLoaded"
-  val Load                     = "load"
   val DOMActivate              = "DOMActivate"
   val Input                    = "input"
   val MouseOver                = "mouseover"

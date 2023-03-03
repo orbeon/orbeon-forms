@@ -41,17 +41,13 @@ object DomSupport {
       }
     } else {
 
-      val eventName = state match {
-        case DomReadyState.Interactive => DOMContentLoaded
-        case DomReadyState.Complete    => Load
-      }
+      lazy val readyStateChanged: js.Function1[dom.Event, _] = (_: dom.Event) =>
+        if (interactiveReadyState(doc, state)) {
+          doc.removeEventListener(ReadystateChange, readyStateChanged)
+          promise.success(())
+        }
 
-      lazy val contentLoaded: js.Function1[dom.Event, _] = (_: dom.Event) => {
-        doc.removeEventListener(eventName, contentLoaded)
-        promise.success(())
-      }
-
-      doc.addEventListener(eventName, contentLoaded)
+      doc.addEventListener(ReadystateChange, readyStateChanged)
     }
 
     promise.future

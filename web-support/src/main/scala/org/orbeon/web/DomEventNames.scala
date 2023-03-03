@@ -24,4 +24,5 @@ object DomEventNames {
 
   val InteractiveReadyState    = "interactive"
   val CompleteReadyState       = "complete"
+  val ReadystateChange         = "readystatechange"
 }

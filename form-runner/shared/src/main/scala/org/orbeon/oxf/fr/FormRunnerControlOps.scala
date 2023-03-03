@@ -81,6 +81,15 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def findControlByNameXPath(inDoc: NodeInfo, controlName: String): Option[NodeInfo] =
     findControlByName(controlName)(new InDocFormRunnerDocContext(inDoc))
 
+  //@XPathFunction
+  def findControlByNameUnderXPath(controlName: String, under: NodeInfo): Option[NodeInfo] = (
+    for {
+      suffix  <- PossibleControlSuffixes.iterator
+      control <- findTryIndex(controlName + '-' + suffix, under, includeSelf = false).iterator
+    } yield
+      control
+  ).nextOption()
+
   // Find a control by name (less efficient than searching by id)
   def findControlByName(controlName: String)(implicit ctx: FormRunnerDocContext): Option[NodeInfo] = (
     for {

@@ -236,7 +236,9 @@
                     @version = '2018.2'
                 ]">
 
-        <xsl:variable name="model-id"    select="../@id/string()" as="xs:string"/>
+        <xsl:variable name="model"       select=".." as="element(xf:model)"/>
+        <xsl:variable name="view-elem"   select="if (exists($model/parent::xbl:implementation)) then $model/../../xbl:template else /xh:html/xh:body" as="element()" xmlns:xbl="http://www.w3.org/ns/xbl"/>
+        <xsl:variable name="model-id"    select="$model/@id/string()" as="xs:string"/>
         <xsl:variable name="action-name" select="@name/string()"  as="xs:string"/>
 
         <!-- Create a document with a root element so that `preceding::` works -->
@@ -277,6 +279,7 @@
                         select="$current-group except $nested-grouping-elems/fr:*"/>
 
                     <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
+                        <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
                         <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>
                         <xsl:with-param tunnel="yes" name="action-name"           select="$action-name"/>
                         <xsl:with-param tunnel="yes" name="continuation-position" select="$group-position"/>
@@ -329,6 +332,7 @@
                             if="xxf:get-request-attribute('{$continuation-key}') = '{$current-continuation-id}'">
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
+                                <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
                                 <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>
                                 <xsl:with-param tunnel="yes" name="action-name"           select="$action-name"/>
                                 <xsl:with-param tunnel="yes" name="continuation-position" select="$group-position"/>
@@ -366,6 +370,7 @@
                                 "/>
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
+                                <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
                                 <xsl:with-param tunnel="yes" name="model-id"              select="$model-id"/>
                                 <xsl:with-param tunnel="yes" name="action-name"           select="$action-name"/>
                                 <xsl:with-param tunnel="yes" name="continuation-position" select="$group-position"/>
@@ -619,6 +624,33 @@
 
             </xf:action>
         </xf:action>
+
+    </xsl:template>
+
+    <xsl:template match="fr:control-setvisited" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="view-elem"    as="element()"/>
+
+        <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
+<!--        Q: How to handle `at`? -->
+<!--        <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>-->
+        <xsl:variable name="visited"         select="@visited/string()" as="xs:string?"/>
+
+        <xxf:setvisited
+            control="{frf:findControlByNameUnderXPath($to-control-name, $view-elem)/@id}"
+            recurse="true"
+            visited="{($visited, 'true')[1]}"/>
+
+    </xsl:template>
+
+    <xsl:template match="fr:control-setfocus" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="view-elem"    as="element()"/>
+
+        <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
+
+        <xf:setfocus
+            control="{frf:findControlByNameUnderXPath($to-control-name, $view-elem)/@id}"/>
 
     </xsl:template>
 

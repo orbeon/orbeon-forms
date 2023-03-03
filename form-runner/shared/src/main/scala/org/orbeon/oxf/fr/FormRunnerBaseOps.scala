@@ -157,7 +157,7 @@ trait FormRunnerBaseOps {
     else
       node ancestor * contains under
 
-  private def findTryIndex(id: String, under: NodeInfo, includeSelf: Boolean): Option[NodeInfo] = {
+  def findTryIndex(id: String, under: NodeInfo, includeSelf: Boolean): Option[NodeInfo] = {
 
     val hasIndex = formDefinitionHasIndex(under)
 

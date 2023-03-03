@@ -236,7 +236,7 @@
 
         <xsl:variable
             name="dataset-names-20182"
-            select="$actions-20182//fr:dataset-write/@name/string()"/>
+            select="$actions-20182//(fr:dataset-write | fr:dataset-clear)/@name/string()"/>
 
         <xsl:variable
             name="existing-dataset-instances"

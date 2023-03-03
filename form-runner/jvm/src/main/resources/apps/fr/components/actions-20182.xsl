@@ -749,6 +749,18 @@
 
     </xsl:template>
 
+    <xsl:template match="fr:dataset-clear" mode="within-action-2018.2">
+
+        <xsl:variable name="dataset-name" select="@name/string()" as="xs:string"/>
+
+        <xf:action>
+            <xf:insert
+                ref="instance('fr-dataset-{$dataset-name}')"
+                origin="xf:element('_')"/>
+        </xf:action>
+
+    </xsl:template>
+
     <xsl:template match="fr:process-call" mode="within-action-2018.2">
 
         <xsl:variable name="process-scope" select="@scope/string()" as="xs:string"/>

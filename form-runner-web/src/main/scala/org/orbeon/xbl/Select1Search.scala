@@ -84,7 +84,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         // Init Select2
         jSelect.select2(new Select2.Options {
           allowClear     = true
-          ajax           = if (servicePerformsSearch) new Select2Ajax(select2SuccessCallbacks, containerElem) else null
+          ajax           = if (servicePerformsSearch) Select2Ajax else null
           width          = "100%" // For Select2 width to update as the viewport width changes
           placeholder    =
             new Select2.Option {
@@ -155,6 +155,18 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   override def xformsFocus(): Unit =
     containerElem.querySelector("select").asInstanceOf[dom.html.Select].focus()
 
+  def updateSuggestions(results: String, isLastPage: String): Unit = {
+    val parsedResults = js.JSON.parse(results)
+    val data = new Select2.Data {
+      val results    = parsedResults.asInstanceOf[js.Array[Select2.Option]]
+      val pagination = new Select2.Pagination {
+        val more = !isLastPage.toBoolean
+      }
+    }
+    val success = select2SuccessCallbacks.dequeue()
+    success(data)
+  }
+
   // TODO: not specific to the autocomplete, should be moved to a utility class
   private def onAttributeChange(element: JQuery, attributeName: String, listener: () => Unit): Unit = {
     val observer = new MutationObserver((_, _) => listener())
@@ -224,35 +236,30 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
     )
   }
 
-}
 
-// We shouldn't have to declare the constructor parameters as `val`, but if we don't, at runtime the JavaScript object
-// for doesn't have a property for `select2SuccessCallbacks`, so we get an `undefined` when trying to access it.
-private class Select2Ajax(
-  val select2SuccessCallbacks : mutable.Queue[Success],
-  val containerElem           : html.Element
-) extends Select2.Ajax {
+  object Select2Ajax extends Select2.Ajax {
 
-  val delay: Int = Page.getFormFromElemOrThrow(containerElem).configuration.delayBeforeIncrementalRequest
+    val delay: Int = Page.getFormFromElemOrThrow(containerElem).configuration.delayBeforeIncrementalRequest
 
-  def transport(
-    params  : Select2.Params,
-    success : Select2.Success,
-    failure : js.Function0[Unit]
-  ): Unit = {
+    val transport = (
+      params  : Select2.Params,
+      success : Select2.Success,
+      failure : js.Function0[Unit]
+    ) => {
 
-    val searchValue = params.data.term.getOrElse("")
-    val searchPage  = params.data.page.getOrElse(1)
-    select2SuccessCallbacks.enqueue(success)
-    AjaxClient.fireEvent(
-      AjaxEvent(
-        eventName  = "fr-search",
-        targetId   = containerElem.id,
-        properties = Map(
-          "fr-search-value" -> searchValue,
-          "fr-search-page"  -> searchPage.toString
+      val searchValue = params.data.term.getOrElse("")
+      val searchPage  = params.data.page.getOrElse(1)
+      select2SuccessCallbacks.enqueue(success)
+      AjaxClient.fireEvent(
+        AjaxEvent(
+          eventName  = "fr-search",
+          targetId   = containerElem.id,
+          properties = Map(
+            "fr-search-value" -> searchValue,
+            "fr-search-page"  -> searchPage.toString
+          )
         )
       )
-    )
+    }
   }
 }

@@ -60,11 +60,7 @@ object Select2 {
   type Success = js.Function1[Data, Unit]
 
   trait Ajax extends js.Object {
-    val delay: Int
-    def transport(
-      params  : Params,
-      success : Success,
-      failure : js.Function0[Unit]
-    ): Unit
+    val delay     : Int
+    val transport : js.Function3[Params, Success, js.Function0[Unit], Unit]
   }
 }

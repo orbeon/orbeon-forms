@@ -521,6 +521,8 @@
                         </fr:action>
                     </xf:model>
                 </xh:head>
+                <!-- Keep for actions-20182.xsl -->
+                <xh:body/>
             </xh:html>
         </input>
         <output name="data">
@@ -598,6 +600,8 @@
                         </fr:action>
                     </xf:model>
                 </xh:head>
+                <!-- Keep for actions-20182.xsl -->
+                <xh:body/>
             </xh:html>
         </input>
         <output name="data">

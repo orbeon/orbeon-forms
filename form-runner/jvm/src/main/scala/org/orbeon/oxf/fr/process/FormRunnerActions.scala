@@ -69,15 +69,15 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
       val pdfTiffParams =
         for {
-          format   <- RenderedFormat.values.toList
-          (uri, _) <- pdfOrTiffPathOpt(
+          renderedFormat <- RenderedFormat.values.toList
+          (uri, _)       <- renderedFormatPathOpt(
               urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
-              format               = format,
+              renderedFormat       = renderedFormat,
               pdfTemplateOpt       = findPdfTemplate(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, Some(currentFormLang)),
               defaultLang          = currentFormLang
             )
         } yield
-          format.entryName -> uri.toString
+          renderedFormat.entryName -> uri.toString
 
       recombineQuery(
         s"/fr/service/$app/$form/email/$document",
@@ -445,18 +445,18 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
   // Create if needed and return the element key name
   private def tryCreateRenderedFormatIfNeeded(
-    params   : ActionParams,
-    format   : RenderedFormat)(implicit
-    frParams : FormRunnerParams
+    params        : ActionParams,
+    renderedFormat: RenderedFormat)(implicit
+    frParams      : FormRunnerParams
   ): Try[(URI, String)] =
     Try {
 
       val currentFormLang = frc.currentLang
       val pdfTemplateOpt  = findPdfTemplate(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, Some(currentFormLang))
 
-      pdfOrTiffPathOpt(
+      renderedFormatPathOpt(
         urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
-        format               = format,
+        renderedFormat       = renderedFormat,
         pdfTemplateOpt       = pdfTemplateOpt,
         defaultLang          = currentFormLang
       ) match {
@@ -466,7 +466,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
           tryChangeMode(XFORMS_SUBMIT_REPLACE_INSTANCE)(
             buildRenderedFormatPath(
               params          = params,
-              renderedFormat  = format,
+              renderedFormat  = renderedFormat,
               fullFilename    = None,
               currentFormLang = currentFormLang
             )
@@ -477,9 +477,9 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
             val response = topLevelInstance(FormModel, "fr-send-submission-response").get
 
             val node =
-              getOrCreatePdfTiffPathElemOpt(
+              getOrCreateRenderedFormatPathElemOpt(
                 urlsInstanceRootElem = FormRunnerActionsCommon.findUrlsInstanceRootElem.get,
-                format               = format,
+                format               = renderedFormat,
                 pdfTemplateOpt       = pdfTemplateOpt,
                 defaultLang          = currentFormLang,
                 create               = true

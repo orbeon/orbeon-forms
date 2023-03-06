@@ -178,7 +178,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
               PermissionsAuthorization.findCurrentCredentialsFromSession,
               dataUser
             )
-            if (!Operations.allows(authorizedOperations, Read))
+            if (! Operations.allows(authorizedOperations, Read))
               throw HttpStatusCodeException(StatusCode.Forbidden)
             httpResponse.setHeader(
               FormRunnerPersistence.OrbeonOperations,
@@ -192,7 +192,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         fromDatabase.stageOpt.foreach(httpResponse.setHeader(StageHeader.HeaderName, _))
         httpResponse.setHeader(Headers.Created,      DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime.toInstant))
         httpResponse.setHeader(Headers.LastModified, DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime.toInstant))
-        if (!req.forAttachment)
+        if (! req.forAttachment)
           httpResponse.setHeader(Headers.ContentType, ContentTypes.XmlContentType)
 
         // Maybe send body

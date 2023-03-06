@@ -18,7 +18,7 @@ import org.scalatest.funspec.AnyFunSpec
 
 class XFormsIdTest extends AnyFunSpec {
 
-  describe("extracting id parts") {
+  describe("Extracting id parts") {
 
     val expected = List(
       "input-control" ->

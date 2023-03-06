@@ -27,7 +27,7 @@
 
     <!-- If data is posted, store as request attribute so that persistence-model.xml picks it up -->
     <p:choose href="#instance">
-        <p:when test="not(/null/@xsi:nil='true')">
+        <p:when test="not(/null/@xsi:nil = 'true')">
             <p:processor name="oxf:scope-serializer">
                 <p:input name="config">
                     <config>

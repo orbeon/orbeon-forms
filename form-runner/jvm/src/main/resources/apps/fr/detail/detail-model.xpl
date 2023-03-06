@@ -32,7 +32,7 @@
 
     <!-- If data is `POST`ed, store as request attribute -->
     <p:choose href="#instance">
-        <p:when test="not(/null/@xsi:nil='true')">
+        <p:when test="not(/null/@xsi:nil = 'true')">
             <p:processor name="oxf:scope-serializer">
                 <p:input name="config">
                     <config>

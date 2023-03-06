@@ -65,7 +65,7 @@ object FormRunnerRenderedFormat {
     pdfTemplateOpt map (_.path) orNull
   }
 
-  def getOrCreatePdfTiffPathElemOpt(
+  def getOrCreateRenderedFormatPathElemOpt(
     urlsInstanceRootElem : NodeInfo,
     format               : RenderedFormat,
     pdfTemplateOpt       : Option[PdfTemplate],
@@ -98,14 +98,14 @@ object FormRunnerRenderedFormat {
     }
   }
 
-  def pdfOrTiffPathOpt(
-    urlsInstanceRootElem : NodeInfo,
-    format               : RenderedFormat,
-    pdfTemplateOpt       : Option[PdfTemplate],
-    defaultLang          : String
+  def renderedFormatPathOpt(
+    urlsInstanceRootElem: NodeInfo,
+    renderedFormat      : RenderedFormat,
+    pdfTemplateOpt      : Option[PdfTemplate],
+    defaultLang         : String
   ): Option[(URI, String)] =
     for {
-      node <- getOrCreatePdfTiffPathElemOpt(urlsInstanceRootElem, format, pdfTemplateOpt, defaultLang, create = false)
+      node <- getOrCreateRenderedFormatPathElemOpt(urlsInstanceRootElem, renderedFormat, pdfTemplateOpt, defaultLang, create = false)
       path <- trimAllToOpt(node.stringValue)
     } yield
       URI.create(path) -> node.localname

@@ -78,7 +78,7 @@
             </xsl:if>
 
             <xsl:for-each select="@min | @max | @freeze | @remove-constraint | @clear-constraint">
-                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name)"/>
+                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name, ())"/>
             </xsl:for-each>
 
             <xsl:apply-templates select="@* except (@page-size | @min | @max | @freeze | @remove-constraint | @clear-constraint)" mode="#current"/>
@@ -133,7 +133,7 @@
             </xsl:if>
 
             <xsl:for-each select="@min | @max | @freeze | @remove-constraint | @clear-constraint">
-                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name)"/>
+                <xsl:attribute name="{name(.)}" select="frf:replaceVarReferencesWithFunctionCalls(., ., true(), $library-name, ())"/>
             </xsl:for-each>
 
             <xsl:apply-templates select="@* except (@min | @max | @freeze | @remove-constraint | @clear-constraint | @markup) | node()" mode="#current"/>

@@ -15,6 +15,7 @@ trait FormRunnerComponents {
 
   private val Logger = LoggerFactory.createLogger(FormRunner.getClass)
   private val indentedLogger: IndentedLogger = new IndentedLogger(Logger)
+  private val DefaultNorewriteSet = Set("fr-lang")
 
   // In an XPath expression, replace non-local variable references.
   //@XPathFunction
@@ -22,7 +23,8 @@ trait FormRunnerComponents {
     elemOrAtt   : NodeInfo,
     xpathString : String,
     avt         : Boolean,
-    libraryName : String
+    libraryName : String,
+    norewrite   : Array[String]
   ): String =
     FormRunnerRename.replaceVarReferencesWithFunctionCalls(
       xpathString,
@@ -32,7 +34,7 @@ trait FormRunnerComponents {
         (_.addFunctionLibrary(FormRunnerFunctionLibrary)),
       avt,
       name =>
-        if (name == "fr-lang")
+        if ((DefaultNorewriteSet ++ norewrite)(name))
           s"$$$name"
         else
           s"frf:controlVariableValue('$name', ${libraryName.trimAllToOpt.map("'" + _ + "'").getOrElse("()")})"

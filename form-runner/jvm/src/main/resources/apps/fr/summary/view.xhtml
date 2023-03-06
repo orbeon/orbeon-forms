@@ -1324,7 +1324,7 @@
                                    for a draft and the PDF functionality right now doesn't support creating a PDF for a draft) -->
                             <xf:group
                                 ref="
-                                    if ($button-name = ('pdf', 'tiff', 'excel-export') and
+                                    if ($button-name = ('pdf', 'tiff', 'excel', 'excel-export') and
                                         not(($button-name = 'pdf' and $has-pdf-template or $button-name = 'tiff') and not(fr:is-pe()))) then
                                         (
                                             if ($view-enabled and $selection-data-or-draft = 'data') then
@@ -1336,7 +1336,7 @@
                                         ()">
                                 <fr:href-button
                                         ref="."
-                                        href="/fr/{$app}/{$form}/{$button-name}/{$selection-document-id}?fr-language={xxf:instance('fr-language-instance')}"
+                                        href="{frf:buildSummaryLinkButton($app, $form, $button-name, $selection-document-id, xxf:instance('fr-language-instance'))}"
                                         class="fr-{$button-name}-button">
                                     <xf:label mediatype="text/html" value="$fr-resources/buttons/*[name() = $button-name]"/>
                                 </fr:href-button>

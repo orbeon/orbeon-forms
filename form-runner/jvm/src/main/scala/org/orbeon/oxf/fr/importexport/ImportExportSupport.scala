@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xforms.model.XFormsInstanceSupport
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.{TransformerUtils, XMLConstants}
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.NodeInfoConversions
 import org.orbeon.scaxon.SimplePath._
@@ -206,7 +206,7 @@ object ImportExportSupport {
 
   def prepareFormRunnerDocContextOrThrow(
     form              : om.NodeInfo,
-    appFormVersionOpt : Option[AppFormVersion],
+    appFormVersionOpt : Option[AppFormVersion], // for migration
     formDataOpt       : Option[(om.DocumentInfo, DataFormatVersion, DataMigrationBehavior)]
   ): FormRunnerDocContext =
     prepareFormRunnerDocContext(form, appFormVersionOpt, formDataOpt)
@@ -214,7 +214,7 @@ object ImportExportSupport {
 
   def prepareFormRunnerDocContext(
     form              : om.NodeInfo,
-    appFormVersionOpt : Option[AppFormVersion],
+    appFormVersionOpt : Option[AppFormVersion], // for migration
     formDataOpt       : Option[(om.DocumentInfo, DataFormatVersion, DataMigrationBehavior)]
   ): List[DataMigrationOp] Either FormRunnerDocContext = {
 
@@ -396,58 +396,70 @@ object ImportExportSupport {
       items map (item => item.elemValue("label") -> item.elemValue("value"))
     }
 
+  def isNilDocument(doc: DocumentNodeInfoType): Boolean =
+    doc.rootElement.self("" -> "null").nonEmpty &&
+      doc.rootElement.attValueOpt(XMLConstants.XSI_URI -> "nil").contains("true")
+
+  def findRequestDocumentId(implicit ec: ExternalContext): Option[String] =
+    ec.getRequest.getFirstParamAsString("document-id").flatMap(_.trimAllToOpt)
+
   def readFormDataIfDocumentIdPresentAndAuthorized(
-    appForm         : AppForm,
-    form            : om.DocumentInfo)(implicit
+    appForm   : AppForm,
+    documentId: String,
+    form      : om.DocumentInfo,
+    mode      : String
+  )(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
-  ): Option[(DocumentNodeInfoType, DataFormatVersion, DataMigrationBehavior.Disabled.type)] = {
+  ): (DocumentNodeInfoType, DataFormatVersion, DataMigrationBehavior.Disabled.type) = {
 
-    val documentIdOpt =
-      externalContext.getRequest.getFirstParamAsString("document-id").flatMap(_.trimAllToOpt)
+    debug(s"document id provided: `$documentId`")
 
-    // Form data is optional and we also need the app/form name in that case
-    documentIdOpt map { documentId =>
+    val (doc, headers) = Transforms.readFormData(appForm, documentId)
 
-      debug(s"document id provided: `$documentId`")
+    val permissions = {
 
-      val (doc, headers) = Transforms.readFormData(appForm, documentId)
+      val ctx = new InDocFormRunnerDocContext(form.rootElement)
 
-      val permissions = {
-
-        val ctx = new InDocFormRunnerDocContext(form.rootElement)
-
-        FormRunnerPermissionsOps.permissionsFromElemOrProperties(
-          ctx.metadataRootElem.firstChildOpt(Names.Permissions),
-          appForm
-        )
-      }
-
-      // Follow what's done in `persistence-model.xml` for the `edit` mode:
-      //
-      // - if the operations are returned via header, use that
-      // - else get the permissions based on roles
-      //
-      val operations =
-        Operations.parseFromHeaders(headers)
-          .getOrElse(frc.authorizedOperationsBasedOnRolesUseAdt(permissions))
-
-      debug(s"operations obtained: `$operations`")
-
-      // Make sure we can edit the data
-      if (! frc.isUserAuthorizedBasedOnOperationsAndMode(operations, "edit", isSubmit = false)) {
-        debug(s"user is unauthorized")
-        throw HttpStatusCodeException(StatusCode.Forbidden)
-      }
-
-      debug(s"user is authorized, returning data")
-
-      (
-        doc,
-        FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
-        DataMigrationBehavior.Disabled
+      FormRunnerPermissionsOps.permissionsFromElemOrProperties(
+        ctx.metadataRootElem.firstChildOpt(Names.Permissions),
+        appForm
       )
     }
+
+    // Follow what's done in `persistence-model.xml` for the `edit` mode:
+    //
+    // - if the operations are returned via header, use that
+    // - else get the permissions based on roles
+    //
+    // TODO: Add support for `new`, split out method, and use from `persistence-model.xml`.
+    //
+    val operations =
+      Operations.parseFromHeaders(headers)
+        .getOrElse {
+          mode match {
+//              Can't be `New` because we have a document id and we read the data above
+//              case FormRunnerMode.New => frc.allAuthorizedOperationsAssumingOwnerGroupMember()
+            case _ =>
+              frc.authorizedOperationsBasedOnRolesUseAdt(permissions)
+          }
+        }
+
+    debug(s"operations obtained: `$operations`")
+
+    // Make sure we can edit the data
+    if (! frc.isUserAuthorizedBasedOnOperationsAndMode(operations, mode, isSubmit = false)) {
+      debug(s"user is unauthorized")
+      throw HttpStatusCodeException(StatusCode.Forbidden)
+    }
+
+    debug(s"user is authorized, returning data")
+
+    (
+      doc,
+      FormRunnerPersistence.providerDataFormatVersionOrThrow(appForm),
+      DataMigrationBehavior.Disabled
+    )
   }
 
   private def isAllowedExcelName(name: String)(implicit config: ExcelNameManglingConfig): Boolean =

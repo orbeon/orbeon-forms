@@ -42,6 +42,10 @@ trait FormRunnerSummary {
     }
 
   //@XPathFunction
+  def buildSummaryLinkButton(app: String, form: String, buttonName: String, documentId: String, lang: String): String =
+    s"/fr/$app/$form/$buttonName/$documentId?fr-language=$lang"
+
+  //@XPathFunction
   def defaultTimezoneToOffsetString: String =
     properties.getPropertyOpt("oxf.fr.default-timezone")
       .flatMap(_.stringValue.trimAllToOpt)

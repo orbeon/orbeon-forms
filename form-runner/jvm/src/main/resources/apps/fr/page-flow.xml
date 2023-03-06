@@ -212,6 +212,12 @@
           model="detail/detail-model.xpl" view="print/pdf-view.xpl">
     </page>
 
+    <!-- Export published form with form data as Excel or XML -->
+    <service path="/fr/([^/^.]+)/([^/^.]+)/(excel-)?export(/([^/^.]+))?"
+             model="detail/detail-model.xpl"
+             view="export/excel-export-with-data.xpl">
+    </service>
+
     <!-- Test form "inline" (when being edited) with new empty document -->
     <page path="/fr/([^/^.]+)/([^/^.]+)/(test)"
           model="inline-test-model.xpl" view="html-view.xpl">

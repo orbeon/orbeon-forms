@@ -413,11 +413,11 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
   }
 
   private def buildRenderedFormatPath(
-    params          : ActionParams,
-    renderedFormat  : RenderedFormat,
-    fullFilename    : Option[String],
-    currentFormLang : String)(implicit
-    frParams        : FormRunnerParams
+    params         : ActionParams,
+    renderedFormat : RenderedFormat,
+    fullFilename   : Option[String],
+    currentFormLang: String)(implicit
+    frParams       : FormRunnerParams
   ): String = {
 
     val FormRunnerParams(app, form, _, Some(document), _, _) = frParams
@@ -426,15 +426,18 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       fullFilename.toList.map("fr-rendered-filename" ->) :::
         createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
 
+    def pathPrefix(usePagePath: Boolean) =
+      s"/fr/${if (usePagePath) "" else "service/"}$app/$form"
+
     renderedFormat match {
       case RenderedFormat.Pdf | RenderedFormat.Tiff =>
         recombineQuery(
-          s"/fr/${if (fullFilename.isDefined) "" else "service/"}$app/$form/${renderedFormat.entryName}/$document",
+          s"${pathPrefix(usePagePath = fullFilename.isDefined)}/${renderedFormat.entryName}/$document",
           urlParams
         )
       case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData =>
         recombineQuery(
-          s"/fr/service/$app/$form/export/$document?export-format=${renderedFormat.entryName}",
+          s"${pathPrefix(usePagePath = false)}/export/$document?export-format=${renderedFormat.entryName}",
           urlParams
         )
     }

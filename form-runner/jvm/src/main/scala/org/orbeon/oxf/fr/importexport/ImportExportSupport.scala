@@ -9,7 +9,7 @@ import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, DataMigrati
 import org.orbeon.oxf.fr.XMLNames.FRNamespace
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
-import org.orbeon.oxf.fr.permission.Operations
+import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.proxy.Transforms
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CollectionUtils.IteratorExt._
@@ -403,12 +403,11 @@ object ImportExportSupport {
   def findRequestDocumentId(implicit ec: ExternalContext): Option[String] =
     ec.getRequest.getFirstParamAsString("document-id").flatMap(_.trimAllToOpt)
 
-  def readFormDataIfDocumentIdPresentAndAuthorized(
-    appForm   : AppForm,
-    documentId: String,
-    form      : om.DocumentInfo,
-    mode      : String
-  )(implicit
+  def readFormDataIfDocumentIdPresentAndAuthorizedOrThrow(
+    appForm         : AppForm,
+    documentId      : String,
+    form            : om.DocumentInfo,
+    mode            : String)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): (DocumentNodeInfoType, DataFormatVersion, DataMigrationBehavior.Disabled.type) = {
@@ -418,42 +417,20 @@ object ImportExportSupport {
     val (doc, headers) = Transforms.readFormData(appForm, documentId)
 
     val permissions = {
-
       val ctx = new InDocFormRunnerDocContext(form.rootElement)
-
       FormRunnerPermissionsOps.permissionsFromElemOrProperties(
         ctx.metadataRootElem.firstChildOpt(Names.Permissions),
         appForm
       )
     }
 
-    // Follow what's done in `persistence-model.xml` for the `edit` mode:
-    //
-    // - if the operations are returned via header, use that
-    // - else get the permissions based on roles
-    //
-    // TODO: Add support for `new`, split out method, and use from `persistence-model.xml`.
-    //
-    val operations =
-      Operations.parseFromHeaders(headers)
-        .getOrElse {
-          mode match {
-//              Can't be `New` because we have a document id and we read the data above
-//              case FormRunnerMode.New => frc.allAuthorizedOperationsAssumingOwnerGroupMember()
-            case _ =>
-              frc.authorizedOperationsBasedOnRolesUseAdt(permissions)
-          }
-        }
-
-    debug(s"operations obtained: `$operations`")
-
-    // Make sure we can edit the data
-    if (! frc.isUserAuthorizedBasedOnOperationsAndMode(operations, mode, isSubmit = false)) {
-      debug(s"user is unauthorized")
-      throw HttpStatusCodeException(StatusCode.Forbidden)
-    }
-
-    debug(s"user is authorized, returning data")
+    PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
+      mode                  = mode,
+      permissions           = permissions,
+      operationsFromDataOpt = Operations.parseFromHeaders(headers),
+      credentialsOpt        = externalContext.getRequest.credentials,
+      isSubmit              = false
+    )
 
     (
       doc,

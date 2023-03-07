@@ -44,23 +44,23 @@ object Operations {
   val AllList: List[Operation] = Operation.values.toList
   val AllSet : Set[Operation]  = AllList.toSet
 
-  // Used by `ImportExportSupport` and tests
   def parseFromHeaders(headers: Map[String, List[String]]): Option[Operations] =
     Headers.firstItemIgnoreCase(headers, FormRunnerPersistence.OrbeonOperations)
-      .map(v => parse(v.splitTo[List]()))
+      .map(v => parseFromStringTokens(v.splitTo[List]()))
 
-  // Used by `persistence-model.xml` and `parseFromHeaders()` above, with the list of operations coming from:
-  //
-  // - persistence headers
-  // - `allAuthorizedOperationsAssumingOwnerGroupMember`
-  // - `authorizedOperationsBasedOnRolesXPath`
-  //
-  def parse(stringOperations: List[String]): Operations =
-    stringOperations match {
+  private def parseFromStringTokens(stringTokens: List[String]): Operations =
+    stringTokens match {
       case List("*") =>
         AnyOperation
       case _ =>
-        SpecificOperations(stringOperations.toSet.map(Operation.withName))
+        SpecificOperations(stringTokens.toSet.map(Operation.withName))
+    }
+
+  def parseFromString(stringOperations: String): Option[Operations] =
+    parseFromStringTokens(stringOperations.splitTo[List]()) match {
+      case o @ AnyOperation                            => Some(o)
+      case o @ SpecificOperations(ops) if ops.nonEmpty => Some(o)
+      case SpecificOperations(_)                       => scala.None
     }
 
   // `operations` contains tokens, including possibly `*`. This is the value of the `operations` attribute in the
@@ -102,10 +102,8 @@ object Operations {
       inDefinitionOrder(withRead - Operation.List).map(_.entryName)
   }
 
-  def inDefinitionOrder(operations: Iterable[Operation]): List[Operation] = {
-    val operationsSet = operations.toSet
-    Operations.AllList.filter(operationsSet)
-  }
+  def inDefinitionOrder(operations: Iterable[Operation]): List[Operation] =
+    Operations.AllList.filter(operations.toSet)
 
   // `normalized == false` only when called from `PermissionsUiTest`. Not sure if that's correct.
   def serialize(operations: Operations, normalized: Boolean): List[String] =

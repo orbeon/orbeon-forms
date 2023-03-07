@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
 import org.orbeon.oxf.fr.FormRunner.orbeonRolesFromCurrentRequest
+import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.XPath
@@ -116,8 +117,8 @@ trait FormBuilderPermissionsOps {
       val wrapper = wrapperOpt.getOrElse(
         // Create wrapper we don't have one already
         new DocumentWrapper(dom.Document(), null, formEl.getConfiguration)
-        // Save wrapper for following iterations
-        |!> (w => wrapperOpt = Some(w))
+          // Save wrapper for following iterations
+          |!> (w => wrapperOpt = Some(w))
       )
 
       val appName  = formEl.elemValue(Names.AppName)
@@ -134,8 +135,15 @@ trait FormBuilderPermissionsOps {
       // For each form, compute the operations the user can potentially perform
       val operations = {
         val adminOperation = hasAdminPermissionForAppForm.list("admin")
-        val permissionsElement = formEl.child(Names.Permissions).headOption.orNull
-        val otherOperations = FormRunner.allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement, appName, formName)
+        val permissionsElement = formEl.child(Names.Permissions).headOption
+        val otherOperations =
+          PermissionsAuthorization.authorizedForModeNoData(
+            mode           = "new", // xxx TODO: check mode! why `edit` or `new`???
+            permissions    = FormRunner.permissionsFromElemOrProperties(permissionsElement, AppForm(appName, formName)), //xxx TODO: do we need to read global permissions here??? also this will parse JSON every time for a non-blank property!
+            credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession
+          ).map(Operations.serialize(_, normalized = true))
+            .getOrElse(Nil)
+
         adminOperation ++ otherOperations
       }
 

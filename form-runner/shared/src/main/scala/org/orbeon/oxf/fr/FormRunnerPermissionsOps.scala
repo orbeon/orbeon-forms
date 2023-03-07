@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.externalcontext.{Credentials, Organization}
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
+import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
-
-import scala.jdk.CollectionConverters._
 
 
 trait FormRunnerPermissionsOps {
@@ -42,153 +40,47 @@ trait FormRunnerPermissionsOps {
         }
     }
 
+  // 2023-03-08: Used by Summary and legacy eXist code
   //@XPathFunction
   def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo, app: String, form: String): List[String] =
     Operations.serialize(
-      authorizedOperationsBasedOnRolesUseAdt(
+      PermissionsAuthorization.authorizedOperations(
         permissionsFromElemOrProperties(
           Option(permissionsElOrNull),
           AppForm(app, form)
-        )
+        ),
+        CoreCrossPlatformSupport.externalContext.getRequest.credentials,
+        PermissionsAuthorization.CheckWithoutDataUserPessimistic
       ),
       normalized = true
     )
 
   //@XPathFunction
-  def isUserAuthorizedBasedOnOperationsAndModeXPath(operations: java.util.List[String], mode: String, isSubmit: Boolean): Boolean =
-    isUserAuthorizedBasedOnOperationsAndMode(Operations.parse(operations.asScala.toList), mode, isSubmit)
-
-  /**
-   * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform,
-   * just based on the user's roles. Users might be able to perform additional operations on specific data, which
-   * can be tested with allAuthorizedOperations().
-   * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
-   */
-  def authorizedOperationsBasedOnRolesUseAdt(
-    permissions              : Permissions,
-    currentUserCredentialsOpt: Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
-  ): Operations =
-    PermissionsAuthorization.authorizedOperations(
-      permissions,
-      currentUserCredentialsOpt,
-      PermissionsAuthorization.CheckWithoutDataUserPessimistic
+  def autosaveAuthorizedForNew(permissionsElOrNull: NodeInfo, app: String, form: String): Boolean =
+    PermissionsAuthorization.autosaveAuthorizedForNew(
+      permissions    = permissionsFromElemOrProperties(Option(permissionsElOrNull), AppForm(app, form)),
+      credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession
     )
 
-  def isUserAuthorizedBasedOnOperationsAndMode(operations: Operations, mode: String, isSubmit: Boolean): Boolean = {
-
-    // Special cases:
-    //
-    // - `schema`: doesn't require any authorized permission as it is simply protected as a service
-    // - `test`: doesn't require any authorized permission, see https://github.com/orbeon/orbeon-forms/issues/2050
-    //
-    // When POSTing data to the page, this is generally considered a "mode change" and doesn't require the
-    // same permissions, especially since the POST is protected by other means. For example, a user with
-    // `create` permission only is allowed to navigate to the `view` page and `edit` page back. This does not
-    // imply that the user need `read` or `update` permissions. Because the current use case is that the user
-    // has at least the `create` permission, we currently require that permission, although this restriction
-    // could be removed in the future if need be.
-
-    def unauthorizedCreation =
-      frc.CreationModes(mode) && ! Operations.allows(operations, Operation.Create)
-
-    def unauthorizedEditing =
-      frc.EditingModes(mode) && ! (
-        Operations.allows(operations, Operation.Update) ||
-        isSubmit && Operations.allows(operations, Operation.Create)
-      )
-
-    def unauthorizedViewing =
-      frc.ReadonlyModes(mode) && ! (
-        Operations.allows(operations, Operation.Read) ||
-        isSubmit && Operations.allows(operations, Operation.Create)
-      )
-
-    def unauthorizedMode =
-      ! frc.AllDetailModes(mode)
-
-    ! (
-      unauthorizedCreation ||
-      unauthorizedEditing  ||
-      unauthorizedViewing  ||
-      unauthorizedMode
-    )
-  }
-
-  // 2022-08-11: Only used by `allAuthorizedOperationsAssumingOwnerGroupMember`.
-  def allAuthorizedOperations(
-    permissions     : Permissions,
-    dataUsername    : Option[String],
-    dataGroupname   : Option[String],
-    dataOrganization: Option[Organization], // 2022-08-12: unused and always passed `None`. A TODO?
-    currentUser     : Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
-  ): Operations = {
-
-    // For both username and groupname, we don't want nulls, or if specified empty string
-    require(dataUsername  ne null)
-    require(dataGroupname ne null)
-    require(! dataUsername .contains(""))
-    require(! dataGroupname.contains(""))
-
-    def ownerGroupMemberOperations(
-      definedPermissions             : DefinedPermissions,
-      maybeCurrentUsernameOrGroupname: Option[String],
-      maybeDataUsernameOrGroupname   : Option[String],
-      condition                      : Condition
-    ): List[Operations] = {
-      (maybeCurrentUsernameOrGroupname, maybeDataUsernameOrGroupname) match {
-        case (Some(currentUsernameOrGroupname), Some(dataUsernameOrGroupname))
-          if currentUsernameOrGroupname == dataUsernameOrGroupname =>
-          definedPermissions.permissionsList.filter(_.conditions.contains(condition)).map(_.operations)
-        case _ =>
-          Nil
-      }
-    }
-
-    permissions match {
-      case UndefinedPermissions =>
-        AnyOperation
-      case defined @ DefinedPermissions(_) =>
-
-        val rolesOperations       = authorizedOperationsBasedOnRolesUseAdt(defined, currentUser)
-        val ownerOperations       = ownerGroupMemberOperations(defined, currentUser map     (_.userAndGroup.username),  dataUsername,  Owner)
-        val groupMemberOperations = ownerGroupMemberOperations(defined, currentUser flatMap (_.userAndGroup.groupname), dataGroupname, Group)
-
-        Operations.combine(rolesOperations :: ownerOperations ::: groupMemberOperations)
-    }
-  }
-
-  /**
-   * This is an "optimistic" version of allAuthorizedOperations, asking what operation you can do on data assuming
-   * you are the owner and a group member. It is used in the Form Runner home page, through the form metadata API,
-   * to determine if it is even worth linking to the summary page for a given form.
-   *
-   * FIXME: We have similar, but better typed logic in `authorizedBasedOnRole()` (`SearchLogic.scala`), which we
-   *        could move to `PermissionsAuthorization`, and use from here and `SearchLogic.scala`
-   *
-   * 2022-08-12: This is now better typed. I don't know if the comment above still applies.
-   */
   //@XPathFunction
-  def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElOrNull: NodeInfo, app: String, form: String): Seq[String] = {
+  def authorizedOperationsForDetailModeOrThrow(operationsFromData: String, permissionsElemOrNull: NodeInfo, isSubmit: Boolean): String = {
 
-    val headers       = CoreCrossPlatformSupport.externalContext.getRequest.getHeaderValuesMap.asScala
-    val authUsername  = headers.get(Headers.OrbeonUsernameLower).toSeq.flatten.headOption
-    val authGroupname = headers.get(Headers.OrbeonGroupLower   ).toSeq.flatten.headOption
+    // Same logger that was used for the `xf:message` action before (could use something else)
+    implicit val logger: IndentedLogger =
+      inScopeContainingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
 
-    val permissions = permissionsFromElemOrProperties(Option(permissionsElOrNull), AppForm(app, form))
+    val FormRunnerParams(app, form, _, _, _, mode) = FormRunnerParams()
 
-    val operationsWithoutAssumingOwnership = allAuthorizedOperations(permissions, None,         None,          None)
-    def operationsAssumingOwnership        = allAuthorizedOperations(permissions, authUsername, authGroupname, None)
-    val authUserCanCreate                  = Operations.allows(operationsWithoutAssumingOwnership, Operation.Create)
-
-    // If the user can't create data, don't return permissions the user might have if that user was the owner; we
-    // assume that if the user can't create data, the user can never be the owner of any data.
     Operations.serialize(
-      if (authUserCanCreate)
-        operationsAssumingOwnership
-      else
-        operationsWithoutAssumingOwnership,
+      PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
+        mode                  = mode,
+        permissions           = permissionsFromElemOrProperties(Option(permissionsElemOrNull), AppForm(app, form)),
+        operationsFromDataOpt = Operations.parseFromString(operationsFromData),
+        credentialsOpt        = PermissionsAuthorization.findCurrentCredentialsFromSession,
+        isSubmit              = isSubmit
+      ),
       normalized = true
-    )
+    ).mkString(" ")
   }
 
   def orbeonRolesFromCurrentRequest: Set[String] =

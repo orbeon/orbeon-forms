@@ -19,6 +19,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
+import org.orbeon.oxf.fr.permission.PermissionsAuthorization
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
@@ -39,7 +40,6 @@ import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.compat._
 import scala.collection.immutable
-import scala.util.Try
 
 
 // The standard Form Runner parameters
@@ -303,8 +303,9 @@ trait FormRunnerBaseOps {
   def parametersInstance          : Option[XFormsInstance] = topLevelInstance(ParametersModel,   "fr-parameters-instance")
   def errorSummaryInstance        : XFormsInstance         = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
   def persistenceInstance         : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
-  def authorizedOperationsInstance: XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
-  def documentMetadataInstance    : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-document-metadata")      get
+
+  private def authorizedOperationsInstance: XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-authorized-operations")  get
+  private def documentMetadataInstance    : XFormsInstance         = topLevelInstance(PersistenceModel,  "fr-document-metadata")      get
 
   // See also FormRunnerHome
   private val CreateOps = Set("*", "create")
@@ -312,8 +313,9 @@ trait FormRunnerBaseOps {
   private val UpdateOps = Set("*", "update")
   private val DeleteOps = Set("*", "delete")
 
-  def authorizedOperations: Set[String] = authorizedOperationsInstance.rootElement.stringValue.splitTo[Set]()
+  private def authorizedOperations: Set[String] = authorizedOperationsInstance.rootElement.stringValue.splitTo[Set]()
 
+  // Used by user XPath functions
   def canCreate: Boolean = authorizedOperations intersect CreateOps nonEmpty
   def canRead  : Boolean = authorizedOperations intersect ReadOps   nonEmpty
   def canUpdate: Boolean = authorizedOperations intersect UpdateOps nonEmpty
@@ -399,16 +401,8 @@ trait FormRunnerBaseOps {
     }
   }
 
-  // NOTE: `tiff` and `test-pdf` are reduced to `pdf` at the XForms level, but not at the XSLT level. We don't
-  // yet expose this to XSLT, but we might in the future, so check on those modes as well.
-  // 2021-12-22: `schema` could be a readonly mode, but we consider this special as it is protected as a service.
-  val CreationModes  = Set("new", "import", "validate")
-  val EditingModes   = Set("edit")
-  val ReadonlyModes  = Set("view", "pdf", "email", "controls", "tiff", "test-pdf")
-  val AllDetailModes = CreationModes ++ EditingModes ++ FormRunnerCommon.frc.ReadonlyModes + "schema" + "test"
-
   def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
-  def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ReadonlyModes(p.mode)
+  def isReadonlyMode(implicit p: FormRunnerParams): Boolean = PermissionsAuthorization.ReadonlyModes(p.mode)
 
   // https://github.com/orbeon/orbeon-forms/issues/5323
   // https://github.com/orbeon/orbeon-forms/issues/5325

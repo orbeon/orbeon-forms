@@ -14,10 +14,21 @@
 package org.orbeon.oxf.fr.permission
 
 import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.Logging.debug
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 
 
 object PermissionsAuthorization {
+
+  // NOTE: `tiff` and `test-pdf` are reduced to `pdf` at the XForms level, but not at the XSLT level. We don't
+  // yet expose this to XSLT, but we might in the future, so check on those modes as well.
+  // 2021-12-22: `schema` could be a readonly mode, but we consider this special as it is protected as a service.
+  val CreationModes  = Set("new", "import", "validate")
+  val EditingModes   = Set("edit")
+  val ReadonlyModes  = Set("view", "pdf", "email", "controls", "tiff", "test-pdf", "export", "excel-export") // `excel-export` is legacy
+  val AllDetailModes = CreationModes ++ EditingModes ++ ReadonlyModes + "schema" + "test"
 
   def findCurrentCredentialsFromSession: Option[Credentials] =
     CoreCrossPlatformSupport.externalContext.getRequest.credentials
@@ -39,6 +50,9 @@ object PermissionsAuthorization {
       case DefinedPermissions(permissionsList) =>
         Operations.combine(permissionsList.map(authorizedOperationsForPermission(_, currentCredentialsOpt, check)))
       case UndefinedPermissions =>
+        // TODO: should we use `AnyOperation`
+        // TODO: probably get rid of `Operations.AllSet`, but then check also `PermissionsToWorkflowConfig`
+//        AnyOperation
         SpecificOperations(Operations.AllSet)
     }
 
@@ -68,6 +82,181 @@ object PermissionsAuthorization {
 
     Operations.allowsAny(authorizedOps, anyOfOperations)
   }
+
+  def authorizedOperationsForDetailModeOrThrow(
+    mode                 : String,// TODO: use an ADT
+    permissions          : Permissions,
+    operationsFromDataOpt: Option[Operations],
+    credentialsOpt       : Option[Credentials],
+    isSubmit             : Boolean)(implicit
+    logger               : IndentedLogger
+  ): Operations = {
+
+    // With `new`, the caller obviously doesn't read the data from the persistence layer first, therefore
+    // `operationsFromDataOpt` must always be `None.
+    require(mode != "new" || operationsFromDataOpt.isEmpty, "`operationsFromDataOpt` must be empty for mode `new`")
+
+    val operationsOpt =
+      operationsFromDataOpt match {
+        case Some(operationsFromData) =>
+          authorizedForModeOperationsFromData(
+            mode,
+            operationsFromData,
+          )
+        case None if CreationModes(mode) =>
+          authorizedForModeNoData(
+            mode           = mode, // could be normalized to `new`
+            permissions    = permissions,
+            credentialsOpt = credentialsOpt
+          )
+        case None =>
+          // Case where we don't have tokens obtained from the persistence layer with the `Orbeon-Operations` header
+          // AND we are not in `new` mode. This can happen in the following cases:
+          //
+          // - `isSubmit == false`:
+          //   - the persistence layer didn't return a `Orbeon-Operations` with tokens, which implies it is a custom
+          //     persistence layer
+          // - `isSubmit == true`:
+          //   - external `POST` of data to the `edit`/`view`/`pdf`/etc. page
+          //   - internal `POST` of data to the `edit`/`view`/`pdf`/etc. page as result of a mode change
+          authorizedForModeAndData(
+            mode           = mode,
+            permissions    = permissions,
+            credentialsOpt = credentialsOpt,
+            isSubmit       = isSubmit
+          )
+      }
+
+    operationsOpt match {
+      case None =>
+        debug(s"UNAUTHORIZED USER")
+        throw HttpStatusCodeException(StatusCode.Forbidden)
+      case Some(ops) =>
+        debug(s"AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): ${Operations.serialize(ops, normalized = true)}")
+        ops
+    }
+  }
+
+  def authorizedForModeOperationsFromData(
+    mode              : String,
+    operationsFromData: Operations
+  ): Option[Operations] =
+    isUserAuthorizedBasedOnOperationsAndMode(operationsFromData, mode, isSubmit = false) option operationsFromData
+
+  def authorizedForModeNoData(
+    mode          : String, // 2023-03-09: creation and update modes only
+    permissions   : Permissions,
+    credentialsOpt: Option[Credentials]
+  ): Option[Operations] = {
+
+    val operations =
+      permissions match {
+        case UndefinedPermissions =>
+          AnyOperation
+        case defined @ DefinedPermissions(_) =>
+
+          val operationsWithoutAssumingOwnership =
+            authorizedOperations(defined, credentialsOpt, CheckWithoutDataUserPessimistic)
+
+          def operationsAssumingOwnership: Operations = {
+
+            def ownerGroupOperations(condition: Option[Condition]): List[Operations] =
+              condition match {
+                case Some(condition) => defined.permissionsList.filter(_.conditions.contains(condition)).map(_.operations)
+                case None            => Nil
+              }
+
+            val ownerOperations       = ownerGroupOperations(credentialsOpt.isDefined option                                   Owner)
+            val groupMemberOperations = ownerGroupOperations(credentialsOpt.flatMap(_.userAndGroup.groupname).isDefined option Group)
+
+            Operations.combine(operationsWithoutAssumingOwnership :: ownerOperations ::: groupMemberOperations)
+          }
+
+          // If the user can't create data, don't return permissions the user might have if that user was the owner; we
+          // assume that if the user can't create data, the user can never be the owner of any data.
+          if (Operations.allows(operationsWithoutAssumingOwnership, Operation.Create))
+            operationsAssumingOwnership
+          else
+            operationsWithoutAssumingOwnership
+      }
+
+    // `isSubmit` is not used when mode is `new`
+    isUserAuthorizedBasedOnOperationsAndMode(operations, mode, isSubmit = false) option operations
+  }
+
+  private def authorizedForModeAndData(
+    mode           : String,
+    permissions    : Permissions,
+    credentialsOpt : Option[Credentials],
+    isSubmit       : Boolean)(implicit
+    logger         : IndentedLogger
+  ): Option[Operations] = {
+
+    val operations =
+      authorizedOperations(
+        permissions,
+        credentialsOpt,
+        CheckWithoutDataUserPessimistic
+      )
+
+    debug(s"operations obtained: `$operations`")
+
+    isUserAuthorizedBasedOnOperationsAndMode(operations, mode, isSubmit) option operations
+  }
+
+  private def isUserAuthorizedBasedOnOperationsAndMode(operations: Operations, mode: String, isSubmit: Boolean): Boolean = {
+
+    // Special cases:
+    //
+    // - `schema`: doesn't require any authorized permission as it is simply protected as a service
+    // - `test`: doesn't require any authorized permission, see https://github.com/orbeon/orbeon-forms/issues/2050
+    //
+    // When `POST`ing data to the page, this is generally considered a "mode change" and doesn't require the
+    // same permissions, especially since the POST is protected by other means. For example, a user with
+    // `create` permission only is allowed to navigate to the `view` page and `edit` page back. This does not
+    // imply that the user need `read` or `update` permissions. Because the current use case is that the user
+    // has at least the `create` permission, we currently require that permission, although this restriction
+    // could be removed in the future if need be.
+
+    def unauthorizedCreation =
+      CreationModes(mode) && ! Operations.allows(operations, Operation.Create)
+
+    def unauthorizedEditing =
+      EditingModes(mode) && ! (
+        Operations.allows(operations, Operation.Update) ||
+        isSubmit && Operations.allows(operations, Operation.Create)
+      )
+
+    def unauthorizedViewing =
+      ReadonlyModes(mode) && ! (
+        Operations.allows(operations, Operation.Read) ||
+        isSubmit && Operations.allows(operations, Operation.Create)
+      )
+
+    def unauthorizedMode =
+      ! AllDetailModes(mode)
+
+    ! (
+      unauthorizedCreation ||
+      unauthorizedEditing  ||
+      unauthorizedViewing  ||
+      unauthorizedMode
+    )
+  }
+
+  private val UpdateMatchingTokens = Set("*", "update")
+
+  def autosaveAuthorizedForNew(
+    permissions    : Permissions,
+    credentialsOpt : Option[Credentials],
+  ): Boolean =
+    authorizedForModeNoData(
+      mode           = "edit", // this is for the `new` mode but disallow autosave if users can't *edit* data
+      permissions    = permissions,
+      credentialsOpt = credentialsOpt
+    ).map(Operations.serialize(_, normalized = true))
+      .getOrElse(Nil)
+      .exists(UpdateMatchingTokens)
 
   private def authorizedOperationsForPermission(
     permission           : Permission,

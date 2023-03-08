@@ -73,7 +73,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <dropdown-with-other>Pistachio</dropdown-with-other>
                             <dropdown-with-search>cat</dropdown-with-search>
                             <dynamic-dropdown itemset-empty="false">ca</dynamic-dropdown>
-                            <dynamic-dropdown-with-search itemset-empty="false" label="">ca</dynamic-dropdown-with-search>
+                            <dynamic-dropdown-with-search-by-ui itemset-empty="false" label="Canada">ca</dynamic-dropdown-with-search-by-ui>
+                            <dynamic-dropdown-with-search-by-service itemset-empty="false" label="Canada">ca</dynamic-dropdown-with-search-by-service>
                             <checkboxes>cat bird</checkboxes>
                             <scrollable-checkboxes>cat bird</scrollable-checkboxes>
                             <checkbox-input>false</checkbox-input>
@@ -159,6 +160,12 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                         <xf:bind name="dynamic-dropdown" id="dynamic-dropdown-bind" ref="dynamic-dropdown"/>
                         <xf:bind name="dynamic-dropdown-with-search" id="dynamic-dropdown-with-search-bind"
                                  ref="dynamic-dropdown-with-search"/>
+                        <xf:bind name="dynamic-dropdown-with-search-by-ui"
+                                 id="dynamic-dropdown-with-search-by-ui-bind"
+                                 ref="dynamic-dropdown-with-search-by-ui"/>
+                        <xf:bind name="dynamic-dropdown-with-search-by-service"
+                                 id="dynamic-dropdown-with-search-by-service-bind"
+                                 ref="dynamic-dropdown-with-search-by-service"/>
                         <xf:bind id="dropdown-with-other-bind" ref="dropdown-with-other"
                                  name="dropdown-with-other"/>
                         <xf:bind id="radio-buttons-with-other-bind" ref="radio-buttons-with-other"
@@ -317,7 +324,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             </item>
                         </dropdown-with-other>
                         <dropdown-with-search>
-                            <label>Dropdown with Search</label>
+                            <label>Dropdown with search</label>
                             <hint/>
                             <item>
                                 <label>Cat</label>
@@ -340,10 +347,15 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Dynamic Dropdown</label>
                             <hint/>
                         </dynamic-dropdown>
-                        <dynamic-dropdown-with-search>
-                            <label>Dynamic Dropdown with Search</label>
-                            <hint/>
-                        </dynamic-dropdown-with-search>
+                        <dynamic-dropdown-with-search-by-ui>
+                            <label>Dynamic Dropdown with search</label>
+                            <hint>Search done by the UI</hint>
+                        </dynamic-dropdown-with-search-by-ui>
+                        <dynamic-dropdown-with-search-by-service>
+                            <label>Dynamic Dropdown with search</label>
+                            <hint>Search done by the service</hint>
+                        </dynamic-dropdown-with-search-by-service>
+
                         <checkboxes>
                             <label>Checkboxes</label>
                             <hint>Standard checkboxes</hint>
@@ -702,10 +714,15 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             <label>Menu déroulant dynamique</label>
                             <hint/>
                         </dynamic-dropdown>
-                        <dynamic-dropdown-with-search>
+                        <dynamic-dropdown-with-search-by-ui>
                             <label>Menu déroulant dynamique avec recherche</label>
-                            <hint/>
-                        </dynamic-dropdown-with-search>
+                            <hint>Recherche faite par l'interface</hint>
+                        </dynamic-dropdown-with-search-by-ui>
+                        <dynamic-dropdown-with-search-by-service>
+                            <label>Menu déroulant dynamique avec recherche</label>
+                            <hint>Recherche faite par le service</hint>
+                        </dynamic-dropdown-with-search-by-service>
+
                         <checkboxes>
                             <label>Cases à cocher</label>
                             <hint>Cases à cocher standards</hint>
@@ -1140,8 +1157,8 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
     <xh:body>
         <fr:view>
             <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                     xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                     xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                     xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
                 <fr:section id="text-controls-section" bind="text-controls-bind">
                     <xf:label ref="$form-resources/text-controls/label"/>
                     <fr:grid columns="3" id="grid-1-grid" bind="grid-1-bind">
@@ -1398,7 +1415,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                                 </xf:itemset>
                             </xf:select1>
                         </fr:c>
-                        <fr:c x="5" y="1" w="4" h="1">
+                        <fr:c x="5" y="1" w="4">
                             <fr:open-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dropdown-with-other-control"
                                              appearance="minimal"
                                              bind="dropdown-with-other-bind">
@@ -1412,7 +1429,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                                 </xf:itemset>
                             </fr:open-select1>
                         </fr:c>
-                        <fr:c x="9" y="1" w="4" h="1">
+                        <fr:c x="9" y="1" w="4">
                             <xf:select1 bind="dropdown-with-search-bind" id="dropdown-with-search-control"
                                         appearance="search"
                                         ref="">
@@ -1426,7 +1443,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                             </xf:select1>
                         </fr:c>
                         <fr:c x="1" y="2" w="4">
-                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-dropdown-control"
+                            <fr:databound-select1 id="dynamic-dropdown-control"
                                                   resource="/fr/service/custom/orbeon/controls/countries?all=true"
                                                   bind="dynamic-dropdown-bind">
                                 <xf:label ref="$form-resources/dynamic-dropdown/label"/>
@@ -1438,19 +1455,36 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                                 </xf:itemset>
                             </fr:databound-select1>
                         </fr:c>
-                        <fr:c x="5" y="2" w="4" h="1"/>
-                        <fr:c x="9" y="2" w="4">
-                            <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                                  id="dynamic-dropdown-with-search-control"
-                                                  bind="dynamic-dropdown-with-search-bind"
+                        <fr:c x="5" y="2" w="4">
+                            <fr:databound-select1 id="dynamic-dropdown-with-search-by-ui-control"
+                                                  bind="dynamic-dropdown-with-search-by-ui-bind"
                                                   appearance="search"
                                                   resource="/fr/service/custom/orbeon/controls/countries?all=true"
                                                   ref=""
                                                   service-performs-search="false"
                                                   service-supports-paging="false"
                                                   is-last-page="">
-                                <xf:label ref="$form-resources/dynamic-dropdown-with-search/label"/>
-                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search/hint"/>
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-by-ui/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-by-ui/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+                                <xf:itemset ref="/*/country">
+                                    <xf:label ref="name"/>
+                                    <xf:value ref="us-code"/>
+                                </xf:itemset>
+                            </fr:databound-select1>
+                        </fr:c>
+                        <fr:c x="9" y="2" w="4">
+                            <fr:databound-select1 id="dynamic-dropdown-with-search-by-service-control"
+                                                  bind="dynamic-dropdown-with-search-by-service-bind"
+                                                  appearance="search"
+                                                  resource="/fr/service/custom/orbeon/controls/countries?country-name={$fr-search-value}"
+                                                  ref=""
+                                                  service-performs-search="true"
+                                                  service-supports-paging="false"
+                                                  is-last-page="">
+                                <xf:label ref="$form-resources/dynamic-dropdown-with-search-by-service/label"/>
+                                <xf:hint ref="$form-resources/dynamic-dropdown-with-search-by-service/hint"/>
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 <xf:itemset ref="/*/country">
                                     <xf:label ref="name"/>
@@ -1469,7 +1503,7 @@ From Wikipedia (https://en.wikipedia.org/wiki/Music).</textarea-resize>
                                 </xf:itemset>
                             </xf:select>
                         </fr:c>
-                        <fr:c x="5" y="3" w="4" h="1">
+                        <fr:c x="5" y="3" w="4">
                             <xf:select bind="scrollable-checkboxes-bind" id="scrollable-checkboxes-control"
                                        appearance="scroll">
                                 <xf:label ref="$form-resources/scrollable-checkboxes/label"/>

@@ -1834,11 +1834,12 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
             }
         },
 
-        _showToolTip: function (tooltipForControl, control, target, toolTipSuffix, message, delay, event) {
+        _showToolTip: function (tooltipForControl, control, target, toolTipSuffix, message, event) {
 
-            // If we already have a tooltip for this control, but that the control is not in the page anymore, destroy the tooltip
+            // Cases where we don't want to reuse an existing tooltip for this control
             if (YAHOO.lang.isObject(tooltipForControl[control.id])) {
-                if (! YAHOO.util.Dom.inDocument(tooltipForControl[control.id].orbeonControl, document)) {
+                const existingTooltip = tooltipForControl[control.id];
+                if (existingTooltip.orbeonTarget != target) {
                     // Prevent the tooltip from becoming visible on mouseover
                     tooltipForControl[control.id].cfg.setProperty("disabled", true);
                     // If visible, hide the tooltip right away, otherwise it will only be hidden a few seconds later
@@ -1853,17 +1854,18 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
                     // Makes it easier for test to check that the mouseover did run
                     tooltipForControl[control.id] = null;
                 } else {
-                    // We have a hint, initialize YUI tooltip
+                    // We have a message, initialize YUI tooltip
                     var yuiTooltip = new YAHOO.widget.Tooltip(control.id + toolTipSuffix, {
                         context: target,
                         text: message,
-                        showDelay: delay,
-                        effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
+                        showDelay: 0,
+                        hideDelay: 0,
                         // We provide here a "high" zIndex value so the tooltip is "always" displayed on top over everything else.
                         // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
                         zIndex: 10000
                     });
                     yuiTooltip.orbeonControl = control;
+                    yuiTooltip.orbeonTarget  = target;
                     // Send the mouse move event, because the tooltip gets positioned when receiving a mouse move.
                     // Without this, sometimes the first time the tooltip is shows at the top left of the screen
                     yuiTooltip.onContextMouseMove.call(target, event, yuiTooltip);
@@ -1877,50 +1879,49 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
         },
 
         mouseover: function (event) {
-            var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+            var target  = YAHOO.util.Event.getTarget(event);
+            var control = ORBEON.xforms.Events._findParentXFormsControl(target);
             if (target != null) {
 
-                // Hint tooltip
-                if (! $(target).closest(".xforms-disable-hint-as-tooltip").is("*")) {
-                    var message = ORBEON.xforms.Controls.getHintMessage(target);
-                    if ($(target).is('.xforms-trigger, .xforms-submit')) {
-                        // Remove the title, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
-                        var formElement = ORBEON.util.Dom.getElementByTagName(target, ["a", "button"]);
-                        formElement.title = "";
-                    }
-                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.hintTooltipForControl, target, target, "-orbeon-hint-tooltip", message, 200, event);
-                }
+                if ($(target).is(".xforms-alert.xforms-active")) {
 
-                // Alert tooltip
-                if ($(target).is(".xforms-alert.xforms-active") && ! $(target).closest(".xforms-disable-alert-as-tooltip").is("*")) {
-                    // NOTE: control may be null if we have <div for="">. Using target.getAttribute("for") returns a proper
+                    // Alert tooltip
+                    // NOTE: control may be null if we have <div for="">. Using control.getAttribute("for") returns a proper
                     // for, but then tooltips sometimes fail later with Ajax portlets in particular. So for now, just don't
                     // do anything if there is no control found.
-                    var control = ORBEON.xforms.Controls.getControlForLHHA(target, "alert");
-                    if (control) {
-                        // The 'for' can point to a form field which is inside the element representing the control
-                        if (! ($(control).is('.xforms-control, .xforms-group')))
-                            control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
+                    var formField = ORBEON.xforms.Controls.getControlForLHHA(target, "alert");
+                    if (formField && ! $(target).closest(".xforms-disable-alert-as-tooltip").is("*")) {
+                        // The 'for' typically points to a form field which is inside the element representing the control
+                        control = ORBEON.xforms.Events._findParentXFormsControl(formField);
                         if (control) {
                             var message = ORBEON.xforms.Controls.getAlertMessage(control);
-                            ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control, target, "-orbeon-alert-tooltip", message, 10, event);
+                            ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control, target, "-orbeon-alert-tooltip", message, event);
                         }
+                    }
+
+                } else if ($(target).is('.xforms-help')) {
+
+                    // Help tooltip
+                    if (control && ORBEON.xforms.Page.getFormFromElemOrThrow(control).helpTooltip()) {
+                        var message = ORBEON.xforms.Controls.getHelpMessage(control);
+                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, event);
+                    }
+
+                } else if (! $(target).closest(".xforms-disable-hint-as-tooltip").is("*") && control) {
+
+                    // Hint tooltip
+                    if (control != target) {
+                        // Only show hint if the mouse is over a child of the control, so we don't show both the hint and the alert or help
+                        var message = ORBEON.xforms.Controls.getHintMessage(control);
+                        if ($(control).is('.xforms-trigger, .xforms-submit')) {
+                            // Remove the title, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
+                            var formElement = ORBEON.util.Dom.getElementByTagName(control, ["a", "button"]);
+                            formElement.title = "";
+                        }
+                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.hintTooltipForControl, control, target, "-orbeon-hint-tooltip", message, event);
                     }
                 }
 
-                // Help tooltip
-                if (ORBEON.xforms.Page.getFormFromElemOrThrow(target).helpTooltip() && $(target).is('.xforms-help')) {
-                    // Get control
-                    var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help");
-                    if (control) {
-                        // The xf:input is a unique case where the 'for' points to the input field, not the element representing the control
-                        if ($(control).is('.xforms-input-input'))
-                            control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
-                        var message = ORBEON.xforms.Controls.getHelpMessage(control);
-                        YAHOO.util.Dom.generateId(target);
-                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, 0, event);
-                    }
-                }
             }
         },
 

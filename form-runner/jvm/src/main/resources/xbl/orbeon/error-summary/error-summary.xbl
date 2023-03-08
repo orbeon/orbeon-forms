@@ -310,22 +310,17 @@
                                                     <xsl:copy-of select="ancestor-or-self::*/namespace::*"/>
                                                     <xh:li>
                                                         <!-- Clickable / linkable label -->
-                                                        <xh:td class="fr-error-number"><xf:output value="position()"/></xh:td>
-                                                        <xh:td>
-                                                            <xsl:if test="exists(fr:label)">
-                                                                <xf:output class="fr-error-label">
-                                                                    <xsl:copy-of select="fr:label/(@*|node())"/>
-                                                                </xf:output>
-                                                            </xsl:if>
-                                                        </xh:td>
-                                                        <xh:td>
-                                                            <!-- Alert message -->
-                                                            <xsl:if test="exists(fr:alert)">
-                                                                <xf:output class="fr-error-alert fr-error-alert-error">
-                                                                    <xsl:copy-of select="fr:alert/(@*|node())"/>
-                                                                </xf:output>
-                                                            </xsl:if>
-                                                        </xh:td>
+                                                        <xsl:if test="exists(fr:label)">
+                                                            <xf:output class="fr-error-label">
+                                                                <xsl:copy-of select="fr:label/(@*|node())"/>
+                                                            </xf:output>
+                                                        </xsl:if>
+                                                        <!-- Alert message -->
+                                                        <xsl:if test="exists(fr:alert)">
+                                                            <xf:output class="fr-error-alert fr-error-alert-error">
+                                                                <xsl:copy-of select="fr:alert/(@*|node())"/>
+                                                            </xf:output>
+                                                        </xsl:if>
                                                     </xh:li>
                                                 </xf:repeat>
                                             </xh:ol>
@@ -354,7 +349,6 @@
                                                         name="focusable"
                                                         value="xxf:focusable(@id, true())"/>
 
-                                                    <xh:span class="fr-error-number"><xf:output value="position()"/></xh:span>
                                                     <xf:switch caseref="$focusable" xxf:xforms11-switch="true">
                                                         <xf:case value="true()">
                                                             <xf:trigger appearance="minimal">

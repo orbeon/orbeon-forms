@@ -217,7 +217,7 @@
                     'map:merge((',
                         string-join(
                             for $p in $params
-                                return for $name in ($p/*:name, name($p))[1]
+                                return for $name in ($p/*:name, name($p))[1][p:non-blank()]
                                     return for $type in ($p/*:type, $p/@type)[1] (: element first as attribute can also exist with for example value `object` :)
                             return
                                 concat(

@@ -228,7 +228,13 @@
                                             fr:maybe-replace(
                                                 concat(
                                                     'string((',
-                                                    frf:replaceVarReferencesWithFunctionCalls($p/(*:expr, *:value)[1], $p/(*:expr, *:value)[1], false(), $library-name, ()),
+                                                    frf:replaceVarReferencesWithFunctionCalls(
+                                                        $p/(*:expr, *:value)[1],
+                                                        $p/(*:expr, *:value)[1],
+                                                        false(),
+                                                        $library-name,
+                                                        ()
+                                                    ),
                                                     ')[1])'
                                                 ),
                                                 $for-pdf
@@ -288,7 +294,13 @@
                                             if (exists($p/*:visible)) then
                                                 concat(
                                                     'if (',
-                                                    frf:replaceVarReferencesWithFunctionCalls($p/*:visible, $p/*:visible, false(), $library-name, ()),
+                                                    frf:replaceVarReferencesWithFunctionCalls(
+                                                        $p/*:visible,
+                                                        $p/*:visible,
+                                                        false(),
+                                                        $library-name,
+                                                        ()
+                                                    ),
                                                     ') then ''&quot; element(logo) &quot;'' else '''''
                                                 )
                                             else

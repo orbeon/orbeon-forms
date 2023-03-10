@@ -646,4 +646,6 @@
         }
     </property>
 
+    <property as="xs:boolean" name="oxf.fr.export.page.enable.*.*"                 value="false"/>
+
 </properties>

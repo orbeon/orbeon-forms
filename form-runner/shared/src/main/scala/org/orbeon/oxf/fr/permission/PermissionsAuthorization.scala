@@ -19,7 +19,7 @@ import org.orbeon.oxf.util.CoreCrossPlatformSupport
 
 object PermissionsAuthorization {
 
-  def currentUserFromSession: Option[Credentials] =
+  def findCurrentCredentialsFromSession: Option[Credentials] =
     CoreCrossPlatformSupport.externalContext.getRequest.credentials
 
   sealed trait PermissionsCheck
@@ -31,36 +31,58 @@ object PermissionsAuthorization {
   case object CheckAssumingOrganizationMatch  extends PermissionsCheck
 
   def authorizedOperations(
-    permissions : Permissions,
-    currentUser : Option[Credentials],
-    check       : PermissionsCheck
+    permissions          : Permissions,
+    currentCredentialsOpt: Option[Credentials],
+    check                : PermissionsCheck
   ): Operations =
     permissions match {
       case DefinedPermissions(permissionsList) =>
-        Operations.combine(permissionsList.map(authorizedOperations(_, currentUser, check)))
+        Operations.combine(permissionsList.map(authorizedOperationsForPermission(_, currentCredentialsOpt, check)))
       case UndefinedPermissions =>
         SpecificOperations(Operations.AllSet)
     }
 
-  private def authorizedOperations(
-    permission     : Permission,
-    currentUserOpt : Option[Credentials],
-    check          : PermissionsCheck
+  def authorizedBasedOnRole(
+    formPermissions: Permissions,
+    credentialsOpt : Option[Credentials],
+    anyOfOperations: Set[Operation],
+    optimistic     : Boolean
+  ): Boolean = {
+
+    val authorizedOperationsNotAssumingOwner =
+      authorizedOperations(formPermissions, credentialsOpt, CheckWithoutDataUserPessimistic)
+
+    val authorizedOps = {
+      val checkAssumingOwner =
+        optimistic &&
+        credentialsOpt.isDefined &&
+        Operations.allows(authorizedOperationsNotAssumingOwner, Operation.Create)
+      if (checkAssumingOwner) {
+        val userAndGroupOpt    = credentialsOpt.map(_.userAndGroup)
+        val assumingOwnerCheck = CheckWithDataUser(userAndGroupOpt, None)
+        authorizedOperations(formPermissions, credentialsOpt, assumingOwnerCheck)
+      } else {
+        authorizedOperationsNotAssumingOwner
+      }
+    }
+
+    Operations.allowsAny(authorizedOps, anyOfOperations)
+  }
+
+  private def authorizedOperationsForPermission(
+    permission           : Permission,
+    currentCredentialsOpt: Option[Credentials],
+    check                : PermissionsCheck
   ): Operations = {
 
     def allConditionsPass(check: PermissionsCheck): Boolean =
-      permission.conditions.forall(conditionPasses(_, currentUserOpt, check))
+      permission.conditions.forall(conditionPasses(_, currentCredentialsOpt, check))
 
     // For `Create`, we can't have data, so check if the conditions would match on the data created by
     // the current user, if that user was allowed to create the data
     lazy val checkWithCurrentUser = CheckWithDataUser(
-      userAndGroup = currentUserOpt.map { currentUser =>
-        UserAndGroup (
-          username     = currentUser.userAndGroup.username,
-          groupname    = currentUser.userAndGroup.groupname
-        )
-      },
-      organization = currentUserOpt.flatMap(_.defaultOrganization)
+      userAndGroup = currentCredentialsOpt.map(_.userAndGroup),
+      organization = currentCredentialsOpt.flatMap(_.defaultOrganization)
     )
 
     permission.operations match {
@@ -90,15 +112,15 @@ object PermissionsAuthorization {
   }
 
   private def conditionPasses(
-    condition   : Condition,
-    currentUser : Option[Credentials],
-    check       : PermissionsCheck
+    condition         : Condition,
+    currentCredentials: Option[Credentials],
+    check             : PermissionsCheck
   ): Boolean =
     condition match {
       case Owner =>
         check match {
           case CheckWithDataUser(dataUserAndGroupOpt, _) =>
-            (currentUser map (_.userAndGroup.username), dataUserAndGroupOpt.map(_.username)) match {
+            (currentCredentials map (_.userAndGroup.username), dataUserAndGroupOpt.map(_.username)) match {
               case (Some(currentUsername), Some(dataUsername)) if currentUsername == dataUsername => true
               case _ => false
             }
@@ -108,7 +130,7 @@ object PermissionsAuthorization {
       case Group =>
         check match {
           case CheckWithDataUser(dataUserAndGroupOpt, _) =>
-            (currentUser flatMap (_.userAndGroup.groupname), dataUserAndGroupOpt.flatMap(_.groupname)) match {
+            (currentCredentials flatMap (_.userAndGroup.groupname), dataUserAndGroupOpt.flatMap(_.groupname)) match {
               case (Some(currentUsername), Some(dataGroupnameOpt)) if currentUsername == dataGroupnameOpt => true
               case _ => false
             }
@@ -117,7 +139,7 @@ object PermissionsAuthorization {
         }
       case RolesAnyOf(permissionRoles) =>
         permissionRoles.exists(permissionRoleName =>
-          currentUser.toList.flatMap(_.roles) exists {
+          currentCredentials.toList.flatMap(_.roles) exists {
             case SimpleRole(userRoleName) =>
               userRoleName == permissionRoleName
             case ParametrizedRole(userRoleName, userOrganizationName) =>

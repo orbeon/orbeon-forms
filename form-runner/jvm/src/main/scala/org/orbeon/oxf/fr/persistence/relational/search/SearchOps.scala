@@ -32,18 +32,18 @@ object SearchOps {
   def xpathAuthorizedIfOrganizationMatch(formPermissionsElOrNull: NodeInfo): List[String] =
     authorizedIfOrganizationMatch(
       permissions = PermissionsXML.parse(Option(formPermissionsElOrNull)),
-      currentUser = PermissionsAuthorization.currentUserFromSession
+      credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession
     )
 
   def authorizedIfOrganizationMatch(
-    permissions : Permissions,
-    currentUser : Option[Credentials]
+    permissions   : Permissions,
+    credentialsOpt: Option[Credentials]
   ): List[String] = {
     val check  = PermissionsAuthorization.CheckAssumingOrganizationMatch
-    val userParametrizedRoles = currentUser.to(List).flatMap(_.roles).collect{ case role @ ParametrizedRole(_, _) => role }
+    val userParametrizedRoles = credentialsOpt.to(List).flatMap(_.roles).collect{ case role @ ParametrizedRole(_, _) => role }
     val usefulUserParametrizedRoles = userParametrizedRoles.filter(role => {
-      val userWithJustThisRole = currentUser.map(_.copy(roles = List(role)))
-      val authorizedOperations = PermissionsAuthorization.authorizedOperations(permissions, userWithJustThisRole, check)
+      val credentialsWithJustThisRoleOpt = credentialsOpt.map(_.copy(roles = List(role)))
+      val authorizedOperations           = PermissionsAuthorization.authorizedOperations(permissions, credentialsWithJustThisRoleOpt, check)
       Operations.allowsAny(authorizedOperations, SearchOperations)
     } )
     usefulUserParametrizedRoles.map(_.organizationName)
@@ -81,9 +81,9 @@ object SearchOps {
 
     val operations =
       PermissionsAuthorization.authorizedOperations(
-        permissions = PermissionsXML.parse(Option(formPermissionsElOrNull)),
-        currentUser = PermissionsAuthorization.currentUserFromSession,
-        check       = checkWithData
+        permissions           = PermissionsXML.parse(Option(formPermissionsElOrNull)),
+        currentCredentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession,
+        check                 = checkWithData
       )
 
     Operations.serialize(operations, normalized = true).mkString(" ")

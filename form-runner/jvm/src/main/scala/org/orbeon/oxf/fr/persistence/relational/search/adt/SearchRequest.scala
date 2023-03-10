@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.Operation
 import org.orbeon.oxf.fr.persistence.relational.Provider
@@ -22,8 +23,7 @@ case class SearchRequest(
   provider        : Provider,
   appForm         : AppForm,
   version         : SearchVersion,
-  username        : Option[String],
-  group           : Option[String],
+  credentials     : Option[Credentials],
   pageSize        : Int,
   pageNumber      : Int,
   columns         : List[Column],

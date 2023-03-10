@@ -401,7 +401,7 @@ trait CreateUpdateDelete
                 val organization  = existing.organization.map(_._2)
                 val authorizedOps = PermissionsAuthorization.authorizedOperations(
                   formPermissions,
-                  PermissionsAuthorization.currentUserFromSession,
+                  PermissionsAuthorization.findCurrentCredentialsFromSession,
                   CheckWithDataUser(createdBy, organization)
                 )
                 val requiredOp    = if (delete) Delete else Update
@@ -415,7 +415,7 @@ trait CreateUpdateDelete
                   else
                     PermissionsAuthorization.authorizedOperations(
                       formPermissions,
-                      PermissionsAuthorization.currentUserFromSession,
+                      PermissionsAuthorization.findCurrentCredentialsFromSession,
                       CheckWithoutDataUserPessimistic
                     )
                 Operations.allowsAny(authorizedOps, Set(if (delete) Delete else Create))

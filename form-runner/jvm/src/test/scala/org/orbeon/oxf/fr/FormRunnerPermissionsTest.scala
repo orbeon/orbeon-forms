@@ -137,8 +137,8 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
         it("grants access to a manager, whatever she manages") {
           assert(
             authorizedOperations(
-              permissions = clerkAndManagerPermissions,
-              currentUser = Some(jmanager.copy(roles = List(ParametrizedRole("manager", "x")))),
+              permissions           = clerkAndManagerPermissions,
+              currentCredentialsOpt = Some(jmanager.copy(roles = List(ParametrizedRole("manager", "x")))),
               CheckAssumingOrganizationMatch
             ) === fullOperations
           )
@@ -146,8 +146,8 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
         it("doesn't grant access to a manager if the permissions don't grant any access to manager") {
           assert(
             authorizedOperations(
-              permissions = clerkPermissions,
-              currentUser = Some(jmanager.copy(roles = List(ParametrizedRole("manager", "x")))),
+              permissions           = clerkPermissions,
+              currentCredentialsOpt = Some(jmanager.copy(roles = List(ParametrizedRole("manager", "x")))),
               CheckAssumingOrganizationMatch
             ) === Operations.None
           )
@@ -155,8 +155,8 @@ class FormRunnerPermissionsTest extends AnyFunSpec {
         it("doesn't grant access to a user with a parametrized role other than manager") {
           assert(
             authorizedOperations(
-              permissions = clerkPermissions,
-              currentUser = Some(jmanager.copy(roles = List(ParametrizedRole("chief", "x")))),
+              permissions           = clerkPermissions,
+              currentCredentialsOpt = Some(jmanager.copy(roles = List(ParametrizedRole("chief", "x")))),
               CheckAssumingOrganizationMatch
             ) === Operations.None
           )

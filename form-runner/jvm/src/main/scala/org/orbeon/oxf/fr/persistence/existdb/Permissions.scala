@@ -41,10 +41,10 @@ object Permissions {
     implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(Permissions.getClass))
 
     val authorizedOperations = {
-      val permissionsElemOpt  = RelationalUtils.readFormPermissions(AppForm(app, form), FormDefinitionVersion.Latest)
-      val permissions         = PermissionsXML.parse(permissionsElemOpt)
-      val currentUser         = PermissionsAuthorization.currentUserFromSession
-      val checkWithDataUser   = CheckWithDataUser(
+      val permissionsElemOpt    = RelationalUtils.readFormPermissions(AppForm(app, form), FormDefinitionVersion.Latest)
+      val permissions           = PermissionsXML.parse(permissionsElemOpt)
+      val currentCredentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession
+      val checkWithDataUser     = CheckWithDataUser(
         userAndGroup = UserAndGroup.fromStrings(
           Option(metadataFromDB).map(_.child("username" ).stringValue).getOrElse(""),
           Option(metadataFromDB).map(_.child("groupname").stringValue).getOrElse("")
@@ -54,7 +54,7 @@ object Permissions {
           Organization(levelsEls.to(List))
         })
       )
-      PermissionsAuthorization.authorizedOperations(permissions, currentUser, checkWithDataUser)
+      PermissionsAuthorization.authorizedOperations(permissions, currentCredentialsOpt, checkWithDataUser)
     }
 
     val requiredOperation = method match {

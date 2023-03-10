@@ -65,12 +65,12 @@ trait FormRunnerPermissionsOps {
    * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
    */
   def authorizedOperationsBasedOnRolesUseAdt(
-    permissions: Permissions,
-    currentUser: Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
+    permissions              : Permissions,
+    currentUserCredentialsOpt: Option[Credentials] = CoreCrossPlatformSupport.externalContext.getRequest.credentials
   ): Operations =
     PermissionsAuthorization.authorizedOperations(
       permissions,
-      currentUser,
+      currentUserCredentialsOpt,
       PermissionsAuthorization.CheckWithoutDataUserPessimistic
     )
 

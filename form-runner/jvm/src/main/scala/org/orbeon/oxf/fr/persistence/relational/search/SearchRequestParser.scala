@@ -15,15 +15,15 @@ package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
-import org.orbeon.oxf.fr.permission.Operation
-import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider}
+import org.orbeon.oxf.fr.permission.{Operation, PermissionsAuthorization}
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon.requestedFormVersion
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
-import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
+import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
@@ -53,8 +53,7 @@ trait SearchRequestParser {
         val freeTextElOpt       = queryEls.find(! _.hasAtt("path"))
         val structuredSearchEls = queryEls.filter(_.hasAtt("path"))
         val draftsElOpt         = searchElement.child("drafts").headOption
-        val username            = httpRequest.credentials map     (_.userAndGroup.username)
-        val group               = httpRequest.credentials flatMap (_.userAndGroup.groupname)
+        val credentials         = PermissionsAuthorization.findCurrentCredentialsFromSession
         val operationsElOpt     = searchElement.child("operations").headOption
         val allFields           = searchElement.attValueOpt("return-all-indexed-fields").contains(true.toString)
 
@@ -118,14 +117,13 @@ trait SearchRequestParser {
           provider       = Provider.withName(provider),
           appForm        = appForm,
           version        = version,
-          username       = username,
-          group          = group,
+          credentials    = credentials,
           pageSize       = searchElement.firstChildOpt("page-size")  .get.stringValue.toInt,
           pageNumber     = searchElement.firstChildOpt("page-number").get.stringValue.toInt,
           freeTextSearch = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // blank means no search
           columns        = columns,
           drafts         =
-            username match {
+            credentials match {
               case None =>
                 ExcludeDrafts
               case Some(_) =>

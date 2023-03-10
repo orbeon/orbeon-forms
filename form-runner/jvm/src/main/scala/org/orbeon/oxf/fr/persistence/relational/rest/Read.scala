@@ -175,7 +175,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
                 formPermissionsElemOpt,
                 req.appForm
               ),
-              PermissionsAuthorization.currentUserFromSession,
+              PermissionsAuthorization.findCurrentCredentialsFromSession,
               dataUser
             )
             if (!Operations.allows(authorizedOperations, Read))

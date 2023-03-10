@@ -354,8 +354,9 @@
                     <xf:itemset ref=".[count(instance('fr-landing-demo-forms-instance')/*) gt $page-size]">
                         <xf:label ref="xxf:r('landing.show-more', '|fr-fr-resources|')"/>
                         <!-- FIXME: The link should pass a search parameter for the app name.
-                             https://github.com/orbeon/orbeon-forms/issues/5255 -->
-                        <xf:value ref="'/fr/orbeon/builder/summary'"/>
+                             https://github.com/orbeon/orbeon-forms/issues/5255
+                             https://github.com/orbeon/orbeon-forms/issues/5274 -->
+                        <xf:value ref="'/fr/forms?fr-search-app=orbeon'"/>
                     </xf:itemset>
                     <fr:card-body>
                         <xh:p class="card-text lead"><xf:output ref="xxf:r('landing.descriptions.demo-forms', '|fr-fr-resources|')"/></xh:p>

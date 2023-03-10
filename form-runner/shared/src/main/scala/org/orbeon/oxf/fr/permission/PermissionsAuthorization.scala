@@ -50,10 +50,7 @@ object PermissionsAuthorization {
       case DefinedPermissions(permissionsList) =>
         Operations.combine(permissionsList.map(authorizedOperationsForPermission(_, currentCredentialsOpt, check)))
       case UndefinedPermissions =>
-        // TODO: should we use `AnyOperation`
-        // TODO: probably get rid of `Operations.AllSet`, but then check also `PermissionsToWorkflowConfig`
-//        AnyOperation
-        SpecificOperations(Operations.AllSet)
+        AnyOperation
     }
 
   def authorizedBasedOnRole(

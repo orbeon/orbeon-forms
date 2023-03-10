@@ -45,7 +45,7 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
           Some(user),
           PermissionsAuthorization.CheckWithoutDataUserPessimistic
         )
-        assert(ops == SpecificOperations(Operations.AllSet))
+        assert(ops == AnyOperation)
       }
     }
 

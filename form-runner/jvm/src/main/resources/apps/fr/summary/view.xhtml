@@ -339,7 +339,7 @@
                 <!-- Check if the user doesn't have the permission to 'list'
                      https://github.com/orbeon/orbeon-forms/issues/5397 -->
                 <xf:action
-                    if="not('list' = $operations-from-role)"
+                    if="not(('*', 'list') = $operations-from-role)"
                     type="xpath">frf:sendError(403)</xf:action>
 
                 <!-- Remember global operations -->

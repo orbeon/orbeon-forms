@@ -91,7 +91,7 @@
             <xf:var name="selection-document-id"     value="if ($selection-is-one-document) then substring-after (instance('fr-selection-instance'), '/') else ()"/>
 
             <!-- Source form -->
-            <xf:instance id="fr-source-form-instance" xxf:readonly="false"><!-- Set to false so that xf:insert works -->
+            <xf:instance id="fr-source-form-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all"><!-- Set to false so that xf:insert works -->
                 <form xmlns=""/>
             </xf:instance>
 
@@ -164,14 +164,14 @@
 
             <!-- Standard Form Runner data instance -->
             <!-- TODO: Can we remove this? -->
-            <xf:instance id="fr-form-instance">
+            <xf:instance id="fr-form-instance" xxf:exclude-result-prefixes="#all">
                 <_/>
             </xf:instance>
 
             <!-- Standard Form Runner resources instance -->
             <!-- Initially empty, but we copy the source form resources into there during initialization.
                  fr-persistence-model then has access to the form resources as if in the detail page. -->
-            <xf:instance id="fr-form-resources">
+            <xf:instance id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources xmlns=""/>
             </xf:instance>
 
@@ -229,7 +229,7 @@
             </xf:instance>
 
             <!-- Contains search labels -->
-            <xf:instance id="fr-search-labels-instance">
+            <xf:instance id="fr-search-labels-instance" xxf:exclude-result-prefixes="#all">
                 <search xmlns=""/>
             </xf:instance>
 
@@ -429,6 +429,8 @@
             </xf:action>
 
             <!-- Summary data -->
+            <!-- Don't use `xxf:exclude-result-prefixes="#all"` as eXist search needs the `xh` and `xf` namespaces -->
+            <!-- With eXist, `return-all-indexed-fields="true"` is not supported, so pass the `<query>` elements anyway -->
             <xf:instance id="fr-search-results-instance">
                 <documents xmlns="" search-total="0">
                     <!-- Content will be like this -->

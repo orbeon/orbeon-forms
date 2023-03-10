@@ -641,16 +641,16 @@
             event="xforms-submit-done"
             ref="instance('fr-search-response')/document[not(xxf:split(@operations) = ('*', 'update'))]"/>
     </xf:submission>
-    <xf:instance id="fr-search-request">
+    <xf:instance id="fr-search-request" xxf:exclude-result-prefixes="#all">
         <search>
             <page-size>10</page-size>
             <page-number>1</page-number>
             <lang>en</lang>
         </search>
     </xf:instance>
-    <xf:instance id="fr-search-response"><dummy/></xf:instance>
+    <xf:instance id="fr-search-response" xxf:exclude-result-prefixes="#all"><dummy/></xf:instance>
 
-    <xf:instance id="fr-lockinfo-request">
+    <xf:instance id="fr-lockinfo-request" xxf:exclude-result-prefixes="#all">
         <d:lockinfo>
             <d:lockscope><d:exclusive/></d:lockscope>
             <d:locktype><d:write/></d:locktype>
@@ -660,7 +660,7 @@
             </d:owner>
         </d:lockinfo>
     </xf:instance>
-    <xf:instance id="fr-lockinfo-response">
+    <xf:instance id="fr-lockinfo-response" xxf:exclude-result-prefixes="#all">
         <d:lockinfo/>
     </xf:instance>
     <xf:submission
@@ -860,21 +860,21 @@
     </xf:action>
 
     <!-- Initial instance (to support clear) -->
-    <xf:instance id="fr-initial-instance" xxf:readonly="false"><!-- Set to false so that `xf:insert` works -->
+    <xf:instance id="fr-initial-instance" xxf:readonly="false" xxf:exclude-result-prefixes="#all"><!-- Set to false so that `xf:insert` works -->
         <form xmlns=""/>
     </xf:instance>
 
     <!-- Which operations the user can perform -->
-    <xf:instance id="fr-authorized-operations">
+    <xf:instance id="fr-authorized-operations" xxf:exclude-result-prefixes="#all">
         <operations/>
     </xf:instance>
 
     <!-- Metadata associated with a GET of the document -->
-    <xf:instance id="fr-document-metadata">
+    <xf:instance id="fr-document-metadata" xxf:exclude-result-prefixes="#all">
         <metadata workflow-stage=""/>
     </xf:instance>
 
-    <xf:instance id="fr-persistence-instance">
+    <xf:instance id="fr-persistence-instance" xxf:exclude-result-prefixes="#all">
         <save xmlns="">
             <!-- Dialog to show upon xforms-ready for handling drafts -->
             <found-document-message-to-show/>
@@ -933,16 +933,16 @@
     </xf:bind>
 
     <!-- Configuration for Saxon serialization -->
-    <xf:instance id="fr-xsl-output-instance">
+    <xf:instance id="fr-xsl-output-instance" xxf:exclude-result-prefixes="#all">
         <xsl:output xmlns:xsl="http://www.w3.org/1999/XSL/Transform" method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
     </xf:instance>
 
     <!-- Instance to store suspended processes -->
-    <xf:instance id="fr-processes-instance">
+    <xf:instance id="fr-processes-instance" xxf:exclude-result-prefixes="#all">
         <processes/>
     </xf:instance>
 
-    <xf:instance id="fr-triggers-instance">
+    <xf:instance id="fr-triggers-instance" xxf:exclude-result-prefixes="#all">
         <triggers xmlns="">
             <strict-submit/>
             <can-access-summary/>

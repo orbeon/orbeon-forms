@@ -213,7 +213,7 @@
     </page>
 
     <!-- Export published form with form data as Excel or XML -->
-    <service path="/fr/([^/^.]+)/([^/^.]+)/(excel-)?export(/([^/^.]+))?"
+    <service path="/fr/([^/^.]+)/([^/^.]+)/export(/([^/^.]+))?"
              model="detail/detail-model.xpl"
              view="export/excel-export-with-data.xpl">
     </service>

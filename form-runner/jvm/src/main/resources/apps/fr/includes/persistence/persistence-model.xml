@@ -280,7 +280,7 @@
                     <xf:setvalue
                         ref="$lease-duration-elem"
                         value="xxf:property(string-join(('oxf.fr.detail.lease.duration.*', $app, $form), '.'))"/>
-                    <xf:action iterate="frf:xpathOrbeonRolesFromCurrentRequest()">
+                    <xf:action iterate="fr:user-roles()">
                         <xf:var name="role" value="."/>
                         <xf:var
                             name="role-duration"

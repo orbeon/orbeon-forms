@@ -87,10 +87,6 @@ trait FormRunnerPermissionsOps {
     CoreCrossPlatformSupport.externalContext.getRequest.credentials.toList.flatMap(_.roles).map(_.roleName).toSet
 
   //@XPathFunction
-  def xpathOrbeonRolesFromCurrentRequest: SequenceIterator =
-    orbeonRolesFromCurrentRequest.iterator
-
-  //@XPathFunction
   def redirectToHomePageIfLoggedIn(): Unit = {
     val request  = CoreCrossPlatformSupport.externalContext.getRequest
     val response = CoreCrossPlatformSupport.externalContext.getResponse

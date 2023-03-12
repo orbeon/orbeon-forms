@@ -745,9 +745,9 @@
                 xxf:default="
                     if (. = ('tiff', 'test-pdf')) then
                         'pdf'
-                    else if (. = ('export') and xxf:is-blank(../document)) then
+                    else if (. = ('export', 'excel-export') and xxf:is-blank(../document)) then
                         'new'
-                    else if (. = ('export') and xxf:non-blank(../document)) then
+                    else if (. = ('export', 'excel-export') and xxf:non-blank(../document)) then
                         'edit'
                     else
                         ."/>

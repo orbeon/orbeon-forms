@@ -52,10 +52,16 @@
             (: PE only :)
             (fr:is-pe() or frf:sendError(404))"/>
 
-    <!-- Crude way of detecting export, might have to fix later! -->
+    <!-- Determine whether we are running in export mode, so we know we produce an XML data response
+         We can't use `fr:mode() = ('excel-export', 'export')`, because that's normalized to `new` or `edit` -->
     <xf:var
         name="is-export"
-        value="$is-background and xxf:get-request-method() = 'GET'"/>
+        value="
+            matches(
+                xxf:get-request-path(),
+                '^/fr/(service/)?([^/]+)/([^/]+)/(excel-export|export)(/([^/]+))?$'
+            )
+        "/>
 
     <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
     <xf:var
@@ -471,7 +477,7 @@
         </xf:action>
 
         <!-- When done in background mode, send out service response -->
-        <xf:action if="$is-background and event('xxf:type') = 'xforms-ready'">
+        <xf:action if="($is-export or $is-background) and event('xxf:type') = 'xforms-ready'">
 
             <xf:setvalue
                 ref="instance('fr-background-response-instance')/document-id"

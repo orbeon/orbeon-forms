@@ -48,7 +48,6 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
   private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), true)
   private implicit val coreCrossPlatformSupport = CoreCrossPlatformSupport
 
-  val AllOperations       = SpecificOperations(Set(Create, Read, Update, Delete, Operation.List))
   val CanCreate           = SpecificOperations(Set(Create))
   val CanRead             = SpecificOperations(Set(Read))
   val CanUpdate           = SpecificOperations(Set(Update))
@@ -128,9 +127,9 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val first = <gaga1/>.toDocument
       val myStage = Some(Stage("my-stage", ""))
       HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), 201)
-      HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AllOperations, Some(1)))
+      HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AnyOperation, Some(1)))
       HttpAssert.put(FirstDataURL, Specific(1), HttpCall.XML(first), expectedCode = 201, stage = myStage)
-      HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AllOperations, Some(1), stage = myStage))
+      HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(first), AnyOperation, Some(1), stage = myStage))
       HttpAssert.del(FirstDataURL, Unspecified, 204)
       HttpAssert.get(FirstDataURL, Unspecified, HttpAssert.ExpectedCode(410))
 
@@ -219,7 +218,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         // Anonymous: no permission defined
         HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, UndefinedPermissions)), 201)
         HttpAssert.put(DataURL, Specific(1), HttpCall.XML(data), 201)
-        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), AllOperations, Some(1)))
+        HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), AnyOperation, Some(1)))
 
         // Anonymous: create and read
         HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, AnyoneCanCreateAndRead)), 201)
@@ -317,7 +316,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpCall.Binary
         val url = HttpCall.crudURLPrefix(provider) + "data/123/file" + position.toString
         HttpAssert.put(url, Specific(1), bytes, 201)
-        HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(bytes, AllOperations, Some(1)))
+        HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(bytes, AnyOperation, Some(1)))
       }
     }
   }
@@ -341,7 +340,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
         val url = HttpCall.crudURLPrefix(provider) + s"data/$position/data.xml"
 
         HttpAssert.put(url, Specific(1), xmlBody, 201)
-        HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(xmlBody, AllOperations, Some(1)))
+        HttpAssert.get(url, Unspecified, HttpAssert.ExpectedBody(xmlBody, AnyOperation, Some(1)))
       }
     }
   }
@@ -358,8 +357,8 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with X
       val DraftURL = HttpCall.crudURLPrefix(provider) + "draft/123/data.xml"
       HttpAssert.put(DataURL,  Specific(1), first, 201)
       HttpAssert.put(DraftURL, Unspecified, second, 201)
-      HttpAssert.get(DataURL,  Unspecified, HttpAssert.ExpectedBody(first, AllOperations, Some(1)))
-      HttpAssert.get(DraftURL, Unspecified, HttpAssert.ExpectedBody(second, AllOperations, Some(1)))
+      HttpAssert.get(DataURL,  Unspecified, HttpAssert.ExpectedBody(first, AnyOperation, Some(1)))
+      HttpAssert.get(DraftURL, Unspecified, HttpAssert.ExpectedBody(second, AnyOperation, Some(1)))
     }
   }
 

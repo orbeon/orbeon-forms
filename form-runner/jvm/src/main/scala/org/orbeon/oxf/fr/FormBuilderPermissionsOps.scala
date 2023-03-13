@@ -137,12 +137,13 @@ trait FormBuilderPermissionsOps {
         val adminOperation = hasAdminPermissionForAppForm.list("admin")
         val permissionsElement = formEl.child(Names.Permissions).headOption
         val otherOperations =
-          PermissionsAuthorization.authorizedForModeNoData(
-            mode           = "new", // xxx TODO: check mode! why `edit` or `new`???
-            permissions    = FormRunner.permissionsFromElemOrProperties(permissionsElement, AppForm(appName, formName)), //xxx TODO: do we need to read global permissions here??? also this will parse JSON every time for a non-blank property!
-            credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession
-          ).map(Operations.serialize(_, normalized = true))
-            .getOrElse(Nil)
+          Operations.serialize(
+            PermissionsAuthorization.authorizedOperationsForNoData(
+              permissions    = FormRunner.permissionsFromElemOrProperties(permissionsElement, AppForm(appName, formName)),
+              credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession
+            ),
+            normalized = true
+          )
 
         adminOperation ++ otherOperations
       }

@@ -147,39 +147,48 @@ object PermissionsAuthorization {
   ): Option[Operations] = {
 
     val operations =
-      permissions match {
-        case UndefinedPermissions =>
-          AnyOperation
-        case defined @ DefinedPermissions(_) =>
-
-          val operationsWithoutAssumingOwnership =
-            authorizedOperations(defined, credentialsOpt, CheckWithoutDataUserPessimistic)
-
-          def operationsAssumingOwnership: Operations = {
-
-            def ownerGroupOperations(condition: Option[Condition]): List[Operations] =
-              condition match {
-                case Some(condition) => defined.permissionsList.filter(_.conditions.contains(condition)).map(_.operations)
-                case None            => Nil
-              }
-
-            val ownerOperations       = ownerGroupOperations(credentialsOpt.isDefined option                                   Owner)
-            val groupMemberOperations = ownerGroupOperations(credentialsOpt.flatMap(_.userAndGroup.groupname).isDefined option Group)
-
-            Operations.combine(operationsWithoutAssumingOwnership :: ownerOperations ::: groupMemberOperations)
-          }
-
-          // If the user can't create data, don't return permissions the user might have if that user was the owner; we
-          // assume that if the user can't create data, the user can never be the owner of any data.
-          if (Operations.allows(operationsWithoutAssumingOwnership, Operation.Create))
-            operationsAssumingOwnership
-          else
-            operationsWithoutAssumingOwnership
-      }
+      authorizedOperationsForNoData(
+        permissions,
+        credentialsOpt
+      )
 
     // `isSubmit` is not used when mode is `new`
     isUserAuthorizedBasedOnOperationsAndMode(operations, mode, isSubmit = false) option operations
   }
+
+  def authorizedOperationsForNoData(
+    permissions   : Permissions,
+    credentialsOpt: Option[Credentials]
+  ): Operations =
+    permissions match {
+      case UndefinedPermissions =>
+        AnyOperation
+      case defined @ DefinedPermissions(_) =>
+
+        val operationsWithoutAssumingOwnership =
+          authorizedOperations(defined, credentialsOpt, CheckWithoutDataUserPessimistic)
+
+        def operationsAssumingOwnership: Operations = {
+
+          def ownerGroupOperations(condition: Option[Condition]): List[Operations] =
+            condition match {
+              case Some(condition) => defined.permissionsList.filter(_.conditions.contains(condition)).map(_.operations)
+              case None            => Nil
+            }
+
+          val ownerOperations       = ownerGroupOperations(credentialsOpt.isDefined option                                   Owner)
+          val groupMemberOperations = ownerGroupOperations(credentialsOpt.flatMap(_.userAndGroup.groupname).isDefined option Group)
+
+          Operations.combine(operationsWithoutAssumingOwnership :: ownerOperations ::: groupMemberOperations)
+        }
+
+        // If the user can't create data, don't return permissions the user might have if that user was the owner; we
+        // assume that if the user can't create data, the user can never be the owner of any data.
+        if (Operations.allows(operationsWithoutAssumingOwnership, Operation.Create))
+          operationsAssumingOwnership
+        else
+          operationsWithoutAssumingOwnership
+    }
 
   private def authorizedForModeAndData(
     mode           : String,

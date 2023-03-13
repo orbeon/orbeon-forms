@@ -16,7 +16,9 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerPersistence.DataFormatVersionName
 import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.oxf.fr.process.RenderedFormat
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
+import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.SimplePath._
@@ -42,8 +44,16 @@ trait FormRunnerSummary {
     }
 
   //@XPathFunction
-  def buildSummaryLinkButton(app: String, form: String, buttonName: String, documentId: String, lang: String): String =
-    s"/fr/$app/$form/$buttonName/$documentId?fr-language=$lang"
+  def buildSummaryLinkButton(app: String, form: String, buttonName: String, documentId: String, lang: String): String = {
+
+    val (mode, params) = buttonName match {
+      case "excel-export" => "export" -> List("export-format" -> RenderedFormat.ExcelWithNamedRanges.entryName)
+      case "xml-export"   => "export" -> List("export-format" -> RenderedFormat.XmlFormStructureAndData.entryName)
+      case other          => other    -> Nil
+    }
+
+    PathUtils.recombineQuery(s"/fr/$app/$form/$mode/$documentId", "fr-language" -> lang :: params)
+  }
 
   //@XPathFunction
   def defaultTimezoneToOffsetString: String =

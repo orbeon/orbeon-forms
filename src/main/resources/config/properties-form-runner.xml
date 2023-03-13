@@ -349,6 +349,8 @@
         home review pdf delete duplicate import new
     </property>
 
+    <property as="xs:boolean" name="oxf.fr.export.page.enable.orbeon.contact"                   value="false"/>
+
     <property as="xs:string" name="oxf.fr.detail.buttons.orbeon.travel">
         home wizard-prev wizard-next pdf save
     </property>

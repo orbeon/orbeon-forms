@@ -1318,22 +1318,27 @@
                                     </xf:action>
                                 </xf:trigger>
                             </xf:group>
-                            <!-- PDF and TIFF button
-                                 - don't show the button in CE if PDF template in use (also on detail page)
-                                 - button not enabled when a draft is selected (not sure it makes sense to create a PDF
-                                   for a draft and the PDF functionality right now doesn't support creating a PDF for a draft) -->
+                            <!-- Export buttons -->
                             <xf:group
                                 ref="
-                                    if ($button-name = ('pdf', 'tiff', 'excel', 'excel-export') and
-                                        not(($button-name = 'pdf' and $has-pdf-template or $button-name = 'tiff') and not(fr:is-pe()))) then
-                                        (
-                                            if ($view-enabled and $selection-data-or-draft = 'data') then
+                                    for $b in $button-name[. = ('pdf', 'tiff', 'excel-export', 'xml-export')]
+                                    return
+                                        let $disallowed :=
+                                            (
+                                                $button-name = ('tiff', 'excel-export', 'xml-export') or
+                                                $button-name = 'pdf' and $has-pdf-template
+                                            ) and
+                                                not(fr:is-pe())
+                                        return
+                                            if ($disallowed) then
+                                                (: If CE then don't show buttons for PE feature :)
+                                                ()
+                                            else if ($view-enabled and $selection-data-or-draft = 'data') then
                                                 $enabled
                                             else
-                                                $disabled
-                                        )
-                                    else
-                                        ()">
+                                                (: Not sure it makes sense to create a PDF for a draft and the PDF
+                                                   functionality right now doesn't support creating a PDF for a draft :)
+                                                $disabled">
                                 <fr:href-button
                                         ref="."
                                         href="{frf:buildSummaryLinkButton($app, $form, $button-name, $selection-document-id, xxf:instance('fr-language-instance'))}"

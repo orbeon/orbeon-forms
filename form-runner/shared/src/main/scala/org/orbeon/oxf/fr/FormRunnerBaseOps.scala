@@ -271,6 +271,9 @@ trait FormRunnerBaseOps {
   def formRunnerProperty(name: String, appForm: AppForm): Option[String] =
     properties.getObjectOpt(buildPropertyName(name, appForm)) map (_.toString)
 
+  def formRunnerRawProperty(name: String, appForm: AppForm): Option[Property] =
+    properties.getPropertyOpt(buildPropertyName(name, appForm))
+
   def formRunnerRawProperty(name: String)(implicit p: FormRunnerParams): Option[Property] =
     properties.getPropertyOpt(buildPropertyName(name))
 

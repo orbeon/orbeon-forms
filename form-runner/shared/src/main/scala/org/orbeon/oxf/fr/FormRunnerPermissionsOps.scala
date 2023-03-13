@@ -15,11 +15,11 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.action.XFormsActions
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
-import org.orbeon.scaxon.Implicits._
+import org.orbeon.saxon.om.NodeInfo
 
 
 trait FormRunnerPermissionsOps {
@@ -34,9 +34,12 @@ trait FormRunnerPermissionsOps {
         PermissionsXML.parse(some)
       case None =>
         // Try app/form properties
-        frc.formRunnerProperty("oxf.fr.permissions", appForm) match {
-          case Some(value) => PermissionsJSON.parseString(value).get // will throw if there is an error in the format of the property
-          case None        => UndefinedPermissions
+        frc.formRunnerRawProperty("oxf.fr.permissions", appForm) match {
+          case Some(p) if p.stringValue.nonAllBlank =>
+            p.associatedValue { _ =>
+              PermissionsJSON.parseString(p.stringValue).get // will throw if there is an error in the format of the property
+            }
+          case _ => UndefinedPermissions
         }
     }
 

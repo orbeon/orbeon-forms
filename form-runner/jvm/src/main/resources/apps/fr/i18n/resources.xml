@@ -247,6 +247,7 @@
                 <error-dialog-title>Unable to complete action</error-dialog-title>
                 <confirmation-dialog-title>Confirmation</confirmation-dialog-title>
                 <confirmation-dialog-message>Are you sure you want to continue?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite>This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Form Submitted</submit-dialog-title>
                 <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
                 <validation-dialog-title>Review Form Validation Messages</validation-dialog-title>
@@ -791,6 +792,7 @@
                 <error-dialog-title>L'opération n'a pas pu être effectuée</error-dialog-title>
                 <confirmation-dialog-title>Confirmation</confirmation-dialog-title>
                 <confirmation-dialog-message>Etes-vous sûr de vouloir continuer ?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite>Cette action peut causer l'effacement de certaines données du formulaire. Etes-vous sûr de vouloir continuer ?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Formulaire envoyé</submit-dialog-title>
                 <submit-dialog-message>Merci, vos informations ont été envoyées.</submit-dialog-message>
                 <validation-dialog-title>Revoir les messages de validation</validation-dialog-title>
@@ -1327,6 +1329,7 @@
                 <error-dialog-title>Imposible completar la acción</error-dialog-title>
                 <confirmation-dialog-title>Confirmación</confirmation-dialog-title>
                 <confirmation-dialog-message>Ésta seguro de continuar ?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Formulario Enviado</submit-dialog-title>
                 <submit-dialog-message>Su información ha sido enviada.</submit-dialog-message>
                 <validation-dialog-title>Revisar mensajes de validación del Formulario</validation-dialog-title>
@@ -1869,6 +1872,7 @@
                 <error-dialog-title>Impossible completar la acció</error-dialog-title>
                 <confirmation-dialog-title>Confirmació</confirmation-dialog-title>
                 <confirmation-dialog-message>Està segur de continuar?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Formulari enviat</submit-dialog-title>
                 <submit-dialog-message>La seva informació he estat enviada.</submit-dialog-message>
                 <validation-dialog-title>Revisi els missatges de validació del seu Formualri</validation-dialog-title>
@@ -2430,6 +2434,7 @@
                 <error-dialog-title todo="true">[Unable to Complete Action]</error-dialog-title>
                 <confirmation-dialog-title todo="true">[Confirmation]</confirmation-dialog-title>
                 <confirmation-dialog-message todo="true">[Are you sure you want to continue?]</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Skjemaet er innsendt</submit-dialog-title>
                 <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
                 <validation-dialog-title todo="true">[Review Form Validation Messages]</validation-dialog-title>
@@ -2959,6 +2964,7 @@
                 <error-dialog-title todo="true">[Unable to Complete Action]</error-dialog-title>
                 <confirmation-dialog-title todo="true">[Confirmation]</confirmation-dialog-title>
                 <confirmation-dialog-message todo="true">[Are you sure you want to continue?]</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Форма отправлена</submit-dialog-title>
                 <submit-dialog-message>Информация успешно отправлена, спасибо!</submit-dialog-message>
                 <validation-dialog-title todo="true">[Review Form Validation Messages]</validation-dialog-title>
@@ -3493,6 +3499,7 @@
                 <error-dialog-title>Non è stato possibile completare questa azione</error-dialog-title>
                 <confirmation-dialog-title>Confermazione</confirmation-dialog-title>
                 <confirmation-dialog-message>Sei sicuro di voler continuare?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Il modulo è stato inviato</submit-dialog-title>
                 <submit-dialog-message>L'informazione è stata inviata. Grazie.</submit-dialog-message>
                 <validation-dialog-title>Elenco dei messaggi di convalida del modulo</validation-dialog-title>
@@ -4034,6 +4041,7 @@
                 <error-dialog-title>Aktion konnte nicht beendet werden</error-dialog-title>
                 <confirmation-dialog-title>Bestätigung</confirmation-dialog-title>
                 <confirmation-dialog-message>Sind Sie sicher, dass Sie fortfahren wollen?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Formular abgeschickt</submit-dialog-title>
                 <submit-dialog-message>Ihre Daten wurden abgeschickt. Danke.</submit-dialog-message>
                 <validation-dialog-title>Überblick über Meldungen zur Formularvalidierung</validation-dialog-title>
@@ -4575,6 +4583,7 @@
                 <error-dialog-title>Kykenemätön suorittamaan toimintaa loppuun</error-dialog-title>
                 <confirmation-dialog-title>Varmistus</confirmation-dialog-title>
                 <confirmation-dialog-message>Haluatko varmasti jatkaa?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Lomake toimitettu</submit-dialog-title>
                 <submit-dialog-message>Tietosi on toimitettu.</submit-dialog-message>
                 <validation-dialog-title>Käy läpi lomakevalidoinnin viestejä</validation-dialog-title>
@@ -5116,6 +5125,7 @@
                 <error-dialog-title>Operationen kunde inte fullföljas</error-dialog-title>
                 <confirmation-dialog-title>Var god bekräfta</confirmation-dialog-title>
                 <confirmation-dialog-message>Vill du genomföra detta?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Formuläret skickat</submit-dialog-title>
                 <submit-dialog-message>Det ifyllda formuläret är skickat.</submit-dialog-message>
                 <validation-dialog-title>Granskning av giltighet</validation-dialog-title>
@@ -5657,6 +5667,7 @@
                 <error-dialog-title>Kon actie niet voltooien</error-dialog-title>
                 <confirmation-dialog-title>Bevestiging</confirmation-dialog-title>
                 <confirmation-dialog-message>Weet u zeker dat u door wilt gaan?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Form ingediend</submit-dialog-title>
                 <submit-dialog-message>Uw informatie is ingediend, bedankt.</submit-dialog-message>
                 <validation-dialog-title>Review form-validatiemeldingen</validation-dialog-title>
@@ -6197,6 +6208,7 @@
                 <error-dialog-title>Não é possível concluir a acção</error-dialog-title>
                 <confirmation-dialog-title>Confirmação</confirmation-dialog-title>
                 <confirmation-dialog-message>Tem certeza de que deseja continuar?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Formulário Submetido</submit-dialog-title>
                 <submit-dialog-message>A sua informação foi submetida, obrigado.</submit-dialog-message>
                 <validation-dialog-title>Reveja as Mensagens de Validação do Formulário</validation-dialog-title>
@@ -6731,6 +6743,7 @@
                 <error-dialog-title>Kunne ikke afslutte behandling</error-dialog-title>
                 <confirmation-dialog-title>Bekræftelse</confirmation-dialog-title>
                 <confirmation-dialog-message>Er du sikker på, at du vil fortsætte?</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Blanket er sendt ind</submit-dialog-title>
                 <submit-dialog-message>Tak, informationen er sendt ind.</submit-dialog-message>
                 <validation-dialog-title>Check blanketvalideringer</validation-dialog-title>
@@ -7265,6 +7278,7 @@
                 <error-dialog-title>Nie można ukończyć akcji.</error-dialog-title>
                 <confirmation-dialog-title>Potwierdzenie</confirmation-dialog-title>
                 <confirmation-dialog-message>Czy kontynuować? Wysłanego formularza nie można poprawić.</confirmation-dialog-message>
+                <confirmation-dialog-message-overwrite todo="true">This action might cause some form data to be overwritten. Are you sure you want to continue?</confirmation-dialog-message-overwrite>
                 <submit-dialog-title>Formularz złożony</submit-dialog-title>
                 <submit-dialog-message>Twój formularz został złożony, dziękuję.</submit-dialog-message>
                 <validation-dialog-title>Przegląd komunikatów walidacji</validation-dialog-title>

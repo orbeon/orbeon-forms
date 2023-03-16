@@ -16,9 +16,10 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.oxf.util.PathUtils
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsValueControl}
 import org.orbeon.xforms.XFormsId
 import org.scalatest.funspec.AnyFunSpecLike
+
 
 class ActionsFormat20182Test
   extends DocumentTestBase
@@ -114,6 +115,85 @@ class ActionsFormat20182Test
 
             assertCount("year", 6)
             assertCount("firstname", 13)
+          }
+        }
+      }
+    }
+
+    describe("#5484: `fr:copy-content`") {
+
+      val (processorService, docOpt, _) =
+        runFormRunner("tests", "actions-format-20182-copy-content", "new", initialize = true)
+
+      val doc = docOpt.get
+
+      it(s"must check that control values are initially copied") {
+
+        val Expected = List(
+          List(
+            "control-3-control" -> "value 1-1",
+            "control-4-control" -> "value 2-1",
+            "control-5-control" -> "",
+          ),
+          List(
+            "control-3-control" -> "value 1-2",
+            "control-4-control" -> "value 2-2",
+            "control-5-control" -> "",
+          )
+        )
+
+        withTestExternalContext { _ =>
+          withFormRunnerDocument(processorService, doc) {
+
+            for {
+              (values, index)    <- Expected.zipWithIndex
+              (controlId, value) <- values
+            } locally {
+              assert(value == resolveObject[XFormsValueControl](controlId, indexes = List(index + 1)).get.getValue)
+            }
+          }
+        }
+      }
+
+      it(s"must check that new control values are subsequently copied") {
+
+        val Expected = List(
+          List(
+            "control-3-control" -> "1-1",
+            "control-4-control" -> "2-1",
+            "control-5-control" -> "",
+          ),
+          List(
+            "control-3-control" -> "1-2",
+            "control-4-control" -> "2-2",
+            "control-5-control" -> "",
+          )
+        )
+
+        withTestExternalContext { _ =>
+          withFormRunnerDocument(processorService, doc) {
+
+            for {
+              index         <- 1 to 2
+              controlNumber <- 1 to 2
+              controlId     = s"control-$controlNumber-control"
+              newValue      = s"$controlNumber-$index"
+            } locally {
+              document.withOutermostActionHandler {
+                setControlValue(resolveObject[XFormsValueControl](controlId, indexes = List(index)).get.getEffectiveId, newValue)
+              }
+            }
+
+            document.withOutermostActionHandler {
+              dispatch(name = "DOMActivate", effectiveId = resolveObject[XFormsControl]("copy-data-button-no-warning-control").get.getEffectiveId)
+            }
+
+            for {
+              (values, index)    <- Expected.zipWithIndex
+              (controlId, value) <- values
+            } locally {
+              assert(value == resolveObject[XFormsValueControl](controlId, indexes = List(index + 1)).get.getValue)
+            }
           }
         }
       }

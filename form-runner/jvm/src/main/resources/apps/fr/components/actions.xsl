@@ -291,7 +291,7 @@
                 observer="{string-join(for $n in $all-service-names return concat($n, '-submission'), ' ')}"
                 type="xpath">
 
-                xxf:set-request-attribute('fr-action-error', true()),
+                xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', 'action-error', true()),
                 fr:run-process-by-name('oxf.fr.detail.process', 'action-service-error')
             </xf:action>
         </xsl:if>
@@ -879,6 +879,17 @@
         <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all"><response/></xf:instance>
 
         <xsl:copy-of select="$model/xf:instance[p:has-class('fr-service') or p:has-class('fr-database-service')]"/>
+
+        <!-- For "continue action" confirmation dialog -->
+        <xf:action event="fr-positive" target="#observer">
+            <xf:dispatch
+                name="{{event('context')}}"
+                targetid="{$model/@id}"/>
+        </xf:action>
+
+        <xf:action event="fr-negative" target="#observer" type="xpath">
+            xxf:remove-document-attributes('<xsl:value-of select="$action-document-att-ns"/>')
+        </xf:action>
 
     </xsl:template>
 

@@ -925,6 +925,13 @@
             </fr:positive-choice>
         </fr:alert-dialog>
 
+        <!-- Action continuation dialog -->
+        <fr:alert-dialog id="fr-action-continuation-dialog">
+            <fr:label ref="$fr-resources/detail/messages/confirmation-dialog-title"/>
+            <fr:negative-choice/>
+            <fr:positive-choice/>
+        </fr:alert-dialog>
+
         <!-- Listen for upload events -->
         <xf:action
             ev:event="xxforms-upload-error"

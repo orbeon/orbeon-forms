@@ -127,6 +127,7 @@ trait FormRunnerContainerOps extends FormRunnerControlOps {
   def findAncestorRepeats(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): Seq[NodeInfo] =
     findAncestorContainersLeafToRoot(descendantOrSelf, includeSelf) filter isRepeat
 
+  //@XPathFunction
   def findAncestorRepeatNames(descendantOrSelf: NodeInfo, includeSelf: Boolean = false): Seq[String] =
     findAncestorRepeats(descendantOrSelf, includeSelf) flatMap getControlNameOpt
 

@@ -24,7 +24,8 @@
 
     <xsl:import href="oxf:/apps/fr/components/actions-common.xsl"/>
 
-    <xsl:variable name="continuation-key">fr-action-continuation-id</xsl:variable>
+    <!-- TODO: store document attributes by action id -->
+    <xsl:variable name="action-document-att-ns">fr-action</xsl:variable>
     <xsl:variable name="continuation-event-prefix">fr-action-continuation-</xsl:variable>
 
     <xsl:function name="fr:build-iterate-att" as="attribute(iterate)">
@@ -60,7 +61,9 @@
                     name="iterate"
                     select="
                         concat(
-                            'frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute(''fr-action-source''), ''',
+                            'frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute(''',
+                            $action-document-att-ns,
+                            ''', ''action-source''), ''',
                             $to-control-name,
                             ''', true(),',
                             if (exists($library-name)) then concat('''', $library-name, '''') else '()',
@@ -76,18 +79,18 @@
         <xsl:param name="context" as="xs:string?"/>
 
          <xsl:if test="$context = 'current-iteration'">
-             <xsl:attribute name="context">xxf:get-request-attribute('<xsl:value-of select="fr:build-context-param($elem/..)"/>')</xsl:attribute>
+             <xsl:attribute name="context">xxf:get-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', '<xsl:value-of select="fr:build-context-param($elem/..)"/>')</xsl:attribute>
          </xsl:if>
     </xsl:function>
 
     <xsl:function name="fr:build-context-param" as="xs:string">
         <xsl:param name="elem" as="element()"/>
-        <xsl:value-of select="concat('fr-iteration-context-', count($elem/ancestor-or-self::fr:data-iterate))"/>
+        <xsl:value-of select="concat('iteration-context-', count($elem/ancestor-or-self::fr:data-iterate))"/>
     </xsl:function>
 
     <xsl:function name="fr:build-is-last-iteration-param" as="xs:string">
         <xsl:param name="elem" as="element()"/>
-        <xsl:value-of select="concat('fr-action-continuation-is-last-iteration-', count($elem/ancestor-or-self::fr:data-iterate))"/>
+        <xsl:value-of select="concat('action-continuation-is-last-iteration-', count($elem/ancestor-or-self::fr:data-iterate))"/>
     </xsl:function>
 
     <xsl:function name="fr:continuation-id" as="xs:string">
@@ -106,7 +109,7 @@
             select="
                 fr:continuation-id(
                     $action-name,
-                    $continuation-position + 1 + count($block-elem//(fr:service-call | fr:data-iterate | fr:if))
+                    $continuation-position + 1 + count($block-elem//(fr:service-call | fr:data-iterate | fr:if | fr:copy-content-check))
                 )"/>
     </xsl:function>
 
@@ -249,6 +252,16 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- Prepend `<fr:copy-content-check>` if needed -->
+    <xsl:template match="fr:copy-content[@warn = 'true']" mode="within-action-2018.2-marking">
+        <fr:copy-content-check>
+            <xsl:apply-templates select="(@* except @warn) | node()" mode="#current"/>
+        </fr:copy-content-check>
+        <xsl:copy>
+            <xsl:apply-templates select="(@* except @warn) | node()" mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- Copy everything else -->
     <xsl:template match="fr:*" mode="within-action-2018.2-marking">
         <xsl:copy>
@@ -263,7 +276,7 @@
         <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
 
         <xf:dispatch
-            if="xxf:get-request-attribute('{fr:build-is-last-iteration-param(.)}') = true()"
+            if="xxf:get-document-attribute('{$action-document-att-ns}', '{fr:build-is-last-iteration-param(.)}') = true()"
             name="{$continuation-event-prefix}{fr:continuation-id($action-name, $continuation-position + 1)}"
             targetid="fr-form-model">
         </xf:dispatch>
@@ -299,26 +312,36 @@
         <xsl:variable name="action-name" select="@name/string()"  as="xs:string"/>
 
         <!-- Create a document with a root element so that `preceding::` works -->
-        <xsl:variable name="content-with-markers" as="element(root)">
-            <root>
+        <xsl:variable name="content-with-markers" as="element(_)">
+            <_>
                 <xsl:apply-templates select="fr:*" mode="within-action-2018.2-marking"/>
-            </root>
+            </_>
         </xsl:variable>
 
         <xf:action id="{@name}-binding" event="fr-call-user-{@name}-action" target="{$model-id}">
 
             <!-- TODO: Consider handling `iterate-control-name` per https://github.com/orbeon/orbeon-forms/issues/1833 -->
-            <!-- Reset global state-->
+
+<!--            <xf:var-->
+<!--                xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"-->
+<!--                name="new-action-id"-->
+<!--                value="concat('fr-action-', secure:randomHexId())"/>-->
+            <xf:var
+                xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
+                name="new-action-id"
+                value="'{$action-document-att-ns}'"/>
+
+            <!-- Initialize action state -->
             <xf:action type="xpath">
-                xxf:set-request-attribute('fr-action-source',                                                               event('action-source')),
-                xxf:set-request-attribute('fr-action-error',                                                                false()),
-                for $i in 1 to 10 return xxf:set-request-attribute(concat('fr-action-continuation-is-last-iteration-', $i), ()),
-                for $i in 1 to 10 return xxf:set-request-attribute(concat('fr-iteration-context-', $i),                     ())
+                xxf:set-document-attribute($new-action-id, 'action-source', event('action-source')),
+                xxf:set-document-attribute($new-action-id, 'action-error',  false())
             </xf:action>
 
+            <!-- TODO: clean action state in case of success AND error (but will need action id!) -->
+
             <xsl:for-each-group
-                select="$content-with-markers//fr:*[not(parent::fr:service-call)]"
-                group-ending-with="fr:service-call | fr:data-iterate-end-marker | fr:if-end-marker">
+                select="$content-with-markers//fr:*[not(parent::fr:service-call | parent::fr:copy-content-check | parent::fr:copy-content)]"
+                group-ending-with="fr:service-call | fr:data-iterate-end-marker | fr:if-end-marker | fr:copy-content-check">
 
                 <xsl:variable name="group-position"   select="position()"/>
 
@@ -349,8 +372,8 @@
 
         <!-- Place continuations at the top-level, see https://github.com/orbeon/orbeon-forms/issues/4068 -->
         <xsl:for-each-group
-            select="$content-with-markers//fr:*[not(parent::fr:service-call)]"
-            group-ending-with="fr:service-call | fr:data-iterate-end-marker | fr:if-end-marker">
+            select="$content-with-markers//fr:*[not(parent::fr:service-call | parent::fr:copy-content-check | parent::fr:copy-content)]"
+            group-ending-with="fr:service-call | fr:data-iterate-end-marker | fr:if-end-marker | fr:copy-content-check">
 
             <xsl:variable name="group-position"   select="position()"/>
 
@@ -369,7 +392,7 @@
                 <!-- Use `preceding::` so that `fr:service-call` nested in preceding iterations are found too -->
                 <xsl:variable
                     name="preceding-delimiter"
-                    select="$current-group[1]/preceding::fr:*[local-name() = ('service-call', 'data-iterate-end-marker', 'if-end-marker')][1]"/>
+                    select="$current-group[1]/preceding::fr:*[local-name() = ('service-call', 'data-iterate-end-marker', 'if-end-marker', 'copy-content-check')][1]"/>
 
                 <xsl:variable
                     name="preceding-service-name-opt"
@@ -386,7 +409,7 @@
                             observer="{$preceding-service-name-opt}-submission"
                             event="xforms-submit-done"
                             context="xxf:instance('fr-service-response-instance')"
-                            if="xxf:get-request-attribute('{$continuation-key}') = '{$current-continuation-id}'">
+                            if="xxf:get-document-attribute('{$action-document-att-ns}', 'action-continuation-id') = '{$current-continuation-id}'">
 
                             <xsl:apply-templates select="$group-content" mode="within-action-2018.2">
                                 <xsl:with-param tunnel="yes" name="view-elem"             select="$view-elem"/>
@@ -421,7 +444,7 @@
                                     if (exists($context-changing-elem-opt/self::fr:service-call)) then
                                         'xxf:instance(''fr-service-response-instance'')'
                                     else if (exists($context-changing-elem-opt/self::fr:data-iterate)) then
-                                        concat('xxf:get-request-attribute(''', fr:build-context-param($context-changing-elem-opt), ''')')
+                                        concat('xxf:get-document-attribute(''', $action-document-att-ns, ''', ''', fr:build-context-param($context-changing-elem-opt), ''')')
                                     else
                                         'instance(''fr-form-instance'')'
                                 "/>
@@ -463,7 +486,7 @@
                     value="."/>
             </xsl:if>
 
-            <xf:action context="xxf:instance('fr-service-request-instance')">
+            <xf:action context="xxf:instance('fr-service-request-instance')" class="fr-action-impl">
                 <xsl:for-each select="$request-actions">
                     <xf:action>
                         <xsl:choose>
@@ -471,7 +494,7 @@
                                 <xsl:variable name="control" select="@control/string()" as="xs:string"/>
                                 <xf:var
                                     name="value"
-                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-request-attribute('fr-action-source'), '{$control}', true(), {if (exists($library-name)) then concat('''', $library-name, '''') else '()'})"/>
+                                    value="frf:resolveTargetRelativeToActionSource(xxf:get-document-attribute('{$action-document-att-ns}', 'action-source'), '{$control}', true(), {if (exists($library-name)) then concat('''', $library-name, '''') else '()'})"/>
                             </xsl:when>
                             <xsl:when test="exists(@value)">
                                 <xsl:variable name="value" select="@value/string()" as="xs:string"/>
@@ -520,7 +543,10 @@
             </xf:action>
         </xsl:if>
 
-        <xf:action type="xpath">xxf:set-request-attribute('<xsl:value-of select="$continuation-key"/>', '<xsl:value-of select="fr:continuation-id($action-name, $continuation-position + 1)"/>')</xf:action>
+        <xf:action type="xpath">
+            xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', 'action-continuation-id', '<xsl:value-of select="fr:continuation-id($action-name, $continuation-position + 1)"/>')
+        </xf:action>
+
         <xf:insert ref="xxf:instance('fr-service-response-instance')" origin="xf:element('response')"/>
         <xf:send submission="{$service-name}-submission"/>
 
@@ -536,8 +562,7 @@
         <xf:action if="empty(({@ref}))">
             <xf:dispatch
                 name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
-                targetid="fr-form-model">
-        </xf:dispatch>
+                targetid="fr-form-model"/>
         </xf:action>
         <xf:action iterate="{frf:replaceVarReferencesWithFunctionCalls(. , @ref, false(), $library-name, ())}">
             <xsl:copy-of select="fr:build-context-att($data-iterate-elem, @expression-context)"/>
@@ -545,13 +570,15 @@
             <!-- Apply only up to the first delimiter for https://github.com/orbeon/orbeon-forms/issues/4067 -->
             <xsl:for-each-group
                 select="fr:*"
-                group-ending-with="fr:service-call | fr:data-iterate-end-marker | fr:if | fr:data-iterate">
+                group-ending-with="fr:service-call | fr:data-iterate-end-marker | fr:if | fr:data-iterate | fr:copy-content-check">
 
                 <xsl:variable name="group-position" select="position()"/>
                 <xsl:if test="$group-position = 1">
-                    <xf:action if="not(xxf:get-request-attribute('fr-action-error') = true())">
-                        <xf:action type="xpath">xxf:set-request-attribute('<xsl:value-of select="fr:build-is-last-iteration-param($data-iterate-elem)"/>', position() = last())</xf:action>
-                        <xf:action type="xpath">xxf:set-request-attribute('<xsl:value-of select="fr:build-context-param($data-iterate-elem)"/>', .)</xf:action>
+                    <xf:action if="not(xxf:get-document-attribute('{$action-document-att-ns}', 'action-error') = true())">
+                        <xf:action type="xpath">
+                            xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', '<xsl:value-of select="fr:build-is-last-iteration-param($data-iterate-elem)"/>', position() = last()),
+                            xxf:set-document-attribute('<xsl:value-of select="$action-document-att-ns"/>', '<xsl:value-of select="fr:build-context-param($data-iterate-elem)"/>', .)
+                        </xf:action>
                         <xsl:apply-templates select="current-group()" mode="within-action-2018.2"/>
                     </xf:action>
                 </xsl:if>
@@ -577,7 +604,7 @@
         <xf:action if="${$var-name}">
             <xsl:for-each-group
                 select="fr:*"
-                group-ending-with="fr:service-call | fr:if-end-marker | fr:if | fr:data-iterate">
+                group-ending-with="fr:service-call | fr:if-end-marker | fr:if | fr:data-iterate | fr:copy-content-check">
 
                 <xsl:variable name="group-position" select="position()"/>
                 <xsl:if test="$group-position = 1">
@@ -598,7 +625,7 @@
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
         <xsl:variable name="at"          select="@at/string()"     as="xs:string?"/>
 
-        <xf:action type="xpath">
+        <xf:action type="xpath" class="fr-action-impl">
             frf:repeatClear('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, true())"/>')
         </xf:action>
 
@@ -615,7 +642,7 @@
         <!-- NOTE: We might like to support `after-current | before-current`, for for that we need the `index()` function which
              needs a repeat id, and we don't have it right now. -->
 
-        <xf:action type="xpath">
+        <xf:action type="xpath" class="fr-action-impl">
             frf:repeatAddIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, false())"/>', <xsl:value-of select="$apply-defaults"/>())
         </xf:action>
 
@@ -626,7 +653,7 @@
         <xsl:variable name="repeat-name" select="@repeat/string()" as="xs:string"/>
         <xsl:variable name="at"          select="@at/string()"     as="xs:string?"/>
 
-        <xf:action type="xpath">
+        <xf:action type="xpath" class="fr-action-impl">
             frf:repeatRemoveIteration('<xsl:value-of select="frf:findContainerDetailsCompileTime($fr-form-model, $repeat-name, $at, false())"/>')
         </xf:action>
 
@@ -641,7 +668,7 @@
         <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
 
-        <xf:action>
+        <xf:action class="fr-action-impl">
             <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name, ())}"/>
 
             <xf:rebuild/>
@@ -665,7 +692,7 @@
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
 
-        <xf:action>
+        <xf:action class="fr-action-impl">
 
             <xf:rebuild/>
             <xf:recalculate/>
@@ -695,6 +722,7 @@
         <xsl:variable name="visited"         select="@visited/string()" as="xs:string?"/>
 
         <xxf:setvisited
+            class="fr-action-impl"
             control="{frf:findControlByNameUnderXPath($to-control-name, $view-elem)/@id}"
             recurse="true"
             visited="{($visited, 'true')[1]}"/>
@@ -708,6 +736,7 @@
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
 
         <xf:setfocus
+            class="fr-action-impl"
             control="{frf:findControlByNameUnderXPath($to-control-name, $view-elem)/@id}"/>
 
     </xsl:template>
@@ -727,7 +756,7 @@
         <xsl:variable name="at"              select="$elem/@at/string()"                 as="xs:string?"/>
         <xsl:variable name="context"         select="$elem/@expression-context/string()" as="xs:string?"/>
 
-        <xf:action>
+        <xf:action class="fr-action-impl">
 
             <xf:rebuild/>
             <xf:recalculate/>
@@ -829,7 +858,7 @@
 
         <xsl:variable name="dataset-name" select="@name/string()" as="xs:string"/>
 
-        <xf:action>
+        <xf:action class="fr-action-impl">
             <xf:var name="value" value="."/>
             <xf:insert
                 context="xxf:instance('fr-service-response-instance')"
@@ -843,7 +872,7 @@
 
         <xsl:variable name="dataset-name" select="@name/string()" as="xs:string"/>
 
-        <xf:action>
+        <xf:action class="fr-action-impl">
             <xf:insert
                 ref="instance('fr-dataset-{$dataset-name}')"
                 origin="xf:element('_')"/>
@@ -856,7 +885,7 @@
         <xsl:variable name="process-scope" select="@scope/string()" as="xs:string"/>
         <xsl:variable name="process-name"  select="@name/string()"  as="xs:string"/>
 
-        <xf:action type="xpath">
+        <xf:action type="xpath" class="fr-action-impl">
             fr:run-process-by-name('<xsl:value-of select="$process-scope"/>', '<xsl:value-of select="$process-name"/>')
         </xf:action>
 
@@ -869,7 +898,7 @@
 
         <!-- Prefer `<xf:load>` to `fr:run-process(…, 'navigate(…))`, as the latter builds a process (string) with
              XPath, which requires escaping, and is thus more error prone -->
-        <xf:load resource="{$location}">
+        <xf:load resource="{$location}" class="fr-action-impl">
             <xsl:if test="exists($target)">
                 <xsl:attribute name="xxf:target" select="$target"/>
             </xsl:if>
@@ -885,7 +914,7 @@
         <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
 
-        <xf:action>
+        <xf:action class="fr-action-impl">
             <xf:var name="value"     value="xxf:instance('fr-service-response-instance')/string()"/>
             <xf:var name="mediatype" value="uri-param-values($value, 'mediatype')[1]"/>
             <xf:var name="size"      value="uri-param-values($value, 'size')[1]"/>
@@ -919,7 +948,7 @@
         <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
 
-        <xf:action>
+        <xf:action class="fr-action-impl">
             <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name, ())}"/>
 
             <xf:rebuild/>
@@ -945,7 +974,7 @@
         <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
         <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
 
-        <xf:action>
+        <xf:action class="fr-action-impl">
             <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name, ())}"/>
 
             <xf:rebuild/>
@@ -963,8 +992,198 @@
     </xsl:template>
 
     <xsl:template match="fr:alert" mode="within-action-2018.2">
-        <xf:var name="message"><xsl:value-of select="@message"/></xf:var>
-        <xf:message value="xxf:evaluate-avt($message)"/>
+        <xf:action class="fr-action-impl">
+            <xf:var name="message"><xsl:value-of select="@message"/></xf:var>
+            <xf:message value="xxf:evaluate-avt($message)"/>
+        </xf:action>
+    </xsl:template>
+
+    <xsl:template match="fr:copy-content-check" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="model-id"              as="xs:string"/>
+        <xsl:param tunnel="yes" name="action-name"           as="xs:string"/>
+        <xsl:param tunnel="yes" name="continuation-position" as="xs:integer"/>
+
+        <xsl:param tunnel="yes" name="view-elem"             as="element()"/>
+
+        <xsl:variable name="left-names"  select="fr:map/@left/string()"  as="xs:string*"/>
+        <xsl:variable name="right-names" select="fr:map/@right/string()" as="xs:string*"/>
+
+        <xsl:variable
+            name="left-repeat-names"
+            select="
+                for $left-name in $left-names
+                return
+                    frf:findAncestorRepeatNames(
+                        frf:findControlByNameUnderXPath($left-name, $view-elem),
+                        false()
+                    )[1]"
+            as="xs:string*"/>
+
+        <xsl:variable
+            name="right-repeat-names"
+            select="
+                for $right-name in $right-names
+                return
+                    frf:findAncestorRepeatNames(
+                        frf:findControlByNameUnderXPath($right-name, $view-elem),
+                        false()
+                    )[1]"
+            as="xs:string*"/>
+
+        <xsl:if test="
+            count(fr:map) != count($left-names)        or
+            count(fr:map) != count($right-names)       or
+            count(fr:map) != count($left-repeat-names) or
+            count(fr:map) != count($right-repeat-names)">
+            <xsl:message terminate="yes">
+                <xsl:text>fr:copy-content: all fr:map elements must refer to repeated controls</xsl:text>
+            </xsl:message>
+        </xsl:if>
+
+        <xf:var class="fr-action-impl" name="must-warn" value="
+            let $left-names         := ({concat('''', string-join($left-names,         ''','''), '''')}),
+                $right-names        := ({concat('''', string-join($right-names,        ''','''), '''')}),
+                $left-repeat-names  := ({concat('''', string-join($left-repeat-names,  ''','''), '''')}),
+                $right-repeat-names := ({concat('''', string-join($right-repeat-names, ''','''), '''')})
+            return
+                some $i in 1 to count($left-names)
+                satisfies
+                    let $left-container         := bind(frf:bindId($left-repeat-names[$i])),
+                        $right-container        := bind(frf:bindId($right-repeat-names[$i])),
+                        $diff                   := count($right-container/*) - count($left-container/*),
+                        $must-remove-iterations := $diff gt 0
+                    return
+                        $must-remove-iterations or (
+                            some $p in 1 to min((count($left-container/*), count($right-container/*)))
+                            satisfies
+                                let $left-value  := string(($left-container/*[$p]//*[name() = $left-names[$i]])[1]),
+                                    $right-value := string(($right-container/*[$p]//*[name() = $right-names[$i]])[1])
+                                return
+                                    xxf:non-blank($right-value) and $left-value != $right-value
+                        )"/>
+
+        <xxf:show if="$must-warn" dialog="fr-action-continuation-dialog" class="fr-action-impl">
+            <xf:property
+                name="message"
+                value="xxf:r('detail.messages.confirmation-dialog-message-overwrite', '|fr-fr-resources|')"/>
+            <xf:property
+                name="context"
+                value="'{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}'"/>
+            <xf:property
+                name="positive-targetid"
+                value="xxf:absolute-id('fr-actions-model')"/>
+            <xf:property
+                name="negative-targetid"
+                value="xxf:absolute-id('fr-actions-model')"/>
+        </xxf:show>
+        <xf:dispatch
+            if="not($must-warn)"
+            name="{$continuation-event-prefix}{fr:following-continuation-id(., $action-name, $continuation-position)}"
+            targetid="{$model-id}"/>
+
+    </xsl:template>
+
+    <xsl:template match="fr:copy-content" mode="within-action-2018.2">
+
+        <xsl:param tunnel="yes" name="view-elem"    as="element()"/>
+
+<!--        <xsl:variable name="action-sync-iterations"  select="@sync-iterations  = 'true'" as="xs:boolean"/>-->
+<!--        <xsl:variable name="action-left-iterations"  select="@left-iterations"           as="xs:string?"/>-->
+<!--        <xsl:variable name="action-right-iterations" select="@right-iterations"          as="xs:string?"/>-->
+
+        <!-- TODO: improve by grouping all source/destination controls within the same source/destination repeats, and
+              adjust the iterations once only. -->
+        <xsl:for-each select="fr:map">
+            <xsl:variable name="left-name"         select="@left"                                                    as="xs:string"/>
+            <xsl:variable name="right-name"        select="@right"                                                   as="xs:string"/>
+            <xsl:variable name="left-control"      select="frf:findControlByNameUnderXPath($left-name,  $view-elem)" as="element()?"/>
+            <xsl:variable name="right-control"     select="frf:findControlByNameUnderXPath($right-name, $view-elem)" as="element()?"/>
+            <xsl:variable name="left-repeat-name"  select="frf:findAncestorRepeatNames($left-control, false())[1]"   as="xs:string?"/> <!-- TODO: more than one repeat level -->
+            <xsl:variable name="right-repeat-name" select="frf:findAncestorRepeatNames($right-control, false())[1]"  as="xs:string?"/> <!-- TODO: more than one repeat level -->
+
+            <!-- Pick `apply-defaults` from the destination control.
+             https://github.com/orbeon/orbeon-forms/issues/4038 -->
+            <xsl:variable
+                name="apply-defaults"
+                select="$right-control/@apply-defaults = 'true'"/>
+
+            <xsl:choose>
+                <xsl:when test="exists($left-repeat-name) and exists($right-repeat-name)">
+<!--                    &lt;!&ndash; Both left and right controls are repeated &ndash;&gt;-->
+<!--                    <xsl:variable name="sync-iterations"  select="$action-sync-iterations and not(@sync-iterations  = 'false') or @sync-iterations  = 'true'" as="xs:boolean"/>-->
+<!--                    &lt;!&ndash; `first|last|42|all` &ndash;&gt;-->
+<!--                    &lt;!&ndash; Could also imagine `1..10` &ndash;&gt;-->
+<!--                    <xsl:variable name="left-iterations"  select="(@left-iterations,  $action-left-iterations,  'all')[1]" as="xs:string"/>-->
+<!--                    &lt;!&ndash; `first|last|42|append|prepend|all` &ndash;&gt;-->
+<!--                    <xsl:variable name="right-iterations" select="(@right-iterations, $action-right-iterations, 'all')[1]" as="xs:string"/>-->
+                    <xf:action class="fr-action-impl"> <!-- group to contain variables scope -->
+                        <xf:var
+                            name="left-container"
+                            value="bind(frf:bindId('{$left-repeat-name}'))"/>
+                        <xf:var
+                            name="right-container"
+                            value="bind(frf:bindId('{$right-repeat-name}'))"/>
+
+                        <xf:var
+                            name="repeat-template"
+                            value="instance(frf:templateId('{$right-repeat-name}'))"/>
+
+                        <xf:var
+                            name="diff"
+                            value="count($right-container/*) - count($left-container/*)"/>
+
+                        <!-- Remove extra iterations if any -->
+                        <xf:delete
+                            if="$diff gt 0"
+                            ref="$right-container/*[position() gt count($left-container/*)]"/>
+
+                        <!-- Insert iterations if needed  -->
+                        <xf:insert
+                            context="$right-container"
+                            if="$diff lt 0"
+                            ref="*"
+                            origin="
+                                let $t := frf:updateTemplateFromInScopeItemsetMaps($right-container, $repeat-template)
+                                return
+                                    for $i in (1 to -$diff)
+                                    return $t"
+                            position="after"
+                            xxf:defaults="{$apply-defaults}"/>
+
+                        <xf:action if="$diff != 0">
+                            <xf:rebuild/>
+                            <xf:recalculate/>
+                        </xf:action>
+
+                        <!-- Update all values -->
+                        <xf:action iterate="1 to count($left-container/*)">
+
+                            <!-- TODO: If section template nested under iteration, we need to be explicit about which name
+                                  is accessed. -->
+                            <xf:var name="p" value="."/>
+                            <xf:var name="src" context="$left-container/*[$p]"  value="(.//{$left-name})[1]"/>
+                            <xf:var name="dst" context="$right-container/*[$p]" value="(.//{$right-name})[1]"/>
+
+                            <xf:setvalue
+                                ref="$dst"
+                                value="$src"/>
+
+                        </xf:action>
+                    </xf:action>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- Temporary restriction -->
+                    <xsl:message terminate="yes">
+                        <xsl:text>fr:copy-content: </xsl:text>
+                        <xsl:value-of select="concat($left-name, ' and ', $right-name)"/>
+                        <xsl:text> must both be repeated</xsl:text>
+                    </xsl:message>
+                </xsl:otherwise>
+            </xsl:choose>
+
+        </xsl:for-each>
+
     </xsl:template>
 
 </xsl:stylesheet>

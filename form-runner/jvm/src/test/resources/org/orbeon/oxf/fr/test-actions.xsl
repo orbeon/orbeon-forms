@@ -16,6 +16,7 @@
     xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
 
     version="2.0">
 
@@ -38,10 +39,30 @@
     <xsl:template match="/">
         <xsl:for-each select="$fr-form-model">
             <xsl:copy>
-                <xsl:apply-templates select="@* | node()"/>
-                <xsl:copy-of select="fr:common-service-actions-impl($fr-form-model)"/>
+                <xsl:variable name="processed-actions" as="element(_)">
+                    <_>
+                        <xsl:apply-templates select="@* | node()"/>
+                        <xsl:copy-of select="fr:common-service-actions-impl($fr-form-model)"/>
+                    </_>
+                </xsl:variable>
+
+                <xsl:apply-templates select="$processed-actions/(@* | node())" mode="filter-out-action-implementation"/>
+
             </xsl:copy>
         </xsl:for-each>
     </xsl:template>
+
+    <!-- Remove actual actions implementation -->
+    <xsl:template match="*[p:has-class('fr-action-impl')]" mode="filter-out-action-implementation">
+        <xsl:comment>Action Implementation Here</xsl:comment>
+    </xsl:template>
+
+    <xsl:template
+        match="_/xf:instance[@id = ('fr-form-instance', 'fr-form-resources', 'fr-form-metadata', 'fr-form-attachments')] | xf:bind"
+        mode="filter-out-action-implementation"/>
+
+    <xsl:template
+        match="_/comment()"
+        mode="filter-out-action-implementation"/>
 
 </xsl:transform>

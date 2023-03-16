@@ -1,13 +1,11 @@
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.dom.Element
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache
-import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction, XFormsActionInterpreter}
-import org.orbeon.xforms.xbl.Scope
-import org.orbeon.saxon.om
+import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
+import org.orbeon.oxf.xforms.model.XFormsModel
 import org.orbeon.xforms.XFormsNames
+
 
 /**
  * Extension xxf:invalidate-instance action.

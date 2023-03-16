@@ -925,7 +925,7 @@
 
     <!-- Instance to store suspended processes -->
     <xf:instance id="fr-processes-instance" xxf:exclude-result-prefixes="#all">
-        <processes/>
+        <_/>
     </xf:instance>
 
     <xf:instance id="fr-triggers-instance" xxf:exclude-result-prefixes="#all">

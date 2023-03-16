@@ -191,6 +191,26 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     Fun("document-id", classOf[XXFormsDocumentId], op = 0, min = 0, STRING, EXACTLY_ONE)
 
+    Fun("set-document-attribute",     classOf[XXFormsSetDocumentAttribute],     op = 0, min = 3, ITEM_TYPE, ALLOWS_ZERO,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE),
+      Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
+    )
+
+    Fun("get-document-attribute",     classOf[XXFormsGetDocumentAttribute],     op = 0, min = 0, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("remove-document-attribute",  classOf[XXFormsRemoveDocumentAttribute],  op = 0, min = 0, ITEM_TYPE, ALLOWS_ZERO,
+      Arg(STRING, EXACTLY_ONE),
+      Arg(STRING, EXACTLY_ONE)
+    )
+
+    Fun("remove-document-attributes", classOf[XXFormsRemoveDocumentAttributes], op = 0, min = 0, ITEM_TYPE, ALLOWS_ZERO,
+      Arg(STRING, EXACTLY_ONE)
+    )
+
     // TODO: This is the only place where we use `op`. Should remove it and remove the `op` from `Fun`.
     Fun("label", classOf[XXFormsLHHA], op = 0, min = 1, STRING, ALLOWS_ZERO_OR_ONE,
       Arg(STRING, EXACTLY_ONE)

@@ -143,6 +143,7 @@ abstract class XFormsContainingDocumentSupport
     with ContainingDocumentClientState
     with XFormsDocumentLifecycle[ExternalContext.Response]
     with ContainingDocumentCacheable
+    with ContainingDocumentAttributes
     with XFormsObject {
 
   self: XFormsContainingDocument =>
@@ -805,4 +806,23 @@ trait ContainingDocumentCacheable extends Cacheable {
   // only if no thread is dealing with this document.
   def evicted(): Unit =
     XFormsStateManager.onEvictedFromCache(self)
+}
+
+// 2023-03-16: Currently there is no serialization of these attributes. They were introduced for
+// https://github.com/orbeon/orbeon-forms/issues/5484.
+trait ContainingDocumentAttributes {
+
+  private val _attributes = mutable.Map[String, mutable.Map[String, Any]]()
+
+  def setAttribute(ns: String, key: String, value: Any): Unit =
+    _attributes.getOrElseUpdate(ns, mutable.Map()) += key -> value
+
+  def getAttribute(ns: String, key: String): Option[Any] =
+    _attributes.get(ns).flatMap(_.get(key))
+
+  def removeAttribute(ns: String, key: String): Unit =
+    _attributes.get(ns).foreach(_ -= key)
+
+  def removeAttributes(ns: String): Unit =
+    _attributes -= ns
 }

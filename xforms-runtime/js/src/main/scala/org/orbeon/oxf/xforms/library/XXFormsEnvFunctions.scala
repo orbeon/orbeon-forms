@@ -23,7 +23,7 @@ import org.orbeon.saxon.ma.map.MapItem
 import org.orbeon.saxon.model.BuiltInAtomicType
 import org.orbeon.saxon.om
 import org.orbeon.saxon.om.{SequenceTool, StandardNames}
-import org.orbeon.saxon.value.{AtomicValue, QNameValue, StringValue}
+import org.orbeon.saxon.value.{AtomicValue, QNameValue, SequenceExtent, StringValue}
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
@@ -376,7 +376,26 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
   @XPathFunction
   def documentId()(implicit xfc: XFormsFunction.Context): String =
-  xfc.containingDocument.uuid
+    xfc.containingDocument.uuid
+
+  @XPathFunction
+  def setDocumentAttribute(ns: String, key: String, value: Iterable[om.Item])(implicit xfc: XFormsFunction.Context): Unit =
+    xfc.containingDocument.setAttribute(ns, key, SequenceExtent.makeSequenceExtent(value.toSeq.asJava): om.GroundedValue)
+
+  @XPathFunction
+  def getDocumentAttribute(ns: String, key: String)(implicit xfc: XFormsFunction.Context): Iterable[om.Item] =
+    xfc.containingDocument.getAttribute(ns, key) match {
+      case Some(value: om.GroundedValue) => value.asIterable.asScala
+      case _                             => Nil
+    }
+
+  @XPathFunction
+  def removeDocumentAttribute(ns: String, key: String)(implicit xfc: XFormsFunction.Context): Unit =
+    xfc.containingDocument.removeAttribute(ns, key)
+
+  @XPathFunction
+  def removeDocumentAttributes(ns: String)(implicit xfc: XFormsFunction.Context): Unit =
+    xfc.containingDocument.removeAttributes(ns)
 
   @XPathFunction
   def label(controlId: String)(implicit xpc: XPathContext, xfc: XFormsFunction.Context): Option[String] =

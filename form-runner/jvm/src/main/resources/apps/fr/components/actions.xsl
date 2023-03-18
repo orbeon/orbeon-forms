@@ -85,9 +85,9 @@
                     else
                         frf:resolveTargetRelativeToActionSourceFromBinds('{$model-id}', $control-name)[
                             if ($at = 'end') then
-                                'last()'
+                                last()
                             else if ($at = 'start') then
-                                '1'
+                                1
                             else if ($at castable as xs:integer) then
                                 xs:integer($at)
                             else

@@ -842,6 +842,7 @@
                  2021-02-02: Q: The offline `xxf:evaluate()` scopes variables. Maybe the older implementation doesn't?
             -->
             <xf:dispatch name="fr-call-itemset-action" targetid="fr-form-instance">
+                <xf:property name="action-source"      value="xxf:get-document-attribute('{$action-document-att-ns}', 'action-source')"/>
                 <xf:property name="control-name"       value="'{$to-control-name}'"/>
                 <xf:property name="new-itemset-id"     value="$new-itemset-id"/>
                 <xf:property name="new-itemset-holder" value="$new-itemset-holder"/>

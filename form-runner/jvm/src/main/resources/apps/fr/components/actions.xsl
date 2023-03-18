@@ -71,14 +71,11 @@
 
         <xf:action event="fr-call-itemset-action">
 
+            <xf:var name="action-source"      value="event('action-source')"      as="xs:string"/>
             <xf:var name="control-name"       value="event('control-name')"       as="xs:string"/>
             <xf:var name="new-itemset-id"     value="event('new-itemset-id')"     as="xs:string"/>
             <xf:var name="new-itemset-holder" value="event('new-itemset-holder')" as="element(itemset)"/>
             <xf:var name="at"                 value="event('at')"                 as="xs:string?"/>
-
-            <xf:var
-                name="action-source"
-                value="xxf:get-request-attribute('fr-action-source')"/>
 
             <xf:var
                 name="resolved-data-holders"
@@ -777,6 +774,7 @@
                                              the problem is the evaluation of `response-items`, 'item-label', and 'item-value', which must take place
                                              in a context where variables are available, so we cannot use `saxon:evaluate()`. -->
                                         <xf:dispatch name="fr-call-itemset-action" targetid="fr-form-instance">
+                                            <xf:property name="action-source"      value="xxf:get-request-attribute('fr-action-source')"/>
                                             <xf:property name="control-name"       value="$control-name"/>
                                             <xf:property name="new-itemset-id"     value="$new-itemset-id"/>
                                             <xf:property name="new-itemset-holder" value="$new-itemset-holder"/>

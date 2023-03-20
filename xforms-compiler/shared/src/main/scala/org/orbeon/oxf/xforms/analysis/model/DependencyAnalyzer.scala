@@ -121,8 +121,15 @@ object DependencyAnalyzer {
           case (Nil, Nil) =>
             done
           case (Nil, head :: _) =>
+            val progressivelyRemoveNonReferenced = Iterator.iterate(bindDetails) { bindDetails =>
+              val allRefs = bindDetails flatMap (_.refs)
+              bindDetails filter (b => b.name.exists(allRefs.contains(_)))
+            }
+            val pairedWithNext = progressivelyRemoveNonReferenced.zip(progressivelyRemoveNonReferenced.drop(1))
+            val bindsInCycle   = pairedWithNext.find { case (current, next) => current.length == next.length }.get._1
+            val idsInCycle     = bindsInCycle map (b => s"`${b.staticBind.staticId}`") mkString ", "
             throw new ValidationException(
-              s"MIP dependency cycle found for bind id `${head.staticBind.staticId}`",
+              s"MIP dependency cycle found for bind ids $idsInCycle",
               head.staticBind.locationData
             )
           case (noRefs, withRefs) =>

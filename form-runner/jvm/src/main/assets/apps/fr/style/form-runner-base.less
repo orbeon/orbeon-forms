@@ -551,6 +551,12 @@
     ol[type='1'] {
         list-style-type: decimal;
     }
+
+    .fr-pdf-color-mode-black-and-white * {
+        // https://github.com/orbeon/orbeon-forms/issues/4158
+        color: black !important;
+        background: transparent !important;
+    }
 }
 
 @page {

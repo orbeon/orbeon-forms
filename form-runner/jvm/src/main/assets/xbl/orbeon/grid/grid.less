@@ -583,6 +583,43 @@
 
         .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
 
+            // https://github.com/orbeon/orbeon-forms/issues/4158
+             &.fr-pdf-color-mode-black-and-white {
+                .fr-grid .xforms-readonly {
+                    &.xforms-static {
+                        &.xforms-textarea pre,
+                        &.xforms-output.xforms-mediatype-text-html.xforms-text,           // `fr:explanation`
+                        &.xforms-output.xforms-mediatype-text-html .xforms-output-output, // HTML text output
+                        .xforms-field {
+                            * {
+                                .black-and-white-properties();
+                            }
+                        }
+                    }
+                    &.xbl-fr-tinymce .xbl-fr-tinymce-div { // "Formatted Text" component
+                        * {
+                            .black-and-white-properties();
+                        }
+                    }
+                }
+            }
+
+            &.fr-pdf-color-mode-black-and-white, &.fr-pdf-color-mode-keep-field-colors {
+                .fr-grid .xforms-readonly {
+                    &.xforms-static {
+                        &.xforms-textarea pre,
+                        &.xforms-output.xforms-mediatype-text-html.xforms-text,           // `fr:explanation`
+                        &.xforms-output.xforms-mediatype-text-html .xforms-output-output, // HTML text output
+                        .xforms-field {
+                            .black-and-white-properties();
+                        }
+                    }
+                    &.xbl-fr-tinymce .xbl-fr-tinymce-div { // "Formatted Text" component
+                        .black-and-white-properties();
+                    }
+                }
+            }
+
             // Values below are empirical
             .span12 {
                 width: 98%; // unclear why 100% doesn't work

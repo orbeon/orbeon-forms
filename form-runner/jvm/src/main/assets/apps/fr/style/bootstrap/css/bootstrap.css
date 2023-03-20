@@ -180,9 +180,11 @@
 
 @media print {
   .orbeon * {
-    color: #000 !important;
+    /*https://github.com/orbeon/orbeon-forms/issues/4158*/
+    /*color: #000 !important;*/
     text-shadow: none !important;
-    background: transparent !important;
+    /*https://github.com/orbeon/orbeon-forms/issues/4158*/
+    /*background: transparent !important;*/
     box-shadow: none !important;
   }
   .orbeon a,

@@ -194,6 +194,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.pdf.disable-if-invalid.*.*"                   value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.hyperlinks.*.*"                           value="true"/>
     <property as="xs:integer" name="oxf.fr.detail.pdf.long-content-threshold.*.*"               value="512"/>
+    <property as="xs:string"  name="oxf.fr.detail.pdf.color-mode.*.*"                           value="black-and-white"/>
 
     <property as="xs:string" name="oxf.fr.detail.tiff.filename.*.*">
         concat(

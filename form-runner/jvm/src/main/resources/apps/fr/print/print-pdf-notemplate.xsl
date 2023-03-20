@@ -30,6 +30,16 @@
     <xsl:variable name="hyperlinks"             select="p:property(string-join(('oxf.fr.detail.pdf.hyperlinks', $app, $form), '.')) = true()"/>
     <xsl:variable name="long-content-threshold" select="p:property(string-join(('oxf.fr.detail.pdf.long-content-threshold', $app, $form), '.'))"/>
 
+    <xsl:variable
+        name="color-mode"
+        select="
+            (
+                p:property(string-join(('oxf.fr.detail.pdf.color-mode', $app, $form), '.'))[
+                    . = ('black-and-white', 'keep-field-colors', 'color')
+                ],
+                'black-and-white'
+            )[1]"/>
+
     <!-- MAYBE: Support URL parameters as well for #4206. Should they be trusted? -->
     <xsl:variable name="metadata"               select="frf:metadataInstanceRootOpt(doc('input:xforms'))"/>
     <xsl:variable name="page-orientation"       select="frf:optionFromMetadataOrPropertiesXPath($metadata, 'rendered-page-orientation', $app, $form, $mode)"/>
@@ -399,6 +409,14 @@
         <xsl:element name="{local-name()}">
             <xsl:apply-templates select="@* | node()" mode="#current"/>
         </xsl:element>
+    </xsl:template>
+
+    <!-- Scope color mode CSS class -->
+    <xsl:template match="*:div[@id = 'fr-view']" mode="#all">
+        <xsl:copy>
+            <xsl:attribute name="class" select="concat(@class, ' fr-pdf-color-mode-', $color-mode)"/>
+            <xsl:apply-templates select="(@* except @class) | node()" mode="#current"/>
+        </xsl:copy>
     </xsl:template>
 
     <!-- Make a copy of useful information so it can be moved, via CSS, to headers and footers -->

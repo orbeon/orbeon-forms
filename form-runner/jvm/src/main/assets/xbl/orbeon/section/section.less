@@ -125,6 +125,24 @@
 @media print {
     .orbeon {
 
+        // https://github.com/orbeon/orbeon-forms/issues/4158
+        .fr-pdf-color-mode-keep-field-colors {
+
+            h2, h3, h4, h5, h6 {
+
+                .black-and-white-properties();
+
+                &.fr-section-title {
+                    .black-and-white-properties();
+
+                    .fr-section-label .btn-link {
+                        .black-and-white-properties();
+                    }
+                }
+
+            }
+        }
+
         h2, h3, h4, h5, h6 {
             border-bottom: 1px solid darken(@wellBackground, 7%);
             color: black;
@@ -151,6 +169,7 @@
                 page-break-after: avoid; // keep title with what follows
 
                 background: none;
+
                 .fr-section-label {
                     &.fr-section-open, &.fr-section-closed {
                         padding-left: 0;        // remove padding as we don't have section arrows

@@ -668,32 +668,100 @@
             "
             xxf:static-readonly-hint="{
                 if ($mode = 'test-pdf') then
-                    'false'
-                else
-                    '{xxf:property(
-                        string-join(
+                    '{
+                        let $use-pdf-template :=
                             (
-                                ''oxf.fr.detail.static-readonly-hint'',
-                                fr:app-name(),
-                                fr:form-name()
-                            ),
-                            ''.''
-                        )
-                    )}'}"
+                                (: TODO: Consider `fr:use-pdf-template()` function :)
+                                xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
+                                not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
+                            )
+                        return
+                            if ($use-pdf-template) then
+                                false()
+                            else
+                                xxf:get-request-parameter(''fr-pdf-show-hints'') = ''true''
+                    }'
+                else
+                    '{
+                        let $mode := fr:mode(),
+                            $use-pdf-template :=
+                                (
+                                    $mode = (''pdf'', ''email'') and
+                                    (: TODO: Consider `fr:use-pdf-template()` function :)
+                                    xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
+                                    not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
+                                ),
+                            $p :=
+                                xxf:property(
+                                    string-join(
+                                        (
+                                            ''oxf.fr.detail.static-readonly-hint'',
+                                            fr:app-name(),
+                                            fr:form-name()
+                                        ),
+                                        ''.''
+                                    )
+                                ),
+                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-hints'')[. = (''false'', ''true'')]
+                        return
+                            if ($use-pdf-template) then
+                                false()
+                            else if (exists($param-opt)) then
+                                $param-opt
+                            else if ($p instance of xs:boolean) then
+                                $p
+                            else
+                                xxf:evaluate-avt(string($p))
+                    }'
+            }"
             xxf:static-readonly-alert="{
                 if ($mode = 'test-pdf') then
-                    'false'
-                else
-                    '{xxf:property(
-                        string-join(
+                    '{
+                        let $use-pdf-template :=
                             (
-                                ''oxf.fr.detail.static-readonly-alert'',
-                                fr:app-name(),
-                                fr:form-name()
-                            ),
-                            ''.''
-                        )
-                    )}'}"
+                                (: TODO: Consider `fr:use-pdf-template()` function :)
+                                xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
+                                not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
+                            )
+                        return
+                            if ($use-pdf-template) then
+                                false()
+                            else
+                                xxf:get-request-parameter(''fr-pdf-show-alerts'') = ''true''
+                    }'
+                else
+                    '{
+                        let $mode := fr:mode(),
+                            $use-pdf-template :=
+                                (
+                                    $mode = (''pdf'', ''email'') and
+                                    (: TODO: Consider `fr:use-pdf-template()` function :)
+                                    xxf:instance(''fr-form-attachments'')/pdf/xxf:trim() != '''' and
+                                    not(xxf:get-request-parameter(''fr-use-pdf-template'') = ''false'')
+                                ),
+                            $p :=
+                                xxf:property(
+                                    string-join(
+                                        (
+                                            ''oxf.fr.detail.static-readonly-alert'',
+                                            fr:app-name(),
+                                            fr:form-name()
+                                        ),
+                                        ''.''
+                                    )
+                                ),
+                            $param-opt := xxf:get-request-parameter(''fr-pdf-show-alerts'')[. = (''false'', ''true'')]
+                        return
+                            if ($use-pdf-template) then
+                                false()
+                            else if (exists($param-opt)) then
+                                $param-opt
+                            else if ($p instance of xs:boolean) then
+                                $p
+                            else
+                                xxf:evaluate-avt(string($p))
+                    }'
+            }"
         >
 
             <!-- Override if specified -->

@@ -1183,6 +1183,8 @@
             <disable-default>Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate>Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant>Show controls, grids, and sections with dynamic visibility</disable-relevant>
+            <show-hints>Show controls hints</show-hints>
+            <show-alerts>Show invalid controls alerts</show-alerts>
             <use-pdf-template>Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -2502,6 +2504,8 @@
             <disable-default>Désactiver l'évaluation des formules "Valeur initiale"</disable-default>
             <disable-calculate>Désactiver l'évaluation des formules "Valeur calculée"</disable-calculate>
             <disable-relevant>Montrer les contrôles, grilles, et sections avec visibilité dynamique</disable-relevant>
+            <show-hints>Montrer les suggestions des contrôles</show-hints>
+            <show-alerts>Montrer les erreurs pour les contrôles invalides</show-alerts>
             <use-pdf-template>Utiliser le modèle PDF</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -3831,7 +3835,9 @@
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
-            <use-pdf-template todd="true">Use PDF template</use-pdf-template>
+            <show-hints todo="true">Show controls hints</show-hints>
+            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
+            <use-pdf-template todo="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
             <label>Orbeon Forms PE-funksjonalitet</label>
@@ -5159,6 +5165,8 @@
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+            <show-hints todo="true">Show controls hints</show-hints>
+            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -6452,6 +6460,8 @@
             <disable-default>Disabilitare la valutazione delle formule “Valore iniziale”</disable-default>
             <disable-calculate>Disabilitare la valutazione delle formule “Valore calcolato”</disable-calculate>
             <disable-relevant>Mostrare i controlli, le griglie e le sezioni con visibilità dinamica</disable-relevant>
+            <show-hints todo="true">Show controls hints</show-hints>
+            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -7746,6 +7756,8 @@
             <disable-default>Auswertung der Formeln “Initialwert” deaktivieren</disable-default>
             <disable-calculate>Auswertung der Formeln “Berechneter Wert” deaktivieren</disable-calculate>
             <disable-relevant>Steuerelemente, Raster und Abschnitte mit dynamischer Sichtbarkeit anzeigen</disable-relevant>
+            <show-hints todo="true">Show controls hints</show-hints>
+            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -9070,6 +9082,8 @@
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+            <show-hints todo="true">Show controls hints</show-hints>
+            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -10391,6 +10405,8 @@
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+            <show-hints todo="true">Show controls hints</show-hints>
+            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -11692,6 +11708,8 @@
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+            <show-hints todo="true">Show controls hints</show-hints>
+            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -13020,6 +13038,8 @@
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+            <show-hints todo="true">Show controls hints</show-hints>
+            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>
@@ -14349,6 +14369,8 @@
             <disable-default todo="true">Disable the evaluation of "Initial Values" formulas</disable-default>
             <disable-calculate todo="true">Disable the evaluation of "Calculated Values" formulas</disable-calculate>
             <disable-relevant todo="true">Show controls, grids, and sections with dynamic visibility</disable-relevant>
+            <show-hints todo="true">Show controls hints</show-hints>
+            <show-alerts todo="true">Show invalid controls alerts</show-alerts>
             <use-pdf-template todd="true">Use PDF template</use-pdf-template>
         </dialog-test-pdf>
         <dialog-pe>

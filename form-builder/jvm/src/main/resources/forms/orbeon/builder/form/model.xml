@@ -748,6 +748,9 @@
             fr-pdf-template-name=""
             fr-pdf-template-lang=""
 
+            fr-pdf-show-hints=""
+            fr-pdf-show-alerts=""
+
             fr-form-data=""
             fr-language=""
         />

@@ -185,6 +185,9 @@ object FormRunnerRenderedFormat {
     }
   }
 
+  private val FalseAndTrue = Set(false.toString, true.toString)
+
+  // TODO: what if no PDF/TIFF is produced at all?
   private[process] // for tests
   def createPdfOrTiffParams(
     frFormAttachmentsRootElemOpt : Option[NodeInfo],
@@ -195,24 +198,38 @@ object FormRunnerRenderedFormat {
     val pdfTemplateOpt = findPdfTemplate(frFormAttachmentsRootElemOpt, params, Some(defaultLang))
 
     def nameParamList =
-      (pdfTemplateOpt flatMap (_.nameOpt)).toList map (s"fr-$PdfTemplateNameParam" -> _)
+      (pdfTemplateOpt flatMap (_.nameOpt)).toList map (s"fr-$PdfTemplate NameParam" -> _)
 
-    def langParamForPdfTemplateOpt =
-      (pdfTemplateOpt flatMap (_.langOpt)) map { lang =>
-        (s"fr-$PdfTemplateLangParam" -> lang) :: Nil
+    def langParamList = {
+
+      def langParamForPdfTemplateOpt =
+        (pdfTemplateOpt flatMap (_.langOpt)) map { lang =>
+          (s"fr-$PdfTemplateLangParam" -> lang) :: Nil
+        }
+
+      def langParamForPdfAutomatic = {
+        val lang = paramByName(params, "lang") flatMap trimAllToOpt getOrElse defaultLang
+        List("fr-remember-language" -> false.toString, LanguageParam -> lang)
       }
 
-    def langParamForPdfAutomatic = {
-      val lang = paramByName(params, "lang") flatMap trimAllToOpt getOrElse defaultLang
-      List("fr-remember-language" -> "false", LanguageParam -> lang)
-    }
-
-    def langParamList =
       pdfTemplateOpt match {
         case Some(_) => langParamForPdfTemplateOpt getOrElse Nil
         case None    => langParamForPdfAutomatic
       }
+    }
 
-    (s"fr-$UsePdfTemplateParam" -> pdfTemplateOpt.isDefined.toString) :: nameParamList ::: langParamList
+    def paramIfBoolean(paramName: String) =
+      paramByName(params, paramName).filter(FalseAndTrue)
+
+    def hintsAlertsParamForPdfAutomatic(token: String) = {
+      val valueOpt = paramIfBoolean(s"show-$token").map(s"fr-pdf-show-$token" -> _)
+      pdfTemplateOpt.isEmpty && valueOpt.isDefined flatList valueOpt.toList
+    }
+
+    (s"fr-$UsePdfTemplateParam" -> pdfTemplateOpt.isDefined.toString) ::
+      nameParamList                            :::
+      langParamList                            :::
+      hintsAlertsParamForPdfAutomatic("hints") :::
+      hintsAlertsParamForPdfAutomatic("alerts")
   }
 }

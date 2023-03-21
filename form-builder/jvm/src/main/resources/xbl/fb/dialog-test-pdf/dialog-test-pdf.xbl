@@ -53,6 +53,8 @@
                     <xf:property name="disable-calculate"     value="$i/disable-calculate/data(.)"/>
                     <xf:property name="disable-default"       value="$i/disable-default/data(.)"/>
                     <xf:property name="disable-relevant"      value="$i/disable-relevant/data(.)"/>
+                    <xf:property name="show-hints"            value="$i/show-hints/data(.)"/>
+                    <xf:property name="show-alerts"           value="$i/show-alerts/data(.)"/>
                     <xf:property name="use-pdf-template"      value="$i/use-pdf-template/data(.)"/>
                     <xf:property name="pdf-template-name"     value="if ($i/use-pdf-template/data(.)) then $i/selected-pdf-template/*/@name/string() else ()"/>
                     <xf:property name="pdf-template-lang"     value="if ($i/use-pdf-template/data(.)) then $i/selected-pdf-template/*/@lang/string() else ()"/>
@@ -74,6 +76,8 @@
                         <disable-calculate/>
                         <disable-default/>
                         <disable-relevant/>
+                        <show-hints/>
+                        <show-alerts/>
                         <pdf-templates/>
                         <selected-pdf-template/>
                         <use-pdf-template/>
@@ -93,7 +97,7 @@
                     readonly="../for-form-being-tested/data(.) and ../use-form-data/data(.)"/>
 
                 <xf:bind
-                    ref="for-form-being-tested | disable-calculate | disable-default | disable-relevant | use-pdf-template"
+                    ref="for-form-being-tested | disable-calculate | disable-default | disable-relevant | show-hints | show-alerts | use-pdf-template"
                     type="xf:boolean"
                     xxf:default="false()"/>
 
@@ -147,12 +151,24 @@
                                     <xf:label ref="xxf:r('dialog-test-pdf.disable-relevant', '|fr-form-resources|')"/>
                                 </fr:checkbox-input>
                             </fr:c>
-                            <fr:c x="1" y="5" w="6">
+
+                            <fr:c x="1" y="5" w="12">
+                                <fr:checkbox-input ref="show-hints">
+                                    <xf:label ref="xxf:r('dialog-test-pdf.show-hints', '|fr-form-resources|')"/>
+                                </fr:checkbox-input>
+                            </fr:c>
+                            <fr:c x="1" y="6" w="12">
+                                <fr:checkbox-input ref="show-alerts">
+                                    <xf:label ref="xxf:r('dialog-test-pdf.show-alerts', '|fr-form-resources|')"/>
+                                </fr:checkbox-input>
+                            </fr:c>
+
+                            <fr:c x="1" y="7" w="6">
                                 <fr:checkbox-input ref="use-pdf-template">
                                     <xf:label ref="xxf:r('dialog-test-pdf.use-pdf-template', '|fr-form-resources|')"/>
                                 </fr:checkbox-input>
                             </fr:c>
-                            <fr:c x="7" y="6" w="6">
+                            <fr:c x="7" y="8" w="6">
                                 <xf:select1 ref="selected-pdf-template">
                                     <xf:label appearance="minimal">Name</xf:label>
                                     <xf:itemset ref="$i/pdf-templates/pdf">

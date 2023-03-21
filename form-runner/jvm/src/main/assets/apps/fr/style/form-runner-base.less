@@ -148,7 +148,7 @@
         display: none;
     }
 
-    // NOTE: Flying Saucer has an issue when using `:not(:empty)`. So we apply these rules with `:empty`
+    // NOTE: The PDF renderer has an issue when using `3`. So we apply these rules with `:empty`
     // first. These rules can be very strong as they won't apply when the content of the alert element
     // is not empty. They must be stronger than the rules below that actually show the alerts.
     .xforms-form .xforms-alert.xforms-active:empty {
@@ -160,7 +160,7 @@
     // - visited controls
     // - `view`/`pdf` modes
     //
-    // NOTE: For Flying Saucer, avoid the use of `:not(:empty)` (see `:empty` rules above).
+    // NOTE: For the PDF renderer, avoid the use of `:not(:empty)` (see `:empty` rules above).
     .xforms-visited > .xforms-alert.xforms-active, // inline alert
     .xforms-visited.xforms-alert.xforms-active,    // external alert
     .fr-mode-view  .xforms-alert.xforms-active,    // `view` mode
@@ -192,14 +192,15 @@
     // NOTE: `.xforms-hint-appearance-inline` is for backward compatibility only and replaced with `.xforms-hint-appearance-full`.
     .xforms-hint-appearance-full, .xforms-hint-appearance-inline {
 
-        .xforms-hint:empty {
-            display: none;
-        }
-
-        .xforms-hint:not(:empty) {
+        // NOTE: For the PDF renderer, avoid the use of `:not(:empty)`
+        .xforms-hint {
             display: block;
             width: 100%;
             clear: both;
+        }
+
+        .xforms-hint:empty {
+            display: none;
         }
 
         // ...except if there is a local `minimal` appearance

@@ -198,7 +198,7 @@ object FormRunnerRenderedFormat {
     val pdfTemplateOpt = findPdfTemplate(frFormAttachmentsRootElemOpt, params, Some(defaultLang))
 
     def nameParamList =
-      (pdfTemplateOpt flatMap (_.nameOpt)).toList map (s"fr-$PdfTemplate NameParam" -> _)
+      (pdfTemplateOpt flatMap (_.nameOpt)).toList map (s"fr-$PdfTemplateNameParam" -> _)
 
     def langParamList = {
 

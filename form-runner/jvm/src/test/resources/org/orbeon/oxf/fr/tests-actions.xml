@@ -739,6 +739,7 @@
                     <!--Action Implementation Here-->
                     <!--Action Implementation Here-->
                     <!--Action Implementation Here-->
+                    <!--Action Implementation Here-->
                 </xf:action>
                 <xf:action
                     id="my-action-no-warning-binding"
@@ -750,6 +751,7 @@
                         xxf:set-document-attribute($new-action-id, 'action-source', event('action-source')),
                         xxf:set-document-attribute($new-action-id, 'action-error', false())
                     </xf:action>
+                    <!--Action Implementation Here-->
                     <!--Action Implementation Here-->
                     <!--Action Implementation Here-->
                     <!--Action Implementation Here-->

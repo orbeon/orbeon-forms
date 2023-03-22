@@ -731,9 +731,9 @@ trait ControlOps extends ResourcesOps {
       val newActions = findNewActions
 
       // `fr:action//(@control | @repeat)`
-      newActions descendant *       att
-        (ControlTest || RepeatTest) filter
-        (_.stringValue == oldName)  foreach
+      newActions descendant * att
+        (ControlTest || RepeatTest || LeftTest || RightTest) filter
+        (_.stringValue == oldName) foreach
         updateNode(newName)
 
       // `fr:listener/@controls`

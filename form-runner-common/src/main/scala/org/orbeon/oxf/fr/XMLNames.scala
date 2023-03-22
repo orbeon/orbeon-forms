@@ -93,6 +93,8 @@ object XMLNames {
   val LabelTest                : Test      = QName("label")
   val HintTest                 : Test      = QName("hint")
   val ConditionTest            : Test      = QName("condition")
+  val LeftTest                 : Test      = QName("left")
+  val RightTest                : Test      = QName("right")
   val ResourceTest             : Test      = QName("resource")
 
   val XMLLangQName             : QName     = XML_LANG_QNAME//both

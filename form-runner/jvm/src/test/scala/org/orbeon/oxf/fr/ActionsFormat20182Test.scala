@@ -133,12 +133,12 @@ class ActionsFormat20182Test
           List(
             "control-3-control" -> "value 1-1",
             "control-4-control" -> "value 2-1",
-            "control-5-control" -> "",
+            "control-5-control" -> "42",
           ),
           List(
             "control-3-control" -> "value 1-2",
             "control-4-control" -> "value 2-2",
-            "control-5-control" -> "",
+            "control-5-control" -> "42",
           )
         )
 
@@ -161,12 +161,12 @@ class ActionsFormat20182Test
           List(
             "control-3-control" -> "1-1",
             "control-4-control" -> "2-1",
-            "control-5-control" -> "",
+            "control-5-control" -> "43",
           ),
           List(
             "control-3-control" -> "1-2",
             "control-4-control" -> "2-2",
-            "control-5-control" -> "",
+            "control-5-control" -> "43",
           )
         )
 
@@ -182,6 +182,10 @@ class ActionsFormat20182Test
               document.withOutermostActionHandler {
                 setControlValue(resolveObject[XFormsValueControl](controlId, indexes = List(index)).get.getEffectiveId, newValue)
               }
+            }
+
+            document.withOutermostActionHandler {
+              setControlValue(resolveObject[XFormsValueControl]("non-repeated-control-control").get.getEffectiveId, "43")
             }
 
             document.withOutermostActionHandler {

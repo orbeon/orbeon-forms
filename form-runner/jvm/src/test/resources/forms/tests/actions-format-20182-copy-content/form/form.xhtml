@@ -30,6 +30,7 @@
                 <fr:copy-content warn="true">
                     <fr:map left="control-1" right="control-3"/>
                     <fr:map left="control-2" right="control-4"/>
+                    <fr:map left="non-repeated-control" right="control-5" right-at="all"/>
                 </fr:copy-content>
                 <fr:alert message="Done!"/>
             </fr:action>
@@ -38,6 +39,7 @@
                 <fr:copy-content>
                     <fr:map left="control-1" right="control-3"/>
                     <fr:map left="control-2" right="control-4"/>
+                    <fr:map left="non-repeated-control" right="control-5" right-at="all"/>
                 </fr:copy-content>
                 <fr:alert message="Done!"/>
             </fr:action>
@@ -58,6 +60,7 @@
                         </grid-1>
                         <buttons-grid>
                             <copy-data-button/>
+                            <non-repeated-control>42</non-repeated-control>
                             <copy-data-button-no-warning/>
                         </buttons-grid>
 
@@ -87,6 +90,9 @@
                         <xf:bind id="copy-data-button-bind" ref="copy-data-button" name="copy-data-button"/>
                         <xf:bind id="copy-data-button-no-warning-bind" ref="copy-data-button-no-warning"
                                  name="copy-data-button-no-warning"/>
+                        <xf:bind id="non-repeated-control-bind" ref="non-repeated-control"
+                                 name="non-repeated-control"
+                                 xxf:whitespace="trim"/>
                     </xf:bind>
 
                 </xf:bind>
@@ -137,6 +143,10 @@
                             <label>Copy data</label>
                             <hint/>
                         </copy-data-button>
+                        <non-repeated-control>
+                            <label>non-repeated-control</label>
+                            <hint/>
+                        </non-repeated-control>
                         <copy-data-button-no-warning>
                             <label>Copy data (no warning)</label>
                             <hint/>
@@ -215,7 +225,7 @@
                         </fr:c>
                     </fr:grid>
                     <fr:grid id="buttons-grid-grid" bind="buttons-grid-bind">
-                        <fr:c x="1" y="1" w="6">
+                        <fr:c x="1" y="1" w="3">
                             <xf:trigger id="copy-data-button-control" bind="copy-data-button-bind">
                                 <xf:label ref="$form-resources/copy-data-button/label"/>
 
@@ -224,6 +234,15 @@
 
 
                             </xf:trigger>
+                        </fr:c>
+                        <fr:c x="4" y="1" w="3" h="1">
+                            <xf:input id="non-repeated-control-control" bind="non-repeated-control-bind">
+                                <xf:label ref="$form-resources/non-repeated-control/label"/>
+                                <xf:hint ref="$form-resources/non-repeated-control/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:input>
                         </fr:c>
                         <fr:c x="7" y="1" w="6">
                             <xf:trigger id="copy-data-button-no-warning-control"

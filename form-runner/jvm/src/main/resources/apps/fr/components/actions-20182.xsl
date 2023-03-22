@@ -51,6 +51,8 @@
                                 '1'
                             else if ($at castable as xs:integer) then
                                 xs:integer($at)
+                            else if ($at = 'all') then
+                                'true()'
                             else
                                 error(),
                             ']'
@@ -1015,9 +1017,12 @@
             select="
                 for $left-name in $left-names
                 return
-                    frf:findAncestorRepeatNames(
-                        frf:findControlByNameUnderXPath($left-name, $view-elem),
-                        false()
+                    (
+                        frf:findAncestorRepeatNames(
+                            frf:findControlByNameUnderXPath($left-name, $view-elem),
+                            false()
+                        )[1],
+                        '0' (: special marker value :)
                     )[1]"
             as="xs:string*"/>
 
@@ -1026,23 +1031,28 @@
             select="
                 for $right-name in $right-names
                 return
-                    frf:findAncestorRepeatNames(
-                        frf:findControlByNameUnderXPath($right-name, $view-elem),
-                        false()
+                    (
+                        frf:findAncestorRepeatNames(
+                            frf:findControlByNameUnderXPath($right-name, $view-elem),
+                            false()
+                        )[1],
+                        '0' (: special marker value :)
                     )[1]"
             as="xs:string*"/>
 
         <xsl:if test="
-            count(fr:map) != count($left-names)        or
-            count(fr:map) != count($right-names)       or
-            count(fr:map) != count($left-repeat-names) or
-            count(fr:map) != count($right-repeat-names)">
+            not(
+                every $i in count($left-repeat-names)
+                satisfies
+                    not($left-repeat-names[$i] != '0' and $right-repeat-names[$i] = '0')
+            )">
             <xsl:message terminate="yes">
-                <xsl:text>fr:copy-content: all fr:map elements must refer to repeated controls</xsl:text>
+                <xsl:text>fr:copy-content: no fr:map can copy from a repeated control to a non-repeatd control</xsl:text>
             </xsl:message>
         </xsl:if>
 
         <xf:var class="fr-action-impl" name="must-warn" value="
+            (: TODO: It's not good that we have to replicate the copy logic here. Can we find a better solution? :)
             let $left-names         := ({concat('''', string-join($left-names,         ''','''), '''')}),
                 $right-names        := ({concat('''', string-join($right-names,        ''','''), '''')}),
                 $left-repeat-names  := ({concat('''', string-join($left-repeat-names,  ''','''), '''')}),
@@ -1050,18 +1060,47 @@
             return
                 some $i in 1 to count($left-names)
                 satisfies
-                    let $left-container         := bind(frf:bindId($left-repeat-names[$i])),
-                        $right-container        := bind(frf:bindId($right-repeat-names[$i])),
+                    let $left-container         := if ($left-repeat-names[$i]  != '0') then bind(frf:bindId($left-repeat-names[$i]))  else (),
+                        $right-container        := if ($right-repeat-names[$i] != '0') then bind(frf:bindId($right-repeat-names[$i])) else (),
                         $diff                   := count($right-container/*) - count($left-container/*),
-                        $must-remove-iterations := $diff gt 0
+                        $must-remove-iterations := exists($left-container) and exists($right-container) and ($diff gt 0)
                     return
                         $must-remove-iterations or (
-                            some $p in 1 to min((count($left-container/*), count($right-container/*)))
-                            satisfies
-                                let $left-value  := string(($left-container/*[$p]//*[name() = $left-names[$i]])[1]),
-                                    $right-value := string(($right-container/*[$p]//*[name() = $right-names[$i]])[1])
+                            if (exists($left-container) and exists($right-container)) then
+                                some $p in 1 to min((count($left-container/*), count($right-container/*)))
+                                satisfies
+                                    let $left-value  := string(($left-container/*[$p]//*[name() = $left-names[$i]])[1]),
+                                        $right-value := string(($right-container/*[$p]//*[name() = $right-names[$i]])[1])
+                                    return
+                                        xxf:non-blank($right-value) and $left-value != $right-value
+                            else if (empty($left-container) and empty($right-container)) then
+                                let $left-value  := fr:control-string-value(
+                                        $left-names[$i],
+                                         false(),
+                                         () (: TODO: support this :)
+                                    ),
+                                    $right-value := fr:control-string-value(
+                                        $right-names[$i],
+                                         false(),
+                                         () (: TODO: support this :)
+                                    )
                                 return
                                     xxf:non-blank($right-value) and $left-value != $right-value
+                            else if (exists($right-container)) then
+                                (: TODO: handle `@right-at` values :)
+                                some $p in 1 to count($right-container/*)
+                                satisfies
+                                    let $left-value  := fr:control-string-value(
+                                            $left-names[$i],
+                                             false(),
+                                             () (: TODO: support this :)
+                                        ),
+                                        $right-value := string(($right-container/*[$p]//*[name() = $right-names[$i]])[1])
+                                    return
+                                        xxf:non-blank($right-value) and $left-value != $right-value
+                            else
+                                (: TODO: not supported yet :)
+                                error()
                         )"/>
 
         <xxf:show if="$must-warn" dialog="fr-action-continuation-dialog" class="fr-action-impl">
@@ -1088,23 +1127,30 @@
     <xsl:template match="fr:copy-content" mode="within-action-2018.2">
 
         <xsl:param tunnel="yes" name="view-elem"    as="element()"/>
+        <xsl:param tunnel="yes" name="model-id"     as="xs:string"/>
+        <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
 
 <!--        <xsl:variable name="action-sync-iterations"  select="@sync-iterations  = 'true'" as="xs:boolean"/>-->
 <!--        <xsl:variable name="action-left-iterations"  select="@left-iterations"           as="xs:string?"/>-->
-<!--        <xsl:variable name="action-right-iterations" select="@right-iterations"          as="xs:string?"/>-->
+        <xsl:variable name="action-right-at" select="@right-at/string()" as="xs:string?"/>
 
         <!-- TODO: improve by grouping all source/destination controls within the same source/destination repeats, and
               adjust the iterations once only. -->
         <xsl:for-each select="fr:map">
             <xsl:variable name="left-name"         select="@left"                                                    as="xs:string"/>
             <xsl:variable name="right-name"        select="@right"                                                   as="xs:string"/>
+            <xsl:variable name="right-at"          select="@right-at/string()"                                       as="xs:string?"/>
+
             <xsl:variable name="left-control"      select="frf:findControlByNameUnderXPath($left-name,  $view-elem)" as="element()?"/>
             <xsl:variable name="right-control"     select="frf:findControlByNameUnderXPath($right-name, $view-elem)" as="element()?"/>
             <xsl:variable name="left-repeat-name"  select="frf:findAncestorRepeatNames($left-control, false())[1]"   as="xs:string?"/> <!-- TODO: more than one repeat level -->
             <xsl:variable name="right-repeat-name" select="frf:findAncestorRepeatNames($right-control, false())[1]"  as="xs:string?"/> <!-- TODO: more than one repeat level -->
 
+            <!-- `start|end|42|all` -->
+            <xsl:variable name="right-at"          select="($right-at, $action-right-at, 'end')[1]"                  as="xs:string"/>
+
             <!-- Pick `apply-defaults` from the destination control.
-             https://github.com/orbeon/orbeon-forms/issues/4038 -->
+                 https://github.com/orbeon/orbeon-forms/issues/4038 -->
             <xsl:variable
                 name="apply-defaults"
                 select="$right-control/@apply-defaults = 'true'"/>
@@ -1116,8 +1162,6 @@
 <!--                    &lt;!&ndash; `first|last|42|all` &ndash;&gt;-->
 <!--                    &lt;!&ndash; Could also imagine `1..10` &ndash;&gt;-->
 <!--                    <xsl:variable name="left-iterations"  select="(@left-iterations,  $action-left-iterations,  'all')[1]" as="xs:string"/>-->
-<!--                    &lt;!&ndash; `first|last|42|append|prepend|all` &ndash;&gt;-->
-<!--                    <xsl:variable name="right-iterations" select="(@right-iterations, $action-right-iterations, 'all')[1]" as="xs:string"/>-->
                     <xf:action class="fr-action-impl"> <!-- group to contain variables scope -->
                         <xf:var
                             name="left-container"
@@ -1173,12 +1217,36 @@
                         </xf:action>
                     </xf:action>
                 </xsl:when>
+                <xsl:when test="empty($left-repeat-name)">
+                    <!-- Non-repeated source to repeated or non-repeated destination -->
+                    <xf:action class="fr-action-impl">
+                        <xf:var
+                            name="value"
+                            value="
+                                fr:control-string-value(
+                                    '{$left-name}',
+                                     false(),
+                                     () (: TODO: support this :)
+                                )"/>
+
+                        <!-- Q: Is this needed? -->
+                        <!--<xf:rebuild/>-->
+                        <!--<xf:recalculate/>-->
+
+                        <xf:action>
+                            <xsl:copy-of select="fr:build-iterate-att($model-id, $right-name, $right-at, $library-name)"/>
+                            <xf:setvalue
+                                ref="."
+                                value="$value"/>
+                        </xf:action>
+                    </xf:action>
+                </xsl:when>
                 <xsl:otherwise>
-                    <!-- Temporary restriction -->
+                    <!-- Temporary restriction: repeated source to non-repeated destination -->
                     <xsl:message terminate="yes">
                         <xsl:text>fr:copy-content: </xsl:text>
                         <xsl:value-of select="concat($left-name, ' and ', $right-name)"/>
-                        <xsl:text> must both be repeated</xsl:text>
+                        <xsl:text> can't copy from repeated source to non-repeated destination</xsl:text>
                     </xsl:message>
                 </xsl:otherwise>
             </xsl:choose>

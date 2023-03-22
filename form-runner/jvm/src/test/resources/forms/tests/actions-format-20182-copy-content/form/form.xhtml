@@ -59,9 +59,10 @@
                             </grid-1-iteration>
                         </grid-1>
                         <buttons-grid>
-                            <copy-data-button/>
                             <non-repeated-control>42</non-repeated-control>
-                            <copy-data-button-no-warning/>
+
+
+
                         </buttons-grid>
 
                     </section-1>
@@ -73,6 +74,10 @@
                                 <control-5/>
                             </grid-2-iteration>
                         </grid-2>
+                        <grid-3>
+                            <copy-data-button/>
+                            <copy-data-button-no-warning/>
+                        </grid-3>
                     </section-2>
                 </form>
             </xf:instance>
@@ -87,12 +92,12 @@
                         </xf:bind>
                     </xf:bind>
                     <xf:bind id="buttons-grid-bind" ref="buttons-grid" name="buttons-grid">
-                        <xf:bind id="copy-data-button-bind" ref="copy-data-button" name="copy-data-button"/>
-                        <xf:bind id="copy-data-button-no-warning-bind" ref="copy-data-button-no-warning"
-                                 name="copy-data-button-no-warning"/>
                         <xf:bind id="non-repeated-control-bind" ref="non-repeated-control"
                                  name="non-repeated-control"
                                  xxf:whitespace="trim"/>
+
+
+
                     </xf:bind>
 
                 </xf:bind>
@@ -103,6 +108,11 @@
                             <xf:bind id="control-4-bind" ref="control-4" name="control-4" xxf:whitespace="trim"/>
                             <xf:bind id="control-5-bind" ref="control-5" name="control-5" xxf:whitespace="trim"/>
                         </xf:bind>
+                    </xf:bind>
+                    <xf:bind id="grid-3-bind" ref="grid-3" name="grid-3">
+                        <xf:bind id="copy-data-button-bind" ref="copy-data-button" name="copy-data-button"/>
+                        <xf:bind id="copy-data-button-no-warning-bind" ref="copy-data-button-no-warning"
+                                 name="copy-data-button-no-warning"/>
                     </xf:bind>
                 </xf:bind>
             </xf:bind>
@@ -139,18 +149,21 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
-                        <copy-data-button>
-                            <label>Copy data</label>
-                            <hint/>
-                        </copy-data-button>
                         <non-repeated-control>
                             <label>non-repeated-control</label>
                             <hint/>
                         </non-repeated-control>
+                        <copy-data-button>
+                            <label>Copy data (with warning)</label>
+                            <hint/>
+                        </copy-data-button>
                         <copy-data-button-no-warning>
                             <label>Copy data (no warning)</label>
                             <hint/>
                         </copy-data-button-no-warning>
+
+
+
                         <control-3>
                             <label>control-3</label>
                             <hint/>
@@ -225,17 +238,11 @@
                         </fr:c>
                     </fr:grid>
                     <fr:grid id="buttons-grid-grid" bind="buttons-grid-bind">
-                        <fr:c x="1" y="1" w="3">
-                            <xf:trigger id="copy-data-button-control" bind="copy-data-button-bind">
-                                <xf:label ref="$form-resources/copy-data-button/label"/>
-
-                                <xf:hint ref="$form-resources/copy-data-button/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
 
 
-                            </xf:trigger>
-                        </fr:c>
-                        <fr:c x="4" y="1" w="3" h="1">
+                        <fr:c x="1" y="1" w="3"/>
+                        <fr:c x="4" y="1" w="6"/>
+                        <fr:c x="10" y="1" w="3">
                             <xf:input id="non-repeated-control-control" bind="non-repeated-control-bind">
                                 <xf:label ref="$form-resources/non-repeated-control/label"/>
                                 <xf:hint ref="$form-resources/non-repeated-control/hint"/>
@@ -243,17 +250,6 @@
 
 
                             </xf:input>
-                        </fr:c>
-                        <fr:c x="7" y="1" w="6">
-                            <xf:trigger id="copy-data-button-no-warning-control"
-                                        bind="copy-data-button-no-warning-bind">
-                                <xf:label ref="$form-resources/copy-data-button-no-warning/label"/>
-
-                                <xf:hint ref="$form-resources/copy-data-button-no-warning/hint"/>
-                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
-
-
-                            </xf:trigger>
                         </fr:c>
                     </fr:grid>
                 </fr:section>
@@ -286,6 +282,30 @@
 
                                 <xf:alert ref="$fr-resources/detail/labels/alert"/>
                             </xf:input>
+                        </fr:c>
+                    </fr:grid>
+                    <fr:grid id="grid-3-grid" bind="grid-3-bind">
+                        <fr:c x="1" y="1" w="3">
+                            <xf:trigger id="copy-data-button-control" bind="copy-data-button-bind">
+                                <xf:label ref="$form-resources/copy-data-button/label"/>
+
+                                <xf:hint ref="$form-resources/copy-data-button/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+
+                            </xf:trigger>
+                        </fr:c>
+                        <fr:c x="4" y="1" w="9">
+                            <xf:trigger id="copy-data-button-no-warning-control"
+                                        bind="copy-data-button-no-warning-bind">
+                                <xf:label ref="$form-resources/copy-data-button-no-warning/label"/>
+
+                                <xf:hint ref="$form-resources/copy-data-button-no-warning/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </xf:trigger>
                         </fr:c>
                     </fr:grid>
                 </fr:section>

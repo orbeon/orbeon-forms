@@ -17,6 +17,7 @@ import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
+import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
@@ -373,7 +374,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     delete(childElems)
   }
 
-  private val ParamsToExcludeUponModeChange = StateParamNames + DataFormatVersionName
+  private val ParamsToExcludeUponModeChange = StateParamNames + DataFormatVersionName + DataMigrationBehaviorName
 
   // Defaults except for `uri`, `serialization` and `prune-metadata` (latter two's defaults depend on other params)
   private val DefaultSendParameters = Map(
@@ -397,11 +398,14 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     "prune" // for backward compatibility,
   ) ++ DefaultSendParameters.keys
 
-  private def prependUserParamsForModeChange(pathQuery: String) = {
+  private def prependUserAndStandardParamsForModeChange(pathQuery: String) = {
 
     val (path, params) = splitQueryDecodeParams(pathQuery)
 
-    val newParams =
+    val dataMigrationParam =
+      DataMigrationBehaviorName -> DataMigrationBehavior.Disabled.entryName
+
+    val userParams =
       for {
         (name, values) <- inScopeContainingDocument.getRequestParameters.toList
         if ! ParamsToExcludeUponModeChange(name)
@@ -409,7 +413,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       } yield
         name -> value
 
-    recombineQuery(path, newParams ::: params)
+    recombineQuery(path, dataMigrationParam :: userParams ::: params)
   }
 
   private def buildRenderedFormatPath(

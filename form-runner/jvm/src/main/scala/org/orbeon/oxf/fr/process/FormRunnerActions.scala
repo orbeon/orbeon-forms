@@ -287,7 +287,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     Try {
       val params: List[Option[(Option[String], String)]] =
         List(
-          Some(             Some("uri")                   -> prependUserParamsForModeChange(prependCommonFormRunnerParameters(path, forNavigate = false))),
+          Some(             Some("uri")                   -> prependUserAndStandardParamsForModeChange(prependCommonFormRunnerParameters(path, forNavigate = false))),
           Some(             Some("method")                -> HttpMethod.POST.entryName.toLowerCase),
           Some(             Some(NonRelevantName)         -> RelevanceHandling.Keep.entryName.toLowerCase),
           Some(             Some("replace")               -> replace),

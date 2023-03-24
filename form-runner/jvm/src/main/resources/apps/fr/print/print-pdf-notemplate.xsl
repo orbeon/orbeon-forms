@@ -420,6 +420,7 @@
     </xsl:template>
 
     <!-- Make a copy of useful information so it can be moved, via CSS, to headers and footers -->
+    <!-- Since #5576, this is no longer the "correct" way of doing things -->
     <xsl:template match="*:body" mode="#all">
         <xsl:element name="{local-name()}">
             <xsl:apply-templates select="@*" mode="#current"/>

@@ -155,7 +155,7 @@ class XXFormsUploadErrorEvent(target: XFormsEventTarget, properties: PropertyGet
   extends XFormsEvent(
     name         = EventNames.XXFormsUploadError,
     targetObject = target,
-    properties   = XXFormsUploadErrorEvent.reasonToProperties(target).toMap orElse properties,
+    properties   = properties orElse XXFormsUploadErrorEvent.reasonToProperties(target).toMap, // allow overriding standard properties
     bubbles      = true,
     cancelable   = true
   )

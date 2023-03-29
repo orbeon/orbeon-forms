@@ -30,12 +30,13 @@
     <xf:label model="fr-form-model" ref="$form-resources/dialog-actions/label"/>
     <xf:var   model="fr-form-model" name="form-resources" value="$form-resources"/>
 
-    <xf:var name="instance" value="instance('fb-actions-editor-instance')"/>
-    <xf:var name="body"     value="$body" model="fr-form-model"/>
+    <xf:var name="instance"                        value="instance('fb-actions-editor-instance')"/>
+    <xf:var name="body"                            value="$body" model="fr-form-model"/>
 
-    <xf:var name="action1"  value="$instance/fb:action/xf:action[1]"/>
-    <xf:var name="observer" value="$action1/@ev:observer"/>
-    <xf:var name="event"    value="$action1/@fb:event"/>
+    <xf:var name="action1"                         value="$instance/fb:action/xf:action[1]"/>
+    <xf:var name="observer"                        value="$action1/@ev:observer"/>
+    <xf:var name="event"                           value="$action1/@fb:event"/>
+    <xf:var name="event-not-before-controls-ready" value="not($event = ('fr-run-form-load-action-before-data', 'fr-run-form-load-action-after-data'))"/>
 
     <xf:var
         name="all-available-services"
@@ -602,7 +603,14 @@
                             if (exists($actions)) then
                                 $actions
                             else
-                                instance('fb-binding-action-template')/xf:action[@class = 'fr-set-control-value-action']">
+                                instance('fb-binding-action-template')/xf:action[@class =
+                                    (
+                                        if ($event-not-before-controls-ready)
+                                        then 'fr-set-control-value-action'
+                                        else 'fr-save-to-dataset-action'
+                                    )
+                                ]
+                    ">
 
                     <xf:var name="current-action"    value="."/>
                     <xf:var name="action-count"      value="count($response-actions-container/xf:action)"/>
@@ -621,9 +629,7 @@
                                 <xf:itemset
                                     ref=".[
                                         context() = 'fr-set-control-value-action' or
-                                        not(
-                                            $event = ('fr-run-form-load-action-before-data', 'fr-run-form-load-action-after-data')
-                                        )
+                                        $event-not-before-controls-ready
                                     ]">
                                     <xf:label ref="$form-resources/dialog-actions/set-control-value"/>
                                     <xf:value>fr-set-control-value-action</xf:value>
@@ -632,9 +638,7 @@
                                     ref=".[
                                         exists($controls-with-itemset) and (
                                             context() = 'fr-itemset-action' or
-                                            not(
-                                                $event = ('fr-run-form-load-action-before-data', 'fr-run-form-load-action-after-data')
-                                            )
+                                            $event-not-before-controls-ready
                                         )
                                     ]">
                                     <xf:label ref="$form-resources/dialog-actions/set-control-itemset"/>

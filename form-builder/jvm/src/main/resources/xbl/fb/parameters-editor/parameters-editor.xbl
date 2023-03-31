@@ -209,7 +209,7 @@
                                                 (
                                                     $template/@type,
                                                     if ($type = $current-param/@type) then
-                                                        $current-param/*             (: keep the currently-selected value as is :)
+                                                        $current-param/*            (: keep the currently-selected value as is :)
                                                     else (
                                                         $current-param/*:name,      (: always keep the parameter name          :)
                                                         $template/(* except *:name) (: but use the other elements if any       :)
@@ -239,6 +239,23 @@
                             </xf:case>
                             <xf:case value="'AllControlValuesParam'">
                                 <!-- No configuration -->
+                            </xf:case>
+                            <xf:case value="'LinkToEditPageParam'">
+                                <xf:select ref="$current-param" appearance="full">
+                                    <xf:itemset ref="xf:element('fr:token', 'true')">
+                                        <xf:label ref="$resources/components/parameters-editor/token/label"/>
+                                        <xf:copy ref="."/>
+                                    </xf:itemset>
+                                </xf:select>
+                            </xf:case>
+                            <!-- TODO: duplication -->
+                            <xf:case value="'LinkToViewPageParam'">
+                                <xf:select ref="$current-param" appearance="full">
+                                    <xf:itemset ref="xf:element('fr:token', 'true')">
+                                        <xf:label ref="$resources/components/parameters-editor/token/label"/>
+                                        <xf:copy ref="."/>
+                                    </xf:itemset>
+                                </xf:select>
                             </xf:case>
                         </xf:switch>
 

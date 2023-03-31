@@ -327,6 +327,9 @@
                     <label>Control</label>
                     <alert>Missing value</alert>
                 </control>
+                <token>
+                    <label>Generate token URL parameter</label>
+                </token>
                 <type>
                     <item id="0">Control Value</item>
                     <item id="1">Formula</item>
@@ -1647,6 +1650,9 @@
                     <label>Contrôle</label>
                     <alert>Valeur manquante</alert>
                 </control>
+                <token>
+                    <label>Générer un paramètre URL pour token</label>
+                </token>
                 <type>
                     <item id="0">Valeur du contrôle</item>
                     <item id="1">Formule</item>
@@ -2950,6 +2956,9 @@
                     <label todo="true">[Control]</label>
                     <alert todo="true">[Missing value]</alert>
                 </control>
+                <token>
+                    <label todo="true">Generate token URL parameter</label>
+                </token>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
@@ -4281,6 +4290,9 @@
                     <label todo="true">[Control]</label>
                     <alert todo="true">[Missing value]</alert>
                 </control>
+                <token>
+                    <label todo="true">Generate token URL parameter</label>
+                </token>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
@@ -5612,6 +5624,9 @@
                     <label todo="true">[Control]</label>
                     <alert todo="true">[Missing value]</alert>
                 </control>
+                <token>
+                    <label todo="true">Generate token URL parameter</label>
+                </token>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
@@ -6907,6 +6922,9 @@
                     <label>Steuerelement</label>
                     <alert>Fehlender Wert</alert>
                 </control>
+                <token>
+                    <label todo="true">Generate token URL parameter</label>
+                </token>
                 <type>
                     <item id="0">Steuerelement-Wert</item>
                     <item id="1">Formel Ausdruck</item>
@@ -8205,6 +8223,9 @@
                     <label todo="true">[Control]</label>
                     <alert todo="true">[Missing value]</alert>
                 </control>
+                <token>
+                    <label todo="true">Generate token URL parameter</label>
+                </token>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
@@ -9528,6 +9549,9 @@
                     <label todo="true">[Control]</label>
                     <alert todo="true">[Missing value]</alert>
                 </control>
+                <token>
+                    <label todo="true">Generate token URL parameter</label>
+                </token>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
@@ -10852,6 +10876,9 @@
                     <label>Control</label>
                     <alert>Ontbrekende waarde</alert>
                 </control>
+                <token>
+                    <label todo="true">Generate token URL parameter</label>
+                </token>
                 <type>
                     <item id="0">Control-waarde</item>
                     <item id="1">Formule</item>
@@ -12155,6 +12182,9 @@
                     <label todo="true">[Control]</label>
                     <alert todo="true">[Missing value]</alert>
                 </control>
+                <token>
+                    <label todo="true">Generate token URL parameter</label>
+                </token>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>
@@ -13485,6 +13515,9 @@
                     <label todo="true">[Control]</label>
                     <alert todo="true">[Missing value]</alert>
                 </control>
+                <token>
+                    <label todo="true">Generate token URL parameter</label>
+                </token>
                 <type>
                     <item id="0" todo="true">[Control Value]</item>
                     <item id="1" todo="true">[Formula]</item>

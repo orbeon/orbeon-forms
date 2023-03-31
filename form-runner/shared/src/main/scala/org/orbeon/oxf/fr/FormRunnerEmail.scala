@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.email.{EmailMetadata, EmailMetadataConversion, EmailMetadataParsing, EmailMetadataSerialization}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
@@ -95,13 +96,15 @@ trait FormRunnerEmail {
         case "admin"   => "LinkToAdminPageParam"
         case "pdf"     => "LinkToPdfParam"
         case other     => throw new IllegalArgumentException(other)
-      }
+      },
+      includeToken = false
     )
 
+  // TODO: move this as it's used by more than email
   //@XPathFunction
-  def buildLinkBackToFormRunner(linkType: String): String = {
+  def buildLinkBackToFormRunner(linkType: String, includeToken: Boolean): String = {
 
-    val FormRunnerParams(app, form, version, documentOpt, isDraftOpt, _) = FormRunnerParams()
+    implicit val formRunnerParams @ FormRunnerParams(app, form, version, documentOpt, _, _) = FormRunnerParams()
 
     val baseUrlNoSlash =
       frc.formRunnerStandaloneBaseUrl(
@@ -109,16 +112,35 @@ trait FormRunnerEmail {
         CoreCrossPlatformSupport.externalContext.getRequest
       ).dropTrailingSlash
 
-    def build(mode: String, documentId: Option[String]) =
+    def buildTokenParam: (String, String) = {
+
+      // Don't take risk and let the token expire immediately if the validity is not set
+      val validityMinutes = frc.intFormRunnerProperty("oxf.fr.access-token.validity").getOrElse(0)
+
+      val token =
+        FormRunnerAccessToken.encryptToken(
+          FormRunnerAccessToken.TokenDetails(
+            app         = app,
+            form        = form,
+            version     = version,
+            documentOpt = documentOpt,
+            expiration  = java.time.Instant.now.plus(java.time.Duration.ofMinutes(validityMinutes))
+          )
+        )
+
+        (frc.AccessTokenParam, token)
+    }
+
+    def build(mode: String, documentId: Option[String], params: List[(String, String)] = Nil): String =
       recombineQuery(
         pathQuery = s"$baseUrlNoSlash/fr/$app/$form/$mode${documentId map ("/" +) getOrElse ""}",
-        params = List(frc.FormVersionParam -> version.toString)
+        params    = (frc.FormVersionParam -> version.toString) :: params
       )
 
     // Would be good not to have to hardcode these constants
     linkType match {
-      case "LinkToEditPageParam"    | "link-to-edit-page"    => build("edit", documentOpt)
-      case "LinkToViewPageParam"    | "link-to-view-page"    => build("view", documentOpt)
+      case "LinkToEditPageParam"    | "link-to-edit-page"    => build("edit", documentOpt, includeToken list buildTokenParam)
+      case "LinkToViewPageParam"    | "link-to-view-page"    => build("view", documentOpt, includeToken list buildTokenParam)
       case "LinkToNewPageParam"     | "link-to-new-page"     => build("new", None)
       case "LinkToSummaryPageParam" | "link-to-summary-page" => build("summary", None)
       case "LinkToHomePageParam"    | "link-to-home-page"    => s"$baseUrlNoSlash/fr/"

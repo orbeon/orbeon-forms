@@ -271,6 +271,8 @@
     <property as="xs:integer" name="oxf.fr.detail.lease.renew-threshold.*.*"                    value="1"/>
     <property as="xs:integer" name="oxf.fr.detail.lease.alert-threshold.*.*"                    value="2"/>
 
+    <property as="xs:integer" name="oxf.fr.access-token.validity.*.*"                           value="0"/>
+
     <property as="xs:boolean" name="oxf.fr.detail.initial-focus.*.*"                            value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.focus.includes.*.*"                           value=""/>
     <property as="xs:string"  name="oxf.fr.detail.focus.excludes.*.*"                           value="xf:trigger xf:output xf:label xf:hint xf:help"/>

@@ -269,8 +269,10 @@
                                             fr:maybe-replace(
                                                 concat(
                                                     'frf:buildLinkBackToFormRunner(''',
-                                                     $type,
-                                                    ''')'
+                                                    $type,
+                                                    ''', ',
+                                                    if ($p/*:token = 'true') then 'true()' else 'false()',
+                                                    ')'
                                                 ),
                                                 $for-pdf
                                             )

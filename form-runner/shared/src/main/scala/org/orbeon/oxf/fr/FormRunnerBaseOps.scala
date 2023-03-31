@@ -114,6 +114,7 @@ trait FormRunnerBaseOps {
 
   val LanguageParam          = "fr-language"
   val FormVersionParam       = "form-version"
+  val AccessTokenParam       = "fr-access-token"
 
   val LiferayLanguageHeader  = "orbeon-liferay-language"
 
@@ -279,6 +280,9 @@ trait FormRunnerBaseOps {
 
   def formRunnerPropertyWithNs(name: String)(implicit p: FormRunnerParams): Option[(String, NamespaceMapping)] =
     properties.getPropertyOpt(buildPropertyName(name)) map { p => (p.stringValue, p.namespaceMapping) }
+
+  def intFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Option[Int] =
+    properties.getIntOpt(buildPropertyName(name))
 
   // Return a boolean property using the form's app/name, false if the property is not defined
   def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams): Boolean =

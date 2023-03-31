@@ -115,16 +115,17 @@ trait FormRunnerEmail {
         params = List(frc.FormVersionParam -> version.toString)
       )
 
+    // Would be good not to have to hardcode these constants
     linkType match {
-      case "LinkToEditPageParam"    => build("edit", documentOpt)
-      case "LinkToViewPageParam"    => build("view", documentOpt)
-      case "LinkToNewPageParam"     => build("new", None)
-      case "LinkToSummaryPageParam" => build("summary", None)
-      case "LinkToHomePageParam"    => s"$baseUrlNoSlash/fr/"
-      case "LinkToFormsPageParam"   => s"$baseUrlNoSlash/fr/forms"
-      case "LinkToAdminPageParam"   => s"$baseUrlNoSlash/fr/admin"
-      case "LinkToPdfParam"         => build("pdf", documentOpt)
-      case _                        => throw new IllegalArgumentException(linkType)
+      case "LinkToEditPageParam"    | "link-to-edit-page"    => build("edit", documentOpt)
+      case "LinkToViewPageParam"    | "link-to-view-page"    => build("view", documentOpt)
+      case "LinkToNewPageParam"     | "link-to-new-page"     => build("new", None)
+      case "LinkToSummaryPageParam" | "link-to-summary-page" => build("summary", None)
+      case "LinkToHomePageParam"    | "link-to-home-page"    => s"$baseUrlNoSlash/fr/"
+      case "LinkToFormsPageParam"   | "link-to-forms-page"   => s"$baseUrlNoSlash/fr/forms"
+      case "LinkToAdminPageParam"   | "link-to-admin-page"   => s"$baseUrlNoSlash/fr/admin"
+      case "LinkToPdfParam"         | "link-to-pdf"          => build("pdf", documentOpt)
+      case _                                                 => throw new IllegalArgumentException(linkType)
     }
   }
 

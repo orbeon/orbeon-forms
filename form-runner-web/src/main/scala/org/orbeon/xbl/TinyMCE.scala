@@ -65,7 +65,7 @@ object TinyMCE {
         // Without this, with `combine-resources` set to `false`, instead of `silver/theme.min.js`,
         // TinyMCE tried to load `silver/theme.js`, which doesn't exist
         tinyMceConfig.suffix      = ".min"
-        tinyMceConfig.content_css = GlobalTinyMce.baseURL + "/../../content.css"
+        // Don't set `tinyMceConfig.content_css` now that we are using the inline mode
 
         val tinyMceDiv = containerElem.querySelector(".xbl-fr-tinymce-div")
         val tinyMceObject = new TinyMceEditor(tinyMceDiv.id, tinyMceConfig, GlobalTinyMce.EditorManager)

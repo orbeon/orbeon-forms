@@ -17,9 +17,8 @@ import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.UserAndGroup
-import org.orbeon.oxf.fr.permission.Operation.Read
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
-import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization, PermissionsXML}
+import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
@@ -94,7 +93,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
         // Holds the data we will read from the database
         case class FromDatabase(
-          dataUserOpt          : Option[CheckWithDataUser],
+          dataUserOpt          : Option[CheckWithDataUser], // set to `Some(_)` if `forData == true`
           formVersion          : Int,
           stageOpt             : Option[String],
           createdDateTime      : Timestamp,
@@ -160,31 +159,32 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
           }
         }
 
-        // Check user can read and set Orbeon-Operations header
-        fromDatabase.dataUserOpt.foreach { dataUser =>
-
-          // Read form permissions after we're done with the connection to read the data,
-          // so we don't use two simultaneous connections
-          val formPermissionsForDataRequestOptOpt = req.forData.option(RelationalUtils.readFormPermissions(
-            req.appForm, FormDefinitionVersion.Specific(fromDatabase.formVersion))
+        // For data, check that the user is allowed to read and set the `Orbeon-Operations` header
+        // Read form permissions after we're done with the connection to read the data,
+        // so we don't use two simultaneous connections
+        for {
+          dataUser <- fromDatabase.dataUserOpt // `dataUserOpt` is `Some(_)` if `req.forData == true`
+          formPermissionsElemOpt = RelationalUtils.readFormPermissions(
+            req.appForm, FormDefinitionVersion.Specific(fromDatabase.formVersion)
           )
+          permissions = FormRunner.permissionsFromElemOrProperties(
+            formPermissionsElemOpt,
+            req.appForm
+          )
+          authorizedOperations = PermissionsAuthorization.authorizedOperations(
+            permissions,
+            PermissionsAuthorization.findCurrentCredentialsFromSession,
+            dataUser
+          )
+        } locally {
 
-          formPermissionsForDataRequestOptOpt foreach { formPermissionsElemOpt =>
-            val authorizedOperations = PermissionsAuthorization.authorizedOperations(
-              FormRunner.permissionsFromElemOrProperties(
-                formPermissionsElemOpt,
-                req.appForm
-              ),
-              PermissionsAuthorization.findCurrentCredentialsFromSession,
-              dataUser
-            )
-            if (! Operations.allows(authorizedOperations, Read))
-              throw HttpStatusCodeException(StatusCode.Forbidden)
-            httpResponse.setHeader(
-              FormRunnerPersistence.OrbeonOperations,
-              Operations.serialize(authorizedOperations, normalized = true).mkString(" ")
-            )
-          }
+          if (! Operations.allows(authorizedOperations, Operation.Read))
+            throw HttpStatusCodeException(StatusCode.Forbidden)
+
+          httpResponse.setHeader(
+            FormRunnerPersistence.OrbeonOperations,
+            Operations.serialize(authorizedOperations, normalized = true).mkString(" ")
+          )
         }
 
         // Send headers

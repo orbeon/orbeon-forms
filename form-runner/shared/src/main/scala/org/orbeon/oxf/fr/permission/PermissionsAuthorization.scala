@@ -41,6 +41,16 @@ object PermissionsAuthorization {
   case object CheckWithoutDataUserPessimistic extends PermissionsCheck
   case object CheckAssumingOrganizationMatch  extends PermissionsCheck
 
+  def hasPermissionCond(permissions: Permissions, condition: Condition, anyOfOperations: Set[Operation]): Boolean =
+    permissions match {
+      case UndefinedPermissions => true
+      case DefinedPermissions(permissionsList) =>
+        permissionsList.exists { permission =>
+          permission.conditions.contains(condition) &&
+            Operations.allowsAny(permission.operations, anyOfOperations)
+        }
+    }
+
   def authorizedOperations(
     permissions          : Permissions,
     currentCredentialsOpt: Option[Credentials],
@@ -326,7 +336,7 @@ object PermissionsAuthorization {
         check match {
           case CheckWithDataUser(dataUserAndGroupOpt, _) =>
             (currentCredentials flatMap (_.userAndGroup.groupname), dataUserAndGroupOpt.flatMap(_.groupname)) match {
-              case (Some(currentUsername), Some(dataGroupnameOpt)) if currentUsername == dataGroupnameOpt => true
+              case (Some(currentGroupname), Some(dataGroupname)) if currentGroupname == dataGroupname => true
               case _ => false
             }
           case CheckWithoutDataUserPessimistic => false

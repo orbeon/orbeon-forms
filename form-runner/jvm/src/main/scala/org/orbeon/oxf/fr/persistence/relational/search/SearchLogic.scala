@@ -43,22 +43,12 @@ trait SearchLogic extends SearchRequestParser {
     val formPermissionsElOpt = RelationalUtils.readFormPermissions(request.appForm, version)
     val formPermissions      = FormRunner.permissionsFromElemOrProperties(formPermissionsElOpt, request.appForm)
 
-    def hasPermissionCond(condition: Condition): Boolean =
-      formPermissions match {
-        case UndefinedPermissions => true
-        case DefinedPermissions(permissionsList) =>
-          permissionsList.exists { permission =>
-            permission.conditions.contains(condition) &&
-              Operations.allowsAny(permission.operations, searchOperations)
-          }
-      }
-
     SearchPermissions(
       formPermissions,
       authorizedBasedOnRoleOptimistic  = PermissionsAuthorization.authorizedBasedOnRole(formPermissions, request.credentials, searchOperations, optimistic = true),
       authorizedBasedOnRolePessimistic = PermissionsAuthorization.authorizedBasedOnRole(formPermissions, request.credentials, searchOperations, optimistic = false),
-      authorizedIfUsername             = hasPermissionCond(Owner).flatOption(request.credentials.map(_.userAndGroup.username)),
-      authorizedIfGroup                = hasPermissionCond(Group).flatOption(request.credentials.map(_.userAndGroup.groupname)).flatten,
+      authorizedIfUsername             = PermissionsAuthorization.hasPermissionCond(formPermissions, Owner, searchOperations).flatOption(request.credentials.map(_.userAndGroup.username)),
+      authorizedIfGroup                = PermissionsAuthorization.hasPermissionCond(formPermissions, Group, searchOperations).flatOption(request.credentials.map(_.userAndGroup.groupname)).flatten,
       authorizedIfOrganizationMatch    = SearchOps.authorizedIfOrganizationMatch(formPermissions, request.credentials)
     )
   }

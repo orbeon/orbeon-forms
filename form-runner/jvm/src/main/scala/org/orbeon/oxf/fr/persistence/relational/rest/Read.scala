@@ -163,7 +163,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         // Read form permissions after we're done with the connection to read the data,
         // so we don't use two simultaneous connections
         for {
-          dataUser <- fromDatabase.dataUserOpt // `dataUserOpt` is `Some(_)` if `req.forData == true`
+          dataUser <- fromDatabase.dataUserOpt // `dataUserOpt` is `Some(_)` iif `req.forData == true`
           formPermissionsElemOpt = RelationalUtils.readFormPermissions(
             req.appForm, FormDefinitionVersion.Specific(fromDatabase.formVersion)
           )
@@ -178,8 +178,13 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
           )
         } locally {
 
-          if (! Operations.allows(authorizedOperations, Operation.Read))
-            throw HttpStatusCodeException(StatusCode.Forbidden)
+          // For #5437: return a 403 only if the user is not allowed to read the data, but only if there is no
+          // additional token permissions that could allow the user to read the data. This means the
+          // `Orbeon-Operations` header below can be empty or return only operations other than `Read`.
+          if (
+            ! Operations.allows(authorizedOperations, Operation.Read) &&
+            ! PermissionsAuthorization.hasPermissionCond(permissions, AnyoneWithToken, Set(Operation.Read)) // `Operation.Update` ???
+          ) throw HttpStatusCodeException(StatusCode.Forbidden)
 
           httpResponse.setHeader(
             FormRunnerPersistence.OrbeonOperations,

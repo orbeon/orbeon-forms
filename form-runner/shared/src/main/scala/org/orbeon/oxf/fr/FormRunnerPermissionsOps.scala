@@ -66,19 +66,35 @@ trait FormRunnerPermissionsOps {
     )
 
   //@XPathFunction
-  def authorizedOperationsForDetailModeOrThrow(operationsFromData: String, permissionsElemOrNull: NodeInfo, isSubmit: Boolean): String = {
+  def authorizedOperationsForDetailModeOrThrow(
+    operationsFromData               : String,
+    encryptedOperationsFromDataOrNull: String,
+    permissionsElemOrNull            : NodeInfo,
+    isSubmit                         : Boolean
+  ): String = {
 
     // Same logger that was used for the `xf:message` action before (could use something else)
     implicit val logger: IndentedLogger =
       inScopeContainingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
 
     val FormRunnerParams(app, form, _, _, _, mode) = FormRunnerParams()
+    // In initial edit/view modes that read data from the database, we use `operationsFromData` which is the result of
+    // headers returned by the the database `GET`. When we change modes from there, we propagate and use
+    // `encryptedOperationsFromData` instead.
+    val combinedOperationsFromData =
+      Operations.parseFromString(operationsFromData)
+        .orElse(
+          if (isSubmit)
+            Option(encryptedOperationsFromDataOrNull).flatMap(FormRunnerAccessToken.decryptOperations)
+          else
+            None // no need as encrypted operations are only used for mode change
+        )
 
     Operations.serialize(
       PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
         mode                  = mode,
         permissions           = permissionsFromElemOrProperties(Option(permissionsElemOrNull), AppForm(app, form)),
-        operationsFromDataOpt = Operations.parseFromString(operationsFromData),
+        operationsFromDataOpt = combinedOperationsFromData,
         credentialsOpt        = PermissionsAuthorization.findCurrentCredentialsFromSession,
         isSubmit              = isSubmit
       ),

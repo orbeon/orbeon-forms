@@ -19,9 +19,11 @@ import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.SimpleDataMigration.DataMigrationBehavior
 import org.orbeon.oxf.fr._
+import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
 import org.orbeon.oxf.fr.process.SimpleProcess._
 import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
@@ -80,12 +82,17 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         } yield
           renderedFormat.entryName -> uri.toString
 
-      recombineQuery(
-        s"/fr/service/$app/$form/email/$document",
-        pdfTiffParams ::: createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
-      )
-    } flatMap
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE)
+      val path =
+        recombineQuery(
+          s"/fr/service/$app/$form/email/$document",
+          pdfTiffParams :::
+          createPdfOrTiffParams(FormRunnerActionsCommon.findFrFormAttachmentsRootElem, params, currentFormLang)
+        )
+
+      (path, formRunnerParams.modeType)
+    } flatMap { case (path, sourceModeType) =>
+      tryChangeMode(XFORMS_SUBMIT_REPLACE_NONE, path, sourceModeType = sourceModeType)
+    }
 
   def trySend(params: ActionParams): Try[Any] =
     Try {
@@ -279,15 +286,16 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
   private def tryChangeMode(
     replace            : String,
+    path               : String,
+    sourceModeType     : ModeType,
     formTargetOpt      : Option[String] = None,
     showProgress       : Boolean        = true,
-    responseIsResource : Boolean        = false)(
-    path               : String
+    responseIsResource : Boolean        = false
   ): Try[Any] =
     Try {
       val params: List[Option[(Option[String], String)]] =
         List(
-          Some(             Some("uri")                   -> prependUserAndStandardParamsForModeChange(prependCommonFormRunnerParameters(path, forNavigate = false))),
+          Some(             Some("uri")                   -> prependUserAndStandardParamsForModeChange(sourceModeType != ModeType.Creation, prependCommonFormRunnerParameters(path, forNavigate = false))),
           Some(             Some("method")                -> HttpMethod.POST.entryName.toLowerCase),
           Some(             Some(NonRelevantName)         -> RelevanceHandling.Keep.entryName.toLowerCase),
           Some(             Some("replace")               -> replace),
@@ -305,17 +313,19 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
   def tryNavigateToReview(params: ActionParams): Try[Any] =
     Try {
-      val FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-      s"/fr/$app/$form/view/$document"
-    } flatMap
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL)
+      val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
+      (s"/fr/$app/$form/view/$document", formRunnerParams.modeType)
+    } flatMap { case (path, sourceModeType) =>
+      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, path, sourceModeType = sourceModeType)
+    }
 
   def tryNavigateToEdit(params: ActionParams): Try[Any] =
     Try {
-      val FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
-      s"/fr/$app/$form/edit/$document"
-    } flatMap
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL)
+      val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
+      (s"/fr/$app/$form/edit/$document", formRunnerParams.modeType)
+    } flatMap { case (path, sourceModeType) =>
+      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, path, sourceModeType = sourceModeType)
+    }
 
   def tryOpenRenderedFormat(params: ActionParams): Try[Any] =
     Try {
@@ -349,15 +359,15 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
           case RenderedFormat.ExcelWithNamedRanges | RenderedFormat.XmlFormStructureAndData => None
         }
 
-      (path, formTargetOpt)
-    } flatMap { case (path, formTargetOpt) =>
+      (path, formTargetOpt, frParams.modeType)
+    } flatMap { case (path, formTargetOpt, sourceModeType) =>
       tryChangeMode(
         replace            = XFORMS_SUBMIT_REPLACE_ALL,
+        path               = path,
+        sourceModeType     = sourceModeType,
         showProgress       = false,
         formTargetOpt      = formTargetOpt,
         responseIsResource = true
-      )(
-        path               = path
       )
     }
 
@@ -398,12 +408,20 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     "prune" // for backward compatibility,
   ) ++ DefaultSendParameters.keys
 
-  private def prependUserAndStandardParamsForModeChange(pathQuery: String) = {
+  private def prependUserAndStandardParamsForModeChange(propagateDataPermissions: Boolean, pathQuery: String) = {
 
     val (path, params) = splitQueryDecodeParams(pathQuery)
 
     val dataMigrationParam =
       DataMigrationBehaviorName -> DataMigrationBehavior.Disabled.entryName
+
+    // https://github.com/orbeon/orbeon-forms/issues/2999
+    // https://github.com/orbeon/orbeon-forms/issues/5437
+    val authorizedOperationsFromPersistenceParam =
+      propagateDataPermissions flatList {
+        val ops = authorizedOperationsFromPersistence
+        ops.nonEmpty list (AuthorizedOperationsFromPersistenceParam -> FormRunnerAccessToken.encryptOperations(ops))
+      }
 
     val userParams =
       for {
@@ -413,7 +431,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       } yield
         name -> value
 
-    recombineQuery(path, dataMigrationParam :: userParams ::: params)
+    recombineQuery(path, dataMigrationParam :: authorizedOperationsFromPersistenceParam ::: userParams ::: params)
   }
 
   private def buildRenderedFormatPath(
@@ -467,14 +485,15 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
         case Some(pathToTmpFileWithKey) => pathToTmpFileWithKey
         case None =>
 
-          tryChangeMode(XFORMS_SUBMIT_REPLACE_INSTANCE)(
+          val path =
             buildRenderedFormatPath(
               params          = params,
               renderedFormat  = renderedFormat,
               fullFilename    = None,
               currentFormLang = currentFormLang
             )
-          ).get
+
+          tryChangeMode(XFORMS_SUBMIT_REPLACE_INSTANCE, path, sourceModeType = frParams.modeType).get
 
           locally {
 

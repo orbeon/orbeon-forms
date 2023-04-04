@@ -19,7 +19,7 @@ import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.XMLNames._
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization
+import org.orbeon.oxf.fr.permission.ModeType
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException}
 import org.orbeon.oxf.properties.{Property, PropertySet}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
@@ -409,7 +409,7 @@ trait FormRunnerBaseOps {
   }
 
   def isDesignTime(implicit p: FormRunnerParams)  : Boolean = AppForm(p.app, p.form) == AppForm.FormBuilder
-  def isReadonlyMode(implicit p: FormRunnerParams): Boolean = PermissionsAuthorization.ReadonlyModes(p.mode)
+  def isReadonlyMode(implicit p: FormRunnerParams): Boolean = ModeType.ReadonlyModes(p.mode)
 
   // https://github.com/orbeon/orbeon-forms/issues/5323
   // https://github.com/orbeon/orbeon-forms/issues/5325

@@ -20,15 +20,36 @@ import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 
 
-object PermissionsAuthorization {
+// TODO: move to more general location
+sealed trait ModeType
+object ModeType {
+
+  case object Creation extends ModeType
+  case object Edition  extends ModeType
+  case object Readonly extends ModeType
 
   // NOTE: `tiff` and `test-pdf` are reduced to `pdf` at the XForms level, but not at the XSLT level. We don't
   // yet expose this to XSLT, but we might in the future, so check on those modes as well.
   // 2021-12-22: `schema` could be a readonly mode, but we consider this special as it is protected as a service.
   val CreationModes  = Set("new", "import", "validate")
-  val EditingModes   = Set("edit")
+  val EditionModes   = Set("edit")
   val ReadonlyModes  = Set("view", "pdf", "email", "controls", "tiff", "test-pdf", "export", "excel-export") // `excel-export` is legacy
-  val AllDetailModes = CreationModes ++ EditingModes ++ ReadonlyModes + "schema" + "test"
+  val AllDetailModes = CreationModes ++ EditionModes ++ ReadonlyModes + "schema" + "test"
+
+  def unapply(modeString: String): Option[ModeType] =
+    if (CreationModes(modeString))
+      Some(Creation)
+    else if (EditionModes(modeString))
+      Some(Edition)
+    else if (ReadonlyModes(modeString))
+      Some(Readonly)
+    else
+      None
+}
+
+object PermissionsAuthorization {
+
+  import ModeType._
 
   def findCurrentCredentialsFromSession: Option[Credentials] =
     CoreCrossPlatformSupport.externalContext.getRequest.credentials

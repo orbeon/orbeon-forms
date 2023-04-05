@@ -14,12 +14,9 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <!--
@@ -92,9 +89,12 @@
         </xbl:implementation>
         <xbl:template>
             <!-- Read external value -->
-            <xf:var name="binding" value="xxf:binding('fr-fields-date-binding')"/>
+            <xf:var name="binding"
+                    value="xxf:binding('fr-fields-date-binding')"/>
+            <xf:var name="view"
+                value="is-readonly = 'true' and property('xxf:readonly-appearance') = 'static'"/>
             <xf:var name="value" as="xs:string" value="xxf:value('fr-fields-date-binding')">
-                <xf:action ev:event="xforms-value-changed xforms-enabled">
+                <xf:action event="xforms-value-changed xforms-enabled">
                     <!-- Only set local values if the bound node is an `xs:date` -->
                     <xf:action if="$value castable as xs:date">
                         <!-- TODO: Instead of `xs:date($value)` we should be able to use `$binding`, but `$binding/string()` is empty -->
@@ -119,8 +119,8 @@
 
             <xh:div id="fr-fields-date-elem" class="fr-component-group" xxf:control="true">
 
-                <!-- Don't show fields at all in static readonly mode -->
-                <xf:group ref=".[not(is-readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">
+                <xf:group ref=".[not($view)]">
+                    <!-- Don't show fields at all in static readonly mode -->
 
                     <xf:var name="month-first" value="starts-with(property('xxf:format.input.date'), '[M]')"/>
                     <xf:var name="ref-1"       value="if ($month-first) then month else day  "/>
@@ -142,7 +142,7 @@
                 </xf:group>
 
                 <!-- React to update to local values -->
-                <xf:action ev:event="xforms-enabled xforms-value-changed">
+                <xf:action event="xforms-enabled xforms-value-changed">
                     <xf:var name="empty" value="xxf:is-blank(string-join((year, month, day), ''))" as="xs:string"/>
                     <xf:action if="$empty">
                         <xf:setvalue ref="is-valid" value="valid($binding)"/>

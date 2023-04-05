@@ -14,7 +14,6 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -210,7 +209,7 @@
                     See https://github.com/orbeon/orbeon-forms/issues/2993.
                     Remove `if` once #2994 is fixed.
                 -->
-                <xf:action ev:event="xforms-model-construct-done" if="empty(instance('years-itemset')/*)">
+                <xf:action event="xforms-model-construct-done" if="empty(instance('years-itemset')/*)">
 
                     <!--
                         Compute start and end years
@@ -251,17 +250,21 @@
         </xbl:implementation>
         <xbl:template>
             <!-- Read external value -->
-            <xf:var name="binding"
-                    value="xxf:binding('fr-dropdown-date-binding')"/>
-            <xf:var name="view"
+            <xf:var
+                name="binding"
+                value="xxf:binding('fr-dropdown-date-binding')"/>
+            <xf:var
+                name="view"
                 value="is-readonly = 'true' and property('xxf:readonly-appearance') = 'static'"/>
             <xf:var name="value" as="xs:string" value="xxf:value('fr-dropdown-date-binding')">
-                <xf:action ev:event="xforms-value-changed xforms-enabled">
-                    <!-- Only set local values if the bound node is an xs:date -->
+                <xf:action event="xforms-value-changed xforms-enabled">
+
+                    <!-- Only set local values if the bound node is an `xs:date` -->
                     <xf:action if="$value castable as xs:date">
-                        <xf:setvalue ref="instance('i')/year" value="year-from-date($binding)"/>
-                        <xf:setvalue ref="instance('i')/month" value="month-from-date($binding)"/>
-                        <xf:setvalue ref="instance('i')/day" value="day-from-date($binding)"/>
+                        <!-- TODO: Instead of `xs:date($value)` we should be able to use `$binding`, but `$binding/string()` is empty -->
+                        <xf:setvalue ref="instance('i')/year"  value="year-from-date (xs:date($value))"/>
+                        <xf:setvalue ref="instance('i')/month" value="month-from-date(xs:date($value))"/>
+                        <xf:setvalue ref="instance('i')/day"   value="day-from-date  (xs:date($value))"/>
                     </xf:action>
                     <xf:action if="not($value castable as xs:date) and xxf:is-blank($value)">
                         <xf:setvalue ref="instance('i')/year"/>
@@ -321,22 +324,20 @@
                     </xf:select1>
 
                     <!-- React to update to local values -->
-                    <xf:action ev:event="xforms-value-changed">
-                        <xf:var name="c" value="xxf:trim(string-join((year, month, day), ''))" as="xs:string"/>
-                        <!-- Blank result -->
-                        <xf:action if="$c = ''">
-                            <xf:setvalue ref="is-valid" value="false()"/>
+                    <xf:action event="xforms-enabled xforms-value-changed">
+                        <xf:var name="empty" value="xxf:is-blank(string-join((year, month, day), ''))" as="xs:string"/>
+                        <xf:action if="$empty">
+                            <xf:setvalue ref="is-valid" value="valid($binding)"/>
                             <xf:setvalue ref="$binding"/>
                         </xf:action>
-                        <!-- Non-blank result -->
-                        <xf:action if="$c != ''">
+                        <xf:action if="not($empty)">
                             <!-- Compute date parts -->
-                            <xf:var name="y" value="if (year  castable as xs:integer) then format-number(xs:integer(year), '0000') else '____'" as="xs:string"/>
-                            <xf:var name="m" value="if (month castable as xs:integer) then format-number(xs:integer(month),  '00') else '__'"   as="xs:string"/>
-                            <xf:var name="d" value="if (day   castable as xs:integer) then format-number(xs:integer(day),    '00') else '__'"   as="xs:string"/>
+                            <xf:var name="y" value="if (year castable as xs:integer)  then format-number(xs:integer(year), '0000') else '____'"/>
+                            <xf:var name="m" value="if (month castable as xs:integer) then format-number(xs:integer(month), '00')  else '__'"/>
+                            <xf:var name="d" value="if (day castable as xs:integer)   then format-number(xs:integer(day), '00')    else '__'"/>
 
                             <!-- Create date string -->
-                            <xf:var name="date-string" value="string-join(($y, $m, $d), '-')" as="xs:string"/>
+                            <xf:var name="date-string" value="string-join(($y, $m, $d), '-')"/>
 
                             <!-- Set value to format like 2008-02-31 or 0000-12-01 if parts are unknown -->
                             <xf:setvalue ref="is-valid" value="$date-string castable as xs:date"/>

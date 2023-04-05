@@ -323,7 +323,6 @@ object XFormsStateManager extends XFormsStateManagerTrait {
       require(containingDocument.staticState.isServerStateHandling)
       EhcacheStateStore.storeDocumentState(
         containingDocument,
-        XFormsCrossPlatformSupport.externalContext.getRequest.getSession(ForceSessionCreation),
         isInitialState
       )
     }

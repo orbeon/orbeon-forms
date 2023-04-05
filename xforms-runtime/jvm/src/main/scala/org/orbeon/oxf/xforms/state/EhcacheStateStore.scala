@@ -26,7 +26,6 @@ object EhcacheStateStore {
 
   def storeDocumentState(
     document       : XFormsContainingDocument,
-    session        : ExternalContext.Session,
     isInitialState : Boolean
   ): Unit = {
 

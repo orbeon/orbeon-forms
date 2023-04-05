@@ -205,11 +205,18 @@
 
                 <!-- Initialize itemsets upon initialization -->
                 <!--
-                    Only do this if not initialized yet.
-                    See https://github.com/orbeon/orbeon-forms/issues/2993.
-                    Remove `if` once #2994 is fixed.
+                    1. https://github.com/orbeon/orbeon-forms/issues/2993
+
+                        - Only do this if not initialized yet.
+                        - Remove `if` once #2994 is fixed.
+
+                    2. https://github.com/orbeon/orbeon-forms/issues/5745
+
+                        - run upon `xxforms-instances-ready` instead of `xforms-model-construct-done`
+                        - it's unclear why the latter causes issues, but building the itemsets before
+                          the first RRR has happened is in fact better
                 -->
-                <xf:action event="xforms-model-construct-done" if="empty(instance('years-itemset')/*)">
+                <xf:action event="xxforms-instances-ready" if="empty(instance('years-itemset')/*)">
 
                     <!--
                         Compute start and end years

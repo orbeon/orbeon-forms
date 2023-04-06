@@ -557,7 +557,7 @@ object Controls {
   def restoringInstances        : Option[List[InstanceState]]       = restoringInstanceControls map (_.instances)
 
   // Whether we are restoring state
-  def isRestoringDynamicState: Boolean = restoringDynamicState exists (_._2)
+  def isRestoringDynamicState: Boolean = restoringDynamicState.isDefined
 
   // ThreadLocal for dynamic state restoration
   private val instancesControlsToRestore = new DynamicVariable[(InstancesControls, Boolean)]

@@ -56,11 +56,11 @@ object Operations {
         SpecificOperations(stringTokens.toSet.map(Operation.withName))
     }
 
+  // Return `None` iif there are not at least one possible operation
   def parseFromString(stringOperations: String): Option[Operations] =
     parseFromStringTokens(stringOperations.splitTo[List]()) match {
-      case o @ AnyOperation                            => Some(o)
-      case o @ SpecificOperations(ops) if ops.nonEmpty => Some(o)
-      case SpecificOperations(_)                       => scala.None
+      case Operations.None => scala.None
+      case operations      => Some(operations)
     }
 
   // `operations` contains tokens, including possibly `*`. This is the value of the `operations` attribute in the
@@ -125,7 +125,7 @@ object Operations {
     }
 
   def combine(operations: List[Operations]): Operations =
-    operations.foldLeft[Operations](None)(combine)
+    operations.foldLeft[Operations](Operations.None)(combine)
 
   def allows(granted: Operations, requested: Operation): Boolean =
     granted match {

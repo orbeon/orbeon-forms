@@ -56,6 +56,9 @@ case class FormRunnerParams(
 
   def appFormVersion: FormRunnerParams.AppFormVersion =
     (appForm, formVersion)
+
+  def modeType: ModeType =
+    ModeType.unapply(mode).getOrElse(throw new IllegalArgumentException(s"Invalid mode: `$mode`"))
 }
 
 object FormRunnerParams {
@@ -114,7 +117,7 @@ trait FormRunnerBaseOps {
 
   val LanguageParam                            = "fr-language"
   val FormVersionParam                         = "form-version"
-  val AccessTokenParam                         = "fr-access-token"
+  val AccessTokenParam                         = "fr-access-token" // or `orbeon-access-token`?
   val AuthorizedOperationsFromPersistenceParam = "fr-authorized-operations-from-persistence"
 
   val LiferayLanguageHeader  = "orbeon-liferay-language"

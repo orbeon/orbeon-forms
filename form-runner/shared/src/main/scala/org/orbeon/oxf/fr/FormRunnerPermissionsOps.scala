@@ -70,14 +70,16 @@ trait FormRunnerPermissionsOps {
     operationsFromData               : String,
     encryptedOperationsFromDataOrNull: String,
     permissionsElemOrNull            : NodeInfo,
-    isSubmit                         : Boolean
+    isSubmit                         : Boolean,
+    tokenOrNull                      : String
   ): String = {
 
     // Same logger that was used for the `xf:message` action before (could use something else)
     implicit val logger: IndentedLogger =
       inScopeContainingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
 
-    val FormRunnerParams(app, form, _, _, _, mode) = FormRunnerParams()
+    val formRunnerParams @ FormRunnerParams(app, form, _, _, _, _) = FormRunnerParams()
+
     // In initial edit/view modes that read data from the database, we use `operationsFromData` which is the result of
     // headers returned by the the database `GET`. When we change modes from there, we propagate and use
     // `encryptedOperationsFromData` instead.
@@ -92,11 +94,11 @@ trait FormRunnerPermissionsOps {
 
     Operations.serialize(
       PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-        mode                  = mode,
+        modeType              = formRunnerParams.modeType,
         permissions           = permissionsFromElemOrProperties(Option(permissionsElemOrNull), AppForm(app, form)),
         operationsFromDataOpt = combinedOperationsFromData,
         credentialsOpt        = PermissionsAuthorization.findCurrentCredentialsFromSession,
-        isSubmit              = isSubmit
+        tokenOpt              = Option(tokenOrNull).map((_, formRunnerParams))
       ),
       normalized = true
     ).mkString(" ")

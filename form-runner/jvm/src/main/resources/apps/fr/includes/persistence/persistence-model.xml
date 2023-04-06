@@ -384,7 +384,8 @@
                     instance('fr-authorized-operations')/@from-persistence,
                     xxf:get-request-parameter('fr-authorized-operations-from-persistence')[1],
                     xxf:instance('fr-form-metadata')/permissions,
-                    $is-submit
+                    $is-submit,
+                    xxf:get-request-parameter('fr-access-token')[1]
                 )"/>
 
     </xf:action>

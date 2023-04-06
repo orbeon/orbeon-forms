@@ -37,10 +37,12 @@ object PermissionsJSON {
 
         def keyToConditions(key: String): List[Condition] =
           key match {
-            case "anyone"       => Nil
-            case "owner"        => List(Owner)
-            case "group-member" => List(Group)
-            case _              => error()
+            case "anyone"                 => Nil
+            case "anyone-with-token"      => List(AnyoneWithToken)      // new with #5437
+            case "any-authenticated-user" => List(AnyAuthenticatedUser) // new with #5437
+            case "owner"                  => List(Owner)
+            case "group-member"           => List(Group)
+            case _                        => error()
           }
 
         def jsonToOperations(jsonArray: Json): SpecificOperations =

@@ -158,43 +158,108 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
   describe("Authorization for detail page") {
 
     describe("using operations from data") {
-      val varyOperations = List(
-        AnyOperation,
-        SpecificOperations(Set(Operation.Read)),
-        SpecificOperations(Set(Operation.Create, Operation.Read, Operation.Update)),
-      )
 
-      val varyPermissions = List(
-        UndefinedPermissions,
-        DefinedPermissions(Nil),
-        DefinedPermissions(
-          List(Permission(Nil, SpecificOperations(Set(Operation.Read))))
-        )
-      )
+      val NoOperation                = Operations.None
+      val ReadOperation              = SpecificOperations(Set(Operation.Read))
+      val UpdateOperation            = SpecificOperations(Set(Operation.Update))
+      val ReadUpdateOperation        = SpecificOperations(Set(Operation.Read, Operation.Update))
+      val CreateReadUpdateOperation  = SpecificOperations(Set(Operation.Create, Operation.Read, Operation.Update))
 
-      val varyCredentials = List(
-        None,
-        Credentials(UserAndGroup("dewey", None), Nil, Nil).some,
-        Credentials(UserAndGroup("dewey", "orbeon-users".some), Nil, Nil).some,
-        Credentials(UserAndGroup("dewey", "employee".some), List(SimpleRole("orbeon-user")), Nil).some,
+      val DefinedButEmptyPermissions = DefinedPermissions(Nil)
+      val AnyoneCanReadPermissions   = DefinedPermissions(List(Permission(Nil, SpecificOperations(Set(Operation.Read)))))
+      val RoleCanReadPermissions     = DefinedPermissions(List(Permission(List(RolesAnyOf(List("orbeon-user"))), SpecificOperations(Set(Operation.Read)))))
+      val RoleCanUpdatePermissions   = DefinedPermissions(List(Permission(List(RolesAnyOf(List("orbeon-user"))), SpecificOperations(Set(Operation.Update)))))
+
+      val NoCredentials              = None
+      val UserOnlyCredentials        = Credentials(UserAndGroup("dewey", None), Nil, Nil).some
+      val UserAndGroupCredentials    = Credentials(UserAndGroup("dewey", "employee".some), Nil, Nil).some
+      val UserAndRolesCredentials    = Credentials(UserAndGroup("dewey", "employee".some), List(SimpleRole("orbeon-user")), Nil).some
+
+      val expected = List(
+        // `AnyOperation` from data means `AnyOperation` is allowed
+        (AnyOperation, UndefinedPermissions, NoCredentials)           -> AnyOperation.some,
+        (AnyOperation, UndefinedPermissions, UserOnlyCredentials)     -> AnyOperation.some,
+        (AnyOperation, UndefinedPermissions, UserAndGroupCredentials) -> AnyOperation.some,
+        (AnyOperation, UndefinedPermissions, UserAndRolesCredentials) -> AnyOperation.some,
+
+        (AnyOperation, DefinedButEmptyPermissions, NoCredentials)           -> AnyOperation.some,
+        (AnyOperation, DefinedButEmptyPermissions, UserOnlyCredentials)     -> AnyOperation.some,
+        (AnyOperation, DefinedButEmptyPermissions, UserAndGroupCredentials) -> AnyOperation.some,
+        (AnyOperation, DefinedButEmptyPermissions, UserAndRolesCredentials) -> AnyOperation.some,
+
+        (AnyOperation, AnyoneCanReadPermissions, NoCredentials)           -> AnyOperation.some,
+        (AnyOperation, AnyoneCanReadPermissions, UserOnlyCredentials)     -> AnyOperation.some,
+        (AnyOperation, AnyoneCanReadPermissions, UserAndGroupCredentials) -> AnyOperation.some,
+        (AnyOperation, AnyoneCanReadPermissions, UserAndRolesCredentials) -> AnyOperation.some,
+
+
+        // `Read` operation from data and `UndefinedPermissions` means `AnyOperation` is allowed
+        (ReadOperation, UndefinedPermissions, NoCredentials)           -> AnyOperation.some,
+        (ReadOperation, UndefinedPermissions, UserOnlyCredentials)     -> AnyOperation.some,
+        (ReadOperation, UndefinedPermissions, UserAndGroupCredentials) -> AnyOperation.some,
+        (ReadOperation, UndefinedPermissions, UserAndRolesCredentials) -> AnyOperation.some,
+
+        // `Read` operation from data and empty permissions means `Read` is allowed (even though this should not happen in practice as this can only happen with owner/group permissions)
+        (ReadOperation, DefinedButEmptyPermissions, NoCredentials)           -> ReadOperation.some,
+        (ReadOperation, DefinedButEmptyPermissions, UserOnlyCredentials)     -> ReadOperation.some,
+        (ReadOperation, DefinedButEmptyPermissions, UserAndGroupCredentials) -> ReadOperation.some,
+        (ReadOperation, DefinedButEmptyPermissions, UserAndRolesCredentials) -> ReadOperation.some,
+
+        // `Read` operation from data and anyone can `Read` means `Read` is allowed
+        (ReadOperation, AnyoneCanReadPermissions, NoCredentials)           -> ReadOperation.some,
+        (ReadOperation, AnyoneCanReadPermissions, UserOnlyCredentials)     -> ReadOperation.some,
+        (ReadOperation, AnyoneCanReadPermissions, UserAndGroupCredentials) -> ReadOperation.some,
+        (ReadOperation, AnyoneCanReadPermissions, UserAndRolesCredentials) -> ReadOperation.some,
+
+
+        // `CreateReadUpdate` operation from data and `UndefinedPermissions` means `AnyOperation` is allowed
+        (CreateReadUpdateOperation, UndefinedPermissions, NoCredentials)           -> AnyOperation.some,
+        (CreateReadUpdateOperation, UndefinedPermissions, UserOnlyCredentials)     -> AnyOperation.some,
+        (CreateReadUpdateOperation, UndefinedPermissions, UserAndGroupCredentials) -> AnyOperation.some,
+        (CreateReadUpdateOperation, UndefinedPermissions, UserAndRolesCredentials) -> AnyOperation.some,
+
+        // `CreateReadUpdate` operation from data and empty permissions means `CreateReadUpdate` is allowed (even though this should not happen in practice with owner/group permissions)
+        (CreateReadUpdateOperation, DefinedButEmptyPermissions, NoCredentials)           -> CreateReadUpdateOperation.some,
+        (CreateReadUpdateOperation, DefinedButEmptyPermissions, UserOnlyCredentials)     -> CreateReadUpdateOperation.some,
+        (CreateReadUpdateOperation, DefinedButEmptyPermissions, UserAndGroupCredentials) -> CreateReadUpdateOperation.some,
+        (CreateReadUpdateOperation, DefinedButEmptyPermissions, UserAndRolesCredentials) -> CreateReadUpdateOperation.some,
+
+        // `CreateReadUpdate` operation from data and anyone can `Read` means `CreateReadUpdate` is allowed
+        (CreateReadUpdateOperation, AnyoneCanReadPermissions, NoCredentials)           -> CreateReadUpdateOperation.some,
+        (CreateReadUpdateOperation, AnyoneCanReadPermissions, UserOnlyCredentials)     -> CreateReadUpdateOperation.some,
+        (CreateReadUpdateOperation, AnyoneCanReadPermissions, UserAndGroupCredentials) -> CreateReadUpdateOperation.some,
+        (CreateReadUpdateOperation, AnyoneCanReadPermissions, UserAndRolesCredentials) -> CreateReadUpdateOperation.some,
+
+
+        // No operations returned from data, but user can have permissions from role
+        (NoOperation, RoleCanReadPermissions, NoCredentials)           -> None,
+        (NoOperation, RoleCanReadPermissions, UserOnlyCredentials)     -> None,
+        (NoOperation, RoleCanReadPermissions, UserAndGroupCredentials) -> None,
+        (NoOperation, RoleCanReadPermissions, UserAndRolesCredentials) -> ReadOperation.some,
+
+        // Operation from role is merged with operation from data
+        (ReadOperation, RoleCanUpdatePermissions, NoCredentials)           -> ReadOperation.some,
+        (ReadOperation, RoleCanUpdatePermissions, UserOnlyCredentials)     -> ReadOperation.some,
+        (ReadOperation, RoleCanUpdatePermissions, UserAndGroupCredentials) -> ReadOperation.some,
+        (ReadOperation, RoleCanUpdatePermissions, UserAndRolesCredentials) -> ReadUpdateOperation.some,
+
+        // TODO: more tests
       )
 
       for {
-        operationsFromData <- varyOperations
-        permissions        <- varyPermissions
-        credentialsOpt     <- varyCredentials
+        ((operationsFromData, permissions, credentialsOpt), resultOpt) <- expected
       } locally {
-        it(s"must use operations from data for`$operationsFromData`, permissions = `$permissions`, credentials = `$credentialsOpt`") {
+        it(s"must use operations from data for `$operationsFromData`, permissions = `$permissions`, credentials = `$credentialsOpt`") {
           assert(
             Try(
               PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-                mode                  = "view",
+                modeType              = ModeType.Readonly,
                 permissions           = permissions,
                 operationsFromDataOpt = operationsFromData.some,
                 credentialsOpt        = credentialsOpt,
-                isSubmit              = false
+                tokenOpt              = None
               )
-            ).toOption == operationsFromData.some
+            ).toOption == resultOpt
           )
         }
       }
@@ -225,11 +290,11 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
           assert(
             Try(
               PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-                mode                  = "new",
+                modeType              = ModeType.Creation,
                 permissions           = definedPermissions,
                 operationsFromDataOpt = None,
                 credentialsOpt        = None,
-                isSubmit              = false
+                tokenOpt              = None
               )
             ).toOption.contains(specificOperations)
           )
@@ -245,11 +310,11 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
           assert(
             Try(
               PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-                mode                  = "new",
+                modeType              = ModeType.Creation,
                 permissions           = definedPermissions,
                 operationsFromDataOpt = None,
                 credentialsOpt        = None,
-                isSubmit              = false
+                tokenOpt              = None
               )
             ).isFailure
           )
@@ -270,11 +335,11 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
           assert(
             Try(
               PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-                mode                  = mode,
+                modeType              = ModeType.unapply(mode).get,
                 permissions           = permissions,
                 operationsFromDataOpt = operationsFromDataOpt,
                 credentialsOpt        = credentialsOpt,
-                isSubmit              = false
+                tokenOpt              = None
               )
             ).toOption == expected
           )

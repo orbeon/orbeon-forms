@@ -9,9 +9,8 @@ import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, DataMigrati
 import org.orbeon.oxf.fr.XMLNames.FRNamespace
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
-import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
+import org.orbeon.oxf.fr.permission.{ModeType, Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.proxy.Transforms
-import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CollectionUtils.IteratorExt._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
@@ -407,7 +406,7 @@ object ImportExportSupport {
     appForm         : AppForm,
     documentId      : String,
     form            : om.DocumentInfo,
-    mode            : String)(implicit
+    modeType        : ModeType)(implicit
     logger          : IndentedLogger,
     externalContext : ExternalContext
   ): (DocumentNodeInfoType, DataFormatVersion, DataMigrationBehavior.Disabled.type) = {
@@ -425,11 +424,11 @@ object ImportExportSupport {
     }
 
     PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-      mode                  = mode,
+      modeType              = modeType,
       permissions           = permissions,
       operationsFromDataOpt = Operations.parseFromHeaders(headers),
       credentialsOpt        = externalContext.getRequest.credentials,
-      isSubmit              = false
+      tokenOpt              = None // xxx should support token?
     )
 
     (

@@ -23,6 +23,8 @@ case class Permission(
 )
 
 sealed trait                                                              Condition
+case object AnyoneWithToken                                       extends Condition // new with #5437
+case object AnyAuthenticatedUser                                  extends Condition // new with #5437
 case object Owner                                                 extends Condition
 case object Group                                                 extends Condition
 case class  RolesAnyOf(roles: List[String])                       extends Condition

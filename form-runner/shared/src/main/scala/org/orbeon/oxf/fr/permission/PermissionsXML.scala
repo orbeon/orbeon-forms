@@ -32,9 +32,11 @@ object PermissionsXML {
             {permissionsList map (p =>
             <permission operations={Operations.serialize(p.operations, normalized).mkString(" ")}>
               {p.conditions map {
-              case Owner => <owner/>
-              case Group => <group-member/>
-              case RolesAnyOf(roles) =>
+              case AnyoneWithToken      => <anyone-with-token/>      // new with #5437
+              case AnyAuthenticatedUser => <any-authenticated-user/> // new with #5437
+              case Owner                => <owner/>
+              case Group                => <group-member/>
+              case RolesAnyOf(roles)    =>
                 val escapedSpaces = roles.map(_.replace(" ", "%20"))
                 val anyOfAttValue = escapedSpaces.mkString(" ")
                   <user-role any-of={anyOfAttValue}/>
@@ -67,9 +69,11 @@ object PermissionsXML {
       permissionEl.child(*).toList.map(
         conditionEl =>
           conditionEl.localname match {
-            case "owner"        => Owner
-            case "group-member" => Group
-            case "user-role"    =>
+            case "anyone-with-token"      => AnyoneWithToken      // new with #5437
+            case "any-authenticated-user" => AnyAuthenticatedUser // new with #5437
+            case "owner"                  => Owner
+            case "group-member"           => Group
+            case "user-role"              =>
               val anyOfAttValue = conditionEl.attValue("any-of")
               val rawRoles      = anyOfAttValue.splitTo[List](" ")
               val roles         = rawRoles.map(_.replace("%20", " "))

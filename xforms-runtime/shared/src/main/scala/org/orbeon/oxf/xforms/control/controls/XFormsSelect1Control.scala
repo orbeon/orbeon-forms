@@ -48,7 +48,7 @@ class XFormsSelect1Control(
   element,
   id
 ) with XFormsValueControl
-  with SingleNodeFocusableTrait {
+  with ReadonlySingleNodeFocusableTrait {
 
   selfControl =>
 

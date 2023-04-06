@@ -153,7 +153,7 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
   }
 
   override def xformsFocus(): Unit =
-    containerElem.querySelector("select").asInstanceOf[dom.html.Select].focus()
+    containerElem.querySelector("[tabindex]").asInstanceOf[dom.html.Element].focus()
 
   def updateSuggestions(results: String, isLastPage: String): Unit = {
     val parsedResults = js.JSON.parse(results)

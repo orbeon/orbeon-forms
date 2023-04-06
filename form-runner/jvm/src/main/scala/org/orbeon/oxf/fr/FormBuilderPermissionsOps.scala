@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.dom
 import org.orbeon.dom.saxon.DocumentWrapper
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.FormRunner.orbeonRolesFromCurrentRequest
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.resources.ResourceManagerWrapper
@@ -100,7 +101,8 @@ trait FormBuilderPermissionsOps {
   def filterFormsAndAnnotateWithOperations(
     formsEls              : List[NodeInfo],
     allForms              : Boolean,
-    ignoreAdminPermissions: Boolean
+    ignoreAdminPermissions: Boolean,
+    credentialsOpt        : Option[Credentials]
   ): List[NodeInfo] = {
 
     // We only need one wrapper; create it when we encounter the first <form>
@@ -140,7 +142,7 @@ trait FormBuilderPermissionsOps {
           Operations.serialize(
             PermissionsAuthorization.authorizedOperationsForNoData(
               permissions    = FormRunner.permissionsFromElemOrProperties(permissionsElement, AppForm(appName, formName)),
-              credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession
+              credentialsOpt = credentialsOpt
             ),
             normalized = true
           )

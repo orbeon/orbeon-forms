@@ -112,7 +112,7 @@ trait FormRunnerEmail {
         CoreCrossPlatformSupport.externalContext.getRequest
       ).dropTrailingSlash
 
-    def buildTokenParam: (String, String) = {
+    def buildTokenParam: Option[(String, String)] = {
 
       // Don't take risk and let the token expire immediately if the validity is not set
       val validityMinutes = frc.intFormRunnerProperty("oxf.fr.access-token.validity").getOrElse(0)
@@ -128,7 +128,7 @@ trait FormRunnerEmail {
           )
         )
 
-        (frc.AccessTokenParam, token)
+      token.map(frc.AccessTokenParam -> _)
     }
 
     def build(mode: String, documentId: Option[String], params: List[(String, String)] = Nil): String =
@@ -139,8 +139,8 @@ trait FormRunnerEmail {
 
     // Would be good not to have to hardcode these constants
     linkType match {
-      case "LinkToEditPageParam"    | "link-to-edit-page"    => build("edit", documentOpt, includeToken list buildTokenParam)
-      case "LinkToViewPageParam"    | "link-to-view-page"    => build("view", documentOpt, includeToken list buildTokenParam)
+      case "LinkToEditPageParam"    | "link-to-edit-page"    => build("edit", documentOpt, (includeToken flatOption buildTokenParam).toList)
+      case "LinkToViewPageParam"    | "link-to-view-page"    => build("view", documentOpt, (includeToken flatOption buildTokenParam).toList)
       case "LinkToNewPageParam"     | "link-to-new-page"     => build("new", None)
       case "LinkToSummaryPageParam" | "link-to-summary-page" => build("summary", None)
       case "LinkToHomePageParam"    | "link-to-home-page"    => s"$baseUrlNoSlash/fr/"

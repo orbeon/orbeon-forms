@@ -87,7 +87,7 @@ trait FormRunnerPermissionsOps {
       Operations.parseFromString(operationsFromData)
         .orElse(
           if (isSubmit)
-            Option(encryptedOperationsFromDataOrNull).flatMap(FormRunnerAccessToken.decryptOperations)
+            encryptedOperationsFromDataOrNull.trimAllToOpt.flatMap(FormRunnerAccessToken.decryptOperations)
           else
             None // no need as encrypted operations are only used for mode change
         )
@@ -98,7 +98,7 @@ trait FormRunnerPermissionsOps {
         permissions           = permissionsFromElemOrProperties(Option(permissionsElemOrNull), AppForm(app, form)),
         operationsFromDataOpt = combinedOperationsFromData,
         credentialsOpt        = PermissionsAuthorization.findCurrentCredentialsFromSession,
-        tokenOpt              = Option(tokenOrNull).map((_, formRunnerParams))
+        tokenOpt              = tokenOrNull.trimAllToOpt.map((_, formRunnerParams))
       ),
       normalized = true
     ).mkString(" ")

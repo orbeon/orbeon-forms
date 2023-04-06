@@ -8,7 +8,7 @@ import org.orbeon.oxf.util.StringUtils._
 // CE doesn't support encryption/decryption
 object FormRunnerAccessToken extends FormRunnerAccessTokenTrait {
 
-  def encryptToken(tokenDetails: TokenDetails): String = ???
+  def encryptToken(tokenDetails: TokenDetails): Option[String] = None
   def decryptToken(token: String): TokenDetails = ???
 
   def encryptOperations(operationsTokens: Set[String]): String =

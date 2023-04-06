@@ -15,7 +15,7 @@ trait FormRunnerAccessTokenTrait {
       app :: form :: version.toString :: documentOpt.toList ::: expiration.toString :: Nil
   }
 
-  def encryptToken(tokenDetails: TokenDetails): String
+  def encryptToken(tokenDetails: TokenDetails): Option[String]
   def decryptToken(token: String): TokenDetails
 
   def encryptOperations(operationsTokens: Set[String]): String

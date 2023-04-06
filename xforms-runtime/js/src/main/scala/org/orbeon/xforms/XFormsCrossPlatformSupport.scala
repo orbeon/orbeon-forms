@@ -20,7 +20,7 @@ import org.orbeon.datatypes.LocationData
 import org.orbeon.dom
 import org.orbeon.dom.io.{SAXContentHandler, SAXReader}
 import org.orbeon.io.IOUtils
-import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.{ExternalContext, URLRewriterImpl, UrlRewriteMode}
 import org.orbeon.oxf.http.HttpMethod.GET
 import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.util._
@@ -79,7 +79,7 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     throw new NotImplementedError("resolveRenderURL")
 
   def rewriteURL(request: ExternalContext.Request, urlString: String, rewriteMode: UrlRewriteMode): String =
-    throw new NotImplementedError("rewriteURL")
+    URLRewriterImpl.rewriteURL(request, urlString, rewriteMode)
 
   def resolveActionURL(containingDocument: XFormsContainingDocument, currentElement: dom.Element, url: String): String =
     throw new NotImplementedError("resolveActionURL")

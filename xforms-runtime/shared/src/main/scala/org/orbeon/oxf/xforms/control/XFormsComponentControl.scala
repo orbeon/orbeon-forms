@@ -342,6 +342,7 @@ class XFormsComponentControl(
       // `xforms-model-construct` without RRR
       for (model <- nestedContainer.models) {
         Dispatch.dispatchEvent(new XFormsModelConstructEvent(model, rrr = false))
+        // 2023-04-05: Not sure below comment is up to date. Can's see a call to `markStructuralChange()`,
         // NOTE: `xforms-model-construct` already does a `markStructuralChange()` but without `AllDefaultsStrategy`
         model.markStructuralChange(None, AllDefaultsStrategy)
       }

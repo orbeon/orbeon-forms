@@ -110,7 +110,7 @@
             <xf:var
                 name="requested-version"
                 as="xs:integer?"
-                value="xs:integer(xxf:get-request-parameter('form-version')[1][. castable as xs:integer])"/>
+                value="xs:integer(xxf:get-request-parameter(frf:FormVersionParam())[1][. castable as xs:integer])"/>
 
             <xf:var
                 name="show-version-selector"

@@ -119,6 +119,21 @@ object FormRunnerPrivateAPI extends js.Object {
     )
   }
 
+  def removeUrlParameter(name: String): Unit = {
+
+    val location   = dom.window.location
+    val (_, query) = PathUtils.splitQueryDecodeParams(location.search)
+
+    if (query.exists(_._1 == name)) {
+      val newParams = query filterNot (_._1 == name)
+      dom.window.history.replaceState(
+        statedata = dom.window.history.state,
+        title     = "",
+        url       = PathUtils.recombineQuery(location.pathname, newParams) + location.hash
+      )
+    }
+  }
+
   def navigateToError(
     validationPosition: String,
     elementId         : String,

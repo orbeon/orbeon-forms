@@ -377,15 +377,20 @@
         observer="fr-persistence-model"
         event="fr-compute-authorized-operations">
 
+        <xf:action type="javascript" if="exists(xxf:get-request-parameter(frf:AccessTokenParam()))">
+            <xf:param name="name" value="frf:AccessTokenParam()"/>
+            <xf:body>ORBEON.fr.private.API.removeUrlParameter(name)</xf:body>
+        </xf:action>
+
         <xf:setvalue
             ref="instance('fr-authorized-operations')"
             value="
                 frf:authorizedOperationsForDetailModeOrThrow(
                     instance('fr-authorized-operations')/@from-persistence,
-                    xxf:get-request-parameter('fr-authorized-operations-from-persistence')[1],
+                    xxf:get-request-parameter(frf:AuthorizedOperationsFromPersistenceParam())[1],
                     xxf:instance('fr-form-metadata')/permissions,
                     $is-submit,
-                    xxf:get-request-parameter('fr-access-token')[1]
+                    xxf:get-request-parameter(frf:AccessTokenParam())[1]
                 )"/>
 
     </xf:action>

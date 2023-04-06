@@ -185,6 +185,5 @@ object StateHandling {
         title     = "",
         url       = null
       )
-
   }
 }

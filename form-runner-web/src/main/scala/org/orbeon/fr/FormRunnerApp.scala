@@ -13,11 +13,17 @@
  */
 package org.orbeon.fr
 
+import org.orbeon.facades.ResizeObserver
 import org.orbeon.xbl
+import org.orbeon.xforms.facade.Events
 import org.orbeon.xforms.{App, XFormsApp}
+import org.scalajs.dom
+import org.scalajs.dom.{document, html, raw, window}
+import org.scalajs.dom.raw.HTMLElement
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
+import org.scalajs.dom.ext._
 
 
 // Scala.js starting point for Form Runner
@@ -65,8 +71,28 @@ object FormRunnerApp extends App {
     xbl.AttachmentMultiple
     xbl.Recaptcha
 
-    // NOTE: `object`s which have `@JSExportTopLevel` do not need to be explicitly called here.
-    //FormRunnerPrivateAPI
+    // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being below the top navbar or button bar
+    // TODO: with embedding, unobserve when the form is destroyed
+    Events.orbeonLoadedEvent.subscribe(() => {
+
+      def addScrollPadding(rawElement: raw.Element, cssClass: String): Unit = {
+        val htmlElement = rawElement.asInstanceOf[HTMLElement]
+        val position    = window.getComputedStyle(htmlElement).position
+        if (position == "fixed" || position == "sticky") {
+          val resizeObserver = new ResizeObserver(() => {
+            val documentElement = document.documentElement.asInstanceOf[HTMLElement]
+            val scrollPaddingWithMargin = htmlElement.clientHeight + 5;
+            documentElement.style.setProperty(cssClass, s"${scrollPaddingWithMargin}px")
+          })
+          resizeObserver.observe(htmlElement)
+        }
+      }
+
+      addScrollPadding(document.querySelector(".orbeon .navbar-fixed-top"), "scroll-padding-top")
+      addScrollPadding(document.querySelector(".orbeon .fr-buttons"      ), "scroll-padding-bottom")
+
+    })
+
   }
 
   def onPageContainsFormsMarkup(): Unit =

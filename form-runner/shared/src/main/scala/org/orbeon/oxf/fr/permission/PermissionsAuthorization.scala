@@ -112,11 +112,12 @@ object PermissionsAuthorization {
   }
 
   def authorizedOperationsForDetailModeOrThrow(
-    modeType                : ModeType,
-    permissions             : Permissions,
+    modeType             : ModeType,
+    permissions          : Permissions,
     operationsFromDataOpt: Option[Operations],
-    credentialsOpt          : Option[Credentials],
-    tokenOpt                : Option[(String, FormRunnerParams)]
+    credentialsOpt       : Option[Credentials],
+    tokenOpt             : Option[(String, FormRunnerParams)],
+    isSubmit             : Boolean
   )(implicit
     logger               : IndentedLogger
   ): Operations = {
@@ -125,14 +126,13 @@ object PermissionsAuthorization {
     // `operationsFromDataOpt` must always be `None.
     require(modeType != ModeType.Creation || operationsFromDataOpt.isEmpty, "`operationsFromDataOpt` must be empty for mode `new`")
 
-    val operationsOpt =
+    val resultingAuthorizedOperations =
       modeType match {
         case ModeType.Creation =>
-          // We don't need to handle the token in creation nodes
-          authorizedForModeNoData(
-            modeType       = modeType,
-            permissions    = permissions,
-            credentialsOpt = credentialsOpt
+          // We don't handle a token in creation modes, although that could be supported later
+          authorizedOperationsForNoData(
+            permissions,
+            credentialsOpt
           )
         case ModeType.Edition | ModeType.Readonly =>
 
@@ -147,7 +147,6 @@ object PermissionsAuthorization {
               definedPermissions        <- permissions.narrowTo[DefinedPermissions]
             } yield
               operationsFromToken(
-                modeType           = modeType,
                 definedPermissions = definedPermissions,
                 credentialsOpt     = credentialsOpt,
                 token              = token,
@@ -162,19 +161,18 @@ object PermissionsAuthorization {
               CheckWithoutDataUserPessimistic
             )
 
-//          println(s"xxx otherOperations = $otherOperations")
-
           // xxx TODO: case of `POST` to page
 
           // Those are combined
           // For example: the data might grand only `Read` but the token might grant `Update` in addition
-          val combinedOperations =
-            Operations.combine(otherOperations :: operationsFromTokenOpt.toList ::: operationsFromDataOpt.toList)
-
-          combinedOperations != Operations.None option combinedOperations
+          Operations.combine(otherOperations :: operationsFromTokenOpt.toList ::: operationsFromDataOpt.toList)
       }
 
-    operationsOpt match {
+    isUserAuthorizedBasedOnOperationsAndMode(
+      operations = resultingAuthorizedOperations,
+      modeType   = modeType,
+      isSubmit   = modeType != ModeType.Creation && isSubmit
+    ) option resultingAuthorizedOperations match {
       case None =>
         debug(s"UNAUTHORIZED USER")
         throw HttpStatusCodeException(StatusCode.Forbidden)
@@ -187,7 +185,6 @@ object PermissionsAuthorization {
   // If we call this, it means that we don't have access based on `Anyone`, `AnyAuthenticatedUser`, `Owner`, roles,
   // etc. We are just testing for `AnyoneWithToken`.
   private def operationsFromToken(
-    modeType          : ModeType,
     definedPermissions: DefinedPermissions,
     credentialsOpt    : Option[Credentials],
     token             : String,
@@ -220,22 +217,6 @@ object PermissionsAuthorization {
     } else {
       ??? // TODO throw?
     }
-  }
-
-  private def authorizedForModeNoData(
-    modeType      : ModeType, // 2023-03-09: creation and update modes only
-    permissions   : Permissions,
-    credentialsOpt: Option[Credentials]
-  ): Option[Operations] = {
-
-    val operations =
-      authorizedOperationsForNoData(
-        permissions,
-        credentialsOpt
-      )
-
-    // `isSubmit` is not used when mode is `new`
-    isUserAuthorizedBasedOnOperationsAndMode(operations, modeType, isSubmit = false) option operations
   }
 
   def authorizedOperationsForNoData(
@@ -312,19 +293,17 @@ object PermissionsAuthorization {
     )
   }
 
-  private val UpdateMatchingTokens = Set("*", "update")
-
   def autosaveAuthorizedForNew(
     permissions    : Permissions,
     credentialsOpt : Option[Credentials],
   ): Boolean =
-    authorizedForModeNoData(
-      modeType       = ModeType.Edition, // this is for the `new` mode but disallow autosave if users can't *edit* data
-      permissions    = permissions,
-      credentialsOpt = credentialsOpt
-    ).map(Operations.serialize(_, normalized = true))
-      .getOrElse(Nil)
-      .exists(UpdateMatchingTokens)
+    Operations.allows(
+      authorizedOperationsForNoData(
+        permissions,
+        credentialsOpt
+      ),
+      Operation.Update // this is for creation modes but we disallow autosave if users can't update data
+    )
 
   private def authorizedOperationsForPermission(
     permission           : Permission,

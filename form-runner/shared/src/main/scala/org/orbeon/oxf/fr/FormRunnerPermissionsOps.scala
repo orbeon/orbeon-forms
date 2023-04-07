@@ -98,7 +98,8 @@ trait FormRunnerPermissionsOps {
         permissions           = permissionsFromElemOrProperties(Option(permissionsElemOrNull), AppForm(app, form)),
         operationsFromDataOpt = combinedOperationsFromData,
         credentialsOpt        = PermissionsAuthorization.findCurrentCredentialsFromSession,
-        tokenOpt              = tokenOrNull.trimAllToOpt.map((_, formRunnerParams))
+        tokenOpt              = tokenOrNull.trimAllToOpt.map((_, formRunnerParams)),
+        isSubmit              = isSubmit
       ),
       normalized = true
     ).mkString(" ")

@@ -257,7 +257,8 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
                 permissions           = permissions,
                 operationsFromDataOpt = operationsFromData.some,
                 credentialsOpt        = credentialsOpt,
-                tokenOpt              = None
+                tokenOpt              = None,
+                isSubmit              = false
               )
             ).toOption == resultOpt
           )
@@ -294,7 +295,8 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
                 permissions           = definedPermissions,
                 operationsFromDataOpt = None,
                 credentialsOpt        = None,
-                tokenOpt              = None
+                tokenOpt              = None,
+                isSubmit              = false
               )
             ).toOption.contains(specificOperations)
           )
@@ -314,7 +316,8 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
                 permissions           = definedPermissions,
                 operationsFromDataOpt = None,
                 credentialsOpt        = None,
-                tokenOpt              = None
+                tokenOpt              = None,
+                isSubmit              = false
               )
             ).isFailure
           )
@@ -339,7 +342,8 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
                 permissions           = permissions,
                 operationsFromDataOpt = operationsFromDataOpt,
                 credentialsOpt        = credentialsOpt,
-                tokenOpt              = None
+                tokenOpt              = None,
+                isSubmit              = false
               )
             ).toOption == expected
           )

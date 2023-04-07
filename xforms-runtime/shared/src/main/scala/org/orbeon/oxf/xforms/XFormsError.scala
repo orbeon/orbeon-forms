@@ -26,36 +26,36 @@ import org.orbeon.xforms.{ServerError, XFormsCrossPlatformSupport, XFormsNames}
 import scala.collection.compat._
 
 
+// What kind of errors get here:
+//
+// - setvalue errors (binding exceptions except in actions)
+//    - @calculate, @xxf:default
+//    - write xf:upload file metadata
+//    - store external value from control
+//    - xf:setvalue
+//    - use of XFormsAPI's setvalue
+//    - instance mirror (XBL, xxf:dynamic)
+//    - xf:switch/@caseref and xf:repeat/@indexref
+//    - xf:submission[@replace = 'text']
+// - XPath errors
+//    - during model rebuild
+//    - evaluating MIPs
+//    - evaluating variables
+//    - evaluating bindings except for actions
+//        - control and LHHA bindings
+//        - itemsets
+//        - xf:submission/@ref
+//        - submission headers
+//        - xf:upload/xf:output metadata
+//    - evaluating value attributes, as with xf:label/@value
+//    - evaluating control AVTs
+//    - evaluating control @format, @unformat, @value
+// - action errors
+//    - XPath errors
+//    - any other action error
 object XFormsError {
 
-  // What kind of errors get here:
-  //
-  // - setvalue errors (binding exceptions except in actions)
-  //    - @calculate, @xxf:default
-  //    - write xf:upload file metadata
-  //    - store external value from control
-  //    - xf:setvalue
-  //    - use of XFormsAPI's setvalue
-  //    - instance mirror (XBL, xxf:dynamic)
-  //    - xf:switch/@caseref and xf:repeat/@indexref
-  //    - xf:submission[@replace = 'text']
-  // - XPath errors
-  //    - during model rebuild
-  //    - evaluating MIPs
-  //    - evaluating variables
-  //    - evaluating bindings except for actions
-  //        - control and LHHA bindings
-  //        - itemsets
-  //        - xf:submission/@ref
-  //        - submission headers
-  //        - xf:upload/xf:output metadata
-  //    - evaluating value attributes, as with xf:label/@value
-  //    - evaluating control AVTs
-  //    - evaluating control @format, @unformat, @value
-  // - action errors
-  //    - XPath errors
-  //    - any other action error
-
+  // `xxforms-binding-error` in model and on controls
   def handleNonFatalSetvalueError(target: XFormsEventTarget, locationData: LocationData, reason: Reason): Unit = {
     val containingDocument = target.container.getContainingDocument
     containingDocument.indentedLogger.logDebug("", reason.message)
@@ -76,17 +76,16 @@ object XFormsError {
 
     // NOTE: We want to catch a status code exception which happen during an XPathException. And in that case, the XPathException
     // is dynamic, so we cannot simply exclude dynamic XPath exceptions. So we have to be inclusive and consider which types of
-    // errors are fatal. See https://github.com/orbeon/orbeon-forms/issues/2194
-    def causesContainFatalError =
-      XFormsCrossPlatformSupport.causesIterator(t) exists {
-        case e: XPathException if e.isStaticError => true
-        case _: HttpStatusCode                    => true
-        case _                                    => false
-      }
+    // errors are fatal.
+    // See https://github.com/orbeon/orbeon-forms/issues/2194
 
-    if (container.getPartAnalysis.isTopLevelPart   &&   // LATER: Other sub-parts could be fatal, depending on settings on xxf:dynamic.
-      container.getContainingDocument.initializing &&
-      causesContainFatalError) {
+    // 2023-04-07: Make all initialization errors fatal.
+    // See https://github.com/orbeon/orbeon-forms/issues/5751
+
+    if (
+      container.getPartAnalysis.isTopLevelPart   &&   // LATER: Other sub-parts could be fatal, depending on settings on xxf:dynamic.
+      container.getContainingDocument.initializing
+    ) {
       throw new OXFException(t)
     } else {
 

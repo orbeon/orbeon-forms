@@ -71,13 +71,11 @@ object Position {
     $(window).on("resize.orbeon.builder", fn)
 
     // `ResizeObserver` catches window resizes, but also Form Builder being moved or resized by the embedding app
-    if (ResizeObserver.isDefined) {
-      Events.orbeonLoadedEvent.subscribe(() => {
-        val resizeObserver = new ResizeObserver(fn)
-        val fbMainOpt      = Option(document.querySelector(".fb-main"))
-        fbMainOpt.foreach(resizeObserver.observe)
-      })
-    }
+    Events.orbeonLoadedEvent.subscribe(() => {
+      val resizeObserver = new ResizeObserver(fn)
+      val fbMainOpt      = Option(document.querySelector(".fb-main"))
+      fbMainOpt.foreach(resizeObserver.observe)
+    })
   }
 
   // Finds the container, if any, based on a vertical position

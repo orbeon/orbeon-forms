@@ -60,10 +60,6 @@ private object ResizeObserverGlobalScope extends js.Object {
   val ResizeObserver: js.UndefOr[js.Any] = js.native
 }
 
-object ResizeObserver {
-  def isDefined: Boolean = ResizeObserverGlobalScope.ResizeObserver.isDefined
-}
-
 @js.native
 @JSGlobal
 class ResizeObserver(observer: js.Function0[Unit]) extends js.Object {

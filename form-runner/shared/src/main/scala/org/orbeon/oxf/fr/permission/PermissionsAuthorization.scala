@@ -21,6 +21,8 @@ import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
 import shapeless.syntax.typeable._
 
+import scala.util.Try
+
 
 // TODO: move to more general location
 sealed trait ModeType
@@ -151,7 +153,7 @@ object PermissionsAuthorization {
                 credentialsOpt     = credentialsOpt,
                 token              = token,
                 formRunnerParams   = formRunnerParams
-              )
+              ).get // can throw if there is an issue with the token
 
           // Operations obtained without consideration for the data
           val otherOperations: Operations =
@@ -160,8 +162,6 @@ object PermissionsAuthorization {
               credentialsOpt,
               CheckWithoutDataUserPessimistic
             )
-
-          // xxx TODO: case of `POST` to page
 
           // Those are combined
           // For example: the data might grand only `Read` but the token might grant `Update` in addition
@@ -189,35 +189,32 @@ object PermissionsAuthorization {
     credentialsOpt    : Option[Credentials],
     token             : String,
     formRunnerParams  : FormRunnerParams
-  ): Operations = {
+  ): Try[Operations] =
+    FormRunnerAccessToken.decryptToken(token) map { tokenDetails =>
 
-    val tokenDetails = FormRunnerAccessToken.decryptToken(token) // xxx can throw
+      val tokenMatches =
+        formRunnerParams.app         == tokenDetails.app         &&
+        formRunnerParams.form        == tokenDetails.form        &&
+        formRunnerParams.formVersion == tokenDetails.version     &&
+        formRunnerParams.document    == tokenDetails.documentOpt
 
-    val tokenMatches =
-      formRunnerParams.app         == tokenDetails.app         &&
-      formRunnerParams.form        == tokenDetails.form        &&
-      formRunnerParams.formVersion == tokenDetails.version     &&
-      formRunnerParams.document    == tokenDetails.documentOpt
+      val tokenIsNotExpired =
+        tokenDetails.expiration.isAfter(java.time.Instant.now)
 
-    val tokenIsNotExpired =
-      tokenDetails.expiration.isAfter(java.time.Instant.now)
+      if (tokenMatches && tokenIsNotExpired) {
 
-    if (tokenMatches && tokenIsNotExpired) {
+        // TODO: consider passing operations as part of the token as well
 
-      // TODO: consider passing operations as part of the token as well
-
-      Operations.combine(
-        definedPermissions.permissionsList collect {
-          case permission if permission.conditions.contains(AnyoneWithToken) =>
-            permission.operations
-        }
-      )
-    } else if (tokenMatches && ! tokenIsNotExpired) {
-      ??? // TODO throw?
-    } else {
-      ??? // TODO throw?
+        Operations.combine(
+          definedPermissions.permissionsList collect {
+            case permission if permission.conditions.contains(AnyoneWithToken) =>
+              permission.operations
+          }
+        )
+      } else {
+        throw HttpStatusCodeException(StatusCode.Forbidden)
+      }
     }
-  }
 
   def authorizedOperationsForNoData(
     permissions   : Permissions,

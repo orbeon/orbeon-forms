@@ -2,6 +2,8 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.permission.Operations
 
+import scala.util.Try
+
 
 trait FormRunnerAccessTokenTrait {
 
@@ -16,7 +18,7 @@ trait FormRunnerAccessTokenTrait {
   }
 
   def encryptToken(tokenDetails: TokenDetails): Option[String]
-  def decryptToken(token: String): TokenDetails
+  def decryptToken(token: String): Try[TokenDetails]
 
   def encryptOperations(operationsTokens: Set[String]): String
   def decryptOperations(permissions: String): Option[Operations]

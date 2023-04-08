@@ -428,7 +428,7 @@ object ImportExportSupport {
       permissions           = permissions,
       operationsFromDataOpt = Operations.parseFromHeaders(headers),
       credentialsOpt        = externalContext.getRequest.credentials,
-      tokenOpt              = None, // xxx should support token?
+      tokenOpt              = None, // we could support a token here
       isSubmit              = false
     )
 

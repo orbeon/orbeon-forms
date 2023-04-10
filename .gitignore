@@ -23,3 +23,5 @@ scratch.txt
 .bsp
 .metals
 .vscode
+# npm install
+package-lock.json

@@ -213,10 +213,10 @@
     </page>
 
     <!-- Export published form with form data as Excel or XML -->
-    <service path="/fr/([^/^.]+)/([^/^.]+)/export(/([^/^.]+))?"
+    <page path="/fr/([^/^.]+)/([^/^.]+)/export(/([^/^.]+))?"
              model="detail/detail-model.xpl"
              view="export/excel-export-with-data.xpl">
-    </service>
+    </page>
 
     <!-- Test form "inline" (when being edited) with new empty document -->
     <page path="/fr/([^/^.]+)/([^/^.]+)/(test)"

@@ -547,12 +547,12 @@ object Controls {
   }
 
   // Evaluate the body with InstancesControls in scope
-  def withDynamicStateToRestore[T](instancesControls: InstancesControls, topLevel: Boolean = false)(body: => T): T =
-    instancesControlsToRestore.withValue((instancesControls, topLevel))(body)
+  def withDynamicStateToRestore[T](instancesControls: InstancesControls)(body: => T): T =
+    instancesControlsToRestore.withValue((instancesControls))(body)
 
   // Get state to restore
   private def restoringDynamicState = instancesControlsToRestore.value
-  def restoringInstanceControls : Option[InstancesControls]         = restoringDynamicState map (_._1)
+  def restoringInstanceControls : Option[InstancesControls]         = restoringDynamicState
   def restoringControls         : Option[Map[String, ControlState]] = restoringInstanceControls map (_.controls)
   def restoringInstances        : Option[List[InstanceState]]       = restoringInstanceControls map (_.instances)
 
@@ -560,7 +560,7 @@ object Controls {
   def isRestoringDynamicState: Boolean = restoringDynamicState.isDefined
 
   // ThreadLocal for dynamic state restoration
-  private val instancesControlsToRestore = new DynamicVariable[(InstancesControls, Boolean)]
+  private val instancesControlsToRestore = new DynamicVariable[InstancesControls]
 
   // Visit all the descendant controls of the given container control
   // 2018-01-04: 2 uses left:

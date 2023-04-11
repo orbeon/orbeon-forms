@@ -6,8 +6,8 @@ import scala.util.Try
 
 // Offline doesn't support encryption/decryption
 object FormRunnerAccessToken extends FormRunnerAccessTokenTrait {
-  def encryptToken(tokenDetails: TokenDetails): Option[String] = None
-  def decryptToken(token: String): Try[TokenDetails] = ???
+  def encryptToken(tokenHmac: TokenHmac, tokenPayload: TokenPayload): Option[String] = None
+  def decryptToken(tokenHmac: TokenHmac, token: String): Try[TokenPayload] = ???
   def encryptOperations(operationsTokens: Set[String]): String = ???
   def decryptOperations(permissions: String): Option[Operations] = ???
 }

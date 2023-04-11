@@ -153,7 +153,7 @@ object PermissionsAuthorization {
                 credentialsOpt     = credentialsOpt,
                 token              = token,
                 formRunnerParams   = formRunnerParams
-              ).get // can throw if there is an issue with the token
+              ).getOrElse(throw HttpStatusCodeException(StatusCode.Forbidden))
 
           // Operations obtained without consideration for the data
           val otherOperations: Operations =
@@ -189,32 +189,29 @@ object PermissionsAuthorization {
     credentialsOpt    : Option[Credentials],
     token             : String,
     formRunnerParams  : FormRunnerParams
-  ): Try[Operations] =
-    FormRunnerAccessToken.decryptToken(token) map { tokenDetails =>
+  ): Try[Operations] = {
 
-      val tokenMatches =
-        formRunnerParams.app         == tokenDetails.app         &&
-        formRunnerParams.form        == tokenDetails.form        &&
-        formRunnerParams.formVersion == tokenDetails.version     &&
-        formRunnerParams.document    == tokenDetails.documentOpt
+    val tokenHmac =
+      FormRunnerAccessToken.TokenHmac(
+        app      = formRunnerParams.app,
+        form     = formRunnerParams.form,
+        version  = formRunnerParams.formVersion,
+        document = formRunnerParams.document
+      )
 
-      val tokenIsNotExpired =
-        tokenDetails.expiration.isAfter(java.time.Instant.now)
-
-      if (tokenMatches && tokenIsNotExpired) {
-
+    FormRunnerAccessToken.decryptToken(tokenHmac, token) map { tokenPayload =>
+      if (tokenPayload.exp.isAfter(java.time.Instant.now)) {
         // TODO: consider passing operations as part of the token as well
-
         Operations.combine(
           definedPermissions.permissionsList collect {
-            case permission if permission.conditions.contains(AnyoneWithToken) =>
-              permission.operations
+            case permission if permission.conditions.contains(AnyoneWithToken) => permission.operations
           }
         )
       } else {
         throw HttpStatusCodeException(StatusCode.Forbidden)
       }
     }
+  }
 
   def authorizedOperationsForNoData(
     permissions   : Permissions,

@@ -119,12 +119,14 @@ trait FormRunnerEmail {
 
       val token =
         FormRunnerAccessToken.encryptToken(
-          FormRunnerAccessToken.TokenDetails(
+          FormRunnerAccessToken.TokenHmac(
             app         = app,
             form        = form,
             version     = version,
-            documentOpt = documentOpt,
-            expiration  = java.time.Instant.now.plus(java.time.Duration.ofMinutes(validityMinutes))
+            document = documentOpt
+          ),
+          FormRunnerAccessToken.TokenPayload(
+            exp = java.time.Instant.now.plus(java.time.Duration.ofMinutes(validityMinutes))
           )
         )
 

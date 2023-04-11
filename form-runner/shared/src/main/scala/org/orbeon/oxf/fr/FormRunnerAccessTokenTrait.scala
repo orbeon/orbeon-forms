@@ -7,18 +7,19 @@ import scala.util.Try
 
 trait FormRunnerAccessTokenTrait {
 
-  private def noPipe(s: String) = ! s.contains('|')
+  case class TokenHmac(
+    app     : String,
+    form    : String,
+    version : Int,
+    document: Option[String]
+  )
 
-  case class TokenDetails(app: String, form: String, version: Int, documentOpt: Option[String], expiration: java.time.Instant) {
+  case class TokenPayload(
+   exp: java.time.Instant // keep `exp`
+ )
 
-    require(noPipe(app) && noPipe(form) && documentOpt.forall(noPipe))
-
-    def toParts: List[String] =
-      app :: form :: version.toString :: documentOpt.toList ::: expiration.toString :: Nil
-  }
-
-  def encryptToken(tokenDetails: TokenDetails): Option[String]
-  def decryptToken(token: String): Try[TokenDetails]
+  def encryptToken(tokenHmac: TokenHmac, tokenPayload: TokenPayload): Option[String]
+  def decryptToken(tokenHmac: TokenHmac, token: String): Try[TokenPayload]
 
   def encryptOperations(operationsTokens: Set[String]): String
   def decryptOperations(permissions: String): Option[Operations]

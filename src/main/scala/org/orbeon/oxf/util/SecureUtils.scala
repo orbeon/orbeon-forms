@@ -185,8 +185,8 @@ object SecureUtils extends SecureUtilsTrait {
     hmacString(text, ByteEncoding.Hex).substring(0, HexIdLength)
 
   // Compute an HMAC with the default password and algorithm
-  def hmacString(text: String, encoding: ByteEncoding, algorithm: String = getHashAlgorithm): String =
-    hmacBytes(getPassword.getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), algorithm, encoding)
+  def hmacString(text: String, encoding: ByteEncoding): String =
+    hmacBytes(getPassword.getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), getHashAlgorithm, encoding)
 
   // Compute an HMAC
   def hmacString(key: String, text: String, algorithm: String, encoding: ByteEncoding): String =

@@ -285,7 +285,7 @@ public class URLRewriterUtils {
     }
 
     private static String getHmacVersion() {
-        return SecureUtils.hmacString(Version.VersionNumber(), "hex");
+        return SecureUtils.hmacStringJava(Version.VersionNumber(), "hex");
     }
 
     public static List<PathMatcher> getMatchAllPathMatcher() {

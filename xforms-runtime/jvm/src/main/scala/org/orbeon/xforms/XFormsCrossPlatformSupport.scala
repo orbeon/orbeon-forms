@@ -35,7 +35,7 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.InstanceData
 import org.orbeon.oxf.xforms.processor.XFormsAssetServer
 import org.orbeon.oxf.xforms.upload.UploaderServer
-import org.orbeon.oxf.xforms.{Loggers, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom.IOSupport
 import org.xml.sax.InputSource
@@ -264,10 +264,13 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
   ): dom.Document =
     TransformerUtils.readOrbeonDom(inputStream, systemId, handleXInclude, handleLexical)
 
-  def hmacString(text: String, encoding: String): String =
+  def hmacStringToHexShort(text: String): String =
+    SecureUtils.hmacStringToHexShort(text)
+
+  def hmacString(text: String, encoding: ByteEncoding): String =
     SecureUtils.hmacString(text, encoding)
 
-  def digestBytes(bytes: Array[Byte], encoding: String): String =
+  def digestBytes(bytes: Array[Byte], encoding: ByteEncoding): String =
     SecureUtils.digestBytes(bytes, encoding)
 
   def openUrlStream(url: URI): InputStream =

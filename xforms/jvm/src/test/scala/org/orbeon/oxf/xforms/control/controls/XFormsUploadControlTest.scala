@@ -35,8 +35,8 @@ class XFormsUploadControlTest extends ResourceManagerTestBase with AssertionsFor
     val signed = hmacFromList(parameters)
 
     // Basic asserts
-    assert("file:/foo/tmp1.tmp?filename=bar+%26+baz.png&mediatype=image%2Fpng&size=1234&mac=49acb231d3cf572cfce67f09a31d6669a3d0257f" === signed)
-    assert(Some("49acb231d3cf572cfce67f09a31d6669a3d0257f") === getMAC(signed))
+    assert("file:/foo/tmp1.tmp?filename=bar+%26+baz.png&mediatype=image%2Fpng&size=1234&mac=b46338d5707a46b22013e078189358836be95bfd39f8fe164a560a347c62c0df" === signed)
+    assert(Some("b46338d5707a46b22013e078189358836be95bfd39f8fe164a560a347c62c0df") === getMAC(signed))
     assert("file:/foo/tmp1.tmp?filename=bar+%26+baz.png&mediatype=image%2Fpng&size=1234" === removeMAC(signed))
 
     assert(true === verifyMAC(signed))

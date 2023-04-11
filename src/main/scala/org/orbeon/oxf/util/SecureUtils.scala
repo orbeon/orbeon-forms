@@ -40,6 +40,13 @@ object SecureUtils extends SecureUtilsTrait {
       (throw new OXFException(PasswordProperty + "property is not set"))
   }
 
+  private val RandomHexIdBits = 128
+  private val RandomHexIdBytes = RandomHexIdBits / 8
+
+  // Length of a value returned by `randomHexId` and other functions
+  // 2023-04-11: Used for asserts only.
+  val HexIdLength: Int = 40
+
   object Tink {
 
     private lazy val aead = {
@@ -62,7 +69,7 @@ object SecureUtils extends SecureUtilsTrait {
     Properties.instance.getPropertySet.getInteger(KeyLengthProperty, 128)
 
   private def getHashAlgorithm: String =
-    Properties.instance.getPropertySet.getString(HashAlgorithmProperty, "SHA1")
+    Properties.instance.getPropertySet.getString(HashAlgorithmProperty, "SHA-256")
 
   private def getPreferredProvider: Option[String] =
     Properties.instance.getPropertySet.getNonBlankString(PreferredProviderProperty)
@@ -151,32 +158,41 @@ object SecureUtils extends SecureUtilsTrait {
       cipher.doFinal(message)
     }
 
+  def digestStringJava(text: String, algorithm: String, encoding: String): String =
+    digestString(text, algorithm, ByteEncoding.fromString(encoding))
+
   // Compute a digest
-  def digestString(text: String, algorithm: String, encoding: String): String =
+  def digestString(text: String, algorithm: String, encoding: ByteEncoding): String =
     digestBytes(text.getBytes(CharsetNames.Utf8), algorithm, encoding)
 
   // Compute a digest with the default algorithm
-  def digestString(text: String, encoding: String): String =
-    digestString(text, getHashAlgorithm, encoding)
+  def digestStringToHexShort(text: String): String =
+    digestString(text, getHashAlgorithm, ByteEncoding.Hex).substring(0, HexIdLength)
 
-  def digestBytes(bytes: Array[Byte], encoding: String): String =
+  def digestBytes(bytes: Array[Byte], encoding: ByteEncoding): String =
     digestBytes(bytes, getHashAlgorithm, encoding)
 
-  def digestBytes(bytes: Array[Byte], algorithm: String, encoding: String): String = {
+  def digestBytes(bytes: Array[Byte], algorithm: String, encoding: ByteEncoding): String = {
     val messageDigest = MessageDigest.getInstance(algorithm)
     messageDigest.update(bytes)
     withEncoding(messageDigest.digest, encoding)
   }
 
+  def hmacStringJava(text: String, encoding: String): String =
+    hmacString(text, ByteEncoding.fromString(encoding))
+
+  def hmacStringToHexShort(text: String): String =
+    hmacString(text, ByteEncoding.Hex).substring(0, HexIdLength)
+
   // Compute an HMAC with the default password and algorithm
-  def hmacString(text: String, encoding: String): String =
-    hmacBytes(getPassword.getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), getHashAlgorithm, encoding)
+  def hmacString(text: String, encoding: ByteEncoding, algorithm: String = getHashAlgorithm): String =
+    hmacBytes(getPassword.getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), algorithm, encoding)
 
   // Compute an HMAC
-  def hmacString(key: String, text: String, algorithm: String, encoding: String): String =
+  def hmacString(key: String, text: String, algorithm: String, encoding: ByteEncoding): String =
     hmacBytes(key.getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), algorithm, encoding)
 
-  def hmacBytes(key: Array[Byte], bytes: Array[Byte], algorithm: String, encoding: String): String = {
+  def hmacBytes(key: Array[Byte], bytes: Array[Byte], algorithm: String, encoding: ByteEncoding): String = {
 
     // See standard names:
     // https://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html
@@ -191,10 +207,9 @@ object SecureUtils extends SecureUtilsTrait {
     result.replace("\n", "")
   }
 
-  private def withEncoding(bytes: Array[Byte], encoding: String) = encoding match {
-    case "base64" => Base64.encode(bytes, useLineBreaks = false)
-    case "hex"    => byteArrayToHex(bytes)
-    case _        => throw new IllegalArgumentException(s"Invalid digest encoding (must be one of `base64` or `hex`): `$encoding`")
+  private def withEncoding(bytes: Array[Byte], encoding: ByteEncoding) = encoding match {
+    case ByteEncoding.Base64 => Base64.encode(bytes, useLineBreaks = false)
+    case ByteEncoding.Hex    => byteArrayToHex(bytes)
   }
 
   // Convert to a lowercase hexadecimal value
@@ -211,18 +226,15 @@ object SecureUtils extends SecureUtilsTrait {
     sb.toString
   }
 
-  // Length of a value returned by randomHexId
-  lazy val HexIdLength: Int = randomHexId.size
-
   // Generate a random 128-bit value hashed to hex
   //@XPathFunction
   def randomHexId: String = {
     // It's unclear whether there is a real benefit to re-seed once in a while:
     // https://stackoverflow.com/questions/295628/securerandom-init-once-or-every-time-it-is-needed
-    val bytes = new Array[Byte](16)
+    val bytes = new Array[Byte](RandomHexIdBytes)
     secureRandom.nextBytes(bytes)
     // We hash on top so that the actual random sequence won't be known if the id is made public
-    digestBytes(bytes, "hex")
+    digestBytes(bytes, ByteEncoding.Hex).substring(0, HexIdLength) // keep the same final length no matter what the hash algorithm is
   }
 
   // Get a new message digest with the default algorithm

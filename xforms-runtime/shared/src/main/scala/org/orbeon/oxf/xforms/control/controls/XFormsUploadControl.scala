@@ -19,7 +19,7 @@ import org.orbeon.io.FileUtils
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ContentHandlerOutputStream, IndentedLogger, PathUtils}
+import org.orbeon.oxf.util.{ByteEncoding, ContentHandlerOutputStream, IndentedLogger, PathUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -31,8 +31,8 @@ import org.orbeon.oxf.xml.XMLReceiverAdapter
 import org.orbeon.saxon.om
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xforms.Constants.ComponentSeparator
-import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.orbeon.xforms.XFormsNames._
+import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import org.xml.sax.helpers.AttributesImpl
 
 import java.net.URI
@@ -276,7 +276,7 @@ object XFormsUploadControl {
 
   // Get the MAC for a given string
   def hmac(value: String): String =
-    XFormsCrossPlatformSupport.hmacString(value, "hex")
+    XFormsCrossPlatformSupport.hmacString(value, ByteEncoding.Hex)
 
   // Remove the MAC from the URL
   def removeMAC(url: String): String = {

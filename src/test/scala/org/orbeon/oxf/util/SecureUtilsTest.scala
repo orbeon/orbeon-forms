@@ -13,10 +13,11 @@
  */
 package org.orbeon.oxf.util
 
-import java.security.SecureRandom
-
 import org.orbeon.oxf.test.ResourceManagerSupport
 import org.scalatest.funspec.AnyFunSpecLike
+
+import java.security.SecureRandom
+
 
 // NOTE: hmac is tested via XFormsUploadControlTest
 class SecureUtilsTest
@@ -64,9 +65,9 @@ class SecureUtilsTest
   describe("Digest") {
 
     val Algorithms = List("SHA1", "MD5")
-    val Encodings  = List("hex", "base64")
+    val Encodings  = List(ByteEncoding.Hex, ByteEncoding.Base64)
 
-    def asserts(algorithm: String, encoding: String, size: Int) = {
+    def asserts(algorithm: String, encoding: ByteEncoding, size: Int) = {
 
       val bytes = randomBytes(size)
 
@@ -99,7 +100,7 @@ class SecureUtilsTest
     }
 
     // Check that for a given algorithm/encoding, the digest has the same size for any size of input data
-    def assertSameSize(algorithm: String, encoding: String): Unit =
+    def assertSameSize(algorithm: String, encoding: ByteEncoding): Unit =
       Sizes map randomBytes map (SecureUtils.digestBytes(_, algorithm, encoding)) map (_.size) sliding 2 foreach
         { case Seq(s1, s2) => assert(s1 == s2) }
 

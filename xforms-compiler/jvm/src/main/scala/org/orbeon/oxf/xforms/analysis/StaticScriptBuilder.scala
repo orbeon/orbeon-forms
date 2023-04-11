@@ -1,6 +1,6 @@
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.util.SecureUtils.digestString
+import org.orbeon.oxf.util.SecureUtils
 import org.orbeon.oxf.xforms._
 
 import scala.collection.mutable
@@ -18,7 +18,7 @@ object StaticScriptBuilder {
 
     val paramNames = params map (_._1)
     val paramValues = params map (_._2)
-    val digest = digestString(body + '|' + (paramNames mkString "|"), "hex")
+    val digest = SecureUtils.digestStringToHexShort(body + '|' + (paramNames mkString "|"))
 
     def newShareableScript =
       ShareableScript(

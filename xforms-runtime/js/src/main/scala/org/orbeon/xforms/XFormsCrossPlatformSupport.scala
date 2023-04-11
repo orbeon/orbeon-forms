@@ -275,8 +275,9 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     result()
   }
 
-  def hmacString(text: String, encoding: String): String = throw new NotImplementedError("hmacString")
-  def digestBytes(bytes: Array[Byte], encoding: String): String = throw new NotImplementedError("digestBytes")
+  def hmacStringToHexShort(text: String): String = throw new NotImplementedError("hmacStringToHexShort")
+  def hmacString(text: String, encoding: ByteEncoding): String = throw new NotImplementedError("hmacString")
+  def digestBytes(bytes: Array[Byte], encoding: ByteEncoding): String = throw new NotImplementedError("digestBytes")
 
   def openUrlStream(url: URI): InputStream = throw new NotImplementedError("openUrlStream")
 

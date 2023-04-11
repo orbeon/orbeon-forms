@@ -14,6 +14,18 @@
 package org.orbeon.oxf.util
 
 
+sealed trait ByteEncoding
+object ByteEncoding {
+  case object Base64 extends ByteEncoding
+  case object Hex    extends ByteEncoding
+
+  def fromString(s: String): ByteEncoding = s match {
+    case "base64" => Base64
+    case "hex"    => Hex
+    case other    => throw new IllegalArgumentException(s"Invalid digest encoding (must be one of `base64` or `hex`): `$other`")
+  }
+}
+
 trait SecureUtilsTrait {
   def randomHexId: String
 }

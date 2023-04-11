@@ -13,13 +13,14 @@
  */
 package org.orbeon.saxon.function
 
-import org.orbeon.oxf.util.SecureUtils
+import org.orbeon.oxf.util.{ByteEncoding, SecureUtils}
 import org.orbeon.oxf.xml.{DefaultFunctionSupport, RuntimeDependentFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.{DoubleValue, StringValue}
 import org.orbeon.scaxon.Implicits._
 
 import java.security.SecureRandom
+
 
 class Digest extends DefaultFunctionSupport {
 
@@ -30,7 +31,7 @@ class Digest extends DefaultFunctionSupport {
     SecureUtils.digestString(
       text      = stringArgument(0),
       algorithm = stringArgument(1),
-      encoding  = stringArgumentOpt(2) getOrElse "base64"
+      encoding  = stringArgumentOpt(2).map(ByteEncoding.fromString) getOrElse ByteEncoding.Base64
     )
   }
 }
@@ -45,7 +46,7 @@ class Hmac extends DefaultFunctionSupport {
       key       = stringArgument(0),
       text      = stringArgument(1),
       algorithm = stringArgument(2),
-      encoding  = stringArgumentOpt(3) getOrElse "base64"
+      encoding  = stringArgumentOpt(3).map(ByteEncoding.fromString) getOrElse ByteEncoding.Base64
     )
   }
 }

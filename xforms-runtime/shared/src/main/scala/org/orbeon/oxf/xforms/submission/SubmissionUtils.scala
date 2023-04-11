@@ -102,7 +102,7 @@ object SubmissionUtils {
     stringAvtTrimmedOpt(value) map (_.toBoolean)
 
   def dataNodeHash(node: om.NodeInfo): String =
-    XFormsCrossPlatformSupport.hmacString(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""), "hex")
+    XFormsCrossPlatformSupport.hmacStringToHexShort(SaxonUtils.buildNodePath(node) mkString ("/", "/", ""))
 
   def readByteArray(
     headersGetter       : String => Option[List[String]],
@@ -134,7 +134,7 @@ object SubmissionUtils {
         is,
         resolvedAbsoluteUrl.toString,
         handleXInclude,
-        true
+        handleLexical = true
       ) -> headers
     }
 

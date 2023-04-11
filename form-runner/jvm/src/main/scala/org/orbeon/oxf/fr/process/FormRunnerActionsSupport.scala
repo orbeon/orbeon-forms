@@ -33,7 +33,7 @@ import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.PathUtils.{recombineQuery, splitQueryDecodeParams}
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, PathUtils, SecureUtils, StaticXPath, URLRewriterUtils}
+import org.orbeon.oxf.util.{ByteEncoding, ConnectionResult, ContentTypes, CoreCrossPlatformSupport, CoreCrossPlatformSupportTrait, ExpirationScope, FileItemSupport, IndentedLogger, Mediatypes, PathUtils, SecureUtils, StaticXPath, URLRewriterUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI.{inScopeContainingDocument, setvalue}
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, XFormsModelSubmissionSupport}
 import org.orbeon.oxf.xml.SaxonUtils
@@ -123,7 +123,7 @@ object FormRunnerActionsSupport {
       )
 
     def createCidForNode(node: NodeInfo): String =
-      SecureUtils.hmacString(SaxonUtils.buildNodePath(node).mkString("/"), "hex")
+      SecureUtils.hmacString(SaxonUtils.buildNodePath(node).mkString("/"), ByteEncoding.Hex)
 
     // Replace attachment paths/URLs in the (copied) data now. We don't need the URLs again since they have been
     // captured by `FormRunner.collectAttachments()`. We need to update the data before serializing attachments as
@@ -243,7 +243,7 @@ object FormRunnerActionsSupport {
                   URI.create(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri.toString, UrlRewriteMode.Absolute))
                 )
               ), // TODO: stream?
-              SecureUtils.hmacString(format.entryName, "hex"),
+              SecureUtils.hmacString(format.entryName, ByteEncoding.Hex),
               format.entryName,
               SupportedRenderFormatsMediatypes.get(format),
               Some(FormRunnerActionsSupport.filenameForRenderedFormat(format))

@@ -254,7 +254,7 @@ object AssetsAggregator extends Logging {
 
       // All resource paths are hashed
       val itemsToHash = resources ++ (if (hasAppResource && appVersion.nonAllBlank) Set(appVersion) else Set())
-      val resourcesHash = SecureUtils.digestString(itemsToHash mkString "|", "hex")
+      val resourcesHash = SecureUtils.digestStringToHexShort(itemsToHash mkString "|")
 
       // Cache mapping so that resource can be served by resource server
       Caches.resourcesCache.put(new EhElement(resourcesHash, resources.toArray)) // use Array which is compact, serializable and usable from Java

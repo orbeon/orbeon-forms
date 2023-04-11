@@ -1581,15 +1581,15 @@
                     <xh:link rel="stylesheet" href="/foobar2.foobar" type="text/x-foobar"/>
                     <xh:script class="xforms-baseline" src="/cs1.cs" type="text/coffeescript"/>
                     <xh:script src="/cs2.cs" type="text/coffeescript"/>
-                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-b42188301ca2449d8870868af1f59c41249754bf.css" type="text/css" media="all"/>
-                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-622c8994102de9821b3d3bed503c742b8dab732d.css" type="text/css" media="all"/>
+                    <xh:link href="/xforms-server/orbeon-92726431581cf4ed2ac0af4fb8a565edd90e04a1.css" rel="stylesheet" type="text/css" media="all"/>
+                    <xh:link href="/xforms-server/orbeon-c6466c49da14d2f510a3a2c0700e1158630952e8.css" rel="stylesheet" type="text/css" media="all"/>
                     <xh:style>.red { color: red }</xh:style>
                     <xh:link rel="stylesheet" href="http://example.org/style.css"/>
                     <xh:link rel="stylesheet" href="/css5.css" f:url-norewrite="true"/>
                     <xh:link rel="stylesheet" href="/css6.css" media="print"/>
                     <xh:style type="text/css">.blue { color: blue }</xh:style>
-                    <xh:script type="text/javascript" src="/xforms-server/orbeon-fef951f1be577d60aea2cc922215892188020a36.js"/>
-                    <xh:script type="text/javascript" src="/xforms-server/orbeon-183854d1a36b84dfcab1deee4c8efe3ac8fd9f08.js"/>
+                    <xh:script src="/xforms-server/orbeon-869d88e9f12129339b4a8d328293cf4fe20ee1fc.js" type="text/javascript"/>
+                    <xh:script src="/xforms-server/orbeon-31af689ed8bf0a016b448997fa5c49a62cdfb735.js" type="text/javascript"/>
                     <xh:script src="http://example.org/script.js" type="text/javascript"/>
                     <xh:script>function foo()</xh:script>
                     <xh:script src="/js5.js" type="text/javascript" f:url-norewrite="true"/>

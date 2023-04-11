@@ -279,7 +279,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
     public String getStatementSHA(int level) {
         final ExecutionContext executionContext = getExecutionContext(level);
         if (executionContext.statementSHA == null) {
-            final String fullSHA = SecureUtils.digestString(executionContext.statementString, "SHA1", "hex");
+            final String fullSHA = SecureUtils.digestStringJava(executionContext.statementString, "SHA1", "hex");
             executionContext.statementSHA = fullSHA.substring(0, 7);
         }
         return executionContext.statementSHA;

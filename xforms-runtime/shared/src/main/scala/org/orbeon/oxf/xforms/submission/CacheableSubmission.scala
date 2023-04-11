@@ -55,7 +55,7 @@ class CacheableSubmission(submission: XFormsModelSubmission)
 
     // Compute a hash of the body if needed
     val requestBodyHash =
-      sp.messageBody map (XFormsCrossPlatformSupport.digestBytes(_, "hex"))
+      sp.messageBody map (XFormsCrossPlatformSupport.digestBytes(_, ByteEncoding.Hex))
 
     val detailsLogger = getDetailsLogger(p, p2)
 

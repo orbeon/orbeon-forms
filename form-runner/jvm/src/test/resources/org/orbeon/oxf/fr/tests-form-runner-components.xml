@@ -467,7 +467,7 @@
                             <xxf:value>42</xxf:value>
                         </xxf:control>
                     </xxf:control-values>
-                    <xxf:script name="xf_723b3546dedd73c5a9253d34adce2089f0bcea93" target-id="my-tabview≡fr-tabview-group" observer-id="my-tabview≡fr-tabview-group"/>
+                    <xxf:script name="xf_9fef21fdccbc6965bf149375a90bf6dd80698fc5" target-id="my-tabview≡fr-tabview-group" observer-id="my-tabview≡fr-tabview-group"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -559,7 +559,7 @@
                         </xxf:control>
                         <xxf:control id="my-tabview≡fr-tabview-content" class="yui-content"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_723b3546dedd73c5a9253d34adce2089f0bcea93" target-id="my-tabview≡fr-tabview-group" observer-id="my-tabview≡fr-tabview-group"/>
+                    <xxf:script name="xf_9fef21fdccbc6965bf149375a90bf6dd80698fc5" target-id="my-tabview≡fr-tabview-group" observer-id="my-tabview≡fr-tabview-group"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -922,7 +922,7 @@
                             <xxf:value>One</xxf:value>
                         </xxf:control>
                     </xxf:control-values>
-                    <xxf:script name="xf_576c47a9bbbf7bd52f7097432fb851f1590ab03e" target-id="my-autocomplete≡component-inner-group" observer-id="my-autocomplete≡component-inner-group"/>
+                    <xxf:script name="xf_ed4418ae1e942caf929861e15992b87f1ba21c33" target-id="my-autocomplete≡component-inner-group" observer-id="my-autocomplete≡component-inner-group"/>
                     <xxf:focus control-id="my-autocomplete≡show-suggestions-button"/>
                 </xxf:action>
             </xxf:event-response>

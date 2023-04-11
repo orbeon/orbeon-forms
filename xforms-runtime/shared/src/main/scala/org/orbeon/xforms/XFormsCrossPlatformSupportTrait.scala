@@ -25,7 +25,7 @@ import org.orbeon.oxf.util.CoreCrossPlatformSupport.FileItemType
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StaticXPath._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, UploadProgress}
+import org.orbeon.oxf.util.{ByteEncoding, CoreCrossPlatformSupport, IndentedLogger, UploadProgress}
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xml.{ForwardingXMLReceiver, PlainHTMLOrXHTMLReceiver, SkipRootElement, XMLReceiver}
@@ -198,8 +198,9 @@ trait XFormsCrossPlatformSupportTrait {
     handleLexical  : Boolean
   ): dom.Document
 
-  def hmacString(text: String, encoding: String): String
-  def digestBytes(bytes: Array[Byte], encoding: String): String
+  def hmacStringToHexShort(text: String): String
+  def hmacString(text: String, encoding: ByteEncoding): String
+  def digestBytes(bytes: Array[Byte], encoding: ByteEncoding): String
 
   def openUrlStream(url: URI): InputStream
 

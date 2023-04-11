@@ -24,6 +24,7 @@ object Select2 {
   @js.native
   trait JQuerySelect2 extends JQuery {
     def select2(options: Options): Unit = js.native
+    def select2(method: String): Unit = js.native
   }
 
   class Options extends js.Object {

@@ -107,6 +107,20 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           comboboxElement.setAttribute("aria-labelledby", labelId)
         }
 
+        // Open the dropdown on up/down arrow key press
+        containerElem
+          .querySelector(".select2-selection")
+          .addEventListener(
+            "keydown",
+            (event: dom.KeyboardEvent) => {
+              if (Set("ArrowUp", "ArrowDown")(event.key)) {
+                org.scalajs.dom.console.log("up/down")
+                jSelect.select2("open")
+                event.stopPropagation() // Prevent scrolling the page
+              }
+            }
+          )
+
         // Make the clear button accessible with the keyboard
         def makeClearAccessible(): Unit = {
           val clearElementOpt = Option(containerElem.querySelector(".select2-selection__clear"))

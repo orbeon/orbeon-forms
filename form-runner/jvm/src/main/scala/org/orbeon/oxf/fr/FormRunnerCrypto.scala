@@ -21,6 +21,9 @@ object FormRunnerAccessToken extends FormRunnerAccessTokenTrait {
     Version.instance.requirePEFeature("Token-based authentication")
     throw new UnsupportedOperationException
   }
+}
+
+object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrait {
 
   def encryptOperations(operationsTokens: Set[String]): String =
     SecureUtils.encrypt(operationsTokens.mkString(" ").getBytes(CharsetNames.Utf8))

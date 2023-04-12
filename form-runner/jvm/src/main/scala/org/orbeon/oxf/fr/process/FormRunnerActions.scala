@@ -420,7 +420,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     val authorizedOperationsFromPersistenceParam =
       propagateDataPermissions flatList {
         val ops = authorizedOperationsFromPersistence
-        ops.nonEmpty list (AuthorizedOperationsFromPersistenceParam -> FormRunnerAccessToken.encryptOperations(ops))
+        ops.nonEmpty list (AuthorizedOperationsFromPersistenceParam -> FormRunnerOperationsEncryption.encryptOperations(ops))
       }
 
     val userParams =

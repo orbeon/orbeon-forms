@@ -8,6 +8,9 @@ import scala.util.Try
 object FormRunnerAccessToken extends FormRunnerAccessTokenTrait {
   def encryptToken(tokenHmac: TokenHmac, tokenPayload: TokenPayload): Option[String] = None
   def decryptToken(tokenHmac: TokenHmac, token: String): Try[TokenPayload] = ???
+}
+
+object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrait {
   def encryptOperations(operationsTokens: Set[String]): String = ???
   def decryptOperations(permissions: String): Option[Operations] = ???
 }

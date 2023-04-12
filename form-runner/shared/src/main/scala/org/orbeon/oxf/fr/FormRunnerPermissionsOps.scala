@@ -87,7 +87,7 @@ trait FormRunnerPermissionsOps {
       Operations.parseFromString(operationsFromData)
         .orElse(
           if (isSubmit)
-            encryptedOperationsFromDataOrNull.trimAllToOpt.flatMap(FormRunnerAccessToken.decryptOperations)
+            encryptedOperationsFromDataOrNull.trimAllToOpt.flatMap(FormRunnerOperationsEncryption.decryptOperations)
           else
             None // no need as encrypted operations are only used for mode change
         )

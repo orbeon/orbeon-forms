@@ -15,12 +15,11 @@ trait FormRunnerAccessTokenTrait {
   )
 
   case class TokenPayload(
-   exp: java.time.Instant // keep `exp`
- )
+    exp: java.time.Instant // keep `exp` for serialization
+  )
+}
 
-  def encryptToken(tokenHmac: TokenHmac, tokenPayload: TokenPayload): Option[String]
-  def decryptToken(tokenHmac: TokenHmac, token: String): Try[TokenPayload]
-
+trait FormRunnerOperationsEncryptionTrait {
   def encryptOperations(operationsTokens: Set[String]): String
   def decryptOperations(permissions: String): Option[Operations]
 }

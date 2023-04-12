@@ -33,7 +33,7 @@ class SecureUtilsTest
       val bytes = randomBytes(size)
 
       // Decrypted value is the same as the original
-      assert(bytes.toList == SecureUtils.decrypt(SecureUtils.KeyUsage.General, SecureUtils.encrypt(SecureUtils.KeyUsage.General, bytes)).toList)
+      assert(bytes sameElements SecureUtils.decrypt(SecureUtils.KeyUsage.General, SecureUtils.encrypt(SecureUtils.KeyUsage.General, bytes)))
 
       // Encrypting the same value twice doesn't yield the same result
       assert(SecureUtils.encrypt(SecureUtils.KeyUsage.General, bytes) != SecureUtils.encrypt(SecureUtils.KeyUsage.General, bytes))
@@ -52,6 +52,28 @@ class SecureUtilsTest
     it("must pass in parallel") {
       for (size <- Sizes.par)
         asserts(size)
+    }
+  }
+
+  describe("Encryption with different passwords") {
+
+    val bytes = randomBytes(100)
+
+    val encrypted1 = SecureUtils.encrypt(SecureUtils.KeyUsage.General, bytes)
+    val encrypted2 = SecureUtils.encrypt(SecureUtils.KeyUsage.Token, bytes)
+
+    val decrypted1 = SecureUtils.decrypt(SecureUtils.KeyUsage.General, encrypted1)
+    val decrypted2 = SecureUtils.decrypt(SecureUtils.KeyUsage.Token, encrypted2)
+
+    it("must encrypt/decrypt with different passwords") {
+      assert(encrypted1 != encrypted2)
+      assert(decrypted1 sameElements decrypted2)
+    }
+
+    it("must error upon decrypting with incorrect password") {
+      assertThrows[java.security.GeneralSecurityException] {
+        SecureUtils.decrypt(SecureUtils.KeyUsage.General, encrypted2)
+      }
     }
   }
 

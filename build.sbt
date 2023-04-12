@@ -124,6 +124,7 @@ val CoreLibraryDependencies = Seq(
     ExclusionRule(organization = "com.amazonaws"),
     ExclusionRule(organization = "com.fasterxml.jackson.core")
   ),
+  "me.gosimple"                 % "nbvcxz"                          % "1.5.1",
   "com.google.code.gson"        % "gson"                            % GsonVersionForTink,
   "com.google.protobuf"         % "protobuf-java"                   % ProtobufJavaVersionForTink,
   "bsf"                         % "bsf"                             % "2.4.0"           % Test,

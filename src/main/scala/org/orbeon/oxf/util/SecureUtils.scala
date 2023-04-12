@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import com.google.crypto.tink.subtle.{AesGcmJce, Base64 => TinkBase64}
 import org.apache.commons.pool.BasePoolableObjectFactory
+import org.log4s.Logger
 import org.orbeon.io.CharsetNames
 import org.orbeon.oxf.properties.Properties
 
@@ -31,6 +32,8 @@ object SecureUtils extends SecureUtilsTrait {
     case object Token           extends KeyUsage
     case object FieldEncryption extends KeyUsage
   }
+
+  private implicit val logger: Logger = LoggerFactory.createLogger("org.orbeon.crypto")
 
   // Properties
   private val XFormsPasswordProperty          = "oxf.xforms.password" // for backward compatibility
@@ -57,9 +60,15 @@ object SecureUtils extends SecureUtilsTrait {
 
       val propertySet = Properties.instance.getPropertySet
 
-      compatPropertyName.flatMap(propertySet.getNonBlankString) orElse
-        propertySet.getNonBlankString(propertyName)             getOrElse
-        (throw new IllegalArgumentException(s"Missing password for property `$propertyName`"))
+      val rawPassword =
+        compatPropertyName.flatMap(propertySet.getNonBlankString) orElse
+          propertySet.getNonBlankString(propertyName)             getOrElse
+          (throw new IllegalArgumentException(s"Missing password for property `$propertyName`"))
+
+      if (! PasswordChecker.checkAndLog(propertyName, rawPassword))
+        throw new IllegalArgumentException(s"Invalid password for property `$propertyName` property, see log for details")
+
+      rawPassword
     }
 
     passwords.computeIfAbsent(keyUsage, _ => getPassword)

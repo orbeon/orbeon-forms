@@ -18,7 +18,7 @@ import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.UserAndGroup
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
-import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
+import org.orbeon.oxf.fr.permission.{AnyoneWithToken, Operation, Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._

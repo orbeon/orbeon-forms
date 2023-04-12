@@ -33,14 +33,14 @@ class SecureUtilsTest
       val bytes = randomBytes(size)
 
       // Decrypted value is the same as the original
-      assert(bytes.toList == SecureUtils.decrypt(SecureUtils.encrypt(bytes)).toList)
+      assert(bytes.toList == SecureUtils.decrypt(SecureUtils.KeyUsage.General, SecureUtils.encrypt(SecureUtils.KeyUsage.General, bytes)).toList)
 
       // Encrypting the same value twice doesn't yield the same result
-      assert(SecureUtils.encrypt(bytes) != SecureUtils.encrypt(bytes))
+      assert(SecureUtils.encrypt(SecureUtils.KeyUsage.General, bytes) != SecureUtils.encrypt(SecureUtils.KeyUsage.General, bytes))
 
       // Unless we provide an IV
       val iv = randomBytes(16)
-      assert(SecureUtils.encryptIV(bytes, Some(iv)) == SecureUtils.encryptIV(bytes, Some(iv)))
+      assert(SecureUtils.encryptIV(SecureUtils.KeyUsage.General, bytes, Some(iv)) == SecureUtils.encryptIV(SecureUtils.KeyUsage.General, bytes, Some(iv)))
     }
 
     // Try multiple data sizes

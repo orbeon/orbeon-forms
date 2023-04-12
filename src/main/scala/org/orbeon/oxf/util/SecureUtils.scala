@@ -13,31 +13,56 @@
  */
 package org.orbeon.oxf.util
 
-import java.security.{MessageDigest, SecureRandom, Security}
-
 import com.google.crypto.tink.subtle.{AesGcmJce, Base64 => TinkBase64}
-import javax.crypto.{Cipher, Mac, SecretKey, SecretKeyFactory}
-import javax.crypto.spec.{IvParameterSpec, PBEKeySpec, SecretKeySpec}
 import org.apache.commons.pool.BasePoolableObjectFactory
 import org.orbeon.io.CharsetNames
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.properties.Properties
+
+import java.security.{MessageDigest, SecureRandom, Security}
+import javax.crypto.spec.{IvParameterSpec, PBEKeySpec, SecretKeySpec}
+import javax.crypto.{Cipher, Mac, SecretKey, SecretKeyFactory}
 
 
 object SecureUtils extends SecureUtilsTrait {
 
-  // Properties
-  private val XFormsPasswordProperty    = "oxf.xforms.password" // for backward compatibility
-  private val PasswordProperty          = "oxf.crypto.password"
-  private val KeyLengthProperty         = "oxf.crypto.key-length"
-  private val HashAlgorithmProperty     = "oxf.crypto.hash-algorithm"
-  private val PreferredProviderProperty = "oxf.crypto.preferred-provider"
+  sealed trait KeyUsage
+  object KeyUsage {
+    case object General         extends KeyUsage
+    case object Token           extends KeyUsage
+    case object FieldEncryption extends KeyUsage
+  }
 
-  private def getPassword: String = {
-    val propertySet = Properties.instance.getPropertySet
-    propertySet.getNonBlankString(XFormsPasswordProperty) orElse
-      propertySet.getNonBlankString(PasswordProperty) getOrElse
-      (throw new OXFException(PasswordProperty + "property is not set"))
+  // Properties
+  private val XFormsPasswordProperty          = "oxf.xforms.password" // for backward compatibility
+  private val GeneralPasswordProperty         = "oxf.crypto.password"
+  private val TokenPasswordProperty           = "oxf.fr.access-token.password"
+  private val FieldEncryptionPasswordProperty = "oxf.fr.field-encryption.password"
+
+  private val KeyLengthProperty               = "oxf.crypto.key-length"
+  private val HashAlgorithmProperty           = "oxf.crypto.hash-algorithm"
+  private val PreferredProviderProperty       = "oxf.crypto.preferred-provider"
+
+  private val passwords: java.util.concurrent.ConcurrentHashMap[KeyUsage, String] =
+    new java.util.concurrent.ConcurrentHashMap
+
+  private def getOrComputePassword(keyUsage: KeyUsage): String = {
+
+    def getPassword: String = {
+
+      val (propertyName, compatPropertyName) = keyUsage match {
+        case KeyUsage.General         => (GeneralPasswordProperty,         Some(XFormsPasswordProperty))
+        case KeyUsage.Token           => (TokenPasswordProperty,           None)
+        case KeyUsage.FieldEncryption => (FieldEncryptionPasswordProperty, Some(GeneralPasswordProperty))
+      }
+
+      val propertySet = Properties.instance.getPropertySet
+
+      compatPropertyName.flatMap(propertySet.getNonBlankString) orElse
+        propertySet.getNonBlankString(propertyName)             getOrElse
+        (throw new IllegalArgumentException(s"Missing password for property `$propertyName`"))
+    }
+
+    passwords.computeIfAbsent(keyUsage, _ => getPassword)
   }
 
   private val RandomHexIdBits = 128
@@ -47,11 +72,12 @@ object SecureUtils extends SecureUtilsTrait {
   // 2023-04-11: Used for asserts only.
   val HexIdLength: Int = 40
 
+  // 2023-04-12: Used by `FieldEncryption` only
   object Tink {
 
     private lazy val aead = {
       val messageDigest = MessageDigest.getInstance("SHA-256")
-      messageDigest.update(getPassword.getBytes(CharsetNames.Utf8))
+      messageDigest.update(getOrComputePassword(KeyUsage.FieldEncryption).getBytes(CharsetNames.Utf8))
       val key256Bit = messageDigest.digest()
       // 128-bit key needed by implementation
       // Shortening is ok https://security.stackexchange.com/a/34797/49208
@@ -80,22 +106,30 @@ object SecureUtils extends SecureUtilsTrait {
   private val KeyCipherAlgorithm = "PBKDF2WithHmacSHA1"
   private val EncryptionCipherTransformation = "AES/CBC/PKCS5Padding"
 
-  val AESBlockSize = 128
-  val AESIVSize    = AESBlockSize / 8
+  private val AESBlockSize = 128
+  private val AESIVSize    = AESBlockSize / 8
 
   private lazy val secureRandom = new SecureRandom
 
-  // Secret key valid for the life of the classloader
-  private lazy val secretKey: SecretKey = {
+  // Secret keys valid for the life of the classloader
+  private val secretKeys: java.util.concurrent.ConcurrentHashMap[KeyUsage, SecretKey] =
+    new java.util.concurrent.ConcurrentHashMap
 
-    // Random seeded salt
-    val salt = new Array[Byte](8)
-    secureRandom.nextBytes(salt)
+  private def getOrComputeSecretKey(keyUsage: KeyUsage): SecretKey = {
 
-    val spec = new PBEKeySpec(getPassword.toCharArray, salt, 65536, getKeyLength)
+    def computeSecretKey: SecretKey = {
 
-    val factory = SecretKeyFactory.getInstance(KeyCipherAlgorithm)
-    new SecretKeySpec(factory.generateSecret(spec).getEncoded, "AES")
+      // Random seeded salt
+      val salt = new Array[Byte](8)
+      secureRandom.nextBytes(salt)
+
+      val spec = new PBEKeySpec(getOrComputePassword(keyUsage).toCharArray, salt, 65536, getKeyLength)
+
+      val factory = SecretKeyFactory.getInstance(KeyCipherAlgorithm)
+      new SecretKeySpec(factory.generateSecret(spec).getEncoded, "AES")
+    }
+
+    secretKeys.computeIfAbsent(keyUsage, _ => computeSecretKey)
   }
 
   // See: https://github.com/orbeon/orbeon-forms/pull/1745
@@ -121,17 +155,18 @@ object SecureUtils extends SecureUtilsTrait {
 
   // Encrypt a byte array
   // The result is converted to Base64 encoding without line breaks or spaces
-  def encrypt(bytes: Array[Byte]): String = encryptIV(bytes, None)
+  def encrypt(keyUsage: KeyUsage, bytes: Array[Byte]): String = encryptIV(keyUsage, bytes, None)
 
-  def encryptIV(bytes: Array[Byte], ivOption: Option[Array[Byte]]): String =
+  // Public for tests
+  def encryptIV(keyUsage: KeyUsage, bytes: Array[Byte], ivOption: Option[Array[Byte]]): String =
     withCipher { cipher =>
       ivOption match {
         case Some(iv) =>
-          cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv))
+          cipher.init(Cipher.ENCRYPT_MODE, getOrComputeSecretKey(keyUsage), new IvParameterSpec(iv))
           // Don't prepend IV
           Base64.encode(cipher.doFinal(bytes), useLineBreaks = false)
         case None =>
-          cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+          cipher.init(Cipher.ENCRYPT_MODE, getOrComputeSecretKey(keyUsage))
           val params = cipher.getParameters
           val iv = params.getParameterSpec(classOf[IvParameterSpec]).getIV
           // Prepend the IV to the ciphertext
@@ -140,9 +175,9 @@ object SecureUtils extends SecureUtilsTrait {
     }
 
   // Decrypt a Base64-encoded string into a byte array
-  def decrypt(text: String): Array[Byte] = decryptIV(text, None)
+  def decrypt(keyUsage: KeyUsage, text: String): Array[Byte] = decryptIV(keyUsage, text, None)
 
-  def decryptIV(text: String, ivOption: Option[Array[Byte]]): Array[Byte] =
+  private def decryptIV(keyUsage: KeyUsage, text: String, ivOption: Option[Array[Byte]]): Array[Byte] =
     withCipher { cipher =>
       val (iv, message) =
         ivOption match {
@@ -154,7 +189,7 @@ object SecureUtils extends SecureUtilsTrait {
             Base64.decode(text).splitAt(AESIVSize)
         }
 
-      cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv))
+      cipher.init(Cipher.DECRYPT_MODE, getOrComputeSecretKey(keyUsage), new IvParameterSpec(iv))
       cipher.doFinal(message)
     }
 
@@ -179,20 +214,20 @@ object SecureUtils extends SecureUtilsTrait {
   }
 
   def hmacStringJava(text: String, encoding: String): String =
-    hmacString(text, ByteEncoding.fromString(encoding))
+    hmacString(SecureUtils.KeyUsage.General, text, ByteEncoding.fromString(encoding))
 
-  def hmacStringToHexShort(text: String): String =
-    hmacString(text, ByteEncoding.Hex).substring(0, HexIdLength)
+  def hmacStringToHexShort(keyUsage: KeyUsage, text: String): String =
+    hmacString(keyUsage, text, ByteEncoding.Hex).substring(0, HexIdLength)
 
   // Compute an HMAC with the default password and algorithm
-  def hmacString(text: String, encoding: ByteEncoding): String =
-    hmacBytes(getPassword.getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), getHashAlgorithm, encoding)
+  def hmacString(keyUsage: KeyUsage, text: String, encoding: ByteEncoding): String =
+    hmacBytes(getOrComputePassword(keyUsage).getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), getHashAlgorithm, encoding)
 
   // Compute an HMAC
   def hmacString(key: String, text: String, algorithm: String, encoding: ByteEncoding): String =
     hmacBytes(key.getBytes(CharsetNames.Utf8), text.getBytes(CharsetNames.Utf8), algorithm, encoding)
 
-  def hmacBytes(key: Array[Byte], bytes: Array[Byte], algorithm: String, encoding: ByteEncoding): String = {
+  private def hmacBytes(key: Array[Byte], bytes: Array[Byte], algorithm: String, encoding: ByteEncoding): String = {
 
     // See standard names:
     // https://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html

@@ -265,10 +265,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     TransformerUtils.readOrbeonDom(inputStream, systemId, handleXInclude, handleLexical)
 
   def hmacStringToHexShort(text: String): String =
-    SecureUtils.hmacStringToHexShort(text)
+    SecureUtils.hmacStringToHexShort(SecureUtils.KeyUsage.General, text)
 
   def hmacString(text: String, encoding: ByteEncoding): String =
-    SecureUtils.hmacString(text, encoding)
+    SecureUtils.hmacString(SecureUtils.KeyUsage.General, text, encoding)
 
   def digestBytes(bytes: Array[Byte], encoding: ByteEncoding): String =
     SecureUtils.digestBytes(bytes, encoding)

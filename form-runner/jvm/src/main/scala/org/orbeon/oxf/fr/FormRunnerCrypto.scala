@@ -26,8 +26,19 @@ object FormRunnerAccessToken extends FormRunnerAccessTokenTrait {
 object FormRunnerOperationsEncryption extends FormRunnerOperationsEncryptionTrait {
 
   def encryptOperations(operationsTokens: Set[String]): String =
-    SecureUtils.encrypt(operationsTokens.mkString(" ").getBytes(CharsetNames.Utf8))
+    SecureUtils.encrypt(
+      keyUsage = SecureUtils.KeyUsage.General,
+      bytes    = operationsTokens.mkString(" ").getBytes(CharsetNames.Utf8)
+    )
 
   def decryptOperations(operationsString: String): Option[Operations] =
-    operationsString.trimAllToOpt.flatMap(s => Operations.parseFromString(new String(SecureUtils.decrypt(s), CharsetNames.Utf8)))
+    operationsString.trimAllToOpt.flatMap(nonBlankOperationsString =>
+      Operations.parseFromString(new String(
+        SecureUtils.decrypt(
+          keyUsage = SecureUtils.KeyUsage.General,
+          text     = nonBlankOperationsString
+        ),
+        CharsetNames.Utf8
+      ))
+    )
 }

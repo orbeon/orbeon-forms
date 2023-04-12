@@ -123,7 +123,7 @@ object FormRunnerActionsSupport {
       )
 
     def createCidForNode(node: NodeInfo): String =
-      SecureUtils.hmacString(SaxonUtils.buildNodePath(node).mkString("/"), ByteEncoding.Hex)
+      SecureUtils.hmacString(SecureUtils.KeyUsage.General, SaxonUtils.buildNodePath(node).mkString("/"), ByteEncoding.Hex)
 
     // Replace attachment paths/URLs in the (copied) data now. We don't need the URLs again since they have been
     // captured by `FormRunner.collectAttachments()`. We need to update the data before serializing attachments as
@@ -243,7 +243,7 @@ object FormRunnerActionsSupport {
                   URI.create(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest, uri.toString, UrlRewriteMode.Absolute))
                 )
               ), // TODO: stream?
-              SecureUtils.hmacString(format.entryName, ByteEncoding.Hex),
+              SecureUtils.hmacString(SecureUtils.KeyUsage.General, format.entryName, ByteEncoding.Hex),
               format.entryName,
               SupportedRenderFormatsMediatypes.get(format),
               Some(FormRunnerActionsSupport.filenameForRenderedFormat(format))

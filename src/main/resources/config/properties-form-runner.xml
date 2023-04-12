@@ -272,6 +272,7 @@
     <property as="xs:integer" name="oxf.fr.detail.lease.alert-threshold.*.*"                    value="2"/>
 
     <property as="xs:integer" name="oxf.fr.access-token.validity.*.*"                           value="0"/>
+    <property as="xs:string"  name="oxf.fr.access-token.password"                               value=""/>
 
     <property as="xs:boolean" name="oxf.fr.detail.initial-focus.*.*"                            value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.focus.includes.*.*"                           value=""/>

@@ -60,8 +60,8 @@ object EncodeDecode {
 
     // Encrypt/encode
     (encrypt, gzipByteArrayOpt) match {
-      case (true,  None)                => "X1" + SecureUtils.encrypt(bytesToEncode)
-      case (true,  Some(gzipByteArray)) => "X2" + SecureUtils.encrypt(gzipByteArray)
+      case (true,  None)                => "X1" + SecureUtils.encrypt(SecureUtils.KeyUsage.General, bytesToEncode)
+      case (true,  Some(gzipByteArray)) => "X2" + SecureUtils.encrypt(SecureUtils.KeyUsage.General, gzipByteArray)
       case (false, None)                => "X3" + org.orbeon.oxf.util.Base64.encode(bytesToEncode, useLineBreaks = false)
       case (false, Some(gzipByteArray)) => "X4" + org.orbeon.oxf.util.Base64.encode(gzipByteArray, useLineBreaks = false)
     }
@@ -76,10 +76,10 @@ object EncodeDecode {
     // Decrypt/decode
     val rawOrCompressedBytes =
       prefix match {
-        case "X1"                      => Left(SecureUtils.decrypt(encodedString))                // encryption    + uncompressed
-        case "X2"                      => Right(SecureUtils.decrypt(encodedString))               // encryption    + compressed
-        case "X3" if ! forceEncryption => Left(org.orbeon.oxf.util.Base64.decode(encodedString))  // no encryption + uncompressed
-        case "X4" if ! forceEncryption => Right(org.orbeon.oxf.util.Base64.decode(encodedString)) // no encryption + compressed
+        case "X1"                      => Left(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encodedString))  // encryption    + uncompressed
+        case "X2"                      => Right(SecureUtils.decrypt(SecureUtils.KeyUsage.General, encodedString)) // encryption    + compressed
+        case "X3" if ! forceEncryption => Left(org.orbeon.oxf.util.Base64.decode(encodedString))                  // no encryption + uncompressed
+        case "X4" if ! forceEncryption => Right(org.orbeon.oxf.util.Base64.decode(encodedString))                 // no encryption + compressed
         case _                         => throw new OXFException(s"Invalid prefix for encoded string: `$prefix`")
       }
 

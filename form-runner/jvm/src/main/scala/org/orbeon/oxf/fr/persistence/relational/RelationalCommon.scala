@@ -14,12 +14,8 @@
 package org.orbeon.oxf.fr.persistence.relational
 
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
-import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchVersion
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion}
-import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
-import org.orbeon.scaxon.SimplePath.NodeInfoOps
 
 
 object RelationalCommon {
@@ -27,43 +23,14 @@ object RelationalCommon {
   def joinColumns(cols: Seq[String], t1: String, t2: String): String =
     cols.map(c => s"$t1.$c = $t2.$c").mkString(" AND ")
 
-  /**
-    * For every request, there is a corresponding specific form version number. In the request, that specific version
-    * can be specified, but the caller can also say that it wants the next version, the latest version, or the version
-    * of the form used to create a specific document. This function finds the specific form version corresponding to
-    * the request.
-    *
-    * Throws `HttpStatusCodeException` if `ForDocument` and the document is not found.
-    */
-  def requestedFormVersion(req: RequestCommon): Int =
-
-    req.version match {
-      case Unspecified                 => Private.latest(req.appForm).getOrElse(1)
-      case Next                        => Private.latest(req.appForm).map(_ + 1).getOrElse(1)
-      case Specific(v)                 => v
-      case ForDocument(docId, isDraft) =>
-        PersistenceMetadataSupport.readDocumentFormVersion(req.appForm, docId, isDraft)
-          .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
-    }
-
-  def requestedFormVersion(
-    appForm : AppForm,
-    version : SearchVersion
+  // Used by search only
+  def getEffectiveFormVersionForSearchMaybeCallApi(
+    appForm        : AppForm,
+    incomingVersion: SearchVersion
   ): FormDefinitionVersion =
-    version match {
-      case SearchVersion.Unspecified  => Private.latest(appForm).map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
+    incomingVersion match {
+      case SearchVersion.Unspecified  => PersistenceMetadataSupport.readLatestVersion(appForm).map(FormDefinitionVersion.Specific).getOrElse(FormDefinitionVersion.Latest)
       case SearchVersion.All          => FormDefinitionVersion.Latest
       case SearchVersion.Specific(v)  => FormDefinitionVersion.Specific(v)
     }
-
-  private object Private {
-
-    def latest(appForm: AppForm): Option[Int] =
-      for {
-        metadata    <- PersistenceMetadataSupport.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
-        formVersion <- metadata.child("form-version").headOption
-      } yield
-        formVersion.stringValue.toInt
-
-  }
 }

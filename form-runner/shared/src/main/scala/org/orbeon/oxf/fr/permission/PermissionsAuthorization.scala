@@ -14,12 +14,11 @@
 package org.orbeon.oxf.fr.permission
 
 import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.fr.{FormRunnerAccessToken, FormRunnerParams}
+import org.orbeon.oxf.fr.FormRunnerAccessToken
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger}
-import shapeless.syntax.typeable._
 
 import scala.util.Try
 
@@ -48,6 +47,12 @@ object ModeType {
       Some(Readonly)
     else
       None
+}
+
+sealed trait ModeTypeAndOps { val modeType: ModeType }
+object ModeTypeAndOps {
+  case object Creation                                   extends ModeTypeAndOps { val modeType = ModeType.Creation }
+  case class  Other(modeType: ModeType, ops: Operations) extends ModeTypeAndOps
 }
 
 object PermissionsAuthorization {
@@ -114,64 +119,29 @@ object PermissionsAuthorization {
   }
 
   def authorizedOperationsForDetailModeOrThrow(
-    modeType             : ModeType,
+    modeTypeAndOps       : ModeTypeAndOps,
     permissions          : Permissions,
-    operationsFromDataOpt: Option[Operations],
     credentialsOpt       : Option[Credentials],
-    tokenOpt             : Option[(String, FormRunnerParams)],
     isSubmit             : Boolean
   )(implicit
     logger               : IndentedLogger
   ): Operations = {
 
-    // With creation modes, the caller obviously doesn't read the data from the persistence layer first, therefore
-    // `operationsFromDataOpt` must always be `None.
-    require(modeType != ModeType.Creation || operationsFromDataOpt.isEmpty, "`operationsFromDataOpt` must be empty for mode `new`")
-
     val resultingAuthorizedOperations =
-      modeType match {
-        case ModeType.Creation =>
-          // We don't handle a token in creation modes, although that could be supported later
+      modeTypeAndOps match {
+        case ModeTypeAndOps.Creation =>
           authorizedOperationsForNoData(
             permissions,
             credentialsOpt
           )
-        case ModeType.Edition | ModeType.Readonly =>
-
-          // The persistence layer might return some operations or none:
-          // - if it doesn't support checking for operations (see also #5741)
-          // - if there are no operations granted (but we might add operations from a token, see below)
-
-          // We might have additional operations from a token
-          val operationsFromTokenOpt: Option[Operations] =
-            for {
-              (token, formRunnerParams) <- tokenOpt
-              definedPermissions        <- permissions.narrowTo[DefinedPermissions]
-            } yield
-              operationsFromToken(
-                definedPermissions = definedPermissions,
-                credentialsOpt     = credentialsOpt,
-                token              = token,
-                formRunnerParams   = formRunnerParams
-              ).getOrElse(throw HttpStatusCodeException(StatusCode.Forbidden))
-
-          // Operations obtained without consideration for the data
-          val otherOperations: Operations =
-           authorizedOperations(
-              permissions,
-              credentialsOpt,
-              CheckWithoutDataUserPessimistic
-            )
-
-          // Those are combined
-          // For example: the data might grand only `Read` but the token might grant `Update` in addition
-          Operations.combine(otherOperations :: operationsFromTokenOpt.toList ::: operationsFromDataOpt.toList)
+        case ModeTypeAndOps.Other(_, ops) =>
+          ops
       }
 
     isUserAuthorizedBasedOnOperationsAndMode(
       operations = resultingAuthorizedOperations,
-      modeType   = modeType,
-      isSubmit   = modeType != ModeType.Creation && isSubmit
+      modeType   = modeTypeAndOps.modeType,
+      isSubmit   = modeTypeAndOps.modeType != ModeType.Creation && isSubmit
     ) option resultingAuthorizedOperations match {
       case None =>
         debug(s"UNAUTHORIZED USER")
@@ -184,21 +154,11 @@ object PermissionsAuthorization {
 
   // If we call this, it means that we don't have access based on `Anyone`, `AnyAuthenticatedUser`, `Owner`, roles,
   // etc. We are just testing for `AnyoneWithToken`.
-  private def operationsFromToken(
+  def operationsFromToken(
     definedPermissions: DefinedPermissions,
-    credentialsOpt    : Option[Credentials],
     token             : String,
-    formRunnerParams  : FormRunnerParams
-  ): Try[Operations] = {
-
-    val tokenHmac =
-      FormRunnerAccessToken.TokenHmac(
-        app      = formRunnerParams.app,
-        form     = formRunnerParams.form,
-        version  = formRunnerParams.formVersion,
-        document = formRunnerParams.document
-      )
-
+    tokenHmac         : FormRunnerAccessToken.TokenHmac
+  ): Try[Operations] =
     FormRunnerAccessToken.decryptToken(tokenHmac, token) map { tokenPayload =>
       if (tokenPayload.exp.isAfter(java.time.Instant.now)) {
         // TODO: consider passing operations as part of the token as well
@@ -211,7 +171,6 @@ object PermissionsAuthorization {
         throw HttpStatusCodeException(StatusCode.Forbidden)
       }
     }
-  }
 
   def authorizedOperationsForNoData(
     permissions   : Permissions,

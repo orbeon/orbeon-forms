@@ -17,13 +17,12 @@ import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.externalcontext.UserAndGroup
+import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
-import org.orbeon.oxf.fr.permission.{AnyoneWithToken, Operation, Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, FormRunnerPersistence}
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{ContentTypes, DateUtils, NetUtils}
@@ -34,21 +33,10 @@ import java.sql.Timestamp
 
 trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
-  def getOrHead(req: Request, method: HttpMethod): Unit = {
+  def getOrHead(req: CrudRequest, method: HttpMethod): Unit = {
 
     RelationalUtils.withConnection { connection =>
 
-      val badVersion =
-        // For data, we don't need a version number, so accept we either accept no version being specified,
-        // or if a form version if specified we'll later check that it matches the version number in the database.
-        (req.forData && (req.version match {
-          case Unspecified => false
-          case Specific(_) => false
-          case           _ => true
-        }))  ||
-        // For form definition, everything is valid except Next
-        (req.forForm && req.version == Next)
-      if (badVersion) throw HttpStatusCodeException(StatusCode.BadRequest)
       val hasStage = req.forData && ! req.forAttachment
       val readBody = method == HttpMethod.GET
 
@@ -84,7 +72,8 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
         val position = Iterator.from(1)
         ps.setString(position.next(), req.appForm.app)
         ps.setString(position.next(), req.appForm.form)
-        if (req.forForm) ps.setInt(position.next(), requestedFormVersion(req))
+        if (req.forForm)
+          ps.setInt(position.next(), req.version.getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest)))
         if (req.forData) {
           ps.setString(position.next(), req.dataPart.get.documentId)
           ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
@@ -112,12 +101,6 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
 
             // Check version if specified
             val dbFormVersion = resultSet.getInt("form_version")
-            req.version match {
-              case Specific(reqFormVersion) =>
-                if (dbFormVersion != reqFormVersion)
-                  throw HttpStatusCodeException(StatusCode.BadRequest)
-              case _ => // NOP; we're all good
-            }
 
             // Info about the owner, which will be used to check the user can access the data
             val dataUser = req.forData.option(CheckWithDataUser(
@@ -159,41 +142,17 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
           }
         }
 
-        // For data, check that the user is allowed to read and set the `Orbeon-Operations` header
-        // Read form permissions after we're done with the connection to read the data,
-        // so we don't use two simultaneous connections
-        for {
-          dataUser <- fromDatabase.dataUserOpt // `dataUserOpt` is `Some(_)` iif `req.forData == true`
-          formPermissionsElemOpt = RelationalUtils.readFormPermissions(
-            req.appForm, FormDefinitionVersion.Specific(fromDatabase.formVersion)
-          )
-          permissions = FormRunner.permissionsFromElemOrProperties(
-            formPermissionsElemOpt,
-            req.appForm
-          )
-          authorizedOperations = PermissionsAuthorization.authorizedOperations(
-            permissions,
-            PermissionsAuthorization.findCurrentCredentialsFromSession,
-            dataUser
-          )
-        } locally {
-
-          // For #5437: return a 403 only if the user is not allowed to read the data, but only if there is no
-          // additional token permissions that could allow the user to read the data. This means the
-          // `Orbeon-Operations` header below can be empty or return only operations other than `Read`.
-          if (
-            ! Operations.allows(authorizedOperations, Operation.Read) &&
-            ! PermissionsAuthorization.hasPermissionCond(permissions, AnyoneWithToken, Set(Operation.Read)) // `Operation.Update` ???
-          ) throw HttpStatusCodeException(StatusCode.Forbidden)
-
-          httpResponse.setHeader(
-            FormRunnerPersistence.OrbeonOperations,
-            Operations.serialize(authorizedOperations, normalized = true).mkString(" ")
-          )
-        }
-
         // Send headers
         httpResponse.setHeader(OrbeonFormDefinitionVersion, fromDatabase.formVersion.toString)
+
+        fromDatabase.dataUserOpt.foreach { dataUser =>
+          dataUser.userAndGroup.foreach { userAndGroup =>
+            httpResponse.setHeader(Headers.OrbeonUsername, userAndGroup.username)
+            userAndGroup.groupname.foreach(httpResponse.setHeader(Headers.OrbeonGroup, _))
+          }
+          // TODO: set `Headers.OrbeonOrganization`, but in what format?
+        }
+
         fromDatabase.stageOpt.foreach(httpResponse.setHeader(StageHeader.HeaderName, _))
         httpResponse.setHeader(Headers.Created,      DateUtils.formatRfc1123DateTimeGmt(fromDatabase.createdDateTime.toInstant))
         httpResponse.setHeader(Headers.LastModified, DateUtils.formatRfc1123DateTimeGmt(fromDatabase.lastModifiedDateTime.toInstant))

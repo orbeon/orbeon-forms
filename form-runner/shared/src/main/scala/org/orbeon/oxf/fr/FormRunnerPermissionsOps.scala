@@ -70,35 +70,39 @@ trait FormRunnerPermissionsOps {
     operationsFromData               : String,
     encryptedOperationsFromDataOrNull: String,
     permissionsElemOrNull            : NodeInfo,
-    isSubmit                         : Boolean,
-    tokenOrNull                      : String
+    isSubmit                         : Boolean
   ): String = {
 
     // Same logger that was used for the `xf:message` action before (could use something else)
     implicit val logger: IndentedLogger =
       inScopeContainingDocument.getIndentedLogger(XFormsActions.LoggingCategory)
 
-    val formRunnerParams @ FormRunnerParams(app, form, _, _, _, _) = FormRunnerParams()
+    val formRunnerParams = FormRunnerParams()
 
     // In initial edit/view modes that read data from the database, we use `operationsFromData` which is the result of
     // headers returned by the the database `GET`. When we change modes from there, we propagate and use
     // `encryptedOperationsFromData` instead.
-    val combinedOperationsFromData =
-      Operations.parseFromString(operationsFromData)
-        .orElse(
-          if (isSubmit)
-            encryptedOperationsFromDataOrNull.trimAllToOpt.flatMap(FormRunnerOperationsEncryption.decryptOperations)
-          else
-            None // no need as encrypted operations are only used for mode change
-        )
+    val modeTypeAndOps =
+      formRunnerParams.modeType match {
+        case modeType @ (ModeType.Edition | ModeType.Readonly) =>
+          val ops =
+            Operations.parseFromString(operationsFromData)
+              .orElse(
+                if (isSubmit)
+                  encryptedOperationsFromDataOrNull.trimAllToOpt.flatMap(FormRunnerOperationsEncryption.decryptOperations)
+                else
+                  None
+              )
+          ModeTypeAndOps.Other(modeType, ops.getOrElse(throw new IllegalStateException))
+        case ModeType.Creation =>
+          ModeTypeAndOps.Creation
+      }
 
     Operations.serialize(
       PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-        modeType              = formRunnerParams.modeType,
-        permissions           = permissionsFromElemOrProperties(Option(permissionsElemOrNull), AppForm(app, form)),
-        operationsFromDataOpt = combinedOperationsFromData,
+        modeTypeAndOps        = modeTypeAndOps,
+        permissions           = permissionsFromElemOrProperties(Option(permissionsElemOrNull), formRunnerParams.appForm),
         credentialsOpt        = PermissionsAuthorization.findCurrentCredentialsFromSession,
-        tokenOpt              = tokenOrNull.trimAllToOpt.map((_, formRunnerParams)),
         isSubmit              = isSubmit
       ),
       normalized = true

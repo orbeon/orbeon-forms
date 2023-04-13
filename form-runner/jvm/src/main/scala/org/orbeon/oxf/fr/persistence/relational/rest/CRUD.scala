@@ -13,14 +13,15 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException}
+import org.orbeon.oxf.fr.AppForm
+import org.orbeon.oxf.fr.persistence.relational.{Provider, Version}
+import org.orbeon.oxf.http.{HttpMethod, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 
 
 class CRUD
     extends ProcessorImpl
-    with RequestResponse
     with Common
     with Read
     with CreateUpdateDelete
@@ -29,18 +30,52 @@ class CRUD
   override def start(pipelineContext: PipelineContext): Unit =
     try {
 
-      val req = request
+      val requestPath = httpRequest.getRequestPath
 
       httpRequest.getMethod match {
-        case HttpMethod.GET | HttpMethod.HEAD => getOrHead(req, httpRequest.getMethod)
-        case HttpMethod.PUT                   => change(req, delete = false)
-        case HttpMethod.DELETE                => change(req, delete = true)
-        case HttpMethod.LOCK                  => lock(req)
-        case HttpMethod.UNLOCK                => unlock(req)
-        case _                                => httpResponse.setStatus(405)
+        case HttpMethod.GET | HttpMethod.HEAD => getOrHead(getCrudRequest(requestPath), httpRequest.getMethod)
+        case HttpMethod.PUT                   => change(getCrudRequest(requestPath), delete = false)
+        case HttpMethod.DELETE                => change(getCrudRequest(requestPath), delete = true)
+        case HttpMethod.LOCK                  => lock(getLockUnlockRequest(requestPath))
+        case HttpMethod.UNLOCK                => unlock(getLockUnlockRequest(requestPath))
+        case _                                => httpResponse.setStatus(StatusCode.MethodNotAllowed)
       }
     } catch {
       case e: HttpStatusCodeException =>
         httpResponse.setStatus(e.code)
     }
+
+  private def getLockUnlockRequest(requestPath: String) =
+    requestPath match {
+      case CrudDataPath(provider, _, _, dataOrDraft, documentId, _) =>
+        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
+        LockUnlockRequest(Provider.withName(provider), dataPart)
+      case _ =>
+        throw HttpStatusCodeException(StatusCode.BadRequest)
+    }
+
+  private def getCrudRequest(requestPath: String): CrudRequest = {
+
+    // xxx , incomingVersion = $incomingVersion
+    if (Logger.debugEnabled)
+      Logger.logDebug("CRUD", s"receiving request: method = ${httpRequest.getMethod}, path = $requestPath")
+
+    // The persistence proxy must pass a specific version when needed. It is not always needed. For example a `GET` of
+    // data doesn't require a version, but a `GET` or a form definition does, and a `PUT` of data does as well as the
+    // version is stored.
+    val incomingVersion =
+      headerValueIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt)
+
+    requestPath match {
+      case CrudFormPath(provider, app, form, filename) =>
+        val file = if (filename == "form.xhtml") None else Some(filename)
+        CrudRequest(Provider.withName(provider), AppForm(app, form), incomingVersion, file, None)
+      case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
+        val file = if (filename == "data.xml") None else Some(filename)
+        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
+        CrudRequest(Provider.withName(provider), AppForm(app, form), incomingVersion, file, Some(dataPart))
+      case _ =>
+        throw HttpStatusCodeException(StatusCode.BadRequest)
+    }
+  }
 }

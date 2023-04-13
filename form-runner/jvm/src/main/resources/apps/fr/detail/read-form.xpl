@@ -41,6 +41,7 @@
                 <include>/request/server-port</include>
                 <include>/request/is-secure</include>
                 <include>/request/context-path</include>
+                <include>/request/parameters/parameter[name = 'fr-access-token']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -53,7 +54,8 @@
         <p:input name="config">
             <config xsl:version="2.0">
 
-                <xsl:variable name="params" select="/*"/>
+                <xsl:variable name="params"  select="/*"/>
+                <xsl:variable name="request" select="doc('input:request')/*" as="element(request)"/>
 
                 <!-- If we know the document id AND no data was POSTed to us, tell the persistence API, use the document
                      id, otherwise pass the requested form version if there is one.
@@ -92,7 +94,13 @@
                             $params/app,
                             '/',
                             $params/form,
-                            '/form/form.xhtml'
+                            '/form/form.xhtml',
+                            (: Forward the token as the persistence proxy requires a `HEAD` on the data to obtain the
+                               form definition version, and that call must pass permission checks. :)
+                            if (exists($request/parameters/parameter[name = 'fr-access-token'])) then
+                                concat('?fr-access-token=', encode-for-uri($request/parameters/parameter[name = 'fr-access-token']/value))
+                            else
+                                ''
                         )"/>
                 <url>
                     <xsl:value-of select="p:rewrite-service-uri($resource, true())"/>

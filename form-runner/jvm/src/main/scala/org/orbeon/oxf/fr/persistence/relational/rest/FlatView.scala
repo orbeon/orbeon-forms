@@ -40,7 +40,7 @@ private object FlatView {
   //
   // - https://github.com/orbeon/orbeon-forms/issues/1069
   // - https://github.com/orbeon/orbeon-forms/issues/1571
-  def createFlatView(req: Request, version: Int, connection: Connection): Unit = {
+  def createFlatView(req: CrudRequest, version: Int, connection: Connection): Unit = {
 
     val viewName = {
       val app  = xmlToSQLId(req.appForm.app)

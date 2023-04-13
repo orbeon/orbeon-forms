@@ -78,7 +78,7 @@ object UploaderServer {
       lifecycleOpt   = Some(
         new UploadProgressMultipartLifecycle(
           requestContentLengthOpt  = request.contentLengthOpt,
-          requestAcceptLanguageOpt = request.getFirstHeader(Headers.AcceptLanguageLower),
+          requestAcceptLanguageOpt = request.getFirstHeaderIgnoreCase(Headers.AcceptLanguage),
           outerLimiterInputStream  = trustedUploadContext.getInputStream,
           session                  = session
         ) {

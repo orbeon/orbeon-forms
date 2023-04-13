@@ -14,29 +14,39 @@
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.oxf.fr.AppForm
-import org.orbeon.oxf.fr.persistence.relational.{Provider, _}
+import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.NetUtils
 
 
-case class DataPart(isDraft: Boolean, documentId: String, stage: Option[String])
+case class DataPart(
+  isDraft   : Boolean,
+  documentId: String,
+  stage     : Option[String]
+)
 
-case class Request(
-  provider      : Provider,
-  appForm       : AppForm,
-  version       : Version,
-  filename      : Option[String],
-  dataPart      : Option[DataPart]
-) extends RequestCommon {
+case class LockUnlockRequest(
+  provider: Provider,
+  dataPart: DataPart
+)
+
+case class CrudRequest(
+  provider: Provider,
+  appForm : AppForm,
+  version : Option[Int],
+  filename: Option[String],
+  dataPart: Option[DataPart]
+) {
   def forForm       : Boolean = dataPart.isEmpty
   def forData       : Boolean = dataPart.isDefined
   def forAttachment : Boolean = filename.isDefined
 }
 
+// xxx move to an object
 trait RequestResponse extends Common {
 
-  def tableName(request: Request, master: Boolean = false): String =
+  def tableName(request: CrudRequest, master: Boolean = false): String =
     Seq(
       Some("orbeon_form"),
       request.forForm                   option "_definition",
@@ -45,42 +55,15 @@ trait RequestResponse extends Common {
     ).flatten.mkString
 
   def httpRequest = NetUtils.getExternalContext.getRequest
-  def headerValue(name: String): Option[String] = httpRequest.getFirstHeader(name)
+  def headerValueIgnoreCase(name: String): Option[String] = httpRequest.getFirstHeaderIgnoreCase(name)
 
-  def requestUsername      : Option[String] = headerValue(Headers.OrbeonUsernameLower)
-  def requestGroup         : Option[String] = headerValue(Headers.OrbeonGroupLower)
-  def requestFlatView      : Boolean        = headerValue("orbeon-create-flat-view").contains("true")
-  def requestWorkflowStage : Option[String] = headerValue(StageHeader.HeaderNameLower)
+  def requestUsername      : Option[String] = headerValueIgnoreCase(Headers.OrbeonUsername)
+  def requestGroup         : Option[String] = headerValueIgnoreCase(Headers.OrbeonGroup)
+  def requestFlatView      : Boolean        = headerValueIgnoreCase("orbeon-create-flat-view").contains("true")
+  def requestWorkflowStage : Option[String] = headerValueIgnoreCase(StageHeader.HeaderName)
 
   val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
   val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
-
-  def request: Request = {
-
-    import Version._
-
-    val version =
-      Version(
-        documentId = headerValue(OrbeonForDocumentIdLower),
-        isDraft    = headerValue(OrbeonForDocumentIsDraftLower),
-        version    = headerValue(OrbeonFormDefinitionVersionLower),
-      )
-
-    val requestPath = httpRequest.getRequestPath
-
-    if (Logger.debugEnabled)
-      Logger.logDebug("CRUD", s"receiving request: method = ${httpRequest.getMethod}, path = $requestPath, version = $version")
-
-    requestPath match {
-      case CrudFormPath(provider, app, form, filename) =>
-        val file = if (filename == "form.xhtml") None else Some(filename)
-        Request(Provider.withName(provider), AppForm(app, form), version, file, None)
-      case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
-        val file = if (filename == "data.xml") None else Some(filename)
-        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
-        Request(Provider.withName(provider), AppForm(app, form), version, file, Some(dataPart))
-    }
-  }
 
   def httpResponse = NetUtils.getExternalContext.getResponse
 }

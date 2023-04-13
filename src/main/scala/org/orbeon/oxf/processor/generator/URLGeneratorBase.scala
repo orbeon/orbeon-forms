@@ -17,10 +17,10 @@ import java.{lang => jl, util => ju}
 
 import org.orbeon.dom.Element
 import org.orbeon.oxf.util.{CollectionUtils, ConnectionResult, DateUtils, NetUtils}
-import org.orbeon.oxf.xml.dom.Comparator
 
 import scala.jdk.CollectionConverters._
 import scala.collection.compat._
+
 
 object URLGeneratorBase {
 
@@ -59,10 +59,7 @@ object URLGeneratorBase {
     if ((readHeader ne null) && ! readHeader.isEmpty) {
       for {
         nameMaybeMixed <- readHeader.asScala.to(List)
-        list           = connectionResult.getHeaderIgnoreCase(nameMaybeMixed)
-        if list.nonEmpty // only support headers with one value
-        value          = list.head
-        nameLower      = nameMaybeMixed.toLowerCase
+        value          <- connectionResult.getFirstHeaderIgnoreCase(nameMaybeMixed)
       } yield {
         nameMaybeMixed -> value
       }

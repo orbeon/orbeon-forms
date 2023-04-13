@@ -10,7 +10,7 @@ import org.orbeon.oxf.fr.SimpleDataMigration.{DataMigrationBehavior, DataMigrati
 import org.orbeon.oxf.fr.XMLNames.FRNamespace
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
-import org.orbeon.oxf.fr.permission.{ModeType, Operations, PermissionsAuthorization}
+import org.orbeon.oxf.fr.permission.{ModeType, ModeTypeAndOps, Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.proxy.Transforms
 import org.orbeon.oxf.util.CollectionUtils.IteratorExt._
 import org.orbeon.oxf.util.CoreUtils._
@@ -425,11 +425,9 @@ object ImportExportSupport {
     }
 
     PermissionsAuthorization.authorizedOperationsForDetailModeOrThrow(
-      modeType              = modeType,
+      modeTypeAndOps        = ModeTypeAndOps.Other(modeType, Operations.parseFromHeaders(headers).getOrElse(throw new IllegalStateException)),
       permissions           = permissions,
-      operationsFromDataOpt = Operations.parseFromHeaders(headers),
       credentialsOpt        = externalContext.getRequest.credentials,
-      tokenOpt              = None, // we could support a token here
       isSubmit              = false
     )
 

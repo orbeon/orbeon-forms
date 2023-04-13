@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.Logging._
 import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
+
 case class ConnectionResult(
   url               : String,
   statusCode        : Int,
@@ -54,6 +55,11 @@ case class ConnectionResult(
   def getHeaderIgnoreCase(name: String): List[String] = {
     val nameLowercase = name.toLowerCase
     headers collectFirst { case (k, v) if k.toLowerCase == nameLowercase => v } getOrElse Nil
+  }
+
+  def getFirstHeaderIgnoreCase(name: String): Option[String] = {
+    val nameLowercase = name.toLowerCase
+    (headers collectFirst { case (k, v) if k.toLowerCase == nameLowercase => v.headOption }).flatten
   }
 
   private var _didLogResponseDetails = false

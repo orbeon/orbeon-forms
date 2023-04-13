@@ -70,7 +70,7 @@ object RelationalUtils extends Logging {
   }
 
   private def getDataSourceNameFromHeaders =
-    NetUtils.getExternalContext.getRequest.getFirstHeader("orbeon-datasource") getOrElse
+    NetUtils.getExternalContext.getRequest.getFirstHeaderIgnoreCase("orbeon-datasource") getOrElse
       (throw new OXFException("Missing `orbeon-datasource` header"))
 
   private def getDataSource(name: String): DataSource =

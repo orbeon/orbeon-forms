@@ -10,12 +10,6 @@ import org.orbeon.scaxon.NodeConversions._
 import org.orbeon.scaxon.SimplePath._
 
 
-trait RequestCommon {
-  val provider : Provider
-  val appForm  : AppForm
-  val version  : Version
-}
-
 sealed trait StageHeader
 object StageHeader {
 

@@ -14,15 +14,14 @@
 package org.orbeon.oxf.fr.persistence.relational.search
 
 import org.orbeon.oxf.fr.persistence.relational.Version._
-import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchVersion
-import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.{ProcessorImpl, ProcessorInputOutputInfo, ProcessorOutput}
 import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.XMLReceiver
+
 
 class SearchProcessor
   extends ProcessorImpl
@@ -41,7 +40,7 @@ class SearchProcessor
         def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
           val version = {
-            val formDefinitionVersionHeader = httpRequest.getFirstHeader(OrbeonFormDefinitionVersionLower)
+            val formDefinitionVersionHeader = httpRequest.getFirstHeaderIgnoreCase(OrbeonFormDefinitionVersion)
             SearchVersion(formDefinitionVersionHeader)
           }
 

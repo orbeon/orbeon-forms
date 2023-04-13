@@ -16,12 +16,13 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.util.CoreUtils._
 
+
 trait Common {
 
   implicit val Logger = RelationalUtils.Logger
 
   // List of columns that identify a row
-  def idColumns(req: Request): List[String] =
+  def idColumns(req: CrudRequest): List[String] =
     List(
       Some("app"),
       Some("form"),
@@ -30,7 +31,4 @@ trait Common {
       req.forData       option "draft",
       req.forAttachment option "file_name"
     ).flatten
-
-  def idColumnsList(req: Request): String = idColumns(req).mkString(", ")
-
 }

@@ -17,15 +17,12 @@ import org.orbeon.io.IOUtils._
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
 import org.orbeon.oxf.externalcontext.UserAndGroup
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
-import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Update}
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.{CheckWithDataUser, CheckWithoutDataUserPessimistic}
-import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
-import org.orbeon.oxf.fr.{FormDefinitionVersion, FormRunner, Names}
+import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.{PipelineContext, TransformerXMLReceiver}
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -47,7 +44,7 @@ import javax.xml.transform.stream.StreamResult
 
 object RequestReader {
 
-  object IdAtt {
+  private object IdAtt {
     val IdQName = JXQName("id")
     def unapply(atts: Atts) = atts.atts collectFirst { case (IdQName, value) => value }
   }
@@ -164,7 +161,7 @@ trait CreateUpdateDelete
      with Common
      with CreateCols {
 
-  private def existingRow(connection: Connection, req: Request): Option[Row] = {
+  private def existingRow(connection: Connection, req: CrudRequest, versionToSet: Int): Option[Row] = {
 
     val idCols = idColumns(req).filter(_ != "file_name")
     val table  = tableName(req, master = true)
@@ -177,8 +174,8 @@ trait CreateUpdateDelete
           |           FROM     $table
           |           WHERE    app  = ?
           |                    and form = ?
-          |                    ${if (! req.forData)     "and form_version = ?" else ""}
-          |                    ${if (req.forData)       "and document_id  = ?" else ""}
+          |                    ${if (req.forForm)     "and form_version = ?" else ""}
+          |                    ${if (req.forData)     "and document_id  = ?" else ""}
           |           GROUP BY ${idCols.mkString(", ")}
           |       ) m
           |WHERE  ${joinColumns("last_modified_time" +: idCols, "t", "m")}
@@ -190,7 +187,8 @@ trait CreateUpdateDelete
       val position = Iterator.from(1)
       ps.setString(position.next(), req.appForm.app)
       ps.setString(position.next(), req.appForm.form)
-      if (! req.forData)     ps.setInt   (position.next(), requestedFormVersion(req))
+      if (req.forForm)
+        ps.setInt(position.next(), versionToSet)
 
       req.dataPart foreach (dataPart => ps.setString(position.next(), dataPart.documentId))
 
@@ -202,7 +200,7 @@ trait CreateUpdateDelete
           // `username`, `groupname`, and `form_version` must be the same on all rows, so it doesn't matter from
           // which row we read this from.
           Some(Row(
-            created      = resultSet.getTimestamp("created"),
+            createdTime  = resultSet.getTimestamp("created"),
             createdBy    = if (req.forData) UserAndGroup.fromStrings(resultSet.getString("username"), resultSet.getString("groupname")) else None,
             organization = if (req.forData) OrganizationSupport.readFromResultSet(connection, resultSet)                                else None,
             formVersion  = if (req.forData) Option(resultSet.getInt("form_version"))                                                    else None,
@@ -216,13 +214,12 @@ trait CreateUpdateDelete
   }
 
   // NOTE: Gets the first organization if there are multiple organization roots
-  private def currentUserOrganization(connection: Connection, req: Request): Option[OrganizationId] =
+  private def currentUserOrganization(connection: Connection, req: CrudRequest): Option[OrganizationId] =
     httpRequest.credentials.flatMap(_.defaultOrganization).map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
 
-  private def store(connection: Connection, req: Request, existingRow: Option[Row], delete: Boolean): Int = {
+  private def store(connection: Connection, req: CrudRequest, existingRow: Option[Row], delete: Boolean, versionToSet: Int): Unit = {
 
     val table = tableName(req)
-    val versionToSet = existingRow.flatMap(_.formVersion).getOrElse(requestedFormVersion(req))
 
     // If for data, start by deleting any draft document and draft attachments
     req.dataPart match {
@@ -343,150 +340,40 @@ trait CreateUpdateDelete
         ps.executeUpdate()
       }
     }
-
-    versionToSet
   }
 
-  def change(req: Request, delete: Boolean): Unit = {
+  def change(req: CrudRequest, delete: Boolean): Unit = {
 
     debug("CRUD: handling change request", List("delete" -> delete.toString, "request" -> req.toString))
 
-    val existing =
+    val versionToSet =
+      req.version.getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest))
+
+    // TODO: Since the persistence proxy does a HEAD already, we must not repeat it here. Instead, the  persistence
+    //  proxy must pass the information needed: existing or not, `formVersion`, `organization._1`, `createdTime`,
+    //  `createdBy.username`
+    val existingRowOpt =
       RelationalUtils.withConnection { connection =>
-        existingRow(connection, req)
+        existingRow(connection, req, versionToSet)
       }
 
-    val versionToSet = existing.flatMap(_.formVersion).getOrElse(requestedFormVersion(req))
+    debug("CRUD: retrieved existing row", List("existing" -> existingRowOpt.isDefined.toString))
+
+    // Just a consistency test
+    existingRowOpt.flatMap(_.formVersion).foreach { versionFromExisting =>
+      if (versionToSet != versionFromExisting)
+        throw HttpStatusCodeException(StatusCode.Conflict) // or 400?
+    }
 
     if (req.forForm)
       PersistenceMetadataSupport.maybeInvalidateCachesFor(req.appForm, versionToSet)
 
-    // Read outside of a `withConnection` block, so we don't use two simultaneous connections
-    // Do this only if the request is for form data, not for form definitions!
-    val formPermissionsIfForData =
-      req.forData option
-        FormRunner.permissionsFromElemOrProperties(
-          req.forData.option(RelationalUtils.readFormPermissions(req.appForm, FormDefinitionVersion.Specific(versionToSet))).flatten,
-          req.appForm
-        ) |!>
-          (formPermissions => debug("CRUD: form permissions", List("permissions" -> formPermissions.toString)))
-
-    // Initial test on version that doesn't rely on accessing the database to read a document; we do this first:
-    // - For correctness: e.g., a PUT for a document id is an invalid request, but if we start by checking
-    //   permissions, we might not find the document and return a 400 instead.
-    // - For efficiency: when we can, it's better to 400 right away without accessing the database.
-    def checkVersionInitial(): Unit = {
-
-      val badVersion =
-        // Only GET for form definitions can request a version for a given document
-        req.version.isInstanceOf[ForDocument] ||
-        // Delete: no version can be specified
-        req.forData && delete && ! (req.version == Unspecified)
-
-      if (badVersion) {
-        debug("CRUD: bad version", List("status code" -> StatusCode.BadRequest.toString))
-        throw HttpStatusCodeException(StatusCode.BadRequest)
-      }
-    }
-
-    def checkAuthorized(existing: Option[Row]): Unit = {
-      val authorized =
-        formPermissionsIfForData match {
-          case Some(formPermissions) =>
-            existing match {
-              case Some(existing) =>
-
-                // Check we're allowed to update or delete this resource
-                val createdBy     = existing.createdBy
-                val organization  = existing.organization.map(_._2)
-                val authorizedOps = PermissionsAuthorization.authorizedOperations(
-                  formPermissions,
-                  PermissionsAuthorization.findCurrentCredentialsFromSession,
-                  CheckWithDataUser(createdBy, organization)
-                )
-                val requiredOp    = if (delete) Delete else Update
-                Operations.allows(authorizedOps, requiredOp)
-              case None =>
-                val authorizedOps =
-                  if (delete)
-                    // For deletes, if there is no data to delete, it unclear we think a 404 is clearer than a 403, so
-                    // let this check pass, and some code later will return a 404
-                    SpecificOperations(Set(Delete))
-                  else
-                    PermissionsAuthorization.authorizedOperations(
-                      formPermissions,
-                      PermissionsAuthorization.findCurrentCredentialsFromSession,
-                      CheckWithoutDataUserPessimistic
-                    )
-                Operations.allowsAny(authorizedOps, Set(if (delete) Delete else Create))
-            }
-          case None =>
-            // Operations on deployed forms are always authorized
-            true
-        }
-
-      if (! authorized) {
-        debug("CRUD: not authorized", List("status code" -> StatusCode.Forbidden.toString))
-        throw HttpStatusCodeException(StatusCode.Forbidden)
-      }
-    }
-
-    def checkVersionWithExisting(existing: Option[Row]): Unit = {
-
-      def isUpdate =
-        ! delete && existing.nonEmpty
-
-      def isCreate =
-        ! delete && existing.isEmpty
-
-      def existingVersionOpt =
-        existing flatMap (_.formVersion)
-
-      def isUnspecifiedOrSpecificVersion =
-        req.version match {
-          case Unspecified       => true
-          case Specific(version) => existingVersionOpt.contains(version)
-          case _                 => false
-        }
-
-      def isSpecificVersion =
-        req.version.isInstanceOf[Specific]
-
-      val badVersion =
-        (req.forData && isUpdate && ! isUnspecifiedOrSpecificVersion) ||
-        (req.forData && isCreate && ! isSpecificVersion)
-
-      if (badVersion) {
-        debug("CRUD: bad version", List("status code" -> StatusCode.BadRequest.toString))
-        throw HttpStatusCodeException(StatusCode.BadRequest)
-      }
-    }
-
-    def checkDocExistsForDelete(existing: Option[Row]): Unit = {
-      // We can't delete a document that doesn't exist
-      val nothingToDelete = delete && existing.isEmpty
-
-      debug("CRUD: nothing to delete", List("status code" -> StatusCode.NotFound.toString))
-
-      if (nothingToDelete)
-        throw HttpStatusCodeException(StatusCode.NotFound)
-    }
-
-    // Checks
-    checkVersionInitial()
-
-    debug("CRUD: retrieved existing row", List("existing" -> existing.isDefined.toString))
-
-    checkAuthorized(existing)
-    checkVersionWithExisting(existing)
-    checkDocExistsForDelete(existing)
-
     RelationalUtils.withConnection { connection =>
 
       // Update database
-      val versionSet = store(connection, req, existing, delete)
+      store(connection, req, existingRowOpt, delete, versionToSet)
 
-      debug("CRUD: database updated, before commit", List("version" -> versionSet.toString))
+      debug("CRUD: database updated, before commit", List("version" -> versionToSet.toString))
 
       // Commit before reindexing, as reindexing will read back the form definition, which can
       // cause a deadlock since we're still in the transaction writing the form definition
@@ -502,7 +389,7 @@ trait CreateUpdateDelete
         case None =>
           // Form definition: update index for this form version
           // Re. the asInstanceOf, when updating a form, we must have a specific version specified
-          WhatToReindex.DataForForm(req.appForm, versionSet)
+          WhatToReindex.DataForForm(req.appForm, versionToSet)
       }
 
       withDebug("CRUD: reindexing", List("what" -> whatToReindex.toString)) {
@@ -518,13 +405,13 @@ trait CreateUpdateDelete
         ! delete                                          &&
         req.appForm.form != Names.LibraryFormName
       ) withDebug("CRUD: creating flat view") {
-        FlatView.createFlatView(req, versionSet, connection)
+        FlatView.createFlatView(req, versionToSet, connection)
       }
 
       // Inform caller of the form definition version used
-      httpResponse.setHeader(OrbeonFormDefinitionVersion, versionSet.toString)
+      httpResponse.setHeader(OrbeonFormDefinitionVersion, versionToSet.toString)
 
-      httpResponse.setStatus(if (delete) 204 else 201)
+      httpResponse.setStatus(if (delete) StatusCode.NoContent else StatusCode.Created)
     }
   }
 }

@@ -29,7 +29,7 @@ trait CreateCols extends RequestResponse with Common {
   }
 
   case class Row(
-    created      : Timestamp,
+    createdTime  : Timestamp,
     createdBy    : Option[UserAndGroup],
     organization : Option[(Int, Organization)],
     formVersion  : Option[Int],
@@ -53,7 +53,7 @@ trait CreateCols extends RequestResponse with Common {
   )
 
   def insertCols(
-    req                    : Request,
+    req                    : CrudRequest,
     existingRow            : Option[Row],
     delete                 : Boolean,
     versionToSet           : Int,
@@ -96,7 +96,7 @@ trait CreateCols extends RequestResponse with Common {
         name          = "created",
         value         = DynamicColValue(
           placeholder = "?",
-          paramSetter = param(_.setTimestamp, existingRow.map(_.created).getOrElse(now))
+          paramSetter = param(_.setTimestamp, existingRow.map(_.createdTime).getOrElse(now))
         )
       ),
       Col(

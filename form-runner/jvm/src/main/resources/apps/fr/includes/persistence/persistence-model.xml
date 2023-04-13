@@ -390,8 +390,7 @@
                     instance('fr-authorized-operations')/@from-persistence,
                     xxf:get-request-parameter(frf:AuthorizedOperationsFromPersistenceParam())[1],
                     xxf:instance('fr-form-metadata')/permissions,
-                    $is-submit,
-                    xxf:get-request-parameter(frf:AccessTokenParam())[1]
+                    $is-submit
                 )"/>
 
     </xf:action>
@@ -721,7 +720,7 @@
                    directly request the format we need. See https://github.com/orbeon/orbeon-forms/issues/3110 :)
 
                 frp:providerDataFormatVersion($app, $form)
-            }"
+            }&amp;{frf:AccessTokenParam()}={encode-for-uri(xxf:get-request-parameter(frf:AccessTokenParam()))}"
         replace="instance"
         xxf:instance="fr-form-instance">
 

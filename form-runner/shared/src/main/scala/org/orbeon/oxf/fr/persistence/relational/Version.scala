@@ -1,8 +1,9 @@
 package org.orbeon.oxf.fr.persistence.relational
 
+
 sealed trait Version
 
-
+// xxx move to parent package in separate commit
 object Version {
 
   case object Unspecified                                       extends Version
@@ -13,9 +14,11 @@ object Version {
   val OrbeonForDocumentId              : String = "Orbeon-For-Document-Id"
   val OrbeonForDocumentIsDraft         : String = "Orbeon-For-Document-IsDraft"
   val OrbeonFormDefinitionVersion      : String = "Orbeon-Form-Definition-Version"
-  val OrbeonForDocumentIdLower         : String = OrbeonForDocumentId.toLowerCase
-  val OrbeonForDocumentIsDraftLower    : String = OrbeonForDocumentIsDraft.toLowerCase
-  val OrbeonFormDefinitionVersionLower : String = OrbeonFormDefinitionVersion.toLowerCase
+
+  val OrbeonFormDefinitionVersionLower : String = OrbeonFormDefinitionVersion.toLowerCase // only used by tests
+
+  val AllVersionHeadersLower: Set[String] =
+    Set(OrbeonForDocumentId, OrbeonForDocumentIsDraft, OrbeonFormDefinitionVersion).map(_.toLowerCase())
 
   def apply(documentId: Option[String], isDraft: Option[String], version: Option[String]): Version =
     documentId match {

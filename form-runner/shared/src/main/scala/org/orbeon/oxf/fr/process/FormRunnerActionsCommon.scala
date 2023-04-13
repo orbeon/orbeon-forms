@@ -20,6 +20,7 @@ import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr.{AppForm, DataStatus, FormRunnerBaseOps, FormRunnerParams, FormRunnerPersistence, GridDataMigration, Names}
 import org.orbeon.oxf.fr.Names._
 import org.orbeon.oxf.fr.process.ProcessInterpreter._
+import org.orbeon.oxf.http.Headers
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.TryUtils._
@@ -159,6 +160,21 @@ trait FormRunnerActionsCommon {
           pruneMetadata           = pruneMetadata
         )
 
+      // Forward the token if present so the persistence proxy can use it
+      val tokenParamOpt =
+        inScopeContainingDocument.getRequestParameters
+          .get(frc.AccessTokenParam)
+          .flatMap(_.headOption)
+          .map(frc.AccessTokenParam -> _)
+
+      val systemParams =
+        PathUtils.encodeSimpleQuery(
+          tokenParamOpt.toList                                           :::
+          ("valid" -> frc.dataValid.toString)                            ::
+          (DataFormatVersionName -> databaseDataFormatVersion.entryName) ::
+          Nil
+        )
+
       // Save
       val (beforeURLs, afterURLs, _) = frc.putWithAttachments(
         liveData          = frc.formInstance.root,
@@ -167,7 +183,7 @@ trait FormRunnerActionsCommon {
         fromBasePaths     = List(frc.createFormDataBasePath(app, form, ! isDraft, document) -> formVersion),
         toBasePath        = frc.createFormDataBasePath(app, form,   isDraft, document),
         filename          = "data.xml",
-        commonQueryString = s"valid=${frc.dataValid}&$DataFormatVersionName=${databaseDataFormatVersion.entryName}" + querySuffix,
+        commonQueryString = systemParams + querySuffix,
         forceAttachments  = false,
         formVersion       = Some(formVersion.toString),
         workflowStage     = frc.documentWorkflowStage

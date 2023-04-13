@@ -13,24 +13,24 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
-import java.sql.Connection
-
 import enumeratum._
+import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.io.IOUtils.useAndClose
 import org.orbeon.oxf.util.{ContentTypes, NetUtils}
 
+import java.sql.Connection
 import scala.util.Try
+
 
 trait LockUnlock extends RequestResponse {
 
   import Private._
 
-  def lock(req: Request): Unit = {
+  def lock(req: LockUnlockRequest): Unit = {
     import LeaseStatus._
     val timeout = readTimeoutFromHeader
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) =>
@@ -45,9 +45,9 @@ trait LockUnlock extends RequestResponse {
     }
   }
 
-  def unlock(req: Request): Unit = {
+  def unlock(req: LockUnlockRequest): Unit = {
     import LeaseStatus._
-    readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) =>
+    readLeaseStatus(req) { (connection, leaseStatus, dataPart, _) =>
       leaseStatus match {
         case DoesNotExist =>
           // NOP, we're already good
@@ -81,14 +81,14 @@ trait LockUnlock extends RequestResponse {
       // Header has the form `Timeout: Second-600` header
       val prefix            = Headers.TimeoutValuePrefix
       val request           = NetUtils.getExternalContext.getRequest
-      val headerValue       = request.getFirstHeader(Headers.TimeoutLower)
+      val headerValue       = request.getFirstHeaderIgnoreCase(Headers.Timeout)
       val timeoutString     = headerValue.flatMap(hv => hv.startsWith(prefix).option(hv.substring(prefix.length)))
       val timeoutInt        = timeoutString.flatMap(ts => Try(ts.toInt).toOption)
       timeoutInt.getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest))
     }
 
     def readLeaseStatus(
-      req   : Request)(
+      req   : LockUnlockRequest)(
       thunk : (Connection, LeaseStatus, DataPart, LockInfo) => Unit
     ): Unit = {
 
@@ -99,26 +99,22 @@ trait LockUnlock extends RequestResponse {
       }
 
       val reqLockInfo = LockInfo.parse(bodyInputStream)
-      req.dataPart match {
-        case None => throw HttpStatusCodeException(StatusCode.BadRequest)
-        case Some(dataPart) =>
-          RelationalUtils.withConnection { connection =>
-            def callThunk(leaseStatus: LeaseStatus): Unit =
-              thunk(connection, leaseStatus, dataPart, reqLockInfo)
-            Provider.withLockedTable(connection, req.provider, "orbeon_form_data_lease", () =>
-              LockSql.readLease(connection, req.provider, dataPart) match {
-                case Some(lease) =>
-                  val canUseExistingLease =
-                    reqLockInfo.userAndGroup.username == lease.lockInfo.userAndGroup.username || lease.timeout <= 0
-                  if (canUseExistingLease)
-                    callThunk(ExistsCanUse)
-                  else
-                    callThunk(ExistsCanNotUse(lease))
-                case None =>
-                  callThunk(DoesNotExist)
-              }
-            )
+      RelationalUtils.withConnection { connection =>
+        def callThunk(leaseStatus: LeaseStatus): Unit =
+          thunk(connection, leaseStatus, req.dataPart, reqLockInfo)
+        Provider.withLockedTable(connection, req.provider, "orbeon_form_data_lease", () =>
+          LockSql.readLease(connection, req.provider, req.dataPart) match {
+            case Some(lease) =>
+              val canUseExistingLease =
+                reqLockInfo.userAndGroup.username == lease.lockInfo.userAndGroup.username || lease.timeout <= 0
+              if (canUseExistingLease)
+                callThunk(ExistsCanUse)
+              else
+                callThunk(ExistsCanNotUse(lease))
+            case None =>
+              callThunk(DoesNotExist)
           }
+        )
       }
     }
   }

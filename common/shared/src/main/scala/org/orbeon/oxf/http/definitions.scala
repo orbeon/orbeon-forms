@@ -228,6 +228,7 @@ trait HttpResponse {
 object StatusCode {
   val Ok                    = 200
   val Created               = 201
+  val NoContent             = 204
   val Found                 = 302
   val NotModified           = 304
   val Unauthorized          = 401
@@ -253,13 +254,15 @@ sealed trait HttpMethod extends EnumEntry
 
 object HttpMethod extends Enum[HttpMethod] {
 
+  sealed trait CrudMethod
+
   val values = findValues
 
-  case object GET     extends HttpMethod
+  case object GET     extends HttpMethod with CrudMethod
   case object POST    extends HttpMethod
-  case object PUT     extends HttpMethod
-  case object DELETE  extends HttpMethod
-  case object HEAD    extends HttpMethod
+  case object PUT     extends HttpMethod with CrudMethod
+  case object DELETE  extends HttpMethod with CrudMethod
+  case object HEAD    extends HttpMethod with CrudMethod
   case object OPTIONS extends HttpMethod
   case object TRACE   extends HttpMethod
   case object LOCK    extends HttpMethod

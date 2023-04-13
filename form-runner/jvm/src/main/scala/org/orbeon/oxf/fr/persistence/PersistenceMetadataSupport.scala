@@ -16,7 +16,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, PathUtils, URLRewriterUtils, XPath}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
@@ -118,17 +118,27 @@ object PersistenceMetadataSupport {
       }
     } .get
 
+  // TODO: Since  this is called by the persistence proxy and must indirectly reaches the persistence proxy again, could
+  //  we directly call the persistence proxy?
   // TODO: Clarify conditions of failure: form definition missing in database, connection failing, etc. Do we get a
   //  `None` in all cases, or can an exception be thrown?
   def readDocumentFormVersion(
     appForm    : AppForm,
     documentId : String,
-    isDraft    : Boolean
+    isDraft    : Boolean,
+    query      : List[(String, String)]
   ): Option[Int] = {
     val path = createFormDataBasePath(appForm.app, appForm.form, isDraft, documentId) + "data.xml"
-    val headers = readHeaders(path, Map.empty)
+    val headers = readHeaders(PathUtils.recombineQuery(path, query), Map.empty)
     headers.get(Version.OrbeonFormDefinitionVersion).map(_.head).map(_.toInt)
   }
+
+  def readLatestVersion(appForm: AppForm): Option[Int] =
+    for {
+      metadata    <- PersistenceMetadataSupport.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
+      formVersion <- metadata.child("form-version").headOption
+    } yield
+      formVersion.stringValue.toInt
 
   private object Private {
 

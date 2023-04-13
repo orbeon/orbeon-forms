@@ -114,8 +114,8 @@ trait FormRunnerLang {
 
     val request = CoreCrossPlatformSupport.externalContext.getRequest
 
-    def fromHeader  = request.getFirstHeader       (frc.LiferayLanguageHeader) map cleanLanguage
-    def fromRequest = request.getFirstParamAsString(frc.LanguageParam)         map cleanLanguage
+    def fromHeader  = request.getFirstHeaderIgnoreCase(frc.LiferayLanguageHeader) map cleanLanguage
+    def fromRequest = request.getFirstParamAsString(frc.LanguageParam)            map cleanLanguage
     def fromSession = stringFromSession(request, frc.LanguageParam)
 
     requestedLang.trimAllToOpt orElse

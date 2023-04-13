@@ -104,10 +104,10 @@ object FormRunnerPersistence {
   val DataPath                            = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
   val DataCollectionPath                  = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
   val SearchPath                          = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
-  val ReEncryptAppFormPath                = """/fr/service/persistence(/reencrypt/([^/]+)/([^/]+))""".r
+  val ReEncryptAppFormPath                = """/fr/service/persistence(/reencrypt/([^/]+)/([^/]+))""".r // `POST` only
   val PublishedFormsMetadataPath          = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
   val ReindexPath                         =   "/fr/service/persistence/reindex"
-  val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt"
+  val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt" // `GET` only
 
   val DataFormatVersionName               = "data-format-version"
   val DataMigrationBehaviorName           = "data-migration-behavior"

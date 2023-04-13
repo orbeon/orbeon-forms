@@ -36,43 +36,15 @@ object SecureUtils extends SecureUtilsTrait {
   private implicit val logger: Logger = LoggerFactory.createLogger("org.orbeon.crypto")
 
   // Properties
-  private val XFormsPasswordProperty          = "oxf.xforms.password" // for backward compatibility
-  private val GeneralPasswordProperty         = "oxf.crypto.password"
-  private val TokenPasswordProperty           = "oxf.fr.access-token.password"
-  private val FieldEncryptionPasswordProperty = "oxf.fr.field-encryption.password"
+  private val DeprecatedXFormsPasswordProperty = "oxf.xforms.password"
+  private val GeneralPasswordProperty          = "oxf.crypto.password"
+  private val TokenPasswordProperty            = "oxf.fr.access-token.password"
+  private val FieldEncryptionPasswordProperty  = "oxf.fr.field-encryption.password"
 
-  private val KeyLengthProperty               = "oxf.crypto.key-length"
-  private val HashAlgorithmProperty           = "oxf.crypto.hash-algorithm"
-  private val PreferredProviderProperty       = "oxf.crypto.preferred-provider"
-
-  private val passwords: java.util.concurrent.ConcurrentHashMap[KeyUsage, String] =
-    new java.util.concurrent.ConcurrentHashMap
-
-  private def getOrComputePassword(keyUsage: KeyUsage): String = {
-
-    def getPassword: String = {
-
-      val (propertyName, compatPropertyName) = keyUsage match {
-        case KeyUsage.General         => (GeneralPasswordProperty,         Some(XFormsPasswordProperty))
-        case KeyUsage.Token           => (TokenPasswordProperty,           None)
-        case KeyUsage.FieldEncryption => (FieldEncryptionPasswordProperty, Some(GeneralPasswordProperty))
-      }
-
-      val propertySet = Properties.instance.getPropertySet
-
-      val rawPassword =
-        compatPropertyName.flatMap(propertySet.getNonBlankString) orElse
-          propertySet.getNonBlankString(propertyName)             getOrElse
-          (throw new IllegalArgumentException(s"Missing password for property `$propertyName`"))
-
-      if (! PasswordChecker.checkAndLog(propertyName, rawPassword))
-        throw new IllegalArgumentException(s"Invalid password for property `$propertyName` property, see log for details")
-
-      rawPassword
-    }
-
-    passwords.computeIfAbsent(keyUsage, _ => getPassword)
-  }
+  private val CheckPasswordStrengthProperty    = "oxf.crypto.check-password-strength"
+  private val KeyLengthProperty                = "oxf.crypto.key-length"
+  private val HashAlgorithmProperty            = "oxf.crypto.hash-algorithm"
+  private val PreferredProviderProperty        = "oxf.crypto.preferred-provider"
 
   private val RandomHexIdBits = 128
   private val RandomHexIdBytes = RandomHexIdBits / 8
@@ -81,42 +53,44 @@ object SecureUtils extends SecureUtilsTrait {
   // 2023-04-11: Used for asserts only.
   val HexShortLength: Int = 40
 
-  // 2023-04-12: Used by `FieldEncryption` only
-  object Tink {
-
-    private lazy val aead = {
-      val messageDigest = MessageDigest.getInstance("SHA-256")
-      messageDigest.update(getOrComputePassword(KeyUsage.FieldEncryption).getBytes(CharsetNames.Utf8))
-      val key256Bit = messageDigest.digest()
-      // 128-bit key needed by implementation
-      // Shortening is ok https://security.stackexchange.com/a/34797/49208
-      val key128Bit = key256Bit.take(16)
-      new AesGcmJce(key128Bit)
-    }
-
-    def encrypt(plaintext  : Array[Byte]): Array[Byte] = aead.encrypt(plaintext,  null)
-    def decrypt(ciphertext : Array[Byte]): Array[Byte] = aead.decrypt(ciphertext, null)
-    def encrypt(plaintext  : String     ): String      = TinkBase64.encode(encrypt(plaintext.getBytes(CharsetNames.Utf8)))
-    def decrypt(ciphertext : String     ): String      = new String(decrypt(TinkBase64.decode(ciphertext)), CharsetNames.Utf8)
-  }
-
-  private def getKeyLength: Int =
-    Properties.instance.getPropertySet.getInteger(KeyLengthProperty, 128)
-
-  private def getHashAlgorithm: String =
-    Properties.instance.getPropertySet.getString(HashAlgorithmProperty, "SHA-256")
-
-  private def getPreferredProvider: Option[String] =
-    Properties.instance.getPropertySet.getNonBlankString(PreferredProviderProperty)
-
   private val HexDigits = Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
 
-  // Modern algorithms as of 2012
   private val KeyCipherAlgorithm = "PBKDF2WithHmacSHA1"
   private val EncryptionCipherTransformation = "AES/CBC/PKCS5Padding"
+  private val DigestAlgorithm = "SHA-256"
 
   private val AESBlockSize = 128
   private val AESIVSize    = AESBlockSize / 8
+
+  private val passwords: java.util.concurrent.ConcurrentHashMap[KeyUsage, String] =
+    new java.util.concurrent.ConcurrentHashMap
+
+  private def getOrComputePassword(keyUsage: KeyUsage): String = {
+
+    def getPassword: String = {
+
+      val propertyNames = keyUsage match {
+        case KeyUsage.General         => List(DeprecatedXFormsPasswordProperty, GeneralPasswordProperty)
+        case KeyUsage.Token           => List(TokenPasswordProperty)
+        case KeyUsage.FieldEncryption => List(FieldEncryptionPasswordProperty, GeneralPasswordProperty)
+      }
+
+      val propertySet = Properties.instance.getPropertySet
+
+      val (propertyName, rawPassword) =
+        propertyNames
+          .flatMap(n => propertySet.getNonBlankString(n).map(n ->))
+          .headOption
+          .getOrElse(throw new IllegalArgumentException(s"Missing password for property ${propertyNames.mkString("`", "`, `", "`")}"))
+
+      if (checkPasswordStrengthProperty && ! PasswordChecker.checkAndLog(propertyName, rawPassword))
+        throw new IllegalArgumentException(s"Invalid password for property `$propertyName` property, see log for details")
+
+      rawPassword
+    }
+
+    passwords.computeIfAbsent(keyUsage, _ => getPassword)
+  }
 
   private lazy val secureRandom = new SecureRandom
 
@@ -140,6 +114,37 @@ object SecureUtils extends SecureUtilsTrait {
 
     secretKeys.computeIfAbsent(keyUsage, _ => computeSecretKey)
   }
+
+  // 2023-04-12: Used by `FieldEncryption` only
+  object Tink {
+
+    private lazy val aead = {
+      val messageDigest = MessageDigest.getInstance(DigestAlgorithm)
+      messageDigest.update(getOrComputePassword(KeyUsage.FieldEncryption).getBytes(CharsetNames.Utf8))
+      val key256Bit = messageDigest.digest()
+      // 128-bit key needed by implementation
+      // Shortening is ok https://security.stackexchange.com/a/34797/49208
+      val key128Bit = key256Bit.take(16)
+      new AesGcmJce(key128Bit)
+    }
+
+    def encrypt(plaintext  : Array[Byte]): Array[Byte] = aead.encrypt(plaintext,  null)
+    def decrypt(ciphertext : Array[Byte]): Array[Byte] = aead.decrypt(ciphertext, null)
+    def encrypt(plaintext  : String     ): String      = TinkBase64.encode(encrypt(plaintext.getBytes(CharsetNames.Utf8)))
+    def decrypt(ciphertext : String     ): String      = new String(decrypt(TinkBase64.decode(ciphertext)), CharsetNames.Utf8)
+  }
+
+  private def checkPasswordStrengthProperty: Boolean =
+    Properties.instance.getPropertySet.getBoolean(CheckPasswordStrengthProperty, default = true)
+
+  private def getKeyLength: Int =
+    Properties.instance.getPropertySet.getInteger(KeyLengthProperty, 128)
+
+  private def getHashAlgorithm: String =
+    Properties.instance.getPropertySet.getString(HashAlgorithmProperty, DigestAlgorithm)
+
+  private def getPreferredProvider: Option[String] =
+    Properties.instance.getPropertySet.getNonBlankString(PreferredProviderProperty)
 
   // See: https://github.com/orbeon/orbeon-forms/pull/1745
   private lazy val preferredProviderOpt =

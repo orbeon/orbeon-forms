@@ -65,6 +65,8 @@
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.reindex"                           value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.postgresql.reindex"                      value="true"/>
 
+    <property as="xs:string"  name="oxf.fr.field-encryption.password"                           value=""/><!-- blank by default, which means use `oxf.crypto.password` -->
+
     <!-- Whether providers are active -->
     <!-- It's possible to set providers, typically `exist` and `resource` to inactive so the Home page does not attempt searches -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.active"                                value="true"/>

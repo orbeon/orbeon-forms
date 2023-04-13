@@ -79,7 +79,7 @@ object SecureUtils extends SecureUtilsTrait {
 
   // Length of a value returned by `randomHexId` and other functions
   // 2023-04-11: Used for asserts only.
-  val HexIdLength: Int = 40
+  val HexShortLength: Int = 40
 
   // 2023-04-12: Used by `FieldEncryption` only
   object Tink {
@@ -211,7 +211,7 @@ object SecureUtils extends SecureUtilsTrait {
 
   // Compute a digest with the default algorithm
   def digestStringToHexShort(text: String): String =
-    digestString(text, getHashAlgorithm, ByteEncoding.Hex).substring(0, HexIdLength)
+    digestString(text, getHashAlgorithm, ByteEncoding.Hex).substring(0, HexShortLength)
 
   def digestBytes(bytes: Array[Byte], encoding: ByteEncoding): String =
     digestBytes(bytes, getHashAlgorithm, encoding)
@@ -226,7 +226,7 @@ object SecureUtils extends SecureUtilsTrait {
     hmacString(SecureUtils.KeyUsage.General, text, ByteEncoding.fromString(encoding))
 
   def hmacStringToHexShort(keyUsage: KeyUsage, text: String): String =
-    hmacString(keyUsage, text, ByteEncoding.Hex).substring(0, HexIdLength)
+    hmacString(keyUsage, text, ByteEncoding.Hex).substring(0, HexShortLength)
 
   // Compute an HMAC with the default password and algorithm
   def hmacString(keyUsage: KeyUsage, text: String, encoding: ByteEncoding): String =
@@ -278,7 +278,7 @@ object SecureUtils extends SecureUtilsTrait {
     val bytes = new Array[Byte](RandomHexIdBytes)
     secureRandom.nextBytes(bytes)
     // We hash on top so that the actual random sequence won't be known if the id is made public
-    digestBytes(bytes, ByteEncoding.Hex).substring(0, HexIdLength) // keep the same final length no matter what the hash algorithm is
+    digestBytes(bytes, ByteEncoding.Hex).substring(0, HexShortLength) // keep the same final length no matter what the hash algorithm is
   }
 
   // Get a new message digest with the default algorithm

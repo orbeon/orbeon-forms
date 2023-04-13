@@ -49,7 +49,7 @@ object XFormsDocumentCache {
     val cache = ObjectCache.instance(CacheName, DefaultSize)
 
     def createCacheKey(uuid: String) = {
-      require(uuid.length == SecureUtils.HexIdLength)
+      require(uuid.length == SecureUtils.HexShortLength)
       new InternalCacheKey(ContainingDocumentKeyType, uuid)
     }
   }

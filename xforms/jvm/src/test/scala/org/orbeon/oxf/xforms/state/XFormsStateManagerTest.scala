@@ -113,7 +113,7 @@ class XFormsStateManagerTest
 
         locally {
 
-          assert(state1.uuid.length === SecureUtils.HexIdLength)
+          assert(state1.uuid.length === SecureUtils.HexShortLength)
           assertNonEmptyClientState(state1)
 
           // Initial response sent
@@ -174,7 +174,7 @@ class XFormsStateManagerTest
         val state1 = TestState(XFormsContainingDocumentBuilder(staticState, None, None, mustInitialize = true))
 
         val initialDynamicStateString = {
-          assert(state1.uuid.length === SecureUtils.HexIdLength)
+          assert(state1.uuid.length === SecureUtils.HexShortLength)
           assertEmptyClientState(state1)
 
           state1.document.afterInitialResponse()

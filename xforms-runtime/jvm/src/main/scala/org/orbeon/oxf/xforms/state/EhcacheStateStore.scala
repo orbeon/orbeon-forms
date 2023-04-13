@@ -90,7 +90,7 @@ object EhcacheStateStore {
           val parts = keyString split ':'
 
           assert(parts.size == 2)
-          assert(parts(0).length == SecureUtils.HexIdLength)   // static state key is an hex hash
+          assert(parts(0).length >= SecureUtils.HexShortLength) // static state key is an hex hash
 
           // If isInitialState == true, force finding the initial state. Otherwise, use current state stored in mapping.
           val dynamicStateKey = if (isInitialState) createDynamicStateKey(documentUUID, isInitialState = true) else parts(1)

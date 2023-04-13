@@ -228,7 +228,8 @@
                                 xxf:absolute-id('fr-form-model'),
                                 instance('fr-initial-instance'),
                                 $format-migrated,
-                                (xxf:get-request-parameter('data-migration-behavior'), 'holesonly')[1]
+                                (xxf:get-request-parameter('data-migration-behavior'), 'holesonly')[1],
+                                true()
                             )
                         return
                             if (exists($simply-migrated)) then

@@ -13,6 +13,7 @@
   */
 package org.orbeon.oxf.fr
 
+import cats.data.NonEmptyList
 import enumeratum.EnumEntry.Lowercase
 import org.log4s
 import org.orbeon.oxf.fr.FormRunnerCommon._
@@ -127,7 +128,8 @@ object SimpleDataMigration {
       enclosingModelAbsoluteId,
       templateInstanceRootElem,
       dataToMigrateRootElem,
-      getConfiguredDataMigrationBehavior(inScopeContainingDocument.staticState).entryName
+      getConfiguredDataMigrationBehavior(inScopeContainingDocument.staticState).entryName,
+      isSubmit = false
     )
 
   //@XPathFunction
@@ -135,7 +137,8 @@ object SimpleDataMigration {
     enclosingModelAbsoluteId : String,
     templateInstanceRootElem : om.NodeInfo,
     dataToMigrateRootElem    : om.NodeInfo,
-    dataMigrationBehavior    : String
+    dataMigrationBehavior    : String,
+    isSubmit                 : Boolean
   ): Option[om.NodeInfo] = {
 
     val maybeMigrated =
@@ -148,7 +151,9 @@ object SimpleDataMigration {
       )
 
     maybeMigrated map {
-      case Left(_)  => frc.sendError(StatusCode.InternalServerError) // TODO: Which error is best?
+      case Left(ops)  =>
+        logger.error(migrationErrorMessage(ops, DataMigrationBehavior.withName(dataMigrationBehavior)))
+        frc.sendError(if (isSubmit) StatusCode.BadRequest else StatusCode.InternalServerError)
       case Right(v) => v
     }
   }
@@ -159,7 +164,7 @@ object SimpleDataMigration {
     dataToMigrateRootElem    : om.NodeInfo,
     dataMigrationBehavior    : DataMigrationBehavior)(implicit
     formOps                  : FormOps
-  ): Option[List[DataMigrationOp] Either om.NodeInfo] = {
+  ): Option[NonEmptyList[DataMigrationOp] Either om.NodeInfo] = {
 
     require(XFormsId.isAbsoluteId(enclosingModelAbsoluteId))
     require(templateInstanceRootElem.isElement)
@@ -192,16 +197,18 @@ object SimpleDataMigration {
             dataMigrationBehavior == DataMigrationBehavior.HolesOnly && deleteAndMoveOps.isEmpty
           )
 
-        val mustRaiseError =
-          ops.nonEmpty && dataMigrationBehavior == DataMigrationBehavior.HolesOnly && deleteAndMoveOps.nonEmpty
-
         if (mustMigrate) {
           performMigrationOps(ops)
           Some(Right(dataToMigrateRootElemMutable))
-        } else if (mustRaiseError) {
-          Some(Left(deleteAndMoveOps))
         } else {
-          None
+
+          val deleteAndMoveOpsIfMustRaiseError =
+            if (dataMigrationBehavior == DataMigrationBehavior.HolesOnly)
+              NonEmptyList.fromList(deleteAndMoveOps)
+            else
+              None
+
+          deleteAndMoveOpsIfMustRaiseError.map(Left.apply)
         }
 
       case DataMigrationBehavior.Error =>
@@ -213,11 +220,44 @@ object SimpleDataMigration {
             dataToMigrateRootElem    = dataToMigrateRootElem
           )
 
-        if (ops.nonEmpty)
-          Some(Left(ops))
-        else
-          None
+        NonEmptyList.fromList(ops).map(Left.apply)
     }
+  }
+
+  private def migrationErrorMessage(
+    ops                  : NonEmptyList[DataMigrationOp],
+    dataMigrationBehavior: DataMigrationBehavior
+  ): String = {
+
+    lazy val deleteAndMoveOps =
+      ops collect {
+        case op: DataMigrationOp.Delete => op
+        case op: DataMigrationOp.Move   => op
+      }
+
+    def gatherMessages(ops: Iterator[DataMigrationOp]): Iterator[String] =
+      ops.map {
+        case DataMigrationOp.Insert(parent, _, template, _) =>
+          s"missing element with name `${template.name}` within `${parent.name}`"
+        case DataMigrationOp.Delete(elem, _) =>
+          s"extra element with name `${elem.name}` within `${elem.parentUnsafe.name}`"
+        case DataMigrationOp.Move(delete, insert) =>
+          s"moved element with name `${delete.elem.name}` from within `${delete.elem.parentUnsafe.name}` to within `${insert.template.name}`"
+      }
+
+    val messagesIt =
+      dataMigrationBehavior match {
+        case DataMigrationBehavior.HolesOnly if deleteAndMoveOps.nonEmpty =>
+          gatherMessages(deleteAndMoveOps.iterator)
+        case DataMigrationBehavior.Error =>
+          gatherMessages(ops.iterator)
+        case _ =>
+          throw new IllegalArgumentException
+      }
+
+    val messages = messagesIt.mkString("- ", "\n- ", "\n")
+
+    s"Simple data migration failed because the following issues were found in the data:\n\n$messages"
   }
 
   // This is used in `form-to-xbl.xsl`, see:

@@ -1,5 +1,6 @@
 package org.orbeon.oxf.fr.importexport
 
+import cats.data.NonEmptyList
 import cats.syntax.option._
 import org.orbeon.dom.QName
 import org.orbeon.oxf.externalcontext.ExternalContext
@@ -215,7 +216,7 @@ object ImportExportSupport {
     form              : om.NodeInfo,
     appFormVersionOpt : Option[AppFormVersion], // for migration
     formDataOpt       : Option[(om.DocumentInfo, DataFormatVersion, DataMigrationBehavior)]
-  ): List[DataMigrationOp] Either FormRunnerDocContext = {
+  ): NonEmptyList[DataMigrationOp] Either FormRunnerDocContext = {
 
     val (metadataRootElem, templateDataRootElem, excludeResultPrefixes) = {
 

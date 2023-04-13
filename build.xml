@@ -540,7 +540,6 @@
                 <include name="orbeon-auth.war"/>
             </zipfileset>
             <zipfileset file="README.md" prefix="${versioned-name}"/>
-            <zipfileset file="README.md" fullpath="${versioned-name}/README.txt"/>
             <zipfileset file="LICENSE.txt" prefix="${versioned-name}"/>
             <zipfileset dir="third-party-licenses" prefix="${versioned-name}/third-party-licenses"/>
         </zip>

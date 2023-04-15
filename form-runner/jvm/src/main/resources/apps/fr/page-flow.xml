@@ -214,8 +214,8 @@
 
     <!-- Export published form with form data as Excel or XML -->
     <page path="/fr/([^/^.]+)/([^/^.]+)/export(/([^/^.]+))?"
-             model="detail/detail-model.xpl"
-             view="export/excel-export-with-data.xpl">
+          model="detail/detail-model.xpl"
+          view="export/excel-export-with-data.xpl">
     </page>
 
     <!-- Test form "inline" (when being edited) with new empty document -->

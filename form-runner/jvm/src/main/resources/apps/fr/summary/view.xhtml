@@ -1409,6 +1409,7 @@
                     <xf:action iterate="xxf:split(instance('fr-selection-instance'))">
                         <xf:var name="document" value="." as="xs:string"/>
                         <xf:dispatch name="fr-delete-data" targetid="fr-persistence-model">
+                            <!-- Each value is `data/12345` or `draft/67890` -->
                             <xf:property name="document-data-or-draft-id" value="$document"/>
                         </xf:dispatch>
                     </xf:action>

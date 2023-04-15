@@ -119,7 +119,7 @@ trait FormRunnerBaseOps {
   //@XPathFunction
   val FormVersionParam                         = "form-version"
   //@XPathFunction
-  val AccessTokenParam                         = "fr-access-token" // or `orbeon-access-token`?
+  val AccessTokenParam                         = "fr-access-token"
   //@XPathFunction
   val AuthorizedOperationsFromPersistenceParam = "fr-authorized-operations-from-persistence"
 

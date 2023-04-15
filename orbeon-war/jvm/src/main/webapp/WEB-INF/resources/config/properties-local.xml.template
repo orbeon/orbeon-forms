@@ -1,9 +1,21 @@
 <!--
-    This file is an empty template for your own properties-local.xml file. Please follow the instructions here:
+    This file is an empty template for your own `properties-local.xml` file.
+    Please follow the instructions linked below:
 
-    https://doc.orbeon.com/configuration/properties/
+    https://doc.orbeon.com/configuration/properties
 -->
-<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<properties
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+>
+
+    <!-- Always set a strong password here, see:
+         https://doc.orbeon.com/configuration/properties/general#oxf.crypto.password -->
+    <property
+        as="xs:string"
+        name="oxf.crypto.password"
+        value=""/>
 
 </properties>

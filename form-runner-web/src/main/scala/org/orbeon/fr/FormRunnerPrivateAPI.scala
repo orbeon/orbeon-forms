@@ -24,7 +24,6 @@ import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
-import scala.scalajs.js.UndefOr
 
 
 object FormRunnerPrivateAPI extends js.Object {
@@ -104,34 +103,26 @@ object FormRunnerPrivateAPI extends js.Object {
     }
   }
 
-  def updateLocationFormVersion(version: Int): Unit = {
+  // For Summary page when changing the form version
+  def updateLocationFormVersion(version: Int): Unit =
+    removeReplaceOrAddUrlParameter("form-version", Some(version.toString))
+
+  def removeUrlParameter(name: String): Unit =
+    removeReplaceOrAddUrlParameter(name, None)
+
+  private def removeReplaceOrAddUrlParameter(name: String, newValueOpt: Option[String]): Unit = {
 
     val location = dom.window.location
+    val search   = location.search
+    val query    = PathUtils.decodeSimpleQuery(if (search.startsWith("?")) search.substring(1) else search)
+    val newQuery = PathUtils.removeReplaceOrAddUrlParameter(query, name, newValueOpt)
 
-    val (_, query) = PathUtils.splitQueryDecodeParams(location.search)
-
-    val newParams = ("form-version" -> version.toString) :: (query filterNot (_._1 == "form-version"))
-
-    dom.window.history.replaceState(
-      statedata = dom.window.history.state,
-      title     = "",
-      url       = PathUtils.recombineQuery(location.pathname, newParams) + location.hash
-    )
-  }
-
-  def removeUrlParameter(name: String): Unit = {
-
-    val location   = dom.window.location
-    val (_, query) = PathUtils.splitQueryDecodeParams(location.search)
-
-    if (query.exists(_._1 == name)) {
-      val newParams = query filterNot (_._1 == name)
+    if (query != newQuery)
       dom.window.history.replaceState(
         statedata = dom.window.history.state,
         title     = "",
-        url       = PathUtils.recombineQuery(location.pathname, newParams) + location.hash
+        url       = PathUtils.recombineQuery(location.pathname, newQuery) + location.hash
       )
-    }
   }
 
   def navigateToError(

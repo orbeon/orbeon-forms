@@ -119,6 +119,24 @@ object PathUtils {
       pathQuery.substring(0, questionIndex)
   }
 
+  // TODO: test
+  def removeReplaceOrAddUrlParameter(
+    query      : List[(String, String)],
+    name       : String,
+    newValueOpt: Option[String]
+  ): List[(String, String)] =
+    newValueOpt match {
+      case Some(newValue) if query.exists(_._1 == name) =>
+        query map {
+          case (`name`, _) => name -> newValue // this replaces all instances of the parameter
+          case other       => other
+        }
+      case Some(value) =>
+        query ::: (name -> value) :: Nil
+      case None =>
+        query filterNot (_._1 == name)
+    }
+
   /**
    * Check whether a URL starts with a protocol.
    *

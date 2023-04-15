@@ -1,5 +1,6 @@
 package org.orbeon.oxf.fr.persistence.relational.search.adt
 
+
 sealed trait SearchVersion
 
 object SearchVersion {
@@ -8,11 +9,10 @@ object SearchVersion {
   case object All                       extends SearchVersion
   case class  Specific   (version: Int) extends SearchVersion
 
-  def apply(version: Option[String]): SearchVersion = {
+  def apply(version: Option[String]): SearchVersion =
     version match {
       case None         => Unspecified
       case Some("all")  => All
       case Some(v)      => Specific(v.toInt)
     }
-  }
 }

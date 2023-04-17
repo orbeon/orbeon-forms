@@ -115,13 +115,13 @@ trait FormRunnerBaseOps {
 
   import FormRunnerBaseOps._
 
-  val LanguageParam                            = "fr-language"
+  val LanguageParam                     = "fr-language"
   //@XPathFunction
-  val FormVersionParam                         = "form-version"
+  val FormVersionParam                  = "form-version"
   //@XPathFunction
-  val AccessTokenParam                         = "fr-access-token"
+  val AccessTokenParam                  = "fr-access-token"
   //@XPathFunction
-  val AuthorizedOperationsFromPersistenceParam = "fr-authorized-operations-from-persistence"
+  val InternalAuthorizedOperationsParam = "fr-internal-authorized-operations"
 
   val LiferayLanguageHeader  = "orbeon-liferay-language"
 
@@ -327,8 +327,7 @@ trait FormRunnerBaseOps {
   private val UpdateOps = Set("*", "update")
   private val DeleteOps = Set("*", "delete")
 
-  private def authorizedOperations: Set[String] = authorizedOperationsInstance.rootElement.stringValue.splitTo[Set]()
-  def authorizedOperationsFromPersistence: Set[String] = authorizedOperationsInstance.rootElement.attValue("from-persistence").splitTo[Set]()
+  def authorizedOperations: Set[String] = authorizedOperationsInstance.rootElement.stringValue.splitTo[Set]()
 
   // Used by user XPath functions
   def canCreate: Boolean = authorizedOperations intersect CreateOps nonEmpty

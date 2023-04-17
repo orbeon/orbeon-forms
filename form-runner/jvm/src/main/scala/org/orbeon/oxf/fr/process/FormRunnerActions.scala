@@ -295,7 +295,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
     Try {
       val params: List[Option[(Option[String], String)]] =
         List(
-          Some(             Some("uri")                   -> prependUserAndStandardParamsForModeChange(sourceModeType != ModeType.Creation, prependCommonFormRunnerParameters(path, forNavigate = false))),
+          Some(             Some("uri")                   -> prependUserAndStandardParamsForModeChange(propagateDataPermissions = true, prependCommonFormRunnerParameters(path, forNavigate = false))),
           Some(             Some("method")                -> HttpMethod.POST.entryName.toLowerCase),
           Some(             Some(NonRelevantName)         -> RelevanceHandling.Keep.entryName.toLowerCase),
           Some(             Some("replace")               -> replace),
@@ -316,7 +316,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
       (s"/fr/$app/$form/view/$document", formRunnerParams.modeType)
     } flatMap { case (path, sourceModeType) =>
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, path, sourceModeType = sourceModeType)
+      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, path, sourceModeType)
     }
 
   def tryNavigateToEdit(params: ActionParams): Try[Any] =
@@ -324,7 +324,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       val formRunnerParams @ FormRunnerParams(app, form, _, Some(document), _, _) = FormRunnerParams()
       (s"/fr/$app/$form/edit/$document", formRunnerParams.modeType)
     } flatMap { case (path, sourceModeType) =>
-      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, path, sourceModeType = sourceModeType)
+      tryChangeMode(XFORMS_SUBMIT_REPLACE_ALL, path, sourceModeType)
     }
 
   def tryOpenRenderedFormat(params: ActionParams): Try[Any] =
@@ -417,10 +417,10 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
 
     // https://github.com/orbeon/orbeon-forms/issues/2999
     // https://github.com/orbeon/orbeon-forms/issues/5437
-    val authorizedOperationsFromPersistenceParam =
+    val internalAuthorizedOperationsParam =
       propagateDataPermissions flatList {
-        val ops = authorizedOperationsFromPersistence
-        ops.nonEmpty list (AuthorizedOperationsFromPersistenceParam -> FormRunnerOperationsEncryption.encryptOperations(ops))
+        val ops = authorizedOperations
+        ops.nonEmpty list (InternalAuthorizedOperationsParam -> FormRunnerOperationsEncryption.encryptOperations(ops))
       }
 
     val userParams =
@@ -431,7 +431,7 @@ trait FormRunnerActions extends FormRunnerActionsCommon {
       } yield
         name -> value
 
-    recombineQuery(path, dataMigrationParam :: authorizedOperationsFromPersistenceParam ::: userParams ::: params)
+    recombineQuery(path, dataMigrationParam :: internalAuthorizedOperationsParam ::: userParams ::: params)
   }
 
   private def buildRenderedFormatPath(

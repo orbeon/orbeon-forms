@@ -387,8 +387,8 @@
             ref="instance('fr-authorized-operations')"
             value="
                 frf:authorizedOperationsForDetailModeOrThrow(
-                    instance('fr-authorized-operations')/@from-persistence,
-                    xxf:get-request-parameter(frf:AuthorizedOperationsFromPersistenceParam())[1],
+                    instance('fr-authorized-operations')/string(),
+                    xxf:get-request-parameter(frf:InternalAuthorizedOperationsParam())[1],
                     xxf:instance('fr-form-metadata')/permissions,
                     $is-submit
                 )"/>
@@ -729,10 +729,10 @@
             <xf:var
                 name="operations-header"
                 value="event('response-headers')[lower-case(name) = 'orbeon-operations']/value"/>
-            <xf:insert
+            <xf:setvalue
                 if="exists($operations-header)"
-                context="instance('fr-authorized-operations')"
-                origin="xf:attribute('from-persistence', $operations-header/string())"/>
+                ref="instance('fr-authorized-operations')"
+                value="$operations-header"/>
             <!-- Save value of the Orbeon-Workflow-Stage header -->
             <xf:setvalue
                 ref="instance('fr-document-metadata')/@workflow-stage"

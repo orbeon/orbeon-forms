@@ -67,7 +67,7 @@ trait FormRunnerPermissionsOps {
 
   //@XPathFunction
   def authorizedOperationsForDetailModeOrThrow(
-    operationsFromData               : String,
+    currentAuthorizedOperations      : String,
     encryptedOperationsFromDataOrNull: String,
     permissionsElemOrNull            : NodeInfo,
     isSubmit                         : Boolean
@@ -86,7 +86,7 @@ trait FormRunnerPermissionsOps {
       formRunnerParams.modeType match {
         case modeType @ (ModeType.Edition | ModeType.Readonly) =>
           val ops =
-            Operations.parseFromString(operationsFromData)
+            Operations.parseFromString(currentAuthorizedOperations)
               .orElse(
                 if (isSubmit)
                   encryptedOperationsFromDataOrNull.trimAllToOpt.flatMap(FormRunnerOperationsEncryption.decryptOperations)

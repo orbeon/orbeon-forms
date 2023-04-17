@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.email.{EmailMetadata, EmailMetadataConversion, EmailMetadataParsing, EmailMetadataSerialization}
+import org.orbeon.oxf.fr.permission.{Operation, Operations}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
 import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.PathUtils._
@@ -24,6 +25,7 @@ import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath.NodeInfoOps
 
 import scala.xml.Elem
+
 
 trait FormRunnerEmail {
 
@@ -120,13 +122,14 @@ trait FormRunnerEmail {
       val token =
         FormRunnerAccessToken.encryptToken(
           FormRunnerAccessToken.TokenHmac(
-            app         = app,
-            form        = form,
-            version     = version,
+            app      = app,
+            form     = form,
+            version  = version,
             document = documentOpt
           ),
           FormRunnerAccessToken.TokenPayload(
-            exp = java.time.Instant.now.plus(java.time.Duration.ofMinutes(validityMinutes))
+            exp = java.time.Instant.now.plus(java.time.Duration.ofMinutes(validityMinutes)),
+            ops = Operations.inDefinitionOrder(List(Operation.Read, Operation.Update))
           )
         )
 

@@ -10,6 +10,7 @@ import scala.collection.immutable
 
 
 sealed trait                                                       Operations
+// TODO: move to inside `object Operations`
 case object AnyOperation                                   extends Operations
 case class  SpecificOperations(operations: Set[Operation]) extends Operations {
 
@@ -40,9 +41,8 @@ object Operations {
 
   private val MinusListToken: String = s"-${Operation.List.entryName}"
 
-  val None   : Operations      = SpecificOperations(Set.empty)
-  val AllList: List[Operation] = Operation.values.toList
-  val AllSet : Set[Operation]  = AllList.toSet
+  val None: SpecificOperations = SpecificOperations(Set.empty)
+  private val AllList: List[Operation] = Operation.values.toList
 
   def parseFromHeaders(headers: Map[String, List[String]]): Option[Operations] =
     Headers.firstItemIgnoreCase(headers, FormRunnerPersistence.OrbeonOperations)
@@ -63,15 +63,15 @@ object Operations {
       case operations      => Some(operations)
     }
 
-  // `operations` contains tokens, including possibly `*`. This is the value of the `operations` attribute in the
-  // serialized form definition format for permissions.
-  def normalizeAndParseOperations(operations: String): Operations = {
+  // `operations` contains tokens.
+  // 2023-04-17: We exclude `*` as this is called by `PermissionsXML` only for parsing
+  // permissions set in form definitions, and there the `*` is not allowed.
+  def normalizeAndParseSpecificOperations(operations: String): SpecificOperations = {
 
     val tokens = operations.tokenizeToSet
 
     if (tokens("*")) {
-      // We shouldn't have `* read`, for example, but in case we do then `*` wins
-      AnyOperation
+      throw new IllegalArgumentException(operations)
     } else {
       val hasMinusListToken = tokens(MinusListToken) // https://github.com/orbeon/orbeon-forms/issues/5397
 

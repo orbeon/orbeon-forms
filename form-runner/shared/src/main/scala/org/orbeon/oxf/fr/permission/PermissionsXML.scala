@@ -64,7 +64,7 @@ object PermissionsXML {
    */
   private def parsePermission(permissionEl: NodeInfo): Permission = {
     val operations =
-      Operations.normalizeAndParseOperations(permissionEl.attValue("operations"))
+      Operations.normalizeAndParseSpecificOperations(permissionEl.attValue("operations"))
     val conditions =
       permissionEl.child(*).toList.map(
         conditionEl =>

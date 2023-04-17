@@ -1,6 +1,6 @@
 package org.orbeon.oxf.fr.workflow
 
-import org.orbeon.oxf.fr.permission.{Operation => PermissionOperation, Operations => PermissionOperations, _}
+import org.orbeon.oxf.fr.permission.{Operation => PermissionOperation, _}
 import org.orbeon.oxf.util.CoreUtils._
 
 
@@ -33,7 +33,6 @@ object PermissionsToWorkflowConfig {
                       case RolesAnyOf(roles)    => roles.map(AuthenticationRoleAvailabilityRule(IsComparison, _))
                     }.map(ToUsersAvailability(_))
               val operations = permission.operations match {
-                case AnyOperation                   => PermissionOperations.AllSet
                 case SpecificOperations(operations) => operations
               }
               actors.map(_ -> operations)

@@ -161,10 +161,10 @@ object PermissionsAuthorization {
   ): Try[Operations] =
     FormRunnerAccessToken.decryptToken(tokenHmac, token) map { tokenPayload =>
       if (tokenPayload.exp.isAfter(java.time.Instant.now)) {
-        // TODO: consider passing operations as part of the token as well
         Operations.combine(
           definedPermissions.permissionsList collect {
-            case permission if permission.conditions.contains(AnyoneWithToken) => permission.operations
+            case permission if permission.conditions.contains(AnyoneWithToken) =>
+              SpecificOperations(permission.operations.operations.intersect(tokenPayload.ops.toSet))
           }
         )
       } else {
@@ -284,15 +284,6 @@ object PermissionsAuthorization {
           }
           allConditionsPass(checkBasedOnOperation)
         })
-      case AnyOperation =>
-        if (allConditionsPass(check))
-          AnyOperation
-        else
-          check match {
-            case CheckWithoutDataUserPessimistic
-                 if allConditionsPass(checkWithCurrentUser) => SpecificOperations(Set(Operation.Create))
-            case _                                          => Operations.None
-          }
     }
   }
 

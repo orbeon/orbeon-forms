@@ -1,8 +1,6 @@
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.fr.permission.Operations
-
-import scala.util.Try
+import org.orbeon.oxf.fr.permission.{Operation, Operations}
 
 
 trait FormRunnerAccessTokenTrait {
@@ -15,7 +13,8 @@ trait FormRunnerAccessTokenTrait {
   )
 
   case class TokenPayload(
-    exp: java.time.Instant // keep `exp` for serialization
+    exp: java.time.Instant, // keep `exp` short for serialization
+    ops: List[Operation]    // keep `ops` short for serialization
   )
 }
 

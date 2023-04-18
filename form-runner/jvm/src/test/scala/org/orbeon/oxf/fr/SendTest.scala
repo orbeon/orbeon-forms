@@ -189,19 +189,19 @@ class SendTest
 
       val ExpectedMetadata: NodeInfo =
         <metadata>
-          <control for="56259ab2f1a2484d960fa1caf7dc3682f77f4f9e" name="section-1" type="section">
+          <control for="83bc9100403624e89f412f567ebadc9fadbc2dd3" name="section-1" type="section">
             <resources lang="en">
               <label>Section 1</label>
             </resources>
           </control>
-          <control for="603fc7fe572459bec642cfb5c867916fff656d8c" name="control-1.1" type="input">
+          <control for="88fe6ff0c038201b4d08bf8ce74314b6ce44d4f1" name="control-1.1" type="input">
             <resources lang="en">
               <label>Control 1.1</label>
               <hint/>
             </resources>
             <value/>
           </control>
-          <control for="1c5e5c4a4cb44407ba52d43adf303239915a96ce" name="control-1.2" type="tinymce">
+          <control for="af8635307e677c8d865c20307ce6b52d0cb653af" name="control-1.2" type="tinymce">
             <resources lang="en">
               <label>Control 1.2</label>
               <hint/>

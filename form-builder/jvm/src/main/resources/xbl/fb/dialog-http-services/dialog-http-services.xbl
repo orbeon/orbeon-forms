@@ -845,7 +845,7 @@
                                         <fr:grid>
                                             <xh:tr>
                                                 <xh:td>
-                                                    <xf:textarea ref="." class="fb-submission-response-body">
+                                                    <xf:textarea ref="." class="fb-submission-response-body" appearance="clipboard-copy">
                                                         <xf:label class="xforms-hidden" ref="$resources/dialog-http-services/response-body/label"/>
                                                     </xf:textarea>
                                                 </xh:td>

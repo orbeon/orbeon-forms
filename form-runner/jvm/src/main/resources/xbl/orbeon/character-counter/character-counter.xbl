@@ -46,7 +46,7 @@
             <display-name lang="pt" todo="true">[With Character Counter]</display-name>
             <toolbox show="false"/>
             <icon>
-                <small-icon>/apps/fr/style/images/other/140-skylt-16.png</small-icon>
+                <icon-class>fa fa-fw fa-gauge</icon-class>
             </icon>
             <templates>
                 <!-- Provide a view template for Form Builder so that CSS resources are loaded -->

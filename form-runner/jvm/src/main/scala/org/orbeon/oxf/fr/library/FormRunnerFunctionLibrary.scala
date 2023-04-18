@@ -139,7 +139,8 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
     )
 
-    Fun("form-runner-link", classOf[FRLinkBackToFormRunner], op = 0, min = 1, STRING, EXACTLY_ONE,
+    Fun("form-runner-link", classOf[FRFormRunnerLink], op = 0, min = 1, STRING, EXACTLY_ONE,
+      Arg(STRING, EXACTLY_ONE),
       Arg(STRING, EXACTLY_ONE)
     )
 
@@ -413,9 +414,12 @@ private object FormRunnerFunctions {
     }
   }
 
-  class FRLinkBackToFormRunner extends FunctionSupport with RuntimeDependentFunction {
+  class FRFormRunnerLink extends FunctionSupport with RuntimeDependentFunction {
     override def evaluateItem(context: XPathContext): StringValue =
-      FormRunner.buildLinkBackToFormRunnerUsePageName(stringArgument(0)(context))
+      FormRunner.buildLinkBackToFormRunnerUsePageName(
+        stringArgument(0)(context),
+        stringArgumentOpt(1)(context)
+      )
   }
 
   class FRIsEmbedded extends FunctionSupport with RuntimeDependentFunction {

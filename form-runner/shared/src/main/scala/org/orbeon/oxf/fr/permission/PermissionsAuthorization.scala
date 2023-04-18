@@ -172,6 +172,19 @@ object PermissionsAuthorization {
       }
     }
 
+  def possiblyAllowedTokenOperations(permissions: Permissions): Operations =
+    permissions match {
+      case UndefinedPermissions =>
+        Operations.None
+      case DefinedPermissions(permissionsList) =>
+        Operations.combine(
+          permissionsList collect {
+            case permission if permission.conditions.contains(AnyoneWithToken) =>
+              SpecificOperations(permission.operations.operations)
+          }
+        )
+    }
+
   def authorizedOperationsForNoData(
     permissions   : Permissions,
     credentialsOpt: Option[Credentials]

@@ -43,6 +43,18 @@ trait FormRunnerPermissionsOps {
         }
     }
 
+  //@XPathFunction
+  def possiblyAllowedTokenOperations(permissionsElOrNull: NodeInfo, app: String, form: String): String =
+    Operations.serialize(
+      PermissionsAuthorization.possiblyAllowedTokenOperations(
+        permissionsFromElemOrProperties(
+            Option(permissionsElOrNull),
+            AppForm(app, form)
+          )
+      ),
+      normalized = true
+    ).mkString(" ")
+
   // 2023-03-08: Used by Summary and legacy eXist code
   //@XPathFunction
   def authorizedOperationsBasedOnRolesXPath(permissionsElOrNull: NodeInfo, app: String, form: String): List[String] =

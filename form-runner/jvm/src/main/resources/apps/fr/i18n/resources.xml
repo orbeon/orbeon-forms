@@ -330,6 +330,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label>Create link to share</label>
+            <body>Let anyone with the link view or edit this data.</body>
+            <link>Link</link>
+            <select-operations>Select operations</select-operations>
+            <readonly>Readonly</readonly>
+            <readwrite>Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title>Form Runner Administration</title>
         </admin>
@@ -876,6 +884,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label>Création d'un lien de partage</label>
+            <body>Permettre à des tiers possédant le lien de lire ou d'écrire ces donnes.</body>
+            <link>Lien</link>
+            <select-operations>Sélectionner les operations</select-operations>
+            <readonly>Lecture seule</readonly>
+            <readwrite>Lecture et écriture</readwrite>
+        </share-dialog>
         <admin>
             <title>Administration Form Runner</title>
         </admin>
@@ -1408,6 +1424,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -1967,6 +1991,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -2511,6 +2543,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -3040,6 +3080,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -3582,6 +3630,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -4124,6 +4180,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -4666,6 +4730,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -5208,6 +5280,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -5749,6 +5829,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -6290,6 +6378,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -6819,6 +6915,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>
@@ -7360,6 +7464,14 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <share-dialog>
+            <label todo="true">Create link to share</label>
+            <body todo="true">Let anyone with the link view or edit this data.</body>
+            <link todo="true">Link</link>
+            <select-operations todo="true">Select operations</select-operations>
+            <readonly todo="true">Readonly</readonly>
+            <readwrite todo="true">Read-write</readwrite>
+        </share-dialog>
         <admin>
             <title todo="true">[Form Runner Administration]</title>
         </admin>

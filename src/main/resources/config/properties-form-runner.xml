@@ -105,6 +105,7 @@
 
     <property as="xs:boolean" name="oxf.fr.navbar.home-link.enable"                             value="true"/>
     <property as="xs:boolean" name="oxf.fr.navbar.language-selector.enable"                     value="true"/>
+    <property as="xs:boolean" name="oxf.fr.navbar.share-button.enable"                          value="false"/>
 
     <!-- 2022-12-18: Still support buttons, but they look weird on those pages, and we have the navbar link to replace them -->
     <property as="xs:string"  name="oxf.fr.forms.buttons"                                       value=""/>

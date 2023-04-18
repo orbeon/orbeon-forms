@@ -120,7 +120,7 @@
                                                 'LinkToPdfParam'
                                             )
                                         ) then
-                                            frf:buildLinkBackToFormRunner($p/@type, $p/token = 'true')
+                                            frf:buildLinkBackToFormRunner($p/@type, if ($p/token = 'true') then 'read update' else '')
                                         else
                                             error()
                                     )

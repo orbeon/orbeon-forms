@@ -494,6 +494,7 @@
 <!--                        <xh:div>-->
 <!--                            xxx: <xf:output value="fr:workflow-stage-value()"/>-->
 <!--                        </xh:div>-->
+                        <fr:share-icon/>
                         <fr:status-icons/>
                         <fr:user-nav/>
                         <fr:navbar-home-link/>
@@ -835,6 +836,28 @@
         </xh:ul>
     </xsl:template>
 
+    <xsl:template match="fr:share-icon">
+        <xf:group
+            class="fr-share-nav"
+            ref=".[
+                xxf:property('oxf.fr.navbar.share-button.enable')                           and
+                not(fr:is-embedded())                                                       and
+                xxf:non-blank(xxf:instance('fr-share-dialog-instance')/possible-operations) and
+                fr:mode() = (
+                    'edit',
+                    'view'
+                )
+            ]">
+
+            <xf:trigger appearance="minimal" class="fr-share-button">
+                <xf:label><xh:i class="fa fa-fw fa-share-nodes"/></xf:label>
+                <xxf:show
+                    event="DOMActivate"
+                    dialog="fr-share-dialog"/>
+            </xf:trigger>
+        </xf:group>
+    </xsl:template>
+
     <xsl:template match="fr:user-nav">
         <xf:group
             class="fr-user-nav"
@@ -931,6 +954,72 @@
             <fr:negative-choice/>
             <fr:positive-choice/>
         </fr:alert-dialog>
+
+        <xxf:dialog
+            id="fr-share-dialog"
+            class="fr-dialog-share"
+            model="fr-persistence-model"
+            level="modal"
+            close="true"
+            draggable="true">
+            <xf:label ref="xxf:r('share-dialog.label', '|fr-fr-resources|')"/>
+
+            <xf:action event="xxforms-dialog-open">
+                <xf:setvalue
+                    ref="instance('fr-share-dialog-instance')/selected-operations"
+                    value="'read'"/>
+            </xf:action>
+
+            <xf:action event="xxforms-dialog-close">
+                <xf:setvalue
+                    iterate="instance('fr-share-dialog-instance')"
+                    ref="."/>
+            </xf:action>
+
+            <fr:grid ref="instance('fr-share-dialog-instance')">
+                <fr:c x="1" w="12" y="1">
+                    <xf:output value="xxf:r('share-dialog.body', '|fr-fr-resources|')" mediatype="text/html"/>
+                </fr:c>
+                <fr:c x="1" w="12" y="2">
+                    <xf:output
+                        id="my-output"
+                        appearance="clipboard-copy"
+                        ref="link">
+                        <xf:label appearance="minimal" ref="xxf:r('share-dialog.link', '|fr-fr-resources|')"/>
+                    </xf:output>
+                </fr:c>
+                <fr:c x="1" w="4" y="3">
+                     <xf:select1 appearance="minimal" ref="selected-operations">
+                        <xf:label appearance="minimal" ref="xxf:r('share-dialog.select-operations', '|fr-fr-resources|')"/>
+                        <xf:item>
+                            <xf:label ref="xxf:r('share-dialog.readonly', '|fr-fr-resources|')"/>
+                            <xf:value>read</xf:value>
+                        </xf:item>
+                        <xf:item>
+                            <xf:label ref="xxf:r('share-dialog.readwrite', '|fr-fr-resources|')"/>
+                            <xf:value>read update</xf:value>
+                        </xf:item>
+                        <xf:setvalue
+                            event="xforms-enabled xforms-value-changed"
+                            ref="instance('fr-share-dialog-instance')/link"
+                            value="
+                                fr:form-runner-link(
+                                    fr:mode(),
+                                    instance('fr-share-dialog-instance')/selected-operations
+                                )"/>
+                    </xf:select1>
+                </fr:c>
+            </fr:grid>
+
+            <xh:div class="fr-dialog-buttons">
+                <xf:trigger appearance="xxf:primary">
+                    <xf:label ref="xxf:r('buttons.close', '|fr-fr-resources|')" mediatype="text/html"/>
+                    <xf:action event="DOMActivate">
+                        <xxf:hide dialog="fr-share-dialog"/>
+                    </xf:action>
+                </xf:trigger>
+            </xh:div>
+        </xxf:dialog>
 
         <!-- Listen for upload events -->
         <xf:action

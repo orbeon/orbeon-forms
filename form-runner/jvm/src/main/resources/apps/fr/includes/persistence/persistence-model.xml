@@ -393,6 +393,15 @@
                     $is-submit
                 )"/>
 
+        <xf:setvalue
+            ref="instance('fr-share-dialog-instance')/possible-operations"
+            value="
+                frf:possiblyAllowedTokenOperations(
+                    xxf:instance('fr-form-metadata')/permissions,
+                    $app,
+                    $form
+                )"/>
+
     </xf:action>
 
     <!-- Instance for background service response -->
@@ -980,6 +989,14 @@
     <!-- Series of temporary URLs for PDF/TIFF generation -->
     <xf:instance id="fr-urls-instance" xxf:exclude-result-prefixes="#all">
         <urls/>
+    </xf:instance>
+
+    <xf:instance id="fr-share-dialog-instance" xxf:exclude-result-prefixes="#all">
+        <_>
+            <possible-operations/>
+            <selected-operations/>
+            <link/>
+        </_>
     </xf:instance>
 
     <xf:bind ref="instance('fr-urls-instance')/*" type="xs:anyURI"/>

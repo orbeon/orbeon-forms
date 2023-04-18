@@ -60,14 +60,11 @@ object XFormsXbl {
       private var initCalled    = false
       private var destroyCalled = false
 
-      private def superPrototypeAsDynamic: js.Dynamic =
-        superclass.asInstanceOf[js.Dynamic].prototype
-
       override def init(): Unit =
         if (! initCalled) {
           initCalled = true
-          if (superPrototypeAsDynamic.init.isInstanceOf[js.Function])
-            superPrototypeAsDynamic.init.call(this) // `super.init()` fails at compilation
+          if (! js.isUndefined(super.init))
+            super.init()
           if (! isJavaScriptLifecycle(containerElem))
             XBL.componentInitialized.fire(new js.Object {
               val container   = containerElem
@@ -78,8 +75,8 @@ object XFormsXbl {
       override def destroy(): Unit = {
         if (! destroyCalled) {
           destroyCalled = true
-          if (superPrototypeAsDynamic.destroy.isInstanceOf[js.Function])
-            superPrototypeAsDynamic.destroy.call(this) // `super.destroy()` fails at compilation
+          if (! js.isUndefined(super.destroy))
+            super.destroy()
           // We can debate whether the following clean-up should happen here or next to the caller of `destroy()`.
           // However, legacy users might call `destroy()` manually, in which case it's better to clean-up here.
           $(containerElem).removeData("xforms-xbl-object")

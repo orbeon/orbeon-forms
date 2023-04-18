@@ -1,0 +1,49 @@
+@import (reference)  "../../../apps/fr/style/form-runner-common";
+
+.orbeon {
+
+    .xbl-fr-clipboard-copy {
+
+        display: inline-block;
+
+        .xforms-label-appearance-minimal {
+            display: none;
+        }
+
+        &> .fr-clipboard-copy-wrapper {
+
+            display: flex;
+            column-gap: 10px;
+
+            &> * {
+                vertical-align: top;
+            }
+
+            &> .fr-clipboard-copy-button {
+                height: fit-content;
+                .focusHighlight();
+            }
+
+            &> .xforms-input, &> .xforms-textarea, &> .xbl-fr-tinymce, &> .xforms-output {
+                width: 100%;
+                word-break: break-all;
+            }
+        }
+    }
+
+    .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+        .xbl-fr-clipboard-copy > .fr-clipboard-copy-wrapper {
+
+            display: inline;
+
+            &> * {
+                display: inline;
+            }
+
+            &> .fr-clipboard-copy-button {
+                display: none;
+            }
+
+        }
+    }
+}

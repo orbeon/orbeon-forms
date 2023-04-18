@@ -22,6 +22,7 @@
         oxf:/xbl/orbeon/tinymce/tinymce.xbl
         oxf:/forms/orbeon/builder/xbl/text-secret.xbl
         oxf:/xbl/orbeon/character-counter/character-counter.xbl
+        oxf:/xbl/orbeon/clipboard-copy/clipboard-copy.xbl
     </property>
 
     <!-- Toolbox -->

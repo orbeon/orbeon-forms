@@ -181,6 +181,7 @@
         +fr:datetime
         +fr:hidden
         +fr:character-counter
+        +fr:clipboard-copy
         +fr:dropdown-date
         +fr:fields-date
         +fr:date-picker

@@ -70,6 +70,7 @@ object FormRunnerApp extends App {
     xbl.TinyMCE
     xbl.AttachmentMultiple
     xbl.Recaptcha
+    xbl.ClipboardCopy
 
     // Add `scroll-padding-top` and `scroll-padding-bottom` to prevent the focused form field from being below the top navbar or button bar
     // TODO: with embedding, unobserve when the form is destroyed

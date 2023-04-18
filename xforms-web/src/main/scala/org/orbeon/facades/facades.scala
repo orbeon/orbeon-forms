@@ -14,12 +14,13 @@
 package org.orbeon.facades
 
 import org.scalajs.dom
-import org.scalajs.dom.html
+import org.scalajs.dom.{html, raw}
 import org.scalajs.dom.raw.HTMLLinkElement
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSGlobal, JSGlobalScope}
+
 
 @js.native
 trait Mousetrap extends js.Object {
@@ -30,6 +31,18 @@ trait Mousetrap extends js.Object {
 @JSGlobal("Mousetrap")
 object Mousetrap extends Mousetrap {
   def apply(elem: html.Element): Mousetrap = js.native
+}
+
+@js.native
+@JSGlobal("ClipboardJS")
+class ClipboardJS(selector: String, config: ClipboardJSConfig) extends js.Object {
+  def destroy(): Unit = js.native
+}
+
+trait ClipboardJSConfig extends js.Object {
+  val target: js.UndefOr[js.Function1[html.Element, raw.Element]] = js.undefined
+  val text: js.UndefOr[js.Function1[html.Element, String]] = js.undefined
+  val container: js.UndefOr[js.Function1[html.Element, raw.Element]] = js.undefined
 }
 
 @js.native

@@ -1,0 +1,91 @@
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:script src="/xbl/orbeon/clipboard-copy/clipboard.min.js"/>
+    <xbl:binding
+            id="fr-clipboard-copy"
+            element="
+                fr|clipboard-copy,
+                xf|input[appearance ~= clipboard-copy],
+                xf|textarea[appearance ~= clipboard-copy],
+                xf|output[appearance ~= clipboard-copy]"
+            xxbl:mode="binding lhha value javascript-lifecycle"
+            xxbl:label-for="field"
+            xxbl:container="span">
+
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">With Clipboard Copy</display-name>
+            <display-name lang="es" todo="true">With Clipboard Copy</display-name>
+            <display-name lang="fi" todo="true">[With Clipboard Copy]</display-name>
+            <display-name lang="fr">Avec copie vers le presse-papiers</display-name>
+            <display-name lang="ru" todo="true">[With Clipboard Copy]</display-name>
+            <display-name lang="de" todo="true">With Clipboard Copy</display-name>
+            <display-name lang="it" todo="true">[With Clipboard Copy]</display-name>
+            <display-name lang="nl" todo="true">[With Clipboard Copy]</display-name>
+            <display-name lang="sv" todo="true">With Clipboard Copy</display-name>
+            <display-name lang="pt" todo="true">[With Clipboard Copy]</display-name>
+            <toolbox show="false"/>
+            <icon>
+                <icon-class>fa fa-fw fa-copy</icon-class>
+            </icon>
+            <templates>
+                <!-- Provide a view template for Form Builder so that CSS resources are loaded -->
+                <view>
+                    <xf:input id="" ref="" appearance="clipboard-copy" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:input>
+                </view>
+            </templates>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/clipboard-copy/clipboard-copy.css"/>
+        </xbl:resources>
+
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <_>
+                        <resource xml:lang="en"><copy>Copy to clipboard</copy></resource>
+                        <resource xml:lang="fr"><copy>Copier vers le presse-papiers</copy></resource>
+                    </_>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xh:span xsl:version="2.0" class="fr-clipboard-copy-wrapper">
+
+                <xf:var
+                    name="binding"
+                    value="xxf:binding('fr-clipboard-copy')"/>
+
+                <xsl:element name="{name(/*)}">
+                    <xsl:attribute name="id"          select="'field'"/>
+                    <xsl:attribute name="ref"         select="'$binding'"/>
+<!--                    <xsl:attribute name="incremental" select="'true'"/>-->
+                    <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'clipboard-copy']"/>
+                    <xsl:copy-of select="/*/@mediatype"/>
+                </xsl:element>
+
+                <xh:button class="fr-clipboard-copy-button">
+                    <xh:i
+                        title="{{xxf:r('copy')}}"
+                        class="fa fa-fw fa-copy"/>
+                </xh:button>
+
+            </xh:span>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

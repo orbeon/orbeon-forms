@@ -195,6 +195,7 @@
         fr:fields-date
         fr:box-select
         fr:character-counter
+        fr:clipboard-copy
         fr:bootstrap-select1
         fr:bootstrap5-select1
         fr:boolean-input

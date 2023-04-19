@@ -231,11 +231,11 @@ object StatusCode {
   val NoContent             = 204
   val Found                 = 302
   val NotModified           = 304
+  val BadRequest            = 400
   val Unauthorized          = 401
   val Forbidden             = 403
-  val MethodNotAllowed      = 405
-  val BadRequest            = 400
   val NotFound              = 404
+  val MethodNotAllowed      = 405
   val Conflict              = 409
   val Gone                  = 410
   val RequestEntityTooLarge = 413

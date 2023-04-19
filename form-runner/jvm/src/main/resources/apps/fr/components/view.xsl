@@ -1004,8 +1004,13 @@
                             ref="instance('fr-share-dialog-instance')/link"
                             value="
                                 fr:form-runner-link(
-                                    fr:mode(),
-                                    instance('fr-share-dialog-instance')/selected-operations
+                                    if (instance('fr-share-dialog-instance')/selected-operations = 'read') then
+                                        'view'
+                                    else if (instance('fr-share-dialog-instance')/selected-operations = 'read update') then
+                                        'edit'
+                                    else
+                                        error(),
+                                    true()
                                 )"/>
                     </xf:select1>
                 </fr:c>

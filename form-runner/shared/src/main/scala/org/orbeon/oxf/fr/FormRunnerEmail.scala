@@ -15,9 +15,8 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.email.{EmailMetadata, EmailMetadataConversion, EmailMetadataParsing, EmailMetadataSerialization}
-import org.orbeon.oxf.fr.permission.{AnyOperation, Operation, Operations, SpecificOperations}
+import org.orbeon.oxf.fr.permission.{Operation, Operations}
 import org.orbeon.oxf.util.CoreCrossPlatformSupport
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
@@ -86,7 +85,7 @@ trait FormRunnerEmail {
       case ControlBindPathHoldersResources(_, _, _, None, _) => Nil
     }
 
-  def buildLinkBackToFormRunnerUsePageName(pageName: String, tokenOperationsString: Option[String]): String =
+  def buildLinkBackToFormRunnerUsePageName(pageName: String, includeToken: Boolean): String =
     buildLinkBackToFormRunner(
       pageName match {
         case "edit"    => "LinkToEditPageParam"
@@ -99,26 +98,14 @@ trait FormRunnerEmail {
         case "pdf"     => "LinkToPdfParam"
         case other     => throw new IllegalArgumentException(other)
       },
-      tokenOperationsString.getOrElse("")
+      includeToken
     )
-
-  private val AllowedTokenOperations: Set[Operation] = Set(Operation.Read, Operation.Update)
 
   // TODO: move this as it's used by more than email
   //@XPathFunction
-  def buildLinkBackToFormRunner(linkType: String, tokenOperationsString: String): String = {
+  def buildLinkBackToFormRunner(linkType: String, includeToken: Boolean): String = {
 
     implicit val formRunnerParams @ FormRunnerParams(app, form, version, documentOpt, _, _) = FormRunnerParams()
-
-    val tokenOperationsOpt =
-      Operations.parseFromString(tokenOperationsString) match {
-        case None =>
-          None
-        case Some(SpecificOperations(operations))
-          if operations.forall(AllowedTokenOperations.apply) => Some(operations)
-        case _ =>
-          throw new IllegalArgumentException
-      }
 
     val baseUrlNoSlash =
       frc.formRunnerStandaloneBaseUrl(
@@ -156,15 +143,18 @@ trait FormRunnerEmail {
 
     // Would be good not to have to hardcode these constants
     linkType match {
-      case "LinkToEditPageParam"    | "link-to-edit-page"    => build("edit", documentOpt, tokenOperationsOpt.flatMap(buildTokenParam).toList)
-      case "LinkToViewPageParam"    | "link-to-view-page"    => build("view", documentOpt, tokenOperationsOpt.flatMap(buildTokenParam).toList)
-      case "LinkToNewPageParam"     | "link-to-new-page"     => build("new", None)
-      case "LinkToSummaryPageParam" | "link-to-summary-page" => build("summary", None)
-      case "LinkToHomePageParam"    | "link-to-home-page"    => s"$baseUrlNoSlash/fr/"
-      case "LinkToFormsPageParam"   | "link-to-forms-page"   => s"$baseUrlNoSlash/fr/forms"
-      case "LinkToAdminPageParam"   | "link-to-admin-page"   => s"$baseUrlNoSlash/fr/admin"
-      case "LinkToPdfParam"         | "link-to-pdf"          => build("pdf", documentOpt)
-      case _                                                 => throw new IllegalArgumentException(linkType)
+      case "LinkToEditPageParam"    | "link-to-edit-page" if includeToken => build("edit", documentOpt, buildTokenParam(Set(Operation.Read, Operation.Update)).toList)
+      case "LinkToViewPageParam"    | "link-to-view-page" if includeToken => build("view", documentOpt, buildTokenParam(Set(Operation.Read)).toList)
+      case otherLinkType                                  if includeToken => throw new IllegalArgumentException(s"Token not supported for link type: $otherLinkType")
+      case "LinkToEditPageParam"    | "link-to-edit-page"                 => build("edit", documentOpt)
+      case "LinkToViewPageParam"    | "link-to-view-page"                 => build("view", documentOpt)
+      case "LinkToNewPageParam"     | "link-to-new-page"                  => build("new", None)
+      case "LinkToSummaryPageParam" | "link-to-summary-page"              => build("summary", None)
+      case "LinkToHomePageParam"    | "link-to-home-page"                 => s"$baseUrlNoSlash/fr/"
+      case "LinkToFormsPageParam"   | "link-to-forms-page"                => s"$baseUrlNoSlash/fr/forms"
+      case "LinkToAdminPageParam"   | "link-to-admin-page"                => s"$baseUrlNoSlash/fr/admin"
+      case "LinkToPdfParam"         | "link-to-pdf"                       => build("pdf", documentOpt)
+      case otherLinkType                                                  => throw new IllegalArgumentException(otherLinkType)
     }
   }
 

@@ -141,7 +141,7 @@ object FormRunnerFunctionLibrary extends OrbeonFunctionLibrary {
 
     Fun("form-runner-link", classOf[FRFormRunnerLink], op = 0, min = 1, STRING, EXACTLY_ONE,
       Arg(STRING, EXACTLY_ONE),
-      Arg(STRING, EXACTLY_ONE)
+      Arg(BOOLEAN, EXACTLY_ONE)
     )
 
     Fun("is-embedded", classOf[FRIsEmbedded], op = 0, min = 0, BOOLEAN, EXACTLY_ONE,
@@ -418,7 +418,7 @@ private object FormRunnerFunctions {
     override def evaluateItem(context: XPathContext): StringValue =
       FormRunner.buildLinkBackToFormRunnerUsePageName(
         stringArgument(0)(context),
-        stringArgumentOpt(1)(context)
+        booleanArgumentOpt(1)(context).getOrElse(false)
       )
   }
 

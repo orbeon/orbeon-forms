@@ -271,7 +271,7 @@
                                                     'frf:buildLinkBackToFormRunner(''',
                                                     $type,
                                                     ''', ',
-                                                    if ($p/*:token = 'true') then '''read update''' else '''''',
+                                                    if ($p/*:token = 'true') then 'true()' else 'false()',
                                                     ')'
                                                 ),
                                                 $for-pdf

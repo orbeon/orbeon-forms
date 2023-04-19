@@ -23,6 +23,7 @@ import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
+import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.{CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, Logging}
@@ -65,7 +66,7 @@ class RestApiTest
   private def createForm(provider: Provider)(implicit ec: ExternalContext): Unit = {
     val form = HttpCall.XML(buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("first")))
     val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
-    HttpAssert.put(formURL, Unspecified, form, 201)
+    HttpAssert.put(formURL, Unspecified, form, StatusCode.Created)
   }
 
   private def buildFormDefinition(
@@ -97,47 +98,47 @@ class RestApiTest
 
           // First time we put with "latest" (AKA unspecified)
           val first = HttpCall.XML(<gaga1/>.toDocument)
-          HttpAssert.put(formURL, Unspecified, first, 201)
+          HttpAssert.put(formURL, Unspecified, first, StatusCode.Created)
           HttpAssert.get(formURL, Specific(1), HttpAssert.ExpectedBody (first, Operations.None, Some(1)))
           HttpAssert.get(formURL, Unspecified, HttpAssert.ExpectedBody (first, Operations.None, Some(1)))
-          HttpAssert.get(formURL, Specific(2), HttpAssert.ExpectedCode(404))
-          HttpAssert.del(formURL, Specific(2), 404)
+          HttpAssert.get(formURL, Specific(2), HttpAssert.ExpectedCode(StatusCode.NotFound))
+          HttpAssert.del(formURL, Specific(2), StatusCode.NotFound)
 
           // Put again with "latest" (AKA unspecified) updates the current version
           val second = <gaga2/>.toDocument
-          HttpAssert.put(formURL, Unspecified, HttpCall.XML(second), 201)
+          HttpAssert.put(formURL, Unspecified, HttpCall.XML(second), StatusCode.Created)
           HttpAssert.get(formURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(1)))
           HttpAssert.get(formURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(1)))
-          HttpAssert.get(formURL, Specific(2), HttpAssert.ExpectedCode(404))
+          HttpAssert.get(formURL, Specific(2), HttpAssert.ExpectedCode(StatusCode.NotFound))
 
           // Put with "next" to get two versions
           val third = <gaga3/>.toDocument
-          HttpAssert.put(formURL, Next, HttpCall.XML(third), 201)
+          HttpAssert.put(formURL, Next, HttpCall.XML(third), StatusCode.Created)
           HttpAssert.get(formURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(1)))
           HttpAssert.get(formURL, Specific(2), HttpAssert.ExpectedBody(HttpCall.XML(third),  Operations.None, Some(2)))
           HttpAssert.get(formURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(third),  Operations.None, Some(2)))
-          HttpAssert.get(formURL, Specific(3), HttpAssert.ExpectedCode(404))
+          HttpAssert.get(formURL, Specific(3), HttpAssert.ExpectedCode(StatusCode.NotFound))
 
           // Put a specific version
           val fourth = <gaga4/>.toDocument
-          HttpAssert.put(formURL, Specific(1), HttpCall.XML(fourth), 201)
+          HttpAssert.put(formURL, Specific(1), HttpCall.XML(fourth), StatusCode.Created)
           HttpAssert.get(formURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
           HttpAssert.get(formURL, Specific(2), HttpAssert.ExpectedBody(HttpCall.XML(third),  Operations.None, Some(2)))
           HttpAssert.get(formURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(third),  Operations.None, Some(2)))
-          HttpAssert.get(formURL, Specific(3), HttpAssert.ExpectedCode(404))
+          HttpAssert.get(formURL, Specific(3), HttpAssert.ExpectedCode(StatusCode.NotFound))
 
           // Delete the latest version
-          HttpAssert.del(formURL, Unspecified, 204)
+          HttpAssert.del(formURL, Unspecified, StatusCode.NoContent)
           HttpAssert.get(formURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
-          HttpAssert.get(formURL, Specific(2), HttpAssert.ExpectedCode(410))
+          HttpAssert.get(formURL, Specific(2), HttpAssert.ExpectedCode(StatusCode.Gone))
           HttpAssert.get(formURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
 
           // After a delete the version number is reused
           val fifth = <gaga5/>.toDocument
-          HttpAssert.put(formURL, Next, HttpCall.XML(fifth), 201)
+          HttpAssert.put(formURL, Next, HttpCall.XML(fifth), StatusCode.Created)
           HttpAssert.get(formURL, Specific(1), HttpAssert.ExpectedBody(HttpCall.XML(fourth), Operations.None, Some(1)))
           HttpAssert.get(formURL, Specific(2), HttpAssert.ExpectedBody(HttpCall.XML(fifth),  Operations.None, Some(2)))
-          HttpAssert.get(formURL, Specific(3), HttpAssert.ExpectedCode(404))
+          HttpAssert.get(formURL, Specific(3), HttpAssert.ExpectedCode(StatusCode.NotFound))
         }
       }
     }
@@ -151,7 +152,7 @@ class RestApiTest
           val dataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
           val data    = HttpCall.XML(<gaga1/>.toDocument)
 
-          HttpAssert.put(dataURL, Specific(1), data, 404) // TODO: return 403 instead as reason is missing permissions!
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.NotFound) // TODO: return `StatusCode.Forbidden` instead as reason is missing permissions!
 
           // 2023-04-18: Following changes to the persistence proxy: `PUT`ting data for a non-existing form definition
           // used to not fail, for some reason. Now we enforce the existence of a form definition so we can check
@@ -160,27 +161,27 @@ class RestApiTest
 
           // Storing for specific form version
           val myStage = Some(Stage("my-stage", ""))
-          HttpAssert.put(dataURL, Specific(1), data, 201)
+          HttpAssert.put(dataURL, Specific(1), data, StatusCode.Created)
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1)))
-          HttpAssert.put(dataURL, Specific(1), data, expectedCode = 201, stage = myStage)
+          HttpAssert.put(dataURL, Specific(1), data, expectedCode = StatusCode.Created, stage = myStage)
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(data, AnyOperation, Some(1), stage = myStage))
-          HttpAssert.del(dataURL, Unspecified, 204)
-          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(410))
+          HttpAssert.del(dataURL, Unspecified, StatusCode.NoContent)
+          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(StatusCode.Gone))
 
           // Don't allow unspecified version for create
-          HttpAssert.put(dataURL, Unspecified       , data, 400)
-          HttpAssert.put(dataURL, Specific(1)       , data, 201)
+          HttpAssert.put(dataURL, Unspecified       , data, StatusCode.BadRequest)
+          HttpAssert.put(dataURL, Specific(1)       , data, StatusCode.Created)
 
           // Allow unspecified or correct version for update
-          HttpAssert.put(dataURL, Unspecified      , data, 201)
-          HttpAssert.put(dataURL, Specific(1)      , data, 201)
+          HttpAssert.put(dataURL, Unspecified      , data, StatusCode.Created)
+          HttpAssert.put(dataURL, Specific(1)      , data, StatusCode.Created)
 
           // But don't allow incorrect version for update
-          HttpAssert.put(dataURL, Specific(2)      , data, 400)
+          HttpAssert.put(dataURL, Specific(2)      , data, StatusCode.BadRequest)
 
           // Fail with next/for document
-          HttpAssert.put(dataURL, Next                               , data, 400)
-          HttpAssert.put(dataURL, ForDocument("123", isDraft = false), data, 400)
+          HttpAssert.put(dataURL, Next                               , data, StatusCode.BadRequest)
+          HttpAssert.put(dataURL, ForDocument("123", isDraft = false), data, StatusCode.BadRequest)
         }
       }
     }
@@ -198,14 +199,14 @@ class RestApiTest
           val second        = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("second"))
           val data          = <gaga/>.toDocument
 
-          HttpAssert.put(formURL      , Unspecified, HttpCall.XML(first) , 201)
-          HttpAssert.put(formURL      , Next       , HttpCall.XML(second), 201)
-          HttpAssert.put(firstDataURL , Specific(1), HttpCall.XML(data)  , 201)
-          HttpAssert.put(secondDataURL, Specific(2), HttpCall.XML(data)  , 201)
+          HttpAssert.put(formURL      , Unspecified, HttpCall.XML(first) , StatusCode.Created)
+          HttpAssert.put(formURL      , Next       , HttpCall.XML(second), StatusCode.Created)
+          HttpAssert.put(firstDataURL , Specific(1), HttpCall.XML(data)  , StatusCode.Created)
+          HttpAssert.put(secondDataURL, Specific(2), HttpCall.XML(data)  , StatusCode.Created)
 
           HttpAssert.get(formURL, ForDocument("123", isDraft = false), HttpAssert.ExpectedBody(HttpCall.XML(first) , Operations.None, Some(1)))
           HttpAssert.get(formURL, ForDocument("456", isDraft = false), HttpAssert.ExpectedBody(HttpCall.XML(second), Operations.None, Some(2)))
-          HttpAssert.get(formURL, ForDocument("789", isDraft = false), HttpAssert.ExpectedCode(404))
+          HttpAssert.get(formURL, ForDocument("789", isDraft = false), HttpAssert.ExpectedCode(StatusCode.NotFound))
         }
       }
     }
@@ -227,17 +228,17 @@ class RestApiTest
             val DataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
 
             // Anonymous: no permission defined
-            HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, UndefinedPermissions)), 201)
-            HttpAssert.put(DataURL, Specific(1), HttpCall.XML(data), 201)
+            HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, UndefinedPermissions)), StatusCode.Created)
+            HttpAssert.put(DataURL, Specific(1), HttpCall.XML(data), StatusCode.Created)
             HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), AnyOperation, Some(1)))
 
             // Anonymous: create and read
-            HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, AnyoneCanCreateAndRead)), 201)
+            HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, AnyoneCanCreateAndRead)), StatusCode.Created)
             HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(Set(Create, Read)), Some(1)))
 
             // Anonymous: just create, then can't read data
-            HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, AnyoneCanCreate)), 201)
-            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403))
+            HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, AnyoneCanCreate)), StatusCode.Created)
+            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(StatusCode.Forbidden))
           }
 
           locally {
@@ -249,34 +250,34 @@ class RestApiTest
               Permission(List(RolesAnyOf(List("clerk"  ))), SpecificOperations(Set(Read))),
               Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update))),
               Permission(List(RolesAnyOf(List("admin"  ))), SpecificOperations(Set(Read, Update, Delete)))
-            )))), 201)
-            HttpAssert.put(DataURL, Specific(1), HttpCall.XML(data), 201)
+            )))), StatusCode.Created)
+            HttpAssert.put(DataURL, Specific(1), HttpCall.XML(data), StatusCode.Created)
 
             // Check who can read
-            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(403)                                                                               , guest)
+            HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedCode(StatusCode.Forbidden)                                                              , guest)
             HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(Set(Create, Read))                , Some(1)), clerk)
             HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(Set(Create, Read, Update))        , Some(1)), manager)
             HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), SpecificOperations(Set(Create, Read, Update, Delete)), Some(1)), admin)
 
             // Only managers and admins can update
-            HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), 403, guest)
-            HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), 403, clerk)
-            HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), 201, manager)
-            HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), 201, admin)
+            HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), StatusCode.Forbidden, guest)
+            HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), StatusCode.Forbidden, clerk)
+            HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), StatusCode.Created, manager)
+            HttpAssert.put(DataURL, Unspecified, HttpCall.XML(data), StatusCode.Created, admin)
 
             // Only admins can delete
-            HttpAssert.del(DataURL, Unspecified, 403, guest)
-            HttpAssert.del(DataURL, Unspecified, 403, clerk)
-            HttpAssert.del(DataURL, Unspecified, 403, manager)
-            HttpAssert.del(DataURL, Unspecified, 204, admin)
+            HttpAssert.del(DataURL, Unspecified, StatusCode.Forbidden, guest)
+            HttpAssert.del(DataURL, Unspecified, StatusCode.Forbidden, clerk)
+            HttpAssert.del(DataURL, Unspecified, StatusCode.Forbidden, manager)
+            HttpAssert.del(DataURL, Unspecified, StatusCode.NoContent, admin)
 
-            // Always return a 404 if the data doesn't exist, irrelevant of the permissions
-            // 2023-04-18: Following changes to the persistence proxy: this is now a 410.
+            // Always return a StatusCode.NotFound if the data doesn't exist, irrelevant of the permissions
+            // 2023-04-18: Following changes to the persistence proxy: this is now a StatusCode.Gone.
             // https://github.com/orbeon/orbeon-forms/issues/4979#issuecomment-912742633
-            HttpAssert.del(DataURL, Unspecified, 410, guest)
-            HttpAssert.del(DataURL, Unspecified, 410, clerk)
-            HttpAssert.del(DataURL, Unspecified, 410, manager)
-            HttpAssert.del(DataURL, Unspecified, 410, admin)
+            HttpAssert.del(DataURL, Unspecified, StatusCode.Gone, guest)
+            HttpAssert.del(DataURL, Unspecified, StatusCode.Gone, clerk)
+            HttpAssert.del(DataURL, Unspecified, StatusCode.Gone, manager)
+            HttpAssert.del(DataURL, Unspecified, StatusCode.Gone, admin)
           }
         }
       }
@@ -306,19 +307,19 @@ class RestApiTest
             Permission(List(Owner)                      , SpecificOperations(Set(Read, Update))),
             Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(Set(Read))),
             Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update)))
-          )))), 201)
+          )))), StatusCode.Created)
 
           // Data initially created by sfUserA
-          HttpAssert.put(dataURL, Specific(1), dataBody, 201, c1User)
+          HttpAssert.put(dataURL, Specific(1), dataBody, StatusCode.Created, c1User)
           // Owner can read their own data
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateReadUpdate, Some(1)), c1User)
           // Other users can't read the data
-          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(403)                                   , c2User)
+          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(StatusCode.Forbidden)                  , c2User)
           // Managers of the user up the organization structure can read the data
-          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateReadUpdate, Some(1)), cManager) //TODO: getting 403
+          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateReadUpdate, Some(1)), cManager) //TODO: getting StatusCode.Forbidden
           HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedBody(dataBody, CanCreateReadUpdate, Some(1)), bManager)
           // Other managers can't read the data
-          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(403)                                   , dManager)
+          HttpAssert.get(dataURL, Unspecified, HttpAssert.ExpectedCode(StatusCode.Forbidden)                  , dManager)
         }
       }
     }
@@ -335,7 +336,7 @@ class RestApiTest
           for ((size, position) <- Seq(1024, 1024 * 1024).zipWithIndex) {
             val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpCall.Binary
             val dataUrl = HttpCall.crudURLPrefix(provider) + "data/123/file" + position.toString
-            HttpAssert.put(dataUrl, Specific(1), bytes, 201)
+            HttpAssert.put(dataUrl, Specific(1), bytes, StatusCode.Created)
             HttpAssert.get(dataUrl, Unspecified, HttpAssert.ExpectedBody(bytes, AnyOperation, Some(1)))
           }
         }
@@ -363,7 +364,7 @@ class RestApiTest
 
             val dataUrl = HttpCall.crudURLPrefix(provider) + s"data/$position/data.xml"
 
-            HttpAssert.put(dataUrl, Specific(1), xmlBody, 201)
+            HttpAssert.put(dataUrl, Specific(1), xmlBody, StatusCode.Created)
             HttpAssert.get(dataUrl, Unspecified, HttpAssert.ExpectedBody(xmlBody, AnyOperation, Some(1)))
           }
         }
@@ -384,15 +385,15 @@ class RestApiTest
           val dataURL  = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
           val draftURL = HttpCall.crudURLPrefix(provider) + "draft/123/data.xml"
 
-          HttpAssert.put(dataURL,  Specific(1), first, 201)
+          HttpAssert.put(dataURL,  Specific(1), first, StatusCode.Created)
 
           println(s"xxx before error")
 
-          // 2023-04-18: Following changes to the persistence proxy: we now get a 400 instead of a 201. It seems
-          // unreasonable that storing a draft would succeed without passing a version, if it's the first time we are
-          // storing the draft for the given document id.
-          HttpAssert.put(draftURL, Unspecified, second, 400)
-          HttpAssert.put(draftURL, Specific(1), second, 201) // this on the other hand succeeds
+          // 2023-04-18: Following changes to the persistence proxy: we now get a `StatusCode.BadRequest` instead of a
+          // `StatusCode.Created`. It seems unreasonable that storing a draft would succeed without passing a version,
+          // if it's the first time we are storing the draft for the given document id.
+          HttpAssert.put(draftURL, Unspecified, second, StatusCode.BadRequest)
+          HttpAssert.put(draftURL, Specific(1), second, StatusCode.Created) // this on the other hand succeeds
           HttpAssert.get(dataURL,  Unspecified, HttpAssert.ExpectedBody(first, AnyOperation, Some(1)))
           HttpAssert.get(draftURL, Unspecified, HttpAssert.ExpectedBody(second, AnyOperation, Some(1)))
         }
@@ -405,11 +406,11 @@ class RestApiTest
       withTestExternalContext { implicit externalContext =>
         Connect.withOrbeonTables("extract metadata") { (_, provider) =>
 
-          val currentFormURL        = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
-          val currentMetadataURL    = HttpCall.metadataURL(provider)
-          val formDefinition        = buildFormDefinition(provider, AnyoneCanCreateAndRead)
+          val currentFormURL     = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+          val currentMetadataURL = HttpCall.metadataURL(provider)
+          val formDefinition     = buildFormDefinition(provider, AnyoneCanCreateAndRead)
 
-          HttpAssert.put(currentFormURL, Unspecified, HttpCall.XML(formDefinition), 201)
+          HttpAssert.put(currentFormURL, Unspecified, HttpCall.XML(formDefinition), StatusCode.Created)
 
           val expectedBody =
             <forms>
@@ -426,7 +427,7 @@ class RestApiTest
 
           val (resultCode, _, resultBodyTry) = HttpCall.get(currentMetadataURL, Unspecified, None)
 
-          assert(resultCode === 200)
+          assert(resultCode == StatusCode.Ok)
 
           def filterResultBody(bytes: Array[Byte]) = {
 

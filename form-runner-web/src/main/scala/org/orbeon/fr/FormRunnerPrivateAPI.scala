@@ -24,6 +24,7 @@ import org.scalajs.jquery.JQueryEventObject
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
+import scala.scalajs.js.UndefOr
 
 
 object FormRunnerPrivateAPI extends js.Object {

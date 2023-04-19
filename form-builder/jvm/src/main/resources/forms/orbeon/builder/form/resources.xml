@@ -2540,7 +2540,9 @@
             <role>Rôle</role>
             <permissions>Permissions</permissions>
             <operations>Opérations</operations>
-            <anyone>Toute personne</anyone>
+            <anyone>Tout le monde</anyone>
+            <anyone-with-token>Nécessiter un jeton</anyone-with-token>
+            <any-authenticated-user>Utilisateurs authentifiés</any-authenticated-user>
             <owner>Propriétaire</owner>
             <group-member>Membres du groupe</group-member>
             <create>Créer</create>
@@ -3875,6 +3877,8 @@
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
+            <anyone-with-token todo="true">[Require token]</anyone-with-token>
+            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
             <owner todo="true">[Owner]</owner>
             <group-member todo="true">[Group members]</group-member>
             <create>Create</create>
@@ -5208,6 +5212,8 @@
             <permissions>Права</permissions>
             <operations>Действия</operations>
             <anyone>Любой пользователь</anyone>
+            <anyone-with-token todo="true">[Require token]</anyone-with-token>
+            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
             <owner todo="true">[Owner]</owner>
             <group-member todo="true">[Group members]</group-member>
             <create>Заполнять форму</create>
@@ -6506,6 +6512,8 @@
             <permissions>Autorizzazioni</permissions>
             <operations>Operazioni</operations>
             <anyone>Tutti</anyone>
+            <anyone-with-token todo="true">[Require token]</anyone-with-token>
+            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
             <owner>Proprietario</owner>
             <group-member>Membri del gruppo</group-member>
             <create>Crea</create>
@@ -7805,6 +7813,8 @@
             <permissions>Berechtigungen</permissions>
             <operations>Operationen</operations>
             <anyone>Alle</anyone>
+            <anyone-with-token todo="true">[Require token]</anyone-with-token>
+            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
             <owner>Inhaber</owner>
             <group-member>Gruppenmitglieder</group-member>
             <create>Erstellen</create>
@@ -9134,6 +9144,8 @@
             <permissions>Käyttöoikeudet</permissions>
             <operations>Operaatiot</operations>
             <anyone>Kuka tahansa</anyone>
+            <anyone-with-token todo="true">[Require token]</anyone-with-token>
+            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
             <owner>Omistaja</owner>
             <group-member>Ryhmän jäsenet</group-member>
             <create>Luo</create>
@@ -10460,6 +10472,8 @@
             <permissions>Permisos</permissions>
             <operations>Operaciones</operations>
             <anyone>Todos</anyone>
+            <anyone-with-token todo="true">[Require token]</anyone-with-token>
+            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
             <owner>Propietario</owner>
             <group-member>Miembros del Grupo</group-member>
             <create>Crear</create>
@@ -11766,6 +11780,8 @@
             <permissions>Bevoegdheden</permissions>
             <operations>Bewerkingen</operations>
             <anyone>Iedereen</anyone>
+            <anyone-with-token todo="true">[Require token]</anyone-with-token>
+            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
             <owner>Eigenaar</owner>
             <group-member>Groepleden</group-member>
             <create>Maken</create>
@@ -13099,6 +13115,8 @@
             <permissions>Permissões</permissions>
             <operations>Operações</operations>
             <anyone>Qualquer um</anyone>
+            <anyone-with-token todo="true">[Require token]</anyone-with-token>
+            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
             <owner>Administrador</owner>
             <group-member>Membros do Grupo</group-member>
             <create>Criar</create>
@@ -14433,6 +14451,8 @@
             <permissions>Rättigheter</permissions>
             <operations>Operationer</operations>
             <anyone>Alla</anyone>
+            <anyone-with-token todo="true">[Require token]</anyone-with-token>
+            <any-authenticated-user todo="true">[Any authenticated user]</any-authenticated-user>
             <owner>Ägaren</owner>
             <group-member>Grupp</group-member>
             <create>Skapa</create>

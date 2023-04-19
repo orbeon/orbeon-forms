@@ -114,10 +114,10 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
       info("method not allowed", logParams)
 
     // For services: only log and set response code
-    def sendError(t: Throwable)                       = { logError(t);           ec.getResponse.setStatus(StatusCode.InternalServerError) }
-    def sendHttpStatusCode(e: HttpStatusCodeException)= { logHttpStatusCode(e);  ec.getResponse.setStatus(e.code); }
-    def sendNotFound(t: Option[Throwable])            = { logNotFound(t);        ec.getResponse.setStatus(StatusCode.NotFound) }
-    def sendMethodNotAllowed()                        = { logMethodNotAllowed(); ec.getResponse.setStatus(StatusCode.MethodNotAllowed) }
+    def sendError(t: Throwable)                                             = { logError(t);           ec.getResponse.setStatus(StatusCode.InternalServerError) }
+    def sendHttpStatusCode(e: HttpStatusCodeException)                      = { logHttpStatusCode(e);  ec.getResponse.setStatus(e.code); }
+    def sendNotFound(t: Option[Throwable], code: Int = StatusCode.NotFound) = { logNotFound(t);        ec.getResponse.setStatus(code) }
+    def sendMethodNotAllowed()                                              = { logMethodNotAllowed(); ec.getResponse.setStatus(StatusCode.MethodNotAllowed) }
 
     // For pages: log and try to run routes
     def runErrorRoute(t: Throwable, log: Boolean = true): Unit = {
@@ -197,8 +197,8 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             // found a "resource" to be deleted
             case e: HttpStatusCodeException =>
               e.code match {
-                case StatusCode.NotFound | StatusCode.Gone =>
-                  if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
+                case code @ (StatusCode.NotFound | StatusCode.Gone) =>
+                  if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t), code) // preserve status code for service at least
                 case StatusCode.Unauthorized | StatusCode.Forbidden =>
                   if (route.isPage) runUnauthorizedRoute(e)   else sendHttpStatusCode(e)
                 case _ =>

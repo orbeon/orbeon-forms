@@ -53,7 +53,7 @@ import javax.xml.transform.stream.StreamResult
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 
 /**
@@ -213,6 +213,14 @@ private object PersistenceProxyProcessor {
     val isFormBuilder    = appForm == AppForm.FormBuilder
 
     // Get persistence implementation target URL and configuration headers
+    //
+    // Headers example:
+    //
+    // - `Orbeon-Versioning` -> true
+    // - `Orbeon-Reencrypt`  -> true
+    // - `Orbeon-Reindex`    -> true
+    // - `Orbeon-Lease`      -> true
+    // - `Orbeon-Datasource` -> mysql
     val (persistenceBaseURL, outgoingPersistenceHeaders) = getPersistenceURLHeaders(appForm, formOrData)
 
     val serviceUri = PathUtils.appendQueryString(
@@ -222,7 +230,7 @@ private object PersistenceProxyProcessor {
 
     val incomingVersion =
       Version(
-        documentId = request.getFirstHeaderIgnoreCase(Version.OrbeonForDocumentId),
+        documentId = request.getFirstHeaderIgnoreCase(Version.OrbeonForDocumentId), // this gets precedence
         isDraft    = request.getFirstHeaderIgnoreCase(Version.OrbeonForDocumentIsDraft),
         version    = request.getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion),
       )
@@ -251,9 +259,22 @@ private object PersistenceProxyProcessor {
               .map(frc.AccessTokenParam ->).toList
 
           versionAction match {
-            case VersionAction.Reject                   =>
+            case VersionAction.Reject =>
               throw HttpStatusCodeException(StatusCode.BadRequest)
-            case VersionAction.AcceptAndUseForForm(v)   =>
+            case VersionAction.AcceptAndUseForForm(v) if crudMethod == HttpMethod.DELETE =>
+
+              connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
+                request,
+                crudMethod,
+                serviceUri,
+                outgoingPersistenceHeaders,
+                Some(v.version),
+                queryForToken,
+                filterVersioningHeaders = false
+              )
+
+              (None, Some(v.version))
+            case VersionAction.AcceptAndUseForForm(v) =>
               (None, Some(v.version))
             case VersionAction.AcceptForData(v) =>
 
@@ -290,21 +311,21 @@ private object PersistenceProxyProcessor {
 
               (cxrOpt, Some(effectiveFormDefinitionVersion))
 
-            case VersionAction.HeadData(v)              =>
+            case VersionAction.HeadData(v) =>
               // TODO: couldn't this use `connectToObtainResponseHeaders()`
               val versionFromHead =
                 PersistenceMetadataSupport.readDocumentFormVersion(appForm, v.documentId, v.isDraft, queryForToken)
                   .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
               (None, Some(versionFromHead))
-            case VersionAction.LatestForm               =>
+            case VersionAction.LatestForm =>
               val versionFromMetadata =
                 PersistenceMetadataSupport.readLatestVersion(appForm).getOrElse(1)
               (None, Some(versionFromMetadata))
-            case VersionAction.NextForm                 =>
+            case VersionAction.NextForm =>
               val versionFromMetadata =
                 PersistenceMetadataSupport.readLatestVersion(appForm).map(_ + 1).getOrElse(1)
               (None, Some(versionFromMetadata))
-            case VersionAction.Ignore                   =>
+            case VersionAction.Ignore =>
               (None, None)
           }
 
@@ -432,35 +453,64 @@ private object PersistenceProxyProcessor {
         (Some(cxr), versionFromProvider, Some(responseHeaders))
       case HttpMethod.PUT | HttpMethod.DELETE =>
 
-        // The call to `HEAD` will require permissions so we need to forward the token
-        val headServiceUri =
-          PathUtils.recombineQuery(serviceUri, queryForToken)
-
         val (versionForPutOrDelete, responseHeadersOpt) =
-          getHeadersFromHeadCallProviderViaProxy(request.getHeaderValuesMap, headServiceUri, outgoingPersistenceHeaders) match {
-            case Some(responseHeaders) =>
-              // Existing data
-              val versionFromProvider = compareVersionAgainstIncomingIfNeeded(specificIncomingVersionOpt, responseHeaders)
-              // NOTE: If we get here, we have already passed successful permissions checks for `GET`/`HEAD` AKA
-              // `Read` and we must have the allowed operations. However here we are doing a `PUT`/`DELETE` AKA
-              // `Update`/`Delete` and we need to check operations again below. But we could skip actually getting
-              // the permissions! We also need `ResponseHeaders` to include `Orbeon-Operations`.
-              // TODO: Check above optimization.
-              (versionFromProvider, Some(responseHeaders))
-            case None =>
-              // Non-existing data
-              specificIncomingVersionOpt match {
-                case Some(version) =>
-                  (version, None)
-                case None =>
-                  // We can't write new data if we don't know the version
-                  // We actually don't need a version to delete data *except* that we need to get form permissions!
-                  // So we require a version for `PUT` and `DELETE`.
-                  throw HttpStatusCodeException(StatusCode.BadRequest) // could also be 404
-              }
-          }
+          connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
+            request,
+            requestMethod,
+            serviceUri,
+            outgoingPersistenceHeaders,
+            specificIncomingVersionOpt,
+            queryForToken,
+            filterVersioningHeaders = true
+          )
 
         (None, versionForPutOrDelete, responseHeadersOpt)
+    }
+
+  private def connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
+    request                   : Request, // for incoming headers and method only // TODO: then pass for example `OutgoingRequest`
+    requestMethod             : HttpMethod.CrudMethod,
+    serviceUri                : String,
+    outgoingPersistenceHeaders: Map[String, String],
+    specificIncomingVersionOpt: Option[Int],
+    queryForToken             : List[(String, String)],
+    filterVersioningHeaders   : Boolean
+  ): (Int, Option[ResponseHeaders]) = {
+
+      // The call to `HEAD` will require permissions so we need to forward the token
+      val headServiceUri =
+        PathUtils.recombineQuery(serviceUri, queryForToken)
+
+      getHeadersFromHeadCallProviderViaProxy(
+        request.getHeaderValuesMap,
+        headServiceUri,
+        outgoingPersistenceHeaders,
+        filterVersioningHeaders
+      ) match {
+        case Success(responseHeaders) =>
+          // Existing data
+          val versionFromProvider = compareVersionAgainstIncomingIfNeeded(specificIncomingVersionOpt, responseHeaders)
+          // NOTE: If we get here, we have already passed successful permissions checks for `GET`/`HEAD` AKA
+          // `Read` and we must have the allowed operations. However here we are doing a `PUT`/`DELETE` AKA
+          // `Update`/`Delete` and we need to check operations again below. But we could skip actually getting
+          // the permissions! We also need `ResponseHeaders` to include `Orbeon-Operations`.
+          // TODO: Check above optimization.
+          (versionFromProvider, Some(responseHeaders))
+        case Failure(HttpStatusCodeException(statusCode @ (StatusCode.NotFound | StatusCode.Gone), _, _)) =>
+          // Non-existing data
+          specificIncomingVersionOpt match {
+            case Some(version) if requestMethod == HttpMethod.PUT =>
+              (version, None)
+            case None if requestMethod == HttpMethod.PUT =>
+              // We can't write new data if we don't know the version
+              throw HttpStatusCodeException(StatusCode.BadRequest)
+            case _ =>
+              // We wouldn't need a version to delete data *except* that we need to get form permissions!
+              throw HttpStatusCodeException(statusCode)
+          }
+        case Failure(t) =>
+          throw t
+      }
     }
 
   private def permissionCheck(
@@ -757,14 +807,18 @@ private object PersistenceProxyProcessor {
     requestHeaders            : java.util.Map[String, Array[String]],
     serviceURI                : String,
     outgoingPersistenceHeaders: Map[String, String],
-  ): Option[ResponseHeaders] = {
+    filterVersioningHeaders   : Boolean
+  ): Try[ResponseHeaders] = {
 
     val headRequest =
       new RequestAdapter {
 
         // We filter out incoming versioning headers as we want to hit the `Version.Unspecified` case
         val filteredRequestHeaders =
-          requestHeaders.asScala.filterKeys(k => ! Version.AllVersionHeadersLower(k.toLowerCase))
+          if (filterVersioningHeaders)
+            requestHeaders.asScala.filterKeys(k => ! Version.AllVersionHeadersLower(k.toLowerCase))
+          else
+            requestHeaders.asScala
 
         override val getMethod: HttpMethod = HttpMethod.HEAD
         override def getHeaderValuesMap: java.util.Map[String, Array[String]] = filteredRequestHeaders.asJava
@@ -778,11 +832,11 @@ private object PersistenceProxyProcessor {
 
     getHeaderIgnoreCaseFromHeadResponseTry match {
       case Success(getHeaderIgnoreCaseFromHeadResponse) =>
-        Some(extractResponseHeaders(getHeaderIgnoreCaseFromHeadResponse))
-      case Failure(HttpStatusCodeException(StatusCode.NotFound, _, _)) =>
-        None
+        Success(extractResponseHeaders(getHeaderIgnoreCaseFromHeadResponse))
+      case Failure(t @ HttpStatusCodeException(StatusCode.NotFound | StatusCode.Gone, _, _)) =>
+        Failure(t)
       case Failure(t) =>
-        throw t
+        Failure(t)
     }
   }
 }

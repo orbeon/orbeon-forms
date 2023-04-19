@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.search
 import org.orbeon.oxf.externalcontext.{Organization, UserAndGroup}
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.Statement._
@@ -40,7 +41,7 @@ trait SearchLogic extends SearchRequestParser {
   ): SearchPermissions = {
 
     val searchOperations     = request.anyOfOperations.getOrElse(SearchOps.SearchOperations)
-    val formPermissionsElOpt = RelationalUtils.readFormPermissions(request.appForm, version)
+    val formPermissionsElOpt = PersistenceMetadataSupport.readFormPermissions(request.appForm, version)
     val formPermissions      = FormRunner.permissionsFromElemOrProperties(formPermissionsElOpt, request.appForm)
 
     SearchPermissions(

@@ -9,7 +9,7 @@ import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Version}
-import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence}
+import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence, Names}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
@@ -134,11 +134,13 @@ object PersistenceMetadataSupport {
   }
 
   def readLatestVersion(appForm: AppForm): Option[Int] =
-    for {
-      metadata    <- PersistenceMetadataSupport.readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
-      formVersion <- metadata.child("form-version").headOption
-    } yield
-      formVersion.stringValue.toInt
+    readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
+      .flatMap(_.firstChildOpt(Names.FormVersion))
+      .map(_.getStringValue.toInt)
+
+  def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion): Option[NodeInfo]=
+    readFormMetadataOpt(appForm, version)
+      .flatMap(_.firstChildOpt(Names.Permissions))
 
   private object Private {
 

@@ -91,9 +91,4 @@ object RelationalUtils extends Logging {
       }
       connection
     }
-
-  def readFormPermissions(appForm: AppForm, version: FormDefinitionVersion): Option[NodeInfo]=
-    PersistenceMetadataSupport
-      .readFormMetadataOpt(appForm, version)
-      .flatMap(_.firstChildOpt(Names.Permissions))
 }

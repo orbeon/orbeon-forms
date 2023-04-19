@@ -25,8 +25,8 @@ import org.orbeon.oxf.fr.permission.PermissionsAuthorization.findCurrentCredenti
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.{ResponseHeaders, extractResponseHeaders}
+import org.orbeon.oxf.fr.persistence.relational.Version
 import org.orbeon.oxf.fr.persistence.relational.index.status.Backend
-import org.orbeon.oxf.fr.persistence.relational.{RelationalUtils, Version}
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -524,7 +524,7 @@ private object PersistenceProxyProcessor {
     // TODO: Check possible optimization above to avoid retrieving form permissions twice.
     val formPermissions =
       FormRunner.permissionsFromElemOrProperties(
-        RelationalUtils.readFormPermissions(appFormVersion._1, FormDefinitionVersion.Specific(appFormVersion._2)),
+        PersistenceMetadataSupport.readFormPermissions(appFormVersion._1, FormDefinitionVersion.Specific(appFormVersion._2)),
         appFormVersion._1
       ) |!>
         (formPermissions => debug("CRUD: form permissions", List("permissions" -> formPermissions.toString)))

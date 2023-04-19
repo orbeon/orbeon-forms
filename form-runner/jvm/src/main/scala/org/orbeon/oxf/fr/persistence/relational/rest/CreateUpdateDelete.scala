@@ -86,7 +86,11 @@ object RequestReader {
   def dataAndMetadataAsString(provider: Provider, metadata: Boolean): (String, Option[String]) =
     dataAndMetadataAsString(provider, requestInputStream(), metadata)
 
-  def dataAndMetadataAsString(provider: Provider, inputStream: InputStream, metadata: Boolean): (String, Option[String]) = {
+  def dataAndMetadataAsString(
+    provider   : Provider,
+    inputStream: InputStream,
+    metadata   : Boolean
+  ): (String, Option[String]) = {
 
     def newTransformer = (
       TransformerUtils.getXMLIdentityTransformer
@@ -161,7 +165,7 @@ trait CreateUpdateDelete
      with Common
      with CreateCols {
 
-  private def existingRow(connection: Connection, req: CrudRequest, versionToSet: Int): Option[Row] = {
+  private def findExistingRow(connection: Connection, req: CrudRequest, versionToSet: Int): Option[Row] = {
 
     val idCols = idColumns(req).filter(_ != "file_name")
     val table  = tableName(req, master = true)
@@ -219,9 +223,17 @@ trait CreateUpdateDelete
 
   // NOTE: Gets the first organization if there are multiple organization roots
   private def currentUserOrganization(connection: Connection, req: CrudRequest): Option[OrganizationId] =
-    httpRequest.credentials.flatMap(_.defaultOrganization).map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
+    httpRequest.credentials
+      .flatMap(_.defaultOrganization)
+      .map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
 
-  private def store(connection: Connection, req: CrudRequest, existingRow: Option[Row], delete: Boolean, versionToSet: Int): Unit = {
+  private def store(
+    connection    : Connection,
+    req           : CrudRequest,
+    existingRowOpt: Option[Row],
+    delete        : Boolean,
+    versionToSet  : Int
+  ): Unit = {
 
     val table = tableName(req)
 
@@ -318,7 +330,7 @@ trait CreateUpdateDelete
     // Do insert, unless we're deleting draft data
     val deletingDataDraft = delete && req.dataPart.exists(_.isDraft)
     if (! deletingDataDraft) {
-      val includedCols = insertCols(req, existingRow, delete, versionToSet, currentUserOrganization(connection, req))
+      val includedCols = insertCols(req, existingRowOpt, delete, versionToSet, currentUserOrganization(connection, req))
       val colNames     = includedCols.map(_.name).mkString(", ")
       val colValues    =
         includedCols
@@ -358,7 +370,7 @@ trait CreateUpdateDelete
     //  `createdBy.username`
     val existingRowOpt =
       RelationalUtils.withConnection { connection =>
-        existingRow(connection, req, versionToSet)
+        findExistingRow(connection, req, versionToSet)
       }
 
     debug("CRUD: retrieved existing row", List("existing" -> existingRowOpt.isDefined.toString))

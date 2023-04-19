@@ -54,7 +54,7 @@ trait CreateCols extends RequestResponse with Common {
 
   def insertCols(
     req                    : CrudRequest,
-    existingRow            : Option[Row],
+    existingRowOpt         : Option[Row], // used to copy username, groupname, organization, created
     delete                 : Boolean,
     versionToSet           : Int,
     currentUserOrganization: => Option[OrganizationId]
@@ -66,7 +66,7 @@ trait CreateCols extends RequestResponse with Common {
     val now = new Timestamp(System.currentTimeMillis())
     val organizationToSet = req.forData match {
       case false => None
-      case true  => existingRow match {
+      case true  => existingRowOpt match {
         case Some(row) => row.organization.map(_._1)
         case None      => currentUserOrganization.map(_.underlying)
       }
@@ -96,7 +96,7 @@ trait CreateCols extends RequestResponse with Common {
         name          = "created",
         value         = DynamicColValue(
           placeholder = "?",
-          paramSetter = param(_.setTimestamp, existingRow.map(_.createdTime).getOrElse(now))
+          paramSetter = param(_.setTimestamp, existingRowOpt.map(_.createdTime).getOrElse(now))
         )
       ),
       Col(
@@ -202,7 +202,7 @@ trait CreateCols extends RequestResponse with Common {
           name          = "username",
           value         = DynamicColValue(
             placeholder = "?" ,
-            paramSetter = param(_.setString, existingRow.flatMap(_.createdBy).map(_.username).getOrElse(requestUsername.orNull))
+            paramSetter = param(_.setString, existingRowOpt.flatMap(_.createdBy).map(_.username).getOrElse(requestUsername.orNull))
           )
         )
     ) ::: (
@@ -211,7 +211,7 @@ trait CreateCols extends RequestResponse with Common {
           name          = "groupname",
           value         = DynamicColValue(
             placeholder = "?",
-            paramSetter = param(_.setString, existingRow.flatMap(_.createdBy).flatMap(_.groupname).getOrElse(requestGroup.orNull))
+            paramSetter = param(_.setString, existingRowOpt.flatMap(_.createdBy).flatMap(_.groupname).getOrElse(requestGroup.orNull))
           )
         )
     ) ::: (

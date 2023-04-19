@@ -109,7 +109,7 @@ private[persistence] object HttpAssert extends XMLSupport {
     body                     : HttpCall.Body,
     expectedCode             : Int,
     credentials              : Option[Credentials] = None,
-    stage                    : Option[Stage]      = None)(implicit
+    stage                    : Option[Stage]       = None)(implicit
     logger                   : IndentedLogger,
     externalContext          : ExternalContext,
     coreCrossPlatformSupport : CoreCrossPlatformSupportTrait

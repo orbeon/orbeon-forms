@@ -27,7 +27,7 @@ import scala.util.Try
 
 private[persistence] object Connect {
 
-  val TestDatabaseName = "orbeon"
+  val TestDatabaseName = "orbeon_unit_tests"
 
   val ProvidersTestedAutomatically: List[Provider] = List(
     Provider.withName(sys.env("DB"))

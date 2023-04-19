@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.fr.persistence.db
 
-import java.io.{InputStreamReader, StringWriter}
-import java.sql.Statement
-
+import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.util.{IndentedLogger, Logging}
 
+import java.io.{InputStreamReader, StringWriter}
+import java.sql.Statement
 import scala.collection.mutable.ArrayBuffer
+
 
 private[persistence] object SQL extends Logging {
 
@@ -58,8 +58,8 @@ private[persistence] object SQL extends Logging {
     )}
 
     // Group lines in statements
-    var allStatements    = ArrayBuffer[String]()
-    var currentStatement = ArrayBuffer[String]()
+    val allStatements = ArrayBuffer[String]()
+    val currentStatement = ArrayBuffer[String]()
     linesWithMarkers.foreach { case (line, isLastLineOfStatement) =>
       // Remove the `;` separator if this is the last line, except at the end of
       // a block (`END;`) where it is required by Oracle
@@ -74,7 +74,7 @@ private[persistence] object SQL extends Logging {
     allStatements.toList
   }
 
-  def executeStatements(provider: Provider, statement: Statement, sql: Seq[String])(implicit logger: IndentedLogger): Unit = {
+  def executeStatements(provider: Provider, statement: Statement, sql: Seq[String])(implicit logger: IndentedLogger): Unit =
     withDebug("running statements", List("provider" -> provider.entryName)) {
       sql foreach { s =>
         withDebug("running", List("statement" -> s)) {
@@ -82,5 +82,4 @@ private[persistence] object SQL extends Logging {
         }
       }
     }
-  }
 }

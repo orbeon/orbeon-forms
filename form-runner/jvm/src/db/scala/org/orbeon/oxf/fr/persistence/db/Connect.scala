@@ -27,6 +27,8 @@ import scala.util.Try
 
 private[persistence] object Connect {
 
+  val TestDatabaseName = "orbeon"
+
   val ProvidersTestedAutomatically: List[Provider] = List(
     Provider.withName(sys.env("DB"))
   )
@@ -71,12 +73,12 @@ private[persistence] object Connect {
       withConnection(datasourceDescriptor) { connection =>
 
         val createUser: PartialFunction[Provider, Unit] = {
-          case MySQL      => runStatements(connection, List("CREATE DATABASE orbeon"))
-          case PostgreSQL => runStatements(connection, List("CREATE SCHEMA   orbeon"))
+          case MySQL      => runStatements(connection, List(s"CREATE DATABASE $TestDatabaseName"))
+          case PostgreSQL => runStatements(connection, List(s"CREATE SCHEMA   $TestDatabaseName"))
         }
 
         if (createUser.isDefinedAt(provider)) {
-          Logging.withDebug("create `orbeon` schema") {
+          Logging.withDebug(s"create `$TestDatabaseName` schema") {
             createUser(provider)
           }
         }
@@ -86,10 +88,10 @@ private[persistence] object Connect {
       }
 
     } finally {
-      Logging.withDebug("drop `orbeon` objects") {
+      Logging.withDebug(s"drop `$TestDatabaseName` objects") {
         provider match {
-          case MySQL      => runStatements(datasourceDescriptor, List("DROP DATABASE orbeon"))
-          case PostgreSQL => runStatements(datasourceDescriptor, List("DROP SCHEMA   orbeon    CASCADE"))
+          case MySQL      => runStatements(datasourceDescriptor, List(s"DROP DATABASE $TestDatabaseName"))
+          case PostgreSQL => runStatements(datasourceDescriptor, List(s"DROP SCHEMA   $TestDatabaseName    CASCADE"))
         }
       }
     }

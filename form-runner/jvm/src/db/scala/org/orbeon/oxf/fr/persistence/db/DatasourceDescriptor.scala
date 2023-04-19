@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.fr.persistence.db
 
+import org.orbeon.oxf.fr.persistence.db.Connect.TestDatabaseName
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Provider.{MySQL, PostgreSQL}
+
 
 case class DatasourceDescriptor(
   name      : String,
@@ -37,7 +39,7 @@ object DatasourceDescriptor {
           url       = "jdbc:mysql://localhost:3306/",
           username  = "root",
           password  = "",
-          switchDB  = "USE orbeon"
+          switchDB  = s"USE $TestDatabaseName"
         )
       case PostgreSQL =>
         DatasourceDescriptor(
@@ -46,7 +48,7 @@ object DatasourceDescriptor {
           url       = "jdbc:postgresql://localhost:5432/",
           username  = "orbeon",
           password  = "",
-          switchDB  = "SET search_path TO orbeon"
+          switchDB  = s"SET search_path TO $TestDatabaseName"
         )
     }
   }

@@ -2996,6 +2996,7 @@
             <section-templates todo="true">[Section templates]</section-templates>
             <controls todo="true">[Controls]</controls>
             <all todo="true">[All]</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>
@@ -4332,6 +4333,7 @@
             <section-templates todo="true">[Section templates]</section-templates>
             <controls todo="true">[Controls]</controls>
             <all todo="true">[All]</all>
+            <use-property todo="true">[Use property]</use-property>
             <singleton>
                 <label todo="true">[Singleton form]</label>
                 <hint todo="true">[Prevent users from creating additional form data if they have access an existing form data for this form definition]</hint>

@@ -174,8 +174,9 @@ trait CreateUpdateDelete
           |           FROM     $table
           |           WHERE    app  = ?
           |                    and form = ?
-          |                    ${if (req.forForm)     "and form_version = ?" else ""}
-          |                    ${if (req.forData)     "and document_id  = ?" else ""}
+          |                    ${if (req.forForm) "and form_version = ?" else ""}
+          |                    ${if (req.forData) "and document_id  = ?" else ""}
+          |                    ${if (req.forData) "and draft        = ?" else ""}
           |           GROUP BY ${idCols.mkString(", ")}
           |       ) m
           |WHERE  ${joinColumns("last_modified_time" +: idCols, "t", "m")}
@@ -190,7 +191,10 @@ trait CreateUpdateDelete
       if (req.forForm)
         ps.setInt(position.next(), versionToSet)
 
-      req.dataPart foreach (dataPart => ps.setString(position.next(), dataPart.documentId))
+      req.dataPart foreach { dataPart =>
+        ps.setString(position.next(), dataPart.documentId)
+        ps.setString(position.next(), if (dataPart.isDraft) "Y" else "N")
+      }
 
       useAndClose(ps.executeQuery()) { resultSet =>
 
@@ -411,7 +415,19 @@ trait CreateUpdateDelete
       // Inform caller of the form definition version used
       httpResponse.setHeader(OrbeonFormDefinitionVersion, versionToSet.toString)
 
-      httpResponse.setStatus(if (delete) StatusCode.NoContent else StatusCode.Created)
+      // "If the target resource does not have a current representation and the PUT successfully creates one, then the
+      // origin server MUST inform the user agent by sending a 201 (Created) response. If the target resource does have
+      // a current representation and that representation is successfully modified in accordance with the state of the
+      // enclosed representation, then the origin server MUST send either a 200 (OK) or a 204 (No Content) response to
+      // indicate successful completion of the request." (https://www.rfc-editor.org/rfc/rfc9110#name-put)
+      httpResponse.setStatus(
+        if (delete)
+          StatusCode.NoContent
+        else if (existingRowOpt.isDefined)
+          StatusCode.NoContent
+        else
+          StatusCode.Created
+      )
     }
   }
 }

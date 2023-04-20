@@ -39,7 +39,7 @@ trait FormRunnerPermissionsOps {
             p.associatedValue { _ =>
               PermissionsJSON.parseString(p.stringValue).get // will throw if there is an error in the format of the property
             }
-          case _ => UndefinedPermissions
+          case _ => Permissions.Undefined
         }
     }
 

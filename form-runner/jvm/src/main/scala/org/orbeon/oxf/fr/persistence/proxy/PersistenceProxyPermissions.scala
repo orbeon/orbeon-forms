@@ -53,7 +53,7 @@ object PersistenceProxyPermissions {
             val operationsFromTokenOpt: Option[Operations] =
               for {
                 token              <- incomingTokenOpt
-                definedPermissions <- formPermissions.narrowTo[DefinedPermissions]
+                definedPermissions <- formPermissions.narrowTo[Permissions.Defined]
               } yield
                 operationsFromToken(
                   definedPermissions = definedPermissions,

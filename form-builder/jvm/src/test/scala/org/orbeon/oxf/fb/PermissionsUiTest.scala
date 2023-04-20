@@ -33,7 +33,7 @@ class PermissionsUiTest extends DocumentTestBase
       </permissions>
 
     val adtAnyoneCanRead =
-      DefinedPermissions(
+      Permissions.Defined(
         List(
           Permission(
             Nil,
@@ -61,7 +61,7 @@ class PermissionsUiTest extends DocumentTestBase
       </permissions>
 
     val adtAnyoneCanReadList =
-      DefinedPermissions(
+      Permissions.Defined(
         List(
           Permission(
             Nil,
@@ -96,14 +96,14 @@ class PermissionsUiTest extends DocumentTestBase
       </permissions>
 
     val adtAnyoneCanReadRoleCanList =
-      DefinedPermissions(
+      Permissions.Defined(
         List(
           Permission(
             Nil,
             SpecificOperations(Set(Operation.Read))
           ),
           Permission(
-            List(RolesAnyOf(List("admin"))),
+            List(Condition.RolesAnyOf(List("admin"))),
             SpecificOperations(Set(Operation.List)) // 2022-10-03: decided that `list` does not imply `read`
           )
         )
@@ -147,22 +147,22 @@ class PermissionsUiTest extends DocumentTestBase
       </permissions>
 
     val adtMixedPermissions =
-      DefinedPermissions(
+      Permissions.Defined(
         List(
           Permission(
-            List(Owner),
+            List(Condition.Owner),
             SpecificOperations(Set(Operation.Update, Operation.Delete, Operation.Read))
           ),
           Permission(
-            List(Group),
+            List(Condition.Group),
             SpecificOperations(Set(Operation.Read))
           ),
           Permission(
-            List(RolesAnyOf(List("orbeon-admin", "orbeon-user"))),
+            List(Condition.RolesAnyOf(List("orbeon-admin", "orbeon-user"))),
             SpecificOperations(Set(Operation.Create, Operation.Update, Operation.Read, Operation.List))
           ),
           Permission(
-            List(RolesAnyOf(List("orbeon-admin"))),
+            List(Condition.RolesAnyOf(List("orbeon-admin"))),
             SpecificOperations(Set(Operation.Delete)))
         )
       )
@@ -205,22 +205,22 @@ class PermissionsUiTest extends DocumentTestBase
       </permissions>
 
     val adtTokenPermissions =
-      DefinedPermissions(
+      Permissions.Defined(
         List(
           Permission(
             Nil,
             SpecificOperations(Set(Operation.Create))
           ),
           Permission(
-            List(AnyoneWithToken),
+            List(Condition.AnyoneWithToken),
             SpecificOperations(Set(Operation.Read, Operation.Update))
           ),
           Permission(
-            List(AnyAuthenticatedUser),
+            List(Condition.AnyAuthenticatedUser),
             SpecificOperations(Set(Operation.Read))
           ),
           Permission(
-            List(RolesAnyOf(List("admin"))),
+            List(Condition.RolesAnyOf(List("admin"))),
             SpecificOperations(Set(Operation.Delete, Operation.List))
           )
         )

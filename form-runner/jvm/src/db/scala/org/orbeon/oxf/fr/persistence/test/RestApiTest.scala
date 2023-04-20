@@ -60,11 +60,11 @@ class RestApiTest
   private val CanCreateReadUpdate = Operations.combine(CanCreateRead, CanUpdate)
   private val FormName = "my-form"
 
-  private val AnyoneCanCreateAndRead = DefinedPermissions(List(Permission(Nil, SpecificOperations(Set(Read, Create)))))
-  private val AnyoneCanCreate        = DefinedPermissions(List(Permission(Nil, SpecificOperations(Set(Create)))))
+  private val AnyoneCanCreateAndRead = Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Read, Create)))))
+  private val AnyoneCanCreate        = Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Create)))))
 
   private def createForm(provider: Provider)(implicit ec: ExternalContext): Unit = {
-    val form = HttpCall.XML(buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("first")))
+    val form = HttpCall.XML(buildFormDefinition(provider, permissions = Permissions.Undefined, title = Some("first")))
     val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
     HttpAssert.put(formURL, Unspecified, form, StatusCode.Created)
   }
@@ -195,8 +195,8 @@ class RestApiTest
           val formURL       = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
           val firstDataURL  = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
           val secondDataURL = HttpCall.crudURLPrefix(provider) + "data/456/data.xml"
-          val first         = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("first"))
-          val second        = buildFormDefinition(provider, permissions = UndefinedPermissions, title = Some("second"))
+          val first         = buildFormDefinition(provider, permissions = Permissions.Undefined, title = Some("first"))
+          val second        = buildFormDefinition(provider, permissions = Permissions.Undefined, title = Some("second"))
           val data          = <gaga/>.toDocument
 
           HttpAssert.put(formURL      , Unspecified, HttpCall.XML(first) , StatusCode.Created)
@@ -228,7 +228,7 @@ class RestApiTest
             val DataURL = HttpCall.crudURLPrefix(provider) + "data/123/data.xml"
 
             // Anonymous: no permission defined
-            HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, UndefinedPermissions)), StatusCode.Created)
+            HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, Permissions.Undefined)), StatusCode.Created)
             HttpAssert.put(DataURL, Specific(1), HttpCall.XML(data), StatusCode.Created)
             HttpAssert.get(DataURL, Unspecified, HttpAssert.ExpectedBody(HttpCall.XML(data), AnyOperation, Some(1)))
 
@@ -245,11 +245,11 @@ class RestApiTest
             val dataURL = HttpCall.crudURLPrefix(provider) + "data/456/data.xml"
 
             // More complex permissions based on roles
-            HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, DefinedPermissions(List(
+            HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, Permissions.Defined(List(
               Permission(Nil                              , SpecificOperations(Set(Create))),
-              Permission(List(RolesAnyOf(List("clerk"  ))), SpecificOperations(Set(Read))),
-              Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update))),
-              Permission(List(RolesAnyOf(List("admin"  ))), SpecificOperations(Set(Read, Update, Delete)))
+              Permission(List(Condition.RolesAnyOf(List("clerk"  ))), SpecificOperations(Set(Read))),
+              Permission(List(Condition.RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update))),
+              Permission(List(Condition.RolesAnyOf(List("admin"  ))), SpecificOperations(Set(Read, Update, Delete)))
             )))), StatusCode.NoContent)
             HttpAssert.put(dataURL, Specific(1), HttpCall.XML(data), StatusCode.Created)
 
@@ -302,11 +302,11 @@ class RestApiTest
           val dataBody  = HttpCall.XML(<gaga/>.toDocument)
 
           // User can read their own data, as well as their managers
-          HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, DefinedPermissions(List(
-            Permission(Nil                              , SpecificOperations(Set(Create))),
-            Permission(List(Owner)                      , SpecificOperations(Set(Read, Update))),
-            Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(Set(Read))),
-            Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update)))
+          HttpAssert.put(formURL, Unspecified, HttpCall.XML(buildFormDefinition(provider, Permissions.Defined(List(
+            Permission(Nil                                        , SpecificOperations(Set(Create))),
+            Permission(List(Condition.Owner)                      , SpecificOperations(Set(Read, Update))),
+            Permission(List(Condition.RolesAnyOf(List("clerk")))  , SpecificOperations(Set(Read))),
+            Permission(List(Condition.RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update)))
           )))), StatusCode.Created)
 
           // Data initially created by sfUserA

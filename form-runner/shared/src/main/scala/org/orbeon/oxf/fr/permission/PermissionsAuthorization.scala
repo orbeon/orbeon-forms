@@ -71,8 +71,8 @@ object PermissionsAuthorization {
 
   def hasPermissionCond(permissions: Permissions, condition: Condition, anyOfOperations: Set[Operation]): Boolean =
     permissions match {
-      case UndefinedPermissions => true
-      case DefinedPermissions(permissionsList) =>
+      case Permissions.Undefined => true
+      case Permissions.Defined(permissionsList) =>
         permissionsList.exists { permission =>
           permission.conditions.contains(condition) &&
             Operations.allowsAny(permission.operations, anyOfOperations)
@@ -85,9 +85,9 @@ object PermissionsAuthorization {
     check                : PermissionsCheck
   ): Operations =
     permissions match {
-      case DefinedPermissions(permissionsList) =>
+      case Permissions.Defined(permissionsList) =>
         Operations.combine(permissionsList.map(authorizedOperationsForPermission(_, currentCredentialsOpt, check)))
-      case UndefinedPermissions =>
+      case Permissions.Undefined =>
         AnyOperation
     }
 
@@ -155,7 +155,7 @@ object PermissionsAuthorization {
   // If we call this, it means that we don't have access based on `Anyone`, `AnyAuthenticatedUser`, `Owner`, roles,
   // etc. We are just testing for `AnyoneWithToken`.
   def operationsFromToken(
-    definedPermissions: DefinedPermissions,
+    definedPermissions: Permissions.Defined,
     token             : String,
     tokenHmac         : FormRunnerAccessToken.TokenHmac
   ): Try[Operations] =
@@ -163,7 +163,7 @@ object PermissionsAuthorization {
       if (tokenPayload.exp.isAfter(java.time.Instant.now)) {
         Operations.combine(
           definedPermissions.permissionsList collect {
-            case permission if permission.conditions.contains(AnyoneWithToken) =>
+            case permission if permission.conditions.contains(Condition.AnyoneWithToken) =>
               SpecificOperations(permission.operations.operations.intersect(tokenPayload.ops.toSet))
           }
         )
@@ -174,16 +174,16 @@ object PermissionsAuthorization {
 
   def possiblyAllowedTokenOperations(permissions: Permissions, authorizedOperationsOpt: Option[Set[Operation]]): Operations =
     (permissions, authorizedOperationsOpt) match {
-      case (UndefinedPermissions, _) =>
+      case (Permissions.Undefined, _) =>
         Operations.None
       case (_, None) =>
         Operations.None
-      case (DefinedPermissions(permissionsList), Some(authorizedOperations)) =>
+      case (Permissions.Defined(permissionsList), Some(authorizedOperations)) =>
 
         val tokenOpsFromPermissions =
           Operations.combine(
             permissionsList collect {
-              case permission if permission.conditions.contains(AnyoneWithToken) =>
+              case permission if permission.conditions.contains(Condition.AnyoneWithToken) =>
                 SpecificOperations(permission.operations.operations)
             }
           )
@@ -198,9 +198,9 @@ object PermissionsAuthorization {
     credentialsOpt: Option[Credentials]
   ): Operations =
     permissions match {
-      case UndefinedPermissions =>
+      case Permissions.Undefined =>
         AnyOperation
-      case defined @ DefinedPermissions(_) =>
+      case defined @ Permissions.Defined(_) =>
 
         val operationsWithoutAssumingOwnership =
           authorizedOperations(defined, credentialsOpt, CheckWithoutDataUserPessimistic)
@@ -213,8 +213,8 @@ object PermissionsAuthorization {
               case None            => Nil
             }
 
-          val ownerOperations       = ownerGroupOperations(credentialsOpt.isDefined option                                   Owner)
-          val groupMemberOperations = ownerGroupOperations(credentialsOpt.flatMap(_.userAndGroup.groupname).isDefined option Group)
+          val ownerOperations       = ownerGroupOperations(credentialsOpt.isDefined option                                   Condition.Owner)
+          val groupMemberOperations = ownerGroupOperations(credentialsOpt.flatMap(_.userAndGroup.groupname).isDefined option Condition.Group)
 
           Operations.combine(operationsWithoutAssumingOwnership :: ownerOperations ::: groupMemberOperations)
         }
@@ -314,11 +314,11 @@ object PermissionsAuthorization {
     check             : PermissionsCheck
   ): Boolean =
     condition match {
-      case AnyoneWithToken      =>
+      case Condition.AnyoneWithToken      =>
         false // TODO: could support an optional token and extra parameters? how to check on this condition depending on scenario?
-      case AnyAuthenticatedUser =>
+      case Condition.AnyAuthenticatedUser =>
         currentCredentials.isDefined
-      case Owner =>
+      case Condition.Owner =>
         check match {
           case CheckWithDataUser(dataUserAndGroupOpt, _) =>
             (currentCredentials map (_.userAndGroup.username), dataUserAndGroupOpt.map(_.username)) match {
@@ -328,7 +328,7 @@ object PermissionsAuthorization {
           case CheckWithoutDataUserPessimistic => false
           case CheckAssumingOrganizationMatch  => false
         }
-      case Group =>
+      case Condition.Group =>
         check match {
           case CheckWithDataUser(dataUserAndGroupOpt, _) =>
             (currentCredentials flatMap (_.userAndGroup.groupname), dataUserAndGroupOpt.flatMap(_.groupname)) match {
@@ -338,7 +338,7 @@ object PermissionsAuthorization {
           case CheckWithoutDataUserPessimistic => false
           case CheckAssumingOrganizationMatch  => false
         }
-      case RolesAnyOf(permissionRoles) =>
+      case Condition.RolesAnyOf(permissionRoles) =>
         permissionRoles.exists(permissionRoleName =>
           currentCredentials.toList.flatMap(_.roles) exists {
             case SimpleRole(userRoleName) =>

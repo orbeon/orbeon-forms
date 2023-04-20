@@ -24,15 +24,15 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
   val juser    = guest.copy(userAndGroup = guest.userAndGroup.copy(username = "juser"))
   val jmanager = guest.copy(userAndGroup = guest.userAndGroup.copy(username = "jmanager"))
 
-  val clerkPermissions = DefinedPermissions(List(
-    Permission(List(RolesAnyOf(List("clerk"))), SpecificOperations(Set(Read)))
+  val clerkPermissions = Permissions.Defined(List(
+    Permission(List(Condition.RolesAnyOf(List("clerk"))), SpecificOperations(Set(Read)))
   ))
 
-  val clerkAndManagerPermissions = DefinedPermissions(List(
+  val clerkAndManagerPermissions = Permissions.Defined(List(
     Permission(Nil                              , SpecificOperations(Set(Create))),
-    Permission(List(Owner)                      , SpecificOperations(Set(Read, Update))),
-    Permission(List(RolesAnyOf(List("clerk")))  , SpecificOperations(Set(Read))),
-    Permission(List(RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update)))
+    Permission(List(Condition.Owner)                      , SpecificOperations(Set(Read, Update))),
+    Permission(List(Condition.RolesAnyOf(List("clerk")))  , SpecificOperations(Set(Read))),
+    Permission(List(Condition.RolesAnyOf(List("manager"))), SpecificOperations(Set(Read, Update)))
   ))
 
   describe("The `authorizedOperations()` function") {
@@ -41,7 +41,7 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
       for (userRoles <- List(Nil, List(SimpleRole("clerk")))) {
         val user = juser.copy(roles = userRoles)
         val ops  = PermissionsAuthorization.authorizedOperations(
-          UndefinedPermissions,
+          Permissions.Undefined,
           Some(user),
           PermissionsAuthorization.CheckWithoutDataUserPessimistic
         )
@@ -165,10 +165,10 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
       val ReadUpdateOperation        = SpecificOperations(Set(Operation.Read, Operation.Update))
       val CreateReadUpdateOperation  = SpecificOperations(Set(Operation.Create, Operation.Read, Operation.Update))
 
-      val DefinedButEmptyPermissions = DefinedPermissions(Nil)
-      val AnyoneCanReadPermissions   = DefinedPermissions(List(Permission(Nil, ReadOperation)))
-      val RoleCanReadPermissions     = DefinedPermissions(List(Permission(List(RolesAnyOf(List("orbeon-user"))), ReadOperation)))
-      val RoleCanUpdatePermissions   = DefinedPermissions(List(Permission(List(RolesAnyOf(List("orbeon-user"))), SpecificOperations(Set(Operation.Update)))))
+      val DefinedButEmptyPermissions = Permissions.Defined(Nil)
+      val AnyoneCanReadPermissions   = Permissions.Defined(List(Permission(Nil, ReadOperation)))
+      val RoleCanReadPermissions     = Permissions.Defined(List(Permission(List(Condition.RolesAnyOf(List("orbeon-user"))), ReadOperation)))
+      val RoleCanUpdatePermissions   = Permissions.Defined(List(Permission(List(Condition.RolesAnyOf(List("orbeon-user"))), SpecificOperations(Set(Operation.Update)))))
 
       val NoCredentials              = None
       val UserOnlyCredentials        = Credentials(UserAndGroup("dewey", None), Nil, Nil).some
@@ -185,7 +185,7 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
       )
 
       val VaryPermissions = List(
-        UndefinedPermissions,
+        Permissions.Undefined,
         DefinedButEmptyPermissions,
         AnyoneCanReadPermissions,
         RoleCanReadPermissions,
@@ -249,7 +249,7 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
       for {
         additionalOperations <- varyAdditionalOperations
         specificOperations   = SpecificOperations(Set(Operation.Create) ++ additionalOperations)
-        definedPermissions   = DefinedPermissions(List(Permission(Nil, specificOperations)))
+        definedPermissions   = Permissions.Defined(List(Permission(Nil, specificOperations)))
       } locally {
         it(s"must pass with `new` mode for permissions including `Create`: $additionalOperations") {
           assert(
@@ -268,7 +268,7 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
       for {
         operations         <- varyAdditionalOperations
         specificOperations = SpecificOperations(operations)
-        definedPermissions = DefinedPermissions(List(Permission(Nil, specificOperations)))
+        definedPermissions = Permissions.Defined(List(Permission(Nil, specificOperations)))
       } locally {
         it(s"must pass with `new` mode for permissions not including `Create`: $operations") {
           assert(
@@ -291,21 +291,21 @@ class PermissionsAuthorizationTest extends AnyFunSpec {
       val credentials = Credentials(UserAndGroup("dewey", "employee".some), List(SimpleRole("orbeon-user")), Nil)
 
       val permissionsWithResults = List(
-        UndefinedPermissions                                                                 -> true,
-        DefinedPermissions(List(Permission(Nil, SpecificOperations(Set(Operation.Update))))) -> true,
-        DefinedPermissions(List(Permission(Nil, SpecificOperations(Set(Operation.Read)))))   -> false,
-        DefinedPermissions(
+        Permissions.Undefined                                                                 -> true,
+        Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Operation.Update))))) -> true,
+        Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Operation.Read)))))   -> false,
+        Permissions.Defined(
           List(
-            Permission(Nil,         SpecificOperations(Set(Operation.Create))),
-            Permission(List(Owner), SpecificOperations(Set(Operation.Update))),
+            Permission(Nil,                   SpecificOperations(Set(Operation.Create))),
+            Permission(List(Condition.Owner), SpecificOperations(Set(Operation.Update))),
           )
         ) -> true,
         // See comment in `PermissionsAuthorization`: "If the user can't create data, don't return permissions the user
         // might have if that user was the owner; we assume that if the user can't create data, the user can never be
         // the owner of any data."
-        DefinedPermissions(
+        Permissions.Defined(
           List(
-            Permission(List(Owner), SpecificOperations(Set(Operation.Update))),
+            Permission(List(Condition.Owner), SpecificOperations(Set(Operation.Update))),
           )
         ) -> false,
 

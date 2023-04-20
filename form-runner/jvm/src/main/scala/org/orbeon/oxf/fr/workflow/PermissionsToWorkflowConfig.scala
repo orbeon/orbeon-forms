@@ -13,9 +13,9 @@ object PermissionsToWorkflowConfig {
 
     val perspectives =
       permissions match {
-        case UndefinedPermissions =>
+        case Permissions.Undefined =>
           throw new UnsupportedOperationException("We only expect `DefinedPermissions` to be converted to a `WorkflowConfig`")
-        case DefinedPermissions(permissionsList) =>
+        case Permissions.Defined(permissionsList) =>
 
           // Determine the possible "actors" (owner, group member, specific authentication role) with the operations they can perform
           val actorsOperations: List[(Availability, Set[PermissionOperation])] =
@@ -26,11 +26,11 @@ object PermissionsToWorkflowConfig {
                 else
                   permission.conditions
                     .flatMap {
-                      case AnyoneWithToken      => ??? // new with #5437
-                      case AnyAuthenticatedUser => ??? // new with #5437
-                      case Owner                => List(WorkflowRoleAvailabilityRule(IsComparison, OwnerWorkflowRole))
-                      case Group                => List(WorkflowRoleAvailabilityRule(IsComparison, GroupMemberWorkflowRole))
-                      case RolesAnyOf(roles)    => roles.map(AuthenticationRoleAvailabilityRule(IsComparison, _))
+                      case Condition.AnyoneWithToken      => ??? // new with #5437
+                      case Condition.AnyAuthenticatedUser => ??? // new with #5437
+                      case Condition.Owner                => List(WorkflowRoleAvailabilityRule(IsComparison, OwnerWorkflowRole))
+                      case Condition.Group                => List(WorkflowRoleAvailabilityRule(IsComparison, GroupMemberWorkflowRole))
+                      case Condition.RolesAnyOf(roles)    => roles.map(AuthenticationRoleAvailabilityRule(IsComparison, _))
                     }.map(ToUsersAvailability(_))
               val operations = permission.operations match {
                 case SpecificOperations(operations) => operations

@@ -16,23 +16,20 @@ package org.orbeon.oxf.fr.permission
 import org.orbeon.oxf.util.CollectionUtils
 
 
-sealed trait                                                              Permissions
-case object UndefinedPermissions                                  extends Permissions
-case class  DefinedPermissions(permissionsList: List[Permission]) extends Permissions
-
 case class Permission(
   conditions: List[Condition],
   operations: SpecificOperations
 )
 
-sealed trait                                                              Condition
-case object AnyoneWithToken                                       extends Condition // new with #5437
-case object AnyAuthenticatedUser                                  extends Condition // new with #5437
-case object Owner                                                 extends Condition
-case object Group                                                 extends Condition
-case class  RolesAnyOf(roles: List[String])                       extends Condition
+sealed trait Condition
 
 object Condition {
+
+  case object AnyoneWithToken                 extends Condition // new with #5437
+  case object AnyAuthenticatedUser            extends Condition // new with #5437
+  case object Owner                           extends Condition
+  case object Group                           extends Condition
+  case class  RolesAnyOf(roles: List[String]) extends Condition
 
   def parseSimpleCondition(conditionString: String): Option[Condition] =
     conditionString match {
@@ -55,9 +52,14 @@ object Condition {
     }
 }
 
+sealed trait Permissions
+
 object Permissions {
 
-  private def addImpliedRead(permissions: DefinedPermissions): DefinedPermissions =
+  case object Undefined                                  extends Permissions
+  case class  Defined(permissionsList: List[Permission]) extends Permissions
+
+  private def addImpliedRead(permissions: Defined): Defined =
     permissions.copy(
       permissionsList =
         permissions.permissionsList.map {
@@ -68,7 +70,7 @@ object Permissions {
         }
     )
 
-  private def addImpliedOps(permissions: DefinedPermissions): DefinedPermissions = {
+  private def addImpliedOps(permissions: Defined): Defined = {
 
     def findOpsForCondition(condition: Option[Condition]): Set[Operation] = {
       val ConditionList = condition.toList
@@ -78,8 +80,8 @@ object Permissions {
     }
 
     val anyoneOps  = findOpsForCondition(None)
-    val tokenOps   = findOpsForCondition(Some(AnyoneWithToken))
-    val anyAuthOps = findOpsForCondition(Some(AnyAuthenticatedUser))
+    val tokenOps   = findOpsForCondition(Some(Condition.AnyoneWithToken))
+    val anyAuthOps = findOpsForCondition(Some(Condition.AnyAuthenticatedUser))
 
     def isAnyAuthImplied(op: Operation) =
       anyoneOps.contains(op) && ! tokenOps.contains(op)
@@ -89,9 +91,9 @@ object Permissions {
         permissions.permissionsList.map {
           case Permission(Nil, SpecificOperations(ops)) =>
             Permission(Nil, SpecificOperations(ops -- tokenOps)) // remove ops that require a token
-          case permission @ Permission(List(AnyoneWithToken), _) =>
+          case permission @ Permission(List(Condition.AnyoneWithToken), _) =>
             permission
-          case Permission(conditions @ List(AnyAuthenticatedUser), SpecificOperations(ops)) =>
+          case Permission(conditions @ List(Condition.AnyAuthenticatedUser), SpecificOperations(ops)) =>
             Permission(conditions, SpecificOperations(ops.filterNot(isAnyAuthImplied)))
           case Permission(conditions, SpecificOperations(ops)) =>
             Permission(conditions, SpecificOperations(ops.filterNot(op => isAnyAuthImplied(op) || anyAuthOps.contains(op))))
@@ -101,7 +103,7 @@ object Permissions {
     )
   }
 
-  private def removeEmptyPermissions(permissions: DefinedPermissions): DefinedPermissions =
+  private def removeEmptyPermissions(permissions: Defined): Defined =
     permissions.copy(
       permissionsList =
         permissions.permissionsList.collect {
@@ -110,10 +112,10 @@ object Permissions {
         }
     )
 
-  private def normalizedRolePermissions(permissions: DefinedPermissions): DefinedPermissions = {
+  private def normalizedRolePermissions(permissions: Defined): Defined = {
 
     val rawRolePermissions = permissions.permissionsList.collect {
-      case rolePermission @ Permission(List(RolesAnyOf(_)), SpecificOperations(_)) => rolePermission
+      case rolePermission @ Permission(List(Condition.RolesAnyOf(_)), SpecificOperations(_)) => rolePermission
     }
 
     val orderedDistinctRoleOperations =
@@ -124,7 +126,7 @@ object Permissions {
         roleOperation <- orderedDistinctRoleOperations
         rolesWithOp   = rawRolePermissions.collect {
           // Pattern matches the structure above (single condition, single role name)
-          case Permission(List(RolesAnyOf(List(role))), SpecificOperations(ops)) if ops.contains(roleOperation) => role
+          case Permission(List(Condition.RolesAnyOf(List(role))), SpecificOperations(ops)) if ops.contains(roleOperation) => role
         }
       } yield
         rolesWithOp.sorted -> roleOperation
@@ -132,7 +134,7 @@ object Permissions {
     val normalizedRolePermissions: List[Permission] =
       for ((roles, operations) <- CollectionUtils.combineValues(rolesWithOperations))
       yield
-        Permission(List(RolesAnyOf(roles)), SpecificOperations(operations.toSet))
+        Permission(List(Condition.RolesAnyOf(roles)), SpecificOperations(operations.toSet))
 
     permissions.copy(
       permissionsList =
@@ -142,7 +144,7 @@ object Permissions {
     )
   }
 
-  def normalizePermissions(rawPermissions: DefinedPermissions): DefinedPermissions =
+  def normalizePermissions(rawPermissions: Defined): Defined =
     removeEmptyPermissions(
       normalizedRolePermissions(
         addImpliedOps(

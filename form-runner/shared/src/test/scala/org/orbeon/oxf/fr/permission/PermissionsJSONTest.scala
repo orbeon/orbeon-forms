@@ -21,26 +21,26 @@ class PermissionsJSONTest extends AnyFunSpecLike {
         |}""".stripMargin
 
     val adt1 =
-      DefinedPermissions(
+      Permissions.Defined(
         List(
           Permission(
             Nil,
             SpecificOperations(Set(Operation.Create))
           ),
           Permission(
-            List(Owner),
+            List(Condition.Owner),
             SpecificOperations(Set(Operation.Read, Operation.Update))
           ),
           Permission(
-            List(Group),
+            List(Condition.Group),
             SpecificOperations(Set(Operation.Read, Operation.Update))
           ),
           Permission(
-            List(RolesAnyOf(List("orbeon-user"))),
+            List(Condition.RolesAnyOf(List("orbeon-user"))),
             SpecificOperations(Set(Operation.Read, Operation.Update, Operation.List))
           ),
           Permission(
-            List(RolesAnyOf(List("orbeon-admin"))),
+            List(Condition.RolesAnyOf(List("orbeon-admin"))),
             SpecificOperations(Set(Operation.Read, Operation.Update, Operation.Delete, Operation.List))
           )
         )
@@ -53,7 +53,7 @@ class PermissionsJSONTest extends AnyFunSpecLike {
     val json2 = "  "
 
     it(s"must succeed with `$json2`") {
-      assert(Success(UndefinedPermissions) == PermissionsJSON.parseString(json2))
+      assert(Success(Permissions.Undefined) == PermissionsJSON.parseString(json2))
     }
 
     val json3 =
@@ -76,11 +76,11 @@ class PermissionsJSONTest extends AnyFunSpecLike {
         |}""".stripMargin
 
     val adt4 =
-      DefinedPermissions(
+      Permissions.Defined(
         List(
           Permission(Nil, Operations.None),
-          Permission(List(RolesAnyOf(List("orbeon-user"))), Operations.None),
-          Permission(List(RolesAnyOf(List("orbeon-admin"))), Operations.None)
+          Permission(List(Condition.RolesAnyOf(List("orbeon-user"))), Operations.None),
+          Permission(List(Condition.RolesAnyOf(List("orbeon-admin"))), Operations.None)
         )
       )
 

@@ -24,9 +24,9 @@ object PermissionsXML {
 
   def serialize(permissions: Permissions, normalized: Boolean): Option[Elem] =
     permissions match {
-      case UndefinedPermissions =>
+      case Permissions.Undefined =>
         None
-      case DefinedPermissions(permissionsList) =>
+      case Permissions.Defined(permissionsList) =>
         Some(
           <permissions>
             {
@@ -34,11 +34,11 @@ object PermissionsXML {
               <permission operations={Operations.serialize(permission.operations, normalized).mkString(" ")}>
                 {
                   permission.conditions map {
-                    case AnyoneWithToken      => <anyone-with-token/>      // new with #5437
-                    case AnyAuthenticatedUser => <any-authenticated-user/> // new with #5437
-                    case Owner                => <owner/>
-                    case Group                => <group-member/>
-                    case RolesAnyOf(roles)    => <user-role any-of={roles.map(_.replace(" ", "%20")).mkString(" ")}/>
+                    case Condition.AnyoneWithToken      => <anyone-with-token/>      // new with #5437
+                    case Condition.AnyAuthenticatedUser => <any-authenticated-user/> // new with #5437
+                    case Condition.Owner                => <owner/>
+                    case Condition.Group                => <group-member/>
+                    case Condition.RolesAnyOf(roles)    => <user-role any-of={roles.map(_.replace(" ", "%20")).mkString(" ")}/>
                   }
                 }
               </permission>
@@ -51,9 +51,9 @@ object PermissionsXML {
   def parse(permissionsElemOpt: Option[NodeInfo]): Permissions =
     permissionsElemOpt match {
       case None =>
-        UndefinedPermissions
+        Permissions.Undefined
       case Some(permissionsEl) =>
-        DefinedPermissions(permissionsEl.child("permission").toList.map(parsePermission))
+        Permissions.Defined(permissionsEl.child("permission").toList.map(parsePermission))
     }
 
   /**
@@ -77,7 +77,7 @@ object PermissionsXML {
                 val anyOfAttValue = conditionEl.attValue("any-of")
                 val rawRoles      = anyOfAttValue.splitTo[List](" ")
                 val roles         = rawRoles.map(_.replace("%20", " "))
-                RolesAnyOf(roles)
+                Condition.RolesAnyOf(roles)
               case condition =>
                 Condition.parseSimpleCondition(condition).getOrElse(throw new IllegalArgumentException(condition))
             }

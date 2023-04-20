@@ -48,8 +48,8 @@ trait SearchLogic extends SearchRequestParser {
       formPermissions,
       authorizedBasedOnRoleOptimistic  = PermissionsAuthorization.authorizedBasedOnRole(formPermissions, request.credentials, searchOperations, optimistic = true),
       authorizedBasedOnRolePessimistic = PermissionsAuthorization.authorizedBasedOnRole(formPermissions, request.credentials, searchOperations, optimistic = false),
-      authorizedIfUsername             = PermissionsAuthorization.hasPermissionCond(formPermissions, Owner, searchOperations).flatOption(request.credentials.map(_.userAndGroup.username)),
-      authorizedIfGroup                = PermissionsAuthorization.hasPermissionCond(formPermissions, Group, searchOperations).flatOption(request.credentials.map(_.userAndGroup.groupname)).flatten,
+      authorizedIfUsername             = PermissionsAuthorization.hasPermissionCond(formPermissions, Condition.Owner, searchOperations).flatOption(request.credentials.map(_.userAndGroup.username)),
+      authorizedIfGroup                = PermissionsAuthorization.hasPermissionCond(formPermissions, Condition.Group, searchOperations).flatOption(request.credentials.map(_.userAndGroup.groupname)).flatten,
       authorizedIfOrganizationMatch    = SearchOps.authorizedIfOrganizationMatch(formPermissions, request.credentials)
     )
   }

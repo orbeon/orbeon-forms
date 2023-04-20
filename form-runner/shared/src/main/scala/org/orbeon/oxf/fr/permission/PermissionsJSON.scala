@@ -60,13 +60,13 @@ object PermissionsJSON {
               topLevelMap.get("roles") map { jsonObject =>
                 jsonObject.asObject.getOrElse(error()).toList map { case (role, jsonArray) =>
                   Permission(
-                    List(RolesAnyOf(List(role))),
+                    List(Condition.RolesAnyOf(List(role))),
                     jsonToOperations(jsonArray)
                   )
                 }
               }
 
-            DefinedPermissions(
+            Permissions.Defined(
               findSimplePermission("anyone").toList       :::
               findSimplePermission("owner").toList        :::
               findSimplePermission("group-member").toList :::
@@ -75,6 +75,6 @@ object PermissionsJSON {
           }
         }
       case None =>
-        Success(UndefinedPermissions)
+        Success(Permissions.Undefined)
     }
 }

@@ -703,17 +703,17 @@ object FormBuilderXPathApi {
         nonEmptyRoleName   <- rolePermissionElem.elemValueOpt(RoleElemName).flatMap(_.trimAllToOpt)
         operations         = Operations.parseFromStringTokensNoWildcard(rolePermissionElem.elemValue(OperationsElemName))
       } yield
-        Permission(List(RolesAnyOf(List(nonEmptyRoleName))), operations)
+        Permission(List(Condition.RolesAnyOf(List(nonEmptyRoleName))), operations)
 
     NodeConversions.elemToNodeInfo(
       PermissionsXML.serialize(
         Permissions.normalizePermissions(
-          DefinedPermissions(
-            findPermissionsFor(None,                       findAnyonePermissionElem).toList :::
-            findPermissionsFor(Some(AnyoneWithToken),      findForPermissionElem).toList    :::
-            findPermissionsFor(Some(AnyAuthenticatedUser), findForPermissionElem).toList    :::
-            findPermissionsFor(Some(Owner),                findForPermissionElem).toList    :::
-            findPermissionsFor(Some(Group),                findForPermissionElem).toList    :::
+          Permissions.Defined(
+            findPermissionsFor(None,                                 findAnyonePermissionElem).toList :::
+            findPermissionsFor(Some(Condition.AnyoneWithToken),      findForPermissionElem).toList    :::
+            findPermissionsFor(Some(Condition.AnyAuthenticatedUser), findForPermissionElem).toList    :::
+            findPermissionsFor(Some(Condition.Owner),                findForPermissionElem).toList    :::
+            findPermissionsFor(Some(Condition.Group),                findForPermissionElem).toList    :::
             rawRolePermissions
           )
         ),

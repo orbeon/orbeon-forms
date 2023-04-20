@@ -13,27 +13,16 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.search
 
-import org.orbeon.oxf.externalcontext.{Credentials, Organization, ParametrizedRole, UserAndGroup}
+import org.orbeon.oxf.externalcontext.{Credentials, ParametrizedRole}
 import org.orbeon.oxf.fr.permission.Operation.{Delete, Read, Update}
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.permission._
-import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
 
 import scala.collection.compat._
+
 
 object SearchOps {
 
   val SearchOperations: Set[Operation] = Set(Read, Update, Delete)
-
-  // Used by eXist only
-  //@XPathFunction
-  def xpathAuthorizedIfOrganizationMatch(formPermissionsElOrNull: NodeInfo): List[String] =
-    authorizedIfOrganizationMatch(
-      permissions = PermissionsXML.parse(Option(formPermissionsElOrNull)),
-      credentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession
-    )
 
   def authorizedIfOrganizationMatch(
     permissions   : Permissions,
@@ -47,45 +36,5 @@ object SearchOps {
       Operations.allowsAny(authorizedOperations, SearchOperations)
     } )
     usefulUserParametrizedRoles.map(_.organizationName)
-  }
-
-  // Used by eXist only
-  //@XPathFunction
-  def authorizedOperations(
-    formPermissionsElOrNull : NodeInfo,
-    metadataOrNullEl        : NodeInfo
-  ): String = {
-
-    val checkWithData = {
-
-      def childValue(name: String): Option[String] =
-        Option(metadataOrNullEl)
-          .flatMap(_.firstChildOpt(name))
-          .map(_.stringValue)
-
-      val organization = {
-        val levels = Option(metadataOrNullEl)
-          .flatMap(_.firstChildOpt("organization"))
-          .map(_.child("level").to(List).map(_.stringValue))
-        levels.map(Organization.apply)
-      }
-
-      CheckWithDataUser(
-        UserAndGroup.fromStrings(
-          childValue("username").getOrElse(""),
-          childValue("groupname").getOrElse("")
-        ),
-        organization
-      )
-    }
-
-    val operations =
-      PermissionsAuthorization.authorizedOperations(
-        permissions           = PermissionsXML.parse(Option(formPermissionsElOrNull)),
-        currentCredentialsOpt = PermissionsAuthorization.findCurrentCredentialsFromSession,
-        check                 = checkWithData
-      )
-
-    Operations.serialize(operations, normalized = true).mkString(" ")
   }
 }

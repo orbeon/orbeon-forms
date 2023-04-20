@@ -265,6 +265,17 @@
                             </xf:action>
                             <xf:trigger>
                                 <xf:label value="$fr-resources/detail/draft-singleton/start-new"/>
+                                <xf:action event="DOMActivate">
+                                    <xf:setvalue
+                                        ref="instance('fr-authorized-operations')"
+                                        value="
+                                            frf:authorizedOperationsForDetailModeOrThrow(
+                                                '', (: No permissions from data :)
+                                                (), (: No mode change to `new`  :)
+                                                xxf:instance('fr-form-metadata')/permissions,
+                                                false()
+                                            )"/>
+                                </xf:action>
                             </xf:trigger>
                             <xf:trigger>
                                 <xf:label value="$fr-resources/detail/draft-singleton/open-draft"/>
@@ -274,7 +285,6 @@
                                     <xf:send submission="fr-get-document-submission">
                                         <xf:property name="data-or-draft" value="'draft'"/>
                                     </xf:send>
-                                    <xf:dispatch name="fr-compute-authorized-operations" target="fr-persistence-model"/>
                                     <xf:action type="xpath">fr:run-process-by-name('oxf.fr.detail.process', 'new-to-edit')</xf:action>
                                 </xf:action>
                             </xf:trigger>

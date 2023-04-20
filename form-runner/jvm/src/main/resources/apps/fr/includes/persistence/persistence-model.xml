@@ -147,6 +147,18 @@
 
             </xf:action>
 
+            <!-- Set `new` permissions if we won't 1. navigate or 2. ask the user what to do -->
+            <xf:setvalue
+                if="not($is-singleton) and xxf:is-blank(instance('fr-persistence-instance')/found-document-message-to-show)"
+                ref="instance('fr-authorized-operations')"
+                value="
+                    frf:authorizedOperationsForDetailModeOrThrow(
+                        '', (: No permissions from data :)
+                        (), (: No mode change to `new`  :)
+                        xxf:instance('fr-form-metadata')/permissions,
+                        false()
+                    )"/>
+
         </xf:action>
 
         <xf:dispatch
@@ -364,45 +376,6 @@
         event="xforms-ready"
         if="xxf:instance('fr-form-metadata')/available = 'false'"
         type="xpath">frf:sendError(404)</xf:action>
-
-    <!-- 3. Maybe show drafts dialog and check form permissions for detail modes -->
-    <xf:action event="xforms-ready" if="not($mode = ('summary', 'home', 'landing'))">
-
-        <xf:var name="show-drafts-dialog" value="instance('fr-persistence-instance')/found-document-message-to-show != ''"/>
-        <xf:action if="not($show-drafts-dialog)">
-            <xf:dispatch name="fr-compute-authorized-operations" target="fr-persistence-model"/>
-        </xf:action>
-    </xf:action>
-
-    <xf:action
-        observer="fr-persistence-model"
-        event="fr-compute-authorized-operations">
-
-        <xf:action type="javascript" if="exists(xxf:get-request-parameter(frf:AccessTokenParam()))">
-            <xf:param name="name" value="frf:AccessTokenParam()"/>
-            <xf:body>ORBEON.fr.private.API.removeUrlParameter(name)</xf:body>
-        </xf:action>
-
-        <xf:setvalue
-            ref="instance('fr-authorized-operations')"
-            value="
-                frf:authorizedOperationsForDetailModeOrThrow(
-                    instance('fr-authorized-operations')/string(),
-                    xxf:get-request-parameter(frf:InternalAuthorizedOperationsParam())[1],
-                    xxf:instance('fr-form-metadata')/permissions,
-                    $is-submit
-                )"/>
-
-        <xf:setvalue
-            ref="instance('fr-share-dialog-instance')/possible-operations"
-            value="
-                frf:possiblyAllowedTokenOperations(
-                    xxf:instance('fr-form-metadata')/permissions,
-                    $app,
-                    $form
-                )"/>
-
-    </xf:action>
 
     <!-- Instance for background service response -->
     <xf:instance
@@ -734,14 +707,35 @@
         xxf:instance="fr-form-instance">
 
         <xf:action event="xforms-submit-done">
-            <!-- Save value of Orbeon-Operations header -->
-            <xf:var
-                name="operations-header"
-                value="event('response-headers')[lower-case(name) = 'orbeon-operations']/value"/>
-            <xf:setvalue
-                if="exists($operations-header)"
-                ref="instance('fr-authorized-operations')"
-                value="$operations-header"/>
+
+            <xf:action>
+
+                <xf:action type="javascript" if="exists(xxf:get-request-parameter(frf:AccessTokenParam()))">
+                    <xf:param name="name" value="frf:AccessTokenParam()"/>
+                    <xf:body>ORBEON.fr.private.API.removeUrlParameter(name)</xf:body>
+                </xf:action>
+
+                <xf:setvalue
+                    ref="instance('fr-authorized-operations')"
+                    value="
+                        frf:authorizedOperationsForDetailModeOrThrow(
+                            event('response-headers')[lower-case(name) = 'orbeon-operations']/value/string(),
+                            xxf:get-request-parameter(frf:InternalAuthorizedOperationsParam())[1],
+                            xxf:instance('fr-form-metadata')/permissions,
+                            $is-submit
+                        )"/>
+
+                <xf:setvalue
+                    ref="instance('fr-share-dialog-instance')/possible-operations"
+                    value="
+                        frf:possiblyAllowedTokenOperations(
+                            xxf:instance('fr-form-metadata')/permissions,
+                            $app,
+                            $form
+                        )"/>
+
+            </xf:action>
+
             <!-- Save value of the Orbeon-Workflow-Stage header -->
             <xf:setvalue
                 ref="instance('fr-document-metadata')/@workflow-stage"
@@ -967,8 +961,7 @@
         <!-- Show summary button if users have the read permission (obviously), but also if they are logged in, as in
              that case they might be able to see data based on ownership -->
         <xf:bind ref="can-access-summary"
-                 relevant="xxf:split(instance('fr-authorized-operations')) = ('*', 'read')
-                           or xxf:non-blank(xxf:username())"/>
+                 relevant="fr:can-read() or xxf:non-blank(xxf:username())"/>
         <!-- Don't show the PDF button at all in CE version if there is a PDF template -->
         <xf:bind ref="pdf"
                  relevant="not((xxf:instance('fr-form-attachments')/pdf/xxf:trim() != '')) or fr:is-pe()"
@@ -998,6 +991,10 @@
             <link/>
         </_>
     </xf:instance>
+
+    <xf:bind
+        ref="instance('fr-share-dialog-instance')/selected-operations"
+        readonly="../possible-operations = 'read'"/>
 
     <xf:bind ref="instance('fr-urls-instance')/*" type="xs:anyURI"/>
 

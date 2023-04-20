@@ -850,9 +850,9 @@
         <xf:group
             class="fr-share-nav"
             ref=".[
-                xxf:property('oxf.fr.navbar.share-button.enable')                           and
-                not(fr:is-embedded())                                                       and
-                xxf:non-blank(xxf:instance('fr-share-dialog-instance')/possible-operations) and
+                xxf:property(string-join(('oxf.fr.navbar.share-button.enable', fr:app-name(), fr:form-name()), '.')) and
+                not(fr:is-embedded())                                                                                and
+                xxf:non-blank(xxf:instance('fr-share-dialog-instance')/possible-operations)                          and
                 fr:mode() = (
                     'edit',
                     'view'
@@ -873,7 +873,7 @@
             class="fr-user-nav"
             ref=".[
                 not(fr:mode() = 'test')                                and
-                xxf:property('oxf.fr.authentication.user-menu.enable') and
+                xxf:property('oxf.fr.authentication.user-menu.enable') and (: Q: Why is this not by app/form? :)
                 not(fr:is-embedded())
             ]">
             <xsl:choose>

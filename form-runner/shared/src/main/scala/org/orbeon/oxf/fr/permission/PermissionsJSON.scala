@@ -35,15 +35,8 @@ object PermissionsJSON {
         def error(): Nothing =
           throw new IllegalArgumentException(trimmedJsonString)
 
-        def keyToConditions(key: String): List[Condition] =
-          key match {
-            case "anyone"                 => Nil
-            case "anyone-with-token"      => List(AnyoneWithToken)      // new with #5437
-            case "any-authenticated-user" => List(AnyAuthenticatedUser) // new with #5437
-            case "owner"                  => List(Owner)
-            case "group-member"           => List(Group)
-            case _                        => error()
-          }
+        def keyToSimpleConditions(key: String): List[Condition] =
+          Try(Condition.parseSimpleCondition(key).toList).getOrElse(error())
 
         def jsonToOperations(jsonArray: Json): SpecificOperations =
           SpecificOperations(jsonArray.asArray.getOrElse(error()).map(_.asString.getOrElse(error())).toSet.map(Operation.withName))
@@ -58,7 +51,7 @@ object PermissionsJSON {
             def findSimplePermission(key: String): Option[Permission] =
                 topLevelMap.get(key) map { jsonArray =>
                   Permission(
-                    keyToConditions(key),
+                    keyToSimpleConditions(key),
                     jsonToOperations(jsonArray)
                   )
                 }

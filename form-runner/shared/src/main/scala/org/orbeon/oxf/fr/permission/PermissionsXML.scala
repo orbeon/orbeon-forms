@@ -29,20 +29,21 @@ object PermissionsXML {
       case DefinedPermissions(permissionsList) =>
         Some(
           <permissions>
-            {permissionsList map (p =>
-            <permission operations={Operations.serialize(p.operations, normalized).mkString(" ")}>
-              {p.conditions map {
-              case AnyoneWithToken      => <anyone-with-token/>      // new with #5437
-              case AnyAuthenticatedUser => <any-authenticated-user/> // new with #5437
-              case Owner                => <owner/>
-              case Group                => <group-member/>
-              case RolesAnyOf(roles)    =>
-                val escapedSpaces = roles.map(_.replace(" ", "%20"))
-                val anyOfAttValue = escapedSpaces.mkString(" ")
-                  <user-role any-of={anyOfAttValue}/>
-            }}
-            </permission>
-            )}
+            {
+              permissionsList map { permission =>
+              <permission operations={Operations.serialize(permission.operations, normalized).mkString(" ")}>
+                {
+                  permission.conditions map {
+                    case AnyoneWithToken      => <anyone-with-token/>      // new with #5437
+                    case AnyAuthenticatedUser => <any-authenticated-user/> // new with #5437
+                    case Owner                => <owner/>
+                    case Group                => <group-member/>
+                    case RolesAnyOf(roles)    => <user-role any-of={roles.map(_.replace(" ", "%20")).mkString(" ")}/>
+                  }
+                }
+              </permission>
+              }
+            }
           </permissions>
         )
     }
@@ -63,24 +64,25 @@ object PermissionsXML {
    * See backward compatibility handling: https://github.com/orbeon/orbeon-forms/issues/5397
    */
   private def parsePermission(permissionEl: NodeInfo): Permission = {
+
     val operations =
       Operations.normalizeAndParseSpecificOperations(permissionEl.attValue("operations"))
+
     val conditions =
       permissionEl.child(*).toList.map(
         conditionEl =>
-          conditionEl.localname match {
-            case "anyone-with-token"      => AnyoneWithToken      // new with #5437
-            case "any-authenticated-user" => AnyAuthenticatedUser // new with #5437
-            case "owner"                  => Owner
-            case "group-member"           => Group
-            case "user-role"              =>
-              val anyOfAttValue = conditionEl.attValue("any-of")
-              val rawRoles      = anyOfAttValue.splitTo[List](" ")
-              val roles         = rawRoles.map(_.replace("%20", " "))
-              RolesAnyOf(roles)
-            case _ => throw new IllegalArgumentException
-          }
+          conditionEl.localname
+            match {
+              case "user-role" =>
+                val anyOfAttValue = conditionEl.attValue("any-of")
+                val rawRoles      = anyOfAttValue.splitTo[List](" ")
+                val roles         = rawRoles.map(_.replace("%20", " "))
+                RolesAnyOf(roles)
+              case condition =>
+                Condition.parseSimpleCondition(condition).getOrElse(throw new IllegalArgumentException(condition))
+            }
       )
+
     Permission(conditions, operations)
   }
 }

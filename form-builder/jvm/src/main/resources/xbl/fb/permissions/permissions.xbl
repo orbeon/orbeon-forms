@@ -18,7 +18,6 @@
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-    xmlns:saxon="http://saxon.sf.net/"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
@@ -52,7 +51,6 @@
                     <xf:bind ref="apply-trigger" readonly="instance()/@valid = 'false'"/>
                     <xf:bind ref="readonly-checked | readonly-unchecked" readonly="true()"/>
                     <xf:bind ref="permissions" id="permissions-bind">
-                        <!-- "Anyone" permission -->
                         <xf:bind ref="permission[1]"                               id="anyone-permission-bind"/>
                         <xf:bind ref="permission[@for = 'anyone-with-token']"      id="anyone-with-token-bind"/>
                         <xf:bind ref="permission[@for = 'any-authenticated-user']" id="any-authenticated-user-bind"/>
@@ -124,12 +122,24 @@
                     <xf:action if="$has-permissions">
 
                         <!-- Add permission for anyone, owner, and group -->
-                        <xf:setvalue ref="$ui/permissions/permission[1]/operations"
-                                     value="$metadata-permissions/permission[empty(*)]/@operations"/>
-                        <xf:setvalue ref="$ui/permissions/permission[@for = 'owner']/operations"
-                                     value="$metadata-permissions/permission[exists(owner)]/@operations"/>
-                        <xf:setvalue ref="$ui/permissions/permission[@for = 'group-member']/operations"
-                                     value="$metadata-permissions/permission[exists(group-member)]/@operations"/>
+                        <xf:setvalue
+                            ref="$ui/permissions/permission[1]/operations"
+                            value="
+                                string-join(
+                                    distinct-values(
+                                        (
+                                            $metadata-permissions/permission[empty(*)]/@operations/xxf:split(),
+                                            $metadata-permissions/permission[exists(*[name() = 'anyone-with-token'])]/@operations/xxf:split()
+                                        )
+                                    ),
+                                    ' '
+                                )"/>
+                        <xf:action iterate="'anyone-with-token', 'any-authenticated-user', 'owner', 'group-member'">
+                            <xf:var name="cond" value="."/>
+                            <xf:setvalue
+                                ref="$ui/permissions/permission[@for = $cond]/operations"
+                                value="$metadata-permissions/permission[exists(*[name() = $cond])]/@operations"/>
+                        </xf:action>
 
                         <!-- Add permissions attached to a role -->
                         <xf:var name="roles" value="distinct-values($metadata-permissions/permission/user-role/@any-of/xxf:split())"/>
@@ -290,7 +300,7 @@
                                                 else
                                                     operations
                                             else if ($is-anyone-with-token) then
-                                                if ($anyone-with-token-operations = ('read', 'update')) then
+                                                if ($anyone-with-token-operations = 'update') then
                                                     $ui/readonly-checked
                                                 else if ($anyone-operations = ('read', 'update')) then
                                                     operations
@@ -428,7 +438,7 @@
                         </fr:grid>
                     </xf:group>
 
-                    <fr:xforms-inspector/>
+<!--                    <fr:xforms-inspector/>-->
 
                     <!-- Buttons -->
                     <xh:div class="fr-dialog-buttons">

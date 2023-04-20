@@ -63,6 +63,16 @@ object Operations {
       case operations      => Some(operations)
     }
 
+  def parseFromStringTokensNoWildcard(stringOperations: String): SpecificOperations = {
+
+    val stringTokensSet = stringOperations.splitTo[Set]()
+
+    if (stringTokensSet("*"))
+      throw new IllegalArgumentException(stringOperations)
+    else
+      SpecificOperations(stringTokensSet.map(Operation.withName))
+  }
+
   // `operations` contains tokens.
   // 2023-04-17: We exclude `*` as this is called by `PermissionsXML` only for parsing
   // permissions set in form definitions, and there the `*` is not allowed.
@@ -85,7 +95,7 @@ object Operations {
     }
   }
 
-  def denormalizeOperations(operationsTokens: Set[Operation]): List[String] = {
+  private def denormalizeOperations(operationsTokens: Set[Operation]): List[String] = {
 
     // The UI format now no longer includes `read` if there is `update`
     // `update` => `read`
@@ -105,7 +115,6 @@ object Operations {
   def inDefinitionOrder(operations: Iterable[Operation]): List[Operation] =
     Operations.AllList.filter(operations.toSet)
 
-  // `normalized == false` only when called from `PermissionsUiTest`. Not sure if that's correct.
   def serialize(operations: Operations, normalized: Boolean): List[String] =
     operations match {
       case AnyOperation =>

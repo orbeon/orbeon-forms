@@ -26,11 +26,9 @@ import org.orbeon.oxf.fr.Names.FormBinds
 import org.orbeon.oxf.fr.NodeInfoCell._
 import org.orbeon.oxf.fr.XMLNames.{FRServiceCallTest, XFSendTest}
 import org.orbeon.oxf.fr._
-import org.orbeon.oxf.fr.permission.{Operation, Operations, PermissionsXML}
-import org.orbeon.oxf.util.CollectionUtils
+import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.NodeInfoFactory._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
@@ -666,6 +664,7 @@ object FormBuilderXPathApi {
         Nil
     }
 
+  // Called by `permissions.xbl` when loading `instance('fr-form-metadata')/permissions`
   //@XPathFunction
   def normalizePermissionsHandleList(permissionsElOrNull: NodeInfo): NodeInfo =
     PermissionsXML.serialize(PermissionsXML.parse(Option(permissionsElOrNull)), normalized = true)
@@ -675,79 +674,52 @@ object FormBuilderXPathApi {
   private val OperationsElemName = "operations"
   private val RoleElemName       = "role"
 
-  private val OperationsAttName  = OperationsElemName
-
-  // NOTE: This function works directly on the XML. Another way would be to produce the `Permissions` ADTs, and
-  // then just call `PermissionsXML.serialize()`.
   //@XPathFunction
   def convertPermissionsFromUiToFormDefinitionFormat(permissionsEl: NodeInfo): NodeInfo = {
 
-    val anyonePermissionElem    = (permissionsEl / PermissionElemName).head
-    val anyoneOperations        = anyonePermissionElem.elemValue(OperationsElemName)
-    val anyoneOperationsTokens  = anyoneOperations.splitTo[Set]().map(Operation.withName)
+    val findAnyonePermissionElem: String => Option[NodeInfo] =
+      (_: String) => (permissionsEl / PermissionElemName).headOption
 
-    def makePermissionElem(operationsTokens: List[String], elemOpt: Option[NodeInfo]): NodeInfo =
-      elementInfo(
-        PermissionElemName,
-        attributeInfo(OperationsAttName, operationsTokens.mkString(" ")) :: elemOpt.toList
-      )
+    val findForPermissionElem: String => Option[NodeInfo] =
+      (condition: String) => (permissionsEl / PermissionElemName).find(_.attValue("for") == condition)
 
-    val anyonePermissionOpt =
-      anyoneOperationsTokens.nonEmpty option
-        makePermissionElem(Operations.denormalizeOperations(anyoneOperationsTokens), None)
+    // NOTE: In `permissions.xbl`, all elements *are* present
+    def findPermissionsFor(conditionOpt: Option[Condition], findElem: String => Option[NodeInfo]): Option[Permission] =
+      findElem(Condition.simpleConditionToStringName(conditionOpt)) flatMap { permissionElem =>
 
-    def findPermissionsFor(condition: String): Option[NodeInfo] = {
+        val specificOperations =
+          Operations.parseFromStringTokensNoWildcard(permissionElem.elemValue(OperationsElemName))
 
-      val permissionElemOpt  = (permissionsEl / PermissionElemName).find(_.attValue("for") == condition)
-
-      permissionElemOpt flatMap { permissionElem =>
-
-        val operations       = permissionElem.elemValue(OperationsElemName)
-        val operationsTokens = operations.splitTo[Set]().map(Operation.withName)
-
-        operationsTokens.nonEmpty option
-          makePermissionElem(Operations.denormalizeOperations(operationsTokens), Some(elementInfo(condition)))
-      }
-    }
-
-    val ownerPermissionOpt        = findPermissionsFor("owner")
-    val groupMembersPermissionOpt = findPermissionsFor("group-member")
-
-    val rolePermissionElems = (permissionsEl / PermissionElemName).filter(_.child(RoleElemName).nonEmpty).toList
-
-    val rolesWithOperations =
-      for {
-        operation <- rolePermissionElems.flatMap(_.elemValue(OperationsElemName).splitTo[List]()).distinct
-        sortedDistinctRoles =
-          rolePermissionElems
-            .filter(_.elemValue(OperationsElemName).splitTo[Set]().contains(operation))
-            .map(_.elemValue(RoleElemName).replace(" ", "%20"))
-            .distinct
-            .sorted
-      } yield
-        sortedDistinctRoles.mkString(" ") -> Operation.withName(operation)
-
-    // Consolidate multiple operations for the same roles
-    val rolesPermissionElems =
-      for ((rolesString, operations) <- CollectionUtils.combineValues(rolesWithOperations))
-        yield
-          makePermissionElem(
-            Operations.denormalizeOperations(operations.toSet),
-            Some(
-              elementInfo(
-                "user-role",
-                attributeInfo("any-of", rolesString)
-              )
-            )
+        specificOperations != Operations.None option
+          Permission(
+            conditionOpt.toList,
+            specificOperations
           )
+      }
 
-    val allPermissionElems =
-      anyonePermissionOpt.toList       :::
-      ownerPermissionOpt.toList        :::
-      groupMembersPermissionOpt.toList :::
-      rolesPermissionElems
+    val rawRolePermissions =
+      for {
+        rolePermissionElem <- (permissionsEl / PermissionElemName).toList
+        nonEmptyRoleName   <- rolePermissionElem.elemValueOpt(RoleElemName).flatMap(_.trimAllToOpt)
+        operations         = Operations.parseFromStringTokensNoWildcard(rolePermissionElem.elemValue(OperationsElemName))
+      } yield
+        Permission(List(RolesAnyOf(List(nonEmptyRoleName))), operations)
 
-    elementInfo("permissions", allPermissionElems)
+    NodeConversions.elemToNodeInfo(
+      PermissionsXML.serialize(
+        Permissions.normalizePermissions(
+          DefinedPermissions(
+            findPermissionsFor(None,                       findAnyonePermissionElem).toList :::
+            findPermissionsFor(Some(AnyoneWithToken),      findForPermissionElem).toList    :::
+            findPermissionsFor(Some(AnyAuthenticatedUser), findForPermissionElem).toList    :::
+            findPermissionsFor(Some(Owner),                findForPermissionElem).toList    :::
+            findPermissionsFor(Some(Group),                findForPermissionElem).toList    :::
+            rawRolePermissions
+          )
+        ),
+        normalized = false
+      ).getOrElse(throw new IllegalStateException)
+    )
   }
 
   //@XPathFunction

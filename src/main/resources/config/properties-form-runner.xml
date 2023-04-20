@@ -20,12 +20,10 @@
 
     <!-- === Persistence configuration === -->
 
-    <!-- Default provider is "exist" -->
-    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="exist"/>
-    <!-- Define resource, exist, oracle, and mysql providers with their parameters -->
+    <!-- Default provider -->
+    <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="mysql"/>
+    <!-- Define resource, oracle, and mysql providers with their parameters -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.resource.uri"                            value="/fr/service/resource"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.exist.uri"                               value="/fr/service/exist"/>
-    <property as="xs:anyURI"  name="oxf.fr.persistence.exist.exist-uri"                         value="/exist/rest/db/orbeon/fr"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.oracle.uri"                              value="/fr/service/oracle"/>
     <property as="xs:string"  name="oxf.fr.persistence.oracle.datasource"                       value="oracle"/>
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.create-flat-view"                 value="false"/>
@@ -46,7 +44,6 @@
 
     <!-- Whether providers support permissions -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.permissions"                           value="false"/>
-    <property as="xs:boolean" name="oxf.fr.persistence.exist.permissions"                       value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.mysql.permissions"                       value="true"/>
     <property as="xs:boolean" name="oxf.fr.persistence.postgresql.permissions"                  value="true"/>
 
@@ -68,7 +65,7 @@
     <property as="xs:string"  name="oxf.fr.field-encryption.password"                           value=""/><!-- blank by default, which means use `oxf.crypto.password` -->
 
     <!-- Whether providers are active -->
-    <!-- It's possible to set providers, typically `exist` and `resource` to inactive so the Home page does not attempt searches -->
+    <!-- It's possible to set providers to be inactive so the Home page does not attempt searches -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.active"                                value="true"/>
 
     <!-- Default data format version -->
@@ -313,11 +310,12 @@
 
     <!-- Configuration of built-in forms -->
     <!-- Be specific, as user might change the default persistence layer -->
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="exist"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"            value="exist"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="exist"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="exist"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"             value="exist"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="mysql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"            value="mysql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="mysql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="mysql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.w9.form"                 value="mysql"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.travel.form"             value="mysql"/>
 
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf">
         home summary clear pdf|tiff wizard-toc wizard-prev wizard-next save-final review

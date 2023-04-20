@@ -11,7 +11,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<project name="orbeon" default="orbeon-dev-war" xmlns:xdb="http://exist-db.org/ant">
+<project name="orbeon" default="orbeon-dev-war">
 
     <!-- Properties to update when version number changes -->
     <property name="version.number" value="2022.1.4-SNAPSHOT"/>
@@ -66,7 +66,6 @@
 
         - xqjapi.jar
         - xqj2-0.0.1.jar
-        - exist-xqj-1.0.1.jar
 
         oxf:pdf-to-image:
 
@@ -245,7 +244,7 @@
         </copy>
     </target>
 
-    <target name="orbeon-dist-war" depends="war-common, exist-import-sample-data-to-build" description="Creates Orbeon Forms WAR">
+    <target name="orbeon-dist-war" depends="war-common" description="Creates Orbeon Forms WAR">
 
         <mkdir dir="build/distrib"/>
 
@@ -255,11 +254,6 @@
                 <exclude name="WEB-INF/exist-data/**"/>
                 <exclude name="WEB-INF/lib/orbeon-embedding.jar"/>
                 <exclude name="WEB-INF/lib/orbeon-proxy-portlet.jar"/>
-            </zipfileset>
-            <!-- eXist sample database -->
-            <zipfileset dir="build/exist-data" prefix="WEB-INF/exist-data">
-                <exclude name="*.log"/>
-                <exclude name="*.lck"/>
             </zipfileset>
         </zip>
     </target>
@@ -476,8 +470,6 @@
 
                 <delete dir="build/temp/test"/>
                	<mkdir  dir="build/temp/test"/>
-           	    <delete dir="src/resources-packaged/ops/unit-tests/exist-data"/>
-               	<mkdir  dir="src/resources-packaged/ops/unit-tests/exist-data"/>
 
                 <!-- Run sbt tests -->
                 <exec executable="sbt" failonerror="true">
@@ -579,106 +571,5 @@
     </target>
 
     <target name="orbeon-dist" depends="orbeon-dist-checksum"/>
-
-    <target name="exist-task" depends="war-common">
-        <!-- eXist tasks -->
-        <!-- http://exist-db.org/ant-tasks.html -->
-        <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
-            <classpath>
-                <fileset dir="orbeon-war/jvm/target/webapp/WEB-INF/lib">
-                    <include name="**/*.jar"/>
-                </fileset>
-            </classpath>
-        </typedef>
-    </target>
-
-    <target name="exist-export-from-web-inf" depends="exist-task">
-        <delete dir="build/exist-data-exported"/>
-        <mkdir dir="build/exist-data-exported"/>
-        <xdb:extract
-            configuration="build/orbeon-war/WEB-INF/exist-conf.xml"
-            uri="xmldb:exist:///db"
-            initDb="true"
-            destdir="build/exist-data-exported"
-            subcollections="true"
-            createdirectories="true"/>
-        <move todir="build/exist-data-exported" includeEmptyDirs="false">
-            <fileset dir="build/exist-data-exported">
-                <include name="**/*.xhtml.xml"/>
-            </fileset>
-            <globmapper from="*.xhtml.xml" to="*.xhtml"/>
-        </move>
-    </target>
-
-    <target name="exist-import-sample-data-to-build" depends="exist-task">
-        <delete dir="build/exist-data"/>
-        <mkdir dir="build/exist-data"/>
-        <!-- Store config first -->
-        <xdb:store
-            configuration="${basedir}/descriptors/ant-exist-conf.xml"
-            uri="xmldb:exist:///db"
-            initDb="true"
-            createcollection="true"
-            createsubcollections="true"
-            user="admin"
-            password="">
-            <fileset dir="data">
-                <include name="system/**"/>
-            </fileset>
-        </xdb:store>
-        <!-- Store data -->
-        <xdb:store
-            configuration="${basedir}/descriptors/ant-exist-conf.xml"
-            uri="xmldb:exist:///db"
-            initDb="true"
-            createcollection="true"
-            createsubcollections="true"
-            user="guest"
-            password="guest">
-            <fileset dir="data">
-                <include name="orbeon/**"/>
-            </fileset>
-        </xdb:store>
-        <!-- Make sure the database is shut down -->
-        <xdb:shutdown
-            configuration="${basedir}/descriptors/ant-exist-conf.xml"
-            uri="xmldb:exist:///db"
-            user="admin"
-            password=""/>
-    </target>
-
-    <!--
-        For this to work:
-
-        - Comment out the eXist security filter in web.xml.
-        - Enable the xmlrpc servlet in web.xml.
-        - Start Orbeon Forms and access a form that requires eXist first.
-    -->
-    <target name="exist-import-sample-data-to-localhost" depends="exist-task">
-        <!-- Store config first -->
-        <xdb:store
-            uri="xmldb:exist://localhost:8080/orbeon/exist/xmlrpc/db"
-            initDb="true"
-            createcollection="true"
-            createsubcollections="true"
-            user="admin"
-            password="">
-            <fileset dir="data">
-                <include name="system/**"/>
-            </fileset>
-        </xdb:store>
-        <!-- Store data only -->
-        <xdb:store
-            uri="xmldb:exist://localhost:8080/orbeon/exist/xmlrpc/db"
-            initDb="true"
-            createcollection="true"
-            createsubcollections="true"
-            user="guest"
-            password="guest">
-            <fileset dir="data">
-                <include name="orbeon/**"/>
-            </fileset>
-        </xdb:store>
-    </target>
 
 </project>

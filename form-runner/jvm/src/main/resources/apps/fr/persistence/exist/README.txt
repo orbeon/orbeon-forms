@@ -1,1 +1,0 @@
-This directory contains an implementation of persistence into eXist.

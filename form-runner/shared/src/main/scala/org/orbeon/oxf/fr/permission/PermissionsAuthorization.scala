@@ -172,16 +172,24 @@ object PermissionsAuthorization {
       }
     }
 
-  def possiblyAllowedTokenOperations(permissions: Permissions): Operations =
-    permissions match {
-      case UndefinedPermissions =>
+  def possiblyAllowedTokenOperations(permissions: Permissions, authorizedOperationsOpt: Option[Set[Operation]]): Operations =
+    (permissions, authorizedOperationsOpt) match {
+      case (UndefinedPermissions, _) =>
         Operations.None
-      case DefinedPermissions(permissionsList) =>
-        Operations.combine(
-          permissionsList collect {
-            case permission if permission.conditions.contains(AnyoneWithToken) =>
-              SpecificOperations(permission.operations.operations)
-          }
+      case (_, None) =>
+        Operations.None
+      case (DefinedPermissions(permissionsList), Some(authorizedOperations)) =>
+
+        val tokenOpsFromPermissions =
+          Operations.combine(
+            permissionsList collect {
+              case permission if permission.conditions.contains(AnyoneWithToken) =>
+                SpecificOperations(permission.operations.operations)
+            }
+          )
+
+        SpecificOperations(
+          authorizedOperations.filter(authorizedOp => Operations.allows(tokenOpsFromPermissions, authorizedOp))
         )
     }
 

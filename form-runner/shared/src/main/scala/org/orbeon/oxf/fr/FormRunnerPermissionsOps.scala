@@ -44,13 +44,16 @@ trait FormRunnerPermissionsOps {
     }
 
   //@XPathFunction
-  def possiblyAllowedTokenOperations(permissionsElOrNull: NodeInfo, app: String, form: String): String =
+  def possiblyAllowedTokenOperations(permissionsElOrNull: NodeInfo, app: String, form: String, authorizedOperations: String): String =
     Operations.serialize(
       PermissionsAuthorization.possiblyAllowedTokenOperations(
         permissionsFromElemOrProperties(
-            Option(permissionsElOrNull),
-            AppForm(app, form)
-          )
+          Option(permissionsElOrNull),
+          AppForm(app, form)
+        ),
+        Operations.parseFromString(authorizedOperations) collect {
+          case SpecificOperations(operations) => operations
+        }
       ),
       normalized = true
     ).mkString(" ")

@@ -731,7 +731,8 @@
                         frf:possiblyAllowedTokenOperations(
                             xxf:instance('fr-form-metadata')/permissions,
                             $app,
-                            $form
+                            $form,
+                            instance('fr-authorized-operations')
                         )"/>
 
             </xf:action>

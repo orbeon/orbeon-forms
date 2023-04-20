@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import enumeratum._
 import org.orbeon.io.IOUtils.useAndClose
+import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils}
 import org.orbeon.oxf.http.{Headers, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -26,11 +27,11 @@ import java.sql.Connection
 import scala.util.Try
 
 
-trait LockUnlock extends RequestResponse {
+trait LockUnlock {
 
   import Private._
 
-  def lock(req: LockUnlockRequest): Unit = {
+  def lock(req: LockUnlockRequest)(implicit httpResponse: ExternalContext.Response): Unit = {
     import LeaseStatus._
     val timeout = readTimeoutFromHeader
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, reqLockInfo) =>
@@ -45,7 +46,7 @@ trait LockUnlock extends RequestResponse {
     }
   }
 
-  def unlock(req: LockUnlockRequest): Unit = {
+  def unlock(req: LockUnlockRequest)(implicit httpResponse: ExternalContext.Response): Unit = {
     import LeaseStatus._
     readLeaseStatus(req) { (connection, leaseStatus, dataPart, _) =>
       leaseStatus match {
@@ -69,7 +70,7 @@ trait LockUnlock extends RequestResponse {
       case object DoesNotExist                                  extends LeaseStatus
     }
 
-    def issueLockedResponse(existingLease: LockSql.Lease): Unit = {
+    def issueLockedResponse(existingLease: LockSql.Lease)(implicit httpResponse: ExternalContext.Response): Unit = {
       httpResponse.setStatus(StatusCode.Locked)
       httpResponse.setHeader(Headers.ContentType, ContentTypes.XmlContentType)
       httpResponse.getOutputStream.pipe(useAndClose(_)(os =>

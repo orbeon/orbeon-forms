@@ -15,12 +15,12 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.io.IOUtils._
 import org.orbeon.io.{IOUtils, StringBuilderWriter}
-import org.orbeon.oxf.externalcontext.UserAndGroup
+import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.XMLNames.{XF, XH}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational.index.Index
+import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
 import org.orbeon.oxf.fr.{FormRunner, Names}
 import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
@@ -160,15 +160,12 @@ object RequestReader {
     TransformerUtils.readTinyTree(XPath.GlobalConfiguration, requestInputStream(), "", false, false)
 }
 
-trait CreateUpdateDelete
-  extends RequestResponse
-     with Common
-     with CreateCols {
+trait CreateUpdateDelete {
 
   private def findExistingRow(connection: Connection, req: CrudRequest, versionToSet: Int): Option[Row] = {
 
-    val idCols = idColumns(req).filter(_ != "file_name")
-    val table  = tableName(req, master = true)
+    val idCols = SqlSupport.idColumns(req).filter(_ != "file_name")
+    val table  = SqlSupport.tableName(req, master = true)
     val sql =
       s"""|SELECT created
           |       ${if (req.forData) ", username , groupname, organization_id, form_version" else ""}
@@ -183,7 +180,7 @@ trait CreateUpdateDelete
           |                    ${if (req.forData) "and draft        = ?" else ""}
           |           GROUP BY ${idCols.mkString(", ")}
           |       ) m
-          |WHERE  ${joinColumns("last_modified_time" +: idCols, "t", "m")}
+          |WHERE  ${SqlSupport.joinColumns("last_modified_time" +: idCols, "t", "m")}
           |       AND deleted = 'N'
           |""".stripMargin
 
@@ -223,7 +220,7 @@ trait CreateUpdateDelete
 
   // NOTE: Gets the first organization if there are multiple organization roots
   private def currentUserOrganization(connection: Connection, req: CrudRequest): Option[OrganizationId] =
-    httpRequest.credentials
+    req.credentials
       .flatMap(_.defaultOrganization)
       .map(OrganizationSupport.createIfNecessary(connection, req.provider, _))
 
@@ -235,7 +232,7 @@ trait CreateUpdateDelete
     versionToSet  : Int
   ): Unit = {
 
-    val table = tableName(req)
+    val table = SqlSupport.tableName(req)
 
     // If for data, start by deleting any draft document and draft attachments
     req.dataPart match {
@@ -358,7 +355,7 @@ trait CreateUpdateDelete
     }
   }
 
-  def change(req: CrudRequest, delete: Boolean): Unit = {
+  def change(req: CrudRequest, delete: Boolean)(implicit httpResponse: ExternalContext.Response): Unit = {
 
     debug("CRUD: handling change request", List("delete" -> delete.toString, "request" -> req.toString))
 
@@ -414,7 +411,7 @@ trait CreateUpdateDelete
 
       // Create flat view if needed
       if (
-        requestFlatView                                   &&
+        req.flatView                                      &&
         Provider.FlatViewSupportedProviders(req.provider) &&
         req.forForm                                       &&
         ! req.forAttachment                               &&

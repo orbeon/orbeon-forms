@@ -13,8 +13,8 @@
   */
 package org.orbeon.oxf.fr.persistence.relational.search
 
+import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Version._
-import org.orbeon.oxf.fr.persistence.relational.search.adt.SearchVersion
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl._
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl

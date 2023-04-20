@@ -13,11 +13,9 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
+import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.persistence.relational._
-import org.orbeon.oxf.http.Headers
-import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.NetUtils
 
 
 case class DataPart(
@@ -32,38 +30,18 @@ case class LockUnlockRequest(
 )
 
 case class CrudRequest(
-  provider: Provider,
-  appForm : AppForm,
-  version : Option[Int],
-  filename: Option[String],
-  dataPart: Option[DataPart]
+  provider     : Provider,
+  appForm      : AppForm,
+  version      : Option[Int],
+  filename     : Option[String],
+  dataPart     : Option[DataPart],
+  username     : Option[String],
+  groupname    : Option[String],
+  flatView     : Boolean,
+  credentials  : Option[Credentials],
+  workflowStage: Option[String]
 ) {
   def forForm       : Boolean = dataPart.isEmpty
   def forData       : Boolean = dataPart.isDefined
   def forAttachment : Boolean = filename.isDefined
-}
-
-// xxx move to an object
-trait RequestResponse extends Common {
-
-  def tableName(request: CrudRequest, master: Boolean = false): String =
-    Seq(
-      Some("orbeon_form"),
-      request.forForm                   option "_definition",
-      request.forData                   option "_data",
-      request.forAttachment && ! master option "_attach"
-    ).flatten.mkString
-
-  def httpRequest = NetUtils.getExternalContext.getRequest
-  def headerValueIgnoreCase(name: String): Option[String] = httpRequest.getFirstHeaderIgnoreCase(name)
-
-  def requestUsername      : Option[String] = headerValueIgnoreCase(Headers.OrbeonUsername)
-  def requestGroup         : Option[String] = headerValueIgnoreCase(Headers.OrbeonGroup)
-  def requestFlatView      : Boolean        = headerValueIgnoreCase("orbeon-create-flat-view").contains("true")
-  def requestWorkflowStage : Option[String] = headerValueIgnoreCase(StageHeader.HeaderName)
-
-  val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
-  val CrudDataPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+)".r
-
-  def httpResponse = NetUtils.getExternalContext.getResponse
 }

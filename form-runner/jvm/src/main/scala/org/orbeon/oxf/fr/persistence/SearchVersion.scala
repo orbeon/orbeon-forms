@@ -1,7 +1,7 @@
-package org.orbeon.oxf.fr.persistence.relational.search.adt
-
+package org.orbeon.oxf.fr.persistence
 
 sealed trait SearchVersion
+
 
 object SearchVersion {
 

@@ -16,8 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.search
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.{Operation, PermissionsAuthorization}
-import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.persistence.relational.RelationalCommon.getEffectiveFormVersionForSearchMaybeCallApi
+import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
@@ -97,7 +96,7 @@ trait SearchRequestParser {
             val specificColumnsByPath =
               specificColumns.map(c => c.path -> c).toMap
 
-            PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, getEffectiveFormVersionForSearchMaybeCallApi(appForm, version)) match {
+            PersistenceMetadataSupport.readPublishedFormEncryptionAndIndexDetails(appForm, PersistenceMetadataSupport.getEffectiveFormVersionForSearchMaybeCallApi(appForm, version)) match {
               case Success(EncryptionAndIndexDetails(_, indexedControlsXPaths)) =>
                 indexedControlsXPaths.value map { indexedControlXPath =>
                   Column(

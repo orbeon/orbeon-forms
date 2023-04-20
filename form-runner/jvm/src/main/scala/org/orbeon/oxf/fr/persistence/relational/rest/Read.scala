@@ -16,11 +16,10 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 import org.apache.commons.io.input.ReaderInputStream
 import org.orbeon.io.CharsetNames
 import org.orbeon.io.IOUtils._
-import org.orbeon.oxf.externalcontext.UserAndGroup
+import org.orbeon.oxf.externalcontext.{ExternalContext, UserAndGroup}
 import org.orbeon.oxf.fr.FormRunnerPersistence
 import org.orbeon.oxf.fr.permission.PermissionsAuthorization.CheckWithDataUser
 import org.orbeon.oxf.fr.persistence.relational.Provider.PostgreSQL
-import org.orbeon.oxf.fr.persistence.relational.RelationalCommon._
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.persistence.relational._
 import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, StatusCode}
@@ -31,9 +30,9 @@ import java.io.{ByteArrayInputStream, StringReader}
 import java.sql.Timestamp
 
 
-trait Read extends RequestResponse with Common with FormRunnerPersistence {
+trait Read extends FormRunnerPersistence {
 
-  def getOrHead(req: CrudRequest, method: HttpMethod): Unit = {
+  def getOrHead(req: CrudRequest, method: HttpMethod)(implicit httpResponse: ExternalContext.Response): Unit = {
 
     RelationalUtils.withConnection { connection =>
 
@@ -41,8 +40,8 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
       val readBody = method == HttpMethod.GET
 
       val sql = {
-        val table  = tableName(req)
-        val idCols = idColumns(req)
+        val table  = SqlSupport.tableName(req)
+        val idCols = SqlSupport.idColumns(req)
         val xmlCol = Provider.xmlColSelect(req.provider, "t")
         val body   =
           if (readBody)
@@ -65,7 +64,7 @@ trait Read extends RequestResponse with Common with FormRunnerPersistence {
             |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
             |            GROUP BY ${idCols.mkString(", ")}
             |        ) m
-            |WHERE   ${joinColumns("last_modified_time" +: idCols, "t", "m")}
+            |WHERE   ${SqlSupport.joinColumns("last_modified_time" +: idCols, "t", "m")}
             |""".stripMargin
       }
       useAndClose(connection.prepareStatement(sql)) { ps =>

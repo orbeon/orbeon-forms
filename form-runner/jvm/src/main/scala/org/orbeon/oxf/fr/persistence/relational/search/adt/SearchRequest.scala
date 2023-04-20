@@ -16,6 +16,7 @@ package org.orbeon.oxf.fr.persistence.relational.search.adt
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.Operation
+import org.orbeon.oxf.fr.persistence.SearchVersion
 import org.orbeon.oxf.fr.persistence.relational.Provider
 
 

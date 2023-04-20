@@ -1,30 +1,55 @@
 /**
- * Copyright (C) 2016 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
+  * Copyright (C) 2013 Orbeon, Inc.
+  *
+  * This program is free software; you can redistribute it and/or modify it under the terms of the
+  * GNU Lesser General Public License as published by the Free Software Foundation; either version
+  * 2.1 of the License, or (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  * See the GNU Lesser General Public License for more details.
+  *
+  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  */
 package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.oxf.externalcontext.{Organization, UserAndGroup}
-import org.orbeon.oxf.fr.persistence.relational.Provider
-import org.orbeon.oxf.fr.persistence.relational.rest.{OrganizationSupport => _}
-import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.IndentedLogger
 
 import java.sql.{PreparedStatement, Timestamp}
 
 
-trait CreateCols extends RequestResponse with Common {
+object SqlSupport {
 
-  type ParamSetterFunc = (PreparedStatement, Int) => Unit
-  def param[T](setter: PreparedStatement => (Int, T) => Unit, value: => T): ParamSetterFunc = {
+  implicit val Logger: IndentedLogger = RelationalUtils.Logger
+
+  def tableName(request: CrudRequest, master: Boolean = false): String =
+    Seq(
+      Some("orbeon_form"),
+      request.forForm                   option "_definition",
+      request.forData                   option "_data",
+      request.forAttachment && ! master option "_attach"
+    ).flatten.mkString
+
+  // List of columns that identify a row
+  def idColumns(req: CrudRequest): List[String] =
+    List(
+      Some("app"),
+      Some("form"),
+      req.forForm       option "form_version",
+      req.forData       option "document_id",
+      req.forData       option "draft",
+      req.forAttachment option "file_name"
+    ).flatten
+
+  def joinColumns(cols: Seq[String], t1: String, t2: String): String =
+    cols.map(c => s"$t1.$c = $t2.$c").mkString(" AND ")
+
+  private type ParamSetterFunc = (PreparedStatement, Int) => Unit
+
+  private def param[T](setter: PreparedStatement => (Int, T) => Unit, value: => T): ParamSetterFunc = {
     (ps: PreparedStatement, i: Int) => setter(ps)(i, value)
   }
 
@@ -110,7 +135,7 @@ trait CreateCols extends RequestResponse with Common {
         name          = "last_modified_by",
         value         = DynamicColValue(
           placeholder = "?",
-          paramSetter = param(_.setString, requestUsername.orNull)
+          paramSetter = param(_.setString, req.username.orNull)
         )
       ),
       Col(
@@ -202,7 +227,7 @@ trait CreateCols extends RequestResponse with Common {
           name          = "username",
           value         = DynamicColValue(
             placeholder = "?" ,
-            paramSetter = param(_.setString, existingRowOpt.flatMap(_.createdBy).map(_.username).getOrElse(requestUsername.orNull))
+            paramSetter = param(_.setString, existingRowOpt.flatMap(_.createdBy).map(_.username).getOrElse(req.username.orNull))
           )
         )
     ) ::: (
@@ -211,7 +236,7 @@ trait CreateCols extends RequestResponse with Common {
           name          = "groupname",
           value         = DynamicColValue(
             placeholder = "?",
-            paramSetter = param(_.setString, existingRowOpt.flatMap(_.createdBy).flatMap(_.groupname).getOrElse(requestGroup.orNull))
+            paramSetter = param(_.setString, existingRowOpt.flatMap(_.createdBy).flatMap(_.groupname).getOrElse(req.groupname.orNull))
           )
         )
     ) ::: (

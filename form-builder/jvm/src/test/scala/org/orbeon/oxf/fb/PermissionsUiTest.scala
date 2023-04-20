@@ -146,7 +146,7 @@ class PermissionsUiTest extends DocumentTestBase
         </permission>
       </permissions>
 
-    val adtMixedPermissionsEl =
+    val adtMixedPermissions =
       DefinedPermissions(
         List(
           Permission(
@@ -167,11 +167,95 @@ class PermissionsUiTest extends DocumentTestBase
         )
       )
 
+    val uiTokenPermissionsEl: om.NodeInfo =
+      <permissions>
+          <permission>
+              <operations>create read update</operations>
+          </permission>
+          <permission for="anyone-with-token">
+              <operations>read update</operations>
+          </permission>
+          <permission for="any-authenticated-user">
+              <operations>read</operations>
+          </permission>
+          <permission for="owner">
+              <operations/>
+          </permission>
+          <permission for="group-member">
+              <operations/>
+          </permission>
+          <permission>
+              <role>admin</role>
+              <operations>delete list</operations>
+          </permission>
+      </permissions>
+
+    val fdTokenPermissionsEl: om.NodeInfo =
+      <permissions>
+          <permission operations="create -list"/>
+          <permission operations="read update -list">
+              <anyone-with-token/>
+          </permission>
+          <permission operations="read -list">
+              <any-authenticated-user/>
+          </permission>
+          <permission operations="delete">
+              <user-role any-of="admin"/>
+          </permission>
+      </permissions>
+
+    val adtTokenPermissions =
+      DefinedPermissions(
+        List(
+          Permission(
+            Nil,
+            SpecificOperations(Set(Operation.Create))
+          ),
+          Permission(
+            List(AnyoneWithToken),
+            SpecificOperations(Set(Operation.Read, Operation.Update))
+          ),
+          Permission(
+            List(AnyAuthenticatedUser),
+            SpecificOperations(Set(Operation.Read))
+          ),
+          Permission(
+            List(RolesAnyOf(List("admin"))),
+            SpecificOperations(Set(Operation.Delete, Operation.List))
+          )
+        )
+      )
+
+    val uiTokenPermissionsDenormalizedEl: om.NodeInfo =
+      <permissions>
+        <permission>
+          <operations>read update create</operations>
+        </permission>
+        <permission for="anyone-with-token">
+          <operations>read update</operations>
+        </permission>
+        <permission for="any-authenticated-user">
+          <operations>read create</operations>
+        </permission>
+        <permission for="owner">
+          <operations>read</operations>
+        </permission>
+        <permission for="group-member">
+          <operations>read</operations>
+        </permission>
+        <permission>
+          <role>admin</role>
+          <operations>delete list read create</operations>
+        </permission>
+    </permissions>
+
     val Expected = List(
-      ("Anyone can read",                uiAnyoneCanReadEl,            fdAnyoneCanReadEl,            adtAnyoneCanRead),
-      ("Anyone can read and list",       uiAnyoneCanReadListEl,        fdAnyoneCanReadListEl,        adtAnyoneCanReadList),
-      ("Anyone can read, role can list", uiAnyoneCanReadRoleCanListEl, fdAnyoneCanReadRoleCanListEl, adtAnyoneCanReadRoleCanList),
-      ("Mixed permissions",              uiMixedPermissionsEl,         fdMixedPermissionsEl,         adtMixedPermissionsEl),
+      ("Anyone can read",                  uiAnyoneCanReadEl,                fdAnyoneCanReadEl,            adtAnyoneCanRead),
+      ("Anyone can read and list",         uiAnyoneCanReadListEl,            fdAnyoneCanReadListEl,        adtAnyoneCanReadList),
+      ("Anyone can read, role can list",   uiAnyoneCanReadRoleCanListEl,     fdAnyoneCanReadRoleCanListEl, adtAnyoneCanReadRoleCanList),
+      ("Mixed permissions",                uiMixedPermissionsEl,             fdMixedPermissionsEl,         adtMixedPermissions),
+      ("Token permissions",                uiTokenPermissionsEl,             fdTokenPermissionsEl,         adtTokenPermissions),
+      ("Token permissions (denormalized)", uiTokenPermissionsDenormalizedEl, fdTokenPermissionsEl,         adtTokenPermissions),
     )
 
     for ((desc, uiEl, expectedFdEl, expectedAdt) <- Expected) {

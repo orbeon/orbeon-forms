@@ -502,6 +502,7 @@ object XFormsInstance extends Logging {
 
   // Take a non-wrapped DocumentInfo and wrap it if needed
   def wrapDocumentInfo(documentInfo: DocumentNodeInfoType, readonly: Boolean, exposeXPathTypes: Boolean): DocumentNodeInfoType = {
+
     assert(
       ! documentInfo.isInstanceOf[VirtualNodeType],
       "DocumentInfo must not be a VirtualNode, i.e. it must be a native readonly tree like TinyTree"

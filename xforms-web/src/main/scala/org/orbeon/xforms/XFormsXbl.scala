@@ -63,7 +63,7 @@ object XFormsXbl {
       override def init(): Unit =
         if (! initCalled) {
           initCalled = true
-          if (! js.isUndefined(super.init))
+          if (! js.isUndefined(super.init _))
             super.init()
           if (! isJavaScriptLifecycle(containerElem))
             XBL.componentInitialized.fire(new js.Object {
@@ -75,7 +75,7 @@ object XFormsXbl {
       override def destroy(): Unit = {
         if (! destroyCalled) {
           destroyCalled = true
-          if (! js.isUndefined(super.destroy))
+          if (! js.isUndefined(super.destroy _))
             super.destroy()
           // We can debate whether the following clean-up should happen here or next to the caller of `destroy()`.
           // However, legacy users might call `destroy()` manually, in which case it's better to clean-up here.

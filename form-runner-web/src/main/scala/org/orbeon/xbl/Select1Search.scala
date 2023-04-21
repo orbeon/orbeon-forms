@@ -34,10 +34,11 @@ object Select1Search {
 
 private class Select1SearchCompanion(containerElem: html.Element) extends XBLCompanion {
 
-  private val DataPlaceholder              = "data-placeholder"
-  private val DataServicePerformsSearch    = "data-service-performs-search"
-  private val DataInitialLabel             = "data-initial-label"
-  private val DataInitialValue             = "data-initial-value"
+  private val    DataPlaceholder              = "data-placeholder"
+  private val    DataServicePerformsSearch    = "data-service-performs-search"
+  private val    DataInitialLabel             = "data-initial-label"
+  private val    DataInitialValue             = "data-initial-value"
+  private object EventSupport                 extends EventListenerSupport
 
   private val select2SuccessCallbacks      : mutable.Queue[Success] = new mutable.Queue[Select2.Success]
   private var onXFormsSelect1ValueChangeJs : Option[js.Function]    = None
@@ -114,7 +115,6 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
             "keydown",
             (event: dom.KeyboardEvent) => {
               if (Set("ArrowUp", "ArrowDown")(event.key)) {
-                org.scalajs.dom.console.log("up/down")
                 jSelect.select2("open")
                 event.stopPropagation() // Prevent scrolling the page
               }
@@ -127,15 +127,16 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
           clearElementOpt.foreach { clearElement =>
             clearElement.setAttribute("tabindex", "0")
             clearElement.setAttribute("role", "button")
-            clearElement.addEventListener(
+            EventSupport.addListener(
+              clearElement,
               "keydown", // Instead of `keyup`, so our listeners runs before Select2's
               (event: dom.KeyboardEvent) =>
                 if (Set(10, 13, 32)(event.keyCode)) { // Enter and space
                   event.stopPropagation() // Prevent Select2 from opening the dropdown
                   jSelect.value("").trigger("change")
                   xformsFocus() // Move the focus from the "x", which disappeared, to the dropdown
-                },
-              useCapture = false)
+                }
+            )
           }
         }
         makeClearAccessible()
@@ -157,13 +158,17 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
 
   override def destroy(): Unit = {
 
-    // Unsubscribe to listener on value change
+    // Remove DOM event listeners
+    EventSupport.clearAllListeners()
+
+    // Remove after value change listener
     onXFormsSelect1ValueChangeJs.foreach(Controls.afterValueChange.unsubscribe)
     onXFormsSelect1ValueChangeJs = None
 
     // Disconnect mutation observers
     mutationObservers.foreach(_.disconnect())
     mutationObservers = Nil
+
   }
 
   override def xformsFocus(): Unit =

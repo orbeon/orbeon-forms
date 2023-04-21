@@ -104,11 +104,12 @@ object PdfConfig20231 extends ScalaToXml {
 
   implicit val paramEncoder: Encoder[List[Param]] = list =>
     Json.fromFields(list.map {
-      case Param.ControlValueParam(name, controlName) =>
+      case Param.ControlValueParam(name, controlNameOpt, controlCssClassOpt) =>
         name ->
           Json.obj(
-            "type"         -> Json.fromString("control-value"),
-            "control-name" -> controlName.asJson
+                                  ("type"              -> Json.fromString("control-value")) ::
+            controlNameOpt.map    ("control-name"      -> _.asJson).toList                  :::
+            controlCssClassOpt.map("control-css-class" -> _.asJson).toList: _*
           )
       case Param.ExpressionParam(name, expr) =>
         name ->
@@ -156,13 +157,17 @@ object PdfConfig20231 extends ScalaToXml {
           obj("type").flatMap(_.asString) match {
             case Some("control-value") =>
               obj("control-name").map(_.asString) match {
-                case Some(Some(controlName)) => Right(Param.ControlValueParam(name, controlName))
-                case _                       => Left(DecodingFailure(s"Missing `control-name` for control-value param `$name`", Nil))
+                case Some(Some(controlName)) => Right(Param.ControlValueParam(name, Some(controlName), None))
+                case _                       =>
+                  obj("control-css-class").map(_.asString) match {
+                    case Some(Some(controlCssClass)) => Right(Param.ControlValueParam(name, None, Some(controlCssClass)))
+                    case _                           => Left(DecodingFailure(s"Missing `control-name` or `control-css-class` for `control-value` param `$name`", Nil))
+                  }
               }
             case Some("formula") =>
               obj("value").map(_.asString) match {
                 case Some(Some(expr)) => Right(Param.ExpressionParam(name, expr))
-                case _                => Left(DecodingFailure(s"Missing `value` for expression param `$name`", Nil))
+                case _                => Left(DecodingFailure(s"Missing `value` for `formula` param `$name`", Nil))
               }
             case Some("page-number") =>
               obj("format").map(_.as[Option[CounterFormat]]) match {

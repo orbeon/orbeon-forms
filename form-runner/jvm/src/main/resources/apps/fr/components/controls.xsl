@@ -200,16 +200,17 @@
                             '.',
                             local-name(),
                             ''',''fr-form-resources'',',
-                            fr:build-template-param-map(fr:param, $library-name, false()),
+                            fr:build-template-param-map(fr:param, $library-name, false(), ()),
                         ')'
                     )"/>
         </xsl:copy>
     </xsl:template>
 
     <xsl:function name="fr:build-template-param-map">
-        <xsl:param name="params"       as="element(*)*"/>
-        <xsl:param name="library-name" as="xs:string?"/>
-        <xsl:param name="for-pdf"      as="xs:boolean"/>
+        <xsl:param name="params"                                as="element(*)*"/>
+        <xsl:param name="library-name"                          as="xs:string?"/>
+        <xsl:param name="for-pdf"                               as="xs:boolean"/>
+        <xsl:param name="custom-css-class-to-control-names-map" as="element(_)?"/>
 
         <xsl:value-of
             select="
@@ -244,8 +245,19 @@
                                                 concat(
                                                     'string((',
                                                     frf:replaceVarReferencesWithFunctionCalls(
-                                                        $p/(*:controlName, *:control-name)[1],
-                                                        concat('$', $p/(*:controlName, *:control-name)[1]),
+                                                        $p/(*:controlName, *:control-name, *:controlCssClass, *:control-css-class)[1],
+                                                        if (exists($p/(*:controlName, *:control-name))) then
+                                                            concat('$', $p/(*:controlName, *:control-name)[1])
+                                                        else if (exists($p/(*:controlCssClass, *:control-css-class))) then
+                                                            (
+                                                                $custom-css-class-to-control-names-map/
+                                                                    entry[
+                                                                        @class = $p/(*:controlCssClass, *:control-css-class)
+                                                                    ]/*/concat('$', name(.)),
+                                                                ''''''
+                                                            )[1]
+                                                        else
+                                                            error(),
                                                         false(),
                                                         $library-name,
                                                         ()

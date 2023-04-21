@@ -1423,6 +1423,12 @@
                     name="pdf-header-footer-config-elem"
                     value="FormRunnerPdfConfig:getHeaderFooterConfigXml(fr:app-name(), fr:form-name())/*"/>
 
+                <!-- Poor man's hashmap until we use XSLT 3 -->
+                <xsl:variable
+                    name="custom-css-class-to-control-names-map"
+                    as="element(_)"
+                    select="frf:buildCustomCssClassToControlNamesMapDocument($body)"/>
+
                 <!-- Parameters are shared among all settings -->
                 <!-- TODO: Error in comparison when the variable contains a `map()` -->
     <!--            <xf:var-->
@@ -1443,7 +1449,14 @@
                                         xxf:process-template(
                                             replace($template, '&quot;', '\\&quot;'),
                                             'en', (: unused! :)
-                                            {fr:build-template-param-map($pdf-header-footer-config-elem/parameters/*, (), true())}
+                                            {
+                                                fr:build-template-param-map(
+                                                    $pdf-header-footer-config-elem/parameters/*,
+                                                    (),
+                                                    true(),
+                                                    $custom-css-class-to-control-names-map
+                                                )
+                                            }
                                         ),
                                         '&quot;'
                                     )

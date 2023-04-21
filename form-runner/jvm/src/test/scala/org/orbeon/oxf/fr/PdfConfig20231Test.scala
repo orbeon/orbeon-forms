@@ -166,6 +166,14 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
       FormRunnerPdfConfigRoot(
         Map(
           HeaderFooterPageType.All -> Map(
+            HeaderFooterType.Header -> Map(
+              HeaderFooterPosition.Right -> PdfHeaderFooterCellConfig.Template(
+                Map(
+                  "_" -> "Value from control referred to by CSS class: {$my-css-reference}"
+                ),
+                None
+              ),
+            ),
             HeaderFooterType.Footer -> Map(
               HeaderFooterPosition.Right -> PdfHeaderFooterCellConfig.Template(
                 Map(
@@ -181,7 +189,8 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
           Param.ExpressionParam(
             "current-dateTime",
             "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
-          )
+          ),
+          Param.ControlValueParam("my-css-reference", None, Some("my-css-class"))
         )
       )
 
@@ -189,6 +198,13 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
       <json type="object">
           <pages type="object">
               <all type="object">
+                  <header type="object">
+                      <right type="object">
+                          <values type="object">
+                              <_>Value from control referred to by CSS class: {{$my-css-reference}}</_>
+                          </values>
+                      </right>
+                  </header>
                   <footer type="object">
                       <right type="object">
                           <values type="object">
@@ -204,14 +220,24 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                   <type>formula</type>
                   <value>format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())</value>
               </current-dateTime>
+              <my-css-reference type="object">
+                  <type>control-value</type>
+                  <control-css-class>my-css-class</control-css-class>
+              </my-css-reference>
           </parameters>
       </json>
-
 
     val customConfigJson =
       """{
         |  "pages": {
         |    "all": {
+        |      "header": {
+        |        "right": {
+        |          "values": {
+        |            "_": "Value from control referred to by CSS class: {$my-css-reference}"
+        |          }
+        |        }
+        |      },
         |      "footer": {
         |        "right": {
         |          "values": {
@@ -226,6 +252,10 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |    "current-dateTime": {
         |      "type": "formula",
         |      "value": "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
+        |    },
+        |    "my-css-reference": {
+        |      "type": "control-value",
+        |      "control-css-class": "my-css-class"
         |    }
         |  }
         |}""".stripMargin
@@ -246,7 +276,11 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |            "_": "{$fr-form-title}"
         |          }
         |        },
-        |        "right": "none"
+        |        "right": {
+        |          "values": {
+        |            "_": "Value from control referred to by CSS class: {$my-css-reference}"
+        |          }
+        |        }
         |      },
         |      "footer": {
         |        "left": {
@@ -287,6 +321,10 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |    "current-dateTime": {
         |      "type": "formula",
         |      "value": "format-dateTime(current-dateTime(), '[D]/[M]/[Y] [h]:[m]:[s] [P,*-2]', xxf:lang(), (), ())"
+        |    },
+        |    "my-css-reference": {
+        |      "type": "control-value",
+        |      "control-css-class": "my-css-class"
         |    }
         |  }
         |}""".stripMargin

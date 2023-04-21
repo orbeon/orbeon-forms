@@ -24,9 +24,9 @@ import org.orbeon.scaxon.SimplePath._
 
 trait FormDefinition {
 
-  private val FRSummary       = "fr-summary"
-  private val FRSearch        = "fr-search"
-  private val FRIndex         = "fr-index"
+  private val FRSummary = "fr-summary"
+  private val FRSearch  = "fr-search"
+  private val FRIndex   = "fr-index"
 
   private val ClassesPredicate = Set(FRSummary, FRSearch, FRIndex)
 

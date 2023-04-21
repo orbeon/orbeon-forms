@@ -20,9 +20,7 @@ import org.orbeon.oxf.fr.FormRunnerCommon._
 import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport.{findMigrationForVersion, findMigrationOps}
 import org.orbeon.oxf.fr.datamigration.PathElem
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.Whitespace
 import org.orbeon.oxf.xforms.NodeInfoFactory.namespaceInfo
@@ -30,8 +28,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI.insert
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
 import org.orbeon.oxf.xml.SaxonUtils.parseQName
-import org.orbeon.oxf.xml.XMLConstants
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om.{Item, NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.scaxon.XPath._
@@ -48,6 +45,15 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   val TrueExpr : String = "true()"
   val FalseExpr: String = "false()"
 
+  val StandardCassNames: Set[String] = Set(
+    "fr-index",
+    "fr-summary",
+    "fr-search",
+    "fr-encrypt",
+    "fr-attachment",
+    "fr-static-attachment"
+  )
+
   def hasAllClassesPredicate(classNamesList: List[String])(control: NodeInfo): Boolean = {
     val controlClasses = control.attClasses
     classNamesList forall controlClasses.contains
@@ -57,6 +63,11 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
     val controlClasses = control.attClasses
     classNamesList exists controlClasses.contains
   }
+
+  def hasAnyCustomClassPredicate(control: NodeInfo): Boolean =
+    control.attClasses exists { className =>
+      ! StandardCassNames(className)
+    }
 
   val LHHAInOrder = LHHA.values map (_.entryName) toList
 

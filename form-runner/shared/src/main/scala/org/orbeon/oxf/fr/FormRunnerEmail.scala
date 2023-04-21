@@ -25,6 +25,8 @@ import org.orbeon.scaxon.SimplePath.NodeInfoOps
 
 import scala.xml.Elem
 
+import scala.collection.mutable
+
 
 trait FormRunnerEmail {
 
@@ -44,7 +46,7 @@ trait FormRunnerEmail {
     classNames: String
   ): SequenceIterator =
     frc.searchControlsTopLevelOnly(
-      data = Option(data),
+      data      = Option(data),
       predicate = frc.hasAllClassesPredicate(classNames.splitTo[List]())
     )(
       new InDocFormRunnerDocContext(body)
@@ -84,6 +86,43 @@ trait FormRunnerEmail {
       case ControlBindPathHoldersResources(_, _, _, Some(holders), _) => holders
       case ControlBindPathHoldersResources(_, _, _, None, _) => Nil
     }
+
+  //@XPathFunction
+  def buildCustomCssClassToControlNamesMapDocument(body: NodeInfo): NodeInfo = {
+
+    val controlNamesWithCustomCssClasses =
+      frc.searchControlsTopLevelOnly(
+        data      = None,
+        predicate = frc.hasAnyCustomClassPredicate
+      )(
+        new InDocFormRunnerDocContext(body)
+      ) map {
+        case ControlBindPathHoldersResources(control, _, _, _, _) =>
+          frc.getControlName(control) -> control.attClasses.filterNot(frc.StandardCassNames)
+      }
+
+    val customCssClassToControlNames = mutable.Map[String, mutable.Set[String]]()
+
+    controlNamesWithCustomCssClasses foreach {
+      case (controlName, classes) =>
+        classes foreach { clazz =>
+          customCssClassToControlNames.getOrElseUpdate(clazz, mutable.Set[String]()) += controlName
+        }
+    }
+
+    import org.orbeon.oxf.xforms.NodeInfoFactory._
+
+    elementInfo(
+      "_",
+      customCssClassToControlNames.toList.map { case (cssClass, controlNames) =>
+        elementInfo(
+          "entry",
+          attributeInfo("class", cssClass) ::
+            controlNames.toList.map(elementInfo(_))
+        )
+      }
+    )
+  }
 
   def buildLinkBackToFormRunnerUsePageName(pageName: String, includeToken: Boolean): String =
     buildLinkBackToFormRunner(

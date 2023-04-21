@@ -4,20 +4,20 @@ package org.orbeon.oxf.fr.pdf.definitions20231
 // See also `EmailMetadata.Param`
 sealed trait Param { val name: String }
 object Param {
-  case class ControlValueParam     (name: String, controlName: String)           extends Param
-  case class ExpressionParam       (name: String, expr: String)                  extends Param
-  case class LinkToEditPageParam   (name: String)                                extends Param
-  case class LinkToViewPageParam   (name: String)                                extends Param
-  case class LinkToNewPageParam    (name: String)                                extends Param
-  case class LinkToSummaryPageParam(name: String)                                extends Param
-  case class LinkToHomePageParam   (name: String)                                extends Param
-  case class LinkToFormsPageParam  (name: String)                                extends Param
-  case class LinkToAdminPageParam  (name: String)                                extends Param
-  case class LinkToPdfParam        (name: String)                                extends Param
-  case class PageNumberParam       (name: String, format: Option[CounterFormat]) extends Param
-  case class PageCountParam        (name: String, format: Option[CounterFormat]) extends Param
-  case class FormTitleParam        (name: String)                                extends Param
-  case class ImageParam            (name: String, url: Option[String])           extends Param
+  case class ControlValueParam     (name: String, controlName: Option[String], controlCssClass: Option[String]) extends Param
+  case class ExpressionParam       (name: String, expr: String)                                                 extends Param
+  case class LinkToEditPageParam   (name: String)                                                               extends Param
+  case class LinkToViewPageParam   (name: String)                                                               extends Param
+  case class LinkToNewPageParam    (name: String)                                                               extends Param
+  case class LinkToSummaryPageParam(name: String)                                                               extends Param
+  case class LinkToHomePageParam   (name: String)                                                               extends Param
+  case class LinkToFormsPageParam  (name: String)                                                               extends Param
+  case class LinkToAdminPageParam  (name: String)                                                               extends Param
+  case class LinkToPdfParam        (name: String)                                                               extends Param
+  case class PageNumberParam       (name: String, format: Option[CounterFormat])                                extends Param
+  case class PageCountParam        (name: String, format: Option[CounterFormat])                                extends Param
+  case class FormTitleParam        (name: String)                                                               extends Param
+  case class ImageParam            (name: String, url: Option[String])                                          extends Param
 }
 
 sealed trait HeaderFooterPosition

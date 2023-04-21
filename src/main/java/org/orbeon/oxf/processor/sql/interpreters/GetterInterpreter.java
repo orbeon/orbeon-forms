@@ -460,7 +460,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
         if (columnType == Types.DATE) {
             final Date value = resultSet.getDate(columnIndex);
             if (value != null)
-                stringValue = DateUtils.formatRfc1123DateTimeGmt(value.getTime());
+                stringValue = DateTimeFormatter.ISO_LOCAL_DATE.format(value.toLocalDate());
         } else if (columnType == Types.TIMESTAMP) {
             final Timestamp value = resultSet.getTimestamp(columnIndex);
             if (value != null)

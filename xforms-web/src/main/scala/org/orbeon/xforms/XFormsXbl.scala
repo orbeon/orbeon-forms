@@ -60,10 +60,13 @@ object XFormsXbl {
       private var initCalled    = false
       private var destroyCalled = false
 
+      private def superPrototypeAsDynamic: js.Dynamic =
+        superclass.asInstanceOf[js.Dynamic].prototype
+
       override def init(): Unit =
         if (! initCalled) {
           initCalled = true
-          if (! js.isUndefined(super.init _))
+          if (superPrototypeAsDynamic.init.isInstanceOf[js.Function])
             super.init()
           if (! isJavaScriptLifecycle(containerElem))
             XBL.componentInitialized.fire(new js.Object {
@@ -75,7 +78,7 @@ object XFormsXbl {
       override def destroy(): Unit = {
         if (! destroyCalled) {
           destroyCalled = true
-          if (! js.isUndefined(super.destroy _))
+          if (superPrototypeAsDynamic.destroy.isInstanceOf[js.Function])
             super.destroy()
           // We can debate whether the following clean-up should happen here or next to the caller of `destroy()`.
           // However, legacy users might call `destroy()` manually, in which case it's better to clean-up here.

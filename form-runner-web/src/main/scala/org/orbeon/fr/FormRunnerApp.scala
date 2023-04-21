@@ -89,8 +89,8 @@ object FormRunnerApp extends App {
         }
       }
 
-      addScrollPadding(document.querySelector(".orbeon .navbar-fixed-top"), "scroll-padding-top")
-      addScrollPadding(document.querySelector(".orbeon .fr-buttons"      ), "scroll-padding-bottom")
+      Option(document.querySelector(".orbeon .navbar-fixed-top")).foreach(addScrollPadding(_, "scroll-padding-top"))
+      Option(document.querySelector(".orbeon .fr-buttons"      )).foreach(addScrollPadding(_, "scroll-padding-bottom"))
 
     })
 

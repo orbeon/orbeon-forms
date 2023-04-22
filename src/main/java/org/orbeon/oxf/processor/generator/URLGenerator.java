@@ -1048,17 +1048,20 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
+            checkStatusCode();
             output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
             BinaryTextSupport.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
         public void readJSON(XMLReceiver output, String contentType, Long lastModified) throws IOException {
             openConnection();
+            checkStatusCode();
             readJSON(inputStream, output);
         }
 
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
+            checkStatusCode();
             output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
             BinaryTextSupport.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode(), null, headersToPropagate);
         }

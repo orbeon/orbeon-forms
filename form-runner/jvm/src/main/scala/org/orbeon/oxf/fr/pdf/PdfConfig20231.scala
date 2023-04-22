@@ -83,9 +83,12 @@ object PdfConfig20231 extends ScalaToXml {
   implicit val pdfHeaderFooterCellConfigEncoder: Encoder[PdfHeaderFooterCellConfig] = {
     case PdfHeaderFooterCellConfig.None                      => Json.fromString("none")
     case PdfHeaderFooterCellConfig.Inherit                   => Json.fromString("inherit")
-    case PdfHeaderFooterCellConfig.Template(values, visible) =>
+    case PdfHeaderFooterCellConfig.Template(values, visible, css) =>
       Json.fromFields(
-        ("values" -> values.asJson) :: visible.map(v => "visible" -> Json.fromString(v)).toList ::: Nil
+                         ("values" -> values.asJson)             ::
+        visible.map(v => "visible" -> Json.fromString(v)).toList :::
+        css.map    (v => "css"     -> Json.fromString(v)).toList :::
+        Nil
       )
   }
 
@@ -98,8 +101,9 @@ object PdfConfig20231 extends ScalaToXml {
       for {
         values  <- c.get[Map[String, String]]("values")
         visible <- c.getOrElse[Option[String]]("visible")(None)
+        css     <- c.getOrElse[Option[String]]("css")(None)
       } yield
-        PdfHeaderFooterCellConfig.Template(values, visible)
+        PdfHeaderFooterCellConfig.Template(values, visible, css)
     }
 
   implicit val paramEncoder: Encoder[List[Param]] = list =>

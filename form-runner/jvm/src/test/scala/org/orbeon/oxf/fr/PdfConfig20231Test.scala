@@ -21,12 +21,14 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                 Map(
                   "_" -> "{$fr-logo}"
                 ),
-                Some("not(xxf:get-request-parameter('show-logo') = 'false')")
+                Some("not(xxf:get-request-parameter('show-logo') = 'false')"),
+                None
               ),
               HeaderFooterPosition.Center -> PdfHeaderFooterCellConfig.Template(
                 Map(
                   "_" -> "{$fr-form-title}"
                 ),
+                None,
                 None
               ),
               HeaderFooterPosition.Right -> PdfHeaderFooterCellConfig.None
@@ -36,6 +38,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                 Map(
                   "_" -> "{$fr-form-title}"
                 ),
+                None,
                 None
               ),
               HeaderFooterPosition.Center -> PdfHeaderFooterCellConfig.Template(
@@ -43,6 +46,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                   "en" -> "Page {$fr-page-number} of {$fr-page-count}",
                   "fr" -> "Page {$fr-page-number} sur {$fr-page-count}"
                 ),
+                None,
                 None
               ),
               HeaderFooterPosition.Right -> PdfHeaderFooterCellConfig.None
@@ -171,6 +175,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                 Map(
                   "_" -> "Value from control referred to by CSS class: {$my-css-reference}"
                 ),
+                None,
                 None
               ),
             ),
@@ -180,7 +185,8 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                   "en" -> "Submitted on: {$current-dateTime}",
                   "fr" -> "Envoyé le: {$current-dateTime}"
                 ),
-                None
+                None,
+                Some("color: blue")
               )
             )
           )
@@ -211,6 +217,7 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
                               <en>Submitted on: {{$current-dateTime}}</en>
                               <fr>Envoyé le: {{$current-dateTime}}</fr>
                           </values>
+                          <css>color: blue</css>
                       </right>
                   </footer>
               </all>
@@ -243,7 +250,8 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |          "values": {
         |            "en": "Submitted on: {$current-dateTime}",
         |            "fr": "Envoyé le: {$current-dateTime}"
-        |          }
+        |          },
+        |          "css": "color: blue"
         |        }
         |      }
         |    }
@@ -298,7 +306,8 @@ class PdfConfig20231Test extends AnyFunSpec with XMLSupport {
         |          "values": {
         |            "en": "Submitted on: {$current-dateTime}",
         |            "fr": "Envoyé le: {$current-dateTime}"
-        |          }
+        |          },
+        |          "css": "color: blue"
         |        }
         |      }
         |    }

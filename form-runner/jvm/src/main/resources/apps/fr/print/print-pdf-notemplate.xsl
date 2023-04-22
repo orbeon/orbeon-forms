@@ -146,12 +146,13 @@
                                     </xsl:choose>
 
                                     <xsl:value-of select="';'"/>
+                                    <xsl:value-of select="css"/>
+                                    <xsl:value-of select="';'"/>
 
                                     <!-- Apparently, the CSS doesn't combine with the default :( -->
                                     <xsl:choose>
                                         <xsl:when test="$header-footer-type = 'header'">
                                             <xsl:text>
-                                                border-bottom: 1px solid gray;
                                                 padding-bottom: 10px;
                                                 margin-bottom: 0;
                                                 vertical-align: bottom;
@@ -159,7 +160,6 @@
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:text>
-                                                border-top: 1px solid gray;
                                                 padding-top: 10px;
                                                 margin-top: 0;
                                                 vertical-align: top;
@@ -176,7 +176,7 @@
                                         else if ($header-footer-position = 'center') then 'text-align: center;'
                                         else 'padding-left: 30px; text-align: right;'"/>
 
-                                    <xsl:value-of select="'}'"/>
+                                    <xsl:value-of select="'}&#xa;'"/>
                                 </xsl:for-each>
                             </xsl:for-each>
 

@@ -63,9 +63,9 @@ object CounterFormat {
 
 sealed trait PdfHeaderFooterCellConfig
 object PdfHeaderFooterCellConfig {
-  case object None                                                           extends PdfHeaderFooterCellConfig
-  case object Inherit                                                        extends PdfHeaderFooterCellConfig
-  case class  Template(values: Map[String, String], visible: Option[String]) extends PdfHeaderFooterCellConfig
+  case object None                                                                                extends PdfHeaderFooterCellConfig
+  case object Inherit                                                                             extends PdfHeaderFooterCellConfig
+  case class  Template(values: Map[String, String], visible: Option[String], css: Option[String]) extends PdfHeaderFooterCellConfig
 }
 
 case class FormRunnerPdfConfigRoot(

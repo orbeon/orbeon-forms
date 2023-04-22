@@ -801,14 +801,14 @@ object XFormsUI {
         yuiDialog.element.style.top = 0;
         yuiDialog.element.style.left = 0;
 
-        // Show the dialog
-        yuiDialog.show()
-
         // Make sure that this dialog is on top of everything else
         yuiDialog.cfg.setProperty("zIndex", {
           Globals.lastDialogZIndex += 1
           Globals.lastDialogZIndex
         })
+
+        // Show the dialog
+        yuiDialog.show()
 
         // See for old centering logic: https://github.com/orbeon/orbeon-forms/issues/4475
         neighborIdOpt foreach { neighborId =>

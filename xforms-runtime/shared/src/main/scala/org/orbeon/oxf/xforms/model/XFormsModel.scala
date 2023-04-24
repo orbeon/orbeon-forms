@@ -395,7 +395,7 @@ trait XFormsModelInstances {
         instance
 
     missingInstancesIt foreach { instance =>
-      setInlineInstance(instance)
+      loadInitialInstance(instance)
     }
   }
 

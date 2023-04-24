@@ -548,7 +548,7 @@ object Controls {
 
   // Evaluate the body with InstancesControls in scope
   def withDynamicStateToRestore[T](instancesControls: InstancesControls)(body: => T): T =
-    instancesControlsToRestore.withValue((instancesControls))(body)
+    instancesControlsToRestore.withValue(instancesControls)(body)
 
   // Get state to restore
   private def restoringDynamicState = instancesControlsToRestore.value

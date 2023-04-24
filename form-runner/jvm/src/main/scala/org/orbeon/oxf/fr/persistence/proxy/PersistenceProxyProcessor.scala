@@ -235,6 +235,7 @@ private object PersistenceProxyProcessor {
     // - `Orbeon-Datasource` -> mysql
     val (persistenceBaseURL, outgoingPersistenceHeaders) = getPersistenceURLHeaders(appForm, formOrData)
 
+    val isVersioningSupported = frc.isFormDefinitionVersioningSupported(appForm.app, appForm.form)
     val serviceUri = PathUtils.appendQueryString(
       persistenceBaseURL.dropTrailingSlash + path,
       PathUtils.encodeQueryString(request.parameters)
@@ -276,20 +277,31 @@ private object PersistenceProxyProcessor {
               throw HttpStatusCodeException(StatusCode.BadRequest)
             case VersionAction.AcceptAndUseForForm(v) if crudMethod == HttpMethod.DELETE =>
 
-              connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
-                request                    = OutgoingRequest(request),
-                requestMethod              = crudMethod,
-                serviceUri                 = serviceUri,
-                outgoingPersistenceHeaders = outgoingPersistenceHeaders,
-                specificIncomingVersionOpt = Some(v.version),
-                queryForToken              = queryForToken,
-                filterVersioningHeaders    = false
-              )
+              if (isVersioningSupported)
+                // Call just to check the version
+                connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
+                  request                     = OutgoingRequest(request),
+                  requestMethod               = crudMethod,
+                  serviceUri                  = serviceUri,
+                  outgoingPersistenceHeaders  = outgoingPersistenceHeaders,
+                  specificIncomingVersionOpt  = Some(v.version),
+                  queryForToken               = queryForToken,
+                  mustFilterVersioningHeaders = false
+                )
+              else if (v.version != 1)
+                throw HttpStatusCodeException(StatusCode.BadRequest)
 
               (None, Some(v.version))
             case VersionAction.AcceptAndUseForForm(v) =>
+
+              if (! isVersioningSupported && v.version != 1)
+                throw HttpStatusCodeException(StatusCode.BadRequest)
+
               (None, Some(v.version))
             case VersionAction.AcceptForData(v) =>
+
+              if (! isVersioningSupported && ! v.forall(_.version == 1))
+                throw HttpStatusCodeException(StatusCode.BadRequest)
 
               val (cxrOpt, effectiveFormDefinitionVersion, responseHeadersOpt) =
                 connectToObtainResponseHeadersAndCheckVersion(
@@ -308,7 +320,7 @@ private object PersistenceProxyProcessor {
                     method             = crudMethod,
                     documentId         = documentIdOpt.getOrElse(throw new IllegalArgumentException), // for data there must be a `documentId`,
                     incomingTokenOpt   = incomingTokenOpt,
-                    responseHeadersOpt = responseHeadersOpt
+                    responseHeadersOpt = responseHeadersOpt // `None` in case of non-existing data
                   )
                 } catch {
                   case NonFatal(t) =>
@@ -333,7 +345,7 @@ private object PersistenceProxyProcessor {
               // This can throw an `HttpStatusCodeException`, including for a 404
               val (cxr, effectiveFormDefinitionVersion, _) =
                 connectToObtainResponseHeadersAndCheckVersionGetOrHead(
-                  request                    = OutgoingRequest(HttpMethod.HEAD, OutgoingRequest.headersFromRequest(request)),
+                  request                    = OutgoingRequest(HttpMethod.HEAD, filterVersioningHeaders(OutgoingRequest.headersFromRequest(request))),
                   serviceUri                 = dataServiceUri,
                   outgoingPersistenceHeaders = outgoingPersistenceHeaders,
                   specificIncomingVersionOpt = None
@@ -342,10 +354,14 @@ private object PersistenceProxyProcessor {
               IOUtils.useAndClose(cxr)(identity)
 
               (None, Some(effectiveFormDefinitionVersion))
+            case VersionAction.LatestForm if ! isVersioningSupported =>
+              (None, Some(1))
             case VersionAction.LatestForm =>
               val versionFromMetadata =
                 PersistenceMetadataSupport.readLatestVersion(appForm).getOrElse(1)
               (None, Some(versionFromMetadata))
+            case VersionAction.NextForm if ! isVersioningSupported =>
+              throw HttpStatusCodeException(StatusCode.BadRequest)
             case VersionAction.NextForm =>
               val versionFromMetadata =
                 PersistenceMetadataSupport.readLatestVersion(appForm).map(_ + 1).getOrElse(1)
@@ -478,13 +494,13 @@ private object PersistenceProxyProcessor {
 
         val (versionForPutOrDelete, responseHeadersOpt) =
           connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
-            request                    = request,
-            requestMethod              = requestMethod,
-            serviceUri                 = serviceUri,
-            outgoingPersistenceHeaders = outgoingPersistenceHeaders,
-            specificIncomingVersionOpt = specificIncomingVersionOpt,
-            queryForToken              = queryForToken,
-            filterVersioningHeaders    = true
+            request                     = request,
+            requestMethod               = requestMethod,
+            serviceUri                  = serviceUri,
+            outgoingPersistenceHeaders  = outgoingPersistenceHeaders,
+            specificIncomingVersionOpt  = specificIncomingVersionOpt,
+            queryForToken               = queryForToken,
+            mustFilterVersioningHeaders = true
           )
 
         (None, versionForPutOrDelete, responseHeadersOpt)
@@ -509,14 +525,14 @@ private object PersistenceProxyProcessor {
   }
 
   private def connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
-    request                   : OutgoingRequest,
-    requestMethod             : HttpMethod.CrudMethod,
-    serviceUri                : String,
-    outgoingPersistenceHeaders: Map[String, String],
-    specificIncomingVersionOpt: Option[Int],
-    queryForToken             : List[(String, String)],
-    filterVersioningHeaders   : Boolean
-  ): (Int, Option[ResponseHeaders]) = {
+    request                    : OutgoingRequest,
+    requestMethod              : HttpMethod.CrudMethod,
+    serviceUri                 : String,
+    outgoingPersistenceHeaders : Map[String, String],
+    specificIncomingVersionOpt : Option[Int],
+    queryForToken              : List[(String, String)],
+    mustFilterVersioningHeaders: Boolean
+  ): (Int, Option[ResponseHeaders]) = { // `ResponseHeaders` are `None` in case of non-existing data
 
       // The call to `HEAD` will require permissions so we need to forward the token
       val headServiceUri =
@@ -526,7 +542,7 @@ private object PersistenceProxyProcessor {
         request.headers,
         headServiceUri,
         outgoingPersistenceHeaders,
-        filterVersioningHeaders
+        mustFilterVersioningHeaders
       ) match {
         case Success(responseHeaders) =>
           // Existing data
@@ -816,18 +832,18 @@ private object PersistenceProxyProcessor {
   }
 
   private def getHeadersFromHeadCallProviderViaProxy(
-    requestHeaders            : Map[String, List[String]],
-    serviceURI                : String,
-    outgoingPersistenceHeaders: Map[String, String],
-    filterVersioningHeaders   : Boolean
+    requestHeaders             : Map[String, List[String]],
+    serviceURI                 : String,
+    outgoingPersistenceHeaders : Map[String, String],
+    mustFilterVersioningHeaders: Boolean
   ): Try[ResponseHeaders] = {
 
     val headRequest =
       OutgoingRequest(
         method  = HttpMethod.HEAD,
         headers = // We filter out incoming versioning headers as we want to hit the `Version.Unspecified` case
-          if (filterVersioningHeaders)
-            requestHeaders.filterKeys(k => ! Version.AllVersionHeadersLower(k.toLowerCase))
+          if (mustFilterVersioningHeaders)
+            filterVersioningHeaders(requestHeaders)
           else
             requestHeaders
       )
@@ -847,4 +863,7 @@ private object PersistenceProxyProcessor {
         Failure(t)
     }
   }
+
+  private def filterVersioningHeaders(headers: Map[String, List[String]]): Map[String, List[String]] =
+    headers.filterKeys(k => ! Version.AllVersionHeadersLower(k.toLowerCase))
 }

@@ -67,6 +67,7 @@ object PersistenceProxyPermissions {
       val authorizedOps =
         responseHeadersOpt match {
           case Some(responseHeaders) =>
+            // Existing data
 
             val operationsFromData: Operations =
               authorizedOperations(
@@ -103,6 +104,7 @@ object PersistenceProxyPermissions {
              Operations.combine(operationsFromData :: otherOperations :: operationsFromTokenOpt.toList)
 
           case None =>
+            // Non-existing data
             if (crudMethod == HttpMethod.DELETE)
               // For deletes, if there is no data to delete, it unclear we think a 404 is clearer than a 403, so
               // let this check pass, and some code later will return a 404

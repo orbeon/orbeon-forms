@@ -665,6 +665,7 @@ object FormBuilderXPathApi {
     }
 
   // Called by `permissions.xbl` when loading `instance('fr-form-metadata')/permissions`
+  // TODO: Should just create the UI XML!
   //@XPathFunction
   def normalizePermissionsHandleList(permissionsElOrNull: NodeInfo): NodeInfo =
     PermissionsXML.serialize(PermissionsXML.parse(Option(permissionsElOrNull)), normalized = true)

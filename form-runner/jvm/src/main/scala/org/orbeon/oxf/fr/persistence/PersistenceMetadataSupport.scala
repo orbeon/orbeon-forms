@@ -4,11 +4,11 @@ import cats.Eval
 import net.sf.ehcache.{Cache, Element => EhElement}
 import org.orbeon.oxf.cache.Caches
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
-import org.orbeon.oxf.fr.FormRunner.{createFormDataBasePath, createFormDefinitionBasePath, createFormMetadataPathAndQuery}
+import org.orbeon.oxf.fr.FormRunner.{createFormDefinitionBasePath, createFormMetadataPathAndQuery}
 import org.orbeon.oxf.fr.persistence.proxy.FieldEncryption
+import org.orbeon.oxf.fr.persistence.relational.EncryptionAndIndexDetails
 import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVersion
 import org.orbeon.oxf.fr.persistence.relational.index.Index
-import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Version}
 import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunnerPersistence, Names}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.properties.Properties
@@ -16,7 +16,7 @@ import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 import org.orbeon.oxf.util.TryUtils._
-import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, PathUtils, URLRewriterUtils, XPath}
+import org.orbeon.oxf.util.{Connection, ConnectionResult, CoreCrossPlatformSupport, IndentedLogger, LoggerFactory, URLRewriterUtils, XPath}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsCrossPlatformSupport
@@ -86,7 +86,7 @@ object PersistenceMetadataSupport {
 
   // TODO: This should return a `Try`. Right now it throws if the document cannot be read.
   // Retrieves from the persistence layer the metadata for a form, return an `Option[<form>]`
-  def readFormMetadataOpt(
+  private def readFormMetadataOpt(
     appForm : AppForm,
     version : FormDefinitionVersion
   ): Option[NodeInfo] =
@@ -117,21 +117,6 @@ object PersistenceMetadataSupport {
         formByVersion.orElse(formElements.headOption)
       }
     } .get
-
-  // TODO: Since  this is called by the persistence proxy and must indirectly reaches the persistence proxy again, could
-  //  we directly call the persistence proxy?
-  // TODO: Clarify conditions of failure: form definition missing in database, connection failing, etc. Do we get a
-  //  `None` in all cases, or can an exception be thrown?
-  def readDocumentFormVersion(
-    appForm    : AppForm,
-    documentId : String,
-    isDraft    : Boolean,
-    query      : List[(String, String)]
-  ): Option[Int] = {
-    val path = createFormDataBasePath(appForm.app, appForm.form, isDraft, documentId) + "data.xml"
-    val headers = readHeaders(PathUtils.recombineQuery(path, query), Map.empty)
-    headers.get(Version.OrbeonFormDefinitionVersion).map(_.head).map(_.toInt)
-  }
 
   def readLatestVersion(appForm: AppForm): Option[Int] =
     readFormMetadataOpt(appForm, FormDefinitionVersion.Latest)
@@ -207,14 +192,6 @@ object PersistenceMetadataSupport {
           )
         }
       }
-
-      def readHeaders(
-        urlString     : String,
-        customHeaders : Map[String, List[String]]
-      ): Map[String, List[String]] =
-        withDebug("reading headers", List("url" -> urlString, "headers" -> customHeaders.toString)) {
-          readConnectionResult(HttpMethod.HEAD, urlString, customHeaders).headers
-        }
     }
 
     private def readConnectionResult(

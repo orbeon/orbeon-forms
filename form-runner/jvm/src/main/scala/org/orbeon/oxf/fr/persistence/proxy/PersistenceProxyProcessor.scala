@@ -17,11 +17,10 @@ import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext._
+import org.orbeon.oxf.fr.FormRunner.createFormDataBasePath
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
-import org.orbeon.oxf.fr.FormRunnerParams.AppFormVersion
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr._
-import org.orbeon.oxf.fr.permission.PermissionsAuthorization.findCurrentCredentialsFromSession
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
 import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
 import org.orbeon.oxf.fr.persistence.proxy.PersistenceProxyPermissions.{ResponseHeaders, extractResponseHeaders}
@@ -34,7 +33,6 @@ import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging.debug
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util._
@@ -69,7 +67,7 @@ class PersistenceProxyProcessor extends ProcessorImpl {
 
   // Start the processor
   override def start(pipelineContext: PipelineContext): Unit = {
-    implicit val ec = NetUtils.getExternalContext
+    implicit val ec: ExternalContext = NetUtils.getExternalContext
     proxyRequest(ec.getRequest, ec.getResponse)
   }
 }
@@ -84,80 +82,93 @@ private object PersistenceProxyProcessor {
   val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.HEAD, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
   val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
 
-  implicit val Logger                = new IndentedLogger(LoggerFactory.createLogger(PersistenceProxyProcessor.getClass))
+  implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(PersistenceProxyProcessor.getClass))
+
+  case class OutgoingRequest(
+    method : HttpMethod,
+    headers: Map[String, List[String]]
+  )
+
+  private object OutgoingRequest {
+    def apply(request: Request): OutgoingRequest =
+      OutgoingRequest(request.getMethod, headersFromRequest(request))
+
+    def headersFromRequest(request: Request): Map[String, List[String]] =
+      request.getHeaderValuesMap.asScala.mapValues(_.toList).toMap
+  }
 
   sealed trait VersionAction
-    object VersionAction {
-      case object Reject                                           extends VersionAction
-      case class  AcceptForData      (v: Option[Version.Specific]) extends VersionAction
-      case class  AcceptAndUseForForm(v: Version.Specific)         extends VersionAction
-      case class  HeadData           (v: Version.ForDocument)      extends VersionAction
-      case object LatestForm                                       extends VersionAction
-      case object NextForm                                         extends VersionAction
-      case object Ignore                                           extends VersionAction
-    }
+  private object VersionAction {
+    case object Reject                                           extends VersionAction
+    case class  AcceptForData      (v: Option[Version.Specific]) extends VersionAction
+    case class  AcceptAndUseForForm(v: Version.Specific)         extends VersionAction
+    case class  HeadData           (v: Version.ForDocument)      extends VersionAction
+    case object LatestForm                                       extends VersionAction
+    case object NextForm                                         extends VersionAction
+    case object Ignore                                           extends VersionAction
+  }
 
-    private val VersionActionMap: Map[HttpMethod, Map[FormOrData, Version => VersionAction]] = Map(
-      HttpMethod.GET -> Map(
-        FormOrData.Form ->
-          {
-            case v @ Version.ForDocument(_, _) => VersionAction.HeadData(v) // only for this case
-            case     Version.Unspecified       => VersionAction.LatestForm
-            case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
-            case     Version.Next              => VersionAction.Reject
-          },
-        FormOrData.Data ->
-          {
-            case     Version.ForDocument(_, _) => VersionAction.Reject
-            case     Version.Unspecified       => VersionAction.AcceptForData(None)
-            case v @ Version.Specific(_)       => VersionAction.AcceptForData(Some(v))
-            case     Version.Next              => VersionAction.Reject
-          }
-      ),
-      HttpMethod.PUT -> Map(
-        FormOrData.Form ->
-          {
-            case     Version.ForDocument(_, _) => VersionAction.Reject
-            case     Version.Unspecified       => VersionAction.LatestForm
-            case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
-            case     Version.Next              => VersionAction.NextForm // only for this case
-          },
-        FormOrData.Data ->
-          {
-            case     Version.ForDocument(_, _) => VersionAction.Reject
-            case     Version.Unspecified       => VersionAction.AcceptForData(None)
-            case v @ Version.Specific(_)       => VersionAction.AcceptForData(Some(v))
-            case     Version.Next              => VersionAction.Reject
-          }
-      ),
-      HttpMethod.DELETE -> Map(
-        FormOrData.Form ->
-          {
-            case     Version.ForDocument(_, _) => VersionAction.Reject
-            case     Version.Unspecified       => VersionAction.LatestForm
-            case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
-            case     Version.Next              => VersionAction.Reject
-          },
-        FormOrData.Data ->
-          {
-            case     Version.ForDocument(_, _) => VersionAction.Reject
-            case     Version.Unspecified       => VersionAction.AcceptForData(None)
-            case v @ Version.Specific(_)       => VersionAction.AcceptForData(Some(v))// could disallow (used to)
-            case     Version.Next              => VersionAction.Reject
-          }
-      ),
-      HttpMethod.LOCK -> Map(
-        FormOrData.Form -> (_ => VersionAction.Ignore),
-        FormOrData.Data -> (_ => VersionAction.Ignore),
-      ),
-      HttpMethod.UNLOCK -> Map(
-        FormOrData.Form -> (_ => VersionAction.Ignore),
-        FormOrData.Data -> (_ => VersionAction.Ignore),
-      )
+  private val VersionActionMap: Map[HttpMethod, Map[FormOrData, Version => VersionAction]] = Map(
+    HttpMethod.GET -> Map(
+      FormOrData.Form ->
+        {
+          case v @ Version.ForDocument(_, _) => VersionAction.HeadData(v) // only for this case
+          case     Version.Unspecified       => VersionAction.LatestForm
+          case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
+          case     Version.Next              => VersionAction.Reject
+        },
+      FormOrData.Data ->
+        {
+          case     Version.ForDocument(_, _) => VersionAction.Reject
+          case     Version.Unspecified       => VersionAction.AcceptForData(None)
+          case v @ Version.Specific(_)       => VersionAction.AcceptForData(Some(v))
+          case     Version.Next              => VersionAction.Reject
+        }
+    ),
+    HttpMethod.PUT -> Map(
+      FormOrData.Form ->
+        {
+          case     Version.ForDocument(_, _) => VersionAction.Reject
+          case     Version.Unspecified       => VersionAction.LatestForm
+          case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
+          case     Version.Next              => VersionAction.NextForm // only for this case
+        },
+      FormOrData.Data ->
+        {
+          case     Version.ForDocument(_, _) => VersionAction.Reject
+          case     Version.Unspecified       => VersionAction.AcceptForData(None)
+          case v @ Version.Specific(_)       => VersionAction.AcceptForData(Some(v))
+          case     Version.Next              => VersionAction.Reject
+        }
+    ),
+    HttpMethod.DELETE -> Map(
+      FormOrData.Form ->
+        {
+          case     Version.ForDocument(_, _) => VersionAction.Reject
+          case     Version.Unspecified       => VersionAction.LatestForm
+          case v @ Version.Specific(_)       => VersionAction.AcceptAndUseForForm(v)
+          case     Version.Next              => VersionAction.Reject
+        },
+      FormOrData.Data ->
+        {
+          case     Version.ForDocument(_, _) => VersionAction.Reject
+          case     Version.Unspecified       => VersionAction.AcceptForData(None)
+          case v @ Version.Specific(_)       => VersionAction.AcceptForData(Some(v))// could disallow (used to)
+          case     Version.Next              => VersionAction.Reject
+        }
+    ),
+    HttpMethod.LOCK -> Map(
+      FormOrData.Form -> (_ => VersionAction.Ignore),
+      FormOrData.Data -> (_ => VersionAction.Ignore),
+    ),
+    HttpMethod.UNLOCK -> Map(
+      FormOrData.Form -> (_ => VersionAction.Ignore),
+      FormOrData.Data -> (_ => VersionAction.Ignore),
     )
+  )
 
-  // Proxy the request to the appropriate persistence implementation
-  private def proxyRequest(request: Request, response: Response)(implicit externalContext: ExternalContext): Unit = {
+  // TODO: Could just pass `ec` and no separate `request`/`response`
+  private def proxyRequest(request: Request, response: Response)(implicit ec: ExternalContext): Unit = {
     val incomingPath = request.getRequestPath
     incomingPath match {
       case FormPath(path, app, form, _)                     => proxyRequest               (request, response, AppForm(app, form), FormOrData.Form, None          , path)
@@ -172,6 +183,7 @@ private object PersistenceProxyProcessor {
     }
   }
 
+  // TODO: test
   private def proxyReEncryptAppForm(
     request  : Request,
     response : Response,
@@ -188,7 +200,7 @@ private object PersistenceProxyProcessor {
 
     // NOTE: No form definition version handled!
     proxyRequestImpl(
-      proxyEstablishConnection(request, None, serviceURI, outgoingPersistenceHeaders),
+      proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, outgoingPersistenceHeaders),
       response,
       Nil
     )
@@ -235,6 +247,7 @@ private object PersistenceProxyProcessor {
         version    = request.getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion),
       )
 
+    // TODO: what about permissions for the attachments? is that a thing?
     val (cxrOpt, effectiveFormDefinitionVersionOpt) =
       request.getMethod match {
         case crudMethod: HttpMethod.CrudMethod
@@ -264,13 +277,13 @@ private object PersistenceProxyProcessor {
             case VersionAction.AcceptAndUseForForm(v) if crudMethod == HttpMethod.DELETE =>
 
               connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
-                request,
-                crudMethod,
-                serviceUri,
-                outgoingPersistenceHeaders,
-                Some(v.version),
-                queryForToken,
-                filterVersioningHeaders = false
+                request                    = OutgoingRequest(request),
+                requestMethod              = crudMethod,
+                serviceUri                 = serviceUri,
+                outgoingPersistenceHeaders = outgoingPersistenceHeaders,
+                specificIncomingVersionOpt = Some(v.version),
+                queryForToken              = queryForToken,
+                filterVersioningHeaders    = false
               )
 
               (None, Some(v.version))
@@ -280,22 +293,22 @@ private object PersistenceProxyProcessor {
 
               val (cxrOpt, effectiveFormDefinitionVersion, responseHeadersOpt) =
                 connectToObtainResponseHeadersAndCheckVersion(
-                  request,
-                  crudMethod,
-                  serviceUri,
-                  outgoingPersistenceHeaders,
-                  v.map(_.version),
-                  queryForToken
+                  request                    = OutgoingRequest(request),
+                  requestMethod              = crudMethod,
+                  serviceUri                 = serviceUri,
+                  outgoingPersistenceHeaders = outgoingPersistenceHeaders,
+                  specificIncomingVersionOpt = v.map(_.version),
+                  queryForToken              = queryForToken
                 )
 
               val operations =
                 try {
-                  permissionCheck(
-                    (appForm, effectiveFormDefinitionVersion),
-                    crudMethod,
-                    documentIdOpt.getOrElse(throw new IllegalArgumentException), // for data there must be a `documentId`,
-                    incomingTokenOpt,
-                    responseHeadersOpt
+                  PersistenceProxyPermissions.permissionCheck(
+                    appFormVersion     = (appForm, effectiveFormDefinitionVersion),
+                    method             = crudMethod,
+                    documentId         = documentIdOpt.getOrElse(throw new IllegalArgumentException), // for data there must be a `documentId`,
+                    incomingTokenOpt   = incomingTokenOpt,
+                    responseHeadersOpt = responseHeadersOpt
                   )
                 } catch {
                   case NonFatal(t) =>
@@ -312,11 +325,23 @@ private object PersistenceProxyProcessor {
               (cxrOpt, Some(effectiveFormDefinitionVersion))
 
             case VersionAction.HeadData(v) =>
-              // TODO: couldn't this use `connectToObtainResponseHeaders()`
-              val versionFromHead =
-                PersistenceMetadataSupport.readDocumentFormVersion(appForm, v.documentId, v.isDraft, queryForToken)
-                  .getOrElse(throw HttpStatusCodeException(StatusCode.NotFound))
-              (None, Some(versionFromHead))
+
+              val dataServiceUri =
+                PathUtils.recombineQuery(createFormDataBasePath(appForm.app, appForm.form, v.isDraft, v.documentId) + "data.xml", queryForToken)
+
+              // This can throw if the connection fails (it is usually internal but can be external)
+              // This can throw an `HttpStatusCodeException`, including for a 404
+              val (cxr, effectiveFormDefinitionVersion, _) =
+                connectToObtainResponseHeadersAndCheckVersionGetOrHead(
+                  request                    = OutgoingRequest(HttpMethod.HEAD, OutgoingRequest.headersFromRequest(request)),
+                  serviceUri                 = dataServiceUri,
+                  outgoingPersistenceHeaders = outgoingPersistenceHeaders,
+                  specificIncomingVersionOpt = None
+                )
+
+              IOUtils.useAndClose(cxr)(identity)
+
+              (None, Some(effectiveFormDefinitionVersion))
             case VersionAction.LatestForm =>
               val versionFromMetadata =
                 PersistenceMetadataSupport.readLatestVersion(appForm).getOrElse(1)
@@ -328,7 +353,6 @@ private object PersistenceProxyProcessor {
             case VersionAction.Ignore =>
               (None, None)
           }
-
         case _ =>
           (None, None)
       }
@@ -415,7 +439,7 @@ private object PersistenceProxyProcessor {
 
     // A connection might have been opened above, and if so we use it
     proxyRequestImpl(
-      cxrOpt.getOrElse(proxyEstablishConnection(request, requestContent, serviceUri, outgoingPersistenceHeaders ++ outgoingVersionHeaderOpt)),
+      cxrOpt.getOrElse(proxyEstablishConnection(OutgoingRequest(request), requestContent, serviceUri, outgoingPersistenceHeaders ++ outgoingVersionHeaderOpt)),
       response,
       responseTransforms
     )
@@ -431,7 +455,7 @@ private object PersistenceProxyProcessor {
   }
 
   private def connectToObtainResponseHeadersAndCheckVersion(
-    request                   : Request, // for incoming headers and method only // TODO: then pass for example `OutgoingRequest`
+    request                   : OutgoingRequest,
     requestMethod             : HttpMethod.CrudMethod,
     serviceUri                : String,
     outgoingPersistenceHeaders: Map[String, String],
@@ -440,35 +464,52 @@ private object PersistenceProxyProcessor {
   ): (Option[ConnectionResult], Int, Option[ResponseHeaders]) =
     requestMethod match {
       case HttpMethod.GET | HttpMethod.HEAD =>
-        // We had `AcceptAndCheckForData` or `AcceptUnspecifiedForData` above
 
-        val cxr =
-          ConnectionResult.trySuccessConnection(
-            proxyEstablishConnection(request, None, serviceUri, outgoingPersistenceHeaders)
-          ).get // throws `HttpStatusCodeException` if not successful, including `NotFound`
-
-        val responseHeaders     = extractResponseHeaders(cxr.getFirstHeaderIgnoreCase)
-        val versionFromProvider = compareVersionAgainstIncomingIfNeeded(specificIncomingVersionOpt, responseHeaders)
+        val (cxr, versionFromProvider, responseHeaders) =
+          connectToObtainResponseHeadersAndCheckVersionGetOrHead(
+            request                   = request,
+            serviceUri                = serviceUri,
+            outgoingPersistenceHeaders = outgoingPersistenceHeaders,
+            specificIncomingVersionOpt = specificIncomingVersionOpt
+          )
 
         (Some(cxr), versionFromProvider, Some(responseHeaders))
       case HttpMethod.PUT | HttpMethod.DELETE =>
 
         val (versionForPutOrDelete, responseHeadersOpt) =
           connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
-            request,
-            requestMethod,
-            serviceUri,
-            outgoingPersistenceHeaders,
-            specificIncomingVersionOpt,
-            queryForToken,
-            filterVersioningHeaders = true
+            request                    = request,
+            requestMethod              = requestMethod,
+            serviceUri                 = serviceUri,
+            outgoingPersistenceHeaders = outgoingPersistenceHeaders,
+            specificIncomingVersionOpt = specificIncomingVersionOpt,
+            queryForToken              = queryForToken,
+            filterVersioningHeaders    = true
           )
 
         (None, versionForPutOrDelete, responseHeadersOpt)
     }
 
+  private def connectToObtainResponseHeadersAndCheckVersionGetOrHead(
+    request                   : OutgoingRequest,
+    serviceUri                : String,
+    outgoingPersistenceHeaders: Map[String, String],
+    specificIncomingVersionOpt: Option[Int]
+  ): (ConnectionResult, Int, ResponseHeaders) = {
+
+    val cxr =
+      ConnectionResult.trySuccessConnection(
+        proxyEstablishConnection(request, None, serviceUri, outgoingPersistenceHeaders)
+      ).get // throws `HttpStatusCodeException` if not successful, including `NotFound`
+
+    val responseHeaders     = extractResponseHeaders(cxr.getFirstHeaderIgnoreCase)
+    val versionFromProvider = compareVersionAgainstIncomingIfNeeded(specificIncomingVersionOpt, responseHeaders)
+
+    (cxr, versionFromProvider, responseHeaders)
+  }
+
   private def connectToObtainResponseHeadersAndCheckVersionPutOrDelete(
-    request                   : Request, // for incoming headers and method only // TODO: then pass for example `OutgoingRequest`
+    request                   : OutgoingRequest,
     requestMethod             : HttpMethod.CrudMethod,
     serviceUri                : String,
     outgoingPersistenceHeaders: Map[String, String],
@@ -482,7 +523,7 @@ private object PersistenceProxyProcessor {
         PathUtils.recombineQuery(serviceUri, queryForToken)
 
       getHeadersFromHeadCallProviderViaProxy(
-        request.getHeaderValuesMap,
+        request.headers,
         headServiceUri,
         outgoingPersistenceHeaders,
         filterVersioningHeaders
@@ -512,33 +553,6 @@ private object PersistenceProxyProcessor {
           throw t
       }
     }
-
-  private def permissionCheck(
-    appFormVersion    : AppFormVersion,
-    method            : HttpMethod.CrudMethod,
-    documentId        : String,
-    incomingTokenOpt  : Option[String],
-    responseHeadersOpt: Option[ResponseHeaders],
-  ) = {
-
-    // TODO: Check possible optimization above to avoid retrieving form permissions twice.
-    val formPermissions =
-      FormRunner.permissionsFromElemOrProperties(
-        PersistenceMetadataSupport.readFormPermissions(appFormVersion._1, FormDefinitionVersion.Specific(appFormVersion._2)),
-        appFormVersion._1
-      ) |!>
-        (formPermissions => debug("CRUD: form permissions", List("permissions" -> formPermissions.toString)))
-
-    PersistenceProxyPermissions.findAuthorizedOperationsOrThrow(
-      formPermissions,
-      findCurrentCredentialsFromSession,
-      method,
-      appFormVersion,
-      documentId,
-      incomingTokenOpt,
-      responseHeadersOpt,
-    )
-  }
 
   private def checkDataFormatVersionIfNeeded(
     request    : Request,
@@ -629,7 +643,7 @@ private object PersistenceProxyProcessor {
     }
 
   private def proxyEstablishConnection(
-    request        : Request, // for incoming headers and method only // TODO: then pass for example `OutgoingRequest`
+    request        : OutgoingRequest,
     requestContent : Option[StreamedContent],
     uri            : String,
     headers        : Map[String, String]
@@ -647,7 +661,7 @@ private object PersistenceProxyProcessor {
 
     // Forwards all incoming headers, with exceptions like connection headers and, importantly, cookie headers
     val proxiedHeaders =
-      proxyAndCapitalizeHeaders(request.getHeaderValuesMap.asScala mapValues (_.toList), request = true)
+      proxyAndCapitalizeHeaders(request.headers, request = true)
 
     val allHeaders =
       Connection.buildConnectionHeadersCapitalizedIfNeeded(
@@ -656,16 +670,14 @@ private object PersistenceProxyProcessor {
         customHeaders    = proxiedHeaders.toMap ++ persistenceHeaders, // give precedence to persistence headers
         headersToForward = Set.empty,                                  // handled by proxyAndCapitalizeHeaders()
         cookiesToForward = Connection.cookiesToForwardFromProperty,    // NOT handled by proxyAndCapitalizeHeaders()
-        getHeader        = Connection.getHeaderFromRequest(request)
+        getHeader        = request.headers.get
       )
 
-    val method = request.getMethod
-
-    if (! SupportedMethods(method))
+    if (! SupportedMethods(request.method))
       throw HttpStatusCodeException(StatusCode.MethodNotAllowed)
 
     Connection.connectNow(
-      method      = method,
+      method      = request.method,
       url         = outgoingURL,
       credentials = None,
       content     = requestContent,
@@ -709,7 +721,7 @@ private object PersistenceProxyProcessor {
       } yield {
         // Read all the forms for the current service
         val serviceURI = PathUtils.appendQueryString(baseURI + "/form" + Option(path).getOrElse(""), parameters)
-        val cxr        = proxyEstablishConnection(request, None, serviceURI, headers)
+        val cxr        = proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, headers)
 
         ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
           val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
@@ -730,8 +742,8 @@ private object PersistenceProxyProcessor {
   }
 
   private def proxyReindex(
-    request  : Request,
-    response : Response
+    request : Request,
+    response: Response
   ): Unit = {
     val dataProviders = getProviders(usableFor = FormOrData.Data)
     val dataProvidersWithIndexSupport =
@@ -745,7 +757,7 @@ private object PersistenceProxyProcessor {
         val serviceURI = baseURI + "/reindex"
 
         proxyRequestImpl(
-          proxyEstablishConnection(request, None, serviceURI, outgoingPersistenceHeaders),
+          proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, outgoingPersistenceHeaders),
           response,
           Nil
         )
@@ -754,8 +766,8 @@ private object PersistenceProxyProcessor {
   }
 
   private def proxyReEncryptStatus(
-    request  : Request,
-    response : Response
+    request : Request,
+    response: Response
   ): Unit = {
 
     val dataProviders = getProviders(usableFor = FormOrData.Data)
@@ -771,7 +783,7 @@ private object PersistenceProxyProcessor {
         dataProvidersWithReEncryptSupport.flatMap { provider =>
           val (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
           val serviceURI         = baseURI + "/reencrypt"
-          val cxr                = proxyEstablishConnection(request, None, serviceURI, headers)
+          val cxr                = proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, headers)
           ConnectionResult.withSuccessConnection(cxr, closeOnSuccess = true) { is =>
             val forms = TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, serviceURI, false, false)
             forms / "forms" / "form"
@@ -804,25 +816,21 @@ private object PersistenceProxyProcessor {
   }
 
   private def getHeadersFromHeadCallProviderViaProxy(
-    requestHeaders            : java.util.Map[String, Array[String]],
+    requestHeaders            : Map[String, List[String]],
     serviceURI                : String,
     outgoingPersistenceHeaders: Map[String, String],
     filterVersioningHeaders   : Boolean
   ): Try[ResponseHeaders] = {
 
     val headRequest =
-      new RequestAdapter {
-
-        // We filter out incoming versioning headers as we want to hit the `Version.Unspecified` case
-        val filteredRequestHeaders =
+      OutgoingRequest(
+        method  = HttpMethod.HEAD,
+        headers = // We filter out incoming versioning headers as we want to hit the `Version.Unspecified` case
           if (filterVersioningHeaders)
-            requestHeaders.asScala.filterKeys(k => ! Version.AllVersionHeadersLower(k.toLowerCase))
+            requestHeaders.filterKeys(k => ! Version.AllVersionHeadersLower(k.toLowerCase))
           else
-            requestHeaders.asScala
-
-        override val getMethod: HttpMethod = HttpMethod.HEAD
-        override def getHeaderValuesMap: java.util.Map[String, Array[String]] = filteredRequestHeaders.asJava
-      }
+            requestHeaders
+      )
 
     // `HEAD` directly through the proxy!
     val getHeaderIgnoreCaseFromHeadResponseTry =

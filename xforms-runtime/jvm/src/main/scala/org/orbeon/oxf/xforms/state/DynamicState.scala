@@ -119,10 +119,9 @@ case class DynamicState(
 
           if (instanceState.readonly) att("readonly", "true")
 
-          instanceState.cachingOrContent match {
-            case Left(caching)  => caching.writeAttributes(att)
-            case Right(content) => instanceElement.addText(content)
-
+          instanceState.cachingOrDocument match {
+            case Left(caching)   => caching.writeAttributes(att)
+            case Right(document) => instanceElement.addText(XFormsInstance.serializeInstanceDocumentToString(document))
           }
 
           instanceElement
@@ -241,6 +240,7 @@ object DynamicState {
     DynamicState(document).encodeToString(compress, isForceEncryption || document.isClientStateHandling)
 
   // For unit tests only
+  //@XPathFunction
   def decodeDynamicStateString(dynamicState: String): Document =
     DynamicState(dynamicState).toXML
 }

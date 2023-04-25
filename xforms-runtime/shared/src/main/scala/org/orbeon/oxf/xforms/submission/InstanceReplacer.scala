@@ -23,9 +23,9 @@ import org.orbeon.oxf.util.{ConnectionResult, ContentTypes, IndentedLogger, XPat
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import org.orbeon.oxf.xforms.event.events.{ErrorType, XFormsSubmitErrorEvent}
+import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.model.{DataModel, InstanceCaching, InstanceDataOps, XFormsInstance}
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
-import org.orbeon.saxon.om
 import org.orbeon.xforms.XFormsCrossPlatformSupport
 
 
@@ -36,7 +36,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
   extends Replacer {
 
   // Unwrapped document set by `deserialize()`
-  private var _resultingDocumentOpt: Option[Document Either DocumentNodeInfoType] = None
+  private var _resultingDocumentOpt: Option[InstanceDocument] = None
   def resultingDocumentOpt: Option[Either[Document, DocumentNodeInfoType]] = _resultingDocumentOpt
 
   // For CacheableSubmission
@@ -88,7 +88,7 @@ class InstanceReplacer(submission: XFormsModelSubmission, containingDocument: XF
     isJSON           : Boolean,
     connectionResult : ConnectionResult)(implicit
     logger           : IndentedLogger
-  ): Document Either DocumentNodeInfoType = {
+  ): InstanceDocument = {
     // Create resulting instance whether entire instance is replaced or not, because this:
     // 1. Wraps a Document within a DocumentInfo if needed
     // 2. Performs text nodes adjustments if needed

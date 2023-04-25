@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.net.URI
-
 import org.orbeon.datatypes.{BasicLocationData, LocationData}
 import org.orbeon.dom
 import org.orbeon.dom._
@@ -28,6 +26,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.state.InstanceState
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om
@@ -35,6 +34,7 @@ import org.orbeon.scaxon.NodeInfoConversions._
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId}
 import shapeless.syntax.typeable._
 
+import java.net.URI
 import scala.collection.compat._
 import scala.jdk.CollectionConverters._
 
@@ -246,10 +246,8 @@ class XFormsInstance(
     }
 
   // For state serialization
-  def contentAsString: String =
-    underlyingDocumentOpt map
-      (_.serializeToString(dom.io.XMLWriter.DefaultFormat)) getOrElse
-        StaticXPath.tinyTreeToString(_documentInfo)
+  def contentAsInstanceDocument: InstanceDocument =
+    underlyingDocumentOpt.toLeft(_documentInfo)
 
   // Don't allow any external events
   def allowExternalEvent(eventName: String) = false
@@ -473,6 +471,8 @@ trait XFormsInstanceIndex extends BasicIdIndex {
 
 object XFormsInstance extends Logging {
 
+  type InstanceDocument = Document Either DocumentNodeInfoType
+
   // Create an initial instance without caching information
   def apply(model: XFormsModel, instance: Instance, documentInfo: DocumentNodeInfoType): XFormsInstance =
     new XFormsInstance(
@@ -485,16 +485,10 @@ object XFormsInstance extends Logging {
       true
     )
 
-  def createDocumentInfo(doc: Document Either DocumentNodeInfoType, exposeXPathTypes: Boolean): DocumentNodeInfoType = doc match {
+  def createDocumentInfo(doc: InstanceDocument, exposeXPathTypes: Boolean): DocumentNodeInfoType = doc match {
     case Left(domDocument)   => XFormsInstanceSupport.wrapDocument(domDocument, exposeXPathTypes)
     case Right(documentInfo) => documentInfo
   }
-
-  def createDocumentInfo(xmlString: String, readonly: Boolean, exposeXPathTypes: Boolean): DocumentNodeInfoType =
-    if (readonly)
-      XFormsCrossPlatformSupport.stringToTinyTree(XPath.GlobalConfiguration, xmlString, false, true)
-    else
-      XFormsInstanceSupport.wrapDocument(XFormsCrossPlatformSupport.readOrbeonDom(xmlString), exposeXPathTypes)
 
   // Take a non-wrapped DocumentInfo and wrap it if needed
   def wrapDocumentInfo(documentInfo: DocumentNodeInfoType, readonly: Boolean, exposeXPathTypes: Boolean): DocumentNodeInfoType = {
@@ -519,7 +513,7 @@ object XFormsInstance extends Logging {
     val instance = model.staticModel.instances(XFormsId.getStaticIdFromId(instanceState.effectiveId))
 
     val (caching, documentInfo) =
-      instanceState.cachingOrContent match {
+      instanceState.cachingOrDocument match {
         case Left(caching)  =>
           debug("restoring instance from instance cache", Seq("id" -> instanceState.effectiveId))
 
@@ -542,7 +536,6 @@ object XFormsInstance extends Logging {
             None,
             createDocumentInfo(
               content,
-              instanceState.readonly,
               instance.exposeXPathTypes
             )
           )
@@ -646,4 +639,22 @@ object XFormsInstance extends Logging {
   // NOTE: If the instance is cacheable, its metadata gets serialized, but not it's XML content
   def mustSerialize(instance: XFormsInstance): Boolean =
     ! (instance.instance.useInlineContent && ! instance.modified)
+
+  def serializeInstanceDocumentToString(instanceDocument: InstanceDocument): String =
+    instanceDocument match {
+      case Left(doc)  => doc.serializeToString(dom.io.XMLWriter.DefaultFormat)
+      case Right(doc) => StaticXPath.tinyTreeToString(doc)
+    }
+
+  def deserializeInstanceDocumentFromString(xmlString: String, readonly: Boolean): InstanceDocument =
+    if (! readonly)
+      Left(XFormsCrossPlatformSupport.readOrbeonDom(xmlString))
+    else
+      Right(XFormsCrossPlatformSupport.stringToTinyTree(
+        XPath.GlobalConfiguration,
+        xmlString,
+        handleXInclude = false,
+        handleLexical  = true
+      ))
+
 }

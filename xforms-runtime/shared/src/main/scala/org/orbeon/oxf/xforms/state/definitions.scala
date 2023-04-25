@@ -1,8 +1,11 @@
 package org.orbeon.oxf.xforms.state
 
-import java.util.concurrent.locks.Lock
+import org.orbeon.dom.Document
+import org.orbeon.oxf.util.StaticXPath.DocumentNodeInfoType
 
+import java.util.concurrent.locks.Lock
 import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.model.XFormsInstance.InstanceDocument
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 
 
@@ -26,7 +29,7 @@ case class ControlState(
 case class InstanceState(
   effectiveId      : String,
   modelEffectiveId : String,
-  cachingOrContent : InstanceCaching Either String,
+  cachingOrDocument: InstanceCaching Either InstanceDocument,
   readonly         : Boolean,
   modified         : Boolean,
   valid            : Boolean
@@ -36,10 +39,11 @@ case class InstanceState(
     this(
       instance.getEffectiveId,
       instance.parent.getEffectiveId,
-      instance.instanceCaching.toLeft(instance.contentAsString),
+      instance.instanceCaching.toLeft(instance.contentAsInstanceDocument),
       instance.readonly,
       instance.modified,
-      instance.valid)
+      instance.valid
+    )
 }
 
 case class InstancesControls(instances: List[InstanceState], controls: Map[String, ControlState])

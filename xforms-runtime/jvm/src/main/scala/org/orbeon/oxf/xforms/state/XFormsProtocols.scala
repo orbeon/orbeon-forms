@@ -15,11 +15,12 @@ package org.orbeon.oxf.xforms.state
 
 import org.orbeon.dom.{Document, Namespace, QName}
 import org.orbeon.oxf.util.PathMatcher
-import org.orbeon.oxf.xforms.model.InstanceCaching
+import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
 import org.orbeon.oxf.xforms.state.XFormsCommonBinaryFormats._
 import org.orbeon.oxf.xml.SBinaryDefaultFormats._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom.LocationDocumentSource
+import org.orbeon.saxon.om.DocumentInfo
 import org.orbeon.xforms.DelayedEvent
 import sbinary.Operations._
 import sbinary._
@@ -118,9 +119,10 @@ object XFormsProtocols {
     def writes(output: Output, instance: InstanceState): Unit = {
       write(output, instance.effectiveId)
       write(output, instance.modelEffectiveId)
-      instance.cachingOrContent match {
-        case Left(caching)  => write[Byte](output, 0); write(output, caching)
-        case Right(content) => write[Byte](output, 1); write(output, content)
+      instance.cachingOrDocument match {
+        case Left (caching)        => write[Byte](output, 0); write(output, caching)
+        case Right(doc @ Left(_))  => write[Byte](output, 1); write(output, XFormsInstance.serializeInstanceDocumentToString(doc))
+        case Right(doc @ Right(_)) => write[Byte](output, 2); write(output, XFormsInstance.serializeInstanceDocumentToString(doc))
       }
       write(output, instance.readonly)
       write(output, instance.modified)
@@ -129,9 +131,10 @@ object XFormsProtocols {
 
     def reads(in: Input): InstanceState = {
 
-      def readCachingOrContent = read[Byte](in) match {
+      def readCachingOrContent: Either[InstanceCaching, Either[Document, DocumentInfo]] = read[Byte](in) match {
         case 0 => Left(read[InstanceCaching](in))
-        case 1 => Right(read[String](in))
+        case 1 => Right(XFormsInstance.deserializeInstanceDocumentFromString(read[String](in), readonly = false))
+        case 2 => Right(XFormsInstance.deserializeInstanceDocumentFromString(read[String](in), readonly = true))
       }
 
       InstanceState(

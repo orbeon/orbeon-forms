@@ -20,6 +20,7 @@ import org.orbeon.web.DomSupport
 import org.orbeon.xforms._
 import org.orbeon.xforms.facade.{Controls, XBL, XBLCompanion}
 import org.scalajs.dom
+import org.scalajs.dom.ext._
 import org.scalajs.dom.{MutationObserver, MutationObserverInit, document, html}
 import org.scalajs.jquery.{JQuery, JQueryEventObject}
 
@@ -100,12 +101,18 @@ private class Select1SearchCompanion(containerElem: html.Element) extends XBLCom
         jSelect.on("select2:open", (onOpen _))
         jSelect.data("select2").on("results:focus", onResultsFocus _)
 
-        // Update `aria-labelledby`, so the screen reader can read the field's label when it gets the focus
+        // Add `aria-labelledby` pointing to the label, `aria-describedby` pointing to the help and hint
         val comboboxElement = containerElem.querySelector(".select2-selection")
-        val labelElement    = containerElem.querySelector(".xforms-label")
-        if (labelElement != null) { // Field might not have a label, which happens in Form Builder
-          val labelId       = DomSupport.generateIdIfNeeded(labelElement)
-          comboboxElement.setAttribute("aria-labelledby", labelId)
+        val LhhaSelectorAriaAttrs = List(
+          ".xforms-label"              -> "aria-labelledby",
+          ".xforms-help, .xforms-hint" -> "aria-describedby"
+        )
+        LhhaSelectorAriaAttrs.foreach { case (selector, ariaAttr) =>
+          val lhhaElems = containerElem.querySelectorAll(selector).toList.asInstanceOf[List[html.Element]]
+          if (lhhaElems.nonEmpty) {
+            val lhhaIds = lhhaElems.map(DomSupport.generateIdIfNeeded).mkString(" ")
+            comboboxElement.setAttribute(ariaAttr, lhhaIds)
+          }
         }
 
         // Open the dropdown on up/down arrow key press

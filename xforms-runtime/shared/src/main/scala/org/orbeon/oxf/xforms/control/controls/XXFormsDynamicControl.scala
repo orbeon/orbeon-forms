@@ -175,12 +175,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     val outerInstance =
       containingDocument.instanceForNodeOpt(boundElem) getOrElse (throw new IllegalArgumentException)
 
-    // Gather relevant switch state before removing children
-    val relevantSwitchState = if (create) Map.empty[String, ControlState] else gatherRelevantSwitchState(this)
-    // LATER: Could also restore everything including models, but need to think about implications. It's
-    // conservative to attempt to restore only switch state, but restoring models should not take place for every
-    // full update.
-    //val dynamicState = DynamicState(this)
+    // Gather relevant state *before* removing children
+    val instanceControlsOpt =
+      ! create option gatherInstanceControls(nested.map(_.container), this)
 
     destroyContainerAndControls(outerInstance.some)
 
@@ -280,7 +277,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     // 2. xxf:dynamic full update  : use only switch state
     // 3. Initial controls creation: don't restore any state
     val stateToRestore =
-      Controls.restoringInstanceControls orElse ((! create) option InstancesControls(Nil, relevantSwitchState))
+      Controls.restoringInstanceControls orElse instanceControlsOpt
 
     def createAndInitializeDynamicSubTree(): Unit =
       containingDocument.controls.getCurrentControlTree.createAndInitializeDynamicSubTree(
@@ -301,6 +298,21 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     ControlsIterator(start, includeSelf = false) collect
       { case switch: XFormsSwitchControl if switch.isRelevant => switch.getEffectiveId -> switch.controlState.get } toMap
 
+  private def gatherInstanceControls(containerOpt: Option[XBLContainer], start: XFormsControl): InstancesControls = {
+
+    def mustSerializeInstance(instance: XFormsInstance): Boolean = ! (
+      // Don't serialize if:
+      instance.instance.useInlineContent && ! instance.modified || // inline but not modified
+      instance.instanceCaching.isDefined                        || // cacheable
+      instance.instance.mirror                                     // mirrored
+    )
+
+    InstancesControls(
+      instances = Controls.iterateInstancesToSerialize(containerOpt, mustSerializeInstance).toList,
+      controls  = gatherRelevantSwitchState(start)
+    )
+  }
+
   // If more than one change touches a given id, processed it once using the last element
   private def groupChanges(changes: Iterable[(String, Element)]): List[(String, Element)] =
     changes.toList groupByKeepOrder (_._1) map { case (prefixedId, prefixedIdsToElemsInSource) =>
@@ -316,10 +328,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     for ((prefixedId, elemInSource) <- groupChanges(xblChanges)) {
       tree.findControl(prefixedId) match { // TODO: should use effective id if in repeat and process all
         case Some(componentControl: XFormsComponentControl) =>
-          // Update and restore switch state
-          // LATER: See above comments
-          // withDynamicStateToRestore(DynamicState(componentControl).decodeInstancesControls) {
-          withDynamicStateToRestore(InstancesControls(Nil, gatherRelevantSwitchState(componentControl))) {
+          withDynamicStateToRestore(gatherInstanceControls(componentControl.nestedContainerOpt, componentControl)) {
             removeDynamicShadowTree(componentControl)
             createOrUpdateStaticShadowTree(partAnalysis, componentControl, elemInSource.some)
             componentControl.recreateNestedContainer()

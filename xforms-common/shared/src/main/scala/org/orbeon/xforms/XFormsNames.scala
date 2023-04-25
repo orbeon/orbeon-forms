@@ -139,6 +139,7 @@ object XFormsNames {
   val XXBL_FORMAT_QNAME                     = xxblQName("format")
   val XXBL_SERIALIZE_EXTERNAL_VALUE_QNAME   = xxblQName("serialize-external-value")
   val XXBL_DESERIALIZE_EXTERNAL_VALUE_QNAME = xxblQName("deserialize-external-value")
+  val XXBL_MIRROR_QNAME                     = xxblQName("mirror")
 
   // Variables
   val XXFORMS_VAR_QNAME      = xxformsQName("var")

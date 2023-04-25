@@ -18,12 +18,13 @@ import org.orbeon.dom.{Document, Element}
 import org.orbeon.oxf.http.HttpMethod
 import org.orbeon.oxf.util.PathMatcher
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
-import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.{Controls, XFormsComponentControl, XFormsControl}
+import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xforms.state.XFormsOperations._
 import org.orbeon.oxf.xforms.state.XFormsProtocols._
-import org.orbeon.oxf.xml.SBinaryDefaultFormats._
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SAXStoreBinaryFormat._
+import org.orbeon.oxf.xml.SBinaryDefaultFormats._
 import org.orbeon.oxf.xml.{EncodeDecode, SAXStore, TransformerUtils}
 import org.orbeon.xforms.{DelayedEvent, XFormsId}
 import sbinary.Operations._
@@ -184,46 +185,23 @@ case class DynamicState(
 
 object DynamicState {
 
-  // Create a DynamicState from a document
+  // Create a `DynamicState` from a document
   def apply(document: XFormsContainingDocument): DynamicState =
     apply(document, document.controls.getCurrentControlTree.rootOpt)
 
-  // Create a DynamicState from a control
-  def apply(document: XFormsContainingDocument, startOpt: Option[XFormsControl]): DynamicState = {
-
-    val startContainerOpt = startOpt match {
-      case Some(componentControl: XFormsComponentControl) => componentControl.nestedContainerOpt
-      case Some(other)                                    => Some(other.container)
-      case None                                           => Some(document)
-    }
-
-    // Serialize relevant controls that have data
-    //
-    // - Repeat, switch and dialogs controls serialize state (have been for a long time). The state of all the other
-    //   controls is rebuilt from model data. This way we minimize the size of serialized controls. In the future,
-    //   more information might be serialized.
-    // - VisitableTrait controls serialize state if `visited == true`
-    def controlsToSerialize =
-      for {
-        start        <- startOpt.toList
-        control      <- ControlsIterator(start, includeSelf = false)
-        if control.isRelevant
-        controlState <- control.controlState
-      } yield
-        controlState
-
-    // Create the dynamic state object. A snapshot of the state is taken, whereby mutable parts of the state, such
-    // as instances, controls, HTML template, Ajax response, are first serialized to Seq[Byte]. A couple of notes:
-    //
-    // 1. We could serialize everything right away to a Seq[Byte] instead of a DynamicState instance, but in the
-    //    scenario where the state is put in cache, then retrieved a bit later without having been pushed to
-    //    external storage, this would be a waste.
-    //
-    // 2. Along the same lines, content that is already (conceptually) immutable, namely pathMatchers,
-    //    annotatedTemplate, and lastAjaxResponse, could be serialized to bytes lazily.
-    //
-    // 3. In the cases where there is a large number of large instances or templates, parallel serialization might
-    //    be something to experiment with.
+  // Create a DynamicState from a control. A snapshot of the state is taken, whereby mutable parts of the state, such
+  // as instances, controls, HTML template, Ajax response, are first serialized to `Seq[Byte]`. A couple of notes:
+  //
+  // 1. We could serialize everything right away to a `Seq[Byte]` instead of a `DynamicState` instance, but in the
+  //    scenario where the state is put in cache, then retrieved a bit later without having been pushed to
+  //    external storage, this would be a waste.
+  //
+  // 2. Along the same lines, content that is already (conceptually) immutable, namely `pathMatchers`,
+  //    `annotatedTemplate`, and `lastAjaxResponse`, could be serialized to bytes lazily.
+  //
+  // 3. In the cases where there is a large number of large instances or templates, parallel serialization might
+  //    be something to experiment with.
+  def apply(document: XFormsContainingDocument, startOpt: Option[XFormsControl]): DynamicState =
     DynamicState(
       uuid               = document.uuid,
       sequence           = document.sequence,
@@ -231,26 +209,32 @@ object DynamicState {
       requestMethod      = Option(document.getRequestMethod),
       requestContextPath = Option(document.getRequestContextPath),
       requestPath        = Option(document.getRequestPath),
-      requestHeaders     = document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of toList
-      requestParameters  = document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of toList
+      requestHeaders     = document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of `toList`
+      requestParameters  = document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of `toList`
       containerType      = Option(document.getContainerType),
       containerNamespace = Option(document.getContainerNamespace),
       pathMatchers       = toByteSeq(document.getVersionedPathMatchers),
       focusedControl     = document.controls.getFocusedControl map (_.getEffectiveId),
       pendingUploads     = toByteSeq(document.getPendingUploads),
       lastAjaxResponse   = toByteSeq(document.lastAjaxResponse),
-      instances          = toByteSeq(startContainerOpt.iterator flatMap (_.allModels) flatMap (_.instancesIterator) filter (_.mustSerialize) map (new InstanceState(_)) toList),
-      controls           = toByteSeq(controlsToSerialize),
+      instances          = toByteSeq(Controls.iterateInstancesToSerialize(findStartContainer(startOpt.toLeft(document)), XFormsInstance.mustSerialize).toList),
+      controls           = toByteSeq(Controls.iterateControlsToSerialize(startOpt).toList),
       initializationData = document.getInitializationData,
       delayedEvents      = toByteSeq(document.delayedEvents),
     )
-  }
 
-  // Create a DynamicState from an encoded string representation
+  // Create a `DynamicState` from an encoded string representation
   def apply(encoded: String): DynamicState = {
     val bytes = EncodeDecode.decodeBytes(encoded, forceEncryption = false)
     fromByteArray[DynamicState](bytes)
   }
+
+  private def findStartContainer(controlOrDoc: XFormsControl Either XFormsContainingDocument): Option[XBLContainer] =
+    controlOrDoc match {
+      case Left(control: XFormsComponentControl) => control.nestedContainerOpt
+      case Left(other)                           => Some(other.container)
+      case Right(document)                       => Some(document)
+    }
 
   // Encode the given document to a string representation
   def encodeDocumentToString(document: XFormsContainingDocument, compress: Boolean, isForceEncryption: Boolean): String =

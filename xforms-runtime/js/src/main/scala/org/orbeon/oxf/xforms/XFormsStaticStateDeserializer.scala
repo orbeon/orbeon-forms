@@ -523,6 +523,7 @@ object XFormsStaticStateDeserializer {
                   useExternalContent      <- c.getOrElse[Boolean]("useExternalContent")(false)
                   instanceSource          <- c.getOrElse[Option[String]]("instanceSource")(None)
                   inlineRootElemOpt       <- c.getOrElse[Option[dom.Element]]("inlineRootElem")(None)
+                  mirror                  <- c.getOrElse[Boolean]("mirror")(false)
 //                  inlineRootElemStringOpt <- c.get[Option[String]]("inlineRootElem")
                 } yield {
 
@@ -555,7 +556,8 @@ object XFormsStaticStateDeserializer {
                         useInlineContent      = useInlineContent,
                         useExternalContent    = useExternalContent,
                         instanceSource        = instanceSource,
-                        dependencyURL         = None // not serialized
+                        dependencyURL         = None, // not serialized
+                        mirror                = mirror
                       )
                     )
                   r.useExternalContent

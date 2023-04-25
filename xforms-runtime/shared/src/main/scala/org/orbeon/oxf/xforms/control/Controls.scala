@@ -19,12 +19,14 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls._
 import org.orbeon.oxf.xforms.state.{ControlState, InstanceState, InstancesControls}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{BindingContext, _}
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.xforms.Constants.{RepeatIndexSeparatorString, RepeatSeparatorString}
-import org.orbeon.xforms.{XFormsNames, XFormsId}
+import org.orbeon.xforms.XFormsId
 
-import scala.jdk.CollectionConverters._
 import scala.collection.compat._
+import scala.jdk.CollectionConverters._
+
 
 object Controls {
 
@@ -552,12 +554,9 @@ object Controls {
 
   // Get state to restore
   private def restoringDynamicState = instancesControlsToRestore.value
+  def isRestoringDynamicState   : Boolean                           = restoringDynamicState.isDefined
   def restoringInstanceControls : Option[InstancesControls]         = restoringDynamicState
   def restoringControls         : Option[Map[String, ControlState]] = restoringInstanceControls map (_.controls)
-  def restoringInstances        : Option[List[InstanceState]]       = restoringInstanceControls map (_.instances)
-
-  // Whether we are restoring state
-  def isRestoringDynamicState: Boolean = restoringDynamicState.isDefined
 
   // ThreadLocal for dynamic state restoration
   private val instancesControlsToRestore = new DynamicVariable[InstancesControls]
@@ -586,6 +585,30 @@ object Controls {
           listener.endVisitControl(control)
         }
     }
+
+  // Serialize relevant controls that have data
+  //
+  // - Repeat, switch and dialogs controls serialize state (have been for a long time). The state of all the other
+  //   controls is rebuilt from model data. This way we minimize the size of serialized controls. In the future,
+  //   more information might be serialized.
+  // - `VisitableTrait` controls serialize state if `visited == true`
+  def iterateControlsToSerialize(startOpt: Option[XFormsControl]): Iterator[ControlState] =
+    for {
+      start        <- startOpt.iterator
+      control      <- ControlsIterator(start, includeSelf = false)
+      if control.isRelevant
+      controlState <- control.controlState.iterator
+    } yield
+      controlState
+
+  def iterateInstancesToSerialize(startOpt: Option[XBLContainer], p: XFormsInstance => Boolean): Iterator[InstanceState] =
+    for {
+      startContainer <- startOpt.iterator
+      model          <- startContainer.allModels
+      instance       <- model.instancesIterator
+      if p(instance)
+    } yield
+      new InstanceState(instance)
 
   private def visitSiblings(listener: XFormsControlVisitorListener, children: Seq[XFormsControl]): Unit =
     for (currentControl <- children) {

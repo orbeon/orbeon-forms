@@ -377,7 +377,7 @@ class XFormsComponentControl(
       nestedContainerOpt.iterator
       flatMap (_.models.iterator)
       flatMap (_.instancesIterator)
-      find    (_.instance.element.attributeValue("mirror") == "true")
+      find    (_.instance.mirror)
     )
 
     // Process mirror instance if any

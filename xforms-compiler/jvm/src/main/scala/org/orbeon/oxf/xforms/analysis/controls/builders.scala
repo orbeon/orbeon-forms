@@ -760,7 +760,8 @@ object InstanceMetadataBuilder {
       useInlineContent      = useInlineContent,
       useExternalContent    = useExternalContent,
       instanceSource        = instanceSource,
-      dependencyURL         = dependencyURL
+      dependencyURL         = dependencyURL,
+      mirror                = element.attributeValue(XXBL_MIRROR_QNAME) == "true"
     )
   }
 }

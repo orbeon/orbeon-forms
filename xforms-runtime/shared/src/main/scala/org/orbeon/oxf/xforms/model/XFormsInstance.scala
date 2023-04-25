@@ -146,10 +146,6 @@ class XFormsInstance(
   def exposeXPathTypes = instance.exposeXPathTypes
   def isSchemaValidation = instance.isSchemaValidation && ! _readonly
 
-  // Don't serialize if the instance is inline and hasn't been modified
-  // NOTE: If the instance is cacheable, its metadata gets serialized, but not it's XML content
-  def mustSerialize = ! (instance.useInlineContent && ! _modified)
-
   // Return the model that contains this instance
   def model = parent
 
@@ -645,4 +641,9 @@ object XFormsInstance extends Logging {
 
     findAbsolute orElse findDynamic orElse findStatic
   }
+
+  // Don't serialize if the instance is inline and hasn't been modified
+  // NOTE: If the instance is cacheable, its metadata gets serialized, but not it's XML content
+  def mustSerialize(instance: XFormsInstance): Boolean =
+    ! (instance.instance.useInlineContent && ! instance.modified)
 }

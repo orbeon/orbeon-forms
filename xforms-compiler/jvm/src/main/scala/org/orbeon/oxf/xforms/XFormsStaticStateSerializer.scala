@@ -492,6 +492,8 @@ object XFormsStaticStateSerializer {
               b += "instanceSource"        -> c.instanceSource.asJson
             if (c.inlineRootElemOpt.isDefined)
               b += "inlineRootElem"        -> c.inlineRootElemOpt.asJson
+            if (c.mirror)
+              b += "mirror"                -> Json.fromBoolean(c.mirror)
 //              "inlineRootElem"        -> (c.inlineRootElemOpt map (e => e.serializeToString())).asJson
         case c: StaticBind    =>
 

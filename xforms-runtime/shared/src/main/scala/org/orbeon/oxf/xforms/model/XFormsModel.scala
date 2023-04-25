@@ -43,6 +43,7 @@ import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}
 
 import scala.util.control.NonFatal
+import org.orbeon.oxf.xforms.state.InstancesControls
 
 
 object XFormsModel {
@@ -368,8 +369,8 @@ trait XFormsModelInstances {
 
     val instanceStatesIt =
       for {
-        instanceStates <- Controls.restoringInstances.iterator
-        instanceState  <- instanceStates
+        InstancesControls(instanceStates, _) <- Controls.restoringInstanceControls.iterator
+        instanceState                        <- instanceStates
         if effectiveId == instanceState.modelEffectiveId  // NOTE: Here instance must contain document
       } yield
         instanceState

@@ -44,7 +44,8 @@ case class InstanceMetadata(
   useInlineContent      : Boolean,
   useExternalContent    : Boolean,
   instanceSource        : Option[String],
-  dependencyURL         : Option[String]
+  dependencyURL         : Option[String],
+  mirror                : Boolean
 )
 
 class Instance(
@@ -139,6 +140,7 @@ class Instance(
   def useExternalContent    : Boolean                  = instanceMetadata.useExternalContent
   def instanceSource        : Option[String]           = instanceMetadata.instanceSource
   def dependencyURL         : Option[String]           = instanceMetadata.dependencyURL
+  def mirror                : Boolean                  = instanceMetadata.mirror
 }
 
 object Instance {

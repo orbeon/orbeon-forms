@@ -4,7 +4,6 @@ import java.util.concurrent.locks.Lock
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.model.{InstanceCaching, XFormsInstance}
-import org.orbeon.xforms.XFormsId
 
 
 sealed trait LockResponse

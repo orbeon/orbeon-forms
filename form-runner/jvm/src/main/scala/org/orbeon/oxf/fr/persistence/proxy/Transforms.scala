@@ -61,7 +61,7 @@ object Transforms {
       resolvedAbsoluteUrl = URI.create(
         URLRewriterUtils.rewriteServiceURL(
           externalContext.getRequest,
-          s"/fr/service/persistence/crud/${appForm.app}/${appForm.form}/data/$documentId/data.xml",
+          FormRunner.createFormDataBasePath(appForm.app, appForm.form, isDraft = false, documentId) + PersistenceProxyProcessor.XmlFormDataFilename,
           UrlRewriteMode.Absolute
         )
       ),

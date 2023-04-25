@@ -301,10 +301,15 @@ trait FormRunnerPersistence {
   def isUploadedFileURL(value: String): Boolean =
     value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
 
+  // Create a path starting and ending with `/`
   // `documentIdOrEmpty` can be empty and if so won't be included. Ideally should be `Option[String]`.
   //@XPathFunction
   def createFormDataBasePath(app: String, form: String, isDraft: Boolean, documentIdOrEmpty: String): String =
-    CRUDBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: documentIdOrEmpty.trimAllToOpt.toList ::: "" :: Nil mkString "/"
+    CRUDBasePath :: createFormDataBasePathNoPrefix(AppForm(app, form), isDraft, documentIdOrEmpty.trimAllToOpt) :: "" :: Nil mkString "/"
+
+  // Path neither starts nor ends with with `/`
+  def createFormDataBasePathNoPrefix(appForm: AppForm, isDraft: Boolean, documentIdOpt: Option[String]): String =
+    appForm.app :: appForm.form :: (if (isDraft) "draft" else "data") :: documentIdOpt.toList ::: Nil mkString "/"
 
   //@XPathFunction
   def createFormDefinitionBasePath(app: String, form: String): String =

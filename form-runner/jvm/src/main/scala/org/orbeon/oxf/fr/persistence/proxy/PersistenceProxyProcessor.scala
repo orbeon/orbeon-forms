@@ -17,8 +17,6 @@ import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.externalcontext._
-import org.orbeon.oxf.fr.FormRunner.createFormDataBasePath
-import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.FormRunnerPersistence._
 import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.permission.{Operations, PermissionsAuthorization}
@@ -81,6 +79,8 @@ private object PersistenceProxyProcessor {
 
   val SupportedMethods               = Set[HttpMethod](HttpMethod.GET, HttpMethod.HEAD, HttpMethod.DELETE, HttpMethod.PUT, HttpMethod.POST, HttpMethod.LOCK, HttpMethod.UNLOCK)
   val GetOrPutMethods                = Set[HttpMethod](HttpMethod.GET, HttpMethod.PUT)
+
+  val XmlFormDataFilename            = "data.xml"
 
   implicit val Logger: IndentedLogger = new IndentedLogger(LoggerFactory.createLogger(PersistenceProxyProcessor.getClass))
 
@@ -221,7 +221,7 @@ private object PersistenceProxyProcessor {
     // Throws if there is an incompatibility
     checkDataFormatVersionIfNeeded(request, appForm, formOrData)
 
-    val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains("data.xml")
+    val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains(XmlFormDataFilename)
     val isFormBuilder    = appForm == AppForm.FormBuilder
 
     // Get persistence implementation target URL and configuration headers
@@ -235,7 +235,8 @@ private object PersistenceProxyProcessor {
     // - `Orbeon-Datasource` -> mysql
     val (persistenceBaseURL, outgoingPersistenceHeaders) = getPersistenceURLHeaders(appForm, formOrData)
 
-    val isVersioningSupported = frc.isFormDefinitionVersioningSupported(appForm.app, appForm.form)
+    val isVersioningSupported = FormRunner.isFormDefinitionVersioningSupported(appForm.app, appForm.form)
+
     val serviceUri = PathUtils.appendQueryString(
       persistenceBaseURL.dropTrailingSlash + path,
       PathUtils.encodeQueryString(request.parameters)
@@ -265,12 +266,12 @@ private object PersistenceProxyProcessor {
               throw HttpStatusCodeException(StatusCode.InternalServerError)
             )(incomingVersion)
 
-          val incomingTokenOpt = request.getFirstParamAsString(frc.AccessTokenParam)
+          val incomingTokenOpt = request.getFirstParamAsString(FormRunner.AccessTokenParam)
 
           def queryForToken: List[(String, String)] =
             incomingTokenOpt
               .flatMap(_.trimAllToOpt)
-              .map(frc.AccessTokenParam ->).toList
+              .map(FormRunner.AccessTokenParam ->).toList
 
           versionAction match {
             case VersionAction.Reject =>
@@ -338,8 +339,18 @@ private object PersistenceProxyProcessor {
 
             case VersionAction.HeadData(v) =>
 
+              // Create path directly to the correct provider so we avoid a callback to the proxy through the PFC
+              val (dataPersistenceBaseUrl, dataOutgoingPersistenceHeaders) = getPersistenceURLHeaders(appForm, FormOrData.Data)
+
               val dataServiceUri =
-                PathUtils.recombineQuery(createFormDataBasePath(appForm.app, appForm.form, v.isDraft, v.documentId) + "data.xml", queryForToken)
+                PathUtils.recombineQuery(
+                  dataPersistenceBaseUrl.dropTrailingSlash                                            ::
+                    "crud"                                                                            ::
+                    FormRunner.createFormDataBasePathNoPrefix(appForm, v.isDraft, Some(v.documentId)) ::
+                    XmlFormDataFilename                                                               ::
+                    Nil mkString "/",
+                  queryForToken
+                )
 
               // This can throw if the connection fails (it is usually internal but can be external)
               // This can throw an `HttpStatusCodeException`, including for a 404
@@ -347,7 +358,7 @@ private object PersistenceProxyProcessor {
                 connectToObtainResponseHeadersAndCheckVersionGetOrHead(
                   request                    = OutgoingRequest(HttpMethod.HEAD, filterVersioningHeaders(OutgoingRequest.headersFromRequest(request))),
                   serviceUri                 = dataServiceUri,
-                  outgoingPersistenceHeaders = outgoingPersistenceHeaders,
+                  outgoingPersistenceHeaders = dataOutgoingPersistenceHeaders,
                   specificIncomingVersionOpt = None
                 )
 

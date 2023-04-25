@@ -1011,7 +1011,7 @@
     </xf:action>
 
     <!-- React to instance mutation events -->
-    <!-- NOTE: We check the standard fr-form-instance, but also fb-form-instance, which is where Form Builder really does its work  -->
+    <!-- NOTE: We check the standard `fr-form-instance`, but also `fb-form-instance`, which is where Form Builder really does its work  -->
     <xf:action observer="fr-form-instance fb-form-instance" event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed">
         <xf:action if="
             $mode = ('new', 'edit') and (
@@ -1028,7 +1028,7 @@
                     else
                         (),
                     (: in theory, `insert`/`delete` can affect more than one node but this doesn't happen in the wizard :)
-                    $att := $nodes[..//@fr:section-status is .]
+                    $att := $nodes[../@fr:section-status is .]
                 return
                     empty($att)
             )">

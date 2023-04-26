@@ -31,7 +31,6 @@
     <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/scroll/annotatescrollbar.js"/>
     <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/search/matchesonscrollbar.js"/>
     <xbl:script src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/search/jump-to-line.js"/>
-    <xbl:script src="/xbl/orbeon/code-mirror/code-mirror.js"/>
 
     <xbl:binding
         id="fr-code-mirror"

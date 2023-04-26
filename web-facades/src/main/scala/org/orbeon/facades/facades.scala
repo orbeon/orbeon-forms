@@ -13,6 +13,7 @@
   */
 package org.orbeon.facades
 
+import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js
@@ -40,4 +41,18 @@ trait Ladda extends js.Object {
 @JSGlobal("Ladda")
 object Ladda extends js.Object {
   def create(button: html.Element): Ladda = js.native
+}
+
+@js.native
+@JSGlobal("CodeMirror")
+class CodeMirror(
+  elem: dom.Element,
+  config: js.Dictionary[js.Any]
+) extends js.Object {
+  def setOption(key: String, value: js.Any): Unit = js.native
+  def getValue(): String = js.native
+  def setValue(value: String): Unit = js.native
+  def focus(): Unit = js.native
+  def on(event: String, handler: js.Function): Unit = js.native
+  def off(event: String, handler: js.Function): Unit = js.native
 }

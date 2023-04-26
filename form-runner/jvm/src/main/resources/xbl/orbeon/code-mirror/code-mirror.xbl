@@ -35,7 +35,9 @@
     <xbl:binding
         id="fr-code-mirror"
         element="fr|code-mirror"
-        xxbl:mode="lhha binding value external-value focus javascript-lifecycle">
+        xxbl:mode="lhha binding value external-value focus javascript-lifecycle"
+        xxf:external-events="DOMActivate">
+
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.5/lib/codemirror.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/code-mirror.css"/>
@@ -46,5 +48,6 @@
         <xbl:template>
             <xf:group id="outer" class="xbl-fr-code-mirror-editor-outer"/>
         </xbl:template>
+
     </xbl:binding>
 </xbl:xbl>

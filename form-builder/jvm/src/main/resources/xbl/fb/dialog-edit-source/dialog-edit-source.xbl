@@ -45,13 +45,15 @@
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
 
-            <xbl:handler event="DOMActivate" observer="apply-trigger" if="valid(source)">
+            <xbl:handler event="DOMActivate" observer="apply-trigger code-mirror" if="valid(source)">
                 <xf:dispatch targetid="fb-dialog-edit-source" name="fr-save">
                     <xf:property name="value" value="xf:parse(instance()/source)/root()"/>
                 </xf:dispatch>
+                <xf:setvalue ref="source"/>
+                <xxf:hide dialog="dialog"/>
             </xbl:handler>
 
-            <xbl:handler event="DOMActivate" observer="apply-trigger cancel-trigger">
+            <xbl:handler event="DOMActivate" observer="cancel-trigger">
                 <xf:setvalue ref="source"/>
                 <xxf:hide dialog="dialog"/>
             </xbl:handler>
@@ -88,7 +90,7 @@
                 <xf:label ref="$resources/dialog-edit-source/label"/>
 
                 <xh:div>
-                    <fr:code-mirror ref="source">
+                    <fr:code-mirror ref="source" id="code-mirror">
                         <xf:alert ref="$resources/dialog-edit-source/source/alert"/>
                     </fr:code-mirror>
                 </xh:div>

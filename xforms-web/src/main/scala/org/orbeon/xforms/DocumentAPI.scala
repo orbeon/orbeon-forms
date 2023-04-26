@@ -18,6 +18,7 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits.global
 
+import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.|
 
@@ -76,7 +77,7 @@ object DocumentAPI extends js.Object {
     controlIdOrElem : String | html.Element,
     newValue        : String | Double | Boolean,
     formElem        : js.UndefOr[html.Form] = js.undefined
-  ): Unit = {
+  ): Future[Unit] = {
 
     val newStringValue = newValue.toString
 
@@ -90,7 +91,7 @@ object DocumentAPI extends js.Object {
     // Directly change the value in the UI without waiting for an Ajax response
     // For an XBL component, this calls `xformsUpdateValue()` on the companion object if supported. This does not
     // dispatch an event, at least not directly.
-    XFormsUI.maybeFutureToScalaFuture(Controls.setCurrentValue(control, newStringValue, force = false)) foreach { _ =>
+    XFormsUI.maybeFutureToScalaFuture(Controls.setCurrentValue(control, newStringValue, force = false)) flatMap { _ => Future(
       // And also fire server event but use the value from the control
       // https://github.com/orbeon/orbeon-forms/issues/5383
       Controls.getCurrentValue(control) foreach { newValue =>
@@ -102,7 +103,7 @@ object DocumentAPI extends js.Object {
           )
         )
       }
-    }
+    )}
   }
 
   def focus(

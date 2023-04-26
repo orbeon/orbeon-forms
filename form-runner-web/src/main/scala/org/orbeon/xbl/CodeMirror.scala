@@ -2,12 +2,12 @@ package org.orbeon.xbl
 
 import org.orbeon.facades
 import org.orbeon.xforms.facade.{XBL, XBLCompanion}
-import org.orbeon.xforms.{$, DocumentAPI}
+import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryPromise
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Promise
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.|
@@ -37,8 +37,12 @@ object CodeMirror {
           "lineWrapping" -> true,
           "indentUnit"   -> 4,
           "foldGutter"   -> true,
-          "extraKeys"    -> js.Dictionary("Ctrl-Q" -> ((cm: js.Dynamic) => cm.foldCode(cm.getCursor()))),
-          "gutters"      -> js.Array("CodeMirror-linenumbers", "CodeMirror-foldgutter")
+          "gutters"      -> js.Array("CodeMirror-linenumbers", "CodeMirror-foldgutter"),
+          "extraKeys"    -> js.Dictionary(
+            "Ctrl-Q"     -> ((cm: js.Dynamic) => cm.foldCode(cm.getCursor())),
+            "Cmd-Enter"  -> js.Any.fromFunction0(userCmdCtrlEnter _),
+            "Ctrl-Enter" -> js.Any.fromFunction0(userCmdCtrlEnter _)
+          )
         )
       )
 
@@ -64,16 +68,32 @@ object CodeMirror {
 
     private def codeMirrorFocus(): Unit = this.hasFocus = true
 
+    private def userCmdCtrlEnter(): Unit = {
+      sendValueToXForms() foreach { _ =>
+        AjaxClient.fireEvent(
+          AjaxEvent(
+            eventName = "DOMActivate",
+            targetId  = this.containerElem.id
+          )
+        )
+      }
+    }
+
+    // We update the value on blur, not on change, to be incremental, for performance on large forms
     private def codeMirrorBlur(): Unit = {
       this.hasFocus = false
       if (this.userChangedSinceLastBlur) {
-        $(containerElem).addClass("xforms-visited")
-        DocumentAPI.setValue(
-          containerElem.id,
-          this.xformsGetValue()
-        )
+        sendValueToXForms()
         this.userChangedSinceLastBlur = false
       }
+    }
+
+    private def sendValueToXForms(): Future[Unit] = {
+      $(containerElem).addClass("xforms-visited")
+      DocumentAPI.setValue(
+        containerElem.id,
+        this.xformsGetValue()
+      )
     }
 
     private def codeMirrorChange(codeMirror: js.Dynamic, event: js.Dynamic): Unit = {

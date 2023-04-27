@@ -6,11 +6,11 @@ import org.orbeon.xforms.{$, AjaxClient, AjaxEvent, DocumentAPI}
 import org.scalajs.dom.html
 import org.scalajs.jquery.JQueryPromise
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.|
+import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 object CodeMirror {
 

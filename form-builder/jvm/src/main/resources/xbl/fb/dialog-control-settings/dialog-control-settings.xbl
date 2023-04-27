@@ -38,8 +38,9 @@
                 <xf:setvalue iterate="$i//*[not(*)] | $i/*//@*" ref="."/>
                 <xf:delete ref="$i/(label, hint, help, text)/fr:param"/>
 
-                <xf:setvalue ref="$i/original-control-name" value="frf:controlNameFromId(event('control-id'))"/>
-                <xf:setvalue ref="$i/control-name"          value="$i/original-control-name"/>
+                <xf:setvalue ref="$i/original-control-name"   value="frf:controlNameFromId(event('control-id'))"/>
+                <xf:setvalue ref="$i/control-name"            value="$i/original-control-name"/>
+                <xf:setvalue ref="$i/last-valid-control-name" value="$i/original-control-name"/>
 
                 <xf:setvalue ref="$i/control-names"         value="string-join(fbf:getAllNamesInUse(), ' ')"/>
 
@@ -176,8 +177,8 @@
                             'next'
                         )"/>
 
-                <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
-                     allows scoping namespaces for XPath expressions validated with xxf:XPath2. -->
+                <!-- Remove all namespace nodes on the root element and insert those from the external `xf:bind`. This
+                     allows scoping namespaces for XPath expressions validated with `xxf:XPath2`. -->
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($i/control-name)/namespace::node()"/>
 
@@ -452,6 +453,42 @@
                     recurse="true"/>
 
             </xbl:handler>
+            <!-- Renaming of internal control references -->
+            <xbl:handler
+                event="xforms-value-changed"
+                observer="control-name-input"
+                if="empty(event('xxf:level'))">
+
+                <!-- Rename references in all local formulas -->
+                <xf:action type="xpath">
+                    fbf:renameControlReferences(
+                        (: All values that can be XPath expressions :)
+                        $i/(
+                            relevant  |
+                            readonly  |
+                            calculate |
+                            default   |
+                            validations/validation/(
+                                required |
+                                constraint/(
+                                    @expression |
+                                    @argument[
+                                        ../../@type = 'excluded-dates'
+                                    ]
+                                )
+                            )
+                        ),
+                        false(),
+                        $i/last-valid-control-name,
+                        event('xxf:value')
+                    )
+                </xf:action>
+
+                <xf:setvalue
+                    ref="$i/last-valid-control-name"
+                    value="event('xxf:value')"/>
+
+            </xbl:handler>
             <!-- Prev and Next buttons -->
             <xbl:handler event="DOMActivate" observer="prev-button next-button" if="$i/@valid = 'true'">
 
@@ -563,7 +600,8 @@
                     <_ valid="true">
                         <original-control-name/>    <!-- So we can find back the control when saving if users change the name -->
                         <control-name/>             <!-- Possibly new name set by users -->
-                        <standard-classes/>         <!-- fr-summary, fr-search... -->
+                        <last-valid-control-name/>  <!-- For renaming -->
+                        <standard-classes/>         <!-- `fr-summary`, `fr-search`... -->
                         <custom-classes/>           <!-- All custom classes except the standard ones -->
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
 
@@ -642,15 +680,19 @@
                     </validation>
                 </xf:instance>
 
+                <xf:var
+                    name="control-names"
+                    value="xxf:split($i/control-names)"/>
+
                 <xf:bind ref="control-name"
                     type="xs:NCName"
                     xxf:whitespace="trim"
                     readonly="false()"
-                     constraint="
+                    constraint="
                         . = $i/original-control-name or
                         not(
                             ends-with(., '-iteration') or
-                            . = xxf:split($i/control-names)
+                            . = $control-names
                         )"/>
 
                 <xf:bind ref="default-alert">
@@ -756,6 +798,7 @@
                             type="xxf:XPath2"
                             xxf:whitespace="trim"
                             required="false()"
+                            constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"
                             relevant="$type = 'formula'"/>
 
                         <xf:bind
@@ -776,13 +819,15 @@
 
                         <xf:bind
                             ref="constraint/@argument[../../@type = 'excluded-dates']"
-                            type="xxf:XPath2"/>
+                            type="xxf:XPath2"
+                            constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
 
                         <xf:bind
                             ref="required"
                             type="xxf:XPath2"
                             xxf:whitespace="trim"
-                            required="true()"/>
+                            required="true()"
+                            constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
 
                         <xf:bind
                             ref="alert/@message"
@@ -794,6 +839,7 @@
                     ref="relevant | readonly | default | calculate"
                     type="xxf:XPath2"
                     xxf:whitespace="trim"
+                    constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"
                     required="false()"/>
 
                 <xf:bind

@@ -19,9 +19,7 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.Expression
-import shapeless.syntax.typeable._
 
-import java.io.PrintStream
 import scala.annotation.tailrec
 import scala.collection.compat._
 
@@ -64,9 +62,8 @@ object DependencyAnalyzer {
     }
   }
 
-  // 2022-03-23: Unused.
-  def findMissingVariableReferences(expr: Expression, validBindNames: scala.collection.Set[String]): Set[String] =
-    (SaxonUtils.iterateExternalVariableReferences(expr) filterNot validBindNames).to(Set)
+  def findMissingVariableReferences(expr: Expression, validBindNames: String => Boolean): Iterator[String] =
+    SaxonUtils.iterateExternalVariableReferences(expr) filterNot validBindNames
 
   def containsVariableReference(expr: Expression, name: String): Boolean =
     SaxonUtils.iterateExternalVariableReferences(expr) contains name

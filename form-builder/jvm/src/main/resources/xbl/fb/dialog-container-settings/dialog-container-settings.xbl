@@ -39,6 +39,7 @@
                 <xf:setvalue ref="$i/container-type"                 value="local-name($control)"/>
                 <xf:setvalue ref="$i/original-control-name"          value="frf:getContainerNameOrEmpty($control)"/>
                 <xf:setvalue ref="$i/control-name"                   value="$i/original-control-name"/>
+                <xf:setvalue ref="$i/last-valid-control-name"        value="$i/original-control-name"/>
 
                 <xf:action if="$i/container-type = 'section'">
                     <xf:setvalue ref="$i/initially-open"             value="not($control/@fb:open = 'false')"/>
@@ -87,8 +88,8 @@
                 <xf:setvalue ref="$i/apply-defaults"                 value="$control/@apply-defaults = 'true'"/>
                 <xf:setvalue ref="$i/initial-iterations"             value="$control/@fb:initial-iterations = 'first'"/>
 
-                <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
-                     allows scoping namespaces for XPath expressions validated with xxf:XPath2. -->
+                <!-- Remove all namespace nodes on the root element and insert those from the external `xf:bind`. This
+                     allows scoping namespaces for XPath expressions validated with `xxf:XPath2`. -->
                 <xf:delete ref="$i/namespace::node()"/>
                 <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($i/control-name)/namespace::node()"/>
 
@@ -252,7 +253,7 @@
                 </xf:action>
 
             </xbl:handler>
-            <xbl:handler event="DOMActivate" observer="fb-control-name-input save-button prev-button next-button">
+            <xbl:handler event="DOMActivate" observer="control-name-input save-button prev-button next-button">
 
                 <xf:action if="valid($i)">
                     <xf:var
@@ -274,6 +275,34 @@
                     if="not(valid($i))"
                     control="dialog"
                     recurse="true"/>
+            </xbl:handler>
+            <!-- Renaming of internal control references -->
+            <xbl:handler
+                event="xforms-value-changed"
+                observer="control-name-input"
+                if="empty(event('xxf:level'))">
+
+                <!-- Rename references in all local formulas -->
+                <xf:action type="xpath">
+                    fbf:renameControlReferences(
+                        (: All values that can be XPath expressions :)
+                        $i/(
+                            relevant   |
+                            readonly   |
+                            min-repeat |
+                            max-repeat |
+                            freeze
+                        ),
+                        false(),
+                        $i/last-valid-control-name,
+                        event('xxf:value')
+                    )
+                </xf:action>
+
+                <xf:setvalue
+                    ref="$i/last-valid-control-name"
+                    value="event('xxf:value')"/>
+
             </xbl:handler>
             <!-- Prev and Next buttons -->
             <xbl:handler event="DOMActivate" observer="prev-button next-button" if="valid($i)">
@@ -306,11 +335,12 @@
             <xf:model id="model">
 
                 <xf:instance id="i" xxf:exclude-result-prefixes="#all">
-                    <local>
+                    <_>
                         <container-type/>
 
                         <original-control-name/>
                         <control-name/>
+                        <last-valid-control-name/>
 
                         <!-- Sections only -->
                         <initially-open/>
@@ -372,7 +402,7 @@
 
                         <prev-control-id/>
                         <next-control-id/>
-                    </local>
+                    </_>
                 </xf:instance>
 
                 <xf:var name="i" value="instance()"/>
@@ -387,6 +417,10 @@
                     ref="instance('modified')"
                     value="true()"/>
 
+                <xf:var
+                    name="control-names"
+                    value="xxf:split($i/control-names)"/>
+
                 <xf:bind
                     ref="control-name"
                     type="xs:NCName"
@@ -397,14 +431,15 @@
                         . = $i/original-control-name or
                         not(
                             ends-with(., '-iteration') or
-                            xxf:split($i/control-names) = . or
-                            xxf:split($i/control-names) = concat(., '-content')
+                            $control-names = . or
+                            $control-names = concat(., '-content')
                         )"/>
 
                 <xf:bind
                     ref="relevant | readonly"
                     type="xxf:XPath2"
-                    required="false()"/>
+                    required="false()"
+                    constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"/>
 
                 <xf:bind
                     ref="initially-open"
@@ -447,13 +482,14 @@
                     constraint="
                         $i/is-custom-iteration-name = false() or
                         . = $i/original-custom-iteration-name or
-                        not(. = xxf:split($i/control-names))"/>
+                        not(. = $control-names)"/>
 
-                <!-- Use xxf:XPath2 as integer values are also XPath expressions! -->
+                <!-- Use `xxf:XPath2` as integer values are also XPath expressions! -->
                 <xf:bind
                     ref="min-repeat | max-repeat | freeze"
                     type="xxf:XPath2"
                     readonly="../user-can-add-remove = false()"
+                    constraint="empty(fbf:findUnresolvedVariableReferences(., false(), $i/original-control-name, $i/control-name))"
                     xxf:whitespace="trim"/>
 
                 <xf:bind
@@ -529,14 +565,14 @@
                 <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-dialog-container-settings">
                     <xf:label ref="$resources/dialog-container-settings/label"/>
 
-                    <fr:tabbable id="tabs">
+                    <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">
                             <fr:label ref="$resources/dialog-container-settings/tab-base/label"/>
 
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td colspan="2">
-                                        <xf:input ref="control-name" incremental="true" id="fb-control-name-input">
+                                        <xf:input ref="control-name" incremental="true" id="control-name-input">
                                             <xf:label ref="$resources/dialog-container-settings/control-name/label"/>
                                             <xf:alert ref="$resources/dialog-container-settings/control-name/alert"/>
                                             <xf:hint  ref="$resources/dialog-container-settings/control-name/hint"/>

@@ -84,6 +84,9 @@ trait BaseOps extends Logging {
       controlNameFromIdOpt                filterNot
       (_.endsWith(DefaultIterationSuffix))
 
+  def iterateNamesInUseCtx(implicit ctx: FormBuilderDocContext): Iterator[String] =
+    iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get))
+
   // Special id namespace for `tmp-n-tmp` ids. We don't care if those are used in data as element names, or
   // if they are in the clipboard.
   def nextTmpIds(token: String = "tmp", count: Int)(implicit ctx: FormBuilderDocContext): immutable.IndexedSeq[String] = {
@@ -129,7 +132,7 @@ trait BaseOps extends Logging {
     val allNamesInUse =
       collection.mutable.Set() ++ others ++
         // Ids coming from the form definition
-        iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get)) ++ {
+        iterateNamesInUseCtx ++ {
         // Ids coming from the special cut/copy/paste instance, if present
         ToolboxOps.readXcvFromClipboard match {
           case Some(xcvNode) => iterateNamesInUse(Right(xcvNode))

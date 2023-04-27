@@ -461,7 +461,7 @@ trait ControlOps extends ResourcesOps {
     }
 
   def getAllNamesInUse(implicit ctx: FormBuilderDocContext): Set[String] =
-    iterateNamesInUse(ctx.explicitFormDefinitionInstance.toRight(ctx.formDefinitionInstance.get)).to(Set)
+    iterateNamesInUseCtx.toSet
 
   // Finds if a control uses a particular type of editor (say "static-itemset")
   def hasEditor(controlElement: NodeInfo, editor: String)(implicit ctx: FormBuilderDocContext): Boolean =
@@ -677,26 +677,26 @@ trait ControlOps extends ResourcesOps {
   def renameControlReferences(
     oldName        : String,
     newName        : String,
-    oldControlIdOpt: Option[String] = None)(implicit
+    oldControlIdOpt: Option[String] = None)(implicit // for renaming legacy actions
     ctx            : FormBuilderDocContext
   ): Int = {
 
+    val functionLibrary = inScopeContainingDocument.partAnalysis.functionLibrary
+
     var countOfUpdatedValues = 0
 
-    def updateNode(newValue: String)(node: NodeInfo): Unit = {
-      if (node.stringValue != newValue)
+    def updateNode(newValue: String)(node: NodeInfo): Unit =
+      if (XFormsAPI.setvalue(node, newValue).exists(_._2))
         countOfUpdatedValues += 1
-      XFormsAPI.setvalue(node, newValue)
-    }
 
     def renameNodeContent(elemOrAtt: NodeInfo, avt: Boolean): Unit =
       FormRunnerRename.replaceVarAndFnReferences(
-        xpathString        = elemOrAtt.stringValue,
-        namespaceMapping   = NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
-        functionLibrary    = inScopeContainingDocument.partAnalysis.functionLibrary,
-        avt                = avt,
-        oldName            = oldName,
-        newName            = newName
+        xpathString      = elemOrAtt.stringValue,
+        namespaceMapping = NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
+        functionLibrary  = functionLibrary,
+        avt              = avt,
+        oldName          = oldName,
+        newName          = newName
       ) foreach { newValue =>
         updateNode(newValue)(elemOrAtt)
       }

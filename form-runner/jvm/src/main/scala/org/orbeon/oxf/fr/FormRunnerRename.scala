@@ -2,12 +2,15 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.XMLNames.{FR, FRPrefix}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils.OrbeonStringOps
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
+import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.DependencyAnalyzer
 import org.orbeon.oxf.xml.SaxonUtils
 import org.orbeon.saxon.expr.{Expression, StringLiteral}
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.saxon.om.StructuredQName
+import org.orbeon.saxon.om.{NodeInfo, StructuredQName}
+import org.orbeon.scaxon.SimplePath.NodeInfoOps
 import org.orbeon.xml.NamespaceMapping
 
 import java.util.regex.Matcher
@@ -100,6 +103,31 @@ object FormRunnerRename {
 
     withFunctionReplacement.orElse(withVarReplacement)
   }
+
+  def findUnresolvedVariableReferences(
+    elemOrAtt     : NodeInfo,
+    avt           : Boolean,
+    validBindNames: => String => Boolean)(implicit // by-name so we can avoid costly computation if not needed
+    logger        : IndentedLogger
+  ): Iterator[String] =
+    elemOrAtt.stringValue.trimAllToOpt match {
+      case Some(xpathString) if ! xpathString.contains("$") =>
+        // Optimization
+        Iterator.empty
+      case Some(xpathString) =>
+
+        val expr =
+          compileExpression(
+            xpathString      = xpathString,
+            namespaceMapping = NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
+            functionLibrary  = inScopeContainingDocument.partAnalysis.functionLibrary, // or could just use the Form Runner function library
+            avt              = avt
+          )
+
+        DependencyAnalyzer.findMissingVariableReferences(expr, validBindNames)
+      case None =>
+        Iterator.empty
+    }
 
   private val FRControlStringValueName = new StructuredQName(FRPrefix, FR, "control-string-value")
   private val FRControlTypedValueName  = new StructuredQName(FRPrefix, FR, "control-typed-value")

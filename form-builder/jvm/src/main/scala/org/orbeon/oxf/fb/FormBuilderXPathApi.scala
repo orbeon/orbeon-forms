@@ -29,6 +29,7 @@ import org.orbeon.oxf.fr._
 import org.orbeon.oxf.fr.permission._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.controls.LHHA
 import org.orbeon.oxf.xforms.analysis.model.ModelDefs
@@ -38,7 +39,7 @@ import org.orbeon.oxf.xforms.xbl.BindingDescriptor._
 import org.orbeon.oxf.xml.{SaxonUtils, TransformerUtils}
 import org.orbeon.saxon.ArrayFunctions
 import org.orbeon.saxon.function.Property
-import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
+import org.orbeon.saxon.om.{EmptyIterator, NodeInfo, SequenceIterator}
 import org.orbeon.saxon.value.QNameValue
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.NodeConversions
@@ -48,6 +49,7 @@ import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
 import scala.collection.compat._
+import scala.util.{Failure, Success, Try}
 
 
 object FormBuilderXPathApi {
@@ -907,6 +909,73 @@ object FormBuilderXPathApi {
   //@XPathFunction
   def canMigrateGridColumns(gridElem: NodeInfo, from: Int, to: Int): Boolean =
     FormBuilder.findGridColumnMigrationType(gridElem, from, to).isDefined
+
+  //@XPathFunction
+  def findUnresolvedVariableReferences(
+    elemOrAtt   : NodeInfo,
+    avt         : Boolean,
+    originalName: String,
+    newName     : String
+  ): SequenceIterator =
+    if (elemOrAtt.stringValue.trimAllToOpt.nonEmpty)
+      Try(
+        FormRunnerRename.findUnresolvedVariableReferences(
+          elemOrAtt      = elemOrAtt,
+          avt            = avt,
+          validBindNames = (
+            FormBuilder.iterateNamesInUseCtx(FormBuilderDocContext())
+              .filterNot(_ == originalName)
+                ++ Iterator(newName)
+          ).toSet
+        )
+      ) match {
+        case Success(it) => it
+        case Failure(_)  => EmptyIterator.getInstance // The user expression can be incorrect in the UI. We ignore it
+                                                      // here and UI validation should inform the user.
+      }
+    else
+      EmptyIterator.getInstance
+
+  //@XPathFunction
+  def renameControlReferences(
+    elemsOrAtts: SequenceIterator,
+    avt        : Boolean,
+    oldName    : String,
+    newName    : String
+  ): Int = {
+
+    val functionLibrary = inScopeContainingDocument.partAnalysis.functionLibrary
+
+    var countOfUpdatedValues = 0
+
+    def updateNode(newValue: String)(node: NodeInfo): Unit =
+      if (XFormsAPI.setvalue(node, newValue).exists(_._2))
+        countOfUpdatedValues += 1
+
+    elemsOrAtts filter (_.getStringValue.nonAllBlank) foreach {
+      case elemOrAtt: NodeInfo =>
+        Try(
+          FormRunnerRename.replaceVarAndFnReferences(
+            xpathString      = elemOrAtt.stringValue,
+            namespaceMapping = NamespaceMapping(elemOrAtt.namespaceMappings.toMap),
+            functionLibrary  = functionLibrary,
+            avt              = avt,
+            oldName          = oldName,
+            newName          = newName
+          )
+        ) match {
+          case Success(Some(newValue)) =>
+            updateNode(newValue)(elemOrAtt)
+          case Success(None) | Failure(_) =>
+            // The user expression can be incorrect in the UI. We ignore it here and UI validation should inform the user.
+            // We could count the number of failed expressions, but it's not really useful.
+        }
+      case _ =>
+        throw new IllegalArgumentException
+    }
+
+    countOfUpdatedValues
+  }
 
   private def processUndoRedoAction(
     undoAction      : UndoAction)(implicit

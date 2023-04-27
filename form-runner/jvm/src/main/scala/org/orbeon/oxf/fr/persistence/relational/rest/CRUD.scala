@@ -21,6 +21,9 @@ import org.orbeon.oxf.http.{Headers, HttpMethod, HttpStatusCodeException, Status
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.StringUtils._
+
+import java.time.Instant
 
 
 class CRUD
@@ -97,6 +100,7 @@ private object CRUD {
           incomingVersion,
           file,
           None,
+          None,
           requestUsername,
           requestGroup,
           requestFlatView,
@@ -104,14 +108,16 @@ private object CRUD {
           requestWorkflowStage
         )
       case CrudDataPath(provider, app, form, dataOrDraft, documentId, filename) =>
-        val file = if (filename == "data.xml") None else Some(filename)
-        val dataPart = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
+        val file            = if (filename == "data.xml") None else Some(filename)
+        val dataPart        = DataPart(dataOrDraft == "draft", documentId, stage = requestWorkflowStage)
+        val lastModifiedOpt = httpRequest.getFirstParamAsString("last-modified-time").flatMap(_.trimAllToOpt).map(Instant.parse) // xxx TODO constant
         CrudRequest(
           Provider.withName(provider),
           AppForm(app, form),
           incomingVersion,
           file,
           Some(dataPart),
+          lastModifiedOpt,
           requestUsername,
           requestGroup,
           requestFlatView,

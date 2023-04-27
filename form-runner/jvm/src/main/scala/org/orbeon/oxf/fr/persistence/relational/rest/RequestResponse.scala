@@ -15,7 +15,9 @@ package org.orbeon.oxf.fr.persistence.relational.rest
 
 import org.orbeon.oxf.externalcontext.Credentials
 import org.orbeon.oxf.fr.AppForm
-import org.orbeon.oxf.fr.persistence.relational._
+import org.orbeon.oxf.fr.persistence.relational.Provider
+
+import java.time.Instant
 
 
 case class DataPart(
@@ -30,16 +32,17 @@ case class LockUnlockRequest(
 )
 
 case class CrudRequest(
-  provider     : Provider,
-  appForm      : AppForm,
-  version      : Option[Int],
-  filename     : Option[String],
-  dataPart     : Option[DataPart],
-  username     : Option[String],
-  groupname    : Option[String],
-  flatView     : Boolean,
-  credentials  : Option[Credentials],
-  workflowStage: Option[String]
+  provider       : Provider,
+  appForm        : AppForm,
+  version        : Option[Int],
+  filename       : Option[String],
+  dataPart       : Option[DataPart],
+  lastModifiedOpt: Option[Instant], // or just plain string?
+  username       : Option[String],
+  groupname      : Option[String],
+  flatView       : Boolean,
+  credentials    : Option[Credentials],
+  workflowStage  : Option[String]
 ) {
   def forForm       : Boolean = dataPart.isEmpty
   def forData       : Boolean = dataPart.isDefined

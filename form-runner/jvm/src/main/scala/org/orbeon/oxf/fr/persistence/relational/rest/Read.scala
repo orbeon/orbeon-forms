@@ -48,29 +48,51 @@ trait Read extends FormRunnerPersistence {
             if (req.forAttachment) ", t.file_content"
             else                   s", $xmlCol"
           else                     ""
-        s"""|SELECT  t.last_modified_time, t.created
-            |        $body
-            |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id" else ""}
-            |        ${if (hasStage)          ", t.stage"                                    else ""}
-            |        , t.form_version, t.deleted
-            |FROM    $table t,
-            |        (
-            |            SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
-            |              FROM   $table
-            |             WHERE   app  = ?
-            |                     and form = ?
-            |                     ${if (req.forForm)       "and form_version = ?"              else ""}
-            |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
-            |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
-            |            GROUP BY ${idCols.mkString(", ")}
-            |        ) m
-            |WHERE   ${SqlSupport.joinColumns("last_modified_time" +: idCols, "t", "m")}
-            |""".stripMargin
+
+        req.lastModifiedOpt match {
+          case Some(_) =>
+            s"""|SELECT  t.last_modified_time, t.created
+                |        $body
+                |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id" else ""}
+                |        ${if (hasStage)          ", t.stage"                                    else ""}
+                |        , t.form_version, t.deleted
+                |FROM    $table t
+                |WHERE   t.app  = ?
+                |        and t.form = ?
+                |        and t.last_modified_time = ?
+                |        ${if (req.forForm)       "and t.form_version = ?"                else ""}
+                |        ${if (req.forData)       "and t.document_id = ? and t.draft = ?" else ""}
+                |        ${if (req.forAttachment) "and t.file_name = ?"                   else ""}
+                |""".stripMargin
+          case None =>
+            s"""|SELECT  t.last_modified_time, t.created
+                |        $body
+                |        ${if (req.forData)       ", t.username, t.groupname, t.organization_id" else ""}
+                |        ${if (hasStage)          ", t.stage"                                    else ""}
+                |        , t.form_version, t.deleted
+                |FROM    $table t,
+                |        (
+                |            SELECT   max(last_modified_time) last_modified_time, ${idCols.mkString(", ")}
+                |              FROM   $table
+                |             WHERE   app  = ?
+                |                     and form = ?
+                |                     ${if (req.forForm)       "and form_version = ?"              else ""}
+                |                     ${if (req.forData)       "and document_id = ? and draft = ?" else ""}
+                |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
+                |            GROUP BY ${idCols.mkString(", ")}
+                |        ) m
+                |WHERE   ${SqlSupport.joinColumns("last_modified_time" +: idCols, "t", "m")}
+                |""".stripMargin
+        }
       }
+
       useAndClose(connection.prepareStatement(sql)) { ps =>
         val position = Iterator.from(1)
         ps.setString(position.next(), req.appForm.app)
         ps.setString(position.next(), req.appForm.form)
+        req.lastModifiedOpt foreach { lastModified =>
+          ps.setTimestamp(position.next(), Timestamp.from(lastModified))
+        }
         if (req.forForm)
           ps.setInt(position.next(), req.version.getOrElse(throw HttpStatusCodeException(StatusCode.BadRequest)))
         if (req.forData) {

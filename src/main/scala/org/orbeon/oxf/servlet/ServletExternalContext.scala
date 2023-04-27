@@ -271,7 +271,9 @@ class ServletExternalContext(
         requestDispatcher.forward(wrappedRequest, nativeResponse)
 
       } else {
-        // Client-side redirect: send the redirect to the client
+        // Client-side redirect: send the redirect to the client,
+        // disabling caching as done for non-2xx status codes
+        setResponseHeaders(ServletExternalContext.nocacheCacheHeaders)
         nativeResponse.sendRedirect(
           if (isEmbedded)
             PathUtils.recombineQuery(

@@ -306,6 +306,9 @@
         <or>
             <label>or</label>
         </or>
+        <errors>
+            <label>Errors</label>
+        </errors>
         <back-to-summary>
             <label>Back to List of Forms</label>
         </back-to-summary>
@@ -1631,6 +1634,9 @@
         <or>
             <label>ou</label>
         </or>
+        <errors>
+            <label>Erreurs</label>
+        </errors>
         <back-to-summary>
             <label>Retour à la liste des formulaires</label>
         </back-to-summary>
@@ -2939,6 +2945,9 @@
         <or>
             <label>eller</label>
         </or>
+        <errors>
+            <label todo="true">Errors</label>
+        </errors>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -4276,6 +4285,9 @@
         <or>
             <label>или</label>
         </or>
+        <errors>
+            <label todo="true">Errors</label>
+        </errors>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -5613,6 +5625,9 @@
         <or>
             <label>o</label>
         </or>
+        <errors>
+            <label todo="true">Errors</label>
+        </errors>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -6913,6 +6928,9 @@
         <or>
             <label>oder</label>
         </or>
+        <errors>
+            <label todo="true">Errors</label>
+        </errors>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -8216,6 +8234,9 @@
         <or>
             <label>tai</label>
         </or>
+        <errors>
+            <label todo="true">Errors</label>
+        </errors>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -9544,6 +9565,9 @@
         <or>
             <label>o</label>
         </or>
+        <errors>
+            <label todo="true">Errors</label>
+        </errors>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -10873,6 +10897,9 @@
         <or>
             <label>of</label>
         </or>
+        <errors>
+            <label todo="true">Errors</label>
+        </errors>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -12181,6 +12208,9 @@
         <or>
             <label>ou</label>
         </or>
+        <errors>
+            <label todo="true">Errors</label>
+        </errors>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>
@@ -13516,6 +13546,9 @@
         <or>
             <label>eller</label>
         </or>
+        <errors>
+            <label todo="true">Errors</label>
+        </errors>
         <back-to-summary>
             <label todo="true">Back to List of Forms</label>
         </back-to-summary>

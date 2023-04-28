@@ -1396,7 +1396,7 @@
                     </fr:tabbable>
 
                     <fr:error-summary id="error-summary" observer="fb-tabbable" valid-ref="$i/@valid">
-                        <fr:label>Errors</fr:label>
+                        <fr:label><xf:output value="xxf:r('errors.label', '|fr-form-resources|')"/></fr:label>
                     </fr:error-summary>
 
                     <!--<fr:xforms-inspector/>-->

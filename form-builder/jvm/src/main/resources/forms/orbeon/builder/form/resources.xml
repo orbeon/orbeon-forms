@@ -1310,7 +1310,7 @@
             <new-metadata-output>Please provide an application and form name to identify your form. You can easily change those later.</new-metadata-output>
             <edit-metadata-output/>
             <save-as-metadata-output>Enter a new application name and form name to be used for the copy of this form:</save-as-metadata-output>
-            <xpath-errors>There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} in your form.</xpath-errors>
+            <xpath-errors>There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} formula errors} in your form.</xpath-errors>
             <lhha-checkbox>Mark this checkbox if you'd like to type HTML tags</lhha-checkbox>
         </messages>
         <alerts>
@@ -10569,7 +10569,7 @@
             <new-metadata-output>Por favor ingrese nombre de aplicación y de formulario, que serán usados para identificar su formulario (se pueden ingresar más adelante).</new-metadata-output>
             <edit-metadata-output/>
             <save-as-metadata-output>Ingrese el nombre de la nueva apliación y formulario ha ser usado para copiar este formulario:</save-as-metadata-output>
-            <xpath-errors>Hay {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} en su formulario.</xpath-errors>
+            <xpath-errors>Hay {0,choice,1#is one XPath error|1&lt;are {0,number,integer} formula errors} en su formulario.</xpath-errors>
             <lhha-checkbox>Marque el checkbox si quiere ingresar etiquetas HTML</lhha-checkbox>
         </messages>
         <alerts>

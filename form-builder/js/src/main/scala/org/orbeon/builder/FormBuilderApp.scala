@@ -15,6 +15,7 @@ package org.orbeon.builder
 
 import org.orbeon.fr.*
 import org.orbeon.xforms.*
+import org.orbeon.xbl.XPathCompletion
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global as g
@@ -60,6 +61,7 @@ object FormBuilderApp extends App {
     ControlLabelHintTextEditor
     GridWallDnD
     FormSettings
+    XPathCompletion
 
     BrowserCheck.checkSupportedBrowser()
   }

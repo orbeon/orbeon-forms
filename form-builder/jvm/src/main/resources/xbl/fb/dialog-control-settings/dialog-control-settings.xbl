@@ -1116,6 +1116,14 @@
                         name="is-multiple-attachments"
                         value="$is-attachment and $i/multiple-attribute = 'true'"/>
 
+                    <xf:var
+                        name="xpath-completion-updates"
+                        value="
+                            if ($i/control-name = $i/original-control-name) then
+                                ''
+                            else
+                                concat('+', $i/control-name, ' -', $i/original-control-name)"/>
+
                     <fb:language-choice ref="$li/lang"/>
 
                     <fr:tabbable id="fb-tabbable">
@@ -1591,7 +1599,9 @@
                                             value="@type"/>
 
                                         <xf:group ref=".[$validation-type = 'required']/required">
-                                            <fb:boolean-or-formula ref="."/>
+                                            <fb:boolean-or-formula
+                                                xpath-completion-updates="{{$xpath-completion-updates}}"
+                                                ref="."/>
                                         </xf:group>
 
                                         <!-- Built-in type -->
@@ -1729,14 +1739,14 @@
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td>
-                                        <xf:textarea ref="calculate">
+                                        <xf:textarea ref="calculate" appearance="xpath-completion" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/calculate/label"/>
                                             <xf:alert ref="$resources/dialog-control-settings/calculate/alert"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/calculate/hint"/>
                                         </xf:textarea>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:textarea ref="default">
+                                        <xf:textarea ref="default" appearance="xpath-completion" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/default/label"/>
                                             <xf:alert ref="$resources/dialog-control-settings/default/alert"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/default/hint"/>
@@ -1745,13 +1755,13 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td>
-                                        <fb:boolean-or-formula ref="relevant">
+                                        <fb:boolean-or-formula ref="relevant" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/visibility/label"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/visibility/hint"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td>
-                                        <fb:boolean-or-formula ref="readonly">
+                                        <fb:boolean-or-formula ref="readonly" xpath-completion-updates="{{$xpath-completion-updates}}">
                                             <xf:label ref="$resources/dialog-control-settings/readonly/label"/>
                                             <xf:hint  ref="$resources/dialog-control-settings/readonly/hint"/>
                                         </fb:boolean-or-formula>
@@ -1807,7 +1817,7 @@
                                     </fr:tinymce>
                                 </fr:c>
                                 <fr:c x="1" y="3" w="12">
-                                    <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true">
+                                    <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true" xpath-completion-updates="{{$xpath-completion-updates}}">
                                         <xf:label ref="$resources/dialog-control-settings/parameters"/>
                                     </fb:parameters-editor>
                                 </fr:c>

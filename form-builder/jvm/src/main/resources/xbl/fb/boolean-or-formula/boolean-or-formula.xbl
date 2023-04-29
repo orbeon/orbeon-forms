@@ -64,6 +64,8 @@
                 </xf:select1>
                 <xf:textarea
                     id="xpath-textarea"
+                    appearance="xpath-completion"
+                    xpath-completion-updates="{fr:component-param-value('xpath-completion-updates')}"
                     ref="if ($true-or-false) then '' else $binding">
 
                     <xf:label ref="xxf:r('dialog-control-settings.formula.label', '|fr-form-resources|')" appearance="minimal"/>

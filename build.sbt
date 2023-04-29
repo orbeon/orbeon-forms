@@ -457,7 +457,8 @@ lazy val assetsSettings = Seq(
   uglify / excludeFilter                   := (uglify / excludeFilter).value || HiddenFileFilter || "*-debug.js" || new SimpleFileFilter(f =>
     // Found out that: 1. `endsWith` is not type-safe 2. `Path.iterator` returns `Path`s :(
     f.toPath.iterator().asScala.map(_.toString).toList.endsWith("acme" :: "map" :: "map.js" :: Nil) ||
-    f.toPath.iterator().asScala.map(_.toString).toList.endsWith("ponyfill.es2018.js" :: Nil)
+    f.toPath.iterator().asScala.map(_.toString).toList.endsWith("ponyfill.es2018.js" :: Nil)        ||
+    f.toPath.iterator().asScala.map(_.toString).toList.endsWith("text-expander-element-bundle.js" :: Nil)
   ),
   uglifyCompressOptions                    := Seq("warnings=false"),
 

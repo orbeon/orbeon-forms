@@ -600,6 +600,14 @@
                                 )
                             )"/>
 
+                    <xf:var
+                        name="xpath-completion-updates"
+                        value="
+                            if ($i/control-name = $i/original-control-name) then
+                                ''
+                            else
+                                concat('+', $i/control-name, ' -', $i/original-control-name)"/>
+
                     <fr:tabbable id="fb-tabbable">
                         <fr:tab id="base-tab">
                             <fr:label ref="$resources/dialog-container-settings/tab-base/label"/>
@@ -678,13 +686,13 @@
                                 </xh:tr>
                                 <xh:tr>
                                     <xh:td colspan="2">
-                                        <fb:boolean-or-formula ref="relevant">
+                                        <fb:boolean-or-formula ref="relevant" xpath-completion-updates="{$xpath-completion-updates}">
                                             <xf:label ref="$resources/dialog-container-settings/visibility/label"/>
                                             <xf:hint  ref="$resources/dialog-container-settings/visibility/hint"/>
                                         </fb:boolean-or-formula>
                                     </xh:td>
                                     <xh:td colspan="2">
-                                        <fb:boolean-or-formula ref="readonly">
+                                        <fb:boolean-or-formula ref="readonly" xpath-completion-updates="{$xpath-completion-updates}">
                                             <xf:label ref="$resources/dialog-container-settings/readonly/label"/>
                                             <xf:hint  ref="$resources/dialog-container-settings/readonly/hint"/>
                                         </fb:boolean-or-formula>
@@ -737,6 +745,7 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
+                                            <!-- TODO: Could this be `fr|open-select1[appearance ~= full]`? -->
                                             <xf:select1 ref="$i/min-repeat" appearance="full" id="min-repeat">
                                                 <xf:label value="$resources/dialog-container-settings/min/label"/>
                                                 <xf:item>
@@ -752,7 +761,7 @@
                                                     <xf:value value="if (string() = ('0', '1')) then '' else ."/>
                                                 </xf:itemset>
                                             </xf:select1>
-                                            <xf:input ref="$i/min-repeat[not(string() = ('0', '1'))]" id="min-input">
+                                            <xf:input ref="$i/min-repeat[not(string() = ('0', '1'))]" id="min-input" appearance="xpath-completion" xpath-completion-updates="{$xpath-completion-updates}">
                                                 <xf:alert ref="$resources/dialog-container-settings/min/alert"/>
                                                 <xf:hint ref="$resources/dialog-container-settings/min/hint"/>
 
@@ -761,6 +770,7 @@
                                             </xf:input>
                                         </xh:td>
                                         <xh:td>
+                                            <!-- TODO: Could this be `fr|open-select1[appearance ~= full]`? -->
                                             <xf:select1 ref="$i/max-repeat" appearance="full" id="max-repeat">
                                                 <xf:label value="$resources/dialog-container-settings/max/label"/>
                                                 <xf:item>
@@ -774,7 +784,7 @@
                                                 <!-- Focus on max-input when Other is selected -->
                                                 <xf:setfocus ev:event="xforms-select" if="event('xxf:item-value') = '1'" control="max-input"/>
                                             </xf:select1>
-                                            <xf:input ref="$i/max-repeat[not(string() = '')]" id="max-input">
+                                            <xf:input ref="$i/max-repeat[not(string() = '')]" id="max-input" appearance="xpath-completion" xpath-completion-updates="{$xpath-completion-updates}">
                                                 <xf:alert ref="$resources/dialog-container-settings/max/alert"/>
                                                 <xf:hint ref="$resources/dialog-container-settings/max/hint"/>
 
@@ -785,6 +795,7 @@
                                     </xh:tr>
                                     <xh:tr>
                                         <xh:td>
+                                            <!-- TODO: Could this be `fr|open-select1[appearance ~= full]`? -->
                                             <xf:select1 ref="$i/freeze" appearance="full" id="freeze">
                                                 <xf:label value="$resources/dialog-container-settings/freeze/label"/>
                                                 <xf:item>
@@ -800,7 +811,7 @@
                                                     <xf:value value="if (string() = ('0', '1')) then '' else ."/>
                                                 </xf:itemset>
                                             </xf:select1>
-                                            <xf:input ref="$i/freeze[not(string() = ('0', '1'))]" id="freeze-input">
+                                            <xf:input ref="$i/freeze[not(string() = ('0', '1'))]" id="freeze-input" appearance="xpath-completion" xpath-completion-updates="{$xpath-completion-updates}">
                                                 <xf:alert ref="$resources/dialog-container-settings/freeze/alert"/>
                                                 <xf:hint ref="$resources/dialog-container-settings/freeze/hint"/>
 
@@ -858,13 +869,13 @@
 
                                     <xh:tr>
                                         <xh:td>
-                                            <fb:boolean-or-formula ref="iteration-relevant" resources-ref="$resources">
+                                            <fb:boolean-or-formula ref="iteration-relevant" xpath-completion-updates="{$xpath-completion-updates}">
                                                 <xf:label ref="$resources/dialog-container-settings/visibility/label"/>
                                                 <xf:hint  ref="$resources/dialog-container-settings/visibility/hint"/>
                                             </fb:boolean-or-formula>
                                         </xh:td>
                                         <xh:td>
-                                            <fb:boolean-or-formula ref="iteration-readonly" resources-ref="$resources">
+                                            <fb:boolean-or-formula ref="iteration-readonly" xpath-completion-updates="{$xpath-completion-updates}">
                                                 <xf:label ref="$resources/dialog-container-settings/readonly/label"/>
                                                 <xf:hint  ref="$resources/dialog-container-settings/readonly/hint"/>
                                             </fb:boolean-or-formula>
@@ -912,7 +923,7 @@
                                     </fr:tinymce>
                                 </fr:c>
                                 <fr:c x="1" y="2" w="12">
-                                    <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true">
+                                    <fb:parameters-editor ref="." resources-ref="$resources" form-runner-links="true" xpath-completion-updates="{$xpath-completion-updates}">
                                         <xf:label ref="$resources/dialog-control-settings/parameters"/>
                                     </fb:parameters-editor>
                                 </fr:c>

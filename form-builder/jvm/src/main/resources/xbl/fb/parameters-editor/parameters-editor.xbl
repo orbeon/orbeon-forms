@@ -222,7 +222,7 @@
 
                         <xf:switch caseref="$current-param/@type" class="fb-param-details">
                             <xf:case value="'ExpressionParam'">
-                                <xf:input ref="$current-param/*:expr">
+                                <xf:input ref="$current-param/*:expr" appearance="xpath-completion" xpath-completion-updates="{fr:component-param-value('xpath-completion-updates')}">
                                     <xf:label appearance="minimal" ref="$resources/components/parameters-editor/xpath/label"/>
                                     <xf:alert ref="$resources/components/parameters-editor/xpath/alert"/>
                                 </xf:input>

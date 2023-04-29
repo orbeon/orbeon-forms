@@ -1,0 +1,62 @@
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:script src="/xbl/fb/xpath-completion/text-expander-element-bundle.js"/>
+    <xbl:binding
+            id="fb-xpath-completion"
+            element="
+                fb|xpath-completion,
+                xf|input[appearance ~= xpath-completion],
+                xf|textarea[appearance ~= xpath-completion]"
+            xxbl:mode="binding lhha value javascript-lifecycle"
+            xxbl:label-for="field"
+            xxbl:container="span"
+            xxf:external-events="fb-query-completions">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/fb/xpath-completion/xpath-completion.css"/>
+        </xbl:resources>
+
+        <xbl:handlers>
+            <xbl:handler event="fb-query-completions" phase="target" defaultAction="cancel">
+                <xf:action type="javascript" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+                    <xf:param
+                        name="completions"
+                        value="fbf:controlNameCompletionsJson(event('text'), 15, fr:component-param-value('xpath-completion-updates'))"/>
+                    <xf:body>
+                        ORBEON.xforms.XBL.instanceForControl(this).returnCompletions(completions);
+                    </xf:body>
+                </xf:action>
+            </xbl:handler>
+        </xbl:handlers>
+
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xh:span xsl:version="2.0" class="fb-xpath-completion-wrapper">
+
+                <xf:var
+                    name="binding"
+                    value="xxf:binding('fb-xpath-completion')"/>
+
+                <xh:text-expander keys="$" suffix="">
+                    <xsl:element name="{name(/*)}">
+                        <xsl:attribute name="id"          select="'field'"/>
+                        <xsl:attribute name="ref"         select="'$binding'"/>
+    <!--                    <xsl:attribute name="incremental" select="'true'"/>-->
+                        <xsl:attribute name="appearance"  select="tokenize(/*/@appearance, '\s+')[. != 'xpath-completion']"/>
+                        <xsl:copy-of select="/*/@mediatype"/>
+                    </xsl:element>
+                </xh:text-expander>
+
+            </xh:span>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

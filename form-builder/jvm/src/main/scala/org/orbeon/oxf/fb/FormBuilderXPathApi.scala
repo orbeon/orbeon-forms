@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fb
 
 import cats.effect.IO
-import io.circe.parser
+import io.circe.{Json, parser}
 import org.orbeon.builder.rpc.FormBuilderRpcApiImpl
 import org.orbeon.css.CSSSelectorParser
 import org.orbeon.datatypes.{AboveBelow, Direction, MediatypeRange}
@@ -56,6 +56,7 @@ import org.orbeon.xforms.XFormsNames.XFORMS_VAR_QNAME
 import org.orbeon.xforms.{XFormsId, XFormsNames}
 import org.orbeon.xml.NamespaceMapping
 
+import scala.collection.immutable.SortedSet
 import scala.util.{Failure, Success, Try}
 
 
@@ -1168,6 +1169,40 @@ object FormBuilderXPathApi {
     }
 
     countOfUpdatedValues
+  }
+
+  //@XPathFunction
+  def controlNameCompletionsJson(text: String, limit: Int, updates: String): String = {
+
+    implicit val ctx: FormBuilderDocContext = FormBuilderDocContext()
+
+    val updatesSet = updates.tokenizeToSet
+    val toRemove   = updatesSet.filter(_.startsWith("-")).map(_.substring(1)).headOption
+    val toAdd      = updatesSet.filter(_.startsWith("+")).map(_.substring(1)).headOption
+
+    val namesIt =
+      text.trimAllToOpt match {
+        case Some(t) =>
+          FormBuilder.iterateNamesInUseCtx.filter(_.startsWith(t))
+        case None =>
+          FormBuilder.iterateNamesInUseCtx
+      }
+
+    Json.fromValues(
+      namesIt
+        .filterNot(toRemove.contains)
+        .concat(toAdd)
+        .to(SortedSet)
+        .iterator
+        .take(limit)
+        .map { name =>
+          Json.obj(
+            "v" -> Json.fromString(name),
+            "l" -> Json.fromString(FormBuilder.getControlResourceOrEmpty(if (toAdd.contains(name)) toRemove.head else name, "label"))
+          )
+        }
+        .toList
+    ).noSpaces
   }
 
   private def processUndoRedoAction(

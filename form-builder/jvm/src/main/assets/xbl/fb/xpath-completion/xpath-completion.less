@@ -1,0 +1,46 @@
+@import (reference) "../../../../../../../bootstrap-src/less/variables";
+@import (reference) "../../../../../../../bootstrap-src/less/mixins";
+@import (reference) "../../../../../../../bootstrap-src/less/forms";
+@import (reference) "../../../../../../../form-runner/jvm/src/main/assets/apps/fr/style/form-runner-common";
+@import (reference) "../../../../../../../form-runner/jvm/src/main/assets/apps/fr/style/form-runner-bootstrap-override";
+
+.orbeon {
+  text-expander {
+    //display: block;
+    position: relative;
+
+    & > .dropdown-menu {
+      display: block;
+    }
+
+    ul {
+      position: absolute;
+
+      background-color: white;
+      border-color: #ddd;
+      border-style: solid;
+      border-radius: 5px;
+      padding: 5px;
+
+      li {
+        list-style: none;
+        white-space: nowrap;
+        padding: 3px 20px;
+        line-height: @baseLineHeight;
+
+        &:hover {
+
+          color: @dropdownLinkColorHover;
+          background-color: @dropdownLinkBackgroundHover;
+
+          cursor: pointer;
+        }
+
+        &[aria-selected = true] {
+          color: @dropdownLinkColorHover;
+          background-color: @dropdownLinkBackgroundActive;
+        }
+      }
+    }
+  }
+}

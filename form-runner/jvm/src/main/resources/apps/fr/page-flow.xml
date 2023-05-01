@@ -17,24 +17,6 @@
 
     <service path="/fr/service/persistence/.*" model="persistence/proxy.xpl"/>
 
-    <!-- ==== Built-in eXist-based persistence services ============================================================ -->
-
-    <!-- Create, Read, Update and Delete operations (id provided) -->
-    <service path="/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))"
-             model="persistence/exist/crud.xpl"/>
-
-    <!-- Search -->
-    <service path="/fr/service/exist/search/([^/^.]+)/([^/^.]+)"
-             view="persistence/exist/search.xpl"/>
-
-    <!-- Deployed forms services -->
-    <service path="/fr/service/exist/form(/([^/]+)(/([^/]+))?)?"
-             default-submission="persistence/form-instance.xml"
-             view="persistence/exist/form.xpl">
-        <setvalue ref="/*/app" matcher-group="2"/>
-        <setvalue ref="/*/form" matcher-group="4"/>
-    </service>
-
     <!-- ==== Built-in relational persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->

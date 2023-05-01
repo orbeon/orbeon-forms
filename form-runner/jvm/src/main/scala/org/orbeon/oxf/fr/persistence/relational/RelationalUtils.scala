@@ -16,16 +16,15 @@ package org.orbeon.oxf.fr.persistence.relational
 import org.orbeon.errorified.Exceptions
 import org.orbeon.io.IOUtils._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.fr.persistence.PersistenceMetadataSupport
-import org.orbeon.oxf.fr.{AppForm, FormDefinitionVersion, FormRunner, Names}
+import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.util.CoreUtils._
+import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.util.{IndentedLogger, LoggerFactory, Logging, NetUtils}
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.SimplePath._
 
 import java.sql.{Connection, ResultSet}
 import javax.naming.{Context, InitialContext}
 import javax.sql.DataSource
+import scala.collection.compat._
 import scala.util.control.NonFatal
 
 
@@ -91,4 +90,13 @@ object RelationalUtils extends Logging {
       }
       connection
     }
+
+  def parsePositiveIntParamOrThrow(paramValue: Option[String], default: Int): Int =
+    paramValue
+      .flatMap(_.trimAllToOpt)
+      .map(_.toIntOption).map{
+        case Some(v) if v <= 0 => throw HttpStatusCodeException(StatusCode.BadRequest)
+        case None              => throw HttpStatusCodeException(StatusCode.BadRequest)
+        case Some(v)           => v
+    }.getOrElse(default)
 }

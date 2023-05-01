@@ -175,7 +175,8 @@ private object PersistenceProxyProcessor {
       case DataPath(path, app, form, _, document, filename) => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, Some(filename), path, Some(document))
       case DataCollectionPath(path, app, form)              => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None          , path)
       case SearchPath(path, app, form)                      => proxyRequest               (request, response, AppForm(app, form), FormOrData.Data, None          , path)
-      case ReEncryptAppFormPath(path, app, form)            => proxyReEncryptAppForm      (request, response, AppForm(app, form), path)
+      case ReEncryptAppFormPath(path, app, form)            => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Form, path)
+      case HistoryPath(path, app, form, _)                  => proxySimpleRequest         (request, response, AppForm(app, form), FormOrData.Data, path)
       case PublishedFormsMetadataPath(path, app, form)      => proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
       case ReindexPath                                      => proxyReindex               (request, response)
       case ReEncryptStatusPath                              => proxyReEncryptStatus       (request, response)
@@ -184,14 +185,16 @@ private object PersistenceProxyProcessor {
   }
 
   // TODO: test
-  private def proxyReEncryptAppForm(
+  private def proxySimpleRequest(
     request  : Request,
     response : Response,
     appForm  : AppForm,
+    formOrData: FormOrData,
     path     : String,
   ): Unit = {
+
     val (persistenceBaseURL, outgoingPersistenceHeaders) =
-      getPersistenceURLHeaders(appForm, FormOrData.Form) // Q: Why `FormOrData.Form`? xxx check! was Form, but Data makes more sense!
+      getPersistenceURLHeaders(appForm, formOrData)
 
     val serviceURI = PathUtils.appendQueryString(
       persistenceBaseURL.dropTrailingSlash + path,

@@ -678,6 +678,9 @@
     <processor name="fr:relational-crud">
         <class name="org.orbeon.oxf.fr.persistence.relational.rest.CRUD"/>
     </processor>
+    <processor name="fr:relational-history">
+        <class name="org.orbeon.oxf.fr.persistence.relational.rest.History"/>
+    </processor>
     <processor name="fr:relational-search">
         <class name="org.orbeon.oxf.fr.persistence.relational.search.SearchProcessor"/>
     </processor>

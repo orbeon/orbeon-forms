@@ -16,13 +16,13 @@ package org.orbeon.oxf.fr.persistence.relational.search
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.fr.AppForm
 import org.orbeon.oxf.fr.permission.{Operation, PermissionsAuthorization}
-import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
-import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.Logger
+import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider}
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils.{Logger, parsePositiveIntParamOrThrow}
 import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.search.adt.Drafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt.WhichDrafts._
 import org.orbeon.oxf.fr.persistence.relational.search.adt._
-import org.orbeon.oxf.fr.persistence.relational.{EncryptionAndIndexDetails, Provider}
+import org.orbeon.oxf.fr.persistence.{PersistenceMetadataSupport, SearchVersion}
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xml.TransformerUtils
@@ -117,8 +117,8 @@ trait SearchRequestParser {
           appForm        = appForm,
           version        = version,
           credentials    = credentials,
-          pageSize       = searchElement.firstChildOpt("page-size")  .get.stringValue.toInt,
-          pageNumber     = searchElement.firstChildOpt("page-number").get.stringValue.toInt,
+          pageSize       = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-size"),  10),
+          pageNumber     = parsePositiveIntParamOrThrow(searchElement.elemValueOpt("page-number"), 1),
           freeTextSearch = freeTextElOpt.map(_.stringValue).flatMap(trimAllToOpt), // blank means no search
           columns        = columns,
           drafts         =

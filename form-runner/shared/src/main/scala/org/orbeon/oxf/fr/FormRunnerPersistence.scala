@@ -106,6 +106,7 @@ object FormRunnerPersistence {
   val SearchPath                          = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
   val ReEncryptAppFormPath                = """/fr/service/persistence(/reencrypt/([^/]+)/([^/]+))""".r // `POST` only
   val PublishedFormsMetadataPath          = """/fr/service/persistence/form(/([^/]+)(?:/([^/]+))?)?""".r
+  val HistoryPath                         = """/fr/service/persistence(/history/([^/]+)/([^/]+)/([^/]+))""".r
   val ReindexPath                         =   "/fr/service/persistence/reindex"
   val ReEncryptStatusPath                 =   "/fr/service/persistence/reencrypt" // `GET` only
 

@@ -35,6 +35,12 @@
         <setvalue ref="/*/form" matcher-group="5"/>
     </service>
 
+    <!-- Data history -->
+    <service
+        path="/fr/service/(oracle|mysql|postgresql|db2|sqlserver)/history/([^/]+/[^/]+/[^/]+)"
+        methods="GET"
+        model="persistence/relational/history.xpl"/>
+
     <!-- ==== Built-in resource manager-based persistence services ================================================= -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->

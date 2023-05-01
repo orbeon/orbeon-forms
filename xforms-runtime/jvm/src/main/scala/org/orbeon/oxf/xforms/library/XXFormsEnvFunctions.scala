@@ -258,6 +258,9 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
       Arg(Type.ITEM_TYPE, EXACTLY_ONE),
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
+      Arg(STRING, ALLOWS_ZERO_OR_ONE),
       Arg(STRING, ALLOWS_ZERO_OR_ONE)
     )
 

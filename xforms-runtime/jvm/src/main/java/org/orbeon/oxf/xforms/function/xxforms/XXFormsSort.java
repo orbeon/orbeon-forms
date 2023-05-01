@@ -76,15 +76,14 @@ public class XXFormsSort extends XFormsFunction {
         final AtomicComparer[] comparers = { comparer };
         return new SortedIterator(xpathContext, sequenceToSortExpression.iterate(xpathContext), sortKeyEvaluator, comparers);
     }
-    
-    private SortKeyDefinition getSortKeyDefinition(Expression sortKeyExpression) {
-        final Expression datatypeExpression = (argument.length > 2) ? argument[2] : null;
-        final Expression orderExpression = (argument.length > 3) ? argument[3] : null;
-        final Expression caseOrderExpression = (argument.length > 4) ? argument[4] : null;
 
-//        Expression langExpression = argument[5];// new in XSLT 2.0
-//        Expression collationExpression = argument[6];// new in XSLT 2.0
-//        Expression stableExpression = argument[7];// new in XSLT 2.0
+    private SortKeyDefinition getSortKeyDefinition(Expression sortKeyExpression) {
+        final Expression datatypeExpression  = (argument.length > 2) ? argument[2] : null;
+        final Expression orderExpression     = (argument.length > 3) ? argument[3] : null;
+        final Expression caseOrderExpression = (argument.length > 4) ? argument[4] : null;
+        final Expression langExpression      = (argument.length > 5) ? argument[5] : null;
+        final Expression collationExpression = (argument.length > 6) ? argument[6] : null;
+        final Expression stableExpression    = (argument.length > 7) ? argument[7] : null;
 
         final SortKeyDefinition sortKeyDefinition = new SortKeyDefinition();
         sortKeyDefinition.setSortKey(sortKeyExpression);
@@ -95,10 +94,12 @@ public class XXFormsSort extends XFormsFunction {
             sortKeyDefinition.setOrder(orderExpression);
         if (caseOrderExpression != null)
             sortKeyDefinition.setCaseOrder(caseOrderExpression);
-
-//        sortKey.setLanguage(langExpression);
-//        sortKey.setCollationName(collationExpression);
-//        sortKey.setStable(stableExpression);
+        if (langExpression != null)
+            sortKeyDefinition.setLanguage(langExpression);
+        if (collationExpression != null)
+            sortKeyDefinition.setCollationNameExpression(collationExpression);
+        if (stableExpression != null)
+            sortKeyDefinition.setStable(stableExpression);
 
         return sortKeyDefinition;
     }

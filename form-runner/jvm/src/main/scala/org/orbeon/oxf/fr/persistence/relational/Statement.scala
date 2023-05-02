@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.fr.persistence.relational
 
-import java.sql.{Connection, PreparedStatement, ResultSet}
 import org.orbeon.io.IOUtils._
+
+import java.sql.{Connection, PreparedStatement, ResultSet}
+
 
 object Statement {
 
@@ -37,15 +39,18 @@ object Statement {
     sql        : String,
     parts      : List[StatementPart])(
     block      : ResultSet => T
-  ): T = {
+  ): T =
     useAndClose(connection.prepareStatement(sql)) { ps =>
+
       val index = Iterator.from(1)
-      parts
-        .map(_.setters)
-        .foreach(setters =>
-          setters.foreach(setter =>
-            setter(ps, index.next())))
+
+      for {
+        StatementPart(_, setters) <- parts
+        setter                    <- setters
+      } locally {
+        setter(ps, index.next())
+      }
+
       useAndClose(ps.executeQuery())(block)
     }
-  }
 }

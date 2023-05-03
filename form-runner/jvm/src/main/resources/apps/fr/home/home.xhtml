@@ -178,7 +178,6 @@
                     <remote-newer-select/>
 
                     <current-remote-server/>
-
                     <remote-servers>
                         <!--
 
@@ -194,6 +193,7 @@
                     </remote-servers>
 
                     <form-definition-version/>
+                    <pinging>false</pinging>
 
                 </_>
             </xf:instance>
@@ -249,16 +249,16 @@
                 <xf:setvalue event="xforms-submit" ref="instance('fr-reindex-instance')/status">starting</xf:setvalue>
             </xf:submission>
 
-            <!-- Refresh page every 2s -->
+            <!-- Refresh page every 2s, as long as we either have a re-index or re-encryption in progress -->
             <xf:action
-                observer="fr-form-instance"
-                event="xxforms-value-changed"
+                event="xforms-ready"
                 if="instance('fr-form-instance')/any-has-admin-permission = 'true'">
                 <xf:dispatch
                         name="ping-event"
                         target="fr-form-model"/>
             </xf:action>
             <xf:action event="ping-event">
+                <xf:setvalue ref="instance('fr-form-instance')/pinging" value="'true'"/>
                 <xf:var name="status" value="index:status()"/>
                 <xf:setvalue
                         ref="instance('fr-reindex-instance')/status"
@@ -274,11 +274,21 @@
                 <xf:setvalue ref="instance('fr-reindex-instance')/provider-total"   value="index:getProviderTotal()"/>
                 <xf:setvalue ref="instance('fr-reindex-instance')/document-current" value="index:getDocumentCurrent()"/>
                 <xf:setvalue ref="instance('fr-reindex-instance')/document-total"   value="index:getDocumentTotal()"/>
-                <xf:dispatch
-                        name="ping-event"
-                        target="fr-form-model"
-                        delay="2000"/>
+
+                <!-- Figure whether we should continue to ping the server -->
+                <xf:var name="re-index-in-progress"   value="instance('fr-reindex-instance')/status = ('starting', 'indexing')"/>
+                <xf:var name="continue-pinging" value="$re-index-in-progress"/>
+                <xf:action if="$continue-pinging">
+                    <xf:dispatch
+                            name="ping-event"
+                            target="fr-form-model"
+                            delay="2000"/>
+                </xf:action>
+                <xf:action if="not($continue-pinging)">
+                    <xf:setvalue ref="instance('fr-form-instance')/pinging" value="'false'"/>
+                </xf:action>
             </xf:action>
+
             <xf:instance id="fr-reindex-instance" xxf:exclude-result-prefixes="#all">
                 <_>
                     <status>stopped</status>
@@ -1240,8 +1250,13 @@
             <fr:message value="$fr-resources/home/messages/reindexing-confirmation"/>
             <fr:negative-choice/>
             <fr:positive-choice>
-                <xf:send event="DOMActivate"
-                         submission="fr-reindex-submission"/>
+                <xf:action event="DOMActivate">
+                    <xf:send submission="fr-reindex-submission"/>
+                    <xf:dispatch
+                        if="instance('fr-form-instance')/pinging = 'false'"
+                        name="ping-event"
+                        target="fr-form-model"/>
+                </xf:action>
             </fr:positive-choice>
         </fr:alert-dialog>
 

@@ -46,6 +46,10 @@
             </fb:templates>
         </fb:metadata>
 
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/explanation/explanation.css"/>
+        </xbl:resources>
+
         <xbl:template>
             <xf:output xxbl:attr="fr:text/( @ref | @mediatype )" xxbl:scope="outer" class="xforms-text"/>
         </xbl:template>

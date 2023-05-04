@@ -16,13 +16,14 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.util.Logging._
-import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction, XFormsActionInterpreter}
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
+
+import scala.collection.compat._
 
 
 /**
@@ -52,7 +53,7 @@ class XFormsSetindexAction extends XFormsAction {
         "number(" + indexXPath + ")"
       )
 
-      indexString.toIntOpt // "If the index evaluates to NaN the action has no effect."
+      indexString.toIntOption // "If the index evaluates to NaN the action has no effect."
     }
 
     indexOpt foreach

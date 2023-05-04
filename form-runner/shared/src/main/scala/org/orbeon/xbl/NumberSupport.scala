@@ -13,9 +13,6 @@
   */
 package org.orbeon.xbl
 
-import java.text.{DecimalFormat, DecimalFormatSymbols}
-import java.util.Locale
-
 import org.orbeon.dom
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -25,6 +22,9 @@ import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.saxon.om
 import org.orbeon.saxon.value.{DecimalValue, IntegerValue}
 
+import java.text.{DecimalFormat, DecimalFormatSymbols}
+import java.util.Locale
+import scala.collection.compat._
 import scala.util.{Failure, Success}
 
 
@@ -51,7 +51,7 @@ trait NumberSupport[Binding] {
 
   // NOTE: Also return `None` if the `fraction-digits` custom MIP is read and is not an `Int`.
   def validationFractionDigitsOpt(binding: Binding): Option[Int] =
-    fractionDigitsIfInteger(binding) orElse (getCustomMipOpt(binding, "fraction-digits") flatMap (_.toIntOpt))
+    fractionDigitsIfInteger(binding) orElse (getCustomMipOpt(binding, "fraction-digits") flatMap (_.toIntOption))
 
   def editValue(binding: String)(implicit params: NumberConfig): String = {
 
@@ -236,7 +236,7 @@ object NumberSupportJava extends NumberSupport[om.Item] {
       decimalSeparator    = decimalSeparator.headOption getOrElse '.',
       groupingSeparator   = groupingSeparator.headOption,
       prefix              = prefix,
-      digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
+      digitsAfterDecimal  = digitsAfterDecimal.toIntOption,
       roundWhenFormatting = roundWhenFormatting,
       roundWhenStoring    = roundWhenStoring
     )
@@ -259,7 +259,7 @@ object NumberSupportJava extends NumberSupport[om.Item] {
       decimalSeparator    = decimalSeparator.headOption getOrElse '.',
       groupingSeparator   = groupingSeparator.headOption,
       prefix              = prefix,
-      digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
+      digitsAfterDecimal  = digitsAfterDecimal.toIntOption,
       roundWhenFormatting = roundWhenFormatting,
       roundWhenStoring    = roundWhenStoring
     )
@@ -294,7 +294,7 @@ object NumberSupportJava extends NumberSupport[om.Item] {
       decimalSeparator    = decimalSeparator.headOption getOrElse '.',
       groupingSeparator   = groupingSeparator.headOption,
       prefix              = prefix,
-      digitsAfterDecimal  = digitsAfterDecimal.toIntOpt,
+      digitsAfterDecimal  = digitsAfterDecimal.toIntOption,
       roundWhenFormatting = roundWhenFormatting,
       roundWhenStoring    = roundWhenStoring
     )

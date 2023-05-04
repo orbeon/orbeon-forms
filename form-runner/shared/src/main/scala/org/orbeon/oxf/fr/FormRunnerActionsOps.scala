@@ -469,7 +469,7 @@ trait FormRunnerActionsOps extends FormRunnerBaseOps {
         case "start"  => Start
         case "end"    => End
         case "none"   => None
-        case maybeInt => maybeInt.toIntOpt map Specific.apply getOrElse (throw new IllegalArgumentException(maybeInt))
+        case maybeInt => maybeInt.toIntOption map Specific.apply getOrElse (throw new IllegalArgumentException(maybeInt))
       }
 
     def asString(p: PositionType): String =

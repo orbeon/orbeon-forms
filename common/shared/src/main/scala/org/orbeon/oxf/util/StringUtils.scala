@@ -179,10 +179,6 @@ object StringUtils {
       index >= 0 option index
     }
 
-    // NOTE: Special the case where the string is blank for performance
-    def toIntOpt: Option[Int] =
-      if (isAllBlank) None else Try(s.toInt).toOption
-
     // Like the XPath `translate` function
     def translate(mapString: String, transString: String): String = {
 

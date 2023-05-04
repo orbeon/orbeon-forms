@@ -70,7 +70,7 @@ trait SearchLogic extends SearchRequestParser {
       RelationalUtils.withConnection { connection =>
 
         val commonParts = List(
-          commonPart         (request, connection, version),
+          commonPart         (request, version),
           draftsPart         (request),
           permissionsPart    (permissions),
           columnFilterPart   (request),
@@ -104,8 +104,8 @@ trait SearchLogic extends SearchRequestParser {
             case None        => ""
           }
 
-          // Use LEFT JOIN instead of regular join, in case the form doesn't have any control marked
-          // to be indexed, in which case there won't be anything for it in orbeon_i_control_text.
+          // Use `LEFT JOIN` instead of regular join, in case the form doesn't have any control marked
+          // to be indexed, in which case there won't be anything for it in `orbeon_i_control_text`.
           s"""SELECT
              |    c.*,
              |    t.control,

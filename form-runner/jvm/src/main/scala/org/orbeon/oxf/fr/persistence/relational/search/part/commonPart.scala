@@ -24,9 +24,8 @@ import org.orbeon.oxf.util.CoreUtils._
 object commonPart  {
 
   def apply(
-    request    : SearchRequest,
-    connection : Connection,
-    version    : FormDefinitionVersion
+    request: SearchRequest,
+    version: FormDefinitionVersion
   ): StatementPart = {
 
     StatementPart(

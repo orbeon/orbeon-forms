@@ -49,6 +49,17 @@
             <fr:error-summary position="top"/>
         </xsl:if>
 
+        <xsl:if test="$is-detail">
+            <fr:row>
+                <fr:data-history
+                    id="fr-data-history"
+                    ref=".[fr:mode() = 'edit']"
+                    app="{{fr:app-name()}}"
+                    form="{{fr:form-name()}}"
+                    form-version="{{fr:form-version()}}"
+                    document="{{fr:document-id()}}"/>
+            </fr:row>
+        </xsl:if>
         <fr:row>
             <fr:toc/>
         </fr:row>
@@ -504,6 +515,7 @@
 <!--                            xxx: <xf:output value="fr:workflow-stage-value()"/>-->
 <!--                        </xh:div>-->
                         <fr:share-icon/>
+                        <fr:data-history-icon/>
                         <fr:status-icons/>
                         <fr:user-nav/>
                         <fr:navbar-home-link/>
@@ -863,6 +875,27 @@
                 <xxf:show
                     event="DOMActivate"
                     dialog="fr-share-dialog"/>
+            </xf:trigger>
+        </xf:group>
+    </xsl:template>
+
+    <xsl:template match="fr:data-history-icon">
+        <xf:group
+            class="fr-data-history"
+            ref=".[
+                xxf:property(string-join(('oxf.fr.navbar.data-history.enable', fr:app-name(), fr:form-name()), '.')) and
+                not(fr:is-embedded())                                                                                and
+                fr:mode() = (
+                    'edit'
+                )
+            ]">
+
+            <xf:trigger appearance="minimal" class="fr-data-history-button">
+                <xf:label><xh:i class="fa fa-fw fa-history" title="{{xxf:r('components.data-history.label', '|fr-fr-resources|')}}"/></xf:label>
+                <xf:dispatch
+                    event="DOMActivate"
+                    name="fr-open"
+                    targetid="fr-data-history"/>
             </xf:trigger>
         </xf:group>
     </xsl:template>

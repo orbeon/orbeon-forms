@@ -33,6 +33,7 @@ import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.XFormsId
 import shapeless.syntax.typeable._
 
+import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag
 
 
@@ -107,6 +108,15 @@ object SimpleDataMigration {
     def templateIterationNamesToRootElems: Map[String, om.NodeInfo]
     def bindChildren(bind: BindType): List[BindType]
     def bindNameOpt(bind: BindType): Option[String]
+  }
+
+  sealed trait FormDiff[BindType] { val bind: BindType }
+  object FormDiff {
+    case class ValueChanged    [BindType](bind: BindType)             extends FormDiff[BindType]
+    case class IterationAdded  [BindType](bind: BindType, count: Int) extends FormDiff[BindType]
+    case class IterationRemoved[BindType](bind: BindType, count: Int) extends FormDiff[BindType]
+    case class ElementAdded    [BindType](bind: BindType)             extends FormDiff[BindType]
+    case class ElementRemoved  [BindType](bind: BindType)             extends FormDiff[BindType]
   }
 
   // Attempt to fill/remove holes in an instance given:
@@ -312,7 +322,7 @@ object SimpleDataMigration {
     isElementReadonly       : om.NodeInfo => Boolean,
     ignoreBlankData         : Boolean,
     allowMissingElemInSource: Boolean)(
-    formOps        : FormOps
+    formOps                 : FormOps
   ): (Int, Int) = {
 
     val templateIterationNamesToRootElems = formOps.templateIterationNamesToRootElems
@@ -416,11 +426,11 @@ object SimpleDataMigration {
                       processLevel(
                         parentBind             = childBind,
                         leftElem               = leftChildElem,
-                        rightElem              = (rightElem firstChildOpt bindName).getOrElse(throw new IllegalArgumentException(s"missing element in destination: `${bindName}`")),
+                        rightElem              = (rightElem firstChildOpt bindName).getOrElse(throw new IllegalArgumentException(s"missing element in destination: `$bindName`")),
                         currentIgnoreBlankData = currentIgnoreBlankData
                       )
                     case None if ! allowMissingElemInSource =>
-                        (leftElem firstChildOpt bindName).getOrElse(throw new IllegalArgumentException(s"missing element in source: `${bindName}`"))
+                      (leftElem firstChildOpt bindName).getOrElse(throw new IllegalArgumentException(s"missing element in source: `$bindName`"))
                     case None =>
                   }
               }
@@ -439,6 +449,105 @@ object SimpleDataMigration {
     }
 
     (allValuesCount, setValuesCount)
+  }
+
+  // TODO: section templates support
+  // TODO: multiple attachments support
+  def diffSimilarXmlData[T](
+    srcDocRootElem   : om.NodeInfo,
+    dstDocRootElem   : om.NodeInfo,
+    isElementReadonly: om.NodeInfo => Boolean)(
+    formOps          : FormOps)(
+    mapBind          : formOps.BindType => T
+  ): List[FormDiff[T]] = {
+
+    val templateIterationNamesToRootElems = formOps.templateIterationNamesToRootElems
+
+    val changes = ListBuffer.empty[FormDiff[T]]
+
+    def processLevel(
+      parentBind            : formOps.BindType,
+      leftElem              : om.NodeInfo,
+      rightElem             : om.NodeInfo
+    ): Unit = {
+
+      formOps.bindChildren(parentBind) match {
+        case Nil =>
+          // Leaf node
+
+          // Data can be copied if there are no nested element. Specific case are:
+          //
+          // - section template content
+          // - multiple attachment using nested array (`<_>`)
+          if (! rightElem.hasChildElement && ! leftElem.hasChildElement)
+            if (leftElem.stringValue != rightElem.stringValue)
+              changes += FormDiff.ValueChanged(mapBind(parentBind))
+
+        case childrenBinds =>
+
+          childrenBinds foreach { childBind =>
+
+            formOps.bindNameOpt(childBind) foreach { bindName =>
+
+              templateIterationNamesToRootElems.get(bindName) match {
+                case Some(_) =>
+                  // We are a repeated container element (that is, an iteration)
+
+                  // Adjust iterations
+                  val leftSize  = (leftElem / bindName).size
+                  val rightSize = (rightElem / bindName).size
+
+                  if (rightSize > leftSize)
+                    changes += FormDiff.IterationAdded(mapBind(parentBind), rightSize - leftSize)
+                  else if (leftSize > rightSize)
+                    changes += FormDiff.IterationRemoved(mapBind(parentBind), leftSize - rightSize)
+
+                  // Recurse into shared iterations
+                  (leftElem / bindName).zip(rightElem / bindName) foreach { case (childLeft, childRight) =>
+                    processLevel(
+                      parentBind = childBind,
+                      leftElem   = childLeft,
+                      rightElem  = childRight
+                    )
+                  }
+
+                case None =>
+                  // We are a non-repeated container element: just recurse
+
+                  leftElem firstChildOpt bindName match {
+                    case Some(leftChildElem) =>
+                      rightElem firstChildOpt bindName match {
+                        case Some(rightChildElem) =>
+                          processLevel(
+                            parentBind = childBind,
+                            leftElem   = leftChildElem,
+                            rightElem  = rightChildElem
+                          )
+                        case None =>
+                          changes += FormDiff.ElementRemoved(mapBind(childBind))
+                      }
+                    case None =>
+                      rightElem firstChildOpt bindName match {
+                        case Some(_) =>
+                          changes += FormDiff.ElementAdded(mapBind(childBind))
+                        case None =>
+                      }
+                  }
+              }
+            }
+          }
+      }
+    }
+
+    formOps.findFormBindsRoot foreach { bind =>
+      processLevel(
+        parentBind             = bind,
+        leftElem               = srcDocRootElem,
+        rightElem              = dstDocRootElem
+      )
+    }
+
+    changes.toList
   }
 
   private object Private {

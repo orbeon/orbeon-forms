@@ -13,18 +13,12 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xforms.model.XFormsInstance
 import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om
-import org.orbeon.saxon.pattern.NameTest
-import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 
 import scala.annotation.tailrec
-import scala.collection.compat._
 
 
 object XXFormsResourceSupport {

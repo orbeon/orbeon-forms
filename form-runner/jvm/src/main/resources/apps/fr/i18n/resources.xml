@@ -144,6 +144,27 @@
                 <show-more>Show More</show-more>
                 <show-less>Show Less</show-less>
             </error-summary>
+            <data-history>
+                <label>Revision History</label>
+                <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format>[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user>User {0}</named-user>
+                <anonymous-user>An anonymous user</anonymous-user>
+
+                <initial-revision>saved the initial revision.</initial-revision>
+                <no-changes>saved with no changes detected.</no-changes>
+                <specific-changes>made the following changes:</specific-changes>
+
+                <view-data>View this revision</view-data>
+
+                <value-changed>value changed</value-changed>
+                <iteration-added>{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed>{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed>internal information changed</other-changed>
+
+                <workflow-stage-changed>workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Untitled Form</untitled-form>
         <errors>
@@ -695,6 +716,27 @@
                 <show-more>Montrer plus</show-more>
                 <show-less>Montrer moins</show-less>
             </error-summary>
+            <data-history>
+                <label>Historique des révisions</label>
+                <date>{0}. {1}{2,choice,0#'{3,choice,0#|1# (Révision initiale)}'|1# (Révision courante)}</date>
+                <date-format>[FNn,*-3] [D] [MNn,*-3] [Y] à [H01]:[m01]</date-format>
+
+                <named-user>L'utilisateur {0}</named-user>
+                <anonymous-user>Un utilisateur anonyme</anonymous-user>
+
+                <initial-revision>a sauvegardé la révision initiale.</initial-revision>
+                <no-changes>a sauvegardé, avec aucun changement détecté.</no-changes>
+                <specific-changes>a effectué les changements suivants:</specific-changes>
+
+                <view-data>Visualiser cette révision</view-data>
+
+                <value-changed>valeur changée</value-changed>
+                <iteration-added>{0,number,integer} {0,choice,1#répétition ajoutée|1&lt;répétitions ajoutées}</iteration-added>
+                <iteration-removed>{0,number,integer} {0,choice,1#répétition supprimée|1&lt;répétitions supprimées}</iteration-removed>
+                <other-changed>information interne changée</other-changed>
+
+                <workflow-stage-changed>étape du workflow changée</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Formulaire sans titre</untitled-form>
         <errors>
@@ -1250,6 +1292,27 @@
                 <show-more>Mostrar Más</show-more>
                 <show-less>Mostrar Menos</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
         <errors>
@@ -2374,6 +2437,27 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
         <errors>
@@ -2913,6 +2997,27 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
         <errors>
@@ -3451,6 +3556,27 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Modulo senza nome</untitled-form>
         <errors>
@@ -4002,6 +4128,27 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Formular ohne Namen</untitled-form>
         <errors>
@@ -4553,6 +4700,27 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Nimetön lomake</untitled-form>
         <errors>
@@ -5104,6 +5272,27 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Formulär utan titel</untitled-form>
         <errors>
@@ -5655,6 +5844,27 @@
                 <show-more>Toon meer</show-more>
                 <show-less>Toon minder</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Naamloos form</untitled-form>
         <errors>
@@ -6205,6 +6415,27 @@
                 <show-more todo="true">[Show More]</show-more>
                 <show-less todo="true">[Show Less]</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Formulário sem título</untitled-form>
         <errors>
@@ -6755,6 +6986,27 @@
                 <show-more>Vis flere</show-more>
                 <show-less>Vis færre</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Blanket uden navn</untitled-form>
         <errors>
@@ -7293,6 +7545,27 @@
                 <show-more>Pokaż więcej</show-more>
                 <show-less>Pokaż mniej</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-changed todo="true">value changed</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Bez tytułu</untitled-form>
         <errors>

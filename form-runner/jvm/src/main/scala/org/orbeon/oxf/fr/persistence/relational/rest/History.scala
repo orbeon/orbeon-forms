@@ -89,7 +89,7 @@ object History {
       }
 
       val innerSQL =
-        s"""|SELECT  t.last_modified_time, t.created
+        s"""|SELECT  t.last_modified_time, t.last_modified_by, t.created
             |        , t.username, t.groupname, t.organization_id
             |        , t.stage, t.form_version, t.deleted
             |FROM    orbeon_form_data t
@@ -197,7 +197,7 @@ object History {
                 "document",
                 atts = List(
                   "modified-time"     -> DateUtils.formatIsoDateTimeUtc(rs.getTimestamp("last_modified_time").getTime),
-                  "modified-username" -> "TODO",
+                  "modified-username" -> rs.getString("last_modified_by").trimAllToEmpty,
                   "owner-username"    -> userAndGroup.map(_.username).getOrElse(""),
                   "owner-group"       -> userAndGroup.flatMap(_.groupname).getOrElse(""),
                   "stage"             -> rs.getString("stage").trimAllToEmpty,

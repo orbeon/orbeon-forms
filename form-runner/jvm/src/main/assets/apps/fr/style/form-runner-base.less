@@ -276,8 +276,12 @@
     // ***** General Layout ********************************************************************************************
 
     // Language and mode selectors
-    .fr-goto-content, .fr-status-icons {
+    .fr-goto-content, .fr-status-icons, .fr-data-history {
         margin-right: 10px;
+
+        .btn-link .fa {
+            color: white;
+        }
 
         .xforms-label {
             display: inline;
@@ -490,6 +494,7 @@
     .orbeon #xforms-form { // make contained rules strong
 
         .fr-status-icons,                                              // no status icons
+        .fr-data-history,
         .fr-user-nav,                                                  // no user navigation
         .fr-navbar-home-link,                                          // no home link
         .xforms-upload-remove,                                         // upload remove button

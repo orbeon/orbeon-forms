@@ -1,15 +1,22 @@
 @import (reference)  "../../../apps/fr/style/form-runner-common";
 
+
 .orbeon {
   .xbl-fr-explanation .xforms-mediatype-text-html {
-    line-height: 1.2; // set line height to something proportional to the font size
+    line-height: @frRelativeLineHeight; // set line height to something proportional to the font size, unlike the default
+    li {
+      line-height: @frRelativeLineHeight;
+    }
   }
 }
 
 @media print {
   .orbeon {
     .xbl-fr-explanation .xforms-mediatype-text-html {
-      line-height: 1.4; // set line height to something proportional to the font size
+      line-height: @frRelativeLineHeightPdf;
+      li {
+        line-height: @frRelativeLineHeightPdf;
+      }
     }
   }
 }

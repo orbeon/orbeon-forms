@@ -60,6 +60,7 @@
             </icon>
             <editors static-itemset="false" item-hint="true"/>
             <templates>
+                <instance label=""/><!-- https://github.com/orbeon/orbeon-forms/issues/5806 -->
                 <view>
                     <fr:databound-select1
                             id=""

@@ -207,7 +207,7 @@ object XFormsServer {
                               }
 
                               debugContentHandlerOpt foreach { debugContentHandler =>
-                                debugResults(List("ajax response" -> debugContentHandler.getDocument.getRootElement.serializeToString(XMLWriter.PrettyFormat)))
+                                debugResults(List("ajax response" -> Option(debugContentHandler.getDocument.getRootElement).map(_.serializeToString(XMLWriter.PrettyFormat)).getOrElse("[EMPTY]")))
                               }
                             }
                           }

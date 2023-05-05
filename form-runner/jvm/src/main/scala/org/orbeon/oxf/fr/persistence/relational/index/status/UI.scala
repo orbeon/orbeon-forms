@@ -13,11 +13,20 @@
  */
 package org.orbeon.oxf.fr.persistence.relational.index.status
 
+import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
+import org.orbeon.oxf.util.DateUtils
+
 // Functions called by UI
 
 object UI {
 
-  def status : String = StatusStore.getStatus.name
+  def status : String = {
+    RelationalUtils.Logger.logDebug("Reindex status read from UI", StatusStore.getStatus.name)
+    val lastModified = DateUtils.formatIsoDateTimeUtc(StatusStore.getLastModified.getTime)
+    val statusName   = StatusStore.getStatus.name
+    s"$lastModified $statusName"
+  }
+
   def stop() : Unit   = StatusStore.setStatus(Status.Stopping)
 
   def getProviderToken   = Some(StatusStore.getStatus).collect{case Status.Indexing(p, _, _) => p               }.getOrElse("")

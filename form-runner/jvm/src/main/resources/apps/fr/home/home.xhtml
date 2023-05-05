@@ -246,7 +246,6 @@
                     serialization="none"
                     replace="none"
                     mode="asynchronous">
-                <xf:setvalue event="xforms-submit" ref="instance('fr-reindex-instance')/status">starting</xf:setvalue>
             </xf:submission>
 
             <!-- Refresh page every 2s, as long as we either have a re-index or re-encryption in progress -->
@@ -259,16 +258,29 @@
             </xf:action>
             <xf:action event="ping-event">
                 <xf:setvalue ref="instance('fr-form-instance')/pinging" value="'true'"/>
-                <xf:var name="status" value="index:status()"/>
+
+                <!-- Update status with value from backend if more recent -->
+                <xf:var name="backend-status" value="index:status()"/>
                 <xf:setvalue
                         ref="instance('fr-reindex-instance')/status"
                         value="
-                            if (
-                                $status = 'stopped' and
-                                instance('fr-reindex-instance')/status != 'stopped'
-                            )
-                            then 'done'
-                            else $status"/>
+                            if (. = '') then
+                                (: No status yet :)
+                                $backend-status
+                            else if (xs:dateTime(xxf:split(.)[1]) lt xs:dateTime(xxf:split($backend-status)[1])) then
+                                (: Status from backend is newer :)
+                                if (xxf:split($backend-status)[2] = 'stopped') then
+                                    (: Backend changed to stopped, so we're done :)
+                                    concat(xxf:split($backend-status)[1], ' done')
+                                else
+                                    (: So other backend status: keep as-is :)
+                                    $backend-status
+                            else
+                                (: Status from backend is older: keep current value :)
+                                .
+                            "/>
+
+                <xf:setvalue ref="instance('fr-reindex-instance')/provider-token"   value="index:getProviderToken()"/>
                 <xf:setvalue ref="instance('fr-reindex-instance')/provider-token"   value="index:getProviderToken()"/>
                 <xf:setvalue ref="instance('fr-reindex-instance')/provider-current" value="index:getProviderCurrent()"/>
                 <xf:setvalue ref="instance('fr-reindex-instance')/provider-total"   value="index:getProviderTotal()"/>
@@ -276,8 +288,9 @@
                 <xf:setvalue ref="instance('fr-reindex-instance')/document-total"   value="index:getDocumentTotal()"/>
 
                 <!-- Figure whether we should continue to ping the server -->
-                <xf:var name="re-index-in-progress"   value="instance('fr-reindex-instance')/status = ('starting', 'indexing')"/>
+                <xf:var name="re-index-in-progress"   value="xxf:split(instance('fr-reindex-instance')/status)[2] != 'stopped'"/>
                 <xf:var name="continue-pinging" value="$re-index-in-progress"/>
+
                 <xf:action if="$continue-pinging">
                     <xf:dispatch
                             name="ping-event"
@@ -291,7 +304,7 @@
 
             <xf:instance id="fr-reindex-instance" xxf:exclude-result-prefixes="#all">
                 <_>
-                    <status>stopped</status>
+                    <status/>
                     <provider-token/>
                     <provider-current/>
                     <provider-total/>
@@ -894,15 +907,17 @@
                             <!-- Buttons for reindexing -->
                             <xf:group ref="instance('fr-reindex-instance')" xxf:internal="true">
 
+                                <xf:var name="status-name" value="xxf:split(status)[2]"/>
+
                                 <!-- Button: start reindexing -->
-                                <xf:trigger ref=".[status = ('stopped', 'done')]"
+                                <xf:trigger ref=".[$status-name = ('stopped', 'done')]"
                                             class="btn-group" >
                                     <xf:label mediatype="text/html" ref="$fr-resources/home/buttons/reindex"/>
                                     <xf:dispatch event="DOMActivate" name="fr-show" targetid="reindex-confirmation-dialog"/>
                                 </xf:trigger>
 
                                 <!-- Button: stop reindexing -->
-                                <xf:trigger ref=".[status = ('starting', 'indexing')]"
+                                <xf:trigger ref=".[$status-name = ('starting', 'indexing')]"
                                             class="btn-group">
                                     <xf:label mediatype="text/html" ref="$fr-resources/home/buttons/stop-reindex"/>
                                     <xf:action event="DOMActivate" type="xpath">
@@ -917,7 +932,9 @@
                         <!-- Progress bars for reindexing -->
                         <xf:group ref="instance('fr-reindex-instance')"
                                   class="fr-reindex-status">
-                            <xf:group ref=".[status = ('starting', 'indexing')]">
+                            <xf:var name="status-name" value="xxf:split(status)[2]"/>
+
+                            <xf:group ref=".[$status-name = ('starting', 'indexing')]">
                                 <xf:var name="have-doc-count" value="document-current != 0"/>
 
                                 <!-- Status: when we don't have document count, show a generic message -->
@@ -949,7 +966,7 @@
                             </xf:group>
 
                             <!-- Status: message when stopping  -->
-                            <xf:group ref=".[status = 'stopping']">
+                            <xf:group ref=".[$status-name = 'stopping']">
                                 <xf:output
                                     class="fr-loading"
                                     mediatype="text/html"
@@ -957,7 +974,7 @@
                             </xf:group>
 
                             <!-- Status: done -->
-                            <xf:group ref=".[status = 'done']">
+                            <xf:group ref=".[$status-name = 'done']">
                                 <xf:output
                                     class="fr-loading"
                                     mediatype="text/html"
@@ -1251,6 +1268,9 @@
             <fr:negative-choice/>
             <fr:positive-choice>
                 <xf:action event="DOMActivate">
+                    <xf:setvalue
+                        ref="instance('fr-reindex-instance')/status"
+                        value="concat(current-dateTime(), ' starting')"/>
                     <xf:send submission="fr-reindex-submission"/>
                     <xf:dispatch
                         if="instance('fr-form-instance')/pinging = 'false'"
@@ -1332,6 +1352,5 @@
             </xf:action>
 
         </xxf:dialog>
-<!--        <fr:xforms-inspector/>-->
     </xh:body>
 </xh:html>

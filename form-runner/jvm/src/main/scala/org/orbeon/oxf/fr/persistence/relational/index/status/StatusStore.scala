@@ -15,13 +15,17 @@ package org.orbeon.oxf.fr.persistence.relational.index.status
 
 import org.orbeon.oxf.fr.persistence.relational.RelationalUtils
 
+import java.util.Date
+
 // Functions dealing with the session
 
 object StatusStore {
 
+  private var lastModified: Date = new Date()
   private var currentStatus: Status = Status.Stopped
 
-  def getStatus: Status = currentStatus
+  def getLastModified : Date   = lastModified
+  def getStatus       : Status = currentStatus
 
   def setStatus(status: Status): Unit = {
 
@@ -44,6 +48,7 @@ object StatusStore {
       }
     }
 
+    lastModified  = new Date()
     currentStatus = status
   }
 }

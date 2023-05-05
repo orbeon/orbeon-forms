@@ -137,31 +137,33 @@ class ServletExternalContext(
     def getHeaderValuesMap = headerValuesMap.asJava
 
     lazy val getParameterMap: ju.Map[String, Array[AnyRef]] = {
-      // NOTE: Regular form POST uses application/x-www-form-urlencoded. In this case, the servlet container
+
+      // Only handle the `multipart/form-data"` case, as for `application/x-www-form-urlencoded` the servlet container
       // exposes parameters with getParameter*() methods (see SRV.4.1.1).
-      if ((getContentType ne null) && getContentType.startsWith("multipart/form-data")) {
+      val multipartParameterMap: Map[String, Array[AnyRef]] =
+        if ((getContentType ne null) && getContentType.startsWith("multipart/form-data")) {
+          if (getInputStreamCalled)
+            throw new IllegalStateException(
+              s"Cannot call `getParameterMap` after `getInputStream` when a form was posted with `multipart/form-data`"
+            )
+          // Decode the multipart data
+          val result = Multipart.getParameterMapMultipartJava(pipelineContext, getRequest, ExternalContext.StandardHeaderCharacterEncoding)
+          // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
+          getParameterMapMultipartFormDataCalled = true
+          result.asScala.toMap
+        } else {
+          // Set the input character encoding before getting the stream as this can cause issues with Jetty
+          // TODO: should we also do this in the `multipart/form-data` case?
+          handleInputEncoding()
+          Map.empty[String, Array[AnyRef]]
+        }
 
-        if (getInputStreamCalled)
-          throw new IllegalStateException(
-            s"Cannot call `getParameterMap` after `getInputStream` when a form was posted with `multipart/form-data`"
-          )
+      val nativeRequestParameterMap =
+        nativeRequest.getParameterNames.asScala.map(name => {
+          name -> nativeRequest.getParameterValues(name).asInstanceOf[Array[AnyRef]]
+        }).toMap
 
-        // Decode the multipart data
-        val result = Multipart.getParameterMapMultipartJava(pipelineContext, getRequest, ExternalContext.StandardHeaderCharacterEncoding)
-        // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
-        getParameterMapMultipartFormDataCalled = true
-        result
-      } else {
-        // Set the input character encoding before getting the stream as this can cause issues with Jetty
-        handleInputEncoding()
-
-        // Just use native request parameters
-        val paramsIt =
-          for (name <- nativeRequest.getParameterNames.asScala)
-            yield name -> nativeRequest.getParameterValues(name).asInstanceOf[Array[AnyRef]]
-
-        paramsIt.toMap.asJava
-      }
+      (nativeRequestParameterMap ++ multipartParameterMap).asJava
     }
 
     def getSession(create: Boolean): ExternalContext.Session =

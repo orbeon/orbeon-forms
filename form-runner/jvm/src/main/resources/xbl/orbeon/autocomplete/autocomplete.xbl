@@ -167,7 +167,7 @@
                                 <xf:insert
                                     ev:event="xforms-submit-error"
                                     ref="instance('suggestions-instance')"
-                                    origin="xf:element('dummy')"/>
+                                    origin="xf:element('_')"/>
                             </xf:submission>
                         </xf:model>
 

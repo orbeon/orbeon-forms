@@ -50,7 +50,6 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
           { "full": "/ops/yui/container/container.js",                                     "min": true  },
           { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
-          { "full": "/ops/yui/slider/slider.js",                                           "min": true  },
 
           { "full": "/ops/javascript/underscore/underscore.min.js",                        "min": false },
 
@@ -91,7 +90,6 @@ class XFormsAssetsTest extends AnyFunSpec{
           { "full": "/ops/yui/dragdrop/dragdrop.js",                                       "min": true  },
           { "full": "/ops/yui/container/container.js",                                     "min": true  },
           { "full": "/ops/yui/examples/container/assets/containerariaplugin.js",           "min": true  },
-          { "full": "/ops/yui/slider/slider.js",                                           "min": true  },
 
           { "full": "/ops/javascript/underscore/underscore.min.js",                        "min": false },
 

@@ -434,6 +434,12 @@
                 <item id="2">Disabled</item>
                 <item id="3">Raise an error</item>
             </data-migration>
+            <grid-tab-order>
+                <label>Grid Tab Order</label>
+                <item id="0">Use property</item>
+                <item id="1">Rows</item>
+                <item id="2">Columns</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label>PDF page orientation</label>
                 <hint/>
@@ -693,11 +699,17 @@
                 <hint>E.g.: "address"</hint>
             </control-name>
             <grid-columns>
-                <label>Number of grid columns</label>
+                <label>Number of Grid Columns</label>
             </grid-columns>
             <grid-rows>
-                <label>Number of grid rows</label>
+                <label>Number of Grid Rows</label>
             </grid-rows>
+            <grid-tab-order>
+                <label>Grid Tab Order</label>
+                <item id="0">Default</item>
+                <item id="1">Rows</item>
+                <item id="2">Columns</item>
+            </grid-tab-order>
             <options>
                 <label>Options</label>
                 <item>
@@ -1762,6 +1774,12 @@
                 <item id="2">Désactivée</item>
                 <item id="3">Produit une erreur</item>
             </data-migration>
+            <grid-tab-order>
+                <label>Ordre de tabulation dans la grille</label>
+                <item id="0">Utiliser la propriété</item>
+                <item id="1">Rangées</item>
+                <item id="2">Colonnes</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label>Orientation de page PDF</label>
                 <hint/>
@@ -2026,6 +2044,12 @@
             <grid-rows>
                 <label>Nombre de rangées dans la grille</label>
             </grid-rows>
+            <grid-tab-order>
+                <label>Ordre de tabulation dans la grille</label>
+                <item id="0">Valeur par défaut</item>
+                <item id="1">Rangées</item>
+                <item id="2">Colonnes</item>
+            </grid-tab-order>
             <options>
                 <label>Options</label>
                 <item>
@@ -3074,6 +3098,12 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -3339,6 +3369,12 @@
             <grid-rows>
                 <label todo="true">Number of grid rows</label>
             </grid-rows>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Default]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -4414,6 +4450,12 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -4678,6 +4720,12 @@
             <grid-rows>
                 <label todo="true">Number of grid rows</label>
             </grid-rows>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Default]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <options>
                 <label todo="true">[Options]</label>
                 <item>
@@ -5753,6 +5801,12 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -6017,6 +6071,12 @@
             <grid-rows>
                 <label todo="true">Number of grid rows</label>
             </grid-rows>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Default]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <options>
                 <label>Opzioni</label>
                 <item>
@@ -7056,6 +7116,12 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -7320,6 +7386,12 @@
             <grid-rows>
                 <label todo="true">Number of grid rows</label>
             </grid-rows>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Default]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <options>
                 <label>Optionen</label>
                 <item>
@@ -8362,6 +8434,12 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -8626,6 +8704,12 @@
             <grid-rows>
                 <label todo="true">Number of grid rows</label>
             </grid-rows>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Default]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <options>
                 <label>Asetukset</label>
                 <item>
@@ -9693,6 +9777,12 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -9957,6 +10047,12 @@
             <grid-rows>
                 <label todo="true">Number of grid rows</label>
             </grid-rows>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Default]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <options>
                 <label>Opciones</label>
                 <item>
@@ -11025,6 +11121,12 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -11289,6 +11391,12 @@
             <grid-rows>
                 <label todo="true">Number of grid rows</label>
             </grid-rows>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Default]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <options>
                 <label>Opties</label>
                 <item>
@@ -12336,6 +12444,12 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -12600,6 +12714,12 @@
             <grid-rows>
                 <label todo="true">Number of grid rows</label>
             </grid-rows>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Default]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <options>
                 <label>Opções</label>
                 <item>
@@ -13674,6 +13794,12 @@
                 <item id="2" todo="true">[Disabled]</item>
                 <item id="3" todo="true">[Raise an error]</item>
             </data-migration>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Use property]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <rendered-page-orientation>
                 <label todo="true">[PDF page orientation]</label>
                 <hint/>
@@ -13938,6 +14064,12 @@
             <grid-rows>
                 <label todo="true">Number of grid rows</label>
             </grid-rows>
+            <grid-tab-order>
+                <label todo="true">[Grid Tab Order]</label>
+                <item id="0" todo="true">[Default]</item>
+                <item id="1" todo="true">[Rows]</item>
+                <item id="2" todo="true">[Columns]</item>
+            </grid-tab-order>
             <options>
                 <label>Val</label>
                 <item>

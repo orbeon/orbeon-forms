@@ -95,6 +95,10 @@
                     ref="$i/data-migration"
                     value="(event('data-migration')[. = ('enabled', 'disabled', 'error')], 'default')[1]"/>
 
+                <xf:setvalue
+                    ref="$i/grid-tab-order"
+                    value="(event('grid-tab-order')[. = ('rows', 'columns')], 'default')[1]"/>
+
                 <xf:action iterate="'rendered-page-orientation', 'rendered-page-size'">
                     <xf:var name="n" value="."/>
                     <xf:setvalue
@@ -347,6 +351,7 @@
                     <xf:property name="wizard-section-status"         value="$i/wizard-section-status/string()"/>
                     <xf:property name="mode"                          value="$i/mode/string()"/>
                     <xf:property name="data-migration"                value="$i/data-migration/string()"/>
+                    <xf:property name="grid-tab-order"                value="$i/grid-tab-order/string()"/>
                     <xf:property name="rendered-page-orientation"     value="$i/rendered-page-orientation/string()"/>
                     <xf:property name="rendered-page-size"            value="$i/rendered-page-size/string()"/>
                     <xf:property name="readonly-disable-calculate"    value="$i/readonly-disable-calculate/string()"/>
@@ -432,6 +437,7 @@
                         <created-with-version/>
                         <updated-with-versions/>
                         <data-migration/>
+                        <grid-tab-order/>
                         <analysis-calculate/>
                         <xbl/>
                     </_>
@@ -811,6 +817,24 @@
                                                                 'disabled'
                                                             else
                                                                 'error'"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+                                        </xh:td>
+
+                                        <xh:td>
+                                            <xf:select1 ref="grid-tab-order" appearance="full xxf:horizontal">
+                                                <xf:label ref="$resources/dialog-form-settings/grid-tab-order/label"/>
+                                                <xf:hint  ref="$resources/dialog-form-settings/grid-tab-order/hint"/>
+                                                <xf:itemset ref="$resources/dialog-form-settings/grid-tab-order/item">
+                                                    <xf:label ref="."/>
+                                                    <xf:value
+                                                        ref="
+                                                        if (@id = 0) then
+                                                            'default'
+                                                        else if (@id = 1) then
+                                                            'rows'
+                                                        else
+                                                            'columns'"/>
                                                 </xf:itemset>
                                             </xf:select1>
                                         </xh:td>

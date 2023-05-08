@@ -148,7 +148,8 @@ object Cell {
 
   def analyze12ColumnGridAndFillHoles[Underlying : CellOps](
     grid       : Underlying,
-    simplify   : Boolean
+    simplify   : Boolean,
+    transpose  : Boolean
   ): GridModel[Underlying] = {
 
     val ops          = implicitly[CellOps[Underlying]]
@@ -185,10 +186,16 @@ object Cell {
 
     fillHoles(xy, maxGridWidth)
 
-    if (simplify)
-      Private.simplify(xy, maxGridWidth)
+    val simplified =
+      if (simplify)
+        Private.simplify(xy, maxGridWidth)
+      else
+        xyToList(xy, maxGridWidth)
+
+    if (transpose)
+      Private.transpose(simplified)
     else
-      xyToList(xy, maxGridWidth)
+      simplified
   }
 
   def originCells[Underlying](gridModel: GridModel[Underlying]): Iterator[Cell[Underlying]] =
@@ -300,7 +307,7 @@ object Cell {
     val ops  = implicitly[CellOps[Underlying]]
     val grid = ops.gridForCell(cellElem)
 
-    val cells = analyze12ColumnGridAndFillHoles(grid, simplify = false)
+    val cells = analyze12ColumnGridAndFillHoles(grid, simplify = false, transpose = false)
     findOriginCell(cells, cellElem).toList.flatMap { originCell =>
       val merge =
         List(Direction.Right, Direction.Down) flatMap { direction =>
@@ -325,7 +332,7 @@ object Cell {
     val ops  = implicitly[CellOps[Underlying]]
     val grid = ops.gridForCell(cellElem)
 
-    val cells = analyze12ColumnGridAndFillHoles(grid, simplify = false)
+    val cells = analyze12ColumnGridAndFillHoles(grid, simplify = false, transpose = false)
     findOriginCell(cells, cellElem).map { originCell =>
 
       def insideCellPositions(cell: Cell[Underlying]): List[Int] =
@@ -453,6 +460,18 @@ object Cell {
         GridModel(xy map (_ grouped gcd map (x => x.head) map (c => c.copy(x = (c.x - 1) / gcd + 1, w = c.w / gcd)(maxGridWidth)) toList) toList)
       else
         xyToList(xy, maxGridWidth)
+    }
+
+    // Create a transposed grid, i.e. a grid with the same cells but with rows and columns swapped
+    def transpose[Underlying](grid: GridModel[Underlying]): GridModel[Underlying] = {
+      val cells = grid.cells.flatten
+      val columns = cells.map(_.x).distinct.sorted
+
+      val transposedCells = columns.map { column =>
+        cells.filter(_.x == column).sortBy(_.y)
+      }
+
+      grid.copy(cells = transposedCells)
     }
   }
 

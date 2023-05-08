@@ -113,6 +113,10 @@
                     else
                         $grid-markup (: otherwise use form/property/default :)"/>
 
+            <xsl:if test="empty(@tab-order)">
+                <xsl:attribute name="tab-order" select="$grid-tab-order"/>
+            </xsl:if>
+
             <!-- Set repeat appearance if available and needed -->
             <xsl:if test="frf:isRepeat(.)">
                 <xsl:if

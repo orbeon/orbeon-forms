@@ -105,7 +105,7 @@ class ClientGridTest extends AnyFunSpec {
     it(s"must must analyze as expected") {
       assert(
         expectedASCII ===
-          Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles($(GridSelector)(0), simplify = false))._1)
+          Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles($(GridSelector)(0), simplify = false, transpose = false))._1)
     }
 
     // NOTE: The logic which allows expanding cells can be improved. Right now (2017-10-03), it won't

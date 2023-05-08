@@ -46,7 +46,7 @@ class GridOpsTest
         |dFG
       """.stripMargin.trim
 
-    val (actual, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true))
+    val (actual, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false))
     assert(expected === actual)
     newMapping
   }
@@ -64,7 +64,7 @@ class GridOpsTest
         // Insert one row below each existing row
         for (rowPos <- List(0, 2, 4)) {
           rowInsertBelow(gridElem, rowPos)
-          val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)
+          val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)
           mapping = newMapping
         }
 
@@ -78,7 +78,7 @@ class GridOpsTest
             |LMN
           """.stripMargin.trim
 
-       assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)._1)
+       assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
       }
     }
   }
@@ -96,7 +96,7 @@ class GridOpsTest
         // Insert one row above each existing row
         for (rowPos <- List(0, 2, 4)) {
           rowInsertAbove(gridElem, rowPos)
-          val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)
+          val (_, newMapping) = Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)
           mapping = newMapping
         }
 
@@ -110,7 +110,7 @@ class GridOpsTest
             |dFG
           """.stripMargin.trim
 
-       assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true), mapping)._1)
+       assert(after === Cell.makeASCII(Cell.analyze12ColumnGridAndFillHoles(gridElem, simplify = true, transpose = false), mapping)._1)
       }
     }
   }

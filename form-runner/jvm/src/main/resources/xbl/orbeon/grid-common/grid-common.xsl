@@ -62,12 +62,14 @@
     <xsl:variable name="th-elem"                  select="if ($is-table) then 'xh:th'    else 'xh:div'"/>
     <xsl:variable name="td-elem"                  select="if ($is-table) then 'xh:td'    else 'xh:div'"/>
 
+    <xsl:variable name="transpose"                select="$use-css-grids-output and $root/@tab-order = 'columns'"/>
+
     <xsl:variable
         name="rows-array"
         xmlns:cell="java:org.orbeon.oxf.fr.NodeInfoCell"
         select="
             if ($is-12or24col-input) then
-                cell:analyze12ColumnGridAndFillHoles($root, not($use-css-grids-output))
+                cell:analyze12ColumnGridAndFillHoles($root, not($use-css-grids-output), $transpose)
             else
                 cell:analyzeTrTdGridAndFillHoles($root, false())
     "/>

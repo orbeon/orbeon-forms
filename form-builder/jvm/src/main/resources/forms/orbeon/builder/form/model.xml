@@ -406,6 +406,7 @@
                 <xf:property name="labels"                        value="bind('labels-bind')"/>
                 <xf:property name="hints"                         value="bind('hints-bind')"/>
                 <xf:property name="data-migration"                value="bind('data-migration-bind')"/>
+                <xf:property name="grid-tab-order"                value="bind('grid-tab-order-bind')"/>
                 <xf:property name="rendered-page-orientation"     value="bind('rendered-page-orientation-bind')"/>
                 <xf:property name="rendered-page-size"            value="bind('rendered-page-size-bind')"/>
                 <xf:property name="readonly-disable-calculate"    value="bind('readonly-disable-calculate-bind')"/>
@@ -444,6 +445,7 @@
                 <xf:property name="labels"                        value="bind('labels-bind')"/>
                 <xf:property name="hints"                         value="bind('hints-bind')"/>
                 <xf:property name="data-migration"                value="bind('data-migration-bind')"/>
+                <xf:property name="grid-tab-order"                value="bind('grid-tab-order-bind')"/>
                 <xf:property name="rendered-page-orientation"     value="bind('rendered-page-orientation-bind')"/>
                 <xf:property name="rendered-page-size"            value="bind('rendered-page-size-bind')"/>
                 <xf:property name="readonly-disable-calculate"    value="bind('readonly-disable-calculate-bind')"/>
@@ -478,6 +480,7 @@
                     <xf:bind id="wizard-section-status-bind"      ref="wizard-section-status"/>
                     <xf:bind id="email-bind"                      ref="email"/>
                     <xf:bind id="data-migration-bind"             ref="data-migration"/>
+                    <xf:bind id="grid-tab-order-bind"             ref="grid-tab-order"/>
                     <xf:bind id="rendered-page-orientation-bind"  ref="rendered-page-orientation"/>
                     <xf:bind id="rendered-page-size-bind"         ref="rendered-page-size"/>
                     <xf:bind id="html-page-layout-bind"           ref="html-page-layout"/>

@@ -93,14 +93,14 @@ object NodeInfoCell {
   }
 
   //
-  // This function is used to analyze a grid in `<fr:c>` format. It i used by `grid.xbl` at runtime and by tests.
+  // This function is used to analyze a grid in `<fr:c>` format. It is used by `grid.xbl` at runtime and by tests.
   //
   // Return `array(map(xs:string, *)*)`.
   //
   //@XPathFunction
-  def analyze12ColumnGridAndFillHoles(grid: NodeInfo, simplify: Boolean): Item =
+  def analyze12ColumnGridAndFillHoles(grid: NodeInfo, simplify: Boolean, transpose: Boolean): Item =
     SaxonUtils.newArrayItem(
-      Cell.analyze12ColumnGridAndFillHoles(grid, simplify).cells.to(Vector) map { row =>
+      Cell.analyze12ColumnGridAndFillHoles(grid, simplify, transpose).cells.to(Vector) map { row =>
         new SequenceExtent(
           row collect {
             case Cell(u, None, x, y, h, w) =>
@@ -117,7 +117,6 @@ object NodeInfoCell {
         )
       }
     )
-
 
   /* How I would like to write the function above with conversions for less boilerplate:
 

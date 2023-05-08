@@ -566,6 +566,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.appearance.*.*"                      value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.markup.*.*"                          value="css-grid"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.insert.*.*"                          value="index"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.grid.tab-order.*.*"                       value="rows"/>
 
     <!-- Blank string means `if (fr:created-with-or-newer('2018.2')) then 'full' else 'minimal'`. But we cannot
          actually use that expression, since the logic runs in XSLT. So that behavior is implicit. -->

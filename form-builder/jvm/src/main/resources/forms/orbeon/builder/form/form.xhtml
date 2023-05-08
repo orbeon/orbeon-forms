@@ -641,6 +641,14 @@
                                             ref="*"
                                             origin="xf:element('data-migration', event('data-migration'))"/>
 
+                                        <xf:delete
+                                            bind="grid-tab-order-bind"/>
+                                        <xf:insert
+                                            if="event('grid-tab-order') = ('default', 'rows', 'columns')"
+                                            context="bind('metadata-bind')"
+                                            ref="*"
+                                            origin="xf:element('grid-tab-order', event('grid-tab-order'))"/>
+
                                         <xf:action iterate="'rendered-page-orientation', 'rendered-page-size', 'html-page-layout'">
                                             <xf:var name="n" value="."/>
                                             <xf:delete

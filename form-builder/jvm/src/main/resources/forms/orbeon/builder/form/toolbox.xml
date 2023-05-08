@@ -61,6 +61,7 @@
                             <xf:property name="labels"                        value="bind('labels-bind')"/>
                             <xf:property name="hints"                         value="bind('hints-bind')"/>
                             <xf:property name="data-migration"                value="bind('data-migration-bind')"/>
+                            <xf:property name="grid-tab-order"                value="bind('grid-tab-order-bind')"/>
                             <xf:property name="rendered-page-orientation"     value="bind('rendered-page-orientation-bind')"/>
                             <xf:property name="rendered-page-size"            value="bind('rendered-page-size-bind')"/>
                             <xf:property name="readonly-disable-calculate"    value="bind('readonly-disable-calculate-bind')"/>

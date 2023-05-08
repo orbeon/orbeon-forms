@@ -360,6 +360,20 @@
             )[1]"/>
 
     <xsl:variable
+        name="grid-tab-order"
+        as="xs:string"
+        select="
+        (
+            $fr-form-metadata/grid-tab-order[
+                . = ('rows', 'columns')
+            ],
+            p:property(string-join(('oxf.xforms.xbl.fr.grid.tab-order', $app, $form), '.'))[
+                . = ('rows', 'columns')
+            ],
+            'rows'
+        )[1]"/>
+
+    <xsl:variable
         name="validation-mode"
         as="xs:string"
         select="

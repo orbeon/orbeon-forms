@@ -96,6 +96,7 @@
 
                 <xf:instance id="inspector-instance">
                     <_ xmlns="">
+                        <layout>open</layout>
                         <current-model/>
                         <current-instance/>
                         <mode>formatted</mode>
@@ -120,8 +121,17 @@
             </xf:model>
         </xbl:implementation>
         <xbl:template>
-            <xf:group id="inspector-group" model="inspector-model" class="fr-xforms-inspector">
+            <xf:group id="inspector-group" model="inspector-model" class="fr-xforms-inspector fr-xforms-inspector-{instance('inspector-instance')/layout}">
+
                 <xh:div class="fr-xforms-inspector-title">Orbeon Forms XForms Inspector</xh:div>
+
+                <xf:trigger class="fr-xforms-inspector-button">
+                    <xf:label>X</xf:label>
+                    <xf:setvalue
+                        event="DOMActivate"
+                        ref="instance('inspector-instance')/layout"
+                        value="if (. = 'open') then 'closed' else 'open'"/>
+                </xf:trigger>
 
                 <xf:dispatch
                     event="xforms-enabled"
@@ -154,7 +164,7 @@
                 </xf:group>
 
                 <!-- Function selection-->
-                <xh:div class="fr-xforms-inspector-block">
+                <xh:div class="fr-xforms-inspector-function">
                     <fr:link-select1 ref="instance('inspector-instance')/function" appearance="full">
                         <xf:action ev:event="xforms-value-changed">
                             <xf:setvalue  if=". = 'view-console'" ref="instance('inspector-instance')/shown-output"/>
@@ -177,7 +187,6 @@
 
                 <!-- Model / instance -->
                 <xh:div class="
-                        fr-xforms-inspector-block
                         fr-xforms-inspector-model-instance
                         fr-xforms-inspector-{if (instance('inspector-instance')/function = ('view-instance', 'evaluate-xpath')) then 'enabled' else 'disabled'}-function">
                     <xf:group appearance="xxf:internal">
@@ -221,7 +230,6 @@
 
                 <!-- Evaluate XPath -->
                 <xh:div class="
-                        fr-xforms-inspector-block
                         fr-xforms-inspector-xpath
                         fr-xforms-inspector-{if (instance('inspector-instance')/function = 'evaluate-xpath') then 'enabled' else 'disabled'}-function">
                     <xf:group ref="instance('inspector-instance')/xpath" appearance="xxf:internal">
@@ -246,7 +254,7 @@
                 <xf:var name="external-input"><xxf:value value="xxf:instance('fr-xforms-inspector-input')" xxbl:scope="outer"/></xf:var>
                 <xf:var name="internal-input" value="instance('inspector-instance')/input"/>
                 <xf:group ref=".[exists($external-input)]">
-                    <xh:div class="fr-xforms-inspector-block fr-xforms-inspector-{if (instance('inspector-instance')/function = 'view-console') then 'enabled' else 'disabled'}-function">
+                    <xh:div class="fr-xforms-inspector-{if (instance('inspector-instance')/function = 'view-console') then 'enabled' else 'disabled'}-function">
                         <xf:input ref="$internal-input" incremental="true">
                             <xf:setvalue ev:event="xforms-value-changed" ref="$external-input" value="$internal-input"/>
                             <xf:label>Input:</xf:label>

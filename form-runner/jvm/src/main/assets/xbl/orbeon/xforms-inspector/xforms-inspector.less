@@ -10,30 +10,114 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+@inputBackground: white;
+@wellBackground:  #f5f5f5;
+
 .xbl-fr-xforms-inspector {
 
     .fr-xforms-inspector {
-        display: block; clear: both;                                                                // Be tolerant of different surroundings
-        border: 1px solid #e3e3e3;
-        padding: .5em 1em;
-        background: white;
-        margin: auto;                                                                               // Center
-        max-width: 940px;
-        box-sizing: border-box;
-    }
 
-    .fr-xforms-inspector-title { font-size: 167%; padding: .5em 0 1em 0; }                           // Use larger font for title with padding
-    .fr-xforms-inspector-disabled-function {
-        color: #ccc;                                                                                // Grey out part of the UI that are disabled
-        .xforms-label { color: #ccc }                                                               // Label is light gray when disabled
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 600px; // TODO: different size depending on screen width
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        row-gap: .5em;
+
+        background-color: white;
+        box-sizing: border-box;
+        padding: 1em;
+        z-index: 10000;
+
+        border-left: 4px solid @wellBackground;
+
+        background: repeating-linear-gradient(
+          -45deg,
+          @wellBackground,
+          @wellBackground 5px,
+          @inputBackground 5px,
+          @inputBackground 10px
+        );
+
+        .fr-xforms-inspector-title {
+            font-size: 167%;
+        }
+
+        .fr-xforms-inspector-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .fr-xforms-inspector-disabled-function {
+            color: #ccc;                                                                                // Grey out part of the UI that are disabled
+            .xforms-label { color: #ccc }                                                               // Label is light gray when disabled
+        }
+
+        .xforms-label {
+            display: block;
+            margin: 0;
+            &:after {
+                content: ": ";
+            }
+        }
+
+        &.fr-xforms-inspector-closed {
+
+            height: auto;
+
+            .fr-xforms-inspector-function,
+            .fr-xforms-inspector-model-instance,
+            .fr-xforms-inspector-xpath,
+            .fr-xforms-inspector-source,
+            .fr-xforms-inspector-mode {
+                display: none;
+            }
+        }
+
+        .fr-xforms-inspector-model-instance { }
+
+        .fr-xforms-inspector-model {
+            margin-right: 20px;
+        }
+
+        .fr-xforms-inspector-instance { }
+
+        .fr-xforms-inspector-xpath {
+            display: flex;
+            flex-direction: row;
+            align-items: end;
+            width: 100%;
+            column-gap: 1em;
+            .xforms-input:first-child {
+                flex-grow: 1;
+                input {
+                    width: 100%;
+                }
+            }
+        }
+
+        .fr-xforms-inspector-source {
+            flex-grow: 1;
+            overflow: auto;
+            border: 1px solid @wellBackground;
+            border-radius: 5px;
+            .xbl-fr-code-mirror {
+                height: 100%;
+                font-size: 12px;
+                .CodeMirror {
+                    height: 100%;
+                    .CodeMirror-sizer {
+                        width: max-content;
+                    }
+                }
+            }
+        }
+
+        .fr-xforms-inspector-mode {
+
+        }
     }
-    .xforms-label { display: block;                                                                 // Labels above controls, as in Form Runner
-                    font-weight: bold; color: #333; margin: 0 }                                     // Styling to distinguish labels
-    .fr-xforms-inspector-model-instance > * { display: inline-block; width: 300px }
-    .fr-xforms-inspector-instance { padding-left: 20px }                                            // Space between model and instance
-    .fr-xforms-inspector-xpath input { width: 545px }
-    .fr-xforms-inspector-block { padding: .5em 0 }                                                  // Space before/after different sections of the form
-    .fr-xforms-inspector-source { padding: 1em 0 0 0 }                                              // Space before the view area
-    .fr-xforms-inspector-mode { background-color: #F8F8F8; padding: .5em 0 }                        // Better integrate formatting with editor
-    .xbl-fr-code-mirror { font-size: 12px }
 }

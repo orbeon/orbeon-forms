@@ -49,6 +49,10 @@
             position: absolute;
             top: 0;
             right: 0;
+            button {
+                border-top-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
         }
 
         .fr-xforms-inspector-disabled-function {
@@ -81,6 +85,18 @@
 
         .fr-xforms-inspector-model {
             margin-right: 20px;
+
+            display: flex;
+            flex-direction: row;
+            align-items: end;
+            width: 100%;
+            column-gap: 1em;
+            .xbl-component:first-child {
+                flex-grow: 1;
+                input {
+                    width: 100%;
+                }
+            }
         }
 
         .fr-xforms-inspector-instance { }

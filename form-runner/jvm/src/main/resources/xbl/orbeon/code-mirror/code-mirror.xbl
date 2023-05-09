@@ -40,6 +40,7 @@
 
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.5/lib/codemirror.css"/>
+            <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.5/theme/darcula.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/code-mirror.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/fold/foldgutter.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/dialog/dialog.css"/>

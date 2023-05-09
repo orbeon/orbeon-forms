@@ -126,7 +126,7 @@
                 <xh:div class="fr-xforms-inspector-title">Orbeon Forms XForms Inspector</xh:div>
 
                 <xf:trigger class="fr-xforms-inspector-button">
-                    <xf:label>X</xf:label>
+                    <xf:label><xh:i class="fa fa-window-restore"/></xf:label>
                     <xf:setvalue
                         event="DOMActivate"
                         ref="instance('inspector-instance')/layout"
@@ -204,6 +204,13 @@
                                     <xf:setvalue ref="instance('inspector-instance')/current-instance"/>
                                 </xf:action>
                             </xf:select1>
+                            <xf:trigger>
+                                <xf:label>Refresh</xf:label>
+                                <xf:dispatch
+                                    event="DOMActivate"
+                                    targetid="inspector-model"
+                                    name="fr-update-models"/>
+                            </xf:trigger>
                         </xf:group>
                         <xf:group ref=".[count($models) = 1]" class="fr-xforms-inspector-model">
                             <xf:output value="instance('inspector-instance')/current-model">

@@ -36,6 +36,7 @@ object CodeMirror {
           "lineNumbers"  -> true,
           "lineWrapping" -> true,
           "indentUnit"   -> 4,
+          "theme"        -> "darcula",
           "foldGutter"   -> true,
           "gutters"      -> js.Array("CodeMirror-linenumbers", "CodeMirror-foldgutter"),
           "extraKeys"    -> js.Dictionary(

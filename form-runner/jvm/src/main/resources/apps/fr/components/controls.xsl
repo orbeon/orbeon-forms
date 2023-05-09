@@ -66,8 +66,9 @@
             <xsl:when test="
                 exists(
                     $binds-root//xf:bind[
-                        @id   = $bind-id and
-                        @type = ('xf:date', 'xs:date')
+                        @id = $bind-id and (
+                            (@type, xf:type) = ('xf:date', 'xs:date')
+                        )
                     ]
                 )">
                 <fr:date>
@@ -81,8 +82,8 @@
             <xsl:when test="
                 exists(
                     $binds-root//xf:bind[
-                        @id   = $bind-id and
-                        @type = ('xf:time', 'xs:time')
+                        @id = $bind-id and
+                        (@type, xf:type) = ('xf:time', 'xs:time')
                     ]
                 )">
                 <fr:time>

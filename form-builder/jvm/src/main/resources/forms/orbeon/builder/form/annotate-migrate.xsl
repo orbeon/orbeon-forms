@@ -279,8 +279,8 @@
                 exists(
                     for $bind-id in @bind return
                     $model//xf:bind[
-                        @id   = $bind-id and
-                        @type = ('xf:date', 'xs:date')
+                        @id = $bind-id and
+                        (@type, xf:type) = ('xf:date', 'xs:date')
                     ]
                 )
             ]">
@@ -297,8 +297,8 @@
                 exists(
                     for $bind-id in @bind return
                     $model//xf:bind[
-                        @id   = $bind-id and
-                        @type = ('xf:time', 'xs:time')
+                        @id = $bind-id and
+                        (@type, xf:type) = ('xf:time', 'xs:time')
                     ]
                 )
             ]">

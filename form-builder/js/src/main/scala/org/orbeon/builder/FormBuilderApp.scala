@@ -13,12 +13,14 @@
  */
 package org.orbeon.builder
 
+import org.orbeon.facades.Mousetrap
 import org.orbeon.fr._
-import org.orbeon.xforms.App
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
+import org.orbeon.xforms.{App, DocumentAPI}
+import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
-
 
 // Scala.js starting point for Form Builder
 object FormBuilderApp extends App {
@@ -42,9 +44,43 @@ object FormBuilderApp extends App {
     }
 
     builderPrivateDyn.API = FormBuilderPrivateAPI
+    registerFormBuilderKeyboardShortcuts()
 
     // Other initializations
     BlockCache
+
+    // Keyboard shortcuts for cut/copy/paste/undo/redo
+  }
+
+  private def registerFormBuilderKeyboardShortcuts(): Unit = {
+    case class Shortcut(
+      shift     : Boolean = false,
+      key       : String,
+      target    : String,
+      condition : Option[js.Function0[Boolean]] = None
+    )
+    val shortcuts = List(
+      Shortcut(              key = "z", target = "undo-trigger"                                                                    ),
+      Shortcut(shift = true, key = "z", target = "redo-trigger"                                                                    ),
+      Shortcut(              key = "x", target = "cut-trigger"                                                                     ),
+      Shortcut(              key = "c", target = "copy-trigger", condition = Some(() => dom.window.getSelection().toString.isEmpty)),
+      Shortcut(              key = "v", target = "paste-trigger"                                                                   ),
+    )
+    shortcuts.foreach(shortcut => {
+      List("command", "ctrl").foreach(modifier => {
+        val keyCombination = (List(modifier) ++ shortcut.shift.list("shift") ++ List(shortcut.key)).mkString("+")
+        Mousetrap.bind(command = keyCombination, callback = { (e: dom.KeyboardEvent, combo: String) =>
+          val conditionPasses = shortcut.condition.forall(_())
+          if (conditionPasses) {
+            e.preventDefault()
+            DocumentAPI.dispatchEvent(
+              targetId = shortcut.target,
+              eventName = "DOMActivate"
+            )
+          }
+        })
+      })
+    })
   }
 
   def onPageContainsFormsMarkup(): Unit = {

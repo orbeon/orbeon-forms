@@ -1096,11 +1096,12 @@
             <paste-trigger/>
         </_>
     </xf:instance>
-    <xf:var name="xcv" value="instance('fb-xcv-triggers-instance')"/>
-
+    <xf:var name="xcv"           value="instance('fb-xcv-triggers-instance')"/>
+    <xf:var name="dialog-opened" value="instance('fb-variables')/dialogs-open > 0"/>
     <xf:bind ref="$xcv">
-        <xf:bind ref="cut-trigger"   readonly="empty($current-td/*)"/>
-        <xf:bind ref="copy-trigger"  readonly="empty($current-td/*)"/>
+        <xf:bind ref="cut-trigger"    readonly="$dialog-opened or empty($current-td/*)"/>
+        <xf:bind ref="copy-trigger"   readonly="$dialog-opened or empty($current-td/*)"/>
+        <xf:bind ref="paste-trigger"  readonly="$dialog-opened"/>
     </xf:bind>
 
     <!-- Undo stack -->
@@ -1113,10 +1114,9 @@
         </_>
     </xf:instance>
     <xf:var name="undo" value="instance('fb-undo-instance')"/>
-
     <xf:bind ref="$undo">
-        <xf:bind ref="undo-trigger" readonly="empty($undo/undos/*)"/>
-        <xf:bind ref="redo-trigger" readonly="empty($undo/redos/*)"/>
+        <xf:bind ref="undo-trigger" readonly="$dialog-opened or empty($undo/undos/*)"/>
+        <xf:bind ref="redo-trigger" readonly="$dialog-opened or empty($undo/redos/*)"/>
     </xf:bind>
 
 </xf:model>

@@ -130,7 +130,6 @@
                 <xh:script src="/ops/yui/dragdrop/dragdrop.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/container/container.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/examples/container/assets/containerariaplugin.min.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/slider/slider.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/underscore/underscore.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/xforms.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer.min.js" class="xforms-baseline"/>

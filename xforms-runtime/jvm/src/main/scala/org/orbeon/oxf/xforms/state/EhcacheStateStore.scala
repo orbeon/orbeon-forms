@@ -41,6 +41,7 @@ object EhcacheStateStore {
     withDebug("storing document state", List(
       "document UUID"             -> documentUUID,
       "store size before storing" -> getCurrentSize.toString,
+      "isInitialState"            -> isInitialState.toString,
       "replication"               -> XFormsGlobalProperties.isReplication.toString
     )) {
       val staticStateDigest = document.staticState.digest

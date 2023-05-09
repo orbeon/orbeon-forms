@@ -140,7 +140,7 @@ class XFormsContainingDocument(
         processCompletedAsynchronousSubmissions(skipDeferredEventHandling = true, addPollEvent = true)
       }
 
-      processDueDelayedEvents(false)
+      processDueDelayedEvents(onlyEventsWithNoTime = false)
     }
 
   def restoreDynamicState(
@@ -242,16 +242,17 @@ class XFormsContainingDocument(
 
     if (isAjaxRequest) {
       processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, addPollEvent = false)
-      processDueDelayedEvents(false)
-    } else
-      processDueDelayedEvents(true)
+      processDueDelayedEvents(onlyEventsWithNoTime = false)
+    } else {
+      processDueDelayedEvents(onlyEventsWithNoTime = true)
+    }
   }
 
   def afterExternalEvents(isAjaxRequest: Boolean): Unit = {
 
     if (isAjaxRequest) {
       processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, addPollEvent = true)
-      processDueDelayedEvents(false)
+      processDueDelayedEvents(onlyEventsWithNoTime = false)
     }
 
     this._responseForReplaceAll = None

@@ -654,7 +654,7 @@ trait ContainingDocumentDelayedEvents {
     )
 
   def findTwoPassSubmitEvent: Option[DelayedEvent] =
-    _delayedEvents find (_.eventName == XFormsEvents.XXFORMS_SUBMIT)
+    _delayedEvents.find(_.eventName == XFormsEvents.XXFORMS_SUBMIT)
 
   // This excludes events where `time == None`, which means it doesn't return the `xxforms-submit` event.
   def findEarliestPendingDelayedEvent: Option[DelayedEvent] =

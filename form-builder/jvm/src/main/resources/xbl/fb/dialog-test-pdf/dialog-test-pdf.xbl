@@ -185,8 +185,6 @@
                         </fr:grid>
                     </xh:div>
 
-<!--                    <fr:xforms-inspector/>-->
-
                     <xh:div class="fr-dialog-buttons">
                         <xf:group id="triggers">
                             <xf:trigger id="save-trigger" appearance="xxf:primary">

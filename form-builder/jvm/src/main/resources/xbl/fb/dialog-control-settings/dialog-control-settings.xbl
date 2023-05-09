@@ -1399,8 +1399,6 @@
                         <fr:label><xf:output value="xxf:r('errors.label', '|fr-form-resources|')"/></fr:label>
                     </fr:error-summary>
 
-                    <!--<fr:xforms-inspector/>-->
-
                     <!-- See https://github.com/orbeon/orbeon-forms/issues/2337 -->
                     <xh:div class="fr-dialog-buttons" xml:space="preserve">
                         <xh:div class="pull-left">

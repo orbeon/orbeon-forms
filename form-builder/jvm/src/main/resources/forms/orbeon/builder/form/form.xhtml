@@ -887,7 +887,6 @@
                             <xf:group class="fb fb-hide-alert">
                                 <!-- Dynamically display the form being edited -->
                                 <xxf:dynamic id="fb" ref="instance('fb-form-instance')"/>
-                                <!--<fr:xforms-inspector/>-->
 
                                 <xf:action event="xxforms-action-error" observer="#document fb" propagate="stop">
                                     <xf:message level="xxf:log-error" value="concat('Error: ', xxf:trim(event('message')))"/>

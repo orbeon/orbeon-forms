@@ -438,8 +438,6 @@
                         </fr:grid>
                     </xf:group>
 
-<!--                    <fr:xforms-inspector/>-->
-
                     <!-- Buttons -->
                     <xh:div class="fr-dialog-buttons">
                         <xf:group appearance="xxf:internal" id="triggers">

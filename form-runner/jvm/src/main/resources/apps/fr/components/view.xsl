@@ -454,7 +454,6 @@
                     </xsl:element>
                 </xsl:otherwise>
             </xsl:choose>
-            <!--<fr:xforms-inspector/>-->
         </xf:group>
     </xsl:template>
 

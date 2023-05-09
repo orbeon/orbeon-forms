@@ -861,8 +861,6 @@
                         <fr:label><xf:output value="xxf:r('errors.label', '|fr-form-resources|')"/></fr:label>
                     </fr:error-summary>
 
-<!--                    <fr:xforms-inspector/>-->
-
                     <xh:div class="fr-dialog-buttons">
                         <xh:div class="pull-left">
                             <xf:trigger id="prev-button" ref="$i/prev-control-id">

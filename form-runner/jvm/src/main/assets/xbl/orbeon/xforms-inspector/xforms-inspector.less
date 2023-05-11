@@ -68,38 +68,28 @@
             }
         }
 
-        &.fr-xforms-inspector-closed {
+        .fr-xforms-inspector-model-instance {
 
-            height: auto;
+            .fr-xforms-inspector-model {
+                margin-right: 20px;
 
-            .fr-xforms-inspector-function,
-            .fr-xforms-inspector-model-instance,
-            .fr-xforms-inspector-xpath,
-            .fr-xforms-inspector-source,
-            .fr-xforms-inspector-mode {
-                display: none;
-            }
-        }
-
-        .fr-xforms-inspector-model-instance { }
-
-        .fr-xforms-inspector-model {
-            margin-right: 20px;
-
-            display: flex;
-            flex-direction: row;
-            align-items: end;
-            width: 100%;
-            column-gap: 1em;
-            .xbl-component:first-child {
-                flex-grow: 1;
-                input {
-                    width: 100%;
+                display: flex;
+                flex-direction: row;
+                align-items: end;
+                width: 100%;
+                column-gap: 1em;
+                .xbl-component:first-child {
+                    flex-grow: 1;
+                    input {
+                        width: 100%;
+                    }
                 }
             }
-        }
 
-        .fr-xforms-inspector-instance { }
+            .fr-xforms-inspector-instance {
+
+            }
+        }
 
         .fr-xforms-inspector-xpath {
             display: flex;
@@ -134,6 +124,33 @@
 
         .fr-xforms-inspector-mode {
 
+        }
+
+        &.fr-xforms-inspector-closed {
+
+            height: auto;
+            width: auto;
+            font-size: 50%;
+            border-bottom-left-radius: 5px;
+            padding: 4px;
+
+            .fr-xforms-inspector-title {
+                margin-right: 40px;
+            }
+
+            .fr-xforms-inspector-button {
+                button {
+                    border-radius: 0;
+                }
+            }
+
+            .fr-xforms-inspector-function,
+            .fr-xforms-inspector-model-instance,
+            .fr-xforms-inspector-xpath,
+            .fr-xforms-inspector-source,
+            .fr-xforms-inspector-mode {
+                display: none;
+            }
         }
     }
 }

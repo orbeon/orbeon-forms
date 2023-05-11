@@ -288,7 +288,7 @@
                                 </_>
                             </xf:instance>
 
-                            <xf:instance id="result-raw" ><result/></xf:instance>
+                            <xf:instance id="result-raw" ><_/></xf:instance>
                             <xf:instance id="result-json"><results type="array"/></xf:instance>
                             <xf:instance id="item-template">
                                 <_ type="object">
@@ -365,7 +365,31 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xf:group>
-                        <xf:input ref="$binding[$view]/@label"/>
+                        <xsl:choose>
+                            <xsl:when test="$service-performs-search">
+                                <xf:input ref="$binding[$view]/@label"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xf:group ref="$binding[$view]">
+                                    <!-- https://github.com/orbeon/orbeon-forms/issues/5813 -->
+                                    <xf:var
+                                        name="non-blank-label-att-opt"
+                                        value="@label[xxf:non-blank()]"/>
+
+                                    <!-- Compute and show the itemset if needed -->
+                                    <fr:databound-select1
+                                            id="select1-for-view-mode"
+                                            appearance="minimal"
+                                            ref=".[empty($non-blank-label-att-opt)]"
+                                            resource="{{xxf:component-param-value('resource')}}">
+                                        <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+                                    </fr:databound-select1>
+
+                                    <!-- Show the stored label if possible -->
+                                    <xf:input ref="$non-blank-label-att-opt"/>
+                                </xf:group>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

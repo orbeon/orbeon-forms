@@ -110,10 +110,25 @@
                     </_>
                 </xf:instance>
 
+                <xf:bind
+                    ref="instance('inspector-instance')/layout"
+                    xxf:default="
+                        if (xxf:get-session-attribute('fr-orbeon-form-runner-inspector-layout') = 'open') then
+                            'open'
+                        else
+                            'closed'"/>
+
                 <xf:var name="xml-indent"   value="instance('inspector-instance')/xsl:output[1]"/>
                 <xf:var name="xml-noindent" value="instance('inspector-instance')/xsl:output[2]"/>
                 <xf:bind ref="instance('inspector-instance')">
-                    <xf:bind ref="current-instance" readonly="false()" calculate="if (. = '') then instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance[1]/@id else ."/>
+                    <xf:bind
+                        ref="current-instance"
+                        readonly="false()"
+                        calculate="
+                            if (. = '') then
+                                instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance[1]/@id
+                            else
+                                ."/>
                     <xf:bind ref="xpath" readonly="../function != 'evaluate-xpath'"/>
                     <xf:bind ref="input" readonly="../function != 'view-console'"/>
                     <xf:bind ref="shown-output" readonly="true()"/>
@@ -127,10 +142,17 @@
 
                 <xf:trigger class="fr-xforms-inspector-button">
                     <xf:label><xh:i class="fa fa-window-restore"/></xf:label>
-                    <xf:setvalue
-                        event="DOMActivate"
-                        ref="instance('inspector-instance')/layout"
-                        value="if (. = 'open') then 'closed' else 'open'"/>
+                    <xf:action event="DOMActivate">
+                        <xf:setvalue
+                            ref="instance('inspector-instance')/layout"
+                            value="if (. = 'open') then 'closed' else 'open'"/>
+                        <xf:action type="xpath">
+                            xxf:set-session-attribute(
+                                'fr-orbeon-form-runner-inspector-layout',
+                                instance('inspector-instance')/layout/string()
+                            )
+                        </xf:action>
+                    </xf:action>
                 </xf:trigger>
 
                 <xf:dispatch

@@ -60,7 +60,6 @@
             </icon>
             <editors static-itemset="false" item-hint="true"/>
             <templates>
-                <instance label=""/><!-- https://github.com/orbeon/orbeon-forms/issues/5806 -->
                 <view>
                     <fr:databound-select1
                             id=""
@@ -243,11 +242,22 @@
                 <xf:setvalue ref="$binding"        value="event('fr-value')"/>
             </xbl:handler>
 
-            <!-- Create the `label` attribute if necessary, and always do it, so code looking at the instance can easily know whether
-                 the `label` attribute is expected by the component -->
-            <xbl:handler event="xforms-enabled">
-                <xf:var name="binding" value="xxf:binding('fr-databound-select1-search')"/>
-                <xf:insert if="empty($binding/@label)" context="$binding" origin="xf:attribute('label')"/>
+            <!--
+                Adjust `label` attribute if needed, but only in read-write modes:
+
+                 - https://github.com/orbeon/orbeon-forms/issues/4553
+                 - https://github.com/orbeon/orbeon-forms/issues/5816
+             -->
+            <xbl:handler event="xforms-enabled" if="not(fr:is-readonly-mode())">
+                <xf:var name="service-performs-search" value="xxf:component-param-value('service-performs-search') = 'true'"/>
+                <xf:var name="binding"                 value="xxf:binding('fr-databound-select1-search')"/>
+                <xf:insert
+                    if="$service-performs-search and empty($binding/@label)"
+                    context="$binding"
+                    origin="xf:attribute('label')"/>
+                <xf:delete
+                    if="not($service-performs-search) and exists($binding/@label)"
+                    ref="$binding/@label"/>
             </xbl:handler>
 
         </xbl:handlers>

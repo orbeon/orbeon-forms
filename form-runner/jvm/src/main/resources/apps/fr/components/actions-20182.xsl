@@ -942,7 +942,12 @@
 
     </xsl:template>
 
-    <xsl:template match="fr:control-setfilename" mode="within-action-2018.2">
+    <xsl:template
+            match="
+                fr:control-setfilename  |
+                fr:control-setmediatype |
+                fr:control-setsize"
+            mode="within-action-2018.2">
 
         <xsl:param tunnel="yes" name="model-id"     as="xs:string"/>
         <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
@@ -959,34 +964,17 @@
 
             <xf:action>
                 <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
+                <xsl:variable
+                    name="ref"
+                    as="xs:string"
+                    select="
+                             if (local-name() = 'control-setfilename' ) then '@filename'
+                        else if (local-name() = 'control-setmediatype') then 'image/@mediatype, @mediatype'
+                        else if (local-name() = 'control-setsize'     ) then '@size'
+                        else error()
+                    "/>
                 <xf:setvalue
-                    ref="@filename"
-                    value="$value"/>
-            </xf:action>
-
-        </xf:action>
-
-    </xsl:template>
-
-    <xsl:template match="fr:control-setmediatype" mode="within-action-2018.2">
-
-        <xsl:param tunnel="yes" name="model-id"     as="xs:string"/>
-        <xsl:param tunnel="yes" name="library-name" as="xs:string?"/>
-
-        <xsl:variable name="to-control-name" select="@control/string()" as="xs:string"/>
-        <xsl:variable name="value-expr"      select="@value/string()"   as="xs:string"/>
-        <xsl:variable name="at"              select="@at/string()"      as="xs:string?"/>
-
-        <xf:action class="fr-action-impl">
-            <xf:var name="value" value="{frf:replaceVarReferencesWithFunctionCalls(. , $value-expr, false(), $library-name, ())}"/>
-
-            <xf:rebuild/>
-            <xf:recalculate/>
-
-            <xf:action>
-                <xsl:copy-of select="fr:build-iterate-att($model-id, $to-control-name, $at, $library-name)"/>
-                <xf:setvalue
-                    ref="image/@mediatype, ./@mediatype"
+                    ref="{$ref}"
                     value="$value"/>
             </xf:action>
 

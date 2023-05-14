@@ -206,6 +206,7 @@ object FormBuilderXPathApi {
 
     val isOptionalLHHAT =
       lhht == LHHA.Help.entryName ||
+      lhht == fr.XMLNames.FRShortLabelQName.localName ||
       lhht == fr.XMLNames.FRIterationLabelQName.localName ||
       lhht == fr.XMLNames.FRAddIterationLabelQName.localName
 

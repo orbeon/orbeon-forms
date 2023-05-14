@@ -184,6 +184,7 @@
             xf:hint               [exists(fr:param)] |
             xf:alert              [exists(fr:param)] |
             fr:text               [exists(fr:param)] |
+            fr:short-label        [exists(fr:param)] |
             fr:iteration-label    [exists(fr:param)] |
             fr:add-iteration-label[exists(fr:param)]"
         mode="within-controls">

@@ -1493,6 +1493,17 @@
                             </xsl:choose>
                         </xsl:variable>
 
+                        <!-- Short label -->
+                        <xsl:variable
+                                name="static-section-has-short-label"
+                                select="exists($static-current-section/fr:short-label)"/>
+                        <xsl:variable
+                                name="static-section-has-html-short-label"
+                                select="$static-current-section/fr:short-label/@mediatype = 'text/html'"/>
+                        <xsl:variable
+                                name="short-label-expr"
+                                select="concat('xxf:value(''', $static-section-id,  '-short-label'')')"/>
+
                         <xh:li class="{{
                             'disabled'           [not($top-level-section-available)],
                             'active'             [$section-active or $top-level-section-active],
@@ -1511,9 +1522,18 @@
                             <xf:trigger appearance="minimal">
                                 <xf:label>
                                     <xh:span class="fr-toc-title">
-                                        <xf:output value="{$section-label-expr}">
-                                            <xsl:if test="$static-section-has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
-                                        </xf:output>
+                                        <xsl:choose>
+                                            <xsl:when test="$static-section-has-short-label">
+                                                <xf:output value="{$short-label-expr}">
+                                                    <xsl:if test="$static-section-has-html-short-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
+                                                </xf:output>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xf:output value="{$section-label-expr}">
+                                                    <xsl:if test="$static-section-has-html-label"><xsl:attribute name="mediatype">text/html</xsl:attribute></xsl:if>
+                                                </xf:output>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
                                     </xh:span>
                                     <xh:span class="fr-toc-edit {{'xforms-hidden'[not(xxf:instance('local')/section-status/data(.))]}}"><xf:output value="xxf:r('components.wizard.edit', '|fr-fr-resources|')"/></xh:span>
                                     <xsl:if test="$static-is-top-level-section">

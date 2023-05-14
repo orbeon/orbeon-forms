@@ -21,7 +21,8 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderXPathApi"
+         xmlns:map="http://www.w3.org/2005/xpath-functions/map">
 
     <xbl:binding
         id="fr-section"
@@ -103,6 +104,13 @@
                         <xf:var
                             name="view-mode"
                             value="xxf:readonly(xxf:component-context()) or fr:is-readonly-mode()"/>
+
+                        <!-- Expose the section's short label as a hidden control to make it accessible to the wizard (TOC) -->
+                        <xsl:for-each select="fr:short-label[1]">
+                            <fr:hidden id="{concat($root/@id, '-short-label')}"
+                                       ref="{@ref}"
+                                       xxbl:scope="outer"/>
+                        </xsl:for-each>
 
                         <xf:group
                             class="{if ($editable) then '{$fb-can-do-classes}' else ''}"
@@ -201,7 +209,7 @@
                                                             <xsl:copy-of select="$root/@page-size"/>
                                                         </xsl:if>
 
-                                                        <xsl:apply-templates select="fr:iteration-label | fr:add-iteration-label"/>
+                                                        <xsl:apply-templates select="fr:short-label | fr:iteration-label | fr:add-iteration-label"/>
 
                                                         <!-- Forward iteration events -->
                                                         <xf:action

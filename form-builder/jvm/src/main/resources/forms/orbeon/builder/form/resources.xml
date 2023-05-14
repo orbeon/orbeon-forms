@@ -665,6 +665,9 @@
                 <label>Explanatory Text</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label>Short Label</label>
+            </control-short-label>
             <control-iteration-label>
                 <label>Repetition Label</label>
             </control-iteration-label>
@@ -2005,6 +2008,9 @@
                 <label>Text explicatif</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label>Libellé court</label>
+            </control-short-label>
             <control-iteration-label>
                 <label>Libellé des répétitions</label>
             </control-iteration-label>
@@ -3330,11 +3336,14 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label todo="true">[Short Label]</label>
+            </control-short-label>
             <control-iteration-label>
-                <label todo="true">Iteration Label</label>
+                <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">Add Repetition Label</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <alert>
                 <label todo="true">[Feilmelding]</label>
@@ -4681,11 +4690,14 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label todo="true">[Short Label]</label>
+            </control-short-label>
             <control-iteration-label>
-                <label todo="true">Iteration Label</label>
+                <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">Add Repetition Label</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <alert>
                 <label todo="true">[Сообщение об ошибке]</label>
@@ -6032,11 +6044,14 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label todo="true">[Short Label]</label>
+            </control-short-label>
             <control-iteration-label>
-                <label todo="true">Iteration Label</label>
+                <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">Add Repetition Label</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <alert>
                 <label>Messaggio di avviso</label>
@@ -7347,11 +7362,14 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label todo="true">[Short Label]</label>
+            </control-short-label>
             <control-iteration-label>
-                <label todo="true">Iteration Label</label>
+                <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">Add Repetition Label</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <alert>
                 <label>Warnmeldung</label>
@@ -8665,11 +8683,14 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label todo="true">[Short Label]</label>
+            </control-short-label>
             <control-iteration-label>
-                <label todo="true">Iteration Label</label>
+                <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">Add Repetition Label</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <alert>
                 <label>Virheviesti</label>
@@ -10008,11 +10029,14 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label todo="true">[Short Label]</label>
+            </control-short-label>
             <control-iteration-label>
-                <label todo="true">Iteration Label</label>
+                <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">Add Repetition Label</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <alert>
                 <label>Mensaje de Alerta</label>
@@ -11352,11 +11376,14 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label todo="true">[Short Label]</label>
+            </control-short-label>
             <control-iteration-label>
-                <label todo="true">Iteration Label</label>
+                <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">Add Repetition Label</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <alert>
                 <label>Waarschuwingsmelding</label>
@@ -12675,11 +12702,14 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label todo="true">[Short Label]</label>
+            </control-short-label>
             <control-iteration-label>
-                <label todo="true">Iteration Label</label>
+                <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">Add Repetition Label</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <alert>
                 <label>Mensagem de Alerta</label>
@@ -14025,11 +14055,14 @@
                 <label todo="true">[Explanatory Text]</label>
                 <hint/>
             </control-text>
+            <control-short-label>
+                <label todo="true">[Short Label]</label>
+            </control-short-label>
             <control-iteration-label>
-                <label todo="true">Iteration Label</label>
+                <label todo="true">[Iteration Label]</label>
             </control-iteration-label>
             <control-add-iteration-label>
-                <label todo="true">Add Repetition Label</label>
+                <label todo="true">[Add Repetition Label]</label>
             </control-add-iteration-label>
             <alert>
                 <label>Avisering</label>

@@ -105,7 +105,7 @@
                     <xf:instance id="fr-form-resources" xxf:readonly="true">
                         <_>
                             <resource xml:lang="en">
-                                <output-format>Output Format</output-format>
+                                <output-format>Output format</output-format>
                                 <default-custom>
                                     <item id="0">Use default</item>
                                     <item id="1">Custom format</item>

@@ -79,8 +79,14 @@
                     <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
                     <xf:value>false</xf:value>
                 </xf:item>
-
             </xf:select1>
+
+            <xf:trigger fr:keep-if-design-time="true" appearance="xxf:mini">
+                <xf:label ref="xxf:r('components.labels.clear', '|fr-fr-resources|')"/>
+                <xf:action event="DOMActivate">
+                    <xf:setvalue ref="xxf:binding('fr-yesno-input-binding')"/>
+                </xf:action>
+            </xf:trigger>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

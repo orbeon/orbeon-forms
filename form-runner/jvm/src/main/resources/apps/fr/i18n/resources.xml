@@ -99,6 +99,7 @@
                 <yes>Yes</yes>
                 <no>No</no>
                 <other>Other</other>
+                <clear>Clear Value</clear>
             </labels>
             <grid>
                 <menu>Menu</menu>
@@ -671,6 +672,7 @@
                 <yes>Oui</yes>
                 <no>Non</no>
                 <other>Autre</other>
+                <clear>Réinitialiser</clear>
             </labels>
             <grid>
                 <menu>Menu</menu>
@@ -1247,6 +1249,7 @@
                 <yes>Sí</yes>
                 <no>No</no>
                 <other>Otro</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu>Menú</menu>
@@ -1809,6 +1812,7 @@
                 <yes>Sí</yes>
                 <no>No</no>
                 <other>Un altre</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu>Menú</menu>
@@ -4083,6 +4087,7 @@
                 <yes>Ja</yes>
                 <no>Nein</no>
                 <other>Sonstige</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu todo="true">Menu</menu>
@@ -5227,6 +5232,7 @@
                 <yes>Ja</yes>
                 <no>Nej</no>
                 <other>Annat</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu>Meny</menu>
@@ -5799,6 +5805,7 @@
                 <yes>Ja</yes>
                 <no>Nee</no>
                 <other>Anders</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu>Menu</menu>
@@ -6941,6 +6948,7 @@
                 <yes>Ja</yes>
                 <no>Nej</no>
                 <other>Andet</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu>Menu</menu>
@@ -7500,6 +7508,7 @@
                 <yes>Tak</yes>
                 <no>Nie</no>
                 <other>inne</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu>Menu</menu>

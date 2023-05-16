@@ -12,6 +12,7 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.fr.persistence.proxy
+
 import org.apache.http.HttpStatus
 import org.orbeon.io.IOUtils
 import org.orbeon.oxf.common.OXFException
@@ -29,7 +30,6 @@ import org.orbeon.oxf.http._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.PathUtils._
 import org.orbeon.oxf.util.StringUtils._
@@ -204,8 +204,10 @@ private object PersistenceProxyProcessor {
     // NOTE: No form definition version handled!
     proxyRequestImpl(
       proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, outgoingPersistenceHeaders),
+      request,
       response,
-      Nil
+      Nil,
+      None
     )
   }
 
@@ -226,6 +228,7 @@ private object PersistenceProxyProcessor {
 
     val isDataXmlRequest = formOrData == FormOrData.Data && filename.contains(XmlFormDataFilename)
     val isFormBuilder    = appForm == AppForm.FormBuilder
+    val isAttachment     = !isDataXmlRequest && filename.isDefined
 
     // Get persistence implementation target URL and configuration headers
     //
@@ -387,38 +390,6 @@ private object PersistenceProxyProcessor {
           (None, None)
       }
 
-    val requestContent = HttpMethod.HttpMethodsWithRequestBody(request.getMethod) option {
-
-      val requestInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
-        case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
-        case None          => request.getInputStream
-      }
-
-      val inputData = requestInputStream -> request.contentLengthOpt
-      val (bodyInputStream, bodyContentLength) = formOrData match {
-        case FormOrData.Form =>
-          // Don't encrypt form definitions
-          inputData
-        case FormOrData.Data if isFormBuilder =>
-          // Don't encrypt Form Builder form data either
-          inputData
-        case FormOrData.Data =>
-          FieldEncryption.encryptDataIfNecessary(
-            request,
-            requestInputStream,
-            appForm,
-            isDataXmlRequest
-          ).getOrElse(inputData)
-      }
-
-      StreamedContent(
-        bodyInputStream,
-        Option(request.getContentType),
-        bodyContentLength,
-        None
-      )
-    }
-
     def maybeMigrateFormDefinition: Option[(InputStream, OutputStream) => Unit] =
       request.getFirstParamAsString(FormDefinitionFormatVersionName).map(DataFormatVersion.withName) map { dstVersion =>
         Transforms.migrateFormDefinition(
@@ -467,15 +438,113 @@ private object PersistenceProxyProcessor {
     val outgoingVersionHeaderOpt =
       effectiveFormDefinitionVersionOpt.map(v => Version.OrbeonFormDefinitionVersion -> v.toString)
 
+    val bodyContentOpt = bodyContent(
+      request,
+      isDataXmlRequest,
+      isFormBuilder,
+      appForm,
+      formOrData
+    )
+
+    val attachmentsProviderCxrOpt = attachmentsProviderCxr(
+      isAttachment,
+      request,
+      appForm,
+      formOrData,
+      path,
+      bodyContentOpt
+    )
+
+    val cxr = cxrOpt.getOrElse {
+      // If an attachments provider is available, always use it to store the actual attachment
+      val outgoingRequestContent = if (attachmentsProviderCxrOpt.isDefined && request.getMethod == HttpMethod.PUT) {
+        // Body content processed by attachments provider, no need to pass it further
+        None
+      } else {
+        bodyContentOpt
+      }
+
+      proxyEstablishConnection(
+        OutgoingRequest(request),
+        outgoingRequestContent,
+        serviceUri,
+        outgoingPersistenceHeaders ++ outgoingVersionHeaderOpt
+      )
+    }
+
     // A connection might have been opened above, and if so we use it
     proxyRequestImpl(
-      cxrOpt.getOrElse(proxyEstablishConnection(OutgoingRequest(request), requestContent, serviceUri, outgoingPersistenceHeaders ++ outgoingVersionHeaderOpt)),
+      cxr,
+      request,
       response,
-      responseTransforms
+      responseTransforms,
+      attachmentsProviderCxrOpt
     )
   }
 
-  private def compareVersionAgainstIncomingIfNeeded(effectiveFormDefinitionVersionOpt: Option[Int],responseHeaders: ResponseHeaders): Int = {
+  private def bodyContent(
+    request: Request,
+    isDataXmlRequest: Boolean,
+    isFormBuilder: Boolean,
+    appForm: AppForm,
+    formOrData: FormOrData
+  ): Option[StreamedContent] =
+    HttpMethod.HttpMethodsWithRequestBody(request.getMethod).option {
+
+      val requestInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
+        case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
+        case None => request.getInputStream
+      }
+
+      val inputData = requestInputStream -> request.contentLengthOpt
+      val (bodyInputStream, bodyContentLength) = formOrData match {
+        case FormOrData.Form =>
+          // Don't encrypt form definitions
+          inputData
+        case FormOrData.Data if isFormBuilder =>
+          // Don't encrypt Form Builder form data either
+          inputData
+        case FormOrData.Data =>
+          FieldEncryption.encryptDataIfNecessary(
+            request,
+            requestInputStream,
+            appForm,
+            isDataXmlRequest
+          ).getOrElse(inputData)
+      }
+
+      StreamedContent(
+        bodyInputStream,
+        Option(request.getContentType),
+        bodyContentLength,
+        None
+      )
+    }
+
+  private def attachmentsProviderCxr(
+    isAttachment: Boolean,
+    request: Request,
+    appForm: AppForm,
+    formOrData: FormOrData,
+    path: String,
+    streamedContent: Option[StreamedContent]
+  ): Option[ConnectionResult] = {
+    if (isAttachment) {
+      findAttachmentsProvider(appForm, formOrData).map { provider =>
+        val (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
+        val serviceURI         = baseURI + path
+
+        proxyEstablishConnection(OutgoingRequest(request), streamedContent, serviceURI, headers)
+      }
+    } else {
+      None
+    }
+  }
+
+  private def compareVersionAgainstIncomingIfNeeded(
+    effectiveFormDefinitionVersionOpt : Option[Int],
+    responseHeaders                   : ResponseHeaders
+  ): Int = {
     val versionFromProvider = responseHeaders.formVersion.getOrElse(1)
     effectiveFormDefinitionVersionOpt.foreach { incomingVersion =>
       if (incomingVersion != versionFromProvider)
@@ -485,12 +554,12 @@ private object PersistenceProxyProcessor {
   }
 
   private def connectToObtainResponseHeadersAndCheckVersion(
-    request                   : OutgoingRequest,
-    requestMethod             : HttpMethod.CrudMethod,
-    serviceUri                : String,
-    outgoingPersistenceHeaders: Map[String, String],
-    specificIncomingVersionOpt: Option[Int],
-    queryForToken             : List[(String, String)]
+    request                    : OutgoingRequest,
+    requestMethod              : HttpMethod.CrudMethod,
+    serviceUri                 : String,
+    outgoingPersistenceHeaders : Map[String, String],
+    specificIncomingVersionOpt : Option[Int],
+    queryForToken              : List[(String, String)]
   ): (Option[ConnectionResult], Int, Option[ResponseHeaders]) =
     requestMethod match {
       case HttpMethod.GET | HttpMethod.HEAD =>
@@ -521,10 +590,10 @@ private object PersistenceProxyProcessor {
     }
 
   private def connectToObtainResponseHeadersAndCheckVersionGetOrHead(
-    request                   : OutgoingRequest,
-    serviceUri                : String,
-    outgoingPersistenceHeaders: Map[String, String],
-    specificIncomingVersionOpt: Option[Int]
+    request                    : OutgoingRequest,
+    serviceUri                 : String,
+    outgoingPersistenceHeaders : Map[String, String],
+    specificIncomingVersionOpt : Option[Int]
   ): (ConnectionResult, Int, ResponseHeaders) = {
 
     val cxr =
@@ -607,7 +676,10 @@ private object PersistenceProxyProcessor {
           throw HttpStatusCodeException(StatusCode.BadRequest)
       }
 
-  private def parsePruneAndSerializeXmlData(is: InputStream, os: OutputStream): Unit = {
+  private def parsePruneAndSerializeXmlData(
+    is : InputStream,
+    os : OutputStream
+  ): Unit = {
 
     val receiver = TransformerUtils.getIdentityTransformerHandler
     receiver.setResult(new StreamResult(os))
@@ -631,9 +703,11 @@ private object PersistenceProxyProcessor {
   }
 
   private def proxyRequestImpl(
-    cxr                : ConnectionResult,
-    response           : Response,
-    responseTransforms : List[(InputStream, OutputStream) => Unit]
+    cxr                       : ConnectionResult,
+    request                   : Request,
+    response                  : Response,
+    responseTransforms        : List[(InputStream, OutputStream) => Unit],
+    attachmentsProviderCxrOpt : Option[ConnectionResult]
   ): Unit =
     IOUtils.useAndClose(cxr) { connectionResult =>
       // Proxy status code
@@ -665,11 +739,25 @@ private object PersistenceProxyProcessor {
       val doTransforms =
         connectionResult.statusCode == HttpStatus.SC_OK
 
-      applyTransforms(
-        connectionResult.content.inputStream,
-        response.getOutputStream,
-        if (doTransforms) responseTransforms else Nil
-      )
+      // If an attachments provider is available, always use it to retrieve the actual attachment
+      val inputStream = attachmentsProviderCxrOpt match {
+        case Some(attachmentsProviderCxr) if request.getMethod           == HttpMethod.GET &&
+                                             connectionResult.statusCode == HttpStatus.SC_OK =>
+          attachmentsProviderCxr.content.inputStream
+
+        case _ =>
+          connectionResult.content.inputStream
+      }
+
+      try {
+        applyTransforms(
+          inputStream,
+          response.getOutputStream,
+          if (doTransforms) responseTransforms else Nil
+        )
+      } finally {
+        attachmentsProviderCxrOpt.foreach(_.close())
+      }
     }
 
   private def proxyEstablishConnection(
@@ -730,23 +818,13 @@ private object PersistenceProxyProcessor {
     path     : String
   ): Unit = {
 
-    val providers = {
-      (app, form) match {
-        case (Some(appName), Some(formName)) =>
-          // Get the specific provider for this app/form
-          findProvider(AppForm(appName, formName), FormOrData.Form).toList
-        case _ =>
-          // Get providers independently from app/form
-          // NOTE: Could also optimize case where only app is provided, but there are no callers as of 2013-10-21.
-          getProviders(usableFor = FormOrData.Form)
-      }
-    }
+    val formProviders = getProviders(app, form, FormOrData.Form)
 
     val parameters = PathUtils.encodeQueryString(request.parameters)
 
     val allFormElements =
       for {
-        provider           <- providers
+        provider           <- formProviders
         (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
       } yield {
         // Read all the forms for the current service
@@ -773,10 +851,11 @@ private object PersistenceProxyProcessor {
   }
 
   private def proxyReindex(
-    request : Request,
-    response: Response
+    request  : Request,
+    response : Response
   ): Unit = {
-    val dataProviders = getProviders(usableFor = FormOrData.Data)
+    val dataProviders = getProviders(app = None, form = None, FormOrData.Data)
+
     val dataProvidersWithIndexSupport =
       dataProviders.filter { provider =>
         FormRunner.providerPropertyAsBoolean(provider, "reindex", default = false)
@@ -789,19 +868,21 @@ private object PersistenceProxyProcessor {
 
         proxyRequestImpl(
           proxyEstablishConnection(OutgoingRequest(request), None, serviceURI, outgoingPersistenceHeaders),
+          request,
           response,
-          Nil
+          Nil,
+          None
         )
       }
     )
   }
 
   private def proxyReEncryptStatus(
-    request : Request,
-    response: Response
+    request  : Request,
+    response : Response
   ): Unit = {
 
-    val dataProviders = getProviders(usableFor = FormOrData.Data)
+    val dataProviders = getProviders(app = None, form = None, FormOrData.Data)
 
     val dataProvidersWithReEncryptSupport =
       dataProviders.filter { provider =>
@@ -835,22 +916,11 @@ private object PersistenceProxyProcessor {
     TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))
   }
 
-  // Get all providers that can be used either for form data or for form definitions
-  private def getProviders(usableFor: FormOrData): List[String] = {
-    val propertySet = Properties.instance.getPropertySet
-    propertySet.propertiesStartsWith(PersistenceProviderPropertyPrefix, matchWildcards = false)
-      .filter (propName => propName.endsWith(".*") ||
-                          propName.endsWith(s".${usableFor.entryName}"))
-      .flatMap(propertySet.getNonBlankString)
-      .distinct
-      .filter(FormRunner.isActiveProvider)
-  }
-
   private def getHeadersFromHeadCallProviderViaProxy(
-    requestHeaders             : Map[String, List[String]],
-    serviceURI                 : String,
-    outgoingPersistenceHeaders : Map[String, String],
-    mustFilterVersioningHeaders: Boolean
+    requestHeaders              : Map[String, List[String]],
+    serviceURI                  : String,
+    outgoingPersistenceHeaders  : Map[String, String],
+    mustFilterVersioningHeaders : Boolean
   ): Try[ResponseHeaders] = {
 
     val headRequest =

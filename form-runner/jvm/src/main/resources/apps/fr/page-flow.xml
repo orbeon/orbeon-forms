@@ -41,6 +41,10 @@
         methods="GET"
         model="persistence/relational/history.xpl"/>
 
+    <!-- Create, Read, Update and Delete operations (attachments) -->
+    <service path="/fr/service/(filesystem)/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))"
+             model="persistence/attachments/crud.xpl"/>
+
     <!-- ==== Built-in resource manager-based persistence services ================================================= -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->

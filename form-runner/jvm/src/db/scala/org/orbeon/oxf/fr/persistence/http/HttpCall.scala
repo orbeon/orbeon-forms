@@ -189,10 +189,10 @@ private[persistence] object HttpCall {
     def close(): Unit = httpResponse.disconnect()
   }
 
-  private val FormName = "my-form"
-  def crudURLPrefix   (provider: Provider) = s"crud/${provider.entryName}/$FormName/"
-  def searchURLPrefix (provider: Provider) = s"search/${provider.entryName}/$FormName"
-  def metadataURL     (provider: Provider) = s"form/${provider.entryName}/$FormName"
+  val DefaultFormName = "my-form"
+  def crudURLPrefix   (provider: Provider, formName: String = DefaultFormName) = s"crud/${provider.entryName}/$formName/"
+  def searchURLPrefix (provider: Provider, formName: String = DefaultFormName) = s"search/${provider.entryName}/$formName"
+  def metadataURL     (provider: Provider, formName: String = DefaultFormName) = s"form/${provider.entryName}/$formName"
 
   def post(
     url                      : String,

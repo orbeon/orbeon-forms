@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fr
 
-
 import cats.syntax.option._
 import enumeratum.EnumEntry.Lowercase
 import enumeratum._
@@ -137,6 +136,7 @@ object FormRunnerPersistence {
   val FormMetadataBasePath                = "/fr/service/persistence/form"
   val PersistencePropertyPrefix           = "oxf.fr.persistence"
   val PersistenceProviderPropertyPrefix   = PersistencePropertyPrefix + ".provider"
+  val AttachmentsSuffix                   = "attachments"
 
   val NewFromServiceUriPropertyPrefix     = "oxf.fr.detail.new.service"
   val NewFromServiceUriProperty           = NewFromServiceUriPropertyPrefix + ".uri"
@@ -149,6 +149,27 @@ object FormRunnerPersistence {
     properties.getNonBlankString(
       PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: Nil mkString "."
     )
+
+  def findAttachmentsProvider(appForm: AppForm, formOrData: FormOrData): Option[String] =
+    properties.getNonBlankString(
+      PersistenceProviderPropertyPrefix :: appForm.app :: appForm.form :: formOrData.entryName :: AttachmentsSuffix :: Nil mkString "."
+    )
+
+  // Get all providers that can be used either for form data or for form definitions
+  def getProviders(app: Option[String], form: Option[String], formOrData: FormOrData): List[String] =
+    (app, form) match {
+      case (Some(appName), Some(formName)) =>
+        // Get the specific provider for this app/form
+        findProvider(AppForm(appName, formName), FormOrData.Form).toList
+      case _ =>
+        // Get providers independently from app/form
+        // NOTE: Could also optimize case where only app is provided, but there are no callers as of 2013-10-21.
+        properties.propertiesStartsWith(PersistenceProviderPropertyPrefix, matchWildcards = false)
+          .filter(propName => propName.endsWith(".*") || propName.endsWith(s".${formOrData.entryName}"))
+          .flatMap(properties.getNonBlankString)
+          .distinct
+          .filter(FormRunner.isActiveProvider)
+    }
 
   def providerPropertyAsURL(provider: String, property: String): String =
     properties.getStringOrURIAsString(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".")

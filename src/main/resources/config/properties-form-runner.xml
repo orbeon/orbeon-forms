@@ -22,7 +22,7 @@
 
     <!-- Default provider -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="mysql"/>
-    <!-- Define resource, oracle, and mysql providers with their parameters -->
+    <!-- Define resource, relational, and attachments providers with their parameters -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.resource.uri"                            value="/fr/service/resource"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.oracle.uri"                              value="/fr/service/oracle"/>
     <property as="xs:string"  name="oxf.fr.persistence.oracle.datasource"                       value="oracle"/>
@@ -36,6 +36,7 @@
     <property as="xs:string"  name="oxf.fr.persistence.db2.datasource"                          value="db2"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.sqlserver.uri"                           value="/fr/service/sqlserver"/>
     <property as="xs:string"  name="oxf.fr.persistence.sqlserver.datasource"                    value="sqlserver"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.filesystem.uri"                          value="/fr/service/filesystem"/>
 
     <!-- Whether providers support autosave -->
     <property as="xs:boolean" name="oxf.fr.persistence.*.autosave"                              value="false"/>

@@ -23,7 +23,7 @@ import org.orbeon.oxf.fr.persistence.relational.index.Index
 import org.orbeon.oxf.fr.persistence.relational.rest.SqlSupport._
 import org.orbeon.oxf.fr.persistence.relational.{Provider, RelationalUtils, WhatToReindex}
 import org.orbeon.oxf.fr.{FormRunner, Names}
-import org.orbeon.oxf.http.{HttpStatusCodeException, StatusCode}
+import org.orbeon.oxf.http.{EmptyInputStream, HttpStatusCodeException, StatusCode}
 import org.orbeon.oxf.pipeline.api.{PipelineContext, TransformerXMLReceiver}
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CoreUtils._
@@ -40,7 +40,6 @@ import java.sql.{Array => _, _}
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.{SAXResult, SAXSource}
 import javax.xml.transform.stream.StreamResult
-
 
 object RequestReader {
 
@@ -71,20 +70,32 @@ object RequestReader {
       case _  => false
     }
 
-  def requestInputStream(): InputStream =
+  def requestInputStream(): Option[InputStream] =
     RequestGenerator.getRequestBody(PipelineContext.get) match {
-      case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
-      case None          => NetUtils.getExternalContext.getRequest.getInputStream
+      case Some(bodyURL) =>
+        Some(NetUtils.uriToInputStream(bodyURL))
+
+      case None =>
+        // TODO: should getInputStream return an Option instead or does it impact too much code elsewhere?
+        val inputStream = NetUtils.getExternalContext.getRequest.getInputStream
+        val nonEmptyInputStream = inputStream != EmptyInputStream
+        nonEmptyInputStream option inputStream
     }
 
-  def bytes(): Array[Byte] = {
-    val os = new ByteArrayOutputStream
-    IOUtils.copyStreamAndClose(requestInputStream(), os)
-    os.toByteArray
-  }
+  def bytes(): Option[Array[Byte]] =
+    requestInputStream().map { is =>
+      val os = new ByteArrayOutputStream
+      IOUtils.copyStreamAndClose(is, os)
+      os.toByteArray
+    }
 
-  def dataAndMetadataAsString(provider: Provider, metadata: Boolean): (String, Option[String]) =
-    dataAndMetadataAsString(provider, requestInputStream(), metadata)
+  def dataAndMetadataAsString(provider: Provider, metadata: Boolean): (Option[String], Option[String]) =
+    requestInputStream().map { is =>
+      val (data, metadataOpt) = dataAndMetadataAsString(provider, is, metadata)
+      (Some(data), metadataOpt)
+    }.getOrElse {
+      (None, None)
+    }
 
   def dataAndMetadataAsString(
     provider   : Provider,
@@ -156,8 +167,10 @@ object RequestReader {
   }
 
   // Used by FlatView
-  def xmlDocument(): DocumentInfo =
-    TransformerUtils.readTinyTree(XPath.GlobalConfiguration, requestInputStream(), "", false, false)
+  def xmlDocument(): Option[DocumentInfo] =
+    requestInputStream().map { is =>
+      TransformerUtils.readTinyTree(XPath.GlobalConfiguration, is, "", false, false)
+    }
 }
 
 trait CreateUpdateDelete {

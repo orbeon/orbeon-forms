@@ -18,11 +18,14 @@ import org.orbeon.dom.Document
 import org.orbeon.oxf.externalcontext._
 import org.orbeon.oxf.fr.permission.Operation.{Create, Delete, Read, Update}
 import org.orbeon.oxf.fr.permission._
+import org.orbeon.oxf.fr.persistence.attachments.FilesystemCRUD
 import org.orbeon.oxf.fr.persistence.db._
+import org.orbeon.oxf.fr.persistence.http.HttpCall.DefaultFormName
 import org.orbeon.oxf.fr.persistence.http.{HttpAssert, HttpCall}
 import org.orbeon.oxf.fr.persistence.relational.Provider
 import org.orbeon.oxf.fr.persistence.relational.Version._
 import org.orbeon.oxf.fr.workflow.definitions20201.Stage
+import org.orbeon.oxf.fr.{AppForm, FormOrData}
 import org.orbeon.oxf.http.StatusCode
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport, XFormsSupport, XMLSupport}
 import org.orbeon.oxf.util.CoreUtils._
@@ -58,21 +61,23 @@ class RestApiTest
   private val CanUpdate           = SpecificOperations(Set(Update))
   private val CanCreateRead       = Operations.combine(CanCreate, CanRead)
   private val CanCreateReadUpdate = Operations.combine(CanCreateRead, CanUpdate)
-  private val FormName = "my-form"
+
+  private val FilesystemAttachmentsFormName = "filesystem-attachments-form"
 
   private val AnyoneCanCreateAndRead = Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Read, Create)))))
   private val AnyoneCanCreate        = Permissions.Defined(List(Permission(Nil, SpecificOperations(Set(Create)))))
 
-  private def createForm(provider: Provider)(implicit ec: ExternalContext): Unit = {
-    val form = HttpCall.XML(buildFormDefinition(provider, permissions = Permissions.Undefined, title = Some("first")))
-    val formURL = HttpCall.crudURLPrefix(provider) + "form/form.xhtml"
+  private def createForm(provider: Provider, formName: String = DefaultFormName)(implicit ec: ExternalContext): Unit = {
+    val form = HttpCall.XML(buildFormDefinition(provider, permissions = Permissions.Undefined, formName, title = Some("first")))
+    val formURL = HttpCall.crudURLPrefix(provider, formName) + "form/form.xhtml"
     HttpAssert.put(formURL, Unspecified, form, StatusCode.Created)
   }
 
   private def buildFormDefinition(
-    provider     : Provider,
-    permissions  : Permissions,
-    title        : Option[String] = None
+    provider    : Provider,
+    permissions : Permissions,
+    formName    : String = DefaultFormName,
+    title       : Option[String] = None
   ): Document =
     <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
       <xh:head>
@@ -80,7 +85,7 @@ class RestApiTest
           <xf:instance id="fr-form-metadata">
             <metadata>
               <application-name>{provider.entryName}</application-name>
-              <form-name>{FormName}</form-name>
+              <form-name>{formName}</form-name>
               <title xml:lang="en">{title.getOrElse("")}</title>
               { PermissionsXML.serialize(permissions, normalized = false).getOrElse("") }
             </metadata>
@@ -327,20 +332,27 @@ class RestApiTest
 
   // Try uploading files of 1 KB, 1 MB
   describe("Attachments") {
-    it("must pass basic operations") {
+    def basicOperationsWithForm(formName   : String): Unit = {
       withTestExternalContext { implicit externalContext =>
         Connect.withOrbeonTables("attachments") { (_, provider) =>
+          createForm(provider, formName)
 
-          createForm(provider)
-
-          for ((size, position) <- Seq(1024, 1024 * 1024).zipWithIndex) {
-            val bytes =  new Array[Byte](size) |!> Random.nextBytes |> HttpCall.Binary
-            val dataUrl = HttpCall.crudURLPrefix(provider) + "data/123/file" + position.toString
+          for ((size, position) <- Seq(0, 1, 1024, 1024 * 1024).zipWithIndex) {
+            val bytes = new Array[Byte](size) |!> Random.nextBytes |> HttpCall.Binary
+            val dataUrl = HttpCall.crudURLPrefix(provider, formName) + s"data/123/file$position"
             HttpAssert.put(dataUrl, Specific(1), bytes, StatusCode.Created)
             HttpAssert.get(dataUrl, Unspecified, HttpAssert.ExpectedBody(bytes, AnyOperation, Some(1)))
           }
         }
       }
+    }
+
+    it("must pass basic operations") {
+      basicOperationsWithForm(formName = DefaultFormName)
+    }
+
+    it("must pass basic operations (filesystem attachments)") {
+      basicOperationsWithForm(formName = FilesystemAttachmentsFormName)
     }
   }
 
@@ -416,7 +428,7 @@ class RestApiTest
             <forms>
                 <form operations="create read">
                     <application-name>{provider.entryName}</application-name>
-                    <form-name>my-form</form-name>
+                    <form-name>{DefaultFormName}</form-name>
                     <form-version>1</form-version>
                     <title xml:lang="en"/>
                     <permissions>

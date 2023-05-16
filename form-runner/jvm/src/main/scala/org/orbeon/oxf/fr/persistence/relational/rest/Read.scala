@@ -130,23 +130,23 @@ trait Read extends FormRunnerPersistence {
             ))
 
             // Maybe read body
-            val bodyOpt = readBody.option {
+            val bodyOpt = readBody.flatOption {
               val bodyInputStream = {
                 if (req.forAttachment) {
                   req.provider match {
-                    case PostgreSQL => new ByteArrayInputStream(resultSet.getBytes("file_content"))
-                    case _          => resultSet.getBlob("file_content").getBinaryStream
+                    case PostgreSQL => Option(resultSet.getBytes("file_content")).map(new ByteArrayInputStream(_))
+                    case _          => Option(resultSet.getBlob("file_content")).map(_.getBinaryStream)
                   }
                 } else {
                   val reader = req.provider match {
                     case PostgreSQL => new StringReader(resultSet.getString("xml"))
                     case _          => resultSet.getClob("xml").getCharacterStream
                   }
-                  new ReaderInputStream(reader, CharsetNames.Utf8)
+                  Some(new ReaderInputStream(reader, CharsetNames.Utf8))
                 }
               }
 
-              useAndClose(bodyInputStream)(NetUtils.inputStreamToByteArray)
+              bodyInputStream.map(useAndClose(_)(NetUtils.inputStreamToByteArray))
             }
 
             FromDatabase(

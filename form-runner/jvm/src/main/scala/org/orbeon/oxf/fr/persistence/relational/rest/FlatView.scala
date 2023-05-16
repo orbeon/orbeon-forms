@@ -62,7 +62,7 @@ private object FlatView {
 
     // Compute columns in the view
     val cols = {
-      val userCols  = extractPathsCols(RequestReader.xmlDocument()) map { case (path, col) =>
+      val userCols  = RequestReader.xmlDocument().map(extractPathsCols).getOrElse(Nil).map { case (path, col) =>
         Col(Provider.flatViewExtractFunction(req.provider, path), col)
       }
       MetadataPairs.iterator ++ userCols

@@ -684,6 +684,9 @@
     <processor name="fr:relational-search">
         <class name="org.orbeon.oxf.fr.persistence.relational.search.SearchProcessor"/>
     </processor>
+    <processor name="fr:attachments-crud">
+        <class name="org.orbeon.oxf.fr.persistence.attachments.CRUD"/>
+    </processor>
     <processor name="fr:resources-patcher">
         <class name="org.orbeon.oxf.fr.ResourcesPatcher"/>
     </processor>

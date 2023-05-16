@@ -99,8 +99,7 @@ object SqlSupport {
 
     val (xmlOpt, metadataOpt) =
       if (! delete && ! req.forAttachment) {
-        val (xml, metadataOpt) = RequestReader.dataAndMetadataAsString(req.provider, metadata = !req.forData)
-        (Some(xml), metadataOpt)
+        RequestReader.dataAndMetadataAsString(req.provider, metadata = !req.forData)
       } else {
         (None, None)
       }
@@ -209,7 +208,7 @@ object SqlSupport {
           name          = "file_content",
           value         = DynamicColValue(
             placeholder = "?",
-            paramSetter = param(_.setBytes, RequestReader.bytes())
+            paramSetter = param(_.setBytes, RequestReader.bytes().orNull)
           )
         )
     ) ::: (

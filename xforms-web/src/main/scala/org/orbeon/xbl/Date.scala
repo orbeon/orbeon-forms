@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.util.StringUtils._
 import org.orbeon.web.DomEventNames
 import org.orbeon.facades.DatePicker._
+import org.orbeon.oxf.util.CoreUtils.BooleanOps
 import org.orbeon.xforms.Constants.XFormsIosClass
 import org.orbeon.xforms.facade.XBL
 import org.orbeon.xforms._
@@ -229,20 +230,26 @@ private class DateCompanion(containerElem: html.Element) extends XBLCompanionWit
   private def onDateSelectedUpdateStateAndSendValueToServer(): Unit =
     stateOpt foreach { state =>
 
-      val valueFromUI =
+      val valueFromUIOpt =
         if (iOS) {
-          getInputFieldValue
+          Some(getInputFieldValue)
         } else {
           Option(datePicker.getDate) match {
-            case Some(date) => JSDateUtils.dateToIsoStringUsingLocalTimezone(date) // https://github.com/orbeon/orbeon-forms/issues/3907
-            case None       => getInputFieldValue
+            case None       => Some(getInputFieldValue)
+            case Some(uiDate) =>
+              // Don't send UI date to server if it's the same as the state date
+              val stateDateOpt = JSDateUtils.parseIsoDateUsingLocalTimezone(state.value)
+              val dateChanged  = stateDateOpt.isEmpty || stateDateOpt.exists(_.getTime() != uiDate.getTime())
+              dateChanged.option(JSDateUtils.dateToIsoStringUsingLocalTimezone(uiDate))
           }
         }
 
-      updateStateAndSendValueToServerIfNeeded(
-        newState       = state.copy(value = valueFromUI),
-        valueFromState = _.value
-      )
+      valueFromUIOpt.foreach { valueFromUI =>
+        updateStateAndSendValueToServerIfNeeded(
+          newState = state.copy(value = valueFromUI),
+          valueFromState = _.value
+        )
+      }
     }
 
   // Force an update of the date picker if we have a valid date, so when users type "1/2", the value

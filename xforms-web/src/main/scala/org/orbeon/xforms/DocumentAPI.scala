@@ -88,22 +88,32 @@ object DocumentAPI extends js.Object {
       s"Cannot set the value of an output or upload control for id `${control.id}`"
     )
 
-    // Directly change the value in the UI without waiting for an Ajax response
-    // For an XBL component, this calls `xformsUpdateValue()` on the companion object if supported. This does not
-    // dispatch an event, at least not directly.
-    XFormsUI.maybeFutureToScalaFuture(Controls.setCurrentValue(control, newStringValue, force = false)) flatMap { _ => Future(
-      // And also fire server event but use the value from the control
-      // https://github.com/orbeon/orbeon-forms/issues/5383
-      Controls.getCurrentValue(control) foreach { newValue =>
+    def fireValueEvent(): Unit = {
+      Controls.getCurrentValue(control).foreach { newValue =>
+        // Use the value from the control, not the one received (2023-05-18 why?)
         AjaxClient.fireEvent(
           AjaxEvent(
-            eventName  = EventNames.XXFormsValue,
-            targetId   = control.id,
+            eventName = EventNames.XXFormsValue,
+            targetId = control.id,
             properties = Map("value" -> newValue)
           )
         )
       }
-    )}
+    }
+
+    // Directly change the value in the UI without waiting for an Ajax response; for an XBL component, this calls
+    // `xformsUpdateValue()` on the companion object if supported, which doesn't dispatch an event (at least not directly)
+    val undefOrPromiseOrFuture = Controls.setCurrentValue(control, newStringValue, force = false)
+
+    // If setting the value was synchronous, fire the event right away
+    if (js.isUndefined(undefOrPromiseOrFuture)) {
+      fireValueEvent()
+      Future(())
+    } else {
+      XFormsUI.maybeFutureToScalaFuture(undefOrPromiseOrFuture).flatMap { _ =>
+        Future(fireValueEvent())
+      }
+    }
   }
 
   def focus(

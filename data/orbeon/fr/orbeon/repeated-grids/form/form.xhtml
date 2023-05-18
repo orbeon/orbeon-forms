@@ -20,6 +20,11 @@
                             </multiple-grid-iteration>
                         </multiple-grid>
                     </section>
+                    <control-section>
+                        <control-grid>
+                            <readonly>false</readonly>
+                        </control-grid>
+                    </control-section>
                     <repeated-full-number-readwrite-table-section>
                         <repeated-full-number-readwrite-table-single-grid>
                             <repeated-full-number-readwrite-table-single-grid-iteration>
@@ -264,16 +269,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-full-number-readwrite-table-section-bind" ref="repeated-full-number-readwrite-table-section" name="repeated-full-number-readwrite-table-section">
-                    <xf:bind id="repeated-full-number-readwrite-table-single-grid-bind" ref="repeated-full-number-readwrite-table-single-grid" name="repeated-full-number-readwrite-table-single-grid">
-                        <xf:bind id="repeated-full-number-readwrite-table-single-grid-iteration-bind" ref="repeated-full-number-readwrite-table-single-grid-iteration" name="repeated-full-number-readwrite-table-single-grid-iteration">
+                <xf:bind id="repeated-full-number-readwrite-table-section-bind"
+                         ref="repeated-full-number-readwrite-table-section"
+                         name="repeated-full-number-readwrite-table-section">
+                    <xf:bind id="repeated-full-number-readwrite-table-single-grid-bind"
+                             ref="repeated-full-number-readwrite-table-single-grid"
+                             name="repeated-full-number-readwrite-table-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-number-readwrite-table-single-grid-iteration-bind"
+                                 ref="repeated-full-number-readwrite-table-single-grid-iteration"
+                                 name="repeated-full-number-readwrite-table-single-grid-iteration">
                             <xf:bind id="repeated-full-number-readwrite-table-f1-bind"
                                      ref="repeated-full-number-readwrite-table-f1"
                                      name="repeated-full-number-readwrite-table-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-full-number-readwrite-table-multiple-grid-bind" ref="repeated-full-number-readwrite-table-multiple-grid" name="repeated-full-number-readwrite-table-multiple-grid">
-                        <xf:bind id="repeated-full-number-readwrite-table-multiple-grid-iteration-bind" ref="repeated-full-number-readwrite-table-multiple-grid-iteration" name="repeated-full-number-readwrite-table-multiple-grid-iteration">
+                    <xf:bind id="repeated-full-number-readwrite-table-multiple-grid-bind"
+                             ref="repeated-full-number-readwrite-table-multiple-grid"
+                             name="repeated-full-number-readwrite-table-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-number-readwrite-table-multiple-grid-iteration-bind"
+                                 ref="repeated-full-number-readwrite-table-multiple-grid-iteration"
+                                 name="repeated-full-number-readwrite-table-multiple-grid-iteration">
                             <xf:bind id="repeated-full-number-readwrite-table-f2-bind"
                                      ref="repeated-full-number-readwrite-table-f2"
                                      name="repeated-full-number-readwrite-table-f2" xxf:whitespace="trim"/>
@@ -286,16 +303,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-minimal-number-readwrite-table-section-bind" ref="repeated-minimal-number-readwrite-table-section" name="repeated-minimal-number-readwrite-table-section">
-                    <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-bind" ref="repeated-minimal-number-readwrite-table-single-grid" name="repeated-minimal-number-readwrite-table-single-grid">
-                        <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-iteration-bind" ref="repeated-minimal-number-readwrite-table-single-grid-iteration" name="repeated-minimal-number-readwrite-table-single-grid-iteration">
+                <xf:bind id="repeated-minimal-number-readwrite-table-section-bind"
+                         ref="repeated-minimal-number-readwrite-table-section"
+                         name="repeated-minimal-number-readwrite-table-section">
+                    <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-bind"
+                             ref="repeated-minimal-number-readwrite-table-single-grid"
+                             name="repeated-minimal-number-readwrite-table-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-number-readwrite-table-single-grid-iteration-bind"
+                                 ref="repeated-minimal-number-readwrite-table-single-grid-iteration"
+                                 name="repeated-minimal-number-readwrite-table-single-grid-iteration">
                             <xf:bind id="repeated-minimal-number-readwrite-table-f1-bind"
                                      ref="repeated-minimal-number-readwrite-table-f1"
                                      name="repeated-minimal-number-readwrite-table-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-minimal-number-readwrite-table-multiple-grid-bind" ref="repeated-minimal-number-readwrite-table-multiple-grid" name="repeated-minimal-number-readwrite-table-multiple-grid">
-                        <xf:bind id="repeated-minimal-number-readwrite-table-multiple-grid-iteration-bind" ref="repeated-minimal-number-readwrite-table-multiple-grid-iteration" name="repeated-minimal-number-readwrite-table-multiple-grid-iteration">
+                    <xf:bind id="repeated-minimal-number-readwrite-table-multiple-grid-bind"
+                             ref="repeated-minimal-number-readwrite-table-multiple-grid"
+                             name="repeated-minimal-number-readwrite-table-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-number-readwrite-table-multiple-grid-iteration-bind"
+                                 ref="repeated-minimal-number-readwrite-table-multiple-grid-iteration"
+                                 name="repeated-minimal-number-readwrite-table-multiple-grid-iteration">
                             <xf:bind id="repeated-minimal-number-readwrite-table-f2-bind"
                                      ref="repeated-minimal-number-readwrite-table-f2"
                                      name="repeated-minimal-number-readwrite-table-f2" xxf:whitespace="trim"/>
@@ -308,16 +337,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-full-nonumber-readwrite-table-section-bind" ref="repeated-full-nonumber-readwrite-table-section" name="repeated-full-nonumber-readwrite-table-section">
-                    <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-bind" ref="repeated-full-nonumber-readwrite-table-single-grid" name="repeated-full-nonumber-readwrite-table-single-grid">
-                        <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-iteration-bind" ref="repeated-full-nonumber-readwrite-table-single-grid-iteration" name="repeated-full-nonumber-readwrite-table-single-grid-iteration">
+                <xf:bind id="repeated-full-nonumber-readwrite-table-section-bind"
+                         ref="repeated-full-nonumber-readwrite-table-section"
+                         name="repeated-full-nonumber-readwrite-table-section">
+                    <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-bind"
+                             ref="repeated-full-nonumber-readwrite-table-single-grid"
+                             name="repeated-full-nonumber-readwrite-table-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-nonumber-readwrite-table-single-grid-iteration-bind"
+                                 ref="repeated-full-nonumber-readwrite-table-single-grid-iteration"
+                                 name="repeated-full-nonumber-readwrite-table-single-grid-iteration">
                             <xf:bind id="repeated-full-nonumber-readwrite-table-f1-bind"
                                      ref="repeated-full-nonumber-readwrite-table-f1"
                                      name="repeated-full-nonumber-readwrite-table-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-full-nonumber-readwrite-table-multiple-grid-bind" ref="repeated-full-nonumber-readwrite-table-multiple-grid" name="repeated-full-nonumber-readwrite-table-multiple-grid">
-                        <xf:bind id="repeated-full-nonumber-readwrite-table-multiple-grid-iteration-bind" ref="repeated-full-nonumber-readwrite-table-multiple-grid-iteration" name="repeated-full-nonumber-readwrite-table-multiple-grid-iteration">
+                    <xf:bind id="repeated-full-nonumber-readwrite-table-multiple-grid-bind"
+                             ref="repeated-full-nonumber-readwrite-table-multiple-grid"
+                             name="repeated-full-nonumber-readwrite-table-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-nonumber-readwrite-table-multiple-grid-iteration-bind"
+                                 ref="repeated-full-nonumber-readwrite-table-multiple-grid-iteration"
+                                 name="repeated-full-nonumber-readwrite-table-multiple-grid-iteration">
                             <xf:bind id="repeated-full-nonumber-readwrite-table-f2-bind"
                                      ref="repeated-full-nonumber-readwrite-table-f2"
                                      name="repeated-full-nonumber-readwrite-table-f2" xxf:whitespace="trim"/>
@@ -330,16 +371,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-minimal-nonumber-readwrite-table-section-bind" ref="repeated-minimal-nonumber-readwrite-table-section" name="repeated-minimal-nonumber-readwrite-table-section">
-                    <xf:bind id="repeated-minimal-nonumber-readwrite-table-single-grid-bind" ref="repeated-minimal-nonumber-readwrite-table-single-grid" name="repeated-minimal-nonumber-readwrite-table-single-grid">
-                        <xf:bind id="repeated-minimal-nonumber-readwrite-table-single-grid-iteration-bind" ref="repeated-minimal-nonumber-readwrite-table-single-grid-iteration" name="repeated-minimal-nonumber-readwrite-table-single-grid-iteration">
+                <xf:bind id="repeated-minimal-nonumber-readwrite-table-section-bind"
+                         ref="repeated-minimal-nonumber-readwrite-table-section"
+                         name="repeated-minimal-nonumber-readwrite-table-section">
+                    <xf:bind id="repeated-minimal-nonumber-readwrite-table-single-grid-bind"
+                             ref="repeated-minimal-nonumber-readwrite-table-single-grid"
+                             name="repeated-minimal-nonumber-readwrite-table-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-nonumber-readwrite-table-single-grid-iteration-bind"
+                                 ref="repeated-minimal-nonumber-readwrite-table-single-grid-iteration"
+                                 name="repeated-minimal-nonumber-readwrite-table-single-grid-iteration">
                             <xf:bind id="repeated-minimal-nonumber-readwrite-table-f1-bind"
                                      ref="repeated-minimal-nonumber-readwrite-table-f1"
                                      name="repeated-minimal-nonumber-readwrite-table-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-minimal-nonumber-readwrite-table-multiple-grid-bind" ref="repeated-minimal-nonumber-readwrite-table-multiple-grid" name="repeated-minimal-nonumber-readwrite-table-multiple-grid">
-                        <xf:bind id="repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration-bind" ref="repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration" name="repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration">
+                    <xf:bind id="repeated-minimal-nonumber-readwrite-table-multiple-grid-bind"
+                             ref="repeated-minimal-nonumber-readwrite-table-multiple-grid"
+                             name="repeated-minimal-nonumber-readwrite-table-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration-bind"
+                                 ref="repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration"
+                                 name="repeated-minimal-nonumber-readwrite-table-multiple-grid-iteration">
                             <xf:bind id="repeated-minimal-nonumber-readwrite-table-f2-bind"
                                      ref="repeated-minimal-nonumber-readwrite-table-f2"
                                      name="repeated-minimal-nonumber-readwrite-table-f2" xxf:whitespace="trim"/>
@@ -352,16 +405,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-full-number-readonly-table-section-bind" ref="repeated-full-number-readonly-table-section" name="repeated-full-number-readonly-table-section">
-                    <xf:bind id="repeated-full-number-readonly-table-single-grid-bind" ref="repeated-full-number-readonly-table-single-grid" name="repeated-full-number-readonly-table-single-grid">
-                        <xf:bind id="repeated-full-number-readonly-table-single-grid-iteration-bind" ref="repeated-full-number-readonly-table-single-grid-iteration" name="repeated-full-number-readonly-table-single-grid-iteration">
+                <xf:bind id="repeated-full-number-readonly-table-section-bind"
+                         ref="repeated-full-number-readonly-table-section"
+                         name="repeated-full-number-readonly-table-section">
+                    <xf:bind id="repeated-full-number-readonly-table-single-grid-bind"
+                             ref="repeated-full-number-readonly-table-single-grid"
+                             name="repeated-full-number-readonly-table-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-number-readonly-table-single-grid-iteration-bind"
+                                 ref="repeated-full-number-readonly-table-single-grid-iteration"
+                                 name="repeated-full-number-readonly-table-single-grid-iteration">
                             <xf:bind id="repeated-full-number-readonly-table-f1-bind"
                                      ref="repeated-full-number-readonly-table-f1"
                                      name="repeated-full-number-readonly-table-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-full-number-readonly-table-multiple-grid-bind" ref="repeated-full-number-readonly-table-multiple-grid" name="repeated-full-number-readonly-table-multiple-grid">
-                        <xf:bind id="repeated-full-number-readonly-table-multiple-grid-iteration-bind" ref="repeated-full-number-readonly-table-multiple-grid-iteration" name="repeated-full-number-readonly-table-multiple-grid-iteration">
+                    <xf:bind id="repeated-full-number-readonly-table-multiple-grid-bind"
+                             ref="repeated-full-number-readonly-table-multiple-grid"
+                             name="repeated-full-number-readonly-table-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-number-readonly-table-multiple-grid-iteration-bind"
+                                 ref="repeated-full-number-readonly-table-multiple-grid-iteration"
+                                 name="repeated-full-number-readonly-table-multiple-grid-iteration">
                             <xf:bind id="repeated-full-number-readonly-table-f2-bind"
                                      ref="repeated-full-number-readonly-table-f2"
                                      name="repeated-full-number-readonly-table-f2" xxf:whitespace="trim"/>
@@ -374,16 +439,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-minimal-number-readonly-table-section-bind" ref="repeated-minimal-number-readonly-table-section" name="repeated-minimal-number-readonly-table-section">
-                    <xf:bind id="repeated-minimal-number-readonly-table-single-grid-bind" ref="repeated-minimal-number-readonly-table-single-grid" name="repeated-minimal-number-readonly-table-single-grid">
-                        <xf:bind id="repeated-minimal-number-readonly-table-single-grid-iteration-bind" ref="repeated-minimal-number-readonly-table-single-grid-iteration" name="repeated-minimal-number-readonly-table-single-grid-iteration">
+                <xf:bind id="repeated-minimal-number-readonly-table-section-bind"
+                         ref="repeated-minimal-number-readonly-table-section"
+                         name="repeated-minimal-number-readonly-table-section">
+                    <xf:bind id="repeated-minimal-number-readonly-table-single-grid-bind"
+                             ref="repeated-minimal-number-readonly-table-single-grid"
+                             name="repeated-minimal-number-readonly-table-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-number-readonly-table-single-grid-iteration-bind"
+                                 ref="repeated-minimal-number-readonly-table-single-grid-iteration"
+                                 name="repeated-minimal-number-readonly-table-single-grid-iteration">
                             <xf:bind id="repeated-minimal-number-readonly-table-f1-bind"
                                      ref="repeated-minimal-number-readonly-table-f1"
                                      name="repeated-minimal-number-readonly-table-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-minimal-number-readonly-table-multiple-grid-bind" ref="repeated-minimal-number-readonly-table-multiple-grid" name="repeated-minimal-number-readonly-table-multiple-grid">
-                        <xf:bind id="repeated-minimal-number-readonly-table-multiple-grid-iteration-bind" ref="repeated-minimal-number-readonly-table-multiple-grid-iteration" name="repeated-minimal-number-readonly-table-multiple-grid-iteration">
+                    <xf:bind id="repeated-minimal-number-readonly-table-multiple-grid-bind"
+                             ref="repeated-minimal-number-readonly-table-multiple-grid"
+                             name="repeated-minimal-number-readonly-table-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-number-readonly-table-multiple-grid-iteration-bind"
+                                 ref="repeated-minimal-number-readonly-table-multiple-grid-iteration"
+                                 name="repeated-minimal-number-readonly-table-multiple-grid-iteration">
                             <xf:bind id="repeated-minimal-number-readonly-table-f2-bind"
                                      ref="repeated-minimal-number-readonly-table-f2"
                                      name="repeated-minimal-number-readonly-table-f2" xxf:whitespace="trim"/>
@@ -396,16 +473,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-full-nonumber-readonly-table-section-bind" ref="repeated-full-nonumber-readonly-table-section" name="repeated-full-nonumber-readonly-table-section">
-                    <xf:bind id="repeated-full-nonumber-readonly-table-single-grid-bind" ref="repeated-full-nonumber-readonly-table-single-grid" name="repeated-full-nonumber-readonly-table-single-grid">
-                        <xf:bind id="repeated-full-nonumber-readonly-table-single-grid-iteration-bind" ref="repeated-full-nonumber-readonly-table-single-grid-iteration" name="repeated-full-nonumber-readonly-table-single-grid-iteration">
+                <xf:bind id="repeated-full-nonumber-readonly-table-section-bind"
+                         ref="repeated-full-nonumber-readonly-table-section"
+                         name="repeated-full-nonumber-readonly-table-section">
+                    <xf:bind id="repeated-full-nonumber-readonly-table-single-grid-bind"
+                             ref="repeated-full-nonumber-readonly-table-single-grid"
+                             name="repeated-full-nonumber-readonly-table-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-nonumber-readonly-table-single-grid-iteration-bind"
+                                 ref="repeated-full-nonumber-readonly-table-single-grid-iteration"
+                                 name="repeated-full-nonumber-readonly-table-single-grid-iteration">
                             <xf:bind id="repeated-full-nonumber-readonly-table-f1-bind"
                                      ref="repeated-full-nonumber-readonly-table-f1"
                                      name="repeated-full-nonumber-readonly-table-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-full-nonumber-readonly-table-multiple-grid-bind" ref="repeated-full-nonumber-readonly-table-multiple-grid" name="repeated-full-nonumber-readonly-table-multiple-grid">
-                        <xf:bind id="repeated-full-nonumber-readonly-table-multiple-grid-iteration-bind" ref="repeated-full-nonumber-readonly-table-multiple-grid-iteration" name="repeated-full-nonumber-readonly-table-multiple-grid-iteration">
+                    <xf:bind id="repeated-full-nonumber-readonly-table-multiple-grid-bind"
+                             ref="repeated-full-nonumber-readonly-table-multiple-grid"
+                             name="repeated-full-nonumber-readonly-table-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-nonumber-readonly-table-multiple-grid-iteration-bind"
+                                 ref="repeated-full-nonumber-readonly-table-multiple-grid-iteration"
+                                 name="repeated-full-nonumber-readonly-table-multiple-grid-iteration">
                             <xf:bind id="repeated-full-nonumber-readonly-table-f2-bind"
                                      ref="repeated-full-nonumber-readonly-table-f2"
                                      name="repeated-full-nonumber-readonly-table-f2" xxf:whitespace="trim"/>
@@ -418,16 +507,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-minimal-nonumber-readonly-table-section-bind" ref="repeated-minimal-nonumber-readonly-table-section" name="repeated-minimal-nonumber-readonly-table-section">
-                    <xf:bind id="repeated-minimal-nonumber-readonly-table-single-grid-bind" ref="repeated-minimal-nonumber-readonly-table-single-grid" name="repeated-minimal-nonumber-readonly-table-single-grid">
-                        <xf:bind id="repeated-minimal-nonumber-readonly-table-single-grid-iteration-bind" ref="repeated-minimal-nonumber-readonly-table-single-grid-iteration" name="repeated-minimal-nonumber-readonly-table-single-grid-iteration">
+                <xf:bind id="repeated-minimal-nonumber-readonly-table-section-bind"
+                         ref="repeated-minimal-nonumber-readonly-table-section"
+                         name="repeated-minimal-nonumber-readonly-table-section">
+                    <xf:bind id="repeated-minimal-nonumber-readonly-table-single-grid-bind"
+                             ref="repeated-minimal-nonumber-readonly-table-single-grid"
+                             name="repeated-minimal-nonumber-readonly-table-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-nonumber-readonly-table-single-grid-iteration-bind"
+                                 ref="repeated-minimal-nonumber-readonly-table-single-grid-iteration"
+                                 name="repeated-minimal-nonumber-readonly-table-single-grid-iteration">
                             <xf:bind id="repeated-minimal-nonumber-readonly-table-f1-bind"
                                      ref="repeated-minimal-nonumber-readonly-table-f1"
                                      name="repeated-minimal-nonumber-readonly-table-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-minimal-nonumber-readonly-table-multiple-grid-bind" ref="repeated-minimal-nonumber-readonly-table-multiple-grid" name="repeated-minimal-nonumber-readonly-table-multiple-grid">
-                        <xf:bind id="repeated-minimal-nonumber-readonly-table-multiple-grid-iteration-bind" ref="repeated-minimal-nonumber-readonly-table-multiple-grid-iteration" name="repeated-minimal-nonumber-readonly-table-multiple-grid-iteration">
+                    <xf:bind id="repeated-minimal-nonumber-readonly-table-multiple-grid-bind"
+                             ref="repeated-minimal-nonumber-readonly-table-multiple-grid"
+                             name="repeated-minimal-nonumber-readonly-table-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-nonumber-readonly-table-multiple-grid-iteration-bind"
+                                 ref="repeated-minimal-nonumber-readonly-table-multiple-grid-iteration"
+                                 name="repeated-minimal-nonumber-readonly-table-multiple-grid-iteration">
                             <xf:bind id="repeated-minimal-nonumber-readonly-table-f2-bind"
                                      ref="repeated-minimal-nonumber-readonly-table-f2"
                                      name="repeated-minimal-nonumber-readonly-table-f2" xxf:whitespace="trim"/>
@@ -440,16 +541,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-full-number-readwrite-css-section-bind" ref="repeated-full-number-readwrite-css-section" name="repeated-full-number-readwrite-css-section">
-                    <xf:bind id="repeated-full-number-readwrite-css-single-grid-bind" ref="repeated-full-number-readwrite-css-single-grid" name="repeated-full-number-readwrite-css-single-grid">
-                        <xf:bind id="repeated-full-number-readwrite-css-single-grid-iteration-bind" ref="repeated-full-number-readwrite-css-single-grid-iteration" name="repeated-full-number-readwrite-css-single-grid-iteration">
+                <xf:bind id="repeated-full-number-readwrite-css-section-bind"
+                         ref="repeated-full-number-readwrite-css-section"
+                         name="repeated-full-number-readwrite-css-section">
+                    <xf:bind id="repeated-full-number-readwrite-css-single-grid-bind"
+                             ref="repeated-full-number-readwrite-css-single-grid"
+                             name="repeated-full-number-readwrite-css-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-number-readwrite-css-single-grid-iteration-bind"
+                                 ref="repeated-full-number-readwrite-css-single-grid-iteration"
+                                 name="repeated-full-number-readwrite-css-single-grid-iteration">
                             <xf:bind id="repeated-full-number-readwrite-css-f1-bind"
                                      ref="repeated-full-number-readwrite-css-f1"
                                      name="repeated-full-number-readwrite-css-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-full-number-readwrite-css-multiple-grid-bind" ref="repeated-full-number-readwrite-css-multiple-grid" name="repeated-full-number-readwrite-css-multiple-grid">
-                        <xf:bind id="repeated-full-number-readwrite-css-multiple-grid-iteration-bind" ref="repeated-full-number-readwrite-css-multiple-grid-iteration" name="repeated-full-number-readwrite-css-multiple-grid-iteration">
+                    <xf:bind id="repeated-full-number-readwrite-css-multiple-grid-bind"
+                             ref="repeated-full-number-readwrite-css-multiple-grid"
+                             name="repeated-full-number-readwrite-css-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-number-readwrite-css-multiple-grid-iteration-bind"
+                                 ref="repeated-full-number-readwrite-css-multiple-grid-iteration"
+                                 name="repeated-full-number-readwrite-css-multiple-grid-iteration">
                             <xf:bind id="repeated-full-number-readwrite-css-f2-bind"
                                      ref="repeated-full-number-readwrite-css-f2"
                                      name="repeated-full-number-readwrite-css-f2" xxf:whitespace="trim"/>
@@ -462,16 +575,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-minimal-number-readwrite-css-section-bind" ref="repeated-minimal-number-readwrite-css-section" name="repeated-minimal-number-readwrite-css-section">
-                    <xf:bind id="repeated-minimal-number-readwrite-css-single-grid-bind" ref="repeated-minimal-number-readwrite-css-single-grid" name="repeated-minimal-number-readwrite-css-single-grid">
-                        <xf:bind id="repeated-minimal-number-readwrite-css-single-grid-iteration-bind" ref="repeated-minimal-number-readwrite-css-single-grid-iteration" name="repeated-minimal-number-readwrite-css-single-grid-iteration">
+                <xf:bind id="repeated-minimal-number-readwrite-css-section-bind"
+                         ref="repeated-minimal-number-readwrite-css-section"
+                         name="repeated-minimal-number-readwrite-css-section">
+                    <xf:bind id="repeated-minimal-number-readwrite-css-single-grid-bind"
+                             ref="repeated-minimal-number-readwrite-css-single-grid"
+                             name="repeated-minimal-number-readwrite-css-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-number-readwrite-css-single-grid-iteration-bind"
+                                 ref="repeated-minimal-number-readwrite-css-single-grid-iteration"
+                                 name="repeated-minimal-number-readwrite-css-single-grid-iteration">
                             <xf:bind id="repeated-minimal-number-readwrite-css-f1-bind"
                                      ref="repeated-minimal-number-readwrite-css-f1"
                                      name="repeated-minimal-number-readwrite-css-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-minimal-number-readwrite-css-multiple-grid-bind" ref="repeated-minimal-number-readwrite-css-multiple-grid" name="repeated-minimal-number-readwrite-css-multiple-grid">
-                        <xf:bind id="repeated-minimal-number-readwrite-css-multiple-grid-iteration-bind" ref="repeated-minimal-number-readwrite-css-multiple-grid-iteration" name="repeated-minimal-number-readwrite-css-multiple-grid-iteration">
+                    <xf:bind id="repeated-minimal-number-readwrite-css-multiple-grid-bind"
+                             ref="repeated-minimal-number-readwrite-css-multiple-grid"
+                             name="repeated-minimal-number-readwrite-css-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-number-readwrite-css-multiple-grid-iteration-bind"
+                                 ref="repeated-minimal-number-readwrite-css-multiple-grid-iteration"
+                                 name="repeated-minimal-number-readwrite-css-multiple-grid-iteration">
                             <xf:bind id="repeated-minimal-number-readwrite-css-f2-bind"
                                      ref="repeated-minimal-number-readwrite-css-f2"
                                      name="repeated-minimal-number-readwrite-css-f2" xxf:whitespace="trim"/>
@@ -484,16 +609,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-full-nonumber-readwrite-css-section-bind" ref="repeated-full-nonumber-readwrite-css-section" name="repeated-full-nonumber-readwrite-css-section">
-                    <xf:bind id="repeated-full-nonumber-readwrite-css-single-grid-bind" ref="repeated-full-nonumber-readwrite-css-single-grid" name="repeated-full-nonumber-readwrite-css-single-grid">
-                        <xf:bind id="repeated-full-nonumber-readwrite-css-single-grid-iteration-bind" ref="repeated-full-nonumber-readwrite-css-single-grid-iteration" name="repeated-full-nonumber-readwrite-css-single-grid-iteration">
+                <xf:bind id="repeated-full-nonumber-readwrite-css-section-bind"
+                         ref="repeated-full-nonumber-readwrite-css-section"
+                         name="repeated-full-nonumber-readwrite-css-section">
+                    <xf:bind id="repeated-full-nonumber-readwrite-css-single-grid-bind"
+                             ref="repeated-full-nonumber-readwrite-css-single-grid"
+                             name="repeated-full-nonumber-readwrite-css-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-nonumber-readwrite-css-single-grid-iteration-bind"
+                                 ref="repeated-full-nonumber-readwrite-css-single-grid-iteration"
+                                 name="repeated-full-nonumber-readwrite-css-single-grid-iteration">
                             <xf:bind id="repeated-full-nonumber-readwrite-css-f1-bind"
                                      ref="repeated-full-nonumber-readwrite-css-f1"
                                      name="repeated-full-nonumber-readwrite-css-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-full-nonumber-readwrite-css-multiple-grid-bind" ref="repeated-full-nonumber-readwrite-css-multiple-grid" name="repeated-full-nonumber-readwrite-css-multiple-grid">
-                        <xf:bind id="repeated-full-nonumber-readwrite-css-multiple-grid-iteration-bind" ref="repeated-full-nonumber-readwrite-css-multiple-grid-iteration" name="repeated-full-nonumber-readwrite-css-multiple-grid-iteration">
+                    <xf:bind id="repeated-full-nonumber-readwrite-css-multiple-grid-bind"
+                             ref="repeated-full-nonumber-readwrite-css-multiple-grid"
+                             name="repeated-full-nonumber-readwrite-css-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-nonumber-readwrite-css-multiple-grid-iteration-bind"
+                                 ref="repeated-full-nonumber-readwrite-css-multiple-grid-iteration"
+                                 name="repeated-full-nonumber-readwrite-css-multiple-grid-iteration">
                             <xf:bind id="repeated-full-nonumber-readwrite-css-f2-bind"
                                      ref="repeated-full-nonumber-readwrite-css-f2"
                                      name="repeated-full-nonumber-readwrite-css-f2" xxf:whitespace="trim"/>
@@ -506,16 +643,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-minimal-nonumber-readwrite-css-section-bind" ref="repeated-minimal-nonumber-readwrite-css-section" name="repeated-minimal-nonumber-readwrite-css-section">
-                    <xf:bind id="repeated-minimal-nonumber-readwrite-css-single-grid-bind" ref="repeated-minimal-nonumber-readwrite-css-single-grid" name="repeated-minimal-nonumber-readwrite-css-single-grid">
-                        <xf:bind id="repeated-minimal-nonumber-readwrite-css-single-grid-iteration-bind" ref="repeated-minimal-nonumber-readwrite-css-single-grid-iteration" name="repeated-minimal-nonumber-readwrite-css-single-grid-iteration">
+                <xf:bind id="repeated-minimal-nonumber-readwrite-css-section-bind"
+                         ref="repeated-minimal-nonumber-readwrite-css-section"
+                         name="repeated-minimal-nonumber-readwrite-css-section">
+                    <xf:bind id="repeated-minimal-nonumber-readwrite-css-single-grid-bind"
+                             ref="repeated-minimal-nonumber-readwrite-css-single-grid"
+                             name="repeated-minimal-nonumber-readwrite-css-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-nonumber-readwrite-css-single-grid-iteration-bind"
+                                 ref="repeated-minimal-nonumber-readwrite-css-single-grid-iteration"
+                                 name="repeated-minimal-nonumber-readwrite-css-single-grid-iteration">
                             <xf:bind id="repeated-minimal-nonumber-readwrite-css-f1-bind"
                                      ref="repeated-minimal-nonumber-readwrite-css-f1"
                                      name="repeated-minimal-nonumber-readwrite-css-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-minimal-nonumber-readwrite-css-multiple-grid-bind" ref="repeated-minimal-nonumber-readwrite-css-multiple-grid" name="repeated-minimal-nonumber-readwrite-css-multiple-grid">
-                        <xf:bind id="repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration-bind" ref="repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration" name="repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration">
+                    <xf:bind id="repeated-minimal-nonumber-readwrite-css-multiple-grid-bind"
+                             ref="repeated-minimal-nonumber-readwrite-css-multiple-grid"
+                             name="repeated-minimal-nonumber-readwrite-css-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration-bind"
+                                 ref="repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration"
+                                 name="repeated-minimal-nonumber-readwrite-css-multiple-grid-iteration">
                             <xf:bind id="repeated-minimal-nonumber-readwrite-css-f2-bind"
                                      ref="repeated-minimal-nonumber-readwrite-css-f2"
                                      name="repeated-minimal-nonumber-readwrite-css-f2" xxf:whitespace="trim"/>
@@ -528,16 +677,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-full-number-readonly-css-section-bind" ref="repeated-full-number-readonly-css-section" name="repeated-full-number-readonly-css-section">
-                    <xf:bind id="repeated-full-number-readonly-css-single-grid-bind" ref="repeated-full-number-readonly-css-single-grid" name="repeated-full-number-readonly-css-single-grid">
-                        <xf:bind id="repeated-full-number-readonly-css-single-grid-iteration-bind" ref="repeated-full-number-readonly-css-single-grid-iteration" name="repeated-full-number-readonly-css-single-grid-iteration">
+                <xf:bind id="repeated-full-number-readonly-css-section-bind"
+                         ref="repeated-full-number-readonly-css-section"
+                         name="repeated-full-number-readonly-css-section">
+                    <xf:bind id="repeated-full-number-readonly-css-single-grid-bind"
+                             ref="repeated-full-number-readonly-css-single-grid"
+                             name="repeated-full-number-readonly-css-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-number-readonly-css-single-grid-iteration-bind"
+                                 ref="repeated-full-number-readonly-css-single-grid-iteration"
+                                 name="repeated-full-number-readonly-css-single-grid-iteration">
                             <xf:bind id="repeated-full-number-readonly-css-f1-bind"
                                      ref="repeated-full-number-readonly-css-f1"
                                      name="repeated-full-number-readonly-css-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-full-number-readonly-css-multiple-grid-bind" ref="repeated-full-number-readonly-css-multiple-grid" name="repeated-full-number-readonly-css-multiple-grid">
-                        <xf:bind id="repeated-full-number-readonly-css-multiple-grid-iteration-bind" ref="repeated-full-number-readonly-css-multiple-grid-iteration" name="repeated-full-number-readonly-css-multiple-grid-iteration">
+                    <xf:bind id="repeated-full-number-readonly-css-multiple-grid-bind"
+                             ref="repeated-full-number-readonly-css-multiple-grid"
+                             name="repeated-full-number-readonly-css-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-number-readonly-css-multiple-grid-iteration-bind"
+                                 ref="repeated-full-number-readonly-css-multiple-grid-iteration"
+                                 name="repeated-full-number-readonly-css-multiple-grid-iteration">
                             <xf:bind id="repeated-full-number-readonly-css-f2-bind"
                                      ref="repeated-full-number-readonly-css-f2"
                                      name="repeated-full-number-readonly-css-f2" xxf:whitespace="trim"/>
@@ -550,16 +711,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-minimal-number-readonly-css-section-bind" ref="repeated-minimal-number-readonly-css-section" name="repeated-minimal-number-readonly-css-section">
-                    <xf:bind id="repeated-minimal-number-readonly-css-single-grid-bind" ref="repeated-minimal-number-readonly-css-single-grid" name="repeated-minimal-number-readonly-css-single-grid">
-                        <xf:bind id="repeated-minimal-number-readonly-css-single-grid-iteration-bind" ref="repeated-minimal-number-readonly-css-single-grid-iteration" name="repeated-minimal-number-readonly-css-single-grid-iteration">
+                <xf:bind id="repeated-minimal-number-readonly-css-section-bind"
+                         ref="repeated-minimal-number-readonly-css-section"
+                         name="repeated-minimal-number-readonly-css-section">
+                    <xf:bind id="repeated-minimal-number-readonly-css-single-grid-bind"
+                             ref="repeated-minimal-number-readonly-css-single-grid"
+                             name="repeated-minimal-number-readonly-css-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-number-readonly-css-single-grid-iteration-bind"
+                                 ref="repeated-minimal-number-readonly-css-single-grid-iteration"
+                                 name="repeated-minimal-number-readonly-css-single-grid-iteration">
                             <xf:bind id="repeated-minimal-number-readonly-css-f1-bind"
                                      ref="repeated-minimal-number-readonly-css-f1"
                                      name="repeated-minimal-number-readonly-css-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-minimal-number-readonly-css-multiple-grid-bind" ref="repeated-minimal-number-readonly-css-multiple-grid" name="repeated-minimal-number-readonly-css-multiple-grid">
-                        <xf:bind id="repeated-minimal-number-readonly-css-multiple-grid-iteration-bind" ref="repeated-minimal-number-readonly-css-multiple-grid-iteration" name="repeated-minimal-number-readonly-css-multiple-grid-iteration">
+                    <xf:bind id="repeated-minimal-number-readonly-css-multiple-grid-bind"
+                             ref="repeated-minimal-number-readonly-css-multiple-grid"
+                             name="repeated-minimal-number-readonly-css-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-number-readonly-css-multiple-grid-iteration-bind"
+                                 ref="repeated-minimal-number-readonly-css-multiple-grid-iteration"
+                                 name="repeated-minimal-number-readonly-css-multiple-grid-iteration">
                             <xf:bind id="repeated-minimal-number-readonly-css-f2-bind"
                                      ref="repeated-minimal-number-readonly-css-f2"
                                      name="repeated-minimal-number-readonly-css-f2" xxf:whitespace="trim"/>
@@ -572,16 +745,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-full-nonumber-readonly-css-section-bind" ref="repeated-full-nonumber-readonly-css-section" name="repeated-full-nonumber-readonly-css-section">
-                    <xf:bind id="repeated-full-nonumber-readonly-css-single-grid-bind" ref="repeated-full-nonumber-readonly-css-single-grid" name="repeated-full-nonumber-readonly-css-single-grid">
-                        <xf:bind id="repeated-full-nonumber-readonly-css-single-grid-iteration-bind" ref="repeated-full-nonumber-readonly-css-single-grid-iteration" name="repeated-full-nonumber-readonly-css-single-grid-iteration">
+                <xf:bind id="repeated-full-nonumber-readonly-css-section-bind"
+                         ref="repeated-full-nonumber-readonly-css-section"
+                         name="repeated-full-nonumber-readonly-css-section">
+                    <xf:bind id="repeated-full-nonumber-readonly-css-single-grid-bind"
+                             ref="repeated-full-nonumber-readonly-css-single-grid"
+                             name="repeated-full-nonumber-readonly-css-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-nonumber-readonly-css-single-grid-iteration-bind"
+                                 ref="repeated-full-nonumber-readonly-css-single-grid-iteration"
+                                 name="repeated-full-nonumber-readonly-css-single-grid-iteration">
                             <xf:bind id="repeated-full-nonumber-readonly-css-f1-bind"
                                      ref="repeated-full-nonumber-readonly-css-f1"
                                      name="repeated-full-nonumber-readonly-css-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-full-nonumber-readonly-css-multiple-grid-bind" ref="repeated-full-nonumber-readonly-css-multiple-grid" name="repeated-full-nonumber-readonly-css-multiple-grid">
-                        <xf:bind id="repeated-full-nonumber-readonly-css-multiple-grid-iteration-bind" ref="repeated-full-nonumber-readonly-css-multiple-grid-iteration" name="repeated-full-nonumber-readonly-css-multiple-grid-iteration">
+                    <xf:bind id="repeated-full-nonumber-readonly-css-multiple-grid-bind"
+                             ref="repeated-full-nonumber-readonly-css-multiple-grid"
+                             name="repeated-full-nonumber-readonly-css-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-full-nonumber-readonly-css-multiple-grid-iteration-bind"
+                                 ref="repeated-full-nonumber-readonly-css-multiple-grid-iteration"
+                                 name="repeated-full-nonumber-readonly-css-multiple-grid-iteration">
                             <xf:bind id="repeated-full-nonumber-readonly-css-f2-bind"
                                      ref="repeated-full-nonumber-readonly-css-f2"
                                      name="repeated-full-nonumber-readonly-css-f2" xxf:whitespace="trim"/>
@@ -594,16 +779,28 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-                <xf:bind id="repeated-minimal-nonumber-readonly-css-section-bind" ref="repeated-minimal-nonumber-readonly-css-section" name="repeated-minimal-nonumber-readonly-css-section">
-                    <xf:bind id="repeated-minimal-nonumber-readonly-css-single-grid-bind" ref="repeated-minimal-nonumber-readonly-css-single-grid" name="repeated-minimal-nonumber-readonly-css-single-grid">
-                        <xf:bind id="repeated-minimal-nonumber-readonly-css-single-grid-iteration-bind" ref="repeated-minimal-nonumber-readonly-css-single-grid-iteration" name="repeated-minimal-nonumber-readonly-css-single-grid-iteration">
+                <xf:bind id="repeated-minimal-nonumber-readonly-css-section-bind"
+                         ref="repeated-minimal-nonumber-readonly-css-section"
+                         name="repeated-minimal-nonumber-readonly-css-section">
+                    <xf:bind id="repeated-minimal-nonumber-readonly-css-single-grid-bind"
+                             ref="repeated-minimal-nonumber-readonly-css-single-grid"
+                             name="repeated-minimal-nonumber-readonly-css-single-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-nonumber-readonly-css-single-grid-iteration-bind"
+                                 ref="repeated-minimal-nonumber-readonly-css-single-grid-iteration"
+                                 name="repeated-minimal-nonumber-readonly-css-single-grid-iteration">
                             <xf:bind id="repeated-minimal-nonumber-readonly-css-f1-bind"
                                      ref="repeated-minimal-nonumber-readonly-css-f1"
                                      name="repeated-minimal-nonumber-readonly-css-f1" xxf:whitespace="trim"/>
                         </xf:bind>
                     </xf:bind>
-                    <xf:bind id="repeated-minimal-nonumber-readonly-css-multiple-grid-bind" ref="repeated-minimal-nonumber-readonly-css-multiple-grid" name="repeated-minimal-nonumber-readonly-css-multiple-grid">
-                        <xf:bind id="repeated-minimal-nonumber-readonly-css-multiple-grid-iteration-bind" ref="repeated-minimal-nonumber-readonly-css-multiple-grid-iteration" name="repeated-minimal-nonumber-readonly-css-multiple-grid-iteration">
+                    <xf:bind id="repeated-minimal-nonumber-readonly-css-multiple-grid-bind"
+                             ref="repeated-minimal-nonumber-readonly-css-multiple-grid"
+                             name="repeated-minimal-nonumber-readonly-css-multiple-grid"
+                             readonly="$readonly = true()">
+                        <xf:bind id="repeated-minimal-nonumber-readonly-css-multiple-grid-iteration-bind"
+                                 ref="repeated-minimal-nonumber-readonly-css-multiple-grid-iteration"
+                                 name="repeated-minimal-nonumber-readonly-css-multiple-grid-iteration">
                             <xf:bind id="repeated-minimal-nonumber-readonly-css-f2-bind"
                                      ref="repeated-minimal-nonumber-readonly-css-f2"
                                      name="repeated-minimal-nonumber-readonly-css-f2" xxf:whitespace="trim"/>
@@ -616,7 +813,11 @@
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
-
+                <xf:bind id="control-section-bind" ref="control-section" name="control-section">
+                    <xf:bind id="control-grid-bind" ref="control-grid" name="control-grid">
+                        <xf:bind id="readonly-bind" ref="readonly" name="readonly" type="xf:boolean"/>
+                    </xf:bind>
+                </xf:bind>
             </xf:bind>
 
             <!-- Metadata -->
@@ -644,9 +845,16 @@
             <xf:instance xxf:readonly="true" id="fr-form-resources" xxf:exclude-result-prefixes="#all">
                 <resources>
                     <resource xml:lang="en">
+                        <readonly>
+                            <label>Readonly</label>
+                            <hint/>
+                        </readonly>
                         <section>
                             <label>Template</label>
                         </section>
+                        <control-section>
+                            <label>Control section</label>
+                        </control-section>
                         <repeated-full-number-readwrite-table-section>
                             <label>repeated-full-number-readwrite-table</label>
                         </repeated-full-number-readwrite-table-section>
@@ -1390,7 +1598,26 @@
                         </fr:c>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="repeated-full-number-readwrite-table-section-section" bind="repeated-full-number-readwrite-table-section-bind">
+                <fr:section id="control-section-section" bind="control-section-bind">
+                    <xf:label ref="$form-resources/control-section/label"/>
+                    <fr:grid id="control-grid-grid" bind="control-grid-bind">
+                        <fr:c x="1" y="1" w="6">
+                            <fr:yesno-input xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                            xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                            id="readonly-control"
+                                            bind="readonly-bind">
+                                <xf:label ref="$form-resources/readonly/label"/>
+                                <xf:hint ref="$form-resources/readonly/hint"/>
+                                <xf:alert ref="$fr-resources/detail/labels/alert"/>
+
+
+                            </fr:yesno-input>
+                        </fr:c>
+                        <fr:c x="7" y="1" w="6"/>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="repeated-full-number-readwrite-table-section-section"
+                            bind="repeated-full-number-readwrite-table-section-bind">
                     <xf:label ref="$form-resources/repeated-full-number-readwrite-table-section/label"/>
                     <fr:grid id="repeated-full-number-readwrite-table-single-grid-grid" bind="repeated-full-number-readwrite-table-single-grid-bind" repeat="content" min="1" template="instance('repeated-full-number-readwrite-table-single-grid-template')" apply-defaults="true" fb:initial-iterations="first" number-rows="true" appearance="full">
                         <fr:c x="1" y="1" w="6">

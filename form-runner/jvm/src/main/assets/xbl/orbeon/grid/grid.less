@@ -163,18 +163,6 @@
                     border-right: none;
                     border-bottom: none;
 
-                    &:not(.fr-grid-readonly):not(.fr-grid-number-rows) {
-                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                            grid-template-columns: auto 35px;
-                        }
-                    }
-
-                    &:not(.fr-grid-readonly).fr-grid-number-rows {
-                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                            grid-template-columns: 35px auto 35px;
-                        }
-                    }
-
                     .fr-grid-th,
                     .fr-grid-td,
                     .fr-repeat-column-left,
@@ -193,6 +181,24 @@
             }
             .fr-grid:not(.fr-grid-css) {
 
+            }
+        }
+
+        // For readonly MIP, see: https://github.com/orbeon/orbeon-forms/issues/5743
+        &.xforms-readonly {
+            & > .fr-grid.fr-grid-css {
+                &.fr-repeat:not(.fr-grid-readonly) {
+                    &:not(.fr-grid-number-rows) {
+                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                            grid-template-columns: auto;
+                        }
+                    }
+                    &.fr-grid-number-rows {
+                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                            grid-template-columns: 35px auto;
+                        }
+                    }
+                }
             }
         }
 
@@ -223,6 +229,7 @@
                     width: 100%;
                 }
 
+                // For `readonly="true"` attribute, see: https://github.com/orbeon/orbeon-forms/issues/5743
                 &.fr-grid-readonly:not(.fr-grid-number-rows) {
                     .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
                         grid-template-columns: auto;
@@ -558,23 +565,6 @@
             &> .xforms-control, &> .xbl-component, &> .xforms-group {
                 background-color: transparent;
                 margin-bottom: @frGridCellPadding; // some margin as there is no more padding
-            }
-        }
-    }
-
-    .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
-        .xbl-fr-grid {
-            .fr-grid.fr-grid-css.fr-repeat {
-                &:not(.fr-grid-readonly):not(.fr-grid-number-rows) {
-                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                        grid-template-columns: auto;
-                    }
-                }
-                &:not(.fr-grid-readonly).fr-grid-number-rows {
-                    .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
-                        grid-template-columns: 35px auto;
-                    }
-                }
             }
         }
     }

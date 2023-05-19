@@ -63,6 +63,7 @@
                             <fr:language-selector/>
                         </xh:li>
                     </xh:ul>
+                    <fr:data-history-icon/>
                     <fr:navbar-home-link/>
                 </xh:div>
             </xh:div>
@@ -1036,6 +1037,14 @@
                 </xh:div>
             </xh:div>
         </xh:div>
+
+        <fr:data-history
+            id="fr-data-history"
+            ref=".[fr:mode() = 'edit']"
+            app="{fr:app-name()}"
+            form="{fr:form-name()}"
+            form-version="{fr:form-version()}"
+            document="{fr:document-id()}"/>
 
         <fr:dialogs>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-language.xml" xxi:omit-xml-base="true"/>

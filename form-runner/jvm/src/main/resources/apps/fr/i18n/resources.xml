@@ -861,7 +861,7 @@
                 <upload-error>Une erreur s'est produite durant le téléchargement vers le serveur. Veuillez ressayer.</upload-error>
                 <upload-error-size>Le fichier téléchargé est trop grand. La taille maximale est {0,number,integer} bytes et la taille reçue est {1,number,integer} bytes.</upload-error-size>
                 <upload-error-mediatype>Le fichier téléchargé est d''un type incorrect.</upload-error-mediatype>
-                <upload-error-file-scan>Le fichier téléchargé a été rejeté par le scanner de fichiers. Veuillez vérifier qu''il ne s'agit pas d'un fichier infecté. Voici le message du scanner de fichiers: "{0}".</upload-error-file-scan>
+                <upload-error-file-scan>Le fichier téléchargé a été rejeté par le scanner de fichiers. Veuillez vérifier qu''il ne s'agit pas d''un fichier infecté. Voici le message du scanner de fichiers: "{0}".</upload-error-file-scan>
                 <lost-attachments>Des fichiers joints ont été perdus suite à un problème sur le serveur. Veuillez vérifier tous vos fichiers joints et les annexer à nouveau si nécessaire.</lost-attachments>
             </messages>
             <draft-singleton>

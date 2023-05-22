@@ -112,11 +112,11 @@ object SimpleDataMigration {
 
   sealed trait FormDiff[BindType] { val bind: BindType }
   object FormDiff {
-    case class ValueChanged    [BindType](bind: BindType)             extends FormDiff[BindType]
-    case class IterationAdded  [BindType](bind: BindType, count: Int) extends FormDiff[BindType]
-    case class IterationRemoved[BindType](bind: BindType, count: Int) extends FormDiff[BindType]
-    case class ElementAdded    [BindType](bind: BindType)             extends FormDiff[BindType]
-    case class ElementRemoved  [BindType](bind: BindType)             extends FormDiff[BindType]
+    case class ValueChanged    [BindType](bind: BindType, from: String, to: String) extends FormDiff[BindType]
+    case class IterationAdded  [BindType](bind: BindType, count: Int)               extends FormDiff[BindType]
+    case class IterationRemoved[BindType](bind: BindType, count: Int)               extends FormDiff[BindType]
+    case class ElementAdded    [BindType](bind: BindType)                           extends FormDiff[BindType]
+    case class ElementRemoved  [BindType](bind: BindType)                           extends FormDiff[BindType]
   }
 
   // Attempt to fill/remove holes in an instance given:
@@ -479,9 +479,12 @@ object SimpleDataMigration {
           //
           // - section template content
           // - multiple attachment using nested array (`<_>`)
-          if (! rightElem.hasChildElement && ! leftElem.hasChildElement)
-            if (leftElem.stringValue != rightElem.stringValue)
-              changes += FormDiff.ValueChanged(mapBind(parentBind))
+          if (! rightElem.hasChildElement && ! leftElem.hasChildElement) {
+            val leftValue  = leftElem.getStringValue
+            val rightValue = rightElem.getStringValue
+            if (leftValue != rightValue)
+              changes += FormDiff.ValueChanged(mapBind(parentBind), leftValue, rightValue)
+          }
 
         case childrenBinds =>
 

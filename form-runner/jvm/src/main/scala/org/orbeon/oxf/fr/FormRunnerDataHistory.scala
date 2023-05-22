@@ -2,7 +2,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
 import org.orbeon.oxf.fr.SimpleDataMigration.{FormDiff, diffSimilarXmlData}
-import org.orbeon.oxf.util.{DateUtils, DateUtilsUsingSaxon}
+import org.orbeon.oxf.util.{DateUtils, DateUtilsUsingSaxon, StringUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI.inScopeContainingDocument
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsResourceSupport
@@ -58,14 +58,21 @@ trait FormRunnerDataHistory {
 
     import org.orbeon.scaxon.NodeConversions.elemToNodeInfo
 
+    val MaxValueLength = 20
+
+    def truncate(s: String) =
+      StringUtils.truncateWithEllipsis(s, MaxValueLength, 1)
+
     <_>
       {
         diffs map {
-          case FormDiff.ValueChanged    (Some(name))        => <c l={getLabelOrNull(name)} t="value-changed"/>
-          case FormDiff.IterationAdded  (Some(name), count) => <c l={getLabelOrNull(name)} t="iteration-added"   count={count.toString}/>
-          case FormDiff.IterationRemoved(Some(name), count) => <c l={getLabelOrNull(name)} t="iteration-removed" count={count.toString}/>
-          case FormDiff.ElementAdded    (Some(name))        => <c l={getLabelOrNull(name)} t="other-changed"/>
-          case FormDiff.ElementRemoved  (Some(name))        => <c l={getLabelOrNull(name)} t="other-changed"/>
+          case FormDiff.ValueChanged    (Some(name), from, to) if from.isBlank => <c l={getLabelOrNull(name)} t="value-entered" to={truncate(to)}/>
+          case FormDiff.ValueChanged    (Some(name), from, to) if to.isBlank   => <c l={getLabelOrNull(name)} t="value-cleared" from={truncate(from)}/>
+          case FormDiff.ValueChanged    (Some(name), from, to)                 => <c l={getLabelOrNull(name)} t="value-changed" from={truncate(from)} to={truncate(to)}/>
+          case FormDiff.IterationAdded  (Some(name), count)                    => <c l={getLabelOrNull(name)} t="iteration-added"   count={count.toString}/>
+          case FormDiff.IterationRemoved(Some(name), count)                    => <c l={getLabelOrNull(name)} t="iteration-removed" count={count.toString}/>
+          case FormDiff.ElementAdded    (Some(name))                           => <c l={getLabelOrNull(name)} t="other-changed"/>
+          case FormDiff.ElementRemoved  (Some(name))                           => <c l={getLabelOrNull(name)} t="other-changed"/>
           case _ => <c/>
         }
       }

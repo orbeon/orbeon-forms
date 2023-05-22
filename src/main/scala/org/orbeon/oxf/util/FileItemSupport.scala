@@ -122,11 +122,11 @@ object FileItemSupport {
   def deleteFileItem(fileItem: FileItem, scope: Option[ExpirationScope]): Unit =
     fileItem.fileLocationOpt foreach (deleteFile(_, scope))
 
-  def deleteFile(file: File, scope: Option[ExpirationScope]): Unit = {
+  def deleteFile(file: File, scopeForDebug: Option[ExpirationScope]): Unit = {
 
     def logIfNeeded(prefix: String, error: Option[String] = None): Unit =
       if (Logger.isDebugEnabled) {
-        val scopeString = scope.map(entryName).map(_ + "-scoped ").getOrElse("")
+        val scopeString = scopeForDebug.map(entryName).map(_ + "-scoped ").getOrElse("")
         val errorString = error.map(" (" + _ + ")").getOrElse("")
         Logger.debug(s"$prefix temporary ${scopeString}file: `${file.getCanonicalPath}`$errorString")
       }
@@ -178,7 +178,8 @@ object FileItemSupport {
               throw e
           }
         case None =>
-          Logger.debug(s"no existing session found so cannot register temporary file deletion upon session destruction: `${file.map(_.getCanonicalPath).getOrElse("[no file provided]")}`")
+          // TODO: This should probably throw an error.
+          Logger.warn(s"no existing session found so cannot register temporary file deletion upon session destruction: `${file.map(_.getCanonicalPath).getOrElse("[no file provided]")}`")
       }
 
     def deleteFileOnApplicationDestroyed(fileItem: FileItem): Unit =

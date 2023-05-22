@@ -43,7 +43,7 @@ object FileItemSupport {
       fileItem.getContentType.trimAllToOpt
 
     def fileLocationOpt: Option[File] =
-      Option(fileItem.asInstanceOf[DiskFileItem].getStoreLocation).filter(_.exists())
+      Option(fileItem.asInstanceOf[DiskFileItem].getStoreLocation)
 
     def debugFileLocation: String =
       fileLocationOpt.map(_.getCanonicalPath).getOrElse("[no location]")
@@ -76,7 +76,7 @@ object FileItemSupport {
 
     scope match {
       case ExpirationScope.Request     => deleteFileOnRequestEnd(fileItem)
-      case ExpirationScope.Session     => deleteFileOnSessionTermination(fileItem.fileLocationOpt)
+      case ExpirationScope.Session     => deleteFileOnSessionTermination(fileItem.fileLocationOpt.filter(_.exists()))
       case ExpirationScope.Application => deleteFileOnApplicationDestroyed(fileItem)
     }
 

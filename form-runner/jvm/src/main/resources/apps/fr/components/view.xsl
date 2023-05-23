@@ -1076,7 +1076,15 @@
             xxf:phantom="true">
             <xf:action type="xpath">
                 frf:errorMessage(
-                    if (event('error-type') = 'size-error') then
+                    if (event('error-type') = 'empty-file-error') then
+                        xxf:format-message(
+                            xxf:r(
+                                'detail.messages.upload-error-empty-file',
+                                'fr-fr-resources'
+                            ),
+                            ()
+                        )
+                    else if (event('error-type') = 'size-error') then
                         xxf:format-message(
                             xxf:r(
                                 'detail.messages.upload-error-size',

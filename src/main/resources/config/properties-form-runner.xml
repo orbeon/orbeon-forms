@@ -658,4 +658,6 @@
 
     <property as="xs:boolean" name="oxf.fr.export.page.enable.*.*"                 value="false"/>
 
+    <property as="xs:boolean" name="oxf.fr.upload.reject-empty-files"              value="true"/>
+
 </properties>

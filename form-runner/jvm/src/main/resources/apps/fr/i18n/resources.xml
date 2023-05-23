@@ -287,6 +287,7 @@
                 <upload-cancel>Upload canceled by the user</upload-cancel>
                 <upload-done>Upload complete</upload-done>
                 <upload-error>There was an error during the upload. Please try again.</upload-error>
+                <upload-error-empty-file>The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.</upload-error-size>
                 <upload-error-mediatype>The file uploaded is of an incorrect type.</upload-error-mediatype>
                 <upload-error-file-scan>The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".</upload-error-file-scan>
@@ -865,6 +866,7 @@
                 <upload-cancel>Téléchargement vers le serveur annulé par l'utilisateur</upload-cancel>
                 <upload-done>Téléchargement vers le serveur terminé</upload-done>
                 <upload-error>Une erreur s'est produite durant le téléchargement vers le serveur. Veuillez ressayer.</upload-error>
+                <upload-error-empty-file>Le fichier téléchargé est vide.</upload-error-empty-file>
                 <upload-error-size>Le fichier téléchargé est trop grand. La taille maximale est {0,number,integer} bytes et la taille reçue est {1,number,integer} bytes.</upload-error-size>
                 <upload-error-mediatype>Le fichier téléchargé est d''un type incorrect.</upload-error-mediatype>
                 <upload-error-file-scan>Le fichier téléchargé a été rejeté par le scanner de fichiers. Veuillez vérifier qu''il ne s'agit pas d''un fichier infecté. Voici le message du scanner de fichiers: "{0}".</upload-error-file-scan>
@@ -1432,6 +1434,7 @@
                 <upload-cancel>Subidad de archivos cancelada por el usuario</upload-cancel>
                 <upload-done>Subidad de archivos completada</upload-done>
                 <upload-error>Ha habido un error durante la subida de archivos. Intentelo nuevamente.</upload-error>
+                <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>El arvhivo subido es demasiado largo. El largo máximo permitido es {0,number,integer} bytes y el tamaño del archivo subido es {1,number,integer} bytes.</upload-error-size>
                 <upload-error-mediatype>El archivo subido es de tipo incorrecto.</upload-error-mediatype>
                 <upload-error-file-scan>El archivo subido fue rechazado por el escaner de archivos. Asegurese que el archivo no esta infectado. Este el es mensaje del escaner de archivos: "{0}".</upload-error-file-scan>
@@ -1989,6 +1992,7 @@
                 <upload-cancel>Pujada de fitxers cancel·lada per l'usuari</upload-cancel>
                 <upload-done>Pujada de fitxers completada.</upload-done>
                 <upload-error>Hi ha hagut una errada en la pujada de fitxers. Torni a intentar-ho.</upload-error>
+                <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>L'arxiu es massa gran. El tamany permes és {0,number,integer} bytes i
                     el tamany del fitxer pujat és {1,number,integer} bytes.</upload-error-size>
                 <upload-error-mediatype>L'arxiu pujat és de tipus incorrecte.</upload-error-mediatype>
@@ -3712,6 +3716,7 @@
                 <upload-cancel>L'operazione di caricamento è stata annullata dall'utente.</upload-cancel>
                 <upload-done>Caricamento completato</upload-done>
                 <upload-error>È apparso un errore durante il caricamento. Si prega di riprovare.</upload-error>
+                <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>Il file caricato è troppo grande. La dimensione massima consentita è di {0,number,integer} byte e la dimensione reale ricevuta è di {1,number,integer} byte.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
                 <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
@@ -4287,6 +4292,7 @@
                 <upload-cancel>Das Hochladen der Datei wurde vom Benutzer abgebrochen.</upload-cancel>
                 <upload-done>Datei fertig hochgeladen</upload-done>
                 <upload-error>Während dem Hochladen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</upload-error>
+                <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>Die hochgeladene Datei ist zu groß. Die maximal zulässige Größe ist {0,number,integer} Bytes und die tatsächlich empfangene Größe ist {1,number,integer} Bytes.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
                 <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
@@ -4861,6 +4867,7 @@
                 <upload-cancel>Käyttäjä keskeytti tiedoston lähetyksen</upload-cancel>
                 <upload-done>Tiedoston lähetys valmis</upload-done>
                 <upload-error>Tiedoston lähetyksen aikana tapahtui virhe. Yritä uudelleen.</upload-error>
+                <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>Lähetettävä tiedosto on liian suuri. Suurin sallittu tiedostokoko on {0,number,integer} tavua ja todellinen vastaanotettu koko on {1,number,integer} tavua.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
                 <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
@@ -5436,6 +5443,7 @@
                 <upload-cancel>Överföring stoppad av användaren</upload-cancel>
                 <upload-done>Överföring klar</upload-done>
                 <upload-error>Fel under överföring. Vänligen försök igen.</upload-error>
+                <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>Filen är för stor för att överföras. Största storlek är {0,number,integer} bytes.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
                 <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
@@ -6011,6 +6019,7 @@
                 <upload-cancel>Upload geannuleerd door de gebruiker</upload-cancel>
                 <upload-done>Upload voltooid</upload-done>
                 <upload-error>Er was een probleem tijdens de upload. Probeer opnieuw.</upload-error>
+                <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>Het geüploade bestand is te groot. De maximale, toegestane grootte is {0,number,integer} bytes en de huidige, ontvangen grootte is {1,number,integer} bytes.</upload-error-size>
                 <upload-error-mediatype>Het geüploade bestand heeft een onjuist type.</upload-error-mediatype>
                 <upload-error-file-scan>Het geüploade bestand is geweigerd door de bestandenscanner. Zorg dat dit geen geïnfecteerd bestand is. De melding uit de bestandenscanner was: "{0}".</upload-error-file-scan>
@@ -6584,6 +6593,7 @@
                 <upload-cancel>Carregamento cancelado pelo utiliazdor</upload-cancel>
                 <upload-done>Carregamento concuído</upload-done>
                 <upload-error>Ocorreu um erro durante o carregamento. Por favor, tente novamente.</upload-error>
+                <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>O documento carregado é muito grande. O tamanho máximo permitido são {0, number, integer} bytes e o tamanho recebido são {1, number, integer} bytes.</upload-error-size>
                 <upload-error-mediatype todo="true">[The file uploaded is of an incorrect type.]</upload-error-mediatype>
                 <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
@@ -7149,6 +7159,7 @@
                 <upload-cancel>Indlæsning afbrudt af bruger</upload-cancel>
                 <upload-done>Indlæsning færdig</upload-done>
                 <upload-error>Der skete en fejl under indlæsning. Prøv igen.</upload-error>
+                <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>Filen, der indlæses, er for stor. Den maksimale størrelse er {0,number,integer} bytes og der blev indlæst {1,number,integer} bytes.]</upload-error-size>
                 <upload-error-mediatype>Den uploadede fil har ikke en tilladt filtype.</upload-error-mediatype>
                 <upload-error-file-scan todo="true">[The file uploaded was rejected by the file scanner. Please make sure this is not an infected file. Here is the file scanner message: "{0}".]</upload-error-file-scan>
@@ -7720,6 +7731,7 @@
                 <upload-cancel>Wgrywanie pliku/-ów zostało anulowane przez użytkownika</upload-cancel>
                 <upload-done>Wgrywanie pliku/-ów zostało zakończone</upload-done>
                 <upload-error>W trakcie wgrywania pliku/-ów wystąpił błąd. Spróbuj ponownie.</upload-error>
+                <upload-error-empty-file todo="true">The file uploaded is empty.</upload-error-empty-file>
                 <upload-error-size>Wgrany plik jest zbyt duży. Maksymalny dozwolony rozmiar plikuto {0,number,integer} bajtów, a rozmiar otrzymanego pliku to {1,number,integer} bajtów.</upload-error-size>
                 <upload-error-mediatype>Wgrany plik jest niewłaściwego typu.</upload-error-mediatype>
                 <upload-error-file-scan>Przesłany plik został odrzucony przez skaner plików. Upewnij się, że nie jest to zainfekowany plik. Oto komunikat skanera plików: „{0}”.</upload-error-file-scan>

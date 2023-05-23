@@ -27,6 +27,7 @@ import org.orbeon.oxf.externalcontext.ExternalContext._
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.util.CollectionUtils._
+import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import shapeless.syntax.typeable._
 
 import java.io.OutputStream
@@ -40,6 +41,8 @@ case class DisallowedMediatypeException(
   permitted : Set[MediatypeRange],
   actual    : Option[Mediatype]
 ) extends FileUploadException
+
+case class EmptyFileException() extends FileUploadException
 
 case class FileScanException(
   fieldName      : String,
@@ -190,6 +193,9 @@ object Multipart {
         FileItemSupport.deleteFileItem(fileItem, None)
     }
 
+  def rejectEmptyFiles: Boolean =
+    properties.getBoolean("oxf.fr.upload.reject-empty-files", default = true)
+
   private object Private {
 
     val StandardParameterEncoding = CharsetNames.Utf8
@@ -221,6 +227,8 @@ object Multipart {
         try {
 
           val fileItem = servletFileUpload.getFileItemFactory.createItem(fieldName, fis.getContentType, false, fis.getName).asInstanceOf[DiskFileItem]
+
+          var fileItemSize = 0L
 
           try {
 
@@ -261,13 +269,18 @@ object Multipart {
 
                 override def flush(): Unit = fios.flush()
                 override def close(): Unit = fios.close()
-              }
+              },
+              progress = fileItemSize += _
             )
           } catch {
             // Clean-up `FileItem` right away in case of failure
             case NonFatal(t) =>
               FileItemSupport.deleteFileItem(fileItem, None)
               throw t
+          }
+
+          if (fileItemSize == 0L && rejectEmptyFiles) {
+            throw EmptyFileException()
           }
 
           lifecycleOpt flatMap (_.fileItemState(UploadState.Completed(fileItem))) match {
@@ -290,6 +303,7 @@ object Multipart {
                 UploadState.Interrupted(
                  Option(Exceptions.getRootThrowable(t))
                  collect {
+                   case _: EmptyFileException                           => Reason.EmptyFile
                    case root: SizeLimitExceededException                => Reason.SizeReason(root.getPermittedSize, root.getActualSize)
                    case DisallowedMediatypeException(permitted, actual) => Reason.MediatypeReason(permitted, actual)
                    case FileScanException(fieldName, fileScanResult)    => Reason.FileScanReason(fieldName, fileScanResult.message)

@@ -165,6 +165,8 @@ object XXFormsUploadErrorEvent {
   def reasonToProperties(target: XFormsEventTarget): List[(String, Option[Any])] =
     target.cast[XFormsUploadControl].to(List) flatMap
       FileMetadata.progress                   flatMap {
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.EmptyFile))) =>
+        List("error-type" -> Some("empty-file-error"))
       case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.SizeReason(permitted, actual)))) =>
         List(
           "error-type" -> Some("size-error"),

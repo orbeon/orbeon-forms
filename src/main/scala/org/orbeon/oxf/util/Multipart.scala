@@ -279,7 +279,7 @@ object Multipart {
               throw t
           }
 
-          if (fileItemSize == 0L && rejectEmptyFiles) {
+          if (lifecycleOpt.isDefined && fileItemSize == 0L && rejectEmptyFiles) {
             throw EmptyFileException()
           }
 

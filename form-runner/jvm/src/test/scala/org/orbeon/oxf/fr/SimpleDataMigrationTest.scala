@@ -649,7 +649,7 @@ class SimpleDataMigrationTest
     val NewFormData: NodeInfo =
       <form>
           <my-section-1>
-              <s1input1>New s1input1 value </s1input1>
+              <s1input1>New s1input1 value</s1input1>
           </my-section-1>
           <my-section-2>
               <my-section-2-iteration>
@@ -680,10 +680,10 @@ class SimpleDataMigrationTest
 
       val Expected =
         List(
-          FormDiff.ValueChanged    ("s1input1"),
+          FormDiff.ValueChanged    ("s1input1", "", "New s1input1 value"),
           FormDiff.IterationRemoved("my-section-2",     1),
           FormDiff.IterationAdded  ("my-repeated-grid", 1),
-          FormDiff.ValueChanged    ("s2number")
+          FormDiff.ValueChanged    ("s2number", "11", ""),
         )
 
       val formOps = new FormDefinitionOps(FormDefinition)

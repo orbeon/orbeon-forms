@@ -65,28 +65,30 @@
         </xbl:handlers>
 
         <xbl:template>
-            <xf:select1
-                id="select1"
-                appearance="full xxf:horizontal"
-                ref="xxf:binding('fr-yesno-input-binding')"
-                xbl:attr="xxf:encrypt-item-values">
+            <xh:div class="fr-component-group">
+                <xf:select1
+                    id="select1"
+                    appearance="full xxf:horizontal"
+                    ref="xxf:binding('fr-yesno-input-binding')"
+                    xbl:attr="xxf:encrypt-item-values">
 
-                <xf:item>
-                    <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
-                    <xf:value>true</xf:value>
-                </xf:item>
-                <xf:item>
-                    <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
-                    <xf:value>false</xf:value>
-                </xf:item>
-            </xf:select1>
+                    <xf:item>
+                        <xf:label ref="xxf:r('components.labels.yes', '|fr-fr-resources|')"/>
+                        <xf:value>true</xf:value>
+                    </xf:item>
+                    <xf:item>
+                        <xf:label ref="xxf:r('components.labels.no', '|fr-fr-resources|')"/>
+                        <xf:value>false</xf:value>
+                    </xf:item>
+                </xf:select1>
 
-            <xf:trigger fr:keep-if-design-time="true" appearance="xxf:mini">
-                <xf:label ref="xxf:r('components.labels.clear', '|fr-fr-resources|')"/>
-                <xf:action event="DOMActivate">
-                    <xf:setvalue ref="xxf:binding('fr-yesno-input-binding')"/>
-                </xf:action>
-            </xf:trigger>
+                <xf:trigger fr:keep-if-design-time="true" appearance="xxf:mini">
+                    <xf:label ref="xxf:r('components.labels.clear', '|fr-fr-resources|')"/>
+                    <xf:action event="DOMActivate">
+                        <xf:setvalue ref="xxf:binding('fr-yesno-input-binding')"/>
+                    </xf:action>
+                </xf:trigger>
+            </xh:div>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

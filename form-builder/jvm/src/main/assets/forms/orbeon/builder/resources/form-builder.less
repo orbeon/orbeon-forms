@@ -1212,11 +1212,15 @@ body.orbeon {
     }
 
     // Yes/no clear button
-
-    .xbl-fr-yesno-input button {
-        width: 100%;
-        &:hover {
-            background-color: #ddd;
+    .xbl-fr-yesno-input {
+        > .fr-component-group {
+            width: fit-content; // so that the radio buttons and the clear button have a consistent width
+            button {
+                width: 100%;
+                &:hover {
+                    background-color: #ddd;
+                }
+            }
         }
     }
 

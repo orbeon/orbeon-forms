@@ -186,11 +186,11 @@ private object PersistenceProxyProcessor {
 
   // TODO: test
   private def proxySimpleRequest(
-    request  : Request,
-    response : Response,
-    appForm  : AppForm,
+    request   : Request,
+    response  : Response,
+    appForm   : AppForm,
     formOrData: FormOrData,
-    path     : String,
+    path      : String,
   ): Unit = {
 
     val (persistenceBaseURL, outgoingPersistenceHeaders) =

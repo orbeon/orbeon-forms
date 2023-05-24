@@ -1100,7 +1100,16 @@ body.orbeon {
     .fb-edit-source-dialog {
         width: 900px;
         max-width: none;
-        .CodeMirror { font-size: 12px; height: 100% }            // Pick slightly smaller font size, default being 13px
+        .xxforms-dialog-body {
+            position: relative;     // So `.CodeMirror` height can be relative to the body height
+        }
+        .CodeMirror {
+            font-size: 12px;        // Pick slightly smaller font size, default being 13px
+            position: absolute;     // So height can be 100%-64px of the dialog body
+            height: auto;           // Override default `300px`
+            top: 0; bottom: 64px;   // Leave room for buttons
+            width: 100%;
+        }
         .xforms-alert.xforms-active { display: block }
     }
 

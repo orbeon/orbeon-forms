@@ -24,13 +24,9 @@ object CodeMirror {
     private var userChangedSinceLastBlur : Boolean = false
 
     override def init(): Unit = {
-      val outer = $(containerElem).find(".xbl-fr-code-mirror-editor-outer").get(0)
-      $("<xh:span class=\"xbl-fr-code-mirror-editor-inner\"/>").appendTo(outer)
-
-      val inner = $(containerElem).find(".xbl-fr-code-mirror-editor-inner").get(0)
-
+      val editorElement = containerElem.querySelector(".xbl-fr-code-mirror-editor")
       this.editor = new facades.CodeMirror(
-        inner,
+        editorElement,
         js.Dictionary(
           "mode"         -> "xml",
           "lineNumbers"  -> true,
@@ -62,7 +58,7 @@ object CodeMirror {
       this.handlers.foreach { case (key, value) => this.editor.off(key, value) }
       this.handlers.clear()
       this.editor = null
-      $(containerElem).find(".xbl-fr-code-mirror-editor-outer").empty()
+      $(containerElem).find(".xbl-fr-code-mirror-editor").empty()
     }
 
     override def xformsFocus(): Unit = this.editor.focus()

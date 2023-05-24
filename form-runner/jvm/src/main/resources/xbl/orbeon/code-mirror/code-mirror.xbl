@@ -47,7 +47,7 @@
             <xbl:style src="/xbl/orbeon/code-mirror/codemirror-5.65.5/addon/search/matchesonscrollbar.css"/>
         </xbl:resources>
         <xbl:template>
-            <xf:group id="outer" class="xbl-fr-code-mirror-editor-outer"/>
+            <xh:div class="xbl-fr-code-mirror-editor"/>
         </xbl:template>
 
     </xbl:binding>

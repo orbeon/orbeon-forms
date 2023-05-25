@@ -51,6 +51,7 @@ case class InstancesControls(instances: List[InstanceState], controls: Map[Strin
 case class RequestParameters(
   uuid                         : String,
   sequenceOpt                  : Option[Long],
+  submissionIdOpt              : Option[String],
   encodedClientStaticStateOpt  : Option[String],
   encodedClientDynamicStateOpt : Option[String]
 ) {

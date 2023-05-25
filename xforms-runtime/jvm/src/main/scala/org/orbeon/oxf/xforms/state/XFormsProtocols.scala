@@ -80,6 +80,7 @@ object XFormsProtocols {
       write(output, delayedEvent.time)
       write(output, delayedEvent.showProgress)
       write(output, delayedEvent.browserTarget)
+      write(output, delayedEvent.submissionId)
       write(output, delayedEvent.isResponseResourceType)
     }
 
@@ -91,6 +92,7 @@ object XFormsProtocols {
         read[Boolean](input),
         read[Option[Long]](input),
         read[Boolean](input),
+        read[Option[String]](input),
         read[Option[String]](input),
         read[Boolean](input)
       )

@@ -39,6 +39,9 @@
                 </xxf:uuid>
                 <!-- Omit sequence number -->
                 <xxf:sequence/>
+                <xxf:submission-id>
+                    <xsl:value-of select="/*/parameters/parameter[name = '$submission-id']/value"/>
+                </xxf:submission-id>
                 <xxf:static-state>
                     <xsl:value-of select="/*/parameters/parameter[name = '$static-state']/value"/>
                 </xxf:static-state>

@@ -37,7 +37,7 @@ class ClientGetAllSubmission(submission: XFormsModelSubmission)
       target                       = None,
       urlType                      = UrlType.Render,
       urlNorewrite                 = p.urlNorewrite,
-      isShowProgressOpt            = Some(containingDocument.findTwoPassSubmitEvent forall (_.showProgress)),
+      isShowProgressOpt            = Some(containingDocument.findTwoPassSubmitEvents forall (_.showProgress)),
       mustHonorDeferredUpdateFlags = true
     )
     None

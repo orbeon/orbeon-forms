@@ -493,6 +493,7 @@ object XFormsUI {
     val urlType         = submissionElement.getAttribute("url-type")
     val showProgressOpt = Option(submissionElement.getAttribute("show-progress"))
     val targetOpt       = Option(submissionElement.getAttribute("target"))
+    val submissionIdOpt = Option(submissionElement.getAttribute("submission-id"))
 
     val form = Page.getForm(formID)
     val formElem = form.elem
@@ -560,6 +561,23 @@ object XFormsUI {
     if (! showProgressOpt.contains("false"))
       notifyReplace()
 
+    val inputElemOpt =
+      submissionIdOpt map { submissionId =>
+
+        val inputElem =
+            dom.document
+              .createElement("input")
+              .asInstanceOf[html.Input]
+
+        inputElem.`type` = "hidden"
+        inputElem.name   = Constants.SubmissionIdFieldName
+        inputElem.value  = submissionId
+
+        formElem.appendChild(inputElem)
+
+        inputElem
+      }
+
     try {
       formElem.submit()
     } catch {
@@ -570,6 +588,10 @@ object XFormsUI {
         // 2022-08-01: We no longer support IE, so if indeed this only happened with
         // IE we could remove this code. Adding logging to see if this ever happens.
         logger.warn(s"`requestForm.submit()` caused an error: ${t.getMessage}")
+    }
+
+    inputElemOpt foreach { inputElem =>
+      inputElem.parentElement.removeChild(inputElem)
     }
   }
 

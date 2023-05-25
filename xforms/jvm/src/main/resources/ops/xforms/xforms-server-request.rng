@@ -30,6 +30,11 @@
                 </choice>
             </element>
             <optional>
+                <element name="xxf:submission-id">
+                    <data type="string"/>
+                </element>
+            </optional>
+            <optional>
                 <element name="xxf:static-state">
                     <data type="string"/>
                 </element>

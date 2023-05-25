@@ -17,6 +17,7 @@ package org.orbeon.xforms
 object Constants {
 
   val UuidFieldName                     = "$uuid"
+  val SubmissionIdFieldName             = "$submission-id"
 
   val RepeatSeparator                   = '\u2299' // ⊙ CIRCLED DOT OPERATOR
   val RepeatSeparatorString    : String = RepeatSeparator.toString

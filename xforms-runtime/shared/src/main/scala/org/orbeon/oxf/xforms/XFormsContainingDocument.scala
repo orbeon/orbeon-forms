@@ -16,22 +16,20 @@ package org.orbeon.oxf.xforms
 import cats.syntax.option._
 import org.orbeon.oxf.externalcontext.ExternalContext
 import org.orbeon.oxf.http.HttpMethod
-import org.orbeon.oxf.util.{CoreCrossPlatformSupport, PathMatcher}
 import org.orbeon.oxf.util.CoreUtils._
-import org.orbeon.oxf.util.Logging._
+import org.orbeon.oxf.util.{CoreCrossPlatformSupport, PathMatcher}
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.xforms.analysis.{DumbXPathDependencies, PartAnalysis, PathMapXPathDependencies, XPathDependencies}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver
-import org.orbeon.oxf.xforms.state.{ControlState, InstancesControls}
+import org.orbeon.oxf.xforms.state.InstancesControls
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager
 import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.xforms.{DelayedEvent, DeploymentType}
 import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
-import org.orbeon.xforms.XFormsCrossPlatformSupport
+import org.orbeon.xforms.{DelayedEvent, DeploymentType}
 
 import scala.collection.{Seq, immutable}
 
@@ -140,7 +138,7 @@ class XFormsContainingDocument(
         processCompletedAsynchronousSubmissions(skipDeferredEventHandling = true, addPollEvent = true)
       }
 
-      processDueDelayedEvents(onlyEventsWithNoTime = false)
+      processDueDelayedEvents(submissionIdOpt = None)
     }
 
   def restoreDynamicState(
@@ -235,24 +233,21 @@ class XFormsContainingDocument(
     xpathDependencies.afterInitialResponse()
   }
 
-  override def beforeExternalEvents(responseForReplaceAll: ExternalContext.Response, isAjaxRequest: Boolean): Unit = {
+  override def beforeExternalEvents(responseForReplaceAll: ExternalContext.Response, submissionIdOpt: Option[String]): Unit = {
 
     xpathDependencies.beforeUpdateResponse()
     this._responseForReplaceAll = responseForReplaceAll.some
 
-    if (isAjaxRequest) {
+    if (submissionIdOpt.isEmpty)
       processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, addPollEvent = false)
-      processDueDelayedEvents(onlyEventsWithNoTime = false)
-    } else {
-      processDueDelayedEvents(onlyEventsWithNoTime = true)
-    }
+    processDueDelayedEvents(submissionIdOpt)
   }
 
-  def afterExternalEvents(isAjaxRequest: Boolean): Unit = {
+  def afterExternalEvents(submissionIdOpt: Option[String]): Unit = {
 
-    if (isAjaxRequest) {
+    if (submissionIdOpt.isEmpty) {
       processCompletedAsynchronousSubmissions(skipDeferredEventHandling = false, addPollEvent = true)
-      processDueDelayedEvents(onlyEventsWithNoTime = false)
+      processDueDelayedEvents(submissionIdOpt = None)
     }
 
     this._responseForReplaceAll = None

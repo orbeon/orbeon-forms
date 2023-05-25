@@ -142,13 +142,14 @@ object XFormsNames {
   val XXBL_MIRROR_QNAME                     = xxblQName("mirror")
 
   // Variables
-  val XXFORMS_VAR_QNAME      = xxformsQName("var")
-  val XXFORMS_VARIABLE_QNAME = xxformsQName("variable")
-  val XFORMS_VAR_QNAME       = xformsQName("var")
-  val XFORMS_VARIABLE_QNAME  = xformsQName("variable")
-  val EXFORMS_VARIABLE_QNAME = QName("variable", EXFORMS_NAMESPACE)
-  val XXFORMS_SEQUENCE_QNAME = xxformsQName("sequence")
-  val XXFORMS_VALUE_QNAME    = xxformsQName("value")
+  val XXFORMS_VAR_QNAME           = xxformsQName("var")
+  val XXFORMS_VARIABLE_QNAME      = xxformsQName("variable")
+  val XFORMS_VAR_QNAME            = xformsQName("var")
+  val XFORMS_VARIABLE_QNAME       = xformsQName("variable")
+  val EXFORMS_VARIABLE_QNAME      = QName("variable", EXFORMS_NAMESPACE)
+  val XXFORMS_SEQUENCE_QNAME      = xxformsQName("sequence")
+  val XXFORMS_SUBMISSION_ID_QNAME = xxformsQName("submission-id")
+  val XXFORMS_VALUE_QNAME         = xxformsQName("value")
 
   val XML_EVENTS_PREFIX = "ev"
   val XML_EVENTS_NAMESPACE_URI = "http://www.w3.org/2001/xml-events"

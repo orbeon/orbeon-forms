@@ -63,14 +63,14 @@ object DeploymentType extends Enum[DeploymentType] {
 // Lifecycle of an XForms document from the point of view of requests/responses
 trait XFormsDocumentLifecycle[Response] {
   def afterInitialResponse(): Unit
-  def beforeExternalEvents(response: Response, isAjaxRequest: Boolean): Unit
-  def afterExternalEvents(isAjaxRequest: Boolean): Unit
+  def beforeExternalEvents(response: Response, submissionIdOpt: Option[String]): Unit
+  def afterExternalEvents(submissionIdOpt: Option[String]): Unit
   def afterUpdateResponse(): Unit
 
-  final def withExternalEvents[T](response: Response, isAjaxRequest: Boolean)(block: => T): T = {
-    beforeExternalEvents(response, isAjaxRequest)
+  final def withExternalEvents[T](response: Response, submissionIdOpt: Option[String])(block: => T): T = {
+    beforeExternalEvents(response, submissionIdOpt)
     val result = block
-    afterExternalEvents(isAjaxRequest)
+    afterExternalEvents(submissionIdOpt)
     result
   }
 }
@@ -103,5 +103,6 @@ case class DelayedEvent(
   time                   : Option[Long],
   showProgress           : Boolean,        // whether to show the progress indicator when submitting the event
   browserTarget          : Option[String], // optional browser target for submit events
+  submissionId           : Option[String],
   isResponseResourceType : Boolean
 )

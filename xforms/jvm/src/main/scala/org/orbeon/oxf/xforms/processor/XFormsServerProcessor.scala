@@ -61,6 +61,10 @@ object XFormsServerProcessor {
     val sequenceOpt =
       sequenceElement.getTextTrim.trimAllToOpt map (_.toLong)
 
+    val submissionIdOpt =
+      request.getRootElement.elementOpt(XXFORMS_SUBMISSION_ID_QNAME) flatMap
+        (_.getTextTrim.trimAllToOpt)
+
     val encodedStaticStateOpt =
       request.getRootElement.elementOpt(XXFORMS_STATIC_STATE_QNAME) flatMap
         (_.getTextTrim.trimAllToOpt)
@@ -75,7 +79,7 @@ object XFormsServerProcessor {
       request.getRootElement.elementOpt(qName) flatMap
         (_.getTextTrim.trimAllToOpt)
 
-    RequestParameters(uuid, sequenceOpt, encodedStaticStateOpt, encodedDynamicStateOpt)
+    RequestParameters(uuid, sequenceOpt, submissionIdOpt, encodedStaticStateOpt, encodedDynamicStateOpt)
   }
 
   def extractWireEvents(actionElement: Element): List[WireAjaxEvent] =

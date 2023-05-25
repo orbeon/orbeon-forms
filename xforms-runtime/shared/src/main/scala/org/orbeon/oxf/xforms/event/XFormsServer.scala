@@ -1,33 +1,33 @@
 package org.orbeon.oxf.xforms.event
 
-import java.{util => ju}
 import cats.Eval
 import org.orbeon.dom.io.XMLWriter
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.externalcontext.ExternalContext
+import org.orbeon.oxf.externalcontext.{ExternalContext, ResponseWrapper}
 import org.orbeon.oxf.http.{SessionExpiredException, StatusCode}
 import org.orbeon.oxf.logging.LifecycleLogger
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.Logging.{debug, debugResults, error, info, withDebug}
+import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocumentSupport.{withLock, withUpdateResponse}
-import org.orbeon.oxf.xforms.{ScriptInvocation, XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
+import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.processor.ControlsComparator
 import org.orbeon.oxf.xforms.state.{RequestParameters, XFormsStateManager}
 import org.orbeon.oxf.xforms.submission.{ConnectResult, XFormsModelSubmissionSupport}
+import org.orbeon.oxf.xforms.{ScriptInvocation, XFormsContainingDocument, XFormsError, XFormsGlobalProperties}
 import org.orbeon.oxf.xml.XMLReceiverSupport._
-import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.oxf.xml.dom.LocationSAXContentHandler
-import org.orbeon.xforms.{DelayedEvent, EventNames, Load, Message, XFormsCrossPlatformSupport}
+import org.orbeon.oxf.xml.{SAXStore, TeeXMLReceiver, XMLReceiver, XMLReceiverHelper}
 import org.orbeon.xforms.XFormsNames.{XXFORMS_NAMESPACE_URI, XXFORMS_SHORT_PREFIX}
 import org.orbeon.xforms.rpc.{WireAjaxEvent, WireAjaxEventWithTarget, WireAjaxEventWithoutTarget}
+import org.orbeon.xforms.{DelayedEvent, EventNames, Load, Message}
 
-import scala.util.{Failure, Success, Try}
+import java.{util => ju}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 
 object XFormsServer {
@@ -110,7 +110,7 @@ object XFormsServer {
                     // Scope the containing document for the XForms API
                     XFormsAPI.withContainingDocument(containingDocument) {
                       withDebug("handling external events") {
-                        containingDocument.withExternalEvents(responseForReplaceAll , isAjaxRequest) {
+                        containingDocument.withExternalEvents(responseForReplaceAll , requestParameters.submissionIdOpt) {
 
                           // Dispatch the events
 
@@ -138,7 +138,7 @@ object XFormsServer {
                 } else {
                   XFormsAPI.withContainingDocument(containingDocument) {
                     withDebug("handling two-pass submission event") {
-                      containingDocument.withExternalEvents(responseForReplaceAll , isAjaxRequest)(())
+                      containingDocument.withExternalEvents(responseForReplaceAll , requestParameters.submissionIdOpt)(())
                       Some(ClientEvents.EmptyEventsFindings)
                     } (eventsIndentedLogger)
                   }
@@ -406,7 +406,7 @@ object XFormsServer {
                 // In case there is a submission AND a poll needed, send both, except if we guess that there
                 // is navigation within the same browsing context. It's just a heuristic to prevent sending
                 // an Ajax request whose response might not succeed because the browsing context has navigated.
-                if (! (containingDocument.findTwoPassSubmitEvent exists (_.browserTarget.isEmpty))) {
+                if (! (containingDocument.findTwoPassSubmitEvents exists (_.browserTarget.isEmpty))) {
                   containingDocument.findEarliestPendingDelayedEvent foreach { event =>
                     outputPoll(event, System.currentTimeMillis)
                   }
@@ -457,7 +457,7 @@ object XFormsServer {
                   outputHelpInfo(containingDocument, helpControlEffectiveId)
                 }
 
-                containingDocument.findTwoPassSubmitEvent foreach { twoPassSubmitEvent =>
+                containingDocument.findTwoPassSubmitEvents foreach { twoPassSubmitEvent =>
                   outputSubmissionInfo(twoPassSubmitEvent)
                 }
 
@@ -554,6 +554,9 @@ object XFormsServer {
       val targetAtt =
          twoPassSubmitEvent.browserTarget.toList map ("target" -> _)
 
+      val submissionId =
+        twoPassSubmitEvent.submissionId.toList map ("submission-id" -> _)
+
       val urlTypeAtt =
         "url-type" -> (
           if (twoPassSubmitEvent.isResponseResourceType)
@@ -566,7 +569,7 @@ object XFormsServer {
         localName = "submission",
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
-        atts      = showProgressAtt ::: targetAtt ::: urlTypeAtt :: Nil
+        atts      = showProgressAtt ::: targetAtt ::: submissionId ::: urlTypeAtt :: Nil
       )
     }
 

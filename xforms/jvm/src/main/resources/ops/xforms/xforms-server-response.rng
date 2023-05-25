@@ -395,7 +395,7 @@
                                 <attribute name="control-id"/>
                             </element>
                         </optional>
-                        <optional>
+                        <zeroOrMore>
                             <element name="xxf:submission">
                                 <attribute name="url-type">
                                     <choice>
@@ -412,10 +412,13 @@
                                     </attribute>
                                 </optional>
                                 <optional>
+                                    <attribute name="submission-id"/>
+                                </optional>
+                                <optional>
                                     <attribute name="target"/>
                                 </optional>
                             </element>
-                        </optional>
+                        </zeroOrMore>
                         <!-- Only for non-`javascript:` loads -->
                         <zeroOrMore>
                             <element name="xxf:load">

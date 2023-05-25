@@ -224,6 +224,7 @@ class XFormsStateManagerTest
         RequestParameters(
           state1.uuid,
           None,
+          None,
           state1.staticStateString,
           state1.dynamicStateString
         )
@@ -240,7 +241,7 @@ class XFormsStateManagerTest
               assert(state1.document ne newDoc) // can't be the same because cache is disabled
 
             // Run events if any
-            newDoc.withExternalEvents(null, isAjaxRequest = true) {
+            newDoc.withExternalEvents(null, submissionIdOpt = None) {
               for (event <- callback(newDoc))
                 ClientEvents.processEvent(newDoc, event)
             }
@@ -266,6 +267,7 @@ class XFormsStateManagerTest
       val parameters =
         RequestParameters(
           state1.uuid,
+          None,
           None,
           state1.staticStateString,
           state1.dynamicStateString

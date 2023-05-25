@@ -58,7 +58,7 @@ import scala.util.{Failure, Success, Try}
 object XFormsContainingDocumentSupport {
 
   def withDocumentAcquireLock[T](uuid: String, timeout: Long)(block: XFormsContainingDocument => T): Try[T] =
-    withLock(RequestParameters(uuid, None, None, None), timeout) {
+    withLock(RequestParameters(uuid, None, None, None, None), timeout) {
       case Some(containingDocument) =>
         withUpdateResponse(containingDocument, ignoreSequence = true)(block(containingDocument))
       case None =>
@@ -196,14 +196,14 @@ trait ContainingDocumentTransientState {
   def getScriptsToRun: immutable.Seq[Load Either ScriptInvocation] = transientState.scriptsToRun
 
   def addLoadToRun(load: Load): Unit =
-    findTwoPassSubmitEvent match {
-      case Some(_) =>
-        throw new OXFException("Unable to run a two-pass submission and `xf:load` within a same action sequence.")
-      case None =>
+    findTwoPassSubmitEvents match {
+      case Nil =>
         if (load.isJavaScript)
           transientState.scriptsToRun :+= Left(load)
         else
           transientState.nonJavaScriptLoadsToRun :+= load
+      case _ =>
+        throw new OXFException("Unable to run a two-pass submission and `xf:load` within a same action sequence.") // TODO: we could in some cases!
     }
 
   def getNonJavaScriptLoadsToRun: immutable.Seq[Load] = transientState.nonJavaScriptLoadsToRun
@@ -650,11 +650,12 @@ trait ContainingDocumentDelayedEvents {
       time                   = None,
       showProgress           = p.showProgress,
       browserTarget          = p.target,
+      submissionId           = CoreCrossPlatformSupport.randomHexId.some,
       isResponseResourceType = p.isResponseResourceType
     )
 
-  def findTwoPassSubmitEvent: Option[DelayedEvent] =
-    _delayedEvents.find(_.eventName == XFormsEvents.XXFORMS_SUBMIT)
+  def findTwoPassSubmitEvents: List[DelayedEvent] =
+    _delayedEvents.filter(_.eventName == XFormsEvents.XXFORMS_SUBMIT).toList // also `_.time.isEmpty && _.submissionId.nonEmpty`
 
   // This excludes events where `time == None`, which means it doesn't return the `xxforms-submit` event.
   def findEarliestPendingDelayedEvent: Option[DelayedEvent] =
@@ -686,6 +687,7 @@ trait ContainingDocumentDelayedEvents {
         time                   = time.some,
         showProgress           = showProgress,
         browserTarget          = None,
+        submissionId           = None,
         isResponseResourceType = false
       )
   }
@@ -693,7 +695,9 @@ trait ContainingDocumentDelayedEvents {
   def delayedEvents: List[DelayedEvent] =
     _delayedEvents.toList
 
-  def processDueDelayedEvents(onlyEventsWithNoTime: Boolean): Unit = {
+  def processDueDelayedEvents(submissionIdOpt: Option[String]): Unit = {
+
+    implicit val logger = self.containingDocument.getIndentedLogger(LOGGING_CATEGORY)
 
     @tailrec
     def processRemainingBatchesRecursively(): Unit = {
@@ -702,10 +706,18 @@ trait ContainingDocumentDelayedEvents {
       val currentTime = System.currentTimeMillis()
 
       val (dueEvents, futureEvents) =
-        if (onlyEventsWithNoTime)
-          delayedEvents partition (_.time.isEmpty)
-        else
-          delayedEvents partition (_.time exists (_ <= currentTime))
+        submissionIdOpt match {
+          case Some(submissionId) =>
+            val eventOpt  = delayedEvents find (e => e.time.isEmpty && e.submissionId.contains(submissionId))
+            val remaining = delayedEvents filterNot (e => eventOpt.exists(_ eq e))
+
+            if (eventOpt.isEmpty)
+              warn(s"no delayed event found for submission id $submissionId")
+
+            (eventOpt.toList, remaining)
+          case None =>
+            delayedEvents partition (_.time exists (_ <= currentTime))
+        }
 
       if (dueEvents.nonEmpty) {
 
@@ -728,7 +740,6 @@ trait ContainingDocumentDelayedEvents {
                   )
                 )
               case _ =>
-                implicit val logger = self.containingDocument.getIndentedLogger(LOGGING_CATEGORY)
                 debug(
                   "ignoring delayed event with invalid target id",
                   List(
@@ -741,7 +752,8 @@ trait ContainingDocumentDelayedEvents {
         }
 
         // Try again in case there are new events available
-        processRemainingBatchesRecursively()
+        if (submissionIdOpt.isEmpty)
+          processRemainingBatchesRecursively()
       }
     }
 

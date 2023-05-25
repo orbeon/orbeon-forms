@@ -119,9 +119,9 @@ trait XFormsSupport extends MockitoSugar {
             vc
         } foreach { target =>
           ClientEvents.processEvent(document, new XXFormsValueEvent(target, value))
-            document.afterExternalEvents(true)
+            document.afterExternalEvents(None)
             document.afterUpdateResponse()
-            document.beforeExternalEvents(null, isAjaxRequest = true)
+            document.beforeExternalEvents(null, submissionIdOpt = None)
         }
       case _ =>
     }

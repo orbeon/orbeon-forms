@@ -115,7 +115,7 @@ class XFormsAssetServer extends ProcessorImpl with Logging {
             // error without logging an exception.
             def fromInitialStateOpt: Option[Option[(Option[String], String)]] =
               XFormsStateManager.getStateFromParamsOrStore(
-                RequestParameters(uuid, None, None, None),
+                RequestParameters(uuid, None, None, None, None),
                 isInitialState = true
               ).map(_.dynamicState.flatMap(_.initializationData))
 

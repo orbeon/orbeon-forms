@@ -563,21 +563,36 @@ object XFormsUI {
     if (! showProgressOpt.contains("false"))
       notifyReplace()
 
-    val inputElem = {
+    // Remove possibly existing hidden fields just in case. In particular, the server should no longer include `$uuid`.
+    Iterator(Constants.UuidFieldName, Constants.SubmissionIdFieldName) foreach { name =>
+      formElem.querySelectorAll(s":scope > input[type = 'hidden'][name = '$name']")
+      .toJSArray
+      .foreach(e => e.parentNode.removeChild(e))
+    }
 
-        val inputElem =
-            dom.document
-              .createElement("input")
-              .asInstanceOf[html.Input]
+    val inputElemsToAddAndRemove = {
 
-        inputElem.`type` = "hidden"
-        inputElem.name   = Constants.SubmissionIdFieldName
-        inputElem.value  = submissionId
+      def createHiddenInput(name: String, value: String) =
+        dom.document
+          .createElement("input")
+          .asInstanceOf[html.Input] |!>
+          (_.`type` = "hidden")     |!>
+          (_.name   = name)         |!>
+          (_.value  = value)
 
-        formElem.appendChild(inputElem)
+      List(
+        createHiddenInput(Constants.UuidFieldName,         form.uuid),
+        createHiddenInput(Constants.SubmissionIdFieldName, submissionId)
+      )
+    }
 
-        inputElem
-      }
+    // TODO: This is missing from the version of `scala-js-dom` we use, but present in newer versions. Once we upgrade
+    //  we can remove this.
+    trait ElementExt extends js.Object {
+      def prepend(nodes: (raw.Node | String)*): Unit
+    }
+
+    formElem.asInstanceOf[ElementExt].prepend(inputElemsToAddAndRemove: _*)
 
     try {
       formElem.submit()
@@ -591,7 +606,9 @@ object XFormsUI {
         logger.warn(s"`requestForm.submit()` caused an error: ${t.getMessage}")
     }
 
-    inputElem.parentElement.removeChild(inputElem)
+    inputElemsToAddAndRemove foreach { inputElem =>
+      inputElem.parentElement.removeChild(inputElem)
+    }
   }
 
   @JSExport // 2020-04-27: 1 JavaScript usage

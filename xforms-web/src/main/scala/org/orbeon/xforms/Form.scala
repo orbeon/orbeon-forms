@@ -27,7 +27,6 @@ import scala.scalajs.js.timers.SetTimeoutHandle
 class Form(
   val uuid                          : String,
   val elem                          : html.Form,
-  val uuidInput                     : html.Input,
   val ns                            : String,
   val contextAndNamespaceOpt        : Option[(String, String)],
   val xformsServerPath              : String,                          // could move to configuration

@@ -108,20 +108,24 @@ class XHTMLBodyHandler(
         Nil
     )
 
-    // Only for 2-pass submission
-    outputHiddenField(htmlPrefix, Constants.UuidFieldName, containingDocument.uuid)
+    if (containingDocument.staticState.isClientStateHandling) {
 
-    // We don't need `$sequence` here as HTML form posts are either:
-    //
-    // - 2nd phase of replace="all" submission: we don't (and can't) retry
-    // - background upload: we don't want a sequence number as this run in parallel
-    //
-    // Output encoded static and dynamic state, only for client state handling (no longer supported in JavaScript)
-    XFormsStateManager.getClientEncodedStaticState(containingDocument) foreach
-      (outputHiddenField(htmlPrefix, "$static-state", _))
+      // Keep this for tests as that uses client state and searches for the UUID
+      // https://github.com/orbeon/orbeon-forms/issues/5719
+      outputHiddenField(htmlPrefix, Constants.UuidFieldName, containingDocument.uuid)
 
-    XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach
-      (outputHiddenField(htmlPrefix, "$dynamic-state", _))
+      // We don't need `$sequence` here as HTML form posts are either:
+      //
+      // - 2nd phase of replace="all" submission: we don't (and can't) retry
+      // - background upload: we don't want a sequence number as this run in parallel
+      //
+      // Output encoded static and dynamic state, only for client state handling (no longer supported in JavaScript)
+      XFormsStateManager.getClientEncodedStaticState(containingDocument) foreach
+        (outputHiddenField(htmlPrefix, "$static-state", _))
+
+      XFormsStateManager.getClientEncodedDynamicState(containingDocument) foreach
+        (outputHiddenField(htmlPrefix, "$dynamic-state", _))
+    }
 
     // HACK: We would be ok with just one template, but IE 6 doesn't allow setting the input/@type attribute properly
     // `xf:select[@appearance = 'full']`, `xf:input[@type = 'xs:boolean']`

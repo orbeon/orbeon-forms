@@ -297,19 +297,6 @@ class XFormsModelSubmission(
           List("id" -> getEffectiveId)
         ) {
           try {
-            // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
-            // issue a warning
-            val twoPassParams = containingDocument.findTwoPassSubmitEvent
-            if (p.isDeferredSubmission && twoPassParams.isDefined) {
-              warn(
-                "another submission requiring a second pass already exists",
-                List(
-                  "existing submission" -> twoPassParams.get.targetEffectiveId,
-                  "new submission"      -> getEffectiveId
-                )
-              )
-              return
-            }
 
             /* ***** Check for pending uploads ********************************************************************** */
 

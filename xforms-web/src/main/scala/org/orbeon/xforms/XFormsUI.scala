@@ -24,7 +24,6 @@ import org.orbeon.xforms.facade.{Controls, Init, Utils, XBL}
 import org.scalajs.dom
 import org.scalajs.dom.experimental.URL
 import org.scalajs.dom.ext._
-import org.scalajs.dom.html.Input
 import org.scalajs.dom.{MouseEvent, html, raw, window}
 import org.scalajs.jquery.JQueryPromise
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
@@ -720,7 +719,7 @@ object XFormsUI {
     // Q: Should this be by form?
     var lastCheckboxChecked: Option[(html.Element, html.Input)] = None
 
-    def nestedInputElems(target: dom.Element): Seq[Input] =
+    def nestedInputElems(target: dom.Element): Seq[html.Input] =
       target.getElementsByTagName("input").map(_.asInstanceOf[html.Input])
 
     private def findLoaderElem: Option[raw.Element] =

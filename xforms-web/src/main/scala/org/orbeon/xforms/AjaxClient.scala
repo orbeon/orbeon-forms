@@ -187,9 +187,9 @@ object AjaxClient {
   @JSExport
   def createDelayedServerEvent(
     encodedEvent : String,
-    delay        : Double, // for JavaScript caller
-    showProgress : Boolean,
-    discardable  : Boolean,
+    delay        : Double,  // for JavaScript caller (2023-05-23: always `0`)
+    showProgress : Boolean, // 2023-05-23: always `true`
+    discardable  : Boolean, // 2023-05-23: always `false`
     formId       : String
   ): Unit = {
 

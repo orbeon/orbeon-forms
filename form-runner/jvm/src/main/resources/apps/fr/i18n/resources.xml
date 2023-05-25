@@ -2429,6 +2429,7 @@
                 <yes todo="true">[Yes]</yes>
                 <no todo="true">[No]</no>
                 <other todo="true">[Other]</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu todo="true">Menu</menu>
@@ -2992,6 +2993,7 @@
                 <yes todo="true">[Yes]</yes>
                 <no todo="true">[No]</no>
                 <other todo="true">[Other]</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu>Menu</menu>
@@ -3554,6 +3556,7 @@
                 <yes>Sì</yes>
                 <no>No</no>
                 <other todo="true">[Other]</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu>Menu</menu>
@@ -4705,6 +4708,7 @@
                 <yes todo="true">[Yes]</yes>
                 <no todo="true">[No]</no>
                 <other todo="true">[Other]</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu todo="true">Menu</menu>
@@ -6431,6 +6435,7 @@
                 <yes todo="true">[Yes]</yes>
                 <no todo="true">[No]</no>
                 <other todo="true">[Other]</other>
+                <clear todo="true">[Clear Value]</clear>
             </labels>
             <grid>
                 <menu todo="true">Menu</menu>

@@ -60,8 +60,7 @@ object CRUD {
   )
 
   private def providerAndAttachmentInformation(httpRequest: Request): (Provider, AttachmentInformation) = {
-    val versionFromHeaders =
-      httpRequest.getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt) orElse Some(1)
+    val versionFromHeaders = httpRequest.getFirstHeaderIgnoreCase(Version.OrbeonFormDefinitionVersion).map(_.toInt)
 
     httpRequest.getRequestPath match {
       case FormPath(providerName, app, form, filename) =>

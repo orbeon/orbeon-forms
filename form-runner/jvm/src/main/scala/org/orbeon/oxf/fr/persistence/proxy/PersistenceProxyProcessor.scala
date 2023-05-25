@@ -452,7 +452,8 @@ private object PersistenceProxyProcessor {
       appForm,
       formOrData,
       path,
-      bodyContentOpt
+      bodyContentOpt,
+      outgoingVersionHeaderOpt
     )
 
     val cxr = cxrOpt.getOrElse {
@@ -527,14 +528,15 @@ private object PersistenceProxyProcessor {
     appForm: AppForm,
     formOrData: FormOrData,
     path: String,
-    streamedContent: Option[StreamedContent]
+    streamedContent: Option[StreamedContent],
+    outgoingVersionHeaderOpt: Option[(String, String)]
   ): Option[ConnectionResult] = {
     if (isAttachment) {
       findAttachmentsProvider(appForm, formOrData).map { provider =>
         val (baseURI, headers) = getPersistenceURLHeadersFromProvider(provider)
         val serviceURI         = baseURI + path
 
-        proxyEstablishConnection(OutgoingRequest(request), streamedContent, serviceURI, headers)
+        proxyEstablishConnection(OutgoingRequest(request), streamedContent, serviceURI, headers ++ outgoingVersionHeaderOpt)
       }
     } else {
       None

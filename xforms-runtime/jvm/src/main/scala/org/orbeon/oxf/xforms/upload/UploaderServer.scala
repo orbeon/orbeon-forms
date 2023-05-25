@@ -207,10 +207,10 @@ object UploaderServer {
           case AllowedMediatypes.AllowedSomeMediatypes(allowedMediatypeRanges) =>
             Mediatypes.fromHeadersOrFilename(findHeaderValue, fileItem.getName.trimAllToOpt) match {
               case None =>
-                throw DisallowedMediatypeException(allowedMediatypeRanges, None)
+                throw DisallowedMediatypeException(fileItem.getName, allowedMediatypeRanges, None)
               case Some(untrustedPartMediatype) =>
                 if (! (allowedMediatypeRanges exists untrustedPartMediatype.is))
-                  throw DisallowedMediatypeException(allowedMediatypeRanges, Some(untrustedPartMediatype))
+                  throw DisallowedMediatypeException(fileItem.getName, allowedMediatypeRanges, Some(untrustedPartMediatype))
             }
         }
       }

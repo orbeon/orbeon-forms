@@ -4,10 +4,10 @@ import org.orbeon.datatypes.{Mediatype, MediatypeRange}
 
 sealed trait Reason
 object Reason {
-  case object EmptyFile                                                                  extends Reason
-  case class  SizeReason     (permitted: Long,                actual: Long)              extends Reason
-  case class  MediatypeReason(permitted: Set[MediatypeRange], actual: Option[Mediatype]) extends Reason
-  case class  FileScanReason (fieldName: String, message: Option[String])                extends Reason
+  case object EmptyFile                                                                                    extends Reason
+  case class  SizeReason     (permitted: Long, actual: Long)                                               extends Reason
+  case class  MediatypeReason(filename: String, permitted: Set[MediatypeRange], actual: Option[Mediatype]) extends Reason
+  case class  FileScanReason (fieldName: String, message: Option[String])                                  extends Reason
 }
 
 sealed trait UploadState[+FileItemType] { def name: String }

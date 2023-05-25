@@ -38,6 +38,7 @@ import scala.util.control.NonFatal
 
 
 case class DisallowedMediatypeException(
+  filename  : String,
   permitted : Set[MediatypeRange],
   actual    : Option[Mediatype]
 ) extends FileUploadException
@@ -303,10 +304,10 @@ object Multipart {
                 UploadState.Interrupted(
                  Option(Exceptions.getRootThrowable(t))
                  collect {
-                   case _: EmptyFileException                           => Reason.EmptyFile
-                   case root: SizeLimitExceededException                => Reason.SizeReason(root.getPermittedSize, root.getActualSize)
-                   case DisallowedMediatypeException(permitted, actual) => Reason.MediatypeReason(permitted, actual)
-                   case FileScanException(fieldName, fileScanResult)    => Reason.FileScanReason(fieldName, fileScanResult.message)
+                   case _: EmptyFileException                                     => Reason.EmptyFile
+                   case root: SizeLimitExceededException                          => Reason.SizeReason(root.getPermittedSize, root.getActualSize)
+                   case DisallowedMediatypeException(filename, permitted, actual) => Reason.MediatypeReason(filename, permitted, actual)
+                   case FileScanException(fieldName, fileScanResult)              => Reason.FileScanReason(fieldName, fileScanResult.message)
                  }
                 )
               ))

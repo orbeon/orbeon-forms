@@ -173,9 +173,10 @@ object XXFormsUploadErrorEvent {
           "permitted"  -> Some(permitted),
           "actual"     -> Some(actual)
         )
-      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.MediatypeReason(permitted, actual)))) =>
+      case UploadProgress(_, _, _, UploadState.Interrupted(Some(Reason.MediatypeReason(filename, permitted, actual)))) =>
         List(
           "error-type" -> Some("mediatype-error"),
+          "filename"   -> Some(filename),
           "permitted"  -> Some(permitted.to(List) map (_.toString)),
           "actual"     -> (actual map (_.toString))
         )

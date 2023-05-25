@@ -1102,6 +1102,7 @@
                                 'fr-fr-resources'
                             ),
                             (
+                                event('filename'),
                                 (: NOTE: As of 2017-11-09 this is not used by the message. :)
                                 event('permitted'),
                                 event('actual')

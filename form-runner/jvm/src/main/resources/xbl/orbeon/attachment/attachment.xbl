@@ -484,6 +484,7 @@
                             targetid="fr-attachment"
                             name="{event('xxf:type')}">
                             <xf:property name="error-type" value="event('error-type')"/>
+                            <xf:property name="filename"   value="event('filename')"/>
                             <xf:property name="permitted"  value="event('permitted')"/>
                             <xf:property name="actual"     value="event('actual')"/>
                             <xf:property name="message"    value="event('message')"/>

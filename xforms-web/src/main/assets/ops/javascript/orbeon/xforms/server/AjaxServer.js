@@ -849,8 +849,7 @@
 
                                 // Display modal message
                                 case "message": {
-                                    var messageElement = childNode;
-                                    ORBEON.xforms.Message.execute(messageElement);
+                                    ORBEON.xforms.Message.execute(childNode);
                                     break;
                                 }
 

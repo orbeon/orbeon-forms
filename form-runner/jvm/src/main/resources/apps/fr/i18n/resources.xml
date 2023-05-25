@@ -1867,6 +1867,29 @@
                 <show-more>Mostrar Més</show-more>
                 <show-less>Mostrar Menys</show-less>
             </error-summary>
+            <data-history>
+                <label todo="true">Revision History</label>
+                <date todo="true">{0}. {1}{2,choice,0#'{3,choice,0#|1# (Initial Revision)}'|1# (Current Revision)}</date>
+                <date-format todo="true">[FNn,*-3], [MNn,*-3] [D], [Y] at [h]:[m] [P,*-2]</date-format>
+
+                <named-user todo="true">User {0}</named-user>
+                <anonymous-user todo="true">An anonymous user</anonymous-user>
+
+                <initial-revision todo="true">saved the initial revision.</initial-revision>
+                <no-changes todo="true">saved with no changes detected.</no-changes>
+                <specific-changes todo="true">made the following changes:</specific-changes>
+
+                <view-data todo="true">View this revision</view-data>
+
+                <value-entered todo="true">value "{0}" entered</value-entered>
+                <value-cleared todo="true">value "{0}" cleared</value-cleared>
+                <value-changed todo="true">value changed from "{0}" to "{1}"</value-changed>
+                <iteration-added todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} added</iteration-added>
+                <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
+                <other-changed todo="true">internal information changed</other-changed>
+
+                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+            </data-history>
         </components>
         <untitled-form>Formulari sense Títol</untitled-form>
         <errors>

@@ -110,7 +110,7 @@ object XFormsServer {
                     // Scope the containing document for the XForms API
                     XFormsAPI.withContainingDocument(containingDocument) {
                       withDebug("handling external events") {
-                        containingDocument.withExternalEvents(responseForReplaceAll , requestParameters.submissionIdOpt) {
+                        containingDocument.withExternalEvents(responseForReplaceAll, requestParameters.submissionIdOpt) {
 
                           // Dispatch the events
 
@@ -138,7 +138,7 @@ object XFormsServer {
                 } else {
                   XFormsAPI.withContainingDocument(containingDocument) {
                     withDebug("handling two-pass submission event") {
-                      containingDocument.withExternalEvents(responseForReplaceAll , requestParameters.submissionIdOpt)(())
+                      containingDocument.withExternalEvents(responseForReplaceAll, requestParameters.submissionIdOpt)(())
                       Some(ClientEvents.EmptyEventsFindings)
                     } (eventsIndentedLogger)
                   }
@@ -554,8 +554,8 @@ object XFormsServer {
       val targetAtt =
          twoPassSubmitEvent.browserTarget.toList map ("target" -> _)
 
-      val submissionId =
-        twoPassSubmitEvent.submissionId.toList map ("submission-id" -> _)
+      val submissionIdAtt =
+        "submission-id" -> twoPassSubmitEvent.submissionId.getOrElse(throw new IllegalStateException)
 
       val urlTypeAtt =
         "url-type" -> (
@@ -569,7 +569,7 @@ object XFormsServer {
         localName = "submission",
         prefix    = XXFORMS_SHORT_PREFIX,
         uri       = XXFORMS_NAMESPACE_URI,
-        atts      = showProgressAtt ::: targetAtt ::: submissionId ::: urlTypeAtt :: Nil
+        atts      = showProgressAtt ::: targetAtt ::: submissionIdAtt :: urlTypeAtt :: Nil
       )
     }
 

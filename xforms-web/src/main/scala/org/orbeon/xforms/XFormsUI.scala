@@ -490,10 +490,12 @@ object XFormsUI {
     notifyReplace    : js.Function0[Unit]
   ): Unit = {
 
-    val urlType         = submissionElement.getAttribute("url-type")
-    val showProgressOpt = Option(submissionElement.getAttribute("show-progress"))
-    val targetOpt       = Option(submissionElement.getAttribute("target"))
-    val submissionIdOpt = Option(submissionElement.getAttribute("submission-id"))
+    val urlType         = attValueOrThrow(submissionElement, "url-type")
+    val submissionId    = attValueOrThrow(submissionElement, "submission-id")
+
+    val showProgressOpt = attValueOpt(submissionElement, "show-progress")
+    val targetOpt       = attValueOpt(submissionElement, "target")
+
 
     val form = Page.getForm(formID)
     val formElem = form.elem
@@ -561,8 +563,7 @@ object XFormsUI {
     if (! showProgressOpt.contains("false"))
       notifyReplace()
 
-    val inputElemOpt =
-      submissionIdOpt map { submissionId =>
+    val inputElem = {
 
         val inputElem =
             dom.document
@@ -590,9 +591,7 @@ object XFormsUI {
         logger.warn(s"`requestForm.submit()` caused an error: ${t.getMessage}")
     }
 
-    inputElemOpt foreach { inputElem =>
-      inputElem.parentElement.removeChild(inputElem)
-    }
+    inputElem.parentElement.removeChild(inputElem)
   }
 
   @JSExport // 2020-04-27: 1 JavaScript usage

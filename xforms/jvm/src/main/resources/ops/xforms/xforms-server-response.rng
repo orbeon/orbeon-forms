@@ -403,6 +403,7 @@
                                         <value>resource</value>
                                     </choice>
                                 </attribute>
+                                <attribute name="submission-id"/>
                                 <optional>
                                     <attribute name="show-progress">
                                         <choice>
@@ -410,9 +411,6 @@
                                             <value>false</value>
                                         </choice>
                                     </attribute>
-                                </optional>
-                                <optional>
-                                    <attribute name="submission-id"/>
                                 </optional>
                                 <optional>
                                     <attribute name="target"/>

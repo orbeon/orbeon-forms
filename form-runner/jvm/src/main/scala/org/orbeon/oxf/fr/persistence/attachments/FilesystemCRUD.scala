@@ -19,7 +19,11 @@ import org.orbeon.oxf.externalcontext.ExternalContext.{Request, Response}
 import org.orbeon.oxf.fr.persistence.attachments.CRUD.AttachmentInformation
 import org.orbeon.oxf.fr.{AppForm, FormOrData, FormRunnerPersistence}
 import org.orbeon.oxf.http.StatusCode
-import org.orbeon.oxf.util.LoggerFactory
+import org.orbeon.oxf.pipeline.api.FunctionLibrary
+import org.orbeon.oxf.util.{LoggerFactory, XPathCache}
+import org.orbeon.saxon.om.ValueRepresentation
+import org.orbeon.saxon.value.StringValue
+import org.orbeon.xml.NamespaceMapping
 
 import java.io._
 import java.nio.file.{Files, Path, Paths}
@@ -128,12 +132,22 @@ object FilesystemCRUD {
       throw new OXFException(s"Could not find attachments provider for `$propertySegment`")
     }
 
-    val directory = Option(FormRunnerPersistence.providerPropertyAsURL(
+    val DirectoryProperty = "directory"
+
+    val rawDirectory = Option(FormRunnerPersistence.providerPropertyAsURL(
       provider,
-      "directory"
+      DirectoryProperty
     )).getOrElse {
       throw new OXFException(s"Could not find directory property for provider `$provider`")
     }
+
+    val directoryNamespaces = NamespaceMapping(
+      FormRunnerPersistence.providerPropertyOpt(provider, DirectoryProperty)
+        .map(_.namespaces)
+        .getOrElse(Map[String, String]())
+    )
+
+    val directory = evaluateAsAvt(rawDirectory, directoryNamespaces)
 
     val path = Paths.get(directory)
 
@@ -143,4 +157,17 @@ object FilesystemCRUD {
 
     path.toRealPath()
   }
+
+  def evaluateAsAvt(value: String, namespaceMapping: NamespaceMapping): String =
+    XPathCache.evaluateAsAvt(
+      contextItem = null,
+      value,
+      namespaceMapping,
+      variableToValueMap = null,
+      FunctionLibrary.instance,
+      functionContext = null,
+      baseURI = null,
+      locationData = null,
+      reporter = null
+    )
 }

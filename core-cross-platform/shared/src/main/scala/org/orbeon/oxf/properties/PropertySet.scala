@@ -21,13 +21,12 @@ import org.orbeon.oxf.util.CollectionUtils
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
 import org.orbeon.oxf.util.StringUtils._
-import org.orbeon.oxf.xml.SaxonUtils
-import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom.Extensions
+import org.orbeon.oxf.xml.{SaxonUtils, XMLConstants}
 import org.orbeon.xml.NamespaceMapping
 
-import java.net.{URI, URISyntaxException}
+import java.net.URI
 import java.{lang => jl, util => ju}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._

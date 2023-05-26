@@ -26,6 +26,7 @@ import org.orbeon.oxf.fr.persistence.relational.Version.OrbeonFormDefinitionVers
 import org.orbeon.oxf.http.Headers._
 import org.orbeon.oxf.http.HttpMethod.{GET, PUT}
 import org.orbeon.oxf.http.{BasicCredentials, StreamedContent}
+import org.orbeon.oxf.properties.Property
 import org.orbeon.oxf.util.CoreCrossPlatformSupport.properties
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.MarkupUtils._
@@ -171,8 +172,14 @@ object FormRunnerPersistence {
           .filter(FormRunner.isActiveProvider)
     }
 
+  private def providerPropertyName(provider: String, property: String): String =
+    PersistencePropertyPrefix :: provider :: property :: Nil mkString "."
+
+  def providerPropertyOpt(provider: String, property: String): Option[Property] =
+    properties.getPropertyOpt(providerPropertyName(provider, property))
+
   def providerPropertyAsURL(provider: String, property: String): String =
-    properties.getStringOrURIAsString(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".")
+    properties.getStringOrURIAsString(providerPropertyName(provider, property))
 
   def getPersistenceURLHeaders(appForm: AppForm, formOrData: FormOrData): (String, Map[String, String]) = {
 

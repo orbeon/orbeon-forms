@@ -13,7 +13,7 @@
  */
 package org.orbeon.saxon.function
 
-import org.orbeon.oxf.externalcontext.{URLRewriter, UrlRewriteMode}
+import org.orbeon.oxf.externalcontext.UrlRewriteMode
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.CollectionUtils.collectByErasedType
 import org.orbeon.oxf.util.NetUtils
@@ -22,8 +22,6 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.SequenceIterator
 import org.orbeon.saxon.value.{AtomicValue, StringValue}
 import org.orbeon.scaxon.Implicits._
-
-import java.lang.SecurityException
 
 class Property extends DefaultFunctionSupport with RuntimeDependentFunction {
   override def evaluateItem(xpathContext: XPathContext): AtomicValue =
@@ -83,9 +81,10 @@ object RewriteResourceURI {
     )
 }
 
-class EnvironmentVariable extends DefaultFunctionSupport with RuntimeDependentFunction {
+trait EnvironmentVariable extends DefaultFunctionSupport with RuntimeDependentFunction {
+  def enabled: Boolean
+
   override def evaluateItem(xpathContext: XPathContext): StringValue = {
-    val enabled = Properties.instance.getPropertySet.getBoolean("oxf.xpath.environment-variable.enabled")
     if (enabled)
       try
         System.getenv(stringArgument(0)(xpathContext))
@@ -96,4 +95,13 @@ class EnvironmentVariable extends DefaultFunctionSupport with RuntimeDependentFu
     else
       null
   }
+}
+
+class EnvironmentVariableEnabledByProperty extends EnvironmentVariable {
+  override def enabled: Boolean =
+    Properties.instance.getPropertySet.getBoolean("oxf.xpath.environment-variable.enabled")
+}
+
+class EnvironmentVariableAlwaysEnabled extends EnvironmentVariable {
+  override val enabled: Boolean = true
 }

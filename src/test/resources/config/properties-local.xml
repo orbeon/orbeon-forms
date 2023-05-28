@@ -20,6 +20,16 @@
     <property as="xs:string" name="oxf.fr.persistence.provider.*.filesystem-attachments-form.*.attachments" value="filesystem"/>
     <property as="xs:string" name="oxf.fr.persistence.filesystem.directory"                                 value="../test/attachments"/>
 
+    <!-- Tests for AVTs in oxf.fr.persistence.*.directory property -->
+    <property as="xs:string" name="oxf.fr.persistence.provider.fs-app.fs-form-1.*.attachments" value="fs-attachments-1"/>
+    <property as="xs:string" name="oxf.fr.persistence.fs-attachments-1.directory"              value="test1"/>
+    <property as="xs:string" name="oxf.fr.persistence.provider.fs-app.fs-form-2.*.attachments" value="fs-attachments-2"/>
+    <property as="xs:string" name="oxf.fr.persistence.fs-attachments-2.directory"              value="{'test2'}"/>
+    <property as="xs:string" name="oxf.fr.persistence.provider.fs-app.fs-form-3.*.attachments" value="fs-attachments-3"/>
+    <property as="xs:string" name="oxf.fr.persistence.fs-attachments-3.directory"              value="{1 + 2}"/>
+    <property as="xs:string" name="oxf.fr.persistence.provider.fs-app.fs-form-4.*.attachments" value="fs-attachments-4"/>
+    <property as="xs:string" name="oxf.fr.persistence.fs-attachments-4.directory"              value="{environment-variable('PATH')}"/>
+
     <property as="xs:string"  processor-name="oxf:page-flow" name="service-public-methods"  value="GET HEAD POST PUT DELETE"/>
     <property as="xs:string"  processor-name="oxf:page-flow" name="page-public-methods"     value="GET HEAD POST PUT DELETE"/>
 

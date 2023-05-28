@@ -354,6 +354,24 @@ class RestApiTest
     it("must pass basic operations (filesystem attachments)") {
       basicOperationsWithForm(formName = FilesystemAttachmentsFormName)
     }
+
+    it("must support AVTs in 'directory' base directory property") {
+      // No AVT
+      val directory1 = FilesystemCRUD.providerAndDirectoryProperty(AppForm("fs-app", "fs-form-1"), FormOrData.Data).directory
+      assert(directory1 == "test1")
+
+      // Simple AVT (constant string)
+      val directory2 = FilesystemCRUD.providerAndDirectoryProperty(AppForm("fs-app", "fs-form-2"), FormOrData.Data).directory
+      assert(directory2 == "test2")
+
+      // Simple AVT (basic arithmetic operation)
+      val directory3 = FilesystemCRUD.providerAndDirectoryProperty(AppForm("fs-app", "fs-form-3"), FormOrData.Data).directory
+      assert(directory3 == "3")
+
+      // environment-variable function
+      val directory4 = FilesystemCRUD.providerAndDirectoryProperty(AppForm("fs-app", "fs-form-4"), FormOrData.Data).directory
+      assert(directory4.nonEmpty)
+    }
   }
 
   // Try uploading files of 1 KB, 1 MB

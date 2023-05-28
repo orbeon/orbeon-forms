@@ -117,7 +117,9 @@ trait FilesystemCRUD extends CRUDMethods {
 }
 
 object FilesystemCRUD {
-  def baseDirectory(appForm: AppForm, formOrData: FormOrData): Path = {
+  case class ProviderAndDirectory(provider: String, directory: String)
+
+  def providerAndDirectoryProperty(appForm: AppForm, formOrData: FormOrData): ProviderAndDirectory = {
     val provider = FormRunnerPersistence.findAttachmentsProvider(
       appForm,
       formOrData
@@ -146,12 +148,16 @@ object FilesystemCRUD {
         .getOrElse(Map[String, String]())
     )
 
-    val directory = evaluateAsAvt(rawDirectory, directoryNamespaces)
+    ProviderAndDirectory(provider, evaluateAsAvt(rawDirectory, directoryNamespaces))
+  }
 
-    val path = Paths.get(directory)
+  def baseDirectory(appForm: AppForm, formOrData: FormOrData): Path = {
+    val providerAndDirectory = providerAndDirectoryProperty(appForm, formOrData)
+
+    val path = Paths.get(providerAndDirectory.directory)
 
     if (!Files.exists(path)) {
-      throw new OXFException(s"Directory `$directory` does not exist for provider `$provider`")
+      throw new OXFException(s"Directory `${providerAndDirectory.directory}` does not exist for provider `${providerAndDirectory.provider}`")
     }
 
     path.toRealPath()

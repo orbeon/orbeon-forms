@@ -166,7 +166,7 @@
                 <iteration-removed>{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed>internal information changed</other-changed>
 
-                <workflow-stage-changed>workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed>Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Untitled Form</untitled-form>
@@ -742,7 +742,7 @@
                 <iteration-removed>{0,number,integer} {0,choice,1#répétition supprimée|1&lt;répétitions supprimées}</iteration-removed>
                 <other-changed>information interne changée</other-changed>
 
-                <workflow-stage-changed>étape du workflow changée</workflow-stage-changed>
+                <workflow-stage-changed>Étape du workflow changée de "{0}" à "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Formulaire sans titre</untitled-form>
@@ -1322,7 +1322,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Formulario sin Título</untitled-form>
@@ -2496,7 +2496,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
@@ -3060,7 +3060,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form todo="true">[Untitled Form]</untitled-form>
@@ -3623,7 +3623,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Modulo senza nome</untitled-form>
@@ -4199,7 +4199,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Formular ohne Namen</untitled-form>
@@ -4775,7 +4775,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Nimetön lomake</untitled-form>
@@ -5351,7 +5351,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Formulär utan titel</untitled-form>
@@ -5927,7 +5927,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Naamloos form</untitled-form>
@@ -6502,7 +6502,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Formulário sem título</untitled-form>
@@ -7077,7 +7077,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Blanket uden navn</untitled-form>
@@ -7640,7 +7640,7 @@
                 <iteration-removed todo="true">{0,number,integer} {0,choice,1#repetition|1&lt;repetitions} removed</iteration-removed>
                 <other-changed todo="true">internal information changed</other-changed>
 
-                <workflow-stage-changed todo="true">workflow stage changed</workflow-stage-changed>
+                <workflow-stage-changed todo="true">Workflow stage changed from "{0}" to "{1}"</workflow-stage-changed>
             </data-history>
         </components>
         <untitled-form>Bez tytułu</untitled-form>

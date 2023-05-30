@@ -17,8 +17,16 @@
 
     <property as="xs:boolean" name="oxf.fr.persistence.form-definition-cache.enable"        value="false"/>             <!-- So tests can avoid stepping on each other -->
 
-    <property as="xs:string" name="oxf.fr.persistence.provider.*.filesystem-attachments-form.*.attachments" value="filesystem"/>
-    <property as="xs:string" name="oxf.fr.persistence.filesystem.directory"                                 value="../test/attachments"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.*.filesystem-attachments-form.*.attachments" value="filesystem"/>
+    <property as="xs:string"  name="oxf.fr.persistence.filesystem.directory"                                 value="{
+      let
+        $travis-job-id := environment-variable('TRAVIS_JOB_ID')
+      return
+        if (string-length($travis-job-id)>0) then
+          concat('/tmp/attachments-', $travis-job-id)
+        else
+          '/tmp/attachments'
+    }"/>
 
     <!-- Tests for AVTs in oxf.fr.persistence.*.directory property -->
     <property as="xs:string" name="oxf.fr.persistence.provider.fs-app.fs-form-1.*.attachments" value="fs-attachments-1"/>

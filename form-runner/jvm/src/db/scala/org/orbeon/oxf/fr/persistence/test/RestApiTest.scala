@@ -35,6 +35,8 @@ import org.orbeon.oxf.xml.dom.IOSupport
 import org.scalatest.funspec.AnyFunSpecLike
 
 import java.io.ByteArrayInputStream
+import java.nio.file.{Files, Path, Paths}
+import java.util.Comparator
 import scala.util.Random
 
 
@@ -332,9 +334,18 @@ class RestApiTest
 
   // Try uploading files of 1 KB, 1 MB
   describe("Attachments") {
-    def basicOperationsWithForm(formName   : String): Unit = {
+    def basicOperationsWithForm(
+      formName : String,
+      preTest  : (AppForm, FormOrData) => Unit = (_, _) => (),
+      postTest : (AppForm, FormOrData) => Unit = (_, _) => ()
+    ): Unit = {
       withTestExternalContext { implicit externalContext =>
         Connect.withOrbeonTables("attachments") { (_, provider) =>
+          val appForm = AppForm(provider.entryName, formName)
+          val formOrData = FormOrData.Data
+
+          preTest(appForm, formOrData)
+
           createForm(provider, formName)
 
           for ((size, position) <- Seq(0, 1, 1024, 1024 * 1024).zipWithIndex) {
@@ -343,6 +354,8 @@ class RestApiTest
             HttpAssert.put(dataUrl, Specific(1), bytes, StatusCode.Created)
             HttpAssert.get(dataUrl, Unspecified, HttpAssert.ExpectedBody(bytes, AnyOperation, Some(1)))
           }
+
+          postTest(appForm, formOrData)
         }
       }
     }
@@ -352,7 +365,46 @@ class RestApiTest
     }
 
     it("must pass basic operations (filesystem attachments)") {
-      basicOperationsWithForm(formName = FilesystemAttachmentsFormName)
+      def baseDirectory(appForm: AppForm, formOrData: FormOrData): Path =
+        Paths.get(FilesystemCRUD.providerAndDirectoryProperty(appForm, formOrData).directory)
+
+      def fileCount(directory: Path): Long =
+        Files.walk(directory).filter(Files.isRegularFile(_)).count()
+
+      var directoryToCleanAfterTest: Option[Path] = None
+      var fileCountBefore = 0L
+
+      def preTest(appForm: AppForm, formOrData: FormOrData): Unit = {
+        val directory = baseDirectory(appForm, formOrData)
+
+        // Create the attachments base directory if needed, assuming that its parent directory exists
+
+        if (!Files.exists(directory)) {
+          Files.createDirectory(directory)
+          directoryToCleanAfterTest = Some(directory)
+        }
+
+        // Assuming no concurrent test, i.e. no concurrent access to the var
+        fileCountBefore = fileCount(directory)
+      }
+
+      def postTest(appForm: AppForm, formOrData: FormOrData): Unit = {
+        val directory = baseDirectory(appForm, formOrData)
+        val fileCountAfter = fileCount(directory)
+
+        // Simple test that checks that files were indeed created
+        assert(fileCountAfter > fileCountBefore)
+      }
+
+      try {
+        basicOperationsWithForm(formName = FilesystemAttachmentsFormName, preTest = preTest, postTest = postTest)
+      } finally {
+        // Delete the base directory only if it was created by the test
+        directoryToCleanAfterTest.foreach { directory =>
+          // Delete all sub-directories and files in reverse order, so that children are deleted before parents
+          Files.walk(directory).sorted(java.util.Comparator.reverseOrder()).forEach(Files.delete)
+        }
+      }
     }
 
     it("must support AVTs in 'directory' base directory property") {

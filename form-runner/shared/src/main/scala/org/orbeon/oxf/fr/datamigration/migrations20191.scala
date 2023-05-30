@@ -221,18 +221,19 @@ object MigrationOps20191 extends MigrationOps {
 
         // 1. Binds
 
-        val containerBindElem = frc.findBindByName(containerName).toList
+        val containerBindElemOpt  = frc.findBindByName(containerName)
+        val containerBindElemList = containerBindElemOpt.toList
 
         val existingBindContent = content flatMap (p => frc.findBindByName(p.value))
 
         val afterBindElem =
-          afterElem flatMap (p => frc.findBindByName(p.value)) filter (_.parentOption contains containerBindElem)
+          afterElem.flatMap(p => frc.findBindByName(p.value)).filter(_.parentOption == containerBindElemOpt)
 
         val useShortPrefix =
-          containerBindElem.flatMap(_.prefixesForURI(XFBindQName.namespace.uri)).contains(XFORMS_SHORT_PREFIX)
+          containerBindElemList.flatMap(_.prefixesForURI(XFBindQName.namespace.uri)).contains(XFORMS_SHORT_PREFIX)
 
         insert(
-          into   = containerBindElem,
+          into   = containerBindElemList,
           after  = afterBindElem.toList,
           origin =
             elementInfo(

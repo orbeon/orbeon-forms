@@ -28,7 +28,7 @@ import org.orbeon.scaxon
 import org.orbeon.scaxon.Implicits._
 import org.orbeon.scaxon.SimplePath._
 import org.orbeon.xforms.BasicNamespaceMapping
-import org.orbeon.xforms.XFormsNames.XFORMS_BIND_QNAME
+import org.orbeon.xforms.XFormsNames.{XFBindQName, XFORMS_BIND_QNAME, XFORMS_SHORT_PREFIX}
 
 import scala.collection.compat._
 
@@ -220,11 +220,14 @@ object MigrationOps48 extends MigrationOps {
 
         val existingGridBindContent = (containerBindElem child *).toList
 
+        val useShortPrefix =
+          containerBindElem.flatMap(_.prefixesForURI(XFBindQName.namespace.uri)).contains(XFORMS_SHORT_PREFIX)
+
         insert(
           into = containerBindElem,
           origin =
             elementInfo(
-              XFORMS_BIND_QNAME,
+              if (useShortPrefix) XFBindQName else XFORMS_BIND_QNAME,
               attributeInfo("id",   frc.bindId(iterationName)) ::
                 attributeInfo("ref",  iterationName)           ::
                 attributeInfo("name", iterationName)           ::

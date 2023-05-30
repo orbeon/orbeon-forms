@@ -32,6 +32,12 @@ object XFormsNames {
   def xblQName      (name: String): QName = QName(name, XBL_NAMESPACE)
   def xxblQName     (name: String): QName = QName(name, XXBL_NAMESPACE)
 
+  // We should probably use this everywhere. Equality (`==`) on `QName` ignores the prefix, but where we use `QName` for
+  // new element creation, we usually want the short prefix. Alternatively, we could pick the preferred prefix in the
+  // document.
+  // https://github.com/orbeon/orbeon-forms/issues/5812
+  def xfQName       (name: String): QName = QName(name, XFORMS_NAMESPACE_SHORT)
+
   val XFORMS_PREFIX           = "xforms" // TODO: remove
   val XFORMS_SHORT_PREFIX     = "xf"
   val XFORMS_NAMESPACE_URI    = Namespaces.XF
@@ -101,6 +107,7 @@ object XFormsNames {
   val XFORMS_SUBMIT_QNAME           = xformsQName("submit")
   val XFORMS_TRIGGER_QNAME          = xformsQName("trigger")
   val XFORMS_BIND_QNAME             = xformsQName("bind")
+  val XFBindQName                   = xfQName("bind") // https://github.com/orbeon/orbeon-forms/issues/5812
 
   val ROOT_QNAME                    = QName("root")
 

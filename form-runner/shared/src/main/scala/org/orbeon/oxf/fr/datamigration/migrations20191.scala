@@ -17,7 +17,6 @@ import io.circe.parser
 import org.orbeon.dom.saxon.{DocumentWrapper, NodeWrapper}
 import org.orbeon.oxf.fr.DataFormatVersion.MigrationVersion
 import org.orbeon.oxf.fr.FormRunnerCommon.frc
-import org.orbeon.oxf.fr.XMLNames._
 import org.orbeon.oxf.fr.datamigration.MigrationSupport._
 import org.orbeon.oxf.fr.{DataFormatVersion, InDocFormRunnerDocContext}
 import org.orbeon.oxf.util.CoreUtils._
@@ -229,12 +228,15 @@ object MigrationOps20191 extends MigrationOps {
         val afterBindElem =
           afterElem flatMap (p => frc.findBindByName(p.value)) filter (_.parentOption contains containerBindElem)
 
+        val useShortPrefix =
+          containerBindElem.flatMap(_.prefixesForURI(XFBindQName.namespace.uri)).contains(XFORMS_SHORT_PREFIX)
+
         insert(
           into   = containerBindElem,
           after  = afterBindElem.toList,
           origin =
             elementInfo(
-              XFORMS_BIND_QNAME,
+              if (useShortPrefix) XFBindQName else XFORMS_BIND_QNAME,
               attributeInfo("id",   frc.bindId(gridName)) ::
                 attributeInfo("ref",  gridName) ::
                 attributeInfo("name", gridName) ::

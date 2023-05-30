@@ -146,6 +146,9 @@ body.orbeon {
         // Let content wrap otherwise the user has no option to see the content
         white-space: normal;
         overflow-wrap: break-word;
+        // https://github.com/orbeon/orbeon-forms/issues/5716
+        word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
+
         min-height: @controlsHeight;
         height: auto;
     }

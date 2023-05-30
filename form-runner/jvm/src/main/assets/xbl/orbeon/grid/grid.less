@@ -471,6 +471,8 @@
                     margin-top: 3px;
                 }
                 overflow-wrap: break-word;
+                // https://github.com/orbeon/orbeon-forms/issues/5716
+                word-wrap: break-word; // keep also `word-wrap`, even if it's deprecated in favor of `overflow-wrap`, for the PDF renderer
             }
 
             .fr-repeat-column-left, .fr-repeat-column-right, .fr-repeat-column-number {

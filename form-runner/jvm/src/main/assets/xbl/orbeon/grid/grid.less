@@ -163,6 +163,18 @@
                     border-right: none;
                     border-bottom: none;
 
+                    &:not(.fr-grid-readonly):not(.fr-grid-number-rows) {
+                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                            grid-template-columns: auto 35px;
+                        }
+                    }
+
+                    &:not(.fr-grid-readonly).fr-grid-number-rows {
+                        .fr-grid-repeat-top-row, .fr-grid-repeat-iteration {
+                            grid-template-columns: 35px auto 35px;
+                        }
+                    }
+
                     .fr-grid-th,
                     .fr-grid-td,
                     .fr-repeat-column-left,

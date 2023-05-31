@@ -88,7 +88,14 @@ object LabelEditor {
               sendNewLabelValue()
             }
           })
-          AjaxClient.ajaxResponseProcessed.add(_ => labelInput.hide())
+          // We close the editor on Ajax response as processing the response can modify the form in ways that make the
+          // label editor irrelevant, badly positioned, etc. We do this unless the response is empty, which is typically
+          // the case for heartbeat responses.
+          AjaxClient.ajaxResponseProcessed.add { ajaxResponseDetails =>
+            val emptyAjaxResponse = ajaxResponseDetails.responseXML.documentElement.childElementCount == 0
+            if (! emptyAjaxResponse)
+              labelInput.hide()
+          }
           labelInputOpt = labelInput
           labelInput
         }

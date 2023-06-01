@@ -13,17 +13,16 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.datatypes.LocationData
+import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException}
 import org.orbeon.oxf.http.HttpStatusCode
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.model.StaticDataModel.Reason
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.xforms.{ServerError, XFormsCrossPlatformSupport, XFormsNames}
-
-import scala.collection.compat._
 
 
 // What kind of errors get here:
@@ -66,10 +65,20 @@ object XFormsError {
   def handleNonFatalXPathError(
     container    : XBLContainer,
     throwable    : Throwable,
-    expressionOpt: Option[String] = None
+    expressionOpt: Option[String]
   ): Unit = {
-    val expressionForMessage = expressionOpt.map(e => s" `$e`").getOrElse("")
-    val message = "exception while evaluating XPath expression" + expressionForMessage
+
+    def expressionFromThrowable: Option[String] =
+      XFormsCrossPlatformSupport
+        .causesIterator(throwable)
+        .flatMap(ExtendedLocationData.iterateParamNameValues(_, "expression"))
+        .lastOption()
+
+    val message =
+      s"exception while evaluating XPath expression${
+        expressionOpt.orElse(expressionFromThrowable).map(e => s" `$e`").getOrElse("")
+      }"
+
     handleNonFatalXFormsError(
       container,
       message,

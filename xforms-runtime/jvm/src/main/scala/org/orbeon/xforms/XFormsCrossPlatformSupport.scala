@@ -381,10 +381,10 @@ object XFormsCrossPlatformSupport extends XFormsCrossPlatformSupportTrait {
     multipartEntity.addPart(element.getName, contentBody)
   }
 
-  def getRootThrowable(t : Throwable) : Throwable =
+  def getRootThrowable(t: Throwable): Throwable =
     Exceptions.getRootThrowable(t)
 
-  def causesIterator(t : Throwable) : Iterator[Throwable] =
+  def causesIterator(t: Throwable): Iterator[Throwable] =
     Exceptions.causesIterator(t)
 
   def tempFileSize(filePath: String): Long =

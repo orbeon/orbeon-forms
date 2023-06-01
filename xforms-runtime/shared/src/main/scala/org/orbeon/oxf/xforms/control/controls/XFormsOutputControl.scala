@@ -130,7 +130,7 @@ class XFormsOutputControl(
       )(getContextStack)
     catch {
       case NonFatal(t) =>
-        XFormsError.handleNonFatalXPathError(container, t)
+        XFormsError.handleNonFatalXPathError(container, t, None)
         Map()
     }
   }

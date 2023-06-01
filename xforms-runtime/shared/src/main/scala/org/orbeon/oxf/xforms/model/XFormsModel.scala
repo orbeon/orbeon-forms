@@ -185,7 +185,15 @@ class XFormsModel(
 
         // NOTE: We don't like this event very much as it is dispatched in the middle of rebuild/recalculate/revalidate,
         // and event handlers for this have to be careful. It might be better to dispatch it *after* RRR.
-        XFormsError.handleNonFatalXPathError(container, ev.throwable)
+
+        XFormsError.handleNonFatalXPathError(
+          container,
+          ev.throwable,
+          XFormsCrossPlatformSupport
+            .causesIterator(ev.throwable)
+            .flatMap(ExtendedLocationData.iterateParamNameValues(_, "expression"))
+            .lastOption()
+        )
       case ev: XXFormsBindingErrorEvent =>
         // Custom event for binding errors
         XFormsError.handleNonFatalSetvalueError(selfModel, ev.locationData, ev.reason)

@@ -197,7 +197,7 @@ object StaticBind {
     val id           : String,
     val name         : String,
     val level        : ValidationLevel,
-    val expression   : String, // public for serialization
+    val expression   : String, // public for serialization and debugging
     namespaceMapping : NamespaceMapping,
     locationData     : ExtendedLocationData,
     functionLibrary  : FunctionLibrary

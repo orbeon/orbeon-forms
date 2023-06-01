@@ -38,7 +38,7 @@ object Exceptions {
   // Typically for Java callers
   def getNestedThrowableOrNull(t: Throwable) = getNestedThrowable(t) orNull
 
-  // Iterator down a throwable's causes
+  // Iterator down a throwable's causes, always non-empty
   def causesIterator(t: Throwable): Iterator[Throwable] =
     Iterator.iterate(t)(getNestedThrowableOrNull).takeWhile(_ ne null)
 

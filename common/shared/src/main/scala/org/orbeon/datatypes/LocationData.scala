@@ -13,10 +13,11 @@
  */
 package org.orbeon.datatypes
 
-import java.{lang => jl}
+import org.orbeon.oxf.common.ValidationException
 
+import java.{lang => jl}
 import scala.collection.compat._
-import scala.collection.immutable
+import scala.collection.{Iterator, immutable}
 
 
 trait LocationData {
@@ -92,4 +93,21 @@ case class ExtendedLocationData private (
         ""
     )
   }
+}
+
+object ExtendedLocationData {
+
+  def iterateParamNameValues(throwable: Throwable, paramName: String): Iterator[String] =
+    for {
+      ld <- throwable match {
+        case e: ValidationException => e.allLocationData.iterator
+        case _                      => Iterator.empty
+      }
+      (name, value) <- ld match {
+        case eld: ExtendedLocationData => eld.params.iterator
+        case _                         => Iterator.empty
+      }
+      if name == paramName
+    } yield
+      value
 }

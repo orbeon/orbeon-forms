@@ -94,11 +94,12 @@
                     <_ xmlns=""/>
                 </xf:instance>
 
-                <xf:instance id="inspector-instance">
+                <xf:instance id="inspector-instance" xxf:exclude-result-prefixes="#all">
                     <_ xmlns="">
                         <layout>open</layout>
                         <current-model/>
                         <current-instance/>
+                        <current-instance-clean/>
                         <mode>formatted</mode>
                         <function>view-instance</function>      <!-- view-instance | evaluate-xpath | view-console -->
                         <xpath>/*</xpath>
@@ -294,12 +295,20 @@
                 <!-- Output -->
                 <xh:div class="fr-xforms-inspector-source" id="fr-xforms-inspector">
                     <xf:group ref="instance('inspector-instance')" appearance="xxf:internal">
-                        <!-- NOTE: We can't use a calculate for this, as it would only be execute if something in the current model changes -->
+                        <!-- We don't use a `calculate`, as it would only be executed if something in the current model changed -->
                         <xf:var name="current-instance" value="xxf:instance(current-instance)"/>
+                        <!-- Store in `current-instance-clean` version of the current instance without blank text nodes, for better formatting -->
+                        <xf:var name="current-instance-xml" value="xxf:serialize($current-instance, 'xml')">`
+                            <xf:action event="xforms-value-changed" context="instance('inspector-instance')/current-instance-clean">
+                                <xf:delete ref="*"/>
+                                <xf:insert context="." origin="$current-instance"/>
+                                <xf:delete ref=".//text()[xxf:is-blank()]"/>
+                            </xf:action>
+                        </xf:var>
                         <xf:var name="shown-output" value="
                                 if (function = 'view-instance') then
                                     if (mode = 'formatted')
-                                        then xxf:serialize($current-instance, $xml-indent)
+                                        then xxf:serialize(current-instance-clean/*, $xml-indent)
                                         else xxf:serialize($current-instance, $xml-noindent)
                                 else if (function = 'evaluate-xpath') then
                                     if (exists(xpath-output/*))

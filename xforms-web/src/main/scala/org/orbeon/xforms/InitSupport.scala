@@ -21,11 +21,10 @@ import org.orbeon.liferay._
 import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.MarkupUtils.MarkupStringOps
 import org.orbeon.oxf.util.PathUtils._
-import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, PathUtils}
 import org.orbeon.oxf.util.StringUtils._
+import org.orbeon.oxf.util.{ContentTypes, LoggerFactory, PathUtils}
 import org.orbeon.web.DomEventNames
 import org.orbeon.wsrp.WSRPSupport
-import org.orbeon.xforms.Constants._
 import org.orbeon.xforms.EventNames.{KeyModifiersPropertyName, KeyTextPropertyName}
 import org.orbeon.xforms.StateHandling.StateResult
 import org.orbeon.xforms.facade._
@@ -33,11 +32,10 @@ import org.orbeon.xforms.rpc.Initializations
 import org.scalajs.dom
 import org.scalajs.dom.ext._
 import org.scalajs.dom.html
-
-import scala.collection.{mutable => m}
 import org.scalajs.macrotaskexecutor.MacrotaskExecutor.Implicits._
 
 import java.io.StringWriter
+import scala.collection.{mutable => m}
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
@@ -333,11 +331,6 @@ object InitSupport {
 
     def allFormElems: Iterable[html.Form] =
       dom.document.forms filter (_.classList.contains(Constants.FormClass)) collect { case f: html.Form => f }
-
-    def getTwoPassSubmissionField(formElem: html.Form, fieldName: String): html.Input =
-      formElem.elements.iterator                          collectFirst
-        { case e: html.Input if fieldName == e.name => e } getOrElse
-        (throw new IllegalStateException(s"missing hidden field for form `$fieldName`"))
 
     def parseRepeatIndexes(repeatIndexesString: String): List[(String, String)] =
       for {

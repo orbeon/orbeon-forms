@@ -2,7 +2,7 @@ package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.fr.datamigration.MigrationSupport
 import org.orbeon.oxf.fr.persistence.relational.index.Index
-import org.orbeon.oxf.fr.persistence.relational.IndexedControl
+import org.orbeon.oxf.fr.persistence.relational.{IndexSettings, IndexedControl}
 import org.orbeon.oxf.test.{DocumentTestBase, ResourceManagerSupport}
 import org.orbeon.scaxon.NodeConversions._
 import org.scalatest.funspec.AnyFunSpecLike
@@ -331,29 +331,29 @@ class IndexTest
 
     val expected40 =
       List(
-        IndexedControl("in-summary", inSearch = false, inSummary = true,  "my-section/in-summary",                        "xs:string", "input", htmlLabel = true,  resources = Nil),
-        IndexedControl("in-search",  inSearch = true,  inSummary = false, "my-section/in-search",                         "xs:string", "input", htmlLabel = false, resources = Nil),
-        IndexedControl("in-both",    inSearch = true,  inSummary = true,  "my-section/in-both",                           "xs:string", "input", htmlLabel = false, resources = Nil),
-        IndexedControl("date",       inSearch = true,  inSummary = true,  "my-section/date",                              "xf:date"  , "date",  htmlLabel = false, resources = Nil),
-        IndexedControl("in-repeat",  inSearch = true,  inSummary = true,  "my-section/repeat/in-repeat",                  "xs:string", "input", htmlLabel = false, resources = Nil)
+        IndexedControl("in-summary", IndexSettings(summarySearch = false, summaryShow = true,  summaryEdit = false), "my-section/in-summary",                        "xs:string", "input", htmlLabel = true,  resources = Nil),
+        IndexedControl("in-search",  IndexSettings(summarySearch = true,  summaryShow = false, summaryEdit = false), "my-section/in-search",                         "xs:string", "input", htmlLabel = false, resources = Nil),
+        IndexedControl("in-both",    IndexSettings(summarySearch = true,  summaryShow = true,  summaryEdit = false), "my-section/in-both",                           "xs:string", "input", htmlLabel = false, resources = Nil),
+        IndexedControl("date",       IndexSettings(summarySearch = true,  summaryShow = true,  summaryEdit = false), "my-section/date",                              "xf:date"  , "date",  htmlLabel = false, resources = Nil),
+        IndexedControl("in-repeat",  IndexSettings(summarySearch = true,  summaryShow = true,  summaryEdit = false), "my-section/repeat/in-repeat",                  "xs:string", "input", htmlLabel = false, resources = Nil)
       )
 
     val expected48 =
       List(
-        IndexedControl("in-summary", inSearch = false, inSummary = true,  "my-section/in-summary",                        "xs:string", "input", htmlLabel = true,  resources = Nil),
-        IndexedControl("in-search",  inSearch = true,  inSummary = false, "my-section/in-search",                         "xs:string", "input", htmlLabel = false, resources = Nil),
-        IndexedControl("in-both",    inSearch = true,  inSummary = true,  "my-section/in-both",                           "xs:string", "input", htmlLabel = false, resources = Nil),
-        IndexedControl("date",       inSearch = true,  inSummary = true,  "my-section/date",                              "xf:date"  , "date",  htmlLabel = false, resources = Nil),
-        IndexedControl("in-repeat",  inSearch = true,  inSummary = true,  "my-section/repeat/repeat-iteration/in-repeat", "xs:string", "input", htmlLabel = false, resources = Nil)
+        IndexedControl("in-summary", IndexSettings(summarySearch = false, summaryShow = true,  summaryEdit = false), "my-section/in-summary",                        "xs:string", "input", htmlLabel = true,  resources = Nil),
+        IndexedControl("in-search",  IndexSettings(summarySearch = true,  summaryShow = false, summaryEdit = false), "my-section/in-search",                         "xs:string", "input", htmlLabel = false, resources = Nil),
+        IndexedControl("in-both",    IndexSettings(summarySearch = true,  summaryShow = true,  summaryEdit = false), "my-section/in-both",                           "xs:string", "input", htmlLabel = false, resources = Nil),
+        IndexedControl("date",       IndexSettings(summarySearch = true,  summaryShow = true,  summaryEdit = false), "my-section/date",                              "xf:date"  , "date",  htmlLabel = false, resources = Nil),
+        IndexedControl("in-repeat",  IndexSettings(summarySearch = true,  summaryShow = true,  summaryEdit = false), "my-section/repeat/repeat-iteration/in-repeat", "xs:string", "input", htmlLabel = false, resources = Nil)
       )
 
     val expected20191 =
       List(
-        IndexedControl("in-summary", inSearch = false, inSummary = true,  "my-section/my-grid/in-summary",                "xs:string", "input", htmlLabel = true,  resources = Nil),
-        IndexedControl("in-search",  inSearch = true,  inSummary = false, "my-section/my-grid/in-search",                 "xs:string", "input", htmlLabel = false, resources = Nil),
-        IndexedControl("in-both",    inSearch = true,  inSummary = true,  "my-section/my-grid/in-both",                   "xs:string", "input", htmlLabel = false, resources = Nil),
-        IndexedControl("date",       inSearch = true,  inSummary = true,  "my-section/my-grid/date",                      "xf:date"  , "date",  htmlLabel = false, resources = Nil),
-        IndexedControl("in-repeat",  inSearch = true,  inSummary = true,  "my-section/repeat/repeat-iteration/in-repeat", "xs:string", "input", htmlLabel = false, resources = Nil)
+        IndexedControl("in-summary", IndexSettings(summarySearch = false, summaryShow = true,  summaryEdit = false), "my-section/my-grid/in-summary",                "xs:string", "input", htmlLabel = true,  resources = Nil),
+        IndexedControl("in-search",  IndexSettings(summarySearch = true,  summaryShow = false, summaryEdit = false), "my-section/my-grid/in-search",                 "xs:string", "input", htmlLabel = false, resources = Nil),
+        IndexedControl("in-both",    IndexSettings(summarySearch = true,  summaryShow = true,  summaryEdit = false), "my-section/my-grid/in-both",                   "xs:string", "input", htmlLabel = false, resources = Nil),
+        IndexedControl("date",       IndexSettings(summarySearch = true,  summaryShow = true,  summaryEdit = false), "my-section/my-grid/date",                      "xf:date"  , "date",  htmlLabel = false, resources = Nil),
+        IndexedControl("in-repeat",  IndexSettings(summarySearch = true,  summaryShow = true,  summaryEdit = false), "my-section/repeat/repeat-iteration/in-repeat", "xs:string", "input", htmlLabel = false, resources = Nil)
       )
 
     for {
@@ -365,7 +365,8 @@ class IndexTest
         assert(
           expected == Index.findIndexedControls(
             elemToDocumentInfo(elem),
-            dstVersion
+            dstVersion,
+            forUserRoles = None
           )
         )
       }

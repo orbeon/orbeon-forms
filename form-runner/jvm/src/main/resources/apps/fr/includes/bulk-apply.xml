@@ -1,0 +1,71 @@
+<!--
+  Copyright (C) 2018 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xf:model
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+
+    id="fr-bulk-apply"
+    xxf:xpath-analysis="true">
+
+    <xf:submission
+        id            = "form-data"
+        method        = "{event('method')}"
+        serialization = "{event('serialization')}"
+        resource      = "{event('url')}"
+        ref           = "instance('fr-bulk-edit-form-data')"
+        replace       = "{event('replace')}"
+        instance      = "fr-bulk-edit-form-data">
+    </xf:submission>
+
+    <xf:action event="apply">
+
+        <xf:var name="app"       value="event('app')"/>
+        <xf:var name="form"      value="event('form')"/>
+        <xf:var name="documents" value="event('documents')"/>
+        <xf:var name="path"      value="event('path')"/>
+        <xf:var name="value"     value="event('value')"/>
+
+        <xf:action iterate="xxf:split($documents)">
+            <xf:var name="document" value="."/>
+            <xf:var name="url"      value="concat('/fr/service/persistence/crud/', $app, '/', $form, '/', $document, '/data.xml')"/>
+
+            <!-- Retrieve form data for current document -->
+            <xf:send submission="form-data">
+                <xf:property name="url"           value="$url"/>
+                <xf:property name="method"        value="'get'"/>
+                <xf:property name="serialization" value="'none'"/>
+                <xf:property name="replace"       value="'instance'"/>
+            </xf:send>
+
+            <xf:action observer="form-data" event="xforms-submit-done">
+                <!-- Locally modify form data -->
+                <xf:setvalue ref="xxf:evaluate(concat('instance(''fr-bulk-edit-form-data'')/', $path))" value="$value"/>
+
+                <!-- Update form data -->
+                <xf:send submission="form-data">
+                    <xf:property name="url"           value="$url"/>
+                    <xf:property name="method"        value="'put'"/>
+                    <xf:property name="serialization" value="'application/xml'"/>
+                    <xf:property name="replace"       value="'none'"/>
+                </xf:send>
+            </xf:action>
+        </xf:action>
+    </xf:action>
+
+    <xf:instance id="fr-bulk-edit-form-data">
+        <_ xmlns="">
+            <dummy/>
+        </_>
+    </xf:instance>
+</xf:model>

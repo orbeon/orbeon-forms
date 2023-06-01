@@ -46,10 +46,6 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   val FalseExpr: String = "false()"
 
   val StandardCassNames: Set[String] = Set(
-    "fr-index",
-    "fr-summary",
-    "fr-search",
-    "fr-encrypt",
     "fr-attachment",
     "fr-static-attachment"
   )
@@ -207,8 +203,25 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
   def isCheckboxInput(controlElem: NodeInfo): Boolean =
     controlElem.resolveQName(controlElem.name) == FRCheckboxInputQName
 
+  def searchControlsInFormBySubElement(
+    subElements       : Set[String],
+    dataFormatVersion : DataFormatVersion)(implicit
+    ctx               : FormRunnerDocContext
+  ): List[ControlBindPathHoldersResources] =
+    searchControlsInFormByControlPredicate(
+      controlPredicate  = (nodeInfo: NodeInfo) => subElements.exists(elem => (nodeInfo / elem).nonEmpty),
+      dataFormatVersion = dataFormatVersion
+    )
+
   def searchControlsInFormByClass(
     classes           : Set[String],
+    dataFormatVersion : DataFormatVersion)(implicit
+    ctx               : FormRunnerDocContext
+  ): List[ControlBindPathHoldersResources] =
+    searchControlsInFormByControlPredicate(frc.hasAnyClassPredicate(classes), dataFormatVersion)
+
+  def searchControlsInFormByControlPredicate(
+    controlPredicate  : NodeInfo => Boolean,
     dataFormatVersion : DataFormatVersion)(implicit
     ctx               : FormRunnerDocContext
   ): List[ControlBindPathHoldersResources] = {
@@ -218,7 +231,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
       val topLevelOnly =
         frc.searchControlsTopLevelOnly(
           data      = None,
-          predicate = frc.hasAnyClassPredicate(classes)
+          predicate = controlPredicate
         )
 
       val withSectionTemplatesOpt =
@@ -227,7 +240,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
             head             = head,
             data             = None,
             sectionPredicate = _ => true,
-            controlPredicate = frc.hasAnyClassPredicate(classes)
+            controlPredicate = controlPredicate
           )
         }
 

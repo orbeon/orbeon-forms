@@ -1058,10 +1058,18 @@ body.orbeon {
                 margin-bottom: 5px; // otherwise they are too close from each other
             }
 
-            // Indent these two options under the `index` option
-            .fb-control-settings-summary, .fb-control-settings-search {
+            // Indent these three options under the `index` option
+            .fb-control-settings-summary-show, .fb-control-settings-summary-search, .fb-control-settings-summary-edit {
                 .xforms-items {
                     margin-left: 20px;
+                }
+            }
+
+            .fb-control-settings-summary-checkbox {
+                display: flex;
+
+                .xforms-switch {
+                    display: flex;
                 }
             }
         }

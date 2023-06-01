@@ -28,20 +28,25 @@ case class EncryptionAndIndexDetails(
 
 sealed trait WhatToReindex
 object WhatToReindex {
-  case object  AllData                                     extends WhatToReindex
-  case class   DataForDocumentId(documentId: String)       extends WhatToReindex
-  case class   DataForForm(appForm: AppForm, version: Int) extends WhatToReindex
+  case object AllData                                     extends WhatToReindex
+  case class  DataForDocumentId(documentId: String)       extends WhatToReindex
+  case class  DataForForm(appForm: AppForm, version: Int) extends WhatToReindex
 }
 
+case class IndexSettings(
+  summaryShow   : Boolean,
+  summarySearch : Boolean,
+  summaryEdit   : Boolean
+)
+
 case class IndexedControl(
-    name      : String,
-    inSearch  : Boolean,
-    inSummary : Boolean,
-    xpath     : String,
-    xsType    : String,
-    control   : String,
-    htmlLabel : Boolean,
-    resources : List[(String, NodeInfo)]
+    name          : String,
+    indexSettings : IndexSettings,
+    xpath         : String,
+    xsType        : String,
+    control       : String,
+    htmlLabel     : Boolean,
+    resources     : List[(String, NodeInfo)]
   ) {
     def toXML: NodeInfo =
       <query
@@ -49,8 +54,9 @@ case class IndexedControl(
         path={xpath}
         type={xsType}
         control={control}
-        search-field={inSearch.toString}
-        summary-field={inSummary.toString}
+        summary-show-field={indexSettings.summaryShow.toString}
+        summary-search-field={indexSettings.summarySearch.toString}
+        summary-edit-field={indexSettings.summaryEdit.toString}
         match={matchForControl(control)}
         html-label={htmlLabel.toString}>{
         for ((lang, resourceHolder) <- resources)

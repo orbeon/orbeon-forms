@@ -224,9 +224,14 @@
             <search>
                 <search>Search</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Search Forms</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Options</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Options</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Search Options</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Search Options</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit</show-bulk-edit>
+                <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit</close-bulk-edit>
+                <apply>Apply</apply>
+            </bulk-edit>
             <paging>
                 <to>to</to>
                 <of>of</of>
@@ -803,9 +808,14 @@
             <search>
                 <search>Recherche</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Rechercher</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer les options</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher les options</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer les options de recherche</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher les options de recherche</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Montrer la modification groupée</show-bulk-edit>
+                <close-bulk-edit>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cacher la modification groupée</close-bulk-edit>
+                <apply>Appliquer</apply>
+            </bulk-edit>
             <paging>
                 <to>à</to>
                 <of>sur</of>
@@ -1377,6 +1387,11 @@
                 <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opciones</show-options>
                 <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Cerrar opciones</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>al</to>
                 <of>de</of>
@@ -1947,6 +1962,11 @@
                 <show-options>Mostrar opcions de cerca</show-options>
                 <close-options>Tancar opcions de cerca</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>al</to>
                 <of>de</of>
@@ -2551,6 +2571,11 @@
                 <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søk</show-options>
                 <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Lukk alternativer for søk</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>til</to>
                 <of>av</of>
@@ -3115,6 +3140,11 @@
                 <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Показать настройки поиска</show-options>
                 <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Закрыть настройки поиска</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>до</to>
                 <of>из</of>
@@ -3684,6 +3714,11 @@
                 <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostra opzioni</show-options>
                 <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Chiudi opzioni</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>a</to>
                 <of>di</of>
@@ -4257,9 +4292,14 @@
             <search>
                 <search>Suchen</search>
                 <search-forms>&lt;i class="fa fa-fw fa-search"&gt;&lt;/i&gt; Formular suchen</search-forms>
-                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Optionen anzeigen</show-options>
-                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Optionen schließen</close-options>
+                <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Suchoptionen anzeigen</show-options>
+                <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Suchoptionen schließen</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>bis</to>
                 <of>von</of>
@@ -4836,6 +4876,11 @@
                 <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Näytä hakuvaihtoehdot</show-options>
                 <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Sulje hakuvaihtoehdot</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>-</to>
                 <of>/</of>
@@ -5412,6 +5457,11 @@
                 <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Visa sökalternativ</show-options>
                 <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Dölj sökalternativ</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>till</to>
                 <of>av</of>
@@ -5988,6 +6038,11 @@
                 <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Zoekopties tonen</show-options>
                 <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zoektopties sluiten</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>tot</to>
                 <of>van</of>
@@ -6563,6 +6618,11 @@
                 <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Mostrar opções</show-options>
                 <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Fechar opções</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>a</to>
                 <of>de</of>
@@ -7132,6 +7192,11 @@
                 <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Vis alternativer for søgning</show-options>
                 <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Luk alternativer for søgnng</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>til</to>
                 <of>af</of>
@@ -7701,6 +7766,11 @@
                 <show-options>&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Pokaż opcje wyszukiwania</show-options>
                 <close-options>&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Zamknij opcje wyszukiwania</close-options>
             </search>
+            <bulk-edit>
+                <show-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-down"&gt;&lt;/i&gt; Show Bulk Edit]</show-bulk-edit>
+                <close-bulk-edit todo="true">[&lt;i class="fa fa-fw fa-caret-up"&gt;&lt;/i&gt; Hide Bulk Edit]</close-bulk-edit>
+                <apply todo="true">[Apply]</apply>
+            </bulk-edit>
             <paging>
                 <to>do</to>
                 <of>z</of>

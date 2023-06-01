@@ -494,7 +494,7 @@ private object PersistenceProxyProcessor {
 
       val requestInputStream = RequestGenerator.getRequestBody(PipelineContext.get) match {
         case Some(bodyURL) => NetUtils.uriToInputStream(bodyURL)
-        case None => request.getInputStream
+        case None          => request.getInputStream
       }
 
       val inputData = requestInputStream -> request.contentLengthOpt

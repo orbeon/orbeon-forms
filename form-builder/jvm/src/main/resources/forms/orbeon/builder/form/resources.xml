@@ -502,11 +502,15 @@
                 </item>
                 <item>
                     <label>Show on Summary page</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>Show in search</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label>Show in bulk edit</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label>Encrypt data at rest</label>
@@ -1845,11 +1849,15 @@
                 </item>
                 <item>
                     <label>Inclure dans le sommaire</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>Inclure dans la recherche</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label>Inclure dans la modification groupée</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label>Crypter les données au repos</label>
@@ -3172,11 +3180,15 @@
                 </item>
                 <item>
                     <label>Vis i oppsummering</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>Vis i søk</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Show in bulk edit]</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
@@ -4527,11 +4539,15 @@
                 </item>
                 <item>
                     <label>Показывать в сводной странице</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>Показывать в поиске</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Show in bulk edit]</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
@@ -5881,11 +5897,15 @@
                 </item>
                 <item>
                     <label>Mostra nel sommario</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>Mostra in cerca</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Show in bulk edit]</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
@@ -7199,11 +7219,15 @@
                 </item>
                 <item>
                     <label>In Übersicht anzeigen</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>In Suche anzeigen</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Show in bulk edit]</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label>Daten in der Datenbank verschlüsseln</label>
@@ -8520,11 +8544,15 @@
                 </item>
                 <item>
                     <label>Näytä tiivistelmänä</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>Näytä haussa</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Show in bulk edit]</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
@@ -9866,11 +9894,15 @@
                 </item>
                 <item>
                     <label>Mostar en el Resumen</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>Mostrar en Búsquedas</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Show in bulk edit]</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
@@ -11213,11 +11245,15 @@
                 </item>
                 <item>
                     <label>Toon in samenvatting</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>Toon in zoeken</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Show in bulk edit]</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label>Encrypt gegevens in rust</label>
@@ -12539,11 +12575,15 @@
                 </item>
                 <item>
                     <label>Mostrar no Resumo</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>Mostrar na Pesquisa</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Show in bulk edit]</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>
@@ -13892,11 +13932,15 @@
                 </item>
                 <item>
                     <label>Visa i sammanställningen</label>
-                    <value>fr-summary</value>
+                    <value>fr-summary-show</value>
                 </item>
                 <item>
                     <label>Visa i sökning</label>
-                    <value>fr-search</value>
+                    <value>fr-summary-search</value>
+                </item>
+                <item>
+                    <label todo="true">[Show in bulk edit]</label>
+                    <value>fr-summary-edit</value>
                 </item>
                 <item>
                     <label todo="true">[Encrypt data at rest]</label>

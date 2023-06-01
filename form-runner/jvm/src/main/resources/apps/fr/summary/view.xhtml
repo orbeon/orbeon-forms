@@ -28,6 +28,9 @@
 
         <!-- This page needs access to Form Builder permission -->
         <xi:include href="oxf:/apps/fr/includes/permissions-model.xml" xxi:omit-xml-base="true"/>
+
+        <xi:include href="oxf:/apps/fr/includes/bulk-apply.xml" xxi:omit-xml-base="true"/>
+
         <!-- FR Summary page XForms model -->
         <xf:model id="fr-form-model" xxf:xpath-analysis="true">
 
@@ -52,7 +55,7 @@
                     if ($has-fb-roles) then
                         instance('fr-search-instance')/query[
                             contains(@path, 'application-name') and
-                            @search-field = 'true'
+                            @summary-search-field = 'true'
                         ]
                     else
                         ()"/>
@@ -64,7 +67,7 @@
                     if ($app-query) then
                         instance('fr-search-instance')/query[
                             contains(@path, 'form-name') and
-                            @search-field = 'true'
+                            @summary-search-field = 'true'
                         ]
                     else
                         ()"/>
@@ -235,7 +238,7 @@
 
             <xf:bind ref="instance('fr-search-instance')">
                 <!-- Don't send this to the server -->
-                <xf:bind ref="query/(@search-field | @summary-field)" relevant=". = 'true'"/>
+                <xf:bind ref="query/(@summary-search-field | @summary-show-field)" relevant=". = 'true'"/>
                 <!-- Set types so the search fields display the proper controls -->
                 <xf:bind ref="query[ends-with(@type, ':date')]"     type="xf:date"/>
                 <xf:bind ref="query[ends-with(@type, ':time')]"     type="xf:time"/>
@@ -276,6 +279,12 @@
                     calculate="if ($form-is-dropdown) then 'exact' else 'substring'"/>
 
             </xf:bind>
+
+            <xf:instance id="fr-bulk-edit-instance">
+                <bulk-edit xmlns="">
+                    <query/>
+                </bulk-edit>
+            </xf:instance>
 
             <xf:instance id="fr-selection-instance" xxf:exclude-result-prefixes="#all">
                 <_ xmlns=""/>
@@ -383,7 +392,7 @@
 
                 <xf:insert
                     context="instance('fr-search-labels-instance')"
-                    origin="frf:findIndexedControlsAsXML(instance('fr-source-form-instance')/root(), $app, $form)"/>
+                    origin="frf:findIndexedControlsAsXML(instance('fr-source-form-instance')/root(), $app, $form, fr:user-roles())"/>
 
                 <xf:insert
                     context="instance('fr-search-instance')"
@@ -402,6 +411,24 @@
                         xf:element('drafts', (xf:attribute('for-never-saved-document', 'true'), 'only')),
                         xf:element('operations', xf:attribute('any-of', 'update'))
                     "/>
+
+                <!-- Use the same indexed controls for bulk edit -->
+                <xf:delete
+                    ref="instance('fr-bulk-edit-instance')/query"/>
+                <xf:insert
+                    context="instance('fr-bulk-edit-instance')"
+                    ref="query"
+                    origin="instance('fr-search-instance')/query[@path]"/>
+
+                <!-- Initial values for bulk edit dropdowns -->
+                <xf:action iterate="instance('fr-search-labels-instance')/query[@control = ('select1', 'open-select1')]">
+                    <xf:var name="control-name"     value="@name"/>
+                    <xf:var name="first-value"      value="resources[1]/item[1]/value"/>
+
+                    <xf:setvalue
+                        ref   = "instance('fr-bulk-edit-instance')/query[@name = $control-name]"
+                        value = "$first-value"/>
+                </xf:action>
 
                 <!-- Query initial list of documents -->
                 <xf:send submission="fr-summary-search-submission"/>
@@ -536,8 +563,10 @@
                     <xf:group class="fr-summary-search">
 
                         <!-- Search also when user presses "enter" in a field -->
+                        <!-- Do not reset selections when showing/hiding the bulk edit section -->
                         <xf:dispatch
                             event="DOMActivate"
+                            if="event('xxf:targetid')!='fr-bulk-edit-button'"
                             name="fr-reset-search"
                             targetid="fr-form-model"/>
 
@@ -562,6 +591,25 @@
                                     'number',
                                     'descending'
                                 )"/>
+
+                        <xf:var
+                            name="non-editable-documents-selected"
+                            value="
+                                let
+                                    $document-names := for $document in xxf:split(instance('fr-selection-instance'))
+                                                       return xxf:split($document, '/')[position() = last()],
+                                    $document-operations := for $name in $document-names
+                                                            return instance('fr-search-results-instance')/document[@name = $name]/@operations,
+                                    $document-editable-statuses := for $operations in $document-operations
+                                                                   return xxf:split($operations) = ('*', 'update'),
+                                    $non-editable-document-count := count($document-editable-statuses[. = false()])
+                                return
+                                    $non-editable-document-count > 0
+                            "/>
+
+                        <xf:var
+                            name="bulk-edit-enabled"
+                            value="count(xxf:split(instance('fr-selection-instance'))) > 0 and not($non-editable-documents-selected)"/>
 
                         <xh:div class="fr-summary-search-top">
 
@@ -675,7 +723,7 @@
 
                             <xf:trigger
                                 appearance="full"
-                                ref="if (instance('fr-search-instance')/query[@path and @search-field = 'true']) then $enabled else $disabled"
+                                ref="if (instance('fr-search-instance')/query[@path and @summary-search-field = 'true']) then $enabled else $disabled"
                                 class="fr-summary-search-show-button">
 
                                 <!-- Switch label depending on which case is shown -->
@@ -703,6 +751,37 @@
                                 </xf:action>
                             </xf:trigger>
 
+                            <!-- Bulk edit logic based on search options -->
+                            <xf:switch caseref="$is-fb">
+                                <xf:case value="true()"/>
+                                <xf:case value="false()">
+                                    <xf:trigger
+                                        id="fr-bulk-edit-button"
+                                        appearance="full"
+                                        ref="if (instance('fr-bulk-edit-instance')/query[@path and @summary-edit-field = 'true'] and $bulk-edit-enabled) then $enabled else $disabled"
+                                        class="fr-summary-bulk-show-button">
+
+                                        <xf:label
+                                            mediatype="text/html"
+                                            ref="$fr-resources/summary/bulk-edit/(if (case('fr-bulk-edit-switch') = 'fr-bulk-edit-closed') then show-bulk-edit else close-bulk-edit)"/>
+
+                                        <xf:action event="DOMActivate">
+                                            <xf:toggle
+                                                case="{
+                                                if (case('fr-bulk-edit-switch') = 'fr-bulk-edit-closed') then
+                                                    'fr-bulk-edit-open'
+                                                else
+                                                    'fr-bulk-edit-closed'
+                                            }"/>
+
+                                            <xf:action if="case('fr-bulk-edit-switch') = 'fr-bulk-edit-open'">
+                                                <xf:setfocus control="fr-bulk-edit-switch"/>
+                                            </xf:action>
+                                        </xf:action>
+                                    </xf:trigger>
+                                </xf:case>
+                            </xf:switch>
+
                             <fr:pager
                                 id="fr-pager"
                                 page-size="{xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))}"
@@ -721,6 +800,7 @@
 
                         </xh:div>
 
+                        <!-- Search options -->
                         <xf:switch id="fr-search-options-switch">
                             <xf:case id="fr-search-free-case"/>
                             <xf:case id="fr-search-options-case">
@@ -793,8 +873,8 @@
                                             <xf:dispatch event="xforms-value-changed" name="fr-reset-search" targetid="fr-form-model"/>
                                         </xf:select1>
                                     </xf:group>
-                                    <!-- Structured search over query terms that have search-field set to 'true' -->
-                                    <xf:repeat ref="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
+                                    <!-- Structured search over query terms that have summary-search-field set to 'true' -->
+                                    <xf:repeat ref="instance('fr-search-instance')/query[@path and @summary-search-field = 'true']" id="search-repeat">
                                         <xf:var name="control-name"    value="@name"/>
                                         <xf:var name="control-path"    value="@path"/>
                                         <xf:var name="control-control" value="@control"/>
@@ -902,6 +982,100 @@
                                 </xh:div>
                             </xf:case>
                         </xf:switch>
+
+                        <!-- Bulk edit (TODO: can search options / bulk edit use common code for controls?)-->
+                        <xf:switch id="fr-bulk-edit-switch">
+                            <xf:case id="fr-bulk-edit-closed"/>
+                            <xf:case id="fr-bulk-edit-open">
+                                <xh:div class="fr-bulk-edit">
+                                    <xh:div class="fr-bulk-edit">
+                                        <xf:repeat ref="instance('fr-bulk-edit-instance')/query[@path and @summary-edit-field = 'true']" id="bulk-repeat">
+                                            <xf:var name="control-name"    value="@name"/>
+                                            <xf:var name="control-path"    value="@path"/>
+                                            <xf:var name="control-control" value="@control"/>
+                                            <xf:var
+                                                name="resources"
+                                                value="
+                                                instance('fr-search-labels-instance')/
+                                                    query[
+                                                        @name = $control-name
+                                                    ]/resources[
+                                                        @lang = xxf:instance('fr-language-instance')
+                                                    ]"/>
+                                            <xf:var name="label" value="$resources/label"/>
+
+                                            <xf:group
+                                                ref="."
+                                                class="fr-summary-bulk-edit-item {'fr-summary-bulk-edit-item-wide'[$control-control = 'open-select1']}">
+
+                                                <xh:div class="fr-component-group">
+                                                    <xf:var name="is-select1"           value="not($control-control = 'open-select1') and frf:isSingleSelectionControl(@control)"/>
+                                                    <xf:var name="is-open-select1"      value="$control-control = 'open-select1'"/>
+                                                    <xf:var name="is-select"            value="frf:isMultipleSelectionControl(@control)"/>
+                                                    <xf:var name="is-supported-control" value="$is-select1 or $is-open-select1 or $is-select"/>
+
+                                                    <xf:select1 ref=".[$is-select1]" id="bulk-select1">
+                                                        <xf:label mediatype="text/html" value="$label"/>
+                                                        <xf:itemset ref="$resources/item">
+                                                            <xf:label ref="label"/>
+                                                            <xf:value ref="value"/>
+                                                        </xf:itemset>
+                                                    </xf:select1>
+                                                    <fr:open-select1 ref=".[$is-open-select1]" id="bulk-open-select1" appearance="minimal">
+                                                        <xf:label mediatype="text/html" value="$label"/>
+                                                        <xf:itemset ref="$resources/item">
+                                                            <xf:label ref="label"/>
+                                                            <xf:value ref="value"/>
+                                                        </xf:itemset>
+                                                        <xf:itemset
+                                                            ref="
+                                                            let $static-values := $resources/item/value/string()
+                                                            return
+                                                                distinct-values(
+                                                                    instance('fr-search-results-instance')/
+                                                                    document/details/detail[
+                                                                        @path = $control-path and
+                                                                        xxf:non-blank()
+                                                                    ]/string()
+                                                                )[
+                                                                    not(. = $static-values)
+                                                                ]">
+                                                            <xf:label ref="."/>
+                                                            <xf:value ref="."/>
+                                                        </xf:itemset>
+                                                    </fr:open-select1>
+                                                    <fr:box-select ref=".[$is-select]" id="bulk-select">
+                                                        <xf:label mediatype="text/html" value="$label"/>
+                                                        <xf:itemset ref="$resources/item">
+                                                            <xf:label ref="label"/>
+                                                            <xf:value ref="value"/>
+                                                        </xf:itemset>
+                                                    </fr:box-select>
+
+                                                    <xf:switch caseref="$is-supported-control">
+                                                        <xf:case value="false()"/>
+                                                        <xf:case value="true()">
+                                                            <xf:trigger appearance="xxf:mini">
+                                                                <xf:label ref="$fr-resources/summary/bulk-edit/apply"/>
+                                                                <xf:action event="DOMActivate">
+                                                                    <xf:dispatch name="apply" targetid="fr-bulk-apply">
+                                                                        <xf:property name="app"       value="$app"/>
+                                                                        <xf:property name="form"      value="$form"/>
+                                                                        <xf:property name="documents" value="instance('fr-selection-instance')"/>
+                                                                        <xf:property name="path"      value="$control-path"/>
+                                                                        <xf:property name="value"     value="."/>
+                                                                    </xf:dispatch>
+                                                                </xf:action>
+                                                            </xf:trigger>
+                                                        </xf:case>
+                                                    </xf:switch>
+                                                </xh:div>
+                                            </xf:group>
+                                        </xf:repeat>
+                                    </xh:div>
+                                </xh:div>
+                            </xf:case>
+                        </xf:switch>
                     </xf:group>
 
                     <xf:group ref="instance('fr-search-results-instance')" xxf:update="full">
@@ -917,7 +1091,7 @@
                             <xf:var name="have-read-only" value="exists(document[not(xxf:split(@operations) = ('*', 'update'))])"/>
                             <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts or $have-read-only) then () else 'xforms-hidden'), ' ')"/>
                             <!-- One column for each detail -->
-                            <xf:var name="detail-positions" value="instance('fr-search-instance')/query[@name and @summary-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
+                            <xf:var name="detail-positions" value="instance('fr-search-instance')/query[@name and @summary-show-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
 
                             <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
@@ -953,7 +1127,7 @@
                                         <xf:group ref="''[empty($detail-positions)]">
                                             <xh:th/>
                                         </xf:group>
-                                        <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
+                                        <xf:repeat ref="instance('fr-search-labels-instance')/query[@summary-show-field = 'true']" id="fr-summary-repeat-column-number">
                                             <xh:th class="{if (@control = ('number', 'currency')) then 'fr-align-right' else ''}">
                                                 <!-- Output showing as the header of the column -->
                                                 <xf:output
@@ -1250,7 +1424,7 @@
                                     </xf:repeat>
                                     <xf:group ref=".[not(document)]">
                                         <xh:tr>
-                                            <xh:td colspan="{7 + count(instance('fr-search-instance')/*[@summary-field = 'true'])}">
+                                            <xh:td colspan="{7 + count(instance('fr-search-instance')/*[@summary-show-field = 'true'])}">
                                                 <xf:output id="fr-no-form-data" class="alert" mediatype="text/html" value="xxf:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
                                             </xh:td>
                                         </xh:tr>

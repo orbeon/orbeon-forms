@@ -40,7 +40,8 @@
         .fr-summary-form-version,
         .fr-summary-search-free-input,
         .fr-summary-search-search-button,
-        .fr-summary-search-show-button {
+        .fr-summary-search-show-button,
+        .fr-summary-bulk-show-button {
         }
 
         .fr-summary-search-free-input {
@@ -57,7 +58,7 @@
             //margin-right: 0;
         }
 
-        .fr-search-options {
+        .fr-search-options, .fr-bulk-edit {
             display: flex;
             flex-wrap: wrap;
 
@@ -69,11 +70,7 @@
             padding: 0 @spacing 0 @spacing; // there is enough padding from the controls at the bottom already
             margin: @spacing 0;
 
-            .fr-search-options-close {
-
-            }
-
-            .fr-summary-search-item {
+            .fr-summary-search-item, .fr-summary-bulk-edit-item {
                 display: inline-block;
                 padding: @spacing;
                 box-sizing: border-box;
@@ -93,9 +90,19 @@
                 .xbl-fr-time .input-append .xforms-input .xforms-type-time {
                     background-image: none;
                 }
+
+                > .fr-component-group {
+                    width: fit-content;
+                    .xbl-fr-box-select, button {
+                        width: 100%;
+                    }
+                    button {
+                        margin-top: 5px;
+                    }
+                }
             }
 
-            .fr-summary-search-item.fr-summary-search-item-wide {
+            .fr-summary-search-item.fr-summary-search-item-wide, .fr-summary-bulk-edit-item.fr-summary-bulk-edit-item-wide {
                 width: 430px;
             }
         }

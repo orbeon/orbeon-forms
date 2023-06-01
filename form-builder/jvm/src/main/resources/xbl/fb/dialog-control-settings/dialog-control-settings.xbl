@@ -42,28 +42,28 @@
                 <xf:setvalue ref="$i/control-name"            value="$i/original-control-name"/>
                 <xf:setvalue ref="$i/last-valid-control-name" value="$i/original-control-name"/>
 
-                <xf:setvalue ref="$i/control-names"         value="string-join(fbf:getAllNamesInUse(), ' ')"/>
+                <xf:setvalue ref="$i/control-names"           value="string-join(fbf:getAllNamesInUse(), ' ')"/>
 
-                <xf:var name="control"                      value="fbf:findControlByNameOrEmpty($i/control-name)"/>
-                <xf:var name="resources"                    value="frf:currentFormResources()"/>
+                <xf:var name="control"                        value="fbf:findControlByNameOrEmpty($i/control-name)"/>
+                <xf:var name="resources"                      value="frf:currentFormResources()"/>
 
                 <!-- Split out classes -->
-                <xf:var name="standard-classes"             value="$resources/dialog-control-settings/options/item/value/string(), 'fr-attachment', 'fr-static-attachment'"/>
-                <xf:var name="control-classes"              value="xxf:split($control/@class)"/>
+                <xf:var name="standard-classes"               value="'fr-attachment', 'fr-static-attachment'"/>
+                <xf:var name="control-classes"                value="xxf:split($control/@class)"/>
+                <xf:setvalue ref="$i/standard-classes"        value="string-join($control-classes[. = $standard-classes], ' ')"/>
+                <xf:setvalue ref="$i/custom-classes"          value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
 
-                <!-- Imply 'fr-index' as needed but for the UI only -->
-                <xf:var
-                    name="effective-standard-classes"
-                    value="
-                        let $distinct    := distinct-values($control-classes[. = $standard-classes]),
-                            $has-summary := $distinct = ('fr-summary', 'fr-search'),
-                            $has-index   := $distinct = 'fr-index',
-                            $filtered    := if ($has-summary and not($has-index)) then ($distinct, 'fr-index') else $distinct
-                        return
-                            $filtered"/>
-
-                <xf:setvalue ref="$i/standard-classes"      value="string-join($effective-standard-classes, ' ')"/>
-                <xf:setvalue ref="$i/custom-classes"        value="string-join($control-classes[not(. = $standard-classes)], ' ')"/>
+                <xf:setvalue ref="$i/fr-index"                         value="exists($control/fr:index)"/>
+                <xf:setvalue ref="$i/fr-summary-show"                  value="exists($control/fr:index/fr:summary-show)"/>
+                <xf:setvalue ref="$i/fr-summary-show/@require-role"    value="$control/fr:index/fr:summary-show/@require-role"/>
+                <xf:setvalue ref="$i/fr-summary-show/@role-required"   value="normalize-space($i/fr-summary-show/@require-role) != ''"/>
+                <xf:setvalue ref="$i/fr-summary-search"                value="exists($control/fr:index/fr:summary-search)"/>
+                <xf:setvalue ref="$i/fr-summary-search/@require-role"  value="$control/fr:index/fr:summary-search/@require-role"/>
+                <xf:setvalue ref="$i/fr-summary-search/@role-required" value="normalize-space($i/fr-summary-search/@require-role) != ''"/>
+                <xf:setvalue ref="$i/fr-summary-edit"                  value="exists($control/fr:index/fr:summary-edit)"/>
+                <xf:setvalue ref="$i/fr-summary-edit/@require-role"    value="$control/fr:index/fr:summary-edit/@require-role"/>
+                <xf:setvalue ref="$i/fr-summary-edit/@role-required"   value="normalize-space($i/fr-summary-edit/@require-role) != ''"/>
+                <xf:setvalue ref="$i/fr-encrypt"                       value="exists($control/fr:encrypt)"/>
 
                 <!-- Figure which one of label, hint, help, or text the control supports -->
                 <xf:action>
@@ -364,7 +364,6 @@
 
                         <xf:action if="$current-control-has-custom-editor">
 
-
                             <xf:delete
                                 ref="$control/node()"/>
 
@@ -382,17 +381,34 @@
                             fbf:renameControlIfNeeded($old-name, $new-name, false())
                         </xf:action>
                         <!-- Write classes -->
-                        <!-- The implied 'fr-index' is not set if we already have summary classes -->
-                        <xf:var
-                            name="classes"
-                            value="
-                                let $distinct    := distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes))),
-                                    $has-summary := $distinct = ('fr-summary', 'fr-search'),
-                                    $filtered    := if ($has-summary) then $distinct[. != 'fr-index'] else $distinct
-                                return
-                                    $filtered"/>
+                        <xf:var name="classes" value="distinct-values((xxf:split($i/standard-classes), xxf:split($i/custom-classes)))"/>
                         <xf:delete if="count($classes) = 0" ref="$control/@class"/>
                         <xf:insert if="count($classes) > 0" context="$control" origin="xf:attribute('class', string-join($classes, ' '))"/>
+                        <!-- Write index settings -->
+                        <xf:delete ref="$control/fr:index"/>
+                        <xf:action if="$i/fr-index = true()">
+                            <xf:insert context="$control" origin="xf:element('fr:index')"/>
+                            <xf:action if="$i/fr-summary-show = true()">
+                                <xf:insert
+                                    context="$control/fr:index"
+                                    origin="xf:element('fr:summary-show', xf:attribute('require-role', $i/fr-summary-show/@require-role))"/>
+                            </xf:action>
+                            <xf:action if="$i/fr-summary-search = true()">
+                                <xf:insert
+                                    context="$control/fr:index"
+                                    origin="xf:element('fr:summary-search', xf:attribute('require-role', $i/fr-summary-search/@require-role))"/>
+                            </xf:action>
+                            <xf:action if="$i/fr-summary-edit = true()">
+                                <xf:insert
+                                    context="$control/fr:index"
+                                    origin="xf:element('fr:summary-edit', xf:attribute('require-role', $i/fr-summary-edit/@require-role))"/>
+                            </xf:action>
+                        </xf:action>
+                        <!-- Write encrypt settings -->
+                        <xf:delete ref="$control/fr:encrypt"/>
+                        <xf:action if="$i/fr-encrypt = true()">
+                            <xf:insert context="$control" origin="xf:element('fr:encrypt')"/>
+                        </xf:action>
 
                         <xf:action type="xpath">
                             (: Write alerts and constraints :)
@@ -601,9 +617,15 @@
                         <original-control-name/>    <!-- So we can find back the control when saving if users change the name -->
                         <control-name/>             <!-- Possibly new name set by users -->
                         <last-valid-control-name/>  <!-- For renaming -->
-                        <standard-classes/>         <!-- `fr-summary`, `fr-search`... -->
+                        <standard-classes/>         <!-- `fr-attachment`, etc. -->
                         <custom-classes/>           <!-- All custom classes except the standard ones -->
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
+
+                        <fr-index/>
+                        <fr-summary-show   role-required="" require-role=""/>
+                        <fr-summary-search role-required="" require-role=""/>
+                        <fr-summary-edit   role-required="" require-role=""/>
+                        <fr-encrypt/>
 
                         <default-alert
                             global-default-alert-message=""
@@ -850,6 +872,17 @@
                     ref="(label | hint | help | text)/value"
                     xxf:whitespace="trim"/>
 
+                <xf:bind ref="$i/fr-index"                         type="xs:boolean"/>
+                <xf:bind ref="$i/fr-summary-show"                  type="xs:boolean"/>
+                <xf:bind ref="$i/fr-summary-show/@role-required"   type="xs:boolean" relevant="$i/fr-summary-show = true()"/>
+                <xf:bind ref="$i/fr-summary-show/@require-role"    relevant="$i/fr-summary-show = true() and $i/fr-summary-show/@role-required = true()"/>
+                <xf:bind ref="$i/fr-summary-search"                type="xs:boolean"/>
+                <xf:bind ref="$i/fr-summary-search/@role-required" type="xs:boolean" relevant="$i/fr-summary-search = true()"/>
+                <xf:bind ref="$i/fr-summary-search/@require-role"  relevant="$i/fr-summary-search = true() and $i/fr-summary-search/@role-required = true()"/>
+                <xf:bind ref="$i/fr-summary-edit"                  type="xs:boolean"/>
+                <xf:bind ref="$i/fr-summary-edit/@role-required"   type="xs:boolean" relevant="$i/fr-summary-edit = true()"/>
+                <xf:bind ref="$i/fr-summary-edit/@require-role"    relevant="$i/fr-summary-edit = true() and $i/fr-summary-edit/@role-required = true()"/>
+                <xf:bind ref="$i/fr-encrypt"                       type="xs:boolean"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -907,7 +940,10 @@
                                                         ]
                                                     "/>
                                                 <xf:group ref=".[exists($items-to-show)]" class="fb-control-settings-options">
-                                                    <xf:var name="selected-values"   value="xxf:split($i/standard-classes)"/>
+                                                    <xf:var
+                                                        name="selected-values"
+                                                        value="for $e in $i/*[local-name() = $items-to-show/value and . = true()] return local-name($e)"/>
+
                                                     <xf:repeat ref="$items-to-show" id="items-to-show-repeat">
                                                         <xf:var name="item-to-show"      value="."/>
                                                         <xf:var name="current-value"     value="$item-to-show/value"/>
@@ -922,37 +958,55 @@
                                                                 (
                                                                     (
                                                                         $selected-values   = 'fr-encrypt'
-                                                                        and $current-value = ('fr-summary', 'fr-search', 'fr-index')
+                                                                        and $current-value = ('fr-summary-show', 'fr-summary-search', 'fr-index', 'fr-summary-edit')
                                                                     ) or
                                                                     (
-                                                                        $selected-values   = ('fr-summary', 'fr-search', 'fr-index')
+                                                                        $selected-values   = ('fr-summary-show', 'fr-summary-search', 'fr-index', 'fr-summary-edit')
                                                                         and $current-value = 'fr-encrypt'
                                                                     ) or
                                                                     (
-                                                                        $selected-values   = ('fr-summary', 'fr-search')
+                                                                        $selected-values   = ('fr-summary-show', 'fr-summary-search', 'fr-summary-edit')
                                                                         and $current-value = 'fr-index'
                                                                     )
                                                                 )"/>
+                                                        <xf:var name="base-binding" value="$i/*[local-name() = $current-value][1]"/>
                                                         <xf:var
                                                             name="checkbox-binding"
-                                                            value="
-                                                                $i/standard-classes/
-                                                                (if ($checkbox-disabled) then string() else .)"/>
-                                                        <xf:select ref="$checkbox-binding" appearance="full" class="fb-control-settings-{{substring-after($current-value, 'fr-')}}">
-                                                            <xf:itemset ref="$item-to-show">
-                                                                <xf:label ref="label"/>
-                                                                <xf:value ref="value"/>
-                                                            </xf:itemset>
-                                                            <!--
-                                                                We don't like to update values of another checkbox when one is selected, but
-                                                                we accept this way of doing things here as we indent the Summary checkboxes
-                                                                under the `fr-index` checkbox, which makes it clear to the user what is
-                                                                happening.
-                                                            -->
-                                                            <xf:action event="xforms-select" if="$current-value = ('fr-summary', 'fr-search')">
-                                                                <xf:setvalue ref="$i/standard-classes" value="string-join((xxf:split(.)[. != 'fr-index'], 'fr-index'), ' ')"/>
-                                                            </xf:action>
-                                                        </xf:select>
+                                                            value="$base-binding/(if ($checkbox-disabled) then string() else .)"/>
+                                                        <xf:var name="is-summary-select" value="$current-value = ('fr-summary-show', 'fr-summary-search', 'fr-summary-edit')"/>
+
+                                                        <xh:div class="{{if ($is-summary-select) then 'fb-control-settings-summary-checkbox' else ''}}">
+                                                            <fr:checkbox-input ref="$checkbox-binding" class="fb-control-settings-{{substring-after($current-value, 'fr-')}}">
+                                                                <xf:label ref="$item-to-show/label"/>
+                                                                <!--
+                                                                    We don't like to update values of another checkbox when one is selected, but
+                                                                    we accept this way of doing things here as we indent the Summary checkboxes
+                                                                    under the `fr-index` checkbox, which makes it clear to the user what is
+                                                                    happening.
+                                                                -->
+                                                                <xf:action event="xforms-select" if="$is-summary-select">
+                                                                    <xf:setvalue ref="$i/fr-index" value="true()"/>
+                                                                </xf:action>
+                                                                <xf:action event="xforms-deselect" if="$is-summary-select">
+                                                                    <xf:setvalue ref="$base-binding/@role-required" value="false()"/>
+                                                                    <xf:setvalue ref="$base-binding/@require-role"/>
+                                                                </xf:action>
+                                                            </fr:checkbox-input>
+
+                                                            <xf:switch caseref="$is-summary-select">
+                                                                <xf:case value="true()">
+                                                                    <!-- Summary settings can have required roles -->
+                                                                    <fr:checkbox-input ref="$base-binding/@role-required">
+                                                                        <xf:label>Restrict to role</xf:label>
+                                                                        <xf:action event="xforms-deselect">
+                                                                            <xf:setvalue ref="$base-binding/@require-role"/>
+                                                                        </xf:action>
+                                                                    </fr:checkbox-input>
+                                                                    <xf:input ref="$base-binding/@require-role" class="fb-control-settings-summary-role"/>
+                                                                </xf:case>
+                                                                <xf:case value="false()"/>
+                                                            </xf:switch>
+                                                        </xh:div>
                                                     </xf:repeat>
                                                 </xf:group>
                                             </xh:td>

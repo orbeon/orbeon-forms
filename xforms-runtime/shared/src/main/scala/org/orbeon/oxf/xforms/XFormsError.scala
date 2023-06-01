@@ -63,16 +63,31 @@ object XFormsError {
   }
 
   // `container`: used for `PartAnalysis` and `XFCD`
-  def handleNonFatalXPathError(container: XBLContainer, t: Throwable, expressionOpt: Option[String] = None): Unit = {
+  def handleNonFatalXPathError(
+    container    : XBLContainer,
+    throwable    : Throwable,
+    expressionOpt: Option[String] = None
+  ): Unit = {
     val expressionForMessage = expressionOpt.map(e => s" `$e`").getOrElse("")
     val message = "exception while evaluating XPath expression" + expressionForMessage
-    handleNonFatalXFormsError(container, message, t)
+    handleNonFatalXFormsError(
+      container,
+      message,
+      throwable,
+      isRecoverableOnInit = ! ( // https://github.com/orbeon/orbeon-forms/issues/5844
+        XFormsCrossPlatformSupport.causesIterator(throwable) exists {
+          case e: XPathException if e.isStaticError => true
+          case _: HttpStatusCode                    => true // this is probably not needed for MIP
+          case _                                    => false
+        }
+      )
+    )
   }
 
-  def handleNonFatalActionError(target: XFormsEventTarget, t: Throwable): Unit =
-    handleNonFatalXFormsError(target.container, "exception while running action", t)
+  def handleNonFatalActionError(target: XFormsEventTarget, throwable: Throwable): Unit =
+    handleNonFatalXFormsError(target.container, "exception while running action", throwable, isRecoverableOnInit = false)
 
-  private def handleNonFatalXFormsError(container: XBLContainer, message: String, t: Throwable): Unit = {
+  private def handleNonFatalXFormsError(container: XBLContainer, message: String, t: Throwable, isRecoverableOnInit: Boolean): Unit = {
 
     // NOTE: We want to catch a status code exception which happen during an XPathException. And in that case, the XPathException
     // is dynamic, so we cannot simply exclude dynamic XPath exceptions. So we have to be inclusive and consider which types of
@@ -83,8 +98,9 @@ object XFormsError {
     // See https://github.com/orbeon/orbeon-forms/issues/5751
 
     if (
-      container.getPartAnalysis.isTopLevelPart   &&   // LATER: Other sub-parts could be fatal, depending on settings on xxf:dynamic.
-      container.getContainingDocument.initializing
+      container.getPartAnalysis.isTopLevelPart     &&   // LATER: Other sub-parts could be fatal, depending on settings on `xxf:dynamic`.
+      container.getContainingDocument.initializing &&
+      ! isRecoverableOnInit
     ) {
       throw new OXFException(t)
     } else {

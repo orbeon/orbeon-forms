@@ -13,13 +13,12 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import java.net.URI
-import java.{util => ju}
 import cats.syntax.option._
-import org.orbeon.datatypes.LocationData
+import org.orbeon.datatypes.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.common.{OXFException, OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.externalcontext.{ExternalContext, UrlRewriteMode}
 import org.orbeon.oxf.http.{Headers, HttpMethod}
+import org.orbeon.oxf.util.CollectionUtils._
 import org.orbeon.oxf.util.CoreUtils._
 import org.orbeon.oxf.util.Logging._
 import org.orbeon.oxf.util.StaticXPath.{DocumentNodeInfoType, ValueRepresentationType}
@@ -30,6 +29,7 @@ import org.orbeon.oxf.xforms.control.Controls
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.state.InstancesControls
 import org.orbeon.oxf.xforms.submission.{BaseSubmission, SubmissionUtils, XFormsModelSubmission}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.SaxonUtils
@@ -42,8 +42,9 @@ import org.orbeon.xforms.runtime.XFormsObject
 import org.orbeon.xforms.xbl.Scope
 import org.orbeon.xforms.{XFormsCrossPlatformSupport, XFormsId, XFormsNames}
 
+import java.net.URI
+import java.{util => ju}
 import scala.util.control.NonFatal
-import org.orbeon.oxf.xforms.state.InstancesControls
 
 
 object XFormsModel {
@@ -178,6 +179,10 @@ class XFormsModel(
         }
       case ev: XXFormsXPathErrorEvent =>
         // Custom event for XPath errors
+
+        // 2023-06-01: We get here only with dispatch from `handleMIPXPathException()` (or it could be a manual
+        // dispatch or forward, but we don't do this as of now).
+
         // NOTE: We don't like this event very much as it is dispatched in the middle of rebuild/recalculate/revalidate,
         // and event handlers for this have to be careful. It might be better to dispatch it *after* RRR.
         XFormsError.handleNonFatalXPathError(container, ev.throwable)

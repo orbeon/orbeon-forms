@@ -298,7 +298,7 @@
                         <!-- We don't use a `calculate`, as it would only be executed if something in the current model changed -->
                         <xf:var name="current-instance" value="xxf:instance(current-instance)"/>
                         <!-- Store in `current-instance-clean` version of the current instance without blank text nodes, for better formatting -->
-                        <xf:var name="current-instance-xml" value="xxf:serialize($current-instance, 'xml')">`
+                        <xf:var name="current-instance-xml" value="xxf:serialize($current-instance, 'xml')">
                             <xf:action event="xforms-value-changed" context="instance('inspector-instance')/current-instance-clean">
                                 <xf:delete ref="*"/>
                                 <xf:insert context="." origin="$current-instance"/>

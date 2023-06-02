@@ -56,6 +56,8 @@ object XMLNames {
   val XFActionTest             : Test      = XF -> "action"
   val XFSendTest               : Test      = XF -> "send"
 
+  val XXFDialogTest            : Test      = XXF -> "dialog"
+
   val XFItemsetTest            : Test      = XFormsNames.XFORMS_ITEMSET_QNAME
   val XFItemTest               : Test      = XFormsNames.XFORMS_ITEM_QNAME
   val XFChoicesTest            : Test      = XFormsNames.XFORMS_CHOICES_QNAME

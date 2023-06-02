@@ -59,7 +59,10 @@ object MigrationSupport {
   }
 
   def findAllGrids(repeat: Boolean)(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
-    ctx.bodyElem descendant * filter frc.IsGrid filter (g => frc.isRepeat(g) ^ ! repeat)
+    ctx.bodyElem descendant * filter
+      frc.IsGrid filter
+      (_.ancestor(XXFDialogTest).isEmpty) filter
+      (g => frc.isRepeat(g) ^ ! repeat)
 
   def findLegacyRepeatedGrids(implicit ctx: FormRunnerDocContext): Seq[NodeInfo] =
     findAllGrids(repeat = true) filter frc.isLegacyRepeat

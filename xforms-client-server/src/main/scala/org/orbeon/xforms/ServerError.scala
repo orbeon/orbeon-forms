@@ -34,27 +34,29 @@ object ServerError {
 
   def errorsAsHtmlString(errors: IterableOnce[ServerError]): String =
     ul {
-      errors.toList map { error =>
-        li {
-          getDetailsAsUserMessage(error)
-        }
+      errors.toList.map { error =>
+        li(
+          span(error.message), {
+            val tuples = collectTuples(error, description)
+            if (tuples.nonEmpty)
+              ul {
+                tuples.map { case (k, v) =>
+                  li(s"$k: $v")
+                }
+              }
+          }
+        )
       }
     } .toString
 
   private object Private {
 
     val attributes  = List("file", "line", "column", "exception")
-    val description = List("in",   "line", "column", "cause")
+    val description = List("in",   "line", "column", "class")
 
     def collectTuples(error: ServerError, names: List[String]): List[(String, String)] =
       names zip
         List(error.fileOpt, error.lineOpt, error.colOpt, error.classOpt) collect
         { case (k, Some(v)) => k -> v.toString }
-
-    def collectList(error: ServerError, names: List[String]): List[String] =
-      collectTuples(error, names).collect { case (k, v) => List(k, v) } .flatten
-
-    def getDetailsAsUserMessage(error: ServerError): String =
-      error.message :: collectList(error, description) mkString " "
   }
 }

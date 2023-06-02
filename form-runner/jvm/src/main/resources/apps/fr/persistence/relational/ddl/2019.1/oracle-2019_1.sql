@@ -88,15 +88,15 @@ CREATE TABLE orbeon_i_current (
     stage               VARCHAR2(255 CHAR)           ,
     document_id         VARCHAR2(255 CHAR)   NOT NULL,
     draft               CHAR(1 CHAR)         NOT NULL,
-    FOREIGN KEY         (data_id)       REFERENCES orbeon_form_data(id)
+    FOREIGN KEY         (data_id)            REFERENCES orbeon_form_data(id)
 );
 
 CREATE TABLE orbeon_i_control_text (
-    data_id             NUMBER          NOT NULL,
-    control             VARCHAR(255)    NOT NULL,
-    pos                 NUMBER          NOT NULL,
-    val                 CLOB            NOT NULL,
-    FOREIGN KEY         (data_id)       REFERENCES orbeon_form_data(id)
+    data_id             NUMBER                NOT NULL,
+    control             VARCHAR2(255 CHAR)    NOT NULL,
+    pos                 NUMBER                NOT NULL,
+    val                 CLOB                  NOT NULL,
+    FOREIGN KEY         (data_id)             REFERENCES orbeon_form_data(id)
 );
 
 CREATE SEQUENCE orbeon_seq;
